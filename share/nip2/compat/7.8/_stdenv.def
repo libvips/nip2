@@ -1,0 +1,1240 @@
+/* Various operators as functions.
+ */
+
+logical_and a b = a && b;
+logical_or a b = a || b;
+bitwise_and a b = a & b;
+bitwise_or a b = a | b;
+eor a b = a ^ b;
+left_shift a b = a << b;
+right_shift a b = a >> b;
+not a = !a;
+
+less a b = a < b;
+more a b = a > b;
+less_equal a b = a <= b;
+more_equal a b = a >= b;
+equal a b = a == b;
+not_equal a b = a != b;
+pointer_equal a b = a === b;
+not_pointer_equal a b = a !== b;
+
+add a b = a + b;
+subtract a b = a - b;
+multiply a b = a * b;
+divide a b = a / b;
+power a b = a ** b;
+square x = x * x;
+remainder a b = a % b;
+
+cons a b = a : b;
+join a b = a ++ b;
+subscript a b = a ? b;
+
+generate s n f = [s, n .. f];
+comma r i = (r, i);
+
+compose f g = f @ g;
+
+cast_unsigned_char x = (unsigned char) x;
+cast_signed_char x = (signed char) x;
+cast_unsigned_short x = (unsigned short) x;
+cast_signed_short x = (signed short) x;
+cast_unsigned_int x = (unsigned int) x;
+cast_signed_int x = (signed int) x;
+cast_float x = (float) x;
+cast_double x = (double) x;
+cast_complex x = (complex) x;
+cast_double_complex x = (double complex) x;
+
+unary_minus x = -x;
+negate x = !x;
+complement x = ~x;
+unary_plus x = +x;
+
+if_then_else a b c = if a then b else c;
+
+// the vector ops ... im is an image, vec is a real_list
+vec op_name im vec
+	= im_lintra_vec ones im vec,
+		op_name == "add" || op_name == "add'"
+	= im_lintra_vec ones (-1 * im) vec,
+		op_name == "subtract'" 
+	= im_lintra_vec ones im inv,
+		op_name == "subtract" 
+	= im_lintra_vec vec im zeros,
+		op_name == "multiply" || op_name == "multiply'"
+	= im_lintra_vec vec (1 / im) zeros,
+		op_name == "divide'" 
+	= im_lintra_vec recip im zeros,
+		op_name == "divide" 
+	= im_expntra_vec im vec,
+		op_name == "power'" 
+	= im_powtra_vec im vec,
+		op_name == "power" 
+	= im_remainderconst_vec im vec,
+		op_name == "remainder" 
+	= im_and_vec im vec,
+		op_name == "bitwise_and" || op_name == "bitwise_and'"
+	= im_or_vec im vec,
+		op_name == "bitwise_or" || op_name == "bitwise_or'"
+	= im_eor_vec im vec,
+		op_name == "eor" || op_name == "eor'"
+	= im_equal_vec im vec,
+		op_name == "equal" || op_name == "equal'"
+	= im_notequal_vec im vec,
+		op_name == "not_equal" || op_name == "not_equal'"
+	= im_less_vec im vec,
+		op_name == "less" 
+	= im_moreeq_vec im vec,
+		op_name == "less'" 
+	= im_lesseq_vec im vec,
+		op_name == "less_equal" 
+	= im_more_vec im vec,
+		op_name == "less_equal'" 
+	= error "unimplemented vector operation"
+{
+	zeros = map (const 0) [1 .. len vec];
+	ones = map (const 1) [1 .. len vec];
+	recip = map (divide 1) vec;
+	inv = map (multiply (-1)) vec;
+}
+
+/* Macbeth chart patch names.
+ */
+_macbeth_names = [
+	"Dark skin",
+	"Light skin",
+	"Blue sky",
+	"Foliage",
+	"Blue flower",
+	"Bluish green",
+	"Orange",
+	"Purplish blue",
+	"Moderate red",
+	"Purple",
+	"Yellow green",
+	"Orange yellow",
+	"Blue",
+	"Green",
+	"Red",
+	"Yellow",
+	"Magenta",
+	"Cyan",
+	"White (density 0.05)",
+	"Neutral 8 (density 0.23)",
+	"Neutral 6.5 (density 0.44)",
+	"Neutral 5 (density 0.70)",
+	"Neutral 3.5 (density 1.05)",
+	"Black (density 1.50)"
+];
+
+bandsplit x 
+	= oo_unary_function bandsplit_op x, is_class x
+	= map (subscript x) [0 .. bands - 1], is_image x
+	= error (errors.badargs ++ "bandsplit")
+{
+	bands = im_header_int "Bands" x;
+	bandsplit_op = Operator "bandsplit" (map Image @ bandsplit)
+		Operator_type.COMPOUND false;
+}
+
+bandjoin l
+	= Image (concat (map get_value l)), 
+		is_listof (is_instanceof "Image") l
+	= concat l, is_listof is_image l
+	= error (errors.badargs ++ "bandjoin")
+{
+	get_value x = x.value;
+}
+
+mean x
+	= oo_unary_function mean_op x, is_class x
+	= im_avg x, is_image x
+	= error (errors.badargs ++ "mean")
+{
+	mean_op = Operator "mean" mean_object Operator_type.COMPOUND false;
+
+	mean_object x
+		= im_avg x, is_image x
+		= mean_list x, is_real_list x || is_matrix x
+		= error (errors.badargs ++ "mean");
+
+	mean_list l 
+		= s / n
+	{
+		totals = sum l;
+		n = totals?0;
+		s = totals?1;
+	}
+
+	// return [n, sum] for a list of numbers, or a list of list of num
+	// etc.
+	sum x
+		= foldr accumulate [0, 0] x
+	{
+		accumulate x sofar
+			= [n + 1, x + s], is_real x
+			= [n + n', s + s'], is_list x
+			= error "mean_list: not real or [real]"
+		{
+			n = sofar?0;
+			s = sofar?1;
+
+			sub_acc = sum x;
+
+			n' = sub_acc?0;
+			s' = sub_acc?1;
+		}
+	}
+}
+
+deviation x
+	= oo_unary_function deviation_op x, is_class x
+	= im_deviate x, is_image x
+	= error (errors.badargs ++ "deviation")
+{
+	deviation_op = Operator "deviation" 
+		deviation_object Operator_type.COMPOUND false;
+
+	deviation_object x
+		= im_deviate x, is_image x
+		= deviation_list x, is_real_list x || is_matrix x
+		= error (errors.badargs ++ "deviation");
+
+	deviation_list l 
+		= (abs (s2 - (s * s / n)) / (n - 1)) ** 0.5
+	{
+		totals = sum_sum2_list l;
+		n = totals?0;
+		s = totals?1;
+		s2 = totals?2;
+	}
+
+	// return n, sum, sum of squares for a list of reals
+	sum_sum2_list x
+		= foldr accumulate [0, 0, 0] x
+	{
+		accumulate x sofar
+			= [n + 1, x + s, x * x + s2], is_real x
+			= [n + n', s + s', s2 + s2'], is_list x
+			= error "sum_sum2_list: not real or [real]"
+		{
+			n = sofar?0;
+			s = sofar?1;
+			s2 = sofar?2;
+
+			sub_acc = sum_sum2_list x;
+
+			n' = sub_acc?0;
+			s' = sub_acc?1;
+			s2' = sub_acc?2;
+		}
+	}
+}
+
+abs x
+	= oo_unary_function abs_op x, is_class x
+	= im_abs x, is_image x
+	= abs_cmplx x, is_complex x
+	= abs_num x, is_real x
+	= error (errors.badargs ++ "abs")
+{
+	abs_op = Operator "abs" abs_object Operator_type.COMPOUND false;
+
+	abs_object x
+		= im_abs x, is_image x
+		= abs_cmplx x, is_complex x
+		= abs_num x, is_real x
+		= abs_list x, is_real_list x
+		= abs_list (map abs_list x), is_matrix x
+		= error (errors.badargs ++ "abs");
+
+	abs_list l = (foldr1 add (map square l)) ** 0.5;
+
+	abs_num n
+		= n, n >= 0
+		= -n;
+
+	abs_cmplx c = ((re c)**2 + (im c)**2) ** 0.5;
+}
+
+copy x
+	= oo_unary_function copy_op x, is_class x
+	= im_copy x, is_image x
+	= x
+{
+	copy_op = Operator "copy" copy Operator_type.COMPOUND_REWRAP false;
+}
+
+// like abs, but treat pixels as vectors ... ie. always get a 1-band image
+// back ... also treat matricies as lists of vectors
+// handy for dE from object difference
+abs_vec x
+	= oo_unary_function abs_vec_op x, is_class x
+	= abs_vec_image x, is_image x
+	= abs_vec_cmplx x, is_complex x
+	= abs_vec_num x, is_real x
+	= error (errors.badargs ++ "abs_vec")
+{
+	abs_vec_op = Operator "abs_vec" 
+		abs_vec_object Operator_type.COMPOUND false;
+
+	abs_vec_object x
+		= abs_vec_image x, is_image x
+		= abs_vec_cmplx x, is_complex x
+		= abs_vec_num x, is_real x
+		= abs_vec_list x, is_real_list x
+		= mean (Vector (map abs_vec_list x)), is_matrix x
+		= error (errors.badargs ++ "abs_vec");
+
+	abs_vec_list l = (foldr1 add (map square l)) ** 0.5;
+
+	abs_vec_num n
+		= n, n >= 0
+		= -n;
+
+	abs_vec_cmplx c = ((re c)**2 + (im c)**2) ** 0.5;
+
+	abs_vec_image im 
+		= (foldr1 add (map square (bandsplit im))) ** 0.5;
+}
+
+transpose x
+	= oo_unary_function transpose_op x, is_class x
+	= transpose_image x, is_image x
+	= transpose_matrix x, is_list x && is_list (hd x)
+	= error (errors.badargs ++ "transpose")
+{
+	transpose_op = Operator "transpose" 
+		transpose_object Operator_type.COMPOUND_REWRAP false;
+
+	transpose_object x
+		= transpose_matrix x, is_matrix x
+		= transpose_image x, is_image x
+		= error (errors.badargs ++ "transpose");
+
+	transpose_matrix l
+		= [], l' == []
+		= (map hd l') : (transpose_matrix (map tl l'))
+	{
+		l' = takewhile (not_equal []) l;
+	}
+
+	transpose_image = im_flipver @ im_rot270;
+}
+
+rot45 x
+	= oo_unary_function rot45_op x, is_class x
+	= error "rot45 image: not implemented", is_image x 
+	= error (errors.badargs ++ "rot45")
+{
+	rot45_op = Operator "rot45" 
+		rot45_object Operator_type.COMPOUND_REWRAP false;
+
+	rot45_object x
+		= rot45_matrix x, is_odd_square_matrix x
+		= error "rot45 image: not implemented", is_image x 
+		= error (errors.badargs ++ "rot45");
+
+	// slow, but what the heck
+	rot45_matrix l = (im_rotate_dmask45 (Matrix l)).value;
+}
+
+rot90 x
+	= oo_unary_function rot90_op x, is_class x
+	= im_rot90 x, is_image x
+	= error (errors.badargs ++ "rot90")
+{
+	rot90_op = Operator "rot90" 
+		rot90_object Operator_type.COMPOUND_REWRAP false;
+
+	rot90_object x
+		= rot90_matrix x, is_matrix x
+		= im_rot90 x, is_image x
+		= error (errors.badargs ++ "rot90");
+
+	// slow, but what the heck
+	rot90_matrix l = (im_rotate_dmask90 (Matrix l)).value;
+}
+
+rot180 x
+	= oo_unary_function rot180_op x, is_class x
+	= im_rot180 x, is_image x
+	= error (errors.badargs ++ "rot180")
+{
+	rot180_op = Operator "rot180" 
+		rot180_object Operator_type.COMPOUND_REWRAP false;
+
+	rot180_object x
+		= rot180_matrix x, is_matrix x
+		= im_rot180 x, is_image x
+		= error (errors.badargs ++ "rot180");
+
+	// slow, but what the heck
+	rot180_matrix l = (im_rotate_dmask90 
+		(im_rotate_dmask90 (Matrix l))).value;
+}
+
+rot270 x
+	= oo_unary_function rot270_op x, is_class x
+	= im_rot270 x, is_image x
+	= error (errors.badargs ++ "rot270")
+{
+	rot270_op = Operator "rot270" 
+		rot270_object Operator_type.COMPOUND_REWRAP false;
+
+	rot270_object x
+		= rot270_matrix x, is_matrix x
+		= im_rot270 x, is_image x
+		= error (errors.badargs ++ "rot270");
+
+	// slow, but what the heck
+	rot270_matrix l = (im_rotate_dmask90 (im_rotate_dmask90 
+		(im_rotate_dmask90 (Matrix l)))).value;
+}
+
+rotquad x
+	= oo_unary_function rotquad_op x, is_class x
+	= im_rotquad x, is_image x
+	= error (errors.badargs ++ "rotquad")
+{
+	rotquad_op = Operator "rotquad" 
+		rotquad_object Operator_type.COMPOUND_REWRAP false;
+
+	rotquad_object x
+		= rotquad_matrix x, is_matrix x
+		= im_rotquad x, is_image x
+		= error (errors.badargs ++ "rotquad");
+
+	rotquad_matrix l = error "rotquad matrix: not implemented"; 
+}
+
+flipud x
+	= oo_unary_function flipud_op x, is_class x
+	= im_flipver x, is_image x
+	= error (errors.badargs ++ "flipud")
+{
+	flipud_op = Operator "flipud" 
+		flipud_object Operator_type.COMPOUND_REWRAP false;
+
+	flipud_object x
+		= flipud_matrix x, is_matrix x
+		= im_flipver x, is_image x
+		= error (errors.badargs ++ "flipud");
+
+	flipud_matrix l = reverse l;
+}
+
+fliplr x
+	= oo_unary_function fliplr_op x, is_class x
+	= im_fliphor x, is_image x
+	= error (errors.badargs ++ "fliplr")
+{
+	fliplr_op = Operator "fliplr" 
+		fliplr_object Operator_type.COMPOUND_REWRAP false;
+
+	fliplr_object x
+		= fliplr_matrix x, is_matrix x
+		= im_fliphor x, is_image x
+		= error (errors.badargs ++ "fliplr");
+
+	fliplr_matrix l = map reverse l;
+}
+
+max_pair a b
+	= a, a > b
+	= b;
+
+min_pair a b
+      =	a, a < b
+      =	b;
+
+max x
+	= oo_unary_function max_op x, is_class x
+	= im_max x, is_image x
+	= x, is_number x
+	= error (errors.badargs ++ "max")
+{
+	max_op = Operator "max" max_list Operator_type.COMPOUND false;
+
+	max_list x
+		= foldr1 max_pair x, is_real_list x
+		= foldr1 max_pair (map max_list x), is_matrix x
+		= max x;
+}
+
+min x
+	= oo_unary_function min_op x, is_class x
+	= im_min x, is_image x
+	= x, is_number x
+	= error (errors.badargs ++ "min")
+{
+	min_op = Operator "min" min_list Operator_type.COMPOUND false;
+
+	min_list x
+		= foldr1 min_pair x, is_real_list x
+		= foldr1 min_pair (map min_list x), is_matrix x
+		= min x;
+}
+
+maxpos x
+	= oo_unary_function maxpos_op x, is_class x
+	= im_maxpos x, is_image x
+	= error (errors.badargs ++ "maxpos")
+{
+	maxpos_op = Operator "maxpos" 
+		maxpos_object Operator_type.COMPOUND false;
+
+	maxpos_object x
+		= maxpos_matrix x, is_matrix x
+		= im_maxpos x, is_image x
+		= error (errors.badargs ++ "maxpos");
+
+	maxpos_matrix m 
+		= (indexes?row, row)
+	{
+		max_value = max (Matrix m);
+		indexes = map (index (equal max_value)) m;
+		row = index (not_equal (-1)) indexes;
+	}
+}
+
+minpos x
+	= oo_unary_function minpos_op x, is_class x
+	= im_minpos x, is_image x
+	= error (errors.badargs ++ "minpos")
+{
+	minpos_op = Operator "minpos" 
+		minpos_object Operator_type.COMPOUND false;
+
+	minpos_object x
+		= minpos_matrix x, is_matrix x
+		= im_minpos x, is_image x
+		= error (errors.badargs ++ "minpos");
+
+	minpos_matrix m 
+		= (indexes?row, row)
+	{
+		min_value = min (Matrix m);
+		indexes = map (index (equal min_value)) m;
+		row = index (not_equal (-1)) indexes;
+	}
+}
+
+stats x
+	= oo_unary_function stats_op x, is_class x
+	= im_stats x, is_image x
+	= error (errors.badargs ++ "stats")
+{
+	stats_op = Operator "stats" 
+		stats_object Operator_type.COMPOUND false;
+
+	stats_object x
+		= im_stats (to_image x).value, is_matrix x
+		= im_stats x, is_image x
+		= error (errors.badargs ++ "stats");
+}
+
+e = 2.7182818284590452354;
+
+pi = 3.14159265358979323846;
+
+rad d = 2 * pi * (d / 360);
+
+deg r = 360 * r / (2 * pi);
+
+sign x
+	= oo_unary_function sign_op x, is_class x
+	= im_sign x, is_image x
+	= sign_cmplx x, is_complex x
+	= sign_num x, is_real x
+	= error (errors.badargs ++ "sign")
+{
+	sign_op = Operator "sign" sign Operator_type.COMPOUND_REWRAP false;
+
+	sign_num n
+		= 0, n == 0
+		= 1, n > 0
+		= -1;
+
+	sign_cmplx c 
+		= (0, 0), mod == 0
+		= (re c / mod, im c / mod)
+	{
+		mod = abs c;
+	}
+}
+
+rint x
+	= oo_unary_function rint_op x, is_class x
+	= rint_value x, is_image x || is_number x 
+	= error (errors.badargs ++ "rint")
+{
+	rint_op = Operator "rint" rint_value Operator_type.ARITHMETIC false;
+
+	rint_value x
+		= (int) (x + 0.5), x > 0
+		= (int) (x - 0.5);
+}
+
+scale x
+	= oo_unary_function scale_op x, is_class x
+	= scale_prim x
+{
+	scale_op = Operator "scale" 
+		scale_prim Operator_type.COMPOUND_REWRAP false;
+
+	scale_prim x
+		= (unsigned char) x, is_number x 
+		= im_scale x, is_image x 
+		= scale_list x, is_real_list x || is_matrix x
+		= error (errors.badargs ++ "scale");
+
+	scale_list l
+		= apply_scale s o l
+	{
+		mn = find_limit min_pair l;
+		mx = find_limit max_pair l;
+		s = 255.0 / (mx - mn);
+		o = -(mn * s);
+	}
+
+	find_limit fn l
+		= find_limit fn (map (find_limit fn) l), is_listof is_list l
+		= foldr1 fn l;
+
+	apply_scale s o x
+		= x * s + o, is_number x
+		= map (apply_scale s o) x;
+}
+
+scaleps x
+	= oo_unary_function scale_op x, is_class x
+	= im_scaleps x, is_image x 
+	= error (errors.badargs ++ "scale")
+{
+	scale_op = Operator "scaleps" 
+		scaleps Operator_type.COMPOUND_REWRAP false;
+}
+
+fwfft x
+	= oo_unary_function fwfft_op x, is_class x
+	= im_fwfft x, is_image x 
+	= error (errors.badargs ++ "fwfft")
+{
+	fwfft_op = Operator "fwfft" 
+		fwfft Operator_type.COMPOUND_REWRAP false;
+}
+
+invfft x
+	= oo_unary_function invfft_op x, is_class x
+	= im_invfftr x, is_image x 
+	= error (errors.badargs ++ "invfft")
+{
+	invfft_op = Operator "invfft" 
+		invfft Operator_type.COMPOUND_REWRAP false;
+}
+
+falsecolour x
+	= oo_unary_function falsecolour_op x, is_class x
+	= im_falsecolour x, is_image x 
+	= error (errors.badargs ++ "falsecolour")
+{
+	falsecolour_op = Operator "falsecolour" 
+		falsecolour Operator_type.COMPOUND_REWRAP false;
+}
+
+polar x
+	= oo_unary_function polar_op x, is_class x
+	= im_c2amph x, is_image x
+	= polar_cmplx x, is_complex x
+	= error (errors.badargs ++ "polar")
+{
+	polar_op = Operator "polar" polar Operator_type.COMPOUND false;
+
+	polar_cmplx r
+		= (l, a)
+	{
+		a
+			= 270, x == 0 && y < 0
+			= 90, x == 0 && y >= 0
+			= 360 + atan (y / x), x > 0 && y < 0
+			= atan (y / x), x > 0 && y >= 0
+			= 180 + atan (y / x);
+
+		l = (x ** 2 + y ** 2) ** 0.5;
+
+		x = re r;
+		y = im r;
+	}
+}
+
+rectangular x
+	= oo_unary_function rectangular_op x, is_class x
+	= im_c2rect x, is_image x
+	= rectangular_cmplx x, is_complex x
+	= error (errors.badargs ++ "rectangular")
+{
+	rectangular_op = Operator "rectangular" 
+		rectangular Operator_type.COMPOUND false;
+
+	rectangular_cmplx p
+		= (x, y)
+	{
+		l = re p;
+		a = im p;
+
+		x = l * cos a;
+		y = l * sin a;
+	}
+}
+
+recomb matrix image
+	= colour_unary recomb_op image
+{
+	recomb_op x
+		= im_recomb x matrix, is_image x
+		= error (errors.badargs ++ "recomb");
+}
+
+extract_area x y w h obj
+	= oo_unary_function extract_area_op obj, is_class obj
+	= extract_area_prim obj
+{
+	x' = to_real x;
+	y' = to_real y;
+	w' = to_real w;
+	h' = to_real h;
+
+	extract_area_op = Operator "extract_area" 
+		extract_area_prim 
+		Operator_type.COMPOUND_REWRAP false;
+
+	extract_area_prim obj
+		= im_extract_area obj x' y' w' h', is_image obj
+		= map (extract_range x' w') (extract_range y' h' obj),
+			is_matrix obj
+		= error (errors.badargs ++ "extract_area");
+
+	extract_range from length list
+		= (take length @ drop from) list;
+}
+
+extract_band b obj = subscript obj b;
+
+extract_row y obj
+	= oo_unary_function extract_row_op obj, is_class obj
+	= extract_row_prim obj
+{
+	y' = to_real y;
+
+	extract_row_op = Operator "extract_row" 
+		extract_row_prim 
+		Operator_type.COMPOUND_REWRAP false;
+
+	extract_row_prim obj
+		= im_extract_area obj 0 y' width 1, is_image obj
+		= [obj?y'], is_matrix obj
+		= error (errors.badargs ++ "extract_row")
+	{
+		width = im_header_int "Xsize" obj;
+	}
+}
+
+extract_column x obj
+	= oo_unary_function extract_column_op obj, is_class obj
+	= extract_column_prim obj
+{
+	x' = to_real x;
+
+	extract_column_op = Operator "extract_column" 
+		extract_column_prim 
+		Operator_type.COMPOUND_REWRAP false;
+
+	extract_column_prim obj
+		= im_extract_area obj x' 0 1 height, is_image obj
+		= map (converse cons [] @ converse subscript x') obj, 
+			is_matrix obj
+		= error (errors.badargs ++ "extract_column")
+	{
+		height = im_header_int "Ysize" obj;
+	}
+}
+
+join_lr a b
+	= oo_binary_function join_lr_op a b, is_class a
+	= oo_binary'_function join_lr_op a b, is_class b
+	= join_lr_prim a b
+{
+	join_lr_op = Operator "join_lr" 
+		join_lr_prim Operator_type.COMPOUND_REWRAP false;
+
+	join_lr_prim a b
+		= im_extract_area (im_insert a b a_width 0)
+			0 0 (a_width + b_width) out_height,
+			is_image a && is_image b
+		= map2 join a b,
+			is_matrix a && is_matrix b
+		= error (errors.badargs ++ "join_lr")
+	{
+		a_height = im_header_int "Ysize" a;
+		b_height = im_header_int "Ysize" b;
+		a_width = im_header_int "Xsize" a;
+		b_width = im_header_int "Xsize" b;
+		out_height = min_pair a_height b_height;
+	}
+}
+
+join_tb a b
+	= oo_binary_function join_tb_op a b, is_class a
+	= oo_binary'_function join_tb_op a b, is_class b
+	= join_tb_prim a b
+{
+	join_tb_op = Operator "join_tb" 
+		join_tb_prim Operator_type.COMPOUND_REWRAP false;
+
+	join_tb_prim a b
+		= im_extract_area (im_insert a b 0 a_height) 
+			0 0 out_width (a_height + b_height),
+			is_image a && is_image b
+		= map (take out_matrix_width) a ++ 
+			map (take out_matrix_width) b,
+			is_matrix a && is_matrix b
+		= error (errors.badargs ++ "join_tb")
+	{
+		a_height = im_header_int "Ysize" a;
+		b_height = im_header_int "Ysize" b;
+		a_width = im_header_int "Xsize" a;
+		b_width = im_header_int "Xsize" b;
+		out_width = min_pair a_width b_width;
+
+		out_matrix_width 
+			= min_pair a_matrix_width b_matrix_width
+		{
+			a_matrix_width = len a?0;
+			b_matrix_width = len b?0;
+		}
+	}
+}
+
+insert x y small big
+	= oo_binary_function insert_op small big, is_class small
+	= oo_binary'_function insert_op small big, is_class big
+	= im_insert big small (to_real x) (to_real y), 
+		is_image small && is_image big
+	= error (errors.badargs ++ "insert")
+{
+	insert_op = Operator "insert" 
+		(insert x y) Operator_type.COMPOUND_REWRAP false;
+}
+
+measure x y w h u v image
+	= oo_unary_function measure_op image, is_class image
+	= im_measure image 
+		(to_real x) (to_real y) (to_real w) (to_real h)
+		(to_real u) (to_real v), 
+			is_image image
+	= error (errors.badargs ++ "measure")
+{
+	measure_op = Operator "measure" 
+		(measure x y w h u v) Operator_type.COMPOUND_REWRAP false;
+}
+
+rotate angle image
+	= oo_binary_function rotate_op angle image, is_class angle
+	= oo_binary'_function rotate_op angle image, is_class image
+	= im_similarity image (cos angle) (sin angle) 0 0, 
+		is_real angle && is_image image 
+	= error (errors.badargs ++ "rotate")
+{
+	rotate_op = Operator "rotate" 
+		rotate Operator_type.COMPOUND_REWRAP false;
+}
+
+conj x
+	= oo_unary_function conj_op x, is_class x
+	= (re x, -im x), 
+		is_complex x || 
+		(is_image x && format == Image_format.COMPLEX) ||
+		(is_image x && format == Image_format.DPCOMPLEX)
+	// assume it's some sort of real 
+	= x
+{
+	format = im_header_int "BandFmt" x;
+	conj_op = Operator "conj" conj Operator_type.COMPOUND false;
+}
+
+
+clip2fmt format image
+	= oo_unary_function (clip2fmt_op format) image, is_class image
+	= im_clip2fmt image format, is_image image
+	= error (errors.badargs ++ "clip2fmt")
+{
+	clip2fmt_op format = Operator "clip2fmt" 
+		(clip2fmt format) Operator_type.COMPOUND_REWRAP false;
+}
+
+/* Morph a mask with a [[real]] matrix ... turn m2 into an image, morph it 
+ * with m1, turn it back to a matrix again.
+ */
+_morph_2_masks fn m1 m2
+	= m''
+{
+	image = (unsigned char) im_mask2vips (Matrix m2);
+	m2_width = im_header_int "Xsize" image;
+	m2_height = im_header_int "Ysize" image;
+
+	// need to embed m2 in an image large enough for us to be able to 
+	// position m1 all around the edges, with a 1 pixel overlap
+	image' = im_embed image 0 (m1.width - 1) (m1.height - 1) 
+		(m2_width + 2 * (m1.width - 1))
+		(m2_height + 2 * (m1.height - 1));
+
+	// morph!
+	image'' = fn m1 image';
+
+	// back to mask
+	m' = im_vips2mask ((double) image'');
+
+	// Turn 0 in output to 128 (don't care).
+	m'' 
+		= map (map fn) m'.value
+	{
+		fn a
+			= 128, a == 0;
+			= a;
+	}
+}
+
+dilate mask image
+	= oo_unary_function dilate_op image, is_class image
+	= im_dilate image mask, is_image image
+	= error (errors.badargs ++ "dilate")
+{
+	dilate_op = Operator "dilate" 
+		dilate_object Operator_type.COMPOUND_REWRAP false;
+	
+	dilate_object x
+		= _morph_2_masks dilate mask x, is_matrix x
+		= dilate mask x;
+}
+
+erode mask image
+	= oo_unary_function erode_op image, is_class image
+	= im_erode image mask, is_image image
+	= error (errors.badargs ++ "erode")
+{
+	erode_op = Operator "erode" 
+		erode_object Operator_type.COMPOUND_REWRAP false;
+
+	erode_object x
+		= _morph_2_masks erode mask x, is_matrix x
+		= erode mask x;
+}
+
+conv mask image
+	= oo_unary_function conv_op image, is_class image
+	= im_conv image mask, is_image image
+	= error (errors.badargs ++ "conv")
+{
+	conv_op = Operator "conv" 
+		(conv mask) Operator_type.COMPOUND_REWRAP false;
+}
+
+rank w h n image
+	= oo_unary_function rank_op image, is_class image
+	= im_rank image w h n, is_image image
+	= error (errors.badargs ++ "rank")
+{
+	rank_op = Operator "rank" 
+		(rank w h n) Operator_type.COMPOUND_REWRAP false;
+}
+
+hist_find image
+	= oo_unary_function hist_find_op image, is_class image
+	= im_histgr image (-1), is_image image
+	= error (errors.badargs ++ "hist_find")
+{
+	hist_find_op = Operator "hist_find" 
+		hist_find Operator_type.COMPOUND_REWRAP false;
+}
+
+hist_find_nD bins image
+	= oo_unary_function hist_find_nD_op image, is_class image
+	= im_histnD image bins, is_image image
+	= error (errors.badargs ++ "hist_find_nD")
+{
+	hist_find_nD_op = Operator "hist_find_nD" 
+		hist_find_nD Operator_type.COMPOUND_REWRAP false;
+}
+
+hist_map hist image
+	= oo_binary_function hist_map_op hist image, is_class hist
+	= oo_binary'_function hist_map_op hist image, is_class image
+	= im_maplut image hist, is_image hist && is_image image
+	= error (errors.badargs ++ "hist_map")
+{
+	hist_map_op = Operator "hist_map" 
+		hist_map Operator_type.COMPOUND_REWRAP false;
+}
+
+hist_cum hist 
+	= oo_unary_function hist_cum_op hist, is_class hist
+	= im_histcum hist, is_image hist
+	= error (errors.badargs ++ "hist_cum")
+{
+	hist_cum_op = Operator "hist_cum" 
+		hist_cum Operator_type.COMPOUND_REWRAP false;
+}
+
+hist_norm hist 
+	= oo_unary_function hist_norm_op hist, is_class hist
+	= im_histnorm hist, is_image hist
+	= error (errors.badargs ++ "hist_norm")
+{
+	hist_norm_op = Operator "hist_norm" 
+		hist_norm Operator_type.COMPOUND_REWRAP false;
+}
+
+hist_match in ref
+	= oo_binary_function hist_match_op in ref, is_class in
+	= oo_binary'_function hist_match_op in ref, is_class ref
+	= im_histspec in ref, is_image in && is_image ref
+	= error (errors.badargs ++ "hist_match")
+{
+	hist_match_op = Operator "hist_match" 
+		hist_match Operator_type.COMPOUND_REWRAP false;
+}
+
+hist_equalize x = hist_map ((hist_norm @ hist_cum @ hist_find) x) x;
+
+hist_equalize_local w h image
+	= oo_unary_function hist_equalize_local_op image, is_class image
+	= im_lhisteq image w h, is_image image
+	= error (errors.badargs ++ "hist_equalize_local")
+{
+	hist_equalize_local_op = Operator "hist_equalize_local" 
+		(hist_equalize_local w h) Operator_type.COMPOUND_REWRAP false;
+}
+
+resize xfac yfac interp image
+	= oo_unary_function resize_op image, is_class image
+	= resize_im image, is_image image
+	= error (errors.badargs ++ "resize")
+{
+	resize_op = Operator "resize" 
+		resize_im Operator_type.COMPOUND_REWRAP false;
+
+	resize_im im
+		// upscale by integer factor, nearest neighbour
+		= im_zoom im xfac yfac, 
+			is_int xfac && is_int yfac && xfac >= 1 && yfac >= 1 &&
+			interp == Interpolate.nearest_neighbour
+
+		// downscale by integer factor, nearest neighbour
+		= im_subsample im xfac' yfac', 
+			is_int xfac' && is_int yfac' && 
+			xfac' >= 1 && yfac' >= 1 &&
+			interp == Interpolate.nearest_neighbour
+
+		// upscale by any factor, nearest neighbour 
+		// can't really do this right ... upscale by integer part, then
+		// bilinear to exact size
+		= scale (break xfac)?1 (break yfac)?1
+			(im_zoom im (break xfac)?0 (break yfac)?0),
+			xfac >= 1 && yfac >= 1 &&
+			interp == Interpolate.nearest_neighbour
+
+		// downscale by any factor, nearest neighbour 
+		// can't really do this right ... downscale by integer part, 
+		// then bilinear to exact size
+		= scale (1 / (break xfac')?1) (1 / (break yfac')?1)
+			(im_subsample im (break xfac')?0 (break yfac')?0),
+			xfac' >= 1 && yfac' >= 1 &&
+			interp == Interpolate.nearest_neighbour
+
+		// upscale by any factor, bilinear
+		= scale xfac yfac im,
+			xfac >= 1 && yfac >= 1 &&
+			interp == Interpolate.bilinear
+
+		// downscale by any factor, bilinear
+		// block shrink by integer factor, then bilinear resample to 
+		// exact
+		= scale (1 / (break xfac')?1) (1 / (break yfac')?1)
+			(im_shrink im (break xfac')?0 (break yfac')?0),
+			xfac' >= 1 && yfac' >= 1 &&
+			interp == Interpolate.bilinear
+
+		= error ("resize: unimplemented argument combination:\n" ++ 
+			"  xfac = " ++ print xfac ++ "\n" ++
+			"  yfac = " ++ print yfac ++ "\n" ++
+			"  interp = " ++ print interp ++ " (" ++
+				Interpolate.names.lookup 1 0 interp ++ ")")
+	{
+		xfac' = 1 / xfac;
+		yfac' = 1 / yfac;
+
+		// convert a float scale to integer plus fraction
+		// eg. scale by 2.5 becomes [2, 1.25] (x * 2.5 == x * 2 * 1.25)
+		break f = [floor f, f / floor f];
+
+		// binlinear resize
+		scale xfac yfac im
+			= im_affine im 
+				xfac 0 0 yfac 
+				0 0 
+				0 0 (width * xfac) (height * yfac)
+		{
+			width = im_header_int "Xsize" im;
+			height = im_header_int "Ysize" im;
+		}
+	}
+}
+
+/* id x: the identity function
+ *
+ * id :: * -> *
+ */
+id x = x;
+
+/* const x y: junk y, return x
+ * 
+ * (const 3) is the function that always returns 3.
+ * const :: * -> ** -> *
+ */
+const x y = x;
+
+/* converse fn a b: swap order of args to fn
+ * 
+ * converse fn a b == fn b a
+ * converse :: (* -> ** -> ***) -> ** -> * -> ***
+ */
+converse fn a b = fn b a;
+
+/* fix fn x: find the fixed point of a function
+ */
+fix fn x = limit (iterate fn x);
+
+/* until pred fn n: apply fn to n until pred succeeds; return that value
+ *
+ * until (more 1000) (multiply 2) 1 = 1024
+ * until :: (* -> bool) -> (* -> *) -> * -> *
+ */
+until pred fn n
+	= n, pred n
+	= until pred fn (fn n);
+
+/* Infinite list of primes.
+ */
+primes 
+	= 1 : (sieve [2..])
+{
+	sieve l = hd l : sieve (filter (nmultiple (hd l)) (tl l));
+	nmultiple n x = x / n != (int) (x / n);
+}
+
+/* Map a 3-ary function over three objects.
+ */
+map_trinary fn a b c
+	= map3 (map_trinary fn) a b c, is_list a && is_list b && is_list c
+
+	= map2 (map_trinary fn a) b c, is_list b && is_list c
+	= map2 (map_trinary (converse31 fn) b) a c, is_list a && is_list c
+	= map2 (map_trinary (converse32 fn) c) a b, is_list a && is_list b
+
+	= map (map_trinary fn a b) c, is_list c
+	= map (map_trinary (converse32 fn) a c) b, is_list b
+	= map (map_trinary (converse34 fn) b c) a, is_list a
+
+	= fn a b c
+{
+	converse31 fn a b c = fn b a c;
+	converse32 fn a b c = fn c a b;
+	converse33 fn a b c = fn a c b;
+	converse34 fn a b c = fn b c a;
+}
+
+/* Map a 2-ary function over a pair of objects.
+ */
+map_binary fn a b
+	= map2 (map_binary fn) a b, is_list a && is_list b
+	= map (map_binary fn a) b, is_list b
+	= map (map_binary (converse fn) b) a, is_list a
+	= fn a b;
+
+/* Map a 1-ary function over an object.
+ */
+map_unary fn a 
+	= map (map_unary fn) a, is_list a
+	= fn a;
+
+/* Chop up an image into a list of lists of smaller images. Pad edges with 
+ * black.
+ */
+imagearray_chop block_size overlap i
+	= map chop' [0, step .. height]
+{
+	width = im_header_int "Xsize" i;
+	height = im_header_int "Ysize" i;
+	bands = im_header_int "Bands" i;
+	format = im_header_int "BandFmt" i;
+	type = im_header_int "Type" i;
+
+	/* Unique pixels per tile.
+	 */
+	step = block_size - overlap;
+
+	/* Calculate padding ... pad up to block_size pixel boundary.
+	 */
+	sx = block_size + (width - width % step);
+	sy = block_size + (height - height % step);
+
+	/* Expand image with black to pad size.
+	 */
+	background = image_new sx sy bands format Image_coding.NOCODING type 
+		0 0 0;
+	pad = im_insert background i 0 0;
+
+	/* Chop up a row.
+	 */
+	chop' y 
+		= map chop'' [0, step .. width]
+	{
+		chop'' x = im_extract_area pad x y block_size block_size;
+	}
+}
+
+/* Reassemble image.
+ */
+imagearray_assemble hoverlap voverlap il
+	= vjoin (map hjoin il)
+{
+	/* Join a list of tiles horizontally.
+	 */
+	hjoin l 
+		= foldl1 lrj l
+	{
+		lrj l r = im_lrmerge l r 
+			(hoverlap - im_header_int "Xsize" l) 0 10;
+	}
+
+	/* Join a list of tiles vertically.
+	 */
+	vjoin l 
+		= foldl1 tbj l
+	{
+		tbj t b = im_tbmerge t b 
+			0 (voverlap - im_header_int "Ysize" t) 10;
+	}
+}
+
+/* Generate an nxn identity matrix.
+ */
+identity_matrix n
+	= error "identity_matrix: n > 0", n < 1
+	= map line [0 .. n - 1]
+{
+	line p = take p [0, 0 ..] ++ [1] ++ take (n - p - 1) [0, 0 ..];
+}

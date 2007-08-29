@@ -1,0 +1,15 @@
+nip documentation
+
+Type "make install" to rebuild html/ and ps/ directories with formatted
+docuimentation. You'll need latex and tex4ht.
+
+The Makefile.am in nip2-x.x copies the contents of the html/ and ps/ to 
+$prefix/share/doc/nip2 during the main nip2 install process.
+
+Once you have the docs installed, rebuild nip2's help index with:
+
+  cd nip2-x.x/src
+  make helpindex.h
+
+to index the HTML docs and link the HELP buttons in nip to the correct place
+in the formatted pages. 

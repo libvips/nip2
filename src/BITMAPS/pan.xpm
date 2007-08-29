@@ -1,0 +1,25 @@
+/* XPM */
+static char * pan_xpm[] = {
+/* width height ncolors cpp [x_hot y_hot] */
+"16 16 3 1 -1 -1",
+/* colors */
+" 	s none	m none	c none",
+".	s iconColor1	m black	c black",
+"X	c #929292929292",
+/* pixels */
+"       .        ",
+"      ...       ",
+"     .....      ",
+"       .XXX     ",
+"       .X       ",
+"  .    .X   .   ",
+" ..    .X   ..  ",
+"............... ",
+" ..XXXX.XXXX..XX",
+"  .X   .X   .XX ",
+"   X   .X    X  ",
+"       .X       ",
+"     .....      ",
+"      ...X      ",
+"       .X       ",
+"       X        "};

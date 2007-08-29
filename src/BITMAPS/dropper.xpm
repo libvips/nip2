@@ -1,0 +1,26 @@
+/* XPM */
+static char * dropper_xpm[] = {
+/* width height ncolors cpp [x_hot y_hot] */
+"16 16 4 1 -1 -1",
+/* colors */
+" 	s none	m none	c none",
+".	s iconColor1	m black	c black",
+"X	s iconColor2	m white	c white",
+"o	s iconGray2	m gray	c #909090909090",
+/* pixels */
+"          ...   ",
+"         .XX... ",
+"         .X.... ",
+"         .......",
+"         .......",
+"       .........",
+"       XX......o",
+"      X.XX.oooo ",
+"     X.XXX.o    ",
+"    X.XXXooo    ",
+"   X.XXXo       ",
+"  X.XXXo        ",
+" X.XXXo         ",
+" XXXXo          ",
+"XXXXo           ",
+"XXoo            "};

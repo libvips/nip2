@@ -1,0 +1,10 @@
+Various test workspaces and images to excercise nip and VIPS
+
+also convert.sed, a sed script which should update 7.10 and 7.11 workspaces to
+work with 7.12
+
+usage:
+
+	sed -f convert.sed oldworkspace.ws > newworkspace.ws
+
+

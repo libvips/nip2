@@ -1,0 +1,347 @@
+Hist_new_item = class
+	Menuaction "_New Histogram" "make a new histogram" {
+	action = class
+		_result {
+		_vislevel = 3;
+
+		d = Option "Depth" ["8 bit", "16 bit"] 0;
+		b = Scale "Black point"  0 100 0;
+		w = Scale "White point"  0 100 100;
+
+		sp = Scale "Shadow point" 0.1 0.3 0.2;
+		mp = Scale "Mid-tone point" 0.4 0.6 0.5;
+		hp = Scale "Highlight point" 0.7 0.9 0.8;
+
+		sa = Scale "Shadow adjust" (-15) 15 0;
+		ma = Scale "Mid-tone adjust" (-30) 30 0;
+		ha = Scale "Highlight adjust" (-15) 15 0;
+
+		_result 
+			= tone_build fmt b w sp mp hp sa ma ha
+		{
+			fmt = [Image_format.UCHAR, Image_format.USHORT]?d;
+		}
+	}
+}
+
+Hist_new_from_matrix = Matrix_buildlut_item; 
+
+Hist_from_image_item = class
+	Menuaction "Ta_g Image As Histogram" "set image Type field to Histogram" {
+	action x = hist_tag x;
+}
+
+#separator
+
+Hist_find_item = class 
+	Menupullright "_Find Histogram" "find a histogram" {
+	Oned_item = class 
+		Menuaction "_One Dimension" 
+			"for a n-band image, make an n-band 1D histogram" {
+		action x = map_unary hist_find x;
+	}
+
+	Nd_item = class 
+		Menuaction "_Many Dimensions" 
+			"for a n-band image, make an n-dimensional histogram" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			// default to something small-ish
+			bins = Expression "Number of bins in each dimension" 8;
+
+			_result 
+				= map_unary process x
+			{
+				process in
+					= hist_find_nD bins in;
+			}
+		}
+	}
+}
+
+Hist_map_item = class 
+	Menuaction "_Map Histogram" "map an image through a histogram" {
+	action x y
+		= map_binary map x y
+	{
+		map a b
+			= hist_map hist im
+		{
+			args = sortc (const is_hist) [a, b];
+			im = args?0;
+			hist = args?1;
+		}
+	}
+}
+
+Hist_eq_item = Filter_enhance_item.Hist_equal_item;
+
+#separator
+
+Hist_cum_item = class 
+	Menuaction "_Cumulativise Histogram" 
+		"form cumulative histogram" {
+	action x = map_unary hist_cum x;
+}
+
+Hist_diff_item = class 
+	Menuaction "_Differentiate Histogram" 
+		"find point-to-point differences (inverse of Cumulativise)" {
+	action x = map_unary hist_diff x;
+}
+
+Hist_norm_item = class 
+	Menuaction "N_ormalise Histogram" "normalise a histogram" {
+	action x = map_unary hist_norm x;
+}
+
+Hist_match_item = class 
+	Menuaction "Ma_tch Histogram" 
+		"find LUT which will match first histogram to second" {
+	action in ref = map_binary hist_match in ref;
+}
+
+Hist_zerox_item = class 
+	Menuaction "_Zero Crossings" "find zero crossings" {
+	action x = class 
+		_result {
+		_vislevel = 3;
+
+		edge = Option "Direction" [
+			"Positive-going", 
+			"Negative-going"
+		] 0;
+
+		_result 
+			= map_unary (zerox (if edge == 0 then -1 else 1)) x;
+	}
+}
+
+#separator
+
+Hist_profile_item = class 
+	Menuaction "Find _Profile" 
+		"search from image edges for non-zero pixels" {
+	action x = class  
+		_result {
+		_vislevel = 3;
+
+		edge = Option "Search from" [
+			"Top edge down", 
+			"Left edge to right",
+			"Bottom edge up",
+			"Right edge to left"
+		] 2;
+
+		_result 
+			= map_unary profile x
+		{
+			profile image
+				= (Plot_histogram @ hist_tag) [
+					profilemb 0 image.value,
+					profilemb 1 image.value,
+					profilemb 0 (fliptb image.value),
+					profilemb 1 (fliplr image.value)
+				]?edge;
+
+			// im_profile only does 1 band images :-(
+			profilemb d = bandjoin @ map (converse im_profile d) @ bandsplit;
+		}
+	}
+}
+
+Hist_project_item = class 
+	Menuaction "Find Pro_jections" 
+		"find horizontal and vertical projections" {
+	action x = class {
+		_vislevel = 2;
+
+		_result = map_unary project x;
+
+		// extract the result ... could be a group
+		extr n
+			= Plot_histogram _result?n, is_list _result
+			= Group (map (Plot_histogram @ converse subscript n) _result.value);
+
+		horizontal = extr 0;
+		vertical = extr 1;
+		centre = (gravity horizontal, gravity vertical);
+	}
+}
+
+#separator
+
+Hist_graph_item = class 
+	Menuaction "P_lot Slice" "plot a slice along a guide or arrow" {
+	action x = class 
+		_value {
+		_vislevel = 3;
+
+		width = Scale "Width" 1 40 1;
+		displace = Scale "Horizontal displace" (-50) 50 0; 
+		vdisplace = Scale "Vertical displace" (-50) 50 0; 
+
+		_value
+			= map_unary graph x
+		{
+			graph arrow
+				= hist_tag area'
+			{
+				// the line as a polar vector
+				pv = polar (arrow.width, arrow.height);
+				a = im pv;
+
+				// smallest rotation that will make the line horizontal
+				a'
+					= 360 - a, a > 270
+					= 180 - a, a > 90
+					= -a;
+
+				im' = rotate a' arrow.image;
+
+				// look at the start and end of the arrow, pick the leftmost
+				p
+					= (arrow.left, arrow.top), arrow.left <= arrow.right
+					= (arrow.right, arrow.bottom);
+
+				// transform that point to im' space
+				p' = rectangular (polar p + (0, a')) + 
+					(im'.xoffset, im'.yoffset);
+
+				// extract that area
+				area = extract_area 
+					(re p' + displace.value) 
+					(im p' - width.value / 2 + vdisplace.value) 
+					(re pv) width.value 
+					im';
+
+				// squish vertically to get an average
+				area' = resize 1 (1 / width.value) Interpolate.BILINEAR area;
+			}
+		}
+	}
+}
+
+Extract_arrow_item = class 
+	Menuaction "Extract _Arrow" "extract the area around an arrow" {
+	action x = class 
+		_value {
+		_vislevel = 3;
+
+		width = Scale "Width" 1 40 1;
+		displace = Scale "Horizontal displace" (-50) 50 0; 
+		vdisplace = Scale "Vertical displace" (-50) 50 0; 
+
+		_value
+			= map_unary graph x
+		{
+			graph arrow
+				= area
+			{
+				// the line as a polar vector
+				pv = polar (arrow.width, arrow.height);
+				a = im pv;
+
+				// smallest rotation that will make the line horizontal
+				a'
+					= 360 - a, a > 270
+					= 180 - a, a > 90
+					= -a;
+
+				im' = rotate a' arrow.image;
+
+				// look at the start and end of the arrow, pick the leftmost
+				p
+					= (arrow.left, arrow.top), arrow.left <= arrow.right
+					= (arrow.right, arrow.bottom);
+
+				// transform that point to im' space
+				p' = rectangular (polar p + (0, a')) + 
+					(im'.xoffset, im'.yoffset);
+
+				// extract that area
+				area = extract_area 
+					(re p' + displace.value) 
+					(im p' - width.value / 2 + vdisplace.value) 
+					(re pv) width.value 
+					im';
+			}
+		}
+	}
+}
+
+Hist_plot_item = class
+	Menuaction "Plot _Object" 
+		"plot an object as a bar, point or line graph" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		format = Option_enum Plot_format.names "Format" "YYYY";
+		style = Option_enum Plot_style.names "Style" "Line";
+
+		auto = Toggle "Auto Range" true;
+		xmin = Expression "X range minimum" 0;
+		xmax = Expression "X range maximum" 1;
+		ymin = Expression "Y range minimum" 0;
+		ymax = Expression "Y range maximum" 1;
+
+		_result
+			= Plot options (image x)
+		{
+			options
+				= [["style", style.value], ["format", format.value]] ++ range;
+			range
+				= [], auto
+				= [["xmin", xmin.expr], ["xmax", xmax.expr], 
+					["ymin", ymin.expr], ["ymax", ymax.expr]]; 
+
+			image x
+				= image (extract_arrow x), is_Arrow x
+				= get_image x, has_image x
+				= x2b im, b == 1
+				= im
+			{
+				im = get_image (to_image x);
+				w = get_width im;
+				h = get_height im;
+				b = get_bands im;
+
+				// matrix to image makes a 1-band mxn image
+				// we need to put columns into bands
+				x2b im 
+					= bandjoin (map extract_col [0 .. w - 1])
+				{
+						extract_col x = extract_area x 0 1 h im;
+				}
+			}
+
+			extract_arrow arrow
+				= extract_area (re p') (im p') (re pv) 1 im'
+			{
+				// the line as a polar vector
+				pv = polar (arrow.width, arrow.height);
+				a = im pv;
+
+				// smallest rotation that will make the line horizontal
+				a'
+					= 360 - a, a > 270
+					= 180 - a, a > 90
+					= -a;
+
+				im' = rotate a' arrow.image;
+
+				// look at the start and end of the arrow, pick the leftmost
+				p
+					= (arrow.left, arrow.top), arrow.left <= arrow.right
+					= (arrow.right, arrow.bottom);
+
+				// transform that point to im' space
+				p' = rectangular (polar p + (0, a')) + 
+					(im'.xoffset, im'.yoffset);
+			}
+		}
+	}
+}

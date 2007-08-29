@@ -1,0 +1,598 @@
+\chapter{Image processing menus}
+\mylabel{sec:menus}
+
+\noindent
+This chapter is runs quickly through the \ct{Toolkits} menu.  See
+\cref{sec:program} if you want to understand how the menus are written
+(or want to add more of your own). Use the Toolkit Browser to find stuff.
+
+Some things are common to almost all menu items:
+
+\begin{description}
+
+\item[Tooltips]
+	If you rest your mouse pointer over an item,
+	you'll see a quick description of what the item does.
+
+\item[Grouping]
+	You can select several objects, click \ctr{Edit}\ct{Group}, and then
+	when you click the item, it will operate on all the objects in the 
+	group.
+
+\item[Any type]
+	Almost all items will work on any object. You can add an image and a
+	number, for example, find the colour difference between a number and
+	an image, or transform a matrix from LAB to XYZ.
+
+\end{description}
+
+\section{Colour}
+\mylabel{sec:menu-colour}
+
+This menu groups operations on colorimetric images and patches of
+colour. A colour patch is three float numbers plus a tag saying how those
+number should be interpreted as colour (for example, as a colour in CIE LAB
+colourspace). You can drag and drop between colour patches, and into and from
+the inkwell in an image paint window. Double-left-click on a colour patch to
+open a colour select dialog.
+
+\nip{} has 9 main types of colorimetric image, see \tref{tb:colour}.
+All these types are D65 (that is, daylight) absolute colorimetric.
+When it displays an image, \nip{} uses the \ct{Type} field in the image
+header as a hint on how to transform the numbers in the image into RGB for
+the display. The current \ct{Type} is displayed at the end of the caption
+line below an image thumbnail. 
+
+\begin{tab2}
+\begin{center}
+\begin{tabular}{||l|l|l||}
+\hline
+Name & Format & Notes \\
+\hline
+\ct{Mono} & One band 8 bit & 
+	Not really calibrated at all \\
+\ct{sRGB} & Three band 8 bit & 
+	Screen device space for the sRGB standard \\
+\ct{Lab} & Three band float & 
+	The 1976 version of the CIE perceptual colourspace \\
+\ct{LabQ} & Four band 8 bit & 
+	Like \ct{Lab}, but represented as 10:11:11 bits \\
+\ct{LabS} & Three band 16 bit & 
+	Like \ct{Lab}, but represented as 15:16:16 bits \\
+\ct{LCh} & Three band float & 
+	\ct{Lab}, but with polar coordinates \\
+\ct{XYZ} & Three band float & 
+	The base CIE colourspace \\
+\ct{Yxy} & Three band float & 
+	Sometimes useful for colour meters \\
+\ct{UCS} & Three band float & 
+	Highly uniform space from the CMC(l:c) standard \\
+\hline
+\end{tabular}
+\end{center}
+\caption{\nip{} colourspaces}
+\mylabel{tb:colour}
+\end{tab2}
+
+\begin{description}
+
+\item[\ct{New}]
+	Make a patch of colour, or pick a colour from a slice through CIELAB
+	colourspace.
+
+\item[\ct{Convert To Colour}]
+	Convert anything into a Colour object.
+
+\item[\ct{Colourspace}]
+	Change the colourspace. The stored numbers change, but the
+	visual appearance should stay the same.
+
+\item[\ct{Tag As}]
+	Change the colourspace tag (the \ct{Type} field in the image
+	header). The stored numbers stay the same, but the visual appearance
+	should change.
+
+\item[\ct{Colour Temperature}]
+	Change the colour temperature. \ct{Move Whitepoint} just adjusts the
+	ratios of X and Z using the CIE standard illuminants.
+	
+	\ct{D65 to D50} and \ct{D50 to D65} transform using either a 3x3
+	matrix which is numerically minimal in XYZ space with respect to the
+	colours on a Macbeth Color Checker, or via Bradford cone space. The
+	Bradford transform omits the power term.
+
+	The final two items go from XYZ to LAB and back, but with D50
+	normalisation rather than the default D65.
+
+\item[\ct{ICC}]
+	Transform images (not patches of colour) device space to profile 
+	connection space (LAB float) and back. 
+	
+	You need to be careful about colour temperature issues:
+	all printers work with D50, and \nip{} is all D65. Use the D65 to D50
+	interchange items in the \ct{Colour Temperature} menu to swap back and
+	forth.
+
+	All printers also work with relative colorimetry, and \nip{} is
+	generally absolute. Use \ct{Absolute to Relative} to scale an absolute
+	colorimetric image by a media white point.
+
+\item[\ct{Difference}]
+	Calculate various colour difference metrics. You can mix patches of
+	colour and colour images.
+
+\item[\ct{Adjust}]
+	Change colour in a colorimetric way. \ct{Recombination}
+	multiplies each pixel in an image through a matrix. \ct{Cast}
+	displaces the neutral axis in LAB space. \ct{HSB} lets you adjust an
+	image in LCh colourspace.
+
+\item[\ct{Similar Colour}]
+	find pixels in an image with a similar colour to a patch of
+	colour. 
+
+\item[\ct{Measure Colour Chart}]
+	This takes a trimmed image of a colour chart (a rectangular grid of
+	coloured squares), measures the average pixel value in the centre 50\%
+	of each square, and returns a matrix of the measured values. 
+
+	Use \ct{Make Synthetic Colour Chart} to make a colour chart image from
+	a matrix of measurements. 
+
+\item[\ct{Plot ab Scatter}]
+	draws a 2 dimensional histogram of the distribution of pixel colours
+	in LAB colourspace.
+
+\end{description}
+
+\section{Filter}
+\mylabel{sec:menu-filter}
+
+This menu groups operations which filter images, or which are filters in the
+photoshop sense.
+
+\begin{description}
+
+\item[\ct{Convolution}]
+	This menu has several standard convolution operations (blur, sharpen,
+	edge detect, etc.), plus the option to convolve with a custom kernel.
+
+	Two menu items are slightly more complicated. \ct{Unsharp Mask}
+	transforms to CIE LAB colour space, then sharpens just the L band
+	with a cored unsharp filter. The \ctr{Tasks}\ct{Print} menu has a
+	version of this filter tuned for typical inkjet printers.
+
+	\ct{Custom Blur} builds and applies a square or gaussian convolution
+	kernel for you based on a radius setting.
+
+\item[\ct{Rank}]
+	A preset median filter, and a custom rank filter that lets you specify
+	window size and rank.
+
+	The \ct{Image Rank} item does pixel-wise ranking of a set of images.
+
+\item[\ct{Morphology}]
+	These menu items implement basic morphological operations. Images are
+	zero for background and non-zero (usually 255) for object. Matricies
+	are shown as 0, 1 and * for background, object and don't-care.
+
+	The \ct{Threshold} item does a simple level threshold. Use the
+	\ctr{Math}\ct{Relational} menu to construct more complex image
+	binarisations. Use \ctr{Math}\ct{Boolean} to combine morphologies.
+
+	The first half of the menu lists simple erode and dilate operations, 4-
+	and 8-way connected. The second half contains several useful compound
+	filters.
+
+	See also \ctr{Histogram}\ct{Find Profile} for
+	something that can search an image for object edges. And
+	\ct{Math}\ctr{Statistics}\ct{Edges} can count the number of edges
+	across and down an image.
+
+\item[\ct{Fourier}]
+	A selection of ideal, Gaussian and Butterworth Fourier space filters.
+
+	You can make other mask shapes yourself using the \ctr{Image}\ct{Make
+	Patterns} menus, then apply them using \ctr{Math}\ct{Fourier}. You can
+	also use the image paintbox to directly paint out peaks in a
+	fourier-space image before transforming back to real space.
+	
+\item[\ct{Enhance}]
+	A selection of simple image enhancement filters. \ct{Statistical
+	Difference} passes a window over an image and tries to match the
+	region statistics at each point to a target mean and deviation. 
+
+\item[\ct{Spatial Correlation}]
+	Place a small image at every possible position in a big image and
+	calculate the correlation at each position. \ct{Simple Difference} is
+	the much faster unnormalised version.
+
+\item[\ct{Tilt Brightness}]
+	A selection of tools for adjusting the brightness of an image across
+	it's surface. Useful for correcting lighting problems.
+
+\item[\ct{Blend}]
+	Blend two objects together using either a third object to control the
+	blend at each point, or a slider to set all points together. You can
+	blend almost anything with anything.
+
+	One useful version is to use a text image (see \ctr{Image}\ctr{Make
+	Patterns}\ct{Text}) to blend between two colours (see
+	\ctr{Colour}\ct{New}).
+
+	\ct{Along Line} does a left/right or top/bottom fade between two
+	images.
+
+\item[\ct{Overlay}]
+	Make a colour overlay of two monochrome images. Useful with
+	\ctr{Image}\ctr{Transform} for testing image superposition.
+
+\item[\ct{Colourize}]
+	Use a colour image to tint a monochrome image. Useful in conjunction
+	with \ctr{Image}\ctr{Transform}.
+
+\item[\ct{Browse}]
+	Look at either the bits or the bands of an image.
+
+\item[\ct{Photographic Negative} and friends]
+	A small selection of faintly photoshop-style filters. 
+
+\end{description}
+
+\section{Format}
+\mylabel{sec:menu-format}
+
+This groups a few items which had no obvious home and which change the format
+of objects.
+
+\begin{description}
+
+\item[\ct{Duplicate}]
+	Copy an object, stripping off any derived classes. For images, this
+	really takes a copy of the underlying object (using \ct{im\_copy()}).
+
+\item[\ct{List to Group}]
+	Changes lists (see \ctr{Math}\ct{List}) into Groups (see
+	\ctr{Edit}\ct{Group}) and back. A list os an ordered collection of
+	objects. A group is a list that \nip{} will automatically iterate
+	over.
+
+\item[\ct{Break Up Object}]
+	This tries to take an object apart. So a multi-band image becomes a
+	list of 1-band images. A matrix becomes a list of vectors, and so on.
+
+\item[\ct{CSV Import}]
+	Import an image from a CSV file, with a few controls.
+
+\item[\ct{Interpret Analyze 7 Header}]
+	Read the meta fields for volume layout and calibration from the
+	Analyze header and reformat the image appropriately.
+
+\end{description}
+
+\section{Histogram}
+\mylabel{sec:menu-histogram}
+
+This menu groups operations for finding and transforming image histograms.
+\nip{} represents histograms and lookup tables as images with \ct{Type}
+set to \ct{Histogram}.  Histograms may have pixels in any format and any
+number of bands. You can only find histograms of unsigned 8- and 16-bit
+images.
+
+\begin{description}
+
+\item[\ct{New Histogram}]
+	This makes a new ramp histogram. A set of sliders let you adjust the
+	shape. Use \ct{Map Histogram} to apply your ramp to an image.
+
+\item[\ct{Build LUT from Scatter}]
+	Make a histogram from a set of $(x, y)$ values. 
+
+\item[\ct{Tag Image as Histogram}]
+	Mark an image as actually being a histogram after all.
+
+\item[\ct{Find Histogram}]
+	A one dimensional histogram treats each band as an independent
+	variable. An $n$-dimensional histogram treats each pixel as a vector of
+	$n$ elements, where $n$ is the number of bands in the image.
+
+\item[\ct{Map Histogram}]
+	Looks up each pixel in the input in the histogram and send the found
+	value to the output.
+
+\item[\ct{Equalise Histogram}]
+	Find the global or locally histogram equalised image.
+
+\item[\ct{Cumulative Histogram}]
+	Use this and friends to calculate a cumulative histogram, normalise a
+	histogram and match two histograms.
+
+\item[\ct{Find Profile}]
+	Searches from the edges of an image for the first non-zero pixel and
+	returns a profile histogram. 
+
+\item[\ct{Find Projections}]
+	Sum columns and rows.
+
+\item[\ct{Plot Slice}]
+	Mark a guide on an image (drag from the
+	image rulers, or click \ctr{File}\ctr{New}\ct{Guide}) and click 
+	\ct{Plot Slice} to make a histogram which is a horizontal or vertical 
+	slice through an image. Use \ct{Extract Arrow} to extract the area
+	around an arrow or guide. Use \ct{Plot Object} to make a plot of any
+	object.
+
+\end{description}
+
+\section{Image}
+\mylabel{sec:menu-image}
+
+This menu groups operations which apply only to images.
+
+\begin{description}
+
+\item[\ct{New}]
+	Makes a new image. \ct{Region on Image} makes a new region, arrow,
+	guide or mark on an image. It's usually easier to open a viewer on
+	an image and Ctrl-drag.
+
+\item[\ct{Convert to Image}]
+	Try to make an image out of anything.
+
+\item[\ct{Header}]
+	Try to change or examine the image header in various ways.
+
+\item[\ct{Set Format}]
+	Switch between the various precisions.
+
+\item[\ct{Levels}]
+	A variety of things for adjusting the values of pixels globally.
+
+\item[\ct{Levels}]
+	Various tools that change the levels in an image. \ct{Tone Curve} is
+	the only complex one: it lets you adjust the image levels with a set
+	of sliders.
+
+\item[\ct{Transform}]
+	Various tools that change the geometry of an image. 
+
+	To use \ctr{Rotate}\ct{Straighten}, mark an arrow on an image
+	(Ctrl-drag up and left in an image view window) along a
+	near-horizontal or near-vertical edge. When you click on
+	\ctr{Rotate}\ct{Straighten}, \nip{} will rotate the image by the
+	smallest amount that makes that edge exactly horizontal or vertical.
+
+	\ct{Linear Match} takes two images and rotates and scales
+	the second so that the images can be superimposed. Drag the
+	tie-=points to mark common features. Use \ctr{Filter}\ct{Overlay}
+	or \ctr{Filter}\ct{Colourize} to actually superimpose them.
+
+	\ct{Rubber Sheet} is useful for fixing things like lens distortion.
+	You give \ct{Find} two images, a reference and a distorted version
+	of that reference, and it automatically finds a transform which
+	will map the distorted image back on to the reference image. Use
+	\ct{Apply} to apply the discovered transform to another image.
+
+\item[\ct{Band}]
+	Extract/insert/delete image bands. Use \ct{To Dimension} to change
+	image bands into a horizontal or vertical dimension. Use \ct{To
+	Bands} to compress the horizontal or vertical dimension into bands
+	(small images only!).
+
+\item[\ct{Crop}]
+	Crops an image. It's often easier to drag out a region. This menu item
+	is only really useful for cropping large groups of images.
+
+\item[\ct{Insert}]
+	This takes two images and pastes the smaller into the centre of the
+	larger. The two images have to have the same number of bands.
+	If you open an image viewer on the large image, you'll see an area
+	which you can drag around to set the exact insert point.
+
+\item[\ct{Select}]
+	Draw elipses and polygons on an image. Useful for selecting defined
+	areas.
+
+\item[\ct{Join}]
+	Use to join two images together bandswise, left/right or up/down. 
+	\ct{Array}
+	joins a list of lists of images together into a single large image.
+
+\item[\ct{Tile}]
+	Repeat an image horizontally and vertically to make a larger image, or
+	chop an image into a set of tiles.
+
+\item[\ct{Patterns}]
+	These items all make useful images for you, from checkerboards to
+	gaussian masks. \ct{XY Image} is the most useful: you can use it to
+	build other patterns.
+
+\item[\ct{Test Images}]
+	These items make a variety of useful testcharts for evaluating
+	spatial response and colour.
+
+\end{description}
+
+\section{Math}
+\mylabel{sec:menu-math}
+
+Basic maths operations on any combination of any objects. You can add a slider
+to a matrix, for example, then divide by an image. Hopefully most of these 
+are obvious.
+
+\begin{description}
+
+\item[\ctr{Arithmetic}\ct{Absolute Value Vector}]
+	The absolute value item normally calculates mod of each band of an
+	image separately. By contrast, \ct{Absolute Value Vector} treats
+	each pixel as a vector and calculates the modulus of that.
+
+\item[\ct{List}]
+	These aren't really maths operations, but they're in here too.
+
+\end{description}
+
+\section{Matrix}
+\mylabel{sec:menu-matrix}
+
+This menu groups operations which operate on matricies. \nip{} has four ways
+of displaying a matrix, but they all behave in the same way under the skin.
+Almost all the items in the \ct{Math} menu will work on matricies. Most of the
+matrix operations will also work on images.
+
+\begin{description}
+
+\item[\ct{New}]
+	The first four items make matricies which display and edit in various 
+	ways useful for different applications. The final two make matricies
+	which are pre-filled with useful numbers.
+
+\item[\ct{Convert to Matrix}]
+	Try to make anything into a matrix.
+
+\item[\ct{Extract}]
+	This group of items extracts various submatricies. You can also do
+	this graphically: just drag-select an area in matrix.
+
+\item[\ct{Insert}, \ct{Delete}, \ldots]
+	Also work on images, which can be handy.
+	A 45 degree rotate will only work for square matricies with
+	odd-length sides.
+
+\item[\ct{Invert}]
+	Simple matrix-only maths operations.
+
+\item[\ct{Plot Scatter}]
+	This takes a two-column matrix where the columns are the X and Y
+	positions of points and draws a scatter graph.
+
+\end{description}
+
+\section{Tasks}
+\mylabel{sec:menu-tasks}
+
+This menu repeats many items from other menus, but tries to group them by
+tasks they are useful for, rather than by function.
+
+\subsection{Capture}
+\mylabel{sec:menu-capture}
+
+This menu groups operations which are useful in capturing images, or for the
+initial processing you might want to do to an image captured from another
+program.
+
+\begin{description}
+
+\item[\ct{Capture Video Frame}]
+	This menu item will currently only work on Linux machines with a
+	compatible video4linux capture card. See \pref{sec:vidpref}
+	for notes on how it works.
+
+\item[\ct{Smooth}]
+	Use this to remove texture from images. It's handy in conjunction with
+	\ct{Flatfield}.
+
+\item[\ct{Flatfield}]
+	Use this to correct homogeneity. Select an image of a piece of white
+	(or mid-grey) card, then select the image to correct, then click
+	\ct{Flatfield}. Use \ct{Smooth} to renmove texture from the white card
+	if necessary.
+
+	You can select a single white and a group of images to correct a large
+	set in one step
+
+\item[\ct{White Balance}]
+	Use this to move the white point to make an area of the image you know
+	to be white, white.
+	Mark a region on an image, enclosing a patch you know to be white.
+	Select the region and the image and click on \ct{White Balance}.
+
+\item[\ct{Find Colour Calibration}]
+	Use this to colour calibrate an image. Drag a region enclosing an
+	image of a Macbeth Color Checker Chart and click \ct{Find Colour
+	Calibration}. 
+
+\item[\ct{Apply Colour Calibration}]
+	Use this to apply the transform calculated by the previous item to
+	another image. Select the calibration object, select the RGB image
+	you want calibrated, and click \ct{Apply Colour Calibration}.
+
+\end{description}
+
+\subsection{Mosaic}
+\mylabel{sec:menu-mosaic}
+
+The items in this menu are discussed in appalling detail in
+\cref{sec:ir}.
+
+\begin{description}
+
+\item[\ct{One Point}]
+	Join two images left-right or top-bottom with a simple
+	translation. Mark a point on each image to be joined (open image
+	view window, Ctrl-left-click, drag to position), then click on the
+	mosaic button. The
+	operation performs elaborate tie-point adjustment, so your selection
+	of a common feature does not have to be exact.
+
+	The \ct{Manual} versions do not perform automatic tie-point correction
+	and are useful when joing very difficult images.
+
+\item[\ct{Two Point}]
+	Do a join, but allow the right-hand (or bottom) image to rotate and
+	scale if it will improve the match. You need to pick two points on
+	each image.
+
+\item[\ct{Balance}]
+	Break a mosaic apart, examine average pixel value in the overlap
+	regions, adjust brightness to match, and reassemble. This only works
+	for images which have been produced just by mosaic joins! If you've
+	done anything else to the image since loading it, the balance will
+	fail with a mysterious message.
+
+\item[\ct{Manual Balance}]
+	Adjust the brightness in a set of masked areas to match. Useful for
+	removing shadows.
+
+\item[\ct{Rebuild}]
+	Use this to mosaic up one set of files based on joins you made
+	in another.  Breaks a mosaic part to component files, performs a
+	string substitution on the file names, and reassembles. 
+
+\item[\ct{Clone Area}]
+	Select over- or under-exposed pixels in one image and replace them
+	with the corresponding pixels from another image. Useful for removing
+	lead numbers used to identify X-ray plates.
+
+	The function
+	operates on two 8-bit mono images.  Move and resize the region
+	on the first image to define the area around the white number.
+	Move the region on the second to overlapping area.  A section of the
+	area on the second image is cloned and blended into the first image.
+	The amount of the defined area to be cloned in defined by a slider
+	within the output image.
+
+\end{description}
+
+\subsection{Picture Frame}
+\mylabel{sec:menu-picture-frame}
+
+Items useful for mocking up painting frames.
+
+\subsection{Print}
+\mylabel{sec:menu-print}
+
+Items useful while preparing an image for printing.
+
+\begin{description}
+
+\item[\ct{Sharpen}]
+	Sharpen an image for printing. This is a version of
+	\ctr{Filter}\ctr{Convolution}\ct{Unsharp Mask} tuned for typical
+	inkjet printers.
+
+\item[\ct{Adjust Tone Curve}]
+	Adjust the reproduction tone curve in LAB. Most useful for offset
+	work, especially from transparencies.
+
+\end{description}

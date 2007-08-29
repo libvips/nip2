@@ -1,0 +1,243 @@
+/* run the display for a slider in a workspace 
+ */
+
+/*
+
+    Copyright (C) 1991-2003 The National Gallery
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+ */
+
+/*
+
+    These files are distributed with VIPS - http://www.vips.ecs.soton.ac.uk
+
+ */
+
+/*
+#define DEBUG
+ */
+
+#include "ip.h"
+
+static GraphicviewClass *parent_class = NULL;
+
+static void
+sliderview_destroy( GtkObject *object )
+{
+	Sliderview *sliderview;
+
+	g_return_if_fail( object != NULL );
+	g_return_if_fail( IS_SLIDERVIEW( object ) );
+
+	sliderview = SLIDERVIEW( object );
+
+	/* My instance destroy stuff.
+	 */
+
+	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+}
+
+static void 
+sliderview_refresh( vObject *vobject )
+{
+	Sliderview *sliderview = SLIDERVIEW( vobject );
+	Slider *slider = SLIDER( VOBJECT( sliderview )->iobject );
+	Tslider *tslider = sliderview->tslider;
+
+        const double range = slider->to - slider->from;
+        const double lrange = log10( range );
+	const char *caption = IOBJECT( slider )->caption;
+
+#ifdef DEBUG
+	printf( "sliderview_refresh\n" );
+#endif /*DEBUG*/
+
+	/* Compatibility ... we used to not have a caption. Don't display
+	 * anything if there's o caption.
+	 */
+	if( caption ) {
+		if( strcmp( caption, "" ) != 0 )
+			set_glabel( sliderview->label, _( "%s:" ), 
+				caption );
+		else
+			set_glabel( sliderview->label, "%s", "" );
+	}
+
+	tslider->from = slider->from;
+	tslider->to = slider->to;
+	tslider->svalue = slider->value;
+	tslider->value = slider->value;
+
+	tslider->digits = IM_MAX( 0, ceil( 2 - lrange ) );
+
+	if( CALC_RECOMP_SLIDER )
+		gtk_range_set_update_policy( GTK_RANGE( tslider->slider ), 
+			GTK_UPDATE_CONTINUOUS );
+	else
+		gtk_range_set_update_policy( GTK_RANGE( tslider->slider ),
+			GTK_UPDATE_DISCONTINUOUS );
+
+#ifdef DEBUG
+	gtk_range_set_update_policy( GTK_RANGE( tslider->slider ),
+		GTK_UPDATE_DISCONTINUOUS );
+#endif /*DEBUG*/
+
+	tslider_changed( tslider );
+
+	VOBJECT_CLASS( parent_class )->refresh( vobject );
+}
+
+static void *
+sliderview_scan( View *view )
+{
+	Sliderview *sliderview = SLIDERVIEW( view );
+	Slider *slider = SLIDER( VOBJECT( sliderview )->iobject );
+	Classmodel *classmodel = CLASSMODEL( slider );
+	Expr *expr = HEAPMODEL( classmodel )->row->expr;
+
+	double value;
+
+	if( !get_geditable_double( sliderview->tslider->entry, &value ) ) {
+		expr_error_set( expr );
+		return( view );
+	}
+
+	if( slider->value != value ) {
+		slider->value = value;
+		classmodel_update( classmodel );
+	}
+
+	return( VIEW_CLASS( parent_class )->scan( view ) );
+}
+
+static void
+sliderview_link( View *view, Model *model, View *parent )
+{
+	Sliderview *sliderview = SLIDERVIEW( view );
+
+	VIEW_CLASS( parent_class )->link( view, model, parent );
+
+	if( GRAPHICVIEW( view )->sview )
+		gtk_size_group_add_widget( GRAPHICVIEW( view )->sview->group,   
+			sliderview->label );
+}
+
+static void
+sliderview_class_init( SliderviewClass *class )
+{
+	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	vObjectClass *vobject_class = (vObjectClass *) class;
+	ViewClass *view_class = (ViewClass *) class;
+
+	parent_class = g_type_class_peek_parent( class );
+
+	object_class->destroy = sliderview_destroy;
+
+	/* Create signals.
+	 */
+
+	/* Init methods.
+	 */
+	vobject_class->refresh = sliderview_refresh;
+
+	view_class->scan = sliderview_scan;
+	view_class->link = sliderview_link;
+}
+
+/* Drag on slider.
+ */
+static void
+sliderview_change_cb( Tslider *tslider, Sliderview *sliderview )
+{
+	Slider *slider = SLIDER( VOBJECT( sliderview )->iobject );
+
+#ifdef DEBUG
+	printf( "sliderview_change_cb\n" );
+#endif /*DEBUG*/
+
+	if( slider->value != tslider->svalue ) {
+		slider->value = tslider->svalue;
+
+		classmodel_update( CLASSMODEL( slider ) );
+		symbol_recalculate_all();
+	}
+}
+
+static void
+sliderview_init( Sliderview *sliderview )
+{
+	GtkWidget *hbox;
+
+	hbox = gtk_hbox_new( FALSE, 12 );
+        gtk_box_pack_start( GTK_BOX( sliderview ), hbox, TRUE, FALSE, 0 );
+
+        sliderview->label = gtk_label_new( "" );
+        gtk_misc_set_alignment( GTK_MISC( sliderview->label ), 0, 0.5 );
+        gtk_misc_set_padding( GTK_MISC( sliderview->label ), 2, 1 );
+	gtk_box_pack_start( GTK_BOX( hbox ), sliderview->label, 
+		FALSE, FALSE, 0 );
+
+	sliderview->tslider = tslider_new();
+	tslider_set_conversions( sliderview->tslider, NULL, NULL );
+        gtk_box_pack_start( GTK_BOX( hbox ), 
+		GTK_WIDGET( sliderview->tslider ), TRUE, TRUE, 0 );
+
+        gtk_signal_connect_object( GTK_OBJECT( sliderview->tslider ), 
+		"text_changed",
+                GTK_SIGNAL_FUNC( view_changed_cb ), 
+		GTK_OBJECT( sliderview ) );
+        gtk_signal_connect_object( GTK_OBJECT( sliderview->tslider ), 
+		"activate",
+                GTK_SIGNAL_FUNC( view_activate_cb ), 
+		GTK_OBJECT( sliderview ) );
+        gtk_signal_connect( GTK_OBJECT( sliderview->tslider ), 
+		"slider_changed", 
+		GTK_SIGNAL_FUNC( sliderview_change_cb ), sliderview );
+
+        gtk_widget_show_all( GTK_WIDGET( sliderview ) );
+}
+
+GtkType
+sliderview_get_type( void )
+{
+	static GtkType sliderview_type = 0;
+
+	if( !sliderview_type ) {
+		static const GtkTypeInfo sinfo = {
+			"Sliderview",
+			sizeof( Sliderview ),
+			sizeof( SliderviewClass ),
+			(GtkClassInitFunc) sliderview_class_init,
+			(GtkObjectInitFunc) sliderview_init,
+			/* reserved_1 */ NULL,
+			/* reserved_2 */ NULL,
+			(GtkClassInitFunc) NULL,
+		};
+
+		sliderview_type = gtk_type_unique( TYPE_GRAPHICVIEW, &sinfo );
+	}
+
+	return( sliderview_type );
+}
+
+View *
+sliderview_new( void )
+{
+	Sliderview *sliderview = gtk_type_new( TYPE_SLIDERVIEW );
+
+	return( VIEW( sliderview ) );
+}

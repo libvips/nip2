@@ -1,0 +1,498 @@
+/* take a copy of x
+ */
+Duplicate x = map_unary copy x;
+
+/* crop image x
+ */
+Crop x 
+	= map_unary build_widget x
+{
+	build_widget image = widget image 
+		(image.width * 0.25 - image.xoffset)
+		(image.height * 0.25 - image.yoffset)
+		(image.width * 0.5)
+		(image.height * 0.5);
+
+	widget image left top width height = class 
+		Region image left top width height {
+		_check_args = [
+			[image, "Image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 4;
+
+		Region_edit image left top width height 
+			= widget image left top width height;
+	}
+}
+
+/* insert image b into image a
+ */
+Insert a b = class 
+	Image value {
+	_check_args = [
+		[a, "a", check_Image],
+		[b, "b", check_Image]
+	] ++ super._check_args;
+	_check_all = [
+		[a.format == b.format && a.coding == b.coding && 
+			a.bands == b.bands, 
+			"a.format == b.format && a.coding == b.coding && " ++
+				"a.bands == b.bands"],
+		[a.width >= b.width && a.height >= b.height,
+			"First image should be able to enclose second"]
+	];
+	_vislevel = 3;
+
+	place = Area a ((a.width - b.width) / 2) ((a.height - b.height) / 2) 
+		b.width b.height;
+
+	value
+		= im_insert_noexpand a' b'' place.left place.top
+	{
+		a' = a.value;
+		b' = b.value;
+
+		b'' = clip2fmt a.format b';
+	}
+}
+
+/* join two images left/right or up/down
+ */
+Join = class {
+	_check_ab_args a b = [
+		[a, "a", check_Image],
+		[b, "b", check_Image]
+	];
+	_check_ab_all a b = [
+		[a.format == b.format && a.coding == b.coding && 
+			a.bands == b.bands,
+			"a.format == b.format && a.coding == b.coding && " ++
+				"a.bands == b.bands"]
+	];
+
+	/* join two images left-right
+	 */
+	Left_right a b = class 
+		Image value {
+		_check_args = _check_ab_args a b ++ super._check_args;
+		_check_all = _check_ab_all a b ++ super._check_all;
+
+		shim = Slider 0 100 0;
+		background_colour = 0;
+		align = Option "Alignment" ["Top", "Centre", "Bottom"] 1;
+
+		value = im2
+		{
+			w = a.width + b.width + shim.value;
+			h = max_pair a.height b.height;
+
+			bg = image_new w h a.bands
+				a.format a.coding a.type
+				background_colour
+				0 0;
+
+			ya = [0, max_pair 0 ((b.height - a.height)/2), 
+				max_pair 0 (b.height - a.height)]; 
+			yb = [0, max_pair 0 ((a.height - b.height)/2), 
+				max_pair 0 (a.height - b.height)]; 
+
+			im1 = im_insert_noexpand bg a.value 
+				0 (ya?align);
+			im2 = im_insert_noexpand im1 b.value 
+				(a.width + shim.value) (yb?align);
+		}
+	}
+
+	/* join two images top-bottom
+	 */
+	Top_bottom a b = class Image value {
+		_check_args = _check_ab_args a b ++ super._check_args;
+		_check_all = _check_ab_all a b ++ super._check_all;
+
+		shim = Slider 0 100 0;
+		background_colour = 0;
+		align = Option "Alignment" ["Left", "Centre", "Right"] 1;
+
+		value = im2
+		{
+			w = max_pair a.width b.width;
+			h = a.height + b.height + shim.value;
+
+			bg = image_new w h a.bands
+				a.format a.coding a.type
+				background_colour
+				0 0;
+
+			xa = [0, max_pair 0 ((b.width - a.width)/2), 
+				max_pair 0 (b.width - a.width)]; 
+			xb = [0, max_pair 0 ((a.width - b.width)/2), 
+				max_pair 0 (a.width - b.width)]; 
+
+			im1 = im_insert_noexpand bg a.value 
+				(xa?align) 0;
+			im2 = im_insert_noexpand im1 b.value 
+				(xb?align) (a.height + shim.value);
+		}
+	}
+
+	/* join a 2-D array of images
+	 */
+	Array x = class Image value {
+		hspacing = Slider (-100) (100) 0;
+		vspacing = Slider (-100) (100) 0;
+		value 
+			= imagearray_assemble 
+				(-hspacing.value) (-vspacing.value) x'
+		{
+			x' = map (map getval) x;
+			getval x 
+				= x.value, is_class x
+				= x;
+		}
+	}
+}
+
+/* morph images to match (needs the rubbersheet plugin)
+ */
+Rubber = class {
+	_rubber_interp = Option "Interpolation"
+		(map (extract 0) Interpolate.names.value)
+		Interpolate.bilinear;
+	_rubber_order = Option "order" ["0", "1", "2", "3"] 1;
+	_rubber_edges = Toggle "Wrap image edges" false;
+
+	/* find a transform which will turn sample image into reference image
+	 */
+	Rubber_find reference sample = class
+		Matrix transformation {
+		_vislevel = 3;
+
+		// controls
+		order = _rubber_order;
+		interp = _rubber_interp;
+		edges = _rubber_edges;
+		max_error = 0.3;
+		max_iterations = 10;
+
+		// transform
+		_result = resample sample.value reference.value 
+			max_error max_iterations order.value 
+			interp.value edges.value;
+
+		// results
+		transformed_image = Image (_result?0);
+		transformation = (_result?1).value;
+		final_error = _result?2;
+	}
+
+	/* apply a transform to an image
+	 */
+	Rubber_apply transform image = class
+		Image value {
+		// controls
+		interp = _rubber_interp;
+		edges = _rubber_edges;
+
+		value = im_transform image.value transform 
+			interp.value edges.value;
+	}
+
+	/* change a transformation's scale factor
+	 */
+	Rubber_scale transform = class 
+		Matrix scaled_transform {
+		factor_hint = "scale transform by this factor";
+		factor_x = 1;
+		factor_y = 1;
+
+		// pairwise multiply
+		scaled_transform 
+			= map2 (map2 multiply) transform.value facs
+		{
+			facs = [[ factor_x, factor_y ],
+				[ 1, 1 ],
+				[ 1, 1 ],
+				[ 1 / factor_x, 1 / factor_y ],
+				[ 1 / factor_x, 1 / factor_y ],
+				[ 1 / factor_x, 1 / factor_y ]];
+		}
+	}
+}
+
+#separator
+
+/* set pixels to 255 - x
+ */
+Photographic_negative x 
+	= map_unary invert x
+{
+	invert x
+		= oo_unary_function neg_op x, is_class x
+		= im_invert x, is_image x
+		= 255 - x, is_number x 
+		= error (errors.badargs ++ "invert");
+
+	neg_op = Operator "photographic_negative" 
+		invert Operator_type.ARITHMETIC false;
+}
+
+/* falsecolour a mono image
+ */
+Falsecolour x = map_unary falsecolour x;
+
+#separator
+
+/* adjust brightness and contrast of image x
+ */
+Adjust_scale_offset x
+	= map_unary widget x
+{
+	widget image = class 
+		Image value {
+		_check_args = [
+			[image, "image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		scale = Slider 0.001 255 1;
+		offset = Slider (-128) 128 0;
+
+		value = clip2fmt image.format (image * scale + offset).value;
+	}
+}
+
+/* adjust gamma of image x
+ */
+Adjust_gamma x
+	= map_unary widget x
+{
+	widget image = class 
+		Image value {
+		_check_args = [
+			[image, "image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		gamma = Slider 0.001 4 1;
+		image_maximum_hint = "Change image_maximum if this is " ++
+			"not an 8 bit image";
+		image_maximum = 255;
+
+		value = clip2fmt image.format gammaed.value 
+		{
+			gammaed = (image_maximum / image_maximum ** gamma) * 
+				image ** gamma;
+		}
+	}
+}
+
+/* change advisory header fields of image x
+ */
+Edit_header x
+	= map_unary widget x
+{
+	type_names = Image_type.type_names;
+	names = sort (map (extract 0) type_names.value);
+
+	widget image = class 
+		Image value {
+		_check_args = [
+			[image, "image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		xres = image.xres;
+		yres = image.yres;
+		xoffset = image.xoffset;
+		yoffset = image.yoffset;
+
+		type_option 
+			= Option "Image type" names pos
+		{
+			name = type_names.lookup 1 0 image.type;
+			pos = index (equal name) names;
+		}
+
+		value = im_copy_set image.value 
+			type xres yres xoffset yoffset
+		{
+			type = type_names.lookup 0 1 names?type_option;
+		}
+	}
+}
+
+#separator
+
+/* rotate and scale one image to match another
+ */
+Match a b = class 
+	Image value {
+	_check_args = [
+		[a, "a", check_Image],
+		[b, "b", check_Image]
+	] ++ super._check_args;
+	_vislevel = 3;
+
+	ap1 = Point_relative a 0.5 0.25;
+	bp1 = Point_relative b 0.5 0.25;
+	ap2 = Point_relative a 0.5 0.75;
+	bp2 = Point_relative b 0.5 0.75;
+
+	refine = Toggle "Refine selected tie-points" false;
+
+	value
+		= b'''
+	{
+		_prefs = Workspaces.Preferences;
+		window = _prefs.MOSAIC_WINDOW_SIZE;
+		object = _prefs.MOSAIC_OBJECT_SIZE;
+		a' = a.value;
+		b' = b.value;
+
+		b'' = clip2fmt a.format b';
+
+		ap1' = ap1.image_rect;
+		ap2' = ap2.image_rect;
+		bp1' = bp1.image_rect;
+		bp2' = bp2.image_rect;
+
+		b''' 
+			= im_match_linear_search a' b''
+				ap1'.left ap1'.top bp1'.left bp1'.top
+				ap2'.left ap2'.top bp2'.left bp2'.top
+				object window,
+					refine 
+			= im_match_linear a' b''
+				ap1'.left ap1'.top bp1'.left bp1'.top
+				ap2'.left ap2'.top bp2'.left bp2'.top;
+	}
+}
+
+/* make a colour overlay of two mono images
+ */
+Overlay a b = class 
+	Image value {
+	_check_args = [
+		[a, "a", check_Image],
+		[b, "b", check_Image]
+	] ++ super._check_args;
+	_check_all = [
+		[a.bands == 1 && b.bands == 1,
+			"a.bands == 1 && b.bands == 1"]
+	] ++ super._check_all;
+	_vislevel = 3;
+
+	ap1 = Point_relative a 0.5 0.25;
+	bp1 = Point_relative b 0.5 0.25;
+	ap2 = Point_relative a 0.5 0.75;
+	bp2 = Point_relative b 0.5 0.75;
+
+	refine = Toggle "Refine selected tie-points" false;
+	lock = Toggle "No resize" false;
+	colour = Option "Colour overlay as" [
+		"Green over Red",
+		"Blue over Red",
+		"Red over Green",
+		"Red over Blue",
+		"Blue over Green",
+		"Green over Blue"
+	] 0;
+
+	value
+		= [(a' ++ b''' ++ black), 
+			(a' ++ black ++ b'''), 
+			(b''' ++ a' ++ black), 
+			(b''' ++ black ++ a'), 
+			(black ++ a' ++ b'''), 
+			(black ++ b''' ++ a')]?colour
+	{
+		_prefs = Workspaces.Preferences;
+		window = _prefs.MOSAIC_WINDOW_SIZE;
+		object = _prefs.MOSAIC_OBJECT_SIZE;
+		a' = a.value;
+		b' = b.value;
+
+		b'' = clip2fmt a.format b';
+
+		ap1' = ap1.image_rect;
+		ap2' = ap2.image_rect;
+		bp1' = bp1.image_rect;
+		bp2' = bp2.image_rect;
+
+		// return p2 ... if lock is set, return a p2 a standard
+		// distance along the vector joining p1 and p2
+		norm p1 p2
+			= Rect left' top' 0 0, lock
+			= p2
+		{
+			v = (p2.left - p1.left, p2.top - p1.top);
+			// 100000 to give precision since we pass points as
+			// ints to match
+			n = 100000 * sign v;
+			left' = p1.left + re n;
+			top' = p1.top + im n;
+		}
+
+		ap2'' = norm ap1' ap2';
+		bp2'' = norm bp1' bp2';
+
+		b''' 
+			= im_match_linear_search a' b''
+				ap1'.left ap1'.top bp1'.left bp1'.top
+				ap2''.left ap2''.top bp2''.left bp2''.top
+				object window,
+					// we can't search if lock is on
+					refine && !lock
+			= im_match_linear a' b''
+				ap1'.left ap1'.top bp1'.left bp1'.top
+				ap2''.left ap2''.top bp2''.left bp2''.top;
+
+		black = image_new a.width a.height 
+			a.bands a.format a.coding a.type 
+			0 0 0;
+	}
+}
+
+/* browse through the bands of a multiband image with a slider
+ */
+Browse_multiband image = class
+        Image value {
+	_vislevel = 3;
+
+        band = Slider 0 (image.bands - 1) 0;
+        display = Option "Display as" [
+            "Grey",
+            "Green over Red",
+            "Blue over Red",
+            "Red over Green",
+            "Red over Blue",
+            "Blue over Green",
+            "Green over Blue"
+	] 0;
+
+        value 
+		= output
+	{
+
+                down = (int) band.value;
+                up = (int) (band.value + 1);
+                remainder = band.value - down;
+
+                a = (image.value ? up) * remainder;
+                b = (image.value ? down) * (1 - remainder);
+		c = image_new image.width image.height 1
+			Image_format.FLOAT Image_coding.NOCODING Image_type.B_W
+			0 0 0;
+
+                output = [  
+			a + b, 
+			a ++ b ++ c, 
+			a ++ c ++ b, 
+			b ++ a ++ c,
+			b ++ c ++ a, 
+			c ++ a ++ b, 
+			c ++ b ++ a
+		] ? display;
+	}
+}
+

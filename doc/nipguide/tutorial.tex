@@ -1,0 +1,516 @@
+\chapter{Tutorial}
+\mylabel{sec:tutorial}
+
+This chapter runs very quickly through how to use \nip{}'s user-interface. See
+\cref{sec:reference} if you want more details on how the different bits work.
+
+\section{Quick interface tour}
+\mylabel{sec:quicktour}
+
+Start up \nip{}. You should see something like \fref{fg:introwin} (the
+exact look might be different on your system).
+
+The menus at the top of the window are very ordinary, except for the
+\ct{Toolkits} menu which contains all of the image processing operations.
+The green thing is the current column (the thing that new objects will get
+added to). Click on the \ct{25 GB free} text and it toggles between showing
+space free on your disc and space free for calculations.
+
+Click on \ctr{File}\ct{Open} to get a file dialog and load up an
+image. \nip{} can load most image formats, try it and see.  Check the
+\ct{Pin up} box to have the dialog remain after you press OK. Click on
+\ct{Show thumbnails} and \nip{} will try to display thumbnail images for
+all the files in the directory. You can also drag files from the desktop or
+from your file manager.
+
+After you've loaded an image, \nip{} should look like \fref{fg:loadedimage}.
+Double click on the thumbnail to open an image view window. Alternatively,
+select \ct{Edit} from the right-button menu on the thumbnail. See
+\fref{fg:imageview}.
+
+\begin{figure}
+\figw{3in}{snap2.jpg}
+\caption{After loading an image}
+\mylabel{fg:loadedimage}
+\end{figure}
+
+\begin{figure}
+\figw{3in}{snap3.jpg}
+\caption{Image view window}
+\mylabel{fg:imageview}
+\end{figure}
+
+As well as the standard keymappings, \nip{} has extra shortcuts for
+navigating images, see \tref{tb:shortcuts}.  Use the \ctr{View}\ct{Toolbar}
+menu to turn on other features. You can have a status bar (shows image
+properties, mouse position and pixel value), a display control bar (lets
+you change scale and offset for display pixels, click on the arrow on the
+left for a useful extra menu), a paint bar and some rulers.
+
+\begin{tab2}
+\begin{center}
+\begin{tabular}{||l|l||}
+\hline
+Keys in image display widget  		& Action \\
+\hline
+\ct{i} 					& Zoom in on mouse pointer \\
+\ct{o} 					& Zoom out \\
+Cursor up/down/left/right 		& Scroll a small amount in direction \\
+Shift + cursor up/down/left/right 	& Scroll a screenful in direction \\
+Ctrl + cursor up/down/left/right 	& Scroll to edge of image \\
+Middle mouse drag 			& Pan image \\
+Mouse wheel 				& Scroll up/down \\
+Shift + mouse wheel			& Scroll left/right \\
+Ctrl + mouse wheel 			& Zoom in/out \\
+\ct{0} (zero key) 			& Zoom out to fit image to window \\
+\ct{1}, \ct{2}, \ct{4}, \ct{8}  	& Set magnification to 1, 2, 4 or 8 \\
+Ctrl + \ct{2}, \ct{4}, \ct{8} 		& Set zoom out factor to 2, 4 or 8 \\
+\hline
+\end{tabular}
+\end{center}
+
+\caption{\nip{} shortcuts for the image view window}
+\mylabel{tb:shortcuts}
+\end{tab2}
+
+You can mark things on an image. Hold down Ctrl and drag down and right with
+the left mouse button to mark a region. Ctrl-left-click to mark a point. Drag
+up and left to mark an arrow (two points connected by a line). Drag from
+the rulers to mark guides. Right-click on a label to get a menu which
+you can use to remove or edit one of these things. Left drag on a label
+to move the things around, left-drag on the edges or corners to resize.
+\fref{fg:imageviewregion} shows the same image with stuff marked on it.
+
+\begin{figure}
+\figw{3in}{snap4.jpg}
+\caption{Image view window with marked regions}
+\mylabel{fg:imageviewregion}
+\end{figure}
+
+Clean up any messing about and leave two regions on your image. The main
+window should now look something like \fref{fg:main2regions}.
+
+\begin{figure}
+\figw{3in}{snap5.jpg}
+\caption{Main window, two regions marked}
+\mylabel{fg:main2regions}
+\end{figure}
+
+There are three rows visible here, \ct{A1}, \ct{A2} and \ct{A3}. Each row
+has (from left to right) a pair of up/down arrows (these indicate that
+the row contains sub-rows: click on the down arrow several times to
+open the row up and see inside), the name button (left-click to select,
+Shift-left-click to extend-select, Ctrl-left-click to toggle select, click
+on the workspace background to unselect everything, left-drag on the name
+button to reorder items within the column) and the thumbnail image.
+
+Left-click on the name button of one of these images to select it, and
+then click on \ctr{Toolkits}\ctr{Image}\ctr{Transform}\ctr{Rotate}\ct{Free}
+(alternatively, if nothing is selected when you click on one of the toolkit
+menus, \nip{} will apply the operation to the bottom object in the current
+column). A new row will appear representing the rotation operation. Drag
+the slider to rotate the image (or type an angle in degrees into the box
+to the left of the slider and press Return). See \fref{fg:rotate}.
+
+\begin{figure}
+\figw{3in}{snap6.jpg}
+\caption{Using \ctr{Rotate}\ct{Free}}
+\mylabel{fg:rotate}
+\end{figure}
+
+The same thing works for image processing operations that take two arguments.
+Left-click on one of your original regions, Ctrl-left-click on the rotated
+image (the box at the left of the main window status bar says what's selected
+and in what order), and click on \ctr{Toolkits}\ctr{Image}\ctr{Join}\ct{Left
+to Right}. A new row appears representing the join operation.
+
+Click on \ct{Background Colour}, type in 128 and press Return. Drag the
+\ct{shim} slider to 50 (or type 50 into the box just to the left of the
+slider and press Return). See \fref{fg:join}.
+
+\begin{figure}
+\figw{3in}{snap7.jpg}
+\caption{Using \ctr{Join}\ct{Left to Right}}
+\mylabel{fg:join}
+\end{figure}
+
+The \ct{Toolkits} menu is large and can be slow and annoying to find
+things in, so \nip{} has several shortcuts. First, you can tear-off menus
+by clicking on the dotted line at the top. If you're going to be using
+one of the sub-menus repeatedly this can save a lot of clicking. Next,
+you can set keyboard shortcuts for menu items by moving the mouse pointer
+over the item and pressing the key combination you want to set. 
+
+Some systems won't let you edit menu shortcuts by default. For example,
+on GNOME, you need to enable this in \ctr{System}\ctr{Preferences}\ct{Menus
+\& Toolbars}.
+
+Finally, there is a toolkit browser: this shows the same set of items, but in
+an easier-to-browse way. Click on \ctr{View}\ct{Toolkit Browser} and the
+browse side-panel will appear, see \fref{fg:browse}. It shows all of the items
+as a single long list. Type into the search box at the top to only show items
+which match. Double-click (or press Return) on an item to activate it. Scroll
+to the right to see what arguments the item needs and what menu it appears in.
+
+\begin{figure}
+\figw{3in}{snap7a.jpg}
+\caption{The toolkit browser}
+\mylabel{fg:browse}
+\end{figure}
+
+The box at the bottom of each column is for entering new expressions. You
+can type stuff here, and \nip{} will make a new row for each item you
+enter. Try typing \ct{2 + 2} and pressing Return. The syntax is (almost,
+with a few small differences) the same as the C programming language. See
+\aref{sec:operators} for a list of the differences. Try
+multiplying the joined images by a small amount (eg. type something like
+\ct{A5 * 1.2} and press Return).
+
+Click the down button once on your brightened image and left-click on the area
+just below the thumbnail. You should see the stuff you typed to make that row.
+You can edit it to be anything else, press Return and \nip{} will recalculate.
+Try going back to your original image (the one you loaded from a file),
+open an image view window, and try dragging one of the regions. You can
+change any of the sliders in the rotate or the join rows as well.  
+
+You can also edit the insides of objects. Click the down button next to
+one of your regions until the \ct{width} and \ct{height} rows appear, click on
+\ct{width} and type \ct{height * 2}. Now open the image window the region is
+defined on and try to resize it: you'll find that the width of the region is
+fixed, but that if you change the height, the width changes with it. This is a
+very general property of classes in \nip{}: you can use it to join objects
+together in complex ways, and to modify the behaviour of interactive objects. 
+
+Right click on a column title bar to get a useful menu. Click on
+\ctr{File}\ctr{New}\ct{Column} 
+make another column (handy for organising a workspace). If you drag from
+an image thumbnail on to the workspace background, \nip{} will make a new
+column for you. You can drop thumbnails on to other thumbnails to make links.
+If \nip{} falls over (I do hope it doesn't), you can usually get your work
+back by restarting \nip{} and clicking on \ctr{File}\ct{Recover After Crash}.
+There are a lot of preferences (perhaps too many), see \aref{sec:config}.
+
+There is a lot of stuff in the \ct{Toolkits} menus, but they do almost
+all have tooltips. If you let your mouse hover over a menu item for a
+moment you should get some helpful text. The toolkit menu is organised by
+object type. If you want to do something to a matrix, look in the
+\ctr{Toolkits}\ct{Matrix} menu. The exception is \ctr{Toolkits}\ct{Tasks}
+which repeats many of the regular toolkit items, but groups them by typical
+tasks instead.
+
+Operations can work on groups as well as on single images, so you can batch
+things up. If you save a group of images, \nip{} will number each image
+sequentially for you.  You can use \ctr{Edit}\ct{Duplicate} to make copies
+of objects. If you select lots of objects and duplicate them, \nip{} will
+(fairly intelligently) rename everything for you so it all still works.
+
+\section{\nip{} for reflectogram mosaics}
+\mylabel{sec:irtut}
+
+This section quickly builds an infrared reflectogram mosaic using the
+sample images that come with \nip{}. See \cref{sec:ir} for detailed
+coverage.
+
+Click on \ctr{File}\ct{Open Examples}. 
+You should see a directory called \ct{1\_point\_mosaic}. Doubleclick and
+you'll see a file called \ct{1pt\_mosaic.ws}. Doubleclick that and you'll load
+the workspace for this example.
+
+If you'd rather make the workspace yourself, click on the file type filter and
+select \ct{All files}. A set of 8 images should appear.  Click on the first
+file, shift-click on the last, and click \ct{Open}. See \fref{fg:loadsamples}.
+
+\begin{figure}
+\figw{3in}{snap14.jpg}
+\caption{Loading the sample images}
+\mylabel{fg:loadsamples}
+\end{figure}
+
+The images have been named to match their positions in the mosaic, so for
+example \ct{cd2.1.jpg} is the first image in row two.  Open up viewing windows
+for the first two images by double clicking on the thumbnails.
+Move the two opened images viewers so that they are side by side. Adjust
+the zoom (using the \ct{i} and \ct{o} keys) and the pan (by dragging with the
+middle mouse button) so that the overlap
+area is visible in both images.
+
+Mark a tie-point on each image by Ctrl-left-clicking on a feature you can see
+in both images, see \fref{fg:readyjoin}. Move a point after you've marked it
+by dragging on the label. You don't need to be exact: \nip{} just uses the
+point you select as the start point for a search. It can cope with
+misses of up to about 10 pixels. To mosaic the two images together, click
+on \ctr{Toolkits}\ctr{Tasks}\ctr{Mosaic}\ctr{One Point}\ct{Left to Right}. 
+See \fref{fg:joined}.
+
+\begin{figure}
+\figw{3in}{snap15.jpg}
+\caption{Ready to join}
+\mylabel{fg:readyjoin}
+\end{figure}
+
+\begin{figure}
+\figw{3in}{snap16.jpg}
+\caption{Joined images}
+\mylabel{fg:joined}
+\end{figure}
+
+Picking items deep in the toolkit menu is fiddly, so \nip{} has several
+shortcuts.  First, you can tear off any toolkit menu by clicking on the dotted
+line at the top. Secondly,
+you can assign any keyboard accelerator to any menu item. Navigate to the
+menu item and while it is selected, press the key combination you want to use
+as a shortcut (for example, Ctrl-L might be good for \ctr{Mosaic}\ctr{One
+Point}\ct{Left to Right}). Now whenever you press Ctrl-L with the keyboard
+focus in the main window, you will do a left-right mosaic join. Finally, you
+can use the toolkit browser to display a selection of the tools in a pane on
+the right-hand side of the main window. Click on \ctr{View}\ct{Browse
+Toolkits}, then type ``mosaic'' into the search box at the top. The toolkit
+browser will display all items related to mosaicing.
+
+Some systems won't let you edit menu shortcuts by default. For example,
+on GNOME, you need to enable this in \ctr{System}\ctr{Preferences}\ct{Menus
+\& Toolbars}.
+
+Join the rest of the pairs of sample images together
+left-right. \fref{fg:joins} shows how they should fit together. Once you
+have made all the rows, join the rows together in turn to make the complete
+image using \ctr{Mosaic}\ctr{One Point}\ct{}\ct{Top to Bottom}. 
+
+When you've built the whole thing you'll see that there are differences
+in brightness between the tiles that make up your composite image. You can
+fix most problems like this automatically by selecting your final mosaiced
+image and clicking on \ctr{Mosaic}\ct{Balance}. This operation takes your
+mosaic apart, examines the overlap areas for differences in brightness,
+calculates a set of adjustment factors to minimise these differences,
+and then rebuilds the mosaic.
+
+There can be some problems left even after mosaic balance. Use
+\ctr{Mosaic}\ct{Tilt Brightness} to remove any left-right or up-down
+graduations in brightness. 
+
+Save your mosaic workspace for future reference by clicking on
+\ctr{File}\ct{Save Workspace}. To save just the mosaiced image, right click
+on the thumbnail and select \ct{Save As}.
+
+\section{\nip{} for nerds}
+\mylabel{sec:nerdtour}
+
+This section sprints through a bit of \nip{} programming, see
+\pref{sec:program} for full details and a more formal definition of the
+language.
+
+The insides of \nip{} are built with \nip{}'s own programming language. It's a
+pure lazy functional language with classes. It's C's expression syntax
+(more or less) plus approximately Miranda/Haskell function syntax,
+plus some basic class stuff. \nip{}'s main window is a class browser for this
+programming language.
+
+Click on \ctr{Toolkits}\ct{Edit Toolkits} in \nip{}'s main window to pop up the
+programming window (see \pref{sec:progwin} for details on all the bits in the
+window), then in the edit area there type:
+
+\begin{verbatim}
+// add two things
+ 
+Fred a b = class {
+  sum = a + b;
+}
+\end{verbatim}
+
+This defines a class called \ct{Fred} whose constructor takes two arguments,
+\ct{a} and \ct{b}. There's one member, called \ct{sum}, which is \ct{a}
+and \ct{b} added together.
+
+In the program window, click \ctr{File}\ct{Process}. This makes \nip{}
+read what you typed, parse it, compile it and update itself. The program
+window should now look like \fref{fg:Fred}.
+
+\begin{figure}
+\figw{3in}{snap8.jpg}
+\caption{Programming \ct{Fred}}
+\mylabel{fg:Fred}
+\end{figure}
+
+If you look back at the main \nip{} window, a new menu will have appeared
+under \ct{Toolkits} called \ct{untitled}. If you click on that, there will
+be a menu item called \ct{Fred}. Let your mouse linger, and you'll see a
+tooltip too.
+
+In the main window, type \ct{Fred 2 3} into the box at the bottom of the
+current column. Press Return and \nip{} will make a \ct{Fred} for you. Click
+on the down arrow to the left of your new \ct{Fred} once to see the members
+of \ct{Fred} (just \ct{sum} in this case), click again to see the class
+parameters too. The main window should look like \fref{fg:mainFred}.
+
+\begin{figure}
+\figw{3in}{snap9.jpg}
+\caption{Main window \ct{Fred}}
+\mylabel{fg:mainFred}
+\end{figure}
+
+Click to the right of \ct{b}, type in a new value and press Return. The
+\ct{sum} member should update. \nip{} keeps track of dependencies between
+rows, but it also tracks dependencies inside rows, both ones that come
+from the class, and ones created by any edits you do to the class instance
+after creating it. You won't see it in a simple example, but \nip{} also
+discovers and tracks dependencies which can arise at run time.  Click on
+the text just to the right of the \ct{b} button again, type \ct{a} and
+press Return. Now edit \ct{a}: press Return and both \ct{b} and \ct{sum}
+will update.
+
+You can use \ct{Fred} to add any two things together. Click on
+\ctr{Toolkits}\ctr{Widgets}\ct{Scale} to make a scale widget, press Ctrl-U
+(the keyboard shortcut for \ctr{Edit}\ct{Duplicate}) to duplicate it, and
+finally click on \ctr{Toolkits}\ctr{untitled}\ct{Fred}. Open up the new
+\ct{Fred} and try dragging some of the scales around. The main window will
+look like \fref{fg:slideFred}.
+
+\begin{figure}
+\figw{3in}{snap10.jpg}
+\caption{Scale \ct{Fred}}
+\mylabel{fg:slideFred}
+\end{figure}
+
+The scales are classes too (instances of \ct{Scale}). You can open them up
+and do strange things with them as well. Open up one of the scales you made
+(eg. \ct{A2} in \fref{fg:slideFred}) and change the \ct{from} parameter to
+be \ct{A3.value}. Now try dragging the sliders again.
+
+Try dragging the \ct{sum} slider. Now go back and drag one of the
+original sliders.  You'll see that \ct{sum} no longer updates, it's stuck
+at the last position you dragged it to. This is because there are now two
+things affecting the value of \ct{sum}: the underlying code (the \ct{a +
+b} inside \ct{Fred}), and the position you dragged the slider representing
+\ct{sum} to. \nip{} has the rule that graphical edits (dragging the slider)
+override code. To make \ct{sum} update again, right click on the \ct{sum}
+button and select \ct{Reset} from the pop up menu. Now drag one of
+the input sliders again, and \ct{sum} will start updating once more.
+
+Classes can inherit from other classes. Go back to the program window,
+click on \ctr{File}\ctr{New}\ct{Tool} to clear the edit window, and type:
+
+\begin{verbatim}
+// multiply two things
+ 
+Jim a b = class Fred a b {
+  product = a * b;
+}
+\end{verbatim}
+
+This defines a class called \ct{Jim} which inherits from \ct{Fred}. Click
+\ctr{File}\ct{Process}, then back in
+the main window, type \ct{Jim 4 5} into the bottom of the column. Click down
+once to expose the members (just \ct{product}), click again to expose the
+parameters as well (\ct{a} and \ct{b}), and click a third time to expose
+the superclass member (which should be an instance of \ct{Fred}). You can
+also open up the \ct{super} member and see inside the \ct{Fred} that this
+\ct{Jim} is using as its superclass. See \fref{fg:Jim}.
+
+\begin{figure}
+\figw{3in}{snap11.jpg}
+\caption{Browsing \ct{Jim}}
+\mylabel{fg:Jim}
+\end{figure}
+
+\nip{} has about 20 different graphical classes like \ct{Scale}. Whenever a
+row takes a new value, \nip{} checks to see if that value is an instance of
+one of these special classes, and if it is, it will add a graphical element to
+the row display which represents that class's value. It builds the graphical
+part by looking inside the class for certain members (for example, the scale
+graphic looks for members called \ct{from}, \ct{to} and \ct{value}). When
+you change the graphic (maybe by dragging the scale), \nip{} rebuilds
+the class by looking inside for a edit member (eg. \ct{Scale\_edit})
+or if that's not defined, a constructor member (eg. \ct{Scale}).
+
+You can make your own graphic widgets by subclassing \nip{}'s built-in
+ones. By selectively overriding default constructors and adding edit members,
+you can control how your new widget will behave in expressions, and how it
+will behave if it's edited graphically.
+
+Make a new column, load up an image (use \ctr{File}\ct{Open}), open an
+image viewer (double-click on the thumbnail), drag out two regions on it
+(hold down Ctrl and the left mouse button and drag down and right). Your main 
+window should look like \fref{fg:twomoreregions}.
+
+\begin{figure}
+\figw{3in}{snap12.jpg}
+\caption{Two more regions}
+\mylabel{fg:twomoreregions}
+\end{figure}
+
+\ct{im\_insert} is a VIPS operation that puts one image inside another at an
+(x, y) position. VIPS operations work on VIPS images. The \ct{value} member of
+an \ct{Image} or \ct{Region} is the VIPS image that underlies the \nip{} row.
+
+You can use \ct{im\_insert} to make a thing to join two images together. Back
+in the program window, click on \ctr{File}\ctr{New}\ct{Tool} and enter:
+
+\begin{verbatim}
+// join two images left-right
+
+Join a b = class Image value {
+  shim = Scale "Spacing" 0 1000 0;
+  value = im_insert a.value b.value
+    (a.width + shim.value) 0;
+}
+\end{verbatim}
+
+\noindent
+Click \ctr{File}\ct{Process}. This defines a class \ct{Join} which
+subclasses the \ct{Image} graphic.  
+
+Now select your two regions (click on the first one, shift-click on
+the second) and click on \ctr{Toolkits}\ctr{untitled}\ct{Join}. A
+new \ct{Join} row will appear. Open it up and drag the slider to
+set the spacing between the two joined images. Go back to the image
+viewer for the image file you loaded and try dragging one of the
+regions. \fref{fg:myjoin} shows this class in action. The thing in
+\ctr{Toolkits}\ctr{Image}\ctr{Join}\ct{Left to Right} is just a fancier
+version of this.
+
+\begin{figure}
+\figw{3in}{snap13.jpg}
+\caption{Joining two images with \ct{Join}}
+\mylabel{fg:myjoin}
+\end{figure}
+
+You can change how the graphic widgets behave by subclassing them. Try:
+
+\begin{verbatim}
+Scale_int c f t v = class
+  scope.Scale c f t ((int) v) {
+  Scale = Scale_int;
+}
+\end{verbatim}
+
+\noindent
+This defines a new scale class called \ct{Scale\_int} which can only take
+integer values. The \ct{Scale = Scale\_int;} line is \ct{Scale\_int}
+overriding \ct{Scale}'s constructor, so that a \ct{Scale\_int} stays a
+\ct{Scale\_int} when you drag. Because there's a local called \ct{Scale},
+\ct{Scale\_int} needs to use \ct{scope.Scale} to refer to the superclass.
+
+Here's a version of \ct{Mark} which can only be dragged in a circle. You pass
+it an image to display on, an xy centre position, a radius and a start angle.
+
+\begin{verbatim}
+Mark_circle image x y r a = class 
+  scope.Mark image _x' _y' {
+  // get rect cods for our point
+  _pos = (x, y) + rectangular (r, a);
+  _x' = re _pos;
+  _y' = im _pos;
+
+  Mark i l t 
+    = this.Mark_circle i x y r a'
+  {
+    // vector from centre of
+    // circle to new position
+    u = (l, t) - (x, y);
+
+    // angle of vector
+    a' = im (polar u);
+  }
+}
+\end{verbatim}
+

@@ -1,0 +1,190 @@
+- do we leak for IMAGEVEC/DOUBLEVEC/etc. in vips_call.c? I think we might
+
+- test classmodel_dict_new() ... part of classmodel member automation
+
+  need to implement member edit for OPTION groups
+
+	classmodel_done_member() ... read widget set -> model
+	classmodel_buildedit_member( ... model -> build widget set 
+
+  part of the [["key",value]] arg type
+
+WONTFIX
+=======
+
+- toolkits / find doesn't find builtins on their name ... eg. search for
+  "im_add"
+
+  too hard to fix with the way searching is done now
+
+- turn on update regions during drag, fix the x pos, try dragging, horrible
+  flickering as we update twice, once after the drag motion and once after the
+  recomp
+
+  if you comment out the explicit vobject_refresh() in 
+  regionview_model_update() the flickering goes, but region dragging is then
+  very unresponsive
+
+  fix this when we get fast recomp back again
+
+- have a test_types.ws ... test arithmetic on all combinations of _types?
+
+- panner would be cool
+
+- tooltips on Expression rows always show unedited formula
+
+  could special-case formula for things with expression RHS?
+
+- what about iimage, iregion, iarrow ... can we member automate these? why are
+  they different?
+
+- can't see error indications in noedit mode
+
+  should set a red background for display area as well as for rowview button?
+
+- need to be able to override cons to be able to make a List class :-(
+
+  see reduce.c:1710
+
+  this will change the strictness of cons ... how much breakage will this
+  cause? very unclear
+
+  try this as a quick hack
+
+  need to do this before we can finish List
+
+  need List to make gamma easy
+
+- unselected column headers are too like the bg colour on windows?
+
+- python uses z.real and z.imag to extract real/image, should we add this too?
+
+  we don't really have complex as a true class, so it would be rather odd
+
+  need to add "[a].head" etc as well
+
+- python blocks complex->real with casts ... insists you use .imag/.real or
+  abs()
+
+- if nip sees a IM_RW_IMAGE argument, it could automatically do this:
+
+	int
+	im_flood_blob_copy( IMAGE *in, IMAGE *out, int x, int y, PEL *ink )
+	{
+		IMAGE *t;
+
+		if( !(t = im_open_local( out, "im_flood_blob_copy", "t" )) ||
+			im_copy( in, t ) ||
+			im_flood_blob( t, x, y, ink, NULL ) ||
+			im_copy( t, out ) ) 
+			return( -1 );
+
+		return( 0 );
+	}
+
+  so it would turn a single IM_RW_IMAGE arg into a paired input and output
+  arg
+
+  could make im_lineset() into a regular inplace func and rely on nip to wrap
+  and unwrap
+
+  junk flood_blob_copy
+
+  nip could do this lazilly ... if we see the user doing
+
+     im_line (im_line ...) ...
+
+  then we could make one memory image and call im_line twice on it
+  destructively ... cool! we'd need to check refcounts to make sure the
+  intermediate wasn't being used anywhere else
+
+  hmm! might actually be very hard, we don't have true refcounts for things in
+  the heap
+
+  need to do it on read instead: 
+
+    - for image i
+
+    - use as an IM_RW_IMAGE arg ... copy to a memory area and pass in memory
+      handle
+
+    - return memory area IMAGE j, and set a flag saying "can operate on
+      destructively"
+
+    - if we use j as an IM_RW_IMAGE arg, skip the copy and just pass memory
+      area in destructively ... we now have two ImageInfo sharing a single
+      IMAGE
+
+    - !!!!
+
+    - does ImageInfo allow IMAGE sharing? not sure it does
+
+    - maybe this needs to be a vips8 feature when we'll have refcounts on
+      IMAGE
+
+- tooltip on column says which other columns items in this column refer to,
+  and which columns refer to items in this column
+
+- how about a nip start folder common to all versions
+
+  so nip2-7.11.14 tries
+
+    .nip2-7.11.14/start
+    .nip2-7.11/start
+    .nip2-7/start
+    .nip2/start
+
+  or maybe
+
+    .nip2/7.11.14/start
+    .nip2/7.11/start
+    .nip2/7/start
+    .nip2/start
+
+  bit less cluttered
+
+  also, we could have
+
+    .nip2/tmp
+
+  and not have multiple nip2 tmp areas
+
+  workspace recover after crash could break though ... maybe keep ws saves in
+  .nip2/7.11.4/tmp?
+
+- think again about class arg checks 
+
+  is there some way we can avoid the _check overhead? or at least check less 
+  often
+
+- plotpresent/imagepresent could have a common base class with the focus stuff
+  in? also kb nav, zoom, drag-scroll
+
+  a bit difficult, because we want two different policies on window resize:
+  plot should change the object to match the window
+
+- photographic negative should also be in image/levels ?
+
+  no, it does ->sRGB, (255-) etc., so it's better as a filter
+
+- gtk+ 2.12 has a treeview widget with rectangular select and grid lines
+
+  use instead of gtksheet?
+
+- stop image flickering on clock recomp?
+
+  want background pattern to be a property of the image display widget, not
+  the image?
+
+  so we fade in tiles when that section of the image has never been displayed
+  before (eg. on scroll or zoom)
+
+  we don't fade when that section has been painted and we are just changing
+  the image (eg. on recalc)
+
+  if fadesteps == 1, only paint the sections of the tile for which mask == 255
+
+  this way we will never paint the bg pattern
+
+  need some hack for scroll/zoom ; test for mask == 255 would be slow :(
+

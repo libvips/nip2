@@ -1,0 +1,312 @@
+/* cored sharpen of L only in LAB image ... tuned for typical printers
+ */
+Sharpen_for_print in
+	= map_unary widget in
+{
+	widget in = class
+		Image value {
+		_check_args = [
+			[in, "in", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		target_dpi = Option "Sharpen for print at" [
+			"300 dpi",
+			"150 dpi",
+			"75 dpi"
+		] 0;
+
+		// sharpen params for 300, 150 and 75 dpi
+		// just change the size of the area we search
+		_param_table = [
+			[7, 2.5, 40, 20, 0.5, 1.5],
+			[5, 2.5, 40, 20, 0.5, 1.5],
+			[3, 2.5, 40, 20, 0.5, 1.5]
+		];
+		_params = _param_table?target_dpi;
+
+		value = im_sharpen 
+			(colour_transform_to Image_type.LABQ in.value)
+			_params?0 _params?1 _params?2 _params?3 _params?4
+			_params?5;
+	}
+}
+
+/* adjust tone curve on L*
+ */
+Tone_for_print in
+	= map_unary widget in
+{
+	widget in = class
+		Image value {
+		_check_args = [
+			[in, "in", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		black = Slider 0 100 0;
+		white = Slider 0 100 100;
+
+		shadow_point = Slider 0.1 0.3 0.2;
+		mid_point = Slider 0.4 0.6 0.5;
+		highlight_point = Slider 0.7 0.9 0.8;
+
+		shadow_adjust = Slider (-15) 15 0;
+		mid_adjust = Slider (-30) 30 0;
+		highlight_adjust = Slider (-15) 15 0;
+
+		preview_curve = Image (im_tone_build 
+			black.value white.value
+			shadow_point.value mid_point.value highlight_point.value
+			shadow_adjust.value mid_adjust.value
+			highlight_adjust.value);
+
+		value = im_tone_map 
+			(colour_transform_to Image_type.LABQ in.value) 
+			preview_curve.value;
+	}
+}
+
+/* morph image colours in LAB space ... useful for tweaking colour for print
+ */
+Morph_for_print in
+	= map_unary widget in
+{
+	widget in = class
+		Image value {
+		_check_args = [
+			[in, "in", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		L_scale = 1.15;
+		L_offset = -4.2;
+		ab_scale = Slider 1 1.5 1.15;
+		a_offset = Slider (-10) 10 0;
+		b_offset = Slider (-10) 10 5;
+		grey_correction = Matrix_con 1 0 [
+			[5, 5, -1 ],
+			[10, 4, -1 ],
+			[15, 2, -1 ],
+			[20, 1, 1 ],
+			[25, 1, 2 ],
+			[30, 0, 1 ],
+			[35, 0, 1 ],
+			[40, 0, 1 ],
+			[45, 0, 1 ],
+			[50, 0, 1 ],
+			[55, 0, 0 ],
+			[99, 0, 0 ]
+		];
+
+		value = im_lab_morph in.value 
+			(Vector [0, a_offset.value, b_offset.value] +
+				grey_correction)
+			L_offset L_scale ab_scale.value ab_scale.value;
+	}
+}
+
+#separator
+
+_sample_print_profile = 
+	"$VIPSHOME/share/$PACKAGE/data/HP5000_UVDuraImageGlossMaxQ.icc";
+_sample_monitor_profile = 
+	"$VIPSHOME/share/$PACKAGE/data/sRGB.icm";
+_render_intents = Option "Render intent" [
+	"Perceptual",
+	"Relative",
+	"Saturation",
+	"Absolute"
+] 3;
+
+/* transform from PCS to device space
+ */
+ICC_export in
+	= map_unary widget in
+{
+	widget in = class
+		Image value {
+		_check_args = [
+			[in, "in", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		profile = Filename _sample_print_profile;
+		intent = _render_intents;
+		depth = Option "Output depth" ["8 bit", "16 bit"] 0;
+
+		value = im_icc_export_depth in.value [8, 16]?depth
+			(expand profile.value) intent.value;
+	}
+}
+
+/* transform from device space to PCS
+ */
+ICC_import in
+	= map_unary widget in
+{
+	widget in = class
+		Image value {
+		_check_args = [
+			[in, "in", check_Image]
+		] ++ super._check_args;
+		_check_all = [
+			[in.bands == 3 || in.bands == 4, 
+				"in.bands == 3 || in.bands == 4" ]
+		] ++ super._check_all;
+		_vislevel = 3;
+
+		profile 
+			= Filename _sample_monitor_profile, in.bands == 3
+			= Filename _sample_print_profile;
+		intent = _render_intents;
+
+		value = im_icc_import in.value 
+			(expand profile.value) intent.value;
+	}
+}
+
+/* transform between two device spaces
+ */
+ICC_transform in
+	= map_unary widget in
+{
+	widget in = class
+		Image value {
+		_check_args = [
+			[in, "in", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		in_profile = Filename _sample_monitor_profile;
+		out_profile = Filename _sample_print_profile;
+		intent = _render_intents;
+
+		value = im_icc_transform in.value 
+			(expand in_profile.value) 
+			(expand out_profile.value) intent.value;
+	}
+}
+
+/* transform from absolute to relative colorimetry
+ */
+ICC_ac2rc in
+	= map_unary widget in
+{
+	widget in = class
+		Image value {
+		_check_args = [
+			[in, "in", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		profile = Filename _sample_print_profile;
+
+		value = im_icc_ac2rc in.value (expand profile.value);
+	}
+}
+
+#separator
+
+/* convert between XYZ and Lab for D50
+ */
+D50XYZ_to_D50Lab in = map_unary (colour_unary im_D50XYZ2Lab) in;
+
+/* convert between XYZ and Lab for D50
+ */
+D50Lab_to_D50XYZ in = map_unary (colour_unary im_D50Lab2XYZ) in;
+
+#separator
+
+/* add an editable drop shadow to an image 
+ */
+Drop_shadow x
+	= map_unary shadow x
+{
+	shadow image = class 
+		Image value {
+		_check_args = [
+			[image, "image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		shadow_width = Slider 0 50 5;
+		shadow_height = Slider 0 50 5;
+		shadow_softness = Slider 0 20 5;
+		use_mask = Toggle "Use mask to make shadow" false;
+		mask_image = foldr1 bitwise_and (bandsplit (image > 128));
+		background_colour = 255;
+		shadow_colour = 128;
+
+		value 
+			 = final
+		{
+			blur_size = shadow_softness.value * 2 + 1;
+
+			// matrix we blur with to soften shadows
+			mask_g = im_gauss_imask (blur_size / 3) 0.2;
+			mask_g_line = mask_g.value ? (mask_g.height / 2);
+			mask_g_sum = foldr1 add mask_g_line;
+			blur_matrix = Matrix_con mask_g_sum 0 [mask_g_line];
+			mask_size = mask_g.width;
+
+			// size of final image we build
+			final_width = image.width + 2 * mask_size + 
+				shadow_width.value;
+			final_height = image.height + 2 * mask_size + 
+				shadow_height.value;
+
+			// make a plain image 
+			mk_background colour = image_new 
+				final_width final_height
+				image.bands image.format 
+				Image_coding.NOCODING image.type
+				colour
+				0 0;
+
+			// make a mask image ... place at (x,y) in the final
+			// image
+			mk_mask x y 
+				= im_insert black mask_image.value x y,
+					use_mask
+				= im_insert black white x y
+			{
+				black = image_new 
+					final_width final_height
+					1 Image_format.UCHAR
+					Image_coding.NOCODING Image_type.B_W
+					0
+					0 0;
+				white = image_new 
+					image.width image.height
+					1 Image_format.UCHAR
+					Image_coding.NOCODING Image_type.B_W
+					255
+					0 0;
+			}
+
+			// make the shadow mask image ... offset mask and
+			// soften
+			shadow_mask = mk_mask  
+				(mask_size + shadow_width.value)
+				(mask_size + shadow_height.value);
+			shadow_mask' = im_convsep shadow_mask blur_matrix;
+
+			// make underlay ... use shadow mask to blend between
+			// background colour and shadow colour
+			background = mk_background background_colour;
+			shadow = mk_background shadow_colour;
+			underlay = im_blend shadow_mask' shadow background;
+
+			// overlay ... place image at final position
+			overlay = mk_background 0;
+			overlay' = im_insert overlay image.value
+				mask_size mask_size;
+
+			// overlay mask
+			overlay_mask = mk_mask mask_size mask_size;
+
+			final = if overlay_mask then overlay' else underlay;
+		}
+	}
+}

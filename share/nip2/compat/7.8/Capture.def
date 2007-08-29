@@ -1,0 +1,190 @@
+/* make a new capture image
+ */
+Capture_video = class
+	Image value {
+	// shortcut to prefs
+	_prefs = Workspaces.Preferences;
+
+	device = _prefs.VIDEO_DEVICE;
+	channel = Option "Input channel" [
+		"TV",
+		"Composite 1",
+		"Composite 2",
+		"Composite 3"
+	] _prefs.VIDEO_CHANNEL;
+	brightness = Slider 0 32767 _prefs.VIDEO_BRIGHTNESS;
+	colour = Slider 0 32767 _prefs.VIDEO_COLOUR;
+	contrast = Slider 0 32767 _prefs.VIDEO_CONTRAST;
+	hue = Slider 0 32767 _prefs.VIDEO_HUE;
+	frames_hint = "Average this many frames:";
+	frames = Slider 0 100 _prefs.VIDEO_FRAMES;
+	mono = Toggle "Monochrome grab" _prefs.VIDEO_MONO;
+	crop = Toggle "Crop image" _prefs.VIDEO_CROP;
+
+	// grab, but hide it ... if we let the crop edit
+	_raw_grab = Image (im_video_v4l1 device channel.value
+		brightness.value colour.value contrast.value hue.value
+		frames.value);
+
+	edit_crop
+		= Region _raw_grab left top width height
+	{
+		left = _prefs.VIDEO_CROP_LEFT;
+		top = _prefs.VIDEO_CROP_TOP;
+		width = min_pair
+			_prefs.VIDEO_CROP_WIDTH
+			(_raw_grab.width + left);
+		height = min_pair
+			_prefs.VIDEO_CROP_HEIGHT
+			(_raw_grab.height + top);
+	}
+
+	aspect_hint = "Stretch vertically by this factor:";
+	aspect_ratio = _prefs.VIDEO_ASPECT;
+
+	value 
+		= frame'
+	{
+		frame 
+			= edit_crop.value, crop
+			= _raw_grab.value;
+
+		frame' 
+			= colour_transform Image_type.sRGB Image_type.B_W frame,
+				mono
+			= frame;
+	}
+}
+
+#separator
+
+/* use white image w to correct image i 
+ */
+Light_correct w i
+	= map_binary wc w i
+{
+	wc w i
+		= clip2fmt i.format (w' * i)
+	{
+		fac = mean w / max w;
+		w' = fac * (max w / w);
+	}
+}
+
+/* equalize bands in region r
+ */
+White_balance r
+	= map_unary wb r
+{
+	wb region
+		= clip2fmt region.format (region.image * Vector facs)
+	{
+		target = mean region; 
+		facs = map (divide target) (map mean (bandsplit region));
+	}
+}
+
+/* remove features larger than a certain size from image x
+ */
+Smooth_image x
+      = map_unary smooth x
+{
+	smooth image = class 
+		Image value {
+		_check_args = [
+			[image, "image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		feature = Slider 1 50 20;
+
+		value = im_resize_linear 
+			(im_shrink image.value feature.value feature.value)
+			image.width image.height;
+	}
+}
+
+#separator
+
+/* calculate RGB -> LAB transform from an image of a Macbeth colour chart
+ */
+Calibrate_chart image = class 
+        Image value {
+	_check_args = [
+		[image, "image", check_Image]
+	] ++ super._check_args;
+	_vislevel = 3;
+
+	// get macbeth data file to use
+        macbeth = Filename "$VIPSHOME/share/$PACKAGE/data/macbeth_lab_d65.mat";
+
+	// get max of input image
+	_max_value = Image_format.maxval image.format;
+
+	// measure chart image
+	_camera = im_measure image.value 0 0 image.width image.height 6 4;
+
+	// load true values
+	_true_Lab = Matrix_file macbeth.value;
+	_true_XYZ = colour_transform 
+		Image_type.LAB Image_type.XYZ _true_Lab;
+
+	// get Ys of greyscale
+	_true_grey_Y = map (extract 1) (drop 18 _true_XYZ.value);
+
+	// camera greyscale (all bands)
+	_camera_grey = drop 18 _camera.value;
+
+	// normalise both to 0-1 and combine
+	_camera_grey' = map (map (multiply (1 / _max_value))) _camera_grey;
+	_true_grey_Y' = map (multiply (1 / 100)) _true_grey_Y;
+	_comb = Matrix (map2 cons _true_grey_Y' _camera_grey');
+
+	// make a linearising lut ... zero on left
+	_linear_lut = im_invertlut _comb (_max_value + 1);
+
+	// and display it
+	linearising_lut = Image _linear_lut;
+
+	// map the original image through the lineariser to get linear 0-1
+	// RGB image
+	_image' = im_maplut image.value linearising_lut.value;
+
+	// remeasure and solve for RGB -> XYZ
+	_camera' = im_measure _image' 0 0 image.width image.height 6 4;
+	_pinv = (transpose _camera' * _camera') ** -1;
+	M = transpose (_pinv * transpose _camera' * _true_XYZ);
+
+	// convert linear RGB camera to Lab 
+	value = colour_transform Image_type.XYZ Image_type.LAB 
+		((float) (recomb M _image'));
+
+	// measure again and compute dE76
+	_camera'' = im_measure value 0 0 image.width image.height 6 4;
+
+	_dEs = map abs_vec (map Vector (_camera'' - _true_Lab).value);
+	final_dE76 = mean (Vector _dEs);
+	_max_dE = foldr max_pair 0 _dEs;
+	_worst = index (equal _max_dE) _dEs;
+	worst_patch = _macbeth_names ? _worst ++ 
+		" (patch " ++ print (_worst + 1) ++ ")";
+}
+
+/* apply RGB -> LAB transform to an image
+ */
+Calibrate_image calib image = class 
+        Image value {
+	_check_args = [
+		[calib, "calib", check_instance "Calibrate_chart"],
+		[image, "image", check_Image]
+	] ++ super._check_args;
+
+	// map the original image through the lineariser to get linear 0-1
+	// RGB image
+	_image' = im_maplut image.value calib.linearising_lut.value;
+
+	// convert linear RGB camera to Lab 
+	value = colour_transform Image_type.XYZ Image_type.LAB 
+		((float) (recomb calib.M _image'));
+}
+

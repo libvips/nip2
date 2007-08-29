@@ -1,0 +1,83 @@
+\documentclass[a4paper,twocolumn,dvips]{book}
+\usepackage[dvips=false,pdftex=false,vtex=false]{geometry}
+\usepackage{ifpdf}
+\ifpdf
+  \usepackage[pdftex]{graphicx,color}
+\else
+  \usepackage{graphicx,color}
+\fi
+\usepackage{times}
+\usepackage{fancyhdr}
+\usepackage{ifthen}
+
+\input{mydefs}
+
+\fancyhead{} % clear all fields
+\fancyhead[LE,RO]{\leftmark}		% left-even, right-odd
+\fancyhead[RE,LO]{\nip{} Manual}	% right-even, left-odd
+\fancyfoot[LE,RO]{\thepage}		% left-even, right-odd
+\fancyfoot[RE,LO]{February 2007}		
+
+\begin{document}
+
+\pagenumbering{roman}
+
+\begin{titlepage}
+\thispagestyle{empty}
+\begin{center}
+\huge
+\nip{} Manual\\
+\large Version 7.12\\
+\vspace{0.5in}
+\large
+John Cupitt, 
+Rachel Billinge,
+Joseph Padfield, 
+Clare Richardson, 
+David Saunders\\ 
+\end{center}
+
+% hmm ... must be a better way to get the quote at the bottom of the page
+\vspace{3in}
+
+\begin{center}
+\noindent
+\emph{``It's quite simple really, and at the same time, rather 
+complicated.''} \\
+--- A.\ Haddock, Sea captain (rtd.)
+\end{center}
+
+\vspace{3in}
+
+\noindent
+\small{This document formatted \today}
+\setcounter{page}{1}
+\end{titlepage}
+
+%\blankpage
+\tableofcontents
+\thispagestyle{plain}
+
+%\blankpage
+\listoffigures
+\thispagestyle{plain}
+
+%\blankpage
+\listoftables
+\thispagestyle{plain}
+
+\blankpage
+\pagenumbering{arabic}
+\thispagestyle{plain}
+\cfoot{}
+
+\input{intro}
+\input{tutorial}
+\input{infrared}
+\input{reference}
+\input{menus}
+\input{program}
+\appendix
+\input{config}
+
+\end{document}

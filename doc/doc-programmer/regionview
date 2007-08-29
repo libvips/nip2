@@ -1,0 +1,19 @@
+how regionviews are built and maintained
+
+
+
+iregion				iregionview
+  end of parent_add, make
+  iregiongroup child
+
+iregiongroup			iregiongroupview
+  monitor object updates,	  on iregiongroupview_refresh() create and 
+  set and unset model->display	  destroy regionview ... watches iregion model
+
+
+regionview_new( iregion, area, imagepresent )
+  does not view_link(), since it's not a true view ... adds own signal 
+  handlers for "changed" and "destroy" on iregion/iarrow
+
+
+

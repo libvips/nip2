@@ -1,0 +1,109 @@
+/* rotate images and matricies by fixed angles
+ */
+Rotate_fixed = class {
+        /* rotate image clockwise in 90 degree increments
+         */
+        _rotate_widget default a
+                = map_unary widget a
+        {
+                widget image = class
+                        Image value {
+                        _check_args = [
+                                [image, "image", check_Image]
+                        ] ++ super._check_args;
+                        _vislevel = 3;
+
+                        angle = Option "Rotate by" [
+                                "Don't rotate", 
+                                "90 degrees clockwise",
+                                "180 degrees",
+                                "90 degrees anticlockwise"
+                        ] default;
+
+                        value = [
+                                image.value, 
+                                rot90 image.value,
+                                rot180 image.value,
+                                rot270 image.value
+                        ] ? angle;
+                }
+        }
+
+        /* clockwise rotate by 90 degrees
+         */
+        R90 x = _rotate_widget 1 x;
+
+        /* rotate by 180 degrees
+         */
+        R180 x = _rotate_widget 2 x;
+
+        /* clockwise rotate by 270 degrees
+         */
+        R270 x = _rotate_widget 3 x;
+
+        /* rotate by 45 degrees ... square, odd-length-sides, matrices only
+         */
+        R45 x = map_unary rot45 x;
+}
+
+/* rotate image anticlockwise by any angle
+ */
+Rotate_free a
+	= map_unary widget a
+{
+	widget image = class 
+		Image value {
+		_check_args = [
+			[image, "image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		angle = Slider 0 360 0;
+
+		value = rotate angle image.value;
+	}
+}
+
+#separator
+
+/* mirror left/right or up/down
+ */
+Flip = class {
+	/* mirror object up/down
+	 */
+	Up_down x = map_unary flipud x;
+
+	/* mirror object left/right
+	 */
+	Left_right x = map_unary fliplr x;
+}
+
+/* swap rows and columns
+ */
+Transpose x = map_unary transpose x;
+
+#separator
+
+/* smallest rotate that gets arrow vertical or horizontal
+ */
+Straighten_arrow x
+	= map_unary straighten x
+{
+	straighten arrow
+		= rotate angle'' arrow.image
+	{
+		x = arrow.width;
+		y = arrow.height;
+
+		angle = im (polar (x, y));
+
+		angle'
+			= angle - 360, angle > 315
+			= angle - 180, angle > 135
+			= angle;
+
+		angle''
+			= -angle', angle' >= (-45) && angle' < 45
+			= 90 - angle';
+	}
+}

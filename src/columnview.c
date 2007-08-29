@@ -1,0 +1,1024 @@
+/* a view of a column
+ */
+
+/*
+
+    Copyright (C) 1991-2003 The National Gallery
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+ */
+
+/*
+
+    These files are distributed with VIPS - http://www.vips.ecs.soton.ac.uk
+
+ */
+
+/* 
+#define DEBUG
+ */
+
+#include "ip.h"
+
+static ViewClass *parent_class = NULL;
+
+/* The columnview popup menu.
+ */
+static GtkWidget *columnview_menu = NULL;
+
+/* Edit caption ... right button menu on title bar.
+ */
+static void
+columnview_caption_cb( GtkWidget *wid, GtkWidget *host, Columnview *cview )
+{
+        /* Edit caption!
+         */
+        if( cview->state == COL_EDIT )
+                return;
+
+        cview->state = COL_EDIT;
+        vobject_refresh_queue( VOBJECT( cview ) );
+}
+
+/* Select all objects in menu's column.
+ */
+static void
+columnview_select_cb( GtkWidget *wid, GtkWidget *host, Columnview *cview )
+{
+	Column *col = COLUMN( VOBJECT( cview )->iobject );
+	Workspace *ws = col->ws;
+
+	workspace_deselect_all( ws );
+        column_select_symbols( col );
+}
+
+/* Clone a column.
+ */
+static void
+columnview_clone_cb( GtkWidget *wid, GtkWidget *host, Columnview *cview )
+{
+	Column *col = COLUMN( VOBJECT( cview )->iobject );
+	Workspace *ws = col->ws;
+	char *newname = workspace_column_name_new( ws, NULL );
+        Column *newcol = workspace_column_get( ws, newname );
+
+	IM_FREE( newname );
+        iobject_set( IOBJECT( newcol ), NULL, IOBJECT( col )->caption );
+        newcol->x = col->x + 30;
+        newcol->y = col->y + 30;
+
+	workspace_deselect_all( ws );
+        column_select_symbols( col );
+	workspace_column_select( ws, newcol );
+        if( !workspace_clone_selected( ws ) )
+                box_alert( GTK_WIDGET( cview ) );
+	workspace_deselect_all( ws );
+
+        symbol_recalculate_all();
+}
+
+/* Callback from save browser.
+ */
+static void
+columnview_save_as_sub( iWindow *iwnd, 
+	void *client, iWindowNotifyFn nfn, void *sys )
+{
+	Filesel *filesel = FILESEL( iwnd );
+	Column *col = COLUMN( client );
+	Workspace *ws = col->ws;
+	char *filename;
+
+	workspace_deselect_all( ws );
+        column_select_symbols( col );
+
+	if( (filename = filesel_get_filename( filesel )) ) {
+		if( workspace_selected_save( ws, filename ) ) {
+			workspace_deselect_all( ws );
+			nfn( sys, IWINDOW_TRUE );
+		}
+		else
+			nfn( sys, IWINDOW_ERROR );
+
+		g_free( filename );
+	}
+	else
+		nfn( sys, IWINDOW_ERROR );
+}
+
+/* Save a column ... can't just do view_save_as_cb(), since we need to save
+ * the enclosing workspace too. Hence we have to save_selected on the ws, but
+ * only after we have the filename.
+ */
+static void
+columnview_save_as_cb( GtkWidget *wid, GtkWidget *host, Columnview *cview )
+{
+	Column *col = COLUMN( VOBJECT( cview )->iobject );
+	iWindow *iwnd = IWINDOW( view_get_toplevel( VIEW( cview ) ) );
+	GtkWidget *filesel = filesel_new();
+
+	iwindow_set_title( IWINDOW( filesel ), 
+		_( "Save Column \"%s\"" ), IOBJECT( col )->name );
+	filesel_set_flags( FILESEL( filesel ), FALSE, TRUE );
+	filesel_set_filetype( FILESEL( filesel ), filesel_type_workspace, 0 ); 
+	iwindow_set_parent( IWINDOW( filesel ), GTK_WIDGET( iwnd ) );
+	idialog_set_iobject( IDIALOG( filesel ), IOBJECT( col ) );
+	filesel_set_done( FILESEL( filesel ), columnview_save_as_sub, col );
+	iwindow_build( IWINDOW( filesel ) );
+
+	gtk_widget_show( GTK_WIDGET( filesel ) );
+}
+
+/* Make a name for a column menu file, based on what we're going to call the
+ * menu item.
+ */
+static void
+columnview_filename( char *file, const char *caption )
+{
+	int i;
+	char name[FILENAME_MAX];
+
+	im_strncpy( name, caption, 10 );
+	for( i = 0; i < strlen( name ); i++ )
+		if( name[i] == ' ' )
+			name[i] = '_';
+
+	for( i = 0; ; i++ ) {
+		im_snprintf( file, FILENAME_MAX, 
+			"$SAVEDIR" G_DIR_SEPARATOR_S "data" G_DIR_SEPARATOR_S 
+			"%s-%d.ws", name, i );
+		if( !existsf( "%s", file ) )
+			break;
+	}
+}
+
+/* Remember the name of the last toolkit the user asked to add to.
+ */
+static char *columnview_to_menu_last_toolkit = NULL;
+
+/* Done button hit.
+ */
+static void
+columnview_to_menu_done_cb( iWindow *iwnd, void *client, 
+	iWindowNotifyFn nfn, void *sys )
+{
+	Column *col = COLUMN( client );
+	Workspace *ws = col->ws;
+	Stringset *ss = STRINGSET( iwnd );
+	StringsetChild *name = stringset_child_get( ss, _( "Name" ) );
+	StringsetChild *toolkit = stringset_child_get( ss, _( "Toolkit" ) );
+	StringsetChild *file = stringset_child_get( ss, _( "Filename" ) );
+
+	char name_text[1024];
+	char toolkit_text[1024];
+	char file_text[1024];
+
+	if( !get_geditable_string( name->entry, name_text, 1024 ) ||
+		!get_geditable_name( toolkit->entry, toolkit_text, 1024 ) ||
+		!get_geditable_filename( file->entry, file_text, 1024 ) ) {
+		nfn( sys, IWINDOW_ERROR );
+		return;
+	}
+
+	/* Save column to file.
+	 */
+	workspace_deselect_all( ws );
+        column_select_symbols( col );
+
+	if( !workspace_selected_save( ws, file_text ) ) {
+		nfn( sys, IWINDOW_ERROR );
+		return;
+	}
+
+	workspace_deselect_all( ws );
+
+	if( !tool_new_dia( toolkit_by_name( ws->kitg, toolkit_text ), 
+			-1, name_text, file_text ) ) {
+		unlinkf( "%s", file_text );
+		nfn( sys, IWINDOW_ERROR );
+		return;
+	}
+
+	IM_SETSTR( columnview_to_menu_last_toolkit, toolkit_text );
+
+	nfn( sys, IWINDOW_TRUE );
+}
+
+/* Make a column into a menu item. 
+ */
+static void
+columnview_to_menu_cb( GtkWidget *wid, GtkWidget *host, Columnview *cview )
+{
+	Column *col = COLUMN( VOBJECT( cview )->iobject );
+	iWindow *iwnd = IWINDOW( view_get_toplevel( VIEW( cview ) ) );
+	GtkWidget *ss = stringset_new();
+	char *name;
+	char *kit_name;
+	char filename[FILENAME_MAX];
+
+	if( !(name = IOBJECT( col )->caption) )
+		name = "untitled";
+	columnview_filename( filename, name );
+
+	if( columnview_to_menu_last_toolkit )
+		kit_name = columnview_to_menu_last_toolkit;
+	else
+		kit_name = "untitled";
+
+	stringset_child_new( STRINGSET( ss ), 
+		_( "Name" ), name, _( "Set menu item text here" ) );
+	stringset_child_new( STRINGSET( ss ), 
+		_( "Toolkit" ), kit_name, _( "Add to this toolkit" ) );
+	stringset_child_new( STRINGSET( ss ), 
+		_( "Filename" ), filename, _( "Store column in this file" ) );
+
+	iwindow_set_title( IWINDOW( ss ), 
+		_( "New Menu Item from Column \"%s\"" ), IOBJECT( col )->name );
+	idialog_set_callbacks( IDIALOG( ss ), 
+		iwindow_true_cb, NULL, NULL, col );
+	idialog_set_help_tag( IDIALOG( ss ), "sec:diaref" );
+	idialog_add_ok( IDIALOG( ss ), columnview_to_menu_done_cb, 
+		_( "Menuize" ) );
+	iwindow_set_parent( IWINDOW( ss ), GTK_WIDGET( iwnd ) );
+	iwindow_build( IWINDOW( ss ) );
+
+	gtk_widget_show( ss );
+}
+
+/* Find the position and size of a columnview.
+ */
+void
+columnview_get_position( Columnview *cview, int *x, int *y, int *w, int *h )
+{
+	Column *col = COLUMN( VOBJECT( cview )->iobject );
+
+        if( GTK_WIDGET( cview )->allocation.x < 2 || 
+		GTK_WIDGET( cview )->allocation.y < 2 ) {
+                /* Nothing there yet, guess.
+                 */
+		*x = col->x; 
+		*y = col->y;
+                *w = 200;
+                *h = 50;
+        }
+        else {
+                *x = GTK_WIDGET( cview )->allocation.x;
+                *y = GTK_WIDGET( cview )->allocation.y;
+                *w = GTK_WIDGET( cview )->allocation.width;
+                *h = GTK_WIDGET( cview )->allocation.height;
+
+#ifdef DEBUG
+		printf( "columnview_get_position: %s, "
+			"x = %d, y = %d, w = %d, h = %d\n",
+			IOBJECT( col )->name, *x, *y, *w, *h );
+#endif /*DEBUG*/
+        }
+}
+
+/* Transition functions for mouse stuff on columnviews.
+ */
+static void
+columnview_left_press( Columnview *cview, GdkEvent *ev )
+{
+	Workspaceview *wview = cview->wview;
+
+        int ix, iy;
+        int jx, jy;
+        int kx, ky;
+        int wx, wy, ww, wh;
+
+#ifdef DEBUG
+	printf( "columnview_left_press\n" );
+#endif /*DEBUG*/
+
+        /* Find pos of columnview.
+         */
+        columnview_get_position( cview, &wx, &wy, &ww, &wh );
+
+        /* Position in virtual tally window.
+         */
+        ix = ev->button.x + wx;
+        iy = ev->button.y + wy;
+
+        /* Position in tally viewport.
+         */
+        jx = ix - wview->vp.left;
+        jy = iy - wview->vp.top;
+
+        /* So ... position of top LH corner of tally viewport in root window.
+         */
+        kx = ev->button.x_root - jx;
+        ky = ev->button.y_root - jy;
+
+        switch( cview->state ) {
+        case COL_WAIT:
+                cview->state = COL_SELECT;
+
+                /* Record offset of mouse in columnview title bar.
+                 */
+                cview->rx = ev->button.x;
+                cview->ry = ev->button.y;
+
+                /* Position of tally window in root window.
+                 */
+                cview->tx = kx;
+                cview->ty = ky;
+
+                /* Start position of mouse in virtual tally window.
+                 */
+                cview->sx = ix;
+                cview->sy = iy;
+
+                break;
+
+        case COL_SELECT:
+        case COL_DRAG:
+        case COL_EDIT:
+                break;
+
+        default:
+		assert( FALSE );
+        }
+}
+
+typedef struct {
+	Column *col;		/* Column we are snapping */
+	Column *best;		/* Closest we've found so far */
+} ColumnviewSnap;
+
+static void *
+columnview_snap_column( Column *col, ColumnviewSnap *snap )
+{
+	if( col != snap->col )
+		if( !snap->best ||
+			IM_ABS( col->x - snap->col->x ) < 
+				IM_ABS( snap->best->x - snap->col->x ) ) 
+			snap->best = col;
+
+	return( NULL );
+}
+
+static void
+columnview_snap( Column *col )
+{
+	const int SNAP_THRESHOLD = 20;
+	Workspace *ws = col->ws;
+	ColumnviewSnap snap;
+	
+	/* Find the column closest to this one.
+	 */
+	snap.col = col;
+	snap.best = NULL;
+	(void) workspace_map_column( ws, 
+		(column_map_fn) columnview_snap_column, &snap );
+
+	if( snap.best && IM_ABS( snap.best->x - col->x ) < SNAP_THRESHOLD ) 
+		col->x = snap.best->x;
+}
+
+static void
+columnview_left_motion( Columnview *cview, GdkEvent *ev )
+{
+	Column *col = COLUMN( VOBJECT( cview )->iobject );
+	Workspaceview *wview = cview->wview;
+
+	int u, v;
+
+        /* Posn of pointer in tally viewport.
+         */
+        int ix = ev->motion.x_root - cview->tx;
+        int iy = ev->motion.y_root - cview->ty;
+
+        /* Posn in virtual tally cods.
+         */
+        int jx = ix + wview->vp.left;
+        int jy = iy + wview->vp.top;
+
+        /* Amount of drag since we started.
+         */
+        int xoff = jx - cview->sx;
+        int yoff = jy - cview->sy;
+
+        /* New columnview position.
+         */
+        int xnew = IM_MAX( 0, jx - cview->rx );
+        int ynew = IM_MAX( 0, jy - cview->ry );
+
+#ifdef DEBUG
+	printf( "columnview_left_motion\n" );
+#endif /*DEBUG*/
+
+        switch( cview->state ) {
+        case COL_EDIT:
+        case COL_WAIT:
+                break;
+
+        case COL_SELECT:
+                /* How much drag?
+                 */
+                if( abs( xoff ) > 5 || abs( yoff ) > 5 ) {
+                        cview->state = COL_DRAG;
+			workspaceview_set_cursor( wview, IWINDOW_SHAPE_MOVE );
+                }
+
+                break;
+
+        case COL_DRAG:
+		col->x = xnew;
+		col->y = ynew;
+
+		/* Snap to other column x positions.
+		 */
+		columnview_snap( col );
+
+		iobject_changed( IOBJECT( col ) );
+
+#ifdef DEBUG
+		printf( "drag columnview: x=%d, y=%d", col->x, col->y );
+#endif /*DEBUG*/
+
+                /* Set vars for bg scroll.
+                 */
+		u = 0;
+                if( ix > wview->vp.width )
+                        u = 10;
+                else if( ix < 0 )
+                        u = -10;
+
+		v = 0;
+                if( iy > wview->vp.height )
+                        v = 10;
+                else if( iy < 0 )
+                        v = -10;
+
+		workspaceview_scroll_background( wview, u, v );
+
+                break;
+
+        default:
+                assert( FALSE );
+        }
+}
+
+static void
+columnview_left_release( Columnview *cview, GdkEvent *ev )
+{
+	Column *col = COLUMN( VOBJECT( cview )->iobject );
+	Workspace *ws = col->ws;
+	Workspaceview *wview = cview->wview;
+
+#ifdef DEBUG
+	printf( "columnview_left_release\n" );
+#endif /*DEBUG*/
+
+        /* Back to wait.
+         */
+        switch( cview->state ) {
+        case COL_SELECT:
+                cview->state = COL_WAIT;
+                workspace_column_select( ws, col );
+                view_child_front( VIEW( cview ) );
+
+                break;
+
+        case COL_DRAG:
+                cview->state = COL_WAIT;
+		workspaceview_scroll_background( wview, 0, 0 );
+		filemodel_set_modified( FILEMODEL( ws ), TRUE );
+		workspaceview_set_cursor( wview, IWINDOW_SHAPE_NONE );
+
+                break;
+
+        case COL_EDIT:
+        case COL_WAIT:
+                break;
+
+        default:
+                assert( FALSE );
+        }
+}
+
+/* Event in columnview title bar.
+ */
+static gboolean
+columnview_event_cb( GtkWidget *widget, GdkEvent *ev, Columnview *cview )
+{
+	gboolean handled = FALSE;
+
+#ifdef DEBUG
+	printf( "columnview_event_cb %d\n", ev->type );
+#endif /*DEBUG*/
+
+        switch( ev->type ) {
+        case GDK_BUTTON_PRESS:
+                if( ev->button.button == 1 ) {
+                        columnview_left_press( cview, ev );
+                        handled = TRUE;
+                }
+
+                break;
+
+        case GDK_2BUTTON_PRESS:
+                if( ev->button.button == 1 ) {
+			if( cview->state != COL_EDIT ) {
+				cview->state = COL_EDIT;
+				vobject_refresh_queue( VOBJECT( cview ) );
+			}
+                        handled = TRUE;
+                }
+
+                break;
+
+        case GDK_MOTION_NOTIFY:
+                if( ev->motion.state & GDK_BUTTON1_MASK ) {
+                        columnview_left_motion( cview, ev );
+                        handled = TRUE;
+                }
+
+                break;
+
+        case GDK_BUTTON_RELEASE:
+                if( ev->button.button == 1 ) {
+                        columnview_left_release( cview, ev );
+                        handled = TRUE;
+                }
+
+                break;
+
+        default:
+                break;
+        }
+
+        return( handled );
+}
+
+/* Arrow button on title bar.
+ */
+static void
+columnview_updown_cb( GtkWidget *wid, Columnview *cview )
+{
+	Column *col = COLUMN( VOBJECT( cview )->iobject );
+
+	column_set_open( col, !col->open );
+}
+
+/* Delete this column from the popup menu.
+ */
+static void
+columnview_destroy_cb( GtkWidget *wid, GtkWidget *host, Columnview *cview )
+{
+	Column *col = COLUMN( VOBJECT( cview )->iobject );
+
+	model_check_destroy( view_get_toplevel( VIEW( cview ) ), MODEL( col ) );
+}
+
+/* Delete this column with a click on the 'x' button.
+ */
+static void
+columnview_destroy2_cb( GtkWidget *wid, Columnview *cview )
+{
+	Column *col = COLUMN( VOBJECT( cview )->iobject );
+
+	model_check_destroy( view_get_toplevel( VIEW( cview ) ), MODEL( col ) );
+}
+
+/* Callback for enter in caption edit box.
+ */
+static void
+columnview_caption_enter_cb( GtkWidget *wid, Columnview *cview )
+{
+        const char *text = gtk_entry_get_text( GTK_ENTRY( cview->capedit ) );
+	Column *col = COLUMN( VOBJECT( cview )->iobject );
+	Workspace *ws = col->ws;
+
+        cview->state = COL_WAIT;
+	iobject_set( IOBJECT( col ), NULL, text );
+	filemodel_set_modified( FILEMODEL( ws ), TRUE );
+
+	/* The ws view needs to update the jumpto menus.
+	 */
+	iobject_changed( IOBJECT( ws ) );
+}
+
+/* Detect cancel in a caption field.
+ */
+static gboolean
+columnview_caption_cancel_cb( GtkWidget *widget, 
+	GdkEvent *ev, Columnview *cview )
+{
+        if( ev->type != GDK_KEY_PRESS || ev->key.keyval != GDK_Escape )
+                return( FALSE );
+
+        /* Turn off edit.
+         */
+        cview->state = COL_WAIT;
+        vobject_refresh_queue( VOBJECT( cview ) );
+
+        return( TRUE );
+}
+
+/* Add a caption entry to a columnview if not there.
+ */
+static void
+columnview_add_caption( Columnview *cview )
+{
+        if( cview->capedit )
+                return;
+
+        cview->capedit = gtk_entry_new();
+	gtk_entry_set_has_frame( GTK_ENTRY( cview->capedit ), FALSE );
+        gtk_box_pack_start( GTK_BOX( cview->titlehb ),
+                cview->capedit, FALSE, FALSE, 0 );
+        set_tooltip( cview->capedit, _( "Edit caption, press enter to "
+                "accept changes, press escape to cancel" ) );
+
+        gtk_signal_connect( GTK_OBJECT( cview->capedit ), "activate",
+                GTK_SIGNAL_FUNC( columnview_caption_enter_cb ), cview );
+        gtk_signal_connect( GTK_OBJECT( cview->capedit ), "event",
+                GTK_SIGNAL_FUNC( columnview_caption_cancel_cb ), cview );
+}
+
+/* Callback for enter in new def widget.
+ */
+static void
+columnview_text_enter_cb( GtkWidget *wid, Columnview *cview )
+{
+        const char *text = gtk_entry_get_text( GTK_ENTRY( cview->text ) );
+	Column *col = COLUMN( VOBJECT( cview )->iobject );
+	Workspace *ws = col->ws;
+        Symbol *sym;
+
+        if( !text || strspn( text, WHITESPACE ) == strlen( text ) )
+		return;
+
+	if( !(sym = workspace_add_def( ws, text )) ) {
+		box_alert( wid );
+		symbol_recalculate_all();
+		return;
+	}
+
+	set_gentry( cview->text, NULL );
+}
+
+/* Add bottom entry widget.
+ */
+static void
+columnview_add_text( Columnview *cview )
+{
+        GtkWidget *inv;
+
+        if( cview->textfr )
+                return;
+
+        cview->textfr = gtk_hbox_new( FALSE, 0 );
+        gtk_box_pack_end( GTK_BOX( cview->vbox ), 
+		cview->textfr, FALSE, FALSE, 0 );
+        inv = gtk_label_new( "" );
+        gtk_box_pack_start( GTK_BOX( cview->textfr ), inv, FALSE, FALSE, 25 );
+        gtk_widget_show( inv );
+        cview->text = gtk_entry_new();
+        gtk_box_pack_start( GTK_BOX( cview->textfr ), 
+		cview->text, TRUE, TRUE, 0 );
+        gtk_signal_connect( GTK_OBJECT( cview->text ), "activate",
+                GTK_SIGNAL_FUNC( columnview_text_enter_cb ), cview );
+        gtk_widget_show( cview->text );
+        set_tooltip( cview->text, _( "Enter expressions here" ) );
+}
+
+static void 
+columnview_refresh( vObject *vobject )
+{
+	Columnview *cview = COLUMNVIEW( vobject );
+	Column *col = COLUMN( VOBJECT( cview )->iobject );
+	gboolean editable = col->ws->mode != WORKSPACE_MODE_NOEDIT;
+
+	/* Update position.
+	 */
+	if( col->x != cview->lx || col->y != cview->ly ) {
+#ifdef DEBUG
+		printf( "columnview_refresh: move column %s to %d x %d\n",
+			IOBJECT( col )->name, col->x, col->y );
+#endif /*DEBUG*/
+
+		cview->lx = col->x;
+		cview->ly = col->y;
+		view_child_position( VIEW( cview ) ); 
+
+		/* Update the save offset hints too.
+		 */
+		filemodel_set_offset( FILEMODEL( col ), cview->lx, cview->ly );
+	}
+
+	/* Turn titlebar on/off.
+	 */
+	widget_visible( cview->title, editable );
+	if( editable ) 
+		gtk_frame_set_label( GTK_FRAME( cview->frame ), NULL );
+	else {
+		GtkWidget *label = gtk_frame_get_label_widget( 
+			GTK_FRAME( cview->frame ) );
+		char buf[256];
+		char buf2[256];
+
+		gtk_frame_set_label( GTK_FRAME( cview->frame ), "x" );
+		label = gtk_frame_get_label_widget( GTK_FRAME( cview->frame ) );
+		escape_markup( IOBJECT( col )->caption, buf2, 256 );
+		im_snprintf( buf, 256, "<b>%s</b>", buf2 );
+		gtk_label_set_markup( GTK_LABEL( label ), buf );
+		gtk_misc_set_padding( GTK_MISC( label ), 2, 6 );
+	}
+
+	/* Update names.
+	 */
+        set_glabel( cview->lab, "%s - ", IOBJECT( col )->name );
+        set_glabel( cview->head, "%s", IOBJECT( col )->caption );
+
+	/* Set open/closed.
+	 */
+	if( col->open ) {
+                gtk_arrow_set( GTK_ARROW( cview->updown ),
+                        GTK_ARROW_DOWN, GTK_SHADOW_OUT );
+                set_tooltip( cview->updownb, _( "Fold the column away" ) );
+	}
+	else {
+                gtk_arrow_set( GTK_ARROW( cview->updown ),
+                        GTK_ARROW_RIGHT, GTK_SHADOW_OUT );
+                set_tooltip( cview->updownb, _( "Open the column" ) );
+	}
+
+	/* Closed columns are hidden in NOEDIT mode.
+	 */
+	widget_visible( GTK_WIDGET( cview ), editable || col->open );
+
+        /* Set caption edit.
+         */
+        if( cview->state == COL_EDIT ) {
+                columnview_add_caption( cview );
+
+                gtk_widget_show( cview->capedit );
+                gtk_widget_hide( cview->headfr );
+
+                set_gentry( cview->capedit, "%s", IOBJECT( col )->caption );
+                gtk_editable_select_region( GTK_EDITABLE( cview->capedit ),
+                        0, strlen( IOBJECT( col )->caption ) );
+                gtk_widget_grab_focus( cview->capedit );
+        }
+        else {
+                gtk_widget_show( cview->headfr );
+                DESTROY_GTK( cview->capedit );
+        }
+
+        /* Set bottom entry.
+         */
+        if( col->selected && col->open && editable ) {
+                columnview_add_text( cview );
+                gtk_widget_show( cview->textfr );
+        }
+        else
+                DESTROY_GTK( cview->textfr );
+
+	/* Set select state.
+	 */
+        if( col->selected && !cview->selected ) {
+                set_name( cview->title, "selected_widget" );
+		cview->selected = TRUE;
+		if( cview->textfr )
+			gtk_widget_grab_focus( cview->text );
+	}
+        else if( !col->selected ) {
+		/* Always do this, even if cview->selected, so we set on the
+		 * first _refresh().
+		 */
+                set_name( cview->title, "column_widget" );
+		cview->selected = FALSE;
+	}
+
+	VOBJECT_CLASS( parent_class )->refresh( vobject );
+}
+
+static void
+columnview_link( View *view, Model *model, View *parent )
+{
+	Columnview *cview = COLUMNVIEW( view );
+	Workspaceview *wview = WORKSPACEVIEW( parent );
+
+	VIEW_CLASS( parent_class )->link( view, model, parent );
+
+	cview->wview = wview;
+}
+
+static void
+columnview_child_add( View *parent, View *child )
+{
+	Columnview *cview = COLUMNVIEW( parent );
+	Subcolumnview *sview = SUBCOLUMNVIEW( child );
+
+	VIEW_CLASS( parent_class )->child_add( parent, child );
+
+	gtk_container_add( GTK_CONTAINER( cview->frame ), GTK_WIDGET( sview ) );
+}
+
+/* Scroll to keep the text entry at the bottom of the columnview on screen.
+ * We can't use the position/size of the text widget for positioning, since it
+ * may not be properly realized yet ... make the bottom of the column visible
+ * instead.
+ */
+static void
+columnview_scrollto( View *view, ModelScrollPosition position )
+{
+	Columnview *cview = COLUMNVIEW( view );
+	Workspaceview *wview = cview->wview;
+	int x, y, w, h;
+
+	columnview_get_position( cview, &x, &y, &w, &h );
+
+	if( position == MODEL_SCROLL_BOTTOM )
+		/* 35 is supposed to be enough to ensure the whole of the edit
+		 * box gets on the screen.
+		 */
+		workspaceview_scroll( wview, x, y + h, w, 35 );
+	else
+		workspaceview_scroll( wview, 
+			x, y, w, cview->title->allocation.height );
+}
+
+static void
+columnview_class_init( ColumnviewClass *class )
+{
+	vObjectClass *vobject_class = (vObjectClass *) class;
+	ViewClass *view_class = (ViewClass *) class;
+
+	GtkWidget *pane;
+
+	parent_class = g_type_class_peek_parent( class );
+
+	/* Create signals.
+	 */
+
+	/* Init methods.
+	 */
+	vobject_class->refresh = columnview_refresh;
+
+	view_class->link = columnview_link;
+	view_class->child_add = columnview_child_add;
+	view_class->scrollto = columnview_scrollto;
+
+	pane = columnview_menu = popup_build( _( "Column menu" ) );
+	popup_add_but( pane, _( "_Edit Caption" ), 
+		POPUP_FUNC( columnview_caption_cb ) );
+	popup_add_but( pane, _( "Select _All" ), 
+		POPUP_FUNC( columnview_select_cb ) );
+	popup_add_but( pane, STOCK_DUPLICATE,
+		POPUP_FUNC( columnview_clone_cb ) );
+	popup_add_but( pane, GTK_STOCK_SAVE_AS,
+		POPUP_FUNC( columnview_save_as_cb ) );
+	menu_add_sep( pane );
+	popup_add_but( pane, _( "Make Column Into _Menu Item" ),
+		POPUP_FUNC( columnview_to_menu_cb ) );
+	menu_add_sep( pane );
+	popup_add_but( pane, GTK_STOCK_DELETE,
+		POPUP_FUNC( columnview_destroy_cb ) );
+}
+
+static void
+columnview_init( Columnview *cview )
+{
+        GtkWidget *sb;
+        GtkWidget *frame;
+        GtkWidget *icon;
+        GtkWidget *but;
+
+        /* No position yet.
+         */
+        cview->lx = -1;
+        cview->ly = -1;
+
+	cview->state = COL_WAIT;
+
+	cview->selected = FALSE;
+
+        /* Make outer vb.
+         */
+        cview->main = gtk_event_box_new();
+	gtk_widget_add_events( GTK_WIDGET( cview->main ), 
+		GDK_BUTTON_PRESS_MASK ); 
+        cview->vbox = gtk_vbox_new( FALSE, 0 );
+        gtk_container_add( GTK_CONTAINER( cview->main ), cview->vbox );
+
+        /* Frame for whole title bar. Need an event_box to catch clicks.
+         */
+        cview->title = gtk_event_box_new();
+        gtk_box_pack_start( GTK_BOX( cview->vbox ), 
+		cview->title, FALSE, FALSE, 0 );
+        set_tooltip( cview->title, _( "Left-drag to move, left-double-click to "
+                "set title, right-click for menu" ) );
+        frame = gtk_frame_new( NULL );
+        gtk_frame_set_shadow_type( GTK_FRAME( frame ), GTK_SHADOW_NONE );
+        gtk_container_add( GTK_CONTAINER( cview->title ), frame );
+        popup_attach( cview->title, columnview_menu, cview );
+        gtk_signal_connect( GTK_OBJECT( cview->title ), "event",
+                GTK_SIGNAL_FUNC( columnview_event_cb ), cview );
+
+        /* Layout contents of title bar.
+         */
+        cview->titlehb = gtk_hbox_new( FALSE, 0 );
+        gtk_container_add( GTK_CONTAINER( frame ), cview->titlehb );
+
+        /* Up/down button.
+         */
+        cview->updownb = gtk_button_new();
+        gtk_button_set_relief( GTK_BUTTON( cview->updownb ), GTK_RELIEF_NONE );
+        gtk_container_set_border_width( GTK_CONTAINER( cview->updownb ), 0 );
+        gtk_box_pack_start( GTK_BOX( cview->titlehb ),
+                cview->updownb, FALSE, FALSE, 0 );
+        cview->updown = gtk_arrow_new( GTK_ARROW_DOWN, GTK_SHADOW_OUT );
+        gtk_container_add( GTK_CONTAINER( cview->updownb ), cview->updown );
+        gtk_signal_connect( GTK_OBJECT( cview->updownb ), "clicked",
+                GTK_SIGNAL_FUNC( columnview_updown_cb ), cview );
+
+        /* Remove columnview button.
+         */
+        sb = gtk_vbox_new( FALSE, 0 );
+        gtk_box_pack_end( GTK_BOX( cview->titlehb ), sb, FALSE, FALSE, 1 );
+        but = gtk_button_new();
+        gtk_button_set_relief( GTK_BUTTON( but ), GTK_RELIEF_NONE );
+        gtk_box_pack_start( GTK_BOX( sb ), but, TRUE, FALSE, 0 );
+        set_tooltip( but, _( "Delete the column" ) );
+	icon = gtk_image_new_from_stock( GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU );
+        gtk_container_add( GTK_CONTAINER( but ), icon );
+        gtk_signal_connect( GTK_OBJECT( but ), "clicked",
+                GTK_SIGNAL_FUNC( columnview_destroy2_cb ), cview );
+
+        /* Columnview name.
+         */
+        cview->lab = gtk_label_new( "" );
+        gtk_box_pack_start( GTK_BOX( cview->titlehb ), 
+		cview->lab, FALSE, FALSE, 2 );
+
+        /* Comment. Wrap a frame around it, to make it the same size as
+         * an entry widget.
+         */
+        cview->headfr = gtk_frame_new( NULL );
+        gtk_frame_set_shadow_type( GTK_FRAME( cview->headfr ), 
+		GTK_SHADOW_NONE );
+        gtk_box_pack_start( GTK_BOX( cview->titlehb ),
+                cview->headfr, FALSE, FALSE, 0 );
+        cview->head = gtk_label_new( "" );
+        gtk_container_add( GTK_CONTAINER( cview->headfr ), cview->head );
+
+        /* Make centre table for tally roll.
+         */
+        cview->frame = gtk_frame_new( NULL );
+	gtk_frame_set_shadow_type( GTK_FRAME( cview->frame ),
+		GTK_SHADOW_NONE );
+        gtk_box_pack_start( GTK_BOX( cview->vbox ), 
+		cview->frame, TRUE, TRUE, 0 );
+
+        gtk_box_pack_start( GTK_BOX( cview ), cview->main, FALSE, FALSE, 0 );
+
+        gtk_widget_show_all( GTK_WIDGET( cview ) );
+}
+
+GtkType
+columnview_get_type( void )
+{
+	static GtkType type = 0;
+
+	if( !type ) {
+		static const GtkTypeInfo info = {
+			"Columnview",
+			sizeof( Columnview ),
+			sizeof( ColumnviewClass ),
+			(GtkClassInitFunc) columnview_class_init,
+			(GtkObjectInitFunc) columnview_init,
+			/* reserved_1 */ NULL,
+			/* reserved_2 */ NULL,
+			(GtkClassInitFunc) NULL,
+		};
+
+		type = gtk_type_unique( TYPE_VIEW, &info );
+	}
+
+	return( type );
+}
+
+View *
+columnview_new( void )
+{
+	Columnview *cview = gtk_type_new( TYPE_COLUMNVIEW );
+
+	return( VIEW( cview ) );
+}
+

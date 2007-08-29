@@ -1,0 +1,55 @@
+SUBDIRS = \
+	src \
+	man \
+	share \
+	po 
+
+EXTRA_DIST = \
+	test \
+	bootstrap.sh \
+	doc \
+	proj \
+	acinclude.m4 \
+	nip2.desktop.in \
+	nip2.xml \
+	intltool-extract.in \
+	intltool-merge.in \
+	intltool-update.in
+
+nip2appdir = $(datadir)/applications
+
+nip2app_DATA = nip2.desktop
+
+nip2mimedir = $(datadir)/mime/packages
+
+nip2mime_DATA = nip2.xml
+
+install-exec-hook:
+	-rm -rf ${DESTDIR}$(datadir)/doc/nip2 
+	$(mkinstalldirs) ${DESTDIR}$(datadir)/doc/nip2
+	-cp -r ${top_srcdir}/doc/html ${top_srcdir}/doc/pdf ${DESTDIR}$(datadir)/doc/nip2
+	-rm -rf ${DESTDIR}$(datadir)/doc/nip2/html/CVS
+	-rm -rf ${DESTDIR}$(datadir)/doc/nip2/pdf/CVS
+
+install-data-hook:
+	-$(UPDATE_MIME_DATABASE) ${DESTDIR}$(datadir)/mime
+	-$(UPDATE_DESKTOP_DATABASE) ${DESTDIR}$(datadir)/applications
+
+dist-hook:
+# make sure we don't get any .svn dirs from EXTRA_DIST
+	-find $(distdir) -name .svn -exec rm -rf {} \;
+
+distclean-local:
+# need to remove expanded intltool files in build area to pass distcheck
+	-rm ${top_builddir}/intltool-extract \
+		${top_builddir}/intltool-merge \
+		${top_builddir}/intltool-update
+
+uninstall-hook:
+# make sure we have write permission for 'rm'
+	-chmod -R u+w ${DESTDIR}$(datadir)/doc/nip2
+	-rm -rf ${DESTDIR}$(datadir)/doc/nip2
+	-$(UPDATE_MIME_DATABASE) ${DESTDIR}$(datadir)/mime
+	-$(UPDATE_DESKTOP_DATABASE) ${DESTDIR}$(datadir)/applications
+
+

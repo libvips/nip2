@@ -1,0 +1,41 @@
+Widget_slider_item = class 
+	Menuaction "_Slider" "make a new slider widget" {
+	icon = "nip-slider-16.png";
+	action = Slider 0 255 128;
+}
+
+Widget_toggle_item = class 
+	Menuaction "_Toggle" "make a new toggle widget" {
+	action = Toggle "untitled" false;
+}
+
+Widget_option_item = class 
+	Menuaction "_Option" "make a new option widget" {
+	action = Option "untitled" ["option0", "option1"] 0;
+}
+
+Widget_string_item = class 
+	Menuaction "St_ring" "make a new string widget" {
+	action = String "Enter a string" "sample text";
+}
+
+Widget_number_item = class 
+	Menuaction "_Number" "make a new number widget" {
+	action = Number "Enter a number" 42;
+}
+
+Widget_expression_item = class 
+	Menuaction "_Expression" "make a new expression widget" {
+	action = Expression "Enter an expression" 42;
+}
+
+Widget_pathname_item = class 
+	Menuaction "_File Chooser" "make a new file chooser widget" {
+	action = Pathname "Pick a file" 
+		"$VIPSHOME/share/$PACKAGE/data/print_test_image.v";
+}
+
+Widget_font_item = class 
+	Menuaction "F_ont Chooser" "make a new font chooser widget" {
+	action = Fontname "Pick a font"  Workspaces.Preferences.PAINTBOX_FONT;
+}

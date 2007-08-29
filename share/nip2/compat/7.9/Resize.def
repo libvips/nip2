@@ -1,0 +1,119 @@
+_resize_interp = Option "Interpolation" 
+	(map (extract 0) Interpolate.names.value)
+	Interpolate.bilinear;
+
+/* resize image x by any scale factor
+ */
+Resize_image x
+	= map_unary widget x
+{
+	widget image = class
+		Image value {
+		_vislevel = 3;
+		factor = 1;
+		interp = _resize_interp;
+		value = resize factor factor interp.value image.value;
+	}
+}
+
+/* resize image with separate x/y factors
+ */
+Resize_xy_image x
+	= map_unary widget x
+{
+	widget image = class
+		Image value {
+		_vislevel = 3;
+		xfactor = 1;
+		yfactor = 1;
+		interp = _resize_interp;
+		value = resize xfactor yfactor interp.value image.value;
+	}
+}
+
+/* place image x in a larger piece of image
+ */
+Resize_canvas x
+	= map_unary widget x
+{
+	widget image = class
+		Image value {
+		_vislevel = 3;
+		new_image_width = image.width;
+		new_image_height = image.height;
+		position = Option "Position" [
+			"North-west",
+			"North",
+			"North-east",
+			"West",
+			"Centre",
+			"East",
+			"South-west",
+			"South",
+			"South-east"
+		] 4;
+		fill = Option "Fill background with" [
+			"White",
+			"Black"
+		] 0;
+
+		value 
+			= im_insert_noexpand background image.value xp yp
+		{
+			width = image.width;
+			height = image.height;
+			coding = image.coding;
+			bands 
+				= 3, coding == Image_coding.LABPACK
+				= image.bands;
+			format 
+				= Image_format.FLOAT, 
+					coding == Image_coding.LABPACK
+				= image.format;
+			type = image.type;
+
+			background_colour 
+				= image_white image, fill == 0
+				= Vector (map (const 0) [1 .. bands]);
+
+			// placement vectors ... left, centre, right
+			xposv = [0, new_image_width / 2 - width / 2, 
+				new_image_width - width];
+			yposv = [0, new_image_height / 2 - height / 2, 
+				new_image_height - height];
+
+			xp = xposv?((int) (position % 3));
+			yp = yposv?((int) (position / 3));
+
+			background = image_new new_image_width new_image_height
+				bands format coding type background_colour 0 0;
+		}
+	}
+}
+
+#separator
+
+/* resize image x so that the shortest axis is a certain size
+ */
+Shrink_to = class {
+	_shrink_width default_size image = class
+		Image value {
+		size = default_size;
+		interp = _resize_interp;
+		value 	
+			= resize factor factor interp.value image.value
+		{
+			xfac = size / image.width;
+			yfac = size / image.height;
+			factor = max_pair xfac yfac;
+		}
+	}
+
+	/* shrink minimum dimension to 400 pixels 
+	 */
+	Quicklook x = map_unary (_shrink_width 400) x;
+
+	/* shrink minimum dimension to 64 pixels 
+	 */
+	Icon x = map_unary (_shrink_width 64) x;
+}

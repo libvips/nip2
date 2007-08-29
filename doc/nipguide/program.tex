@@ -1,0 +1,1423 @@
+\chapter{Programming}
+\mylabel{sec:program}
+
+\nip{} includes a tiny lazy functional programming language. You can use it to
+glue VIPS image processing functions together to perform more complicated
+tasks.  All of the \nip{} toolkit menus are written in this language.
+
+These first sections just describe the programming language. See
+\pref{sec:progwin} for a description of the programming window.  You use
+\nip{}'s programming language to control the user interface: the link between
+what happens inside a \nip{} function and what you see on the screen in
+covered in \pref{sec:bowser}.
+
+\section{Load and save}
+
+When \nip{} starts up it loads all of the definition files it can find in
+the directories listed in \ct{Start path}. You can change \ct{Start path}
+in the \ct{Preferences} workspace. By default, the start path lists
+just two areas: a personal start directory that \nip{} makes in your home
+area, and the main system \nip{} start directory containing all the standard
+toolkits.
+
+If there are two files with the same name on the start path, then
+\nip{} will only load the first one. This means that if you modify one
+of \nip{}'s built-in menus and save it to your personal start directory,
+in future you'll just see your personalised version. 
+
+You can load or reload a toolkit at any time with the \ctr{File}\ct{Open
+Toolkit} menu item in the program window. If you open a toolkit with the same
+name as an existing toolkit, \nip{} will remove the old toolkit before it
+loads the new one. 
+
+\section{Using an external editor}
+
+If you're going to be doing any more than a little programming in \nip{} you
+probably won't want to use the built-in editor. I suggest you start your
+favorite editor in one window on the screen and then in the \nip{} program
+window click \ctr{File}\ct{Open Toolkit} and check the Pin-up box in the file
+selector.
+
+Now every time you want to try out your definition, save the file from your
+external editor and click OK in \nip{}'s file selector. 
+
+\nip{}'s editor automatically adds some semicolon characters to separate
+definitions in a file. If you're using an external editor, you'll need to put
+these in yourself. Also check the syntax for adding separators and column
+items to menus.
+
+\section{Syntax}
+
+The most basic sort of definition looks like this:
+
+\begin{verbatim}
+// very simple!
+fred = 12
+\end{verbatim}
+
+\noindent
+This defines a function called \ct{fred} whose value is the number 12. The
+\ct{//} marks a comment: everything to the end of the line is skipped.
+Case is distinguished, so \ct{Fred} and \ct{fred} are two different functions.
+You can use letters, numbers, underscores and single quotes in function names.
+
+Functions may take parameters:
+
+\begin{verbatim}
+/* A function with parameters.
+ */
+jim a b = a + b + 12
+\end{verbatim}
+
+\noindent
+This defines a function called \ct{jim} which takes two parameters and whose
+value is the sum of the two parameters, plus 12. The \ct{/*} and \ct{*/}
+enclose a multi-line comment.
+
+Functions may have several right-hand-sides, each right-hand-side qualified by
+a guard expression. Guards are tested from top to bottom, and the first guard
+which has the value \ct{true} causes the function to have the value of that
+right-hand-side. If no guard evaluates to \ct{true}, then the last
+right-hand-side is used.
+
+\begin{verbatim}
+jenny a b
+  = 42, a + b >= 100
+  = 43, a + b >= 50
+  = 44
+\end{verbatim}
+
+\noindent
+This defines a function called \ct{jenny} which takes two parameters and whose
+value is 42 if the sum of the parameters is 100 or greater; 43 if the sum is
+greater than or equal to 50 but less than 100; and 44 if the sum is less than
+50.
+
+Any function may be followed by any number of local functions, enclosed in
+curly braces. So \ct{jenny} could be written as:
+
+\begin{verbatim}
+jenny a b
+  = 42, sum >= 100
+  = 43, sum >= 50
+  = 44
+{
+  sum = a + b;
+}
+\end{verbatim}
+
+\noindent
+Note that you need a semi-colon after each local function.  A local function
+may refer to anything in an enclosing scope, including itself.
+
+You can write \ct{if-then-else} expressions:
+
+\begin{verbatim}
+david a = if a < 12 then "my cat"
+  else "likes lasagne"
+\end{verbatim}
+
+\noindent
+This is exactly equivalent to:
+
+\begin{verbatim}
+david a
+  = "my cat", a < 12
+  = "likes lasagne"
+\end{verbatim}
+
+\noindent
+\ct{if-then-else} expressions are sometimes easier to read than guards.
+
+Functions application is with spaces (juxtaposition). For example:
+
+\begin{verbatim}
+harry = jim 2 3
+\end{verbatim}
+
+\noindent
+defines \ct{harry} to have the value 17. 
+
+All functions are curried, that is, they can accept their arguments in
+stages. For example:
+
+\begin{verbatim}
+sandro = jim 1
+\end{verbatim}
+
+\noindent
+defines \ct{sandro}, a function which takes one parameter and will add 13 to
+it. This trick becomes very useful with list processing, see \pref{sec:lists}.
+
+\nip{} has some built-in functions, see \tref{tb:builtin}. They mostly 
+take a single argument. All other functions are defined in the various
+standard toolkits and can be edited in the program window.
+
+\begin{tab2}
+\begin{center}
+\begin{tabular}{||l|l||}
+\hline
+Function & Description \\
+\hline
+\ct{dir} \textit{any}		& List names in scope \\
+\ct{has\_member} \textit{[char]} \textit{any}	& 
+				Does class have member \\
+\hline
+\ct{name2gtype} \textit{[char]}	& Search for a GType by name \\
+\ct{gtype2name} \textit{real}	& Return the name of a GType \\
+\hline
+\ct{error} \textit{[char]}	& Stop with error message \\
+\ct{print} \textit{any}		& Convert to string \\
+\ct{expand} \textit{[char]}	& Expand environment variables in string \\
+\ct{search} \textit{[char]}	& Search for a file \\
+\ct{\_} \textit{[char]}		& Translate string \\
+\hline
+\ct{is\_image} \textit{any}	& Test for image \\
+\ct{is\_bool} \textit{any}	& Test for boolean \\
+\ct{is\_real} \textit{any}	& Test for real	\\
+\ct{is\_class} \textit{any}	& Test for class \\
+\ct{is\_char} \textit{any}	& Test for char	\\
+\ct{is\_list} \textit{any}	& Test for list	\\
+\ct{is\_complex} \textit{any}	& Test for complex \\
+\ct{is\_instanceof} \textit{[char]} \textit{any}	& 
+				Test for instance of class	\\
+\hline
+\ct{re} \textit{image}/\textit{complex}/\textit{class} & 
+				Extract real part of complex	\\
+\ct{im}	\textit{image}/\textit{complex}/\textit{class} &
+				Extract imaginary part of complex \\
+\ct{hd} \textit{list}		& Extract head of list \\
+\ct{tl}	\textit{list}		& Extract tail of list \\
+
+\ct{sin} \textit{image}/\textit{number}/\textit{class} & 
+				Sine \\
+\ct{cos} \textit{image}/\textit{number}/\textit{class} & 
+				Cosine \\
+\ct{tan} \textit{image}/\textit{number}/\textit{class} & 
+				Tangent \\
+\ct{asin} \textit{image}/\textit{number}/\textit{class} & 
+				Arc sine \\
+\ct{acos} \textit{image}/\textit{number}/\textit{class} & 
+				Arc cosine \\
+\ct{atan} \textit{image}/\textit{number}/\textit{class} & 
+				Arc tangent \\
+\ct{log} \textit{image}/\textit{number}/\textit{class} & 
+				Natural log \\
+\ct{log10} \textit{image}/\textit{number}/\textit{class} & 
+				Base 10 log \\
+\ct{exp} \textit{image}/\textit{number}/\textit{class} & 
+				e to the power \\
+\ct{exp10} \textit{image}/\textit{number}/\textit{class} & 
+				10 to the power \\
+\ct{ceil} \textit{image}/\textit{number}/\textit{class} & 
+				Round up \\
+\ct{floor} \textit{image}/\textit{number}/\textit{class} & 
+				Round down \\
+\ct{gammq} \textit{real} \textit{real} & 
+				Normalised incomplete Gamma function \\
+\hline
+\ct{vips\_image} \textit{[char]}& Load image from file \\
+\ct{read} \textit{[char]}	& Load file as a string \\
+\hline
+\end{tabular}
+\end{center}
+\caption{\nip{} built in functions}
+\mylabel{tb:builtin}
+\end{tab2}
+
+\section{Naming conventions}
+
+Of course you can name things any way you like, but we've used the following
+conventions.
+
+\begin{itemize}
+
+\item
+Classes start with a capital letter, words are separated with underscores,
+subsequent words are not capitalised (eg. \ct{Image\_file})
+
+\item
+Private names are prefixed with underscores (and are hidden by most of the
+user interface)
+
+\item
+Functions from the VIPS library are prefixed with \ct{im\_}
+
+\item
+Global utility functions (eg. \ct{map}), public members (eg.
+\ct{Colour.colour\_space}) are all lower case, words are separated
+with underscores, subsequent words are not capitalised
+
+\item
+Constants are capitalised (eg. \ct{Operator\_type.COMPOUND\_REWRAP})
+
+\end{itemize}
+
+\section{Evaluation}
+
+\nip{} calculates the value of an expression by using the definitions you
+entered to successively reduce the expression until it becomes one of the
+base types. Sometimes there is a choice as to which part of the expression
+will be reduced next --- \nip{} will always choose to reduce the leftmost,
+outermost part of the expression first.
+
+For example, consider this definition:
+
+\begin{verbatim}
+factorial n
+  = n * factorial (n - 1), n > 1
+  = 1
+\end{verbatim}
+
+And here's how \nip{} will evaluate the expression \ct{factorial 3}:
+
+\begin{verbatim}
+factorial 3 -->
+  3 > 1 -->
+  true
+3 * factorial (3 - 1) -->
+  (3 - 1) > 1 -->
+  2 > 1 -->
+  true
+3 * (2 * factorial (2 - 1)) -->
+  (2 - 1) > 1 -->
+  1 > 1 -->
+  false
+3 * (2 * 1) -->
+3 * 2 -->
+6
+\end{verbatim}
+
+\noindent
+Note how \nip{} delays evaluating parameters to functions until they are
+needed, but still shares the result. \ct{3 - 1} is only evaluated once,
+for example, even though the result is used three times.  \nip{} has a trace
+window: click on \ctr{Debug}\ct{Trace} in the program window and check the
+\ctr{View}\ct{Operators} menu item.
+
+The advantage of this style of computation over conventional imperative
+programming languages is that you can reason about your program
+mathematically\footnote{Since programs are referentially transparent (that
+is, the value of an expression depends only upon its syntactic context,
+not upon computation history), you can easily do equational reasoning,
+proof by induction, and so on.
+
+Expressions are like theorems, definitions are like axioms, computation
+is like proof.}. 
+
+This isn't the best way to write a factorial function. A function with lots of
+recursive calls can be hard to understand: it's much better to use one of the
+higher order functions from the standard environment to encapsulate the type
+of recursion you want to use.
+
+The clearest definition for factorial is probably:
+
+\begin{verbatim}
+factorial n = product [1 .. n]
+\end{verbatim}
+
+\section{Operators}
+\mylabel{sec:operators}
+
+\nip{}'s expression syntax is almost exactly the same as C,
+with a few small changes. \tref{tb:precedence} lists all of 
+\nip{}'s operators in order of increasing precedence. If you've used C, the
+differences are:
+
+\begin{itemize}
+
+\item
+	C's \verb+?:+ operator becomes \ct{if-then-else}, see above
+
+\item
+	Like almost every functional language, \nip{} uses square brackets
+	for list constants (see \pref{sec:listsyntax}), so to index a
+	list, \nip{} uses \ct{?}
+
+\item
+	The \ct{:} operator is infix list cons, see \pref{sec:lists}
+
+\item
+	\nip{} adds \ct{@} for function composition, see \pref{sec:func}
+
+\item
+	The \ct{++} operator becomes an infix concatenation operator, again
+	see \pref{sec:lists}
+
+\item
+	\nip{} adds \ct{**} for raise to power
+
+\end{itemize}
+
+The only slightly tricky point is that function application binds very
+tightly (only list index and class project bind more tightly). So the
+expression:
+
+\begin{verbatim}
+jim = fred 2 + 3
+\end{verbatim}
+
+\noindent
+binds as:
+
+\begin{verbatim}
+jim = (fred 2) + 3
+\end{verbatim}
+
+\noindent
+This is almost always the behaviour you want.
+
+There are two special equality tests: \ct{===} and 
+\ct{!==}. These test for pointer equality, that is, they return \ct{true} if
+their arguments refer to the same object. These are occasionally useful for
+writing interactive functions.
+
+\begin{tab2}
+\begin{center}
+\begin{tabular}{||l|l|l||}
+\hline
+Operator & Associativity & Description \\
+\hline
+\ct{if then else}	& Right			& If-then-else construct \\
+\ct{,}			& Left			& List/complex separator \\
+\verb+||+		& Left			& Logical or \\
+\ct{\&\&}		& Left			& Logical and \\
+\ct{@}			& 			& Function composition 
+						  (see \pref{sec:func}) \\
+\verb+|+		& Left			& Bitwise or \\
+\rtp{}			& Left			& Bitwise exclusive or \\
+\ct{\&}			& Left			& Bitwise and \\
+\hline
+\ct{==}			& Left			& Equal to\\
+\ct{!=}			& 			& Not equal to\\
+\ct{===}		& 			& Pointer equal to\\
+\ct{!==}		& 			& Pointer not equal to\\
+\hline
+\ct{<}			& Left			& Less than \\
+\ct{<=}			& 			& Less than or equal to\\
+\ct{>}			& 			& Greater than \\
+\ct{>=}			& 			& Greater than or equal to\\
+\hline
+\ct{<<}			& Left			& Left shift \\
+\ct{>>}			& 			& Right shift \\
+\hline
+\ct{+}			& Left			& Addition \\
+\ct{-}			& 			& Subtraction \\
+\ct{*}			& Left			& Multiplication \\
+$/$			& 			& Division \\
+\ct{\%}			& 			& Remainder after division \\
+\ct{!}			& Left			& Logical negation \\
+\verb+~+		& 			& One's complement \\
+\ct{++}			& 			& Join (see \pref{sec:lists}) \\
+\ct{--}			& 			& Unary minus \\
+\ct{+}			& 			& Unary plus \\
+\ct{(}\emph{type}\ct{)}	& 			& Type cast expression \\
+\ct{**}			& Right			& Raise to power \\
+\ct{:}			& 			& List CONS
+						  (see \pref{sec:lists}) \\
+\emph{space}		& Left			& Function application \\
+\ct{?}			& Left			& List index 
+						  (see \pref{sec:lists}) \\
+\ct{.}			& Left			& Class project 
+						  (see \pref{sec:class}) \\
+\hline
+\end{tabular}
+\end{center}
+\caption{\nip{} operators in order of increasing precedence}
+\mylabel{tb:precedence}
+\end{tab2}
+
+\subsection{The real type}
+
+\nip{} has a single number type for integers and real numbers. All are
+represented internally as 64-bit floating point values. You can use the four
+standard arithmetic operators (\ct{+}, \ct{-}, \ct{*}, \ct{/}), remainder
+after integer division (\%), raise-to-power (\ct{**}), the relational
+operators (\ct{<}, \ct{<=}, \ct{>}, \ct{>=}, \ct{==}), the bitwise logical
+operators (\ct{\&}, \verb+|+, \rtp{}, \verb+~+), integer shift operators
+(\ct{<<}, \ct{>>}) and unary negation and positive (\ct{-}, \ct{+}).
+
+Other mathematical functions are pre-defined for you:  \ct{sin}, \ct{cos},
+\ct{tan}, \ct{asin}, \ct{acos}, \ct{atan}, \ct{log}, \ct{log10}, \ct{exp},
+\ct{exp10}, \ct{ceil}, \ct{floor}. Each has the standard behaviour.
+
+You can use type-casts on reals. However, they remain 64-bit floating point,
+the range is simply clipped. Casting to \ct{unsigned short} produces a 64-bit
+float whose fractional part has been set to zero, and which has been
+clipped to the range 0 to 65535. This may or may not cause rounding problems.
+
+\subsection{The complex type}
+
+Complex numbers are rather sketchily implemented. They are generally handy for
+representing vectors and coordinates rather than for doing arithmetic, so the
+range of operations is limited.
+
+Complex constants are written as two numbers enclosed in round brackets and
+separated by a comma. You can use the four standard arithmetic operators
+(\ct{+}, \ct{-}, \ct{*}, \ct{/}), raise-to-power (\ct{**}), and unary negation
+and positive (\ct{-}, \ct{+}). You can use \ct{==} only of the relational
+operators. You can mix complex and real numbers in expressions. You can cast
+reals to complex and back.  Use the functions \ct{re} and \ct{im}
+to extract the real and imaginary parts.
+
+\begin{verbatim}
+(12, 13) + 4 == (16, 13)
+(12, 2 + 2) ==  (12, 4)
+re (12, 13) == 12
+im (12, 13) == 13
+\end{verbatim}
+
+\subsection{The character type}
+
+Character constants are written as single characters enclosed in single
+quotes. You can use the relational operators (\ct{<}, \ct{<=}, \ct{>},
+\ct{>=}, \ct{==}) to sort characters by ASCII order. You can cast a
+character to a real to get its ASCII value. You can cast a real ASCII value 
+to a character.
+
+\begin{verbatim}
+(int) 'A' == 65
+(char) 65 == 'A'
+is_digit x = '0' <= x && x <= '9'
+\end{verbatim}
+
+\subsection{The boolean type}
+
+The two boolean constants are written as \ct{true} and \ct{false}. Boolean
+values are generated by the relational operators.  You can use the standard
+logical operators (\ct{\&\&}, \verb+||+, \ct{!}). You can use a boolean type
+as an argument in an \ct{if-then-else} expression.
+
+As with C, the logical operators do not evaluate their right-hand sides if
+their value can be determined just from evaluating their left-hand sides.
+
+\begin{verbatim}
+true && false == false
+true || error "boink!" == true
+if true then 12 else 13 == 12
+\end{verbatim}
+
+\subsection{The list type}
+\mylabel{sec:listsyntax}
+
+Lists are created from two constructors. \ct{[]} denotes the empty list. The
+list construction operator (\ct{:}, pronounced CONS by LISP programmers) takes
+an item and a list, and returns a new list with the item added to the front.
+As a convenience, \nip{} has a syntax for list constants. A list constant is a
+list of items, separated by commas, and enclosed in square brackets:
+
+\begin{verbatim}
+12:[] == [12]
+12:13:14:[] == 12:(13:(14:[])) == [12,13,14]
+[a+2,3,4] == (a+2):3:4:[]
+[2]:[3,4] == [[2],3,4]
+\end{verbatim}
+
+Use the functions \ct{hd} and \ct{tl} to take the head and the
+tail of a list:
+
+\begin{verbatim}
+hd [12,13,14] == 12
+tl [12,13,14] == [13,14]
+\end{verbatim}
+
+Use \ct{..} in a list constant to define a list generator. List generators
+build lists of numbers for you:
+
+\begin{verbatim}
+[1..10] == [1,2,3,4,5,6,7,8,9,10]
+[1,3..10] == [1,3,5,7,9]
+[10,9..1] == [10,9,8,7,6,5,4,3,2,1]
+\end{verbatim}
+
+\noindent
+List generators are useful for expressing iteration. 
+
+Lists may be infinite:
+
+\begin{verbatim}
+[1..] == [1,2,3,4,5,6,7,8,9 ..]
+[5,4..] == [5,4,3,2,1,0,-1,-2,-3 ..]
+\end{verbatim}
+
+\noindent
+Infinite lists are useful for expressing unbounded iteration.
+See \pref{sec:lazy}.
+
+A list may contain any object:
+
+\begin{verbatim}
+[1,'a',true,[1,2,3]] 
+\end{verbatim}
+
+\noindent
+Mixing types in a list tends to be confusing and should be avoided. If you
+want to group a set of diverse objects, define a class instead, 
+see \pref{sec:class}.
+
+Lists of lists of reals are useful for representing arrays.
+
+As a convenience, lists of characters may be written enclosed in double
+quotes:
+
+\begin{verbatim}
+"abc" == ['a','b','c']
+\end{verbatim}
+
+You can use the list index operator (\ct{?}) to extract an element from a
+position in a list:
+
+\begin{verbatim}
+[1,2,3] ? 0 == 1
+"abc" ? 1 == 'b'
+\end{verbatim}
+
+You can use the list join operator (\ct{++}) to join two lists together
+end-to-end.
+
+\begin{verbatim}
+[1,2,3] ++ [4,5,6] == [1,2,3,4,5,6]
+\end{verbatim}
+
+\subsection{The function type}
+\mylabel{sec:func}
+
+Functions are objects just like any other. You can pass functions to other
+functions as parameters, store functions in lists, and so on. You can compose
+functions with the \ct{@} operator. For example, for two functions of one
+argument \ct{f} and \ct{g}:
+
+\begin{verbatim}
+f (g 2) == (f @ g) 2
+\end{verbatim}
+
+\subsection{The image type}
+
+These represent a low-level handle to a VIPS image structure. You can make
+them with the \ct{vips\_image} builtin, and you can pass them as parameters to
+VIPS functions. The \ct{Image} class is built on top of them,
+see \pref{sec:Image}.
+
+As an accident of history, \nip{} also lets you do arithmetic with them. This
+will probably be removed in the next version or two, so it's best to go
+through the higher-level \ct{Image} class.
+
+\section{Lists and recursion}
+\mylabel{sec:lists}
+
+Functional programming languages do not have variables, assignment or
+iteration. You can achieve the same effects using just lists and recursion.
+
+There are two main sorts of recursion over lists. The first is called 
+\emph{mapping}: a function is applied to each element of a list, producing
+a new list in which each element has been transformed.
+
+\begin{verbatim}
+map fn [a,b,c] == [fn a, fn b, fn c]
+\end{verbatim}
+
+The second main sort of recursion is called \emph{folding}: a list is turned
+into a single value by joining pairs of elements together with a function and
+a start value.
+
+\begin{verbatim}
+foldr fn start [a,b .. c] == 
+  (fn a (fn b (.. (fn c start))))
+\end{verbatim}
+
+\noindent
+(The function is called \ct{foldr} as it folds the list up right-to-left.
+There is an analogous function called \ct{foldl} which folds a list up
+left-to-right, but because of the way lists work, it is much slower and should
+be avoided if possible.)
+
+\ct{map} is defined in the standard list library for you:
+
+\begin{verbatim}
+/* map fn l: map function fn over list l
+ */
+
+map fn l
+  = [], l == []
+  = fn (hd l) : map fn (tl l) 
+\end{verbatim}
+
+\noindent
+So, for example, you could use \ct{map} like this:
+
+\begin{verbatim}
+map (add 2) [1..5] == [3,4,5,6,7,8]
+\end{verbatim}
+
+\ct{foldr} is defined in the standard list library for you:
+
+\begin{verbatim}
+/* foldr fn st l: fold up list l, right to
+ * left with function fn and start value st
+ */
+ 
+foldr fn st l
+  = st, l == []
+  = fn (hd l) (foldr fn st (tl l)) 
+\end{verbatim}
+
+\noindent
+So, for example, you could use \ct{foldr} like this:
+
+\begin{verbatim}
+foldr add 0 [1..5] == 15
+\end{verbatim}
+
+\noindent
+(Mathematically, \ct{foldr} is the more basic operation. You can write
+\ct{map} in terms of \ct{foldr}, but you can't write \ct{foldr} in terms of
+\ct{map}.)
+
+Unconstrained recursion over lists can be very hard to understand, rather like
+\ct{goto} in an imperative language. It's much better to use a combination of
+\ct{map} and \ct{foldr} if you possibly can.
+
+The toolkit \ct{\_list} contains definitions of most of the standard
+list-processing functions. These are listed in \tref{tb:list}. Check the
+source for detailed comments.
+
+\begin{tab2}
+\begin{center}
+\begin{tabular}{||l|l||}
+\hline
+Name & Description \\
+\hline
+\ct{concat l} 		& join a list of lists together \\
+\ct{drop n l} 		& drop the first \ct{n} elements from list \ct{l} \\
+\ct{dropwhile fn l} 	& drop while \ct{fn} is true \\
+\ct{extract n l} 	& extract element \ct{n} from list \ct{l} \\
+\ct{filter fn l} 	& all elements of \ct{l} for which \ct{fn} holds \\
+\ct{foldl fn st l} 	& fold list \ct{l} left-to-right with \ct{fn} 
+			  and \ct{st} \\
+\ct{foldl1 fn l} 	& like \ct{foldl}, but use the first element of the 
+			  list as the start value \\
+\ct{foldr fn st l} 	& fold list \ct{l} right-to-left with \ct{fn} 
+			  and \ct{st} \\
+\ct{foldr1 fn l} 	& like \ct{foldr}, but use the first element of the 
+			  list as the start value \\
+\ct{index fn l} 	& search list \ct{l} for index of first element 
+			  matching predicate \ct{fn} \\
+\ct{init l} 		& remove last element of list \ct{l} \\
+\ct{iterate f x} 	& repeatedly apply \ct{f} to \ct{x} \\
+\ct{land l} 		& and all the elements of list \ct{l} together \\
+\ct{last l} 		& return the last element of list \ct{l} \\
+\ct{len l} 		& find length of list \ct{l} \\
+\ct{limit l}		& find the first element of list \ct{l} equal to
+			  its predecessor \\
+\ct{lor l} 		& or all the elements of list \ct{l} together \\
+\ct{map fn l} 		& map function \ct{fn} over list \ct{l} \\
+\ct{map2 fn l1 l2} 	& map 2-ary function \ct{fn} over lists \ct{l1}
+		 	  and \ct{l2} \\
+\ct{map3 fn l1 l2 l3} 	& map 3-ary function \ct{fn} over lists \ct{l1},
+		 	  \ct{l2} and \ct{l3} \\
+\ct{member l x}		& true if \ct{x} is a member of list \ct{l} \\
+\ct{mkset l} 		& remove duplicates from list \ct{l} \\
+\ct{postfix l r} 	& add element \ct{r} to the end of list \ct{l} \\
+\ct{product l} 		& product of list l \\
+\ct{repeat x} 		& make an infinite list of \ct{x}es \\
+\ct{replicate n x} 	& make \ct{n} copies of \ct{x} in a list \\
+\ct{reverse l} 		& reverse list \ct{l} \\
+\ct{scan fn st l} 	& apply \ct{(foldr fn r)} to every initial segment
+			  of list \ct{l} \\
+\ct{sort l} 		& sort list \ct{l} into ascending order \\
+\ct{sortc fn l} 	& sort list \ct{l} into order by using a comparison
+			  function \\
+\ct{sortpl pl l} 	& sort list \ct{l} by predicate list \ct{pl} \\
+\ct{sortr l} 		& sort list \ct{l} into descending order \\
+\ct{split fn l} 	& break list \ct{l} into sections separated by
+			  predicate \ct{fn} \\
+\ct{splits fn l} 	& break list \ct{l} into single sections separated by
+			  predicate \ct{fn} \\
+\ct{splitpl pl l} 	& break list \ct{l} up by predicate list \ct{pl} \\
+\ct{split\_lines n l} 	& break list \ct{l} into lines of length \ct{n} \\
+\ct{sum l} 		& sum list l \\
+\ct{take n l} 		& take the first \ct{n} elements from list \ct{l} \\
+\ct{takewhile fn l} 	& take from the front of \ct{l} while \ct{fn} holds \\
+\ct{zip2 l1 l2} 	& zip two lists together \\
+\ct{zip3 l1 l2 l3} 	& zip three lists together \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Functions in the standard list-processing toolkit}
+\mylabel{tb:list}
+\end{tab2}
+
+\section{Lazy programming}
+\mylabel{sec:lazy}
+
+\nip{}'s programming language is \emph{lazy}, that is, it delays evaluation
+as long as it possibly can.  For example, \ct{error} is a function which 
+immediately halts execution of your function and pops up an alert window. So:
+
+\begin{verbatim}
+12 + error "wombat!"
+\end{verbatim}
+
+\noindent
+Has no value: this expression will halt with an error message. However:
+
+\begin{verbatim}
+false && error "lasagne!"
+\end{verbatim}
+
+\noindent
+Will evaluate to \ct{false}, since \nip{} knows after looking at the
+left-hand-side of \ct{\&\&} that the result must be \ct{false}, and so does
+not evaluate the right-hand-side.
+
+\begin{verbatim}
+[12, error "hot chilli!"] ? 0 == 12
+\end{verbatim}
+
+\noindent
+This also evaluates completely, since the second element of the list is never
+used, and therefore never evaluates.
+
+Things become more confusing when you start calling functions, since the
+arguments to a function call are also not evaluated until the function needs
+that value. For example:
+
+\begin{verbatim}
+foldr (error "boink!") 2 [] == 2
+\end{verbatim}
+
+\noindent
+Again, this evaluates successfully, since the function is never used by
+\ct{foldr}.
+
+\section{The standard libraries}
+
+\nip{} comes with a lot of little utility functions. The functions for list
+processing are listed in \tref{tb:list}. There are a huge number more, too
+many to really list here. \tref{tb:toolkits} lists all the utility toolkits
+with some hints about the kinds of function they contain. Read the (heavily
+commented) toolkits for details.
+
+\begin{tab2}
+\begin{center}
+\begin{tabular}{||l|l|l||}
+\hline
+Toolkit & Contains & Description \\
+\hline
+\ct{\_convert}		& \ct{parse\_int l}, \ldots{}  		& 
+	convert ascii text to numbers \\
+			& \ct{to\_matrix x}, \ldots{}  		& 
+	convert anything into a matrix \\
+			& \ct{colour\_transform\_to to x}, \ldots{}	& 
+	convert between colour spaces \\
+\hline
+\ct{\_generate}		& \ct{image\_new w h ...}  		& 
+	make a blank image \\
+			& \ct{image\_white i}  			& 
+	look at image \ct{i}, try to guess what white is \\
+			& \ct{make\_xy w h}  			& 
+	make an image of size \ct{w} by \ct{h} whose pixel value are \\
+			& 		  			& 
+	their coordinates \\
+\hline
+\ct{\_types}		& \ct{Image i}  			& 
+	all the standard classes and support functions, \\
+			& 		  			& 
+	see \pref{sec:object} \\
+\hline
+\ct{\_predicate}	& \ct{is\_colour\_space i} 		& 
+	test for objects are in various categories or have \\
+			& 		  			& 
+	various properties \\
+\hline
+\ct{\_stdenv}		& \ct{logical\_and x}, \ldots{}		& 
+	function versions of all the operators \\
+			& \ct{bandsplit i}, \ldots{}		& 
+	break up and recombine images by band \\
+			& \ct{mean x}, \ldots{}			& 
+	statistical ops on objects \\
+			& \ct{transpose x}, \ct{flipud x}, \ct{rot90 x},
+			\ldots{} 				& 
+	flips, rotates, etc. on objects \\
+			& \ct{rad x}, \ct{pi}, \ldots{}		& 
+	trigonometry stuff \\
+			& \ct{sign x}, \ct{conj x}, \ct{polar x}, \ldots{} & 
+	complex stuff \\
+			& \ct{rint x}, \ct{ceil x}, \ldots{}	& 
+	various rounding things \\
+			& \ct{fwfft x}, \ldots{}		& 
+	fourier stuff \\
+			& \ct{dilate m x}, \ct{rank w h n i}, \ldots{} & 
+	morphology stuff \\
+			& \ct{conv m x}, \ldots{}		& 
+	convolution stuff \\
+			& \ct{image\_set\_type t i}, \ldots{}  	& 
+	set various image header field \\
+			& \ct{resize x y i}, \ldots{}		& 
+	resampling images \\
+			& \ct{recomb m i}, \ldots{}		& 
+	recombinations \\
+			& \ct{clip2fmt f i}, \ldots{}		& 
+	format conversions \\
+			& \ct{hist\_find m x}, \ldots{}		& 
+	histogram stuff \\
+			& \ct{id x}, \ct{const x y}, \ldots{} 	& 
+	various useful operations on functions \\
+			& \ct{map\_binary fn x y},  \ldots{} 	& 
+	mapping over groups \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Useful utility functions --- see the source for details}
+\mylabel{tb:toolkits}
+\end{tab2}
+
+\section{Classes}
+\mylabel{sec:class}
+
+You can define new types using \ct{class}. For example:
+
+\begin{verbatim}
+Pasta_plain = class {
+  lasagne = "large sheets";
+  fusilli = "sort of twisty";
+  radiatori = "lots of ridges";
+}
+\end{verbatim}
+
+\noindent
+This defines a new class called \ct{Pasta\_plain}. The class has three members
+(\ct{lasagne}, \ct{fusilli} and \ct{radiatori}), each of which has a list of
+\ct{char} as its value. By convention, we've named classes with an initial
+capital letter, but of course you can do what you like.
+
+You can refer to the members of a class using the class project (\ct{.}) 
+operator. For example:
+
+\begin{verbatim}
+Pasta_plain.lasagne == "large sheets"
+\end{verbatim}
+
+\noindent
+You can use an expression to the right of \ct{.} if you enclose it in
+brackets. For example:
+
+\begin{verbatim}
+Pasta_plain.("las" ++ "agne") == "large sheets"
+\end{verbatim}
+
+Classes can contain any objects as members, including functions and
+sub-classes. Functions may define local classes, classes may define local
+functions, and all may refer to each other using the usual scope rules. For
+example:
+
+\begin{verbatim}
+Pasta_all = class { 
+  filled = class { 
+    tortelloni = "venus' navel";
+    ravioli = "square guys";
+  }
+  plain = Pasta_plain;
+}
+\end{verbatim}
+
+When you define a class, \nip{} adds a few extra members for you. \ct{name}
+is a list of \ct{char} giving the name of the class. \ct{this} and
+\ct{super} are the most-enclosing class instance and the class instance
+this class is derived from (see \pref{sec:inheritance}). \nip{} also adds
+a default constructor: a member with the same name as the class, pointing
+back to the class constructor. 
+
+For efficiency reasons \nip{} does not allow mutual recursion at the top
+level. If two functions depend on each other, neither will ever be
+calculated. For example:
+
+\begin{verbatim}
+a = 1 : b;
+b = 2 : a;
+\end{verbatim}
+
+\noindent
+Neither \ct{a} nor \ct{b} will have a value.
+
+You can have mutual recursion between class members. For example:
+
+\begin{verbatim}
+Fred = class {
+  a = 1 : b;
+  b = 2 : a;
+}
+\end{verbatim}
+
+\noindent
+Now \ct{Fred.a} will have the value \ct{[1, 2, 1, 2, 1, \ldots{}]}.
+
+\subsection{Parameterised classes}
+
+Classes can have parameters. Parameters behave like class members initialised
+from arguments to the class constructor. For example:
+
+\begin{verbatim}
+My_pasta pasta_name cooked = class {
+  is_ready t = "your " ++ pasta_name ++
+         " is " ++ state
+  {
+    state
+      = "underdone!", t < cooked
+      = "perfect", t == cooked
+      = "yuk!";
+  }
+}
+\end{verbatim}
+
+\noindent
+This defines a class called \ct{My\_pasta} which takes a pasta name
+and a cooking time as parameters. Once you have made an instance of
+\ct{My\_pasta}, you can test if it's been cooked at a certain time with the
+\ct{is\_ready} member. For example:
+
+\begin{verbatim}
+tele = My_pasta "telephoni" 10;
+tele.is_ready 5 == "your telephoni " ++
+  "is underdone!"
+\end{verbatim}
+
+\subsection{Inheritance}
+\mylabel{sec:inheritance}
+
+Classes can inherit from a super-class. For example:
+
+\begin{verbatim}
+Pasta_more = class Pasta_plain { 
+  macaroni = "tubes";
+  spaghetti = "long and thin";
+  lasagne = "fairly large sheets";
+}
+\end{verbatim}
+
+\noindent
+Here the new class \ct{Pasta\_more} inherits members from the previous class
+\ct{Pasta\_plain}. It also overrides the definition of \ct{lasagne} from
+\ct{Pasta\_plain} with a new value. For example:
+
+\begin{verbatim}
+Pasta_more.macaroni == "tubes"
+Pasta_more.fusilli == "sort of twisty"
+Pasta_more.lasagne == "fairly large sheets"
+\end{verbatim}
+
+You can use \ct{this} and
+\ct{super} to refer to other members up and down the class hierarchy.
+\ct{super} is the class instance that the current class inherits from (if
+there's no super-class, \ct{super} has the value \ct{[]}), and
+\ct{this} is the most-enclosing class instance. 
+
+\begin{verbatim}
+Pasta_more.super == Pasta_plain
+Pasta_more.this == Pasta_more
+Pasta_more.super.this == Pasta_more 
+\end{verbatim}
+
+\noindent
+therefore:
+
+\begin{verbatim}
+Pasta_more.lasagne == "fairly large sheets"
+Pasta_more.super.lasagne == "large sheets"
+Pasta_more.super.this.lasagne ==
+  "fairly large sheets" 
+\end{verbatim}
+
+There's a special symbol \ct{root} which encloses all symbols. For
+example:
+
+\begin{verbatim}
+fred = 12; 
+
+Freddage = class { 
+  fred = 42;
+  mystery = root.fred;
+}
+\end{verbatim}
+
+\noindent
+Now \ct{Fred.mystery} will have the value 12.
+
+There's another special symbol called \ct{scope} which encloses all symbols in
+the file this definition was loaded from. If you want to refer to another
+definition in the same file which is being masked somehow, use \ct{scope}.
+
+You can use the built in function \ct{is\_instanceof} to test whether an
+instance is or inherits from a class. For example:
+
+\begin{verbatim}
+is_instanceof "Pasta_more" Pasta_more == true
+is_instanceof "Pasta_plain" Pasta_more == true
+is_instanceof "Pasta_more" Pasta_plain ==
+  false
+\end{verbatim}
+
+The super-class constructor can take arguments, and these arguments can refer
+to class members. For example:
+
+\begin{verbatim}
+Fresh_pasta pasta_name = class
+  My_pasta pasta_name cooked {
+  cooked = 2;
+}
+\end{verbatim}
+
+\noindent
+Defines a class for fresh pasta, which always cooks in 2 minutes. You need to
+be careful not to make loops: if \ct{cooked} did tried to refer to
+something in the super-class, this class would never construct properly.
+\nip{} unfortunately does not check for this error.
+
+Finally, the superclass can be a fully constructed class. In this case, the
+superclass is cloned and the new class members wrapped around it. You can use
+this to write a class which can wrap any other class and add members to it.
+Many of the toolkit menu items use this trick to enable them to work for any
+object type.
+
+\subsection{Minor class features}
+
+There are a couple of other things you can do with classes. You can define a
+special member called \ct{\_check}. If this member is defined, then when a
+class instance is created, the check member is returned instead of the class
+itself. You can use this to implement class argument type checks, for example:
+
+\begin{verbatim}
+Fred a b = class { 
+  _check
+    = this, is_real a && is_real b
+    = error "args to Fred must " ++
+      "both be real"
+}
+\end{verbatim}
+
+\noindent
+Defines a class called \ct{Fred} which has to have two real numbers as
+arguments.
+
+You can define members called \ct{oo\_binary}, \ct{oo\_binary'} and
+\ct{oo\_unary} and do operator overloading. When \nip{} sees one of the
+standard operators being used on an instance of your class, it will look up
+one of these members and pass in the name of the operator and the argument.
+The two forms of the binary operator member are called for the class-on-left
+and the class-on-rights cases. So:
+
+\begin{verbatim}
+x = Fred 1 2
+x + 12 == x.oo_binary "add" 12
+12 + x == x.oo_binary' "add" 12
+!x == x.oo_unary "negate" 
+\end{verbatim}
+
+These two features are very primitive. The \ct{\_Object} class in the
+\ct{\_types} toolkit builds on these to provide a fairly high-level system for
+checking class arguments and defining the meaning of operators.
+See \pref{sec:object}.
+
+\section{Controlling the interface}
+\mylabel{sec:bowser}
+
+\nip{} looks at the scraps of program you type in and execute and tries to
+show them on the screen in a graphical way. The sorts of display you get
+depend on where in \nip{} you define the expression, and what sort of value it
+has.
+
+\subsection{Tools and toolkits}
+\mylabel{sec:tools}
+
+Definitions in toolkits are turned into menus off the \ct{Toolkits} menu
+in the main window, and added to the toolkit browser. Toolkits are loaded
+from files at startup or can be made in the program window.
+Toolkit or a definition names which start with
+an underscore character are hidden and not displayed. The toolkits are always
+displayed in alphabetical order, but you can order the items within a toolkit
+in any way you like. 
+
+There are two ways to write toolkit definitions. Function definitions and
+zero-argument classes simply appear as menu items, built from static analysis
+of their source code. However, if a definition evaluates to an instance of the
+class \ct{Menu}, a menu item is built from dynamic analysis of the value of
+the definition.
+
+\subsubsection{Static menu items}
+
+Zero-argument classes within toolkits are displayed
+as pull-right menus. You can nest classes to any depth. 
+
+\nip{} uses the first line of the comment before a definition as
+help text for that function, so it's a good idea to put a simple one-line
+description of the function at the start of a comment.
+
+For example, if the following text is placed in a file called \ct{Fred.def}
+on \nip{}'s start path, you'll get a menu in the tookits called \ct{Fred} with
+a pull-right and a tooltip. See \fref{fg:toolkit}.
+
+\begin{verbatim}
+Banana a = a * 3;
+
+Subfred = class { 
+  // add two things
+  Jim a b = a + b;
+  Apple e = e * 12;
+  Harry z = 12 + z;
+}
+\end{verbatim}
+
+\begin{figure}
+\figw{2.5in}{toolkit.jpg}
+\caption{How \ct{Fred.def} will look}
+\mylabel{fg:toolkit}
+\end{figure}
+
+\subsubsection{Dynamic menu items}
+
+Dynamic menus give you much more control over the way menus are drawn and make
+it easy to reuse menus. A dynamic menu item is a class instance that is a
+sub-class of \ct{Menuitem}. It needs to have three members: \ct{label}, the
+text that should appear in the menu (with an underscore character to indicate
+the mnenonic); \ct{tooltip}, a short hint that appears as a tooltip or in
+the toolkit browser; \ct{icon}, an optional image file to be displayed in the 
+menu next to the text; and \ct{action}, the function that is called when
+the menu item is activated. \ct{label} and \ct{tooltip} are constructor
+arguments for \ct{Menu}.
+
+So for example:
+
+\begin{verbatim}
+Wombat_find_item = class Menuitem
+  "_Find Wombat"
+  "analyse image and locate wombat" {
+  icon = "nip-slider-16.png";
+  action x = im_wombat_locate x;
+}
+\end{verbatim}
+
+\noindent
+will appear as shown in \fref{fg:toolkit2}.
+
+\begin{figure}
+\figw{2.5in}{toolkit2.jpg}
+\caption{How \ct{Wombat\_find\_item} will look}
+\mylabel{fg:toolkit2}
+\end{figure}
+
+A dynamic pullright menu is a subclass of \ct{Menupullright}. It's just like
+\ct{Menuitem}, but without the need for an \ct{action} member. Any members
+which are subclasses of \ct{Menu} are displayed as items in the submenu. So
+again:
+
+\begin{verbatim}
+Wombat_item = class Menupullright
+  "_Wombat"
+  "wombat-related operations" {
+  icon = "nip-slider-16.png";
+  item1 = Wombat_find_item;
+  sep = Menuseparator;
+  boink = Wombat_find_item;
+}
+\end{verbatim}
+
+\noindent
+will appear as shown in \fref{fg:toolkit3}.
+
+\begin{figure}
+\figw{2.5in}{toolkit3.jpg}
+\caption{How \ct{Wombat\_item} will look}
+\mylabel{fg:toolkit3}
+\end{figure}
+
+\subsection{Workspaces}
+\mylabel{sec:workspaces}
+
+Definitions in workspaces are displayed with \nip{}'s class browser. Each row
+is displayed in four main parts: a button for the row name, a line of text,
+a set of sub-rows for the members of the row's class, and a graphic display
+representing the row's value. See \fref{fg:row2}.
+
+\begin{figure}
+\figw{2.5in}{ir8a.jpg}
+\caption{Components of a workspace row}
+\mylabel{fg:row2}
+\end{figure}
+
+The text part of the right-hand-side of each row is always displayed, but the
+sub-rows are only displayed if the row represents a class, and the graphic is
+only displayed if the class is an instance of one of the classes in
+\tref{tb:classes}. You can subclass these if you want to use the graphic
+display in your own widgets.
+
+There are three separate ways to set the value for a row. You can
+edit the line of program text, you can edit one of the members, or you can
+manipulate the graphic representation (dragging a slider, or moving a region).
+These can be contradictory, so \nip{} resolves conflicts by always applying
+changes in the order text, then graphic, then member. 
+
+When it applies a graphic change, \nip{} rebuilds the class using a class 
+member called \emph{class-name}\ct{\_edit}, or if that is not defined, the
+class's constructor member. For example, the \ct{Colour} class can be defined
+as:
+
+\begin{verbatim}
+Colour colour_space value = class {}
+A1 = Colour "sRGB" [255,0,0];
+\end{verbatim}
+
+\noindent
+There are two ways to change \ct{A1}. You can open \ct{A1} and change
+\ct{colour\_space} to \ct{"Lab"}, or you can double-click on the swatch
+and drag the disc. When you click \ct{OK} on the colour edit dialog, \nip{}
+searches for a member called \ct{Colour\_edit}, fails to find it, and so
+picks the \ct{Colour} member instead (the default constructor generated by
+\nip{}). It then replaces the value of A1 with
+
+[needs finishing]
+
+\begin{tab2}
+\begin{center}
+\begin{tabular}{||l|l||}
+\hline
+Class & Description \\
+\hline
+\ct{Clock \emph{interval} \emph{value}}				& 
+	A clock widget, handy for animations \\
+\ct{Expression \emph{caption} \emph{expr}}			& 
+	Displays an editable expression \\
+\ct{Group \emph{value}}						& 
+	A group of objects for iteration \\
+\ct{List \emph{value}}						& 
+	A list of related objects \\
+\ct{Pathname \emph{caption} \emph{value}}			& 
+	Displays a file browser \\
+\ct{Fontname \emph{caption} \emph{value}}			& 
+	Displays a font browser \\
+\ct{Toggle \emph{caption} \emph{value}}				& 
+	A toggle switch \\
+\ct{Scale \emph{caption} \emph{from} \emph{to} \emph{value}}	& 
+	A slider \\
+\ct{Option \emph{caption} \emph{labels} \emph{value}}		& 
+	Select one item from a list \\
+\ct{Colour \emph{colour\_space} \emph{value}}			& 
+	A patch of colour \\
+\ct{Matrix\_vips \emph{value} \emph{scale} \emph{offset} \emph{filename} 
+	\emph{display}}						& 
+	A matrix \\
+\ct{Arrow \emph{image} \emph{left} \emph{top} \emph{width} \emph{height}} & 
+	Two points joined by a line on an image \\
+\ct{Region \emph{image} \emph{left} \emph{top} \emph{width} \emph{height}} & 
+	A sub-area of an image \\
+\ct{Plot \emph{options} \emph{value}}				& 
+	Displays a plot widget \\
+\ct{Image \emph{value}}						& 
+	An image \\
+\ct{Number \emph{caption} \emph{value}}				& 
+	Displays an editable number \\
+\ct{Real \emph{value}}						& 
+	Displays a real number \\
+\ct{Vector \emph{value}}					& 
+	Displays a list of reals \\
+\ct{String \emph{caption} \emph{value}}				& 
+	Displays an editable string \\
+\ct{Mark \emph{image} \emph{left} \emph{top}} 			& 
+	A point on an image \\
+\ct{HGuide \emph{image} \emph{top}} 				& 
+	A horizontal line on an image \\
+\ct{VGuide \emph{image} \emph{left}} 				& 
+	A vertical line on an image \\
+\ct{Area \emph{image} \emph{left} \emph{top} \emph{width} \emph{height}} & 
+	A sub-area of an image, fixed in size \\
+\hline
+\end{tabular}
+\end{center}
+\caption{\nip{} built in graphic classes}
+\mylabel{tb:classes}
+\end{tab2}
+
+\subsection{The \ct{Image} class}
+\mylabel{sec:Image}.
+
+say supports mioxed ops with real, vector and complex constants 
+
+\subsection{The \ct{Colour} class}
+\mylabel{sec:colour}
+
+This class displays a swatch of colour. If you double-click on the
+
+\begin{verbatim}
+Pathname caption value = class {}
+\end{verbatim}
+
+\section{The \ct{\_Object} class}
+\mylabel{sec:object}
+
+\section{Optimisation}
+\mylabel{sec:optimise}
+
+\nip{} performs three useful optimisations on expressions. First, it finds and
+removes common sub-expressions in functions. So for example:
+
+\begin{verbatim}
+if a + b < 12 then a + b else b
+\end{verbatim}
+
+\noindent
+will only evaluate \ct{a + b} once. This can save a lot of time if \ct{a} or
+\ct{b} is a large image. 
+
+Second, \nip{} detects arithmetic operations on \ct{unsigned char} images, and
+replaces them with look-up tables. For example:
+
+\begin{verbatim}
+a = vips_image "campin.v"
+b = a * (a - 1) ** 0.5
+\end{verbatim}
+
+\noindent
+Provided \ct{campin.v} is an 8 bit image image, this expression will
+evaluate with a single call to \ct{im\_maplut()}.
+
+Finally, \nip{} has a VIPS operation cache. It memorises the arguments to the 
+last few hundred calls to VIPS, and the result each call gave. Before calling
+VIPS again, it checks to see if there is a previous call with the same
+arguments and if there is, uses the result it obtained last time.
+
+\section{Calling VIPS functions}
+\mylabel{sec:callvips}
+
+You can call any VIPS operation which has the following properties:
+
+\begin{itemize}
+
+\item
+There must be at least 1 output argument. If there's a single output argument,
+that becomes the value of the function. If there is more than one output, then
+the function returns a list with the outputs as members.
+
+\item
+The output arguments must all be one of:
+
+\begin{itemize}
+\item \verb+IM_TYPE_DOUBLE+, 
+\item \verb+IM_TYPE_INT+, 
+\item \verb+IM_TYPE_COMPLEX+, 
+\item \verb+IM_TYPE_STRING+, 
+\item \verb+IM_TYPE_IMAGE+, 
+\item \verb+IM_TYPE_DOUBLEVEC+, 
+\item \verb+IM_TYPE_DMASK+, 
+\item \verb+IM_TYPE_IMASK+
+\end{itemize}
+
+\item
+The input arguments must all be one of the types above, or
+\verb+IM_TYPE_DISPLAY+. If an argument is an input display, \nip{} passes in
+its current display structure, it does not take a display from your program.
+
+\end{itemize}
+
+When \nip{} starts up, it loads any VIPS plug ins it can find on its data
+search path. You can call functions from plug ins in just the same way. For
+information on writing plug ins, see the \emph{VIPS Manual}.
+

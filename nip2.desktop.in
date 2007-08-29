@@ -1,0 +1,14 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=@PACKAGE@
+Comment=Image manipulation program based on VIPS
+Comment[it]=Programma per la manipolazione di immagini basato su VIPS
+Exec=@prefix@/bin/run-nip2.sh
+Icon=@prefix@/share/nip2/data/vips-128.png
+Terminal=false
+Type=Application
+Categories=Application;Graphics;RasterGraphics;
+X-GNOME-Bugzilla-Bugzilla=GNOME
+X-GNOME-Bugzilla-Product=NIP2
+StartupNotify=true
+MimeType=image/x-vips

@@ -1,0 +1,207 @@
+/* various operations to convert numeric precision
+ */
+Convert_format_to = class {
+	/* convert to unsigned 8 bit [0, 255]
+	 */
+	unsigned_8bit x = map_unary cast_unsigned_char x;
+
+	/* convert to signed 8 bit [-128, 127]
+	 */
+	signed_8bit x = map_unary cast_signed_char x;
+
+	/* convert to unsigned 16 bit [0, 65535]
+	 */
+	unsigned_16bit x = map_unary cast_unsigned_short x;
+
+	/* convert to signed 16 bit [-32768, 32767]
+	 */
+	signed_16bit x = map_unary cast_signed_short x;
+
+	/* convert to unsigned 32 bit [0, 4294967295]
+	 */
+	unsigned_32bit x = map_unary cast_unsigned_int x;
+
+	/* convert to signed 32 bit [-2147483648, 2147483647]
+	 */
+	signed_32bit x = map_unary cast_signed_int x;
+
+	/* convert to IEEE 32 bit floating point
+	 */
+	float_32bit x = map_unary cast_float x;
+
+	/* convert to IEEE 64 bit floating point
+	 */
+	float_64bit x = map_unary cast_double x;
+
+	/* convert to 64 bit complex (2 x IEEE 32 bit floating point)
+	 */
+	complex_64bit x = map_unary cast_complex x;
+
+	/* convert to 128 bit complex (2 x IEEE 64 bit floating point)
+	 */
+	complex_128bit x = map_unary cast_double_complex x;
+}
+
+/* linear scale of pixel values to fit range 0-255
+ */
+Scale_to_byte x = map_unary scale x;
+
+#separator
+
+/* try to make a matrix out of an object
+ */
+Convert_to_matrix in = map_unary to_matrix in;
+
+/* try to make an image out of an object
+ */
+Convert_to_image in = map_unary to_image in;
+
+#separator
+
+/* measure average value of a set of patches
+ */
+Matrix_from_colour_chart x
+	= map_unary chart x
+{
+	chart image = class 
+		Matrix value {
+		_check_args = [
+			[image, "image", check_Image]
+		] ++ super._check_args;
+
+		pacross = 6;
+		pdown = 4;
+		value = (im_measure image.value 0 0 image.width image.height
+			pacross pdown).value;
+
+		/* Hmm, not very helpful, we throw edits away.
+		 */
+		Matrix_vips_edit value scale offset filename display = 
+			chart image;
+	}
+}
+
+/* make a synthetic colour chart image from a matrix
+ */
+Colour_chart_from_matrix matrix
+	= map_unary build_chart matrix
+{
+	build_chart matrix = class 
+		Image value {
+		_check_args = [
+			[matrix, "matrix", check_Matrix]
+		] ++ super._check_args;
+
+		patches_across = 6;
+		patches_down = 4;
+		patch_width = 50;
+		patch_height = 50;
+		border_width = 0;
+
+		value
+			= imagearray_assemble overlap overlap patch_table 
+		{
+			overlap = -border_width;
+
+			// patch numbers for row starts
+			rowstart = map (multiply patches_across) 
+				[0 .. patches_down - 1];
+
+			// assemble patches ... each one a pixel value
+			patches = map (take patches_across) 
+				(map (converse drop matrix.value) rowstart);
+
+			// make an n-band constant image from eg. [1,2,3]
+			patch v = image_new patch_width patch_height (len v) 
+				Image_format.FLOAT Image_coding.NOCODING 
+				Image_type.sRGB (Vector v) 0 0;
+
+			// make an image for each patch
+			patch_table = map (map patch) patches;
+		}
+	}
+}
+
+#separator
+
+/* make a colour from the average values in an image
+ */
+Colour_from_image image
+	= map_unary test image
+{
+	test x
+		= build_chart x, is_instanceof "Image" x
+		= build_chart (Image pixel), is_instanceof "Point" x
+		= error ("Colour_from_image: arg not Image or Point: " ++ 
+			print x)
+	{
+		pixel = x.image.extract_area x.left x.top 1 1;
+	}
+
+	build_chart image = class 
+		Colour colour_space value {
+		_check_args = [
+			[image, "image", check_Image]
+		] ++ super._check_args;
+
+		colour_space 
+			= table.lookup 1 0 type, table.present 1 type
+			= error ("Colour_from_image: unable to make Colour " ++
+				"from " ++ 
+				Image_type.type_names.lookup 1 0 type ++
+				" image")
+		{
+			table = Image_type.colour_spaces;
+			type = im_header_int "Type" image.value;
+		}
+
+		value = map mean (bandsplit image.value);
+	}
+}
+
+/* make a constant image from a colour patch
+ */
+Image_from_colour x
+	= map_unary build x
+{
+	build c = class 
+		Image value {
+		_check_args = [
+			[c, "c", check_Colour]
+		] ++ super._check_args;
+
+		width = 64;
+		height = 64;
+
+		value = image_new width height 3 Image_format.FLOAT 
+			Image_coding.NOCODING (get_type c) c 0 0;
+	}
+}
+
+#separator
+
+/* try to break object in into a list of components
+ */
+Decompose in
+	= map_unary dec in
+{
+	dec x
+		= bandsplit x, is_instanceof "Image" x
+		= map Vector x.value, is_instanceof "Matrix_base" x
+		= x.value, is_instanceof "Vector" x || is_instanceof "Real" x
+		= error "Decompose: not Image/Matrix/Vector/Real";
+}
+
+/* try to put a list of objects together into a large single object
+ */
+Compose x
+	= Vector x, is_real_list x
+	= Matrix x, is_matrix x
+	= bandjoin x, is_listof (is_instanceof "Image") x
+	= Vector (map get_value x), is_listof (is_instanceof "Real") x
+	= Matrix (map get_value x), is_listof (is_instanceof "Vector") x
+	= map_unary Compose x, is_list x
+	= error "Compose: not list of Image/Vector/Real/image/real"
+{
+	get_value x = x.value;
+}

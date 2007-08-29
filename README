@@ -1,0 +1,105 @@
+nip 7.12
+========
+
+nip2 is a user interface for the VIPS image processing library. 
+
+	http://www.vips.ecs.soton.ac.uk
+
+Getting nip2 from SVN
+=====================
+
+Enter:
+
+	svn co https://vips.svn.sourceforge.net/svnroot/vips/nip2
+
+Building nip2 from source
+=========================
+
+In the nip2 directory, you should just be able to do:
+
+	user% ./configure
+	user% make
+
+then as root: 
+
+	root% make install
+
+By default this will install files to /usr/local/bin, /usr/local/share/vips,
+/usr/local/include, /usr/local/lib and /usr/local/man. 
+
+If you have problems, read on.
+
+Building nip2 on win32
+----------------------
+
+Probably the easiest route is to use mingw/msys. This provides a GNU-style
+build environment for win32. 
+
+	http://www.vips.ecs.soton.ac.uk/index.php?title=Build_on_windows
+
+Alternatively, vips-7.x/win32 contains sample build systems using the
+Microsoft toolchain. See the README in there for details.
+
+Building nip2 on OS X
+---------------------
+
+I used macports to install all the dependencies. Fink also works.
+
+	http://www.macports.org
+
+You need to tell configure to use the msgfmt from macports. Something like:
+
+	GMSGFMT="/opt/local/bin/msgfmt" ./configure --prefix=/Users/john/vips
+
+Dependencies
+============
+
+vips
+gtk2
+libxml2
+	all needed at runtime
+
+flex/bison
+	needed at compiletime
+	
+fftw3
+gsl
+	optional, but useful
+
+vips8
+	not required: internal development only, but you may see warning
+	messages
+
+Tips 
+----
+
+production build with
+
+./configure --prefix=/home/john/vips 
+
+debug build with
+
+CFLAGS="-g -Wall" ./configure --prefix=/home/john/vips 
+
+(--enable-debug turns on and off automatically with development / production
+minor version numbers)
+
+leak check
+
+export G_DEBUG=gc-friendly 
+
+	This makes Glib clear certain memory areas after using them, too.
+
+export G_SLICE=always-malloc 
+
+	This completely disables the magazine and slab allocator in Glib, 
+	and makes it use plain malloc()/free() instead.
+
+valgrind --suppressions=/home/john/nip2.supp --leak-check=yes nip2 ...
+
+valgrind --suppressions=/home/john/nip2.supp --leak-check=no --db-attach=yes nip2 ...
+
+Disclaimer: No guarantees of performance accompany this software, nor is any
+responsibility assumed on the part of the authors. Please read the licence
+agreement.
+

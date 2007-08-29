@@ -1,0 +1,583 @@
+
+/* make a new blank image
+ */
+New_image 
+	= widget
+{
+	type_names = Image_type.type_names;
+	names = sort (map (extract 0) type_names.value);
+
+	default_type_name = type_names.lookup 1 0 Image_type.MULTIBAND;
+	default_type_pos = index (equal default_type_name) names;
+
+	widget = class 
+		Image value {
+		width = 64;
+		height = 64;
+		bands = 1;
+
+		format_option = Option "Image format" [
+			"8-bit unsigned int - UCHAR", 		// 0
+			"8-bit signed int - CHAR", 		// 1
+			"16-bit unsigned int - USHORT", 	// 2
+			"16-bit signed int - SHORT", 		// 3
+			"32-bit unsigned int - UINT", 		// 4
+			"32-bit signed int - INT", 		// 5
+			"32-bit float - FLOAT", 		// 6
+			"64-bit complex - COMPLEX", 		// 7
+			"64-bit float - DOUBLE", 		// 8
+			"128-bit complex - DPCOMPLEX" 		// 9
+		] 0;
+
+		type_option = Option "Image type" names default_type_pos;
+
+		value
+			= image_new width height bands format
+				Image_coding.NOCODING type 0 0 0
+		{
+			format = format_option.value;
+			type = type_names.lookup 0 1 names?type_option;
+		}
+	}
+}
+
+/* pick a colour ... any colour space
+ */
+New_colour
+	= widget "Lab" [50,0,0]
+{
+	widget default_colour value = class
+		Colour colour_space value {
+		_colourspaces = [
+			"XYZ",         
+			"Yxy",         
+			"Lab",         
+			"LCh",         
+			"UCS",        
+			"RGB",       
+			"sRGB"      
+		];
+
+		colour_space_option = Option "Colour space" _colourspaces
+			(index (equal default_colour) _colourspaces);
+
+		colour_space = colour_space_option.labels?
+			colour_space_option.value;
+
+		Colour_edit colour_space value = widget colour_space value;
+	}
+}
+
+/* make a slider
+ */
+New_slider = Slider 0 255 128;
+
+/* make a toggle widget
+ */
+New_toggle = Toggle "untitled" false;
+
+/* make an option widget
+ */
+New_option = Option "untitled" ["option0", "option1"] 0;
+
+/* make a string entry widget
+ */
+New_string = String "Enter a string" "sample text";
+
+/* make a number entry widget
+ */
+New_number = Number "Enter a number" 42;
+
+/* make a file chooser
+ */
+New_filename = Filename "$VIPSHOME/share/$PACKAGE/data/print_test_image.v";
+
+/* make a matrix
+ */
+New_matrix = class {
+	/* make a plain matrix
+	 */
+	Plain = Matrix (identity_matrix 3);
+
+	/* make a convolution matrix
+	 */
+	Convolution = Matrix_con 1 0 [[0, 0, 0], [0, 1, 0], [0, 0, 0]];
+
+	/* make a recombination matrix
+	 */
+	Recombination = Matrix_rec (identity_matrix 3);
+
+	/* make a morphology matrix
+	 */
+	Morphology = Matrix_mor [[0, 0, 0], [0, 255, 0], [0, 0, 0]];
+}
+
+/* make a mark on an image
+ */
+New_mark = class {
+	/* mark a region on an image
+	 */
+	Region image = scope.Region_relative image 0.25 0.25 0.5 0.5;
+
+	/* mark a point on an image
+	 */
+	Point image = scope.Point_relative image 0.5 0.5;
+
+	/* mark an arrow on an image
+	 */
+	Arrow image = scope.Arrow_relative image 0.25 0.25 0.5 0.5;
+
+	/* mark a horizontal guide on an image
+	 */
+	HGuide image = scope.HGuide_relative image 0.5;
+
+	/* mark a vertical guide on an image
+	 */
+	VGuide image = scope.VGuide_relative image 0.5;
+}
+
+#separator
+
+/* make a spatial response pattern image
+ */
+New_eye = class
+	Image value {
+	width = 64;
+	height = 64;
+	factor = Slider 0.001 1 0.2;
+
+	value = im_eye width height factor.value;
+}
+
+/* make a zone plate image
+ */
+New_zone_plate = class
+	Image value {
+	size = 64;
+
+	value = im_zone size;
+}
+
+/* make a grey ramp image
+ */
+New_grey = class
+	Image value {
+	width = 64;
+	height = 64;
+	orientation = Option "" ["Horizontal", "Vertical"] 0;
+
+	value = [im_grey width height, 
+		im_rot90 (im_grey height width)]?orientation;
+}
+
+/* make a two band image whose pixel values are their coordinates
+ */
+New_xy = class
+	Image value {
+	width = 64;
+	height = 64;
+
+	value = make_xy width height; 
+}
+
+/* make a new image of gaussian noise
+ */
+New_gauss_noise = class
+	Image value {
+	size = 64;
+	mean = Slider 0 255 128;
+	deviation = Slider 0 128 50;
+
+	value = im_gaussnoise size size mean.value deviation.value;
+}
+
+/* make a 2d fractal image
+ */
+New_fractal = class
+	Image value {
+	size = 64;
+	dimension = Slider 2.001 2.999 2.001;
+
+	value = im_fractsurf size dimension.value; 
+}
+
+/* make a CRT calibration chart
+ */
+New_CRT_test_chart = class
+	Image value {
+	brightness = Slider 0 255 200;
+	patch_size = 32;
+
+	value 
+		= imagearray_assemble 0 0 [[green, red], [blue, white]]
+	{
+
+		black = image_new patch_size patch_size 1
+			Image_format.FLOAT Image_coding.NOCODING 
+			Image_type.B_W 0 0 0;
+		notblack = black + brightness;
+
+		green = black ++ notblack ++ black;
+		red = notblack ++ black ++ black;
+		blue = black ++ black ++ notblack;
+		white = notblack ++ notblack ++ notblack;
+	}
+}
+
+/* make a frequency test chart
+ */
+New_frequency_test_chart = class
+	Image value {
+	width = 64;
+	strip_height = 10;
+	wavelengths = [64, 32, 16, 8, 4, 2];
+
+	value 
+		= join.value
+	{
+		freq_slice wave 
+			= Image (sin ((im_fgrey width strip_height) * 360 * 
+				width / wave) > 0);
+		strips = map freq_slice wavelengths;
+		join = foldl1 Join.Top_bottom strips;
+	}
+}
+
+/* make a checkerboard pattern
+ */
+New_checkerboard = class
+	Image value {
+	width = 64;
+	height = 64;
+	horizontal_patch_size = 8;
+	vertical_patch_size = 8;
+	horizontal_patch_offset = 0;
+	vertical_patch_offset = 0;
+
+	value
+		= xstripes ^ ystripes
+	{
+		pixels = make_xy width height;
+		xpixels = pixels?0 + horizontal_patch_offset;
+		ypixels = pixels?1 + vertical_patch_offset;
+
+		make_stripe pix swidth = pix % (swidth * 2) >= swidth;
+
+		xstripes = make_stripe xpixels horizontal_patch_size;
+		ystripes = make_stripe ypixels vertical_patch_size;
+	}
+}
+
+/* make a grid pattern
+ */
+New_grid = class
+	Image value {
+	width = 64;
+	height = 64;
+	horizontal_line_spacing = 8;
+	vertical_line_spacing = 8;
+	line_thickness = 1;
+	horizontal_grid_offset = 0;
+	vertical_grid_offset = 0;
+
+	value
+		= xstripes | ystripes
+	{
+		pixels = make_xy width height;
+		xpixels = pixels?0 + horizontal_grid_offset;
+		ypixels = pixels?1 + vertical_grid_offset;
+
+		make_stripe pix swidth = pix % swidth < line_thickness;
+
+		xstripes = make_stripe xpixels horizontal_line_spacing;
+		ystripes = make_stripe ypixels vertical_line_spacing;
+	}
+}
+
+#separator
+
+/* make a gaussian matrix
+ */
+New_gauss_matrix = class
+	Matrix_vips _mask.value 
+		_mask.scale _mask.offset _mask.filename _mask.display {
+	sigma = Slider 0.001 10 1;
+	min_amplitude = Slider 0 1 0.2;
+	integer = Toggle "Integer" false;
+	_mask 
+		= fn sigma.value min_amplitude.value
+	{
+		fn
+			= im_gauss_imask, integer
+			= im_gauss_dmask;
+	}
+}
+
+/* make a laplacian of a gaussian mask
+ */
+New_log_matrix = class
+	Matrix_vips _mask.value 
+		_mask.scale _mask.offset _mask.filename _mask.display {
+	sigma = Slider 0.001 10 1.5;
+	min_amplitude = Slider 0 1 0.1;
+	integer = Toggle "Integer" false;
+	_mask 
+		= fn sigma.value min_amplitude.value
+	{
+		fn
+			= im_log_imask, integer
+			= im_log_dmask;
+	}
+}
+
+#separator
+
+/* make the mask images for various ideal fourier filters
+ */
+New_ideal = class {
+	/* make a mask image for an ideal highpass/lowpass fourier filter
+	 */
+	High_low = class 
+		Image value {
+		size = 64;
+		frequency_cutoff = Slider 0.01 0.99 0.5;
+		type = Option "High or low" ["High pass", "Low pass"] 0;
+
+		_type = type.value;
+
+		value
+			= image_set_type Image_type.FOURIER (rotquad mask)
+		{
+			mask = im_create_fmask 
+				size size _type
+				frequency_cutoff.value 0 0 0 0;
+		}
+	}
+
+	/* make a mask image for an ideal ring pass/reject fourier filter
+	 */
+	Ring = class 
+		Image value {
+		size = 64;
+		frequency_cutoff = Slider 0.01 0.99 0.5;
+		ring_width = Slider 0.01 0.99 0.5;
+		type = Option "Pass or reject" ["Ring pass", "Ring reject"] 0;
+
+		_type = type.value + 6;
+
+		value
+			= image_set_type Image_type.FOURIER (rotquad mask)
+		{
+			mask = im_create_fmask 
+				size size _type
+				frequency_cutoff.value ring_width.value 0 0 0;
+		}
+	}
+
+	/* make a mask image for an ideal band pass/reject fourier filter
+	 */
+	Band = class 
+		Image value {
+		size = 64;
+		frequency_cutoff_x = Slider 0.01 0.99 0.5;
+		frequency_cutoff_y = Slider 0.01 0.99 0.5;
+		radius = Slider 0.01 0.99 0.5;
+		type = Option "Pass or reject" ["Band pass", "Band reject"] 0;
+
+		_type = type.value + 12;
+
+		value
+			= image_set_type Image_type.FOURIER (rotquad mask)
+		{
+			mask = im_create_fmask 
+				size size _type
+				frequency_cutoff_x.value
+				frequency_cutoff_y.value
+				radius.value 0 0;
+		}
+	}
+}
+
+/* various Gaussian fourier filters
+ */
+New_gaussian = class {
+	/* make a mask image for a gaussian highpass/lowpass fourier filter
+	 */
+	High_low = class 
+		Image value {
+		size = 64;
+		frequency_cutoff = Slider 0.01 0.99 0.5;
+		amplitude_cutoff = Slider 0.01 0.99 0.5;
+		type = Option "High or low" ["High pass", "Low pass"] 0;
+
+		_type = type.value + 4;
+
+		value
+			= image_set_type Image_type.FOURIER (rotquad mask)
+		{
+			mask = im_create_fmask 
+				size size _type
+				frequency_cutoff.value 
+				amplitude_cutoff.value 0 0 0;
+		}
+	}
+
+	/* make a mask image for a gaussian ring pass/reject fourier filter
+	 */
+	Ring = class 
+		Image value {
+		size = 64;
+		frequency_cutoff = Slider 0.01 0.99 0.5;
+		ring_width = Slider 0.01 0.99 0.5;
+		amplitude_cutoff = Slider 0.01 0.99 0.5;
+		type = Option "Pass or reject" ["Ring pass", "Ring reject"] 0;
+
+		_type = type.value + 10;
+
+		value
+			= image_set_type Image_type.FOURIER (rotquad mask)
+		{
+			mask = im_create_fmask 
+				size size _type
+				frequency_cutoff.value
+				ring_width.value amplitude_cutoff.value 0 0;
+		}
+	}
+
+	/* make a mask image for a gaussian band pass/reject fourier filter
+	 */
+	Band = class 
+		Image value {
+		size = 64;
+		frequency_cutoff_x = Slider 0.01 0.99 0.5;
+		frequency_cutoff_y = Slider 0.01 0.99 0.5;
+		radius = Slider 0.01 0.99 0.5;
+		amplitude_cutoff = Slider 0.01 0.99 0.5;
+		type = Option "Pass or reject" ["Band pass", "Band reject"] 0;
+
+		_type = type.value + 16;
+
+		value
+			= image_set_type Image_type.FOURIER (rotquad mask)
+		{
+			mask = im_create_fmask 
+				size size _type
+				frequency_cutoff_x.value
+				frequency_cutoff_y.value
+				radius.value amplitude_cutoff.value 0;
+		}
+	}
+}
+
+/* various Butterworth fourier filters
+ */
+New_butterworth = class {
+	/* make a mask image for a Butterworth highpass/lowpass fourier filter
+	 */
+	High_low = class 
+		Image value {
+		size = 64;
+		order = Slider 1 10 2;
+		frequency_cutoff = Slider 0.01 0.99 0.5;
+		amplitude_cutoff = Slider 0.01 0.99 0.5;
+		type = Option "High or low" ["High pass", "Low pass"] 0;
+
+		_type = type.value + 2;
+
+		value
+			= image_set_type Image_type.FOURIER (rotquad mask)
+		{
+			mask = im_create_fmask 
+				size size _type
+				order.value frequency_cutoff.value
+				amplitude_cutoff.value 0 0;
+		}
+	}
+
+	/* make a mask image for a Butterworth ring pass/reject fourier filter
+	 */
+	Ring = class 
+		Image value {
+		size = 64;
+		order = Slider 1 10 2;
+		frequency_cutoff = Slider 0.01 0.99 0.5;
+		ring_width = Slider 0.01 0.99 0.5;
+		amplitude_cutoff = Slider 0.01 0.99 0.5;
+		type = Option "Pass or reject" ["Ring pass", "Ring reject"] 0;
+
+		_type = type.value + 8;
+
+		value
+			= image_set_type Image_type.FOURIER (rotquad mask)
+		{
+			mask = im_create_fmask 
+				size size _type
+				order.value frequency_cutoff.value
+				ring_width.value amplitude_cutoff.value 0;
+		}
+	}
+
+	/* make a mask image for a Butterworth band pass/reject fourier filter
+	 */
+	Band = class 
+		Image value {
+		size = 64;
+		order = Slider 1 10 2;
+		frequency_cutoff_x = Slider 0.01 0.99 0.5;
+		frequency_cutoff_y = Slider 0.01 0.99 0.5;
+		radius = Slider 0.01 0.99 0.5;
+		amplitude_cutoff = Slider 0.01 0.99 0.5;
+		type = Option "Pass or reject" ["Band pass", "Band reject"] 0;
+
+		_type = type.value + 14;
+
+		value
+			= image_set_type Image_type.FOURIER (rotquad mask)
+		{
+			mask = im_create_fmask 
+				size size _type
+				order.value frequency_cutoff_x.value
+				frequency_cutoff_y.value
+				radius.value amplitude_cutoff.value;
+		}
+	}
+}
+
+#separator
+
+/* make a slice through CIELAB space
+ */
+New_CIELAB_slice = class
+	Image value {
+	size = 64;
+	L = Slider 0 100 50;
+	value = lab_slice size L.value;
+}
+
+/* pick a colour in LAB space
+ */
+New_LAB_colour
+	= widget "Lab" [50, 0, 0]
+{
+	// ab_slice size
+	size = 512;
+
+	// range of values ... +/- 128 for ab
+	range = 256;
+
+	// map xy in slice image to ab and back
+	xy2ab x = x / (size / range);
+	ab2xy a = (a * (size / range));
+
+	widget space default_value = class
+		Colour space value {
+		L = default_value?0;
+		a = default_value?1;
+		b = default_value?2;
+		lightness = Slider 0 100 L;
+		ab_slice = Image (lab_slice size lightness.value);
+		point = Point ab_slice (ab2xy a) (ab2xy b);
+		value = [lightness.value, xy2ab point.left, xy2ab point.top];
+		Colour_edit colour_space value = widget colour_space value;
+	}
+}

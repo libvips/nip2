@@ -1,0 +1,79 @@
+/* find histogram of x
+ */
+Hist_find x = map_unary hist_find x;
+
+/* find n-dimensional histogram from n-band image
+ */
+Hist_find_nD in
+	= map_unary widget in
+{
+	widget image = class 
+		Image value {
+		_check_args = [
+			[image, "Image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		// default to something small-ish
+		bins = 8;
+
+		value = hist_find_nD bins image.value;
+	}
+}
+
+/* map image x through histogram hist
+ */
+Hist_map hist x = map_binary hist_map hist x;
+
+/* find cumulative histogram of hist
+ */
+Hist_cumulative x = map_unary hist_cum x;
+
+/* find normalised histogram of hist
+ */
+Hist_normalise x = map_unary hist_norm x;
+
+/* find LUT which matches hist in to hist ref
+ */
+Hist_match in ref = map_binary hist_match in ref;
+
+#separator
+
+/* histogram equalisation
+ */
+Hist_equalise = class {
+	/* histogram equalise x globally
+	 */
+	Global x = map_unary hist_equalize x;
+
+	/* local histogram equalisation using region r as window
+	 */
+	Local r = map_unary (hist_equalize_local r.width r.height) r.image;
+}
+
+/* slice a line of pixels along a guide line and display as a histogram
+ */
+Guide_slice in
+	= map_unary widget in
+{
+	widget guide = class 
+		Image value {
+		_check_args = [
+			[guide, "Guide", check_Guide]
+		] ++ super._check_args;
+
+		value 
+			= image_set_type Image_type.HISTOGRAM slice
+		{
+			slice
+				= guide.image.extract_area 
+					guide.image.rect.left guide.top 
+					guide.width 1,
+					is_instanceof "HGuide" guide
+				= guide.image.extract_area
+					guide.left guide.image.rect.top
+					1 guide.height;
+		}
+	}
+}
+

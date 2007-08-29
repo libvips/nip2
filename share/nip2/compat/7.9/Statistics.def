@@ -1,0 +1,155 @@
+/* mean value of object
+ */
+Mean a = map_unary mean a;
+
+/* standard deviation of object
+ */
+Deviation a = map_unary deviation a;
+
+/* calculate a large set of stats on an object
+ */ 
+Stats a = map_unary stats a;
+
+#separator
+
+/* maximum of an object
+ */
+Max a = map_unary max a;
+
+/* minimum of an object
+ */
+Min a = map_unary min a;
+
+/* return complex number (max, min)
+ */
+Maxmin a 
+	= map_unary maxmin a
+{
+	maxmin x = (Max x, Min x);
+}
+
+/* position of maximum in an image
+ */ 
+Maximum_position a = map_unary maxpos a;
+
+/* position of minimum in an image 
+ */ 
+Minimum_position a = map_unary minpos a;
+
+#separator
+
+/* count the number of non-zeros in an image 
+ */
+Count_set a
+	= map_unary cset a
+{
+	cset i = (mean (i != 0) * i.width * i.height) / 255;
+}
+
+/* count the number of zeros in an image 
+ */
+Count_clear a
+	= map_unary cclear a
+{
+	cclear i = (mean (i == 0) * i.width * i.height) / 255;
+}
+
+#separator
+
+/* plot a scatter graph of a list of [x,y] coordinates
+ */
+Plot_scatter x 
+	//= map_unary widget x
+	= widget x
+{	
+	widget data
+		= class
+		Image value {
+		_check_args = [
+			[data, "data", check_xy_list]
+		] ++ super._check_args;
+
+		width = 512;
+		height = 512;
+		plot_colour = Colour "Lab" [80, -80, 80];
+		xmin = foldr1 min_pair (map (extract 0) data);
+		xmax = foldr1 max_pair (map (extract 0) data);
+		ymin = foldr1 min_pair (map (extract 1) data);
+		ymax = foldr1 max_pair (map (extract 1) data);
+		axies = Toggle "Draw axies" true;
+		mark 
+			= Point this x y
+		{
+			p = _to_image data?0;
+			x = p?0;
+			y = p?1;
+		}
+		mark_position_hint = "mark is at position:";
+		mark_position = _from_image [mark.left, mark.top];
+
+		// geometry
+		_xrange = xmax - xmin;
+		_yrange = ymax - ymin;
+		_xscale = width / _xrange;
+		_yscale = height / _yrange;
+
+		// map an [x,y] point into the image coordinates
+		_to_image p = [(p?0 - xmin) * _xscale, 
+			height - (p?1 - ymin) * _yscale];
+
+		// map an [x,y] point from image cods back to real cods
+		_from_image p = [p?0 / _xscale + xmin, 
+			(height - p?1) / _yscale + ymin];
+
+		value
+			= foldr plot background' data
+		{
+			plot_image_new width height pixel
+				= image_new width height 3
+					Image_format.FLOAT 
+					Image_coding.NOCODING
+					(Image_type.colour_spaces.lookup 
+						0 1 plot_colour.colour_space)
+					pixel 0 0;
+
+			// background
+			background = plot_image_new width height 0;
+
+			// mark we plot
+			mark_width = max_pair 1 (width / 100);
+			mark_height = max_pair 1 (height / 100);
+			mark = plot_image_new mark_width mark_height 
+					plot_colour;
+
+			// draw axies on background 
+			background' 
+				= drawxy, axies
+				= background
+			{
+				// axies
+				xaxis = plot_image_new width 1 
+					(Colour "Lab" [100, 0, 0]); 
+				yaxis = plot_image_new 1 height 
+					(Colour "Lab" [100, 0, 0]);
+				origin = _to_image [0, 0];
+
+				drawx = im_insert_noexpand 
+					background xaxis 0 origin?1;
+				drawxy = im_insert_noexpand 
+					drawx yaxis origin?0 0;
+			}
+
+			// plot a single point on an image
+			plot p im 
+				= im_insert_noexpand im mark 
+					(x - mark_width / 2) 
+					(y - mark_height / 2)
+			{
+				p' = _to_image p;
+				x = p'?0;
+				y = p'?1;
+			}
+		}
+	}
+}
+

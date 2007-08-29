@@ -1,0 +1,233 @@
+# Process this file with autoconf to produce a configure script.
+AC_INIT(src/ip.h)
+AM_CONFIG_HEADER(config.h)
+
+dnl
+dnl We do the version number components as m4 macros
+dnl so that we can base configure --help output off
+dnl of them.
+dnl
+
+m4_define([nip_major_version], [7])
+m4_define([nip_minor_version], [12])
+m4_define([nip_micro_version], [5])
+m4_define([nip_version],
+          [nip_major_version.nip_minor_version.nip_micro_version])
+
+PACKAGE=nip2
+MAJOR_VERSION=nip_major_version()
+MINOR_VERSION=nip_minor_version()
+MICRO_VERSION=nip_micro_version()
+VERSION=nip_version()
+
+AC_CANONICAL_HOST
+AC_CANONICAL_TARGET
+
+AM_INIT_AUTOMAKE($PACKAGE,$VERSION)
+
+AC_DEFINE_UNQUOTED(MAJOR_VERSION, $MAJOR_VERSION, [Major version number])
+AC_DEFINE_UNQUOTED(MINOR_VERSION, $MINOR_VERSION, [Minor version number])
+AC_DEFINE_UNQUOTED(MICRO_VERSION, $MICRO_VERSION, [Micro version number])
+
+AC_MSG_CHECKING([for native Win32])
+case "$host" in
+  *-*-mingw*)
+    nip_os_win32=yes
+    ;;
+  *)
+    nip_os_win32=no
+    ;;
+esac
+AC_MSG_RESULT([$nip_os_win32])
+
+if test x"$nip_os_win32" = "xyes"; then
+  AC_DEFINE(OS_WIN32,1,[native win32])
+
+  # stops command window popping up if not started from command line
+  # makes gcc use win native alignment
+  IP_CFLAGS="-mwindows -mms-bitfields $IP_CFLAGS"
+fi
+
+# src/Makeile.am uses this to add an icon to the .exe
+AM_CONDITIONAL(OS_WIN32, test x"$nip_os_win32" = "xyes")
+
+AC_MSG_CHECKING([for Mac OS X])
+case "$host" in
+  *-*-darwin*)
+    nip_os_darwin=yes
+    ;;
+  *)
+    nip_os_darwin=no
+    ;;
+esac
+AC_MSG_RESULT([$nip_os_darwin])
+if test x"$nip_os_darwin" = "xyes"; then
+  AC_DEFINE(OS_DARWIN,1,[native Mac OS X])
+fi
+
+if test x"$nip_os_darwin" = "xyes"; then
+  # need this env setting on darwin, for some reason
+  export GMSGFMT=msgfmt
+fi
+
+# disable debugging by default for production releases
+m4_define([debug_default],
+  m4_if(m4_eval(nip_minor_version() % 2), [1], [yes], [minimum]))
+
+AC_ARG_ENABLE(debug,
+  AC_HELP_STRING([--enable-debug=@<:@no/minimum/yes@:>@],
+    [turn on debugging @<:@default=debug_default()@:>@]),,
+  enable_debug=debug_default())
+
+if test "x$enable_debug" = "xyes"; then
+  NIP_DEBUG_FLAGS="-DDEBUG_FATAL -DDEBUG_LEAK"
+else
+  NIP_DEBUG_FLAGS="-DG_DISABLE_CAST_CHECKS"
+
+  if test "x$enable_debug" = "xno"; then
+    NIP_DEBUG_FLAGS="$GLIB_DEBUG_FLAGS -DG_DISABLE_ASSERT -DG_DISABLE_CHECKS"
+  fi
+fi
+
+IP_CFLAGS="$NIP_DEBUG_FLAGS $IP_CFLAGS"
+
+# we want largefile support, if possible
+AC_SYS_LARGEFILE
+
+# Checks for programs.
+AC_PROG_AWK
+AC_PROG_CC
+AC_PROG_YACC
+AM_PROG_LEX
+IP_LIBS="$IP_LIBS $LEXLIBS"
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_CHECK_TOOL(WINDRES, windres)
+AC_CHECK_TOOL(DLLWRAP, dllwrap)
+AC_CHECK_TOOL(DLLTOOL, dlltool)
+AC_CHECK_TOOL(OBJDUMP, objdump)
+AC_CHECK_TOOL(RANLIB, ranlib)
+AC_CHECK_TOOL(STRIP, strip)
+AC_CHECK_TOOL(AR, ar)
+AC_CHECK_TOOL(AS, as)
+AC_CHECK_TOOL(LD, ld)
+AC_LIBTOOL_WIN32_DLL
+AC_PROG_LIBTOOL
+
+# dmalloc option
+AM_WITH_DMALLOC
+
+# i18n
+GETTEXT_PACKAGE=nip2
+AC_SUBST(GETTEXT_PACKAGE)
+AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
+	[The prefix for our gettext translation domains.])
+ALL_LINGUAS="en_GB malkovich"
+AC_PROG_INTLTOOL
+AM_GLIB_GNU_GETTEXT
+
+# check for flex ... nip needs to adjust itself a bit
+if test "${LEX}" = "flex"; then
+	AC_DEFINE(HAVE_FLEX,1,[using flex, rather than lex])
+fi
+
+# get packages we need
+# gtk before 2.4.9 crashes with the way we use combobox :-(
+PKG_CHECK_MODULES(PKGFLAGS, gthread-2.0 gtk+-2.0 >= 2.4.9 libxml-2.0 vips-7.12)
+IP_CFLAGS="$PKGFLAGS_CFLAGS $IP_CFLAGS"
+IP_LIBS="$PKGFLAGS_LIBS $IP_LIBS"
+
+# this is optional
+#
+#    commented out ... we have our own copy of gtksheet with some patches not
+#    yet in the main distribution
+#
+#    also, we should probably switch to treeview now it has gridlines and
+#    rectangular selects
+#
+#PKG_CHECK_MODULES(GTKEXTRA, gtkextra-2.0,
+#  [AC_DEFINE(HAVE_GTK_EXTRA,1,[define if you have gtkextra installed.])],
+#  [AC_MSG_WARN([gtkextra not found; matrix display will suck])])
+#IP_CFLAGS="$IP_CFLAGS $GTKEXTRA_CFLAGS"
+#IP_LIBS="$IP_LIBS $GTKEXTRA_LIBS"
+
+# Check for the function strccpy in libgen
+AC_CHECK_HEADER(libgen.h, 
+	AC_CHECK_LIB(gen, strccpy, 
+		AC_DEFINE(HAVE_STRCCPY,1,[have strccpy() in -lgen]) 
+		IP_LIBS="$IP_LIBS -lgen" 
+	), 
+)
+
+# Checks for header files.
+AC_HEADER_DIRENT
+AC_HEADER_STDC
+AC_HEADER_SYS_WAIT
+AC_CHECK_HEADERS(limits.h pwd.h fnmatch.h regex.h sys/statvfs.h sys/vfs.h sys/mount.h sys/resource.h sys/wait.h malloc.h sys/time.h sys/param.h unistd.h)
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_STRUCT_TM
+
+# Checks for library functions.
+AC_FUNC_ALLOCA
+AC_FUNC_FNMATCH
+AC_FUNC_MKDIR
+AC_FUNC_VPRINTF
+AC_CHECK_FUNCS(geteuid getcwd regexec getpwnam getrlimit getpwent getwd putenv regcomp strcspn strspn strstr)
+
+# need fftw so we load and unload wisdom on startup/shutdown
+# no need to add to libs (pkg-config will do this for us when we ask for vips)
+# we do need to add to CFLAGS though
+AC_ARG_WITH([fftw3], AS_HELP_STRING([--without-fftw3], [build without fftw3 (default: test)]))
+
+if test "x$with_fftw3" != "xno"; then
+  PKG_CHECK_MODULES(FFTW3, fftw3,
+    [AC_DEFINE(HAVE_FFTW3,1,[define if you have fftw3 installed.])],
+    [AC_MSG_WARN([fftw3 not found; disabling fftw support])])
+  IP_CFLAGS="$FFTW_INCLUDES $FFTW3_CFLAGS $IP_CFLAGS"
+fi
+
+# optional ... we add some gsl funcs as builtins if available
+AC_ARG_WITH([gsl], AS_HELP_STRING([--without-gsl], [build without gsl (default: test)]))
+
+if test "x$with_gsl" != "xno"; then
+  PKG_CHECK_MODULES(GSL, gsl,
+    [AC_DEFINE(HAVE_GSL,1,[define if you have gsl installed.])],
+    [AC_MSG_WARN([gsl not found; disabling extra numerical functions])])
+  IP_CFLAGS="$GSL_CFLAGS $IP_CFLAGS"
+  IP_LIBS="$GSL_LIBS $IP_LIBS"
+fi
+
+# optional ... can build against vips8 for testing
+AC_ARG_WITH([vips8], AS_HELP_STRING([--without-vips8], [build without vips8 (default: test)]))
+
+if test "x$with_vips8" != "xno"; then
+  PKG_CHECK_MODULES(VIPS8, vips-8.0,
+    [AC_DEFINE(HAVE_VIPS8,1,[define if you have vips8 installed.])],
+    [AC_MSG_WARN([vips8 not found; disabling library testing])])
+  IP_CFLAGS="$VIPS8_CFLAGS $IP_CFLAGS"
+  IP_LIBS="$VIPS8_LIBS $IP_LIBS"
+fi
+
+AC_SUBST(IP_CFLAGS)
+AC_SUBST(IP_LIBS)
+
+AC_OUTPUT([
+	nip2.desktop
+	Makefile
+	man/Makefile
+	man/man1/Makefile
+	share/Makefile
+	share/nip2/Makefile
+	share/nip2/data/Makefile
+	share/nip2/rc/Makefile
+	share/nip2/start/Makefile
+	share/nip2/compat/Makefile
+	share/nip2/compat/7.8/Makefile
+	share/nip2/compat/7.9/Makefile
+	share/nip2/compat/7.10/Makefile
+	src/BITMAPS/Makefile 
+	src/Makefile
+	po/Makefile.in
+])

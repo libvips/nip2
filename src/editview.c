@@ -1,0 +1,211 @@
+/* a view of a text thingy
+ */
+
+/*
+
+    Copyright (C) 1991-2003 The National Gallery
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+ */
+
+/*
+
+    These files are distributed with VIPS - http://www.vips.ecs.soton.ac.uk
+
+ */
+
+/* 
+#define DEBUG
+ */
+
+#include "ip.h"
+
+static GraphicviewClass *parent_class = NULL;
+
+static void
+editview_destroy( GtkObject *object )
+{
+	Editview *editview;
+
+#ifdef DEBUG
+	printf( "editview_destroy\n" );
+#endif /*DEBUG*/
+
+	g_return_if_fail( object != NULL );
+	g_return_if_fail( IS_EDITVIEW( object ) );
+
+	/* My instance destroy stuff.
+	 */
+	editview = EDITVIEW( object );
+
+	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+}
+
+static void
+editview_link( View *view, Model *model, View *parent )
+{
+	Editview *editview = EDITVIEW( view );
+
+	VIEW_CLASS( parent_class )->link( view, model, parent );
+
+	if( GRAPHICVIEW( view )->sview )
+		gtk_size_group_add_widget( GRAPHICVIEW( view )->sview->group,   
+			editview->label );
+}
+
+static void 
+editview_refresh( vObject *vobject )
+{
+	Editview *editview = EDITVIEW( vobject );
+
+#ifdef DEBUG
+	printf( "editview_refresh:\n" );
+#endif /*DEBUG*/
+
+	if( vobject->iobject->caption )
+		set_glabel( editview->label, _( "%s:" ), 
+			vobject->iobject->caption );
+
+	VOBJECT_CLASS( parent_class )->refresh( vobject );
+}
+
+static void
+editview_class_init( EditviewClass *class )
+{
+	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	vObjectClass *vobject_class = (vObjectClass *) class;
+	ViewClass *view_class = (ViewClass *) class;
+
+	parent_class = g_type_class_peek_parent( class );
+
+	object_class->destroy = editview_destroy;
+
+	/* Create signals.
+	 */
+
+	/* Init methods.
+	 */
+	vobject_class->refresh = editview_refresh;
+
+	view_class->link = editview_link;
+}
+
+/* Detect cancel in a text field.
+ */
+static gboolean
+editview_event_cb( GtkWidget *widget, GdkEvent *ev, Editview *editview )
+{
+	gboolean handled;
+
+	handled = FALSE;
+
+        if( ev->key.keyval == GDK_Escape ) {
+		handled = TRUE;
+
+		/* Zap model value back into edit box.
+		 */
+		vobject_refresh_queue( VOBJECT( editview ) );
+	}
+
+        return( handled );
+}
+
+static void
+editview_activate_cb( GtkWidget *wid, Editview *editview )
+{
+    	Expr *expr = HEAPMODEL( VOBJECT( editview )->iobject )->row->expr;
+
+	/* If we've been changed, we'll be on the scannable list ... just
+	 * recomp.
+	 */
+	symbol_recalculate_all();
+
+	if( expr->err ) {
+		expr_error_get( expr );
+		box_alert( wid );
+	}
+}
+
+static void
+editview_init( Editview *editview )
+{
+	GtkWidget *hbox;
+
+	gtk_container_set_border_width( GTK_CONTAINER( editview ), 2 );
+
+	hbox = gtk_hbox_new( FALSE, 12 );
+        gtk_box_pack_start( GTK_BOX( editview ), hbox, TRUE, FALSE, 0 );
+
+        editview->label = gtk_label_new( "" );
+        gtk_misc_set_alignment( GTK_MISC( editview->label ), 0, 0.5 );
+	gtk_box_pack_start( GTK_BOX( hbox ), editview->label, FALSE, FALSE, 2 );
+
+        editview->text = gtk_entry_new();
+	gtk_box_pack_start( GTK_BOX( hbox ), editview->text, TRUE, TRUE, 0 );
+        set_tooltip( editview->text, _( "Escape to cancel edit, "
+                "press Return to accept edit and recalculate" ) );
+        gtk_signal_connect_object( GTK_OBJECT( editview->text ), "changed",
+                GTK_SIGNAL_FUNC( view_changed_cb ), GTK_OBJECT( editview ) );
+        gtk_signal_connect( GTK_OBJECT( editview->text ), "activate",
+                GTK_SIGNAL_FUNC( editview_activate_cb ), editview );
+        gtk_signal_connect( GTK_OBJECT( editview->text ), "event",
+                GTK_SIGNAL_FUNC( editview_event_cb ), editview );
+
+        gtk_widget_show_all( hbox );
+}
+
+GtkType
+editview_get_type( void )
+{
+	static GtkType type = 0;
+
+	if( !type ) {
+		static const GtkTypeInfo info = {
+			"Editview",
+			sizeof( Editview ),
+			sizeof( EditviewClass ),
+			(GtkClassInitFunc) editview_class_init,
+			(GtkObjectInitFunc) editview_init,
+			/* reserved_1 */ NULL,
+			/* reserved_2 */ NULL,
+			(GtkClassInitFunc) NULL,
+		};
+
+		type = gtk_type_unique( TYPE_GRAPHICVIEW, &info );
+	}
+
+	return( type );
+}
+
+void
+editview_set_entry( Editview *editview, const char *fmt, ... )
+{
+	va_list ap;
+	char buf[1000];
+
+	va_start( ap, fmt );
+	(void) im_vsnprintf( buf, 1000, fmt, ap );
+	va_end( ap );
+
+	/* Make sure we don't trigger "changed" when we zap in the
+	 * text.
+	 */
+	gtk_signal_handler_block_by_data( 
+		GTK_OBJECT( editview->text ), editview );
+	set_gentry( editview->text, "%s", buf );
+	gtk_signal_handler_unblock_by_data( 
+		GTK_OBJECT( editview->text ), editview );
+}

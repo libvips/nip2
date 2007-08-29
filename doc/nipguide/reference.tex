@@ -1,0 +1,671 @@
+\chapter{Reference}
+\mylabel{sec:reference}
+
+\noindent
+This chapter is supposed to be a user-interface reference.
+\cref{sec:menus} describes the items in the \ct{Toolkits} menu
+and \cref{sec:program} is the programming language 
+reference. \cref{sec:tutorial} has a tutorial-style introduction.
+
+\section{Image view window}
+\mylabel{sec:view}
+
+\fref{fg:imageview} shows \nip{}'s image view window with all the toolbars
+turned on.
+
+If you press \ct{i} with the keyboard focus on the image you will
+zoom in on the pixel your mouse pointer is over. Press \ct{o} to zoom
+out again, or press the number keys \ct{1}, \ct{2}, \ct{4} and \ct{8}
+to jump straight to a particular magnification. If you hold down the
+Ctrl key while pressing these numbers, \nip{} will zoom out by
+that amount. If you press \ct{0} (the number zero), then \nip{} will pick
+a magnification or reduction which fits the image to the size of the window.
+
+When the image is too large for the window, you can use the scroll bars
+to move about the image. With the keyboard focus on the image the cursor
+keys left, right, up and down move a few pixels in each direction; hold down
+Shift as well to move a screenful at a time; hold down Ctrl as well to jump
+to the extreme edges of the image. 
+
+You can also drag with the middle mouse button to pan around the image. Use
+the mousewheel to pan up and down, hold down Shift and the mousewheel to
+pan left and right.  Use Ctrl and the mousewheel to zoom in and out.
+
+Use the \ct{View} menu to add extra elements to the window.  You can turn
+the status bar on and off, and you can add a display control bar, a paintbox
+and a set of rulers to the window. 
+
+\begin{fig2}
+\figw{6in}{ir2.jpg}
+\caption{The display control bar}
+\mylabel{fg:scr3}
+\end{fig2}
+
+If you select \ctr{View}\ctr{Toolbar}\ct{Display Control}, \nip{} will add a
+bar to the top of the window which you can use to change the contrast and
+brightness of the image you are viewing. The left-hand slider and text box
+set the gain for the image: each pixel is multiplied by this amount
+before display. The right-hand slider and text box set the offset:
+each pixel has this value added to it before display. This is useful
+for boosting the brightness in dark areas of images.
+
+\begin{figure}
+\figw{1.5in}{ir3.jpg}
+\caption{The display control bar menu}
+\mylabel{fg:scr4}
+\end{figure}
+
+If you click the left mouse button on the arrow to the left of the display 
+control bar, \nip{} pops up a menu of useful display functions ---
+see \fref{fg:scr4}.
+
+\ct{Scale} searches the area of the image you are viewing for the darkest
+and brightest points and chooses settings for the gain and offset sliders
+which will stretch the image to use the full range of your screen. \ct{False
+colour} tries to make small differences in brightness more visible by
+colour-coding them.
+
+If \ct{Interpret} is turned on (it is by default), then \nip{} will look
+at the \ct{Type} field in the image header, and use that as a hint when
+transforming the image to a viewable form for you. This is usually the
+behaviour you want.  \ct{Reset} moves the sliders back to the default
+positions of 1.0 and 0.0. \ct{Set As Workspace Default} makes the current
+display bar settings the default for all new image windows in this workspace.
+Finally, \ct{Hide} removes this display control
+bar.
+
+If you select \ctr{View}\ctr{Toolbar}\ct{Rulers}, \nip{} will add rulers to the
+edges of the window which you can use to measure numbers of pixels.
+If you left-drag from the ruler, you can create a guide.
+Guides are useful for lining up other things in the view window, and also
+affect paint box actions. A right-button menu on the rulers lets you use a mm
+scale rather than a pixel scale, and controls whether the \ct{Xoffset} and
+\ct{Yoffset} header fields are used.
+
+The \ct{File} menu contains two useful items: select \ct{Replace
+Image} to change the image which is being displayed in the window (you can
+also drag and drop new images in). Select
+\ct{Save Image} to save the image you are viewing to a file. See
+\pref{sec:loadsave} for details on \nip{}'s load and save dialogs. The
+\ct{New} menu is a no-mouse route for creating regions, points, guides
+and arrows.
+
+\mylabel{sec:paintbox} 
+If you select \ctr{View}\ctr{Toolbar}\ct{Paint}, \nip{} adds a paint bar
+to the top of the window. You can use the paint bar to do simple edits to
+the image being displayed. See \fref{fg:paint}.
+
+While the paint bar is very limited, it does have two useful features. First,
+it can paint with any pixel value, even complex. For example you can take the
+fourier transform of an image and paint out the peaks. Secondly, it doesn't
+operate on a memory copy of an image, it operates directly on the file on
+disc. This means that you can paint on images of any size, but it does make
+the paint bar a bit dangerous.
+
+Normally paint actions are live, that is, every time you paint something all
+the objects which depend on the thing you painted will recalculate. This can
+sometimes cause annoying delays: there's a preferences option to turn off
+automatic recalculations for the paint bar.
+
+\begin{fig2}
+\figw{6in}{ir4.jpg}
+\caption{The paint bar}
+\mylabel{fg:paint}
+\end{fig2}
+
+The \ct{Undo} and \ct{Redo} buttons move forward and back though paint
+actions. The \ct{Clear} button wipes the undo/redo history (useful if memory
+is getting low). There's an option in the preferences workspace which controls
+the number of undo steps \nip{} tracks.
+
+You can mark regions on images by holding down Ctrl and dragging down and
+right with the left mouse button.  You can move the region about by dragging
+on the label with the left mouse button; you can resize it by dragging with
+the left mouse button in the border; you can get a useful context menu by
+right-clicking on the label; and you can pop up a box which will let you
+edit the region numerically by double-left-clicking on the label.  
+
+If you drag up and left, you will make an \emph{arrow}.  If you hold down Ctrl
+and just click the left mouse button, you will make a \emph{point}. If you
+drag from a horizontal or vertical ruler, you'll make a \emph{guide}. Guides
+are useful for lining up other things in the view window.
+
+Use \ctr{File}\ct{New} to make regions, points, arrows and guides without
+the mouse.
+
+\section{File select dialogs}
+\mylabel{sec:loadsave}
+
+On most platforms you can drag files from your file manager directly to
+\nip{}'s main window.  Alternatively, if you select \ctr{File}\ct{Open}
+in the main window, \nip{} will pop up a file dialog, see
+\fref{fg:open}. The open dialog has the following extra features:
+
+\begin{figure}
+\figw{2in}{ir5.jpg}
+\caption{Open dialog}
+\mylabel{fg:open}
+\end{figure}
+
+\begin{description}
+
+\item[Pin up button]
+Normally the file dialog closes after you have opened something.
+If this item is checked, the dialog will stay up instead --- this is useful
+if you want to load or save a series of objects.
+
+\item[Image type select]
+Use this menu to select the type of file you want \nip{} to display.
+There's a preference option to set the default image format.  The VIPS
+file format is fast and accurate, but sadly not very widely supported
+(joke). You can also load and save images in TIFF, JPEG, PNG, CSV and 
+PBM/PGM/PPM formats. 
+You can usually load in many more
+formats, it depends how your \nip{} has been configured.
+
+\item[Show thumbnails]
+Pressing this button pops up a window which shows thumbnail-sized images
+for all the matching files in the current directory.
+
+\end{description}
+
+The save dialog is a little different, see 
+\fref{fg:save}. 
+
+\begin{figure}
+\figw{2in}{ir6.jpg}
+\caption{Save dialog}
+\mylabel{fg:save}
+\end{figure}
+
+If pin up and increment are both selected, then after a save \nip{} will
+attempt to add one to the selected file name. For example, if you save a file
+called \ct{fred001.v}, after the save \nip{} will put the name \ct{fred002.v}
+into the selected file name box. Again, this is useful if you want to save
+a series of images.
+
+\section{Image processing window}
+\mylabel{sec:ipwindow}
+
+\fref{fg:startup} show's \nip{}'s main image processing window. Drag with the
+middle mouse button to scroll the workspace window. Drop a file on to the
+workspace background (from your file manager) to load that file. 
+If you right-click on the workspace background, a useful menu will appear.
+
+\begin{figure}
+\figw{3in}{ir7.jpg}
+\caption{\nip{}'s main image processing window}
+\mylabel{fg:startup}
+\end{figure}
+
+\begin{description}
+
+\item[Workspace]
+This area displays the objects (images, numbers and so on) which
+are currently loaded into \nip{}. The workspace is divided into columns of
+objects which each behave rather like windows: they can be moved around,
+folded away, loaded, saved and deleted. 
+
+\item[Current column]
+One column is the current column. This is the column to
+which all new objects are added. Single-left-clicking on the title bar of
+a column makes that the current column. See \pref{sec:column}.
+
+\item[File, Edit, View]
+Use the \ct{File} menu to create or save work\-spaces, to open workspaces or
+load other objects into this workspace, to merge workspaces and to recover
+after crashes (loads last automatically saved workspace).
+Use the \ct{Edit} menu to select, group, delete and duplicate sets of objects.
+Use \ct{View} to show and hide elements of the main window, and to set the
+object view mode. 
+
+\item[Toolkits]
+This menu contains all of the image processing functions which are currently
+loaded into \nip{}. They are generally grouped by object type: all of the
+operations on matricies are under \ctr{Toolkits}\ct{Matrix}, for example.
+
+If you select one of these image processing operations, \nip{} will apply
+that operation to the bottom few items in the current column (however many are
+necessary --- two items for \ctr{Math}\ctr{Arithmetic}\ct{Add}, for example),
+or alternatively, if you have selected some objects explicitly, it will try
+to apply the operation to the selected objects. See \pref{sec:apply}. As
+you move the mouse pointer over menu items \nip{} tries to display some
+helpful information about the operation, including the number and type of
+arguments the operation expects.
+
+\item[Toolkit Browser]
+This side panel shows all the image processing operations again, but this time
+as a large flat list you can easily browse. Type into the search box at the
+top to filter operations by keyword. Doubleclick on an item to activate it.
+
+\item[Free space]
+This displays the amount of disc space you have left in your temporary
+file area. See \pref{sec:config} if you want to change the directory \nip{}
+uses to store temporary files.
+
+If you left-click on the label, it changes to display the space \nip{} has
+free internally for performing calculations. You can change this limit in the
+\ct{Preferences} workspace. Click again to switch back to disc free.
+
+If you have objects selected, this area changes to show the
+names of the selected objects.
+
+\item[Status bar]
+As you move the mouse pointer about the window, this bar tries to display
+useful information about the thing you are pointing at. 
+
+\end{description}
+
+\subsection{Columns}
+\mylabel{sec:column}
+
+Columns are split into a number of areas:
+
+\begin{description}
+
+\item[Column name]
+Each column has a name. You can pick any name you like when you make a new
+column with \ctr{File}\ctr{New}\ct{Column}. There's no way to rename a column,
+unfortunately. Objects in the column are named using the column name,
+plus a number.
+
+\item[Column title bar]
+Drag with the left mouse button held down on the column title bar to move
+the column around the workspace. Double-left-click on the title bar to
+change the comment attached to the column. Hold down the right mouse button
+on the column title bar to pop up a useful menu. 
+
+The items in the menu let you edit the caption, select all the objects
+in the column, make a new column which is a copy of this column, save the
+column to a file, convert the column into a menu item
+(see \pref{sec:diaref}) and remove the whole column.
+
+\item[Column fold button]
+Left-clicking on the fold button folds the column away. Use this to hide
+columns which you still need, but which you are not interested in just now.
+
+\item[Expression entry]
+You can perform calculations by typing expressions directly into this box. For
+example, try entering the following expressions, and pressing Return:
+
+\begin{verbatim}
+2 + 2
+A1 + 120
+"My cat likes\nlasagne"
+\end{verbatim}
+
+\end{description}
+
+\subsection{Rows}
+\mylabel{sec:row}
+
+A column holds a number of rows. Each row comes in four main parts, not all of
+which are visible for all row values. Rows which represent classes have a pair
+or up/down arrows to the left of the row name button which you can use to
+control which parts of the row are visible.
+
+\begin{figure}
+\figw{1.5in}{ir8a.jpg}
+\caption{Components of a workspace row}
+\mylabel{fg:row}
+\end{figure}
+
+\begin{description}
+
+\item[Row name button]
+Each row has a name. The name is formed from the name of the current
+column, plus a number.
+
+If you double-left-click on the row name button, \nip{} will pop up a viewer
+or dialog box for the value of the row. If you left-click, \nip{} will select
+that row and deselect all other rows. If you click on an empty space
+in the workspace, it will deselect all rows. If you
+Ctrl-left-click, \nip{} will toggle selection of that row.  
+If you select one row and then Shift-left-click on
+another row in the same column it will select the second row and
+all the rows in between. If you drag with the left button, you can change
+the order of rows in a column.  Hold down the right mouse button for a useful
+menu. If you let the mouse linger over a button, a useful tooltip will appear.
+
+\item[Graphic]
+If the row's value is a class, and if the class is an instance of one of
+\nip{}'s graphic classes, then \nip{} will draw a graphic representation of
+the row's value. See \pref{sec:workspaces} for a more detailed explanation.
+
+\item[Members]
+If the row has a class for a value, then \nip{} will draw a sub-column listing
+the class members. Subcolumn members are in turn rows themselves.
+
+\item[Text]
+Finally, the text part normally shows a text representation of the row's
+value. If you left-click on the value, it changes to show the formula which
+generated that value. You can edit the formula and press Return to change it.
+
+Alternatively, selecting \ctr{View}\ct{Show Formula} toggles 
+between displaying values for objects and displaying the formula.
+
+\end{description}
+
+\subsubsection{Object name colours}
+
+\nip{} changes the background colour of the row name button to show the state
+of the row. If background colours are not visible (perhaps your theme turns
+them off), try turning on the \ct{Display LEDs in workspace} option in
+\ct{Preferences}.
+
+Green means the row is selected (click on the background to unselect), red
+indicates an error (right-click on the row button ans select \ct{Recalculate}
+to see the full text of the error), brown indicates that the row value is out 
+of date and needs recalculating and the various blues indicate parent and
+child relationships.
+
+\subsection{Applying operations to objects}
+\mylabel{sec:apply}
+
+There are three ways you can apply image processing operations to objects
+in your workspace:
+
+\begin{enumerate}
+
+\item
+Select the object you want to apply the operation to by single-left-clicking
+on the object name. When you single-click, the object name will change
+colour to show that it is selected, and \nip{} will display the name of
+the selected object at the left end of the status bar (this is
+useful if the selected object is scrolled off the edge of the window).
+
+You can select additional objects with Ctrl-left-click and
+Shift-left-click. This is necessary if you want to use an image
+processing operation that takes more than one argument.
+
+Once you have selected the rows (sometimes you need to select them in a
+certain order), click on the
+processing operation you want from the \ct{Toolkits} menu.
+
+\item
+If there are no objects selected when you click on an image processing
+operation, \nip{} uses the bottom few items (as many as are needed by the
+operation) in the current column. 
+
+\item
+You can also type your formula directly into the expresion
+entry line at the bottom of the selected column. \cref{sec:program} describes
+the syntax in detail, but it's approximately C.
+
+\end{enumerate}
+
+\subsection{Batch processing}
+\mylabel{sec:batch}
+
+If you select a number of rows and then click \ctr{Edit}\ct{Group}, \nip{}
+will group the rows together. Now if you select the group and click on an item
+in the \ct{Toolkits} menu, \nip{} will apply that operation to every item in
+the group. You can group groups, and you can mix grouped and non-grouped rows
+freely.
+
+If you save a group, \nip{} will write each item in the group to a separate
+file, incrementing the filename each time. 
+
+\subsection{Error handling}
+\mylabel{sec:error}
+
+If an object in your workspace has an error (for example, if you are trying
+to join two images of different types), then the object name button will
+turn red to show that this object contains an error and the tooltip for the
+button will show the error message.
+
+\subsection{Making menu items out of columns}
+\mylabel{sec:diaref}
+
+If you make a column that does
+something useful, you can make it into a menu item by following these steps:
+
+\begin{enumerate}
+
+\item
+Make your column look nice. Drag with the left mouse button on the object
+name buttons to re-order items in the column, and add comments to explain
+what are the input fields and what are the output. Double-click on the column
+title bar to add a helpful title to the column.
+
+Add a comment by typing your text (enclosed in double quotes) into the line
+at the bottom of the column. Left-drag the row to the right place.
+
+\item
+Select \ct{Make Column Into Menu Item} from the 
+column title-bar menu, see \pref{sec:column}.
+
+This will open up a new dialog box which you can use to set a name for
+your new menu item and the name of the top level menu 
+the item should be added to. 
+
+\item
+That's it. You'll be prompted to save your new toolkit when you try to
+quit \nip{}. We recommend you just say \ct{OK} to the suggested location
+for the file. Edit your menus with the programming window, see
+\pref{sec:progwin}.
+
+\end{enumerate}
+
+\section{The programming window}
+\mylabel{sec:progwin}
+
+To pop up the programming window, click on \ctr{Toolkits}\ct{Edit Toolkits} in
+\nip{}'s main image processing window. The window shown in \fref{fg:Fred}
+should appear.
+
+Each of the things down the left of the program window 
+is a toolkit. Each toolkit is a text
+file containing a set of definitions in \nip{}'s programming language.
+See \cref{sec:program} for details on the language.
+
+If you open a toolkit, \nip{} shows all of the definitions in that file.
+If you click on one of these
+\nip{} shows the source for that definition in the main part of the
+program window.  After editing a definition, click on \ctr{File}\ct{Process} 
+to make \nip{} read what you typed, compile it, and update itself.
+
+Click on \ctr{File}\ctr{New}\ct{Tool} to add a new definition to a toolkit,
+click on \ctr{File}\ctr{New}\ct{Toolkit} to make a completely new toolkit. You
+can also right-click on tools and toolkits to get a context menu, and you
+can left-drag tools to move them around within a toolkit or between toolkits.
+
+Some toolkits are loaded from files when \nip{} starts up, others are built
+from the VIPS operation database (for example, \ct{\_arithmetic}), and one 
+(called \ct{\_builtin}) contains the functions that are built into \nip{}. If
+you select a tool and then click on \ctr{Help}\ct{Help on 
+Tool}, \nip{} will try to display the relevant section from the VIPS manual
+in your web browser. Currently, this works only for things in the VIPS
+operation database: try \ctr{\_arithmetic}\ct{im\_add}, for example.
+There's a section in the \ct{Preferences} workspace to control which web
+browser \nip{} uses and how it asks for a page.
+
+Toolkits and tools whose names begin with an underscore character are not
+displayed in the main \ct{Toolkits} menu.  The idea is that they represent
+little utility functions, rather than stuff a user might be interested in. See
+\pref{sec:tools} for more information on how tools and toolkits are displayed.
+
+You can have several programming windows open at the same time (often useful,
+if confusing). The \ct{Edit} menu lets you search for patterns across all
+definitions. The \ct{Jump To Definition} item jumps to the definition of a
+symbol. 
+
+\mylabel{sec:trace}
+The \ct{Debug} menu has items which open a trace window (use this to track
+the actions taken by \nip{}'s reduction engine) and which report on unresolved
+symbols and list all current errors.
+
+\section{Command-line interface}
+\mylabel{sec:cmdline}
+
+You can use \nip{} from the command-line as well as from the GUI. This can be
+handy for automation: you can build a workspace, then run it over a whole set
+of images, or use the results as part of a larger automated system. We've make
+websites which use \nip{} as the back-end.
+
+In command-line mode \nip{} runs without a GUI of any sort: it doesn't
+even need a window system to be installed on the machine. This makes it
+possible to use it in a server or batch context.
+
+These notes are for the Unix command-line, but they should work for Windows as
+well.
+
+\nip{} has three main modes of operation from the command-line:
+
+\begin{description}
+
+\item[\nip{} \emph{filename1} \ldots{}]
+Start \nip{} in GUI mode, loading the command-line arguments as files.
+Filenames can be images, workspaces, matricies, toolkits, and so on.
+
+\item[\nip{} \ct{-e} \emph{expression} \emph{arg1} \ldots{}]
+Start in no-GUI mode, print the value of \emph{expression}. The list
+\ct{argv} is set to be \verb+["filename","arg1",..]+.
+
+\item[\nip{} \ct{-s} \emph{filename} \emph{arg1} \ldots{}] Start
+in no-GUI mode, read in \emph{filename} as a set of definitions,
+print the value of symbol \ct{main}.  The list \ct{argv} is set to be
+\verb+["filename","arg1",..]+.
+
+\end{description}
+
+You can use the \ct{-o} option to send output somewhere other than the
+screen. If these modes don't do quite what you need, you can get finer control
+of how \nip{} behaves with a set of other options: see the man page for
+details.
+
+\subsection{Using expression mode}
+
+The \ct{-e} option is very easy to use. For example:
+
+\begin{verbatim}
+nip2 -e "2 + 2"
+\end{verbatim}
+
+\noindent
+Prints 4 to stdout.
+
+\begin{verbatim}
+nip2 -e "99 + Image_file argv?1" -o result.png fred.jpg
+\end{verbatim}
+
+\noindent
+Loads argv1 (\ct{fred.jpg}), adds 99, writes the result to \ct{result.png}.
+
+\begin{verbatim}
+nip2 -e "Matrix [[1,2],[4,5]] ** -1" -o poop.mat
+\end{verbatim}
+
+\noindent
+Invert the 2x2 matrix and write the result to \ct{poop.mat}.
+
+If the result of the expression is a list, each item is printed on a new
+line. For example:
+
+\begin{verbatim}
+nip2 -e "[1..5]"
+\end{verbatim}
+
+\noindent
+Will print the numbers 1 to 5, each on a new line.
+
+If you have a list result and you are using \ct{-o} to direct the output to a
+file, the filename will be incremented each time you write. For example:
+
+\begin{verbatim}
+nip2 -e "map (add (Image_file argv?1)) [10, 20 .. 50]" -o result1.png fred.jpg
+\end{verbatim}
+
+\noindent
+Will load \ct{fred.jpg}, add 10, 20, 30, 40 and 50, then save those images to
+\ct{result1.png} to \ct{result5.png}.
+
+\subsection{Using script mode}
+
+With the \ct{-s} option you can use \nip{} as a Unix script interpreter.
+
+Create a file in your favourite text editor called \ct{brighten} containing:
+
+\begin{verbatim}
+#!/usr/bin/nip2 -s
+
+main
+  = clip2fmt infile.format (infile * scale), argc == 3
+  = error "usage: infile scale -o outfile"
+{
+  infile = Image_file argv?1;
+  scale = parse_float argv?2;
+}
+\end{verbatim}
+
+\noindent
+The first line needs to be the path to \nip{} on your system. Use \ct{which
+nip2} to find the path if you don't know it. Mark the file as executable with
+\ct{chmod +x brighten}, then use it on one of your image files with:
+
+\begin{verbatim}
+brighten fred.jpg 1.5 -o bright_fred.png
+\end{verbatim}
+
+\noindent
+See \cref{sec:program} for details on the programming language. This program
+multiplies each input pixel by the constant, producing a floating point image,
+then then clips the result back to the same format as the original image
+(usually 8-bit unsigned).
+
+\nip{} takes a while (a few seconds) to start up, so this isn't going to be
+appropriate for small images or simple calculations. But for complex
+operations, or operations on large images, this mode can be very useful.
+
+\subsection{Other modes}
+
+A set of sub-options let you mix up other modes yourself. One I've used lets
+me run a workspace repeatedly over a directory of images. First, create a file
+called \ct{main.def} (you need the \ct{.def} suffix) containing:
+
+\begin{verbatim}
+main = Workspaces.myworkspace.A1;
+\end{verbatim}
+
+\noindent
+Where \ct{A1} is the name of the row in your workspace that you want to save,
+and \ct{myworkspace} is the name of your workspace. Now run \nip{} with:
+
+\begin{verbatim}
+nip2 -bp main.def myworkspace.ws -o fred.jpg
+\end{verbatim}
+
+\noindent
+This will start \nip{} in batch (ie. no GUI) mode (the \ct{-b} switch), 
+load \ct{myworkspace.ws}, and save the value of \ct{A1} to \ct{fred.jpg} (the
+\ct{-p} switch).
+
+The remaining problem is how to pass the name of the file to be processed to
+the workspace. The easiest solution is to use environment variables. In your
+workspace, type:
+
+\begin{verbatim}
+if expand "$FILE" != [] then expand "$FILE" else "default.jpg"
+\end{verbatim}
+
+\noindent
+This will expand to either the value of the \ct{\$FILE} environment variable,
+or the empty list if \ct{\$FILE} is not defined. Now, if that was row
+\ct{B27}, change the row that loads the workspace's input image to be:
+
+\begin{verbatim}
+Image_file B27
+\end{verbatim}
+
+\noindent
+And you now have a workspace that processes the image \ct{default.jpg} if you
+run \nip{} normally, but if you run at the command-line, you can enter:
+
+\begin{verbatim}
+FILE="another.jpg" nip2 -bp main.def myworkspace.ws -o fred.jpg
+\end{verbatim}
+
+\noindent
+And it will process \ct{another.jpg} instead. You can use the
+\ctr{Widgets}\ct{File Chooser} widget to make it a little prettier.
+

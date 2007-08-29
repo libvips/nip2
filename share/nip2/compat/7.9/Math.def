@@ -1,0 +1,339 @@
+/* basic arithmetic for objects
+ */
+Arithmetic = class {
+	/* add a and b
+	 */
+	Add a b = map_binary add a b;
+
+	/* subtract b from a 
+	 */
+	Subtract a b = map_binary subtract a b;
+
+	/* multiply a by b
+	 */
+	Multiply a b = map_binary multiply a b;
+
+	/* divide a by b
+	 */
+	Divide a b = map_binary divide a b;
+
+	/* remainder after dividing a by b
+	 */
+	Remainder a b = map_binary remainder a b;
+
+	sep1 = Separator;
+
+	/* absolute value of x
+	 */
+	Absolute_value x = map_unary abs x;
+
+	/* like Absolute_value, but treat pixels as vectors
+	 */
+	Absolute_value_vector x = map_unary abs_vec x;
+
+	/* calculate unit vector for band elements
+	 */
+	Sign x = map_unary sign x;
+
+	/* multiply by -1
+	 */
+	Negate x = map_unary unary_minus x;
+}
+
+/* trigonometry operations (all in degrees)
+ */
+Trig = class {
+	/* calculate sine x
+	 */
+	Sin x = map_unary sin x;
+
+	/* calculate cosine x
+	 */
+	Cos x = map_unary cos x;
+
+	/* calculate tangent x
+	 */
+	Tan x = map_unary tan x;
+
+	sep1 = Separator;
+
+	/* calculate arc sine x
+	 */
+	Asin x = map_unary asin x;
+
+	/* calculate arc cosine x
+	 */
+	Acos x = map_unary acos x;
+
+	/* calculate arc tangent x
+	 */
+	Atan x = map_unary atan x;
+
+	sep2 = Separator;
+
+	/* convert degrees to radians
+	 */
+	Rad x = map_unary rad x;
+
+	/* convert radians to degrees
+	 */
+	Deg x = map_unary deg x;
+
+	sep3 = Separator;
+
+	/* is angle within t degrees of r, mod 360
+	 */
+	Angle_range t r angle
+	      =	clock (max - angle) < 2*r
+	{
+		max = clock (t + r);
+
+		clock a 
+		      =	a + 360, a < 0;
+		      =	a - 360, a >= 360;
+		      = a;
+	}
+}
+
+/* logarithms and anti-logs
+ */
+Log = class {
+	/* calculate e ** x
+	 */
+	Exponential x = map_unary (power e) x;
+
+	/* log base e of x
+	 */
+	Log_natural x = map_unary log x;
+
+	sep1 = Separator;
+
+	/* log base 10 of x
+	 */
+	Log10 x = map_unary log10 x;
+
+	/* calculate 10 ** x
+	 */
+	Exponential10 x = map_unary (power 10) x;
+
+	sep2 = Separator;
+
+	/* calculate x ** y
+	 */
+	Raise_to_power x y = map_binary power x y;
+}
+
+/* operations on complex numbers and images
+ */
+Complex = class {
+	/* extract fields from complex
+	 */
+	Complex_extract = class {
+		/* extract real part of complex
+		 */
+		Real in = map_unary re in;
+
+		/* extract imaginary part of complex
+		 */
+		Imaginary in = map_unary im in;
+	}
+
+	/* join a and b to make a complex 
+	 */
+	Complex_build a b = map_binary comma a b;
+
+	sep1 = Separator;
+
+	/* convert real and imag to amplitude and phase
+	 */
+	Polar a = map_unary polar a;
+
+	/* convert (amplitude, phase) image to rectangular coordinates
+	 */
+	Rectangular x = map_unary rectangular x;
+
+	sep2 = Separator;
+
+	/* invert imaginary part
+	 */
+	Conjugate x = map_unary conj x;
+}
+
+/* bitwise boolean operations for integer objects
+ */
+Boolean = class {
+	/* bitwise and of a and b
+	 */
+	And a b = map_binary bitwise_and a b;
+
+	/* bitwise or of a and b
+	 */
+	Or a b = map_binary bitwise_or a b;
+
+	/* bitwise exclusive or of a and b
+	 */
+	Eor a b = map_binary eor a b;
+
+	/* invert a
+	 */
+	Not a = map_unary not a;
+
+	sep1 = Separator;
+
+	/* shift a right by b bits
+	 */
+	Right_shift a b = map_binary right_shift a b;
+
+	/* shift a left by b bits
+	 */
+	Left_shift a b = map_binary left_shift a b;
+
+	sep2 = Separator;
+
+	/* b where a is non-zero, c elsewhere
+	 */
+	If_then_else a b c = map_trinary if_then_else a b c;
+
+	/* or the bands of an image together
+	 */
+	Band_or im = foldr1 bitwise_or (bandsplit im);
+
+	/* and the bands of an image together
+	 */
+	Band_and im = foldr1 bitwise_and (bandsplit im);
+}
+
+/* all comparison operations
+ */
+Relational = class {
+	/* find points at which a is equal to b
+	 */
+	Equal a b = map_binary equal a b;
+
+	/* find points at which a is not equal to b
+	 */
+	Not_equal a b = map_binary not_equal a b;
+
+	/* find points at which a is greater than b
+	 */
+	More a b = map_binary more a b;
+
+	/* find points at which a is less than b
+	 */
+	Less a b = map_binary less a b;
+
+	/* find points at which a is greater than or equal to b
+	 */
+	More_equal a b = map_binary more_equal a b;
+
+	/* find points at which a is less than or equal to b
+	 */
+	Less_equal a b = map_binary less_equal a b;
+}
+
+/* operations on lists
+ */
+List = class {
+	/* take first element of list
+	 */
+	Head x = hd x;
+
+	/* drop the first element of list 
+	 */
+	Tail x = tl x;
+
+	/* drop the last element of list
+	 */
+	Init x = init x;
+
+	/* take the last element of list
+	 */
+	Last x = last x;
+
+	sep1 = Separator;
+
+	/* reverse order of elements in list 
+	 */
+	Reverse x = reverse x;
+
+	/* sort elements of list into ascending order
+	 */
+	Sort x = sort x;
+
+	/* remove duplicates from list
+	 */
+	Make_set x = mkset equal x;
+
+	/* exchange rows and columns in a list of lists
+	 */
+	Transpose_list x = transpose x;
+
+	/* flatten a list of lists into a single list
+	 */
+	Concat l = concat l;
+
+	sep2 = Separator;
+
+	/* find the length of list 
+	 */
+	Length x = len x;
+
+	/* return element n from list (index from zero)
+	 */
+	Subscript n x = n ? x;
+
+	/* take the first n elements of list x
+	 */
+	Take n x = take n x;
+
+	/* drop the first n elements of list x
+	 */
+	Drop n x = drop n x;
+
+	sep3 = Separator;
+
+	/* join two lists end to end
+	 */
+	Join a b = a ++ b;
+
+	/* put element a on the front of list x
+	 */
+	Cons a x = a : x;
+
+	/* join two lists, pairwise
+	 */
+	Zip a b = zip2 a b;
+}
+
+/* various rounding operations
+ */
+Round = class {
+	/* smallest integral value not less than x 
+	 */
+	Ceil x = map_unary ceil x;
+
+	/* largest integral value not greater than x 
+	 */
+	Floor x = map_unary floor x;
+
+	/* round to nearest integer
+	 */
+	Rint x = map_unary rint x;
+}
+
+/* forward and reverse fourier transforms
+ */
+Fourier = class {
+	/* find fourier transform of image
+	 */
+	Forward a = map_unary (rotquad @ fwfft) a;
+
+	/* find inverse fourier transform of image
+	 */
+	Reverse a = map_unary (invfft @ rotquad) a;
+
+	/* rotate quadrants 
+	 */
+	Rotate_quadrants a = map_unary rotquad a;
+}
+

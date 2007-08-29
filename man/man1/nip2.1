@@ -1,0 +1,144 @@
+.TH NIP2 1 "Oct 4 2004"
+.SH NAME
+nip2 \- image processing with the VIPS library
+
+.SH SYNOPSIS
+.B nip2 [filename1 ...]
+.br
+.B nip2 -s filename [arg1 ...]
+.br
+.B nip2 -e expression [arg1 ...]
+
+.SH DESCRIPTION
+.B nip2
+(for New Image Processing) is a tool for manipulating images using the
+VIPS image processing library.
+
+There are three principle modes:
+
+.B nip2 [filename1 ...]
+.br
+  start in GUI mode, loading the named files
+
+.B nip2 -e expression [arg1 ...]
+.br
+.B nip2 --expression=EXPRESSION [arg1 ...]
+.br
+  start in no-GUI mode; set main = expression, set list argv to
+  ["filename", "arg1", "arg2", ...], set argc to length of list; print
+  the value of symbol "main" to stdout; exit
+
+.B nip2 -s filename [arg1 ...]
+.br
+.B nip2 --script=FILENAME [arg1 ...]
+.br
+  start in no-GUI mode; read in filename as a set of definitions, 
+  set list argv to ["filename", "arg1", "arg2", ...], set argc to 
+  length of list; print the value of symbol "main" to stdout; exit; 
+  useful for running nip2 as an interpreter on unix
+
+You can use
+.B -o
+to direct output to a file rather than stdout.
+
+.B -o filename
+.br
+.B --output=FILENAME
+.br
+  the value of main is written to the named file. If main is a 
+  list, the filename is incremented between objects. You can use 
+  the suffix to specify the format and options to write in
+
+Other options provide finer control over startup and shutdown. If you need to
+do something strange, don't use -e/-s, use these in combination.
+
+.B -b
+.br
+.B --batch
+.br
+  batch (ie. non-GUI) mode
+
+.B -m
+.br
+.B --no-load-menus
+.br
+  don't load menus, for faster startup
+
+.B -a
+.br
+.B --no-load-args
+.br
+  don't load extra command-line arguments
+
+.B -w
+.br
+.B --stdin-ws
+.br
+  load stdin as a workspace
+
+.B -d
+.br
+.B --stdin-def
+.br
+  load stdin as a set of definitions
+
+.B -p
+.br
+.B --print-main
+.br
+  print the value of main on exit
+
+Finally some other options are useful for debugging, timing and for generating
+strings for internationalisation.
+
+.B -V
+.br
+.B --verbose
+.br
+  produce verbose error messages: handy for debugging in batch mode
+
+.B -i
+.br
+.B --i18n
+.br
+  output strings from .def files for internationalisation
+
+.B -v
+.br
+.B --version
+.br
+  print version information
+
+.B -c
+.br
+.B --benchmark
+.br
+  benchmark: no GUI, just start up and shut down
+
+.B -t
+.br
+.B --time-save
+.br
+  time saves: after every image save a popup tells you the time the 
+  save took in seconds
+
+.SH EXAMPLES
+
+  nip2 fred.jpg
+
+Start nip2, loading fred.jpg.
+
+  nip2 -e "2 + 2"
+
+Prints 4 to stdout.
+
+  nip2 -e "99 + Image_file argv?1" -o result.png fred.jpg
+
+Load argv1 (fred.jpg), add 99, output to result.png.
+
+  nip2 -e "Matrix [[1,2],[4,5]] ** -1" -o poop.mat
+
+Invert the 2x2 matrix and write the result to poop.mat.
+
+.SH COPYRIGHT
+2006 (c) Imperial College, London

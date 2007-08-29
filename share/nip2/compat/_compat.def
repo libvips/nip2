@@ -1,0 +1,470 @@
+// compatibility with nip-7.8
+
+_colour_conv2 from to = _colour_conv to @ _colour_set from;
+
+Mono_to = class {
+	Mono x = _colour_conv2 Image_type.B_W Image_type.B_W x;
+	XYZ x = _colour_conv2 Image_type.B_W Image_type.XYZ x;
+	Yxy x = _colour_conv2 Image_type.B_W Image_type.YXY x;
+	Lab x = _colour_conv2 Image_type.B_W Image_type.LAB x;
+	LCh x = _colour_conv2 Image_type.B_W Image_type.LCH x;
+	UCS x = _colour_conv2 Image_type.B_W Image_type.UCS x;
+	RGB x = _colour_conv2 Image_type.B_W Image_type.RGB x;
+	sRGB x = _colour_conv2 Image_type.B_W Image_type.sRGB x;
+	LabQ x = _colour_conv2 Image_type.B_W Image_type.LABQ x;
+	LabS x = _colour_conv2 Image_type.B_W Image_type.LABS x;
+}
+
+XYZ_to = class {
+	Mono x = _colour_conv2 Image_type.XYZ Image_type.B_W x;
+	XYZ x = _colour_conv2 Image_type.XYZ Image_type.XYZ x;
+	Yxy x = _colour_conv2 Image_type.XYZ Image_type.YXY x;
+	Lab x = _colour_conv2 Image_type.XYZ Image_type.LAB x;
+	LCh x = _colour_conv2 Image_type.XYZ Image_type.LCH x;
+	UCS x = _colour_conv2 Image_type.XYZ Image_type.UCS x;
+	RGB x = _colour_conv2 Image_type.XYZ Image_type.RGB x;
+	sRGB x = _colour_conv2 Image_type.XYZ Image_type.sRGB x;
+	LabQ x = _colour_conv2 Image_type.XYZ Image_type.LABQ x;
+	LabS x = _colour_conv2 Image_type.XYZ Image_type.LABS x;
+}
+
+Yxy_to = class {
+	Mono x = _colour_conv2 Image_type.YXY Image_type.B_W x;
+	XYZ x = _colour_conv2 Image_type.YXY Image_type.XYZ x;
+	Yxy x = _colour_conv2 Image_type.YXY Image_type.YXY x;
+	Lab x = _colour_conv2 Image_type.YXY Image_type.LAB x;
+	LCh x = _colour_conv2 Image_type.YXY Image_type.LCH x;
+	UCS x = _colour_conv2 Image_type.YXY Image_type.UCS x;
+	RGB x = _colour_conv2 Image_type.YXY Image_type.RGB x;
+	sRGB x = _colour_conv2 Image_type.YXY Image_type.sRGB x;
+	LabQ x = _colour_conv2 Image_type.YXY Image_type.LABQ x;
+	LabS x = _colour_conv2 Image_type.YXY Image_type.LABS x;
+}
+
+Lab_to = class {
+	Mono x = _colour_conv2 Image_type.LAB Image_type.B_W x;
+	XYZ x = _colour_conv2 Image_type.LAB Image_type.XYZ x;
+	Yxy x = _colour_conv2 Image_type.LAB Image_type.YXY x;
+	Lab x = _colour_conv2 Image_type.LAB Image_type.LAB x;
+	LCh x = _colour_conv2 Image_type.LAB Image_type.LCH x;
+	UCS x = _colour_conv2 Image_type.LAB Image_type.UCS x;
+	RGB x = _colour_conv2 Image_type.LAB Image_type.RGB x;
+	sRGB x = _colour_conv2 Image_type.LAB Image_type.sRGB x;
+	LabQ x = _colour_conv2 Image_type.LAB Image_type.LABQ x;
+	LabS x = _colour_conv2 Image_type.LAB Image_type.LABS x;
+}
+
+LCh_to = class {
+	Mono x = _colour_conv2 Image_type.LCH Image_type.B_W x;
+	XYZ x = _colour_conv2 Image_type.LCH Image_type.XYZ x;
+	Yxy x = _colour_conv2 Image_type.LCH Image_type.YXY x;
+	Lab x = _colour_conv2 Image_type.LCH Image_type.LAB x;
+	LCh x = _colour_conv2 Image_type.LCH Image_type.LCH x;
+	UCS x = _colour_conv2 Image_type.LCH Image_type.UCS x;
+	RGB x = _colour_conv2 Image_type.LCH Image_type.RGB x;
+	sRGB x = _colour_conv2 Image_type.LCH Image_type.sRGB x;
+	LabQ x = _colour_conv2 Image_type.LCH Image_type.LABQ x;
+	LabS x = _colour_conv2 Image_type.LCH Image_type.LABS x;
+}
+
+UCS_to = class {
+	Mono x = _colour_conv2 Image_type.UCS Image_type.B_W x;
+	XYZ x = _colour_conv2 Image_type.UCS Image_type.XYZ x;
+	Yxy x = _colour_conv2 Image_type.UCS Image_type.YXY x;
+	Lab x = _colour_conv2 Image_type.UCS Image_type.LAB x;
+	LCh x = _colour_conv2 Image_type.UCS Image_type.LCH x;
+	UCS x = _colour_conv2 Image_type.UCS Image_type.UCS x;
+	RGB x = _colour_conv2 Image_type.UCS Image_type.RGB x;
+	sRGB x = _colour_conv2 Image_type.UCS Image_type.sRGB x;
+	LabQ x = _colour_conv2 Image_type.UCS Image_type.LABQ x;
+	LabS x = _colour_conv2 Image_type.UCS Image_type.LABS x;
+}
+
+RGB_to = class {
+	Mono x = _colour_conv2 Image_type.RGB Image_type.B_W x;
+	XYZ x = _colour_conv2 Image_type.RGB Image_type.XYZ x;
+	Yxy x = _colour_conv2 Image_type.RGB Image_type.YXY x;
+	Lab x = _colour_conv2 Image_type.RGB Image_type.LAB x;
+	LCh x = _colour_conv2 Image_type.RGB Image_type.LCH x;
+	UCS x = _colour_conv2 Image_type.RGB Image_type.UCS x;
+	RGB x = _colour_conv2 Image_type.RGB Image_type.RGB x;
+	sRGB x = _colour_conv2 Image_type.RGB Image_type.sRGB x;
+	LabQ x = _colour_conv2 Image_type.RGB Image_type.LABQ x;
+	LabS x = _colour_conv2 Image_type.RGB Image_type.LABS x;
+}
+
+sRGB_to = class {
+	Mono x = _colour_conv2 Image_type.sRGB Image_type.B_W x;
+	XYZ x = _colour_conv2 Image_type.sRGB Image_type.XYZ x;
+	Yxy x = _colour_conv2 Image_type.sRGB Image_type.YXY x;
+	Lab x = _colour_conv2 Image_type.sRGB Image_type.LAB x;
+	LCh x = _colour_conv2 Image_type.sRGB Image_type.LCH x;
+	UCS x = _colour_conv2 Image_type.sRGB Image_type.UCS x;
+	RGB x = _colour_conv2 Image_type.sRGB Image_type.RGB x;
+	sRGB x = _colour_conv2 Image_type.sRGB Image_type.sRGB x;
+	LabQ x = _colour_conv2 Image_type.sRGB Image_type.LABQ x;
+	LabS x = _colour_conv2 Image_type.sRGB Image_type.LABS x;
+}
+
+LabQ_to = class {
+	Mono x = _colour_conv2 Image_type.LABQ Image_type.B_W x;
+	XYZ x = _colour_conv2 Image_type.LABQ Image_type.XYZ x;
+	Yxy x = _colour_conv2 Image_type.LABQ Image_type.YXY x;
+	Lab x = _colour_conv2 Image_type.LABQ Image_type.LAB x;
+	LCh x = _colour_conv2 Image_type.LABQ Image_type.LCH x;
+	UCS x = _colour_conv2 Image_type.LABQ Image_type.UCS x;
+	RGB x = _colour_conv2 Image_type.LABQ Image_type.RGB x;
+	sRGB x = _colour_conv2 Image_type.LABQ Image_type.sRGB x;
+	LabQ x = _colour_conv2 Image_type.LABQ Image_type.LABQ x;
+	LabS x = _colour_conv2 Image_type.LABQ Image_type.LABS x;
+}
+
+LabS_to = class {
+	Mono x = _colour_conv2 Image_type.LABS Image_type.B_W x;
+	XYZ x = _colour_conv2 Image_type.LABS Image_type.XYZ x;
+	Yxy x = _colour_conv2 Image_type.LABS Image_type.YXY x;
+	Lab x = _colour_conv2 Image_type.LABS Image_type.LAB x;
+	LCh x = _colour_conv2 Image_type.LABS Image_type.LCH x;
+	UCS x = _colour_conv2 Image_type.LABS Image_type.UCS x;
+	RGB x = _colour_conv2 Image_type.LABS Image_type.RGB x;
+	sRGB x = _colour_conv2 Image_type.LABS Image_type.sRGB x;
+	LabQ x = _colour_conv2 Image_type.LABS Image_type.LABQ x;
+	LabS x = _colour_conv2 Image_type.LABS Image_type.LABS x;
+}
+
+// various renames
+Tint_mono_image = Tint_image;
+Matrix_from_colour_chart = Colour_chart_to_matrix;
+Colour_chart_from_matrix = Matrix_to_colour_chart;
+Colour_from_image = Image_to_colour;
+Image_from_colour = Colour_to_image;
+Convert_format_to = Convert_numeric_format_to;
+
+Insert a b = Insert_image b a;
+
+/* make a colour overlay of two mono images
+ */
+Overlay a b = class 
+	Image value {
+	_check_args = [
+		[a, "a", check_Image],
+		[b, "b", check_Image]
+	];
+	_check_all = [
+		[a.bands == 1 && b.bands == 1,
+			"a.bands == 1 && b.bands == 1"]
+	];
+	_vislevel = 3;
+
+	ap1 = Point_relative a 0.5 0.25;
+	bp1 = Point_relative b 0.5 0.25;
+	ap2 = Point_relative a 0.5 0.75;
+	bp2 = Point_relative b 0.5 0.75;
+
+	refine = Toggle "Refine selected tie-points" false;
+	lock = Toggle "No resize" false;
+	colour = Option "Colour overlay as" [
+		"Green over Red",
+		"Blue over Red",
+		"Red over Green",
+		"Red over Blue",
+		"Blue over Green",
+		"Green over Blue"
+	] 0;
+
+	value
+		= [(a' ++ b''' ++ black), 
+			(a' ++ black ++ b'''), 
+			(b''' ++ a' ++ black), 
+			(b''' ++ black ++ a'), 
+			(black ++ a' ++ b'''), 
+			(black ++ b''' ++ a')]?colour
+	{
+		_prefs = Workspaces.Preferences;
+		window = _prefs.MOSAIC_WINDOW_SIZE;
+		object = _prefs.MOSAIC_OBJECT_SIZE;
+		a' = a.value;
+		b' = b.value;
+
+		b'' = clip2fmt a.format b';
+
+		// return p2 ... if lock is set, return a p2 a standard
+		// distance along the vector joining p1 and p2
+		norm p1 p2
+			= Rect left' top' 0 0, lock
+			= p2
+		{
+			v = (p2.left - p1.left, p2.top - p1.top);
+			// 100000 to give precision since we pass points as
+			// ints to match
+			n = 100000 * sign v;
+			left' = p1.left + re n;
+			top' = p1.top + im n;
+		}
+
+		ap2'' = norm ap1 ap2;
+		bp2'' = norm bp1 bp2;
+
+		b''' 
+			= im_match_linear_search a' b''
+				ap1.left ap1.top bp1.left bp1.top
+				ap2''.left ap2''.top bp2''.left bp2''.top
+				object window,
+					// we can't search if lock is on
+					refine && !lock
+			= im_match_linear a' b''
+				ap1.left ap1.top bp1.left bp1.top
+				ap2''.left ap2''.top bp2''.left bp2''.top;
+
+		black = image_new a.width a.height 
+			a.bands a.format a.coding a.type 
+			0 0 0;
+	}
+}
+
+
+/* apply a colour to an image
+ */
+Tint_image in = class 
+	_result {
+	_vislevel = 3;
+
+	tint = Colour "Lab" [50, 0, 0];
+	type = Option "Tint type" ["Colour filter", "Colour replacement"] 1;
+
+	_result 
+		= map_unary apply_tint in
+	{
+		apply_tint in
+			= result, type == 0
+			= fancy_result
+		{
+			// input image ... to L only
+			in_lab = colour_transform_to Image_type.LAB in;
+			in_l = in_lab?0;
+
+			// make sure tint is LAB (might have been edited)
+			tint_lab = colour_transform_to Image_type.LAB tint;
+
+			// selected lab
+			tint_l = tint_lab.value?0;
+			tint_a = tint_lab.value?1;
+			tint_b = tint_lab.value?2;
+
+			// how much tint to apply .. maximum tint where image
+			// L is equal to tint L, angle towards 0 tint up to
+			// white and down to black
+			mod 
+				= (100 - in_l) / (100 - tint_l), in_l > tint_l
+				= in_l / tint_l;
+
+			// tag as lab (we've probably lost the tag in all that
+			// fiddling)
+			lab = image_set_type Image_type.LAB 
+				(in_l ++ (mod * tint_a) ++ (mod * tint_b));
+
+			// don't convert back to the input colourspace if it's
+			// mono .. converting back to mono will lose all
+			// our colour
+			fancy_result
+				= lab, in.bands == 1
+				= colour_transform_to (get_type in) lab;
+
+			// again, but just do a simple colour filter
+			in_xyz = colour_transform_to Image_type.XYZ in;
+			tint_xyz = colour_transform_to Image_type.XYZ tint;
+			result_xyz = in_xyz * (tint_xyz / 100);
+			result
+				= result_xyz, in.bands == 1
+				= colour_transform_to (get_type in) result_xyz;
+		}
+	}
+}
+
+/* add an editable drop shadow to an image 
+ */
+Drop_shadow x
+	= map_unary shadow x
+{
+	shadow image = class 
+		Image value {
+		_check_args = [
+			[image, "image", check_Image]
+		];
+		_vislevel = 3;
+
+		shadow_width = Slider 0 50 5;
+		shadow_height = Slider 0 50 5;
+		shadow_softness = Slider 0 20 5;
+		use_mask = Toggle "Use mask to make shadow" false;
+		mask_image = foldr1 bitwise_and (bandsplit (image > 128));
+		background_colour = 255;
+		shadow_colour = 128;
+
+		value 
+			 = final
+		{
+			blur_size = shadow_softness.value * 2 + 1;
+
+			// matrix we blur with to soften shadows
+			mask_g = im_gauss_imask (blur_size / 3) 0.2;
+			mask_g_line = mask_g.value?(mask_g.height / 2);
+			mask_g_sum = foldr1 add mask_g_line;
+			blur_matrix = Matrix_con mask_g_sum 0 [mask_g_line];
+			mask_size = mask_g.width;
+
+			// size of final image we build
+			final_width = image.width + 2 * mask_size + 
+				shadow_width.value;
+			final_height = image.height + 2 * mask_size + 
+				shadow_height.value;
+
+			// make a plain image 
+			mk_background colour = image_new 
+				final_width final_height
+				image.bands image.format 
+				Image_coding.NOCODING image.type
+				colour
+				0 0;
+
+			// make a mask image ... place at (x,y) in the final
+			// image
+			mk_mask x y 
+				= im_insert black mask_image.value x y,
+					use_mask
+				= im_insert black white x y
+			{
+				black = image_new 
+					final_width final_height
+					1 Image_format.UCHAR
+					Image_coding.NOCODING Image_type.B_W
+					0
+					0 0;
+				white = image_new 
+					image.width image.height
+					1 Image_format.UCHAR
+					Image_coding.NOCODING Image_type.B_W
+					255
+					0 0;
+			}
+
+			// make the shadow mask image ... offset mask and
+			// soften
+			shadow_mask = mk_mask  
+				(mask_size + shadow_width.value)
+				(mask_size + shadow_height.value);
+			shadow_mask' = im_convsep shadow_mask blur_matrix;
+
+			// make underlay ... use shadow mask to blend between
+			// background colour and shadow colour
+			background = mk_background background_colour;
+			shadow = mk_background shadow_colour;
+			underlay = im_blend shadow_mask' shadow background;
+
+			// overlay ... place image at final position
+			overlay = mk_background 0;
+			overlay' = im_insert overlay image.value
+				mask_size mask_size;
+
+			// overlay mask
+			overlay_mask = mk_mask mask_size mask_size;
+
+			final = if overlay_mask then overlay' else underlay;
+		}
+	}
+}
+
+// renamed these
+
+Mosaic_translate = Mosaic_1point;
+
+Mosaic_force = class {
+	Left_right = Mosaic_1point.Left_right_manual;
+	Top_bottom = Mosaic_1point.Top_bottom_manual;
+}
+
+Mosaic_affine = Mosaic_2point;
+
+// Mark used to be called Point, and was relative to xoffset/yoffset
+// need to keep this so we can still edit old image mosaic workspaces
+
+is_Point x = is_instanceof "Point" x;
+check_Point = check_instance "Point";
+
+Point image l t = class 
+	root.Mark image (l + image.xoffset) (t + image.yoffset) {
+	Mark image l t 
+		= this.Point image (l - image.xoffset) (t - image.xoffset);
+}
+
+Point_relative image u v
+	= Point image 
+		(image.width * u)
+		(image.height * v);
+
+/* morph image colours in LAB space ... useful for tweaking colour for print
+ */
+Morph_for_print in
+	= map_unary widget in
+{
+	widget in = class
+		Image value {
+		_check_args = [
+			[in, "in", check_Image]
+		];
+		_vislevel = 3;
+
+		L_scale = 1.15;
+		L_offset = -4.2;
+		ab_scale = Slider 1 1.5 1.15;
+		a_offset = Slider (-10) 10 0;
+		b_offset = Slider (-10) 10 5;
+		grey_correction = Matrix_con 1 0 [
+			[5, 5, -1 ],
+			[10, 4, -1 ],
+			[15, 2, -1 ],
+			[20, 1, 1 ],
+			[25, 1, 2 ],
+			[30, 0, 1 ],
+			[35, 0, 1 ],
+			[40, 0, 1 ],
+			[45, 0, 1 ],
+			[50, 0, 1 ],
+			[55, 0, 0 ],
+			[99, 0, 0 ]
+		];
+
+		value = im_lab_morph in.value 
+			(Vector [0, a_offset.value, b_offset.value] +
+				grey_correction)
+			L_offset L_scale ab_scale.value ab_scale.value;
+	}
+}
+
+New_filename = New_pathname;
+Filename = Pathname "Pick a file";
+
+New_colour
+	= widget "Lab" [50,0,0]
+{
+	widget default_colour value = class
+		Colour colour_space value {
+		_colourspaces = [
+			"XYZ",         
+			"Yxy",         
+			"Lab",         
+			"LCh",         
+			"UCS",        
+			"RGB",       
+			"sRGB"      
+		];
+
+		colour_space_option = Option "Colour space" _colourspaces
+			(index (equal default_colour) _colourspaces);
+
+		colour_space = colour_space_option.labels?
+			colour_space_option.value;
+
+		Colour_edit colour_space value = widget colour_space value;
+	}
+}

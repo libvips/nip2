@@ -1,0 +1,8 @@
+imagemodel is the base model class ... imageview_new makes the imagemodel, then
+all the component widgets (imagepresent, statusview, paintboxview,
+conversionview, imageview) watch this for updates
+
+the conversion from the real image to the display image is handled by
+conversion, a sub-model of imagemodel
+
+imageview holds the ref to imagemodel ... destroy this and everything goes

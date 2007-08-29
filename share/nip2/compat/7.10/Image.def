@@ -1,0 +1,1548 @@
+Image_new_item = class 
+	Menuaction "New _Image" "make a new image" {
+	format_names = [
+		"8-bit unsigned int - UCHAR", 		// 0
+		"8-bit signed int - CHAR", 			// 1
+		"16-bit unsigned int - USHORT", 	// 2
+		"16-bit signed int - SHORT", 		// 3
+		"32-bit unsigned int - UINT", 		// 4
+		"32-bit signed int - INT", 			// 5
+		"32-bit float - FLOAT", 			// 6
+		"64-bit complex - COMPLEX", 		// 7
+		"64-bit float - DOUBLE", 			// 8
+		"128-bit complex - DPCOMPLEX" 		// 9
+	];
+
+	action = class 
+		Image _result {
+		_vislevel = 3;
+
+		nwidth = Expression "Image width (pixels)" 64;
+		nheight = Expression "Image height (pixels)" 64;
+		nbands = Expression "Image bands" 1;
+		format_option = Option "Image format" format_names 0;
+		type_option = Option_enum 
+			Image_type.type_names "Image type" "B_W";
+		pixel = Expression "Pixel value" 0;
+
+		_result
+			= image_new (to_real nwidth) (to_real nheight) (to_real nbands) 
+				(to_real format_option) Image_coding.NOCODING 
+				type_option.value_thing pixel.expr 0 0;
+	}
+}
+
+Image_new_from_image_item = class
+	Menuaction "New _From Image" "make a new image based on image x" {
+	action x = class
+		Image _result {
+			_vislevel = 3;
+
+			pixel = Expression "Pixel value" 0;
+
+			_result
+				= image_new x.width x.height x.bands
+					x.format x.coding x.type pixel.expr x.xoffset x.yoffset;
+	}
+} 
+
+Image_region_item = class 
+	Menupullright "New _Region on Image" "make a new region on an image" {
+	Region_item = class 
+		Menuaction "_Region" "make a region on an image" {
+		action image = scope.Region_relative image 0.25 0.25 0.5 0.5;
+	}
+
+	Mark_item = class 
+		Menuaction "_Point" "make a point on an image" {
+		action image = scope.Mark_relative image 0.5 0.5;
+	}
+
+	Arrow_item = class 
+		Menuaction "_Arrow" "make an arrow on an image" {
+		action image = scope.Arrow_relative image 0.25 0.25 0.5 0.5;
+	}
+
+	HGuide_item = class 
+		Menuaction "_Horizontal Guide" "make a horizontal guide on an image" {
+		action image = scope.HGuide image 0.5;
+	}
+
+	VGuide_item = class 
+		Menuaction "_Vertical Guide" "make a vertical guide on an image" {
+		action image = scope.VGuide image 0.5;
+	}
+}
+
+#separator
+
+Image_number_format_item = class
+	Menupullright "_Number Format" "convert numeric format" {
+
+	U8_item = class
+		Menuaction "_8 bit unsigned" "convert to unsigned 8 bit [0, 255]" {
+		action x = map_unary cast_unsigned_char x;
+	}
+
+	U16_item = class
+		Menuaction "1_6 bit unsigned" "convert to unsigned 16 bit [0, 65535]" {
+		action x = map_unary cast_unsigned_short x;
+	}
+
+	U32_item = class
+		Menuaction "_32 bit unsigned" 
+			"convert to unsigned 32 bit [0, 4294967295]" {
+		action x = map_unary cast_unsigned_int x;
+	}
+
+    sep1 = Menuseparator;
+
+	S8_item = class
+		Menuaction "8 _bit signed" "convert to signed 8 bit [-128, 127]" {
+		action x = map_unary cast_signed_char x;
+	}
+
+	S16_item = class
+		Menuaction "16 b_it signed" "convert to signed 16 bit [-32768, 32767]" {
+		action x = map_unary cast_signed_short x;
+	}
+
+	S32_item = class
+		Menuaction "32 bi_t signed" 
+			"convert to signed 32 bit [-2147483648, 2147483647]" {
+		action x = map_unary cast_signed_int x;
+	}
+
+    sep2 = Menuseparator;
+
+	Float_item = class
+		Menuaction "_Single precision float" "convert to IEEE 32 bit float" {
+		action x = map_unary cast_float x;
+	}
+
+	Double_item = class
+		Menuaction "_Double precision float" "convert to IEEE 64 bit float" {
+		action x = map_unary cast_double x;
+	}
+
+    sep3 = Menuseparator;
+
+	Scmplxitem = class
+		Menuaction "Single _precision complex" 
+			"convert to 2 x IEEE 32 bit float" {
+		action x = map_unary cast_complex x;
+	}
+
+	Dcmplx_item = class
+		Menuaction "Double p_recision complex" 
+			"convert to 2 x IEEE 64 bit float" {
+		action x = map_unary cast_double_complex x;
+	}
+}
+
+Image_band_item = class 
+	Menupullright "_Band" "manipulate image bands" {
+	// like extract_bands, but return [] for zero band image
+	// makes compose a bit simpler
+	exb b n x
+		= [], to_real n == 0
+		= extract_bands b n x;
+
+	Extract_item = class Menuaction "_Extract" "extract bands from image" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			first = Expression "Extract from band" 0;
+			number = Expression "Extract this many bands" 1;
+
+			_result = map_unary (exb first number) x;
+		}
+	}
+
+	Insert_item = class Menuaction "_Insert" "insert bands into image" {
+		action x y = class
+			_result {
+			_vislevel = 3;
+
+			first = Expression "Insert at position" 0;
+
+			_result 
+				= map_binary process x y
+			{
+				process im1 im2
+					= exb 0 f im1 ++ im2 ++ exb f (b - f) im1
+				{
+					f = to_real first;
+					b = im1.bands;
+				}
+			}
+		}
+	}
+
+	Delete_item = class Menuaction "_Delete" "delete bands from image" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			first = Expression "Delete from band" 0;
+			number = Expression "Delete this many bands" 1;
+
+			_result 
+				= map_unary process x
+			{
+				process im
+					= exb 0 f im ++ exb (f + n) (b - (f + n)) im
+				{
+					f = to_real first;
+					n = to_real number;
+					b = im.bands;
+				}
+			}
+		}
+	}
+}
+
+Image_crop_item = class 
+	Menuaction "_Crop" "extract a rectangular area from an image" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		// try to find the image geometry ... don't bother trying to look
+		// inside groups though
+		_geo
+			= x.rect, is_Image x
+			= Rect 0 0 100 100;
+
+		l = Expression "Crop left" ((int) (_geo.left + _geo.width / 4));
+		t = Expression "Crop top" ((int) (_geo.top + _geo.height / 4));
+		w = Expression "Crop width" (max_pair 1 ((int) (_geo.width / 2)));
+		h = Expression "Crop height" (max_pair 1 ((int) (_geo.height / 2)));
+
+		_result 
+			= map_unary extract x
+		{
+			extract im
+				= extract_area left' top' width' height' im
+			{
+				width' = min_pair (to_real w) im.width;
+				height' = min_pair (to_real h) im.height;
+				left' = range 0 (to_real l) (im.width - width');
+				top' = range 0 (to_real t) (im.height - height');
+			}
+		}
+	}
+}
+
+Image_insert_item = class
+	Menuaction "_Insert" "insert a small image into a large image" {
+	action a b 
+		= insert_position, is_Group a || is_Group b
+		= insert_area
+	{
+		insert_area = class
+			_result {
+			_check_args = [
+				[a, "a", check_Image],
+				[b, "b", check_Image]
+			];
+			_check_all = [
+				[a.coding == b.coding && a.bands == b.bands, 
+					"a.coding == b.coding && a.bands == b.bands"]
+			];
+			_vislevel = 3;
+
+			// sort to get smallest first
+			_pred x y = x.width * x.height < y.width * y.height;
+			_sorted = sortc _pred [a, b];
+			_a' = _sorted?0;
+			_b' = _sorted?1;
+
+			place 
+				= Area _b' left top width height
+			{
+				// be careful in case b is smaller than a 
+				left = max_pair 0 ((_b'.width - _a'.width) / 2);
+				top = max_pair 0 ((_b'.height - _a'.height) / 2);
+				width = min_pair _a'.width _b'.width;
+				height = min_pair _a'.height _b'.height;
+			}
+
+			_result
+				= insert_noexpand place.left place.top 
+					(clip2fmt _b'.format a'') _b'
+			{
+				a'' = extract_area 0 0 place.width place.height _a';
+			}
+		}
+
+		insert_position = class
+			_result {
+			_vislevel = 3;
+
+			position = Option "Position" [
+				"North-west",
+				"North",
+				"North-east",
+				"West",
+				"Centre",
+				"East",
+				"South-west",
+				"South",
+				"South-east",
+				"Specify in pixels"
+			] 4;
+			left = Expression "Pixels from left" 0;
+			top = Expression "Pixels from top" 0;
+
+			_result
+				= map_binary insert a b
+			{
+				insert a b 
+					= insert_noexpand left top (clip2fmt b.format a) b, 
+						position == 9
+					= insert_noexpand xp yp (clip2fmt b.format a) b
+				{
+					xr = b.width - a.width;
+					yr = b.height - a.height;
+					xp = [0, xr / 2, xr]?((int) (position % 3));
+					yp = [0, yr / 2, yr]?((int) (position / 3));
+				}
+			}
+		}
+	}
+}
+
+Image_select_item = Select_item;
+
+Image_join_item = class 
+	Menupullright "_Join" "join images together left/right or up/down" {
+	join_lr shim bg align a b
+		= im2
+	{
+		w = a.width + b.width + shim;
+		h = max_pair a.height b.height;
+	
+		back = image_new w h a.bands a.format a.coding a.type bg 0 0;
+	
+		ya = [0, max_pair 0 ((b.height - a.height)/2), 
+			max_pair 0 (b.height - a.height)]; 
+		yb = [0, max_pair 0 ((a.height - b.height)/2), 
+			max_pair 0 (a.height - b.height)]; 
+	
+		im1 = insert_noexpand 0 ya?align a back;
+		im2 = insert_noexpand (a.width + shim) yb?align b im1;
+	}
+	
+	join_tb shim bg align a b
+		= im2
+	{
+		w = max_pair a.width b.width;
+		h = a.height + b.height + shim;
+	
+		back = image_new w h a.bands a.format a.coding a.type bg 0 0;
+	
+		xa = [0, max_pair 0 ((b.width - a.width)/2), 
+			max_pair 0 (b.width - a.width)]; 
+		xb = [0, max_pair 0 ((a.width - b.width)/2), 
+			max_pair 0 (a.width - b.width)]; 
+	
+		im1 = insert_noexpand xa?align 0 a back;
+		im2 = insert_noexpand xb?align (a.height + shim) b im1;
+	}
+
+	halign_names = ["Top", "Centre", "Bottom"];
+	valign_names = ["Left", "Centre", "Right"];
+
+	Left_right_item = class
+		Menuaction "_Left to Right" "join two images left-right" {
+		action a b = class 
+			_result {
+			_vislevel = 3;
+	
+			shim = Slider 0 100 0;
+			bg_colour = Expression "Background colour" 0;
+			align = Option "Alignment" halign_names 1;
+	
+			_result = map_binary 
+				(join_lr shim.value bg_colour.expr align.value) a b;
+		}
+	}
+
+	Top_bottom_item = class
+		Menuaction "_Top to Bottom" "join two images top-bottom" {
+		action a b = class 
+			_result {
+			_vislevel = 3;
+	
+			shim = Slider 0 100 0;
+			bg_colour = Expression "Background colour" 0;
+			align = Option "Alignment" valign_names 1;
+	
+			_result = map_binary 
+				(join_tb shim.value bg_colour.expr align.value) a b;
+		}
+	}
+
+	Array_item = class
+		Menuaction "_Array" 
+			"join a list of lists of images into a single image" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			hshim = Slider (-100) (100) 0;
+			vshim = Slider (-100) (100) 0;
+			bg_colour = Expression "Background colour" 0;
+			halign = Option "Horizontal alignment" valign_names 1;
+			valign = Option "Vertical alignment" halign_names 1;
+
+			_result 
+				= (image_set_origin 0 0 @ 
+					foldl1 (join_tb vshim.value bg_colour.expr halign.value) @
+					map (foldl1 (join_lr hshim.value 
+						bg_colour.expr valign.value))) (to_list x);
+		}
+	}
+}
+
+Image_tile_item = class 
+	Menupullright "Til_e" "tile an image across and down" {
+	tile_widget default_type x = class
+		_result {
+		_vislevel = 3;
+		
+		across = Expression "Tiles across" 2;
+		down = Expression "Tiles down" 2;
+		repeat = Option "Tile type" 
+			["Replicate", "Four-way mirror"] default_type;
+
+		_result
+			= map_unary process x
+		{
+			process image
+				= tile across down image, repeat == 0
+				= tile across down image''
+			{
+				image' = insert image.width 0 (fliplr image) image;
+				image'' = insert 0 image.height (fliptb image') image';
+			}
+		}
+	}
+
+	Replicate_item = class
+		Menuaction "_Replicate" "replicate image across and down" {
+		action x = tile_widget 0 x;
+	}
+
+	Fourway_item = class
+		Menuaction "_Four-way Mirror" "four-way mirror across and down" {
+		action x = tile_widget 1 x;
+	}
+
+	Chop_item = class
+		Menuaction "_Chop Into Tiles" "slice an image into tiles" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			tile_width = Expression "Tile width" 100;
+			tile_height = Expression "Tile height" 100;
+			hoverlap = Expression "Horizontal overlap" 10;
+			voverlap = Expression "Vertical overlap" 10;
+
+			_result
+				= map_unary (Group @ process) x
+			{
+				process x
+					= imagearray_chop tile_width tile_height
+						hoverlap voverlap x;
+			}
+		}
+	}
+}
+
+Image_levels_item = class 
+	Menupullright "_Levels" "change image levels" {
+	Scale_item = class
+		Menuaction "_Scale to 0 - 255" "linear transform to fit 0 - 255 range" {
+		action x = map_unary scale x;
+	}
+
+	Linear_item = class
+		Menuaction "_Linear" "linear transform of image levels" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			scale = Slider 0.001 3 1;
+			offset = Slider (-128) 128 0;
+
+			_result
+				= map_unary adj x
+			{
+				adj x
+					// only force back to input type if this is a thing
+					// with a type ... so we work for Colour / Matrix etc.
+					= clip2fmt x.format x', has_member "format" x
+					= x'
+				{
+					x' = x * scale + offset;
+				}
+			}
+		}
+	}
+
+	Gamma_item = class
+		Menuaction "_Power" "power transform of image levels (gamma)" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			gamma = Slider 0.001 4 1;
+			image_maximum_hint = "You may need to change image_maximum if " ++
+				"this is not an 8 bit image";
+			im_mx 
+				= Expression "Image maximum" mx
+			{
+				mx 
+						= Image_format.maxval x.format, has_format x
+						= 255;
+			}
+
+			_result
+				= map_unary gam x
+			{
+				gam x
+					= clip2fmt (get_format x) x', has_format x
+					= x'
+				{
+					x' = (im_mx.expr / im_mx.expr ** gamma) * x ** gamma;
+				}
+			}
+		}
+	}
+
+	Tone_item = class
+		Menuaction "_Tone Curve" "adjust tone curve" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			shadow_adjust = Slider (-15) 15 0;
+			mid_adjust = Slider (-30) 30 0;
+			highlight_adjust = Slider (-15) 15 0;
+
+			shadow_point = Slider 0.1 0.3 0.2;
+			mid_point = Slider 0.4 0.6 0.5;
+			highlight_point = Slider 0.7 0.9 0.8;
+			black = Slider 0 100 0;
+			white = Slider 0 100 100;
+
+			curve = tone_build x.format 
+					black white
+					shadow_point mid_point highlight_point
+					shadow_adjust mid_adjust highlight_adjust;
+
+			_result = map_unary (hist_map curve) x;
+		}
+	}
+}
+
+Image_transform_item = class 
+	Menupullright "_Transform" "transform images" {
+	Rotate_item = class 
+		Menupullright "Ro_tate" "rotate image" {
+		Fixed_item = class
+			Menupullright "_Fixed" "clockwise rotation by fixed angles" {
+	        rotate_widget default x = class
+				_result {
+				_vislevel = 3;
+	
+				angle = Option "Rotate by" [
+					"Don't rotate", 
+					"90 degrees clockwise",
+					"180 degrees",
+					"90 degrees anticlockwise"
+				] default;
+	
+				_result 
+					= map_unary process x
+				{
+					process in = [
+						in, 
+						rot90 in,
+						rot180 in,
+						rot270 in
+					] ? angle;
+				}
+			}
+	
+			Rot90_item = class
+				Menuaction "_90 Degrees" "clockwise rotation by 90 degrees" {
+				action x = rotate_widget 1 x;
+			}
+	
+			Rot180_item = class
+				Menuaction "_180 Degrees" "clockwise rotation by 180 degrees" {
+				action x = rotate_widget 2 x;
+			}
+	
+			Rot270_item = class
+				Menuaction "_270 Degrees" "clockwise rotation by 270 degrees" {
+				action x = rotate_widget 3 x;
+			}
+		}
+
+		Free_item = class
+			Menuaction "_Free" "clockwise rotation by any angle" {
+			action x = class
+				_result {
+				_vislevel = 3;
+	
+				angle = Slider (-180) 180 0;
+	
+				_result
+					= map_unary process x
+				{
+					process image 
+						= rotate angle image;
+				}
+			}
+		}
+	
+		Straighten_item = class
+			Menuaction "_Straighten" 
+				("smallest rotation that makes an arrow either horizontal " ++
+				"or vertical") {
+			action x 
+				= map_unary straighten x
+			{
+				straighten arrow
+					= rotate angle'' arrow.image
+				{
+					x = arrow.width;
+					y = arrow.height;
+	
+					angle = im (polar (x, y));
+	
+					angle'
+						= angle - 360, angle > 315
+						= angle - 180, angle > 135
+						= angle;
+	
+					angle''
+						= -angle', angle' >= (-45) && angle' < 45
+						= 90 - angle';
+				}
+			}
+		}
+	}
+
+	Flip_item = class 
+		Menupullright "_Flip" "mirror left/right or up/down" {
+		Left_right_item = class
+			Menuaction "_Left Right" "mirror object left/right" {
+			action x = map_unary fliplr x;
+		}
+	
+		Top_bottom_item = class
+			Menuaction "_Top Bottom" "mirror object top/bottom" {
+			action x = map_unary fliptb x;
+		}
+	}
+
+	Resize_item = class 
+		Menupullright "_Resize" "change image size" {
+		_interp = Option_enum Interpolate.names "Interpolation" "Bilinear";
+
+		Scale_item = class
+			Menuaction "_Scale" "scale image size by a factor" {
+			action x = class
+				_result {
+				_vislevel = 3;
+
+				xfactor = Expression "Horizontal scale factor" 1;
+				yfactor = Expression "Vertical scale factor" 1;
+				interp = _interp;
+
+				_result 
+					= map_unary process x
+				{
+					process image 
+						= resize xfactor yfactor interp.value_thing image;
+				}
+			}
+		}
+
+		Size_item = class
+			Menuaction "_Size To" "resize to a fixed size" {
+			action x = class 
+				_result {
+				_vislevel = 3;
+
+				which = Option "Resize axis" [
+					"Shortest",
+					"Longest",
+					"Horizontal",
+					"Vertical"
+				] 0;
+				size = Expression "Resize to (pixels)" 128;
+				interp = _interp;
+
+				_result
+					= map_unary process x
+				{
+					process image
+						= resize fac fac interp.value_thing image
+					{
+						xfac = to_real size / image.width;
+						yfac = to_real size / image.height;
+						max_factor = max_pair xfac yfac;
+						min_factor = min_pair xfac yfac;
+						fac = [max_factor, min_factor, xfac, yfac]?which;
+					}
+				}
+			}
+		}
+	}
+
+	Image_perspective_item = Perspective_item;
+
+	Image_rubber_item = class 
+		Menupullright "Ru_bber Sheet" 
+			"automatically warp images to superposition" {
+		rubber_interp = Option "Interpolation"
+			(map (extract 0) Interpolate.names.value) Interpolate.BILINEAR;
+		rubber_order = Option "order" ["0", "1", "2", "3"] 1;
+		rubber_wrap = Toggle "Wrap image edges" false;
+
+		// a transform ... a matrix, plus the size of the image the
+		// matrix was made for
+		Transform matrix image_width image_height = class 
+			matrix {
+			// scale a transform ... if it worked for a m by n image, make
+			// it work for a (m * xfac) by (y * yfac) image
+			scale xfac yfac 
+				= Transform (Matrix (map2 (map2 multiply) matrix.value facs))
+					(image_width * xfac) (image_height * yfac)
+			{
+				facs = [
+					[xfac, yfac],
+					[1, 1],
+					[1, 1],
+					[1 / xfac, 1 / yfac],
+					[1 / xfac, 1 / yfac],
+					[1 / xfac, 1 / yfac]
+				];
+			}
+		}
+
+		// yuk!!!! fix is_instanceof to not need absolute names
+		is_Transform = is_instanceof 
+			"Image_transform_item.Image_rubber_item.Transform";
+
+		Find_item = class
+			Menuaction "_Find" 
+				("find a transform which will map sample image onto " ++
+				"reference") {
+			action reference sample = class
+				_transform {
+				_vislevel = 3;
+	
+				// controls
+				order = rubber_order;
+				interp = rubber_interp;
+				wrap = rubber_wrap;
+				max_err = Expression "Maximum error" 0.3;
+				max_iter = Expression "Maximum iterations" 10;
+	
+				// transform
+				_result = transform_search max_err max_iter order interp wrap
+						sample reference;
+
+				transformed_image = Image _result?0;
+				_transform = Transform _result?1 
+					reference.width reference.height;
+				final_error = _result?2;
+			}
+		}
+
+		Apply_item = class
+			Menuaction "_Apply" "apply a transform to an image" {
+			action a b = class
+				_result {
+				_vislevel = 3;
+	
+				// controls
+				interp = rubber_interp;
+				wrap = rubber_wrap;
+	
+				_result
+					= map_binary trans a b
+				{
+					trans a b
+						= transform interp wrap t' i
+					{
+						// get the transform arg first
+						args = sortc (const is_Transform) [a, b];
+						i = args?0;
+						t = args?1;
+						t' = t.scale (i.width / t.image_width) 
+							(i.height / t.image_height);
+					}
+				}
+			}
+		}
+	}
+
+    sep1 = Menuseparator;
+
+	Match_item = class
+		Menuaction "_Linear Match" 
+			"rotate and scale one image to match another" {
+		action x y = class 
+			_result {
+			_vislevel = 3;
+
+			// try to find an image ... for a group, get the first item
+			find_image x
+				= x, is_Image x
+				= find_image x?0, is_list x
+				= find_image x.value, is_class x && has_value x
+				= error "unable to find image";
+
+			_a = find_image x;
+			_b = find_image y;
+
+			ap1 = Mark_relative _a 0.5 0.25;
+			bp1 = Mark_relative _b 0.5 0.25;
+			ap2 = Mark_relative _a 0.5 0.75;
+			bp2 = Mark_relative _b 0.5 0.75;
+		
+			refine = Toggle "Refine selected tie-points" false;
+			lock = Toggle "No resize" false;
+		
+			_result
+				= map_binary process x y
+			{
+				process a b
+					= Image b'''
+				{
+					_prefs = Workspaces.Preferences;
+					window = _prefs.MOSAIC_WINDOW_SIZE;
+					object = _prefs.MOSAIC_OBJECT_SIZE;
+					
+					a' = a.value;
+					b' = b.value;
+			
+					b'' = clip2fmt a.format b';
+			
+					// return p2 ... if lock is set, return a p2 a standard
+					// distance along the vector joining p1 and p2
+					norm p1 p2
+						= Rect left' top' 0 0, lock
+						= p2
+					{
+						v = (p2.left - p1.left, p2.top - p1.top);
+						// 100000 to give precision since we pass points as
+						// ints to match
+						n = 100000 * sign v;
+						left' = p1.left + re n;
+						top' = p1.top + im n;
+					}
+			
+					ap2'' = norm ap1 ap2;
+					bp2'' = norm bp1 bp2;
+			
+					b''' 
+						= im_match_linear_search a' b''
+							ap1.left ap1.top bp1.left bp1.top
+							ap2''.left ap2''.top bp2''.left bp2''.top
+							object window,
+								// we can't search if lock is on
+								refine && !lock
+						= im_match_linear a' b''
+							ap1.left ap1.top bp1.left bp1.top
+							ap2''.left ap2''.top bp2''.left bp2''.top;
+				}
+			}
+		}
+	}
+
+	Image_perspective_match_item = Perspective_match_item;
+
+    sep2 = Menuseparator;
+
+	Resize_canvas_item = class
+		Menuaction "Resize _Canvas" "change size of surrounding image" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			// try to guess a sensible size for the new image 
+			_guess_size
+				= x.rect, is_Image x
+				= Rect 0 0 100 100;
+
+			nwidth = Expression "New width (pixels)" _guess_size.width;
+			nheight = Expression "New height (pixels)" _guess_size.height;
+			bgcolour = Expression "Background colour" 0;
+
+			position = Option "Position" [
+				"North-west",
+				"North",
+				"North-east",
+				"West",
+				"Centre",
+				"East",
+				"South-west",
+				"South",
+				"South-east",
+				"Specify in pixels"
+			] 4;
+			left = Expression "Pixels from left" 0;
+			top = Expression "Pixels from top" 0;
+
+			_result 
+				= map_unary process x
+			{
+				process image 
+					= insert_noexpand xp yp image background
+				{
+					width = image.width;
+					height = image.height;
+					coding = image.coding;
+					bands 
+						= 3, coding == Image_coding.LABPACK
+						= image.bands;
+					format 
+						= Image_format.FLOAT, coding == Image_coding.LABPACK
+						= image.format;
+					type = image.type;
+
+					// placement vectors ... left, centre, right
+					xposv = [0, to_real nwidth / 2 - width / 2, 
+						to_real nwidth - width];
+					yposv = [0, to_real nheight / 2 - height / 2, 
+						to_real nheight - height];
+					xp 
+						= left, position == 9
+						= xposv?((int) (position % 3));
+					yp 
+						= top, position == 9
+						= yposv?((int) (position / 3));
+
+					background = image_new nwidth nheight
+						bands format coding type bgcolour.expr 0 0;
+				}
+			}
+		}
+	}
+}
+
+Image_edit_header_item = class
+	Menuaction "Change _Header" "change advisory header fields of image" {
+	type_names = Image_type.type_names;
+	all_names = sort (map (extract 0) type_names.value);
+
+	get_prop has get def x
+		= get x, has x
+		= def;
+
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		nxres = Expression "Xres" (get_prop has_xres get_xres 1 x);
+		nyres = Expression "Yres" (get_prop has_yres get_yres 1 x);
+		nxoff = Expression "Xoffset" (get_prop has_xoffset get_xoffset 0 x);
+		nyoff = Expression "Yoffset" (get_prop has_yoffset get_yoffset 0 x);
+
+		type_option 
+			= Option_enum Image_type.type_names "Image type"
+				(Image_type.type_names.get_name type)
+		{
+			type 
+				= x.type, is_Image x
+				= Image_type.MULTIBAND;
+		}
+
+		_result
+			= map_unary process x
+		{
+			process image
+				= Image (im_copy_set image.value type_option.value_thing
+					(to_real nxres) (to_real nyres) 
+					(to_real nxoff) (to_real nyoff));
+		}
+	}
+}
+
+#separator
+
+Pattern_images_item = class 
+	Menupullright "_Patterns" "make a variety of useful patterns" {
+	Grey_item = class 
+		Menuaction "Grey _Ramp" "make a smooth grey ramp" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			nwidth = Expression "Image width (pixels)" 64;
+			nheight = Expression "Image height (pixels)" 64;
+			orientation = Option "Orientation" [
+				"Horizontal", 
+				"Vertical"
+			] 0;
+			foption = Option "Format" ["8 bit", "float"] 0;
+
+			_result 
+				= ramp, orientation == 0
+				= rot90 ramp
+			{
+				fn 
+					= im_grey, foption == 0
+					= im_fgrey;
+				ramp = Image (fn (to_real nwidth) (to_real nheight));
+			}
+		}
+	}
+
+	Xy_item = class 
+		Menuaction "_XY Image" 
+			"make a two band image whose pixel values are their coordinates" {
+		action = class 
+			_result {
+			_vislevel = 3;
+
+			nwidth = Expression "Image width (pixels)" 64;
+			nheight = Expression "Image height (pixels)" 64;
+
+			_result = Image (make_xy nwidth nheight); 
+		}
+	}
+
+	Gaussian_item = class 
+		Menuaction "Gaussian _Noise" "make an image of gaussian noise" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			nwidth = Expression "Image width (pixels)" 64;
+			nheight = Expression "Image height (pixels)" 64;
+			mean = Slider 0 255 128;
+			deviation = Slider 0 128 50;
+
+			_result = Image (im_gaussnoise (to_real nwidth) (to_real nheight) 
+				mean.value deviation.value);
+		}
+	}
+
+	Fractal_item = class 
+		Menuaction "_Fractal" "make a fractal image" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			nsize = Expression "Image size (pixels)" 64;
+			dimension = Slider 2.001 2.999 2.001;
+
+			_result = Image (im_fractsurf (to_real nsize) dimension.value); 
+		}
+	}
+
+	Checkerboard_item = class 
+		Menuaction "_Checkerboard" "make a checkerboard image" {
+		action = class 
+			_result {
+			_vislevel = 3;
+
+			nwidth = Expression "Image width (pixels)" 64;
+			nheight = Expression "Image height (pixels)" 64;
+			hpsize = Expression "Horizontal patch size" 8;
+			vpsize = Expression "Vertical patch size" 8;
+			hpoffset = Expression "Horizontal patch offset" 0;
+			vpoffset = Expression "Vertical patch offset" 0;
+
+			_result
+				= Image (xstripes ^ ystripes)
+			{
+				pixels = make_xy nwidth nheight;
+				xpixels = pixels?0 + to_real hpoffset;
+				ypixels = pixels?1 + to_real vpoffset;
+
+				make_stripe pix swidth = pix % (swidth * 2) >= swidth;
+
+				xstripes = make_stripe xpixels (to_real hpsize);
+				ystripes = make_stripe ypixels (to_real vpsize);
+			}
+		}
+	}
+
+	Grid_item = class 
+		Menuaction "Gri_d" "make a grid" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			nwidth = Expression "Image width (pixels)" 64;
+			nheight = Expression "Image height (pixels)" 64;
+			hspace = Expression "Horizontal line spacing" 8;
+			vspace = Expression "Vertical line spacing" 8;
+			thick = Expression "Line thickness" 1;
+			hoff = Expression "Horizontal grid offset" 4;
+			voff = Expression "Vertical grid offset" 4;
+
+			_result
+				= Image (xstripes | ystripes)
+			{
+				pixels = make_xy nwidth nheight;
+				xpixels = pixels?0 + to_real hoff;
+				ypixels = pixels?1 + to_real voff;
+
+				make_stripe pix swidth = pix % swidth < to_real thick;
+
+				xstripes = make_stripe xpixels (to_real hspace);
+				ystripes = make_stripe ypixels (to_real vspace);
+			}
+		}
+	}
+
+	Text_item = class 
+		Menuaction "_Text" "make a bitmap of some text" {
+		action = class 
+			_result {
+			_vislevel = 3;
+
+			text = String "Text to paint" "<i>Hello</i> world!";
+			font = Fontname "Use font" Workspaces.Preferences.PAINTBOX_FONT;
+			wrap = Expression "Wrap text at" 500;
+			align = Option "Alignment" [
+				"Left",
+				"Centre", 
+				"Right" 
+			] 0;
+			dpi = Expression "DPI" 300;
+
+			_result = Image (im_text text.value font.value 
+				(to_real wrap) align.value (to_real dpi));
+		}
+	}
+
+	New_CIELAB_slice_item = class
+		Menuaction "CIELAB _Slice" "make a slice through CIELAB space" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			nsize = Expression "Image size (pixels)" 64;
+			L = Slider 0 100 50;
+
+			_result = Image (lab_slice (to_real nsize) L.value);
+		}
+	}
+
+	sense_option = Option "Sense" [
+		"Pass", 
+		"Reject"
+	] 0;
+
+	build fn size
+		= (Image @ image_set_type Image_type.FOURIER @ rotquad @ fn)
+			(im_create_fmask size size);
+
+	New_ideal_item = class 
+		Menupullright "_Ideal Fourier Mask" 
+			"make various ideal Fourier filter masks" {
+		High_low_item = class 
+			Menuaction "_High or Low Pass" 
+				("make a mask image for a highpass/lowpass " ++
+					"ideal Fourier filter") {
+			action = class
+				_result {
+				_vislevel = 3;
+
+				nsize = Expression "Image size (pixels)" 64;
+				sense = sense_option;
+				frequency_cutoff = Slider 0.01 0.99 0.5;
+
+				_result 
+					= build param (to_real nsize)
+				{
+						param f = f sense.value frequency_cutoff.value 0 0 0 0;
+				}
+			}
+		}
+
+		Ring_item = class 
+			Menuaction "_Ring Pass or Ring Reject"
+				("make a mask image for an ring pass/reject " ++
+				"ideal Fourier filter") {
+			action = class
+				_result {
+				_vislevel = 3;
+
+				nsize = Expression "Image size (pixels)" 64;
+				sense = sense_option;
+				frequency_cutoff = Slider 0.01 0.99 0.5;
+				ring_width = Slider 0.01 0.99 0.5;
+
+				_result 
+					= build param (to_real nsize)
+				{
+						param f = f (sense.value + 6) frequency_cutoff.value 
+								ring_width.value 0 0 0;
+				}
+			}
+		}
+
+		Band_item = class 
+			Menuaction "_Band Pass or Band Reject"
+				("make a mask image for a band pass/reject " ++
+				"ideal Fourier filter") {
+			action = class
+				_result {
+				_vislevel = 3;
+
+				nsize = Expression "Image size (pixels)" 64;
+				sense = sense_option;
+				frequency_cutoff_x = Slider 0.01 0.99 0.5;
+				frequency_cutoff_y = Slider 0.01 0.99 0.5;
+				radius = Slider 0.01 0.99 0.5;
+
+				_result 
+					= build param (to_real nsize)
+				{
+						param f = f (sense.value + 12)
+							frequency_cutoff_x.value frequency_cutoff_y.value
+							radius.value 0 0;
+				}
+			}
+		}
+	}
+
+	New_gaussian_item = class 
+		Menupullright "_Gaussian Fourier Mask" 
+			"make various Gaussian Fourier filter masks" {
+		High_low_item = class 
+			Menuaction "_High or Low Pass" 
+				("make a mask image for a highpass/lowpass " ++
+					"Gaussian Fourier filter") {
+			action = class
+				_result {
+				_vislevel = 3;
+
+				nsize = Expression "Image size (pixels)" 64;
+				sense = sense_option;
+				frequency_cutoff = Slider 0.01 0.99 0.5;
+				amplitude_cutoff = Slider 0.01 0.99 0.5;
+
+				_result 
+					= build param (to_real nsize)
+				{
+						param f = f (sense.value + 4)
+							frequency_cutoff.value amplitude_cutoff.value 0 0 0;
+				}
+			}
+		}
+
+		Ring_item = class 
+			Menuaction "_Ring Pass or Ring Reject"
+				("make a mask image for an ring pass/reject " ++
+				"Gaussian Fourier filter") {
+			action = class
+				_result {
+				_vislevel = 3;
+
+				nsize = Expression "Image size (pixels)" 64;
+				sense = sense_option;
+				frequency_cutoff = Slider 0.01 0.99 0.5;
+				amplitude_cutoff = Slider 0.01 0.99 0.5;
+				ring_width = Slider 0.01 0.99 0.5;
+
+				_result 
+					= build param (to_real nsize)
+				{
+						param f = f (sense.value + 10)
+							frequency_cutoff.value ring_width.value 
+							amplitude_cutoff.value 0 0;
+				}
+			}
+		}
+
+		Band_item = class 
+			Menuaction "_Band Pass or Band Reject"
+				("make a mask image for a band pass/reject " ++
+				"Gaussian Fourier filter") {
+			action = class
+				_result {
+				_vislevel = 3;
+
+				nsize = Expression "Image size (pixels)" 64;
+				sense = sense_option;
+				frequency_cutoff_x = Slider 0.01 0.99 0.5;
+				frequency_cutoff_y = Slider 0.01 0.99 0.5;
+				radius = Slider 0.01 0.99 0.5;
+				amplitude_cutoff = Slider 0.01 0.99 0.5;
+
+				_result 
+					= build param (to_real nsize)
+				{
+						param f = f (sense.value + 16)
+							frequency_cutoff_x.value frequency_cutoff_y.value
+							radius.value amplitude_cutoff.value 0;
+				}
+			}
+		}
+	}
+
+	New_butterworth_item = class 
+		Menupullright "_Butterworth Fourier Mask" 
+			"make various Butterworth Fourier filter masks" {
+		High_low_item = class 
+			Menuaction "_High or Low Pass" 
+				("make a mask image for a highpass/lowpass " ++ 
+					"Butterworth Fourier filter") {
+			action = class
+				_result {
+				_vislevel = 3;
+
+				nsize = Expression "Image size (pixels)" 64;
+				sense = sense_option;
+				frequency_cutoff = Slider 0.01 0.99 0.5;
+				amplitude_cutoff = Slider 0.01 0.99 0.5;
+				order = Slider 1 10 2;
+
+				_result 
+					= build param (to_real nsize)
+				{
+						param f = f (sense.value + 2)
+								order.value frequency_cutoff.value 
+								amplitude_cutoff.value 0 0;
+				}
+			}
+		}
+
+		Ring_item = class 
+			Menuaction "_Ring Pass or Ring Reject"
+				("make a mask image for an ring pass/reject " ++
+				"Butterworth Fourier filter") {
+			action = class
+				_result {
+				_vislevel = 3;
+
+				nsize = Expression "Image size (pixels)" 64;
+				sense = sense_option;
+				frequency_cutoff = Slider 0.01 0.99 0.5;
+				amplitude_cutoff = Slider 0.01 0.99 0.5;
+				ring_width = Slider 0.01 0.99 0.5;
+				order = Slider 1 10 2;
+
+				_result 
+					= build param (to_real nsize)
+				{
+						param f = f (sense.value + 8)
+							order.value frequency_cutoff.value 
+							ring_width.value amplitude_cutoff.value 0;
+				}
+			}
+		}
+
+		Band_item = class 
+			Menuaction "_Band Pass or Band Reject"
+				("make a mask image for a band pass/reject " ++
+				"Butterworth Fourier filter") {
+			action = class
+				_result {
+				_vislevel = 3;
+
+				nsize = Expression "Image size (pixels)" 64;
+				sense = sense_option;
+				frequency_cutoff_x = Slider 0.01 0.99 0.5;
+				frequency_cutoff_y = Slider 0.01 0.99 0.5;
+				radius = Slider 0.01 0.99 0.5;
+				amplitude_cutoff = Slider 0.01 0.99 0.5;
+				order = Slider 1 10 2;
+
+				_result 
+					= build param (to_real nsize)
+				{
+						param f = f (sense.value + 14)
+							order.value frequency_cutoff_x.value
+							frequency_cutoff_y.value radius.value 
+							amplitude_cutoff.value;
+				}
+			}
+		}
+	}
+}
+
+Test_images_item = class 
+	Menupullright "Test I_mages" "make a variety of test images" {
+	Eye_item = class 
+		Menuaction "_Spatial Response" 
+			"image for testing the eye's spatial response" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			nwidth = Expression "Image width (pixels)" 64;
+			nheight = Expression "Image height (pixels)" 64;
+			factor = Slider 0.001 1 0.2;
+
+			_result = Image (im_eye (to_real nwidth) (to_real nheight) 
+				factor.value);
+		}
+	}
+
+	Zone_plate = class 
+		Menuaction "_Zone Plate" "make a zone plate" {
+		action = class 
+			_result {
+			_vislevel = 3;
+
+			nsize = Expression "Image size (pixels)" 64;
+
+			_result = Image (im_zone (to_real nsize));
+		}
+	}
+
+	Frequency_test_chart_item = class 
+		Menuaction "_Frequency Testchart" 
+			"make a black/white frequency test pattern" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			nwidth = Expression "Image width (pixels)" 64;
+			sheight = Expression "Strip height (pixels)" 10;
+			waves = Expression "Wavelengths" [64, 32, 16, 8, 4, 2];
+
+			_result 
+				= imagearray_assemble 0 0 (transpose [strips])
+			{
+				freq_slice wave = Image (sin (grey / wave) > 0);
+				strips = map freq_slice waves.expr;
+				grey = im_fgrey (to_real nwidth) (to_real sheight) * 
+					360 * (to_real nwidth);
+			}
+		}
+	}
+
+	CRT_test_chart_item = class 
+		Menuaction "CRT _Phosphor Chart" 
+			"make an image for measuring phosphor colours" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			brightness = Slider 0 255 200;
+			psize = Expression "Patch size (pixels)" 32;
+
+			_result 
+				= Image (imagearray_assemble 0 0 [[green, red], [blue, white]])
+			{
+
+				black = image_new (to_real psize) (to_real psize) 1
+					Image_format.FLOAT Image_coding.NOCODING 
+					Image_type.B_W 0 0 0;
+				notblack = black + brightness;
+
+				green = black ++ notblack ++ black;
+				red = notblack ++ black ++ black;
+				blue = black ++ black ++ notblack;
+				white = notblack ++ notblack ++ notblack;
+			}
+		}
+	}
+
+	Greyscale_chart_item = class 
+		Menuaction "_Greyscale" "make a greyscale" {
+		action = class 
+			_result {
+			_vislevel = 3;
+
+			pwidth = Expression "Patch width" 8;
+			pheight = Expression "Patch height" 8;
+			npatches = Expression "Number of patches" 16;
+
+			_result
+				= Image (image_set_type Image_type.B_W 
+					(clip2fmt Image_format.UCHAR wedge))
+			{
+				wedge 
+					= 255 / (to_real npatches - 1) * 
+						(int) (strip?0 / to_real pwidth)
+				{
+					strip = make_xy (to_real pwidth * to_real npatches) pheight;
+				}
+			}
+		}
+	}
+
+	CMYK_test_chart_item = class 
+		Menuaction "_CMYK Wedges" "make a set of CMYK wedges" {
+		action = class 
+			_result {
+			_vislevel = 3;
+
+			pwidth = Expression "Patch width" 8;
+			pheight = Expression "Patch height" 8;
+			npatches = Expression "Number of patches" 16;
+
+			_result
+				= Image (image_set_type Image_type.CMYK 
+					(clip2fmt Image_format.UCHAR strips))
+			{
+				wedge 
+					= 255 / (to_real npatches - 1) * 
+						(int) (strip?0 / to_real pwidth)
+				{
+					strip = make_xy (to_real pwidth * to_real npatches) pheight;
+				}
+
+				black = wedge * 0;
+
+				C = wedge ++ black ++ black ++ black;
+				M = black ++ wedge ++ black ++ black;
+				Y = black ++ black ++ wedge ++ black;
+				K = black ++ black ++ black ++ wedge;
+
+				strips = imagearray_assemble 0 0 [[C],[M],[Y],[K]];
+			}
+		}
+	}
+
+    Colour_atlas_item = class
+        Menuaction "_Colour Atlas"
+            "make a grid of patches grouped around a colour" {
+        action = class 
+            _result {   
+            _vislevel = 3;
+       
+            start = Colour_picker "Lab" [50,0,0];
+            nstep = Expression "Number of steps" 2;
+            ssize = Expression "Step size" 2; 
+
+            _result
+                = Image (colour_transform_to (get_type start) im)
+            {
+                base = colour_transform_to Image_type.LAB start;
+                step = to_real ssize;
+                offset = to_real nstep * step;
+                range c = [c - offset, c - offset + step ... c + offset]; 
+                                
+                mk_patch b a = image_new 150 150 3
+                    Image_format.FLOAT Image_coding.NOCODING 
+                    Image_type.LAB (Vector [base?0, a, b]) 0 0;
+
+                mk_strip b = map (mk_patch b) (range base?1);
+                mk_grid = map mk_strip (range base?2);
+                im = imagearray_assemble 15 15 mk_grid;
+            }    
+        }
+    }
+}
+

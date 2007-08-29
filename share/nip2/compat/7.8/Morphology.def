@@ -1,0 +1,159 @@
+/* Some useful masks.
+ */
+_morph_mask8 = Matrix_mor [[255, 255, 255], [255, 255, 255], [255, 255, 255]];
+_morph_mask4 = Matrix_mor [[128, 255, 128], [255, 255, 255], [128, 255, 128]];
+_morph_mask1 = Matrix_mor [[0, 0, 0], [0, 255, 0], [0, 0, 0]];
+_morph_thin = Matrix_mor [[0, 0, 0], [128, 255, 128], [255, 255, 255]];
+
+/* dilate x with 8-connected mask
+ */
+Dilate8 x = map_unary (dilate _morph_mask8) x;
+
+/* dilate x with 4-connected mask
+ */
+Dilate4 x = map_unary (dilate _morph_mask4) x;
+
+/* erode x with 8-connected mask
+ */
+Erode8 x = map_unary (erode _morph_mask8) x;
+
+/* erode x with 4-connected mask
+ */
+Erode4 x = map_unary (erode _morph_mask4) x;
+
+#separator
+
+/* open with 8-connected mask
+ */
+Open x = map_unary (dilate _morph_mask8 @ erode _morph_mask8) x;
+
+/* close with 8-connected mask
+ */
+Close x = map_unary (erode _morph_mask8 @ dilate _morph_mask8) x;
+
+/* remove single points 
+ */
+Clean x 
+	= map_unary clean x
+{
+	clean x = x ^ erode _morph_mask1 x;
+}
+
+/* thin once
+ */
+Thin x 
+	= map_unary thinall x
+{
+	masks = take 8 (iterate rot45 _morph_thin);
+	thin1 m x = x ^ erode m x;
+	thinall x = foldr thin1 x masks;
+}
+
+#separator
+
+/* dilate object x with mask m
+ */
+Dilate m x = map_unary (dilate m) x;
+
+/* erode object x with mask m
+ */
+Erode m x = map_unary (erode m) x;
+
+/* dilate mask m with itself n times
+ */
+Dilate_multiple m n = (iterate (dilate m) m)?n;
+
+/* erode mask m with itself n times
+ */
+Erode_multiple m n = (iterate (erode m) m)?n;
+
+#separator
+
+/* morph with a mask you can edit
+ */
+Custom_morphology in
+	= map_unary morph in
+{
+	morph image = class 
+		Image value {
+		_check_args = [
+			[image, "Image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		mask = _morph_mask8;
+		type = Option "Operation" ["Erode", "Dilate"] 1;
+		hint_apply_n_times = "Number of times to apply mask:";
+		apply_n_times = 1;
+		border = Toggle "Output image matches input image in size" true;
+
+		value 
+			= im_embed image' 0 xoff yoff image.width image.height,
+				border
+			= image'
+		{
+			fatmask = (iterate (dilate mask) mask) ? 
+				(apply_n_times - 1);
+
+			image'
+				= im_erode_raw image.value fatmask, 
+					type.value == 0
+				= im_dilate_raw image.value fatmask;
+
+			xoff = (fatmask.width + 1) / 2;
+			yoff = (fatmask.height + 1) / 2;
+		}
+	}
+}
+
+/* search in from the edges of an image for the first non-zero pixel
+ */
+Find_profile in
+	= map_unary widget in
+{
+	widget image = class 
+		Image value {
+		_check_args = [
+			[image, "Image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		edge = Option "Search from" [
+			"Top edge down", 
+			"Left edge to right",
+			"Bottom edge up",
+			"Right edge to left"
+		] 2;
+
+		value = image_set_type Image_type.HISTOGRAM [
+			im_profile image.value 0,
+			rot270 (im_profile image.value 1),
+			im_profile (flipud image.value) 0,
+			rot270 (im_profile (fliplr image.value) 1)
+		]?edge;
+	}
+}
+
+/* count the average number of black-to-white transitions across an image
+ */
+Count_lines in
+	= map_unary widget in
+{
+	widget image = class 
+		Real value {
+		_check_args = [
+			[image, "Image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		edge = Option "Count" [
+			"Horizontal lines", 
+			"Vertical lines"
+		] 0;
+
+		value = im_cntlines image.value edge.value;
+	}
+}
+
+
+

@@ -1,0 +1,105 @@
+
+/* make an image of size x by y whose pixels are their coordinates.
+ */
+make_xy x y = im_make_xy (to_real x) (to_real y);
+
+/* make an image with the specified properties ... pixel is (eg.) 
+ * Vector [0, 0, 0], or 12. If coding == labq, we ignore bands, format and
+ * type, generate a 3 band float image, and lab2labq it before handing it
+ * back.
+ */
+image_new w h b fmt coding type pixel xoff yoff
+	= im''''
+{
+	b'
+		= 3, coding == Image_coding.LABPACK
+		= b;
+	fmt'
+		= Image_format.FLOAT, coding == Image_coding.LABPACK
+		= fmt;
+	type'
+		= Image_type.LAB, coding == Image_coding.LABPACK
+		= type;
+
+	im = im_black (to_real w) (to_real h) (to_real b') + pixel;
+
+	im' = clip2fmt fmt' im;
+
+	im'' 
+		= im_Lab2LabQ im', coding == Image_coding.LABPACK;
+		= im';
+
+	im''' = image_set_type type' im'';
+	im'''' = image_set_origin xoff yoff im''';
+}
+
+/* generate a slice of LAB space size x size pixels for L* == l
+ */
+lab_slice size l 
+	= image_set_type Image_type.LAB im
+{
+    L = image_new size size 1
+		Image_format.FLOAT Image_coding.NOCODING Image_type.B_W l 0 0;
+	A1 = im_fgrey (to_real size) (to_real size);
+
+	/* im_fgrey always makes 0-1, so these ranges can be wired in.
+	 */
+	A2 = A1 * 256 - 128;
+
+	A4 = im_rot90 A2;
+	im = image_set_origin (size / 2) (size / 2) (L ++ A2 ++ A4);
+}
+
+/* Look at Image, try to make a Colour (failing that, a Vector) which is white
+ * for that image type.
+ */
+image_white im
+	= colour_transform_to type white_lab,
+		bands == 3 && coding == Image_coding.NOCODING &&
+		colour_spaces.present 1 type
+	= white_lab,
+		coding == Image_coding.LABPACK
+	= Vector (replicate bands (max_value.lookup 1 0 format))
+{
+	bands = im.bands;
+	type = im.type;
+	format = im.format;
+	coding = im.coding;
+	colour_spaces = Image_type.colour_spaces;
+
+	// white as LAB
+	white_lab = Colour "Lab" [100, 0, 0];
+
+	// maximum value for this numeric type
+	max_value = Table [
+		[255, Image_format.DPCOMPLEX],
+		[255, Image_format.DOUBLE],
+		[255, Image_format.COMPLEX],
+		[255, Image_format.FLOAT],
+		[2 ** 31 - 1, Image_format.INT],
+		[2 ** 32 - 1, Image_format.UINT],
+		[2 ** 15 - 1, Image_format.SHORT],
+		[2 ** 16 - 1, Image_format.USHORT],
+		[2 ** 7 - 1, Image_format.CHAR],
+		[2 ** 8 - 1, Image_format.UCHAR]
+	];
+}
+
+/* Make a seperable gaussian mask.
+ */
+matrix_gaussian_blur radius
+        = Matrix_con mask_g_sum 0 [mask_g_line]
+{
+        mask_g = im_gauss_imask (radius / 3) 0.2;
+        mask_g_line = mask_g.value?(mask_g.height / 2);
+        mask_g_sum = foldr1 add mask_g_line;
+}
+
+/* Make a seperable square mask.
+ */
+matrix_blur radius
+        = Matrix_con (foldr1 add mask_sq_line) 0 [mask_sq_line]
+{
+        mask_sq_line = replicate (2 * radius - 1) 1; 
+}
+

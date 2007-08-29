@@ -1,0 +1,451 @@
+\chapter{Assembling infrared mosaics}
+\mylabel{sec:ir}
+
+VIPS has a package of functions designed to help join many small images
+together to make a single large image. They were originally designed to
+assemble infrared reflectograms but are general enough to be useful for
+other sorts of image as well, such as X-rays.
+
+This chapter first introduces the mechanics of infrared imaging then
+explains how to use \nip{} to assemble the images you grab. Finally, it
+suggests some printing techniques.
+
+\section{Infrared imaging}
+
+Most museums use tube cameras (usually called Vidicons) for infrared
+imaging. Although they are relatively cheap they are not very stable
+and they suffer from (sometimes quite severe) geometric distortions.
+More modern solid-state cameras are still expensive but are becoming
+more widely used because of their greater stability. This
+guide assumes you are using a tube camera but almost all of it applies to
+solid-state cameras as well.
+
+Whatever your camera there are three main sources of error which have to be
+addressed in order to be able to make successful mosaics:
+
+\begin{enumerate}
+
+\item
+Tube cameras suffer very badly from distortions in the image, usually either
+`pin-cushioning' or `barrelling'. These distortions result in alignment
+errors when sub-images are joined together.
+
+\item
+The sensitivity of the tube varies across its surface, causing some parts of
+each sub-image to be brighter than others. This is made worse by unavoidable
+variations in illumination. When a lot of such images are joined together the
+result is a `brick wall' effect.
+
+\item
+The sensitivity of the tube also varies between sub-images, partly as
+the overall lightness in the field of view changes, and also because the
+electronics in the camera change as the camera heats up. This leads to a
+patchy, unbalanced mosaic.
+
+\end{enumerate}
+
+The first two problems will be different in each Vidicon and will change
+each time a tube is replaced. All three problems need to be addressed to
+create successful infrared reflectogram mosaics.
+
+\subsection{Setting up your system}
+
+\subsubsection{Mechanical set-up} 
+
+It is vital that the optical axis of the Vidicon is at right-angles to the
+picture plane and that, whether it is the Vidicon or the painting that moves
+during image capture, it remains perpendicular. Obviously, with a seriously
+warped panel, this may not be possible. The lighting should be carefully
+adjusted so that the area of interest is lit as evenly as possible. If you
+can, arrange for the lights to remain stationary with respect to the camera.
+
+An easy way to test camera alignment is to image a piece of graph paper,
+move the camera (either left-right or up-down) by 90\% of the field of view,
+and see how features in the overlap area move.  First rotate the centre
+around the optical axis to get the centre line of the images lined up. Next
+check the corners and adjust camera pitch and yaw.
+
+\subsubsection{Video set-up} 
+\mylabel{sec:vidpref}
+
+On Linux, you can capture video directly into \nip{} provided that your
+capture card is compatible with v4l. You may need to adjust the \nip{}
+video settings.  These settings can be found under the headings \ct{Video
+for linux} and \ct{General video capture} in the \ct{Preferences} window,
+which can be accessed by selecting \ctr{Edit}\ct{Preferences} from the main
+\nip{} window.  The default settings, see \fref{fg:vidpref}, are for the
+Hauppauge PCI capture card and should be changed as required.
+
+\begin{fig2}
+\figw{3in}{scr21a.png}
+\caption{Recommended video preference settings}
+\mylabel{fg:vidpref}
+\end{fig2}
+
+Once you have set up your card, select \ctr{Tasks}\ctr{Capture}\ct{Capture
+Video Frame} to create a new video object, which will appear as a still
+image in your current selected column.  The captured image can be updated by
+opening the image in a viewing window and then pressing Ctrl-C (a shortcut
+for \ctr{File}\ct{Recalculate Image}).
+
+You can create more than one video object: this can help you to get the
+overlaps right if you have two open at once (one showing the previous grab)
+when you are moving the camera around.
+
+\subsubsection{Setting the crop and aspect}
+
+While it is possible to correct geometric distortions after the image is
+captured, it is difficult to do the necessary modelling accurately and
+reliably. Instead, we suggest the grabbed images should simply be cropped,
+since the most severe distortion affects the perimeter of each video image.
+
+To determine the area to crop, set up the Vidicon as it would be set to
+image a painting and capture an image of a rectangular grid --- a piece of
+graph paper works well as a target.  Before capturing the grid, check the
+current video crop settings in the \ct{Preferences} window
+and ensure that the crop is set at maximum: left 0, top 0, width 768,
+height 576 (these are the dimensions for a PAL signal, they may be different
+on your system). Also set the \ct{Aspect ratio} line to 1.
+
+Create a new video object and look for the largest rectangle with little
+distortion (no more than a few pixels). If you create a region on the video
+image (by holding down the Ctrl key and dragging down and right with
+the left mouse button, see \pref{sec:region}) you can compare the straight
+edges of the region against the distorted lines of the grid. You can then
+expand and contract the region until you decide on the optimum area. The
+settings you need for the crop box can be taken from the values contained
+within the region object, which can be viewed by left-clicking several
+times on the down arrow to the left of the region object name.
+
+Finally, you can set an aspect ratio: \nip{} will automatically stretch
+video frames vertically by this factor. You can measure the aspect ratio of
+your capture card by taking a picture of something you know to be square and
+dividing the width in pixels by the height in pixels.
+
+Move back to the \ct{Preferences} window and enter the crop values in the
+\ct{General video capture} section.  Next time you create a new video object,
+you should find that it is cropped to the appropriate area.  The settings
+you enter in the \ctr{Preferences} window will be saved and automatically
+loaded again next time you start \nip{}. See appendix~\ref{sec:config}.
+
+Choosing the usable area of the image is a matter of compromise --- the
+smaller the area, the more images are required to build a mosaic of a
+particular painting. If the area chosen is too large then the amount of
+distortion can cause serious errors in the final mosaic.
+
+It's possible to use the VIPS rubber sheet plug in to detect and correct
+geometric distortion in your images automatically. This lets you use the
+full area of the sensor. It is a bit fiddly, but see the rubber sheet
+documentation if you are determined.
+
+\subsection{Capturing the data}
+
+\subsubsection{Setting the gain and offset}
+
+Once everything is correctly set up, position the painting in front of the
+camera and experiment with the gain and offset settings on the Vidicon to
+achieve the optimum infrared image on the computer screen. Note that the
+appearance of the image on the computer will normally be different to its
+appearance on the video monitor connected directly to the camera.
+
+Repeat this process at different points across the whole area to be captured.
+Although it is not always possible, the aim is to find a setting that does
+not need altering much during the capture of the data. This seems to lead
+to more successful mosaics.
+
+\subsubsection{Grey card correction}
+
+To counteract the problem of uneven sensitivity across the target area of the
+tube, it is necessary to capture an image of a piece of grey card. This grey
+card image is then used to correct all subsequent images. The card should be a
+flat, even grey, of around 50\% reflectance. The Vidicon and lighting
+positions with respect to the painting should not be changed between the
+imaging of the grey card and the capturing of the mosaic. A grey card can be
+captured at any time, but it is good practice to start with one --- you may
+forget later.
+
+If your mosaic will take several hours to capture, you may wish to grab extra
+grey cards, since the sensitivity of the tube can change as it warms
+up. Be sure to note which data images correspond to which grey cards!
+
+In association with the first grey card, it is a good idea to grab an image of
+your grid to record the scale at which the data images are being made.
+
+\subsubsection{Image capture}
+\mylabel{sec:imcap}
+
+Open a video window, \ctr{Tasks}\ctr{Capture}\ct{Capture Video Frame},
+and when it shows the desired area, save the file. The choice of file name
+is a question of personal preference. We find it helpful to use a format
+that indicates where in the mosaic the data comes from --- for example,
+\ct{dat3.5.v} for the fifth image in row three.
+
+It is helpful to be able to see the previous image to ensure that there is
+sufficient overlap. To achieve this, a second video window can be opened and
+placed alongside and the images grabbed into alternate windows.
+
+\subsubsection{Capture tips}
+
+\begin{itemize}
+
+\item
+Make a new directory for each painting, and keep all of the image files
+for that painting (including a grey card and a grid) in that directory.
+
+\item
+VIPS can join up images in any layout, but you will get much less confused
+when you assemble your images if you stick to a regular grid. This can be
+difficult --- a good compromise is to keep one axis fixed and grab in rows
+(or columns).
+
+\item
+You can help to reduce mosaicing errors later if you keep your rows (or
+columns) as short as possible. So if the painting is in landscape format, grab
+in columns (or turn the painting on its side and grab in rows); if the
+painting is portrait, grab in rows (or turn the painting on its side and grab
+in columns).
+
+\item
+The semi-automatic mosaic functions (see \pref{sec:mosaicing}) need a minimum
+overlap between the sub-images they join of around 20 pixels. For safety, you
+should aim for a larger overlap than this: we recommend an overlap
+of 60 pixels (around 20mm, usually).
+
+\item
+If the overlap area is featureless, it is worth identifying a good tie-point
+and ensuring it is visible in both images, even if this means increasing the
+overlap for one of the joins.
+
+\end{itemize}
+
+\subsection{Correcting illumination}
+\mylabel{sec:grey}
+
+Before the mosaic can be assembled, the data images need to be corrected for
+non-uniformity of illumination using the grey card image. This function can be
+performed within \nip{} or directly using a predefined VIPS command-line tool.
+
+\subsection{Correcting with the command-line tool}
+\mylabel{sec:linuxgrey}
+
+First, close \nip{} and open a command line window, (xterm, mingw, etc). Move
+to the directory containing your image files with \ct{cd}. For example, if you
+have made a directory called \ct{raphael} inside your home directory, type:
+
+\begin{verbatim}
+prompt% cd raphael
+\end{verbatim}
+
+The program you need to use is called \ct{light\_correct}. You need to give
+it the name of the grey-card image and the names of all of the image files
+you want it to correct with that gray card.  Suppose you have saved your
+gray card image as \ct{grey.v}, and your painting image files are called
+\ct{dat1.1.v} and \ct{dat1.2.v}. You would then enter:
+
+\begin{verbatim}
+prompt% light_correct grey.v dat1.1.v dat1.2.v
+\end{verbatim}
+
+The program will run and print messages explaining its progress. It creates
+a new set of corrected image files, with the same names as before, but
+prefixed with \ct{ic\_}. In this example, it would create two new images files
+called \ct{ic\_dat1.1.v} and \ct{ic\_dat1.2.v}.
+
+If there are a lot of image files to correct this could mean a lot of typing.
+Fortunately, you can use wildcard characters to abbreviate lists of file
+names. The example above can be abbreviated to:
+
+\begin{verbatim}
+prompt% light_correct grey.v dat*.v
+\end{verbatim}
+
+\noindent
+The \ct{dat*.v} means `any filename which starts \ct{dat} and ends with
+\ct{.v}'. 
+
+You can use this technique to correct different parts of your mosaic
+with different grey cards. If you have a file called \ct{grey1.v} for the
+first row in your mosaic, and a file called \ct{grey2.v} for the second, you
+could do the correction in two parts:
+
+\begin{verbatim}
+prompt% light_correct grey1.v dat1.*.v \\
+prompt% light_correct grey2.v dat2.*.v
+\end{verbatim}
+
+\subsection{Correcting within \nip{}}
+\mylabel{sec:wingrey}
+
+The function within \nip{} used to preform this correction is
+\ctr{Tasks}\ctr{Capture}\ct{Flatfield}.  A set of images can be corrected
+at the same time by joining them together in a \ct{Group}.  A group can
+be produced by selecting all of the required images and then using the
+\ctr{Edit}\ct{Group} command.
+
+Load all of your images into \nip{}, and group all the image except the
+grey image.  Select your grey image and then your new group and then run
+the \ctr{Tasks}\ctr{Capture}\ct{Flatfield} function.  This will produce
+you a group of corrected images.  Right-click on this new group and select
+\ct{Save As} from the menu.  In the save window type in a name, for example
+\ct{fred\_01.v} and then hit the save button.  All of the images in your group
+will then be saved as \ct{fred\_01.v}, \ct{fred\_02.v}, \ct{fred\_03.v}
+\ldots{} \ct{fred\_n.v}.
+
+If you want to keep row numbers in your file names, (see \pref{sec:imcap}),
+you will need to correct your images one row at a time, saving each row as
+\ct{fred01\_01.v}, \ct{fred02\_01.v}, etc.
+
+\section{Assembling the mosaic}
+\mylabel{sec:mosaicing}
+
+The tutorial has a section on mosaic assembly with \nip{}: see \pref{sec:irtut}.
+
+Mosaic assembly is normally painless.  There are a few factors
+you should bear in mind when you are deciding how to assemble an image
+(particularly a large image):
+
+\begin{itemize}
+
+\item
+You can open up a mosaic join and change a few options, such as the blend
+width. If you want to change the defaults for a whole workspace, change the
+\ct{Mosaic defaults} options in your \ct{Preferences}.
+
+\item
+If two images just won't join correctly, try using 
+\ctr{Tasks}\ctr{Mosaic}\ctr{One Point}\ct{Manual Left to
+Right} instead.  These functions operate in the same way as the usual
+mosaic functions, but do not do a search. 
+This is useful when the overlap is too small for the search
+to work correctly, or when the overlap area is very smooth and contains
+too few features for the search to find the exact overlap for you.
+
+\item
+\nip{} does not do sub-pixel interpolation. As a result, each join will on
+average cause a positioning error of about 0.5 pixels, even if your input
+images contain no geometric distortion. If there are distortions in your input
+images (there usually are distortions in infrared images), then errors can be
+as much as 1--2 pixels per join. These errors accumulate as the number of
+images you join becomes larger.
+
+If you join a strip of 10 images together with
+\ctr{Tasks}\ctr{Mosaic}\ctr{One Point}\ct{Left to Right}, on average you
+can expect a total error of about 5 pixels. If you join two strips like
+this together top-bottom, you can therefore expect a mismatch of about 2.5
+pixels at each end of the join.
+
+You can minimise the effect of these errors if you assemble your images
+differently. Suppose you have a 10 by 10 mosaic to build.  Instead of making
+and joining 10 strips of 10 images each, make four 5 by 5 sub-mosaics (one for
+each quadrant) and then join these four quadrants together.  The errors will
+now be more evenly spread over the image and therefore will be less visible.
+
+\item
+\mylabel{sec:pieces}
+Some operating systems limit the number of files a program can have open
+at once: this in turn limits the size of the mosaics you can assemble in
+one go.  If you are having problems putting together very large mosaics, try
+building your image in sections (\ct{top}, \ct{middle} and \ct{bottom},
+perhaps), and later load up and join these larger pieces.
+
+\end{itemize}
+
+\section{Balancing the mosaic}
+\mylabel{sec:balance}
+
+Like assembly, mosaic balancing is normally automatic and painless. You may
+sometimes have problems if the image is very large, or needs dramatic
+corrections:
+
+\begin{itemize}
+
+\item
+Each VIPS image file has an associated history, recording the operations on
+that image since it was loaded from a file. You can view an image's history
+by clicking on \ctr{View}\ct{Image header} in an image view window.
+
+The automatic balancer uses the history to work out how you built your
+mosaic. The balancer knows about left-right and top-bottom joins, but nothing
+else! If the history has other stuff recorded in there, you'll see
+unhelpful error messages like \ct{unable to open tmp/xxx.v}, or \ct{more
+than one root}.
+
+If you need to perform corrections to any of your sub-images, do them, save
+the image, load it again, and then build the mosaic. This will make sure the
+history of the image you are trying to balance only contains mosaic
+operations.
+
+\item
+On some systems the balancer can run out of memory or out of file descriptors
+on very large mosaics. If your mosaic is made up of more than a few hundred
+images, and you are having balancing problems you may have hit one
+of these limits.
+
+The solution (as with mosaic assembly) is to assemble and balance your mosaic
+in smaller pieces.
+
+\item
+If your grey-card correction is not accurate, you will find that the
+balancer will magnify any problems you have. 
+
+Suppose your lighting and camera set-up always produces images which are
+brighter on the right than the left, and suppose, due to some problem with
+your grey-card correction, this effect is not completely removed. You will
+find that when you balance a mosaic, the small differences between left and
+right edges of your sub-images will have been smoothed out, but they will have
+caused a large difference in brightness between the extreme left edge of your
+final image and the extreme right.
+
+\nip{} includes several functions which can help to fix this problem, the
+most commonly used being: \ctr{Tasks}\ctr{Mosaic}\ctr{Tilt Brightness}\ct{Left
+to Right} and \ctr{Tasks}\ctr{Mosaic}\ctr{Tilt Brightness}\ct{Top to Bottom}.
+
+\end{itemize}
+
+\section{Other \nip{} features useful for reflectograms}
+
+You can use \nip{}'s general image processing facilities to play around with
+reflectogram mosaics. You can make false-colour images of your reflectograms,
+blend them with visible images or X-rays, search them for edges, and so on
+see the \ct{registering} and
+\ct{overlays\_and\_blending}
+examples for ideas.
+
+There are also some first order mosaic functions:
+\ctr{Tasks}\ctr{Mosaic}\ctr{Two Points}\ct{Left to Right} and
+\ctr{Tasks}\ctr{Mosaic}\ctr{Two Points}\ct{Top to Bottom}. These functions
+automatically rotate and scale the right-hand image in a join. They are
+useful for assembling X-ray mosaics, and for fixing very difficult joins in
+reflectogram images. These functions work the same way as the \ct{One Point}
+functions except that you will need to define two tie-points on each image.
+
+You can mosaic images of any numeric type: 16-bit integer images are handy for
+mosaicing X-ray images, for example.
+
+\section{Printing}
+
+Once you have assembled a good reflectogram, you will want to print it,
+or to use it in other computer programs. The best way to do this is to save
+the final image in TIFF or JPEG format, and then load it into the new
+application --- see~\pref{sec:loadsave}.
+
+There are a couple of points to bear in mind: first, like any image,
+reflectograms look best on paper if you sharpen them up a little first. Click
+on \ctr{Filter}\ctr{Convolution}\ct{Custom Convolution}, right click on
+the matrix button, select \ct{Replace from file}. Double Click on the
+second or lower \ct{data} directory listed in the left hand column to
+enter \nip{}'s main data directory. Change the \ctr{Image type select}
+option to \ct{All FIles (*)} and then select and load \ct{rachel.con}.
+This will usually produce an approprioatly sharpened reflectogram.
+
+Secondly, you will need to try several prints with different contrasts
+and brightnesses to get a good match between the paper and the screen,
+try \ctr{Image}\ctr{Levels}\ct{Linear}. You may even want to fiddle with
+the gamma, try \ctr{Image}\ctr{Levels}\ct{Power}.
+
+Finally, you may not need a full resolution image. For almost all printers
+there's no point going over about 300 dpi (dots per inch), or about 3000 by
+2000 pixels for an A4 page. To reduce the size of an image, use one of the 
+functions listed under \ctr{Resize}\ctr{Transform}\ct{Resize}.
+
+

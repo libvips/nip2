@@ -1,0 +1,422 @@
+/* replace dark or light section of im1 with section from im2
+ */
+Replace_area im1 im2 = class 
+	Image value 
+{
+	_check_args = [
+		[im1, "im1", check_Image],
+		[im2, "im2", check_Image]
+	] ++ super._check_args;
+	
+	_vislevel = 3;
+
+	/* Region on first image placed in the top left hand corner,
+	 * positioned and size relative to the height and width of im1.
+	 */
+	r1 = Region_relative im1 0.1 0.1 0.1 0.1;
+
+	/* Point on second image placed in the top left hand corner,
+	 * positioned relative to the height and width of im2. Used to
+	 * define _r2, the region from which the section of image is cloned 
+	 * from.
+	 */
+
+	p2 = Point im2 
+			(im2.width * 0.1 - im2.xoffset)
+			(im2.height * 0.1 - im2.yoffset);
+
+	_r2 = Region im2 
+		p2.left
+		p2.top
+		r1.width
+		r1.height;
+
+	_mask = [r1 <= Options.scale_cutoff, r1 >= Options.scale_cutoff] ? Options.control;
+	mask = _mask?0;
+
+	Options = option_1, format  < 4
+			= option_2
+		{
+		format = im1.format;
+		
+		option_1 = class
+			{
+			_vislevel = 3;
+			
+			/* Option toggle used to define whether the user is replacing a
+	 		 * dark or a light area.
+	 		 */
+			control = Option "Removing a" [
+							 "Dark Area",
+							 "Light Area"
+							 ] 1;
+				
+			/* Used to select the area to be replaced.
+			 */			 
+			scale_cutoff = Slider 0.01 mx (mx / 2)
+				{
+				mx = Image_format.maxval im1.format;
+				}
+			
+			/* Option toggle how the levels in the replacment area are calculated.
+	 		 * Replacement with gaussian noise uses the scale&offset balancing.
+	 		 */							 
+			process = Option "Use" [
+							 "Scale&Offset Balancing",
+							 "Gaussian noise replacement",
+							 "Histogram Balancing"
+							 ] 0;
+							 
+			/* This allows the function to be paused. 
+			 */				 
+			pause = Toggle "Pause function to allow easy adjustment of region r1." true;
+			}
+		option_2 = class
+			{
+			_vislevel = 3;
+			
+			/* Option toggle used to define whether the user is replacing a
+	 		 * dark or a light area.
+	 		 */
+			control = Option "Removing a" [
+							 "Dark Area",
+							 "Light Area"
+							 ] 1;
+				
+			/* Used to select the area to be replaced.
+			 */			 
+			scale_cutoff = Slider 0.01 mx (mx / 2)
+				{
+				/* the below function can not cope with floats 
+				 * and don't need massive range for 32-bit ints so 
+				 * will just define the max as for a 16 bit unsigned.
+				 */		
+				 mx = Image_format.maxval 2; //im1.format;
+				}
+			
+			/* Option toggle how the levels in the replacment area are calculated.
+	 		 * Replacement with gaussian noise uses the scale&offset balancing.
+	 		 */							 
+			process = Option "Use" [
+							 "Scale&Offset Balancing",
+							 "Gaussian noise replacement"
+							 ] 0;
+							 
+			/* This allows the function to be paused. 
+			 */				 
+			pause = Toggle "Pause function to allow easy adjustment of region r1." true;
+			}
+		}
+		
+	value 
+		= im1.value, Options.pause 
+		= im_insert im1.value patch r1.left r1.top 
+	{
+		patch = _so_balance mask r1.value _r2.value false, Options.process == 0;
+			  = _so_balance mask r1.value _r2.value true, Options.process == 1;
+			  = _hist_balance_2 mask r1.value _r2.value;
+	}
+};
+
+#separator
+
+/* Balance the effect of secondary structure on an X-ray image
+ * Takes an X-ray image an 8-bit control mask and a list of 8-bit reference 
+ * masks, where the masks are white on a black background.  Then simplifys 
+ * the original X-ray to reduce  interference from stretchers cradles etc.
+ */
+
+Balance_areas im_in m_control m_list = class
+	Image value 
+	{
+	_vislevel = 3;
+	
+	_format = im_in.format;
+	
+	Options = option_1, format  < 4
+			= option_2
+		{
+		format = im_in.format;
+		
+		option_1 = class
+			{
+			_vislevel = 3;
+			pause = Toggle "Pause Process." true;
+			blur = Slider 0 5 0;
+			_blur = rint blur.value;
+			option = Toggle "Use Scale&Offset Balancing rather than Histogram." true;
+			_option = option;
+			}
+
+		option_2 = class
+			{
+			_vislevel = 3;
+			pause = Toggle "Pause Process." true;
+			blur = Slider 0 5 0;
+			_blur = rint blur.value;
+			_option = true;
+			}
+		}
+
+	_control_im = _section_select2 im_in m_control;
+	_control_values = _so_values _control_im;
+
+	/* blur mask over a set number of pixels then histogram match an area
+	 * of the original image defined by m_current to the _control_im
+	 * then blend the matched area back into im_in.
+	 */
+	process m_current im_start 
+		= im_out
+		{
+		alternative = false;
+		bl_mask    = _mask_blur_2 m_current Options._blur;
+		scaled_im  = _so_convert _control_values im_start m_current, Options._option == true
+						= _hist_convert_2 _control_im im_start m_current;
+		fmt_im      = clip2fmt im_start.format scaled_im;
+		blended_im  = im_blend bl_mask scaled_im.value im_start.value;
+		im_out      = Image (clip2fmt im_start.format blended_im);
+		}
+
+	value = im_in.value, Options.pause == true
+		  = (foldr process im_in m_list).value;
+};
+
+_so_balance mask im1 im2 gauss 
+	= result
+{
+	/* Extract the undamaged areas.
+	 */
+	im1' = if !mask then Image im1 else 0;
+	im2' = if !mask then Image im2 else 0;
+
+	/* Find the non_zero means of the undamaged areas.
+	 */
+	m1 = _mean_fn im1';
+	m2 = _mean_fn im2';
+	
+	im1_mn = im1' - m1;	
+	im2_mn = im2' - m2;
+	
+	scale = (max im1_mn)/(max im2_mn);
+	
+	im2_corrected_a = ((im2 - m2) * scale) + m1;
+	im2_corrected_b = clip2fmt im1'.format im2_corrected_a;
+	
+	/* Option to convert replacement image to scaled gaussian noise
+	 */	
+	im2_corrected = im2_corrected_b, gauss == false
+				   = _gauss_noise im2_corrected_b;
+
+	/* Blur mask.
+	 */
+	mask' = _mask_blur_2 mask 5;
+	//mask' = _feather_mask_2 5 mask.value;
+
+	/* Blend im2 into im1.
+	 */
+	result = im_blend mask' im2_corrected im1;
+};
+
+/* make a new image of gaussian noise
+ */
+_gauss_noise im2 = value 
+	{
+	i = Image (im2);
+	width = i.width;
+	height = i.height;
+	mean = Mean i;
+	deviation = Deviation i;
+
+	noise = im_gaussnoise width height mean deviation;
+	value = clip2fmt i.format noise;
+};
+
+/* Dilate and blur a mask by a number of pixels.
+ *
+ *_feather_mask_2 pixels mask 
+ *	= im_convsep (dilate dilate_matrix mask) blur_matrix
+ *{
+ *	dilate_matrix = (iterate (dilate _morph_mask8) _morph_mask8) ? pixels;
+ *	blur_matrix = Matrix_con pixels 0 [(map (const 1) [1 .. pixels])];
+ *};
+ */
+
+/* Mask is 255 to indicate parts of im1 which are damaged: replace these bits
+ * with the corresponding parts of im2.
+ *
+ * Match the histograms of the two images to hide grey-level differences, be
+ * careful to only consider undamaged sections.
+ *
+ * Feather the edges of the blend to hide the join.
+ *
+ * mask is an Image class. im1, im2 and result are vips images.
+ */
+_hist_balance_2 mask im1 im2 
+	= result
+{
+	format = im_header_int "BandFmt" im1;
+	bands = im_header_int "Bands" im1;
+
+	/* checks for 8 or 16 bit signed and converts to unsigned
+	 */
+	force_unsigned i 
+		= clip2fmt Image_format.UCHAR (i + 128), 
+			format == Image_format.CHAR
+		= clip2fmt Image_format.USHORT (i + 32768), 
+			format == Image_format.SHORT
+		= i;
+
+	/* undo any force_unsigned 
+	 */
+	format_restore i 
+		= clip2fmt Image_format.CHAR (i - 128),
+			format == Image_format.CHAR
+		= clip2fmt Image_format.SHORT (i - 32768),
+			format == Image_format.SHORT
+		= i;
+
+	/* Find histogram and then zap the zero column (0 == background). For
+	 * 16-bit images, the histogram can be smaller than 65535 .... expand
+	 * up to full size.
+	 */
+	build_hist i
+		= im_insert big_black h' 0 0
+	{
+		max_value = Image_format.maxval i.format;
+
+		h = hist_find i.value;
+
+		black_1 = image_new 1 1 i.bands 
+			Image_format.UINT Image_coding.NOCODING i.type 0 0 0;
+		big_black = image_new max_value 1 i.bands 
+			Image_format.UINT Image_coding.NOCODING i.type 0 0 0;
+
+		h' = im_insert h black_1 0 0;
+	}
+
+	/* We can't get hists of signed images :-( go unsigned if we have to.
+	 */
+	im1' = force_unsigned im1;
+	im2' = force_unsigned im2;
+
+	/* Extract the undamaged areas.
+	 */
+	reference = if !mask then Image im1' else 0;
+	secondary = if !mask then Image im2' else 0;
+
+	/* Find the hists of the undamaged areas.
+	 */
+	h1 = build_hist reference;
+	h2 = build_hist secondary;
+
+	/* Match greylevels of im2 to match im1.
+	 */
+	im2'' = hist_map (hist_match h1 h2) im2';
+
+	/* Feather mask.
+	 */
+	mask' = _mask_blur_2 mask 5;
+	//mask' = _feather_mask_2 5 mask.value;
+
+	/* Blend im2 into im1.
+	 */
+	im1'' = im_blend mask' im2'' im1';
+
+	/* Undo any signed/unsigned nonsense.
+	 */
+	result = format_restore im1'';
+};
+
+// Blurs the edges of an 8 bit mask, over a given number of pixels.
+_mask_blur_2 mask pixel 
+	= value
+{
+	pixels   = 1, pixel == 0
+		     = pixel;
+	black = im_black (mask.width + (2*pixels)) (mask.height + (2*pixels)) 1;
+	new_mask = Image (im_insert black mask.value pixels pixels);
+	blur_matrix = Matrix_con pixels 0 [(map (const 1) [1 .. pixels])];
+	im_blur = im_convsep new_mask.value blur_matrix;
+
+	left = pixels;
+	top = pixels;
+	width = mask.width;
+	height = mask.height;
+
+	value = im_extract_area im_blur left top width height;
+};
+
+_so_values im = result
+{
+	mean_of_im = _mean_fn im;
+	adjusted_im = im - mean_of_im;
+	max_of_im = max adjusted_im;
+	
+	result = [mean_of_im, max_of_im];
+};
+
+_so_convert con_values im mask = result
+{
+	im' = _section_select2 im mask;
+	im_values = _so_values im';
+	
+	mean_of_con = con_values?0; 
+	mean_of_im  = im_values?0;
+	
+	max_of_con = con_values?1; 
+	max_of_im  = im_values?1;
+	
+	scale = (max_of_con)/(max_of_im);
+	
+	im_convert = ((im - mean_of_im) * scale) + mean_of_con;
+	result = clip2fmt im.format im_convert;
+};
+
+/* Convert the histogram of part of image im_a, depending on the mask im_m,
+ * to match the histogram of im_c.
+ */
+_hist_convert_2 control_im im adjust_mask
+	= im_final
+{
+	max_value = Image_format.maxval im.format;
+
+	adjust_im = _section_select2 im adjust_mask;
+	hist_c = hist_fn control_im;
+	hist_a = hist_fn adjust_im;
+
+	/* Find histogram and then edit out any information related to parts 
+	 * of the image with value 0.  Ensure that the histogram represents 
+	 * the full scale for the appropriate format. Output corrected 
+	 * histograms for the correct parts of the image.
+	 */
+	hist_fn im_in 
+		= output
+	{
+		hist_1 = hist_find im_in;
+		black_1 = clip2fmt hist_1.format (im_black 1 1 1);
+		hist_2 = im_insert hist_1.value black_1 0 0;
+		black_2 = clip2fmt hist_1.format (im_black max_value 1 1);
+		output = im_insert black_2 hist_2 0 0;
+	}
+
+	im_final = hist_map (hist_match hist_a hist_c) im;
+};
+
+//-------------------------------------------------------------------------------
+
+/*Returns a section of im, defined by a mask, on a black background*/
+_section_select2 im_in mask = output
+	{
+	output  
+		= clip2fmt im_in.format (im_black im_in.width im_in.height 1), mask == 0
+	        = im_in;
+        };
+
+_mean_fn im = no_out
+   {
+   zero_im = (im == 0);
+   zero_mean = mean zero_im;              
+   no_mean = mean im;
+   no_out = no_mean/(1 - (zero_mean/255));
+   } 
+

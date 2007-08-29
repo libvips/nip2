@@ -1,0 +1,12 @@
+/* Gamma im gam: correct
+ */
+
+Gamma A1 B7 
+      =	error "arg 1 is not image", not is_image A1;
+      =	error "arg 2 is not number", not is_number B7;
+      =	Convert_to_unsigned_char B5
+{
+	B4 = A1 ^ (1/B7);
+	B5 = B4 * (255 / 255 ^ (1/B7));
+};
+

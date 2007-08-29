@@ -1,0 +1,398 @@
+
+/* Check and group a point list by image.
+ */
+_mosaic_sort_test l
+	= error "mosaic: not all points",
+		!is_listof (is_instanceof "Point") l
+	= error "mosaic: points not on two images",
+		len images != 2 
+	= error "mosaic: images do not match in format and coding",
+		!all_equal (map get_format l) ||
+		!all_equal (map get_coding l)
+	= error "mosaic: not same number of points on each image",
+		!foldr1 equal (map len l') 
+	= l'
+{
+	// test for all elements of a list equal
+	all_equal l = land (map (equal (hd l)) (tl l));
+
+	get_format x = x.image.format;
+	get_coding x = x.image.coding;
+
+	// all the different images
+	get_image x = x.image;
+	images = mkset pointer_equal (map get_image l);
+
+	// find all points defined on image
+	test_image image p = p.image === image;
+	find l image = filter (test_image image) l;
+
+	// group point list by image
+	l' = map (find l) images;
+}
+
+/* Sort a point group to get right before left, and within each group to get 
+ * above before below.
+ */
+_mosaic_sort_lr l
+	= l''
+{
+	// sort to get upper point first
+	above a b = a.top < b.top;
+	l' = map (sortc above) l;
+
+	// sort to get right group before left group
+	right a b = (a?0).left > (b?0).left;
+	l'' = sortc right l';
+}
+
+/* Sort a point group to get top before bottom, and within each group to get 
+ * left before right.
+ */
+_mosaic_sort_tb l
+	= l''
+{
+	// sort to get upper point first
+	left a b = a.left < b.left;
+	l' = map (sortc left) l;
+
+	// sort to get right group before left group
+	below a b = (a?0).top > (b?0).top;
+	l'' = sortc below l';
+}
+
+/* Put 'em together! Group by image, sort vertically (or horizontally) with
+ * one of the above, transpose to get pairs matched up, and flatten again.
+ */
+_mosaic_sort fn = concat @ transpose @ fn @ _mosaic_sort_test;
+
+/* translate and blend two images together left/right or up/down
+ */
+Mosaic_translate = class {
+	_check_ab_args a b = [
+		[a, "a", check_Point],
+		[b, "b", check_Point]
+	];
+
+	// shortcut to prefs
+	_prefs = Workspaces.Preferences;
+	_search_area = _prefs.MOSAIC_WINDOW_SIZE;
+	_object_size = _prefs.MOSAIC_OBJECT_SIZE;
+	_blend_width = Slider 0 100 _prefs.MOSAIC_MAX_BLEND_WIDTH;
+	_refine = Toggle "Refine selected tie-points" _prefs.MOSAIC_REFINE;
+
+	/* translate and blend two images left/right
+	 */
+	Left_right a b = class 
+		Image value {
+		_check_args = _check_ab_args a b ++ super._check_args;
+
+		blend_width = _blend_width;
+		refine = _refine;
+
+		value 
+			= im_lrmosaic a'.image.value b'.image.value
+				0
+				ra'.left ra'.top
+				rb'.left rb'.top
+				(_object_size / 2) (_search_area / 2)
+				0
+				blend_width.value,
+					refine
+			= im_lrmerge a'.image.value b'.image.value
+				(rb'.left - ra'.left)
+				(rb'.top - ra'.top)
+				blend_width.value
+		{
+			sorted = _mosaic_sort _mosaic_sort_lr [a, b];
+			a' = sorted?0;
+			b' = sorted?1;
+			ra' = a'.image_rect;
+			rb' = b'.image_rect;
+		}
+	}
+
+	/* translate and blend two images top/bottom
+	 */
+	Top_bottom a b = class 
+		Image value {
+		_check_args = _check_ab_args a b ++ super._check_args;
+
+		blend_width = _blend_width;
+		refine = _refine;
+
+		value 
+			= im_tbmosaic a'.image.value b'.image.value
+				0
+				ra'.left ra'.top
+				rb'.left rb'.top
+				(_object_size / 2) (_search_area / 2)
+				0
+				blend_width.value,
+					refine
+			= im_tbmerge a'.image.value b'.image.value
+				(rb'.left - ra'.left)
+				(rb'.top - ra'.top)
+				blend_width.value
+		{
+			sorted = _mosaic_sort _mosaic_sort_tb [a, b];
+			a' = sorted?0;
+			b' = sorted?1;
+			ra' = a'.image_rect;
+			rb' = b'.image_rect;
+		}
+	}
+}
+
+/* forcibly translate and blend two images together left/right or up/down
+ */
+Mosaic_force = class {
+	_check_ab_args a b = [
+		[a, "a", check_Point],
+		[b, "b", check_Point]
+	];
+
+	// shortcut to prefs
+	_prefs = Workspaces.Preferences;
+	_blend_width = Slider 0 100 _prefs.MOSAIC_MAX_BLEND_WIDTH;
+
+	/* forcibly translate and blend two images left/right
+	 */
+	Left_right a b = class 
+		Image value {
+		_check_args = _check_ab_args a b ++ super._check_args;
+
+		blend_width = _blend_width;
+
+		value 
+			= im_lrmerge a'.image.value b'.image.value
+				(rb'.left - ra'.left)
+				(rb'.top - ra'.top)
+				blend_width.value
+		{
+			sorted = _mosaic_sort _mosaic_sort_lr [a, b];
+			a' = sorted?0;
+			b' = sorted?1;
+			ra' = a'.image_rect;
+			rb' = b'.image_rect;
+		}
+	}
+
+	/* forcibly translate and blend two images top/bottom
+	 */
+	Top_bottom a b = class 
+		Image value {
+		_check_args = _check_ab_args a b ++ super._check_args;
+
+		blend_width = _blend_width;
+
+		value 
+			= im_tbmerge a'.image.value b'.image.value
+				(rb'.left - ra'.left)
+				(rb'.top - ra'.top)
+				blend_width.value
+		{
+			sorted = _mosaic_sort _mosaic_sort_tb [a, b];
+			a' = sorted?0;
+			b' = sorted?1;
+			ra' = a'.image_rect;
+			rb' = b'.image_rect;
+		}
+	}
+}
+
+/* translate, rotate, scale and blend two images together left/right or up/down
+ */
+Mosaic_affine = class {
+	_check_abcd_args a b c d = [
+		[a, "a", check_Point],
+		[b, "b", check_Point],
+		[c, "c", check_Point],
+		[d, "d", check_Point]
+	];
+
+	// shortcut to prefs
+	_prefs = Workspaces.Preferences;
+	_search_area = _prefs.MOSAIC_WINDOW_SIZE;
+	_object_size = _prefs.MOSAIC_OBJECT_SIZE;
+	_blend_width = Slider 0 100 _prefs.MOSAIC_MAX_BLEND_WIDTH;
+	_refine = Toggle "Refine selected tie-points" _prefs.MOSAIC_REFINE;
+
+	/* translate, rotate, scale and blend two images left/right
+	 */
+	Left_right a b c d = class 
+		Image value {
+		_check_args = _check_abcd_args a b c d ++ super._check_args;
+
+		blend_width = _blend_width;
+		refine = _refine;
+
+		value 
+			= im_lrmosaic1 a'.image.value b'.image.value
+				0
+				ra'.left ra'.top
+				rb'.left rb'.top
+				rc'.left rc'.top
+				rd'.left rd'.top
+				(_object_size / 2) (_search_area / 2)
+				0
+				blend_width.value,
+					refine
+			= im_lrmerge1 a'.image.value b'.image.value
+				ra'.left ra'.top
+				rb'.left rb'.top
+				rc'.left rc'.top
+				rd'.left rd'.top
+				blend_width.value
+		{
+			sorted = _mosaic_sort _mosaic_sort_lr [a, b, c, d];
+			a' = sorted?0;
+			b' = sorted?1;
+			c' = sorted?2;
+			d' = sorted?3;
+			ra' = a'.image_rect;
+			rb' = b'.image_rect;
+			rc' = c'.image_rect;
+			rd' = d'.image_rect;
+		}
+	}
+
+	/* translate, rotate, scale and blend two images top/bottom
+	 */
+	Top_bottom a b c d = class 
+		Image value {
+		_check_args = _check_abcd_args a b c d ++ super._check_args;
+
+		blend_width = _blend_width;
+		refine = _refine;
+
+		value 
+			= im_tbmosaic1 a'.image.value b'.image.value
+				0
+				ra'.left ra'.top
+				rb'.left rb'.top
+				rc'.left rc'.top
+				rd'.left rd'.top
+				(_object_size / 2) (_search_area / 2)
+				0
+				blend_width.value,
+					refine
+			= im_tbmerge1 a'.image.value b'.image.value
+				ra'.left ra'.top
+				rb'.left rb'.top
+				rc'.left rc'.top
+				rd'.left rd'.top
+				blend_width.value
+		{
+			sorted = _mosaic_sort _mosaic_sort_tb [a, b, c, d];
+			a' = sorted?0;
+			b' = sorted?1;
+			c' = sorted?2;
+			d' = sorted?3;
+			ra' = a'.image_rect;
+			rb' = b'.image_rect;
+			rc' = c'.image_rect;
+			rd' = d'.image_rect;
+		}
+	}
+}
+
+#separator
+
+/* disassemble mosaic, adjust brightnesses to match, and reassemble
+ */
+Mosaic_balance x
+	= map_unary balance x
+{
+	balance x
+		= oo_unary_function balance_op x, is_class x
+		= im_global_balancef x 
+			Workspaces.Preferences.MOSAIC_BALANCE_GAMMA, 
+			is_image x
+		= error (errors.badargs ++ "balance")
+	{
+		balance_op = Operator "balance" balance 
+			Operator_type.COMPOUND_REWRAP false;
+	}
+}
+
+/* brighten along a left/right or up/down axis
+ */
+Tilt_brightness = class {
+	/* brighten along a left/right axis
+	 */
+	Left_right x 
+		= map_unary tilt_lr x
+	{
+		tilt_lr image = class
+			Image value {
+			_check_args = [
+				[image, "image", check_Image]
+			] ++ super._check_args;
+			_vislevel = 3;
+
+			tilt = Slider (-1) 1 0;
+
+			value
+				= final
+			{
+				ramp = im_fgrey image.width image.height;
+				ramp' = bandjoin 
+					(map (const ramp) [1..image.bands]);
+				scale = (ramp' - 0.5) * tilt + 1;
+				final = image.value * scale;
+			}
+		}
+	}
+
+	/* brighten along a top/bottom axis
+	 */
+	Top_bottom x 
+		= map_unary tilt_tb x
+	{
+		tilt_tb image = class
+			Image value {
+			_check_args = [
+				[image, "image", check_Image]
+			] ++ super._check_args;
+			_vislevel = 3;
+
+			tilt = Slider (-1) 1 0;
+
+			value
+				= final
+			{
+				ramp = rot90 
+					(im_fgrey image.height image.width);
+				ramp' = bandjoin 
+					(map (const ramp) [1..image.bands]);
+				scale = (ramp' - 0.5) * tilt + 1;
+				final = image.value * scale;
+			}
+		}
+	}
+}
+
+#separator
+
+/* disassemble mosaic, substitute different image files, and reassemble
+ */
+Mosaic_rebuild x 
+	= map_unary remosaic x
+{
+	remosaic image = class
+		Image value {
+		_check_args = [
+			[image, "image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		old_hint = "For the name of each file making up the mosaic, " ++
+			"exchange this string:";
+		old = "foo";
+		new_hint = "for this string:";
+		new = "bar";
+
+		value = im_remosaic image.value old new;
+	}
+}

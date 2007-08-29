@@ -1,0 +1,561 @@
+/* Some useful masks.
+ */
+_filter_blur = Matrix_con 9 0 [[1, 1, 1], [1, 1, 1], [1, 1, 1]];
+_filter_sharp = Matrix_con 8 0 [[-1, -1, -1], [-1, 16, -1], [-1, -1, -1]];
+_filter_laplacian = Matrix_con 1 128 [[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]];
+_filter_sobel = Matrix_con 1 128 [[1, 2, 1], [0, 0, 0], [-1, -2, -1]];
+_filter_lindet = Matrix_con 1 0 [[1, 1, 1], [-2, -2, -2], [1, 1, 1]];
+_filter_emboss = Matrix_con 1 128 [[-1, 0], [0, 1]];
+
+/* 3x3 blur of image
+ */
+Blur x = map_unary (conv _filter_blur) x;
+
+/* 3x3 sharpen of image
+ */
+Sharpen x = map_unary (conv _filter_sharp) x;
+
+/* 1-pixel displacement emboss
+ */
+Emboss x = map_unary (conv _filter_emboss) x;
+
+/* 3x3 median filter of image
+ */
+Median x = map_unary (rank 3 3 5) x;
+
+/* 3x3 laplacian of image
+ */
+Laplacian x = map_unary (conv _filter_laplacian) x;
+
+/* 3x3 Sobel edge detect of image
+ */
+Sobel x
+        = map_unary sobel x
+{ 
+	sobel im
+		= abs (a - 128) + abs (b - 128)
+	{
+		a = conv _filter_sobel im;
+		b = conv (rot270 _filter_sobel) im;
+	}
+}
+
+/* 3x3 line detect of image
+diagonals should be scaled down by root(2) I guess
+Kirk 
+*/
+
+Linedet x
+        = map_unary lindet x
+{ 
+	lindet im
+		= foldr1 max_pair images
+	{
+		masks = take 4 (iterate rot45 _filter_lindet);
+		images = map (converse conv im) masks;
+        }
+}
+
+#separator
+
+/* custom convolution of an image
+ */
+Custom_convolution in
+	= map_unary widget in
+{
+	widget image = class 
+		Image value {
+		_check_args = [
+			[image, "Image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		matrix = Matrix_con 1 0 [[0, 0, 0], [0, 1, 0], [0, 0, 0]];
+		separable 
+			= Toggle "Seperable convolution" false, 
+				matrix.width == 1 || matrix.height == 1
+			= false;
+		type = Option "Convolution type" ["Int", "Float"] 0;
+		border = Toggle "Output image matches input image in size" true;
+
+		value 
+			= im_embed image' 0 off off image.width image.height,
+				border
+			= image'
+		{
+			conv_op 
+				= im_conv_raw, !separable && type == 0
+				= im_convsep_raw, separable && type == 0
+				= im_convf_raw, !separable && type == 1
+				= im_convsepf_raw, separable && type == 1
+				= error "boink!";
+
+			image' = conv_op image.value matrix;
+
+			off = (matrix.width + 1) / 2;
+		}
+	}
+}
+
+/* blur with a radius and shape
+ */
+Custom_blur in
+	= map_unary widget in
+{
+	widget in = class
+		Image value {
+		_check_args = [
+			[in, "in", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		radius = Slider 1 50 1;
+		shape = Option "Mask shape" [
+			"Square",
+			"Gaussian"
+		] 0;
+
+		value 
+			= im_convsep in.value mask
+		{
+			/* Make a square mask.
+			 */
+			mask_sq_line = map (const 1) 
+				[1 .. 2 * radius.value - 1];
+			mask_sq_sum = foldr1 add mask_sq_line;
+			mask_sq_sep = Matrix_con mask_sq_sum 0 [mask_sq_line];
+
+			/* Make a gaussian mask. sigma is not really related
+			 * to radius very well, sort-of bodge it.
+			 */
+			mask_g = im_gauss_imask (radius.value / 2) 0.2;
+			mask_g_line = mask_g.value ? (mask_g.height / 2);
+			mask_g_sum = foldr1 add mask_g_line;
+			mask_g_sep = Matrix_con mask_g_sum 0 [mask_g_line];
+
+			mask
+				= mask_sq_sep, shape.value == 0
+				= mask_g_sep;
+		}
+	}
+}
+
+/* cored sharpen of L only in LAB image
+ */
+Custom_sharpen in
+	= map_unary widget in
+{
+	widget in = class
+		Image value {
+		_check_args = [
+			[in, "in", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		size = Option "Mask size" [
+			"3 x 3",
+			"5 x 5",
+			"7 x 7",
+			"9 x 9",
+			"11 x 11"
+		] 0;
+
+		smooth_threshold = Slider 0 5 1.5;
+		brighten_max = Slider 1 50 10;
+		darken_max = Slider 1 50 50;
+		flat_sharp = Slider (-2) 5 1;
+		jaggy_sharp = Slider (-2) 5 2;
+
+		value = im_sharpen in.value 
+			[3, 5, 7, 9, 11]?size
+			smooth_threshold.value 
+			brighten_max.value 
+			darken_max.value
+			flat_sharp.value
+			jaggy_sharp.value;
+	}
+}
+
+/* custom rank filter of an image
+ */
+Custom_rank in
+	= map_unary widget in
+{
+	widget image = class 
+		Image value {
+		_check_args = [
+			[image, "Image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		window_size_hint = "Length of side of window to pass " ++ 
+			"over image:";
+		window_size = 3;
+		rank = (int) ((window_size * window_size + 1) / 2);
+		border = Toggle "Output image matches input image in size" true;
+
+		value 
+			= im_embed image' 0 off off image.width image.height,
+				border
+			= image'
+		{
+			image' = im_rank_raw image.value 
+				window_size window_size rank;
+
+			off = (window_size + 1) / 2;
+		}
+	}
+}
+
+/* statistical difference of an image
+ */
+Statistical_difference in
+	= map_unary widget in
+{
+	widget image = class 
+		Image value {
+		_check_args = [
+			[image, "Image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		window_size_hint = "Length of side of window to pass " ++ 
+			"over image:";
+		window_size = 11;
+		target_mean = 128;
+		target_mean_weight = Slider 0 1 0.8;
+		target_deviation = 50;
+		target_deviation_weight = Slider 0 1 0.8;
+		border = Toggle "Output image matches input image in size" true;
+
+		value 
+			= im_embed image' 0 off off image.width image.height,
+				border
+			= image'
+		{
+			image' = im_stdif_raw image.value 
+				target_mean_weight.value target_mean
+				target_deviation_weight.value target_deviation
+				window_size window_size;
+
+			off = (window_size + 1) / 2;
+		}
+	}
+}
+
+#separator
+
+/* various ideal fourier filters
+ */
+Ideal_filter = class {
+	_preview_size = 64;
+
+	_high_low image = class 
+		Image value {
+		_check_args = [
+			[image, "Image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		frequency_cutoff = Slider 0.01 0.99 0.5;
+		type = Option "High or low" ["High pass", "Low pass"] 0;
+
+		_type = type.value;
+
+		visualize_mask
+			= Image vis
+		{
+			vis = image_set_type Image_type.FOURIER (rotquad mask);
+			mask = im_create_fmask 
+				_preview_size _preview_size _type
+				frequency_cutoff.value 0 0 0 0;
+		}
+
+		value = im_flt_image_freq image.value _type 
+			frequency_cutoff.value 0 0 0 0;
+	}
+
+	_ring image = class 
+		Image value {
+		_check_args = [
+			[image, "Image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		frequency_cutoff = Slider 0.01 0.99 0.5;
+		ring_width = Slider 0.01 0.99 0.5;
+		type = Option "Pass or reject" ["Ring pass", "Ring reject"] 0;
+
+		_type = type.value + 6;
+
+		visualize_mask
+			= Image vis
+		{
+			vis = image_set_type Image_type.FOURIER (rotquad mask);
+			mask = im_create_fmask 
+				_preview_size _preview_size _type
+				frequency_cutoff.value ring_width.value 0 0 0;
+		}
+
+		value = im_flt_image_freq image.value _type 
+			frequency_cutoff.value ring_width.value 0 0 0;
+	}
+
+	_band image = class 
+		Image value {
+		_check_args = [
+			[image, "Image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		frequency_cutoff_x = Slider 0.01 0.99 0.5;
+		frequency_cutoff_y = Slider 0.01 0.99 0.5;
+		radius = Slider 0.01 0.99 0.5;
+		type = Option "Pass or reject" ["Band pass", "Band reject"] 0;
+
+		_type = type.value + 12;
+
+		visualize_mask
+			= Image vis
+		{
+			vis = image_set_type Image_type.FOURIER (rotquad mask);
+			mask = im_create_fmask 
+				_preview_size _preview_size _type
+				frequency_cutoff_x.value
+				frequency_cutoff_y.value
+				radius.value 0 0;
+		}
+
+		value = im_flt_image_freq image.value _type 
+			frequency_cutoff_x.value frequency_cutoff_y.value
+			radius.value 0 0;
+	}
+
+	/* high or low pass ideal filter
+	 */
+	High_low x = map_unary _high_low x;
+
+	/* ring pass or reject ideal filter
+	 */
+	Ring x = map_unary _ring x;
+
+	/* band pass or reject ideal filter
+	 */
+	Band x = map_unary _band x;
+}
+
+/* Gaussian fourier filters
+ */
+Gaussian_filter = class {
+	_preview_size = 64;
+
+	_high_low image = class 
+		Image value {
+		_check_args = [
+			[image, "Image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		frequency_cutoff = Slider 0.01 0.99 0.5;
+		amplitude_cutoff = Slider 0.01 0.99 0.5;
+		type = Option "High or low" ["High pass", "Low pass"] 0;
+
+		_type = type.value + 4;
+
+		visualize_mask
+			= Image vis
+		{
+			vis = image_set_type Image_type.FOURIER (rotquad mask);
+			mask = im_create_fmask 
+				_preview_size _preview_size _type
+				frequency_cutoff.value 
+				amplitude_cutoff.value 0 0 0;
+		}
+
+		value = im_flt_image_freq image.value _type 
+			frequency_cutoff.value amplitude_cutoff.value 0 0 0;
+	}
+
+	_ring image = class 
+		Image value {
+		_check_args = [
+			[image, "Image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		frequency_cutoff = Slider 0.01 0.99 0.5;
+		ring_width = Slider 0.01 0.99 0.5;
+		amplitude_cutoff = Slider 0.01 0.99 0.5;
+		type = Option "Pass or reject" ["Ring pass", "Ring reject"] 0;
+
+		_type = type.value + 10;
+
+		visualize_mask
+			= Image vis
+		{
+			vis = image_set_type Image_type.FOURIER (rotquad mask);
+			mask = im_create_fmask 
+				_preview_size _preview_size _type
+				frequency_cutoff.value
+				ring_width.value amplitude_cutoff.value 0 0;
+		}
+
+		value = im_flt_image_freq image.value _type 
+			frequency_cutoff.value
+			ring_width.value amplitude_cutoff.value 0 0;
+	}
+
+	_band image = class 
+		Image value {
+		_check_args = [
+			[image, "Image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		frequency_cutoff_x = Slider 0.01 0.99 0.5;
+		frequency_cutoff_y = Slider 0.01 0.99 0.5;
+		radius = Slider 0.01 0.99 0.5;
+		amplitude_cutoff = Slider 0.01 0.99 0.5;
+		type = Option "Pass or reject" ["Band pass", "Band reject"] 0;
+
+		_type = type.value + 16;
+
+		visualize_mask
+			= Image vis
+		{
+			vis = image_set_type Image_type.FOURIER (rotquad mask);
+			mask = im_create_fmask 
+				_preview_size _preview_size _type
+				frequency_cutoff_x.value
+				frequency_cutoff_y.value
+				radius.value amplitude_cutoff.value 0;
+		}
+
+		value = im_flt_image_freq image.value _type 
+			frequency_cutoff_x.value
+			frequency_cutoff_y.value
+			radius.value amplitude_cutoff.value 0;
+	}
+
+	/* high or low pass Gaussian filter
+	 */
+	High_low x = map_unary _high_low x;
+
+	/* ring pass or reject Gaussian filter
+	 */
+	Ring x = map_unary _ring x;
+
+	/* band pass or reject Gaussian filter
+	 */
+	Band x = map_unary _band x;
+}
+
+/* various Butterworth fourier filters
+ */
+Butterworth_filter = class {
+	_preview_size = 64;
+
+	_high_low image = class 
+		Image value {
+		_check_args = [
+			[image, "Image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		order = Slider 1 10 2;
+		frequency_cutoff = Slider 0.01 0.99 0.5;
+		amplitude_cutoff = Slider 0.01 0.99 0.5;
+		type = Option "High or low" ["High pass", "Low pass"] 0;
+
+		_type = type.value + 2;
+
+		visualize_mask
+			= Image vis
+		{
+			vis = image_set_type Image_type.FOURIER (rotquad mask);
+			mask = im_create_fmask 
+				_preview_size _preview_size _type
+				order.value frequency_cutoff.value
+				amplitude_cutoff.value 0 0;
+		}
+
+		value = im_flt_image_freq image.value _type 
+			order.value frequency_cutoff.value
+			amplitude_cutoff.value 0 0;
+	}
+
+	_ring image = class 
+		Image value {
+		_check_args = [
+			[image, "Image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		order = Slider 1 10 2;
+		frequency_cutoff = Slider 0.01 0.99 0.5;
+		ring_width = Slider 0.01 0.99 0.5;
+		amplitude_cutoff = Slider 0.01 0.99 0.5;
+		type = Option "Pass or reject" ["Ring pass", "Ring reject"] 0;
+
+		_type = type.value + 8;
+
+		visualize_mask
+			= Image vis
+		{
+			vis = image_set_type Image_type.FOURIER (rotquad mask);
+			mask = im_create_fmask 
+				_preview_size _preview_size _type
+				order.value frequency_cutoff.value
+				ring_width.value amplitude_cutoff.value 0;
+		}
+
+		value = im_flt_image_freq image.value _type 
+			order.value frequency_cutoff.value
+			ring_width.value amplitude_cutoff.value 0;
+	}
+
+	_band image = class 
+		Image value {
+		_check_args = [
+			[image, "Image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		order = Slider 1 10 2;
+		frequency_cutoff_x = Slider 0.01 0.99 0.5;
+		frequency_cutoff_y = Slider 0.01 0.99 0.5;
+		radius = Slider 0.01 0.99 0.5;
+		amplitude_cutoff = Slider 0.01 0.99 0.5;
+		type = Option "Pass or reject" ["Band pass", "Band reject"] 0;
+
+		_type = type.value + 14;
+
+		visualize_mask
+			= Image vis
+		{
+			vis = image_set_type Image_type.FOURIER (rotquad mask);
+			mask = im_create_fmask 
+				_preview_size _preview_size _type
+				order.value frequency_cutoff_x.value
+				frequency_cutoff_y.value
+				radius.value amplitude_cutoff.value;
+		}
+
+		value = im_flt_image_freq image.value _type 
+			order.value frequency_cutoff_x.value
+			frequency_cutoff_y.value
+			radius.value amplitude_cutoff.value;
+	}
+
+	/* high or low pass Butterworth filter
+	 */
+	High_low x = map_unary _high_low x;
+
+	/* ring pass or reject Butterworth filter
+	 */
+	Ring x = map_unary _ring x;
+
+	/* band pass or reject Butterworth filter
+	 */
+	Band x = map_unary _band x;
+}

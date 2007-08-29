@@ -1,0 +1,43 @@
+
+/* Lots of error messages.
+ */
+
+errors = class {
+	not1band = "not 1 band image";
+	not1band8bit = "not 1 band 8-bit image";
+	not1band3band = "not 1 band image, or 3 band 1 column image";
+	notodd = "not odd width|height";
+	notmask = "not mask";
+	notmaskim = "not image|mask, mask";
+	badcoding = "not NOCODING or LABPACK";
+	badlab = "unable to convert to LAB";
+	allreal = "not all real numbers";
+	allreg = "not all regions";
+	badargs = "bad arguments to ";
+	badbands = "images have differing numbers of bands";
+	badcolour = "bad arg to colourspace function";
+	badmatrixmatch = "matrix arguments do not match";
+	badnum = "wrong number of real number arguments";
+	bandFmt = "bad BandFmt";
+	internal = "menu macro sanity failure!";
+	lengthdiff = "list arguments differ in length";
+	noimage = "no image argument";
+	noregion = "no region argument";
+	notim = "not image";
+	notimcmplx = "not image|complex";
+	notimnotreal = "non image arguments not all real numbers";
+	notimreg = "not image|region";
+	notregimreg = "not region, image|region";
+	notimregnum = "not image|region|number";
+	notimregstr = "not image|region|string";
+	notmatnum = "not real|matrix|mask";
+	notmatrix = "not matrix|mask";
+	notodd_square_matrix = "not odd-sided square matrix|mask";
+	notreal = "not real number";
+	notreglist = "not region|[region]";
+	notsquare_matrix = "not square matrix|mask";
+	regwrong = "regions not on two images";
+	sfacgt1 = "shrink factors should be >= 1";
+	unknownType = "unknown type";
+	usage = "usage: ";
+};

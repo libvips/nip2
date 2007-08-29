@@ -1,0 +1,674 @@
+/* Save a bit of typing.
+ */
+_colour_conv from to x = map_unary (colour_transform from to) x;
+
+/* convert Mono to various formats
+ */
+Mono_to = class {
+	/* convert mono colourspace to mono colourspace
+	 */
+	Mono x = _colour_conv Image_type.B_W Image_type.B_W x;
+
+	/* convert mono colourspace to XYZ colourspace
+	 */
+	XYZ x = _colour_conv Image_type.B_W Image_type.XYZ x;
+
+	/* convert mono colourspace to Yxy colourspace
+	 */
+	Yxy x = _colour_conv Image_type.B_W Image_type.YXY x;
+
+	/* convert mono colourspace to Lab colourspace
+	 */
+	Lab x = _colour_conv Image_type.B_W Image_type.LAB x;
+
+	/* convert mono colourspace to LCh colourspace
+	 */
+	LCh x = _colour_conv Image_type.B_W Image_type.LCH x;
+
+	/* convert mono colourspace to UCS colourspace
+	 */
+	UCS x = _colour_conv Image_type.B_W Image_type.UCS x;
+
+	/* convert mono colourspace to RGB colourspace
+	 */
+	RGB x = _colour_conv Image_type.B_W Image_type.RGB x;
+
+	/* convert mono colourspace to sRGB colourspace
+	 */
+	sRGB x = _colour_conv Image_type.B_W Image_type.sRGB x;
+
+	/* convert mono colourspace to LabQ colourspace
+	 */
+	LabQ x = _colour_conv Image_type.B_W Image_type.LABQ x;
+
+	/* convert mono colourspace to LabS colourspace
+	 */
+	LabS x = _colour_conv Image_type.B_W Image_type.LABS x;
+}
+
+/* convert XYZ to various formats
+ */
+XYZ_to = class {
+	/* convert XYZ colourspace to mono colourspace
+	 */
+	Mono x = _colour_conv Image_type.XYZ Image_type.B_W x;
+
+	/* convert XYZ colourspace to XYZ colourspace
+	 */
+	XYZ x = _colour_conv Image_type.XYZ Image_type.XYZ x;
+
+	/* convert XYZ colourspace to Yxy colourspace
+	 */
+	Yxy x = _colour_conv Image_type.XYZ Image_type.YXY x;
+
+	/* convert XYZ colourspace to Lab colourspace
+	 */
+	Lab x = _colour_conv Image_type.XYZ Image_type.LAB x;
+
+	/* convert XYZ colourspace to LCh colourspace
+	 */
+	LCh x = _colour_conv Image_type.XYZ Image_type.LCH x;
+
+	/* convert XYZ colourspace to UCS colourspace
+	 */
+	UCS x = _colour_conv Image_type.XYZ Image_type.UCS x;
+
+	/* convert XYZ colourspace to RGB colourspace
+	 */
+	RGB x = _colour_conv Image_type.XYZ Image_type.RGB x;
+
+	/* convert XYZ colourspace to sRGB colourspace
+	 */
+	sRGB x = _colour_conv Image_type.XYZ Image_type.sRGB x;
+
+	/* convert XYZ colourspace to LabQ colourspace
+	 */
+	LabQ x = _colour_conv Image_type.XYZ Image_type.LABQ x;
+
+	/* convert XYZ colourspace to LabS colourspace
+	 */
+	LabS x = _colour_conv Image_type.XYZ Image_type.LABS x;
+}
+
+/* convert Yxy to various formats
+ */
+Yxy_to = class {
+	/* convert Yxy colourspace to mono colourspace
+	 */
+	Mono x = _colour_conv Image_type.YXY Image_type.B_W x;
+
+	/* convert Yxy colourspace to XYZ colourspace
+	 */
+	XYZ x = _colour_conv Image_type.YXY Image_type.XYZ x;
+
+	/* convert Yxy colourspace to Yxy colourspace
+	 */
+	Yxy x = _colour_conv Image_type.YXY Image_type.YXY x;
+
+	/* convert Yxy colourspace to Lab colourspace
+	 */
+	Lab x = _colour_conv Image_type.YXY Image_type.LAB x;
+
+	/* convert Yxy colourspace to LCh colourspace
+	 */
+	LCh x = _colour_conv Image_type.YXY Image_type.LCH x;
+
+	/* convert Yxy colourspace to UCS colourspace
+	 */
+	UCS x = _colour_conv Image_type.YXY Image_type.UCS x;
+
+	/* convert Yxy colourspace to RGB colourspace
+	 */
+	RGB x = _colour_conv Image_type.YXY Image_type.RGB x;
+
+	/* convert Yxy colourspace to sRGB colourspace
+	 */
+	sRGB x = _colour_conv Image_type.YXY Image_type.sRGB x;
+
+	/* convert Yxy colourspace to LabQ colourspace
+	 */
+	LabQ x = _colour_conv Image_type.YXY Image_type.LABQ x;
+
+	/* convert Yxy colourspace to LabS colourspace
+	 */
+	LabS x = _colour_conv Image_type.YXY Image_type.LABS x;
+}
+
+/* convert Lab to various formats
+ */
+Lab_to = class {
+	/* convert Lab colourspace to mono colourspace
+	 */
+	Mono x = _colour_conv Image_type.LAB Image_type.B_W x;
+
+	/* convert Lab colourspace to XYZ colourspace
+	 */
+	XYZ x = _colour_conv Image_type.LAB Image_type.XYZ x;
+
+	/* convert Lab colourspace to Yxy colourspace
+	 */
+	Yxy x = _colour_conv Image_type.LAB Image_type.YXY x;
+
+	/* convert Lab colourspace to Lab colourspace
+	 */
+	Lab x = _colour_conv Image_type.LAB Image_type.LAB x;
+
+	/* convert Lab colourspace to LCh colourspace
+	 */
+	LCh x = _colour_conv Image_type.LAB Image_type.LCH x;
+
+	/* convert Lab colourspace to UCS colourspace
+	 */
+	UCS x = _colour_conv Image_type.LAB Image_type.UCS x;
+
+	/* convert Lab colourspace to RGB colourspace
+	 */
+	RGB x = _colour_conv Image_type.LAB Image_type.RGB x;
+
+	/* convert Lab colourspace to sRGB colourspace
+	 */
+	sRGB x = _colour_conv Image_type.LAB Image_type.sRGB x;
+
+	/* convert Lab colourspace to LabQ colourspace
+	 */
+	LabQ x = _colour_conv Image_type.LAB Image_type.LABQ x;
+
+	/* convert Lab colourspace to LabS colourspace
+	 */
+	LabS x = _colour_conv Image_type.LAB Image_type.LABS x;
+}
+
+/* convert LCh to various formats
+ */
+LCh_to = class {
+	/* convert LCh colourspace to mono colourspace
+	 */
+	Mono x = _colour_conv Image_type.LCH Image_type.B_W x;
+
+	/* convert LCh colourspace to XYZ colourspace
+	 */
+	XYZ x = _colour_conv Image_type.LCH Image_type.XYZ x;
+
+	/* convert LCh colourspace to Yxy colourspace
+	 */
+	Yxy x = _colour_conv Image_type.LCH Image_type.YXY x;
+
+	/* convert LCh colourspace to Lab colourspace
+	 */
+	Lab x = _colour_conv Image_type.LCH Image_type.LAB x;
+
+	/* convert LCh colourspace to LCh colourspace
+	 */
+	LCh x = _colour_conv Image_type.LCH Image_type.LCH x;
+
+	/* convert LCh colourspace to UCS colourspace
+	 */
+	UCS x = _colour_conv Image_type.LCH Image_type.UCS x;
+
+	/* convert LCh colourspace to RGB colourspace
+	 */
+	RGB x = _colour_conv Image_type.LCH Image_type.RGB x;
+
+	/* convert LCh colourspace to sRGB colourspace
+	 */
+	sRGB x = _colour_conv Image_type.LCH Image_type.sRGB x;
+
+	/* convert LCh colourspace to LabQ colourspace
+	 */
+	LabQ x = _colour_conv Image_type.LCH Image_type.LABQ x;
+
+	/* convert LCh colourspace to LabS colourspace
+	 */
+	LabS x = _colour_conv Image_type.LCH Image_type.LABS x;
+}
+
+/* convert UCS to various formats
+ */
+UCS_to = class {
+	/* convert UCS colourspace to mono colourspace
+	 */
+	Mono x = _colour_conv Image_type.UCS Image_type.B_W x;
+
+	/* convert UCS colourspace to XYZ colourspace
+	 */
+	XYZ x = _colour_conv Image_type.UCS Image_type.XYZ x;
+
+	/* convert UCS colourspace to Yxy colourspace
+	 */
+	Yxy x = _colour_conv Image_type.UCS Image_type.YXY x;
+
+	/* convert UCS colourspace to Lab colourspace
+	 */
+	Lab x = _colour_conv Image_type.UCS Image_type.LAB x;
+
+	/* convert UCS colourspace to LCh colourspace
+	 */
+	LCh x = _colour_conv Image_type.UCS Image_type.LCH x;
+
+	/* convert UCS colourspace to UCS colourspace
+	 */
+	UCS x = _colour_conv Image_type.UCS Image_type.UCS x;
+
+	/* convert UCS colourspace to RGB colourspace
+	 */
+	RGB x = _colour_conv Image_type.UCS Image_type.RGB x;
+
+	/* convert UCS colourspace to sRGB colourspace
+	 */
+	sRGB x = _colour_conv Image_type.UCS Image_type.sRGB x;
+
+	/* convert UCS colourspace to LabQ colourspace
+	 */
+	LabQ x = _colour_conv Image_type.UCS Image_type.LABQ x;
+
+	/* convert UCS colourspace to LabS colourspace
+	 */
+	LabS x = _colour_conv Image_type.UCS Image_type.LABS x;
+}
+
+/* convert RGB to various formats
+ */
+RGB_to = class {
+	/* convert RGB colourspace to mono colourspace
+	 */
+	Mono x = _colour_conv Image_type.RGB Image_type.B_W x;
+
+	/* convert RGB colourspace to XYZ colourspace
+	 */
+	XYZ x = _colour_conv Image_type.RGB Image_type.XYZ x;
+
+	/* convert RGB colourspace to Yxy colourspace
+	 */
+	Yxy x = _colour_conv Image_type.RGB Image_type.YXY x;
+
+	/* convert RGB colourspace to Lab colourspace
+	 */
+	Lab x = _colour_conv Image_type.RGB Image_type.LAB x;
+
+	/* convert RGB colourspace to LCh colourspace
+	 */
+	LCh x = _colour_conv Image_type.RGB Image_type.LCH x;
+
+	/* convert RGB colourspace to UCS colourspace
+	 */
+	UCS x = _colour_conv Image_type.RGB Image_type.UCS x;
+
+	/* convert RGB colourspace to RGB colourspace
+	 */
+	RGB x = _colour_conv Image_type.RGB Image_type.RGB x;
+
+	/* convert RGB colourspace to sRGB colourspace
+	 */
+	sRGB x = _colour_conv Image_type.RGB Image_type.sRGB x;
+
+	/* convert RGB colourspace to LabQ colourspace
+	 */
+	LabQ x = _colour_conv Image_type.RGB Image_type.LABQ x;
+
+	/* convert RGB colourspace to LabS colourspace
+	 */
+	LabS x = _colour_conv Image_type.RGB Image_type.LABS x;
+}
+
+/* convert sRGB to various formats
+ */
+sRGB_to = class {
+	/* convert sRGB colourspace to mono colourspace
+	 */
+	Mono x = _colour_conv Image_type.sRGB Image_type.B_W x;
+
+	/* convert sRGB colourspace to XYZ colourspace
+	 */
+	XYZ x = _colour_conv Image_type.sRGB Image_type.XYZ x;
+
+	/* convert sRGB colourspace to Yxy colourspace
+	 */
+	Yxy x = _colour_conv Image_type.sRGB Image_type.YXY x;
+
+	/* convert sRGB colourspace to Lab colourspace
+	 */
+	Lab x = _colour_conv Image_type.sRGB Image_type.LAB x;
+
+	/* convert sRGB colourspace to LCh colourspace
+	 */
+	LCh x = _colour_conv Image_type.sRGB Image_type.LCH x;
+
+	/* convert sRGB colourspace to UCS colourspace
+	 */
+	UCS x = _colour_conv Image_type.sRGB Image_type.UCS x;
+
+	/* convert sRGB colourspace to RGB colourspace
+	 */
+	RGB x = _colour_conv Image_type.sRGB Image_type.RGB x;
+
+	/* convert sRGB colourspace to sRGB colourspace
+	 */
+	sRGB x = _colour_conv Image_type.sRGB Image_type.sRGB x;
+
+	/* convert sRGB colourspace to LabQ colourspace
+	 */
+	LabQ x = _colour_conv Image_type.sRGB Image_type.LABQ x;
+
+	/* convert sRGB colourspace to LabS colourspace
+	 */
+	LabS x = _colour_conv Image_type.sRGB Image_type.LABS x;
+}
+
+/* convert LabQ to various formats
+ */
+LabQ_to = class {
+	/* convert LabQ colourspace to mono colourspace
+	 */
+	Mono x = _colour_conv Image_type.LABQ Image_type.B_W x;
+
+	/* convert LabQ colourspace to XYZ colourspace
+	 */
+	XYZ x = _colour_conv Image_type.LABQ Image_type.XYZ x;
+
+	/* convert LabQ colourspace to Yxy colourspace
+	 */
+	Yxy x = _colour_conv Image_type.LABQ Image_type.YXY x;
+
+	/* convert LabQ colourspace to Lab colourspace
+	 */
+	Lab x = _colour_conv Image_type.LABQ Image_type.LAB x;
+
+	/* convert LabQ colourspace to LCh colourspace
+	 */
+	LCh x = _colour_conv Image_type.LABQ Image_type.LCH x;
+
+	/* convert LabQ colourspace to UCS colourspace
+	 */
+	UCS x = _colour_conv Image_type.LABQ Image_type.UCS x;
+
+	/* convert LabQ colourspace to RGB colourspace
+	 */
+	RGB x = _colour_conv Image_type.LABQ Image_type.RGB x;
+
+	/* convert LabQ colourspace to sRGB colourspace
+	 */
+	sRGB x = _colour_conv Image_type.LABQ Image_type.sRGB x;
+
+	/* convert LabQ colourspace to LabQ colourspace
+	 */
+	LabQ x = _colour_conv Image_type.LABQ Image_type.LABQ x;
+
+	/* convert LabQ colourspace to LabS colourspace
+	 */
+	LabS x = _colour_conv Image_type.LABQ Image_type.LABS x;
+}
+
+/* convert LabS to various formats
+ */
+LabS_to = class {
+	/* convert LabS colourspace to mono colourspace
+	 */
+	Mono x = _colour_conv Image_type.LABS Image_type.B_W x;
+
+	/* convert LabS colourspace to XYZ colourspace
+	 */
+	XYZ x = _colour_conv Image_type.LABS Image_type.XYZ x;
+
+	/* convert LabS colourspace to Yxy colourspace
+	 */
+	Yxy x = _colour_conv Image_type.LABS Image_type.YXY x;
+
+	/* convert LabS colourspace to Lab colourspace
+	 */
+	Lab x = _colour_conv Image_type.LABS Image_type.LAB x;
+
+	/* convert LabS colourspace to LCh colourspace
+	 */
+	LCh x = _colour_conv Image_type.LABS Image_type.LCH x;
+
+	/* convert LabS colourspace to UCS colourspace
+	 */
+	UCS x = _colour_conv Image_type.LABS Image_type.UCS x;
+
+	/* convert LabS colourspace to RGB colourspace
+	 */
+	RGB x = _colour_conv Image_type.LABS Image_type.RGB x;
+
+	/* convert LabS colourspace to sRGB colourspace
+	 */
+	sRGB x = _colour_conv Image_type.LABS Image_type.sRGB x;
+
+	/* convert LabS colourspace to LabQ colourspace
+	 */
+	LabQ x = _colour_conv Image_type.LABS Image_type.LABQ x;
+
+	/* convert LabS colourspace to LabS colourspace
+	 */
+	LabS x = _colour_conv Image_type.LABS Image_type.LABS x;
+}
+
+#separator
+
+/* recombine image bands with an editable matrix
+ */
+Colour_recombination in
+	= map_unary widget in
+{
+	widget image = class 
+		Image value {
+		_check_args = [
+			[image, "image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		matrix = Matrix_rec (identity_matrix image.bands);
+
+		value = recomb matrix image.value;
+	}
+}
+
+/* colour temperature conversions
+ */
+Colour_temperature = class {
+	/* convert XYZ from D65 to D50 ... use the Bradford approximation
+	 */
+	D65XYZ_to_D50XYZ in = map_unary (colour_unary im_D652D50) in;
+
+	/* convert XYZ from D50 to D65 ... use the Bradford approximation
+	 */
+	D50XYZ_to_D65XYZ in = map_unary (colour_unary im_D502D65) in;
+}
+
+/* various colour difference metrics 
+ */
+dE_ = class {
+	/* Apply a converter to an object ... convert image or colour (since
+	 * we can guess the colour space we're converting from), don't convert
+	 * matrix or vector (since we can't tell ... assume it's in the right
+	 * space already).
+	 */
+	_apply_cvt cvt x
+		= cvt x, 
+			is_instanceof "Image" x || is_instanceof "Colour" x || 
+			is_image x
+		= x;
+
+	_diff cvt in1 in2 = abs_vec (_apply_cvt cvt in1 - _apply_cvt cvt in2);
+
+	/* Converter to LAB.
+	 */
+	_lab_cvt = colour_transform_to Image_type.LAB;
+
+	/* Converter to UCS ... plain UCS is Ch form, so we go LAB again after
+	 * to make sure we get a rectangular coord system.
+	 */
+	_ucs_cvt = colour_transform Image_type.LCH Image_type.LAB @
+		colour_transform_to Image_type.UCS;
+
+	/* calculate delta-E CIE76 for two objects
+	 */
+	CIE76 in1 in2 = map_binary (_diff _lab_cvt) in1 in2;
+
+	/* calculate delta-E00 (CIEDE2000) for two objects
+	 */
+	CIE00 in1 in2 = map_binary 
+		(colour_binary "im_dE00_fromLab" im_dE00_fromLab) in1 in2;
+
+	/* calculate delta-E CMC(1:1) for two objects
+	 */
+	UCS in1 in2 = map_binary (_diff _ucs_cvt) in1 in2;
+}
+
+#separator
+
+/* apply a coloured tint to a monochrome image
+ */
+Tint_mono_image in 
+	= map_unary apply_tint in
+{
+	apply_tint in = class 
+		Image value {
+		_check_args = [
+			[in, "in", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		tint = Colour "Lab" [50, 0, 0];
+
+		value = image_set_type Image_type.LAB 
+			(fancytint inp l_tint a_tint b_tint)
+		{
+			// input image ... to L only
+			inp_lab = colour_transform_to Image_type.LAB in.value;
+			inp = inp_lab?0;
+
+			// make sure tint is LAB (might be edited)
+			lab_tint = colour_transform_to Image_type.LAB tint;
+
+			// selected lab
+			l_tint = lab_tint.value?0;
+			a_tint = lab_tint.value?1;
+			b_tint = lab_tint.value?2;
+
+			// fancy tint function ... don't tint black and white
+			fancytint im l a b
+				= im ++ ima ++ imb
+			{
+				mod 
+					= (100 - im) / (100 - l), im > l
+					= im / l;
+
+				backgr = image_new in.width in.height 1
+					Image_format.FLOAT 
+					Image_coding.NOCODING 
+					Image_type.B_W 0 0 0;
+
+				ima = mod * (backgr + a);
+				imb = mod * (backgr + b);
+			}
+		}
+	}
+}
+
+/* displace neutral axis in LAB colourspace
+ */
+Adjust_cast image
+	= map_unary widget image
+{
+	widget image = class
+		Image value {
+		_check_args = [
+			[image, "Image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		green_red = Slider (-20) 20 0;
+		blue_yellow = Slider (-20) 20 0;
+
+		value
+			= (colour_transform_to (get_type image) image'').value
+		{
+			image' = colour_transform_to Image_type.LAB image;
+			image'' = image' + 
+				Vector [0, green_red.value, blue_yellow.value];
+		}
+	}
+}
+
+/* displace h, scale LC in LCh colourspace
+ */
+Adjust_hue_saturation_brightness image
+	= map_unary widget image
+{
+	widget image = class
+		Image value {
+		_check_args = [
+			[image, "Image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		hue = Slider 0 360 0;
+		saturation = Slider 0.01 5 1;
+		brightness = Slider 0.01 5 1;
+
+		value
+			= (colour_transform_to (get_type image) image'').value
+		{
+			image' = colour_transform_to Image_type.LCH image;
+			image'' = 
+				image' * Vector [bv, sv, 1] + Vector [0, 0, hv];
+			bv = brightness.value;
+			sv = saturation.value;
+			hv = hue.value;
+		}
+	}
+}
+
+/* find pixels with a similar colour
+ */
+Similar_colour image
+	= map_unary match image
+{
+	match image = class 
+		Image value {
+		_check_args = [
+			[image, "Image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		target_patch = Region image 
+			(20 - image.xoffset) 
+			(20 - image.yoffset)
+			10 10;
+		target_colour = Colour_from_image target_patch;
+		dE_threshold = Slider 0 100 10;
+
+		value = (dE_.CIE76 image target_colour < dE_threshold).value;
+	}
+}
+
+/* plot an ab scatter histogram
+ */
+Plot_ab_scatter image
+	= map_unary widget image
+{
+	widget image = class 
+		Image value {
+		_check_args = [
+			[image, "Image", check_Image]
+		] ++ super._check_args;
+		_vislevel = 3;
+
+		bins = 8;
+
+		value 
+			= bg * (((90 / mx) * hist) ++ blk)
+		{
+			lab = colour_transform_to Image_type.LAB image.value;
+			ab = (unsigned char) ((lab?1 ++ lab?2) + 128);
+			hist = hist_find_nD bins ab;
+			mx = max hist;
+			bg = lab_slice bins 1;
+			blk = 1 + im_black bins bins 2;
+		}
+	}
+}
+
+
+
+

@@ -1,0 +1,461 @@
+
+/* Convert an image ... just set the Type field.
+ */
+image_set_type type in = im_copy_set in type 
+	(im_header_double "Xres" in) (im_header_double "Yres" in)
+	(im_header_int "Xoffset" in) (im_header_int "Yoffset" in);
+
+/* Convert an image ... just set origin
+ */
+image_set_origin xoff yoff in = im_copy_set in 
+	(im_header_int "Type" in) 
+	(im_header_double "Xres" in) (im_header_double "Yres" in)
+	xoff yoff;
+
+/* Try to make a Matrix ... works for Vector/Image/Real, plus image/real
+ */
+to_matrix x
+	= oo_unary_function to_matrix_op x, is_class x
+	= tom x, is_real x || is_image x 
+	= error (errors.badargs ++ "to_matrix")
+{
+	to_matrix_op = Operator "to_matrix" tom Operator_type.COMPOUND false;
+
+	tom x
+		= Matrix (itom x), is_image x
+		= Matrix [[x]], is_real x
+		= Matrix [x], is_real_list x
+		= Matrix x, is_matrix x
+		= error (errors.badargs ++ "to_matrix");
+
+	itom i
+		= (im_vips2mask ((double) i)).value, is_image i && bands == 1
+		= (im_vips2mask ((double) i'')).value, 
+			is_image i && bands == 3 && width == 1
+		= error errors.not1band3band
+        {
+		width = im_header_int "Xsize" i;
+		bands = im_header_int "Bands" i;
+
+                split = bandsplit i;
+                i' = im_insert (split?0) (split?1) 1 0;
+                i'' = im_insert i' (split?2) 2 0;
+        }
+}
+
+/* Try to make an Image ... works for Vector/Matrix/Real, plus image/real
+ * Special case for Colour ... pull out the colour_space and set Type in the
+ * image.
+ */
+to_image x
+	= Image (image_set_type 
+			(Image_type.colour_spaces.lookup 0 1 x.colour_space)
+			(mtoi [x.value])),
+		is_instanceof "Colour" x
+	= oo_unary_function to_image_op x, is_class x
+	= toi x, is_real x || is_image x 
+	= error (errors.badargs ++ "to_image")
+{
+	to_image_op = Operator "to_image" toi Operator_type.COMPOUND false;
+
+	toi x
+		= Image x, is_image x
+		= Image (mtoi [[x]]), is_real x
+		= Image (mtoi [x]), is_real_list x
+		= Image (mtoi x), is_matrix x
+		= error (errors.badargs ++ "to_image");
+
+	// [[real]] -> image
+	mtoi m
+		= im_mask2vips (Matrix m), width != 3
+		= joinup (im_mask2vips (Matrix m))
+	{
+		width = len m?0;
+		height = len m;
+		joinup i
+                        = b1 ++ b2 ++ b3
+                {
+                        b1 = extract_area 0 0 1 height i;
+                        b2 = extract_area 1 0 1 height i;
+                        b3 = extract_area 2 0 1 height i;
+                }
+	}
+}
+
+/* Try to make a real.
+ */
+to_real x
+	= to_real x.value, is_class x
+	= x, is_real x
+	= abs x, is_complex x
+	= error (errors.badargs ++ "to_real");
+
+/* Parse a positive integer.
+ */
+parse_pint l
+	= foldl acc 0 l
+{
+	acc sofar ch = sofar * 10 + parse_c ch;
+
+        /* Turn a char digit to a number.
+         */
+        parse_c ch
+                = error "parse_c: not a digit", ! is_digit ch
+                = (int) ch - (int) '0';
+}
+
+/* Parse an integer, with an optional sign character.
+ */
+parse_int l
+        = error "parse_number: badly formed number", len parts != 2
+        = sign * n
+{
+        parts = splitpl [ member "+-", is_digit ] l;
+
+        n = parse_pint parts?1;
+        sign
+                = 1, parts?0 == [] || parts?0 == "+"
+                = -1;
+}
+
+/* Parse a float. 
+ *	[+-]?[0-9]*([.][0-9]*)?(e[0-9]+)?
+ */
+parse_float l
+        = err, len parts != 4
+        = (ipart + fpart) * 10 ** exp
+{
+	err = error "parse_float: badly formed number";
+
+        parts = splitpl [
+                member "+-0123456789", member ".0123456789",
+                member "eE", member "+-0123456789" ] l;
+
+        ipart = parse_int parts?0;
+        fpart
+                = 0, parts?1 == [];
+                = err, parts?1?0 != '.'
+                = parse_pint (tl parts?1) / 10**(len parts?1 - 1);
+        exp
+                = 0, parts?2 == [] && parts?3 == []
+                = err, parts?2 == [] 
+                = parse_int parts?3;
+
+}
+
+/* Print integer as hex.
+ */
+print_hex i
+	= "0", chars == []
+	= "0x" ++ reverse chars
+{
+	digits = takewhile (not_equal 0)
+		(map (bitwise_and 0xf) 
+			(iterate (converse right_shift 4) i));
+	chars = map tohd digits;
+
+	tohd x
+		= (char) ((int) '0' + x), x < 10
+	        = (char) ((int) 'a' + (x - 10));
+}
+
+/* Convert normalised XYZ to bradford RGB.
+ */
+XYZ2RGBbrad = Matrix
+        [[ 0.8951,  0.2664, -0.1614],
+         [-0.7502,  1.7135,  0.0367],
+         [ 0.0389, -0.0685,  1.0296]];
+
+/* Convert bradford RGB to normalised XYZ.
+ */
+RGBbrad2XYZ = XYZ2RGBbrad ** -1;
+
+/* Convert D50 XYZ to D65 using the bradford chromatic adaptation approx.
+ */
+im_D502D65 xyz
+        = xyz'''
+{
+	// divide by D50 white point
+        xyz' = xyz / Vector [96.4250, 100.0, 82.4680];
+
+        rgb = recomb XYZ2RGBbrad xyz';
+
+	// move white in bradford RGB
+        rgb' = rgb / Vector [0.94, 1.02, 1.33];
+
+        xyz'' = recomb RGBbrad2XYZ rgb';
+
+	// back to D65
+	xyz''' = xyz'' * Vector [95.0470, 100.0, 108.8827];
+}
+
+/* Convert D65 XYZ to D50 using the bradford approx.
+ */
+im_D652D50 xyz
+        = xyz'''
+{
+	// divide by D65 white point
+        xyz' = xyz / Vector [95.0470, 100.0, 108.8827];
+
+        rgb = recomb XYZ2RGBbrad xyz';
+
+	// move white in bradford RGB
+        rgb' = rgb * Vector [0.94, 1.02, 1.33];
+
+        xyz'' = recomb RGBbrad2XYZ rgb';
+
+	// back to D50
+	xyz''' = xyz'' * Vector [96.4250, 100.0, 82.4680];
+}
+
+/* Convert D50 XYZ to Lab.
+ */
+im_D50XYZ2Lab xyz
+	= im_XYZ2Lab_temp xyz 96.4250 100 82.4680;
+
+/* Convert D50 Lab to XYZ.
+ */
+im_D50Lab2XYZ lab
+	= im_Lab2XYZ_temp lab 96.4250 100 82.4680;
+
+/* ... and mono conversions
+ */
+im_sRGB2mono in = clip2fmt 
+	(im_header_int "BandFmt" in)
+	(im_recomb in (Matrix [[.3, .6, .1]]));
+im_mono2sRGB in = (unsigned char) (in ++ in ++ in);
+
+/* Any 1-ary colour op, applied to Vector/Image/Matrix or image
+ */
+colour_unary fn x
+	= oo_unary_function colour_op x, is_class x
+	= fn x, is_image x
+	= error (errors.badargs ++ "colour_unary")
+{
+	// COMPOUND_REWRAP ... signal to the colour class to go to image and 
+	// back
+	colour_op = Operator "colour_unary" 
+		colour_object Operator_type.COMPOUND_REWRAP false;
+
+	colour_object x
+		= colour_real_list x, is_real_list x
+		= map colour_real_list x, is_matrix x 
+		= fn x, is_image x
+		= error (errors.badargs ++ "colour_unary");
+
+	colour_real_list l
+		= (to_matrix (fn (float) (to_image (Vector l)).value)).value?0;
+}
+
+/* Any symmetric 2-ary colour op, applied to Vector/Image/Matrix or image ...
+ * name is op name for error messages etc.
+ */
+colour_binary name fn x y
+	= oo_binary_function colour_op x y, is_class x
+	= oo_binary'_function colour_op x y, is_class y
+	= fn x y, is_image x && is_image y
+	= error (errors.badargs ++ name)
+{
+	colour_op = Operator name 
+		colour_object Operator_type.COMPOUND_REWRAP true;
+
+	colour_object x y
+		= fn x y, is_image x && is_image y
+		= colour_real_list fn x y, is_real_list x && is_real_list y
+		= map (colour_real_list fn x) y, is_real_list x && is_matrix y 
+		= map (colour_real_list (converse fn) y) x, 
+			is_matrix x && is_real_list y 
+		= map2 (colour_real_list fn) x y, is_matrix x && is_matrix y 
+		= error (errors.badargs ++ name);
+
+	colour_real_list fn l1 l2
+		= (to_matrix (fn i1 i2)).value?0
+	{
+		i1 = (float) (to_image (Vector l1)).value;
+		i2 = (float) (to_image (Vector l2)).value;
+	}
+}
+
+_colour_conversion_table = [
+	/* Lines are [space-from, space-to, conversion function]. Could do
+	 * this as a big array, but table lookup feels safer.
+	 */
+	[B_W, B_W, image_set_type B_W],
+	[B_W, XYZ, im_sRGB2XYZ @ im_mono2sRGB],
+	[B_W, YXY, im_XYZ2Yxy @ im_sRGB2XYZ @ im_mono2sRGB],
+	[B_W, LAB, im_XYZ2Lab @ im_sRGB2XYZ @ im_mono2sRGB],
+	[B_W, LCH, im_Lab2LCh @ im_XYZ2Lab @ im_sRGB2XYZ @ im_mono2sRGB],
+	[B_W, UCS, im_XYZ2UCS @ im_sRGB2XYZ @ im_mono2sRGB],
+	[B_W, RGB, im_XYZ2disp @ im_sRGB2XYZ @ im_mono2sRGB],
+	[B_W, sRGB, im_mono2sRGB],
+	[B_W, LABQ, im_Lab2LabQ @ im_XYZ2Lab @ im_sRGB2XYZ @ im_mono2sRGB],
+	[B_W, LABS, im_LabQ2LabS @ im_Lab2LabQ @ im_XYZ2Lab @ im_sRGB2XYZ @ 
+		im_mono2sRGB],
+
+	[XYZ, B_W, im_sRGB2mono @ im_XYZ2sRGB],
+	[XYZ, XYZ, image_set_type XYZ],
+	[XYZ, YXY, im_XYZ2Yxy],
+	[XYZ, LAB, im_XYZ2Lab],
+	[XYZ, LCH, im_Lab2LCh @ im_XYZ2Lab],
+	[XYZ, UCS, im_XYZ2UCS],
+	[XYZ, RGB, im_XYZ2disp],
+	[XYZ, sRGB, im_XYZ2sRGB],
+	[XYZ, LABQ, im_Lab2LabQ @ im_XYZ2Lab],
+	[XYZ, LABS, im_LabQ2LabS @ im_Lab2LabQ @ im_XYZ2Lab],
+
+	[YXY, B_W, im_sRGB2mono @ im_XYZ2sRGB @ im_Yxy2XYZ],
+	[YXY, XYZ, im_Yxy2XYZ],
+	[YXY, YXY, image_set_type YXY],
+	[YXY, LAB, im_XYZ2Lab @ im_Yxy2XYZ],
+	[YXY, LCH, im_Lab2LCh @ im_XYZ2Lab @ im_Yxy2XYZ],
+	[YXY, UCS, im_XYZ2UCS @ im_Yxy2XYZ],
+	[YXY, RGB, im_XYZ2disp @ im_Yxy2XYZ],
+	[YXY, sRGB, im_XYZ2sRGB @ im_Yxy2XYZ],
+	[YXY, LABQ, im_Lab2LabQ @ im_XYZ2Lab @ im_Yxy2XYZ],
+	[YXY, LABS, im_LabQ2LabS @ im_Lab2LabQ @ im_XYZ2Lab @ im_Yxy2XYZ],
+
+	[LAB, B_W, im_sRGB2mono @ im_XYZ2sRGB @ im_Lab2XYZ],
+	[LAB, XYZ, im_Lab2XYZ],
+	[LAB, YXY, im_XYZ2Yxy @ im_Lab2XYZ],
+	[LAB, LAB, image_set_type LAB],
+	[LAB, LCH, im_Lab2LCh],
+	[LAB, UCS, im_Lab2UCS],
+	[LAB, RGB, im_Lab2disp],
+	[LAB, sRGB, im_XYZ2sRGB @ im_Lab2XYZ],
+	[LAB, LABQ, im_Lab2LabQ],
+	[LAB, LABS, im_Lab2LabS],
+
+	[LCH, B_W, im_sRGB2mono @ im_XYZ2sRGB @ im_Lab2XYZ @ im_LCh2Lab],
+	[LCH, XYZ, im_Lab2XYZ @ im_LCh2Lab],
+	[LCH, YXY, im_XYZ2Yxy @ im_XYZ2sRGB @ im_Lab2XYZ @ im_LCh2Lab],
+	[LCH, LAB, im_LCh2Lab],
+	[LCH, LCH, image_set_type LCH],
+	[LCH, UCS, im_LCh2UCS],
+	[LCH, RGB, im_Lab2disp @ im_LCh2Lab],
+	[LCH, sRGB, im_XYZ2sRGB @ im_Lab2XYZ @ im_LCh2Lab],
+	[LCH, LABQ, im_Lab2LabQ @ im_LCh2Lab],
+	[LCH, LABS, im_LabQ2LabS @ im_Lab2LabQ @ im_LCh2Lab],
+
+	[UCS, B_W, im_sRGB2mono @ im_XYZ2sRGB @ im_UCS2XYZ],
+	[UCS, XYZ, im_UCS2XYZ],
+	[UCS, YXY, im_XYZ2Yxy @ im_Lab2XYZ @ im_UCS2Lab],
+	[UCS, LAB, im_UCS2Lab],
+	[UCS, LCH, im_UCS2LCh],
+	[UCS, UCS, image_set_type UCS],
+	[UCS, RGB, im_Lab2disp @ im_UCS2Lab],
+	[UCS, sRGB, im_XYZ2sRGB @ im_Lab2XYZ @ im_UCS2Lab],
+	[UCS, LABQ, im_Lab2LabQ @ im_UCS2Lab],
+	[UCS, LABS, im_LabQ2LabS @ im_Lab2LabQ @ im_UCS2Lab],
+
+	[RGB, B_W, im_sRGB2mono @ im_XYZ2sRGB @ im_disp2XYZ @ im_clip],
+	[RGB, XYZ, im_disp2XYZ @ im_clip],
+	[RGB, YXY, im_XYZ2Yxy @ im_disp2XYZ @ im_clip],
+	[RGB, LAB, im_disp2Lab @ im_clip],
+	[RGB, LCH, im_Lab2LCh @ im_disp2Lab @ im_clip],
+	[RGB, UCS, im_Lab2UCS @ im_disp2Lab @ im_clip],
+	[RGB, RGB, image_set_type RGB],
+	[RGB, sRGB, im_XYZ2sRGB @ im_disp2XYZ @ im_clip],
+	[RGB, LABQ, im_Lab2LabQ @ im_disp2Lab @ im_clip],
+	[RGB, LABS, im_LabQ2LabS @ im_Lab2LabQ @ im_disp2Lab @ im_clip],
+
+	[sRGB, B_W, im_sRGB2mono],
+	[sRGB, XYZ, im_sRGB2XYZ @ im_clip],
+	[sRGB, YXY, im_XYZ2Yxy @ im_sRGB2XYZ @ im_clip],
+	[sRGB, LAB, im_XYZ2Lab @ im_sRGB2XYZ @ im_clip],
+	[sRGB, LCH, im_Lab2LCh @ im_XYZ2Lab @ im_sRGB2XYZ @ im_clip],
+	[sRGB, UCS, im_XYZ2UCS @ im_sRGB2XYZ @ im_clip],
+	[sRGB, RGB, im_XYZ2disp @ im_sRGB2XYZ @ im_clip],
+	[sRGB, sRGB, image_set_type sRGB],
+	[sRGB, LABQ, im_Lab2LabQ @ im_XYZ2Lab @ im_sRGB2XYZ @ im_clip],
+	[sRGB, LABS, im_LabQ2LabS @ im_Lab2LabQ @ im_XYZ2Lab @ im_sRGB2XYZ @ 
+		im_clip],
+
+	[LABQ, B_W, im_sRGB2mono @ im_XYZ2sRGB @ im_Lab2XYZ @ im_LabQ2Lab],
+	[LABQ, XYZ, im_Lab2XYZ @ im_LabQ2Lab],
+	[LABQ, YXY, im_XYZ2Yxy @ im_Lab2XYZ @ im_LabQ2Lab],
+	[LABQ, LAB, im_LabQ2Lab],
+	[LABQ, LCH, im_Lab2LCh @ im_LabQ2Lab],
+	[LABQ, UCS, im_Lab2UCS @ im_LabQ2Lab],
+	[LABQ, RGB, im_LabQ2disp],
+	[LABQ, sRGB, im_XYZ2sRGB @ im_Lab2XYZ @ im_LabQ2Lab],
+	[LABQ, LABQ, image_set_type LABQ],
+	[LABQ, LABS, im_LabQ2LabS],
+
+	[LABS, B_W, im_sRGB2mono @ im_XYZ2sRGB @ im_Lab2XYZ @ im_LabQ2Lab @ 
+		im_LabS2LabQ @ im_clip2s],
+	[LABS, XYZ, im_Lab2XYZ @ im_LabQ2Lab @ im_LabS2LabQ @ im_clip2s],
+	[LABS, YXY, im_XYZ2Yxy @ 
+		im_Lab2XYZ @ im_LabQ2Lab @ im_LabS2LabQ @ im_clip2s],
+	[LABS, LAB, im_LabS2Lab],
+	[LABS, LCH, im_Lab2LCh @ im_LabQ2Lab @ im_LabS2LabQ @ im_clip2s],
+	[LABS, UCS, im_Lab2UCS @ im_LabQ2Lab @ im_LabS2LabQ @ im_clip2s],
+	[LABS, RGB, im_LabQ2disp @ im_LabS2LabQ @ im_clip2s],
+	[LABS, sRGB, im_XYZ2sRGB @ 
+		im_Lab2XYZ @ im_LabQ2Lab @ im_LabS2LabQ @ im_clip2s],
+	[LABS, LABQ, im_LabS2LabQ @ im_clip2s],
+	[LABS, LABS, image_set_type LABS]
+]
+{
+	/* From Image_type ... repeat here for brevity. Use same ordering as
+	 * in Colour menu for consistency.
+	 */
+	B_W = 1;
+	XYZ = 12;
+	YXY = 23;
+	LAB = 13;
+	LCH = 19;
+	UCS = 18;
+	RGB = 17;
+	sRGB = 22;
+	LABQ = 16;
+	LABS = 21;
+}
+
+/* Transform between two colour spaces.
+ */
+colour_transform from to in
+	= colour_unary _colour_conversion_table?i?2 in, i >= 0
+	= error ("unable to convert " ++ from_name ++ " to " ++ to_name)
+{
+	match x = x?0 == from && x?1 == to;
+	i = index match _colour_conversion_table;
+	from_name = Image_type.type_names.lookup 1 0 from;
+	to_name = Image_type.type_names.lookup 1 0 to;
+}
+
+/* Does an object have a sensible VIPS type?
+ */
+has_type x
+	= is_image x || is_instanceof "Image" x || is_instanceof "Arrow" x ||
+		is_instanceof "Colour" x;
+
+/* Try to get a VIPS image type from an object.
+ */
+get_type x
+	= get_type_im x, is_image x
+	= get_type_im x.value, is_instanceof "Image" x
+	= get_type_im x.image.value, is_instanceof "Arrow" x
+	= Image_type.colour_spaces.lookup 0 1 x.colour_space,
+		is_instanceof "Colour" x
+	= error ("get_type: unable to get type from " ++ print x)
+{
+	// get the type from a VIPS image ... but only if it makes sense with
+	// the rest of the image
+	get_type_im im
+		= Image_type.LABQ, coding == Image_coding.LABPACK
+		= Image_type.B_W, bands == 1
+		= type, bands == 3 && is_colorimetric
+		= Image_type.MULTIBAND, bands != 3 && !is_colorimetric
+		= type
+	{
+		is_colorimetric = Image_type.colour_spaces.present 1 type;
+		type = im_header_int "Type" im;
+		coding = im_header_int "Coding" im;
+		bands = im_header_int "Bands" im;
+	}
+}
+
+/* Transform to a colour space, assuming the type field in the input is
+ * correct 
+ */
+colour_transform_to to in = colour_transform (get_type in) to in;

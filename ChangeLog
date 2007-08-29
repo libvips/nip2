@@ -1,0 +1,1550 @@
+started 7.12.5
+- tiny win32 cleanups
+- nicer formula widget, better view switching
+- better file filter lookup
+- oops, min and max only worked for rectangular lists
+
+started 7.12.4
+- cleaner Makefile.ams
+- transform was only working for [[real]] :-( (thanks Mikkel)
+
+started 7.12.3
+- added right click / save for plot widgets
+- remove .svn dirs from dist
+
+started 7.12.2
+- added support for TIFF predictor
+- added Tasks / Capture / Plot Bands
+
+started 7.12.1 9/5/07
+- custom convolution of Plot no longer loses Plot wrapper
+- better plot colours
+- better spacing in plot status bar
+- added histogram differentiate, zero crossings
+- better ifthenelse on groups
+- added "expr.(expr)" form, removed builtin get_member
+- larger sensitive area for arrow crosshairs
+- added region-on-image-from-region, again
+- minpos/maxpos work for lists
+- Math / List works for Groups
+- maxpos/minpos return -1 for []
+- max/min error for []
+- stricter about the empty matrix being [[]]
+- image/Image ==/!= list was broken
+- empty groups were broken
+- remove special case for assemble on groups ... you now need to group->list
+  first
+- [] as a group member means no-value
+- better Group insides
+
+started 7.12.0 28/4/07
+- fix up 7.10 compat mode
+- more fixes to the convert.sed script
+- small fixes to 7.12 toolkits for test_toolkits.ws
+
+started 7.11.18 10/3/07
+- added plotwindow, floatwindow
+- duplicate plot was broken
+- floating plots have stuff
+- gtkplotcanvas.c only swallows motion/buttonpress events it handles
+- gtkplotcanvas.c no longer tries to do focus handling
+- plotwindow status bar
+- added plotmodel.[hc], plotpresent.[hc]
+- plotview has a caption, displays class name
+- better captions for real/group/vector in heapmodel
+- gtk_plot_canvas_destroy() was not unreffing the pixmap (thanks Simon)
+- added next error stock item
+- better clock value display
+- added keep-child-windows-in-front pref (thanks Rachel)
+- gtkplotcanvas.c has new cursor handling stuff to help nip do cursor changes
+  for middle-drag scrolling
+- lots of toolkit tweaks
+- revised the manual
+- ooop, increment_filename fix, it was putting the number at the start of the
+  filename if there was no number there
+- better batch mode error messages, added -V flag for verbose messages
+- oop, variable name from filename was a bit broken
+- started revising the examples
+- increment on save and browse thumbnails were broken by gtk-2.10, gah
+- removed debugging menus
+- bump for 7.12! w00t
+
+started 7.11.17 26/1/07
+- snap hdrag of columns to make lining up easier
+- better CSV import
+- added zero-excluding mean and deviation to Math
+- better set-workspace-name on ws load
+- started a ws background popup menu
+- grey ramp orientation swaps w/h 
+- better display control bar scale/offset for HDR XYZ/Lab/etc. images 
+- possible fix for intermittent fail to recomp on edit bug
+- fix for image * group
+- paste in gtkplot sources (we will probably need to hack it about a little)
+- added plot/plotview
+- oop, memleak in icontainer
+- added a temporary Plot menu for testing
+- set plot tick step to avoid mad mallocs on large ranges
+
+started 7.11.16 21/12/06
+- look for release on rulers as well as press
+- adapt for new Hist system
+- use im_concurrency_set()
+- add im_get_option_group() 
+- oop, recursive invocation gah
+- slightly better error messages
+- better mainw title bar text
+- added 'splits'
+- better trace / profile / leak options
+- more robust find chart calib 
+- only interpret RGB16 for display for int formats
+- change im_histgr args
+- oops, paintbox could set delete-on-close sometimes
+- custom blur has many more controls
+- better inter-workspace "depends on ..." messages
+- chop/assemble image arrays now work on groups of groups, not list of lists
+  so you can process the chopped up image
+- added 7.11 toolkit_tester, plus a little sed sscript to update old workspaces
+
+started 7.11.15 6/12/06
+- tiny fixes to startup code
+
+started 7.11.14 6/12/06
+- Vector arithmetic fix
+- Vector display class
+- more Matrix fixes
+
+started 7.11.12 8/9/06
+- Image Rank no longer rounds up
+- only obey IM_CONCURRENCY pref in GUI mode
+- added GVALUE input/output args
+- added set_header, Set Metadata
+- use LC_ALL rather then LC_MESSAGES (thanks Simon)
+- better range == 0 check in conversionview
+- re-added make-named-column action
+- better textview reset during background recomp behaviour
+- added LUT from scatter
+- added AC_CHECK_TOOL to configure to find tools for cross-compilation. 
+- added map_nary, Crop now loops on all args
+- test for glibtoolize during configure
+- added tag image as hist, set type, image->matrix more flexible
+- added get header field
+- added Real displayer
+- reordered Image menu
+- optionview refresh was a bit broken
+- ruler resize was a bit broken
+- map_nary recurses
+- make image windows children of the mainw ... so they can't pop behind
+- "mean" can do lists of images etc.
+- move ->parent from idialog into iwindow
+- revised to_list behaviour, added to_Group
+- show save prefs automatically on save
+- removed broken scroll on focus code in columnview 
+- map_*ary no longer loop over lists ... they often represent compound
+  objects, eg. "mean [1, 2, 3]"
+- new preferences viewer
+- kill parent of nested dialog now kills dialog as well
+- more JPEG save prefs
+- CSV save prefs
+
+started 7.11.11 18/7/06
+- small polishes from gtkdisp3
+- tweak for im_init_world() changes
+- better behaviour for scale == 0 in conversionview
+- better original-filename handling
+- use im_msb() for GREY16/RGB16 images
+- csv2vips wrapper update
+- added parse_time
+- fontname defaults to "Sans" ... stops a warning on load
+- set window title less often
+- update i18n infrastructure
+
+started 7.11.10 23/6/06
+- sync CVS again
+- oop, selected closed columns caused kb grab confusion
+- added call8.[hc].. vips8 interface
+- new builtins vips_image_new, vips_call
+- reworked doc build again, seems to work in dapper now
+- added missing .br to man page
+- allow '_' in environment variables in "expand"
+- mainw tooltip reports operation cache size
+- upped default memoisation cache max to 10000
+- better caption for Group objects
+- oop, mac os x detect was broken
+- GSL error handler
+- more work on vips8 interface
+- add gcc attributes for varargs and noreturn
+- mac build fixes
+- keep prefs in ~/Library on mac
+- vips8 interface done
+- more tweaking for vips_call for robustness
+- quick stab at background recomp in workspaces ... some stability problems
+- tiny Toolitem fixes
+- "Calculating ..." appears in status bar during a background recomp
+- is_image builtin says yes to vips8 images too
+- added Analyze and Vips8 menus
+- added vips8_get_header builtin
+
+started 7.11.9 15/5/06
+- reverse order of decls in image_name etc. to sensibleify Change Header
+  options
+- better HIST preserving
+- bug in complex display control bar (thanks Jean) 
+- use gtk_disable_setlocale() to preserve LC_NUMERIC setting (thanks Peter)
+- more g_ascii_strtod() and friends for double parse/print
+- disallow vips funcs with no input args
+- gtksheet was freeing pixmaps with g_free(), not g_object_unref()
+- better matrix type guesser
+- optional link to vips8 for testing
+- CSV load/save
+- strict reduction of vips_call arguments prevents GC during argument gather
+  and dangling pointers
+- oop, problem in Transform in Image.def
+- added "dir" builtin
+- always grab focus for bottom entry widget on column select
+- even more test view reset tweaks
+- added "objects in workspace" count to main status tooltip
+- limit number of cursor shape updates
+
+started 7.11.8  22/4/06
+- added gravity, Find Projections now shows centre
+- added project
+- added OpenEXR read support
+- fewer int/void* tricks to help x64
+- call im_existsf() more sanely
+- better Group caption
+- don't save/load ->name automatically ... better 7.10 compat
+- better pointer printing
+- added support for RGB16 and GREY16 image types
+- workspace window size is saved in ws file and overrides the global default
+- some edit dialogs now done with member automation
+- fixed NO_SPLASH
+- fixed scroll to row on error, for closed columns
+
+started 7.11.7  11/3/06
+- allow complex constants of the form "12j", cf. python (also allow i)
+- optionally display complex as "x + yj"
+- ifdef'd out some more debugging code .. saved 30kb!
+- new Managed class abstracts out code for GC/C managed objects
+- Imageinfo now sits on this
+- Managedfile object replaces the thing we had for read
+- split trims trailing fails too
+- scrapped ELEMENT_IMAGE .. we just have managed objects now
+- added managedgobject
+- added experimental Clock class
+- moved some views into modelview.c 
+- delay showing the hglass for 0.2s
+- change clock to seconds, subclass off Real
+- modelview now has a right-button menu
+- disable tile fade animation for thumbnails
+- model _get()/_set()/_load()/_save() now automated
+- sort column jump widget
+- better scroll-to-column behaviour
+- column jump is tear-off-able
+- column jump is sorted by column name and name length
+- added geometric mean
+- added sum, product
+- added linear regression
+- fixed assert( 0 ) for VIPS operations with an implicit DISPLAY param
+- added optional dependency on GSL, added gammq builtin
+- print_base was broken for some argument combinations
+- shift + mwheel scrolls left-right in workspaces
+- update thumbnail on falsecolour / type changes in display bar
+- matrix now uses member automation
+- main uses GOption command-line parser
+- make sure we don't clear dirty on rows coontain errors
+- optionview only rebuilds the menu on change
+- 7.10 compat defs updated
+- itextview/clock fixes to make editing members easier
+- added -o cmdline switch
+- scrapped print-last mechanism ... printing main from an associated .def file
+  is much better
+- always set argv, allow save of Image, split save to file and print value
+- save Matrix as well with -o
+- added -e option
+- revised man page
+- added Find Projections
+- raised default memoisation cache size and heap size
+
+started 7.11.6  18/2/06
+- custom morph was broken, grid was broken (thanks Dave)
+- Matrix_file now uses "search"
+- reorganised morph menu slightly
+- added Format / CSV import
+- better handling of display of very long strings
+- added lazy (read "filename") builtin
+- \n was missing in expr_info error report
+- removed "save successful" info box for great HIG-ness
+- added is_prefix, is_suffix, is_substr
+- Pathname widgets add to session path
+- widgets like Group, Toggle, etc no longer add annoying stuff to tooltips
+- readded "auto-recalc" menu item
+- renamed Slider as Scale and added a caption field
+- oops, string constant "\\" failed
+- drag from konqueror might work now
+- added hist_thresh, added threshold items to Image / Levels menu
+- prettier Scale display, better display of multiline class member formula
+- added correlate, correlate_fast, Filter / Correlate
+- added "jump to column" menu item, handy for navigation in large workspaces
+
+started 7.11.5  15/2/06
+- added "search" builtin
+- (c) line changed
+- itextview mouse enter/exit now does help/highlight
+- itextview insensitive in noedit mode
+- tweak formula to stop resize with clearlooks theme
+
+started 7.11.4 18/11/05
+- added tile fade pref for Kirk ... it is a bit slow on win32
+- fix compiler crash for [1..2] (thanks Jay)
+- automatically add an icon to the win32 .exe
+- added -main_load_args switch ... just a temp hack
+- better -main printing
+- added "path_separator" ... either '/' or '\\' depending on platform
+- better char constant parsing
+- better char constant display
+- added path_relative/_absolute/_parse
+- prefs now switch between / and \ automatically
+
+started 7.11.3 26/9/05
+- display original filename only for iimage which really were loaded from a
+  file
+- ppm read uses direct open, rather than converting to vips
+- fixed used-before-set problem in option ... could cause segvs when
+  displaying rows built from .defs containing errors
+- added Filter / Blend / Alpha Blend (thanks rich)
+- added Edit / Info (Ctrl-I) to mainw, some stuff there now, space for more to
+  go in
+- removed nip2-7.11.ebuild now that nip2 is in gentoo portage
+- desktop integration binds .v files to nip2 (thanks Ruven)
+- align cols marks the ws as modified
+- configure.in magic stolen from pango ... we now automatically disable
+  gobject cast checks in production builds
+- display formula rather than value if there's a visible graphic
+- falsecolour and type applied to thumbnails
+- fix gcc4 warnings
+- use g_mem_profile()
+- plot slice can now plot along any arrow
+- oop, some filters inadvertantly overrode width/height
+- fix isclass is_class confusion
+- itextview only shows value for non-class rows ... we assume members /
+  graphic will show the value, so we show the formula
+- don't apply scale/offset displaybar controls to histograms / fourier images
+  if Interpret Types is on
+- better initial kb focus for file load/save dialogs
+- better tooltip for iimageview
+- tooltips on demand function added
+- colourdisplay, ... adapted to new dynamic tooltip API
+- use input-only eventboxes for spinbuttons
+- better rowview tooltip
+- oops, buf_appendc() was a bit broken, fixed in vips too
+
+started 7.11 (1/6/05)
+- view image header now shows meta fields too
+- does INTVEC args to vips
+- now in CVS
+- added Analyze format
+- added name2gtype, gtype2name builtins
+- added get_header, grid, matrix lr/tb join
+- slice into tiles was broken for case tile size == image size
+- removed led.[hc], now uses stock system
+- always define our own strcasestr
+- icc import offers to use embedded profile
+- added 7.10 compat mode
+- "reset" in display bar resets to workspace default, not to 1/0
+- column titlebars reorganised
+- reenable gtksheet support now gtkextra-2.0 is out
+- original-filename tracks name loaded at
+- bumped version to 7.11.2
+- oop, fixed a nasty refresh bug
+- configure now adds LEXLIB to link line
+- pasted gtksheet code in so we can hack it
+- added matrix area selects
+- added Matrix / Extract / Area
+- slightly better default widget handliing in dialogs
+
+started 7.10.11
+- docs no longer contain absolute nav links
+- increment filename on save works again
+- hide closed columns in NOEDIT mode
+- install a .desktop file for GNOME (thanks Denis)
+- group, right click, ungroup, no longer pops a spurious error dialog
+- new pref lets you not use the crosshair in image display windows ... some
+  desktop themes have very annoying crosshair cursors
+- call libMagick less to reduce segvs from the file open dialog with broken
+  ImageMagick libs
+- show args in vips history
+- fixed a rounding bug in image resize which sometimes made it miss by a
+  pixel
+
+started 7.10.10
+- fixed crash in vips_call with repeated calls to fns with large image vectors
+- fixed crash replacing a region with an image
+- fixed exit if temp area was missing (thanks Denis)
+
+started 7.10.9
+- allow filenames containing ':' chars
+- uses im_render_fade() for prettier image display
+- added CCITTFAX4 compression mode for TIFF save
+- oops, image save options were being ignored :-(
+- fix 64-bit compiler warnings
+- fixed problem with very long filenames
+- recover-after-crash no longer messes up recent menu
+- "Jump to" in program window was broken
+- fixed a crash with very large objects (thanks David)
+- swap shift/control scroll modifiers to match HIG
+- rotate matrix works for any size matrix
+- rotate quadrants works for matrix as well as image
+- added recalc after reload start stuff
+- use auto label wrap
+- firefox is now the default HTML viewer on *nix
+- limit matrix display size to 10x10 unless we have gtksheet
+- small startup speedups
+- destroy views when a column is folded away to save some memory
+- added Image Rank
+- band join is much faster at joining many bands
+- safer empty temp area
+- added cute column open/close animation
+- fixed a couple of problems with region dragging in compatibility mode
+- removed column name dialog (thanks Joe)
+- program window now lets you collapse the current kit
+- allow \r in .def files (so we work with DOS edited files)
+- added Image / Tile / Chop Into Tiles
+- added 'Open Examples'
+
+started 7.10.8
+- explicit gthread dependency makes us work even if vips is built without
+  threads
+- tiny .def fixes
+- "-time_save" switch turns on image save timer for benchmarking
+- mainw, trace, imageview, program now use gtkaction / gtkuimanager
+- mainw and imagewindow 'view' settings now update prefs for you
+- trace window uses new gtk_text_buffer/view widget
+- image header uses GtkTextView for history display
+- program window uses GtkTextView / GtkTreeView
+- windows remember their size and pane positions
+- fix a crash for edit defs of live widgets in prog window
+- removed default file type pref ... now remembers last image and matrix file
+  type
+- added "Set As Workspace Default" to conversion bar
+- mnemonics for more popups 
+- fixed a crash if you quit mainw with an image window open (thanks Jay)
+- new default cursor for imageview windows (thanks Jay)
+- regions only update when grabbed
+- now passes distcheck
+- use g_setenv(), g_mkstemp(), IM_FREE*(), g_set_application_name(),
+  g_set_prgname()
+- better cursor change layering
+- better initial toolkitbrowser size
+- absoluteize & canonicalize VIPSHOME (so we work with a relative path for
+  VIPSHOME)
+- better time-to-go text
+- more fixes to help compiles on 64-bit systems
+- invalidate operation cache on paintbox actions ... makes paint on FFT work
+  again
+- save settings in APPDIR on win32 rather than a dotfile
+- added SAVEDIR environment variable
+
+started 7.10.7
+- tiny build fixes
+- added "_" builtin function for i18n of toolkit menus
+- softer 'unpainted' checkerboard (thanks Kirk)
+- added "-i18n" command-line switch ... outputs constant _() strings and quits
+- compiled string constants are automatically shared between all defs
+- (_ "kjh") substituted at compile time
+- started marking up .defs for i18n
+- trace_args() was printing backwards
+
+started 7.10.6
+- uses fftw3 if available
+
+started 7.10.5 19 oct 04
+- removed "beta" from version
+- perspective distort works on groups (thanks Joe)
+- added get_left/get_top
+- chaneg and tag colourspace now have option boxes
+- new enum class and option builder cleans up some stuff
+- fixed crash for display control bar scale on black image (thanks Mikkel)
+- fixed image windows appearing off screen for workspaces made on large
+  displays being used on small displays (thanks Mikkel)
+- un-offset regions during create in compatibility mode (thanks Rachel)
+- fixed a race in vips history memo-isation (thanks Joe)
+- speedups to vips function call history too
+
+started 7.10.4 4 oct 04
+- always include formatted html in dist, and install on install
+- enable line crawl on win32
+- prefs now autolayout, so look sensible even with font changes
+- added Image/Bands/Extract|Insert|Delete
+- linear match now works for groups
+- prefs were not always saving automatically
+- white_balance now takes two args: uses band ratios in small image to
+  fix large image ... makes using one image to fix a group of images much
+  easier
+- also, works in XYZ, has adjustable white point target
+- new icon (also used in About)
+- LabQ and LabS conversions were broken
+- check for strcasestr in libc
+- display symbolic names in iimage caption
+- oops, custom rank menu item was broken
+- use a dumber sort algorithm for row recomp order ... glib was skipping too
+  many tests
+- thumbnail convert settings update is smarter
+- much faster display convert bar
+- Joe's .defs are in
+- image blend is smarter about reordering args
+- small win32 fixes
+- oops, did not remove all temp files if debugging was turned off
+
+started 7.10.3 13 sep 04
+- to_real now works for toggle & bool
+- Rubber menu items were b0rked (thanks Joe)
+- Rubber scale removed (rubber transforms now automatically rescale)
+- fixed crash if you gave a number as a superclass (thanks Joe)
+- win32: block log output to prevent annoying console window appearing
+- shared model for toolkits menu and toolkitbrowser for big speed-up on main
+  window build and better update behaviour
+- tk browser columns are reorderable (thanks Joe)
+- better image type guessing (thanks Joe)
+- thumbnails now use Type hint (thanks Joe)
+- added simple number base conversion
+- compound unary ops on Rect now work on width/height rather than left/top ...
+  so abs(Arrow) now gives the expected result
+- repaint regionview immediately for better feedback
+- group save can save unboxed images and will iterate over nested lists
+- added trace VIPS operations, including cache hits/misses
+- small menu polishing
+- better 'revert to defaults' in prefs (thanks Jay)
+- documentation revised
+- fixed dependency tracking inside zero-arg hidden classes (thanks Joe)
+- help system updated
+
+started 7.10.2 23 aug 04
+- convert bar settings now affect thumbnails too (thanks John VanVliet)
+- show hglass cursor more often
+- free rotate is now -180 to 180 (thanks Jay)
+- added 'toolkit browser'
+- work on docs
+- small toolkit fixes
+- better mainw decoration handling
+- minor main window menu rearranging
+
+started 7.10.1 28 july 04
++ top-bottom 2 point mos was broken (thanks Joe)
++ added aliases for resample and estpar to help compat mode rubber sheet
++ colour ops on LABQ were broken by the alpha channel stuff
++ larger default max heap size (thanks Mikkel)
++ added ebuild (thanks Ruven)
++ oop, fftw includes missing from IP_CFLAGS
++ added Expression widget
++ suppress unneeded textview in NOEDIT mode
++ better textview layout
++ indent subcolumns in NOEDIT mode
++ better regionview text layout
++ Image/Format reamed to Image/Number Format (thanks Joe)
++ prelight for rows, expressions and spinbuttons
++ better row label layout
++ menus reworked (again) for Expression class
++ oops, resample renamed as transform_search
++ win32 build fixes
++ added "Align Columns To Grid"
++ better focus handling in imageview (thanks Mikkel)
+
+started 7.10.0 21 june 04
++ toolkit menu is now built dynamically from heap ... you can write functions
+  that generate menus
++ menu items can have tooltips, icons and labels
++ reorganised all menus
++ added "scope" keyword ... helps remove "root" from toolkits and makes them
+  relocatable
++ added "solarise" filter for fun
++ added "diffuse glow" filter for fun
++ slight improvement to references to non-local members in deeply nested
+  classes
++ ungroup will now also unpack lists
++ fixed segv if option menus were rebuilt while posted
++ added vips function call cache ... memoisation!
++ added prefs for #cpus and #memoise
++ gah, had forgotten to add several new widgets to model_base_init(), so they
+  were not loading correctly if used in prefs
++ put tearoffs back and fixed accels
++ added empty-temps yesno on startup
++ -main can output many images correctly
++ display control bar false colour works on RGB images
++ regionviews are offset in compatibility mode
+
+started 7.9.7 1 jun 04
++ enable broken for gtk all the time in program.h (thanks Ruven)
++ now uses im_text() to paint paintbox text (imageinfo.c:2185)
++ better zooming from menu items (imageview.c, imagepresent.c, imagepresent.h)
++ extra recalc on startup to build classes before we load args (main.c)
++ set_output() was missing an "!" before imageinfo_file (graph.c)
++ saner startup error logging (main.c)
++ expr_error_print_all() now goes to a buffer (expr.[hc])
++ program.c has an error lister
++ main.c knows about new error lister
++ prefs.ws had max_undo broken by precedence change
++ String now interprets and expands C escape chars (eg. \n)
++ fixed close program window with selected text crash
++ fixed edit of row with error itext crash 
++ added tile and Tile (replicate/mirror ... using im_replicate)
++ leak testing only in DEBUG builds
++ binary and unary operators now track the function they were called from, for
+  slightly better error messages
++ Number spots trailing characters
++ shadow and text paint work on labq
++ added resize longest axis mode to Shrink_to
++ fixed up menu dumper
++ don't track load/save progress in command-line mode (thanks Joe)
++ arithmetic and relational ops now work on images with a mixed number of
+  bands
++ UI polish suggestions from Joe are in or noted on the TODO
++ better update of visible hints in imagedisplay
++ new menu item system with "action" member lets you have icons, mnenonics
+  and i18n for toolkits
++ compatibility system for 7.8 workspaces
++ better recent menu
+
+started 7.9.6 8 mar 04
++ added Group class
++ .def files rewritten for Groups, also many enhancements
++ oops, imageview=>file=>view header was broken
++ prefs option for 1 bit TIFF write
++ scale in display control bar was broken (thanks Ruven)
++ removed on-demand compile, caused strange recomp problems :-(
++ value display no longer decompiles class args
++ tracks lineno for tools
++ better "not defined" error message
++ better "bad parent class" error message
++ better error messages from calling VIPS functions
++ better "link report" error message
++ relaxed the restriction on superclasses ... you can now have anything as a
+  superclass, including a full constructed multi-arg class
++ detects redefinition of syms within a single parse action
++ precedence change: "?" and "." now the same precedence, like C
++ better "member not found" error message
++ spots nested comments
++ visualise image can handle labq hist
++ case ignored for class names in ws save files 
++ SHIFT-mwheel now zooms in and out, like gimp-2.0; CTRL-mwheel scrolls 
+  left-right
++ autosave does not back up system workspaces (eg. prefs) (thanks Joe)
++ raised arrow/region create threshold
++ optionmenu swapped for gtk-2.4's combobox
++ now gtk 2.4 only, gah! too annoying to have lots of ifdefs
++ uses GtkFileChooser
++ oops, String/Number did not implement load/save 
++ much polishing
++ row.c no longer tries to recomp all rows that ref "this", was causing
+  confusion ... so, much faster, but will change row recomp order in some cases
++ hmm, trace was a bit broken
++ auug, instanceof_exact was broken for deeply nested classes, must have been 
+  like that forever
++ fixed a nasty and long-standing bug with shared classes ... we now always 
+  copy code rather than trying to cache it
++ ruler menus now have mm and offset setting
++ got rid of all xoffset/yoffset stuff, what a pain it was
++ Rect (and hence Arrow, Point, etc.) now behaves (roughly) like a complex for
+  arithmetic
++ better select behavior on thumbnail drag
++ renamed Point as Mark, Point is now a subclass that lets old nip workspaces
+  load
++ added Fontname widget
++ colour picker can be pinned up
++ better image thumbnail in workspace sizing
++ renamed Filename as Pathname and added a caption 
++ all menus items rewritten for new batch system
+
+started 7.9.5 6 feb 04
++ Rotate_fixed now has an option menu for the angle
++ imagearray_chop was broken
++ image thumbnail drags no longer embed the workspace name (unless they have
+  to)
++ merge workspace now shows an error dialog on failure
++ statusview does not display more than 8 bands
++ workspace saves view mode in files, and mainw knows about it
++ now uses pkg-config to find vips
++ splash does not focus "remove" toggle by default
++ oop, hourglass was broken
++ better hourglass animation
++ select/extend select now works on image thumbnails again
++ PRINT_LAST now done in workspace _dispose()
++ drag image thumbnail to background to make a new column and put in a link
++ compile now delayed until value needed ... saves 10% on startup time
++ value pointers only registered for GC if necessary .. saves another 3%
+
+started 7.9.4 9 dec 03
++ removed last gtk_timeout*()s
++ fixed some memleaks
++ views now _sink() their child views, so even if views don't ever get added
+  to containers (eg. toolview, rowview), they still get freed properly
++ niprc now sets gtk-can-change-accels ... no one will discover this otherwise
++ added Custom_blur, dropshadow now uses a gaussian blur
++ some better error messages
++ Toolkits=>New items for filename, number, string
++ usage and About have version info
++ row delete now asks for confirmation
++ faster and more comprehensive common subexpression removal ... removed the
+ 'optimise' option, might as well have it on always
++ better session path behaviour 
++ much better open recent menu
++ better graphic save/replace scheme ... image filenames now change in a much
+  more sensible way
++ better iimage/iregion/iarrow caption scheme
++ can now drag from image thumbnails, cool drag icons
++ progress feedback on non-vips saves, and you can cancel too (!)
++ added extract_row, extract_column, extract_band, join_lr join_tb
++ extract_area now works for matricies too
++ better ruler tracking at high magnifications
++ defines HAVE_FFTW so we actually save and load wisdom now
++ "pos_changed" signal stops all the suprious imageinfo changed signals
++ "file_changed" signal lets iimage know when files are swapped about
++ better vips_call error messages
++ image cache is on mtime as well as filename, so loading changed files gets
+  the new version
++ auto-reload on file change preference
++ reorganised main window menus and scrapped "Insert"
++ done a simple splash screen with some startup feedback
+
+started 7.9.3 20 oct 03
++ better welcome message
++ command-line mode with -main/-script/-workspace/-benchmark flags
++ better middle drag scroll 
++ fixed the annoying race condition in repaint
++ fixed annoying rounding problems with colour drag
++ added TRUE/FALSE as synonyms for true/false
++ better image zoom shortcuts
++ more HIG-y layout in NOEDIT mode
++ added String/Number types
++ windows have icons, yea
++ fixed browse icons window
++ message internationalisation done
++ en_GB translation file 
++ more higgy Stringset class
++ better help system for dialog boxes
++ paintbox now has buttons for tool select
++ cursor shape change in subwindows
++ load and save accelerators
++ configurable accelerators on the toolkit menu
++ more HIGgy dialogs for sliders, regions and matricies
++ basic "Open Recent" thing on workspace file menu
++ better keyboard nav for workspaceview
++ reworked image viewer for more model-view-ness
++ unified image view state
++ hmm, row_new_heap had a double paste, wonder how long that's been there ...
+  should be a bit faster at recomps
+
+started 7.9.2 (30 sep 03)
++ toolbar accelerators done
++ image display, colour display, region display all reworked for gtk2-ness
+
+started 7.9.1
++ HIG-ified (I hope)
++ broken into SDI interface
++ prefs dialog
++ toolbar in mainw
++ progress dialogs for image load/save
++ new error message system
++ live watch system
+
+started 7.9.0 (1 aug 03)
++ compiles with gtk2!
++ lots of cleaning up
+
+started 7.8.11 (30 jul 03)
++ better run-nip.sh start script
++ tiny fix to Calibrate_chart, thanks haida
++ big LED stolen from mozilla, just one of them now
++ add "%s" to existsf() calls for filenames with % in, thanks Clare
+
+started 7.8.10 (22 may 03)
++ icc profile JPEG save option
++ "." now on end of datapath in prefs
++ fixed a race condition in regionview ... could crash during paint on slow
+  machines
++ better vector/image ops 
++ D65 <-> D50 conversions improved
++ added d50 macbeth data file
++ added "measure" to _stdenv
++ added "insert", "extract_area" to _stdenv
++ "recomb" now works on matrix, vector etc.
++ more use of extract_area
++ mark_tree() is now iterative, so no stack overflow on large heaps
++ reduce_spine() is (slightly) less stack-hungry
++ recomp_row() will not rebuild models for rows with errors ... is this the
+  best way to stop it though?
++ calib_chart now works on 16 bit images
++ bumped version to 7.8.10 to match vips ... less confusing
++ changed doc builds so that we can include formatted documentation in the
+  make dist
++ fix to drag-n-drop code on winders (thanks Jim)
++ fix to incorrect error message in file info view
++ blocked dash crawl on winders, does nothing but flicker
++ "config" help option (thanks Kirk)
++ columns resize on close 
++ middle-drag in workspace scrolls
++ new version of Joe's x-ray stuff
++ spec/ now has RPM .spec file
++ added a "run-nip.sh" startup script
++ moved reload to program window
++ drag column and workspace gets a + cursor
++ added "Match" to Image menu
++ added "Tone_for_print" to Print menu
++ new macos icon, thanks denis
+
+started 7.8.7 (10 feb 03)
++ added set of relative constructors for point/region/arrow/etc.
++ used in various places to fix problems with dialogs on images with displaced
+  origins
++ _vislevel member sets default visibility level
++ updated widget menu items to set vislevel
++ added has_member, get_member builtins
++ add "%s" to everror() calls so we can have "%" in error messages safely
++ better if-then-else overloading
++ add "." to the end of the default search path
++ added "Area", a non-resizeable region
++ option.c was not initing value edit correctly
++ better initial size for option edit dialog
++ added orderlist_scan()
++ better title for region edit dialog
++ better row_save_test() means member ordering does not get lost on clone of
+  edited rows
++ imagedisplay_link() no longer makes conversion for you ... change to
+  iimageview.c _init() in step (removes redundant create/destroy pair)
++ imageview_new_area() could pick shrink == -1 in some circumstances (thanks
+  Joe)
++ drag file to imageview or thumbnail does replace-image
++ Region can now never fail (thanks Clare)
++ better feedback during paint image creation
++ better imageview File=>New=>* for images with displaced origins
++ added Edit_header to Image menu
++ catch errors from libxml2
++ Image == Vector was broken
++ Overlay has a "lock size" toggle
++ added Image=>Insert
++ renamed "Clear edits" as "Reset"
++ saves/restores fftw wisdom for first fft speedup
++ snap-to-* on region drag could resize region for zoom != 1
++ statusbar gave bad numbers for FFT and histogram images
++ use im_invfftr() for speedup
++ better ruler display at high magnification
++ oops, program=>find was broken
++ pin-up now part of dialog
+
+started 7.8.6 (23 dec 02)
++ swapped list for hash table in heap set of managed pointers ... startup time
+  fallen from 2.4s to 1s!
++ much better heap-full reporting
++ knows about png
++ patch from Hans Breuer:
+	+ paintbox sort-of hacked back in 
+	+ fixes to file selector on win32 
+	+ misc. win32 #include fixes 
++ OK buttons in dialogs now verbs
++ knows about magick
++ oops, Colour_chart_from_matrix and New_CRT_test_chart were broken in 7.8.5
++ new heap_is*() function style handles eval errors better
++ paintbox rewritten ... now paint bar
++ snap to guide added
++ much smarter region repaint system now does true xor animation
++ dash lines crawl in the background
++ Rect/Region/Arrow etc. can now have float args and won't barf on images with
+  strange offsets
++ default image file format preference
++ colour temperature conversions sorted out (thanks Haida)
++ fourier transforms now work with optical transform, rather than having
+  optical built into visualisation (helps paintbox)
++ removed use of g_mem_chunk() 
++ new colourdisplay class for displaying swatches of flat colour
++ drag-n-drop colours
++ tries to detect C stack overflow in reduce_spine()
++ new trace system reduces C stack usage during reduction
++ fixed a few memleaks
++ copy-on-write for member edit slightly reduces overcomputations and makes
+  changes feed forward more gracefully
++ scale column coordinates with changes in font size
++ Tilt_brightness now works with n-band images
++ nativize paths
++ drag URIs to main window to load files (thanks Hans)
++ load any file type from command line arguments
++ small menu fixes
++ added RPM .spec files to distribution
++ help launcher for mac os x
+
+started 7.8.5 (12 nov 02)
++ added a bunch of "%s" to allow percent in tooltips
++ rearranged reduce_spine() to trim stack usage ... should reduce C stack
+  overflow segv on deep recursion
++ added IR sample images to data dir
++ added rachel.con IR sharpen matrix
++ added Join.Array to build an image array
++ added Rubber stuff to Image
++ removed auto column switch on row select
++ added New to imageview window
++ finished-ish docs
++ >3 band images now display as RGB, 2 band images as mono ... helps 
+  display of imported RGBA/GA tiffs
++ better update of toolkit menus on tool change with zero-param classes
++ better positioning in toolkit menus with hidden items
++ default vid crop fixed
++ added Overlay to Image menu (thanks Joe)
++ added Calibrate_chart and Calibrate_image to Capture menu  (thanks Joe)
++ help buttons linked to html manual display 
++ can now load workspaces from win machines on *nix, and vice versa (tries
+  both types of dir separator)
++ added Joe's Xray menu 
++ present menus and rows in definition order rather than reference 
+  dependence order
++ added Browse_multiband (thanks Joe)
++ can now pop up help viewer on win32 as well
++ knows about new im_LabS2Lab() and im_Lab2LabS() funcs
++ junk Hist on load to lessen balance confusion
++ more helpful save/replace file dialog titles
++ longer doubleclick time
++ sub-menus tear-offable
++ settable default image window size in prefs
++ optional auto-popup of new image rows
++ gtkfilesel2 knows not to select something twice
++ larger default max heap size
++ ws save files are prettyprinted and uncompressed by default for greater
+  portability
+
+started 7.8.4 (8 nov 02)
++ fixed recover workspaces (thanks Joe)
+
+started 7.8.3 (31 oct 02)
++ acinclude.m4 fixes for mac os x
++ set extension on get_filename if none set and not showing All
++ added Mosaic_force ... no tie-point refining, ever
++ only save edited sub-trees on workspace save ... shrinks ws files to about
+  1/3 their previous size
++ setlocale for numeric conversions to "C" to avoid "," as decimal point
+  madness
++ escape C sequences in filenames (eg. "\n" etc)
++ vips functions and builtins now linked via main symbol table, rather than an
+  extra lookup on "undefined"
++ pseudo-toolkits group VIPS packages and builtins
++ display help text on pseudo-tools in program window
++ "go to def" for program window
++ auto-expand for rows in program window
+
+started 7.8.2 (27 oct 02)
++ set $HOME on win32
++ WinMain on win32 for non-cmdline start
++ -mwindows flag to stop command.com starting for non-command line start 
+  on w32
++ lots of hacking on gtkfilesel2 for win32 compat
++ Matrix_file "" 
++ New_mark.Region etc. menu item
++ more robust row recalc on .def edit
++ zero-arg local classes of classes sometimes recomped in the wrong order
+  (thanks Joe)
+
+started 7.8.1 (18 oct 02)
++ d'oh, matrix constructors have to be classes for is_instanceof to work
++ much better change/refresh/scan behaviour for gtk_sheet
++ uses IM_DIR_SEP* for some win compat
++ many configure fixes for mingw
++ use gtk_fixed for workspace layout for gtkwin compat
++ rename Text -> iText to stop windows breakage
++ woohoo, fixed the grab problem in regionview
++ more robust workspace load
++ polishing
+
+started 7.7.23 (23 aug 02)
++ bug in history tracking
++ better filename select
++ OK buttons in multi-select fsbs turn on and off
++ supress "super" iimages for region/arrow displays
++ rulers and status bar know about Xoffset/Yoffset
++ regionview uses IMAGE cods, converts to model cods and back on
+  refresh/update
++ defs adapted to origin stuff ... including Mosaic!
++ region create is ctrl-left
++ save-as-TIFF traps errors
++ done Plot and Resize, phew ... all menus finished (the ones I did anyway)
++ added namespaces to XML save file, prettyprint disabled, compression on
++ tooltips for toolkit menu items
++ "Name param1 param1: " string automatically prepended to help text
++ preferences for mainw start window size
++ menus reorganised to be more logical (I hope)
++ Separator class for submenus
++ column save adds enclosing workspace 
++ drag in program window was broken
++ #dialog back in again, with an edit dialog
++ "menu item from column" thingy
++ refcount bug for long image load fixed
++ iDialog can autopopdown for represented obj destroy
++ toggle MB free/cells free
++ use gtk_sheet for text matrix display
++ configure detects gtk+extra for gtk_sheet
++ iimage caption displays name of most derived class
++ relaesed as 7.8.0 ! yea!
+
+started 7.7.22 (15 july 02)
++ started Print menu
++ added "expand" builtin ... expands environment variables in a string
++ filesel history fixed
++ reconstruction from overridden constructor in oo removed ... now just there 
+  for edits
++ done Colour menu, started Morphology
++ done Morphology menu, started Filter
++ if_then_else is now an overrideable binop
++ use (double) for image size calc to avoid int overflow
++ logical_and and logical_or can be overloaded ... still shortcut for plain
+  types, so not quite like other overloads
++ done Filter menu, started Freqfilter (will become part of Fourier)
++ done freqfilter, started Histogram
++ sliders no longer each have a continuous member ... set with a watch
+  directly from prefs
++ histogram visualisation
++ better trace will never evaluate graph unexpectedly
++ Real widget ... just draws a real number
++ better row name set system gets less confused 
++ can now edit superclass constructors
++ better recovery after error in row recomp
++ better region caption
++ better scroll to new object for main window
++ "<", "<=" work on strings
++ started Image menu
++ small fixes for large files
++ image window title bar update fixes
++ auto select 1st matching file on load if no file specified
++ rename Patch -> Colour to fix class name / gtk type name confusion
++ classmodel_class_instance_new() now uses CLASS_new in preference, if defined
+  ... lets you have separate behaviours for _type object creation and OK
+  in edit dialog
++ Xoffset/Yoffset added to header view
++ default class == thing, class != thing operations in _Object
++ class params no longer have subcolumns ... stops O(n**2) increase in
+  complexity with workspace size!
++ multiple select for for fileselect ... load many images/matricies/etc at
+  once
++ on load, objects renamed to the filename they were stored in
++ better workspace scroll on new object
+
+started 7.7.21 (21 june 02)
++ override Pixel constructor in Colour and Generate_colour.widget
++ rename ... ivector -> iarrow
++ new op type for colour-through-image operations
++ better expr->err update on link clean
++ convolution matrix display now shows scale & offset
++ Matrix is now the base class, Matrix_vips etc. inherit from that
++ tags now decompile for better error messages
++ better graphic rebuilds for sub/super classes
++ better member-not-found error message
++ better new column positioning
++ rotate menu started
++ convert menu started
++ segv on CTRL-S on local objects fixed
++ flash help on row buttons
++ suppress display of superclasses with a leading '_'
++ better auto new workspace name
++ better column rename on ws merge
++ better scroll-to-visible for columns
++ row just uses "name" property now ... no "sym"
++ toolkit list now scrolls down RHS of main window ... no more resize probs
++ parent/child relationships shown with colour changes in rowview
++ removing column with an error resets error state properly
++ x2 speed up for recalc with fancy heap node serial number system, heh
++ better regionview create/destroy/link fixes occasional bad casts
++ better auto workspace scroll on load
++ scrapped .hd/.tl etc., too hard to overload ... builtins now
++ '' chars are now unsigned, signed chars are numbers in [-128, 127], chars
+  default to unsigned (now unlike int, short)
++ regions/arrows/etc. now defined on Image, not image
++ better trace system does not confusingly interleave prints
++ small filesel fixes
++ Complex, List, Fourier menus
++ display control bar knows about fourier images
++ display control bar menu resets properly
++ bits of Arithmetic broken out into Log and Trig menus
++ Filename widget ... should help make an ICC profile chooser
+
+started 7.7.20 (17 may 02)
++ redone configure system ... data files now go in share/nip, not
+  share/vips/nip
++ fixes to Pixel class and Generate menu
++ -image is now *-1, not im_invert()
++ separate '!' and '-' operators for better C-style semantics
++ better toggle/extend select for thumbnails
++ Yxy display
++ ops on Matrix class done
++ stats menu added
++ removed matrix size limit
++ errors -> ierrors to please mac os
++ keep local edits on reload
++ oops, classes as parameters were broken
++ member edit of local classes was broken
++ class arg checks inherited
++ view header dialog in imageview
++ colour menu
++ nasty bug killed for discovered dynamic references to dirty symbols
++ Colour widget shows a swatch and lets you gtkcolorsel for edit
++ rowview menu on subrows too, plus select/extend-select
++ ceil/floor added as builtins
++ lots of small polishes
+
+started 7.7.19 (10 apr 02)
++ it's now (c) 2002 :)
++ better LED spacing
++ "stop" sign toned down
++ split Expr to static stuff (Compile: parse/compile logic) and dynamic
+  stuff (called Expr still ... reduce stuff)
++ Exprs can share Compiles if we know they will have the same code
++ copy-on-write for edits
++ 100s of times faster for large workspaces: load ws with 270 images = 7s
++ oops, temp files now unlinked properly
++ icon browser refreshes in idle handler, plus better cancel behaviour
++ destroy callback added to iDialog, popdown_cb memleaks plugged
++ memleak in model rewrite plugged
++ all class instances in hierarchy have the same "this" ... simplifies OO
+  stuff a lot
++ removed heap_gc() from REDUCE_CATCH_START() for big speed up (d'oh)
++ smarter row dependency finder 
++ leak plugged in get_image_info, plus more informative
++ reset menu item on graphic edit objects
++ ooop, added '\'' as a constant
++ C-style hex constants, better real constants
++ even fancier operator overloading scheme does builtins too, and is
+  extensible for other user funcs
++ abs/max/min/etc. can be overloaded
++ lots of menus done!
++ newimage dialog removed
++ classes with supers don't display as pull-rights in toolkits
++ updated vips.m4 for IRIX
++ top level dirties now say what they're blocked on in tooltip
++ cast to int type now behaves as C (no more round to nearest)
++ reload toolkit works better
++ smarter image cache dependency tracking fixes occasional segv
++ _animate() in class build for greater interruptibility
++ "++" is lazier for list args
++ image ++ [] allowed
++ builtins can be overloaded
++ tidies to reduce/action
++ dmalloc support
++ better column/row select behaviour
++ better event handling in image windows
++ scroll wheel in image windows
++ class typecheck delayed until first reference for great speedup
++ lots of polishing
++ Mac OS X fixes:
+  - change include order in ip.h for mac os x
+  - test for mount.h, util.c, ip.h changes for space free display on mac os x
+  - file size stuff changes
+  - small include order changes
+  - temp_name() fixes for duff mkstemp()
+  - ignore GDK warnings (eg. locale not known)
++ changeable max print length, dynamic buffers
++ Pixel[] class
++ ontop no longer saved for workspaces
++ text values display left justified
+
+started 7.7.18 (1 mar 02)
++ load images from command line
++ new operator overloading system
++ new check system allows check to be inherited
++ nasty ii_destroy bug fixed
++ new trace option for builtin functions
++ nasty row destroy bug nailed
++ much better busy/not busy handling, feels smoother
++ more sensible workspace checkmarking, good speed improvement
++ more info displayed in image status bar
++ red error arrow not always unset ... eg failed file load
++ try to load a damaged (eg. truncated) image file ... wrong err msg
++ recover ws after crash fixed
+
+started 7.7.17 (23 jan 02)
++ changed appearance order for subcolumn
++ params and super start with vislevel 0
++ '.' now binds more tightly than '\'
++ '\' renamed to '?'
++ '&&' and '||' split to separate logical and bitwise operators
++ removed local function display
++ better code generated for access to members across nested classes
++ better preservation of sharing in class browser
++ decompile makes loop labels
++ non-row locals link back to enclosing row correctly
++ inter-row dependencies via non-row locals spotted
++ user def of default constructor banned
++ nested classes with implicits refs now work
++ operator overloading added
+
+started 7.7.16 (14 dec 01)
++ delay GC to once per sec where possible
++ ruler preferences
++ rows only reset on enter, not on dirty
++ graph.c indents prettily for easier debugging
++ nasty GC bug nailed
++ trace prefs options
++ assert() on program forced close fixed, class redef bug fixed, program
+  window tracks filemodel->modified more closely
++ region clone menu
++ destroy regionviews on hide
++ smarter and simpler layout resize
++ final (I hope) precedence changes ... now just like C
++ '<<', '>>', '~' and '@' (function compose) added 
++ row recomp refinement ... simpler and faster
++ oops, menu items all done in imageview
++ row locals with external refs were not adding to top level dirties correctly
++ more rigorous backtracking for deducing recomp order
++ fancy pantsy heapmodel_reset() system for great justice
++ traced and optimised recomp ... seldom repeats itself now
+
+started 7.7.15 (16/11/01)
++ rename workspace on top level load
++ added workspace merge
++ added column merge
++ clone stuff done
++ layout sizing done (tho' not very well)
++ toggle select and range select for rows
++ junked all old menus (now in scraps)
++ fancy new view manager only creates views when required ... x2 speed up on
+  workspace load
++ file browser lets you change the suffix by typing (eg. type "fred.jpg" into
+  save box while files-of-type is VIPS and you save JPEG)
++ replace and save matrix and image graphics
++ new Matrix class hierarchy
++ .nip-x.x.x directory stuff added, "Preferences" workspace loaded on startup
++ Watch class for getting pref settings quickly in C
++ removed all .iprc code
++ region drag now synchronous, so it can't lag
++ max heap size scales with workspaces loaded
++ duplicates automatically removed from paths, system files renamed to user
+  directory on auto load
++ workspaces reorder correctly
++ new row number layout scheme using on model pos layout
++ row drag 'n drop reordering
++ is_class predicate
++ Abut.Left_right and Add menu items done as trials
++ syntax changes to become more C-like:
+    and/or/eor/not keywords removed ... now &&/& ||/| ^ !
+    & (join) becomes ++ and does list cat too
+    ! (region extract) removed
+    ^ (raise to power) becomes **
++ precedences changed to be more C-like ... `\` now binds like array subscript
+
+started 7.7.14
++ oop, about copyright line was wrong
++ model now has child_add(), child_remove() methods
++ child_add() child_remove() used for much init and cleanup ... nice!
++ fewer typed parent/child pointers in models ... getters to cast model 
+  parent/child instead
++ parent_add(), parent_remove() methods in model
++ XML prettifier does indenting in save files
++ load/save moved to model from filemodel
++ text now loaded too, new rhs child add system
++ forward references in workspace load now work
++ simplified _build_display() system with _link() method for view subclasses
++ new iregiongroupview class for managing sets of region displays
++ more intelligent naming of objects across workspaces
++ workspace modified set for more actions ... reflected in mainw titlebar
++ context pointers are back, but inited from _child/parent_add() system
++ split to nip package
++ reworks for new package structure
++ row_recomp() sorts regeneration by row depth
++ new scan/reset system
++ Text now derives from Heapmodel, scrapped the last of the model_link() funcs
++ _refresh_value() -> _update_model()/_update_heap() pair, with ->modified to
+  control behaviour
++ _stdenv.def changes ... added is_space, split, splitl, split_lines,
+  parse_pint, parse_int, parse_float
++ program window parses on popdown
++ gtkutil has set-2-adjustments-at-once convenience function
++ all tally models (subcolumn downwards) now derive from Heapmodel
++ Heapmodel -> Heapmodel/Classmodel
++ all widget models derive from Classmodel
++ Text now delays parse/compile until recomp
++ regenerate system now uniform between graphic and text representations
++ new model_freeze()/model_thaw() system to reduce model_changed() emissions
++ XML load/save done for all class widgets 
++ only save edited formula ... deduce others
++ better target symbol naming for region/point/vector/guide create
++ dialog boxes now have GNOME2 button ordering ... F1 binds to help
++ old row_change() mechanism ditched ... much simpler and clearer now
++ all class.c getters renamed
++ _update_model() -> _update_model()/_new_heap() pair ... faster
++ ditched base/derived instance vars, new rebuild from base system from new
+  unified model recomp system 
++ ditched remake-from-base system :-( can no longer do islider ... but much
+  cleaner and more intuitive behaviour
++ tslider is now a proper widget
++ better jumping region labels during scroll
++ switch current column on row select
++ region labels / image window titles change helpfully on workspace switch
++ fantastically more complicated row_recomp() now deduces recomp order from
+  dependencies
++ graphic displays only save and restore their settings if they've been edited
++ text edit resets edits on sub rows 
++ don't make a display or RHS for system rows (eg. this, check, name)
++ mainw_countdown_animate() now updates display again ... this may cause
+  problems, have to see :-(
++ tslider has elaborate workaround for slider destroy during changed callback
+  problems
+
+started 7.7.12
++ added program window
++ reworked TODO list ... only 140 issues outstanding ... :-(
++ toolkitgroup now emits "changed" on any tool/toolkit change
++ find/find-next thing for program
++ new info mechanism
++ link report finds undefined symbols
++ tree view maintains sort order
++ model_child_add_before() to aid drag and drop reordering
++ toolview does menu reordering 
++ popups pass down host widget
++ general "are you sure you want to remove" for models
++ destroying a tool now destroys associated symbol too
++ destroying a toolkit destroys all contained tools
++ destroying a top level row destroys the symbol
++ symbol/filemodel/model destroy split to finalize as well
++ stable owns a ref to syms it holds
++ if destroy a sym, mark all parents as having "not defined" errors
++ expr_error_set() now zaps compiled code to force recompile ... ensures user 
+  fixes problems properly
++ textview always recompiles lines which you hit return on
++ better typecheck error messages for widget classes
++ right button menu on rulers
++ xml save
++ load_text and save_text methods in filemodel.c for tool/toolkit load/save
+
+started 7.7.11
++ added trace window
+
+started 7.7.10
++ BI_CONS is lazier and faster
+
+started 7.7.9
++ "print" builtin added
++ oops, parse_function() was not passing sym down
++ better checkargs function
++ x-ray print menu patched, duh
+
+started 7.7.8
++ browse now uses new image display code
++ ooops, PPM/PGM/PBM read added
++ conversion is now refcounted
++ all old image/region code removed
++ old window/dialog code removed
++ paintbox/edit/magic/menu/calibrate/cursor/request/dragdrop also gone for now
++ last of X11/Motif gone ... # of lines down 20k!
++ iregion/iregionview added
++ finally GNUified it
++ fixed newimage dialog
++ region redone as subclass of image
++ ip class names now have initial caps
++ better iwindow popdown behavious
++ imagedisplay implements gtk focus model
++ imageview key navigation: left-right-up-down-in-out, zoom to fit
++ imagedisplay repaint probs fixed
++ new expr_value_new()/_destroy() system to track images
++ regionview added
++ cursor manager added to iWindow
++ jumping region labels!
++ nasty reduce bug nailed ... heap corrupted if super-class constructor failed
++ class construction errors handled gracefully
++ rubberbanding regions on imagepresent
++ point and vector display types added
++ ivector/ivectorview added
++ instance vars can be virtualised by heapmodel ... for code sharing between
+  iregion/ivector/etc. ... sort of a lame MI fudge
++ regionview morphs between display types if unfrozen
++ Region/Vector/Point/HGuide/VGuide classes added
++ lists/image-bands index from zero
++ mark spine stack on GC ... oops, sometimes broke for nested recomp
++ reduce.c -> reduce.c/action.c
++ new action_strict() interface handles nested reduce_spine() calls correctly
+  ... allows mutually recursive locals
++ some reworking of reduce.c ... still not very pretty :-(
+
+started 7.7.7
++ [] can have whitespace between the [s
++ conversion.c added ... manages display conversion model and region/thread
+  display stuff
++ _list.def and _stdenv.def reworked from Miranda 2 stdenv:
+	foldl function args reversed
+	swap renamed as converse
+	foldl1, foldr1, map2, merge, replicate, scan, until added
+	faster sort (merge sort)
++ option/optionview pasted back in
++ image/option parts of sym->recomp scrapped
++ tslider widget ... entry, plus slider
++ conversionview ... display control bar
++ tslider does non-linear sliders
++ now uses 100%, 25%, 400% etc. to show magnification
++ oops, mono to labq was broken
++ statusview.[hc] added ... status bar!
++ iimage now tracks derived image value as well
++ better file_info display for JPEG/TIFF/PPM in file load
++ iimage now just has vips_image as class param
++ matrix/matrixview added, old mask stuff removed
++ lots of memory leaks removed (thank you memprof)
++ workspacegroup is a symbol ... workspaces are named root.Workspaces.blah
++ matrix resize
++ matrix load
++ is_string now defined in _stdenv.def, rather than being built in
++ vips_call knows about new matrix representation
++ better scanning system for text widgets
++ better uop/bop error messages with text_decompile()
+
+started 7.7.6
++ decompile for parameter edit, value displays parameters (tho not secrets)
++ save/save as/close added to model
++ new workspace save done
++ better notebook tabs
++ new iWindowSusp stuff now allows composition of window funcs
++ iDialog now allows multiple OK buttons
++ Save/Don't save/Cancel on filemodel close 
++ nasty nested iDialog problem found and fixed
++ close all filemodels on quit
++ tookit.c -> tool/toolview/toolkit/toolkitview; toolkits are filemodels
++ all sprintf()s gone
++ empty/load/replace for filemodel done
++ workspacegroup/workspacegroupview added
++ toolkitgroup/toolkitgroupview added
++ model -> view links removed, signals for 'changed' ... bit simpler n nicer
++ views track parents and children
++ scan set for auto re-reads of widgets
++ reset/scrollto now signals too
++ now called ip2
++ gtkdisp imagedisplay/present/asynch code pasted in
++ "image" builtin renamed as "vips_image"
++ image class added
++ iimage/iimageview added ... thumbnail display!
++ new (smarter) behaviour for spin expand/shrink; affects rhsview visibility
+  as well as subcolumnview visibility
++ threaded display code patched in
++ imageview added
++ image display rulers, magnification, titlebar wired up to menus
+
+started 7.7.5
++ better centering of dialogs over their parents
++ oops, silly bug in stable_resolve()
++ new expr_resolve() sorts out static/dynamic scoping problems
++ uses mkstemp() for temp image file names
++ new mark dirty scheme
++ small destroy bugfixes
++ better tallyrow_recomp_rethink() code finds the right expr more often
++ better binding to root for dynamic exprs
++ expr_resolve() before expr_check()
++ "super" member is a regular member, not a parameter
++ about dialog, with easter egg :-)
++ new code for recomputation of superclasses ... does "this.x" if any supers
+  change, tracks use of params in super construct
++ warp focus to column bottom on column select
++ ':' char banned in file names
++ workspace load/save/save as/close done
++ workspace tab menu and tooltip
++ don't mark zombies dirty
+
+clean up of front end started
++ Symbol extends GtkObject, Workspace extends Symbol
++ Columnset renamed Workspaceview, members moved between it and Workspace
++ Column split into Column and Columnview
++ refresh_note() system added
++ Model class underpins symbol/workspace/column etc.
++ tallycolumn -> subcolumn/subcolumnview
++ tallyrow -> row/rowview
++ tallyitem -> view
++ tallyrhs -> rhs/rhsview
++ text -> text/textview
++ Heapmodel class added to underpin slider/toggle/option/matpanel
++ slider -> slider/sliderview
++ toggle -> toggle/toggleview
++ mono <-> sRGB gammas both ways now
+
+started 7.7.4
++ reload $VIPSHOME/lib on menu and plugin reload
++ no longer includes gtkintl.h
++ better namecaption API
++ better iwindow/idialog/namecaption build inheritance 
++ cleaned up naming in main.c
++ gtkfilesel2 now inherits from idialog
++ filesel now inherits from gtkfilesel2
++ browse now inherits from idialog
++ now builds cleanly on Sun cc
++ found horrible gtkfilesel2 bug
++ fileselect removed
++ toggle/option/matpanel edit uses idialog
++ secret optimisation supressed for tally display
++ edit value (rather than source) for class params
++ edit reset on column after ENTER
++ asynch/menu bug fixes backported
++ Histogram.def renaming
++ -,/,* for realvec
+
+started 7.7.3
++ secret now in terms of expr
++ compile now in terms of expr, not sym
++ bulletproof errors()/verrors()
++ resolve_names now knows about tally scopes as well as symbol scopes
++ linked global recompute and tallyrow recompute up
++ new link object joins up topsyms for recomputation ... saves a search on
+  tallyrow dirty, makes multiple external refs work
++ better slider edit dialog
++ new code for '.' operator now records context in heap, so we can spot 
+  dynamic dependencies
++ improved link objects ... better handling of multiple links, more stuff
+  deduced, support for static and dynamic links
++ dynamic dependency management
++ class parameter edit
++ new spin widget for class display open/close
++ class member visibility table, controlled by spin widget
++ new im_vipshome() startup code
+
+started 7.7.2
++ ws error button colour fix
++ big sym/expr/row relationship reorganisation
++ better error handling
++ better tally tooltips
++ better toolkit flash help, plus flash for sub menus
++ fixed some input_push/pop() problems
++ reorganised main menus, better pull-right display rules
++ automatic.c -> mainw.c ... lots of renaming and tidying up
++ multiple workspaces linked to symbols, columnsets now make syms local to
+  their workspaces
++ iwindow/idialog improvements, newcolumn/workspace dialog is now subclassed
+  off idialog
++ countdown fixes
++ another nasty tallyrow destroy bug
++ error message display fixes
+
+started 7.7.1 ... 19/10/00
++ another nasty destroy bug
++ class browser looped for some classes containing errors
++ default constructor now not displayed (unless overridden in an enclosing
+  class)
++ recomp inside a class instance done
++ abs in _stdenv.def failed for complex
++ nasty gcc error in class_member() with -O2
++ tallytext rhs handling broken out into tallyrhs ... tallytext is simpler
+  ... now have graphic/klass/text display
++ new tallyitem_trigger system with better error propogation
++ fold/unfold button for class instances
++ button tooltip displays long messages 
++ tally => row rename
++ recomp/refresh/refresh_value sequences optimised
++ expr_clone() now works for function members of classes
++ refresh_value no longer uses _trigger() propogation mechanism
++ now tracks prhstext ... everything but the function name ... needed for
+  class edit of local functions
++ class/super now properties of expr, not sym ... classes are expressions, 
+  not symbols
++ displays args to function members of classes
++ sym_tab tracks insert order, used to order class members in tally
++ table_find_child handles hidden children
+
+started 7.7.0 
++ default constructors
++ escape cancel in idialog
++ 'root.' and 'workspace.' static scope references
++ recalc dynamic dependencies on link
++ super-class constructors are blocked from referring to locals (other than 
+  params)
++ class_member_base() stuff sorted out in slider.c ... usually need
+  non-overridden value
++ display update block mechanism for tally stops widgets updating
+  themselves
++ slider text value display redone
++ fixed a couple of nasty destroy bugs
++ 'Arithmetic.Add' now does sliders!
++ released as 7.7.0

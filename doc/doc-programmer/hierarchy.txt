@@ -1,0 +1,126 @@
+class hierarchy
+===============
+
+GObject 
+|
++-iObject
+  |
+  +-Heap
+  +-Imagemodel
+  +-Toolviewitemgroup
+  +-iContainer
+    |
+    +-Compile
+    +-Expr
+    +-Imageinfo
+    +-Watch
+    +-Model
+      |
+      +-Conversion
+      +-Toolkitgroup
+      +-Workspacegroup
+      +-Filemodel
+      | |
+      | +-Tool
+      | +-Toolkit
+      | +-Column
+      | +-Symbol
+      |   |
+      |   +-Workspace
+      |
+      +-Heapmodel
+        |
+        +-Rhs
+        +-Subcolumn
+        +-iText
+        +-Row
+        +-Classmodel
+          |
+          +-Slider
+          +-Patch
+          +-Filename
+          +-Fontname
+          +-Expression
+          +-Number
+          +-Matrix
+          +-String
+          +-Option
+          +-Toggle
+          +-iRegiongroup
+          +-iArrow
+          +-iImage
+            |
+            +-iRegion
+ 
+
+
+GtkVBox
+
+  View
+
+    Textview
+    Workspacegroupview
+    Workspaceview
+    Toolkitgroupview
+    Toolkitview
+    Toolview
+
+    Graphicview
+
+      Toggleview
+      Sliderview
+      Patchview
+      Filenameview
+      Fontnameview
+      Optionview
+      iArrowview
+      Matrixview
+      Regionview
+      iImageview
+
+        iRegionview
+
+      Editview
+
+        Stringview
+	Numberview
+	Expressionview
+
+    Rhsview
+    Rowview
+    Subcolumnview
+    Spin
+    Columnview
+
+    iRegiongroupview
+
+  Imagepresent
+  
+GtkFrame
+
+  Conversionview
+  Statusview
+
+GtkDrawingArea
+
+  Imagedisplay
+
+GtkWindow
+
+  iWindow
+
+    Imageview
+    Program
+    Trace
+
+    iDialog
+
+      Namecaption
+      Find
+      Imageheader
+      Browse
+      Filesel
+
+GtkEventBox
+
+  Formula

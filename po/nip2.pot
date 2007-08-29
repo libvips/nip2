@@ -1,0 +1,3864 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-09-06 13:27+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: ../src/action.c:85
+msgid "Bad arguments."
+msgstr ""
+
+#. Expands to eg. 'bad args to "+", called from "fred"'
+#.
+#: ../src/action.c:105 ../src/action.c:191
+msgid "Called from"
+msgstr ""
+
+#: ../src/action.c:111
+#, c-format
+msgid ""
+"Error in binary \"%s\".\n"
+"left = %s\n"
+"right = %s\n"
+"%s"
+msgstr ""
+
+#: ../src/action.c:145 ../src/class.c:190
+#, c-format
+msgid "Member \"%s\" not found in class \"%s\"."
+msgstr ""
+
+#: ../src/action.c:152
+#, c-format
+msgid "object = %s"
+msgstr ""
+
+#: ../src/action.c:156
+#, c-format
+msgid "tag = %s"
+msgstr ""
+
+#: ../src/action.c:161
+#, c-format
+msgid "Reference attempted in \"%s\"."
+msgstr ""
+
+#: ../src/action.c:165 ../src/class.c:189
+msgid "Member not found."
+msgstr ""
+
+#: ../src/action.c:176 ../src/builtin.c:419 ../src/builtin.c:1017
+#: ../src/class.c:50 ../src/class.c:1026 ../src/reduce.c:762
+#: ../src/reduce.c:775 ../src/vips_call.c:967
+msgid "Bad argument."
+msgstr ""
+
+#: ../src/action.c:197
+#, c-format
+msgid ""
+"Error in unary \"%s\".\n"
+"argument = %s\n"
+"%s"
+msgstr ""
+
+#: ../src/action.c:357
+msgid "Symbol on left hand side of '.' is not scope"
+msgstr ""
+
+#: ../src/action.c:362 ../src/action.c:404
+msgid "Right hand side of '.' is not tag."
+msgstr ""
+
+#: ../src/action.c:409
+msgid "Bad left hand side of '.'."
+msgstr ""
+
+#: ../src/action.c:881
+msgid "Division by zero."
+msgstr ""
+
+#: ../src/action.c:1253 ../src/action.c:1533
+msgid "Unimplemented."
+msgstr ""
+
+#: ../src/action.c:1616 ../src/action.c:1652 ../src/action.c:1902
+msgid "invoking method:"
+msgstr ""
+
+#: ../src/boxes.c:243
+msgid "Close _without Saving"
+msgstr ""
+
+#. Translators: translate this to a credit for you, and it'll appear in
+#. * the About box.
+#.
+#: ../src/boxes.c:262
+msgid "translator_credits"
+msgstr ""
+
+#: ../src/boxes.c:273
+#, c-format
+msgid "About %s."
+msgstr ""
+
+#: ../src/boxes.c:276
+#, c-format
+msgid "%s is an image processing package."
+msgstr ""
+
+#: ../src/boxes.c:280
+#, c-format
+msgid ""
+"%s comes with ABSOLUTELY NO WARRANTY. This is free software and you are "
+"welcome to redistribute it under certain conditions, see http://www.gnu.org."
+msgstr ""
+
+#: ../src/boxes.c:297
+msgid "Personal start folder:"
+msgstr ""
+
+#: ../src/boxes.c:300
+msgid "Homepage:"
+msgstr ""
+
+#: ../src/boxes.c:303
+msgid "Linked to VIPS:"
+msgstr ""
+
+#: ../src/boxes.c:306
+msgid "Built against VIPS:"
+msgstr ""
+
+#: ../src/boxes.c:319
+msgid "Temp files in:"
+msgstr ""
+
+#: ../src/boxes.c:385
+msgid "Help page not found."
+msgstr ""
+
+#: ../src/boxes.c:386
+#, c-format
+msgid "No indexed help page found for tag \"%s\""
+msgstr ""
+
+#: ../src/boxes.c:595
+msgid "Search for"
+msgstr ""
+
+#: ../src/boxes.c:596
+msgid "Case sensitive"
+msgstr ""
+
+#: ../src/boxes.c:598
+msgid "Regular expression"
+msgstr ""
+
+#: ../src/boxes.c:600
+msgid "Search from start"
+msgstr ""
+
+#. Scrolled area to hold fields.
+#.
+#: ../src/boxes.c:798
+msgid "Image header fields"
+msgstr ""
+
+#: ../src/boxes.c:812
+msgid "Image history"
+msgstr ""
+
+#: ../src/boxes.c:928 ../src/boxes.c:963
+msgid "Unable to open location."
+msgstr ""
+
+#: ../src/boxes.c:929
+#, c-format
+msgid "Unable to open URL \"%s\", windows error code = %d."
+msgstr ""
+
+#: ../src/boxes.c:939 ../src/boxes.c:973
+msgid "Browser window opened."
+msgstr ""
+
+#: ../src/boxes.c:940
+#, c-format
+msgid ""
+"Opened window for URL:\n"
+"  %s\n"
+"This may take a few seconds."
+msgstr ""
+
+#: ../src/boxes.c:965
+#, c-format
+msgid ""
+"Attempted to launch browser with command:\n"
+"  %s\n"
+"You can change this command in Preferences."
+msgstr ""
+
+#: ../src/boxes.c:974
+#, c-format
+msgid ""
+"Opened window for URL:\n"
+"  %s\n"
+"You may need to switch desktops to see the new window."
+msgstr ""
+
+#: ../src/boxes.c:1029
+msgid "Cancelling"
+msgstr ""
+
+#: ../src/boxes.c:1055
+msgid "Computing image."
+msgstr ""
+
+#: ../src/boxes.c:1056
+msgid ""
+"Calculating all the pixels in an image. Press the Cancel button to stop "
+"computation early."
+msgstr ""
+
+#: ../src/boxes.c:1072
+msgid "Calculating"
+msgstr ""
+
+#: ../src/boxes.c:1157
+#, c-format
+msgid "About %d minute left"
+msgid_plural "About %d minutes left"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../src/boxes.c:1162
+#, c-format
+msgid "About %d seconds left"
+msgstr ""
+
+#: ../src/boxes.c:1219
+#, c-format
+msgid "Version %s"
+msgstr ""
+
+#: ../src/boxes.c:1235
+msgid "Display this splash screen during startup"
+msgstr ""
+
+#: ../src/boxes.c:1304
+msgid "Initialising toolkit"
+msgstr ""
+
+#: ../src/boxes.c:1333
+msgid "Select Font"
+msgstr ""
+
+#: ../src/boxes.c:1391
+msgid "Font not found."
+msgstr ""
+
+#: ../src/boxes.c:1392
+#, c-format
+msgid "Font \"%s\" not found on system."
+msgstr ""
+
+#: ../src/boxes.c:1472
+msgid "Pick a font"
+msgstr ""
+
+#: ../src/boxes.c:1477
+msgid "Set Font"
+msgstr ""
+
+#: ../src/boxes.c:1523
+msgid "Click to select font"
+msgstr ""
+
+#: ../src/browse.c:83
+msgid "Thumbnails"
+msgstr ""
+
+#: ../src/browse.c:302
+#, c-format
+msgid "Image files found in: \"%s\""
+msgstr ""
+
+#: ../src/browse.c:304
+msgid "Searching ..."
+msgstr ""
+
+#: ../src/browse.c:306
+msgid "Search incomplete!"
+msgstr ""
+
+#: ../src/builtin.c:281
+msgid "Out of range."
+msgstr ""
+
+#: ../src/builtin.c:282
+msgid "gammq arguments must be a > 0, x >= 0."
+msgstr ""
+
+#: ../src/builtin.c:289
+msgid "Not available."
+msgstr ""
+
+#: ../src/builtin.c:290
+msgid "No GSL library available for gammq."
+msgstr ""
+
+#: ../src/builtin.c:420
+msgid "GObject is not a VipsObject."
+msgstr ""
+
+#: ../src/builtin.c:525 ../src/classmodel.c:85 ../src/classmodel.c:159
+#: ../src/filemodel.c:100 ../src/filemodel.c:130 ../src/filemodel.c:340
+#: ../src/filemodel.c:561 ../src/filemodel.c:602 ../src/mainw.c:770
+#: ../src/mainw.c:778 ../src/model.c:326 ../src/model.c:381
+#: ../src/rowview.c:455 ../src/view.c:770
+msgid "Not implemented."
+msgstr ""
+
+#: ../src/builtin.c:526
+msgid "Complex math ops not implemented."
+msgstr ""
+
+#: ../src/builtin.c:601
+msgid "Macro error."
+msgstr ""
+
+#: ../src/builtin.c:911
+msgid "GSL library error."
+msgstr ""
+
+#: ../src/builtin.c:960
+#, c-format
+msgid "Builtin \"%s\" takes %d argument."
+msgid_plural "Builtin \"%s\" takes %d arguments."
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../src/builtin.c:1018
+#, c-format
+msgid ""
+"Argument %d to builtin \"%s\" should be \"%s\", you passed:\n"
+"  %s"
+msgstr ""
+
+#: ../src/call8.c:97
+msgid "VIPS8 error."
+msgstr ""
+
+#: ../src/call8.c:170
+msgid "Unimplemented list type."
+msgstr ""
+
+#: ../src/call8.c:250
+msgid "Unimplemented type."
+msgstr ""
+
+#: ../src/call8.c:251
+#, c-format
+msgid "Unable to convert %s to a nip type."
+msgstr ""
+
+#: ../src/call8.c:264 ../src/class.c:662 ../src/class.c:886 ../src/class.c:984
+msgid "Too many arguments."
+msgstr ""
+
+#: ../src/call8.c:265
+#, c-format
+msgid "No more than %d arguments allowed."
+msgstr ""
+
+#: ../src/call8.c:451
+msgid "Wrong number of required arguments."
+msgstr ""
+
+#: ../src/call8.c:452
+#, c-format
+msgid "Operation \"%s\" has %d required arguments, you supplied %d."
+msgstr ""
+
+#: ../src/call8.c:558
+msgid "VIPS8 not linked."
+msgstr ""
+
+#: ../src/class.c:51
+#, c-format
+msgid "Object %s is not a class."
+msgstr ""
+
+#: ../src/class.c:333
+msgid "No such secret."
+msgstr ""
+
+#: ../src/class.c:334
+msgid ""
+"Editing local classes which reference non-local objects is a bit broken at "
+"the moment :-("
+msgstr ""
+
+#: ../src/class.c:663
+#, c-format
+msgid "You can't have more than %d arguments to a superclass constructor."
+msgstr ""
+
+#: ../src/class.c:792 ../src/class.c:849
+msgid "Bad superclass."
+msgstr ""
+
+#: ../src/class.c:793
+#, c-format
+msgid "Superclass constructor \"%s\" should have no secret arguments."
+msgstr ""
+
+#: ../src/class.c:800 ../src/workspace.c:1455
+msgid "Wrong number of arguments."
+msgstr ""
+
+#: ../src/class.c:801
+#, c-format
+msgid "Superclass constructor \"%s\" expects %d arguments, not %d."
+msgstr ""
+
+#: ../src/class.c:855
+#, c-format
+msgid "First element in superclass of \"%s\" must be class or constructor."
+msgstr ""
+
+#: ../src/class.c:859 ../src/vips_call.c:837 ../src/vips_call.c:857
+msgid "You passed:"
+msgstr ""
+
+#: ../src/class.c:887 ../src/class.c:985
+#, c-format
+msgid ""
+"Too many arguments to class constructor \"%s\". No more than %d arguments "
+"are supported."
+msgstr ""
+
+#: ../src/class.c:978
+msgid "Class not found."
+msgstr ""
+
+#: ../src/class.c:979
+#, c-format
+msgid "Class \"%s\" not found."
+msgstr ""
+
+#: ../src/class.c:1017
+#, c-format
+msgid "Member \"%s\" of class \"%s\" should be of type \"%s\", instead it's:"
+msgstr ""
+
+#: ../src/classmodel.c:86 ../src/classmodel.c:160
+#, c-format
+msgid "_%s() method not implemented for %s."
+msgstr ""
+
+#: ../src/classmodel.c:95
+#, c-format
+msgid "Save %s \"%s\""
+msgstr ""
+
+#: ../src/classmodel.c:170
+#, c-format
+msgid "Replace %s \"%s\""
+msgstr ""
+
+#: ../src/classmodel.c:581
+msgid "Set boolean value here"
+msgstr ""
+
+#: ../src/classmodel.c:587
+msgid "Enter a floating point number here"
+msgstr ""
+
+#: ../src/classmodel.c:594
+msgid "Enter a string here"
+msgstr ""
+
+#. Expands to "Edit Toggle A1".
+#.
+#: ../src/classmodel.c:650
+#, c-format
+msgid "Edit %s %s"
+msgstr ""
+
+#: ../src/classmodel.c:661
+#, c-format
+msgid "Set %s"
+msgstr ""
+
+#: ../src/classmodel.c:978 ../src/matrixview.c:197 ../src/matrixview.c:218
+msgid "Bad value."
+msgstr ""
+
+#: ../src/classmodel.c:979
+#, c-format
+msgid "%d band value only"
+msgstr ""
+
+#: ../src/clock.c:59 ../src/clock.c:93 ../src/clock.c:179
+msgid "Interval"
+msgstr ""
+
+#: ../src/clock.c:60 ../src/clock.c:96
+msgid "Elapsed time"
+msgstr ""
+
+#: ../src/clock.c:93
+msgid "Interval between ticks (seconds)"
+msgstr ""
+
+#: ../src/clock.c:96
+msgid "Elapsed time (seconds)"
+msgstr ""
+
+#: ../src/clock.c:101
+#, c-format
+msgid "Edit Clock \"%s\""
+msgstr ""
+
+#: ../src/clock.c:105
+msgid "Set Clock"
+msgstr ""
+
+#: ../src/clock.c:182 ../src/colour.c:297 ../src/fontname.c:55
+#: ../src/matrix.c:257 ../src/number.c:62 ../src/option.c:177
+#: ../src/option.c:219 ../src/pathname.c:64 ../src/slider.c:51
+#: ../src/string.c:64 ../src/toggle.c:45
+msgid "Value"
+msgstr ""
+
+#: ../src/colour.c:262
+#, c-format
+msgid "Edit Color \"%s\""
+msgstr ""
+
+#: ../src/colour.c:268
+msgid "Set Color"
+msgstr ""
+
+#: ../src/colour.c:294
+msgid "Colour Space"
+msgstr ""
+
+#: ../src/colourdisplay.c:264
+msgid "Double-click to edit this color, or drag-and-drop between colors"
+msgstr ""
+
+#: ../src/column.c:312 ../src/tool.c:786 ../src/workspace.c:1298
+#: ../src/workspacegroup.c:145
+msgid "Name clash."
+msgstr ""
+
+#: ../src/column.c:313
+#, c-format
+msgid "Can't create column \"%s\". A column with that name already exists."
+msgstr ""
+
+#: ../src/column.c:350
+msgid "Empty column."
+msgstr ""
+
+#: ../src/column.c:351
+msgid "There are no objects in the current column."
+msgstr ""
+
+#: ../src/column.c:370
+msgid "Too few items."
+msgstr ""
+
+#: ../src/column.c:371
+#, c-format
+msgid "This column only has %d items, but %s needs %d items."
+msgstr ""
+
+#: ../src/columnview.c:153
+#, c-format
+msgid "Save Column \"%s\""
+msgstr ""
+
+#: ../src/columnview.c:200 ../src/columnview.c:261 ../src/program.c:602
+#: ../src/program.c:631 ../src/program.c:1070 ../src/program.c:1112
+#: ../src/program.c:1158 ../src/program.c:1190 ../src/program.c:1514
+#: ../src/program.c:1555 ../src/program.c:2245 ../src/row.c:481
+#: ../src/workspacegroup.c:177 ../src/workspacegroup.c:213
+msgid "Name"
+msgstr ""
+
+#: ../src/columnview.c:201 ../src/columnview.c:263
+msgid "Toolkit"
+msgstr ""
+
+#: ../src/columnview.c:202 ../src/columnview.c:265 ../src/matrix.c:266
+#: ../src/program.c:603 ../src/program.c:633 ../src/program.c:1159
+#: ../src/program.c:1192
+msgid "Filename"
+msgstr ""
+
+#: ../src/columnview.c:261
+msgid "Set menu item text here"
+msgstr ""
+
+#: ../src/columnview.c:263
+msgid "Add to this toolkit"
+msgstr ""
+
+#: ../src/columnview.c:265
+msgid "Store column in this file"
+msgstr ""
+
+#: ../src/columnview.c:268
+#, c-format
+msgid "New Menu Item from Column \"%s\""
+msgstr ""
+
+#: ../src/columnview.c:273
+msgid "Menuize"
+msgstr ""
+
+#: ../src/columnview.c:674
+msgid "Edit caption, press enter to accept changes, press escape to cancel"
+msgstr ""
+
+#: ../src/columnview.c:749
+msgid "Enter expressions here"
+msgstr ""
+
+#: ../src/columnview.c:808
+msgid "Fold the column away"
+msgstr ""
+
+#: ../src/columnview.c:813
+msgid "Open the column"
+msgstr ""
+
+#: ../src/columnview.c:938
+msgid "Column menu"
+msgstr ""
+
+#: ../src/columnview.c:939
+msgid "_Edit Caption"
+msgstr ""
+
+#: ../src/columnview.c:941 ../src/mainw.c:1512 ../src/program.c:1764
+msgid "Select _All"
+msgstr ""
+
+#: ../src/columnview.c:948
+msgid "Make Column Into _Menu Item"
+msgstr ""
+
+#: ../src/columnview.c:985
+msgid "Left-drag to move, left-double-click to set title, right-click for menu"
+msgstr ""
+
+#: ../src/columnview.c:1020
+msgid "Delete the column"
+msgstr ""
+
+#: ../src/compile.c:1484
+msgid "Too many shared nodes in graph."
+msgstr ""
+
+#: ../src/compile.c:1486
+msgid "Raise MAX_RELOC"
+msgstr ""
+
+#: ../src/compile.c:1754
+#, c-format
+msgid "Member \"%s\" of class \"%s\" should have no arguments."
+msgstr ""
+
+#: ../src/conversion.c:529
+msgid "not uncoded"
+msgstr ""
+
+#: ../src/conversionview.c:66
+msgid "Unable to find image range."
+msgstr ""
+
+#: ../src/conversionview.c:67
+msgid "Find image range failed."
+msgstr ""
+
+#: ../src/conversionview.c:90
+msgid "Unable to scale image."
+msgstr ""
+
+#: ../src/conversionview.c:91
+msgid "Maximum and minimum pixel values are equal."
+msgstr ""
+
+#. Build menu. One for each window, as we need to track falsecolour
+#. * etc. toggles. Could just have one, and modify pre-popup, but this
+#. * is easier.
+#.
+#: ../src/conversionview.c:229
+msgid "Convert menu"
+msgstr ""
+
+#: ../src/conversionview.c:230
+msgid "_Scale"
+msgstr ""
+
+#: ../src/conversionview.c:232
+msgid "_False Color"
+msgstr ""
+
+#: ../src/conversionview.c:234
+msgid "_Interpret"
+msgstr ""
+
+#: ../src/conversionview.c:236 ../src/regionview.c:986
+msgid "_Reset"
+msgstr ""
+
+#: ../src/conversionview.c:238
+msgid "Set As Workspace _Default"
+msgstr ""
+
+#: ../src/dump.c:184 ../src/expr.c:597
+msgid "value"
+msgstr ""
+
+#: ../src/dump.c:185
+msgid "parameter"
+msgstr ""
+
+#: ../src/dump.c:186
+msgid "zombie"
+msgstr ""
+
+#: ../src/dump.c:187
+msgid "workspace"
+msgstr ""
+
+#: ../src/dump.c:188
+msgid "workspace group"
+msgstr ""
+
+#: ../src/dump.c:189
+msgid "root symbol"
+msgstr ""
+
+#: ../src/dump.c:190
+msgid "external symbol"
+msgstr ""
+
+#: ../src/dump.c:191
+msgid "built-in symbol"
+msgstr ""
+
+#: ../src/editview.c:79 ../src/fontnameview.c:80 ../src/formula.c:199
+#: ../src/gtkutil.c:730 ../src/gtkutil.c:765 ../src/gtkutil.c:819
+#: ../src/optionview.c:168 ../src/pathnameview.c:80 ../src/sliderview.c:74
+#, c-format
+msgid "%s:"
+msgstr ""
+
+#: ../src/editview.c:158
+msgid "Escape to cancel edit, press Return to accept edit and recalculate"
+msgstr ""
+
+#: ../src/expr.c:66
+#, c-format
+msgid "error in \"%s\": %s %s"
+msgstr ""
+
+#: ../src/expr.c:310
+msgid "Error"
+msgstr ""
+
+#: ../src/expr.c:569
+msgid "top level"
+msgstr ""
+
+#: ../src/expr.c:574
+msgid "class"
+msgstr ""
+
+#: ../src/expr.c:577
+msgid "instance"
+msgstr ""
+
+#: ../src/expr.c:581
+msgid "definition"
+msgstr ""
+
+#: ../src/expr.c:588
+#, c-format
+msgid "parameter \"%s\""
+msgstr ""
+
+#: ../src/expr.c:592
+msgid "member"
+msgstr ""
+
+#: ../src/expr.c:601 ../src/itext.c:448
+msgid "function"
+msgstr ""
+
+#: ../src/expr.c:610
+msgid "of"
+msgstr ""
+
+#: ../src/filemodel.c:101 ../src/filemodel.c:131 ../src/filemodel.c:562
+#: ../src/filemodel.c:603 ../src/model.c:327 ../src/model.c:382
+#: ../src/model.c:401
+#, c-format
+msgid "_%s() not implemented for class \"%s\"."
+msgstr ""
+
+#: ../src/filemodel.c:253 ../src/filemodel.c:268 ../src/model.c:432
+msgid "XML library error."
+msgstr ""
+
+#: ../src/filemodel.c:254
+msgid "model_save_filename: xmlNewDoc() failed"
+msgstr ""
+
+#: ../src/filemodel.c:269
+msgid "model_save_filename: xmlNewDocNode() failed"
+msgstr ""
+
+#: ../src/filemodel.c:285
+msgid "Save failed."
+msgstr ""
+
+#: ../src/filemodel.c:286
+#, c-format
+msgid ""
+"Save of %s \"%s\" to file \"%s\" failed.\n"
+"%s"
+msgstr ""
+
+#: ../src/filemodel.c:341
+msgid "filemodel_real_save_all: no save method"
+msgstr ""
+
+#: ../src/filemodel.c:447 ../src/filemodel.c:456 ../src/filemodel.c:469
+#: ../src/mainw.c:977 ../src/model.c:130
+msgid "Load failed."
+msgstr ""
+
+#: ../src/filemodel.c:448
+#, c-format
+msgid "Can't load XML file \"%s\", it's not a %s save file."
+msgstr ""
+
+#: ../src/filemodel.c:457
+#, c-format
+msgid ""
+"Can't load XML file \"%s\", unable to extract version information from "
+"namespace."
+msgstr ""
+
+#: ../src/filemodel.c:470
+#, c-format
+msgid "Can't load XML file \"%s\", the file does not contain a %s."
+msgstr ""
+
+#. Expands to (eg.) "Save Column A2".
+#.
+#: ../src/filemodel.c:655
+#, c-format
+msgid "Save %s %s"
+msgstr ""
+
+#: ../src/filemodel.c:730 ../src/filemodel.c:742
+msgid "Object has been modified."
+msgstr ""
+
+#: ../src/filemodel.c:731
+#, c-format
+msgid ""
+"%s \"%s\" has been modified since you loaded it from file \"%s\".\n"
+"\n"
+"Do you want to save your changes?"
+msgstr ""
+
+#: ../src/filemodel.c:743
+#, c-format
+msgid "%s \"%s\" has been modified. Do you want to save your changes?"
+msgstr ""
+
+#: ../src/filesel.c:94
+msgid "TIFF image files (*.tif, *.tiff)"
+msgstr ""
+
+#: ../src/filesel.c:96
+msgid "JPEG image files (*.jpg, *.jpeg, *.jpe)"
+msgstr ""
+
+#: ../src/filesel.c:98
+msgid "PNG image files (*.png)"
+msgstr ""
+
+#: ../src/filesel.c:100
+msgid "VIPS image files (*.v)"
+msgstr ""
+
+#: ../src/filesel.c:102
+msgid "PPM image files (*.ppm, *.pgm, *.pbm)"
+msgstr ""
+
+#: ../src/filesel.c:104
+msgid "OpenEXR image files (*.exr)"
+msgstr ""
+
+#: ../src/filesel.c:106
+msgid "Analyze image files (*.img, *.hdr)"
+msgstr ""
+
+#: ../src/filesel.c:108
+msgid "Workspace files (*.ws)"
+msgstr ""
+
+#: ../src/filesel.c:110
+msgid "Recombination matrix files (*.rec)"
+msgstr ""
+
+#: ../src/filesel.c:112
+msgid "Morphology matrix files (*.mor)"
+msgstr ""
+
+#: ../src/filesel.c:114
+msgid "Convolution matrix files (*.con)"
+msgstr ""
+
+#: ../src/filesel.c:116
+msgid "Matrix files (*.mat)"
+msgstr ""
+
+#: ../src/filesel.c:118
+msgid "Definition files (*.def)"
+msgstr ""
+
+#: ../src/filesel.c:120
+msgid "ICC profiles (*.icc, *.icm)"
+msgstr ""
+
+#: ../src/filesel.c:122
+msgid "CSV files (*.csv)"
+msgstr ""
+
+#: ../src/filesel.c:124
+msgid "All files (*)"
+msgstr ""
+
+#: ../src/filesel.c:378
+#, c-format
+msgid "Unable to determine space free in \"%s\"."
+msgstr ""
+
+#. Expands to (eg.) '6GB free in "/pics/tmp"'
+#.
+#: ../src/filesel.c:390
+#, c-format
+msgid "free in \"%s\""
+msgstr ""
+
+#: ../src/filesel.c:614 ../src/util.c:2211 ../src/util.c:2217
+msgid "Bad filename."
+msgstr ""
+
+#: ../src/filesel.c:615
+msgid "No file selected."
+msgstr ""
+
+#: ../src/filesel.c:819
+msgid "Increment filename"
+msgstr ""
+
+#: ../src/filesel.c:825
+msgid "After Save, add 1 to the last number in the file name"
+msgstr ""
+
+#: ../src/filesel.c:838
+msgid "Show thumbnails"
+msgstr ""
+
+#: ../src/filesel.c:844
+msgid "Show thumbnails for files in this directory"
+msgstr ""
+
+#: ../src/filesel.c:1068
+msgid "Overwrite"
+msgstr ""
+
+#: ../src/filesel.c:1069
+msgid "Overwrite file?"
+msgstr ""
+
+#: ../src/filesel.c:1070
+#, c-format
+msgid "File \"%s\" exists. OK to overwrite?"
+msgstr ""
+
+#: ../src/fontname.c:52 ../src/number.c:59 ../src/option.c:146
+#: ../src/option.c:213 ../src/pathname.c:61 ../src/program.c:1071
+#: ../src/program.c:1114 ../src/slider.c:42 ../src/string.c:61
+#: ../src/toggle.c:42 ../src/workspacegroup.c:178 ../src/workspacegroup.c:215
+msgid "Caption"
+msgstr ""
+
+#: ../src/formula.c:148
+msgid ""
+"Press Escape to cancel edit, press Return to accept edit and recalculate"
+msgstr ""
+
+#: ../src/graph.c:179
+msgid "circular"
+msgstr ""
+
+#: ../src/graph.c:184
+#, c-format
+msgid "circular to label %d"
+msgstr ""
+
+#: ../src/graph.c:194
+#, c-format
+msgid "label %d"
+msgstr ""
+
+#: ../src/graph.c:211
+msgid "unevaluated"
+msgstr ""
+
+#: ../src/graph.c:246
+#, c-format
+msgid "class (%p)"
+msgstr ""
+
+#: ../src/graph.c:257
+msgid "members"
+msgstr ""
+
+#: ../src/graph.c:267
+msgid "secret"
+msgstr ""
+
+#: ../src/graph.c:284
+msgid "from"
+msgstr ""
+
+#: ../src/graph.c:332
+#, c-format
+msgid "no value (type %d)"
+msgstr ""
+
+#: ../src/graph.c:340
+msgid "NULL pointer"
+msgstr ""
+
+#: ../src/graph.c:349
+msgid "symbol"
+msgstr ""
+
+#: ../src/graph.c:357
+msgid "constructor"
+msgstr ""
+
+#: ../src/graph.c:365
+msgid "symref"
+msgstr ""
+
+#: ../src/graph.c:373
+msgid "compileref"
+msgstr ""
+
+#: ../src/graph.c:401
+#, c-format
+msgid "tag \"%s\""
+msgstr ""
+
+#: ../src/graph.c:407
+#, c-format
+msgid "static string \"%s\""
+msgstr ""
+
+#: ../src/graph.c:422
+#, c-format
+msgid "unknown element tag %d"
+msgstr ""
+
+#: ../src/group.c:70
+msgid "No group"
+msgstr ""
+
+#: ../src/gtkutil.c:571
+msgid "Bad identifier."
+msgstr ""
+
+#: ../src/gtkutil.c:573
+msgid ""
+"Enter an identifier. Identifiers start with a letter, and then contain only "
+"letters, numbers, apostrophy and underscore."
+msgstr ""
+
+#: ../src/gtkutil.c:626 ../src/gtkutil.c:634 ../src/matrixview.c:104
+msgid "Bad floating point number."
+msgstr ""
+
+#: ../src/gtkutil.c:627 ../src/matrixview.c:105
+#, c-format
+msgid "\"%s\" is not a floating point number."
+msgstr ""
+
+#: ../src/gtkutil.c:635
+#, c-format
+msgid "Extra characters \"%s\" after number."
+msgstr ""
+
+#: ../src/gtkutil.c:659
+msgid "Bad integer."
+msgstr ""
+
+#: ../src/gtkutil.c:660
+#, c-format
+msgid "\"%s\" is not an integer."
+msgstr ""
+
+#: ../src/gtkutil.c:678
+msgid "Bad unsigned integer."
+msgstr ""
+
+#: ../src/gtkutil.c:694
+msgid "Bad positive integer."
+msgstr ""
+
+#: ../src/gtkutil.c:827 ../src/toggleview.c:106
+msgid "Left-click to change value"
+msgstr ""
+
+#: ../src/heap.c:839
+msgid "Heap full."
+msgstr ""
+
+#: ../src/heap.c:846
+#, c-format
+msgid ""
+"The compile heap for %s has filled. Make it smaller and less complicated."
+msgstr ""
+
+#: ../src/heap.c:851
+msgid ""
+"The main calculation heap has filled. Raise the heap size limit in "
+"Preferences."
+msgstr ""
+
+#: ../src/iarrow.c:116 ../src/iimage.c:151 ../src/iregion.c:156
+msgid "No image"
+msgstr ""
+
+#. Used in (eg.) "Mark at (10, 10) on [A1, A2]"
+#.
+#. Expands to (eg.) "Region on A1 at (10, 10), size (50, 50)"
+#.
+#: ../src/iarrow.c:129 ../src/iregion.c:164
+msgid "on"
+msgstr ""
+
+#: ../src/iarrow.c:148 ../src/iarrow.c:154
+#, c-format
+msgid "at %d"
+msgstr ""
+
+#: ../src/iarrow.c:160
+#, c-format
+msgid "at (%d, %d)"
+msgstr ""
+
+#: ../src/iarrow.c:167
+#, c-format
+msgid "at (%d, %d), offset (%d, %d)"
+msgstr ""
+
+#: ../src/idialog.c:415
+msgid "Pin up"
+msgstr ""
+
+#: ../src/idialog.c:417
+msgid "Check this to pin the dialog up"
+msgstr ""
+
+#: ../src/iimage.c:198
+msgid "Original filename"
+msgstr ""
+
+#: ../src/iimage.c:419
+msgid "Save timer."
+msgstr ""
+
+#: ../src/iimage.c:420
+#, c-format
+msgid "Image save took %g seconds."
+msgstr ""
+
+#: ../src/imageinfo.c:1130
+msgid "Unable to open image."
+msgstr ""
+
+#: ../src/imageinfo.c:1131
+#, c-format
+msgid "Unable to open file \"%s\" as image."
+msgstr ""
+
+#: ../src/imageinfo.c:1155 ../src/imageinfo.c:1165 ../src/imageinfo.c:1316
+msgid "Unable to write to file."
+msgstr ""
+
+#: ../src/imageinfo.c:1156
+#, c-format
+msgid "File \"%s\" is already open for read."
+msgstr ""
+
+#: ../src/imageinfo.c:1166
+#, c-format
+msgid "Unable to open \"%s\" for write."
+msgstr ""
+
+#: ../src/imageinfo.c:1317
+#, c-format
+msgid "Error writing image to file \"%s\"."
+msgstr ""
+
+#: ../src/imageinfo.c:1383
+msgid "Unable to paint on image."
+msgstr ""
+
+#: ../src/imageinfo.c:1384
+#, c-format
+msgid ""
+"Unable to get write permission for file \"%s\".\n"
+"Check permission settings."
+msgstr ""
+
+#: ../src/imageinfo.c:1427
+msgid "Modify"
+msgstr ""
+
+#: ../src/imageinfo.c:1428
+msgid "Modify disc file?"
+msgstr ""
+
+#: ../src/imageinfo.c:1429
+#, c-format
+msgid ""
+"This image is being shown directly from the disc file:\n"
+"\n"
+"   %s\n"
+"\n"
+"If you paint on this file, it will be permanently changed. If something goes "
+"wrong, you may lose work. Are you sure you want to modify this file?"
+msgstr ""
+
+#: ../src/imageinfo.c:2132
+msgid "Unable to paint text."
+msgstr ""
+
+#: ../src/imageinfo.c:2133
+#, c-format
+msgid "Unable to paint text \"%s\" in font \"%s\"."
+msgstr ""
+
+#: ../src/imagemodel.c:499
+msgid "No text specified."
+msgstr ""
+
+#: ../src/imagemodel.c:500
+msgid "Enter some text to paint in the entry widget at the top of the window."
+msgstr ""
+
+#. Need one menu per image window (could have a single menu for all
+#. * windows, but then we'd have to set the state of the toggle buttons
+#. * before mapping)
+#.
+#: ../src/imagepresent.c:1530
+msgid "Ruler menu"
+msgstr ""
+
+#: ../src/imagepresent.c:1531
+msgid "Rulers In _mm"
+msgstr ""
+
+#: ../src/imagepresent.c:1533
+msgid "Show _Offset"
+msgstr ""
+
+#: ../src/imageview.c:375
+#, c-format
+msgid "Header for \"%s\""
+msgstr ""
+
+#: ../src/imageview.c:379
+msgid "OK"
+msgstr ""
+
+#: ../src/imageview.c:480
+msgid "New _Mark"
+msgstr ""
+
+#: ../src/imageview.c:481
+msgid "Create a new mark"
+msgstr ""
+
+#: ../src/imageview.c:485
+msgid "New _Horizontal Guide"
+msgstr ""
+
+#: ../src/imageview.c:486
+msgid "Create a new horizontal guide"
+msgstr ""
+
+#: ../src/imageview.c:490
+msgid "New _Vertical Guide"
+msgstr ""
+
+#: ../src/imageview.c:491
+msgid "Create a new vertical guide"
+msgstr ""
+
+#: ../src/imageview.c:495
+msgid "New _Arrow"
+msgstr ""
+
+#: ../src/imageview.c:496
+msgid "Create a new arrow"
+msgstr ""
+
+#: ../src/imageview.c:500
+msgid "New _Region"
+msgstr ""
+
+#: ../src/imageview.c:501
+msgid "Create a new region"
+msgstr ""
+
+#: ../src/imageview.c:505
+msgid "Replace Image"
+msgstr ""
+
+#: ../src/imageview.c:506
+msgid "Replace image from file"
+msgstr ""
+
+#: ../src/imageview.c:510
+msgid "Save Image As"
+msgstr ""
+
+#: ../src/imageview.c:511
+msgid "Save image to file"
+msgstr ""
+
+#: ../src/imageview.c:515 ../src/mainw.c:879
+msgid "Recalculate"
+msgstr ""
+
+#: ../src/imageview.c:516
+msgid "Recalculate image"
+msgstr ""
+
+#: ../src/imageview.c:520 ../src/mainw.c:1502 ../src/program.c:1739
+#: ../src/trace.c:297
+msgid "_Close"
+msgstr ""
+
+#: ../src/imageview.c:521 ../src/program.c:1740
+msgid "Close"
+msgstr ""
+
+#: ../src/imageview.c:525
+msgid "Image _Header"
+msgstr ""
+
+#: ../src/imageview.c:526
+msgid "View image header"
+msgstr ""
+
+#: ../src/imageview.c:530 ../src/imageview.c:594
+msgid "Zoom _In"
+msgstr ""
+
+#: ../src/imageview.c:531 ../src/imageview.c:595
+msgid "Zoom in on mouse cursor"
+msgstr ""
+
+#: ../src/imageview.c:535 ../src/imageview.c:599
+msgid "Zoom _Out"
+msgstr ""
+
+#. IMAGEMODEL_MAGIN
+#: ../src/imageview.c:536 ../src/imageview.c:600 ../src/paintboxview.c:257
+msgid "Zoom out"
+msgstr ""
+
+#: ../src/imageview.c:540
+msgid "Zoom _100%"
+msgstr ""
+
+#: ../src/imageview.c:541 ../src/imageview.c:614
+msgid "Zoom to 100%"
+msgstr ""
+
+#: ../src/imageview.c:545
+msgid "Zoom to _Fit"
+msgstr ""
+
+#: ../src/imageview.c:546
+msgid "Zoom to fit image to window"
+msgstr ""
+
+#: ../src/imageview.c:550 ../src/mainw.c:1572 ../src/program.c:1824
+#: ../src/trace.c:302
+msgid "_Contents"
+msgstr ""
+
+#: ../src/imageview.c:551 ../src/mainw.c:1573 ../src/program.c:1825
+#: ../src/trace.c:303
+msgid "Open the users guide"
+msgstr ""
+
+#: ../src/imageview.c:555 ../src/mainw.c:1567 ../src/program.c:1819
+#: ../src/trace.c:307
+msgid "_About"
+msgstr ""
+
+#: ../src/imageview.c:556 ../src/mainw.c:1568 ../src/program.c:1820
+#: ../src/trace.c:308
+msgid "About this program"
+msgstr ""
+
+#: ../src/imageview.c:562
+msgid "_Status"
+msgstr ""
+
+#: ../src/imageview.c:563
+msgid "Show status bar"
+msgstr ""
+
+#: ../src/imageview.c:567
+msgid "_Display Control"
+msgstr ""
+
+#: ../src/imageview.c:568
+msgid "Show display control bar"
+msgstr ""
+
+#: ../src/imageview.c:572
+msgid "_Paint"
+msgstr ""
+
+#: ../src/imageview.c:573
+msgid "Show paint bar"
+msgstr ""
+
+#: ../src/imageview.c:577
+msgid "_Rulers"
+msgstr ""
+
+#: ../src/imageview.c:578
+msgid "Show rulers"
+msgstr ""
+
+#: ../src/imageview.c:584
+msgid "_Select"
+msgstr ""
+
+#: ../src/imageview.c:585
+msgid "Select and modify selections"
+msgstr ""
+
+#: ../src/imageview.c:589
+msgid "_Pan"
+msgstr ""
+
+#: ../src/imageview.c:590
+msgid "Pan image"
+msgstr ""
+
+#: ../src/imageview.c:606
+msgid "6%"
+msgstr ""
+
+#: ../src/imageview.c:606
+msgid "Zoom to 6%"
+msgstr ""
+
+#: ../src/imageview.c:608
+msgid "12%"
+msgstr ""
+
+#: ../src/imageview.c:608
+msgid "Zoom to 12%"
+msgstr ""
+
+#: ../src/imageview.c:610
+msgid "25%"
+msgstr ""
+
+#: ../src/imageview.c:610
+msgid "Zoom to 25%"
+msgstr ""
+
+#: ../src/imageview.c:612
+msgid "50%"
+msgstr ""
+
+#: ../src/imageview.c:612
+msgid "Zoom to 50%"
+msgstr ""
+
+#: ../src/imageview.c:614
+msgid "100%"
+msgstr ""
+
+#: ../src/imageview.c:616
+msgid "200%"
+msgstr ""
+
+#: ../src/imageview.c:616
+msgid "Zoom to 200%"
+msgstr ""
+
+#: ../src/imageview.c:618
+msgid "400%"
+msgstr ""
+
+#: ../src/imageview.c:618
+msgid "Zoom to 400%"
+msgstr ""
+
+#: ../src/imageview.c:620
+msgid "800%"
+msgstr ""
+
+#: ../src/imageview.c:620
+msgid "Zoom to 800%"
+msgstr ""
+
+#: ../src/imageview.c:622
+msgid "1600%"
+msgstr ""
+
+#: ../src/imageview.c:622
+msgid "Zoom to 1600%"
+msgstr ""
+
+#: ../src/iregion.c:174
+#, c-format
+msgid "at (%d, %d), size (%d, %d)"
+msgstr ""
+
+#: ../src/iregion.c:189 ../src/iregion.c:225
+msgid "Left"
+msgstr ""
+
+#: ../src/iregion.c:190 ../src/iregion.c:228
+msgid "Top"
+msgstr ""
+
+#: ../src/iregion.c:191 ../src/iregion.c:231
+msgid "Width"
+msgstr ""
+
+#: ../src/iregion.c:192 ../src/iregion.c:234
+msgid "Height"
+msgstr ""
+
+#: ../src/iregion.c:225
+msgid "Left edge of region"
+msgstr ""
+
+#: ../src/iregion.c:228
+msgid "Top edge of region"
+msgstr ""
+
+#: ../src/iregion.c:231
+msgid "Width of region"
+msgstr ""
+
+#: ../src/iregion.c:234
+msgid "Height of region"
+msgstr ""
+
+#: ../src/iregion.c:240
+#, c-format
+msgid "Edit \"%s\""
+msgstr ""
+
+#: ../src/iregion.c:244
+msgid "Set Region"
+msgstr ""
+
+#: ../src/itext.c:67
+msgid "Formula"
+msgstr ""
+
+#: ../src/itext.c:184 ../src/itext.c:327
+msgid "no value"
+msgstr ""
+
+#: ../src/itext.c:505 ../src/itext.c:538
+msgid "Dirty value"
+msgstr ""
+
+#: ../src/lex.l:96 ../src/lex.l:106
+msgid "line too long"
+msgstr ""
+
+#: ../src/lex.l:114
+msgid "end of line inside string"
+msgstr ""
+
+#: ../src/lex.l:116
+msgid "no end of string"
+msgstr ""
+
+#: ../src/lex.l:137 ../src/lex.l:147 ../src/lex.l:155
+msgid "bad char constant"
+msgstr ""
+
+#: ../src/lex.l:178
+msgid "nested comment!"
+msgstr ""
+
+#: ../src/lex.l:185
+msgid "no end of comment!"
+msgstr ""
+
+#: ../src/lex.l:291
+#, c-format
+msgid "bad number %s"
+msgstr ""
+
+#: ../src/lex.l:338
+#, c-format
+msgid "illegal character \"%c\""
+msgstr ""
+
+#: ../src/link.c:577
+msgid "Circular dependency."
+msgstr ""
+
+#: ../src/link.c:578
+#, c-format
+msgid "Circular dependency detected near symbol \"%s\"."
+msgstr ""
+
+#: ../src/main.c:98
+msgid "evaluate and print EXPRESSION"
+msgstr ""
+
+#: ../src/main.c:101
+msgid "load FILE as a set of definitions"
+msgstr ""
+
+#: ../src/main.c:104
+msgid "write value of 'main' to FILE"
+msgstr ""
+
+#: ../src/main.c:106
+msgid "run in batch mode"
+msgstr ""
+
+#: ../src/main.c:109
+msgid "don't load menu definitions"
+msgstr ""
+
+#: ../src/main.c:111
+msgid "don't try to load extra cmd-line args as files"
+msgstr ""
+
+#: ../src/main.c:113
+msgid "load stdin as a workspace"
+msgstr ""
+
+#: ../src/main.c:115
+msgid "load stdin as a set of definitions"
+msgstr ""
+
+#: ../src/main.c:117
+msgid "print value of 'main' to stdout"
+msgstr ""
+
+#: ../src/main.c:120
+msgid "start up and shut down"
+msgstr ""
+
+#: ../src/main.c:123
+msgid "time image save operations"
+msgstr ""
+
+#: ../src/main.c:126
+msgid "output strings for internationalisation"
+msgstr ""
+
+#: ../src/main.c:129
+msgid "print version number"
+msgstr ""
+
+#: ../src/main.c:215
+msgid "symbol \"main\" not found"
+msgstr ""
+
+#: ../src/main.c:220
+msgid "error calculating \"main\""
+msgstr ""
+
+#: ../src/main.c:378
+#, c-format
+msgid "Loading \"%s\""
+msgstr ""
+
+#: ../src/main.c:409
+msgid "Unknown file type."
+msgstr ""
+
+#: ../src/main.c:410
+#, c-format
+msgid "Unable to load \"%s\"."
+msgstr ""
+
+#: ../src/main.c:421
+msgid "Unable to load."
+msgstr ""
+
+#: ../src/main.c:422
+#, c-format
+msgid "Error loading plug-in \"%s\"."
+msgstr ""
+
+#: ../src/main.c:437
+#, c-format
+msgid "Loading toolkit \"%s\""
+msgstr ""
+
+#: ../src/main.c:459
+#, c-format
+msgid "Loading workspace \"%s\""
+msgstr ""
+
+#: ../src/main.c:532
+msgid "Loading plugins"
+msgstr ""
+
+#. Can be (eg.)
+#. *
+#. *   { GTK_STOCK_COPY, N_("_Copy"), GDK_CONTROL_MASK, 'c', GETTEXT_PACKAGE },
+#. *
+#.
+#: ../src/main.c:633
+msgid "Ink dropper"
+msgstr ""
+
+#: ../src/main.c:634
+msgid "D_uplicate"
+msgstr ""
+
+#: ../src/main.c:635
+msgid "Pen"
+msgstr ""
+
+#: ../src/main.c:636
+msgid "Line"
+msgstr ""
+
+#: ../src/main.c:637 ../src/matrix.c:147
+msgid "Text"
+msgstr ""
+
+#. IMAGEMODEL_TEXT
+#: ../src/main.c:638 ../src/paintboxview.c:267
+msgid "Smudge"
+msgstr ""
+
+#: ../src/main.c:639
+msgid "Flood"
+msgstr ""
+
+#: ../src/main.c:640
+msgid "Flood Blob"
+msgstr ""
+
+#: ../src/main.c:641
+msgid "Fill Rectangle"
+msgstr ""
+
+#: ../src/main.c:642
+msgid "Pan"
+msgstr ""
+
+#: ../src/main.c:643
+msgid "Select"
+msgstr ""
+
+#. And the LEDs we use.
+#.
+#: ../src/main.c:647
+msgid "Red LED"
+msgstr ""
+
+#: ../src/main.c:648
+msgid "Green LED"
+msgstr ""
+
+#: ../src/main.c:649
+msgid "Blue LED"
+msgstr ""
+
+#: ../src/main.c:650
+msgid "Yellow LED"
+msgstr ""
+
+#: ../src/main.c:651
+msgid "Cyan LED"
+msgstr ""
+
+#: ../src/main.c:652
+msgid "Off LED"
+msgstr ""
+
+#: ../src/main.c:826
+msgid "Empty temp area"
+msgstr ""
+
+#: ../src/main.c:827
+msgid "Many files in temp area."
+msgstr ""
+
+#: ../src/main.c:828
+#, c-format
+msgid ""
+"The temp area \"%s\" contains %s of files. Would you like to empty the temp "
+"area? This will delete any workspace backups and cannot be undone."
+msgstr ""
+
+#: ../src/main.c:964
+msgid "- image processing spreadsheet"
+msgstr ""
+
+#: ../src/main.c:982
+#, c-format
+msgid "%s version: %s"
+msgstr ""
+
+#: ../src/main.c:985
+#, c-format
+msgid "linked to vips library: %s"
+msgstr ""
+
+#: ../src/main.c:1035
+#, c-format
+msgid ""
+"unable to change max file descriptors\n"
+"max file descriptors still set to %d"
+msgstr ""
+
+#: ../src/main.c:1042
+msgid "unable to read max file descriptors"
+msgstr ""
+
+#: ../src/main.c:1060
+#, c-format
+msgid "unable to make %s area: %s"
+msgstr ""
+
+#: ../src/main.c:1202
+msgid "First recalculation ..."
+msgstr ""
+
+#: ../src/main.c:1248 ../src/main.c:1298
+#, c-format
+msgid ""
+"Startup error log:\n"
+"%s"
+msgstr ""
+
+#. Recalc to load any args.
+#.
+#: ../src/main.c:1256
+msgid "Final recalculation ..."
+msgstr ""
+
+#: ../src/main.c:1279
+msgid "Building main window"
+msgstr ""
+
+#: ../src/main.c:1297
+msgid "Startup error."
+msgstr ""
+
+#: ../src/main.c:1308
+#, c-format
+msgid "Welcome to %s-%s!"
+msgstr ""
+
+#: ../src/main.c:1313
+#, c-format
+msgid ""
+"A new directory has been created in your home directory to hold startup, "
+"data and temporary files:\n"
+"\n"
+"     %s\n"
+"\n"
+"If you've used previous versions of %s, you will probably want to move any "
+"files over from your old work area and remove any old temps."
+msgstr ""
+
+#: ../src/mainw.c:167
+msgid "Compatibility mode."
+msgstr ""
+
+#: ../src/mainw.c:168
+#, c-format
+msgid ""
+"This workspace was created by version %d.%d.%d. A set of compatibility menus "
+"have been loaded for this window."
+msgstr ""
+
+#: ../src/mainw.c:296
+msgid "No temp area"
+msgstr ""
+
+#: ../src/mainw.c:303
+#, c-format
+msgid "%s free"
+msgstr ""
+
+#: ../src/mainw.c:316
+#, c-format
+msgid "%d cells free"
+msgstr ""
+
+#. Display select message instead.
+#.
+#: ../src/mainw.c:333
+msgid "Selected:"
+msgstr ""
+
+#: ../src/mainw.c:362
+msgid "compatibility mode"
+msgstr ""
+
+#: ../src/mainw.c:371 ../src/program.c:260 ../src/program.c:269
+msgid "modified"
+msgstr ""
+
+#: ../src/mainw.c:386
+msgid "Calculating ..."
+msgstr ""
+
+#. Expands to (eg.) "14GB free in /pics/tmp"
+#: ../src/mainw.c:631
+#, c-format
+msgid " in \"%s\""
+msgstr ""
+
+#: ../src/mainw.c:635
+#, c-format
+msgid "%d cells in heap, %d cells free, %d cells maximum"
+msgstr ""
+
+#: ../src/mainw.c:639
+#, c-format
+msgid "%d objects in workspace"
+msgstr ""
+
+#: ../src/mainw.c:643
+#, c-format
+msgid "%d vips calls cached"
+msgstr ""
+
+#: ../src/mainw.c:771
+msgid "Find in workspace not implemented yet."
+msgstr ""
+
+#: ../src/mainw.c:779
+msgid "Find again in workspace not implemented yet."
+msgstr ""
+
+#: ../src/mainw.c:814
+msgid "No errors."
+msgstr ""
+
+#: ../src/mainw.c:815
+msgid "There are no errors (that I can see) in this workspace."
+msgstr ""
+
+#: ../src/mainw.c:880
+msgid "Completely recalculate?"
+msgstr ""
+
+#: ../src/mainw.c:978
+#, c-format
+msgid ""
+"Unable to load from file \"%s\". Error loading as image, workspace or matrix."
+msgstr ""
+
+#: ../src/mainw.c:1024 ../src/mainw.c:1051
+msgid "Open File"
+msgstr ""
+
+#: ../src/mainw.c:1151
+msgid "Recent Workspaces"
+msgstr ""
+
+#: ../src/mainw.c:1159
+msgid "Recent Images"
+msgstr ""
+
+#: ../src/mainw.c:1167
+msgid "Recent Matricies"
+msgstr ""
+
+#: ../src/mainw.c:1176
+msgid "No recent items"
+msgstr ""
+
+#: ../src/mainw.c:1182
+msgid "Clear Recent Menu"
+msgstr ""
+
+#: ../src/mainw.c:1241
+msgid "Merge Workspace"
+msgstr ""
+
+#. Menu items.
+#.
+#: ../src/mainw.c:1440
+msgid "_File"
+msgstr ""
+
+#: ../src/mainw.c:1441
+msgid "_New"
+msgstr ""
+
+#: ../src/mainw.c:1442
+msgid "Open _Recent"
+msgstr ""
+
+#: ../src/mainw.c:1443 ../src/program.c:731 ../src/regionview.c:982
+#: ../src/rowview.c:585
+msgid "_Edit"
+msgstr ""
+
+#: ../src/mainw.c:1444
+msgid "Jump to _Column"
+msgstr ""
+
+#: ../src/mainw.c:1445
+msgid "_View"
+msgstr ""
+
+#: ../src/mainw.c:1446
+msgid "_Toolkits"
+msgstr ""
+
+#: ../src/mainw.c:1447
+msgid "_Help"
+msgstr ""
+
+#: ../src/mainw.c:1457
+msgid "New C_olumn"
+msgstr ""
+
+#: ../src/mainw.c:1458
+msgid "Create a new column"
+msgstr ""
+
+#: ../src/mainw.c:1462 ../src/program.c:1709
+msgid "New _Workspace"
+msgstr ""
+
+#: ../src/mainw.c:1463
+msgid "Create a new workspace"
+msgstr ""
+
+#: ../src/mainw.c:1467
+msgid "_Open"
+msgstr ""
+
+#: ../src/mainw.c:1468
+msgid "Open a file"
+msgstr ""
+
+#: ../src/mainw.c:1472
+msgid "Open _Examples"
+msgstr ""
+
+#: ../src/mainw.c:1473
+msgid "Open example workspaces"
+msgstr ""
+
+#: ../src/mainw.c:1477
+msgid "_Duplicate Workspace"
+msgstr ""
+
+#: ../src/mainw.c:1478
+msgid "Duplicate workspace"
+msgstr ""
+
+#: ../src/mainw.c:1482
+msgid "_Merge Workspace"
+msgstr ""
+
+#: ../src/mainw.c:1483
+msgid "Merge workspace into this workspace"
+msgstr ""
+
+#: ../src/mainw.c:1487
+msgid "_Save Workspace"
+msgstr ""
+
+#: ../src/mainw.c:1488
+msgid "Save workspace"
+msgstr ""
+
+#: ../src/mainw.c:1492
+msgid "_Save Workspace As"
+msgstr ""
+
+#: ../src/mainw.c:1493
+msgid "Save workspace as"
+msgstr ""
+
+#: ../src/mainw.c:1497
+msgid "Re_cover After Crash"
+msgstr ""
+
+#: ../src/mainw.c:1498
+msgid "Load last automatically backed-up workspace"
+msgstr ""
+
+#: ../src/mainw.c:1503
+msgid "Close workspace"
+msgstr ""
+
+#: ../src/mainw.c:1507 ../src/orderlist.c:179 ../src/program.c:1759
+msgid "_Delete"
+msgstr ""
+
+#: ../src/mainw.c:1508
+msgid "Delete selected items"
+msgstr ""
+
+#: ../src/mainw.c:1513
+msgid "Select all items"
+msgstr ""
+
+#: ../src/mainw.c:1517
+msgid "D_uplicate Selected"
+msgstr ""
+
+#: ../src/mainw.c:1518
+msgid "Duplicate selected items"
+msgstr ""
+
+#: ../src/mainw.c:1522 ../src/rowview.c:595
+msgid "_Recalculate"
+msgstr ""
+
+#: ../src/mainw.c:1523
+msgid "Recalculate selected items"
+msgstr ""
+
+#: ../src/mainw.c:1527
+msgid "Align _Columns"
+msgstr ""
+
+#: ../src/mainw.c:1528
+msgid "Align columns to grid"
+msgstr ""
+
+#: ../src/mainw.c:1532 ../src/program.c:1784
+msgid "_Find"
+msgstr ""
+
+#: ../src/mainw.c:1533
+msgid "Find in workspace"
+msgstr ""
+
+#: ../src/mainw.c:1537 ../src/program.c:1789
+msgid "Find _Next"
+msgstr ""
+
+#: ../src/mainw.c:1538
+msgid "Find again in workspace"
+msgstr ""
+
+#: ../src/mainw.c:1542
+msgid "Next _Error"
+msgstr ""
+
+#: ../src/mainw.c:1543
+msgid "Jump to next error"
+msgstr ""
+
+#: ../src/mainw.c:1547
+msgid "_Group"
+msgstr ""
+
+#: ../src/mainw.c:1548
+msgid "Group selected items"
+msgstr ""
+
+#: ../src/mainw.c:1552 ../src/rowview.c:589
+msgid "U_ngroup"
+msgstr ""
+
+#: ../src/mainw.c:1553
+msgid "Ungroup selected items"
+msgstr ""
+
+#: ../src/mainw.c:1557
+msgid "_Preferences"
+msgstr ""
+
+#: ../src/mainw.c:1558
+msgid "Edit preferences"
+msgstr ""
+
+#: ../src/mainw.c:1562
+msgid "Edit _Toolkits"
+msgstr ""
+
+#: ../src/mainw.c:1563
+msgid "Edit toolkits"
+msgstr ""
+
+#: ../src/mainw.c:1577
+msgid "_Website"
+msgstr ""
+
+#: ../src/mainw.c:1578
+msgid "Open the VIPS Homepage"
+msgstr ""
+
+#: ../src/mainw.c:1584
+msgid "Au_to Recalculate"
+msgstr ""
+
+#: ../src/mainw.c:1585
+msgid "Recalculate automatically on change"
+msgstr ""
+
+#: ../src/mainw.c:1589
+msgid "_Toolbar"
+msgstr ""
+
+#: ../src/mainw.c:1590
+msgid "Show window toolbar"
+msgstr ""
+
+#: ../src/mainw.c:1594
+msgid "_Statusbar"
+msgstr ""
+
+#: ../src/mainw.c:1595
+msgid "Show window statusbar"
+msgstr ""
+
+#: ../src/mainw.c:1599
+msgid "Toolkit _Browser"
+msgstr ""
+
+#: ../src/mainw.c:1600
+msgid "Show toolkit browser"
+msgstr ""
+
+#: ../src/mainw.c:1606
+msgid "_Normal"
+msgstr ""
+
+#: ../src/mainw.c:1607
+msgid "Normal view mode"
+msgstr ""
+
+#: ../src/mainw.c:1611
+msgid "Show _Formula"
+msgstr ""
+
+#: ../src/mainw.c:1612
+msgid "Show formula view mode"
+msgstr ""
+
+#: ../src/mainw.c:1616
+msgid "No _Edits"
+msgstr ""
+
+#: ../src/mainw.c:1617
+msgid "No edits view mode"
+msgstr ""
+
+#: ../src/matrix.c:148
+msgid "Sliders"
+msgstr ""
+
+#: ../src/matrix.c:149
+msgid "Toggle buttons"
+msgstr ""
+
+#: ../src/matrix.c:150
+msgid "Text, plus scale and offset"
+msgstr ""
+
+#: ../src/matrix.c:161
+msgid "Display as"
+msgstr ""
+
+#: ../src/matrix.c:188
+#, c-format
+msgid "Edit Matrix \"%s\""
+msgstr ""
+
+#: ../src/matrix.c:193
+msgid "Set Matrix"
+msgstr ""
+
+#: ../src/matrix.c:260 ../src/matrixview.c:433
+msgid "Scale"
+msgstr ""
+
+#: ../src/matrix.c:263 ../src/matrixview.c:438
+msgid "Offset"
+msgstr ""
+
+#: ../src/matrix.c:269
+msgid "Display"
+msgstr ""
+
+#: ../src/matrixview.c:198 ../src/matrixview.c:219
+#, c-format
+msgid ""
+"Cell (%d, %d):\n"
+"%s"
+msgstr ""
+
+#. Expands to (eg) "A2: cell (1,2): 45" ... status line display during
+#. * matrix traverse.
+#.
+#: ../src/matrixview.c:504
+#, c-format
+msgid ": cell (%d, %d): %s"
+msgstr ""
+
+#: ../src/model.c:131
+#, c-format
+msgid ""
+"Unable to load from file \"%s\". Error log is:\n"
+"%s"
+msgstr ""
+
+#: ../src/model.c:433
+msgid "model_save: xmlNewChild() failed"
+msgstr ""
+
+#: ../src/model.c:490
+msgid "XML load error."
+msgstr ""
+
+#: ../src/model.c:491
+#, c-format
+msgid "Can't load node of type \"%s\" into object of type \"%s\""
+msgstr ""
+
+#: ../src/model.c:702
+msgid "Delete?"
+msgstr ""
+
+#: ../src/model.c:703
+#, c-format
+msgid "Are you sure you want to delete %s \"%s\"?"
+msgstr ""
+
+#: ../src/option.c:103
+msgid "No options."
+msgstr ""
+
+#: ../src/option.c:104
+msgid "You need at least one option in your option list"
+msgstr ""
+
+#: ../src/option.c:147
+msgid "Set option caption here"
+msgstr ""
+
+#: ../src/option.c:168
+msgid "Options"
+msgstr ""
+
+#: ../src/option.c:179
+msgid "Set option default value here"
+msgstr ""
+
+#: ../src/option.c:196
+msgid "Edit Option"
+msgstr ""
+
+#: ../src/option.c:201
+msgid "Set Option"
+msgstr ""
+
+#: ../src/option.c:216
+msgid "Labels"
+msgstr ""
+
+#. Create signals.
+#.
+#. Init default methods.
+#.
+#: ../src/orderlist.c:178
+msgid "Orderlist menu"
+msgstr ""
+
+#: ../src/orderlist.c:181
+msgid "Delete _Selected"
+msgstr ""
+
+#: ../src/orderlist.c:183
+msgid "Delete _All"
+msgstr ""
+
+#: ../src/orderlist.c:205
+msgid "Current options - right button for menu"
+msgstr ""
+
+#: ../src/orderlist.c:279
+msgid "Enter new option fields here"
+msgstr ""
+
+#. Create signals.
+#.
+#. Init methods.
+#.
+#: ../src/paintboxview.c:109
+msgid "Paintbox bar menu"
+msgstr ""
+
+#: ../src/paintboxview.c:202
+msgid "Clear undo history?"
+msgstr ""
+
+#: ../src/paintboxview.c:203
+msgid ""
+"Are you sure you want to clear all undo and redo? This will free up memory, "
+"but you will no longer be able to undo or redo any of the painting you have "
+"done so far."
+msgstr ""
+
+#: ../src/paintboxview.c:238
+msgid "1 round"
+msgstr ""
+
+#. PAINTBOX_1ROUND
+#: ../src/paintboxview.c:239
+msgid "2 round"
+msgstr ""
+
+#. PAINTBOX_2ROUND
+#: ../src/paintboxview.c:240
+msgid "3 round"
+msgstr ""
+
+#. PAINTBOX_3ROUND
+#: ../src/paintboxview.c:241
+msgid "4 round"
+msgstr ""
+
+#. PAINTBOX_4ROUND
+#: ../src/paintboxview.c:242
+msgid "5 round"
+msgstr ""
+
+#. PAINTBOX_5ROUND
+#: ../src/paintboxview.c:243
+msgid "6 round"
+msgstr ""
+
+#. PAINTBOX_6ROUND
+#: ../src/paintboxview.c:244
+msgid "10 round"
+msgstr ""
+
+#. PAINTBOX_10ROUND
+#: ../src/paintboxview.c:245
+msgid "2 italic"
+msgstr ""
+
+#. PAINTBOX_2ITALIC
+#: ../src/paintboxview.c:246
+msgid "3 italic"
+msgstr ""
+
+#. PAINTBOX_3ITALIC
+#: ../src/paintboxview.c:247
+msgid "4 italic"
+msgstr ""
+
+#. PAINTBOX_4ITALIC
+#: ../src/paintboxview.c:248
+msgid "5 italic"
+msgstr ""
+
+#. PAINTBOX_5ITALIC
+#: ../src/paintboxview.c:249
+msgid "6 italic"
+msgstr ""
+
+#. PAINTBOX_6ITALIC
+#: ../src/paintboxview.c:250
+msgid "10 italic"
+msgstr ""
+
+#: ../src/paintboxview.c:254
+msgid "Manipulate regions"
+msgstr ""
+
+#. IMAGEMODEL_SELECT
+#: ../src/paintboxview.c:255
+msgid "Pan window"
+msgstr ""
+
+#. IMAGEMODEL_PAN
+#: ../src/paintboxview.c:256
+msgid "Zoom in on mouse"
+msgstr ""
+
+#. IMAGEMODEL_MAGOUT
+#: ../src/paintboxview.c:258
+msgid "Read pixel into inkwell"
+msgstr ""
+
+#. IMAGEMODEL_DROPPER
+#: ../src/paintboxview.c:259
+msgid "Freehand draw "
+msgstr ""
+
+#. IMAGEMODEL_PEN
+#: ../src/paintboxview.c:260
+msgid "Draw straight lines"
+msgstr ""
+
+#. IMAGEMODEL_LINE
+#: ../src/paintboxview.c:261
+msgid "Fill rectangles"
+msgstr ""
+
+#. IMAGEMODEL_RECT
+#: ../src/paintboxview.c:262
+msgid "Flood while pixel not equal to ink"
+msgstr ""
+
+#. IMAGEMODEL_FLOOD
+#: ../src/paintboxview.c:264
+msgid "Flood while pixel equal to click"
+msgstr ""
+
+#. IMAGEMODEL_BLOB
+#: ../src/paintboxview.c:266
+msgid "Draw text"
+msgstr ""
+
+#: ../src/paintboxview.c:317
+msgid "Undo last paint action"
+msgstr ""
+
+#: ../src/paintboxview.c:326
+msgid "Redo last paint action"
+msgstr ""
+
+#: ../src/paintboxview.c:335
+msgid "Clear all undo and redo buffers"
+msgstr ""
+
+#: ../src/paintboxview.c:355
+msgid "Nib"
+msgstr ""
+
+#: ../src/paintboxview.c:376
+msgid "Enter text for text tool"
+msgstr ""
+
+#: ../src/parse.y:102 ../src/program.c:1435 ../src/wild.c:106
+msgid "Parse error."
+msgstr ""
+
+#: ../src/parse.y:105
+#, c-format
+msgid "Error in %s: %s"
+msgstr ""
+
+#: ../src/parse.y:108
+#, c-format
+msgid "Error: %s"
+msgstr ""
+
+#: ../src/parse.y:228
+msgid "definition is too long!"
+msgstr ""
+
+#: ../src/parse.y:582 ../src/parse.y:596
+msgid "not top level"
+msgstr ""
+
+#: ../src/parse.y:602
+msgid "not strings"
+msgstr ""
+
+#: ../src/parse.y:652
+#, c-format
+msgid ""
+"unable to compile \"%s\"\n"
+"%s"
+msgstr ""
+
+#. Not found? Maybe - error message anyway.
+#.
+#: ../src/path.c:278 ../src/path.c:305 ../src/program.c:1454
+#: ../src/program.c:1504 ../src/program.c:1525 ../src/program.c:1533
+#: ../src/symbol.c:460
+msgid "Not found."
+msgstr ""
+
+#: ../src/path.c:279
+#, c-format
+msgid "File \"%s\" not found."
+msgstr ""
+
+#: ../src/path.c:306
+#, c-format
+msgid "File \"%s\" not found on path"
+msgstr ""
+
+#: ../src/pathnameview.c:172
+msgid "Select a new file name"
+msgstr ""
+
+#: ../src/prefs.c:142 ../src/prefs.c:163
+msgid "Revert to Defaults"
+msgstr ""
+
+#: ../src/prefs.c:143
+msgid "Revert to installation defaults?"
+msgstr ""
+
+#: ../src/prefs.c:144
+msgid ""
+"Would you like to reset all preferences to their factory settings? This will "
+"delete any changes you have ever made to your preferences and may take a few "
+"seconds."
+msgstr ""
+
+#: ../src/prefs.c:159
+msgid "Preferences"
+msgstr ""
+
+#. Probably failed to load prefs on startup for some reason.
+#.
+#: ../src/prefs.c:276
+msgid "Unable to display preferences."
+msgstr ""
+
+#: ../src/prefs.c:277
+#, c-format
+msgid ""
+"No preferences workspace was found. Preferences probably failed to load when "
+"%s started."
+msgstr ""
+
+#: ../src/program.c:73
+msgid "Edit window"
+msgstr ""
+
+#: ../src/program.c:254
+msgid "Program"
+msgstr ""
+
+#: ../src/program.c:631
+msgid "Menu item text"
+msgstr ""
+
+#: ../src/program.c:634
+msgid "Load column from this file"
+msgstr ""
+
+#: ../src/program.c:636
+#, c-format
+msgid "Edit Column Item \"%s\""
+msgstr ""
+
+#: ../src/program.c:641
+msgid "Set column item"
+msgstr ""
+
+#: ../src/program.c:662 ../src/program.c:668
+msgid "Unable to save."
+msgstr ""
+
+#: ../src/program.c:663
+msgid "You can only save toolkits, not tools."
+msgstr ""
+
+#: ../src/program.c:669
+msgid "You can't save auto-generated toolkits."
+msgstr ""
+
+#. Create signals.
+#.
+#. Init methods.
+#.
+#: ../src/program.c:730
+msgid "Toolkit menu"
+msgstr ""
+
+#: ../src/program.c:1112
+msgid "Set toolkit name here"
+msgstr ""
+
+#: ../src/program.c:1114
+msgid "Set toolkit caption here"
+msgstr ""
+
+#: ../src/program.c:1115
+msgid "New Toolkit"
+msgstr ""
+
+#: ../src/program.c:1119 ../src/program.c:1197
+msgid "Create"
+msgstr ""
+
+#: ../src/program.c:1131
+msgid "Nothing selected."
+msgstr ""
+
+#: ../src/program.c:1132
+msgid "No toolkit selected."
+msgstr ""
+
+#: ../src/program.c:1190
+msgid "Display this name"
+msgstr ""
+
+#: ../src/program.c:1192
+msgid "Load this file"
+msgstr ""
+
+#: ../src/program.c:1256
+msgid "Load Definition"
+msgstr ""
+
+#: ../src/program.c:1310
+msgid "Reload"
+msgstr ""
+
+#: ../src/program.c:1311
+msgid "Reload startup objects?"
+msgstr ""
+
+#: ../src/program.c:1312
+msgid ""
+"Would you like to reload all startup menus, workspaces and plugins now? This "
+"may take a few seconds."
+msgstr ""
+
+#: ../src/program.c:1395
+msgid "No tool selected"
+msgstr ""
+
+#: ../src/program.c:1436
+msgid "Bad regular expression."
+msgstr ""
+
+#: ../src/program.c:1455
+#, c-format
+msgid "No match found for \"%s\"."
+msgstr ""
+
+#: ../src/program.c:1468
+msgid "Find in all Toolkits"
+msgstr ""
+
+#: ../src/program.c:1478
+msgid "Enter search string here"
+msgstr ""
+
+#: ../src/program.c:1505
+msgid "No match found."
+msgstr ""
+
+#: ../src/program.c:1526
+#, c-format
+msgid "No top-level symbol called \"%s\"."
+msgstr ""
+
+#: ../src/program.c:1534
+#, c-format
+msgid "Symbol \"%s\" has no tool inforation."
+msgstr ""
+
+#: ../src/program.c:1555
+msgid "Go to definition of this symbol"
+msgstr ""
+
+#: ../src/program.c:1557
+msgid "Go to Definition"
+msgstr ""
+
+#: ../src/program.c:1588
+msgid "Object information."
+msgstr ""
+
+#: ../src/program.c:1610
+msgid "No unresolved symbols found."
+msgstr ""
+
+#: ../src/program.c:1612
+msgid "Link report."
+msgstr ""
+
+#: ../src/program.c:1625
+msgid "No errors found."
+msgstr ""
+
+#: ../src/program.c:1627
+msgid "Error report."
+msgstr ""
+
+#: ../src/program.c:1665
+msgid "No documentation available."
+msgstr ""
+
+#: ../src/program.c:1666
+msgid ""
+"On-line documentation is only currently available for VIPS functions and nip "
+"builtins."
+msgstr ""
+
+#: ../src/program.c:1684
+msgid "New _Tool"
+msgstr ""
+
+#: ../src/program.c:1685
+msgid "Make a new tool"
+msgstr ""
+
+#: ../src/program.c:1689
+msgid "New Tool_kit"
+msgstr ""
+
+#: ../src/program.c:1690
+msgid "Make a new toolkit"
+msgstr ""
+
+#: ../src/program.c:1694
+msgid "New _Separator"
+msgstr ""
+
+#: ../src/program.c:1695
+msgid "Make a new separator"
+msgstr ""
+
+#: ../src/program.c:1699
+msgid "New _Column Item"
+msgstr ""
+
+#: ../src/program.c:1700
+msgid "Make a new column item"
+msgstr ""
+
+#: ../src/program.c:1704
+msgid "New _Program Window"
+msgstr ""
+
+#: ../src/program.c:1705
+msgid "Make a new program window"
+msgstr ""
+
+#: ../src/program.c:1710
+msgid "Make a new workspace"
+msgstr ""
+
+#: ../src/program.c:1714
+msgid "_Open Toolkit"
+msgstr ""
+
+#: ../src/program.c:1715
+msgid "_Open toolkit"
+msgstr ""
+
+#: ../src/program.c:1719
+msgid "Save Toolkit"
+msgstr ""
+
+#: ../src/program.c:1720
+msgid "_Save toolkit"
+msgstr ""
+
+#: ../src/program.c:1724
+msgid "Save Toolkit _As"
+msgstr ""
+
+#: ../src/program.c:1725
+msgid "Save toolkit as"
+msgstr ""
+
+#: ../src/program.c:1729
+msgid "_Process"
+msgstr ""
+
+#: ../src/program.c:1730
+msgid "Process text"
+msgstr ""
+
+#: ../src/program.c:1734
+msgid "_Reload Start Stuff"
+msgstr ""
+
+#: ../src/program.c:1735
+msgid "Remove and reload all startup data"
+msgstr ""
+
+#: ../src/program.c:1744
+msgid "C_ut"
+msgstr ""
+
+#: ../src/program.c:1745
+msgid "Cut selected text"
+msgstr ""
+
+#: ../src/program.c:1749
+msgid "_Copy"
+msgstr ""
+
+#: ../src/program.c:1750
+msgid "Copy selected text"
+msgstr ""
+
+#: ../src/program.c:1754
+msgid "_Paste"
+msgstr ""
+
+#: ../src/program.c:1755
+msgid "Paste selected text"
+msgstr ""
+
+#: ../src/program.c:1760
+msgid "Delete selected text"
+msgstr ""
+
+#: ../src/program.c:1765
+msgid "Select all text"
+msgstr ""
+
+#: ../src/program.c:1769
+msgid "Dese_lect All"
+msgstr ""
+
+#: ../src/program.c:1770
+msgid "Deselect all text"
+msgstr ""
+
+#: ../src/program.c:1774
+msgid "Delete _Tool"
+msgstr ""
+
+#: ../src/program.c:1775
+msgid "Delete current tool"
+msgstr ""
+
+#: ../src/program.c:1779
+msgid "Delete Tool_kit"
+msgstr ""
+
+#: ../src/program.c:1780
+msgid "Delete current toolkit"
+msgstr ""
+
+#: ../src/program.c:1785
+msgid "Find text in toolkits"
+msgstr ""
+
+#: ../src/program.c:1790
+msgid "Find text again"
+msgstr ""
+
+#: ../src/program.c:1794
+msgid "_Jump To Definition"
+msgstr ""
+
+#: ../src/program.c:1795
+msgid "Jump to definition"
+msgstr ""
+
+#: ../src/program.c:1799
+msgid "_Info"
+msgstr ""
+
+#: ../src/program.c:1800
+msgid "Info on selected object"
+msgstr ""
+
+#: ../src/program.c:1804
+msgid "_Trace"
+msgstr ""
+
+#: ../src/program.c:1805
+msgid "Make a new trace window"
+msgstr ""
+
+#: ../src/program.c:1809
+msgid "_Link"
+msgstr ""
+
+#: ../src/program.c:1810
+msgid "Show a link report"
+msgstr ""
+
+#: ../src/program.c:1814
+msgid "_Errors"
+msgstr ""
+
+#: ../src/program.c:1815
+msgid "Show all errors"
+msgstr ""
+
+#: ../src/program.c:1829
+msgid "Help on _Tool"
+msgstr ""
+
+#: ../src/program.c:1830
+msgid "View docs for this tool"
+msgstr ""
+
+#: ../src/program.c:2074
+msgid "Bad drag."
+msgstr ""
+
+#: ../src/program.c:2075
+msgid ""
+"Sorry, you can only drag tools between toolkits. You can't reorder toolkits, "
+"you can't nest toolkits and you can't drag tools to the top level."
+msgstr ""
+
+#: ../src/program.c:2240
+msgid "Tool"
+msgstr ""
+
+#: ../src/reduce.c:111
+msgid "Typecheck error."
+msgstr ""
+
+#: ../src/reduce.c:113
+#, c-format
+msgid "%s expected %s, instead saw:"
+msgstr ""
+
+#: ../src/reduce.c:124 ../src/reduce.c:919 ../src/trace.c:126
+#: ../src/workspace.c:1466
+msgid "Overflow error."
+msgstr ""
+
+#: ../src/reduce.c:125
+#, c-format
+msgid "%s too long."
+msgstr ""
+
+#: ../src/reduce.c:429 ../src/reduce.c:488
+msgid "Not rectangular."
+msgstr ""
+
+#: ../src/reduce.c:430 ../src/reduce.c:489
+#, c-format
+msgid ""
+"Matrix of real is not rectangular. Found row of length %d, should be %d."
+msgstr ""
+
+#: ../src/reduce.c:734
+msgid "List length"
+msgstr ""
+
+#: ../src/reduce.c:763
+#, c-format
+msgid "List index must be positive, not %d"
+msgstr ""
+
+#: ../src/reduce.c:771
+msgid "List index"
+msgstr ""
+
+#: ../src/reduce.c:776
+#, c-format
+msgid "List only has %d elements, unable to get element %d."
+msgstr ""
+
+#: ../src/reduce.c:818
+msgid "No arguments allowed."
+msgstr ""
+
+#: ../src/reduce.c:819
+#, c-format
+msgid "Object \"%s\" should have no arguments."
+msgstr ""
+
+#: ../src/reduce.c:920
+msgid "C stack overflow. Expression too complex."
+msgstr ""
+
+#: ../src/reduce.c:1037
+msgid "No value."
+msgstr ""
+
+#: ../src/reduce.c:1038
+#, c-format
+msgid "Symbol \"%s\" has no value"
+msgstr ""
+
+#: ../src/reduce.c:1571 ../src/reduce.c:1576 ../src/reduce.c:1582
+msgid "List generator"
+msgstr ""
+
+#: ../src/reduce.h:75 ../src/reduce.h:105
+msgid "Stack overflow."
+msgstr ""
+
+#: ../src/reduce.h:76
+msgid "Spine stack overflow, runaway recursion?"
+msgstr ""
+
+#: ../src/reduce.h:106
+msgid "Frame stack overflow, expression too complex."
+msgstr ""
+
+#: ../src/reduce.h:119 ../src/reduce.h:131
+msgid "Stack underflow."
+msgstr ""
+
+#: ../src/reduce.h:120
+msgid "Frame stack underflow, you've found a bug!"
+msgstr ""
+
+#: ../src/reduce.h:132
+msgid "Spine stack underflow, you've found a bug!"
+msgstr ""
+
+#: ../src/regionview.c:903 ../src/rowview.c:303
+msgid "Can't duplicate."
+msgstr ""
+
+#: ../src/regionview.c:904
+msgid "You can only duplicate top level regions."
+msgstr ""
+
+#: ../src/regionview.c:946
+msgid "Can't delete."
+msgstr ""
+
+#: ../src/regionview.c:947
+msgid "You can only delete top level regions."
+msgstr ""
+
+#: ../src/regionview.c:955
+msgid "Delete Region?"
+msgstr ""
+
+#: ../src/regionview.c:956
+#, c-format
+msgid "Are you sure you want to delete Region \"%s\"?"
+msgstr ""
+
+#. Other init.
+#.
+#: ../src/regionview.c:981
+msgid "Region menu"
+msgstr ""
+
+#: ../src/row.c:187
+msgid "Error in row."
+msgstr ""
+
+#. Elements are name of row, principal error,
+#. * secondary error.
+#.
+#: ../src/row.c:191
+#, c-format
+msgid ""
+"Error in row %s: %s\n"
+"%s"
+msgstr ""
+
+#. Expands to eg. "B1 refers to: B2, B3".
+#.
+#: ../src/row.c:498
+msgid "refers to"
+msgstr ""
+
+#. Expands to eg. "B1 is referred to by: B2, B3".
+#.
+#: ../src/row.c:509
+msgid "is referred to by"
+msgstr ""
+
+#: ../src/row.c:522
+msgid "is blocked on"
+msgstr ""
+
+#: ../src/rowview.c:304
+msgid "You can only duplicate top level rows."
+msgstr ""
+
+#: ../src/rowview.c:456
+msgid "Drag between columns not yet implemented."
+msgstr ""
+
+#. Other init.
+#.
+#: ../src/rowview.c:584
+msgid "Row menu"
+msgstr ""
+
+#: ../src/rowview.c:593
+msgid "Replace From _File"
+msgstr ""
+
+#: ../src/rowview.c:597
+msgid "Re_set"
+msgstr ""
+
+#: ../src/rowview.c:663
+msgid "Click to open or close class"
+msgstr ""
+
+#: ../src/slider.c:45
+msgid "From"
+msgstr ""
+
+#: ../src/slider.c:48
+msgid "To"
+msgstr ""
+
+#: ../src/spin.c:223
+msgid "Expand or collapse row"
+msgstr ""
+
+#. Create signals.
+#.
+#. Init methods.
+#.
+#: ../src/statusview.c:108
+msgid "Status bar menu"
+msgstr ""
+
+#: ../src/statusview.c:223 ../src/statusview.c:226
+msgid "Magnification"
+msgstr ""
+
+#: ../src/symbol.c:439
+#, c-format
+msgid "defined in toolkit \"%s\""
+msgstr ""
+
+#: ../src/symbol.c:443
+#, c-format
+msgid "line %d"
+msgstr ""
+
+#: ../src/symbol.c:462
+#, c-format
+msgid "Symbol %s is not defined."
+msgstr ""
+
+#: ../src/symbol.c:466
+#, c-format
+msgid "%s is referred to by"
+msgstr ""
+
+#: ../src/symbol.c:675
+#, c-format
+msgid "Redefinition of \"%s\"."
+msgstr ""
+
+#: ../src/symbol.c:679
+#, c-format
+msgid "Previously defined at line %d."
+msgstr ""
+
+#: ../src/symbol.c:702
+#, c-format
+msgid "Attempt to redefine root symbol \"%s\"."
+msgstr ""
+
+#. Parameter, workspace, etc.
+#.
+#: ../src/symbol.c:727
+#, c-format
+msgid "Can't redefine %s \"%s\"."
+msgstr ""
+
+#: ../src/tool.c:787
+#, c-format
+msgid ""
+"Can't create dialog with name \"%s\", an object with that name already "
+"exists in kit \"%s\"."
+msgstr ""
+
+#: ../src/toolkitbrowser.c:243
+msgid "Search:"
+msgstr ""
+
+#: ../src/toolkitbrowser.c:268
+msgid "Action"
+msgstr ""
+
+#: ../src/toolkitbrowser.c:276
+msgid "Parameters"
+msgstr ""
+
+#: ../src/toolkitbrowser.c:284
+msgid "Menu Item"
+msgstr ""
+
+#: ../src/toolkit.c:317
+#, c-format
+msgid "tool \"%s\""
+msgstr ""
+
+#: ../src/toolkit.c:320
+#, c-format
+msgid "toolkit \"%s\""
+msgstr ""
+
+#. used as in "fred refers to undefined symbol jim"
+#.
+#: ../src/toolkit.c:326
+msgid "refers to undefined symbol"
+msgstr ""
+
+#: ../src/trace.c:127
+msgid "Trace buffer stack overflow."
+msgstr ""
+
+#: ../src/trace.c:292
+msgid "_Clear"
+msgstr ""
+
+#: ../src/trace.c:293
+msgid "Clear trace window"
+msgstr ""
+
+#: ../src/trace.c:298
+msgid "Close trace window"
+msgstr ""
+
+#: ../src/trace.c:314
+msgid "_Operators"
+msgstr ""
+
+#: ../src/trace.c:315
+msgid "trace operators"
+msgstr ""
+
+#: ../src/trace.c:319
+msgid "_Builtin Functions"
+msgstr ""
+
+#: ../src/trace.c:320
+msgid "trace calls to built in functions"
+msgstr ""
+
+#: ../src/trace.c:324
+msgid "_Class Construction"
+msgstr ""
+
+#: ../src/trace.c:325
+msgid "trace class constructors"
+msgstr ""
+
+#: ../src/trace.c:329
+msgid "_VIPS Operations"
+msgstr ""
+
+#: ../src/trace.c:330
+msgid "trace calls to VIPS"
+msgstr ""
+
+#: ../src/trace.c:418
+msgid "Trace"
+msgstr ""
+
+#: ../src/tslider.c:369
+msgid "Slider value ... edit!"
+msgstr ""
+
+#: ../src/tslider.c:390
+msgid "Left-drag to set number"
+msgstr ""
+
+#: ../src/util.c:182 ../src/vips_call.c:139 ../src/vips_call.c:989
+msgid "VIPS library error."
+msgstr ""
+
+#: ../src/util.c:202
+msgid "Unable to set XML property."
+msgstr ""
+
+#: ../src/util.c:203
+#, c-format
+msgid "Unable to set property \"%s\" to value \"%s\"."
+msgstr ""
+
+#: ../src/util.c:1098
+msgid "(no image)"
+msgstr ""
+
+#: ../src/util.c:1111
+#, c-format
+msgid "%dx%d %s, %d band, %s"
+msgid_plural "%dx%d %s, %d bands, %s"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../src/util.c:1559
+msgid "8-bit unsigned integer"
+msgstr ""
+
+#. IM_BANDFMT_UCHAR
+#: ../src/util.c:1560
+msgid "8-bit signed integer"
+msgstr ""
+
+#. IM_BANDFMT_CHAR
+#: ../src/util.c:1561
+msgid "16-bit unsigned integer"
+msgstr ""
+
+#. IM_BANDFMT_USHORT
+#: ../src/util.c:1562
+msgid "16-bit signed integer"
+msgstr ""
+
+#. IM_BANDFMT_SHORT
+#: ../src/util.c:1563
+msgid "32-bit unsigned integer"
+msgstr ""
+
+#. IM_BANDFMT_UINT
+#: ../src/util.c:1564
+msgid "32-bit signed integer"
+msgstr ""
+
+#. IM_BANDFMT_INT
+#: ../src/util.c:1565
+msgid "32-bit float"
+msgstr ""
+
+#. IM_BANDFMT_FLOAT
+#: ../src/util.c:1566
+msgid "64-bit complex"
+msgstr ""
+
+#. IM_BANDFMT_COMPLEX
+#: ../src/util.c:1567
+msgid "64-bit float"
+msgstr ""
+
+#. IM_BANDFMT_DOUBLE
+#: ../src/util.c:1568
+msgid "128-bit complex"
+msgstr ""
+
+#: ../src/util.c:1576
+msgid "<unknown format>"
+msgstr ""
+
+#: ../src/util.c:1618
+msgid "<unknown type>"
+msgstr ""
+
+#: ../src/util.c:1642
+msgid "directory"
+msgstr ""
+
+#: ../src/util.c:1648
+msgid "TIFF image"
+msgstr ""
+
+#: ../src/util.c:1650
+msgid "JPEG image"
+msgstr ""
+
+#: ../src/util.c:1652
+msgid "PNG image"
+msgstr ""
+
+#: ../src/util.c:1654
+msgid "PPM/PGM/PBM image"
+msgstr ""
+
+#: ../src/util.c:1656
+msgid "OpenEXR image"
+msgstr ""
+
+#: ../src/util.c:1658
+msgid "Analyze image"
+msgstr ""
+
+#: ../src/util.c:1660
+msgid "libMagick-supported image"
+msgstr ""
+
+#: ../src/util.c:1662
+msgid "VIPS image"
+msgstr ""
+
+#: ../src/util.c:1907
+msgid "Unable to find install area."
+msgstr ""
+
+#: ../src/util.c:2083
+msgid "<charset conversion error>"
+msgstr ""
+
+#: ../src/util.c:2212
+msgid "Filename is too long."
+msgstr ""
+
+#: ../src/util.c:2218
+msgid "Filename contains only blank characters."
+msgstr ""
+
+#: ../src/util.c:2281 ../src/util.c:2290 ../src/util.c:2345
+msgid "Unable to open."
+msgstr ""
+
+#: ../src/util.c:2282 ../src/util.c:2291
+#, c-format
+msgid ""
+"Unable to open file \"%s\" for reading.\n"
+"%s."
+msgstr ""
+
+#: ../src/util.c:2346
+#, c-format
+msgid ""
+"Unable to open file \"%s\" for writing.\n"
+"%s."
+msgstr ""
+
+#: ../src/util.c:2367
+msgid "Unable to write."
+msgstr ""
+
+#: ../src/util.c:2368
+#, c-format
+msgid ""
+"Unable to write to file \"%s\".\n"
+"%s."
+msgstr ""
+
+#: ../src/util.c:2403 ../src/util.c:2416 ../src/util.c:2441
+msgid "Unable to read."
+msgstr ""
+
+#: ../src/util.c:2404
+#, c-format
+msgid "File \"%s\" too large."
+msgstr ""
+
+#: ../src/util.c:2417 ../src/util.c:2442
+#, c-format
+msgid ""
+"Unable to read from file \"%s\".\n"
+"%s."
+msgstr ""
+
+#. File length unit.
+#.
+#: ../src/util.c:2712
+msgid "bytes"
+msgstr ""
+
+#. Kilo byte unit.
+#.
+#: ../src/util.c:2716
+msgid "KB"
+msgstr ""
+
+#. Mega byte unit.
+#.
+#: ../src/util.c:2720
+msgid "MB"
+msgstr ""
+
+#. Giga byte unit.
+#.
+#: ../src/util.c:2724
+msgid "GB"
+msgstr ""
+
+#. Tera byte unit.
+#.
+#: ../src/util.c:2728
+msgid "TB"
+msgstr ""
+
+#: ../src/util.c:2771
+msgid "Unable to create temporary file."
+msgstr ""
+
+#: ../src/util.c:2772
+#, c-format
+msgid ""
+"Unable to make file \"%s\"\n"
+"%s"
+msgstr ""
+
+#: ../src/util.c:2967
+msgid "Out of memory."
+msgstr ""
+
+#: ../src/util.c:2968
+#, c-format
+msgid "Request for %s of RAM triggered memory allocation failure."
+msgstr ""
+
+#: ../src/vips_call.c:140 ../src/vips_call.c:992
+#, c-format
+msgid "Error calling library function \"%s\" (%s)."
+msgstr ""
+
+#: ../src/vips_call.c:155
+msgid "Unknown type."
+msgstr ""
+
+#: ../src/vips_call.c:156
+#, c-format
+msgid "VIPS type \"%s\" not supported"
+msgstr ""
+
+#: ../src/vips_call.c:910
+msgid "Usage:"
+msgstr ""
+
+#: ../src/vips_call.c:912
+#, c-format
+msgid "VIPS operator \"%s\""
+msgstr ""
+
+#: ../src/vips_call.c:914
+#, c-format
+msgid "%s, from package \"%s\""
+msgstr ""
+
+#: ../src/vips_call.c:919
+#, c-format
+msgid "\"%s\" takes %d argument:"
+msgid_plural "\"%s\" takes %d arguments:"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../src/vips_call.c:926
+#, c-format
+msgid "And produces %d result:"
+msgid_plural "And produces %d results:"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Print any flags this function has.
+#.
+#: ../src/vips_call.c:934
+msgid "Flags:"
+msgstr ""
+
+#: ../src/vips_call.c:938
+msgid "PIO function"
+msgstr ""
+
+#: ../src/vips_call.c:940
+msgid "WIO function"
+msgstr ""
+
+#: ../src/vips_call.c:943
+msgid "coordinate transformer"
+msgstr ""
+
+#: ../src/vips_call.c:945
+msgid "no coordinate transformation"
+msgstr ""
+
+#: ../src/vips_call.c:948
+msgid "point-to-point operation"
+msgstr ""
+
+#: ../src/vips_call.c:950
+msgid "area operation"
+msgstr ""
+
+#: ../src/vips_call.c:953
+msgid "uncacheable operation"
+msgstr ""
+
+#: ../src/vips_call.c:955
+msgid "operation can be cached"
+msgstr ""
+
+#: ../src/vips_call.c:971
+#, c-format
+msgid "Argument %d (%s) to \"%s\" is the wrong type."
+msgstr ""
+
+#: ../src/vips_call.c:995
+#, c-format
+msgid "VIPS library: %s"
+msgstr ""
+
+#: ../src/vips_call.c:1964 ../src/vips_call.c:2012
+#, c-format
+msgid "image \"%s\""
+msgstr ""
+
+#: ../src/vips_call.c:1970
+msgid "no image"
+msgstr ""
+
+#: ../src/vips_call.c:1986
+msgid "doublevec"
+msgstr ""
+
+#: ../src/vips_call.c:2009
+msgid "imagevec"
+msgstr ""
+
+#: ../src/wild.c:107
+#, c-format
+msgid "Bad regular expression \"%s\"."
+msgstr ""
+
+#: ../src/workspace.c:156
+msgid "No objects selected."
+msgstr ""
+
+#: ../src/workspace.c:157 ../src/workspace.c:162
+msgid "Select exactly one object and try again."
+msgstr ""
+
+#: ../src/workspace.c:161
+msgid "More than one object selected."
+msgstr ""
+
+#: ../src/workspace.c:722 ../src/workspace.c:728
+msgid "No backup workspaces found."
+msgstr ""
+
+#: ../src/workspace.c:723
+msgid ""
+"You need to enable \"Auto workspace save\" in Preferences before automatic "
+"recovery works."
+msgstr ""
+
+#: ../src/workspace.c:729
+#, c-format
+msgid "No suitable workspace save files found in \"%s\""
+msgstr ""
+
+#: ../src/workspace.c:743
+msgid "Open workspace backup?"
+msgstr ""
+
+#: ../src/workspace.c:744
+#, c-format
+msgid ""
+"Found workspace \"%s\", dated %s. Do you want to recover this workspace?"
+msgstr ""
+
+#: ../src/workspace.c:1109
+msgid "Version mismatch."
+msgstr ""
+
+#: ../src/workspace.c:1110
+#, c-format
+msgid ""
+"File \"%s\" was saved from %s-%d.%d.%d. You may see compatibility problems."
+msgstr ""
+
+#: ../src/workspace.c:1299
+#, c-format
+msgid "Can't create workspace \"%s\". A symbol with that name already exists."
+msgstr ""
+
+#: ../src/workspace.c:1381
+msgid "Default empty workspace"
+msgstr ""
+
+#: ../src/workspace.c:1456
+#, c-format
+msgid "%s needs %d arguments, there are %d selected."
+msgstr ""
+
+#: ../src/workspace.c:1467
+msgid "Too many names selected."
+msgstr ""
+
+#: ../src/workspace.c:1607
+msgid "You can only remove top level rows."
+msgstr ""
+
+#: ../src/workspace.c:1608
+msgid "Not all selected objects are top level rows."
+msgstr ""
+
+#: ../src/workspace.c:1659
+msgid "Delete selected objects?"
+msgstr ""
+
+#: ../src/workspace.c:1660
+#, c-format
+msgid "Are you sure you want to delete %s?"
+msgstr ""
+
+#: ../src/workspace.c:1719
+msgid "Unable to ungroup."
+msgstr ""
+
+#: ../src/workspace.c:1720
+#, c-format
+msgid "Row \"%s\" is not a Group or a list."
+msgstr ""
+
+#: ../src/workspacegroup.c:146
+#, c-format
+msgid ""
+"Can't create workspacegroup \"%s\". A symbol with that name already exists."
+msgstr ""
+
+#: ../src/workspacegroup.c:213
+msgid "Set workspace name here"
+msgstr ""
+
+#: ../src/workspacegroup.c:215
+msgid "Set workspace caption here"
+msgstr ""
+
+#: ../src/workspacegroup.c:217
+msgid "New Workspace"
+msgstr ""
+
+#: ../src/workspacegroup.c:221
+msgid "Create Workspace"
+msgstr ""

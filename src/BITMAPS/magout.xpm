@@ -1,0 +1,26 @@
+/* XPM */
+static char * magout_xpm[] = {
+/* width height ncolors cpp [x_hot y_hot] */
+"16 16 4 1 -1 -1",
+/* colors */
+" 	s none	m none	c none",
+".	s iconColor1	m black	c black",
+"X	s iconColor2	m white	c white",
+"o	s iconGray1	m white	c #dededededede",
+/* pixels */
+"    ....        ",
+"  ..XXXX..      ",
+" .XXXXXXXX.     ",
+" .XXXXXXXX.     ",
+".XXXXXXXXXX.    ",
+".XX......XX.o   ",
+".XX......XX.o   ",
+".XXXXXXXXXX.o   ",
+" .XXXXXXXX.o    ",
+" .XXXXXXXX..o   ",
+"  ..XXXX...X.   ",
+"    ....o.X.X.  ",
+"     ooo o...X. ",
+"           ...X.",
+"            ...X",
+"             ..."};

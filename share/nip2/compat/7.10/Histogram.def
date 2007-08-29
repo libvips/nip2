@@ -1,0 +1,139 @@
+Hist_new_item = class
+	Menuaction "_New Histogram" "make a new histogram" {
+	action = class
+		_result {
+		_vislevel = 3;
+
+		depth = Option "Depth" ["8 bit", "16 bit"] 0;
+		black = Slider 0 100 0;
+		white = Slider 0 100 100;
+
+		shadow_point = Slider 0.1 0.3 0.2;
+		mid_point = Slider 0.4 0.6 0.5;
+		highlight_point = Slider 0.7 0.9 0.8;
+
+		shadow_adjust = Slider (-15) 15 0;
+		mid_adjust = Slider (-30) 30 0;
+		highlight_adjust = Slider (-15) 15 0;
+
+		_result = tone_build fmt
+				black white
+				shadow_point mid_point highlight_point
+				shadow_adjust mid_adjust highlight_adjust
+		{
+			fmt = [Image_format.UCHAR, Image_format.USHORT]?depth;
+		}
+	}
+}
+
+Hist_find_item = class 
+	Menupullright "_Find Histogram" "find a histogram" {
+	Oned_item = class 
+		Menuaction "_One Dimension" 
+			"for a n-band image, make an n-band 1D histogram" {
+		action x = map_unary hist_find x;
+	}
+
+	Nd_item = class 
+		Menuaction "_Many Dimensions" 
+			"for a n-band image, make an n-dimensional histogram" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			// default to something small-ish
+			bins = Expression "Number of bins in each dimension" 8;
+
+			_result 
+				= map_unary process x
+			{
+				process in
+					= hist_find_nD bins in;
+			}
+		}
+	}
+}
+
+Hist_map_item = class 
+	Menuaction "_Map Histogram" "map an image through a histogram" {
+	action x y
+		= map_binary map x y
+	{
+		map a b
+			= hist_map hist im
+		{
+			args = sortc (const is_hist) [a, b];
+			im = args?0;
+			hist = args?1;
+		}
+	}
+}
+
+Hist_eq_item = Filter_enhance_item.Hist_equal_item;
+
+#separator
+
+Hist_cum_item = class 
+	Menuaction "_Cumulativise Histogram" 
+		"form cumulative histogram from frequency histogram" {
+	action x = map_unary hist_cum x;
+}
+
+Hist_norm_item = class 
+	Menuaction "N_ormalise Histogram" "normalise a histogram" {
+	action x = map_unary hist_norm x;
+}
+
+Hist_match_item = class 
+	Menuaction "Ma_tch Histogram" 
+		"find LUT which will match first histogram to second" {
+	action in ref = map_binary hist_match in ref;
+}
+
+#separator
+
+Hist_profile_item = class 
+	Menuaction "Find _Profile" 
+		"search from image edges for non-zero pixels" {
+	action x = class  
+		_result {
+		_vislevel = 3;
+
+		edge = Option "Search from" [
+			"Top edge down", 
+			"Left edge to right",
+			"Bottom edge up",
+			"Right edge to left"
+		] 2;
+
+		_result 
+			= map_unary profile x
+		{
+			profile image
+				= (image_set_type Image_type.HISTOGRAM @ Image) [
+					im_profile image.value 0,
+					im_profile image.value 1,
+					im_profile (fliptb image.value) 0,
+					im_profile (fliplr image.value) 1
+				]?edge;
+		}
+	}
+}
+
+Hist_graph_item = class 
+	Menuaction "_Slice Image" "slice an image along a guide" {
+	action x
+		= map_unary process x
+	{
+		process guide
+			= image_set_type Image_type.HISTOGRAM slice
+		{
+			slice
+				= extract_area 
+					0 guide.top guide.width 1 guide.image,
+					is_HGuide guide
+				= extract_area
+					guide.left 0 1 guide.height guide.image;
+		}
+	}
+}

@@ -1,0 +1,122 @@
+
+/* is_colour_space str: is a string one of nip's colour space names
+ */
+is_colour_space str = Image_type.colour_spaces.present 0 str;
+
+/* is_colour_type n: is a number one of VIPS's colour spaces
+ */
+is_colour_type n = Image_type.colour_spaces.present 1 n;
+
+/* is_number: is a real or a complex number.
+ */
+is_number a = is_real a || is_complex a;
+
+/* is_int: is an integer
+ */
+is_int a = is_real a && a == (int) a;
+
+/* is_uint: is an unsigned integer
+ */
+is_uint a = is_int a && a >= 0;
+
+/* is_pint: is a positive integer
+ */
+is_pint a = is_int a && a > 0;
+
+/* is_preal: is a positive real
+ */
+is_preal a = is_real a && a > 0;
+
+/* is_ureal: is an unsigned real
+ */
+is_ureal a = is_real a && a >= 0;
+
+/* is_letter c: true of character c is an ASCII letter
+ *
+ * is_letter :: char -> bool
+ */
+is_letter c = ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+
+/* is_digit c: true if character c is an ASCII digit
+ *
+ * is_digit :: char->bool
+ */
+is_digit x = '0' <= x && x <= '9';
+
+/* A whitespace character.
+ *
+ * is_space :: char->bool
+ */
+is_space = member " \n\t";
+
+/* is_listof p s: true if finite list with p true for every element.
+ */
+is_listof p l = is_list l && land (map p l);
+
+/* is_string s: true if finite list of char.
+ */
+is_string s = is_listof is_char s;
+
+/* is_real_list l: is l a list of real numbers ... test each element,
+ * so no infinite lists pls.
+ */
+is_real_list l = is_listof is_real l;
+
+/* is_string_list l: is l a finite list of finite strings.
+ */
+is_string_list l = is_listof is_string l;
+
+/* is_rectangular l: is l a rectangular data structure
+ */
+is_rectangular l
+	= true, !is_list l
+	= true, land (map is_obj l)
+	= true, land (map is_list l) &&
+		land (map (not @ is_obj) l) &&
+		land (map is_rectangular l) &&
+		len l > 0 &&
+		land (map (equal (hd lengths)) (tl lengths))
+	= false
+{
+	// treat strings as a base type, not [char]
+	is_obj x = !is_list x || is_string x;
+	lengths = map len l;
+}
+
+/* is_matrix l: is l a list of lists of real numbers, all the same length
+ */
+is_matrix l = is_listof is_real_list l && is_rectangular l;
+
+/* is_square_matrix l: is l a matrix with width == height
+ */
+is_square_matrix l
+      = true, l == []
+      = is_matrix l && len l == len (hd l);
+
+/* is_oddmatrix l: is l a matrix with odd-length sides
+ */
+is_oddmatrix l
+      = true, l == []
+      = is_matrix l && (len l) % 2 == 1 && (len (l?0)) % 2 == 1;
+
+/* is_odd_square_matrix l: is l a square_matrix with odd-length sides
+ */
+is_odd_square_matrix l = is_square_matrix l && (len l) % 2 == 1;
+
+/* Is an item in a column of a table?
+ */
+is_incolumn n table x = member (map (extract n) table) x;
+
+/* Is HGuide or VGuide.
+ */
+is_Guide x = is_instanceof "HGuide" x || is_instanceof "VGuide" x;
+
+is_Point x = is_instanceof "Point" x;
+
+/* A list of the form [[1,2],[3,4],[5,6]...]
+ */
+is_xy_list l 
+	= is_list l && land (map xy l)
+{
+	xy l = is_real_list l && len l == 2;
+}

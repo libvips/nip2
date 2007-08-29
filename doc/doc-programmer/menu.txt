@@ -1,0 +1,358 @@
+nip menu organisation
+
+here's how it's currently arranged, all ideas for new arrangements welcome
+
+you can change the name of any item, move between menus etc.
+
+once we pick an arrangement, we're stuck with it forever :-(
+
+top level menus are always sorted alphabetically, within each menu, you can
+have any order you like
+
+I was thinking (for example) maybe there should be a "Capture" menu: we could
+put all the stuff you tend to do when acquiring images in there (eg. crop,
+white balance, New_video, etc.)
+
+Arithmetic
+  Add
+  Subtract
+  Multiply
+  Divide
+  Remainder
+  -------
+  Absolute_value
+  Absolute_value_vector		like abs, but treat pixels as vectors
+  Sign				unit vector in direction of value
+  Negate			value * -1
+  Photographic_negative		255 - value (255 == max value for type)
+
+Boolean
+  And
+  Or
+  Eor
+  Not
+  -------
+  Left_shift			bitwise left/right shift
+  Right_shift
+  -------
+  If_then_else
+  Band_and			and the bands of an image together
+  Band_or			or the bands of an image together
+
+Colour
+  Mono_to
+    Mono 
+    XYZ 
+    Yxy 
+    Lab 
+    LCh 
+    UCS 
+    RGB 
+    sRGB 
+    LabQ 
+    LabS 
+    Falsecolour 
+  XYZ_to 
+    Mono 
+    XYZ 
+    Yxy 
+    Lab 
+    LCh 
+    UCS 
+    RGB 
+    sRGB 
+    LabQ 
+    LabS 
+  etc. etc. ... every combination of the 10 colour spaces
+  -------
+  Recombination 		linear recombination with editable matrix
+  -------
+  dE_ 				calculate colour difference between two objects
+    CIELAB 
+    UCS 
+  -------
+  Tint_mono_image 		apply coloured tint to mono image
+  Colour_chart_from_matrix 	make a synthetic colour chart from a matrix
+  Colour_from_image 		make a colour from the average colour in image
+  Image_from_colour  		make a patch of pixels from a colour		
+  Similar_colour 		find similar colours
+
+Complex
+  Complex_extract 
+    Real 			extract real part of complex
+    Imaginary 			extract imaginary part of complex
+  Complex_build 		combine two reals to make a complex
+  -------
+  Polar 			rectangular to (amplitude, phase)
+  Rectangular 			polar to rectangular
+
+Convert
+  Decompose 			break up compound object 
+  Compose 			combine small objects to make a bigger one
+  -------
+  Cast_to 
+    unsigned_8bit 		convert numeric types
+    signed_8bit 
+    unsigned_16bit 
+    signed_16bit 
+    unsigned_32bit 
+    signed_32bit 
+    float_32bit 
+    float_64bit 
+    complex_64bit 
+    complex_128bit 
+  Ceil 				round up
+  Floor 			round down
+  Rint 				round nearest
+  Scale_to_byte 		
+  -------
+  Convert_to_matrix 		try to make a matrix from an object
+  Convert_to_image 		try to make an image from a thing
+  -------
+  Falsecolour 
+
+Filter
+  Blur 
+  Sharpen 
+  Median 
+  Laplacian 
+  Sobel 
+  Linedet 
+  Emboss 
+  -------
+  Custom_rank 			rank filter with editable params
+  Custom_convolution 		convolution filter with editable params
+
+Fourier
+  Fourier_transform 
+  Fourier_inverse 
+  -------
+  Ideal_fourier_filter 
+    High_low 
+    Ring 
+    Band 
+  Gaussian_fourier_filter 
+    High_low 
+    Ring 
+    Band 
+  Butterworth_fourier_filter 
+    High_low 
+    Ring 
+    Band 
+
+Histogram
+  Hist_find 
+  Hist_map 
+  Hist_cumulative 
+  Hist_normalise 
+  Hist_match 
+  -------
+  Hist_equalise 
+    Global 
+    Local 
+  Guide_slice 			graph pixel values along a guide
+
+Image
+  Copy 
+  -------
+  Adjust_scale_offset 
+  Adjust_gamma 
+  Custom_sharpen 
+  White_balance 
+  Light_correct_white_image 
+  Smooth_image 
+  Drop_shadow 
+
+Join
+  Abut
+    Left_right
+    Top_bottom
+  Crop
+
+List
+  Head 
+  Tail 
+  Init 
+  Last 
+  -------
+  Reverse 
+  Sort 
+  Make_set 
+  Transpose_list 
+  Concat 
+  -------
+  Length 
+  Subscript 
+  Take 
+  Drop 
+  -------
+  Join 
+  Cons 
+  Zip 
+
+Log
+  Exponential 
+  Log_natural 
+  -------
+  Log10 
+  Exponential10 
+  -------
+  Raise_to_power 
+
+Morphology
+  Dilate8 
+  Dilate4 
+  Erode8 
+  Erode4 
+  -------
+  Open 
+  Close 
+  Clean 
+  Thin 
+  -------
+  Dilate 
+  Erode 
+  Dilate_multiple 
+  Erode_multiple 
+  -------
+  Custom_morphology 
+  Find_profile 			search an image for edge profiles
+
+Mosaic
+  Mosaic_translate 		the two-point funcs
+    Left_right 
+    Top_bottom 
+  Mosaic_affine 		the four-point funcs
+    Left_right 
+    Top_bottom 
+  -------
+  Mosaic_balance 
+  Tilt_brightness 
+    Left_right 		
+    Top_bottom 
+  -------
+  Mosaic_rebuild 		rebuild mosaic with different files
+
+New
+  New_slider 
+  New_toggle
+  New_option 
+  New_matrix 
+    Convolution 
+    Recombination 
+    Morphology 
+  New_image 
+  New_colour
+  New_video 			just linux video at the moment
+  -------
+  New_eye 
+  New_zone_plate 
+  New_grey 
+  New_xy 
+  New_gauss_noise 
+  New_fractal 
+  New_CRT_test_chart 
+  New_frequency_test_chart 
+  New_checkerboard 
+  New_grid 
+  New_ideal 
+    High_low 			this set of items make fourier filter masks
+    Ring 
+    Band 
+  New_gaussian 
+    High_low 
+    Ring 
+    Band 
+  New_butterworth 
+    High_low 
+    Ring 
+    Band 
+  -------
+  New_CIELAB_slice 		slice through cielab
+  New_LAB_colour		pick a colour with a poiont on a LAB slice
+
+Plot
+  Plot_scatter			
+
+Print
+  ICC_export 			PCS -> device
+  ICC_import 			device -> PCS
+  ICC_transform 		device -> device
+  ICC_ac2rc 
+  -------
+  D65XYZ_to 			change white point for measure/print
+    D50XYZ 
+  D50XYZ_to 
+    D65XYZ 
+  D50XYZ_to 
+    Lab 
+  D50Lab_to 
+    XYZ 
+  -------
+  Sharpen_for_print 
+  Morph_for_print 
+
+Relational
+  Equal 
+  Not_equal 
+  More 
+  Less 
+  More_equal 
+  Less_equal 
+
+Resize
+  Resize_image			change size by a scale factor
+  Resize_xy_image		separate xy scale factors
+  Resize_canvas
+  -------
+  Shrink_to
+    Quicklook			shrink to smallest axis == 64 pixels
+    Icon			shrink to smallest axis == 400 pixels
+
+Rotate
+  Rotate_fixed 
+    r90 
+    r180 
+    r270 
+    r45 
+  Rotate_free 			rotate with a slider
+  -------
+  Flip 
+    up_down 
+    left_right 
+  Transpose 
+  -------
+  Straighten_arrow 		rotate to get an arrow straight
+
+Statistics
+  Mean 
+  Deviation 
+  Stats 
+  -------
+  Max 
+  Min 
+  Maxmin 
+  Maximum_position 
+  Minimum_position 
+  -------
+  Count_set 
+  Count_clear 
+  -------
+  Measure_colour_chart 
+  Statistical_difference 	more of a filter really :-(
+  Count_lines 
+
+Trig
+  Sin 
+  Cos 
+  Tan 
+  -------
+  Asin 
+  Acos 
+  Atan 
+  -------
+  Rad 
+  Deg 
+  -------
+  Angle_range 			is angle within arc ... clock arithmetic
+

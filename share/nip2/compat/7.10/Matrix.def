@@ -1,0 +1,395 @@
+
+Matrix_build_item = class 
+	Menupullright "_New" "make a new matrix of some sort" {
+
+	Plain_item = class 
+		Menuaction "_Plain" "make a new plain matrix widget" {
+		action = Matrix (identity_matrix 3);
+	}
+
+	Convolution_item = class 
+		Menuaction "_Convolution" "make a new convolution matrix widget" {
+		action = Matrix_con 1 0 [[0, 0, 0], [0, 1, 0], [0, 0, 0]];
+	}
+
+	Recombination_item = class 
+		Menuaction "_Recombination" 
+			"make a new recombination matrix widget" {
+		action = Matrix_rec (identity_matrix 3);
+	}
+
+	Morphology_item = class 
+		Menuaction "_Morphology" "make a new morphology matrix widget" {
+		action = Matrix_mor [[0, 0, 0], [0, 255, 0], [0, 0, 0]];
+	}
+
+	sep1 = Menuseparator;
+
+	Matrix_gaussian_item = class 
+		Menuaction "_Gaussian" "make a gaussian matrix" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			sigma = Slider 0.001 10 1;
+			min_amplitude = Slider 0 1 0.2;
+			integer = Toggle "Integer" false;
+
+			_result 
+				= fn sigma.value min_amplitude.value
+			{
+				fn
+					= im_gauss_imask, integer
+					= im_gauss_dmask;
+			}
+		}
+	}
+
+	Matrix_laplacian_item = class 
+		Menuaction "_Laplacian" "make the Laplacian of a Gaussian matrix" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			sigma = Slider 0.001 10 1.5;
+			min_amplitude = Slider 0 1 0.1;
+			integer = Toggle "Integer" false;
+
+			_result 
+				= fn sigma.value min_amplitude.value
+			{
+				fn
+					= im_log_imask, integer
+					= im_log_dmask;
+			}
+		}
+	}
+}
+
+#separator
+
+Matrix_extract_item = class
+	Menupullright "_Extract" "extract rows or columns from a matrix" {
+	extract n f = take (to_real n) @ drop (to_real f);
+
+	Rows_item = class
+		Menuaction "_Rows" "extract rows" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			first = Expression "Extract from row" 0;
+			number = Expression "Extract this many rows" 1;
+
+			_result 
+				= map_unary process x
+			{
+				process mat
+					= mat.Matrix_base (extract number first mat.value);
+			}
+		}
+	}
+
+	Columns_item = class
+		Menuaction "_Columns" "extract columns" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			first = Expression "Extract from column" 0;
+			number = Expression "Extract this many columns" 1;
+
+			_result 
+				= map_unary process x
+			{
+				process mat
+					= mat.Matrix_base (map (extract number first) mat.value);
+			}
+		}
+	}
+
+	Diagonal_item = class
+		Menuaction "_Diagonal" "extract diagonal" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			which = Option "Extract" [
+				"Leading Diagonal",
+				"Trailing Diagonal"
+			] 0;
+
+			_result 
+				= map_unary process x
+			{
+				process mat
+					= mat.Matrix_base (map2 (extract 1) [0..] mat.value),
+						which == 0
+					= mat.Matrix_base (map2 (extract 1) 
+						[mat.width - 1, mat.width - 2 .. 0] mat.value);
+			}
+		}
+	}
+}
+
+Matrix_insert_item = class
+	Menupullright "_Insert" "insert rows or columns into a matrix" {
+	// insert a thing in a list at position first
+	insert first x l
+		= take first l ++ x ++ drop first l;
+
+	Rows_item = class
+		Menuaction "_Rows" "insert rows" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			first = Expression "Insert at row" 0;
+			number = Expression "Insert this many rows" 1;
+			item = Expression "Set new cells to" 0;
+
+			_result 
+				= map_unary process x
+			{
+				process mat
+					= mat.Matrix_base (insert (to_real first) rows mat.value)
+				{
+					row = replicate mat.width (to_real item);
+					rows = replicate (to_real number) row;
+				}
+			}
+		}
+	}
+
+	Columns_item = class
+		Menuaction "_Columns" "remove columns" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			first = Expression "Insert at column" 0;
+			number = Expression "Insert this many columns" 1;
+			item = Expression "Set new cells to" 0;
+
+			_result 
+				= map_unary process x
+			{
+				process mat
+					= mat.Matrix_base 
+						(map (insert (to_real first) cells) mat.value)
+				{
+					cells = replicate (to_real number) (to_real item);
+				}
+			}
+		}
+	}
+}
+
+Matrix_delete_item = class
+	Menupullright "_Delete" "delete rows or columns from a matrix" {
+	// remove number of items, starting at first
+	delete first number l = take (to_real first) l ++ 
+		drop (to_real first + to_real number) l;
+
+	Rows_item = class
+		Menuaction "_Rows" "delete rows" {
+
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			first = Expression "Delete from row" 0;
+			number = Expression "Delete this many rows" 1;
+
+			_result 
+				= map_unary process x
+			{
+				process mat
+					= mat.Matrix_base (delete first number mat.value);
+			}
+		}
+
+	}
+
+	Columns_item = class
+		Menuaction "_Columns" "delete columns" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			first = Expression "Delete from column" 0;
+			number = Expression "Delete this many columns" 1;
+
+			_result 
+				= map_unary process x
+			{
+				process mat
+					= mat.Matrix_base (map (delete first number) mat.value);
+			}
+		}
+	}
+}
+
+Matrix_rotate_item = class
+	Menupullright "_Rotate" "clockwise rotation by fixed angles" {
+
+	rot90 = Image_transform_item.Rotate_item.Fixed_item.Rot90_item;
+
+	rot180 = Image_transform_item.Rotate_item.Fixed_item.Rot180_item;
+
+	rot270 = Image_transform_item.Rotate_item.Fixed_item.Rot270_item;
+
+	Matrix_rot45_item = class
+		Menuaction "_45 Degrees" 
+			"45 degree rotate (square, odd-length-sides only)" {
+		action x = map_unary rot45 x;
+	}
+}
+
+Matrix_flip_item = Image_transform_item.Flip_item;
+
+#separator
+
+Matrix_invert_item = class
+	Menuaction "In_vert" "calculate inverse matrix" {
+	action x = map_unary (converse power (-1)) x;
+}
+
+Matrix_transpose_item = class
+	Menuaction "_Transpose" "swap rows and columns" {
+	action x = map_unary transpose x;
+}
+
+#separator
+
+Matrix_convert_to_image_item = class
+	Menuaction "Matrix to I_mage" "convert matrix to image" {
+	action x = class 
+		_result {
+		_vislevel = 3;
+
+		conversion = Option "Convert to" [
+			"Monochrome image, same size as matrix",
+			"Multiband image, each row becomes a pixel"
+		] 0;
+
+		_result
+			= map_unary process x
+		{
+			process mat
+				= Image im, conversion == 0
+				= Image joinup
+			{
+				im = im_mask2vips mat;
+
+				joinup = bandjoin 
+					(map extract_column 
+						[0 .. mat.width - 1]);
+
+				extract_column n
+					= extract_area n 0 1 mat.height im;
+			}
+		}
+	}
+}
+
+Matrix_from_image_item = class
+	Menuaction "Image to M_atrix" "convert image to matrix" {
+	action x = map_unary to_matrix x;
+}
+
+#separator
+
+Matrix_plot_scatter_item = class 
+	Menuaction "_Plot Scatter" 
+		"plot a scatter graph of a matrix of [x,y] coordinates" {
+	action x = class
+		_result {
+		_check_args = [
+			[x, "x", check_Matrix_width 2]
+		];
+		_vislevel = 3;
+
+		gwidth = Expression "Graph size across (pixels)" 512;
+		gheight = Expression "Graph size down (pixels)" 512;
+		plot_colour = Colour_picker "Lab" [80, -80, 80];
+		xmin = Expression "X range minimum" 
+			(foldr1 min_pair (map (extract 0) x.value));
+		xmax = Expression "X range maximum"
+			(foldr1 max_pair (map (extract 0) x.value));
+		ymin = Expression "Y range minimum"
+			(foldr1 min_pair (map (extract 1) x.value));
+		ymax = Expression "Y range maximum"
+			(foldr1 max_pair (map (extract 1) x.value));
+		axies = Toggle "Draw axies" true;
+
+		mark 
+			= Mark this p?0 p?1
+		{
+			p = _to_image x.value?0;
+		}
+		mark_hint = "Mark is at position:";
+		mark_position = _from_image [mark.left, mark.top];
+
+		// geometry
+		_xrange = to_real xmax - to_real xmin;
+		_yrange = to_real ymax - to_real ymin;
+		_xscale = to_real gwidth / _xrange;
+		_yscale = to_real gheight / _yrange;
+
+		// map an [x,y] point into the image coordinates
+		_to_image p = [(p?0 - to_real xmin) * _xscale, 
+			to_real gheight - (p?1 - to_real ymin) * _yscale];
+
+		// map an [x,y] point from image cods back to real cods
+		_from_image p = [p?0 / _xscale + to_real xmin, 
+			(to_real gheight - p?1) / _yscale + to_real ymin];
+
+		_result
+			= Image (foldr plot background' x.value)
+		{
+			// colourspace we are drawing in
+			space = Image_type.colour_spaces.lookup 
+				0 1 plot_colour.colour_space;
+
+			plot_image_new width height pixel
+				= image_new width height 3 Image_format.FLOAT 
+					Image_coding.NOCODING space pixel 0 0;
+
+			// background
+			background = plot_image_new (to_real gwidth) (to_real gheight) 0;
+
+			// mark we plot
+			mark_width = max_pair 1 (to_real gwidth / 100);
+			mark_height = max_pair 1 (to_real gheight / 100);
+			mark = plot_image_new mark_width mark_height plot_colour;
+
+			// draw axies on background 
+			background' 
+				= drawxy, axies
+				= background
+			{
+				// colour we draw axies in
+				ax_col = colour_transform_to space (Colour "Lab" [100, 0, 0]);
+
+				// axies
+				xaxis = plot_image_new (to_real gwidth) 1 ax_col; 
+				yaxis = plot_image_new 1 (to_real gheight) ax_col;
+				origin = _to_image [0, 0];
+
+				drawx = insert_noexpand 0 origin?1 xaxis background;
+				drawxy = insert_noexpand origin?0 0 yaxis drawx;
+			}
+
+			// plot a single point on an image
+			plot p im 
+				= insert_noexpand 
+					(x - mark_width / 2) (y - mark_height / 2) mark im
+			{
+				p' = _to_image p;
+				x = p'?0;
+				y = p'?1;
+			}
+		}
+	}
+}

@@ -1,3 +1,17 @@
+- reformat parse.y to be a bit more compact
+
+  make DOT more regular ... expr either side, do the TAG stuff in the
+  compiler
+
+  need MORE and MOREEQ ... again, convert to LESSEQ / LESS in the compiler
+
+  try adding (*) as well (operator sections) ... need a binup / uop production
+
+
+  try adding (|x| expr)? add a (low?) precedence too
+
+
+
 - do we leak for IMAGEVEC/DOUBLEVEC/etc. in vips_call.c? I think we might
 
 - test classmodel_dict_new() ... part of classmodel member automation

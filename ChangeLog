@@ -1,5 +1,6 @@
 started 7.13.0
 - woo, fork for new development version
+- started cleaning up parse.y
 
 started 7.12.5
 - tiny win32 cleanups

@@ -562,7 +562,10 @@ filesel_get_filetype( Filesel *filesel )
 
 		for( i = 0; filesel->type[i]; i++ ) 
 			if( filter == filesel->filter[i] )
-				return( i );
+				break;
+		assert( filesel->type[i] );
+
+		return( i );
 	}
 }
 

@@ -75,6 +75,8 @@ typedef enum {
 	BI_PNOTEQ,
 	BI_LESS,		/* Relational ops */
 	BI_LESSEQ,
+	BI_MORE,		
+	BI_MOREEQ,
 	BI_IF,			/* if-then-else */
 	BI_CONS			/* List cons */
 } BinOp;

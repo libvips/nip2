@@ -958,10 +958,10 @@ binop	: expr '+' expr {
 		$$ = tree_binop_new( current_compile, BI_LESSEQ, $1, $3 );
 	}
 	| expr TK_MORE expr {	
-		$$ = tree_binop_new( current_compile, BI_LESS, $3, $1 );
+		$$ = tree_binop_new( current_compile, BI_MORE, $1, $3 );
 	}
 	| expr TK_MOREEQ expr {	
-		$$ = tree_binop_new( current_compile, BI_LESSEQ, $3, $1 );
+		$$ = tree_binop_new( current_compile, BI_MOREEQ, $1, $3 );
 	}
 	| expr TK_EQ expr {	
 		$$ = tree_binop_new( current_compile, BI_EQ, $1, $3 );

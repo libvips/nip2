@@ -5,10 +5,122 @@
 
   need MORE and MOREEQ ... again, convert to LESSEQ / LESS in the compiler
 
-  try adding (*) as well (operator sections) ... need a binup / uop production
+- add (*) as well (operator sections) ... need a binup / uop production
+
+- pattern matching
+
+  	fred (Image x) = rot90 x
+
+  is equivalent to
+
+  	fred x
+		= rot90 x, is_Image x
+		= error "bad args"
+
+  also for list and complex
+
+  	fred (a:x) = x
+	fred [a, b, c] = 
+	fred [a, b, ...] =
+	fred (a, b) = 
+	fred [(a, b), (c, d), ...] = 
+	fred [Image x, Matrix y] =
+
+- try adding (|x| expr)? add a (low?) precedence too
+  possibilities:
+
+  	(\x -> expr)
+  	(\x expr)
+  	($x expr)
+  	(|x, y| expr)
+  	($x $y expr)
+  	(\x \y -> expr)
+
+- (from a paper describing Miranda's list comps)
+
+  list comprehensions have the form:
+  
+	[ <expression> | <qualifier> , ..., <qualifier> ]
+  
+  where each qualifier is either a generator (of the form pat <- expr)
+  or a filter (a Boolean expression). The syntax derives from analogy with
+  common set notation. For example:
+
+	{x|x ∈ S;P(x)}
+
+  defines the subset of S for which P holds. Similarly:
+
+	[ x | x <- s, p x ]
+
+  defines the sublist of s for which p x is True. The scope of variables
+  defined using generators extends from the generator itself to all qualifiers
+  defined to the right of the generator, and to the main expression.
+
+  For example, the following expression keeps all odd numbers of the list
+  of numbers xs
+
+	[x | x <- xs ; odd x]
+
+  Generators can be nested as in
+
+	[x+y | x <- xs; odd x; y <- ys; even y]
+
+  which returns all possible sums for all odd numbers in xs with all
+  even number of ys. The last generators change most rapidly and a later
+  qualifier may refer to a variable defined in an earlier one. Thus this
+  defines a simple but quite powerful list iteration mechanism; it is much
+  simpler than most “loop” or “do” macros found in Common Lisp
+  [6]; it is also more general than the “collect” macro given in [1,
+  p 254-256]. It is in a way similar in spirit with the “Series Macro
+  Package” of Waters [9] but considerably simpler (our macro is less
+  than 20 lines of Lisp...). Of course, our model is much less powerful
+  but is very useful anyhow. The limitations of the comprehension notation
+  imply that the generated code is efficient without resorting to a program
+  analysis like the one necessary in some cases for the series.
+
+  The following Miranda functions show the power of expression of list
+  expressions (and also of pattern matching in the function heads):
+
+  • function for quicksort:
+
+	q_sort [] = [] 
+	q_sort (a:x) = q_sort [y|y <- x; y<a] ++ [a] ++ 
+	  	q_sort[y|y <- x; y >=a]
+
+    which means: sorting the empty list gives the empty list; sorting a
+    list beginning with a followed by the list x is appending three lists:
+    the first one is the result of sorting all elements of x smaller than a,
+    the second only comprises the “pivot ” a and the third is the result
+    of sorting all elements of x greater or equal to a.
+
+  • function for finding all permutations of a list of elements
+
+	perms [] = [[]] 
+	perms x = [a:p | a <- x ; p <- perms (x -- [a])]
+
+    This is read as finding the permutations of the empty list is the list
+    of one empty list; finding the permutations of list x is the list of
+    all elements a from x in front of all possible permutations of the
+    remaining elements of x. (: is the “cons” operator and -- denotes
+    list difference).
 
 
-  try adding (|x| expr)? add a (low?) precedence too
+  example compilation:
+
+	z = [x + y | x <- odds, y <- evens, x + y < 12];
+
+
+	x = odds
+	y = evens
+	t1 = filter pred (zip2 x y)
+		pred x y = x + y < 12
+	x' = map (extract 0) t1
+	y' = map (extract 1) t1
+	z = map f (zip2 x' y')
+		f x y = x + y
+
+
+
 
 
 

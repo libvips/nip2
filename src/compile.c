@@ -458,6 +458,23 @@ compile_binop( Compile *compile,
 	HeapNode *hn1, *hn2, *hn3;
 	PElement e1, e2;
 
+	switch( bop ) {
+	case BI_MORE:
+		bop = BI_LESS;
+		SWAPP( arg1, arg2 );
+		break;
+
+	case BI_MOREEQ:
+		bop = BI_LESSEQ;
+		SWAPP( arg1, arg2 );
+		break;
+
+		/* Gah, keep warnings quiet.
+		 */
+	default:
+		break;
+	}
+
 	if( NEWNODE( heap, hn1 ) )
 		return( FALSE );
 	hn1->type = TAG_APPL;

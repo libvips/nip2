@@ -55,6 +55,16 @@
 	} \
 } while( 0 )
 
+/* Swap two pointers.
+ */
+#define SWAPP( A, B ) { \
+	void *swapp_t; \
+ 	\
+	swapp_t = (A); \
+	(A) = (B); \
+	(B) = swapp_t; \
+}
+
 /* A string in the process of being written to ... multiple calls to 
  * buf_append add to it, on overflow append "..." and block further writes.
  */

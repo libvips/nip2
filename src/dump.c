@@ -63,6 +63,8 @@ decode_BinOp( BinOp op )
 	case BI_PNOTEQ:		return( "!==" );
 	case BI_LESS:		return( "<" );
 	case BI_LESSEQ:		return( "<=" );
+	case BI_MORE:		return( ">" );
+	case BI_MOREEQ:		return( ">=" );
 	case BI_IF:		return( "if_then_else" );
 	case BI_CONS:		return( ":" );
 

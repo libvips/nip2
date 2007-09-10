@@ -1,3 +1,10 @@
+- try
+
+	A1 = Image ...
+	max_pair A1 A1
+
+  ?!?!
+
 - reformat parse.y to be a bit more compact
 
   make DOT more regular ... expr either side, do the TAG stuff in the

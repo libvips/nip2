@@ -138,13 +138,15 @@ struct _ParseNode {
 
 	NodeTypes type;
 
-	/* Bundle for node types with up to three arguments.
-	 * Unary ops, binary ops, application and ifthenelse ops.
+	/* Bundle for node types with up to two arguments.
 	 */
 	BinOp biop;
 	UnOp uop;
 	ParseNode *arg1;
 	ParseNode *arg2;
+
+	/* Just for generators, eg. [a, b .. c]
+	 */
 	ParseNode *arg3;
 
 	/* A symbol reference.
@@ -190,3 +192,7 @@ ParseNode *tree_class_new( Compile *compile );
 ParseNode *tree_compose_new( Compile *compile, ParseNode *f, ParseNode *g );
 
 void *tree_node_destroy( ParseNode *n );
+
+typedef ParseNode *(*tree_map_fn)( Compile *, ParseNode *, void *, void * );
+ParseNode *tree_map( Compile *compile, 
+	tree_map_fn fn, ParseNode *node, void *a, void *b );

@@ -183,10 +183,6 @@ ip_input( void )
 	InputState *is = &input_state;
 	int ch;
 
-#ifdef DEBUG_CHARACTER
-	printf( "ip_input: starting ...\n" ); 
-#endif /*DEBUG_CHARACTER*/
-
 	if( is->oldchar >= 0 ) {
 		/* From unget buffer.
 		 */
@@ -476,7 +472,7 @@ input_pop( void )
 	BinOp yy_binop;
 }
 
-%token TK_IDENT TK_CONST TK_DOTDOTDOT
+%token TK_TAG TK_IDENT TK_CONST TK_DOTDOTDOT
 %token TK_UMINUS TK_UPLUS TK_POW
 %token TK_LESS TK_LESSEQ TK_MORE TK_MOREEQ TK_NOTEQ
 %token TK_LAND TK_LOR TK_BAND TK_BOR TK_JOIN
@@ -487,7 +483,7 @@ input_pop( void )
 
 %type <yy_node> expr binop uop rhs listex clist body crhs cexprlist prhs
 %type <yy_const> TK_CONST 
-%type <yy_name> TK_IDENT 
+%type <yy_name> TK_IDENT TK_TAG
 
 %nonassoc TK_IF 
 %left ',' 
@@ -504,7 +500,7 @@ input_pop( void )
 %left '!' '~' TK_JOIN TK_UMINUS TK_UPLUS 
 %right TK_POW ':'
 %right TK_CONST '(' 
-%right TK_IDENT TK_SCOPE '['
+%right TK_IDENT TK_TAG TK_SCOPE '['
 %right TK_APPLICATION
 %left '?' '.' 
 
@@ -512,7 +508,7 @@ input_pop( void )
 
 %%
 
-select	: '.' main
+select	: ',' main
 	| '^' onedef
 	| '*' sdef optsemi {
 		compile_check( current_compile );
@@ -677,13 +673,13 @@ def	: TK_IDENT {
 	sdef {
 		Compile *parent = compile_get_parent( current_compile );
 
-		/* Link unresolved names.
-		 */
-		compile_resolve_names( current_compile, parent );
-
 		/* Do some checking.
 		 */
 		compile_check( current_compile );
+
+		/* Link unresolved names.
+		 */
+		compile_resolve_names( current_compile, parent );
 
 		scope_pop();
 	}
@@ -788,13 +784,13 @@ crhs	: {
 		if( current_compile->tree->elist )
 			parent->has_super = TRUE;
 
-		/* Link unresolved names.
-		 */
-		compile_resolve_names( current_compile, parent );
-
 		/* Do some checking.
 		 */
 		compile_check( current_compile );
+
+		/* Link unresolved names.
+		 */
+		compile_resolve_names( current_compile, parent );
 
 		scope_pop();
 
@@ -848,6 +844,10 @@ expr	: '(' expr ')' {
 	}
 	| TK_IDENT {
 		$$ = tree_leaf_new( current_compile, $1 );
+		IM_FREE( $1 );
+	}
+	| TK_TAG {
+		$$ = tree_tag_new( current_compile, $1 );
 		IM_FREE( $1 );
 	}
 	| TK_SCOPE {
@@ -975,14 +975,8 @@ binop	: expr '+' expr {
 	| expr TK_PNOTEQ expr {	
 		$$ = tree_binop_new( current_compile, BI_PNOTEQ, $1, $3 );
 	}
-	| expr '.' TK_IDENT {
-		ParseNode *tag = tree_tag_new( current_compile, $3 );
-
-		$$ = tree_binop_new( current_compile, BI_DOT, $1, tag );
-		IM_FREE( $3 );
-	}
-	| expr '.' '(' expr ')' {
-		$$ = tree_binop_new( current_compile, BI_DOT, $1, $4 );
+	| expr '.' expr {
+		$$ = tree_binop_new( current_compile, BI_DOT, $1, $3 );
 	}
 	| '(' expr ',' expr ')' {	
 		$$ = tree_binop_new( current_compile, BI_COMMA, $2, $4 );
@@ -1087,7 +1081,7 @@ parse_toplevel( Toolkit *kit, int pos )
 
 	current_compile = NULL;
 
-	result = parse_input( '.', kit->kitg->root, kit, pos );
+	result = parse_input( ',', kit->kitg->root, kit, pos );
 
 	if( kit )
 		iobject_changed( IOBJECT( kit ) );

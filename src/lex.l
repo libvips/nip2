@@ -160,8 +160,10 @@ read_char( void )
 
 %}
 
+%Start DOT
+%Start BINARY 
+
 %option noyywrap
-%Start BINARY
 %%
 \/\*			{ 
 				int ch;
@@ -228,6 +230,15 @@ FALSE			{
 
 				return( TK_CONST );
 			}
+
+<DOT>[a-zA-Z_][a-zA-Z0-9_']* {
+				BEGIN BINARY;
+
+				yylval.yy_name = im_strdupn( yytext );
+
+				return( TK_TAG );
+			}
+
 [a-zA-Z_][a-zA-Z0-9_']*	{
 				char *name = model_loadstate_rewrite_name( 
 					yytext );
@@ -243,9 +254,10 @@ FALSE			{
 
 				return( TK_IDENT );
 			}
+
 \(			{ BEGIN 0; return( '(' ); }
 \)			{ BEGIN BINARY; return( ')' ); }
-<BINARY>\+\+		{ BEGIN 0; return( TK_JOIN ); }
+\+\+			{ BEGIN 0; return( TK_JOIN ); }
 <BINARY>\+		|
 <BINARY>\-		{ BEGIN 0; return( *yytext ); }
 \-			{ BEGIN 0; return( TK_UMINUS ); }
@@ -265,7 +277,6 @@ FALSE			{
 \=\=\=			{ BEGIN 0; return( TK_PEQ ); }
 \!\=			{ BEGIN 0; return( TK_NOTEQ ); }
 \!\=\=			{ BEGIN 0; return( TK_PNOTEQ ); }
-\.			|
 \^			|
 \?			|
 \*			|
@@ -281,6 +292,7 @@ FALSE			{
 \@			|
 \{			|
 \}			{ BEGIN 0; return( *yytext ); }
+\.			{ BEGIN DOT; return( *yytext ); }
 \]			{ BEGIN BINARY; return( *yytext ); }
 0x[0-9a-fA-F]+		{
 				unsigned int i;

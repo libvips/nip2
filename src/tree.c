@@ -353,3 +353,63 @@ tree_appl_new( Compile *compile, ParseNode *l, ParseNode *r )
 
 	return( no );
 }
+
+ParseNode *
+tree_map( Compile *compile, tree_map_fn fn, ParseNode *node, void *a, void *b ) 
+{
+	ParseNode *result;
+	GSList *l;
+
+	assert( node );
+
+	if( (result = fn( compile, node, a, b )) )
+		return( result );
+
+	switch( node->type ) {
+	case NODE_GENERATOR:
+		if( (result = tree_map( compile, fn, node->arg1, a, b )) )
+			return( result );
+		if( node->arg2 &&
+			(result = tree_map( compile, fn, node->arg2, a, b )) )
+			return( result );
+		if( node->arg3 &&
+			(result = tree_map( compile, fn, node->arg3, a, b )) )
+			return( result );
+		break;
+
+	case NODE_APPLY:
+	case NODE_BINOP:
+	case NODE_COMPOSE:
+		if( (result = tree_map( compile, fn, node->arg1, a, b )) ||
+			(result = tree_map( compile, fn, node->arg2, a, b )) )
+			return( result );
+		break;
+
+	case NODE_UOP:
+		if( (result = fn( compile, node->arg1, a, b )) )
+			return( result );
+		break;
+
+	case NODE_SUPER:
+	case NODE_LISTCONST:
+		for( l = node->elist; l; l = l->next ) {
+			ParseNode *arg = (ParseNode *) l->data;
+
+			if( (result = tree_map( compile, fn, arg, a, b )) )
+				return( result );
+		}
+		break;
+
+	case NODE_LEAF:
+	case NODE_CLASS:
+	case NODE_TAG:
+	case NODE_CONST:
+		break;
+
+	case NODE_NONE:
+	default:
+		assert( FALSE );
+	}
+
+	return( NULL );
+}

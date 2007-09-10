@@ -458,23 +458,6 @@ compile_binop( Compile *compile,
 	HeapNode *hn1, *hn2, *hn3;
 	PElement e1, e2;
 
-	switch( bop ) {
-	case BI_MORE:
-		bop = BI_LESS;
-		SWAPP( arg1, arg2 );
-		break;
-
-	case BI_MOREEQ:
-		bop = BI_LESSEQ;
-		SWAPP( arg1, arg2 );
-		break;
-
-		/* Gah, keep warnings quiet.
-		 */
-	default:
-		break;
-	}
-
 	if( NEWNODE( heap, hn1 ) )
 		return( FALSE );
 	hn1->type = TAG_APPL;
@@ -1634,11 +1617,9 @@ compile_symbol( Symbol *sym )
 /* Parse support.
  */
 
-static void
+static ParseNode *
 compile_check_i18n( Compile *compile, ParseNode *pn )
 {
-	GSList *l;
-
 	switch( pn->type ) {
 	case NODE_APPLY:
 		if( pn->arg1->type == NODE_LEAF && 
@@ -1676,43 +1657,39 @@ compile_check_i18n( Compile *compile, ParseNode *pn )
 		}
 		break;
 
-	case NODE_GENERATOR:
-		compile_check_i18n( compile, pn->arg1 );
-		if( pn->arg2 )
-			compile_check_i18n( compile, pn->arg2 );
-		if( pn->arg3 )
-			compile_check_i18n( compile, pn->arg3 );
+	default:
 		break;
+	}
 
+	return( NULL );
+}
+
+static ParseNode *
+compile_check_more( Compile *compile, ParseNode *pn )
+{
+	switch( pn->type ) {
 	case NODE_BINOP:
-	case NODE_COMPOSE:
-		compile_check_i18n( compile, pn->arg1 );
-		compile_check_i18n( compile, pn->arg2 );
-		break;
+		switch( pn->biop ) {
+		case BI_MORE:
+			pn->biop = BI_LESS;
+			SWAPP( pn->arg1, pn->arg2 );
+			break;
 
-	case NODE_UOP:
-		compile_check_i18n( compile, pn->arg1 );
-		break;
+		case BI_MOREEQ:
+			pn->biop = BI_LESSEQ;
+			SWAPP( pn->arg1, pn->arg2 );
+			break;
 
-	case NODE_SUPER:
-	case NODE_LISTCONST:
-		for( l = pn->elist; l; l = l->next ) {
-			ParseNode *arg = (ParseNode *) l->data;
-
-			compile_check_i18n( compile, arg );
+		default:
+			break;
 		}
 		break;
 
-	case NODE_LEAF:
-	case NODE_CLASS:
-	case NODE_TAG:
-	case NODE_CONST:
-		break;
-
-	case NODE_NONE:
 	default:
-		assert( FALSE );
+		break;
 	}
+
+	return( NULL );
 }
 
 /* Do end-of-parse checks. Called after every 'A=...' style definition (not 
@@ -1734,15 +1711,22 @@ compile_check( Compile *compile )
 				MEMBER_CHECK, symbol_name( parent ) );
 	}
 
-	/* Magic stuff for i18n of menus. Look for (_ "string constant") and
-	 * pump it through gettext.
+	/* Look for (_ "string constant") and pump it through gettext. We can
+	 * do a lot of 18n at compile-time.
 	 */
 #ifdef DEBUG
 	printf( "compile_check_i18n: " );
 	compile_name_print( compile );
 	printf( "\n" );
 #endif /*DEBUG*/
-	compile_check_i18n( compile, compile->tree );
+	(void) tree_map( compile, 
+		(tree_map_fn) compile_check_i18n, compile->tree, NULL, NULL );
+
+	/* Swap MORE and MOREEQ for LESS and LESSEQ. Reduces the number of
+	 * cases for the compiler. 
+	 */
+	(void) tree_map( compile, 
+		(tree_map_fn) compile_check_more, compile->tree, NULL, NULL );
 }
 
 /* Mark error on all exprs using this compile.

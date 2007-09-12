@@ -1,25 +1,5 @@
-- add (*) (operator sections) ... need a binup / uop production? can't
-  do this without losing precedence stuff, it'll need a separate production
-  for sections
-
-- pattern matching
-
-  	fred (Image x) = rot90 x
-
-  is equivalent to
-
-  	fred x
-		= rot90 x, is_Image x
-		= error "bad args"
-
-  also for list and complex
-
-  	fred (a:x) = x
-	fred [a, b, c] = 
-	fred [a, b, ...] =
-	fred (a, b) = 
-	fred [(a, b), (c, d), ...] = 
-	fred [Image x, Matrix y] =
+- there's some left-recursion in the parser, eg. comma_list, is this easily
+  fixable?
 
 - (from a paper describing Miranda's list comps)
 
@@ -35,7 +15,7 @@
 
   defines the subset of S for which P holds. Similarly:
 
-	[ x | x <- s, p x ]
+	[x | x <- s; p x]
 
   defines the sublist of s for which p x is True. The scope of variables
   defined using generators extends from the generator itself to all qualifiers
@@ -48,7 +28,7 @@
 
   Generators can be nested as in
 
-	[x+y | x <- xs; odd x; y <- ys; even y]
+	[x + y | x <- xs; odd x; y <- ys; even y]
 
   which returns all possible sums for all odd numbers in xs with all
   even number of ys. The last generators change most rapidly and a later
@@ -103,6 +83,28 @@
 	z = map (\x\y x + y) (zip2 x' y')
 
 
+- add (*) (operator sections) ... need a binup / uop production? can't
+  do this without losing precedence stuff, it'll need a separate production
+  for sections
+
+- pattern matching
+
+  	fred (Image x) = rot90 x
+
+  is equivalent to
+
+  	fred x
+		= rot90 x, is_Image x
+		= error "bad args"
+
+  also for list and complex
+
+  	fred (a:x) = x
+	fred [a, b, c] = 
+	fred [a, b, ...] =
+	fred (a, b) = 
+	fred [(a, b), (c, d), ...] = 
+	fred [Image x, Matrix y] =
 
 
 

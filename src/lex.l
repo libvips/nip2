@@ -271,6 +271,7 @@ FALSE			{
 \*\*			{ BEGIN 0; return( TK_POW ); }
 \>\>			{ BEGIN 0; return( TK_RSHIFT ); }
 \<\<			{ BEGIN 0; return( TK_LSHIFT ); }
+\<\-			{ BEGIN 0; return( TK_FROM ); }
 \|			{ BEGIN 0; return( TK_BOR ); }
 \|\|			{ BEGIN 0; return( TK_LOR ); }
 \=\=			{ BEGIN 0; return( TK_EQ ); }

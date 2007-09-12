@@ -3,6 +3,7 @@ started 7.13.0
 - started cleaning up parse.y
 - simpler DOT syntax ... A1."poop" works now
 - added lambdas ... \x x + 1
+- added listcomp syntax ... [x | x <- [1..]; x > 12]
 
 started 7.12.5
 - tiny win32 cleanups

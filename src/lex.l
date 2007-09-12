@@ -277,6 +277,7 @@ FALSE			{
 \=\=\=			{ BEGIN 0; return( TK_PEQ ); }
 \!\=			{ BEGIN 0; return( TK_NOTEQ ); }
 \!\=\=			{ BEGIN 0; return( TK_PNOTEQ ); }
+\\			{ BEGIN 0; return( TK_LAMBDA ); }
 \^			|
 \?			|
 \*			|

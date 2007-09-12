@@ -1,10 +1,6 @@
-
-- reformat parse.y to be a bit more compact
-
-  make DOT more regular ... expr either side, do the TAG stuff in the
-  compiler
-
-- add (*) as well (operator sections) ... need a binup / uop production
+- add (*) (operator sections) ... need a binup / uop production? can't
+  do this without losing precedence stuff, it'll need a separate production
+  for sections
 
 - pattern matching
 
@@ -24,16 +20,6 @@
 	fred (a, b) = 
 	fred [(a, b), (c, d), ...] = 
 	fred [Image x, Matrix y] =
-
-- try adding (|x| expr)? add a (low?) precedence too
-  possibilities:
-
-  	(\x -> expr)
-  	(\x expr)
-  	($x expr)
-  	(|x, y| expr)
-  	($x $y expr)
-  	(\x \y -> expr)
 
 - (from a paper describing Miranda's list comps)
 
@@ -111,12 +97,10 @@
 
 	x = odds
 	y = evens
-	t1 = filter pred (zip2 x y)
-		pred x y = x + y < 12
+	t1 = filter (\x\y x + y < 12) (zip2 x y)
 	x' = map (extract 0) t1
 	y' = map (extract 1) t1
-	z = map f (zip2 x' y')
-		f x y = x + y
+	z = map (\x\y x + y) (zip2 x' y')
 
 
 

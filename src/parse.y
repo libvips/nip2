@@ -472,7 +472,7 @@ input_pop( void )
 	BinOp yy_binop;
 }
 
-%token TK_TAG TK_IDENT TK_CONST TK_DOTDOTDOT
+%token TK_TAG TK_IDENT TK_CONST TK_DOTDOTDOT TK_LAMBDA
 %token TK_UMINUS TK_UPLUS TK_POW
 %token TK_LESS TK_LESSEQ TK_MORE TK_MOREEQ TK_NOTEQ
 %token TK_LAND TK_LOR TK_BAND TK_BOR TK_JOIN
@@ -485,6 +485,7 @@ input_pop( void )
 %type <yy_const> TK_CONST 
 %type <yy_name> TK_IDENT TK_TAG
 
+%left TK_LAMBDA 
 %nonassoc TK_IF 
 %left ',' 
 %left TK_LOR 
@@ -671,15 +672,12 @@ def	: TK_IDENT {
 		IM_FREE( current_compile->rhstext );
 	}
 	sdef {
-		Compile *parent = compile_get_parent( current_compile );
-
-		/* Do some checking.
-		 */
 		compile_check( current_compile );
 
-		/* Link unresolved names.
+		/* Link unresolved names in to the outer scope.
 		 */
-		compile_resolve_names( current_compile, parent );
+		compile_resolve_names( current_compile, 
+			compile_get_parent( current_compile ) );
 
 		scope_pop();
 	}
@@ -860,12 +858,50 @@ expr	: '(' expr ')' {
 	| expr expr %prec TK_APPLICATION {
 		$$ = tree_appl_new( current_compile, $1, $2 );
 	}
+	| TK_LAMBDA TK_IDENT %prec TK_LAMBDA {
+		static int count = 0;
+		char name[256];
+		Symbol *sym;
+
+		/* Make an anonymous symbol local to the current sym, compile
+		 * the expr inside that.
+		 */
+		im_snprintf( name, 256, "$$lambda%d", count++ );
+		sym = symbol_new_defining( current_compile, name );
+		(void) symbol_user_init( sym );
+		(void) compile_new_local( sym->expr );
+
+		/* Initialise symbol parsing variables. Save old current symbol,
+		 * add new one.
+		 */
+		scope_push();
+		current_symbol = sym;
+		current_compile = sym->expr->compile;
+
+		/* Make the parameter.
+		 */
+		sym = symbol_new_defining( current_compile, $2 );
+		symbol_parameter_init( sym, current_compile );
+		IM_FREE( $2 );
+	}
+	expr {
+		current_compile->tree = $4;
+
+		compile_check( current_compile );
+
+		/* Link unresolved names in to the outer scope.
+		 */
+		compile_resolve_names( current_compile, 
+			compile_get_parent( current_compile ) );
+
+		/* The value of the expr is the anon we defined.
+		 */
+		$$ = tree_leafsym_new( current_compile, current_symbol );
+
+		scope_pop();
+	}
 	| '[' listex ']' {
 		$$ = $2;
-#ifdef DEBUG
-		printf( "parsed list constant:\n" );
-		dump_tree( $$ );
-#endif /*DEBUG*/
 	}
 	| '(' expr ',' expr ')' {	
 		$$ = tree_binop_new( current_compile, BI_COMMA, $2, $4 );
@@ -1127,6 +1163,11 @@ parse_rhs( Expr *expr, ParseRhsSyntax syntax )
 		return( FALSE );
 	}
 	current_compile = NULL;
+
+#ifdef DEBUG
+	printf( "parse_rhs:\n" );
+	dump_tree( compile->tree );
+#endif /*DEBUG*/
 
 	/* Resolve any dynamic refs.
 	 */

@@ -229,25 +229,20 @@ tree_unop_new( Compile *compile, UnOp op, ParseNode *a )
 	return( no );
 }
 
-/* Make a new leaf node. 
- */
 ParseNode *
 tree_leaf_new( Compile *compile, const char *name )
 {
 	ParseNode *no = tree_new( compile );
-	Symbol *sym = symbol_new_reference( compile, name );
 
-	/* Fill fields.
-	 */
 	no->type = NODE_LEAF;
-	no->leaf = sym;
+	no->leaf = symbol_new_reference( compile, name );
 
 	/* Have we a reference to a ZOMBIE? If yes, we may need to patch this
 	 * leaf to point to a new symbol. Add the leaf's pointer to the
 	 * refedat list on the ZOMBIE.
 	 */
-	if( sym->type == SYM_ZOMBIE )
-		(void) symbol_patch_add( (void **) &no->leaf, sym );
+	if( no->leaf->type == SYM_ZOMBIE )
+		(void) symbol_patch_add( (void **) &no->leaf, no->leaf );
 
 	return( no );
 }

@@ -1712,7 +1712,7 @@ compile_check( Compile *compile )
 	}
 
 	/* Look for (_ "string constant") and pump it through gettext. We can
-	 * do a lot of 18n at compile-time.
+	 * do a lot of i18n at compile-time.
 	 */
 #ifdef DEBUG
 	printf( "compile_check_i18n: " );

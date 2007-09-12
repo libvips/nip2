@@ -1,16 +1,8 @@
-- try
-
-	A1 = Image ...
-	max_pair A1 A1
-
-  ?!?!
 
 - reformat parse.y to be a bit more compact
 
   make DOT more regular ... expr either side, do the TAG stuff in the
   compiler
-
-  need MORE and MOREEQ ... again, convert to LESSEQ / LESS in the compiler
 
 - add (*) as well (operator sections) ... need a binup / uop production
 

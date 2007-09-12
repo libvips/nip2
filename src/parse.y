@@ -867,6 +867,9 @@ expr	: '(' expr ')' {
 		dump_tree( $$ );
 #endif /*DEBUG*/
 	}
+	| '(' expr ',' expr ')' {	
+		$$ = tree_binop_new( current_compile, BI_COMMA, $2, $4 );
+	}
 	| binop
 	| uop
 	;
@@ -977,9 +980,6 @@ binop	: expr '+' expr {
 	}
 	| expr '.' expr {
 		$$ = tree_binop_new( current_compile, BI_DOT, $1, $3 );
-	}
-	| '(' expr ',' expr ')' {	
-		$$ = tree_binop_new( current_compile, BI_COMMA, $2, $4 );
 	}
 	;
 

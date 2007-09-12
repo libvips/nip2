@@ -78,7 +78,7 @@ typedef enum {
 	BI_MORE,		
 	BI_MOREEQ,
 	BI_IF,			/* if-then-else */
-	BI_CONS			/* List cons */
+	BI_CONS			/* List cons ... has to be last, see below */
 } BinOp;
 
 /* Unary operators.

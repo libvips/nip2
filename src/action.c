@@ -56,6 +56,8 @@ const char *operator_table[] = {
 	"pointer_not_equal",	/* BI_PNOTEQ */
 	"less",			/* BI_LESS */
 	"less_equal",		/* BI_LESSEQ */
+	"none",			/* BI_MORE */		
+	"none",			/* BI_MOREEQ */
 	"if_then_else",		/* BI_IF */
 	"cons",			/* BI_CONS */
 	"none",			/* UN_NONE */

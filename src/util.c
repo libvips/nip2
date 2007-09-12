@@ -119,7 +119,7 @@ error_set( BufInfo *buf, const char *fmt, va_list ap )
 		(void) buf_appends( buf, buf_all( &tmp ) );
 
 #ifdef DEBUG_ERROR
-		printf( "error: %s\n", buf_all( buf ) );
+		printf( "error: %p %s\n", buf, buf_all( buf ) );
 #endif /*DEBUG_ERROR*/
 	}
 }
@@ -130,6 +130,10 @@ error_clear_nip( void )
 	if( !error_level ) {
 		buf_rewind( &error_top_buf );
 		buf_rewind( &error_sub_buf );
+
+#ifdef DEBUG_ERROR
+		printf( "error_clear_nip\n" );
+#endif /*DEBUG_ERROR*/
 	}
 }
 
@@ -147,10 +151,14 @@ error_top( const char *fmt, ... )
 {
 	va_list ap;
 
-	error_clear_nip();
 	va_start( ap, fmt );
 	error_set( &error_top_buf, fmt, ap );
 	va_end( ap );
+
+	/* We could use error_clear_nip() before calling error_set(), but that
+	 * fails if the arg to us uses the contents of either error buffer.
+	 */
+	buf_rewind( &error_sub_buf );
 }
 
 void

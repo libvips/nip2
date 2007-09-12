@@ -142,8 +142,7 @@ bandsplit x
 }
 
 bandjoin l
-	= wrapper joined,
-		has_wrapper
+	= wrapper joined, has_wrapper
 	= joined, is_listof has_image l
 	= error (_ "bad arguments to " ++ "bandjoin")
 {

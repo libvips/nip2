@@ -1,3 +1,13 @@
+- in stdenv print_base, try:
+
+		digits = map (\x remainder x base) 
+			(takewhile (not_equal 0) 
+				(iterate (\x idiv x base) in));
+
+  get an abort for
+
+  	print_base 2 10
+
 - there's some left-recursion in the parser, eg. comma_list, is this easily
   fixable?
 
@@ -10,6 +20,7 @@
   where each qualifier is either a generator (of the form pat <- expr)
   or a filter (a Boolean expression). The syntax derives from analogy with
   common set notation. For example:
+  we have MOREEQ in tree.h, just need adding to stuff
 
 	{x|x ∈ S;P(x)}
 

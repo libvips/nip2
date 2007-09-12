@@ -320,10 +320,8 @@ oo_binary_function op a b
 
  */
 oo_binary'_function op a b
-	= matches1?0, 
-		matches1 != []
-	= matches2?0, 
-		op.symmetric && matches2 != []
+	= matches1?0, matches1 != []
+	= matches2?0, op.symmetric && matches2 != []
 	= error (_ "No method found for binary operator." ++ "\n" ++
 		_ "left" ++ " = " ++ print a ++ "\n" ++
 		_ "operator" ++ " = " ++ op.op_name ++ "\n" ++
@@ -334,8 +332,7 @@ oo_binary'_function op a b
 }
 
 oo_unary_function op x
-	= matches?0,
-		matches != []
+	= matches?0, matches != []
 	= error (_ "No method found for unary operator." ++ "\n" ++ 
 		_ "operator" ++ " = " ++ op.op_name ++ "\n" ++
 		_ "argument" ++ " = " ++ print x)
@@ -354,12 +351,9 @@ _Object = class {
 
 	/* Operator overloading stuff.
 	 */
-	oo_binary op x 
-		= oo_binary_function (oo_binary_lookup op) this x;
-	oo_binary' op x 
-		= oo_binary'_function (oo_binary_lookup op) x this;
-	oo_unary op 
-		= oo_unary_function (oo_unary_lookup op) this;
+	oo_binary op x = oo_binary_function (oo_binary_lookup op) this x;
+	oo_binary' op x = oo_binary'_function (oo_binary_lookup op) x this;
+	oo_unary op = oo_unary_function (oo_unary_lookup op) this;
 
 	/* Provide a fallback for class == thing ... just use pointer
 	 * equality.
@@ -720,7 +714,7 @@ Matrix_base value = class
 	// extract a rectanguar area
 	extract left top width height
 		= this.Matrix_base 
-				((map (take width) @ map (drop left) @
+			((map (take width) @ map (drop left) @
 				take height @ drop top) value);
 
 	// methods

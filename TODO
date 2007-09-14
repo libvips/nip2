@@ -1,13 +1,3 @@
-- in stdenv print_base, try:
-
-		digits = map (\x remainder x base) 
-			(takewhile (not_equal 0) 
-				(iterate (\x idiv x base) in));
-
-  get an abort for
-
-  	print_base 2 10
-
 - there's some left-recursion in the parser, eg. comma_list, is this easily
   fixable?
 

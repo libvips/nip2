@@ -915,6 +915,8 @@ lambda:
 		IM_FREE( $2 );
 	}
 	expr {
+		Symbol *sym;
+
 		current_compile->tree = $4;
 
 		compile_check( current_compile );
@@ -926,9 +928,9 @@ lambda:
 
 		/* The value of the expr is the anon we defined.
 		 */
-		$$ = tree_leafsym_new( current_compile, current_symbol );
-
+		sym = current_symbol;
 		scope_pop();
+		$$ = tree_leafsym_new( current_compile, sym );
 	}
 	;
 

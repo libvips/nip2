@@ -32,7 +32,6 @@
 #define DEBUG_ADD
  */
 
-
 #include "ip.h"
 
 /* build secret sets for exprs
@@ -217,7 +216,7 @@ secret_find_nonlocal( Compile *compile )
 	return( NULL );
 }
 
-/* Does child have any secrets that sym does not?
+/* Does child have any secrets that compile does not?
  */
 static void *
 secret_test( Symbol *child, Compile *compile, gboolean *changed )
@@ -326,7 +325,7 @@ secret_build( Compile *compile )
 		(map_compile_fn) secret_find_nonlocal, NULL );
 
 	/* Now take the closure of the secret lists ... have to 
-	 * fix() this, to get limit of secret_close().
+	 * fix() this to get limit of secret_close().
 	 */
 	do {
 		changed = FALSE;

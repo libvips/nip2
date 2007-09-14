@@ -259,6 +259,10 @@ tree_leafsym_new( Compile *compile, Symbol *sym )
 	no->type = NODE_LEAF;
 	no->leaf = sym;
 
+	/* Note that this compile refs this sym.
+	 */
+	compile_link_make( compile, sym );
+
 	/* Have we a reference to a ZOMBIE? If yes, we may need to patch this
 	 * leaf to point to a new symbol. Add the leaf's pointer to the
 	 * refedat list on the ZOMBIE.

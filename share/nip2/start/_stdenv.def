@@ -23,6 +23,7 @@ add a b = a + b;
 subtract a b = a - b;
 multiply a b = a * b;
 divide a b = a / b;
+idivide a b = (int) ((int) a / (int) b);
 power a b = a ** b;
 square x = x * x;
 remainder a b = a % b;
@@ -866,7 +867,7 @@ extract_row y obj
 extract_column x obj
 	= oo_unary_function extract_column_op obj, is_class obj
 	= extract_area x' 0 1 height obj, is_image obj
-	= map (converse cons [] @ converse subscript x') obj, is_matrix obj
+	= map (\row [row?x']) obj, is_matrix obj
 	= error (_ "bad arguments to " ++ "extract_column")
 {
 	x' = to_real x;
@@ -1555,9 +1556,7 @@ icc_ac2rc profile in
 
 flood_blob x y v image
 	= oo_unary_function flood_blob_op image, is_class image
-	= im_flood_blob_copy image 
-		(to_real x) (to_real y) v, 
-			is_image image
+	= im_flood_blob_copy image (to_real x) (to_real y) v, is_image image
 	= error (_ "bad arguments to " ++ "flood_blob")
 {
 	flood_blob_op = Operator "flood_blob" 
@@ -1578,16 +1577,14 @@ print_base base in
 		= "0", in < 0 || chars == [] 
 		= reverse chars
 	{
-		digits = map (converse remainder base) 
+		digits = map (\x x % base) 
 			(takewhile (not_equal 0) 
-				(iterate (converse idiv base) in));
+				(iterate (\x idivide x base) in));
 		chars = map tohd digits;
 
 		tohd x
 			= (char) ((int) '0' + x), x < 10
 			= (char) ((int) 'A' + (x - 10));
-
-		idiv a b = (int) (a / b);
 	}
 }
 

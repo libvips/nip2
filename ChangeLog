@@ -4,6 +4,7 @@ started 7.13.0
 - simpler DOT syntax ... A1."poop" works now
 - added lambdas ... \x x + 1
 - added listcomp syntax ... [x | x <- [1..]; x > 12]
+- lambdas were not being marked as locals correctly, oops
 
 started 7.12.5
 - tiny win32 cleanups

@@ -824,12 +824,26 @@ rectangular x
 	}
 }
 
-recomb matrix image
-	= colour_unary recomb_op image
+// we can't use colour_unary: that likes 3 band only
+recomb matrix x
+	= oo_unary_function recomb_op x, is_class x
+	= im_recomb x matrix, is_image x
+	= recomb_real_list x, is_real_list x
+	= map recomb_real_list x, is_matrix x 
+	= error (_ "bad arguments to " ++ "recomb")
 {
-	recomb_op x
-		= im_recomb x (to_matrix matrix), is_image x
-		= error (_ "bad arguments to " ++ "recomb");
+	// COMPOUND_REWRAP ... signal to the colour class to go to image and 
+	// back
+	recomb_op = Operator "recomb" 
+		(recomb matrix) Operator_type.COMPOUND_REWRAP false;
+
+	// process [1,2,3 ..] as an image
+	recomb_real_list l
+		= (to_matrix im').value?0
+	{
+		im = (float) (to_image (Vector l)).value;
+		im' = recomb matrix im;
+	}
 }
 
 extract_area x y w h obj

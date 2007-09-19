@@ -70,19 +70,62 @@
     remaining elements of x. (: is the “cons” operator and -- denotes
     list difference).
 
-
   example compilation:
 
-	z = [x + y | x <- odds; y <- evens; x + y < 12];
+  	z = [(x, y) | x <- [1..3]; y <- [x..3]; x + y > 3] 
+		--> [(1,3), (2,2), (2,3), (3,3)]
 
+  another try:
 
-	x = odds
-	y = evens
-	t1 = filter (\x\y x + y < 12) (zip2 x y)
-	x' = map (extract 0) t1
-	y' = map (extract 1) t1
-	z = map (\x\y x + y) (zip2 x' y')
+  	z = $$lcomp1
+	{
+		// final map
+		$$lcomp1 = map $$f $$lcomp2
+		{
+			$$f $$p = (x, y)
+			{
+				// insert these locals at the end of the
+				// parse when we know the number and order of
+				// the generators
+				x = $$p?1;
+				y = $$p?0;
+			}
+		}
 
+		// base generator
+		$$lcomp3 = [[]];
+
+		$$lcomp4 = concat (map $$f $$lcomp3)
+		{
+			$$f $$p = map (\$$p2 cons $$p2 $$p) [1..3]
+			{
+			}
+		}
+
+		$$lcomp5 = concat (map $$f $$lcomp4)
+		{
+			$$f $$p = map (\$$p2 cons $$p2 $$p) [x..3]
+			{
+				x = $$p?0;
+			}
+		}
+
+		$$lcomp2 = filter $$f $$lcomp5
+		{
+			$$f $$p = x + y > 3
+			{
+				x = $$p?1;
+				y = $$p?0;
+			}
+		}
+	}
+
+  haskell has 
+  
+  	[(x, y) | x <- [1..3]; y <- [x..3]; x + y > 3] == 
+		[(1,1), (1,2), (1,3), (2,2), (2,3), (3,3)]
+
+  ie. they don't try diagonalisation
 
 - add (*) (operator sections) ... need a binup / uop production? can't
   do this without losing precedence stuff, it'll need a separate production

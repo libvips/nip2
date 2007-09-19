@@ -39,6 +39,14 @@ tree_const_destroy( ParseConst *pc )
 	pc->type = PARSE_CONST_NONE;
 }
 
+void
+tree_const_copy( ParseConst *from, ParseConst *to )
+{
+	*to = *from;
+	if( to->val.str )
+		to->val.str = im_strdupn( to->val.str );
+}
+
 /* Free a parse node.
  */
 void *
@@ -412,3 +420,82 @@ tree_map( Compile *compile, tree_map_fn fn, ParseNode *node, void *a, void *b )
 
 	return( NULL );
 }
+
+/* Copy a tree in to a new context. Any leaves which reference symbols on
+ * rewrite get rebound in the new context.
+ */
+ParseNode *
+tree_copy_rewrite( Compile *compile, ParseNode *node, GSList *rewrite )
+{
+	ParseNode *copy;
+	GSList *l;
+
+	assert( node );
+
+	switch( node->type ) {
+	case NODE_GENERATOR:
+		copy = tree_new( compile );
+		copy->arg1 = tree_copy_rewrite( compile, node->arg1, rewrite );
+		copy->arg2 = tree_copy_rewrite( compile, node->arg2, rewrite );
+		copy->arg3 = tree_copy_rewrite( compile, node->arg3, rewrite );
+		copy->type = node->type;
+		break;
+
+	case NODE_APPLY:
+	case NODE_BINOP:
+	case NODE_COMPOSE:
+		copy = tree_new( compile );
+		copy->arg1 = tree_copy_rewrite( compile, node->arg1, rewrite );
+		copy->arg2 = tree_copy_rewrite( compile, node->arg2, rewrite );
+		copy->type = node->type;
+		copy->biop = node->biop;
+		break;
+
+	case NODE_UOP:
+		copy = tree_new( compile );
+		copy->arg1 = tree_copy_rewrite( compile, node->arg1, rewrite );
+		copy->type = node->type;
+		copy->uop = node->uop;
+		break;
+
+	case NODE_SUPER:
+	case NODE_LISTCONST:
+		copy = tree_new( compile );
+		for( l = node->elist; l; l = l->next ) {
+			ParseNode *arg = (ParseNode *) l->data;
+
+			copy->elist = g_slist_append( copy->elist, 
+				tree_copy_rewrite( compile, arg, rewrite ) );
+		}
+		copy->type = node->type;
+		break;
+
+	case NODE_CLASS:
+		copy = tree_class_new( compile );
+		break;
+
+	case NODE_TAG:
+	case NODE_CONST:
+		copy = tree_new( compile );
+		if( node->tag )
+			copy->tag = im_strdupn( node->tag );
+		tree_const_copy( &node->con, &copy->con );
+		copy->type = node->type;
+		break;
+
+	case NODE_LEAF:
+		if( g_slist_find( rewrite, node->leaf ) ) 
+			copy = tree_leaf_new( compile, 
+				IOBJECT( node->leaf )->name );
+		else 
+			copy = tree_leafsym_new( compile, node->leaf );
+		break;
+
+	case NODE_NONE:
+	default:
+		assert( FALSE );
+	}
+
+	return( copy );
+}
+

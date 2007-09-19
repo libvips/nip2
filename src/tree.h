@@ -196,3 +196,8 @@ void *tree_node_destroy( ParseNode *n );
 typedef ParseNode *(*tree_map_fn)( Compile *, ParseNode *, void *, void * );
 ParseNode *tree_map( Compile *compile, 
 	tree_map_fn fn, ParseNode *node, void *a, void *b );
+
+/* Copy a tree into a new context.
+ */
+ParseNode *tree_copy_rewrite( Compile *compile, 
+	ParseNode *node, GSList *rewrite );

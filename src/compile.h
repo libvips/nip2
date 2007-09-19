@@ -117,3 +117,5 @@ void compile_resolve_dynamic( Compile *tab, Compile *context );
 
 Symbol *compile_get_member( Compile *compile, const char *name );
 const char *compile_get_member_string( Compile *compile, const char *name );
+
+void compile_lcomp( Compile *compile );

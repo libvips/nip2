@@ -79,20 +79,15 @@
 
   	z = $$lcomp1
 	{
-		// final map
 		$$lcomp1 = map $$f $$lcomp2
 		{
 			$$f $$p = (x, y)
 			{
-				// insert these locals at the end of the
-				// parse when we know the number and order of
-				// the generators
 				x = $$p?1;
 				y = $$p?0;
 			}
 		}
 
-		// base generator
 		$$lcomp3 = [[]];
 
 		$$lcomp4 = concat (map $$f $$lcomp3)
@@ -117,6 +112,20 @@
 				x = $$p?1;
 				y = $$p?0;
 			}
+		}
+	}
+
+  after parse, before compile_generate_list_comp():
+
+	A1 = [(x, y) | x <- [1..3]; y <- [x..3]; x + y > 3];
+
+	A1 = $$lcomp0
+	{
+		$$lcomp0 = (x, y)
+		{
+			x = [1..3]
+			y = [x..3]
+			$$filter0 = x + y > 3
 		}
 	}
 

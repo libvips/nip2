@@ -947,8 +947,61 @@ listex:
 	'[' expr ',' expr TK_DOTDOTDOT expr ']' {
 		$$ = tree_generator_new( current_compile, $2, $4, $6 );
 	} | 
-	'[' expr TK_BOR from frompred_list ']' {
-		$$ = $2;
+	'[' expr TK_BOR TK_IDENT TK_FROM expr {
+		static int count = 0;
+		char name[256];
+		Symbol *sym;
+
+		/* Make an anonymous symbol local to the current sym, save
+		 * the map expr inside that. 
+		 */
+		im_snprintf( name, 256, "$$lcomp%d", count++ );
+		sym = symbol_new_defining( current_compile, name );
+		(void) symbol_user_init( sym );
+		(void) compile_new_local( sym->expr );
+
+		/* Initialise symbol parsing variables. Save old current symbol,
+		 * add new one.
+		 */
+		scope_push();
+		current_symbol = sym;
+		current_compile = sym->expr->compile;
+
+		current_compile->tree = $2;
+
+		/* Make the first "x <- expr" generator.
+		 */
+		sym = symbol_new_defining( current_compile, $4 );
+		(void) symbol_user_init( sym );
+		(void) compile_new_local( sym->expr );
+		sym->expr->compile->tree = $6;
+		IM_FREE( $4 );
+	}
+	frompred_list ']' {
+		Symbol *sym;
+
+		/* The map expr can refer to generator names. Resolve inwards
+		 * so it links to the generators.
+		 */
+		compile_resolve_names( compile_get_parent( current_compile ),
+			current_compile ); 
+
+		/* Generate the code for the list comp.
+		 */
+		compile_lcomp( current_compile );
+
+		compile_check( current_compile );
+
+		/* Link unresolved names outwards.
+		 */
+		compile_resolve_names( current_compile, 
+			compile_get_parent( current_compile ) );
+
+		/* The value of the expr is the anon we defined.
+		 */
+		sym = current_symbol;
+		scope_pop();
+		$$ = tree_leafsym_new( current_compile, sym );
 	} |
 	'[' comma_list ']' {
 		$$ = $2;
@@ -969,14 +1022,25 @@ frompred_list:
 	;
 
 frompred:
-       from {
+       TK_IDENT TK_FROM expr {
+		Symbol *sym;
+
+		sym = symbol_new_defining( current_compile, $1 );
+		(void) symbol_user_init( sym );
+		(void) compile_new_local( sym->expr );
+		sym->expr->compile->tree = $3;
+		IM_FREE( $1 );
        } |
        expr {
-       }
-       ;
+		static int count = 0;
+		char name[256];
+		Symbol *sym;
 
-from:
-       TK_IDENT TK_FROM expr {
+		im_snprintf( name, 256, "$$filter%d", count++ );
+		sym = symbol_new_defining( current_compile, name );
+		(void) symbol_user_init( sym );
+		(void) compile_new_local( sym->expr );
+		sym->expr->compile->tree = $1;
        }
        ;
 

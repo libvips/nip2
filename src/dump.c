@@ -244,6 +244,11 @@ dump_expr( Expr *expr )
 	printf( "%s->row = %s\n", IOBJECT( sym )->name, 
 		expr->row?"(set)":"(not set)" );
 
+	if( expr->compile ) {
+		printf( "%s->compile:\n", IOBJECT( sym )->name );
+		dump_compile( expr->compile );
+	}
+
 	printf( "%s->expr->root = ", IOBJECT( sym )->name );
 	if( !sym->dirty )
 		pgraph( &expr->root );

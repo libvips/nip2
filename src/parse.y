@@ -625,7 +625,7 @@ topdef:
 		/* Compile.
 		 */
 		if( compile_heap( sym->expr->compile ) )
-			yyerror( _( "unable to compile \"%s\"\n%s" ),
+			yyerror( _( "Unable to compile \"%s\"\n%s." ),
 				IOBJECT( sym )->name, error_get_sub() );
 
 		input_reset();
@@ -919,7 +919,8 @@ lambda:
 
 		current_compile->tree = $4;
 
-		compile_check( current_compile );
+		if( !compile_check( current_compile ) )
+			yyerror( error_get_sub() );
 
 		/* Link unresolved names in to the outer scope.
 		 */
@@ -967,7 +968,12 @@ listex:
 		current_symbol = sym;
 		current_compile = sym->expr->compile;
 
-		current_compile->tree = $2;
+		/* Somewhere to save the result expr
+		 */
+		sym = symbol_new_defining( current_compile, "$$result" );
+		(void) symbol_user_init( sym );
+		(void) compile_new_local( sym->expr );
+		sym->expr->compile->tree = $2;
 
 		/* Make the first "x <- expr" generator.
 		 */
@@ -976,6 +982,7 @@ listex:
 		(void) compile_new_local( sym->expr );
 		sym->expr->compile->tree = $6;
 		IM_FREE( $4 );
+
 	}
 	frompred_list ']' {
 		Symbol *sym;

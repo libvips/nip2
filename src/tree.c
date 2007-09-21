@@ -43,7 +43,7 @@ void
 tree_const_copy( ParseConst *from, ParseConst *to )
 {
 	*to = *from;
-	if( to->val.str )
+	if( to->type == PARSE_CONST_STR && to->val.str )
 		to->val.str = im_strdupn( to->val.str );
 }
 
@@ -436,8 +436,12 @@ tree_copy_rewrite( Compile *compile, ParseNode *node, GSList *rewrite )
 	case NODE_GENERATOR:
 		copy = tree_new( compile );
 		copy->arg1 = tree_copy_rewrite( compile, node->arg1, rewrite );
-		copy->arg2 = tree_copy_rewrite( compile, node->arg2, rewrite );
-		copy->arg3 = tree_copy_rewrite( compile, node->arg3, rewrite );
+		if( node->arg2 )
+			copy->arg2 = tree_copy_rewrite( compile, 
+				node->arg2, rewrite );
+		if( node->arg3 )
+			copy->arg3 = tree_copy_rewrite( compile, 
+				node->arg3, rewrite );
 		copy->type = node->type;
 		break;
 

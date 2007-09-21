@@ -1695,7 +1695,7 @@ compile_check_more( Compile *compile, ParseNode *pn )
 /* Do end-of-parse checks. Called after every 'A=...' style definition (not 
  * just top-level syms). Used to do lots of checks, not much left now.
  */
-void
+gboolean
 compile_check( Compile *compile )
 {
 	Symbol *sym = compile->sym;
@@ -1705,10 +1705,14 @@ compile_check( Compile *compile )
 	 */ 
 	if( is_member( sym ) &&
 		strcmp( IOBJECT( sym )->name, MEMBER_CHECK ) == 0 ) {
-		if( compile->nparam != 0 ) 
-			yyerror( _( "Member \"%s\" of class "
+		if( compile->nparam != 0 ) {
+			error_top( _( "Too many arguments." ) );
+			error_sub( _( "Member \"%s\" of class "
 				"\"%s\" should have no arguments." ),
 				MEMBER_CHECK, symbol_name( parent ) );
+
+			return( FALSE );
+		}
 	}
 
 	/* Look for (_ "string constant") and pump it through gettext. We can
@@ -1727,6 +1731,8 @@ compile_check( Compile *compile )
 	 */
 	(void) tree_map( compile, 
 		(tree_map_fn) compile_check_more, compile->tree, NULL, NULL );
+
+	return( TRUE );
 }
 
 /* Mark error on all exprs using this compile.
@@ -1966,8 +1972,9 @@ compile_get_member_string( Compile *compile, const char *name )
 
 	... $$lcomp1 ...
 	{
-		$$lcomp1 = (x, y)
+		$$lcomp1 = NULL
 		{
+			$$result = (x, y);
 			// elements in left-to-right order
 			// in compile->children
 			x = [1..3]
@@ -1977,90 +1984,42 @@ compile_get_member_string( Compile *compile, const char *name )
 	}
 
   and we generate this code:
- 
-  	... $$lcomp1 ...
+
+  	z = $$lcomp1
 	{
-		$$lcomp1 = map $$f $$lcomp2
+		$$lcomp1 = foldr $f1 [] [1..3]
 		{
-			$$f $$p = (x, y)
+			$f1 x $sofar = foldr $f2 $sofar [x..3]
 			{
-				x = $$p?1;
-				y = $$p?0;
-			}
-		}
-
-		$$lcomp3 = [[]];
-
-		$$lcomp4 = concat (map $$f $$lcomp3)
-		{
-			$$f $$p = map (\$$p2 cons $$p2 $$p) [1..3]
-			{
-			}
-		}
-
-		$$lcomp5 = concat (map $$f $$lcomp4)
-		{
-			$$f $$p = map (\$$p2 cons $$p2 $$p) [x..3]
-			{
-				x = $$p?0;
-			}
-		}
-
-		$$lcomp2 = filter $$f $$lcomp5
-		{
-			$$f $$p = x + y > 3
-			{
-				x = $$p?1;
-				y = $$p?0;
+				$f2 y $sofar = if x + y > 3 then $f3 else $sofar
+				{
+					$f3 = (x, y) : $sofar;
+				}
 			}
 		}
 	}
- 
+
+*/
+
+/* Find elements of the lcomp. Filters, generators and $$result. We need to
+ * disregard zombies, params, all that fluff.
  */
-
-/* Use this to generate unique names for lcomp locals.
- */
-static int compile_lcomp_next = 0;
-
-/* Stuff we track during a lcomp code generate.
- */
-typedef struct _CompileLcomp {
-	Compile *compile;
-
-	GSList *elements;
-	GSList *generators;
-} CompileLcomp;
-
 void *
-compile_lcomp_gen_find( Symbol *sym, CompileLcomp *lcomp )
+compile_lcomp_find( Symbol *sym, GSList **children )
 {
-	if( !is_prefix( "$$", IOBJECT( sym )->name ) )
-		lcomp->generators = g_slist_append( lcomp->generators, sym );
+	if( is_prefix( "$$filter", IOBJECT( sym )->name ) ||
+		is_prefix( "$$result", IOBJECT( sym )->name ) ||
+		is_value( sym ) )
+		*children = g_slist_append( *children, sym );
 
 	return( NULL );
 }
 
-/* Generate "x = $$p?0" on compile, where gen is x, param is $$p and i is 0.
- */
 void *
-compile_lcomp_gen_local( Symbol *gen, Symbol *param, Compile *compile, int *i )
+compile_lcomp_gen_find( Symbol *sym, GSList **generators )
 {
-	Symbol *local;
-	ParseConst pc;
-	ParseNode *n1, *n2, *n3;
-
-	local = symbol_new_defining( compile, IOBJECT( gen )->name );
-	(void) symbol_user_init( local );
-	(void) compile_new_local( local->expr );
-
-	n1 = tree_leafsym_new( compile, param );
-	pc.type = PARSE_CONST_NUM;
-	*i -= 1;
-	pc.val.num = *i;
-	n2 = tree_const_new( compile, pc );
-	n3 = tree_binop_new( compile, BI_SELECT, n1, n2 );
-
-	local->expr->compile->tree = n3;
+	if( !is_prefix( "$$", IOBJECT( sym )->name ) )
+		*generators = g_slist_append( *generators, sym );
 
 	return( NULL );
 }
@@ -2068,109 +2027,169 @@ compile_lcomp_gen_local( Symbol *gen, Symbol *param, Compile *compile, int *i )
 void 
 compile_lcomp( Compile *compile )
 {
-	CompileLcomp lcomp;
-	Symbol *sym;
-	Symbol *param;
-	int i;
-	Symbol *final;
-	char name[256];
-	ParseNode *n1, *n2;
-	Symbol *sofar;
-	ParseConst con;
+	GSList *generators;
+	GSList *children;
+	gboolean sofar;
+	Compile *scope;
+	Symbol *result;
+	int count;
 	GSList *p;
+	Symbol *child;
+	char name[256];
+	ParseNode *n1, *n2, *n3;
 
 #ifdef DEBUG
 	printf( "before compile_lcomp:\n" );
 	dump_compile( compile );
 #endif /*DEBUG*/
 
-	/* Find the generators.
+	/* Find all the elements of the lcomp, generators, filters and
+	 * $$result.
 	 */
-	lcomp.compile = compile;
-	lcomp.generators = NULL;
+	children = NULL;
 	(void) icontainer_map( ICONTAINER( compile ), 
-		(icontainer_map_fn) compile_lcomp_gen_find, &lcomp, NULL );
+		(icontainer_map_fn) compile_lcomp_find, &children, NULL );
 
-	/* Find all generators and filters.
+	/* Find the subset of children which are generators. We need a list of 
+	 * symbols we rebind on copy.
 	 */
-	lcomp.elements = g_slist_copy( ICONTAINER( compile )->children );
+	generators = NULL;
+	(void) slist_map( children,
+		(SListMapFn) compile_lcomp_gen_find, &generators );
 
-	/* Build the function we map.
+#ifdef DEBUG
+	printf( "list comp " );
+	compile_name_print( compile );
+	printf( " has children: " ); 
+	(void) slist_map( children, (SListMapFn) dump_tiny, NULL );
+	printf( "\n" ); 
+	printf( "and generators: " ); 
+	(void) slist_map( generators, (SListMapFn) dump_tiny, NULL );
+	printf( "\n" ); 
+#endif /*DEBUG*/
+
+	/* As yet no list to build on.
 	 */
-	sym = symbol_new_defining( compile, "$$f" );
-	(void) symbol_user_init( sym );
-	(void) compile_new_local( sym->expr );
+	sofar = FALSE;
 
-	/* Param of fn.
+	/* Start by building a tree in this scope.
 	 */
-	param = symbol_new_defining( sym->expr->compile, "$$p" );
-	symbol_parameter_init( param, sym->expr->compile );
+	scope = compile;
 
-	/* Add a local for each generator which picks that gen from the param.
+	/* Not seen the result element yet, but we should.
 	 */
-	i = g_slist_length( lcomp.generators );
-	slist_map3( lcomp.generators, 
-		(SListMap3Fn) compile_lcomp_gen_local, 
-			param, sym->expr->compile, &i );
+	result = NULL;
 
-	/* Copy the map expression, rewriting references to generator
-	 * variables to references to these new locals.
+	/* Number nested locals with this.
 	 */
-	sym->expr->compile->tree = tree_copy_rewrite( sym->expr->compile,
-		compile->tree, lcomp.generators );
-
-	/* The final filter/gen. We have to fwd ref this.
-	 */
-	im_snprintf( name, 256, "$$lcomp_final%d", compile_lcomp_next++ );
-	final = symbol_new_defining( compile, name );
-	(void) symbol_user_init( final );
-	(void) compile_new_local( final->expr );
-
-	/* Now generate the main value of $$lcomp1: (map $$f $$lcomp2).
-	 * Overwrite the value generated by the parser. This won't leak,
-	 * since we free with the fragment list, not by tree traversal.
-	 */
-	n1 = tree_leaf_new( compile, "map" );
-	n2 = tree_leaf_new( compile, "$$f" );
-	n1 = tree_appl_new( compile, n1, n2 );
-	n2 = tree_leafsym_new( compile, final );
-	n1 = tree_appl_new( compile, n1, n2 );
-	compile->tree = n1;
-
-	/* Generate the initial data: $$lcomp3 = [[]];
-	 */
-	im_snprintf( name, 256, "$$lcomp_base%d", compile_lcomp_next++ );
-	sofar = symbol_new_defining( compile, name );
-	(void) symbol_user_init( sofar );
-	(void) compile_new_local( sofar->expr );
-
-	con.type = PARSE_CONST_ELIST;
-	n1 = tree_const_new( sofar->expr->compile, con );
-	n2 = tree_lconst_new( sofar->expr->compile, n1 );
-	sofar->expr->compile->tree = n1;
+	count = 1;
 
 	/* Now generate code for each element, either a filter or a generator.
 	 */
-	for( p = lcomp.elements; p; p = p->next ) {
+	for( p = children; p; p = p->next ) {
 		Symbol *element = (Symbol *) p->data;
 
-		im_snprintf( name, 256, "$$lcomp%d", compile_lcomp_next++ );
-		sym = symbol_new_defining( compile, name );
-		(void) symbol_user_init( sym );
-		(void) compile_new_local( sym->expr );
+		/* Skip the result element ... we use it right at the end.
+		 */
+		if( strcmp( "$$result", IOBJECT( element )->name ) == 0 ) {
+			result = element;
+			continue;
+		}
 
-		if( is_prefix( "$$", IOBJECT( element )->name ) ) {
+		/* Start the next nest in.
+		 */
+		im_snprintf( name, 256, "$$fn%d", count++ );
+		child = symbol_new_defining( scope, name );
+		(void) symbol_user_init( child );
+		(void) compile_new_local( child->expr );
+
+		if( is_prefix( "$$filter", IOBJECT( element )->name ) ) {
 			/* A filter.
 			 */
+			n1 = tree_copy_rewrite( scope, 
+				element->expr->compile->tree, generators );
+			n2 = tree_leafsym_new( scope, child );
+			n3 = tree_leaf_new( scope, "$$sofar" );
+			n1 = tree_ifelse_new( scope, n1, n2, n3 );
+			scope->tree = n1;
 		}
 		else {
+			Symbol *param;
+
 			/* A generator.
 			 */
+			n1 = tree_leaf_new( scope, "foldr" );
+			n2 = tree_leafsym_new( scope, child );
+			n3 = tree_appl_new( scope, n1, n2 );
+			if( sofar )
+				n2 = tree_leaf_new( scope, "$$sofar" );
+			else {
+				ParseConst con;
+
+				con.type = PARSE_CONST_ELIST;
+				n2 = tree_const_new( scope, con );
+			}
+			n3 = tree_appl_new( scope, n3, n2 );
+			n2 = tree_copy_rewrite( scope, 
+				element->expr->compile->tree, generators );
+			n3 = tree_appl_new( scope, n3, n2 );
+			scope->tree = n3;
+
+			/* The child will need params.
+			 */
+			param = symbol_new_defining( child->expr->compile, 
+				IOBJECT( element )->name );
+			symbol_parameter_init( param, child->expr->compile );
+			param = symbol_new_defining( child->expr->compile, 
+				"$$sofar" );
+			symbol_parameter_init( param, child->expr->compile );
+
+			/* There's now an enclosing sofar we can use.
+			 */
+			sofar = TRUE;
 		}
+
+		/* Nest in again.
+		 */
+		scope = child->expr->compile;
 	}
 
-	dump_compile( compile );
+	/* Copy the code for the final result.
+	 */
+	assert( result );
+	n1 = tree_copy_rewrite( scope, 
+		result->expr->compile->tree, generators );
+	n2 = tree_leaf_new( scope, "$$sofar" );
+	n3 = tree_binop_new( compile, BI_CONS, n1, n2 );
+	scope->tree = n3;
+	
+	/* Loop outwards again, closing the scopes we made.
+	 */
+	while( scope != compile ) {
+		/* We know check can't fail on generated code.
 
-	g_slist_free( lcomp.generators );
-	g_slist_free( lcomp.elements );
+		   	FIXME ... yuk, maybe compile_lcomp should be 
+			failable too
+
+		 */
+		(void) compile_check( scope );
+		compile_resolve_names( scope, compile_get_parent( scope ) );
+
+		scope = compile_get_parent( scope );
+	}
+
+	/* Now destroy all the temps created by the parser: we don't want to
+	 * generate code for them.
+	 */
+	for( p = children; p; p = p->next ) 
+		IDESTROY( p->data );
+
+#ifdef DEBUG
+	printf( "after compile_lcomp:\n" );
+	dump_compile( compile );
+#endif /*DEBUG*/
+
+	g_slist_free( generators );
+	g_slist_free( children );
 }
+

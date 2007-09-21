@@ -158,7 +158,8 @@ error_top( const char *fmt, ... )
 	/* We could use error_clear_nip() before calling error_set(), but that
 	 * fails if the arg to us uses the contents of either error buffer.
 	 */
-	buf_rewind( &error_sub_buf );
+	if( !error_level ) 
+		buf_rewind( &error_sub_buf );
 }
 
 void

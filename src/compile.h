@@ -109,7 +109,7 @@ Compile *compile_new_local( Expr *expr );
 void *compile_heap( Compile *compile );
 
 void compile_error_set( Compile *compile );
-void compile_check( Compile *compile );
+gboolean compile_check( Compile *compile );
 
 void compile_resolve_names( Compile *inner, Compile *outer );
 Symbol *compile_resolve_top( Symbol *sym );

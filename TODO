@@ -10,7 +10,6 @@
   where each qualifier is either a generator (of the form pat <- expr)
   or a filter (a Boolean expression). The syntax derives from analogy with
   common set notation. For example:
-  we have MOREEQ in tree.h, just need adding to stuff
 
 	{x|x ∈ S;P(x)}
 

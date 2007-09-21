@@ -446,6 +446,8 @@ the range is simply clipped. Casting to \ct{unsigned short} produces a 64-bit
 float whose fractional part has been set to zero, and which has been
 clipped to the range 0 to 65535. This may or may not cause rounding problems.
 
+You can write hexadecimal number constants as \verb"0xff".
+
 \subsection{The complex type}
 
 Complex numbers are rather sketchily implemented. They are generally handy for
@@ -473,12 +475,14 @@ Character constants are written as single characters enclosed in single
 quotes. You can use the relational operators (\ct{<}, \ct{<=}, \ct{>},
 \ct{>=}, \ct{==}) to sort characters by ASCII order. You can cast a
 character to a real to get its ASCII value. You can cast a real ASCII value 
-to a character.
+to a character. You can use the standard C escapes to represent non-ASCII
+characters.
 
 \begin{verbatim}
 (int) 'A' == 65
 (char) 65 == 'A'
 is_digit x = '0' <= x && x <= '9'
+newline == '\n' 
 \end{verbatim}
 
 \subsection{The boolean type}
@@ -579,13 +583,50 @@ end-to-end.
 [1,2,3] ++ [4,5,6] == [1,2,3,4,5,6]
 \end{verbatim}
 
+You can write list comprehensions like this:
+
+\begin{verbatim}
+[x | x <- [1..]; x % 2 == 0]
+\end{verbatim}
+
+\noindent
+This could be read as \emph{All x such that x is in [1..] and x is
+even}, that is, the list of even numbers.
+
+You can have any number of semicolon-separated qualifiers and each one can be
+either a generator (like \verb"x <- [1..]") introducing a new variable,
+or a predicate (like \verb"x % 2 == 0") which filters the generators to the
+left of it. 
+
+Later generators change more rapidly, so for example:
+
+\begin{verbatim}
+[(x, y) | x <- [1..3]; y <- [x..3]] ==
+  [(1, 1), (1, 2), (1, 3), 
+    (2, 2), (2, 3), (3, 3)]
+\end{verbatim}
+
 \subsection{The function type}
 \mylabel{sec:func}
 
 Functions are objects just like any other. You can pass functions to other
-functions as parameters, store functions in lists, and so on. You can compose
-functions with the \ct{@} operator. For example, for two functions of one
-argument \ct{f} and \ct{g}:
+functions as parameters, store functions in lists, and so on. 
+
+You can create anonymous functions with \verb"\" (lambda). For example:
+
+\begin{verbatim}
+map (\x x + 2) [1..3] == [3, 4, 5]
+\end{verbatim}
+
+You can nest lambdas to make multi-argument anonymous functions, for example:
+
+\begin{verbatim}
+map2 (\x\y x + y) [1..3] [2..5] == 
+  [3, 5, 7]
+\end{verbatim}
+
+You can compose functions with the \ct{@} operator. For example, for two
+functions of one argument \ct{f} and \ct{g}:
 
 \begin{verbatim}
 f (g 2) == (f @ g) 2
@@ -652,8 +693,9 @@ map (add 2) [1..5] == [3,4,5,6,7,8]
 \ct{foldr} is defined in the standard list library for you:
 
 \begin{verbatim}
-/* foldr fn st l: fold up list l, right to
- * left with function fn and start value st
+/* foldr fn st l: fold up list l, 
+ * right to left with function fn and 
+ * start value st
  */
  
 foldr fn st l

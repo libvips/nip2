@@ -2027,8 +2027,8 @@ static int compile_lcomp_next = 0;
 typedef struct _CompileLcomp {
 	Compile *compile;
 
+	GSList *elements;
 	GSList *generators;
-
 } CompileLcomp;
 
 void *
@@ -2075,6 +2075,9 @@ compile_lcomp( Compile *compile )
 	Symbol *final;
 	char name[256];
 	ParseNode *n1, *n2;
+	Symbol *sofar;
+	ParseConst con;
+	GSList *p;
 
 #ifdef DEBUG
 	printf( "before compile_lcomp:\n" );
@@ -2087,6 +2090,10 @@ compile_lcomp( Compile *compile )
 	lcomp.generators = NULL;
 	(void) icontainer_map( ICONTAINER( compile ), 
 		(icontainer_map_fn) compile_lcomp_gen_find, &lcomp, NULL );
+
+	/* Find all generators and filters.
+	 */
+	lcomp.elements = g_slist_copy( ICONTAINER( compile )->children );
 
 	/* Build the function we map.
 	 */
@@ -2130,7 +2137,40 @@ compile_lcomp( Compile *compile )
 	n1 = tree_appl_new( compile, n1, n2 );
 	compile->tree = n1;
 
+	/* Generate the initial data: $$lcomp3 = [[]];
+	 */
+	im_snprintf( name, 256, "$$lcomp_base%d", compile_lcomp_next++ );
+	sofar = symbol_new_defining( compile, name );
+	(void) symbol_user_init( sofar );
+	(void) compile_new_local( sofar->expr );
+
+	con.type = PARSE_CONST_ELIST;
+	n1 = tree_const_new( sofar->expr->compile, con );
+	n2 = tree_lconst_new( sofar->expr->compile, n1 );
+	sofar->expr->compile->tree = n1;
+
+	/* Now generate code for each element, either a filter or a generator.
+	 */
+	for( p = lcomp.elements; p; p = p->next ) {
+		Symbol *element = (Symbol *) p->data;
+
+		im_snprintf( name, 256, "$$lcomp%d", compile_lcomp_next++ );
+		sym = symbol_new_defining( compile, name );
+		(void) symbol_user_init( sym );
+		(void) compile_new_local( sym->expr );
+
+		if( is_prefix( "$$", IOBJECT( element )->name ) ) {
+			/* A filter.
+			 */
+		}
+		else {
+			/* A generator.
+			 */
+		}
+	}
+
 	dump_compile( compile );
 
 	g_slist_free( lcomp.generators );
+	g_slist_free( lcomp.elements );
 }

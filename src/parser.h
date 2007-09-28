@@ -82,6 +82,7 @@ typedef enum {
 gboolean parse_toplevel( Toolkit *kit, int pos );
 gboolean parse_onedef( Toolkit *kit, int pos );
 gboolean parse_rhs( Expr *expr, ParseRhsSyntax syntax );
+Symbol *parse_def( Symbol *enclosing );
 
 extern Symbol *last_top_sym;
 

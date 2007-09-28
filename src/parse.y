@@ -485,6 +485,7 @@ input_pop( void )
 %type <yy_node> crhs cexprlist prhs lambda
 %type <yy_const> TK_CONST 
 %type <yy_name> TK_IDENT TK_TAG
+%type <yy_sym> topdef
 
 %left TK_LAMBDA 
 %nonassoc TK_IF 
@@ -513,6 +514,7 @@ input_pop( void )
 select: 
       	',' main | 
 	'^' onedef | 
+	'?' topdef | 
 	'*' sdef optsemi {
 		compile_check( current_compile );
 	} | 
@@ -615,8 +617,10 @@ topdef:
 
 		/* Add to the current kit.
 		 */
-		tool = tool_new_sym( current_kit, tool_position, sym );
-		tool->lineno = last_top_lineno;
+		if( current_kit ) {
+			tool = tool_new_sym( current_kit, tool_position, sym );
+			tool->lineno = last_top_lineno;
+		}
 
 		/* Finished with this symbol.
 		 */
@@ -629,6 +633,8 @@ topdef:
 				IOBJECT( sym )->name, error_get_sub() );
 
 		input_reset();
+
+		$$ = sym;
 	}
 	;
 
@@ -1308,4 +1314,20 @@ parse_rhs( Expr *expr, ParseRhsSyntax syntax )
 		return( FALSE );
 
 	return( TRUE );
+}
+
+/* Parse a single definition, like "fred = 12" or "fred a = a * 2". Return
+ * the symbol we made.
+ */
+Symbol *
+parse_def( Symbol *enclosing )
+{
+	if( !parse_input( '?', enclosing, NULL, -1 ) ) {
+		current_compile = NULL;
+		IDESTROY( last_top_sym );
+
+		return( NULL );
+	}
+
+	return( last_top_sym );
 }

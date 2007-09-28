@@ -1,3 +1,53 @@
+- change the grammar so that the trailing semicolon on a def is enforced by
+  the thing that looks for a set of defs
+
+  we don't want it for onedef
+
+- if a sym has an existing row, destroy it ... we want redefining syms to move
+  them between columns
+
+- should do the ops in the other order: if you type
+
+     A1 A2
+
+  at the moment, it'll delete A1 :-( as it tries to redefine it
+
+  maybe we should lex the input line and look for IDENT IDENT EQUALS before we
+  even try calling onedef?
+
+- add a left pane where you can enter per-workspace defs
+
+  needs to work in compat mode too! ie. we shouldn't see all the compat defs
+  there in compat mode
+
+  currently:
+
+	  root
+	  |
+	  +-Workspaces
+	    |
+	    +-untitled
+	      |
+	      +-A1
+	      +-fred = 12;
+
+  change to:
+
+	  root
+	  |
+	  +-Workspaces
+	    |
+	    +-compat-7.10
+	      |
+	      +-untitled
+	      | |
+	      | +-A1
+	      | +-fred = 12;
+	      |
+	      +-old_menu_item = ...
+
+  maybe?
+
 - there's some left-recursion in the parser, eg. comma_list, is this easily
   fixable?
 

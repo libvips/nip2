@@ -427,24 +427,38 @@ workspace_add_def( Workspace *ws, const char *str )
 
         if( !str || strspn( str, WHITESPACE ) == strlen( str ) )
 		return( NULL );
-	if( !(sym = workspace_add_symbol( ws )) )
-		return( NULL );
+
+	/* Try parsing as a "fred = 12" style def. 
+	 */
 	attach_input_string( str );
-	if( !symbol_user_init( sym ) || !parse_rhs( sym->expr, PARSE_RHS ) ) {
-		/* Parse error.
+	if( !(sym = parse_def( ws->sym )) ) {
+		/* That didn't work. Try making a symbol and parsing as a
+		 * RHS.
 		 */
-		expr_error_get( sym->expr );
+		if( !(sym = workspace_add_symbol( ws )) )
+			return( NULL );
+		attach_input_string( str );
+		if( !symbol_user_init( sym ) || 
+			!parse_rhs( sym->expr, PARSE_RHS ) ) {
+			/* Another parse error.
+			 */
+			expr_error_get( sym->expr );
 
-		/* Block changes to error_string ... symbol_destroy() can set
-		 * this for compound objects.
-		 */
-		error_block();
-		IDESTROY( sym );
-		error_unblock();
+			/* Block changes to error_string ... symbol_destroy() 
+			 * can set this for compound objects.
+			 */
+			error_block();
+			IDESTROY( sym );
+			error_unblock();
 
-		return( NULL );
+			return( NULL );
+		}
 	}
-	(void) row_new( col->scol, sym, &sym->expr->root );
+
+	/* If we're redefining a sym, it might have a row already.
+	 */
+	if( !sym->expr->row )
+		(void) row_new( col->scol, sym, &sym->expr->root );
 	symbol_made( sym );
 	filemodel_set_modified( FILEMODEL( ws ), TRUE );
 

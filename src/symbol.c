@@ -711,7 +711,7 @@ symbol_new_defining( Compile *compile, const char *name )
 			/* Redef of existing symbol? Only allowed at top
 			 * level.
 			 */
-			if( compile->sym != symbol_root )
+			if( !is_scope( compile->sym ) )
 				symbol_error_redefine( sym );
 			break;
 

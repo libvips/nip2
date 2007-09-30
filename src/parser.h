@@ -66,6 +66,7 @@ void attach_input_file( iOpenFile *of );
 void attach_input_string( const char *str );
 int ip_input( void );
 void ip_unput( int ch );
+void ip_unget( void );
 gboolean is_EOF( void );
 
 /* Parse stuff.
@@ -82,7 +83,7 @@ typedef enum {
 gboolean parse_toplevel( Toolkit *kit, int pos );
 gboolean parse_onedef( Toolkit *kit, int pos );
 gboolean parse_rhs( Expr *expr, ParseRhsSyntax syntax );
-Symbol *parse_def( Symbol *enclosing );
+char *parse_test_define( void );
 
 extern Symbol *last_top_sym;
 

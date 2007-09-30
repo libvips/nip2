@@ -420,6 +420,7 @@ workspace_add_def( Workspace *ws, const char *str )
 {
 	Column *col = workspace_column_pick( ws );
 	Symbol *sym;
+	char *name;
 
 #ifdef DEBUG
 	printf( "workspace_add_def: %s\n", str );
@@ -431,28 +432,32 @@ workspace_add_def( Workspace *ws, const char *str )
 	/* Try parsing as a "fred = 12" style def. 
 	 */
 	attach_input_string( str );
-	if( !(sym = parse_def( ws->sym )) ) {
-		/* That didn't work. Try making a symbol and parsing as a
-		 * RHS.
+	if( (name = parse_test_define()) ) {
+		sym = symbol_new( ws->sym->expr->compile, name );
+		IM_FREE( name );
+		attach_input_string( str + input_state.charpos - 1 );
+	}
+	else {
+		/* That didn't work. Make a sym from the col name.
 		 */
-		if( !(sym = workspace_add_symbol( ws )) )
-			return( NULL );
+		sym = workspace_add_symbol( ws );
 		attach_input_string( str );
-		if( !symbol_user_init( sym ) || 
-			!parse_rhs( sym->expr, PARSE_RHS ) ) {
-			/* Another parse error.
-			 */
-			expr_error_get( sym->expr );
+	}
 
-			/* Block changes to error_string ... symbol_destroy() 
-			 * can set this for compound objects.
-			 */
-			error_block();
-			IDESTROY( sym );
-			error_unblock();
+	if( !symbol_user_init( sym ) || 
+		!parse_rhs( sym->expr, PARSE_RHS ) ) {
+		/* Another parse error.
+		 */
+		expr_error_get( sym->expr );
 
-			return( NULL );
-		}
+		/* Block changes to error_string ... symbol_destroy() 
+		 * can set this for compound objects.
+		 */
+		error_block();
+		IDESTROY( sym );
+		error_unblock();
+
+		return( NULL );
 	}
 
 	/* If we're redefining a sym, it might have a row already.

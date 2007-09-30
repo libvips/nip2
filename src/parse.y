@@ -196,8 +196,7 @@ ip_input( void )
 			return( 0 );
 	}
 	else {
-		/* Input from string. Make sure we do not read past the end of
-		 * the string.
+		/* Input from string. 
 		 */
 		if( (ch = *is->strpos) )
 			is->strpos++;
@@ -245,6 +244,10 @@ ip_unput( int ch )
 {
 	InputState *is = &input_state;
 
+#ifdef DEBUG_CHARACTER
+	printf( "ip_unput: ungetting '%c'\n", ch ); 
+#endif /*DEBUG_CHARACTER*/
+
 	/* Is lex trying to unget the end-of-file marker? Do nothing if it is.
 	 */
 	if( !ch )
@@ -254,15 +257,11 @@ ip_unput( int ch )
 		if( ungetc( ch, is->of->fp ) == EOF )
 			error( "unget buffer overflow" );
 	}
-	else {
-		if( is->strpos > is->str )
-			is->strpos--;	
-		else
-			/* Save extra char here.
-			 */
-			is->oldchar = ch;
-	}
-	
+	else 
+		/* Save extra char here.
+		 */
+		is->oldchar = ch;
+
 	/* Redo counts.
 	 */
 	if( ch == '\n' ) {
@@ -514,7 +513,6 @@ input_pop( void )
 select: 
       	',' main | 
 	'^' onedef | 
-	'?' topdef | 
 	'*' sdef optsemi {
 		compile_check( current_compile );
 	} | 
@@ -1316,18 +1314,30 @@ parse_rhs( Expr *expr, ParseRhsSyntax syntax )
 	return( TRUE );
 }
 
-/* Parse a single definition, like "fred = 12" or "fred a = a * 2". Return
- * the symbol we made.
+/* Do we have a string of the form "IDENT = .."? Use the lexer to look along
+ * the string checking components, return the IDENT if we do.
  */
-Symbol *
-parse_def( Symbol *enclosing )
+char *
+parse_test_define( void )
 {
-	if( !parse_input( '?', enclosing, NULL, -1 ) ) {
-		current_compile = NULL;
-		IDESTROY( last_top_sym );
+	int yychar;
+	extern int yylex( void );
+	char *ident;
 
+	if( setjmp( parse_error_point ) ) 
+		/* Here for yyerror in lex. 
+		 */
+		return( NULL ); 
+
+	if( (yychar = yylex()) <= 0 || yychar != TK_IDENT )
+		return( NULL );
+	ident = yylval.yy_name;
+
+	if( (yychar = yylex()) <= 0 || yychar != '=' ) {
+		IM_FREE( ident );
 		return( NULL );
 	}
 
-	return( last_top_sym );
+	return( ident );
 }
+

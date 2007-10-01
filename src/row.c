@@ -298,7 +298,7 @@ row_dirty_set_single( Row *row, gboolean clear_error )
 #ifdef DEBUG_DIRTY
 		printf( "row_dirty_set_single: " );
 		row_name_print( row );
-		printf( "\n" );
+		printf( " clear_error = %s\n", bool_to_char( clear_error ) );
 #endif /*DEBUG_DIRTY*/
 
 		/* Make sure error is clear ... we want to recomp.

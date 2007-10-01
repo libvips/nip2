@@ -2181,8 +2181,21 @@ compile_lcomp( Compile *compile )
 	/* Now destroy all the temps created by the parser: we don't want to
 	 * generate code for them.
 	 */
-	for( p = children; p; p = p->next ) 
-		IDESTROY( p->data );
+	for( p = children; p; p = p->next ) {
+		Symbol *element = SYMBOL( p->data );
+		GSList *q;
+
+		/* Need to unlink from our parents, or they will be marked as
+		 * in error.
+		 */
+		for( q = element->parents; q; q = q->next ) {
+			Compile *parent = COMPILE( q->data );
+
+			compile_link_break( parent, element );
+		}
+
+		IDESTROY( element );
+	}
 
 #ifdef DEBUG
 	printf( "after compile_lcomp:\n" );

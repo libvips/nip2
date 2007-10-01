@@ -273,7 +273,6 @@ imagedisplay_destroy( GtkObject *object )
 	UNREF( id->conv );
 
 	UNREF( id->back_gc );
-	UNREF( id->xor_gc );
 	UNREF( id->top_gc );
 	UNREF( id->bottom_gc );
 
@@ -375,7 +374,7 @@ imagedisplay_make_gcs( Imagedisplay *id )
 	GdkGCValues values;
 	GdkColor fg, bg;
 
-	if( id->xor_gc )
+	if( id->back_gc )
 		return;
 
 	values.fill = GDK_OPAQUE_STIPPLED;
@@ -387,13 +386,6 @@ imagedisplay_make_gcs( Imagedisplay *id )
 	bg.red = bg.green = bg.blue = 0xA0 << 8;
 	gdk_gc_set_rgb_fg_color( id->back_gc, &fg );
 	gdk_gc_set_rgb_bg_color( id->back_gc, &bg );
-
-	values.foreground = main_window_top->style->white;
-	values.function = GDK_XOR;
-	id->xor_gc = gdk_gc_new_with_values( main_window_gdk, &values,
-		GDK_GC_FOREGROUND | GDK_GC_FUNCTION );
-	gdk_gc_set_line_attributes( id->xor_gc, 
-		0, GDK_LINE_ON_OFF_DASH, GDK_CAP_BUTT, GDK_JOIN_MITER );
 
 	id->top_gc = gdk_gc_new( main_window_gdk );
 	id->bottom_gc = gdk_gc_new( main_window_gdk );
@@ -408,7 +400,6 @@ imagedisplay_init( Imagedisplay *id )
 	id->shrink_to_fit = FALSE;
 
 	id->back_gc = NULL;
-	id->xor_gc = NULL;
 	id->top_gc = NULL;
 	id->bottom_gc = NULL;
 

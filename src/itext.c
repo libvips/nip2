@@ -608,7 +608,7 @@ itext_update_heap_sub( Symbol *sym, BufInfo *buf )
 	return( NULL );
 }
 
-/* model->modified is set ... parse, compile, and mark for recomp.
+/* heapmodel->modified is set ... parse, compile, and mark for recomp.
  */
 static void *
 itext_update_heap( Heapmodel *heapmodel )
@@ -620,6 +620,12 @@ itext_update_heap( Heapmodel *heapmodel )
 	char txt[MAX_STRSIZE];
 	BufInfo buf;
 	ParseRhsSyntax syntax;
+
+#ifdef DEBUG
+	printf( "itext_update_heap: " );
+	row_name_print( HEAPMODEL( itext )->row );
+	printf( "\n" );
+#endif /*DEBUG*/
 
 	buf_init_static( &buf, txt, MAX_STRSIZE );
 	if( is_super( row->sym ) ) {

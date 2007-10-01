@@ -294,10 +294,17 @@ regionview_paint_crosshair( GdkDrawable *draw,
 /* Paint the dotted line connecting an arrow or a guide.
  */
 static void
-regionview_paint_arrow( GdkDrawable *draw, GdkGC *fg, Rect *r )
+regionview_paint_arrow( GdkDrawable *draw, GdkGC *fg, int off, Rect *r )
 {
+        static gint8 dash_list[] = { 10, 10 };
+
+        gdk_gc_set_dashes( fg, off, dash_list, 2 );
+	gdk_gc_set_line_attributes( fg, 2, 
+		GDK_LINE_DOUBLE_DASH, GDK_CAP_BUTT, GDK_JOIN_MITER );
 	gdk_draw_line( draw, fg, 
 		r->left, r->top, IM_RECT_RIGHT( r ), IM_RECT_BOTTOM( r ) );
+	gdk_gc_set_line_attributes( fg, 0, 
+		GDK_LINE_SOLID, GDK_CAP_BUTT, GDK_JOIN_MITER );
 }
 
 /* Apply a function to every rect in a crosshair positioned at (x, y).
@@ -462,8 +469,6 @@ regionview_queue_draw( Regionview *regionview )
 static void
 regionview_paint( Regionview *regionview )
 {
-        static gint8 dash_list[] = { 10, 10 };
-
 	Imagepresent *ip = regionview->ip;
 	Imagedisplay *id = ip->id;
 	Conversion *conv = id->conv;
@@ -479,7 +484,6 @@ regionview_paint( Regionview *regionview )
 	br = style->dark_gc[state];
 	fg = style->fg_gc[state];
 	bg = style->bg_gc[state];
-        gdk_gc_set_dashes( id->xor_gc, regionview->dash_offset, dash_list, 2 );
 
 	conversion_im_to_disp_rect( conv, &regionview->area, &dr );
 	switch( regionview->last_type ) {
@@ -497,7 +501,8 @@ regionview_paint( Regionview *regionview )
 		break;
 
 	case REGIONVIEW_ARROW:
-		regionview_paint_arrow( draw, id->xor_gc, &dr );
+		regionview_paint_arrow( draw, 
+			tl, regionview->dash_offset, &dr );
 		regionview_paint_crosshair( draw, 
 			tl, bg, br, dr.left, dr.top );
 		regionview_paint_crosshair( draw, tl, bg, br, 
@@ -507,12 +512,14 @@ regionview_paint( Regionview *regionview )
 	case REGIONVIEW_HGUIDE:
 	case REGIONVIEW_VGUIDE:
 	case REGIONVIEW_LINE:
-		regionview_paint_arrow( draw, id->xor_gc, &dr );
+		regionview_paint_arrow( draw, 
+			tl, regionview->dash_offset, &dr );
 		break;
 
 	case REGIONVIEW_BOX:
 		im_rect_normalise( &dr );
-		regionview_paint_rect( draw, id->xor_gc, &dr );
+		regionview_paint_arrow( draw, 
+			tl, regionview->dash_offset, &dr );
 		break;
 
 	default:

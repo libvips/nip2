@@ -56,7 +56,6 @@ struct _Imagedisplay {
 	/* GCs also used by region paint.
 	 */
 	GdkGC *back_gc;
-	GdkGC *xor_gc;
 	GdkGC *top_gc;
 	GdkGC *bottom_gc;
 };

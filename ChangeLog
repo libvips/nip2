@@ -1,5 +1,7 @@
 started 7.13.1
 - you can type "fred = 12" into a columnview, woo
+- gah, lcomps had "undefined" set on various members because of trimming off
+  parser temps
 
 started 7.13.0
 - woo, fork for new development version

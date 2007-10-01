@@ -152,7 +152,6 @@ mainw_destroy( GtkObject *object )
 	FREESID( mainw->watch_changed_sid, main_watchgroup );
 	DESTROY_GTK( mainw->popup );
 	UNREF( mainw->kitgview );
-	IM_FREEF( g_source_remove, mainw->pane_animate_timeout );
 
 	mainw_all = g_slist_remove( mainw_all, mainw );
 
@@ -230,7 +229,7 @@ mainw_init( Mainw *mainw )
 
 	mainw->toolbar_visible = MAINW_TOOLBAR;
 	mainw->statusbar_visible = MAINW_STATUSBAR;
-	mainw->pane_visible = MAINW_TOOLKITBROWSER;
+	mainw->rpane_visible = MAINW_TOOLKITBROWSER;
 
 	mainw->row_last_error = NULL;
 
@@ -246,9 +245,7 @@ mainw_init( Mainw *mainw )
 
 	mainw->compat_timeout = 0;
 
-	mainw->pane_position = MAINW_PANE_POSITION;
-	mainw->pane_animate_timeout = 0;
-	mainw->pane_last_visible = mainw->pane_visible;
+	mainw->rpane = NULL;
 
 	mainw_all = g_slist_prepend( mainw_all, mainw );
 }
@@ -390,65 +387,6 @@ mainw_status_update( Mainw *mainw )
 			ws->status );
 }
 
-static gboolean
-mainw_pane_animate_timeout_cb( Mainw *mainw )
-{
-	int now = gtk_paned_get_position( GTK_PANED( mainw->pane ) );
-	int target = mainw->target_position;
-	int new;
-	gboolean more;
-
-#ifdef DEBUG
-	printf( "mainw_pane_animate_timeout_cb\n" );
-#endif /*DEBUG*/
-
-	new = now + (target - now) / 2;
-
-	if( ABS( new - target ) < 5 || new == mainw->last_set_position ) {
-		/* Close enough: set exactly the target and stop animating. Or
-		 * the new we set last hasn't taken .. in which case we must
-		 * have hit a stop.
-		 */
-		new = target;
-		mainw->pane_animate_timeout = 0;
-		more = FALSE;
-	}
-	else 
-		/* Keep moving.
-		 */
-		more = TRUE;
-
-	gtk_paned_set_position( GTK_PANED( mainw->pane ), new );
-	mainw->last_set_position = new;
-
-	return( more );
-}
-
-/* Animate the pane to a new position.
- */
-static void
-mainw_pane_animate( Mainw *mainw, int target_position )
-{
-	int max_position;
-	int min_position;
-
-	g_object_get( mainw->pane, 
-		"max_position", &max_position, 
-		"min_position", &min_position, 
-		NULL );
-
-	mainw->target_position = 
-		IM_CLIP( min_position, target_position, max_position );
-
-	/* Invalidate the last set pos.
-	 */
-	mainw->last_set_position = -1;
-
-	if( !mainw->pane_animate_timeout ) 
-		mainw->pane_animate_timeout = g_timeout_add( 50, 
-			(GSourceFunc) mainw_pane_animate_timeout_cb, mainw );
-}
-
 static gint
 mainw_jump_name_compare( iContainer *a, iContainer *b )
 {
@@ -566,36 +504,14 @@ mainw_refresh( Mainw *mainw )
 	action = gtk_action_group_get_action( mainw->action_group, 
 		"ToolkitBrowser" );
 	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
-		mainw->pane_visible );
+		mainw->rpane_visible );
 
 	action = gtk_action_group_get_action( mainw->action_group, 
 		view_mode[ws->mode] );
 	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
 		TRUE );
 
-	if( mainw->pane_visible != mainw->pane_last_visible ) {
-		mainw->pane_last_visible = mainw->pane_visible;
-
-		if( mainw->pane_visible ) {
-			/* -1 means pick a position from the browser size.
-			 */
-			if( mainw->pane_position == -1 )
-				mainw->pane_position = mainw->wsview->vp.width -
-					toolkitbrowser_get_width( 
-					mainw->toolkitbrowser );
-
-			mainw_pane_animate( mainw, mainw->pane_position );
-		}
-		else {
-			mainw->pane_position = gtk_paned_get_position( 
-				GTK_PANED( mainw->pane ) );
-
-			prefs_set( "MAINW_PANE_POSITION", 
-				"%d", mainw->pane_position );
-
-			mainw_pane_animate( mainw, 10000 );
-		}
-	}
+	pane_set_visible( mainw->rpane, mainw->rpane_visible );
 
 	mainw_jump_update( mainw, mainw->jump_to_column_menu );
 	mainw_jump_update( mainw, mainw->popup_jump );
@@ -1449,9 +1365,9 @@ mainw_statusbar_action_cb( GtkToggleAction *action, Mainw *mainw )
 static void
 mainw_toolkitbrowser_action_cb( GtkToggleAction *action, Mainw *mainw )
 {
-	mainw->pane_visible = gtk_toggle_action_get_active( action );
+	mainw->rpane_visible = gtk_toggle_action_get_active( action );
 	prefs_set( "MAINW_TOOLKITBROWSER", 
-		"%s", bool_to_char( mainw->pane_visible ) );
+		"%s", bool_to_char( mainw->rpane_visible ) );
 	mainw_refresh( mainw );
 }
 
@@ -1961,9 +1877,6 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	mainw->heap_changed_sid = g_signal_connect( reduce_context->heap, 
 		"changed",
 		G_CALLBACK( mainw_free_changed_cb ), mainw );
-	mainw->watch_changed_sid = g_signal_connect( main_watchgroup, 
-		"watch_changed",
-		G_CALLBACK( mainw_watch_changed_cb ), mainw );
 
 	/* Make message label.
 	 */
@@ -1986,14 +1899,19 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	gtk_menu_set_accel_group( GTK_MENU( mainw->kitgview->menu ),
 		iwnd->accel_group );
 
-	mainw->pane = gtk_hpaned_new();
+	mainw->rpane = pane_new( "MAINW_RPANE_POSITION", 10000 );
 	gtk_box_pack_start( GTK_BOX( vbox ), 
-		GTK_WIDGET( mainw->pane ), TRUE, TRUE, 0 );
-	gtk_widget_show( mainw->pane );
+		GTK_WIDGET( mainw->rpane ), TRUE, TRUE, 0 );
+	gtk_widget_show( GTK_WIDGET( mainw->rpane ) );
+
+	mainw->lpane = pane_new( "MAINW_LPANE_POSITION", 0 );
+	gtk_paned_pack1( GTK_PANED( mainw->rpane ), GTK_WIDGET( mainw->lpane ),
+		TRUE, FALSE );
+	gtk_widget_show( GTK_WIDGET( mainw->lpane ) );
 
 	mainw->wsview = WORKSPACEVIEW( 
 		model_view_new( MODEL( mainw->ws ), NULL ) );
-	gtk_paned_pack1( GTK_PANED( mainw->pane ), GTK_WIDGET( mainw->wsview ),
+	gtk_paned_pack2( GTK_PANED( mainw->lpane ), GTK_WIDGET( mainw->wsview ),
 		TRUE, FALSE );
 	gtk_widget_show( GTK_WIDGET( mainw->wsview ) );
 
@@ -2016,7 +1934,7 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	 * clipped to the pane size.
 	 */
 	ebox = gtk_event_box_new();
-	gtk_paned_pack2( GTK_PANED( mainw->pane ), ebox, TRUE, TRUE );
+	gtk_paned_pack2( GTK_PANED( mainw->rpane ), ebox, TRUE, TRUE );
 	gtk_widget_show( ebox );
 
 	mainw->toolkitbrowser = toolkitbrowser_new();
@@ -2027,25 +1945,29 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 		GTK_WIDGET( mainw->toolkitbrowser ) );
 	gtk_widget_show( GTK_WIDGET( mainw->toolkitbrowser ) );
 
+	{ 
+		GtkWidget *text;
+
+		text = gtk_text_view_new();
+		gtk_paned_pack1( GTK_PANED( mainw->lpane ), text, TRUE, TRUE );
+		gtk_widget_show( text );
+	}
+
 	/* Set start state.
 	 */
 	(void) mainw_refresh( mainw );
+
+	/* Any changes to prefs, refresh (yuk!).
+	 */
+	mainw->watch_changed_sid = g_signal_connect( main_watchgroup, 
+		"watch_changed",
+		G_CALLBACK( mainw_watch_changed_cb ), mainw );
 }
 
 static void
 mainw_popdown( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys )
 {
 	Mainw *mainw = MAINW( iwnd );
-
-	if( mainw->pane_visible )
-		/* Re-read the position rather than looking at pane_position ...
-		 * pane_position is only updated on hide.
-		 */
-		prefs_set( "MAINW_PANE_POSITION", "%d", 
-			gtk_paned_get_position( GTK_PANED( mainw->pane ) ) );
-	else
-		prefs_set( "MAINW_PANE_POSITION", "%d", 
-			mainw->pane_position );
 
 	IM_FREEF( g_source_remove, mainw->compat_timeout );
 
@@ -2088,14 +2010,6 @@ mainw_link( Mainw *mainw, Workspace *ws )
 			IM_MIN( ws->window_height, 
 				gdk_screen_get_height( screen ) ) );
 	}
-
-	/* 10000: just a huge number; enough to get the gutter locked on to
-	 * the right edge.
-	 */
-	gtk_paned_set_position( GTK_PANED( mainw->pane ), 
-		MAINW_TOOLKITBROWSER ? 
-			mainw->pane_position : 
-			10000 );
 }
 
 Mainw *

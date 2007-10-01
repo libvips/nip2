@@ -60,6 +60,8 @@ nip2_SOURCES = \
 	expr.h \
 	filemodel.c \
 	filemodel.h \
+	pane.c \
+	pane.h \
 	pathname.c \
 	pathname.h \
 	fontname.c \

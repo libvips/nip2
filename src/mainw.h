@@ -63,7 +63,7 @@ struct _Mainw {
 	 */
 	gboolean toolbar_visible;
 	gboolean statusbar_visible;
-	gboolean pane_visible;
+	gboolean rpane_visible;
 
 	/* The last row we visited with the 'next-error' button.
 	 */
@@ -94,12 +94,10 @@ struct _Mainw {
 	GtkWidget *space_free;	
 	GtkWidget *space_free_eb;	
 
-	GtkWidget *pane;
-	gboolean pane_last_visible;	/* Current widget state */
-	int pane_position;		
-	int target_position;		/* Animating towards this pos */
-	int last_set_position;		/* The last one we set ... for sanity */
-	guint pane_animate_timeout;	/* With this timeout */
+	/* Left and righ panes ... program window and toolkit browser.
+	 */
+	Pane *rpane;
+	Pane *lpane;
 };
 
 typedef struct _MainwClass {

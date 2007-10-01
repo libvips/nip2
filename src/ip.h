@@ -346,6 +346,7 @@ typedef void *(*tool_map_fn)( Tool *, void *, void * );
 #include "floatwindow.h"
 #include "imageview.h"
 #include "tslider.h"
+#include "pane.h"
 
 /* Basic ip includes (order important).
  */

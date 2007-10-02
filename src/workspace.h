@@ -118,6 +118,13 @@ struct _Workspace {
 	 */
 	double scale;
 	double offset;
+
+	/* Workspace-local defs, displayed in the left pane. All in a private
+	 * kitg and kit.
+	 */
+	char *local_defs;
+	Toolkitgroup *local_kitg;
+	Toolkit *local_kit;
 };
 
 typedef struct _WorkspaceClass {
@@ -191,3 +198,4 @@ void workspace_set_status( Workspace *ws, const char *fmt, ... )
 
 void workspace_set_mode( Workspace *ws, WorkspaceMode mode );
 
+gboolean workspace_local_set( Workspace *ws, const char *txt );

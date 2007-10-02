@@ -94,10 +94,12 @@ struct _Mainw {
 	GtkWidget *space_free;	
 	GtkWidget *space_free_eb;	
 
+	GtkWidget *text;	
+
 	/* Left and righ panes ... program window and toolkit browser.
 	 */
-	Pane *rpane;
 	Pane *lpane;
+	Pane *rpane;
 };
 
 typedef struct _MainwClass {

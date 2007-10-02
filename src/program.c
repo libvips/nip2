@@ -2161,6 +2161,24 @@ program_tabs_new( void )
 	return( tabs );
 }
 
+GtkWidget *
+program_text_new( void )
+{
+	PangoFontDescription *font_desc;
+	PangoTabArray *tabs;
+	GtkWidget *text;
+
+	text = gtk_text_view_new();
+	font_desc = pango_font_description_from_string( "Mono" );
+	gtk_widget_modify_font( text, font_desc );
+	pango_font_description_free( font_desc );
+	tabs = program_tabs_new();
+	gtk_text_view_set_tabs( GTK_TEXT_VIEW( text ), tabs );
+	pango_tab_array_free( tabs );
+
+	return( text );
+}
+
 static void
 program_build( Program *program, GtkWidget *vbox )
 {
@@ -2173,8 +2191,6 @@ program_build( Program *program, GtkWidget *vbox )
 	GtkTreeViewColumn *column;
 	GtkTreeSelection *select;
 	GtkWidget *swin;
-	PangoFontDescription *font_desc;
-	PangoTabArray *tabs;
 
         /* Make main menu bar
          */
@@ -2271,13 +2287,7 @@ program_build( Program *program, GtkWidget *vbox )
 	gtk_paned_pack2( GTK_PANED( program->pane ), swin, TRUE, TRUE );
 	gtk_widget_show( swin );
 
-	program->text = gtk_text_view_new();
-	font_desc = pango_font_description_from_string( "Mono" );
-	gtk_widget_modify_font( program->text, font_desc );
-	pango_font_description_free( font_desc );
-	tabs = program_tabs_new();
-	gtk_text_view_set_tabs( GTK_TEXT_VIEW( program->text ), tabs );
-	pango_tab_array_free( tabs );
+	program->text = program_text_new();
         g_signal_connect( 
 		gtk_text_view_get_buffer( GTK_TEXT_VIEW( program->text ) ),
 		"changed",

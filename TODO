@@ -1,35 +1,8 @@
-- add a left pane where you can enter per-workspace defs
+- ws doesn't always update when we edit and process local defs?
 
-  needs to work in compat mode too! ie. we shouldn't see all the compat defs
-  there in compat mode
+  add load/save of ws-locals
 
-  currently:
-
-	  root
-	  |
-	  +-Workspaces
-	    |
-	    +-untitled
-	      |
-	      +-A1
-	      +-fred = 12;
-
-  change to:
-
-	  root
-	  |
-	  +-Workspaces
-	    |
-	    +-compat-7.10
-	      |
-	      +-untitled
-	      | |
-	      | +-A1
-	      | +-fred = 12;
-	      |
-	      +-old_menu_item = ...
-
-  maybe?
+  highlight on syntax error
 
 - there's some left-recursion in the parser, eg. comma_list, is this easily
   fixable?

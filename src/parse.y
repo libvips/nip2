@@ -1236,7 +1236,7 @@ parse_input( int ch, Symbol *sym, Toolkit *kit, int pos )
 	return( TRUE );
 }
 
-/* Parse the input into a set of symbols into a position in a kit. 
+/* Parse the input into a set of symbols at a position in a kit. 
  * kit may be NULL for no kit. 
  */
 gboolean

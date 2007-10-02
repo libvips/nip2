@@ -140,3 +140,5 @@ int get_dpi( void );
 GtkWidget *image_new_from_file( const char *name );
 
 void vfatal( GError **error );
+
+char *text_view_get_text( GtkTextView *text_view );

@@ -1100,3 +1100,19 @@ vfatal( GError **error )
 
 	exit( -1 );
 } 
+
+char *
+text_view_get_text( GtkTextView *text_view )
+{ 
+	GtkTextBuffer *text_buffer = gtk_text_view_get_buffer( text_view );
+	GtkTextIter start_iter;
+	GtkTextIter end_iter;
+	char *text;
+
+	gtk_text_buffer_get_start_iter( text_buffer, &start_iter );
+	gtk_text_buffer_get_end_iter( text_buffer, &end_iter );
+	text = gtk_text_buffer_get_text( text_buffer, 
+		&start_iter, &end_iter, FALSE ); 
+
+	return( text );
+}

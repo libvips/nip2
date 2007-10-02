@@ -105,6 +105,7 @@ typedef struct _ProgramClass {
 } ProgramClass;
 
 GtkType program_get_type( void );
+GtkWidget *program_text_new( void );
 Program *program_new( Toolkitgroup *kitg );
 
 gboolean program_select( Program *program, Model *model );

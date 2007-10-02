@@ -233,6 +233,8 @@ mainw_init( Mainw *mainw )
 
 	mainw->row_last_error = NULL;
 
+	mainw->compat_timeout = 0;
+
 	mainw->kitgview = NULL;
 	mainw->toolkitbrowser = NULL;
 	mainw->wsview = NULL;
@@ -243,8 +245,7 @@ mainw_init( Mainw *mainw )
 	mainw->space_free = NULL;
 	mainw->space_free_eb = NULL;
 
-	mainw->compat_timeout = 0;
-
+	mainw->lpane = NULL;
 	mainw->rpane = NULL;
 
 	mainw_all = g_slist_prepend( mainw_all, mainw );
@@ -1757,6 +1758,19 @@ static const char *mainw_toolbar_ui_description =
 "  </toolbar>"
 "</ui>";
 
+/* "Process" in ws defs area.
+ */
+static void
+mainw_process_cb( GtkWidget *wid, Mainw *mainw )
+{
+	char *txt;
+
+	txt = text_view_get_text( GTK_TEXT_VIEW( mainw->text ) );
+	if( !workspace_local_set( mainw->ws, txt ) )
+		box_alert( GTK_WIDGET( mainw ) );
+	g_free( txt );
+}
+
 static void
 mainw_watch_changed_cb( Watchgroup *watchgroup, Watch *watch, Mainw *mainw )
 {
@@ -1779,6 +1793,9 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	GtkAccelGroup *accel_group;
 	GError *error;
 	GtkWidget *item;
+	GtkWidget *pbox;
+	GtkWidget *hbox;
+	GtkWidget *but;
 
 #ifdef DEBUG
 	printf( "mainw_init: %p\n", mainw );
@@ -1945,13 +1962,22 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 		GTK_WIDGET( mainw->toolkitbrowser ) );
 	gtk_widget_show( GTK_WIDGET( mainw->toolkitbrowser ) );
 
-	{ 
-		GtkWidget *text;
-
-		text = gtk_text_view_new();
-		gtk_paned_pack1( GTK_PANED( mainw->lpane ), text, TRUE, TRUE );
-		gtk_widget_show( text );
-	}
+	/* Make the program pane.
+	 */
+	pbox = gtk_vbox_new( FALSE, 2 );
+	gtk_paned_pack1( GTK_PANED( mainw->lpane ), pbox, TRUE, TRUE );
+	gtk_widget_show( pbox );
+	mainw->text = program_text_new();
+	gtk_box_pack_start( GTK_BOX( pbox ), mainw->text, TRUE, TRUE, 0 );
+	gtk_widget_show( mainw->text );
+	hbox = gtk_hbox_new( FALSE, 0 );
+	gtk_box_pack_end( GTK_BOX( pbox ), hbox, FALSE, FALSE, 0 );
+	gtk_widget_show( hbox );
+	but = gtk_button_new_with_label( _( "Process" ) );
+	gtk_box_pack_end( GTK_BOX( hbox ), but, FALSE, FALSE, 0 );
+	gtk_widget_show( but );
+        g_signal_connect( G_OBJECT( but ), "clicked",
+                G_CALLBACK( mainw_process_cb ), mainw );
 
 	/* Set start state.
 	 */

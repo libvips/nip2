@@ -797,8 +797,11 @@ workspace_finalize( GObject *gobject )
 	ws = WORKSPACE( gobject );
 
 	UNREF( ws->kitg );
-
 	IM_FREE( ws->status );
+	IM_FREE( ws->local_defs );
+	UNREF( ws->local_kit );
+	UNREF( ws->local_kitg );
+
 	workspace_all = g_slist_remove( workspace_all, ws );
 
 	G_OBJECT_CLASS( parent_class )->finalize( gobject );
@@ -851,6 +854,8 @@ workspace_link( Workspace *ws, Workspacegroup *wsg, const char *name )
 	(void) compile_new( sym->expr );
 	symbol_made( sym );
 	iobject_set( IOBJECT( ws ), name, NULL );
+
+	ws->local_kitg = toolkitgroup_new( ws->sym );
 }
 
 static const char *
@@ -1300,6 +1305,10 @@ workspace_init( Workspace *ws )
 
 	ws->scale = 1.0;
 	ws->offset = 0.0;
+
+	ws->local_defs = NULL;
+	ws->local_kitg = NULL;
+	ws->local_kit = NULL;
 
 	filemodel_register( FILEMODEL( ws ) );
 
@@ -1830,4 +1839,23 @@ workspace_set_mode( Workspace *ws, WorkspaceMode mode )
 		icontainer_map_all( ICONTAINER( ws ),
 			(icontainer_map_fn) iobject_changed, NULL );
 	}
+}
+
+/* New ws private defs.
+ */
+gboolean
+workspace_local_set( Workspace *ws, const char *txt )
+{
+	/* New kit for defs ... will destroy any old defs.
+	 */
+	ws->local_kit = toolkit_new( ws->local_kitg, "$$local" );
+	IM_SETSTR( ws->local_defs, txt );
+	filemodel_set_modified( FILEMODEL( ws ), TRUE );
+	attach_input_string( txt );
+	if( !parse_toplevel( ws->local_kit, 0 ) ) 
+		return( FALSE );
+
+	symbol_recalculate_all();
+
+	return( TRUE );
 }

@@ -901,6 +901,7 @@ workspace_load( Model *model,
 {
 	Workspace *ws = WORKSPACE( model );
 	char buf[256];
+	char *txt;
 
 	assert( IS_WORKSPACEGROUP( parent ) );
 
@@ -931,6 +932,13 @@ workspace_load( Model *model,
 		IM_SETSTR( IOBJECT( ws )->caption, buf );
 	}
 
+	/* Don't use get_sprop() and avoid a limit on def size.
+	 */
+	if( (txt = (char *) xmlGetProp( xnode, (xmlChar *) "local_defs" )) ) {
+		(void) workspace_local_set( ws, txt );
+		IM_FREEF( xmlFree, txt );
+	}
+
 	if( !MODEL_CLASS( parent_class )->load( model, state, parent, xnode ) )
 		return( FALSE );
 
@@ -951,6 +959,7 @@ workspace_save( Model *model, xmlNode *xnode )
 		!set_dprop( xthis, "offset", ws->offset ) ||
 		!set_prop( xthis, "window_width", "%d", ws->window_width ) ||
 		!set_prop( xthis, "window_height", "%d", ws->window_height ) ||
+		!set_sprop( xthis, "local_defs", ws->local_defs ) ||
 		!set_sprop( xthis, "name", IOBJECT( ws )->name ) ||
 		!set_sprop( xthis, "caption", IOBJECT( ws )->caption ) ) 
 		return( NULL );
@@ -1306,7 +1315,8 @@ workspace_init( Workspace *ws )
 	ws->scale = 1.0;
 	ws->offset = 0.0;
 
-	ws->local_defs = NULL;
+	ws->local_defs = im_strdupn( _( 
+		"// private definitions for this workspace\n" ) );
 	ws->local_kitg = NULL;
 	ws->local_kit = NULL;
 
@@ -1854,8 +1864,6 @@ workspace_local_set( Workspace *ws, const char *txt )
 	attach_input_string( txt );
 	if( !parse_toplevel( ws->local_kit, 0 ) ) 
 		return( FALSE );
-
-	symbol_recalculate_all();
 
 	return( TRUE );
 }

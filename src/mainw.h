@@ -64,6 +64,7 @@ struct _Mainw {
 	gboolean toolbar_visible;
 	gboolean statusbar_visible;
 	gboolean rpane_visible;
+	gboolean lpane_visible;
 
 	/* The last row we visited with the 'next-error' button.
 	 */

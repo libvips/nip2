@@ -838,16 +838,7 @@ program_kit_destroy( Toolkit *kit, Program *program )
 static void
 program_set_text( Program *program, const char *text, gboolean editable )
 {
-	GtkTextView *text_view = GTK_TEXT_VIEW( program->text );
-
-	gtk_text_buffer_set_text( 
-		gtk_text_view_get_buffer( 
-			GTK_TEXT_VIEW( program->text ) ),
-		text ? text : "", -1 );
-
-	gtk_text_view_set_editable( text_view, editable );
-	gtk_text_view_set_cursor_visible( text_view, editable );
-
+	text_view_set_text( GTK_TEXT_VIEW( program->text ), text, editable );
 	program->dirty = FALSE;
 }
 

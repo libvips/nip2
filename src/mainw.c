@@ -512,7 +512,11 @@ mainw_refresh( Mainw *mainw )
 	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
 		TRUE );
 
+	pane_set_visible( mainw->lpane, mainw->lpane_visible );
 	pane_set_visible( mainw->rpane, mainw->rpane_visible );
+
+	text_view_set_text( GTK_TEXT_VIEW( mainw->text ), 
+		ws->local_defs, TRUE );
 
 	mainw_jump_update( mainw, mainw->jump_to_column_menu );
 	mainw_jump_update( mainw, mainw->popup_jump );
@@ -1372,6 +1376,17 @@ mainw_toolkitbrowser_action_cb( GtkToggleAction *action, Mainw *mainw )
 	mainw_refresh( mainw );
 }
 
+/* Expose/hide the workspace defs.
+ */
+static void
+mainw_workspacedefs_action_cb( GtkToggleAction *action, Mainw *mainw )
+{
+	mainw->lpane_visible = gtk_toggle_action_get_active( action );
+	prefs_set( "MAINW_WORKSPACEDEFS", 
+		"%s", bool_to_char( mainw->lpane_visible ) );
+	mainw_refresh( mainw );
+}
+
 /* Layout columns.
  */
 static void
@@ -1660,6 +1675,11 @@ static GtkToggleActionEntry mainw_toggle_actions[] = {
 		NULL, N_( "Toolkit _Browser" ), NULL,
 		N_( "Show toolkit browser" ),
 		G_CALLBACK( mainw_toolkitbrowser_action_cb ), FALSE },
+
+	{ "WorkspaceDefs",
+		NULL, N_( "Workspace _Definitions" ), NULL,
+		N_( "Show workspace definitions" ),
+		G_CALLBACK( mainw_workspacedefs_action_cb ), FALSE },
 };
 
 static GtkRadioActionEntry mainw_radio_actions[] = {
@@ -1726,6 +1746,7 @@ static const char *mainw_menubar_ui_description =
 "      <menuitem action='Toolbar'/>"
 "      <menuitem action='Statusbar'/>"
 "      <menuitem action='ToolkitBrowser'/>"
+"      <menuitem action='WorkspaceDefs'/>"
 "      <separator/>"
 "      <menuitem action='Normal'/>"
 "      <menuitem action='ShowFormula'/>"
@@ -1769,6 +1790,8 @@ mainw_process_cb( GtkWidget *wid, Mainw *mainw )
 	if( !workspace_local_set( mainw->ws, txt ) )
 		box_alert( GTK_WIDGET( mainw ) );
 	g_free( txt );
+
+	symbol_recalculate_all();
 }
 
 static void

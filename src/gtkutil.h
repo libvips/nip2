@@ -142,3 +142,5 @@ GtkWidget *image_new_from_file( const char *name );
 void vfatal( GError **error );
 
 char *text_view_get_text( GtkTextView *text_view );
+void text_view_set_text( GtkTextView *text_view, 
+	const char *text, gboolean editable );

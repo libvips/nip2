@@ -1,8 +1,4 @@
-- ws doesn't always update when we edit and process local defs?
-
-  add load/save of ws-locals
-
-  highlight on syntax error
+- don't remember pane positions nicely, how annoying
 
 - there's some left-recursion in the parser, eg. comma_list, is this easily
   fixable?

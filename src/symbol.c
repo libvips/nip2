@@ -340,15 +340,15 @@ symbol_strip( Symbol *sym )
 	printf( "\n" );
 #endif /*DEBUG_MAKE*/
 
+	/* Anything that refers to us will need a recomp.
+	 */
+	if( is_top( sym ) ) 
+		symbol_dirty_intrans( sym, link_serial_new() );
+
 	/* Clean out old exprinfo.
 	 */
 	icontainer_map( ICONTAINER( sym ),
 		(icontainer_map_fn) expr_strip, NULL, NULL );
-
-	/* Set inital state again. 
-	 */
-	if( is_top( sym ) ) 
-		symbol_dirty_clear( sym );
 
 	/* Free any top-links we made.
 	 */

@@ -86,6 +86,7 @@ typedef struct _FilemodelClass {
 } FilemodelClass;
 
 void filemodel_register( Filemodel *filemodel );
+void filemodel_unregister( Filemodel *filemodel );
 
 void *filemodel_top_load( Filemodel *filemodel, 
 	ModelLoadState *state, Model *parent, xmlNode *xnode );

@@ -1127,3 +1127,17 @@ text_view_set_text( GtkTextView *text_view,
 	gtk_text_view_set_editable( text_view, editable );
 	gtk_text_view_set_cursor_visible( text_view, editable );
 }
+
+void
+text_view_select_text( GtkTextView *text_view, int start, int end )
+{
+	GtkTextBuffer *text_buffer = gtk_text_view_get_buffer( text_view );
+	GtkTextMark *mark = gtk_text_buffer_get_insert( text_buffer );
+	GtkTextIter start_iter;
+	GtkTextIter end_iter;
+
+	gtk_text_buffer_get_iter_at_offset( text_buffer, &start_iter, start );
+	gtk_text_buffer_get_iter_at_offset( text_buffer, &end_iter, end );
+	gtk_text_buffer_select_range( text_buffer, &start_iter, &end_iter );
+	gtk_text_view_scroll_mark_onscreen( text_view, mark );
+}

@@ -70,6 +70,10 @@ tool_dispose( GObject *gobject )
 		tool->sym = NULL;
 
 		symbol_strip( sym );
+
+		/* Anything that referred to this symbol is going to need a
+		 * recalc.
+		 */
 	}
 
 	filemodel_set_modified( FILEMODEL( tool->kit ), TRUE );

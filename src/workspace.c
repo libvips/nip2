@@ -771,13 +771,19 @@ workspace_dispose( GObject *gobject )
 {
 	Workspace *ws;
 
+#ifdef DEBUG
+	printf( "workspace_dispose: %s\n", NN( IOBJECT( gobject )->name ) );
+#endif /*DEBUG*/
+
 	g_return_if_fail( gobject != NULL );
 	g_return_if_fail( IS_WORKSPACE( gobject ) );
 
 	ws = WORKSPACE( gobject );
 
-	IDESTROY( ws->sym );
 	IM_FREEF( g_source_remove, ws->auto_save_timeout );
+	UNREF( ws->kitg );
+	UNREF( ws->local_kitg );
+	IDESTROY( ws->sym );
 
 	G_OBJECT_CLASS( parent_class )->dispose( gobject );
 }
@@ -796,11 +802,8 @@ workspace_finalize( GObject *gobject )
 
 	ws = WORKSPACE( gobject );
 
-	UNREF( ws->kitg );
 	IM_FREE( ws->status );
 	IM_FREE( ws->local_defs );
-	UNREF( ws->local_kit );
-	UNREF( ws->local_kitg );
 
 	workspace_all = g_slist_remove( workspace_all, ws );
 
@@ -856,6 +859,8 @@ workspace_link( Workspace *ws, Workspacegroup *wsg, const char *name )
 	iobject_set( IOBJECT( ws ), name, NULL );
 
 	ws->local_kitg = toolkitgroup_new( ws->sym );
+	g_object_ref( G_OBJECT( ws->local_kitg ) );
+	iobject_sink( IOBJECT( ws->local_kitg ) );
 }
 
 static const char *
@@ -1856,9 +1861,12 @@ workspace_set_mode( Workspace *ws, WorkspaceMode mode )
 gboolean
 workspace_local_set( Workspace *ws, const char *txt )
 {
-	/* New kit for defs ... will destroy any old defs.
+	/* New kit for defs ... will destroy any old defs. Don't register it,
+	 * we don't want it to be autosaved on quit.
 	 */
 	ws->local_kit = toolkit_new( ws->local_kitg, "$$local" );
+	filemodel_unregister( FILEMODEL( ws->local_kit ) );
+
 	IM_SETSTR( ws->local_defs, txt );
 	filemodel_set_modified( FILEMODEL( ws ), TRUE );
 	attach_input_string( txt );

@@ -65,6 +65,24 @@ toolkit_dispose( GObject *gobject )
 }
 
 static void
+toolkit_finalize( GObject *gobject )
+{
+	Toolkit *kit;
+
+#ifdef DEBUG
+	printf( "toolkit_finalize: %p %s\n", 
+		gobject, NN( IOBJECT( gobject )->name ) );
+#endif /*DEBUG*/
+
+	g_return_if_fail( gobject != NULL );
+	g_return_if_fail( IS_TOOLKIT( gobject ) );
+
+	kit = TOOLKIT( gobject );
+
+	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+}
+
+static void
 toolkit_changed( iObject *iobject )
 {
 	/* If we change, signal change on our parent too (toolkitgroup) ...
@@ -147,6 +165,7 @@ toolkit_class_init( ToolkitClass *class )
 	/* Init methods.
 	 */
 	gobject_class->dispose = toolkit_dispose;
+	gobject_class->finalize = toolkit_finalize;
 
 	iobject_class->info = toolkit_info;
 	iobject_class->changed = toolkit_changed;
@@ -215,6 +234,10 @@ Toolkit *
 toolkit_new( Toolkitgroup *kitg, const char *name )
 {	
 	Toolkit *kit;
+
+#ifdef DEBUG
+	printf( "toolkit_new: %s\n", name );
+#endif /*DEBUG*/
 
 	/* Exists already?
 	 */

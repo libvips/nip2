@@ -1787,8 +1787,11 @@ mainw_process_cb( GtkWidget *wid, Mainw *mainw )
 	char *txt;
 
 	txt = text_view_get_text( GTK_TEXT_VIEW( mainw->text ) );
-	if( !workspace_local_set( mainw->ws, txt ) )
+	if( !workspace_local_set( mainw->ws, txt ) ) {
+		text_view_select_text( GTK_TEXT_VIEW( mainw->text ), 
+			input_state.charpos - yyleng, input_state.charpos );
 		box_alert( GTK_WIDGET( mainw ) );
+	}
 	g_free( txt );
 
 	symbol_recalculate_all();

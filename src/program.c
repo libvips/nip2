@@ -971,23 +971,6 @@ program_get_text( Program *program )
 	return( text );
 }
 
-/* Select a range in byte offset units. end == -1 means to end of buffer.
- */
-static void
-program_select_text( Program *program, int start, int end )
-{
-	GtkTextView *text_view = GTK_TEXT_VIEW( program->text );
-	GtkTextBuffer *text_buffer = gtk_text_view_get_buffer( text_view );
-	GtkTextMark *mark = gtk_text_buffer_get_insert( text_buffer );
-	GtkTextIter start_iter;
-	GtkTextIter end_iter;
-
-	gtk_text_buffer_get_iter_at_offset( text_buffer, &start_iter, start );
-	gtk_text_buffer_get_iter_at_offset( text_buffer, &end_iter, end );
-	gtk_text_buffer_select_range( text_buffer, &start_iter, &end_iter );
-	gtk_text_view_scroll_mark_onscreen( text_view, mark );
-}
-
 /* Read and parse the text.
  */
 static gboolean
@@ -1022,7 +1005,7 @@ program_parse( Program *program )
 	 */
 	attach_input_string( buffer );
 	if( !parse_onedef( program->kit, program->pos ) ) {
-		program_select_text( program, 
+		text_view_select_text( GTK_TEXT_VIEW( program->text ), 
 			input_state.charpos - yyleng, input_state.charpos );
 		return( FALSE );
 	}
@@ -1363,7 +1346,7 @@ program_delete_action_cb( GtkAction *action, Program *program )
 static void
 program_select_all_action_cb( GtkAction *action, Program *program )
 {
-	program_select_text( program, 0, -1 );
+	text_view_select_text( GTK_TEXT_VIEW( program->text ), 0, -1 );
 }
 
 static void
@@ -1442,7 +1425,7 @@ program_find_done_cb( iWindow *iwnd, void *client,
 
 	if( program_find( program ) ) {
 		program_select_tool( program, program->find_sym->tool );
-		program_select_text( program, 
+		text_view_select_text( GTK_TEXT_VIEW( program->text ), 
 			program->find_start, program->find_end );
 	}
 	else {
@@ -1491,7 +1474,7 @@ program_find_again_action_cb( GtkAction *action, Program *program )
 
 	if( program_find( program ) ) {
 		program_select_tool( program, program->find_sym->tool );
-		program_select_text( program, 
+		text_view_select_text( GTK_TEXT_VIEW( program->text ), 
 			program->find_start, program->find_end );
 	}
 	else

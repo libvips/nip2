@@ -66,7 +66,7 @@ filemodel_register( Filemodel *filemodel )
 	}
 }
 
-static void 
+void 
 filemodel_unregister( Filemodel *filemodel )
 {
 	if( filemodel->registered ) {

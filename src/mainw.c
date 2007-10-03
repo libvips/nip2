@@ -515,9 +515,6 @@ mainw_refresh( Mainw *mainw )
 	pane_set_visible( mainw->lpane, mainw->lpane_visible );
 	pane_set_visible( mainw->rpane, mainw->rpane_visible );
 
-	text_view_set_text( GTK_TEXT_VIEW( mainw->text ), 
-		ws->local_defs, TRUE );
-
 	mainw_jump_update( mainw, mainw->jump_to_column_menu );
 	mainw_jump_update( mainw, mainw->popup_jump );
 }
@@ -1779,24 +1776,6 @@ static const char *mainw_toolbar_ui_description =
 "  </toolbar>"
 "</ui>";
 
-/* "Process" in ws defs area.
- */
-static void
-mainw_process_cb( GtkWidget *wid, Mainw *mainw )
-{
-	char *txt;
-
-	txt = text_view_get_text( GTK_TEXT_VIEW( mainw->text ) );
-	if( !workspace_local_set( mainw->ws, txt ) ) {
-		text_view_select_text( GTK_TEXT_VIEW( mainw->text ), 
-			input_state.charpos - yyleng, input_state.charpos );
-		box_alert( GTK_WIDGET( mainw ) );
-	}
-	g_free( txt );
-
-	symbol_recalculate_all();
-}
-
 static void
 mainw_watch_changed_cb( Watchgroup *watchgroup, Watch *watch, Mainw *mainw )
 {
@@ -1819,9 +1798,6 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	GtkAccelGroup *accel_group;
 	GError *error;
 	GtkWidget *item;
-	GtkWidget *pbox;
-	GtkWidget *hbox;
-	GtkWidget *but;
 
 #ifdef DEBUG
 	printf( "mainw_init: %p\n", mainw );
@@ -1988,22 +1964,12 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 		GTK_WIDGET( mainw->toolkitbrowser ) );
 	gtk_widget_show( GTK_WIDGET( mainw->toolkitbrowser ) );
 
-	/* Make the program pane.
+	/* Workspace-local defs pane.
 	 */
-	pbox = gtk_vbox_new( FALSE, 2 );
-	gtk_paned_pack1( GTK_PANED( mainw->lpane ), pbox, TRUE, TRUE );
-	gtk_widget_show( pbox );
-	mainw->text = program_text_new();
-	gtk_box_pack_start( GTK_BOX( pbox ), mainw->text, TRUE, TRUE, 0 );
-	gtk_widget_show( mainw->text );
-	hbox = gtk_hbox_new( FALSE, 0 );
-	gtk_box_pack_end( GTK_BOX( pbox ), hbox, FALSE, FALSE, 0 );
-	gtk_widget_show( hbox );
-	but = gtk_button_new_with_label( _( "Process" ) );
-	gtk_box_pack_end( GTK_BOX( hbox ), but, FALSE, FALSE, 0 );
-	gtk_widget_show( but );
-        g_signal_connect( G_OBJECT( but ), "clicked",
-                G_CALLBACK( mainw_process_cb ), mainw );
+	mainw->workspacedefs = workspacedefs_new( mainw );
+	gtk_paned_pack1( GTK_PANED( mainw->lpane ), 
+		GTK_WIDGET( mainw->workspacedefs ), TRUE, TRUE );
+	gtk_widget_show( GTK_WIDGET( mainw->workspacedefs ) );
 
 	/* Set start state.
 	 */

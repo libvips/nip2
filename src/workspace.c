@@ -1866,8 +1866,9 @@ workspace_local_set( Workspace *ws, const char *txt )
 	 */
 	ws->local_kit = toolkit_new( ws->local_kitg, "$$local" );
 	filemodel_unregister( FILEMODEL( ws->local_kit ) );
-
 	IM_SETSTR( ws->local_defs, txt );
+	iobject_changed( IOBJECT( ws ) );
+
 	filemodel_set_modified( FILEMODEL( ws ), TRUE );
 	attach_input_string( txt );
 	if( !parse_toplevel( ws->local_kit, 0 ) ) 

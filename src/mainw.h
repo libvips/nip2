@@ -80,6 +80,7 @@ struct _Mainw {
 	 */
 	Toolkitgroupview *kitgview;
 	Toolkitbrowser *toolkitbrowser;
+	Workspacedefs *workspacedefs;
 	Workspaceview *wsview;
 	GtkActionGroup *action_group;
 	GtkUIManager *ui_manager;
@@ -95,9 +96,7 @@ struct _Mainw {
 	GtkWidget *space_free;	
 	GtkWidget *space_free_eb;	
 
-	GtkWidget *text;	
-
-	/* Left and righ panes ... program window and toolkit browser.
+	/* Left and right panes ... program window and toolkit browser.
 	 */
 	Pane *lpane;
 	Pane *rpane;

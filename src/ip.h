@@ -391,6 +391,7 @@ typedef void *(*tool_map_fn)( Tool *, void *, void * );
 
 /* Per module includes, any order
  */
+#include "workspacedefs.h"
 #include "toolkitbrowser.h"
 #include "trace.h"
 #include "program.h"

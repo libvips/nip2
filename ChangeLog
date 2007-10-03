@@ -6,6 +6,7 @@ started 7.13.1
 - added pane.[hc]
 - added a left pane to mainw to hold ws-local defs
 - ws-local defs sort-of work
+- added workspacedefs.[hc]
 
 started 7.13.0
 - woo, fork for new development version

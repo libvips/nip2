@@ -310,6 +310,8 @@ nip2_SOURCES = \
 	wild.h \
 	workspace.c \
 	workspace.h \
+	workspacedefs.c \
+	workspacedefs.h \
 	workspacegroup.c \
 	workspacegroup.h \
 	workspaceview.c \

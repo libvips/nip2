@@ -1,12 +1,4 @@
-- need a scrollbar for the local defs side pane
-
-  mainw_refresh kills edits, gah! only refresh the text if it's different from
-  the one there now and what's there now has not been edited
-
-  have a status area next to the process button saying "13 definitions, no
-  errors, not edited" or somesuch
-
-  right-button menu for load/save .def?
+- right-button menu for load/save .def?
 
 - don't remember pane positions nicely, how annoying
 

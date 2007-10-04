@@ -44,6 +44,10 @@ typedef struct _Workspacedefs {
 	Mainw *mainw;			/* Mainw whose workspace we explore */
 
 	GtkWidget *text;	
+	gboolean changed;		/* Text has been edited */
+	gboolean errors;		/* Error on last process */
+	guint text_hash;		/* Hash of the last text we set */
+	GtkWidget *status;	
 } Workspacedefs;
 
 typedef struct _WorkspacedefsClass {

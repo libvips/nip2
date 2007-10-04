@@ -28,8 +28,8 @@
  */
 
 /*
-#define DEBUG
  */
+#define DEBUG
 
 #include "ip.h"
 
@@ -44,18 +44,74 @@ workspacedefs_destroy( GtkObject *object )
 }
 
 static void
+workspacedefs_text_changed( GtkTextBuffer *buffer, 
+	Workspacedefs *workspacedefs )
+{
+#ifdef DEBUG
+	printf( "workspacedefs_text_changed\n" );
+#endif /*DEBUG*/
+
+	if( !workspacedefs->changed ) {
+		workspacedefs->changed = TRUE;
+
+#ifdef DEBUG
+		printf( "\t(changed = TRUE)\n" );
+#endif /*DEBUG*/
+
+		/* The workspace hasn't changed, but this will queue a refresh
+		 * on us.
+		 */
+		iobject_changed( IOBJECT( workspacedefs->mainw->ws ) );
+	}
+}
+
+static void
 workspacedefs_refresh( vObject *vobject )
 {
 	Workspacedefs *workspacedefs = WORKSPACEDEFS( vobject );
 	Mainw *mainw = workspacedefs->mainw;
 	Workspace *ws = mainw->ws;
+	BufInfo buf;
+	char txt[256];
 
 #ifdef DEBUG
 	printf( "workspacedefs_refresh:\n" );
 #endif /*DEBUG*/
 
-	text_view_set_text( GTK_TEXT_VIEW( workspacedefs->text ), 
-		ws->local_defs, TRUE );
+	if( !workspacedefs->changed ) {
+		guint text_hash = g_str_hash( ws->local_defs );
+
+		if( text_hash != workspacedefs->text_hash ) {
+			g_signal_handlers_block_by_func( 
+				gtk_text_view_get_buffer( 
+					GTK_TEXT_VIEW( workspacedefs->text ) ),
+				workspacedefs_text_changed, workspacedefs );
+			text_view_set_text( 
+				GTK_TEXT_VIEW( workspacedefs->text ), 
+				ws->local_defs, TRUE );
+			g_signal_handlers_unblock_by_func( 
+				gtk_text_view_get_buffer( 
+					GTK_TEXT_VIEW( workspacedefs->text ) ),
+				workspacedefs_text_changed, workspacedefs );
+
+			workspacedefs->text_hash = text_hash;
+		}
+	}
+
+	buf_init_static( &buf, txt, 512 );
+	if( workspacedefs->mainw->ws->local_kit ) 
+		buf_appendf( &buf, _( "%d definitions" ), 
+			icontainer_get_n_children( ICONTAINER( 
+				workspacedefs->mainw->ws->local_kit ) ) );
+	if( workspacedefs->errors ) {
+		buf_appendf( &buf, ", " ); 
+		buf_appendf( &buf, _( "errors " ) ); 
+	}
+	if( workspacedefs->changed ) {
+		buf_appendf( &buf, ", " ); 
+		buf_appendf( &buf, _( "modified" ) ); 
+	}
+	set_glabel( workspacedefs->status, "%s", buf_all( &buf ) );
 
 	VOBJECT_CLASS( parent_class )->refresh( vobject );
 }
@@ -82,11 +138,19 @@ workspacedefs_process_cb( GtkWidget *wid, Workspacedefs *workspacedefs )
 	Workspace *ws = mainw->ws;
 	char *txt;
 
+#ifdef DEBUG
+	printf( "workspacedefs_process_cb:\n" );
+	printf( "\tchanged = FALSE\n" );
+#endif /*DEBUG*/
+
 	txt = text_view_get_text( GTK_TEXT_VIEW( workspacedefs->text ) );
+	workspacedefs->changed = FALSE;
+	workspacedefs->errors = FALSE;
 	if( !workspace_local_set( ws, txt ) ) {
 		text_view_select_text( GTK_TEXT_VIEW( workspacedefs->text ), 
 			input_state.charpos - yyleng, input_state.charpos );
 		box_alert( GTK_WIDGET( mainw ) );
+		workspacedefs->errors = TRUE;
 	}
 	g_free( txt );
 
@@ -100,22 +164,38 @@ workspacedefs_init( Workspacedefs *workspacedefs )
 	GtkWidget *hbox;
 	GtkWidget *but;
 
+#ifdef DEBUG
+	printf( "workspacedefs_init:\n" );
+#endif /*DEBUG*/
+
+	workspacedefs->changed = FALSE;
+	workspacedefs->errors = FALSE;
+	workspacedefs->text_hash = 0;
+
 	swin = gtk_scrolled_window_new( NULL, NULL );
 	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( swin ),
 		GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
 	gtk_box_pack_start( GTK_BOX( workspacedefs ), swin, TRUE, TRUE, 0 );
 	gtk_widget_show( swin );
 	workspacedefs->text = program_text_new();
+        g_signal_connect( gtk_text_view_get_buffer( 
+		GTK_TEXT_VIEW( workspacedefs->text ) ), "changed",
+                G_CALLBACK( workspacedefs_text_changed ), workspacedefs );
 	gtk_container_add( GTK_CONTAINER( swin ), workspacedefs->text );
 	gtk_widget_show( workspacedefs->text );
 	hbox = gtk_hbox_new( FALSE, 0 );
 	gtk_box_pack_end( GTK_BOX( workspacedefs ), hbox, FALSE, FALSE, 0 );
 	gtk_widget_show( hbox );
 	but = gtk_button_new_with_label( _( "Process" ) );
-	gtk_box_pack_end( GTK_BOX( hbox ), but, FALSE, FALSE, 0 );
-	gtk_widget_show( but );
         g_signal_connect( G_OBJECT( but ), "clicked",
                 G_CALLBACK( workspacedefs_process_cb ), workspacedefs );
+	gtk_box_pack_end( GTK_BOX( hbox ), but, FALSE, FALSE, 0 );
+	gtk_widget_show( but );
+	workspacedefs->status = gtk_label_new( NULL );
+	gtk_misc_set_alignment( GTK_MISC( workspacedefs->status ), 1.0, 0.5 );
+	gtk_box_pack_end( GTK_BOX( hbox ), 
+		workspacedefs->status, TRUE, TRUE, 0 );
+	gtk_widget_show( workspacedefs->status );
 }
 
 GtkType

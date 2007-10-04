@@ -1967,6 +1967,7 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	/* Workspace-local defs pane.
 	 */
 	mainw->workspacedefs = workspacedefs_new( mainw );
+	vobject_link( VOBJECT( mainw->workspacedefs ), IOBJECT( mainw->ws ) );
 	gtk_paned_pack1( GTK_PANED( mainw->lpane ), 
 		GTK_WIDGET( mainw->workspacedefs ), TRUE, TRUE );
 	gtk_widget_show( GTK_WIDGET( mainw->workspacedefs ) );

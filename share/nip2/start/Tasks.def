@@ -305,7 +305,7 @@ Tasks_mosaic_item = class
 		= l'
 	{
 		// test for all elements of a list equal
-		all_equal l = land (map (equal (hd l)) (tl l));
+		all_equal l = all (map (equal (hd l)) (tl l));
 	
 		// all the different images
 		images = mkset pointer_equal (map get_image l);

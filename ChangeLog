@@ -8,6 +8,7 @@ started 7.13.1
 - ws-local defs sort-of work
 - added workspacedefs.[hc]
 - print all workspace mains on exit too
+- renamed lor/land as any/all, in line with Haskell
 
 started 7.13.0
 - woo, fork for new development version

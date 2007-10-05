@@ -68,11 +68,11 @@ is_suffix suffix str = take (len suffix) (reverse str) == reverse suffix;
  * is_substr "llo" "hello world!" == true
  * is_substr :: [*] -> [*] -> bool
  */
-is_substr seq str = lor (map (is_prefix seq) (iterate tl str));
+is_substr seq str = any (map (is_prefix seq) (iterate tl str));
 
 /* is_listof p s: true if finite list with p true for every element.
  */
-is_listof p l = is_list l && land (map p l);
+is_listof p l = is_list l && all (map p l);
 
 /* is_string s: true if finite list of char.
  */
@@ -91,12 +91,12 @@ is_string_list l = is_listof is_string l;
  */
 is_rectangular l
 	= true, !is_list l
-	= true, land (map is_obj l)
-	= true, land (map is_list l) &&
-		land (map (not @ is_obj) l) &&
-		land (map is_rectangular l) &&
+	= true, all (map is_obj l)
+	= true, all (map is_list l) &&
+		all (map (not @ is_obj) l) &&
+		all (map is_rectangular l) &&
 		len l > 0 &&
-		land (map (equal (hd lengths)) (tl lengths))
+		all (map (equal (hd lengths)) (tl lengths))
 	= false
 {
 	// treat strings as a base type, not [char]
@@ -173,15 +173,15 @@ is_String x = is_instanceof "String" x;
 /* A list of the form [[1,2],[3,4],[5,6]...]
  */
 is_xy_list l 
-	= is_list l && land (map xy l)
+	= is_list l && all (map xy l)
 {
 	xy l = is_real_list l && len l == 2;
 }
 
 // does a nested list structure contain a Group object?
 contains_Group l
-	= true, is_list l && lor (map is_Group l)
-	= lor (map contains_Group l), is_list l
+	= true, is_list l && any (map is_Group l)
+	= any (map contains_Group l), is_list l
 	= false;
 
 /* Does an object have a sensible VIPS type?

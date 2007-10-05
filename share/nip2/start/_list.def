@@ -1,3 +1,17 @@
+/* any l: or all the elements of list l together
+ *
+ * any (map (equal 0) list) == true, if any element of list is zero.
+ * any :: [bool] -> bool
+ */
+any = foldr logical_or false;
+
+/* all l: and all the elements of list l together
+ *
+ * all (map (==0) list) == true, if every element of list is zero.
+ * all :: [bool] -> bool
+ */
+all = foldr logical_and true;
+
 /* concat l: join a list of lists together
  *
  * concat ["abc","def"] == "abcdef".
@@ -117,13 +131,6 @@ init l
  */
 iterate f x = x : iterate f (f x);
 
-/* land l: and all the elements of list l together
- *
- * land (map (==0) list) == true, if every element of list is zero.
- * land :: [bool] -> bool
- */
-land = foldr logical_and true;
-
 /* last l: return the last element of list l
  *
  * The dual of hd. last [1,2,3] == 3
@@ -168,13 +175,6 @@ list_4ary fn x = fn x?0 x?1 x?2 x?3;
 list_5ary fn x = fn x?0 x?1 x?2 x?3 x?4;
 list_6ary fn x = fn x?0 x?1 x?2 x?3 x?4 x?5;
 list_7ary fn x = fn x?0 x?1 x?2 x?3 x?4 x?5 x?6;
-
-/* lor l: or all the elements of list l together
- *
- * lor (map (equal 0) list) == true, if any element of list is zero.
- * lor :: [bool] -> bool
- */
-lor = foldr logical_or false;
 
 /* map fn l: map function fn over list l
  *

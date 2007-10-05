@@ -453,7 +453,7 @@ Group value = class
 			shortest = foldr1 min_pair (map (len @ get_value) groups);
 
 			process n
-				= [], lor (map (is_noval n) args)
+				= [], any (map (is_noval n) args)
 				= map_nary fn (map (extract n) args)
 			{
 				extract n arg
@@ -486,7 +486,7 @@ Group value = class
 			shortest = foldr1 min_pair (map (len @ get_value) groups);
 
 			process n
-				= [], lor (map (is_noval n) args)
+				= [], any (map (is_noval n) args)
 				= map_nary fn (map (extract n) args)
 			{
 				extract n arg

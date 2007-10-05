@@ -176,9 +176,15 @@ main_log_null( const char *log_domain, GLogLevelFlags log_level,
 /* Print all errors and quit. Batch mode only.
  */
 static void
-main_error_exit( const char *msg )
+main_error_exit( const char *fmt, ... )
 {
-	fprintf( stderr, "%s %s\n", 
+	va_list args;
+
+        va_start( args, fmt );
+        (void) vfprintf( stderr, fmt, args );
+        va_end( args );
+
+	fprintf( stderr, "\n%s %s\n", 
 		error_get_top(), error_get_sub() );
 
 	if( main_option_verbose ) {
@@ -188,10 +194,47 @@ main_error_exit( const char *msg )
 		buf_init_static( &buf, txt, MAX_STRSIZE );
 		expr_error_print_all( &buf );
 		fprintf( stderr, "%s\n", buf_all( &buf ) );
-		error( msg );
 	}
 
 	exit( 1 );
+}
+
+/* Output a single main.
+ */
+static void
+main_print_main( Symbol *sym )
+{
+	PElement *root;
+
+	root = &sym->expr->root;
+	if( symbol_recalculate_check( sym ) || 
+		!reduce_pelement( reduce_context, reduce_spine_strict, root ) ) 
+		main_error_exit( _( "error calculating \"%s\"" ), 
+			symbol_name( sym ) );
+
+	if( main_option_output ) {
+		char filename[FILENAME_MAX];
+
+		im_strncpy( filename, main_option_output, FILENAME_MAX );
+		(void) save_objects( root, filename );
+	}
+
+	if( main_option_print_main )
+		graph_value( root );
+}
+
+static void *
+main_print_ws( Workspace *ws, gboolean *found )
+{
+	Symbol *sym;
+
+	if( (sym = compile_lookup( 
+		ws->sym->expr->compile, "main" )) ) {
+		main_print_main( sym );
+		*found = TRUE;
+	}
+
+	return( NULL );
 }
 
 /* Clean up our application and quit. Not interactive! Do any "has been
@@ -210,30 +253,23 @@ main_quit( void )
 
 	if( main_option_print_main || main_option_output ) {
 		Symbol *sym;
-		PElement *root;
+		gboolean found;
 
 		symbol_recalculate_all();
 
-		sym = compile_lookup( symbol_root->expr->compile, "main" );
-
-		if( !sym )
-			main_error_exit( _( "symbol \"main\" not found" ) );
-		root = &sym->expr->root;
-		if( symbol_recalculate_check( sym ) || 
-			!reduce_pelement( reduce_context, 
-				reduce_spine_strict, root ) ) 
-			main_error_exit( _( "error calculating \"main\"" ) );
-
-		if( main_option_output ) {
-			char filename[FILENAME_MAX];
-
-			im_strncpy( filename, main_option_output, 
-				FILENAME_MAX );
-			(void) save_objects( root, filename );
+		/* Process all the mains we can find: one at the top level,
+		 * one in each workspace.
+		 */
+		found = FALSE;
+		if( (sym = compile_lookup( 
+			symbol_root->expr->compile, "main" )) ) {
+			main_print_main( sym );
+			found = TRUE;
 		}
+		workspace_map( (workspace_map_fn) main_print_ws, &found, NULL );
 
-		if( main_option_print_main )
-			graph_value( root );
+		if( !found )
+			main_error_exit( "%s", _( "no \"main\" found" ) );
 	}
 
 	/* Force all windows down. 

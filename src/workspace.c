@@ -1864,7 +1864,7 @@ workspace_local_set( Workspace *ws, const char *txt )
 	/* New kit for defs ... will destroy any old defs. Don't register it,
 	 * we don't want it to be autosaved on quit.
 	 */
-	ws->local_kit = toolkit_new( ws->local_kitg, "$$local" );
+	ws->local_kit = toolkit_new( ws->local_kitg, "Workspace Locals" );
 	filemodel_unregister( FILEMODEL( ws->local_kit ) );
 	IM_SETSTR( ws->local_defs, txt );
 	iobject_changed( IOBJECT( ws ) );
@@ -1873,6 +1873,32 @@ workspace_local_set( Workspace *ws, const char *txt )
 	attach_input_string( txt );
 	if( !parse_toplevel( ws->local_kit, 0 ) ) 
 		return( FALSE );
+
+	return( TRUE );
+}
+
+gboolean
+workspace_local_set_from_file( Workspace *ws, const char *fname )
+{
+	iOpenFile *of;
+	char *txt;
+
+	if( !(of = file_open_read( "%s", fname )) ) 
+		return( FALSE );
+	if( !(txt = file_read( of )) ) {
+		file_close( of );
+		return( FALSE );
+	}
+	if( !workspace_local_set( ws, txt ) ) {
+		g_free( txt );
+		file_close( of );
+		return( FALSE );
+	}
+
+	filemodel_set_filename( FILEMODEL( ws->local_kit ), fname );
+
+	g_free( txt );
+	file_close( of );
 
 	return( TRUE );
 }

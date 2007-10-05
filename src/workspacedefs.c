@@ -28,8 +28,8 @@
  */
 
 /*
- */
 #define DEBUG
+ */
 
 #include "ip.h"
 
@@ -99,16 +99,21 @@ workspacedefs_refresh( vObject *vobject )
 	}
 
 	buf_init_static( &buf, txt, 512 );
-	if( workspacedefs->mainw->ws->local_kit ) 
-		buf_appendf( &buf, _( "%d definitions" ), 
-			icontainer_get_n_children( ICONTAINER( 
-				workspacedefs->mainw->ws->local_kit ) ) );
+	if( workspacedefs->mainw->ws->local_kit ) {
+		int n = icontainer_get_n_children( ICONTAINER( 
+			workspacedefs->mainw->ws->local_kit ) );
+
+		buf_appendf( &buf, ngettext( "%d definition", 
+			"%d definitions", n ), n );
+	}
 	if( workspacedefs->errors ) {
-		buf_appendf( &buf, ", " ); 
-		buf_appendf( &buf, _( "errors " ) ); 
+		if( !buf_is_empty( &buf ) )
+			buf_appendf( &buf, ", " ); 
+		buf_appendf( &buf, _( "errors" ) ); 
 	}
 	if( workspacedefs->changed ) {
-		buf_appendf( &buf, ", " ); 
+		if( !buf_is_empty( &buf ) )
+			buf_appendf( &buf, ", " ); 
 		buf_appendf( &buf, _( "modified" ) ); 
 	}
 	set_glabel( workspacedefs->status, "%s", buf_all( &buf ) );
@@ -129,13 +134,119 @@ workspacedefs_class_init( WorkspacedefsClass *class )
 	vobject_class->refresh = workspacedefs_refresh;
 }
 
+static gboolean
+workspacedefs_set_text_from_file( Workspacedefs *workspacedefs, 
+	const char *fname )
+{
+	Mainw *mainw = workspacedefs->mainw;
+	Workspace *ws = mainw->ws;
+
+	workspacedefs->changed = FALSE;
+	workspacedefs->errors = FALSE;
+	if( !workspace_local_set_from_file( ws, fname ) ) {
+		text_view_select_text( GTK_TEXT_VIEW( workspacedefs->text ), 
+			input_state.charpos - yyleng, input_state.charpos );
+		workspacedefs->errors = TRUE;
+
+		return( FALSE );
+	}
+
+	symbol_recalculate_all();
+
+	return( TRUE );
+}
+
+/* Callback from load browser.
+ */
+static void
+workspacedefs_load_file_cb( iWindow *iwnd, 
+	void *client, iWindowNotifyFn nfn, void *sys )
+{
+	Filesel *filesel = FILESEL( iwnd );
+	Workspacedefs *workspacedefs = WORKSPACEDEFS( client );
+	char *fname;
+
+	if( !(fname = filesel_get_filename( filesel )) ) 
+		nfn( sys, IWINDOW_ERROR );
+	else {
+		if( !workspacedefs_set_text_from_file( workspacedefs, 
+			fname ) ) 
+			nfn( sys, IWINDOW_ERROR );
+
+		g_free( fname );
+	}
+
+	nfn( sys, IWINDOW_TRUE );
+}
+
+static void
+workspacedefs_replace_cb( GtkWidget *wid, Workspacedefs *workspacedefs )
+{
+	Mainw *mainw = workspacedefs->mainw;
+	GtkWidget *filesel;
+
+	filesel = filesel_new();
+	iwindow_set_title( IWINDOW( filesel ), 
+		_( "Replace Definition From File" ) );
+	filesel_set_flags( FILESEL( filesel ), FALSE, FALSE );
+	filesel_set_filetype( FILESEL( filesel ), filesel_type_definition, 0 ); 
+	iwindow_set_parent( IWINDOW( filesel ), GTK_WIDGET( mainw ) );
+	filesel_set_done( FILESEL( filesel ), 
+		workspacedefs_load_file_cb, workspacedefs );
+	iwindow_build( IWINDOW( filesel ) );
+
+	gtk_widget_show( GTK_WIDGET( filesel ) );
+}
+
+static void
+workspacedefs_save_as_cb( GtkWidget *wid, Workspacedefs *workspacedefs )
+{
+	Mainw *mainw = workspacedefs->mainw;
+	Workspace *ws = mainw->ws;
+
+	if( ws->local_kit )
+		filemodel_inter_saveas( IWINDOW( workspacedefs->mainw ), 
+			FILEMODEL( ws->local_kit ) );
+}
+
+static void
+workspacedefs_hide_cb( GtkWidget *wid, Workspacedefs *workspacedefs )
+{
+	Mainw *mainw = workspacedefs->mainw;
+	Workspace *ws = mainw->ws;
+
+	/* Yuk! Shouldn't really look at mainw's insides.
+	 */
+	mainw->lpane_visible = FALSE;
+	iobject_changed( IOBJECT( ws ) );
+}
+
+static gboolean
+workspacedefs_set_text( Workspacedefs *workspacedefs, const char *txt )
+{
+	Mainw *mainw = workspacedefs->mainw;
+	Workspace *ws = mainw->ws;
+
+	workspacedefs->changed = FALSE;
+	workspacedefs->errors = FALSE;
+	if( !workspace_local_set( ws, txt ) ) {
+		text_view_select_text( GTK_TEXT_VIEW( workspacedefs->text ), 
+			input_state.charpos - yyleng, input_state.charpos );
+		workspacedefs->errors = TRUE;
+
+		return( FALSE );
+	}
+
+	symbol_recalculate_all();
+
+	return( TRUE );
+}
+
 /* "Process" in defs area.
  */
 static void
 workspacedefs_process_cb( GtkWidget *wid, Workspacedefs *workspacedefs )
 {
-	Mainw *mainw = workspacedefs->mainw;
-	Workspace *ws = mainw->ws;
 	char *txt;
 
 #ifdef DEBUG
@@ -144,24 +255,19 @@ workspacedefs_process_cb( GtkWidget *wid, Workspacedefs *workspacedefs )
 #endif /*DEBUG*/
 
 	txt = text_view_get_text( GTK_TEXT_VIEW( workspacedefs->text ) );
-	workspacedefs->changed = FALSE;
-	workspacedefs->errors = FALSE;
-	if( !workspace_local_set( ws, txt ) ) {
-		text_view_select_text( GTK_TEXT_VIEW( workspacedefs->text ), 
-			input_state.charpos - yyleng, input_state.charpos );
-		box_alert( GTK_WIDGET( mainw ) );
-		workspacedefs->errors = TRUE;
-	}
+	if( !workspacedefs_set_text( workspacedefs, txt ) )
+		box_alert( GTK_WIDGET( workspacedefs->mainw ) );
 	g_free( txt );
-
-	symbol_recalculate_all();
 }
 
 static void
 workspacedefs_init( Workspacedefs *workspacedefs )
 {
+	GtkWidget *pane;
 	GtkWidget *swin;
 	GtkWidget *hbox;
+	GtkWidget *arrow;
+	GtkWidget *mb;
 	GtkWidget *but;
 
 #ifdef DEBUG
@@ -171,6 +277,15 @@ workspacedefs_init( Workspacedefs *workspacedefs )
 	workspacedefs->changed = FALSE;
 	workspacedefs->errors = FALSE;
 	workspacedefs->text_hash = 0;
+
+	pane = menu_build( _( "Workspace definitions" ) );
+	menu_add_but( pane, _( "Replace From _File" ),
+		GTK_SIGNAL_FUNC( workspacedefs_replace_cb ), workspacedefs );
+	menu_add_but( pane, GTK_STOCK_SAVE_AS,
+		GTK_SIGNAL_FUNC( workspacedefs_save_as_cb ), workspacedefs );
+	menu_add_sep( pane );
+	menu_add_but( pane, GTK_STOCK_CLOSE,
+		GTK_SIGNAL_FUNC( workspacedefs_hide_cb ), workspacedefs );
 
 	swin = gtk_scrolled_window_new( NULL, NULL );
 	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( swin ),
@@ -183,9 +298,22 @@ workspacedefs_init( Workspacedefs *workspacedefs )
                 G_CALLBACK( workspacedefs_text_changed ), workspacedefs );
 	gtk_container_add( GTK_CONTAINER( swin ), workspacedefs->text );
 	gtk_widget_show( workspacedefs->text );
-	hbox = gtk_hbox_new( FALSE, 0 );
+
+	hbox = gtk_hbox_new( FALSE, 7 );
 	gtk_box_pack_end( GTK_BOX( workspacedefs ), hbox, FALSE, FALSE, 0 );
 	gtk_widget_show( hbox );
+
+	mb = gtk_menu_bar_new();
+	gtk_box_pack_end( GTK_BOX( hbox ), mb, FALSE, FALSE, 0 );
+	gtk_widget_show( mb );
+	but = gtk_menu_item_new();
+	gtk_menu_item_set_submenu( GTK_MENU_ITEM( but ), pane );
+	gtk_menu_bar_append( GTK_MENU_BAR( mb ), but );
+	gtk_widget_show( but );
+        arrow = gtk_arrow_new( GTK_ARROW_RIGHT, GTK_SHADOW_OUT );
+        gtk_container_add( GTK_CONTAINER( but ), arrow );
+	gtk_widget_show( arrow );
+
 	but = gtk_button_new_with_label( _( "Process" ) );
         g_signal_connect( G_OBJECT( but ), "clicked",
                 G_CALLBACK( workspacedefs_process_cb ), workspacedefs );

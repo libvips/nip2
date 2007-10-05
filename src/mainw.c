@@ -503,6 +503,11 @@ mainw_refresh( Mainw *mainw )
         widget_visible( mainw->statusbar_main, mainw->statusbar_visible );
 
 	action = gtk_action_group_get_action( mainw->action_group, 
+		"WorkspaceDefs" );
+	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
+		mainw->lpane_visible );
+
+	action = gtk_action_group_get_action( mainw->action_group, 
 		"ToolkitBrowser" );
 	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
 		mainw->rpane_visible );

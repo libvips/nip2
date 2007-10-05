@@ -1,5 +1,3 @@
-- right-button menu for load/save .def?
-
 - don't remember pane positions nicely, how annoying
 
 - there's some left-recursion in the parser, eg. comma_list, is this easily

@@ -199,3 +199,4 @@ void workspace_set_status( Workspace *ws, const char *fmt, ... )
 void workspace_set_mode( Workspace *ws, WorkspaceMode mode );
 
 gboolean workspace_local_set( Workspace *ws, const char *txt );
+gboolean workspace_local_set_from_file( Workspace *ws, const char *fname );

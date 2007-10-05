@@ -1637,7 +1637,7 @@ static GtkActionEntry mainw_actions[] = {
 		G_CALLBACK( mainw_preferences_action_cb ) },
 
 	{ "EditToolkits", 
-		NULL, N_( "Edit _Toolkits" ), NULL,
+		NULL, N_( "_Edit" ), NULL,
 		N_( "Edit toolkits" ), 
 		G_CALLBACK( mainw_program_new_action_cb ) },
 

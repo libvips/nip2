@@ -773,6 +773,7 @@ program_init( Program *program )
 
 	program->text = NULL;
 	program->dirty = FALSE;
+	program->text_hash = 0;
 	program->tree = NULL;
 	program->store = NULL;
 	program->pane_position = PROGRAM_PANE_POSITION;
@@ -838,7 +839,14 @@ program_kit_destroy( Toolkit *kit, Program *program )
 static void
 program_set_text( Program *program, const char *text, gboolean editable )
 {
-	text_view_set_text( GTK_TEXT_VIEW( program->text ), text, editable );
+	guint text_hash = g_str_hash( text );
+
+	if( text_hash != program->text_hash ) {
+		text_view_set_text( GTK_TEXT_VIEW( program->text ), 
+			text, editable );
+		program->text_hash = text_hash;
+	}
+
 	program->dirty = FALSE;
 }
 
@@ -982,9 +990,11 @@ program_parse( Program *program )
 	if( !program->dirty )
 		return( TRUE );
 
-	/* Irritatingly, we need to append a ';'.
+	/* Irritatingly, we need to append a ';'. Also, update the hash, so we
+	 * don't set the same text back again if we can help it.
 	 */
 	txt = program_get_text( program );
+	program->text_hash = g_str_hash( txt );
 	im_snprintf( buffer, MAX_STRSIZE, "%s;", txt );
 	IM_FREEF( g_free, txt );
 

@@ -229,6 +229,7 @@ workspacedefs_set_text( Workspacedefs *workspacedefs, const char *txt )
 
 	workspacedefs->changed = FALSE;
 	workspacedefs->errors = FALSE;
+	workspacedefs->text_hash = g_str_hash( txt );
 	if( !workspace_local_set( ws, txt ) ) {
 		text_view_select_text( GTK_TEXT_VIEW( workspacedefs->text ), 
 			input_state.charpos - yyleng, input_state.charpos );

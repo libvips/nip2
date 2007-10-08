@@ -201,7 +201,7 @@ map3 fn l1 l2 l3 = map (list_3ary fn) (zip3 l1 l2 l3);
  * is_digit == member "0123456789"
  * member :: [*] -> * -> bool
  */
-member l x = lor (map (equal x) l);
+member l x = any (map (equal x) l);
 
 /* merge b l r: merge two lists based on a bool list
  *

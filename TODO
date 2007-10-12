@@ -1,3 +1,5 @@
+- quit while a thumbnail is painting: IMAGEs are leaked
+
 - manual needs updating for ws defs
 
 - don't remember pane positions nicely, how annoying

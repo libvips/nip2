@@ -80,7 +80,7 @@ Image_new_item = class
 
 		Move_item = class
 			Menuaction "From Region" 
-				"new region using existing region as a guide" {
+				"new region on image using existing region as a guide" {
 			action a b 
 				= map_binary process a b
 			{

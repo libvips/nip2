@@ -3156,40 +3156,6 @@ recent_save( GSList *recent, const char *filename )
 	recent_free( old_recent );
 }
 
-/* Add symbol drag to the target list.
- */
-void
-set_symbol_drag_type( GtkWidget *widget )
-{
-	static const GtkTargetEntry targets[] = {
-		{ "text/symbol", 0, TARGET_SYMBOL }
-	};
-
-	GtkTargetList *target_list;
-
-	if( !GTK_WIDGET_REALIZED( widget ) ) 
-		return;
-
-	/* We can't always set the dest types, since we're probably already a
-	 * filedrop. Just add to the target list.
-	 */
-	if( (target_list = 
-		gtk_drag_dest_get_target_list( widget )) )
-		gtk_target_list_add_table( target_list, 
-			targets, IM_NUMBER( targets ) );
-	else
-		gtk_drag_dest_set( widget,
-			GTK_DEST_DEFAULT_HIGHLIGHT | GTK_DEST_DEFAULT_MOTION | 
-				GTK_DEST_DEFAULT_DROP,
-			targets, IM_NUMBER( targets ),
-			GDK_ACTION_COPY );
-
-	gtk_drag_source_set( widget,
-		GDK_BUTTON1_MASK | GDK_BUTTON3_MASK,
-		targets, IM_NUMBER( targets ),
-		GDK_ACTION_COPY | GDK_ACTION_MOVE );
-}
-
 /* Return the name of the save dir we use ... eg. "/home/john/.nip2-7.10.8",
  * or maybe "C:\Documents and Settings\john\Application Data"
  */

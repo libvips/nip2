@@ -1,8 +1,36 @@
+- you might think this would work:
+
+	nip2 -e "Workspaces.stdin.E15.value" -w -o page1.png \
+		ref_book1_up.tiff book*.tiff < calib.ws
+
+  ie. load a workspace which processes argv, use -e to make a main which saves
+  the ws output
+
+  BUT: -e turns on "don't load menus" which will (mostly) prevent the WS
+  working
+
+- have a toggle in find colour calib for "linearise"
+
+  another option that uses the greyscale to set the zero, but does not adjust
+  gamma?
+
+- find colour calib should show LUT using Plot rather than Image
+
+- apply calib should work for groups
+
+- Hist / New should be "Plot [] (im_identity 1)" or similar, and have
+  the tone thing as a custom tone curve
+
+- "nip2 -w < test.ws", then modify workspace, then CTRL-S saves as a file
+  called "stdin" ... o.O
+
 - quit while a thumbnail is painting: IMAGEs are leaked
 
 - manual needs updating for ws defs
 
 - don't remember pane positions nicely, how annoying
+
+  save in workspace file?
 
 - there's some left-recursion in the parser, eg. comma_list, is this easily
   fixable?

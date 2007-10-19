@@ -341,13 +341,4 @@ GSList *recent_load( const char *filename );
 void recent_free( GSList *recent );
 void recent_save( GSList *recent, const char *filename );
 
-/* Tag our thumbnail drag-n-drops with these. Start up a bit to leave room for 
- * filedrop.
- */
-enum {
-	TARGET_SYMBOL = 99
-};
-
-void set_symbol_drag_type( GtkWidget *widget );
-
 const char *get_savedir( void );

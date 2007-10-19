@@ -128,6 +128,15 @@ GtkWidget *build_goption( GtkWidget *box, GtkSizeGroup *group,
 typedef gboolean (*FiledropFunc)( void *client, const char *file );
 void filedrop_register( GtkWidget *widget, FiledropFunc fn, void *client );
 
+/* Tag our thumbnail drag-n-drops with these. Start up a bit to leave room for 
+ * filedrop.
+ */
+enum {
+	TARGET_SYMBOL = 99
+};
+
+void set_symbol_drag_type( GtkWidget *widget );
+
 void listen_add( GObject *gobject, GObject **zap, 
 	const char *name, GCallback gcallback );
 

@@ -1,3 +1,22 @@
+- how about
+
+	nip2 --set="A1=12" fred.ws
+
+  loads fred.ws, sets A1 to 12, recalcs
+
+  also:
+
+	nip2 --set="A1=12" --set="main=A9" -o fred.png fred.ws
+
+  might need
+
+	nip2 --set="Workspaces.fred.A1=12" \
+		--set="main=Workspaces.fred.A9" -o fred.png fred.ws
+
+  I guess
+
+  much more convenient command-line use of workspaces
+
 - you might think this would work:
 
 	nip2 -e "Workspaces.stdin.E15.value" -w -o page1.png \

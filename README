@@ -99,6 +99,8 @@ valgrind --suppressions=/home/john/nip2.supp --leak-check=yes nip2 ...
 
 valgrind --suppressions=/home/john/nip2.supp --leak-check=no --db-attach=yes nip2 ...
 
+or put "--suppressions=/home/john/nip2.supp" into ~/.valgrindrc 
+
 Disclaimer: No guarantees of performance accompany this software, nor is any
 responsibility assumed on the part of the authors. Please read the licence
 agreement.

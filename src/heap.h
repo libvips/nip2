@@ -390,6 +390,7 @@ gboolean heap_complex_element_new( Heap *heap,
 	PElement *rp, PElement *ip, PElement *out );
 gboolean heap_complex_new( Heap *heap, double rp, double ip, PElement *out );
 gboolean heap_realvec_new( Heap *heap, int n, double *vec, PElement *out );
+gboolean heap_intvec_new( Heap *heap, int n, int *vec, PElement *out );
 void heap_list_init( PElement *list );
 gboolean heap_list_add( Heap *heap, PElement *list, PElement *data );
 gboolean heap_list_next( PElement *list );

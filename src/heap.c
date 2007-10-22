@@ -1145,6 +1145,33 @@ heap_realvec_new( Heap *heap, int n, double *vec, PElement *out )
 	return( TRUE );
 }
 
+/* Make a realvec, but from an int*.
+ */
+gboolean
+heap_intvec_new( Heap *heap, int n, int *vec, PElement *out )
+{
+	PElement list = *out;
+	int i;
+
+	/* Make first RHS ... the end of the list. 
+	 */
+	heap_list_init( &list );
+
+	/* Build a CONS node for each element. 
+	 */
+	for( i = 0; i < n; i++ ) {
+		PElement t;
+
+		if( !heap_list_add( heap, &list, &t ) )
+			return( FALSE );
+		if( !heap_real_new( heap, (double) vec[i], &t ) )
+			return( FALSE );
+		(void) heap_list_next( &list );
+	}
+
+	return( TRUE );
+}
+
 /* Make a matrix.
  */
 gboolean

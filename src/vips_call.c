@@ -1442,6 +1442,24 @@ vips_toip( VipsInfo *vi, int i, int *outiiindex, PElement *arg )
 			reduce_throw( vi->rc );
 		break;
 
+	case VIPS_DOUBLEVEC:
+	{
+		im_doublevec_object *dv = obj;
+
+		if( !heap_realvec_new( vi->rc->heap, dv->n, dv->vec, arg ) )
+			reduce_throw( vi->rc );
+		break;
+	}
+
+	case VIPS_INTVEC:
+	{
+		im_intvec_object *iv = obj;
+
+		if( !heap_intvec_new( vi->rc->heap, iv->n, iv->vec, arg ) )
+			reduce_throw( vi->rc );
+		break;
+	}
+
 	case VIPS_COMPLEX:
 		if( !heap_complex_new( vi->rc->heap, 
 			((double*)obj)[0], ((double*)obj)[1], arg ) )
@@ -1491,7 +1509,6 @@ vips_toip( VipsInfo *vi, int i, int *outiiindex, PElement *arg )
 			reduce_throw( vi->rc );
 		break;
 
-	case VIPS_DOUBLEVEC:
 	case VIPS_IMAGEVEC:
 	default:
 		assert( FALSE );
@@ -1728,11 +1745,17 @@ vips_build_output( VipsInfo *vi, int i )
 
 	case VIPS_DOUBLEVEC:
 	case VIPS_INTVEC:
-		/* 
-
-			FIXME ... add these as output args
-
+	{
+		/* intvev is also int + pointer.
 		 */
+		im_doublevec_object *dv = vi->vargv[i];
+
+		dv->n = 0;
+		dv->vec = NULL;
+
+		break;
+	}
+
 	default:
 		assert( FALSE );
 	}

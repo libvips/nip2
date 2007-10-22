@@ -86,6 +86,7 @@ static gboolean main_option_no_load_args = FALSE;
 static gboolean main_option_stdin_ws = FALSE;
 static gboolean main_option_stdin_def = FALSE;
 static char *main_option_output = NULL;
+static char **main_option_set = NULL;
 static gboolean main_option_benchmark = FALSE;
 gboolean main_option_time_save = FALSE;
 gboolean main_option_i18n = FALSE;
@@ -104,6 +105,8 @@ static GOptionEntry main_option[] = {
 		N_( "write value of 'main' to FILE" ), "FILE" },
 	{ "batch", 'b', 0, G_OPTION_ARG_NONE, &main_option_batch, 
 		N_( "run in batch mode" ), NULL },
+	{ "set", '=', 0, G_OPTION_ARG_STRING_ARRAY, &main_option_set, 
+		N_( "set values" ), NULL },
 	{ "verbose", 'V', 0, G_OPTION_ARG_NONE, &main_option_verbose, 
 		N_( "verbose error output" ), NULL },
 	{ "no-load-menus", 'm', 0, G_OPTION_ARG_NONE, 
@@ -1314,6 +1317,13 @@ main( int argc, char *argv[] )
 				main_log_get() );
 			exit( 1 );
 		}
+	}
+
+	if( main_option_set ) {
+		int i;
+
+		for( i = 0; main_option_set[i]; i++ ) 
+			printf( "set '%s'\n", main_option_set[i] );
 	}
 
 	/* Recalc to load any args.

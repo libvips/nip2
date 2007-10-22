@@ -2,6 +2,8 @@
 
 	nip2 --set="A1=12" fred.ws
 
+	nip2 -t A1=12 fred.ws
+
   loads fred.ws, sets A1 to 12, recalcs
 
   also:

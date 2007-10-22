@@ -1116,7 +1116,7 @@ Image_format = class {
 			255,		// FLOAT
 			255,		// COMPLEX
 			255,		// DOUBLE
-			255		// DPCOMPLEX
+			255			// DPCOMPLEX
 		] ? fmt, fmt >= 0 && fmt <= DPCOMPLEX
 		= error (_ "bad value for BandFmt");
 }

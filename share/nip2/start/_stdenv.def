@@ -1204,6 +1204,39 @@ rank_image n x
 	}
 }
 
+greyc iterations amplitude sharpness anisotropy alpha
+	sigma dl da gauss_prec interpolation fast_approx x
+	= oo_unary_function greyc_op x, is_class x
+	= greyc_im x, is_image x
+	= error (_ "bad argument" ++ " (" ++ print x ++ ") to " ++ "greyc")
+{
+	greyc_op = Operator "greyc" (greyc
+			iterations amplitude sharpness anisotropy alpha
+			sigma dl da gauss_prec interpolation fast_approx)
+		Operator_type.COMPOUND_REWRAP false;
+	greyc_im x = im_greyc x
+		iterations amplitude sharpness anisotropy alpha
+		sigma dl da gauss_prec interpolation fast_approx;
+}
+
+greyc_mask iterations amplitude sharpness anisotropy alpha
+	sigma dl da gauss_prec interpolation fast_approx mask x
+	= oo_binary_function greyc_mask_op mask x, is_class mask
+	= oo_binary'_function greyc_mask_op mask x, is_class x
+	= greyc_im mask x, is_image mask && is_image x
+	= error (_ "bad arguments" ++ 
+		" (" ++ print mask ++ ", " ++ print x ++ ") " ++
+		"to " ++ "greyc")
+{
+	greyc_mask_op = Operator "greyc_mask" (greyc_mask
+			iterations amplitude sharpness anisotropy alpha
+			sigma dl da gauss_prec interpolation fast_approx)
+		Operator_type.COMPOUND_REWRAP false;
+	greyc_im mask x = im_greyc_mask x mask
+		iterations amplitude sharpness anisotropy alpha
+		sigma dl da gauss_prec interpolation fast_approx;
+}
+
 // find the correlation surface for a small image within a big one
 correlate small big
 	= oo_binary_function correlate_op small big, is_class small

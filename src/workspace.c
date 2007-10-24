@@ -964,6 +964,10 @@ workspace_save( Model *model, xmlNode *xnode )
 		!set_dprop( xthis, "offset", ws->offset ) ||
 		!set_prop( xthis, "window_width", "%d", ws->window_width ) ||
 		!set_prop( xthis, "window_height", "%d", ws->window_height ) ||
+		!set_prop( xthis, "lpane_position", "%d", 
+			ws->lpane_position ) ||
+		!set_prop( xthis, "rpane_position", "%d", 
+			ws->rpane_position ) ||
 		!set_sprop( xthis, "local_defs", ws->local_defs ) ||
 		!set_sprop( xthis, "name", IOBJECT( ws )->name ) ||
 		!set_sprop( xthis, "caption", IOBJECT( ws )->caption ) ) 

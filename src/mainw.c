@@ -1782,6 +1782,12 @@ static const char *mainw_toolbar_ui_description =
 "</ui>";
 
 static void
+mainw_pane_changed_cb( Pane *pane, int *ws_position )
+{
+	*ws_position = pane->position;
+}
+
+static void
 mainw_watch_changed_cb( Watchgroup *watchgroup, Watch *watch, Mainw *mainw )
 {
 	if( strcmp( IOBJECT( watch )->name, "MAINW_TOOLBAR_STYLE" ) == 0 )
@@ -1923,12 +1929,18 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	gtk_menu_set_accel_group( GTK_MENU( mainw->kitgview->menu ),
 		iwnd->accel_group );
 
-	mainw->rpane = pane_new( "MAINW_RPANE_POSITION", 10000 );
+	mainw->rpane = pane_new( "MAINW_RPANE_POSITION", PANE_HIDE_RIGHT );
+	g_signal_connect( mainw->rpane, "changed",
+		G_CALLBACK( mainw_pane_changed_cb ), 
+		&mainw->ws->rpane_position );
 	gtk_box_pack_start( GTK_BOX( vbox ), 
 		GTK_WIDGET( mainw->rpane ), TRUE, TRUE, 0 );
 	gtk_widget_show( GTK_WIDGET( mainw->rpane ) );
 
-	mainw->lpane = pane_new( "MAINW_LPANE_POSITION", 0 );
+	mainw->lpane = pane_new( "MAINW_LPANE_POSITION", PANE_HIDE_LEFT );
+	g_signal_connect( mainw->lpane, "changed",
+		G_CALLBACK( mainw_pane_changed_cb ), 
+		&mainw->ws->lpane_position );
 	gtk_paned_pack1( GTK_PANED( mainw->rpane ), GTK_WIDGET( mainw->lpane ),
 		TRUE, FALSE );
 	gtk_widget_show( GTK_WIDGET( mainw->lpane ) );

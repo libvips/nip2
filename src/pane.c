@@ -30,10 +30,33 @@
 #include "ip.h"
 
 /* 
-#define DEBUG
  */
+#define DEBUG
+
+/* Our signals. 
+ */
+enum {
+	SIG_CHANGED,	/* Change to position or visibility */
+	SIG_LAST
+};
 
 static GtkHPanedClass *parent_class = NULL;
+
+static guint pane_signals[SIG_LAST] = { 0 };
+
+static void
+pane_changed( Pane *pane )
+{
+	assert( IS_PANE( pane ) );
+
+	g_signal_emit( G_OBJECT( pane ), pane_signals[SIG_CHANGED], 0 );
+}
+
+static int
+pane_hidden_position( Pane *pane )
+{
+	return( pane->handedness == PANE_HIDE_RIGHT ? 10000 : 0 ); 
+}
 
 static void
 pane_destroy( GtkObject *object )
@@ -51,22 +74,20 @@ pane_destroy( GtkObject *object )
 
 	/* My instance destroy stuff.
 	 */
-	if( pane->pref ) {
-		if( pane->visible )
-			/* Re-read the position rather than looking at 
-			 * pane_position ... pane_position is only updated on 
-			 * hide.
-			 */
-			prefs_set( pane->pref, "%d", 
-				gtk_paned_get_position( GTK_PANED( pane ) ) );
-		else
-			prefs_set( pane->pref, "%d", pane->position );
-
-		IM_FREEF( g_source_remove, pane->animate_timeout );
-		IM_FREE( pane->pref );
-	}
+	IM_FREEF( g_source_remove, pane->animate_timeout );
+	IM_FREE( pane->pref );
 
 	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+}
+
+static void
+pane_real_changed( Pane *pane )
+{
+#ifdef DEBUG
+	printf( "pane_real_changed: %d\n", pane->position );
+#endif /*DEBUG*/
+
+	prefs_set( pane->pref, "%d", pane->position );
 }
 
 static void
@@ -77,6 +98,48 @@ pane_class_init( PaneClass *class )
 	parent_class = g_type_class_peek_parent( class );
 
 	object_class->destroy = pane_destroy;
+
+	class->changed = pane_real_changed;
+
+	pane_signals[SIG_CHANGED] = g_signal_new( "changed",
+		G_OBJECT_CLASS_TYPE( object_class ),
+		G_SIGNAL_RUN_FIRST,
+		G_STRUCT_OFFSET( PaneClass, changed ),
+		NULL, NULL,
+		g_cclosure_marshal_VOID__VOID,
+		G_TYPE_NONE, 0 );
+}
+
+/* Position property has changed.
+ */
+static void
+pane_notify_position_cb( Pane *pane )
+{
+	if( pane->visible ) {
+		/* This must be caused by a user drag. Look for hitting the
+		 * endstops and update visibility.
+		 */
+		int max_position;
+		int min_position;
+
+		g_object_get( pane, 
+			"max_position", &max_position, 
+			"min_position", &min_position, 
+			NULL );
+
+		pane->position = gtk_paned_get_position( GTK_PANED( pane ) );
+
+		if( pane->handedness == PANE_HIDE_LEFT &&
+			pane->position == min_position ) {
+			pane->visible = FALSE;
+		}
+		else if( pane->handedness == PANE_HIDE_RIGHT &&
+			pane->position == max_position ) {
+			pane->visible = FALSE;
+		}
+
+		pane_changed( pane );
+	}
 }
 
 static void
@@ -85,6 +148,8 @@ pane_init( Pane *pane )
 	pane->position = 400; 		/* overwritten on _link() */
 	pane->animate_timeout = 0;
 	pane->visible = FALSE;
+	g_signal_connect( pane, "notify::position", 
+		G_CALLBACK( pane_notify_position_cb ), NULL );
 }
 
 GType
@@ -128,8 +193,8 @@ pane_animate_timeout_cb( Pane *pane )
 
 	if( ABS( new - target ) < 5 || new == pane->last_set_position ) {
 		/* Close enough: set exactly the target and stop animating. Or
-		 * the new we set last hasn't taken .. in which case we must
-		 * have hit a stop.
+		 * the new position we set last hasn't taken .. in which case 
+		 * we must have hit a stop.
 		 */
 		new = target;
 		pane->animate_timeout = 0;
@@ -200,29 +265,26 @@ pane_set_visible( Pane *pane, gboolean visible )
 
 			pane_animate( pane, pane->position );
 		}
-		else {
-			pane->position = gtk_paned_get_position( 
-				GTK_PANED( pane ) );
+		else 
+			pane_animate( pane, pane_hidden_position( pane ) );
 
-			prefs_set( pane->pref, "%d", pane->position );
-
-			pane_animate( pane, pane->hidden_position );
-		}
+		pane_changed( pane );
 	}
 }
 
 static void
-pane_link( Pane *pane, const char *pref, int hidden_position )
+pane_link( Pane *pane, const char *pref, PaneHandedness handedness )
 {
 	pane->pref = im_strdupn( pref );
-	pane->hidden_position = hidden_position;
+	pane->handedness = handedness;
 	pane->position = watch_int_get( main_watchgroup, pref, 400 );
 	pane->visible = FALSE;
-	gtk_paned_set_position( GTK_PANED( pane ), hidden_position );
+	gtk_paned_set_position( GTK_PANED( pane ), 
+		pane_hidden_position( pane ) );
 }
 
 Pane *
-pane_new( const char *pref, int hidden_position )
+pane_new( const char *pref, PaneHandedness handedness )
 {
 	Pane *pane;
 
@@ -231,7 +293,7 @@ pane_new( const char *pref, int hidden_position )
 #endif /*DEBUG*/
 
 	pane = PANE( g_object_new( TYPE_PANE, NULL ) );
-	pane_link( pane, pref, hidden_position );
+	pane_link( pane, pref, handedness );
 
 	return( pane );
 }

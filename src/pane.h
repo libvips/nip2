@@ -35,13 +35,22 @@
 #define IS_PANE_CLASS( klass ) \
 	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_PANE ))
 
+/* Can hide on the left or the right hand side of a window.
+ */
+typedef enum {
+	PANE_HIDE_LEFT,
+	PANE_HIDE_RIGHT
+} PaneHandedness;
+
 typedef struct _Pane {
 	GtkHPaned parent_object;
 
 	char *pref;			/* Pref we save our position in */
-	int hidden_position;		/* Move here for hidden */
+	PaneHandedness handedness;	/* Hide on left or right */
 
-	gboolean visible;		/* Current widget state */
+	/* Current state.
+	 */
+	gboolean visible;
 	int position;		
 	int target_position;		/* Animating towards this pos */
 	int last_set_position;		/* The last one we set ... for sanity */
@@ -53,9 +62,9 @@ typedef struct _PaneClass {
 
 	/* My methods.
 	 */
+	void (*changed)( Pane * );
 } PaneClass;
 
 GType pane_get_type( void );
 void pane_set_visible( Pane *pane, gboolean visible );
-Pane *pane_new( const char *pref, int hidden_position );
-
+Pane *pane_new( const char *pref, PaneHandedness handedness );

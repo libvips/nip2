@@ -1315,29 +1315,86 @@ parse_rhs( Expr *expr, ParseRhsSyntax syntax )
 }
 
 /* Do we have a string of the form "IDENT = .."? Use the lexer to look along
- * the string checking components, return the IDENT if we do.
+ * the string checking components, return the IDENT if we do. 
  */
 char *
 parse_test_define( void )
 {
-	int yychar;
 	extern int yylex( void );
 	char *ident;
 
-	if( setjmp( parse_error_point ) ) 
+	ident = NULL;
+
+	if( setjmp( parse_error_point ) ) {
 		/* Here for yyerror in lex. 
 		 */
+		IM_FREE( ident );
 		return( NULL ); 
+	}
 
-	if( (yychar = yylex()) <= 0 || yychar != TK_IDENT )
-		return( NULL );
+	if( yylex() != TK_IDENT )
+		yyerror( _( "no leading identifier" ) );
 	ident = yylval.yy_name;
 
-	if( (yychar = yylex()) <= 0 || yychar != '=' ) {
-		IM_FREE( ident );
-		return( NULL );
-	}
+	if( yylex() != '=' ) 
+		yyerror( _( "'=' missing" ) );
 
 	return( ident );
 }
+
+/* Do we have a string like "Workspaces.untitled.A1 = .."? Check for the
+ * symbols as we see them, make the last one and return it. Used by --set.
+ */
+Symbol *
+parse_set_symbol( void )
+{
+	int yychar;
+	extern int yylex( void );
+	Compile *compile = symbol_root->expr->compile;
+	char *ident;
+	Symbol *sym;
+
+	ident = NULL;
+
+	if( setjmp( parse_error_point ) ) {
+		/* Here for yyerror in lex. 
+		 */
+		IM_FREE( ident );
+		return( NULL ); 
+	}
+
+	do {
+		if( (yychar = yylex()) != TK_IDENT && yychar != TK_TAG ) 
+			yyerror( _( "identifier expected" ) );
+		ident = yylval.yy_name;
+
+		switch( (yychar = yylex()) ) {
+		case '.':
+			/* There's a dot, so we expect another identifier to 
+			 * come. Look up this one and move to that context.
+			 */
+			if( !(sym = compile_lookup( compile, ident )) ) 
+				yyerror( _( "'%s' does not exist" ), ident );
+			if( !sym->expr || !sym->expr->compile )
+				yyerror( _( "'%s' has no members" ), ident );
+			compile = sym->expr->compile;
+			IM_FREE( ident );
+			break;
+
+		case '=':
+			/* This is the final identifier: create the symbol in
+			 * this context.
+			 */
+			sym = symbol_new_defining( compile, ident );
+			IM_FREE( ident );
+			break;
+
+		default:
+			yyerror( _( "'.' or '=' expected" ) ); 
+		}
+	} while( yychar != '=' );
+
+	return( sym );
+}
+
 

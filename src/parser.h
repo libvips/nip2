@@ -80,11 +80,10 @@ typedef enum {
 	PARSE_SUPER 		/* eg. "fred c d" */
 } ParseRhsSyntax;
 
+extern Symbol *last_top_sym;
+
 gboolean parse_toplevel( Toolkit *kit, int pos );
 gboolean parse_onedef( Toolkit *kit, int pos );
 gboolean parse_rhs( Expr *expr, ParseRhsSyntax syntax );
 char *parse_test_define( void );
-
-extern Symbol *last_top_sym;
-
-
+Symbol *parse_set_symbol( void );

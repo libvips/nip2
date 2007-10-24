@@ -1,34 +1,9 @@
-- how about
 
-	nip2 --set="A1=12" fred.ws
+- manual needs updating for ws defs, --set
 
-	nip2 -t A1=12 fred.ws
+- don't remember pane positions nicely, how annoying
 
-  loads fred.ws, sets A1 to 12, recalcs
-
-  also:
-
-	nip2 --set="A1=12" --set="main=A9" -o fred.png fred.ws
-
-  might need
-
-	nip2 --set="Workspaces.fred.A1=12" \
-		--set="main=Workspaces.fred.A9" -o fred.png fred.ws
-
-  I guess
-
-  much more convenient command-line use of workspaces
-
-- you might think this would work:
-
-	nip2 -e "Workspaces.stdin.E15.value" -w -o page1.png \
-		ref_book1_up.tiff book*.tiff < calib.ws
-
-  ie. load a workspace which processes argv, use -e to make a main which saves
-  the ws output
-
-  BUT: -e turns on "don't load menus" which will (mostly) prevent the WS
-  working
+  save in workspace file?
 
 - have a toggle in find colour calib for "linearise"
 
@@ -46,12 +21,6 @@
   called "stdin" ... o.O
 
 - quit while a thumbnail is painting: IMAGEs are leaked
-
-- manual needs updating for ws defs
-
-- don't remember pane positions nicely, how annoying
-
-  save in workspace file?
 
 - there's some left-recursion in the parser, eg. comma_list, is this easily
   fixable?

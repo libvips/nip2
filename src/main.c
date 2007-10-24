@@ -890,6 +890,42 @@ main_mkdir( const char *dir )
 				get_savedir(), dir, g_strerror( errno ) );
 }
 
+static gboolean
+main_set( const char *str )
+{
+	Symbol *sym;
+
+	attach_input_string( str );
+	if( !(sym = parse_set_symbol()) ) 
+		return( FALSE );
+
+	/* Put the input just after the '=', ready to parse a RHS into the
+	 * symbol.
+	 */
+	attach_input_string( str + 
+		IM_CLIP( 0, input_state.charpos - 1, strlen( str ) ) );
+
+	if( !symbol_user_init( sym ) || 
+		!parse_rhs( sym->expr, PARSE_RHS ) ) {
+		/* Another parse error.
+		 */
+		expr_error_get( sym->expr );
+
+		/* Block changes to error_string ... symbol_destroy() 
+		 * can set this for compound objects.
+		 */
+		error_block();
+		IDESTROY( sym );
+		error_unblock();
+
+		return( FALSE );
+	}
+
+	symbol_made( sym );
+
+	return( TRUE );
+}
+
 /* Start here!
  */
 int
@@ -1323,7 +1359,8 @@ main( int argc, char *argv[] )
 		int i;
 
 		for( i = 0; main_option_set[i]; i++ ) 
-			printf( "set '%s'\n", main_option_set[i] );
+			if( !main_set( main_option_set[i] ) )
+				main_log_add( "%s\n", error_get_sub() );
 	}
 
 	/* Recalc to load any args.

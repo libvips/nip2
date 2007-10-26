@@ -966,8 +966,12 @@ workspace_save( Model *model, xmlNode *xnode )
 		!set_prop( xthis, "window_height", "%d", ws->window_height ) ||
 		!set_prop( xthis, "lpane_position", "%d", 
 			ws->lpane_position ) ||
+		!set_prop( xthis, "lpane_open", 
+			bool_to_char( ws->lpane_open ) ) ||
 		!set_prop( xthis, "rpane_position", "%d", 
 			ws->rpane_position ) ||
+		!set_prop( xthis, "rpane_open", 
+			bool_to_char( ws->rpane_open ) ) ||
 		!set_sprop( xthis, "local_defs", ws->local_defs ) ||
 		!set_sprop( xthis, "name", IOBJECT( ws )->name ) ||
 		!set_sprop( xthis, "caption", IOBJECT( ws )->caption ) ) 
@@ -1314,6 +1318,13 @@ workspace_init( Workspace *ws )
 	ws->vp = ws->area;
 	ws->window_width = 0;
 	ws->window_height = 0;
+
+	/* Overwritten by mainw.
+	 */
+	ws->lpane_open = WORKSPACE_RPANE_OPEN;
+	ws->lpane_position = WORKSPACE_RPANE_POSITION;
+	ws->rpane_open = WORKSPACE_LPANE_OPEN;
+	ws->rpane_position = WORKSPACE_LPANE_POSITION;
 
 	ws->auto_save_timeout = 0;
 

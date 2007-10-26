@@ -103,7 +103,9 @@ struct _Workspace {
 	Rect vp;		/* Viewport hint ... set by views */
 	int window_width;	/* Enclosing window size ... set by views */
 	int window_height;
-	int lpane_position;	/* Pane positions */
+	gboolean lpane_open;	/* Pane model */
+	int lpane_position;	
+	gboolean rpane_open;
 	int rpane_position;
 
 	guint auto_save_timeout;/* Timeout for next autosave */

@@ -1,4 +1,4 @@
-/* A pane with some extra animation and prefs stuff.
+/* a side panel that can slide in and out of view
  */
 
 /*
@@ -48,9 +48,10 @@ typedef struct _Pane {
 	char *pref;			/* Pref we save our position in */
 	PaneHandedness handedness;	/* Hide on left or right */
 
-	/* Current state.
+	/* Current state. Four states: open, close, opening, closing. Use open
+	 * and animate_timeout NULL/not-NULL to encode the four states.
 	 */
-	gboolean visible;
+	gboolean open;
 	int position;		
 	int target_position;		/* Animating towards this pos */
 	int last_set_position;		/* The last one we set ... for sanity */
@@ -60,11 +61,12 @@ typedef struct _Pane {
 typedef struct _PaneClass {
 	GtkHPanedClass parent_class;
 
-	/* My methods.
+	/* Either position or open have changed.
 	 */
 	void (*changed)( Pane * );
 } PaneClass;
 
 GType pane_get_type( void );
-void pane_set_visible( Pane *pane, gboolean visible );
 Pane *pane_new( const char *pref, PaneHandedness handedness );
+void pane_set_open( Pane *pane, gboolean open );
+void pane_set_position( Pane *pane, int position );

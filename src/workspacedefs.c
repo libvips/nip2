@@ -215,9 +215,7 @@ workspacedefs_hide_cb( GtkWidget *wid, Workspacedefs *workspacedefs )
 	Mainw *mainw = workspacedefs->mainw;
 	Workspace *ws = mainw->ws;
 
-	/* Yuk! Shouldn't really look at mainw's insides.
-	 */
-	mainw->lpane_visible = FALSE;
+	ws->lpane_open = FALSE;
 	iobject_changed( IOBJECT( ws ) );
 }
 

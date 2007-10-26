@@ -229,7 +229,6 @@ mainw_init( Mainw *mainw )
 
 	mainw->toolbar_visible = MAINW_TOOLBAR;
 	mainw->statusbar_visible = MAINW_STATUSBAR;
-	mainw->rpane_visible = MAINW_TOOLKITBROWSER;
 
 	mainw->row_last_error = NULL;
 
@@ -502,23 +501,27 @@ mainw_refresh( Mainw *mainw )
 		mainw->statusbar_visible );
         widget_visible( mainw->statusbar_main, mainw->statusbar_visible );
 
+/*
 	action = gtk_action_group_get_action( mainw->action_group, 
 		"WorkspaceDefs" );
 	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
-		mainw->lpane_visible );
+		ws->lpane_open );
 
 	action = gtk_action_group_get_action( mainw->action_group, 
 		"ToolkitBrowser" );
 	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
-		mainw->rpane_visible );
+		ws->rpane_open );
+ */
 
 	action = gtk_action_group_get_action( mainw->action_group, 
 		view_mode[ws->mode] );
 	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
 		TRUE );
 
-	pane_set_visible( mainw->lpane, mainw->lpane_visible );
-	pane_set_visible( mainw->rpane, mainw->rpane_visible );
+	pane_set_open( mainw->lpane, ws->lpane_open );
+	pane_set_position( mainw->lpane, ws->lpane_position );
+	pane_set_open( mainw->rpane, ws->rpane_open );
+	pane_set_position( mainw->rpane, ws->rpane_position );
 
 	mainw_jump_update( mainw, mainw->jump_to_column_menu );
 	mainw_jump_update( mainw, mainw->popup_jump );
@@ -1372,9 +1375,9 @@ mainw_statusbar_action_cb( GtkToggleAction *action, Mainw *mainw )
 static void
 mainw_toolkitbrowser_action_cb( GtkToggleAction *action, Mainw *mainw )
 {
-	mainw->rpane_visible = gtk_toggle_action_get_active( action );
-	prefs_set( "MAINW_TOOLKITBROWSER", 
-		"%s", bool_to_char( mainw->rpane_visible ) );
+	mainw->ws->rpane_open = gtk_toggle_action_get_active( action );
+	prefs_set( "WORKSPACE_RPANE_OPEN", 
+		"%s", bool_to_char( mainw->ws->rpane_open ) );
 	mainw_refresh( mainw );
 }
 
@@ -1383,9 +1386,9 @@ mainw_toolkitbrowser_action_cb( GtkToggleAction *action, Mainw *mainw )
 static void
 mainw_workspacedefs_action_cb( GtkToggleAction *action, Mainw *mainw )
 {
-	mainw->lpane_visible = gtk_toggle_action_get_active( action );
-	prefs_set( "MAINW_WORKSPACEDEFS", 
-		"%s", bool_to_char( mainw->lpane_visible ) );
+	mainw->ws->lpane_open = gtk_toggle_action_get_active( action );
+	prefs_set( "WORKSPACE_LPANE_OPEN", 
+		"%s", bool_to_char( mainw->ws->lpane_open ) );
 	mainw_refresh( mainw );
 }
 
@@ -1782,9 +1785,45 @@ static const char *mainw_toolbar_ui_description =
 "</ui>";
 
 static void
-mainw_pane_changed_cb( Pane *pane, int *ws_position )
+mainw_lpane_changed_cb( Pane *pane, Mainw *mainw )
 {
-	*ws_position = pane->position;
+	gboolean changed;
+
+	changed = FALSE;
+
+	if( mainw->ws->lpane_open != pane->open ) {
+		mainw->ws->lpane_open = pane->open;
+		changed = TRUE;
+	}
+
+	if( mainw->ws->lpane_position != pane->position ) {
+		mainw->ws->lpane_position = pane->position;
+		changed = TRUE;
+	}
+
+	if( changed )
+		mainw_refresh( mainw );
+}
+
+static void
+mainw_rpane_changed_cb( Pane *pane, Mainw *mainw )
+{
+	gboolean changed;
+
+	changed = FALSE;
+
+	if( mainw->ws->rpane_open != pane->open ) {
+		mainw->ws->rpane_open = pane->open;
+		changed = TRUE;
+	}
+
+	if( mainw->ws->rpane_position != pane->position ) {
+		mainw->ws->rpane_position = pane->position;
+		changed = TRUE;
+	}
+
+	if( changed )
+		mainw_refresh( mainw );
 }
 
 static void
@@ -1931,16 +1970,14 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 
 	mainw->rpane = pane_new( "MAINW_RPANE_POSITION", PANE_HIDE_RIGHT );
 	g_signal_connect( mainw->rpane, "changed",
-		G_CALLBACK( mainw_pane_changed_cb ), 
-		&mainw->ws->rpane_position );
+		G_CALLBACK( mainw_lpane_changed_cb ), mainw );
 	gtk_box_pack_start( GTK_BOX( vbox ), 
 		GTK_WIDGET( mainw->rpane ), TRUE, TRUE, 0 );
 	gtk_widget_show( GTK_WIDGET( mainw->rpane ) );
 
 	mainw->lpane = pane_new( "MAINW_LPANE_POSITION", PANE_HIDE_LEFT );
 	g_signal_connect( mainw->lpane, "changed",
-		G_CALLBACK( mainw_pane_changed_cb ), 
-		&mainw->ws->lpane_position );
+		G_CALLBACK( mainw_rpane_changed_cb ), mainw );
 	gtk_paned_pack1( GTK_PANED( mainw->rpane ), GTK_WIDGET( mainw->lpane ),
 		TRUE, FALSE );
 	gtk_widget_show( GTK_WIDGET( mainw->lpane ) );

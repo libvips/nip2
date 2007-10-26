@@ -59,12 +59,11 @@ struct _Mainw {
 	 */
 	gboolean free_type;
 
-	/* View menu show/hide toggle states.
+	/* View menu show/hide toggle states. The pane states are in the ws as
+	 * we need to save them to the ws file.
 	 */
 	gboolean toolbar_visible;
 	gboolean statusbar_visible;
-	gboolean rpane_visible;
-	gboolean lpane_visible;
 
 	/* The last row we visited with the 'next-error' button.
 	 */

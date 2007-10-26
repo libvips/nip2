@@ -1,4 +1,4 @@
-/* main processing window
+/* a side panel that can slide in and out of view
  */
 
 /*
@@ -36,7 +36,7 @@
 /* Our signals. 
  */
 enum {
-	SIG_CHANGED,	/* Change to position or visibility */
+	SIG_CHANGED,	/* Change to position or openness */
 	SIG_LAST
 };
 
@@ -48,6 +48,10 @@ static void
 pane_changed( Pane *pane )
 {
 	assert( IS_PANE( pane ) );
+
+#ifdef DEBUG
+	printf( "pane_changed\n" );
+#endif /*DEBUG*/
 
 	g_signal_emit( G_OBJECT( pane ), pane_signals[SIG_CHANGED], 0 );
 }
@@ -115,9 +119,9 @@ pane_class_init( PaneClass *class )
 static void
 pane_notify_position_cb( Pane *pane )
 {
-	if( pane->visible ) {
+	if( !pane->animate_timeout ) {
 		/* This must be caused by a user drag. Look for hitting the
-		 * endstops and update visibility.
+		 * endstops and update open.
 		 */
 		int max_position;
 		int min_position;
@@ -131,12 +135,14 @@ pane_notify_position_cb( Pane *pane )
 
 		if( pane->handedness == PANE_HIDE_LEFT &&
 			pane->position == min_position ) {
-			pane->visible = FALSE;
+			pane->open = FALSE;
 		}
 		else if( pane->handedness == PANE_HIDE_RIGHT &&
 			pane->position == max_position ) {
-			pane->visible = FALSE;
+			pane->open = FALSE;
 		}
+		else
+			pane->open = TRUE;
 
 		pane_changed( pane );
 	}
@@ -147,7 +153,7 @@ pane_init( Pane *pane )
 {
 	pane->position = 400; 		/* overwritten on _link() */
 	pane->animate_timeout = 0;
-	pane->visible = FALSE;
+	pane->open = FALSE;
 	g_signal_connect( pane, "notify::position", 
 		G_CALLBACK( pane_notify_position_cb ), NULL );
 }
@@ -245,40 +251,13 @@ pane_animate( Pane *pane, int target_position )
 			(GSourceFunc) pane_animate_timeout_cb, pane );
 }
 
-void
-pane_set_visible( Pane *pane, gboolean visible )
-{
-#ifdef DEBUG
-	printf( "pane_set_visible: %s\n", bool_to_char( visible ) );
-#endif /*DEBUG*/
-
-	if( pane->visible != visible ) {
-		pane->visible = visible;
-
-		if( visible ) {
-			/* -1 means pick a position from the browser size.
-			if( pane->position == -1 )
-				pane->position = mainw->wsview->vp.width -
-					toolkitbrowser_get_width( 
-					mainw->toolkitbrowser );
-			 */
-
-			pane_animate( pane, pane->position );
-		}
-		else 
-			pane_animate( pane, pane_hidden_position( pane ) );
-
-		pane_changed( pane );
-	}
-}
-
 static void
 pane_link( Pane *pane, const char *pref, PaneHandedness handedness )
 {
 	pane->pref = im_strdupn( pref );
 	pane->handedness = handedness;
 	pane->position = watch_int_get( main_watchgroup, pref, 400 );
-	pane->visible = FALSE;
+	pane->open = FALSE;
 	gtk_paned_set_position( GTK_PANED( pane ), 
 		pane_hidden_position( pane ) );
 }
@@ -296,4 +275,61 @@ pane_new( const char *pref, PaneHandedness handedness )
 	pane_link( pane, pref, handedness );
 
 	return( pane );
+}
+
+/* Change open state with an animation.
+ */
+void
+pane_set_open( Pane *pane, gboolean open )
+{
+#ifdef DEBUG
+	printf( "pane_set_open: %s\n", bool_to_char( open ) );
+#endif /*DEBUG*/
+
+	if( !pane->animate_timeout && pane->open != open ) {
+		pane->open = open;
+
+		if( open ) {
+			/* -1 means pick a position from the browser size.
+			if( pane->position == -1 )
+				pane->position = mainw->wsview->vp.width -
+					toolkitbrowser_get_width( 
+					mainw->toolkitbrowser );
+			 */
+
+			pane_animate( pane, pane->position );
+		}
+		else 
+			pane_animate( pane, pane_hidden_position( pane ) );
+
+		pane_changed( pane );
+	}
+}
+
+/* Change position.
+ */
+void
+pane_set_position( Pane *pane, int position )
+{
+#ifdef DEBUG
+	printf( "pane_set_position: %d\n", position );
+#endif /*DEBUG*/
+
+	if( !pane->animate_timeout && pane->position != position ) {
+		pane->position = position;
+
+		if( pane->open ) {
+			/* -1 means pick a position from the browser size.
+			if( pane->position == -1 )
+				pane->position = mainw->wsview->vp.width -
+					toolkitbrowser_get_width( 
+					mainw->toolkitbrowser );
+			 */
+
+			gtk_paned_set_position( GTK_PANED( pane ), 
+				pane->position );
+		}
+
+		pane_changed( pane );
+	}
 }

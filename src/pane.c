@@ -57,9 +57,36 @@ pane_changed( Pane *pane )
 }
 
 static int
-pane_hidden_position( Pane *pane )
+pane_closed_position( Pane *pane )
 {
-	return( pane->handedness == PANE_HIDE_RIGHT ? 10000 : 0 ); 
+	int max_position;
+	int min_position;
+
+	g_object_get( pane, 
+		"max_position", &max_position, 
+		"min_position", &min_position, 
+		NULL );
+
+	return( pane->handedness == PANE_HIDE_RIGHT ? 
+		max_position : min_position ); 
+}
+
+/* An open position ... used in case we are asked to open, but the position is
+ * already closed.
+ */
+static int
+pane_open_position( Pane *pane )
+{
+	int max_position;
+	int min_position;
+
+	g_object_get( pane, 
+		"max_position", &max_position, 
+		"min_position", &min_position, 
+		NULL );
+
+	return( pane->handedness == PANE_HIDE_RIGHT ? 
+		max_position - 100: min_position + 100 ); 
 }
 
 static void
@@ -203,7 +230,6 @@ pane_animate_timeout_cb( Pane *pane )
 		 * we must have hit a stop.
 		 */
 		new = target;
-		pane->animate_timeout = 0;
 		more = FALSE;
 	}
 	else 
@@ -211,8 +237,14 @@ pane_animate_timeout_cb( Pane *pane )
 		 */
 		more = TRUE;
 
-	gtk_paned_set_position( GTK_PANED( pane ), new );
 	pane->last_set_position = new;
+	gtk_paned_set_position( GTK_PANED( pane ), new );
+
+	/* Need to clear this after setting the position so notify callbacks
+	 * don't think we're really moved to 0.
+	 */
+	if( !more )
+		pane->animate_timeout = 0;
 
 	return( more );
 }
@@ -259,7 +291,7 @@ pane_link( Pane *pane, const char *pref, PaneHandedness handedness )
 	pane->position = watch_int_get( main_watchgroup, pref, 400 );
 	pane->open = FALSE;
 	gtk_paned_set_position( GTK_PANED( pane ), 
-		pane_hidden_position( pane ) );
+		pane_closed_position( pane ) );
 }
 
 Pane *
@@ -290,17 +322,15 @@ pane_set_open( Pane *pane, gboolean open )
 		pane->open = open;
 
 		if( open ) {
-			/* -1 means pick a position from the browser size.
-			if( pane->position == -1 )
-				pane->position = mainw->wsview->vp.width -
-					toolkitbrowser_get_width( 
-					mainw->toolkitbrowser );
+			/* In case we were dragged to the closed position.
 			 */
+			if( pane->position == pane_closed_position( pane ) )
+				pane->position = pane_open_position( pane );
 
 			pane_animate( pane, pane->position );
 		}
 		else 
-			pane_animate( pane, pane_hidden_position( pane ) );
+			pane_animate( pane, pane_closed_position( pane ) );
 
 		pane_changed( pane );
 	}

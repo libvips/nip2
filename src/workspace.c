@@ -930,6 +930,11 @@ workspace_load( Model *model,
 	(void) get_iprop( xnode, "window_width", &ws->window_width );
 	(void) get_iprop( xnode, "window_height", &ws->window_height );
 
+	(void) get_bprop( xnode, "lpane_open", &ws->lpane_open );
+	(void) get_iprop( xnode, "lpane_position", &ws->lpane_position );
+	(void) get_bprop( xnode, "rpane_open", &ws->rpane_open );
+	(void) get_iprop( xnode, "rpane_position", &ws->rpane_position );
+
 	if( get_sprop( xnode, "name", buf, 256 ) ) {
 		IM_SETSTR( IOBJECT( ws )->name, buf );
 	}

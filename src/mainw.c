@@ -501,27 +501,20 @@ mainw_refresh( Mainw *mainw )
 		mainw->statusbar_visible );
         widget_visible( mainw->statusbar_main, mainw->statusbar_visible );
 
-/*
 	action = gtk_action_group_get_action( mainw->action_group, 
 		"WorkspaceDefs" );
 	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
-		ws->lpane_open );
+		mainw->lpane->open );
 
 	action = gtk_action_group_get_action( mainw->action_group, 
 		"ToolkitBrowser" );
 	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
-		ws->rpane_open );
- */
+		mainw->rpane->open );
 
 	action = gtk_action_group_get_action( mainw->action_group, 
 		view_mode[ws->mode] );
 	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
 		TRUE );
-
-	pane_set_open( mainw->lpane, ws->lpane_open );
-	pane_set_position( mainw->lpane, ws->lpane_position );
-	pane_set_open( mainw->rpane, ws->rpane_open );
-	pane_set_position( mainw->rpane, ws->rpane_position );
 
 	mainw_jump_update( mainw, mainw->jump_to_column_menu );
 	mainw_jump_update( mainw, mainw->popup_jump );
@@ -1375,10 +1368,8 @@ mainw_statusbar_action_cb( GtkToggleAction *action, Mainw *mainw )
 static void
 mainw_toolkitbrowser_action_cb( GtkToggleAction *action, Mainw *mainw )
 {
-	mainw->ws->rpane_open = gtk_toggle_action_get_active( action );
-	prefs_set( "WORKSPACE_RPANE_OPEN", 
-		"%s", bool_to_char( mainw->ws->rpane_open ) );
-	mainw_refresh( mainw );
+	pane_set_open( mainw->rpane, 
+		gtk_toggle_action_get_active( action ) );
 }
 
 /* Expose/hide the workspace defs.
@@ -1386,10 +1377,8 @@ mainw_toolkitbrowser_action_cb( GtkToggleAction *action, Mainw *mainw )
 static void
 mainw_workspacedefs_action_cb( GtkToggleAction *action, Mainw *mainw )
 {
-	mainw->ws->lpane_open = gtk_toggle_action_get_active( action );
-	prefs_set( "WORKSPACE_LPANE_OPEN", 
-		"%s", bool_to_char( mainw->ws->lpane_open ) );
-	mainw_refresh( mainw );
+	pane_set_open( mainw->lpane, 
+		gtk_toggle_action_get_active( action ) );
 }
 
 /* Layout columns.
@@ -1787,43 +1776,23 @@ static const char *mainw_toolbar_ui_description =
 static void
 mainw_lpane_changed_cb( Pane *pane, Mainw *mainw )
 {
-	gboolean changed;
+	mainw->ws->lpane_open = pane->open;
+	mainw->ws->lpane_position = pane->position;
 
-	changed = FALSE;
-
-	if( mainw->ws->lpane_open != pane->open ) {
-		mainw->ws->lpane_open = pane->open;
-		changed = TRUE;
-	}
-
-	if( mainw->ws->lpane_position != pane->position ) {
-		mainw->ws->lpane_position = pane->position;
-		changed = TRUE;
-	}
-
-	if( changed )
-		mainw_refresh( mainw );
+	/* Give menus an update.
+	 */
+	mainw_refresh( mainw );
 }
 
 static void
 mainw_rpane_changed_cb( Pane *pane, Mainw *mainw )
 {
-	gboolean changed;
+	mainw->ws->rpane_open = pane->open;
+	mainw->ws->rpane_position = pane->position;
 
-	changed = FALSE;
-
-	if( mainw->ws->rpane_open != pane->open ) {
-		mainw->ws->rpane_open = pane->open;
-		changed = TRUE;
-	}
-
-	if( mainw->ws->rpane_position != pane->position ) {
-		mainw->ws->rpane_position = pane->position;
-		changed = TRUE;
-	}
-
-	if( changed )
-		mainw_refresh( mainw );
+	/* Give menus an update.
+	 */
+	mainw_refresh( mainw );
 }
 
 static void
@@ -2083,6 +2052,11 @@ mainw_link( Mainw *mainw, Workspace *ws )
 			IM_MIN( ws->window_height, 
 				gdk_screen_get_height( screen ) ) );
 	}
+
+	pane_set_open( mainw->lpane, ws->lpane_open );
+	pane_set_position( mainw->lpane, ws->lpane_position );
+	pane_set_open( mainw->rpane, ws->rpane_open );
+	pane_set_position( mainw->rpane, ws->rpane_position );
 }
 
 Mainw *

@@ -499,11 +499,11 @@ symbols and list all current errors.
 \mylabel{sec:cmdline}
 
 You can use \nip{} from the command-line as well as from the GUI. This can be
-handy for automation: you can build a workspace, then run it over a whole set
-of images, or use the results as part of a larger automated system. We've make
+handy for automation: you can build a workspace and then run it over a whole set
+of images, or use \nip{} as part of a larger system. We've make
 websites which use \nip{} as the back-end.
 
-In command-line mode \nip{} runs without a GUI of any sort: it doesn't
+In command-line mode \nip{} runs without a GUI of any sort, it doesn't
 even need a window system to be installed on the machine. This makes it
 possible to use it in a server or batch context.
 
@@ -617,27 +617,40 @@ then then clips the result back to the same format as the original image
 appropriate for small images or simple calculations. But for complex
 operations, or operations on large images, this mode can be very useful.
 
-\subsection{Other modes}
+\subsection{Using \ct{--set}}}
 
-A set of sub-options let you mix up other modes yourself. One I've used lets
-me run a workspace repeatedly over a directory of images. First, create a file
-called \ct{main.def} (you need the \ct{.def} suffix) containing:
+The \ct{--set} option (which can be abbreviated to \ct{-=}) lets you make 
+changes to a workspace after loading it.
+Suppose the workspace \ct{test.ws} has a row called \ct{A1} with the value 12.
+Then entering:
 
 \begin{verbatim}
-main = Workspaces.myworkspace.A1;
+nip2 test.ws --set Workspaces.test.A1=45
 \end{verbatim}
 
 \noindent
-Where \ct{A1} is the name of the row in your workspace that you want to save,
-and \ct{myworkspace} is the name of your workspace. Now run \nip{} with:
+Will, as normal, start \nip{} and load \ct{test.ws}. But before the first
+recalculation, \nip{} will change the value of \ct{A1} to be 45. You can use
+\ct{--set} to create new symbols as well.
+
+\subsection{Other modes}
+
+A set of sub-options let you mix up other modes yourself. For example, it's
+common to want to run a workspace on many files.
+
+Suppose the workspace \ct{process.ws} loads an image in \ct{A1}, performs some
+processing and produces a result image \ct{A10}. If you run \nip{} with:
 
 \begin{verbatim}
-nip2 -bp main.def myworkspace.ws -o fred.jpg
+nip2 -bp --set 'A1=Image_file "fred.jpg"' --set main=A10 -o fred.jpg process.ws
 \end{verbatim}
 
 \noindent
 This will start \nip{} in batch (ie. no GUI) mode (the \ct{-b} switch), 
-load \ct{myworkspace.ws}, and save the value of \ct{A1} to \ct{fred.jpg} (the
+load \ct{myworkspace.ws}, change \ct{A1} to load another file, set \ct{main}
+to be the value of A10
+
+and save the value of \ct{A10} to \ct{fred.jpg} (the
 \ct{-p} switch).
 
 The remaining problem is how to pass the name of the file to be processed to

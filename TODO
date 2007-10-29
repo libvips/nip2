@@ -1,3 +1,25 @@
+- on PC, need to patch arith_dispatch with transform ... perhaps automate this?
+
+- hmm! what about
+
+	nip2 -bp test.ws --set Workspaces.test.A1=12 
+		--set main=Workspaces.test.A1
+
+  (where test.ws loads an image in A1)
+
+  does not print 12
+
+  because the workspace load creates a bunch of rows as the XML comes in, and
+  these rows are not being destroyed by the recomp that follows main_set
+
+  working on the end of reference.tex
+
+- image view windows are missing 'max' buttons?
+
+  caused by gtk_window_set_transient_for() in iwindow
+
+  not much we can do here, except remove the transient_for behaviour
+
 - manual needs updating for ws defs, --set
 
 - have a toggle in find colour calib for "linearise"

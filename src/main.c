@@ -895,6 +895,10 @@ main_set( const char *str )
 {
 	Symbol *sym;
 
+#ifdef DEBUG
+	printf( "main_set: %s\n", str );
+#endif /*DEBUG*/
+
 	attach_input_string( str );
 	if( !(sym = parse_set_symbol()) ) 
 		return( FALSE );
@@ -979,7 +983,7 @@ main( int argc, char *argv[] )
 	g_set_application_name( _( PACKAGE ) );
 
 #ifdef DEBUG
-	printf( "main: sizeof( HeapNode ) == %d\n", sizeof( HeapNode ) );
+	printf( "main: sizeof( HeapNode ) == %zd\n", sizeof( HeapNode ) );
 
 	/* Should be 3 pointers, hopefully.
 	 */

@@ -952,6 +952,10 @@ static gboolean symbol_running = FALSE;
 void *
 symbol_recalculate_check( Symbol *sym )
 {
+#ifdef DEBUG
+	printf( "symbol_recalculate_check: %s\n", symbol_name( sym ) );
+#endif /*DEBUG*/
+
 	error_clear();
 	if( sym->expr->err ) {
 		expr_error_get( sym->expr );

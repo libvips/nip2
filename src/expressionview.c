@@ -90,8 +90,8 @@ expressionview_scan( View *view )
 void
 expressionview_activate_cb( GtkWidget *wid, Expressionview *expressionview )
 {
-	Expression *expression = EXPRESSION( VOBJECT( expressionview
-)->iobject );
+	Expression *expression = 
+		EXPRESSION( VOBJECT( expressionview )->iobject );
 	Row *row = HEAPMODEL( expression )->row;
 
 	/* Reset edits on this row and all children.

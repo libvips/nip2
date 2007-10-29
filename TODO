@@ -1,5 +1,3 @@
-- toolkitbrowser search text box could grow with drag of divider?
-
 - manual needs updating for ws defs, --set
 
 - have a toggle in find colour calib for "linearise"
@@ -17,7 +15,8 @@
 - "nip2 -w < test.ws", then modify workspace, then CTRL-S saves as a file
   called "stdin" ... o.O
 
-- quit while a thumbnail is painting: IMAGEs are leaked
+- quit while a thumbnail is painting: IMAGEs are leaked? seems esp. bad with
+  greyc, perhaps just because it's so slow
 
 - there's some left-recursion in the parser, eg. comma_list, is this easily
   fixable?

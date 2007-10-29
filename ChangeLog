@@ -13,6 +13,7 @@ started 7.13.1
 - added greyc filter
 - added "--set" command-line option
 - better left/right pane widget
+- resize tk browser search box with pane
 
 started 7.13.0
 - woo, fork for new development version

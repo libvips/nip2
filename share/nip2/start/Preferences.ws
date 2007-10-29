@@ -43,9 +43,24 @@
             <iText formula="500"/>
           </Rhs>
         </Row>
-        <Row popup="false" name="MAINW_PANE_POSITION">
+        <Row popup="false" name="WORKSPACE_LPANE_OPEN">
           <Rhs vislevel="1" flags="4">
-            <iText formula="-1"/>
+            <iText formula="false"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="WORKSPACE_LPANE_POSITION">
+          <Rhs vislevel="1" flags="4">
+            <iText formula="100"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="WORKSPACE_RPANE_OPEN">
+          <Rhs vislevel="1" flags="4">
+            <iText formula="false"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="WORKSPACE_RPANE_POSITION">
+          <Rhs vislevel="1" flags="4">
+            <iText formula="400"/>
           </Rhs>
         </Row>
         <Row popup="false" name="CALC_RELOAD">

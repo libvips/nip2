@@ -12,6 +12,7 @@ started 7.13.1
 - added INTVEC and DOUBLEVEC output
 - added greyc filter
 - added "--set" command-line option
+- better left/right pane widget
 
 started 7.13.0
 - woo, fork for new development version

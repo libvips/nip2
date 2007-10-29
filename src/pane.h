@@ -45,7 +45,6 @@ typedef enum {
 typedef struct _Pane {
 	GtkHPaned parent_object;
 
-	char *pref;			/* Pref we save our position in */
 	PaneHandedness handedness;	/* Hide on left or right */
 
 	/* Current state. Four states: open, close, opening, closing. Use open
@@ -67,6 +66,7 @@ typedef struct _PaneClass {
 } PaneClass;
 
 GType pane_get_type( void );
-Pane *pane_new( const char *pref, PaneHandedness handedness );
+Pane *pane_new( PaneHandedness handedness );
+void pane_set_open_position( Pane *pane, gboolean open, int position );
 void pane_set_open( Pane *pane, gboolean open );
-void pane_set_position( Pane *pane, int position );
+

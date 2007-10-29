@@ -286,20 +286,8 @@ workspacedefs_init( Workspacedefs *workspacedefs )
 	menu_add_but( pane, GTK_STOCK_CLOSE,
 		GTK_SIGNAL_FUNC( workspacedefs_hide_cb ), workspacedefs );
 
-	swin = gtk_scrolled_window_new( NULL, NULL );
-	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( swin ),
-		GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
-	gtk_box_pack_start( GTK_BOX( workspacedefs ), swin, TRUE, TRUE, 0 );
-	gtk_widget_show( swin );
-	workspacedefs->text = program_text_new();
-        g_signal_connect( gtk_text_view_get_buffer( 
-		GTK_TEXT_VIEW( workspacedefs->text ) ), "changed",
-                G_CALLBACK( workspacedefs_text_changed ), workspacedefs );
-	gtk_container_add( GTK_CONTAINER( swin ), workspacedefs->text );
-	gtk_widget_show( workspacedefs->text );
-
 	hbox = gtk_hbox_new( FALSE, 7 );
-	gtk_box_pack_end( GTK_BOX( workspacedefs ), hbox, FALSE, FALSE, 0 );
+	gtk_box_pack_start( GTK_BOX( workspacedefs ), hbox, FALSE, FALSE, 0 );
 	gtk_widget_show( hbox );
 
 	mb = gtk_menu_bar_new();
@@ -323,6 +311,18 @@ workspacedefs_init( Workspacedefs *workspacedefs )
 	gtk_box_pack_end( GTK_BOX( hbox ), 
 		workspacedefs->status, TRUE, TRUE, 0 );
 	gtk_widget_show( workspacedefs->status );
+
+	swin = gtk_scrolled_window_new( NULL, NULL );
+	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( swin ),
+		GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
+	gtk_box_pack_end( GTK_BOX( workspacedefs ), swin, TRUE, TRUE, 0 );
+	gtk_widget_show( swin );
+	workspacedefs->text = program_text_new();
+        g_signal_connect( gtk_text_view_get_buffer( 
+		GTK_TEXT_VIEW( workspacedefs->text ) ), "changed",
+                G_CALLBACK( workspacedefs_text_changed ), workspacedefs );
+	gtk_container_add( GTK_CONTAINER( swin ), workspacedefs->text );
+	gtk_widget_show( workspacedefs->text );
 }
 
 GtkType

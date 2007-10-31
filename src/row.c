@@ -28,12 +28,12 @@
  */
 
 /* Mad detail.
-#define DEBUG
  */
+#define DEBUG
 
 /* Show each row being calculated.
-#define DEBUG_ROW
  */
+#define DEBUG_ROW
 
 /* Making and removing links between rows.
 #define DEBUG_LINK
@@ -45,12 +45,12 @@
  */
 
 /* Trace create/destroy.
-#define DEBUG_NEW
  */
+#define DEBUG_NEW
 
 /* Dirty/clean stuff.
-#define DEBUG_DIRTY
  */
+#define DEBUG_DIRTY
 
 /* Error set/clear.
 #define DEBUG_ERROR

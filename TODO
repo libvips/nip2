@@ -5,9 +5,11 @@
 	nip2 -bp test.ws --set Workspaces.test.A1=12 
 		--set main=Workspaces.test.A1
 
-  (where test.ws loads an image in A1)
+  (where test.ws has "A1=45")
 
-  does not print 12
+  prints
+
+  	45
 
   because the workspace load creates a bunch of rows as the XML comes in, and
   these rows are not being destroyed by the recomp that follows main_set

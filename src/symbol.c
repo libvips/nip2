@@ -953,8 +953,8 @@ void *
 symbol_recalculate_check( Symbol *sym )
 {
 #ifdef DEBUG
-	printf( "symbol_recalculate_check: %s\n", symbol_name( sym ) );
 #endif /*DEBUG*/
+	printf( "symbol_recalculate_check: %s\n", symbol_name( sym ) );
 
 	error_clear();
 	if( sym->expr->err ) {

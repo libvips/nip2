@@ -30,8 +30,8 @@
 #include "ip.h"
 
 /* 
-#define DEBUG
  */
+#define DEBUG
 
 /* Stop startup creation of externs for all VIPS functions etc.
 #define DEBUG_NOAUTO

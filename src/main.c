@@ -30,8 +30,8 @@
 #include "ip.h"
 
 /* 
- */
 #define DEBUG
+ */
 
 /* Stop startup creation of externs for all VIPS functions etc.
 #define DEBUG_NOAUTO
@@ -926,6 +926,16 @@ main_set( const char *str )
 	}
 
 	symbol_made( sym );
+
+	/* Is there a row? Make sure any modified text there can't zap our new
+	 * text.
+	 */
+	if( sym->expr->row ) {
+		Row *row = sym->expr->row;
+
+		heapmodel_set_modified( 
+			HEAPMODEL( row->child_rhs->itext ), FALSE );
+	}
 
 	return( TRUE );
 }

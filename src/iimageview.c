@@ -389,7 +389,7 @@ iimageview_init( iImageview *iimageview )
 		(TooltipGenerateFn) iimageview_tooltip_generate, 
 		iimageview, NULL );
 
-	set_name( eb, "caption_widget" );
+	gtk_widget_set_name( eb, "caption_widget" );
         gtk_widget_show( GTK_WIDGET( eb ) );
 }
 

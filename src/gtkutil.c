@@ -728,17 +728,6 @@ get_geditable_pint( GtkWidget *text, int *n )
 	return( TRUE );
 }
 
-/* Set a name for a widget and all it's children ... so they pick up a style.
- */
-void 
-set_name( GtkWidget *widget, const char *name )
-{
-	gtk_widget_set_name( widget, name );
-	if( GTK_IS_CONTAINER( widget ) )
-		gtk_container_foreach( GTK_CONTAINER( widget ), 
-                           (GtkCallback) set_name, (char *) name );
-}
-
 /* Indent widget, label above.
  */
 GtkWidget *

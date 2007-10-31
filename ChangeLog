@@ -14,6 +14,8 @@ started 7.13.1
 - added "--set" command-line option
 - better left/right pane widget
 - resize tk browser search box with pane
+- nicer widget colour change ... use "*xx*" in style file rather than setting
+  names and contained names
 
 started 7.13.0
 - woo, fork for new development version

@@ -276,7 +276,7 @@ plotview_init( Plotview *plotview )
         gtk_box_pack_start( GTK_BOX( plotview ), 
 		eb, FALSE, FALSE, 0 );
 	gtk_widget_show( eb );
-	set_name( eb, "caption_widget" );
+	gtk_widget_set_name( eb, "caption_widget" );
         set_tooltip_generate( eb,
 		(TooltipGenerateFn) plotview_tooltip_generate, plotview, NULL );
 	doubleclick_add( eb, FALSE,

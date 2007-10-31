@@ -110,10 +110,6 @@ gboolean get_geditable_int( GtkWidget *text, int *n );
 gboolean get_geditable_uint( GtkWidget *text, int *n );
 gboolean get_geditable_pint( GtkWidget *text, int *n );
 
-/* Set a name for a widget and all its children.
- */
-void set_name( GtkWidget *widget, const char *name );
-
 /* Make widget groups.
  */
 GtkWidget *build_glabelframe2( GtkWidget *box, const char *label );

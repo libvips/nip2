@@ -65,14 +65,14 @@ style "caption_style" = "default"
 	bg[NORMAL] = "#EED680"
 }
 
-widget "*parent_widget" style "parent_style"
-widget "*child_widget" style "child_style"
-widget "*selected_widget" style "selected_style"
-widget "*column_widget" style "column_style"
-widget "*error_widget" style "error_style"
-widget "*dirty_widget" style "dirty_style"
-widget "*caption_widget" style "caption_style"
-widget "*centre_widget" style "child_style"
+widget "*parent_widget*" style "parent_style"
+widget "*child_widget*" style "child_style"
+widget "*selected_widget*" style "selected_style"
+widget "*column_widget*" style "column_style"
+widget "*error_widget*" style "error_style"
+widget "*dirty_widget*" style "dirty_style"
+widget "*caption_widget*" style "caption_style"
+widget "*centre_widget*" style "child_style"
 
 # turn this on here ... no one will find this useful thing unless we turn it
 # on by default

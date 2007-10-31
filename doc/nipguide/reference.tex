@@ -642,43 +642,15 @@ Suppose the workspace \ct{process.ws} loads an image in \ct{A1}, performs some
 processing and produces a result image \ct{A10}. If you run \nip{} with:
 
 \begin{verbatim}
-nip2 -bp --set 'A1=Image_file "fred.jpg"' --set main=A10 -o fred.jpg process.ws
+nip2 -bp \
+  -= 'Workspaces.process.A1=Image_file "fred.jpg"' \
+  -= main=Workspaces.process.A10 \
+  -o fred.jpg process.ws
 \end{verbatim}
 
 \noindent
 This will start \nip{} in batch (ie. no GUI) mode (the \ct{-b} switch), 
-load \ct{myworkspace.ws}, change \ct{A1} to load another file, set \ct{main}
-to be the value of A10
-
-and save the value of \ct{A10} to \ct{fred.jpg} (the
-\ct{-p} switch).
-
-The remaining problem is how to pass the name of the file to be processed to
-the workspace. The easiest solution is to use environment variables. In your
-workspace, type:
-
-\begin{verbatim}
-if expand "$FILE" != [] then expand "$FILE" else "default.jpg"
-\end{verbatim}
-
-\noindent
-This will expand to either the value of the \ct{\$FILE} environment variable,
-or the empty list if \ct{\$FILE} is not defined. Now, if that was row
-\ct{B27}, change the row that loads the workspace's input image to be:
-
-\begin{verbatim}
-Image_file B27
-\end{verbatim}
-
-\noindent
-And you now have a workspace that processes the image \ct{default.jpg} if you
-run \nip{} normally, but if you run at the command-line, you can enter:
-
-\begin{verbatim}
-FILE="another.jpg" nip2 -bp main.def myworkspace.ws -o fred.jpg
-\end{verbatim}
-
-\noindent
-And it will process \ct{another.jpg} instead. You can use the
-\ctr{Widgets}\ct{File Chooser} widget to make it a little prettier.
+load \ct{process.ws}, change \ct{A1} to load another file, set \ct{main}
+to be the value of \ct{A10} and save the value of \ct{A10} to \ct{fred.jpg} 
+(the \ct{-p} switch).
 

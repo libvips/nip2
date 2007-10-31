@@ -160,7 +160,7 @@ colourview_init( Colourview *colourview )
 		DOUBLECLICK_FUNC( colourview_doubleclick_one_cb ), colourview,
 		DOUBLECLICK_FUNC( colourview_doubleclick_two_cb ), colourview );
 
-	set_name( eb, "caption_widget" );
+	gtk_widget_set_name( eb, "caption_widget" );
         gtk_widget_show( eb );
 }
 

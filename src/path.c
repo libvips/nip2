@@ -28,8 +28,8 @@
  */
 
 /* just load .defs/.wses from "."
- */
 #define DEBUG
+ */
 
 #include "ip.h"
 

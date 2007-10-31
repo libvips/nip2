@@ -127,7 +127,7 @@ valueview_init( Valueview *valueview )
         gtk_misc_set_alignment( GTK_MISC( valueview->label ), 0, 0.5 );
         gtk_misc_set_padding( GTK_MISC( valueview->label ), 2, 0 );
         gtk_container_add( GTK_CONTAINER( valueview->eb ), valueview->label );
-	set_name( valueview->eb, "caption_widget" );
+	gtk_widget_set_name( valueview->eb, "caption_widget" );
         gtk_signal_connect( GTK_OBJECT( valueview->eb ), "event",
                 GTK_SIGNAL_FUNC( valueview_event_cb ), valueview );
 

@@ -105,7 +105,7 @@ rowview_set_name_cb( Rowview *rview )
 	printf( ".name = %s\n", rview->to_set_name );
 #endif /*DEBUG*/
 
-	set_name( rview->but, rview->to_set_name );
+	gtk_widget_set_name( rview->but, rview->to_set_name );
 	rview->set_name = rview->to_set_name;
 	rview->to_set_name = NULL;
 

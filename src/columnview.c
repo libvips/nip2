@@ -792,7 +792,7 @@ columnview_refresh( vObject *vobject )
 	/* Set select state.
 	 */
         if( col->selected && !cview->selected ) {
-                set_name( cview->title, "selected_widget" );
+                gtk_widget_set_name( cview->title, "selected_widget" );
 		cview->selected = TRUE;
 		if( cview->textfr )
 			gtk_widget_grab_focus( cview->text );
@@ -801,7 +801,7 @@ columnview_refresh( vObject *vobject )
 		/* Always do this, even if cview->selected, so we set on the
 		 * first _refresh().
 		 */
-                set_name( cview->title, "column_widget" );
+                gtk_widget_set_name( cview->title, "column_widget" );
 		cview->selected = FALSE;
 	}
 

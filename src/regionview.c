@@ -1043,7 +1043,7 @@ regionview_init( Regionview *regionview )
 
 	buf_init_dynamic( &regionview->caption, REGIONVIEW_LABEL_MAX );
 
-	set_name( GTK_WIDGET( regionview ), "regionview_widget" );
+	gtk_widget_set_name( GTK_WIDGET( regionview ), "regionview_widget" );
 }
 
 GtkType

@@ -303,7 +303,7 @@ matrixview_toggle_build( Matrixview *matrixview )
     				GTK_SIGNAL_FUNC( matrixview_toggle_change_cb ),
     				matrixview );
     			if( x == cx && y == cy )
-    				set_name( but, "centre_widget" );
+    				gtk_widget_set_name( but, "centre_widget" );
 			/*
 
 				FIXME ... this b0rks thanks to pangolayout

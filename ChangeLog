@@ -1,3 +1,5 @@
+started 7.13.2
+
 started 7.13.1
 - you can type "fred = 12" into a columnview, woo
 - gah, lcomps had "undefined" set on various members because of trimming off

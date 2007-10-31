@@ -1,19 +1,8 @@
-- on PC, need to patch arith_dispatch with transform ... perhaps automate this?
-
-- image view windows are missing 'max' buttons?
-
-  caused by gtk_window_set_transient_for() in iwindow
-
-  not much we can do here, except remove the transient_for behaviour
-
-- manual needs updating for ws defs, --set
 
 - have a toggle in find colour calib for "linearise"
 
   another option that uses the greyscale to set the zero, but does not adjust
   gamma?
-
-- find colour calib should show LUT using Plot rather than Image
 
 - apply calib should work for groups
 
@@ -54,6 +43,11 @@
 
 
 
+- image view windows are missing 'max' buttons?
+
+  caused by gtk_window_set_transient_for() in iwindow
+
+  not much we can do here, except remove the transient_for behaviour
 
 - do we leak for IMAGEVEC/DOUBLEVEC/etc. in vips_call.c? I think we might
 

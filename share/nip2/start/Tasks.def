@@ -189,7 +189,7 @@ Tasks_capture_item = class
 			_linear_lut = im_invertlut _comb (_max_value + 1);
 
 			// and display it
-			linearising_lut = Image _linear_lut;
+			linearising_lut = Plot [] _linear_lut;
 
 			// map the original image through the lineariser to 
 			// get linear 0-1 RGB image

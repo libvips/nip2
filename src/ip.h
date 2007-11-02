@@ -125,8 +125,6 @@ extern int statfs();
 #include <gdk/gdkkeysyms.h>
 
 #include <vips/vips.h>
-#include <vips/history.h>
-#include <vips/time.h>
 
 /* Experimental vips8 links.
  */

@@ -422,10 +422,7 @@ imageinfo_undo_free( Imageinfo *imageinfo )
 static void
 imageinfo_dispose_eval( Imageinfo *imageinfo )
 {
-	if( imageinfo->eval_progress ) {
-		gtk_widget_destroy( GTK_WIDGET( imageinfo->eval_progress ) );
-		imageinfo->eval_progress = NULL;
-	}
+	DESTROY_GTK( imageinfo->eval_progress );
 	IM_FREEF( g_timer_destroy, imageinfo->eval_timer );
 	if( imageinfo->eval_parent ) {
 		g_object_remove_weak_pointer( 
@@ -722,9 +719,11 @@ imageinfo_new_modlut( Imageinfogroup *imageinfogroup,
 }
 
 static int
-imageinfo_progress_close( Imageinfo *imageinfo )
+imageinfo_progress_start( Imageinfo *imageinfo )
 {
-	imageinfo_dispose_eval( imageinfo );
+	/* Reset our timer.
+	 */
+	imageinfo->eval_last = g_timer_elapsed( imageinfo->eval_timer, NULL );
 
 	return( 0 );
 }
@@ -747,10 +746,10 @@ imageinfo_progress_eval( Imageinfo *imageinfo )
 			while( g_main_context_iteration( NULL, FALSE ) )
 				;
 
-			imageinfo->eval_last = latest;
-
 			if( imageinfo->eval_progress->cancelled )
 				imageinfo->im->kill = 1;
+
+			imageinfo->eval_last = latest;
 		}
 	}
 	else {
@@ -772,6 +771,26 @@ imageinfo_progress_eval( Imageinfo *imageinfo )
 			imageinfo->eval_last = latest;
 		}
 	}
+
+	return( 0 );
+}
+
+static int
+imageinfo_progress_stop( Imageinfo *imageinfo )
+{
+	/* Pop down the dialog.
+	 */
+	DESTROY_GTK( imageinfo->eval_progress );
+
+	return( 0 );
+}
+
+static int
+imageinfo_progress_close( Imageinfo *imageinfo )
+{
+	/* Remove everything related to progress.
+	 */
+	imageinfo_dispose_eval( imageinfo );
 
 	return( 0 );
 }
@@ -799,15 +818,19 @@ imageinfo_progress_add( Imageinfo *imageinfo, GtkWidget *eval_parent )
 		g_object_add_weak_pointer( G_OBJECT( eval_parent ), 
 			(gpointer *) &imageinfo->eval_parent );
 
-        /* Call to tidy up.
-         */ 
-        (void) im_add_close_callback( imageinfo->im, 
-                (im_callback_fn) imageinfo_progress_close, imageinfo, NULL );
-
         /* Call to animate countdown. 
          */ 
+	(void) im_add_evalstart_callback( imageinfo->im, 
+		(im_callback_fn) imageinfo_progress_start, imageinfo, NULL );
 	(void) im_add_eval_callback( imageinfo->im, 
 		(im_callback_fn) imageinfo_progress_eval, imageinfo, NULL );
+	(void) im_add_evalend_callback( imageinfo->im, 
+		(im_callback_fn) imageinfo_progress_stop, imageinfo, NULL );
+
+	/* On close, remove everything.
+	 */
+	(void) im_add_close_callback( imageinfo->im, 
+		(im_callback_fn) imageinfo_progress_close, imageinfo, NULL );
 }
 
 /* Need this context during imageinfo_open_image_input().
@@ -1013,8 +1036,8 @@ imageinfo_open_image_input( const char *filename, ImageinfoOpen *open )
 	}
 
 	else {
-		im_errormsg( "\"%s\" is not in a supported image file format",
-			filename );
+		im_error( "open", _( "\"%s\" is not in a supported "
+			"image file format" ), filename );
 		return( NULL );
 	}
 
@@ -1023,7 +1046,12 @@ imageinfo_open_image_input( const char *filename, ImageinfoOpen *open )
 	if( im_pincheck( imageinfo->im ) ) 
 		return( NULL );
 
-	/* Attach the origiinal filename ... pick this up again later as a
+	/* The rewind will have removed everything from the IMAGE. Reattach
+	 * progress.
+	 */
+	imageinfo_progress_add( imageinfo, NULL );
+
+	/* Attach the original filename ... pick this up again later as a
 	 * save default.
 	 */
 	if( im_meta_set_string( imageinfo->im, ORIGINAL_FILENAME, filename ) )

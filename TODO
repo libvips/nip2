@@ -1,4 +1,17 @@
 
+- which gtk are we using for the windows build? new gtks come from the main gtk
+  site now, rather than tor's homepage:
+
+	http://ftp.gnome.org/pub/GNOME/binaries/win32/
+
+  should be all zips, so we could automate?
+
+- could make progress_add lighter?
+
+  attach progress to everything
+
+  maybe fold more into imageinfo, since we use it everywhere?
+
 - have a toggle in find colour calib for "linearise"
 
   another option that uses the greyscale to set the zero, but does not adjust

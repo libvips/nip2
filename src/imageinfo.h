@@ -133,10 +133,10 @@ struct _Imageinfo {
 
 	/* A progress dialog popped up for eval on this ->im.
 	 */
-	GTimer *eval_timer;		/* Time progress with this */
+	gboolean monitored;		/* Have we attached callbacks */
 	double eval_last;		/* When we last updated */
 	Progress *eval_progress;	/* The progress box */
-	GtkWidget *eval_parent;		/* Display progress here */
+	GtkWidget *eval_parent;		/* ... as child of */
 
 	/* If we're from a file, the timestamp on the file we loaded from ...
 	 * used to spot changes.

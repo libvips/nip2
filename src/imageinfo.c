@@ -423,13 +423,14 @@ static void
 imageinfo_dispose_eval( Imageinfo *imageinfo )
 {
 	DESTROY_GTK( imageinfo->eval_progress );
-	IM_FREEF( g_timer_destroy, imageinfo->eval_timer );
 	if( imageinfo->eval_parent ) {
 		g_object_remove_weak_pointer( 
 			G_OBJECT( imageinfo->eval_parent ), 
 			(gpointer *) &imageinfo->eval_parent );
 		imageinfo->eval_parent = NULL;
 	}
+
+	imageinfo->monitored = FALSE;
 }
 
 static void
@@ -606,7 +607,7 @@ imageinfo_init( Imageinfo *imageinfo )
 	imageinfo->redo = NULL;
 	imageinfo->cundo = NULL;
 
-	imageinfo->eval_timer = NULL;
+	imageinfo->monitored = FALSE;
 	imageinfo->eval_progress = NULL;
 
 	imageinfo->check_mtime = 0;
@@ -638,92 +639,13 @@ imageinfo_get_type( void )
 	return( type );
 }
 
-/* Make a basic imageinfo. No refs, will be destroyed on next GC. If name is
- * NULL, make a temp name up; otherwise name needs to be unique.
- */
-Imageinfo *
-imageinfo_new( Imageinfogroup *imageinfogroup, 
-	Heap *heap, IMAGE *im, const char *name )
-{
-	Imageinfo *imageinfo = 
-		IMAGEINFO( g_object_new( TYPE_IMAGEINFO, NULL ) );
-	char buf[FILENAME_MAX];
-
-#ifdef DEBUG_OPEN
-	printf( "imageinfo_new: \"%s\"\n", im->filename );
-#endif /*DEBUG_OPEN*/
-
-	managed_link_heap( MANAGED( imageinfo ), heap );
-
-	if( !name ) {
-		if( !temp_name( buf, "v" ) ) 
-			/* Will be freed on next GC.
-			 */
-			return( NULL );
-
-		name = buf;
-	}
-	iobject_set( IOBJECT( imageinfo ), name, NULL );
-
-	/* Only record the pointer when we know we will make the imageinfo
-	 * successfully.
-	 */
-	imageinfo->im = im;
-
-	icontainer_child_add( ICONTAINER( imageinfogroup ),
-		ICONTAINER( imageinfo ), -1 );
-
-	return( imageinfo );
-}
-
-/* Make a temp image. Deleted on close. No refs: closed on next GC. If you
- * want it to stick around, ref it!
- */
-Imageinfo *
-imageinfo_new_temp( Imageinfogroup *imageinfogroup, 
-	Heap *heap, const char *name, const char *mode )
-{
-	IMAGE *im;
-	Imageinfo *imageinfo;
-	char tname[FILENAME_MAX];
-
-	if( !temp_name( tname, "v" ) || !(im = im_open( tname, mode )) )
-		return( NULL );
-	if( !(imageinfo = imageinfo_new( imageinfogroup, heap, im, name )) ) {
-		im_close( im );
-		return( NULL );
-	}
-	imageinfo->dfile = TRUE;
-
-	return( imageinfo );
-}
-
-/* An image is a transformed LUT (eg. after passing a LUT from above through
- * VIPS) ... wrap it around the underlying image.
- */
-Imageinfo *
-imageinfo_new_modlut( Imageinfogroup *imageinfogroup, 
-	Heap *heap, Imageinfo *imageinfo, IMAGE *im )
-{
-	Imageinfo *top_imageinfo;
-
-	if( !(top_imageinfo = imageinfo_new( imageinfogroup, heap, im, NULL )) )
-		return( NULL );
-
-	/* Link together.
-	 */
-	top_imageinfo->underlying = imageinfo;
-	MANAGED_REF( top_imageinfo->underlying );
-
-	return( top_imageinfo );
-}
-
 static int
 imageinfo_progress_start( Imageinfo *imageinfo )
 {
-	/* Reset our timer.
+	/* Note the start time.
 	 */
-	imageinfo->eval_last = g_timer_elapsed( imageinfo->eval_timer, NULL );
+	imageinfo->eval_last = 
+		g_timer_elapsed( imageinfo->im->time->start, NULL );
 
 	return( 0 );
 }
@@ -734,7 +656,7 @@ imageinfo_progress_eval( Imageinfo *imageinfo )
 	const double start_threshold = 0.5;
         const double update_threshold = 0.2;
 
-	double latest = g_timer_elapsed( imageinfo->eval_timer, NULL );
+	double latest = g_timer_elapsed( imageinfo->im->time->start, NULL );
 	double elapsed = latest - imageinfo->eval_last;
 
 	if( imageinfo->eval_progress ) {
@@ -800,19 +722,22 @@ imageinfo_progress_close( Imageinfo *imageinfo )
 static void
 imageinfo_progress_add( Imageinfo *imageinfo, GtkWidget *eval_parent )
 {
-	/* Already being monitored.
-	 */
-	if( imageinfo->eval_timer )
-		return;
-
 	/* Only if we're running interactively.
 	 */
 	if( !main_window_top )
 		return;
 
-	if( !imageinfo->eval_timer ) 
-		imageinfo->eval_timer = g_timer_new();
-	imageinfo->eval_last = g_timer_elapsed( imageinfo->eval_timer, NULL );
+	/* Always update this.
+	 */
+	imageinfo->eval_parent = eval_parent;
+
+	/* Already being monitored. Just update eval_parent.
+	 */
+	if( imageinfo->monitored ) 
+		return;
+
+	imageinfo->monitored = TRUE;
+
 	imageinfo->eval_parent = eval_parent;
 	if( eval_parent )
 		g_object_add_weak_pointer( G_OBJECT( eval_parent ), 
@@ -831,6 +756,90 @@ imageinfo_progress_add( Imageinfo *imageinfo, GtkWidget *eval_parent )
 	 */
 	(void) im_add_close_callback( imageinfo->im, 
 		(im_callback_fn) imageinfo_progress_close, imageinfo, NULL );
+}
+
+/* Make a basic imageinfo. No refs, will be destroyed on next GC. If name is
+ * NULL, make a temp name up; otherwise name needs to be unique.
+ */
+Imageinfo *
+imageinfo_new( Imageinfogroup *imageinfogroup, 
+	Heap *heap, IMAGE *im, const char *name )
+{
+	Imageinfo *imageinfo = 
+		IMAGEINFO( g_object_new( TYPE_IMAGEINFO, NULL ) );
+	char buf[FILENAME_MAX];
+
+#ifdef DEBUG_OPEN
+	printf( "imageinfo_new: \"%s\"\n", im->filename );
+#endif /*DEBUG_OPEN*/
+
+	managed_link_heap( MANAGED( imageinfo ), heap );
+
+	if( !name ) {
+		if( !temp_name( buf, "v" ) ) 
+			/* Will be freed on next GC.
+			 */
+			return( NULL );
+
+		name = buf;
+	}
+	iobject_set( IOBJECT( imageinfo ), name, NULL );
+
+	/* Only record the pointer when we know we will make the imageinfo
+	 * successfully.
+	 */
+	imageinfo->im = im;
+
+	icontainer_child_add( ICONTAINER( imageinfogroup ),
+		ICONTAINER( imageinfo ), -1 );
+	
+	/* Sometimes overridden later to set a real parent.
+	 */
+	imageinfo_progress_add( imageinfo, NULL );
+
+	return( imageinfo );
+}
+
+/* An image is a transformed LUT (eg. after passing a LUT from above through
+ * VIPS) ... wrap it around the underlying image.
+ */
+Imageinfo *
+imageinfo_new_modlut( Imageinfogroup *imageinfogroup, 
+	Heap *heap, Imageinfo *imageinfo, IMAGE *im )
+{
+	Imageinfo *top_imageinfo;
+
+	if( !(top_imageinfo = imageinfo_new( imageinfogroup, heap, im, NULL )) )
+		return( NULL );
+
+	/* Link together.
+	 */
+	top_imageinfo->underlying = imageinfo;
+	MANAGED_REF( top_imageinfo->underlying );
+
+	return( top_imageinfo );
+}
+
+/* Make a temp image. Deleted on close. No refs: closed on next GC. If you
+ * want it to stick around, ref it!
+ */
+Imageinfo *
+imageinfo_new_temp( Imageinfogroup *imageinfogroup, 
+	Heap *heap, const char *name, const char *mode )
+{
+	IMAGE *im;
+	Imageinfo *imageinfo;
+	char tname[FILENAME_MAX];
+
+	if( !temp_name( tname, "v" ) || !(im = im_open( tname, mode )) )
+		return( NULL );
+	if( !(imageinfo = imageinfo_new( imageinfogroup, heap, im, name )) ) {
+		im_close( im );
+		return( NULL );
+	}
+	imageinfo->dfile = TRUE;
+
+	return( imageinfo );
 }
 
 /* Need this context during imageinfo_open_image_input().
@@ -882,7 +891,6 @@ imageinfo_open_image_input( const char *filename, ImageinfoOpen *open )
 			open->heap, open->filename, "w" )) )
 			return( NULL );
 		MANAGED_REF( imageinfo );
-		imageinfo_progress_add( imageinfo, NULL );
 		if( im_tiff2vips( filename, imageinfo->im ) ||
 			im_histlin( imageinfo->im, "im_tiff2vips %s %s",
 				filename, imageinfo->im->filename ) ) {
@@ -901,7 +909,6 @@ imageinfo_open_image_input( const char *filename, ImageinfoOpen *open )
 			open->heap, open->filename, "w" )) )
 			return( NULL );
 		MANAGED_REF( imageinfo );
-		imageinfo_progress_add( imageinfo, NULL );
 		if( im_jpeg2vips( filename, imageinfo->im ) ||
 			im_histlin( imageinfo->im, "im_jpeg2vips %s %s",
 				filename, imageinfo->im->filename ) ) {
@@ -920,7 +927,6 @@ imageinfo_open_image_input( const char *filename, ImageinfoOpen *open )
 			open->heap, open->filename, "w" )) )
 			return( NULL );
 		MANAGED_REF( imageinfo );
-		imageinfo_progress_add( imageinfo, NULL );
 		if( im_png2vips( filename, imageinfo->im ) ||
 			im_histlin( imageinfo->im, "im_png2vips %s %s",
 				filename, imageinfo->im->filename ) ) {
@@ -1001,7 +1007,6 @@ imageinfo_open_image_input( const char *filename, ImageinfoOpen *open )
 			open->heap, open->filename, "w" )) )
 			return( NULL );
 		MANAGED_REF( imageinfo );
-		imageinfo_progress_add( imageinfo, NULL );
 		if( im_magick2vips( filename, imageinfo->im ) ||
 			im_histlin( imageinfo->im, "im_magick2vips %s %s",
 				filename, imageinfo->im->filename ) ) {

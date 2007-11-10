@@ -295,14 +295,6 @@ is_EOF( void )
 		return( *is->str == '\0' );
 }
 
-/* Reset/push/pop parser stacks.
- */
-static void
-scope_reset( void )
-{
-	scope_sp = 0;
-}
-
 static void
 scope_push( void )
 {
@@ -323,6 +315,26 @@ scope_pop( void )
 	scope_sp -= 1;
 	current_symbol = scope_stack_symbol[scope_sp];
 	current_compile = scope_stack_compile[scope_sp];
+}
+
+/* Back to the outermost scope.
+ */
+static void
+scope_pop_all( void )
+{
+	if( scope_sp > 0 ) {
+		scope_sp = 0;
+		current_symbol = scope_stack_symbol[scope_sp];
+		current_compile = scope_stack_compile[scope_sp];
+	}
+}
+
+/* Reset/push/pop parser stacks. 
+ */
+static void
+scope_reset( void )
+{
+	scope_sp = 0;
 }
 
 /* Return the text we have accumulated for the current definition. Remove
@@ -1221,6 +1233,10 @@ parse_input( int ch, Symbol *sym, Toolkit *kit, int pos )
 	ip_unput( ch );
 
 	if( setjmp( parse_error_point ) ) {
+		/* Restore current_compile.
+		 */
+		scope_pop_all();
+
 		if( current_compile ) 
 			compile_error_set( current_compile );
 

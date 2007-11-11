@@ -1,8 +1,4 @@
-- try
-
-	[[x*y|x<-[1..10]|y<-[1..10]]
-
-  get an empty dialog box (yes, I know there's a syntax error)
+- try 
 
 	[[x*y|x<-[1..10]]|y<-[1..10]]
 
@@ -13,6 +9,24 @@
 	Matrix [[x*y|x<-[1..10]]|y<-[1..10]]
 
   to generate a times table
+
+  trace compile:
+
+	A1 = [[x*y|x<-[1..10]]|y<-[1..10]]
+
+  before compile
+
+	.. $$lcomp0 ..
+	{
+		$$lcomp0 = 
+		{
+			$$result = x * y;
+			x = [1..10];
+			y = zombie;
+		}
+	}
+
+  now the outer lcomp
 
 - which gtk are we using for the windows build? new gtks come from the main gtk
   site now, rather than tor's homepage:

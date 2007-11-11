@@ -1,6 +1,7 @@
 started 7.13.2
 - remove Application from nip2.desktop.in
 - revised progress system ... works for "max" now!
+- fix reporting of parse errors in inner scopes
 
 started 7.13.1
 - you can type "fred = 12" into a columnview, woo

@@ -421,8 +421,8 @@ tree_map( Compile *compile, tree_map_fn fn, ParseNode *node, void *a, void *b )
 	return( NULL );
 }
 
-/* Copy a tree in to a new context. Any leaves which reference symbols on
- * rewrite get rebound in the new context.
+/* Copy a tree to a new context. Any leaves which reference symbols on
+ * the rewrite list get rebound in the new context.
  */
 ParseNode *
 tree_copy_rewrite( Compile *compile, ParseNode *node, GSList *rewrite )

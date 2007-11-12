@@ -238,6 +238,8 @@ symbol_clear( Symbol *sym )
 	sym->ndirtychildren = 0;
 	sym->leaf = FALSE;
 
+	sym->generated = FALSE;
+
 	sym->tool = NULL;
 
 	sym->function = NULL;

@@ -914,6 +914,7 @@ lambda:
 		 */
 		im_snprintf( name, 256, "$$lambda%d", count++ );
 		sym = symbol_new_defining( current_compile, name );
+		sym->generated = TRUE;
 		(void) symbol_user_init( sym );
 		(void) compile_new_local( sym->expr );
 
@@ -975,6 +976,7 @@ listex:
 		im_snprintf( name, 256, "$$lcomp%d", count++ );
 		sym = symbol_new_defining( current_compile, name );
 		(void) symbol_user_init( sym );
+		sym->generated = TRUE;
 		(void) compile_new_local( sym->expr );
 
 		/* Initialise symbol parsing variables. Save old current symbol,
@@ -987,9 +989,20 @@ listex:
 		/* Somewhere to save the result expr
 		 */
 		sym = symbol_new_defining( current_compile, "$$result" );
+		sym->generated = TRUE;
 		(void) symbol_user_init( sym );
 		(void) compile_new_local( sym->expr );
 		sym->expr->compile->tree = $2;
+
+		/* We need to move any syms that $2 generated (eg. nested
+		 * lcomps or lambdas) inside $$result as well. All this pain
+		 * because we don't know we're seeing an lcomp until the first 
+		 * "<-" and we've passed two exprs by then. We could turn on
+		 * more backtracking in the parser (slower and would tie us to
+		 * bison) or we could change the lcomp syntax (eg. use a 
+		 * different bracket character).
+		 */
+		compile_move_syms( sym->expr->compile, $2 );
 
 		/* Make the first "x <- expr" generator.
 		 */
@@ -998,7 +1011,7 @@ listex:
 		(void) compile_new_local( sym->expr );
 		sym->expr->compile->tree = $6;
 		IM_FREE( $4 );
-
+		compile_move_syms( sym->expr->compile, $6 );
 	}
 	frompred_list ']' {
 		Symbol *sym;
@@ -1061,6 +1074,7 @@ frompred:
 
 		im_snprintf( name, 256, "$$filter%d", count++ );
 		sym = symbol_new_defining( current_compile, name );
+		sym->generated = TRUE;
 		(void) symbol_user_init( sym );
 		(void) compile_new_local( sym->expr );
 		sym->expr->compile->tree = $1;

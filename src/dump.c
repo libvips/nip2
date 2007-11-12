@@ -241,27 +241,30 @@ dump_expr( Expr *expr )
 
 	printf( "expr (%p)->sym->name = \"%s\"\n", 
 		expr, IOBJECT( sym )->name );
-	printf( "%s->row = %s\n", IOBJECT( sym )->name, 
-		expr->row?"(set)":"(not set)" );
+	if( expr->row )
+		printf( "%s->row = (set)\n", IOBJECT( sym )->name ); 
 
 	if( expr->compile ) {
 		printf( "%s->compile:\n", IOBJECT( sym )->name );
 		dump_compile( expr->compile );
 	}
 
-	printf( "%s->expr->root = ", IOBJECT( sym )->name );
-	if( !sym->dirty )
+	if( sym->dirty ) 
+		printf( "<symbol is dirty ... can't print root>\n" );
+	else if( !PEISNOVAL( &expr->root ) ) {
+		printf( "%s->expr->root = ", IOBJECT( sym )->name );
 		pgraph( &expr->root );
-	else
-		printf( "<symbol is dirty ... can't print root>" );
-	printf( "\n" );
+	}
 
-	printf( "%s->expr->err = %s\n", 
-		IOBJECT( sym )->name, bool_to_char( expr->err ) );
-	printf( "%s->expr->error_top = \"%s\"\n", 
-		IOBJECT( sym )->name, NN( expr->error_top ) );
-	printf( "%s->expr->error_sub = \"%s\"\n", 
-		IOBJECT( sym )->name, NN( expr->error_sub ) );
+	if( expr->err )
+		printf( "%s->expr->err = %s\n", 
+			IOBJECT( sym )->name, bool_to_char( expr->err ) );
+	if( expr->error_top )
+		printf( "%s->expr->error_top = \"%s\"\n", 
+			IOBJECT( sym )->name, NN( expr->error_top ) );
+	if( expr->error_sub )
+		printf( "%s->expr->error_sub = \"%s\"\n", 
+			IOBJECT( sym )->name, NN( expr->error_sub ) );
 }
 
 /* Dump a compile, tiny.
@@ -282,12 +285,15 @@ void
 dump_compile( Compile *compile )
 {
 	Symbol *sym = compile->sym;
+#ifdef VERBOSE
 	BufInfo buf;
 	char str[100];
+#endif /*VERBOSE*/
 
 	printf( "compile (%p)->sym->name = \"%s\"\n", 
 		compile, IOBJECT( sym )->name );
 
+#ifdef VERBOSE
 	printf( "%s->class = %s\n", 
 		IOBJECT( sym )->name, bool_to_char( compile->is_klass ) );
 	printf( "%s->super = %s\n", 
@@ -299,19 +305,25 @@ dump_compile( Compile *compile )
 		IOBJECT( sym )->name, NN( compile->prhstext ) );
 	printf( "%s->compile->rhstext = \"%s\"\n", 
 		IOBJECT( sym )->name, NN( compile->rhstext ) );
+#endif /*VERBOSE*/
 
-	printf( "%s->compile->tree = \n", IOBJECT( sym )->name ); 
-	if( compile->tree ) 
+	if( compile->tree ) {
+		printf( "%s->compile->tree = \n", IOBJECT( sym )->name ); 
 		(void) dump_tree( compile->tree ); 
-	else
-		printf( "   (no compile tree)\n" );
+	}
+#ifdef VERBOSE
 	printf( "%s->compile->treefrag = %d pointers\n", IOBJECT( sym )->name,
 		g_slist_length( compile->treefrag ) );
+#endif /*VERBOSE*/
 
-	printf( "%s->compile->children =\n", 
-		IOBJECT( sym )->name );
-	(void) icontainer_map( ICONTAINER( compile ), 
-		(icontainer_map_fn) dump_symbol, NULL, NULL );
+	if( icontainer_get_n_children( ICONTAINER( compile ) ) > 0 ) {
+		printf( "%s->compile->children =\n", 
+			IOBJECT( sym )->name );
+		(void) icontainer_map( ICONTAINER( compile ), 
+			(icontainer_map_fn) dump_symbol, NULL, NULL );
+	}
+
+#ifdef VERBOSE
 	printf( "%s->compile->nparam = %d\n", 
 		IOBJECT( sym )->name, compile->nparam );
 	printf( "%s->compile->param = ", IOBJECT( sym )->name );
@@ -344,6 +356,7 @@ dump_compile( Compile *compile )
 		IOBJECT( sym )->name, buf_all( &buf ) );
 	if( compile->heap )
 		iobject_dump( IOBJECT( compile->heap ) );
+#endif /*VERBOSE*/
 }
 
 /* Print a full symbol and all it's children. 
@@ -355,14 +368,17 @@ dump_symbol( Symbol *sym )
 	(void) dump_tiny( sym );
 	printf( "\n" );
 
+#ifdef VERBOSE
 	printf( "%s->patch = %d pointers\n", IOBJECT( sym )->name,
 		g_slist_length( sym->patch ) );
+#endif /*VERBOSE*/
 
 	if( sym->expr ) 
 		dump_expr( sym->expr );
 	else
 		printf( "%s->expr = <no expr info>\n", IOBJECT( sym )->name );
 
+#ifdef VERBOSE
 	printf( "%s->base = ", IOBJECT( sym )->name );
 	if( !sym->dirty ) {
 		PElement root;
@@ -393,6 +409,7 @@ dump_symbol( Symbol *sym )
 		dump_kit( sym->tool->kit );
 	else
 		printf( "<NULL>\n" );
+#endif /*VERBOSE*/
 
 	return( NULL );
 }
@@ -719,7 +736,7 @@ dump_tree( ParseNode *n )
 		break;
 
 	case NODE_LEAF:
-		printf( "Leaf symbol: " );
+		printf( "Leaf symbol (%p): ", n->leaf );
 		(void) dump_tiny( n->leaf );
 		printf( "\n" );
 		break;

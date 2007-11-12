@@ -85,6 +85,10 @@ struct _Symbol {
 	int ndirtychildren;	/* Number of dirty top syms we refer to */
 	gboolean leaf;		/* True for in recomp set */
 
+	/* This is a generated symbol, like $$result, $$fn1, whatever.
+	 */
+	gboolean generated;
+
 	/* X-tras for definitions.
 	 */
 	Tool *tool;		/* Tool and toolkit defined in */

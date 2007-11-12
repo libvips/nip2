@@ -14,7 +14,7 @@
 
 	A1 = [[x*y|x<-[1..10]]|y<-[1..10]]
 
-  before compile
+  before compile #1
 
 	.. $$lcomp0 ..
 	{
@@ -26,7 +26,149 @@
 		}
 	}
 
-  now the outer lcomp
+  after compile #1
+
+	A1 = .. $$lcomp0 ..
+	{
+		$$lcomp0 = foldr $$fn1 [] [1..10]
+		{
+			y = zombie;
+			$$fn1 x $$sofar = (x * y) : $$sofar;
+			foldr = zombie;
+		}
+	}
+
+  before compile #2
+
+	A1 = .. $$lcomp1 ..
+	{
+		$$lcomp1 = 
+		{
+			$$result = $$lcomp0;
+			y = [1..10];
+			foldr = zombie;
+		}
+	}
+
+  after compile #2
+
+	A1 = .. $$lcomp1 ..
+	{
+		$$lcomp1 = foldr $$fn1 [] [1..10]
+		{
+			foldr = zombie;
+			$$fn1 y $$sofar = $lcomp0 : $$sofar;
+		}
+	}
+
+  the problem is this -- we have:
+
+	'[' expr TK_BOR TK_IDENT TK_FROM expr {
+		make new scope
+	}
+	frompred_list ']' {
+		pop scope
+	}
+	
+  we move the trees for the first two exprs inside the scope, but we don't
+  move any locals they make
+
+  so if expr contains an lcomp, it ends up as a peer of the lcomp we are
+  defining, rather than as a child
+
+  so, we generate:
+
+	A1 = .. $$lcomp1 ..
+	{
+		$$lcomp0 = foldr $$fn1 [] [1..10]
+		{
+			y = zombie;
+			$$fn1 x $$sofar = (x * y) : $$sofar;
+			foldr = zombie;
+		}
+
+		$$lcomp1 = foldr $$fn1 [] [1..10]
+		{
+			foldr = zombie;
+			$$fn1 y $$sofar = $$lcomp0 : $$sofar;
+		}
+	}
+
+  we should generate:
+
+	A1 = .. $$lcomp1 ..
+	{
+		$$lcomp1 = foldr $$fn1 [] [1..10]
+		{
+			$$fn1 y $$sofar = $$lcomp0 : $$sofar
+			{
+				$$lcomp0 = foldr $$fn2 [] [1..10]
+				{
+					$$fn2 x $$sofar = (x * y) : $$sofar;
+				}
+			}
+		}
+	}
+
+
+
+
+
+  before compile #1
+
+	A1 = .. $$lcomp0 ..
+	{
+		$$lcomp0 = 
+		{
+			$$result = x * y;
+			x = [1..10];
+			y = zombie;
+		}
+	}
+
+  after compile #1
+
+	A1 = .. $$lcomp0 ..
+	{
+		$$lcomp0 = foldr $$fn1 [] [1..10]
+		{
+			y = zombie;
+			$$fn1 x $$sofar = (x * y) : $$sofar;
+			foldr = zombie;
+		}
+	}
+
+  before compile #2
+
+	A1 = .. $$lcomp1 ..
+	{
+		$$lcomp1 = $$result
+		{
+			$$result = $$lcomp0
+			{
+				$$lcomp0 = foldr $$fn1 [] [1..10]
+				{
+					y = zombie;
+					$$fn1 x $$sofar = (x * y) : $$sofar;
+					foldr = zombie;
+				}
+			}
+			y = [1..10];
+			foldr = zombie;
+		}
+	}
+
+  after compile #2
+
+	A1 = .. $$lcomp1 ..
+	{
+		$$lcomp1 = foldr $$fn2 [] [1..10]
+		{
+			$$result = $$lcomp0
+
+  
+
+
 
 - which gtk are we using for the windows build? new gtks come from the main gtk
   site now, rather than tor's homepage:

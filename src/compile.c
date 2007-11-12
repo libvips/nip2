@@ -1934,6 +1934,38 @@ compile_resolve_dynamic( Compile *tab, Compile *context )
 		context, NULL );
 }
 
+static void *
+compile_move_node( Compile *compile, ParseNode *node )
+{
+	if( node->type == NODE_LEAF && node->leaf->generated ) {
+		Symbol *sym = node->leaf;
+
+		printf( "moving " );
+		symbol_name_print( sym );
+		printf( " to scope " );
+		compile_name_print( compile );
+		printf( "\n" );
+
+		g_object_ref( G_OBJECT( sym ) );
+		icontainer_child_remove( ICONTAINER( sym ) );
+		icontainer_child_add( ICONTAINER( compile ), 
+			ICONTAINER( sym ), -1 );
+		g_object_unref( G_OBJECT( sym ) );
+	}
+
+	return( NULL );
+}
+
+/* Tree is a scrap of expression which may have caused some locals to be
+ * created (eg. by lcomps or lambdas). Move any generated locals into the
+ * scope of compile.
+ */
+void
+compile_move_syms( Compile *compile, ParseNode *tree )
+{
+	tree_map( compile, (tree_map_fn) compile_move_node, tree, NULL, NULL );
+}
+
 Symbol *
 compile_get_member( Compile *compile, const char *name )
 {
@@ -2027,21 +2059,25 @@ compile_lcomp_gen_find( Symbol *sym, GSList **generators )
 void 
 compile_lcomp( Compile *compile )
 {
+	/* Number nested locals with this. Keep numbering global so debugging
+	 * nested lcomps is easier.
+	 */
+	static int count = 1;
+
 	GSList *generators;
 	GSList *children;
 	gboolean sofar;
 	Compile *scope;
 	Symbol *result;
-	int count;
 	GSList *p;
 	Symbol *child;
 	char name[256];
 	ParseNode *n1, *n2, *n3;
 
 #ifdef DEBUG
+#endif /*DEBUG*/
 	printf( "before compile_lcomp:\n" );
 	dump_compile( compile );
-#endif /*DEBUG*/
 
 	/* Find all the elements of the lcomp, generators, filters and
 	 * $$result.
@@ -2058,6 +2094,7 @@ compile_lcomp( Compile *compile )
 		(SListMapFn) compile_lcomp_gen_find, &generators );
 
 #ifdef DEBUG
+#endif /*DEBUG*/
 	printf( "list comp " );
 	compile_name_print( compile );
 	printf( " has children: " ); 
@@ -2066,7 +2103,6 @@ compile_lcomp( Compile *compile )
 	printf( "and generators: " ); 
 	(void) slist_map( generators, (SListMapFn) dump_tiny, NULL );
 	printf( "\n" ); 
-#endif /*DEBUG*/
 
 	/* As yet no list to build on.
 	 */
@@ -2079,10 +2115,6 @@ compile_lcomp( Compile *compile )
 	/* Not seen the result element yet, but we should.
 	 */
 	result = NULL;
-
-	/* Number nested locals with this.
-	 */
-	count = 1;
 
 	/* Now generate code for each element, either a filter or a generator.
 	 */
@@ -2112,6 +2144,7 @@ compile_lcomp( Compile *compile )
 			n3 = tree_leaf_new( scope, "$$sofar" );
 			n1 = tree_ifelse_new( scope, n1, n2, n3 );
 			scope->tree = n1;
+			compile_move_syms( scope, n1 );
 		}
 		else {
 			Symbol *param;
@@ -2134,6 +2167,7 @@ compile_lcomp( Compile *compile )
 				element->expr->compile->tree, generators );
 			n3 = tree_appl_new( scope, n3, n2 );
 			scope->tree = n3;
+			compile_move_syms( scope, n3 );
 
 			/* The child will need params.
 			 */
@@ -2162,6 +2196,7 @@ compile_lcomp( Compile *compile )
 	n2 = tree_leaf_new( scope, "$$sofar" );
 	n3 = tree_binop_new( compile, BI_CONS, n1, n2 );
 	scope->tree = n3;
+	compile_move_syms( scope, n1 );
 	
 	/* Loop outwards again, closing the scopes we made.
 	 */
@@ -2187,22 +2222,25 @@ compile_lcomp( Compile *compile )
 
 		/* Need to unlink from our parents, or they will be marked as
 		 * in error.
-		 */
 		for( q = element->parents; q; q = q->next ) {
 			Compile *parent = COMPILE( q->data );
 
 			compile_link_break( parent, element );
 		}
 
+		printf( "destroying (%p) ", element );
+		symbol_name_print( element );
+		printf( "\n" );
+
 		IDESTROY( element );
+		 */
 	}
 
 #ifdef DEBUG
+#endif /*DEBUG*/
 	printf( "after compile_lcomp:\n" );
 	dump_compile( compile );
-#endif /*DEBUG*/
 
 	g_slist_free( generators );
 	g_slist_free( children );
 }
-

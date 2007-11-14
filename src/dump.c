@@ -211,6 +211,7 @@ dump_tiny( Symbol *sym )
 	BufInfo buf;
 	char str[100];
 
+	printf( "(%p) ", sym );
 	buf_init_static( &buf, str, 100 );
 	symbol_qualified_name( sym, &buf );
 	if( sym->dirty )
@@ -375,8 +376,6 @@ dump_symbol( Symbol *sym )
 
 	if( sym->expr ) 
 		dump_expr( sym->expr );
-	else
-		printf( "%s->expr = <no expr info>\n", IOBJECT( sym )->name );
 
 #ifdef VERBOSE
 	printf( "%s->base = ", IOBJECT( sym )->name );

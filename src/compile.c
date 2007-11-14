@@ -2222,18 +2222,18 @@ compile_lcomp( Compile *compile )
 
 		/* Need to unlink from our parents, or they will be marked as
 		 * in error.
+		 */
 		for( q = element->parents; q; q = q->next ) {
 			Compile *parent = COMPILE( q->data );
 
 			compile_link_break( parent, element );
 		}
 
-		printf( "destroying (%p) ", element );
+		printf( "** destroying (%p) ", element );
 		symbol_name_print( element );
 		printf( "\n" );
 
 		IDESTROY( element );
-		 */
 	}
 
 #ifdef DEBUG

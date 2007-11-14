@@ -488,9 +488,13 @@ tree_copy_rewrite( Compile *compile, ParseNode *node, GSList *rewrite )
 		break;
 
 	case NODE_LEAF:
-		if( g_slist_find( rewrite, node->leaf ) ) 
+		if( g_slist_find( rewrite, node->leaf ) ) {
+			printf( "tree_copy_rewrite: rebinding %s\n",
+				symbol_name( node->leaf ) );
+
 			copy = tree_leaf_new( compile, 
 				IOBJECT( node->leaf )->name );
+		}
 		else 
 			copy = tree_leafsym_new( compile, node->leaf );
 		break;

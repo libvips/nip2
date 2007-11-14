@@ -142,14 +142,13 @@
 
 	A1 = .. $$lcomp1 ..
 	{
-		$$lcomp1 = $$result
+		$$lcomp1 = 
 		{
 			$$result = $$lcomp0
 			{
 				$$lcomp0 = foldr $$fn1 [] [1..10]
 				{
-					y = zombie;
-					$$fn1 x $$sofar = (x * y) : $$sofar;
+					$$fn1 x $$sofar = (x * $$lcomp1.y) : $$sofar;
 					foldr = zombie;
 				}
 			}
@@ -164,10 +163,34 @@
 	{
 		$$lcomp1 = foldr $$fn2 [] [1..10]
 		{
-			$$result = $$lcomp0
+			$$fn2 y $$sofar = $$lcomp0 : $$sofar
+			{
+				$$lcomp0 = foldr $$fn1 [] [1..10]
+				{
+					$$fn1 x $$sofar = (x * y) : $$sofar;
+				}
+			}
+		}
+	}
 
-  
+  correct! but it fails because things are bound incorrectly ... the
+  innermost y is bound to the left-over $$lcomp1.y
 
+  if we destroy unused sys we still leave the ref to $$lcomp1.y in $$fn1 ...
+  it's never rebound to $$fn2.y
+
+  trace rebindings: we only rebind the 'x' during compile #1
+
+  when we copy the value of $$result into $$fn2, we also move any generated
+  syms for the tree, but we don't rebind the code in those syms
+
+  is y on the rename list, but not spotted because the ref is in the generated
+  sym? get tree_copy_rewrite() to print the rewrite list
+
+  yup, y is on the rewrite list for the copy
+
+  so compile_move_syms() needs a rewrite list too ... tricky! can we update
+  the compile trees in-place?? or will we need to copy the whole graph?
 
 
 - which gtk are we using for the windows build? new gtks come from the main gtk

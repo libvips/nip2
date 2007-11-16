@@ -969,6 +969,7 @@ listex:
 		static int count = 0;
 		char name[256];
 		Symbol *sym;
+		Compile *enclosing = current_compile;
 
 		/* Make an anonymous symbol local to the current sym, save
 		 * the map expr inside that. 
@@ -995,14 +996,9 @@ listex:
 		sym->expr->compile->tree = $2;
 
 		/* We need to move any syms that $2 generated (eg. nested
-		 * lcomps or lambdas) inside $$result as well. All this pain
-		 * because we don't know we're seeing an lcomp until the first 
-		 * "<-" and we've passed two exprs by then. We could turn on
-		 * more backtracking in the parser (slower and would tie us to
-		 * bison) or we could change the lcomp syntax (eg. use a 
-		 * different bracket character).
+		 * lcomps or lambdas) inside $$result as well. 
 		 */
-		compile_move_syms( sym->expr->compile, $2 );
+		compile_move_syms( enclosing, $2, sym->expr->compile, NULL );
 
 		/* Make the first "x <- expr" generator.
 		 */
@@ -1011,7 +1007,7 @@ listex:
 		(void) compile_new_local( sym->expr );
 		sym->expr->compile->tree = $6;
 		IM_FREE( $4 );
-		compile_move_syms( sym->expr->compile, $6 );
+		compile_move_syms( enclosing, $6, sym->expr->compile, NULL );
 	}
 	frompred_list ']' {
 		Symbol *sym;

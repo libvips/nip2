@@ -173,6 +173,8 @@
 		}
 	}
 
+
+
   correct! but it fails because things are bound incorrectly ... the
   innermost y is bound to the left-over $$lcomp1.y
 
@@ -190,8 +192,48 @@
   yup, y is on the rewrite list for the copy
 
   so compile_move_syms() needs a rewrite list too ... tricky! can we update
-  the compile trees in-place?? or will we need to copy the whole graph?
+  the compile trees in-place? or will we need to copy the whole graph?
 
+  best to copy the graph ... need to recurse for all children too
+
+  compile_move_syms() needs to check that the syms it is moving are really
+  locals of that tree ... not good enough to just test ->generated, we need to
+  test for the location too
+
+  forget the glr-parser thing
+
+  try again
+
+	A1 = .. $$lcomp1 ..
+	{
+		$$lcomp1 = foldr $$fn2 [] [1..10]
+		{
+			$$fn2 y $$sofar = $$lcomp0 : $$sofar
+			{
+				$$lcomp0 = foldr $$fn1 [] [1..10]
+				{
+					$$fn1 x $$sofar = (x * y) : $$sofar;
+				}
+			}
+		}
+	}
+
+  correct binding!
+
+  but we still don't work, because the old tree, which we have't removed,
+  still has references to dead syms recorded by compile_link_make() & friends
+
+  perhaps we should copy the entire tree rather than trying to move syms?
+  compile_copy_rewrite()
+
+  working on compile_copy_sym()
+
+
+
+
+- compile_map_all() now works boittom-up, has this broken anything?
+
+  seems OK
 
 - which gtk are we using for the windows build? new gtks come from the main gtk
   site now, rather than tor's homepage:

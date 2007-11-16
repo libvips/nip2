@@ -114,7 +114,8 @@ gboolean compile_check( Compile *compile );
 void compile_resolve_names( Compile *inner, Compile *outer );
 Symbol *compile_resolve_top( Symbol *sym );
 void compile_resolve_dynamic( Compile *tab, Compile *context );
-void compile_move_syms( Compile *compile, ParseNode *tree );
+void compile_move_syms( Compile *fromscope, ParseNode *tree, 
+	Compile *toscope, GSList *rewrite );
 
 Symbol *compile_get_member( Compile *compile, const char *name );
 const char *compile_get_member_string( Compile *compile, const char *name );

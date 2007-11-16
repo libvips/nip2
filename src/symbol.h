@@ -78,7 +78,7 @@ struct _Symbol {
 	/* Recomputation links. Use these to work out what to build next.
 	 */
 	gboolean dirty;		/* True if this sym needs recalc */
-	GSList *parents;	/* Compile which refer to this sym */
+	GSList *parents;	/* Compiles which refer to this sym */
 
 	GSList *topchildren;	/* For top syms, all top-level children */
 	GSList *topparents;	/* For top syms, all top-level parents */

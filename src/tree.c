@@ -421,11 +421,11 @@ tree_map( Compile *compile, tree_map_fn fn, ParseNode *node, void *a, void *b )
 	return( NULL );
 }
 
-/* Copy a tree to a new context. Any leaves which reference symbols on
- * the rewrite list get rebound in the new context.
+/* Copy a tree to a new context. Make all symbols afresh ... you need to link
+ * after calling this. 
  */
 ParseNode *
-tree_copy_rewrite( Compile *compile, ParseNode *node, GSList *rewrite )
+tree_copy( Compile *compile, ParseNode *node )
 {
 	ParseNode *copy;
 	GSList *l;
@@ -435,13 +435,11 @@ tree_copy_rewrite( Compile *compile, ParseNode *node, GSList *rewrite )
 	switch( node->type ) {
 	case NODE_GENERATOR:
 		copy = tree_new( compile );
-		copy->arg1 = tree_copy_rewrite( compile, node->arg1, rewrite );
+		copy->arg1 = tree_copy( compile, node->arg1 );
 		if( node->arg2 )
-			copy->arg2 = tree_copy_rewrite( compile, 
-				node->arg2, rewrite );
+			copy->arg2 = tree_copy( compile, node->arg2 );
 		if( node->arg3 )
-			copy->arg3 = tree_copy_rewrite( compile, 
-				node->arg3, rewrite );
+			copy->arg3 = tree_copy( compile, node->arg3 );
 		copy->type = node->type;
 		break;
 
@@ -449,15 +447,15 @@ tree_copy_rewrite( Compile *compile, ParseNode *node, GSList *rewrite )
 	case NODE_BINOP:
 	case NODE_COMPOSE:
 		copy = tree_new( compile );
-		copy->arg1 = tree_copy_rewrite( compile, node->arg1, rewrite );
-		copy->arg2 = tree_copy_rewrite( compile, node->arg2, rewrite );
+		copy->arg1 = tree_copy( compile, node->arg1 );
+		copy->arg2 = tree_copy( compile, node->arg2 );
 		copy->type = node->type;
 		copy->biop = node->biop;
 		break;
 
 	case NODE_UOP:
 		copy = tree_new( compile );
-		copy->arg1 = tree_copy_rewrite( compile, node->arg1, rewrite );
+		copy->arg1 = tree_copy( compile, node->arg1 );
 		copy->type = node->type;
 		copy->uop = node->uop;
 		break;
@@ -469,7 +467,7 @@ tree_copy_rewrite( Compile *compile, ParseNode *node, GSList *rewrite )
 			ParseNode *arg = (ParseNode *) l->data;
 
 			copy->elist = g_slist_append( copy->elist, 
-				tree_copy_rewrite( compile, arg, rewrite ) );
+				tree_copy( compile, arg ) );
 		}
 		copy->type = node->type;
 		break;
@@ -488,15 +486,7 @@ tree_copy_rewrite( Compile *compile, ParseNode *node, GSList *rewrite )
 		break;
 
 	case NODE_LEAF:
-		if( g_slist_find( rewrite, node->leaf ) ) {
-			printf( "tree_copy_rewrite: rebinding %s\n",
-				symbol_name( node->leaf ) );
-
-			copy = tree_leaf_new( compile, 
-				IOBJECT( node->leaf )->name );
-		}
-		else 
-			copy = tree_leafsym_new( compile, node->leaf );
+		copy = tree_leaf_new( compile, IOBJECT( node->leaf )->name );
 		break;
 
 	case NODE_NONE:

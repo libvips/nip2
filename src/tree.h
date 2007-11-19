@@ -199,5 +199,4 @@ ParseNode *tree_map( Compile *compile,
 
 /* Copy a tree into a new context.
  */
-ParseNode *tree_copy_rewrite( Compile *compile, 
-	ParseNode *node, GSList *rewrite );
+ParseNode *tree_copy( Compile *compile, ParseNode *node );

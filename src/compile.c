@@ -109,23 +109,22 @@ compile_map_all_sub( Symbol *sym, map_compile_fn fn, void *a )
 		return( compile_map_all( sym->expr->compile, fn, a ) );
 }
 
-/* Apply a function to a compile ... and any local compiles. Do bottom-up (ie.
- * most nested first).
+/* Apply a function to a compile ... and any local compiles. Do top-down.
  */
 Compile *
 compile_map_all( Compile *compile, map_compile_fn fn, void *a )
 {
 	Compile *res;
 
-	/* Do any children.
+	/* Us first.
+	 */
+	if( (res = fn( compile, a )) )
+		return( res );
+
+	/* Then any children.
 	 */
 	if( (res = (Compile *) icontainer_map( ICONTAINER( compile ),
 		(icontainer_map_fn) compile_map_all_sub, (void *) fn, a )) )
-		return( res );
-
-	/* Then us.
-	 */
-	if( (res = fn( compile, a )) )
 		return( res );
 
 	return( NULL );
@@ -1935,119 +1934,6 @@ compile_resolve_dynamic( Compile *tab, Compile *context )
 		context, NULL );
 }
 
-static void *
-compile_rewrite( Compile *compile, GSList *rewrite )
-{
-	if( compile->tree ) {
-		printf( "compile_rewrite: examining " );
-		compile_name_print( compile );
-		printf( "\n" );
-
-		/* The current tree will have recoded a set of links ...
-		 * remove them all. We ignore patch lists, is that right?
-		 */
-		(void) slist_map( compile->children, 
-			(SListMapFn) symbol_link_break, compile );
-		IM_FREEF( g_slist_free, compile->children );
-
-		/* We make a copy of the tree rather than walking it and
-		 * rewriting in-place. There's no leak because
-		 * trees are freed with treefrags, not from a walk of the tree
-		 * pointer.
-		 */
-		compile->tree = tree_copy_rewrite( compile, 
-			compile->tree, rewrite );
-
-		compile_resolve_names( compile, compile_get_parent( compile ) );
-	}
-
-	return( NULL );
-}
-
-/* Make a copy of sym (and all it's children and trees) in the destination 
- * scope. This only works for stuff from the parse stage. Symbols which have
- * values and stuff attached are too complicated to copy easily.
- */
-static void *
-compile_copy_sym( Compile *dest, Symbol *sym )
-{
-	/* Must be a different place.
-	 */
-	assert( symbol_get_parent( sym )->expr->compile != dest );
-
-	/* Must not be an existing sym of that name.
-	 */
-	assert( !compile_lookup( dest, IOBJECT( sym )->name ) );
-
-	switch( sym->type ) {
-	case SYM_VALUE:
-
-	case SYM_PARAM:
-
-
-	case SYM_ZOMBIE:
-		break;
-
-	case SYM_WORKSPACE:
-	case SYM_WORKSPACEGROUP:
-	case SYM_ROOT:
-	case SYM_EXTERNAL:
-	case SYM_BUILTIN:
-	default:
-		assert( 0 );
-	}
-
-	return( NULL );
-}
-
-static void *
-compile_move_node( Compile *fromscope, ParseNode *node, 
-	Compile *toscope, GSList *rewrite )
-{
-	Symbol *sym = node->leaf;
-
-	if( node->type == NODE_LEAF && 
-		sym->generated &&
-		symbol_get_parent( sym ) &&
-		symbol_get_parent( sym )->expr->compile == fromscope ) {
-		printf( "moving " );
-		symbol_name_print( sym );
-		printf( " to scope " );
-		compile_name_print( toscope );
-		printf( "\n" );
-
-		g_object_ref( G_OBJECT( sym ) );
-		icontainer_child_remove( ICONTAINER( sym ) );
-		icontainer_child_add( ICONTAINER( toscope ), 
-			ICONTAINER( sym ), -1 );
-		g_object_unref( G_OBJECT( sym ) );
-
-		/* Now rewrite any trees we've moved. 
-		 */
-		compile_map_all( sym->expr->compile, 
-			(map_compile_fn) compile_rewrite, rewrite );
-	}
-
-	return( NULL );
-}
-
-/* Tree is a scrap of expression which may have caused some locals to be
- * created (eg. by lcomps or lambdas) as children of fromscope. Move any 
- * generated locals in fromscope referred to by tree into the scope of compile.
- *
- * Moving syms can break binding: pass in a list of syms which tree might be
- * referring to. They need to be rebound in the new context. Do this by
- * rewriting all the trees we move (syms we move may themselves have locals
- * containing trees) rebinding anything on the rewrite list.
- */
-void
-compile_move_syms( Compile *fromscope, ParseNode *tree, 
-	Compile *toscope, GSList *rewrite )
-{
-	tree_map( fromscope, 
-		(tree_map_fn) compile_move_node, tree, toscope, rewrite );
-}
-
 Symbol *
 compile_get_member( Compile *compile, const char *name )
 {
@@ -2076,6 +1962,153 @@ compile_get_member_string( Compile *compile, const char *name )
 		return( member_compile->tree->con.val.str );
 
 	return( NULL );
+}
+
+static void *
+compile_find_generated_node( Compile *compile, ParseNode *node,
+	GSList **list )
+{
+	Symbol *sym = node->leaf;
+
+        if( node->type == NODE_LEAF &&
+		sym->generated &&
+		symbol_get_parent( sym ) &&
+		symbol_get_parent( sym )->expr->compile == compile ) 
+		*list = g_slist_prepend( *list, sym );
+
+	return( NULL );
+}
+
+/* Search a scrap of tree and build a list of all the lambdas/lcomps/etc. it
+ * generated.
+ */
+static GSList *
+compile_find_generated( Compile *compile, ParseNode *tree )
+{
+	GSList *list;
+
+	list = NULL;
+	tree_map( compile,
+		(tree_map_fn) compile_find_generated_node, tree, &list, NULL );
+
+	return( list );
+}
+
+/* Make a copy of sym (and all it's children and trees) in the destination 
+ * scope. This only works for stuff from the parse stage. Symbols which have
+ * values and stuff attached are too complicated to copy easily.
+ */
+static void *
+compile_copy_sym( Symbol *sym, Compile *dest )
+{
+	const char *name = IOBJECT( sym )->name;
+	Symbol *copy_sym;
+
+#ifdef DEBUG
+#endif /*DEBUG*/
+	printf( "compile_copy_sym: copying " );
+	symbol_name_print( sym );
+	printf( " to scope of " );
+	compile_name_print( dest );
+	printf( "\n" );
+
+	/* Must be a different place.
+	 */
+	assert( symbol_get_parent( sym )->expr->compile != dest );
+
+	/* Must not be an existing sym of that name.
+	 */
+	assert( !compile_lookup( dest, name ) );
+
+	switch( sym->type ) {
+	case SYM_VALUE:
+		copy_sym = symbol_new_defining( dest, name );
+		(void) symbol_user_init( copy_sym );
+		copy_sym->generated = sym->generated;
+		(void) compile_new_local( copy_sym->expr );
+
+		/* Copy any locals over. We have to do this before we copy the
+		 * tree so that the new tree links to the new syms.
+		 */
+		icontainer_map( ICONTAINER( sym->expr->compile ),
+			(icontainer_map_fn) compile_copy_sym, 
+			copy_sym->expr->compile, NULL );
+
+		copy_sym->expr->compile->tree = tree_copy( 
+			copy_sym->expr->compile, sym->expr->compile->tree );
+
+		/* Copying the tree may have made some zombies. Resolve 
+		 * outwards.
+		 */
+		compile_resolve_names( copy_sym->expr->compile, dest );
+
+		break;
+
+	case SYM_PARAM:
+		copy_sym = symbol_new_defining( dest, name );
+		symbol_parameter_init( copy_sym );
+		break;
+
+	case SYM_ZOMBIE:
+		break;
+
+	case SYM_WORKSPACE:
+	case SYM_WORKSPACEGROUP:
+	case SYM_ROOT:
+	case SYM_EXTERNAL:
+	case SYM_BUILTIN:
+	default:
+		assert( 0 );
+	}
+
+	return( NULL );
+}
+
+/* tree is a scrap of graph in fromscope's context. It may have caused the
+ * generation of a number of lambdas, lcomps etc. in fromscope. Make a copy
+ * of the tree in toscope and copy over any generated syms too. fromscope and
+ * toscope can be the same, in which case we can just copy the tree.
+ */
+ParseNode *
+compile_copy_tree( Compile *fromscope, ParseNode *tree, Compile *toscope )
+{
+	ParseNode *copy_tree;
+
+#ifdef DEBUG
+#endif /*DEBUG*/
+	printf( "compile_copy_tree: copying tree from " );
+	compile_name_print( fromscope );
+	printf( " to " );
+	compile_name_print( toscope );
+	printf( "\n" );
+
+	/* A new context? Copy generated syms over.
+	 */
+	if( fromscope != toscope ) {
+		GSList *generated;
+
+		generated = compile_find_generated( fromscope, tree );
+
+#ifdef DEBUG
+#endif /*DEBUG*/
+		printf( "with generated children: " ); 
+		(void) slist_map( generated, (SListMapFn) dump_tiny, NULL );
+		printf( "\n" ); 
+
+		slist_map( generated, 
+			(SListMapFn) compile_copy_sym, toscope );
+
+		g_slist_free( generated );
+	}
+
+	copy_tree = tree_copy( toscope, tree );
+
+	/* Copying the tree may have made some zombies. Resolve 
+	 * outwards.
+	 */
+	compile_resolve_names( toscope, compile_get_parent( toscope ) );
+
+	return( copy_tree );
 }
 
 /* Generate the parse tree for this list comprehension. 
@@ -2113,27 +2146,18 @@ compile_get_member_string( Compile *compile, const char *name )
 		}
 	}
 
-*/
+ */
 
 /* Find elements of the lcomp. Filters, generators and $$result. We need to
  * disregard zombies, params, all that fluff.
  */
-void *
+static void *
 compile_lcomp_find( Symbol *sym, GSList **children )
 {
 	if( is_prefix( "$$filter", IOBJECT( sym )->name ) ||
 		is_prefix( "$$result", IOBJECT( sym )->name ) ||
 		is_value( sym ) )
 		*children = g_slist_append( *children, sym );
-
-	return( NULL );
-}
-
-void *
-compile_lcomp_gen_find( Symbol *sym, GSList **generators )
-{
-	if( !is_prefix( "$$", IOBJECT( sym )->name ) )
-		*generators = g_slist_append( *generators, sym );
 
 	return( NULL );
 }
@@ -2146,7 +2170,6 @@ compile_lcomp( Compile *compile )
 	 */
 	static int count = 1;
 
-	GSList *generators;
 	GSList *children;
 	gboolean sofar;
 	Compile *scope;
@@ -2168,22 +2191,12 @@ compile_lcomp( Compile *compile )
 	(void) icontainer_map( ICONTAINER( compile ), 
 		(icontainer_map_fn) compile_lcomp_find, &children, NULL );
 
-	/* Find the subset of children which are generators. We need a list of 
-	 * symbols we rebind on copy.
-	 */
-	generators = NULL;
-	(void) slist_map( children,
-		(SListMapFn) compile_lcomp_gen_find, &generators );
-
 #ifdef DEBUG
 #endif /*DEBUG*/
 	printf( "list comp " );
 	compile_name_print( compile );
 	printf( " has children: " ); 
 	(void) slist_map( children, (SListMapFn) dump_tiny, NULL );
-	printf( "\n" ); 
-	printf( "and generators: " ); 
-	(void) slist_map( generators, (SListMapFn) dump_tiny, NULL );
 	printf( "\n" ); 
 
 	/* As yet no list to build on.
@@ -2210,7 +2223,8 @@ compile_lcomp( Compile *compile )
 			continue;
 		}
 
-		/* Start the next nest in.
+		/* Start the next nest in. child is the local we will make for
+		 * this scope.
 		 */
 		im_snprintf( name, 256, "$$fn%d", count++ );
 		child = symbol_new_defining( scope, name );
@@ -2220,19 +2234,28 @@ compile_lcomp( Compile *compile )
 		if( is_prefix( "$$filter", IOBJECT( element )->name ) ) {
 			/* A filter.
 			 */
-			n1 = tree_copy_rewrite( scope, 
-				element->expr->compile->tree, generators );
+			n1 = compile_copy_tree( compile, 
+				element->expr->compile->tree,
+				scope );
 			n2 = tree_leafsym_new( scope, child );
 			n3 = tree_leaf_new( scope, "$$sofar" );
 			n1 = tree_ifelse_new( scope, n1, n2, n3 );
 			scope->tree = n1;
-			compile_move_syms( element->expr->compile, n1, 
-				scope, generators );
 		}
 		else {
 			Symbol *param;
 
-			/* A generator.
+			/* A generator. Make the params first, so that the
+			 * tree can link to these locals when we copy.
+			 */
+			param = symbol_new_defining( child->expr->compile, 
+				IOBJECT( element )->name );
+			symbol_parameter_init( param );
+			param = symbol_new_defining( child->expr->compile, 
+				"$$sofar" );
+			symbol_parameter_init( param );
+
+			/* Make the tree.
 			 */
 			n1 = tree_leaf_new( scope, "foldr" );
 			n2 = tree_leafsym_new( scope, child );
@@ -2246,21 +2269,11 @@ compile_lcomp( Compile *compile )
 				n2 = tree_const_new( scope, con );
 			}
 			n3 = tree_appl_new( scope, n3, n2 );
-			n2 = tree_copy_rewrite( scope, 
-				element->expr->compile->tree, generators );
+			n2 = compile_copy_tree( compile,
+				element->expr->compile->tree, 
+				scope );
 			n3 = tree_appl_new( scope, n3, n2 );
 			scope->tree = n3;
-			compile_move_syms( element->expr->compile, n3, 
-				scope, generators );
-
-			/* The child will need params.
-			 */
-			param = symbol_new_defining( child->expr->compile, 
-				IOBJECT( element )->name );
-			symbol_parameter_init( param, child->expr->compile );
-			param = symbol_new_defining( child->expr->compile, 
-				"$$sofar" );
-			symbol_parameter_init( param, child->expr->compile );
 
 			/* There's now an enclosing sofar we can use.
 			 */
@@ -2275,13 +2288,13 @@ compile_lcomp( Compile *compile )
 	/* Copy the code for the final result.
 	 */
 	assert( result );
-	n1 = tree_copy_rewrite( scope, 
-		result->expr->compile->tree, generators );
+
+	n1 = compile_copy_tree( compile, 
+		result->expr->compile->tree, scope );
 	n2 = tree_leaf_new( scope, "$$sofar" );
 	n3 = tree_binop_new( compile, BI_CONS, n1, n2 );
 	scope->tree = n3;
-	compile_move_syms( result->expr->compile, n1, scope, generators );
-	
+
 	/* Loop outwards again, closing the scopes we made.
 	 */
 	while( scope != compile ) {
@@ -2306,7 +2319,6 @@ compile_lcomp( Compile *compile )
 
 		/* Need to unlink from our parents, or they will be marked as
 		 * in error.
-		 */
 		for( q = element->parents; q; q = q->next ) {
 			Compile *parent = COMPILE( q->data );
 
@@ -2318,6 +2330,7 @@ compile_lcomp( Compile *compile )
 		printf( "\n" );
 
 		IDESTROY( element );
+		 */
 	}
 
 #ifdef DEBUG
@@ -2325,6 +2338,5 @@ compile_lcomp( Compile *compile )
 	printf( "after compile_lcomp:\n" );
 	dump_compile( compile );
 
-	g_slist_free( generators );
 	g_slist_free( children );
 }

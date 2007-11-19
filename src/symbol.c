@@ -796,13 +796,15 @@ symbol_user_init( Symbol *sym )
 /* Specialise into a parameter on an expression.
  */
 gboolean
-symbol_parameter_init( Symbol *sym, Compile *compile )
+symbol_parameter_init( Symbol *sym )
 {
+	Compile *parent = COMPILE( ICONTAINER( sym )->parent );
+
 	assert( sym->type == SYM_ZOMBIE );
 
 	sym->type = SYM_PARAM;
-	compile->param = g_slist_append( compile->param, sym );
-	compile->nparam = g_slist_length( compile->param );
+	parent->param = g_slist_append( parent->param, sym );
+	parent->nparam = g_slist_length( parent->param );
 	symbol_made( sym );
 
 	return( TRUE );

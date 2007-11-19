@@ -763,9 +763,10 @@ sdef:
 params: 
       	/* Empty */ | 
 	params TK_IDENT {
-		Symbol *sym = symbol_new_defining( current_compile, $2 );
+		Symbol *sym;
 
-		symbol_parameter_init( sym, current_compile );
+		sym = symbol_new_defining( current_compile, $2 );
+		symbol_parameter_init( sym );
 
 		IM_FREE( $2 );
 	}
@@ -928,7 +929,7 @@ lambda:
 		/* Make the parameter.
 		 */
 		sym = symbol_new_defining( current_compile, $2 );
-		symbol_parameter_init( sym, current_compile );
+		symbol_parameter_init( sym );
 		IM_FREE( $2 );
 	}
 	expr {
@@ -993,21 +994,18 @@ listex:
 		sym->generated = TRUE;
 		(void) symbol_user_init( sym );
 		(void) compile_new_local( sym->expr );
-		sym->expr->compile->tree = $2;
-
-		/* We need to move any syms that $2 generated (eg. nested
-		 * lcomps or lambdas) inside $$result as well. 
-		 */
-		compile_move_syms( enclosing, $2, sym->expr->compile, NULL );
+		sym->expr->compile->tree = compile_copy_tree( enclosing, $2, 
+			sym->expr->compile );
 
 		/* Make the first "x <- expr" generator.
 		 */
 		sym = symbol_new_defining( current_compile, $4 );
 		(void) symbol_user_init( sym );
 		(void) compile_new_local( sym->expr );
-		sym->expr->compile->tree = $6;
+		sym->expr->compile->tree = compile_copy_tree( enclosing, $6, 
+			sym->expr->compile );
+
 		IM_FREE( $4 );
-		compile_move_syms( enclosing, $6, sym->expr->compile, NULL );
 	}
 	frompred_list ']' {
 		Symbol *sym;

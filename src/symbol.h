@@ -160,7 +160,7 @@ void symbol_not_defined( Symbol *sym );
 void *symbol_link_break( Symbol *child, Compile *compile );
 
 gboolean symbol_user_init( Symbol *sym );
-gboolean symbol_parameter_init( Symbol *sym, Compile *compile );
+gboolean symbol_parameter_init( Symbol *sym );
 gboolean symbol_parameter_builtin_init( Symbol *sym );
 
 gboolean symbol_busy( void );

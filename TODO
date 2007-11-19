@@ -223,11 +223,99 @@
   but we still don't work, because the old tree, which we have't removed,
   still has references to dead syms recorded by compile_link_make() & friends
 
-  perhaps we should copy the entire tree rather than trying to move syms?
-  compile_copy_rewrite()
 
-  working on compile_copy_sym()
 
+
+
+
+	A1 = [[x*y|x<-[1..10]]|y<-[1..10]]
+
+  before compile #1
+
+	A1 = .. $$lcomp0 ..
+	{
+		$$lcomp0 = 
+		{
+			$$result = x * y;
+			x = [1..10];
+			y = zombie;
+		}
+	}
+
+  after compile #1
+
+	A1 = .. $$lcomp0 ..
+	{
+		$$lcomp0 = foldr $$fn1 [] [1..10]
+		{
+			$$result = x * A1.y;
+			x = [1..10];
+			y = zombie;
+			$$fn1 x $$sofar = (x * y) : $$sofar;
+			foldr = zombie;
+		}
+		y = zombie;
+	}
+
+
+
+now dies when copying result of first lcomp into A1.$$lcomp1.$$result
+
+compile_copy_tree: copying tree from compile(0x39c94b0) A1  to compile(0x3c32b10) A1.$$lcomp1.$$result 
+with generated children: (0x35cf5a0) SYM_VALUE A1.$$lcomp0; 
+compile_copy_sym: copying A1.$$lcomp0 to scope of compile(0x3c32b10) A1.$$lcomp1.$$result 
+compile_copy_sym: copying A1.$$lcomp0.$$result to scope of compile(0x3c32c00) A1.$$lcomp1.$$result.$$lcomp0 
+compile_copy_sym: copying A1.$$lcomp0.x to scope of compile(0x3c32c00) A1.$$lcomp1.$$result.$$lcomp0 
+nip2: compile.c:2021: compile_copy_sym: Assertion `!compile_lookup( dest, name
+)' failed.
+
+trying to copy  A1.$$lcomp0.x to A1.$$lcomp1.$$result.$$lcomp0 and it's there
+already
+
+
+
+
+
+
+
+
+
+
+
+  before compile #2
+
+	A1 = .. $$lcomp1 ..
+	{
+		$$lcomp1 = 
+		{
+			$$result = $$lcomp0
+			{
+				$$lcomp0 = foldr A1.$$lcomp0.$$fn1 [] [1..10]
+				{
+					$$fn1 x $$sofar = (x * $$lcomp1.y) : $$sofar;
+					foldr = zombie;
+				}
+			}
+			y = [1..10];
+			foldr = zombie;
+		}
+	}
+
+  after compile #2
+
+	A1 = .. $$lcomp1 ..
+	{
+		$$lcomp1 = foldr $$fn2 [] [1..10]
+		{
+			$$fn2 y $$sofar = $$lcomp0 : $$sofar
+			{
+				$$lcomp0 = foldr $$fn1 [] [1..10]
+				{
+					$$fn1 x $$sofar = (x * y) : $$sofar;
+				}
+			}
+		}
+	}
 
 
 

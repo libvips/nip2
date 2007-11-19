@@ -2016,15 +2016,17 @@ compile_copy_sym( Symbol *sym, Compile *dest )
 	 */
 	assert( symbol_get_parent( sym )->expr->compile != dest );
 
-	/* Must not be an existing sym of that name.
+	/* Must not be an existing sym of that name. Or if there is, it has to
+	 * be a zombie.
 	 */
-	assert( !compile_lookup( dest, name ) );
+	assert( !compile_lookup( dest, name ) ||
+		compile_lookup( dest, name )->type == SYM_ZOMBIE );
 
 	switch( sym->type ) {
 	case SYM_VALUE:
 		copy_sym = symbol_new_defining( dest, name );
-		(void) symbol_user_init( copy_sym );
 		copy_sym->generated = sym->generated;
+		(void) symbol_user_init( copy_sym );
 		(void) compile_new_local( copy_sym->expr );
 
 		/* Copy any locals over. We have to do this before we copy the
@@ -2046,6 +2048,7 @@ compile_copy_sym( Symbol *sym, Compile *dest )
 
 	case SYM_PARAM:
 		copy_sym = symbol_new_defining( dest, name );
+		copy_sym->generated = sym->generated;
 		symbol_parameter_init( copy_sym );
 		break;
 
@@ -2289,7 +2292,7 @@ compile_lcomp( Compile *compile )
 	 */
 	assert( result );
 
-	n1 = compile_copy_tree( compile, 
+	n1 = compile_copy_tree( result->expr->compile, 
 		result->expr->compile->tree, scope );
 	n2 = tree_leaf_new( scope, "$$sofar" );
 	n3 = tree_binop_new( compile, BI_CONS, n1, n2 );

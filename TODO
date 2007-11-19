@@ -1,234 +1,12 @@
 - try 
 
-	[[x*y|x<-[1..10]]|y<-[1..10]]
-
-  crashes
-
-  I'd like 
-
-	Matrix [[x*y|x<-[1..10]]|y<-[1..10]]
-
-  to generate a times table
-
-  trace compile:
-
 	A1 = [[x*y|x<-[1..10]]|y<-[1..10]]
 
-  before compile #1
+  works! but only if we don't trim off unused syms
 
-	.. $$lcomp0 ..
-	{
-		$$lcomp0 = 
-		{
-			$$result = x * y;
-			x = [1..10];
-			y = zombie;
-		}
-	}
+  if we trim, we fail with a patch pointer error, gah
 
-  after compile #1
-
-	A1 = .. $$lcomp0 ..
-	{
-		$$lcomp0 = foldr $$fn1 [] [1..10]
-		{
-			y = zombie;
-			$$fn1 x $$sofar = (x * y) : $$sofar;
-			foldr = zombie;
-		}
-	}
-
-  before compile #2
-
-	A1 = .. $$lcomp1 ..
-	{
-		$$lcomp1 = 
-		{
-			$$result = $$lcomp0;
-			y = [1..10];
-			foldr = zombie;
-		}
-	}
-
-  after compile #2
-
-	A1 = .. $$lcomp1 ..
-	{
-		$$lcomp1 = foldr $$fn1 [] [1..10]
-		{
-			foldr = zombie;
-			$$fn1 y $$sofar = $lcomp0 : $$sofar;
-		}
-	}
-
-  the problem is this -- we have:
-
-	'[' expr TK_BOR TK_IDENT TK_FROM expr {
-		make new scope
-	}
-	frompred_list ']' {
-		pop scope
-	}
-	
-  we move the trees for the first two exprs inside the scope, but we don't
-  move any locals they make
-
-  so if expr contains an lcomp, it ends up as a peer of the lcomp we are
-  defining, rather than as a child
-
-  so, we generate:
-
-	A1 = .. $$lcomp1 ..
-	{
-		$$lcomp0 = foldr $$fn1 [] [1..10]
-		{
-			y = zombie;
-			$$fn1 x $$sofar = (x * y) : $$sofar;
-			foldr = zombie;
-		}
-
-		$$lcomp1 = foldr $$fn1 [] [1..10]
-		{
-			foldr = zombie;
-			$$fn1 y $$sofar = $$lcomp0 : $$sofar;
-		}
-	}
-
-  we should generate:
-
-	A1 = .. $$lcomp1 ..
-	{
-		$$lcomp1 = foldr $$fn1 [] [1..10]
-		{
-			$$fn1 y $$sofar = $$lcomp0 : $$sofar
-			{
-				$$lcomp0 = foldr $$fn2 [] [1..10]
-				{
-					$$fn2 x $$sofar = (x * y) : $$sofar;
-				}
-			}
-		}
-	}
-
-
-
-
-
-  before compile #1
-
-	A1 = .. $$lcomp0 ..
-	{
-		$$lcomp0 = 
-		{
-			$$result = x * y;
-			x = [1..10];
-			y = zombie;
-		}
-	}
-
-  after compile #1
-
-	A1 = .. $$lcomp0 ..
-	{
-		$$lcomp0 = foldr $$fn1 [] [1..10]
-		{
-			y = zombie;
-			$$fn1 x $$sofar = (x * y) : $$sofar;
-			foldr = zombie;
-		}
-	}
-
-  before compile #2
-
-	A1 = .. $$lcomp1 ..
-	{
-		$$lcomp1 = 
-		{
-			$$result = $$lcomp0
-			{
-				$$lcomp0 = foldr $$fn1 [] [1..10]
-				{
-					$$fn1 x $$sofar = (x * $$lcomp1.y) : $$sofar;
-					foldr = zombie;
-				}
-			}
-			y = [1..10];
-			foldr = zombie;
-		}
-	}
-
-  after compile #2
-
-	A1 = .. $$lcomp1 ..
-	{
-		$$lcomp1 = foldr $$fn2 [] [1..10]
-		{
-			$$fn2 y $$sofar = $$lcomp0 : $$sofar
-			{
-				$$lcomp0 = foldr $$fn1 [] [1..10]
-				{
-					$$fn1 x $$sofar = (x * y) : $$sofar;
-				}
-			}
-		}
-	}
-
-
-
-  correct! but it fails because things are bound incorrectly ... the
-  innermost y is bound to the left-over $$lcomp1.y
-
-  if we destroy unused sys we still leave the ref to $$lcomp1.y in $$fn1 ...
-  it's never rebound to $$fn2.y
-
-  trace rebindings: we only rebind the 'x' during compile #1
-
-  when we copy the value of $$result into $$fn2, we also move any generated
-  syms for the tree, but we don't rebind the code in those syms
-
-  is y on the rename list, but not spotted because the ref is in the generated
-  sym? get tree_copy_rewrite() to print the rewrite list
-
-  yup, y is on the rewrite list for the copy
-
-  so compile_move_syms() needs a rewrite list too ... tricky! can we update
-  the compile trees in-place? or will we need to copy the whole graph?
-
-  best to copy the graph ... need to recurse for all children too
-
-  compile_move_syms() needs to check that the syms it is moving are really
-  locals of that tree ... not good enough to just test ->generated, we need to
-  test for the location too
-
-  forget the glr-parser thing
-
-  try again
-
-	A1 = .. $$lcomp1 ..
-	{
-		$$lcomp1 = foldr $$fn2 [] [1..10]
-		{
-			$$fn2 y $$sofar = $$lcomp0 : $$sofar
-			{
-				$$lcomp0 = foldr $$fn1 [] [1..10]
-				{
-					$$fn1 x $$sofar = (x * y) : $$sofar;
-				}
-			}
-		}
-	}
-
-  correct binding!
-
-  but we still don't work, because the old tree, which we have't removed,
-  still has references to dead syms recorded by compile_link_make() & friends
-
-
-
-
-
-
-	A1 = [[x*y|x<-[1..10]]|y<-[1..10]]
+  trace again and try to see where the stray patch pointer is
 
   before compile #1
 
@@ -257,31 +35,6 @@
 		y = zombie;
 	}
 
-
-
-now dies when copying result of first lcomp into A1.$$lcomp1.$$result
-
-compile_copy_tree: copying tree from compile(0x39c94b0) A1  to compile(0x3c32b10) A1.$$lcomp1.$$result 
-with generated children: (0x35cf5a0) SYM_VALUE A1.$$lcomp0; 
-compile_copy_sym: copying A1.$$lcomp0 to scope of compile(0x3c32b10) A1.$$lcomp1.$$result 
-compile_copy_sym: copying A1.$$lcomp0.$$result to scope of compile(0x3c32c00) A1.$$lcomp1.$$result.$$lcomp0 
-compile_copy_sym: copying A1.$$lcomp0.x to scope of compile(0x3c32c00) A1.$$lcomp1.$$result.$$lcomp0 
-nip2: compile.c:2021: compile_copy_sym: Assertion `!compile_lookup( dest, name
-)' failed.
-
-trying to copy  A1.$$lcomp0.x to A1.$$lcomp1.$$result.$$lcomp0 and it's there
-already
-
-
-
-
-
-
-
-
-
-
-
   before compile #2
 
 	A1 = .. $$lcomp1 ..
@@ -290,14 +43,15 @@ already
 		{
 			$$result = $$lcomp0
 			{
-				$$lcomp0 = foldr A1.$$lcomp0.$$fn1 [] [1..10]
+				$$lcomp0 = foldr $$fn1 [] [1..10]
 				{
+					$$result = x * $$lcomp1.y;
+					x = [1..10];
 					$$fn1 x $$sofar = (x * $$lcomp1.y) : $$sofar;
-					foldr = zombie;
 				}
 			}
-			y = [1..10];
 			foldr = zombie;
+			y = [1..10];
 		}
 	}
 
@@ -307,21 +61,23 @@ already
 	{
 		$$lcomp1 = foldr $$fn2 [] [1..10]
 		{
-			$$fn2 y $$sofar = $$lcomp0 : $$sofar
+			$$result = $$lcomp0
 			{
 				$$lcomp0 = foldr $$fn1 [] [1..10]
 				{
-					$$fn1 x $$sofar = (x * y) : $$sofar;
+					$$result = x * $$lcomp1.y;
+					x = [1..10];
+					$$fn1 x $$sofar = (x * $$lcomp1.y) : $$sofar;
 				}
 			}
+			y = [1..10];
+			$$fn2 y $$sofar = $$lcomp0 : $$sofar
+			$$lcomp0 = zombie;
 		}
+		foldr = zombie;
 	}
 
 
-
-- compile_map_all() now works boittom-up, has this broken anything?
-
-  seems OK
 
 - which gtk are we using for the windows build? new gtks come from the main gtk
   site now, rather than tor's homepage:

@@ -2005,12 +2005,12 @@ compile_copy_sym( Symbol *sym, Compile *dest )
 	Symbol *copy_sym;
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "compile_copy_sym: copying " );
 	symbol_name_print( sym );
 	printf( " to scope of " );
 	compile_name_print( dest );
 	printf( "\n" );
+#endif /*DEBUG*/
 
 	/* Must be a different place.
 	 */
@@ -2078,12 +2078,12 @@ compile_copy_tree( Compile *fromscope, ParseNode *tree, Compile *toscope )
 	ParseNode *copy_tree;
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "compile_copy_tree: copying tree from " );
 	compile_name_print( fromscope );
 	printf( " to " );
 	compile_name_print( toscope );
 	printf( "\n" );
+#endif /*DEBUG*/
 
 	/* A new context? Copy generated syms over.
 	 */
@@ -2093,10 +2093,10 @@ compile_copy_tree( Compile *fromscope, ParseNode *tree, Compile *toscope )
 		generated = compile_find_generated( fromscope, tree );
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 		printf( "with generated children: " ); 
 		(void) slist_map( generated, (SListMapFn) dump_tiny, NULL );
 		printf( "\n" ); 
+#endif /*DEBUG*/
 
 		slist_map( generated, 
 			(SListMapFn) compile_copy_sym, toscope );
@@ -2183,9 +2183,9 @@ compile_lcomp( Compile *compile )
 	ParseNode *n1, *n2, *n3;
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "before compile_lcomp:\n" );
 	dump_compile( compile );
+#endif /*DEBUG*/
 
 	/* Find all the elements of the lcomp, generators, filters and
 	 * $$result.
@@ -2195,12 +2195,12 @@ compile_lcomp( Compile *compile )
 		(icontainer_map_fn) compile_lcomp_find, &children, NULL );
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "list comp " );
 	compile_name_print( compile );
 	printf( " has children: " ); 
 	(void) slist_map( children, (SListMapFn) dump_tiny, NULL );
 	printf( "\n" ); 
+#endif /*DEBUG*/
 
 	/* As yet no list to build on.
 	 */
@@ -2314,7 +2314,11 @@ compile_lcomp( Compile *compile )
 	}
 
 	/* Now destroy all the temps created by the parser: we don't want to
-	 * generate code for them.
+	 * generate code for them. In fact, we can't destroy them, since they
+	 * may contain references to live symbols (eg. the local foldr zombie) 
+	 * in their parse trees, and if we remove them, then when we resolve
+	 * foldr outwards, we'll try to patch pointers which no longer exist.
+	 * Just mark them as zombies to stop the code generator seeing them.
 	 */
 	for( p = children; p; p = p->next ) {
 		Symbol *element = SYMBOL( p->data );
@@ -2322,24 +2326,26 @@ compile_lcomp( Compile *compile )
 
 		/* Need to unlink from our parents, or they will be marked as
 		 * in error.
+		 */
 		for( q = element->parents; q; q = q->next ) {
 			Compile *parent = COMPILE( q->data );
 
 			compile_link_break( parent, element );
 		}
 
-		printf( "** destroying (%p) ", element );
+#ifdef DEBUG
+		printf( "** zombie-ing (%p) ", element );
 		symbol_name_print( element );
 		printf( "\n" );
+#endif /*DEBUG*/
 
-		IDESTROY( element );
-		 */
+		element->type = SYM_ZOMBIE;
 	}
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "after compile_lcomp:\n" );
 	dump_compile( compile );
+#endif /*DEBUG*/
 
 	g_slist_free( children );
 }

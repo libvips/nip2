@@ -1,83 +1,8 @@
-- try 
+- make sure
 
 	A1 = [[x*y|x<-[1..10]]|y<-[1..10]]
 
-  works! but only if we don't trim off unused syms
-
-  if we trim, we fail with a patch pointer error, gah
-
-  trace again and try to see where the stray patch pointer is
-
-  before compile #1
-
-	A1 = .. $$lcomp0 ..
-	{
-		$$lcomp0 = 
-		{
-			$$result = x * y;
-			x = [1..10];
-			y = zombie;
-		}
-	}
-
-  after compile #1
-
-	A1 = .. $$lcomp0 ..
-	{
-		$$lcomp0 = foldr $$fn1 [] [1..10]
-		{
-			$$result = x * A1.y;
-			x = [1..10];
-			y = zombie;
-			$$fn1 x $$sofar = (x * y) : $$sofar;
-			foldr = zombie;
-		}
-		y = zombie;
-	}
-
-  before compile #2
-
-	A1 = .. $$lcomp1 ..
-	{
-		$$lcomp1 = 
-		{
-			$$result = $$lcomp0
-			{
-				$$lcomp0 = foldr $$fn1 [] [1..10]
-				{
-					$$result = x * $$lcomp1.y;
-					x = [1..10];
-					$$fn1 x $$sofar = (x * $$lcomp1.y) : $$sofar;
-				}
-			}
-			foldr = zombie;
-			y = [1..10];
-		}
-	}
-
-  after compile #2
-
-	A1 = .. $$lcomp1 ..
-	{
-		$$lcomp1 = foldr $$fn2 [] [1..10]
-		{
-			$$result = $$lcomp0
-			{
-				$$lcomp0 = foldr $$fn1 [] [1..10]
-				{
-					$$result = x * $$lcomp1.y;
-					x = [1..10];
-					$$fn1 x $$sofar = (x * $$lcomp1.y) : $$sofar;
-				}
-			}
-			y = [1..10];
-			$$fn2 y $$sofar = $$lcomp0 : $$sofar
-			$$lcomp0 = zombie;
-		}
-		foldr = zombie;
-	}
-
-
+  doesn't leak (the zombie-ing might cause leaks? dunno)
 
 - which gtk are we using for the windows build? new gtks come from the main gtk
   site now, rather than tor's homepage:
@@ -85,6 +10,8 @@
 	http://ftp.gnome.org/pub/GNOME/binaries/win32/
 
   should be all zips, so we could automate?
+
+- check command-line args under windows, WimMain madness?
 
 - have a toggle in find colour calib for "linearise"
 

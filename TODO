@@ -1,3 +1,5 @@
+- check command-line args under windows, WimMain madness?
+
 - make sure
 
 	A1 = [[x*y|x<-[1..10]]|y<-[1..10]]
@@ -10,8 +12,6 @@
 	http://ftp.gnome.org/pub/GNOME/binaries/win32/
 
   should be all zips, so we could automate?
-
-- check command-line args under windows, WimMain madness?
 
 - have a toggle in find colour calib for "linearise"
 

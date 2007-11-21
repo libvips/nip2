@@ -381,7 +381,6 @@ filemodel_init( Filemodel *filemodel )
 	filemodel->modified = FALSE;
 	filemodel->registered = FALSE;
 	filemodel->auto_load = FALSE;
-	filemodel->nosave = FALSE;
 	filemodel->x_off = 0;
 	filemodel->y_off = 0;
 
@@ -723,7 +722,7 @@ filemodel_inter_savenempty_cb( iWindow *iwnd, void *client,
 	Filemodel *filemodel = FILEMODEL( client );
 	const char *tname = G_OBJECT_TYPE_NAME( filemodel );
 
-	if( filemodel->modified && !filemodel->nosave ) {
+	if( filemodel->modified ) {
 		if( filemodel->filename )
 			box_savenosave( GTK_WIDGET( iwnd ), 
 				filemodel_inter_savenempty_ok_cb, 

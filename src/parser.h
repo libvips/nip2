@@ -85,5 +85,7 @@ extern Symbol *last_top_sym;
 gboolean parse_toplevel( Toolkit *kit, int pos );
 gboolean parse_onedef( Toolkit *kit, int pos );
 gboolean parse_rhs( Expr *expr, ParseRhsSyntax syntax );
+
+void free_lex( int yychar );
 char *parse_test_define( void );
 Symbol *parse_set_symbol( void );

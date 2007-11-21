@@ -48,7 +48,6 @@ struct _Filemodel {
 	gboolean modified;	/* Set if modified (and should be saved) */
 	gboolean registered;	/* Set if on list of things to save on quit */
 	gboolean auto_load;	/* TRUE if loaded from path_start */
-	gboolean nosave;	/* Model made by a program, don't save */
 
 	int x_off, y_off;	/* Save offset for things below this */
 

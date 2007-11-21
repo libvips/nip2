@@ -3,6 +3,7 @@ started 7.13.2
 - revised progress system ... works for "max" now!
 - fix reporting of parse errors in inner scopes
 - lcomps now nest correctly ... try "Matrix [[x*y|x<-[1..10]]|y<-[1..10]]"
+- workspaces loaded from stdin with -w save more sensibly
 
 started 7.13.1
 - you can type "fred = 12" into a columnview, woo

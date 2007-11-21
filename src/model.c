@@ -245,20 +245,7 @@ model_loadstate_rewrite( ModelLoadState *state, char *old_rhs, char *new_rhs )
 	/* Lex and rewrite.
 	 */
 	while( (yychar = yylex()) > 0 ) 
-		/* Fee any stuff the lexer might have allocated. 
-		 */
-		switch( yychar ) {
-		case TK_CONST:
-			tree_const_destroy( &yylval.yy_const );
-			break;
-
-		case TK_IDENT:
-			IM_FREE( yylval.yy_name );
-			break;
-
-		default:
-			break;
-		}
+		free_lex( yychar );
 
 	model_loadstate = NULL;
 

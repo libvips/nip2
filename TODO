@@ -1,5 +1,3 @@
-- check command-line args under windows, WimMain madness?
-
 - make sure
 
 	A1 = [[x*y|x<-[1..10]]|y<-[1..10]]
@@ -19,12 +17,6 @@
   gamma?
 
 - apply calib should work for groups
-
-- Hist / New should be "Plot [] (im_identity 1)" or similar, and have
-  the tone thing as a custom tone curve
-
-- "nip2 -w < test.ws", then modify workspace, then CTRL-S saves as a file
-  called "stdin" ... o.O
 
 - quit while a thumbnail is painting: IMAGEs are leaked? seems esp. bad with
   greyc, perhaps just because it's so slow
@@ -56,6 +48,7 @@
 	fred [Image x, Matrix y] =
 
 
+- magic definition maker could make a workspace-local def, rather cool
 
 - image view windows are missing 'max' buttons?
 

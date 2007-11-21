@@ -1338,6 +1338,26 @@ parse_rhs( Expr *expr, ParseRhsSyntax syntax )
 	return( TRUE );
 }
 
+/* Free any stuff the lexer might have allocated. 
+ */
+void
+free_lex( int yychar )
+{
+	switch( yychar ) {
+	case TK_CONST:
+		tree_const_destroy( &yylval.yy_const );
+		break;
+
+	case TK_IDENT:
+	case TK_TAG:
+		IM_FREE( yylval.yy_name );
+		break;
+
+	default:
+		break;
+	}
+}
+
 /* Do we have a string of the form "IDENT = .."? Use the lexer to look along
  * the string checking components, return the IDENT if we do. 
  */
@@ -1345,6 +1365,7 @@ char *
 parse_test_define( void )
 {
 	extern int yylex( void );
+	int yychar;
 	char *ident;
 
 	ident = NULL;
@@ -1356,12 +1377,16 @@ parse_test_define( void )
 		return( NULL ); 
 	}
 
-	if( yylex() != TK_IDENT )
+	if( (yychar = yylex()) != TK_IDENT ) {
+		free_lex( yychar );
 		yyerror( _( "no leading identifier" ) );
+	}
 	ident = yylval.yy_name;
 
-	if( yylex() != '=' ) 
+	if( (yychar = yylex()) != '=' ) {
+		free_lex( yychar );
 		yyerror( _( "'=' missing" ) );
+	}
 
 	return( ident );
 }
@@ -1388,8 +1413,10 @@ parse_set_symbol( void )
 	}
 
 	do {
-		if( (yychar = yylex()) != TK_IDENT && yychar != TK_TAG ) 
+		if( (yychar = yylex()) != TK_IDENT && yychar != TK_TAG ) {
+			free_lex( yychar );
 			yyerror( _( "identifier expected" ) );
+		}
 		ident = yylval.yy_name;
 
 		switch( (yychar = yylex()) ) {
@@ -1414,6 +1441,7 @@ parse_set_symbol( void )
 			break;
 
 		default:
+			free_lex( yychar );
 			yyerror( _( "'.' or '=' expected" ) ); 
 		}
 	} while( yychar != '=' );

@@ -1280,10 +1280,10 @@ main( int argc, char *argv[] )
 		if( !(ws = workspace_new_from_openfile( 
 			main_workspacegroup, main_stdin )) ) 
 			main_log_add( "%s\n", error_get_sub() );
-		else {
-			filemodel_set_filename( FILEMODEL( ws ), "stdin" );
-			FILEMODEL( ws )->nosave = TRUE;
-		}
+		else 
+			/* Don't want to have "stdin" as the filename.
+			 */
+			filemodel_set_filename( FILEMODEL( ws ), NULL );
 	}
 
 	/* Make sure we have a start workspace.

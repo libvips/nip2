@@ -365,22 +365,13 @@ imageview_header_action_cb( GtkAction *action, Imageview *iv )
 	iImage *iimage = imagemodel->iimage;
 	Row *row = HEAPMODEL( iimage )->row;
 	Workspace *ws = row_get_workspace( row );
-	GtkWidget *imageheader = imageheader_new( imagemodel->conv );
 	BufInfo buf;
 	char txt[512];
 
 	buf_init_static( &buf, txt, 512 );
 	row_qualified_name_relative( ws->sym, row, &buf );
-
-	iwindow_set_title( IWINDOW( imageheader ), _( "Header for \"%s\"" ), 
-		buf_all( &buf ) );
-	idialog_set_callbacks( IDIALOG( imageheader ), 
-		NULL, NULL, NULL, iv );
-	idialog_add_ok( IDIALOG( imageheader ), iwindow_true_cb, _( "OK" ) );
-	iwindow_set_parent( IWINDOW( imageheader ), GTK_WIDGET( iv ) );
-	iwindow_build( IWINDOW( imageheader ) );
-
-	gtk_widget_show( imageheader );
+	conversion_header_dialog( imagemodel->conv, 
+		buf_all( &buf ), GTK_WIDGET( iv ) );
 }
 
 static void

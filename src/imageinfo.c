@@ -653,45 +653,37 @@ imageinfo_progress_start( Imageinfo *imageinfo )
 static int
 imageinfo_progress_eval( Imageinfo *imageinfo )
 {
-	const double start_threshold = 0.5;
         const double update_threshold = 0.2;
 
 	double latest = g_timer_elapsed( imageinfo->im->time->start, NULL );
 	double elapsed = latest - imageinfo->eval_last;
 
-	if( imageinfo->eval_progress ) {
-		if( elapsed > update_threshold ) {
+	if( imageinfo->im->time->eta > 1 &&
+		!imageinfo->eval_progress ) {
+		imageinfo->eval_progress = progress_new( imageinfo );
+		iwindow_set_parent( IWINDOW( imageinfo->eval_progress ),
+			imageinfo->eval_parent );
+		idialog_set_iobject( 
+			IDIALOG( imageinfo->eval_progress ), 
+			IOBJECT( imageinfo ) );
+		iwindow_build( IWINDOW( imageinfo->eval_progress ) );
+		gtk_widget_show( GTK_WIDGET( imageinfo->eval_progress ) );
+	}
+
+	if( elapsed > update_threshold ) {
+		if( imageinfo->eval_progress ) 
 			progress_update( imageinfo->eval_progress,
 				imageinfo->im->time->percent,
 				imageinfo->im->time->eta );
 
-			while( g_main_context_iteration( NULL, FALSE ) )
-				;
+		while( g_main_context_iteration( NULL, FALSE ) )
+			;
 
-			if( imageinfo->eval_progress->cancelled )
-				imageinfo->im->kill = 1;
+		if( imageinfo->eval_progress &&
+			imageinfo->eval_progress->cancelled )
+			imageinfo->im->kill = 1;
 
-			imageinfo->eval_last = latest;
-		}
-	}
-	else {
-		if( elapsed > start_threshold ) {
-			imageinfo->eval_progress = progress_new( imageinfo );
-			iwindow_set_parent( IWINDOW( imageinfo->eval_progress ),
-				imageinfo->eval_parent );
-			idialog_set_iobject( 
-				IDIALOG( imageinfo->eval_progress ), 
-				IOBJECT( imageinfo ) );
-			iwindow_build( IWINDOW( imageinfo->eval_progress ) );
-			progress_update( imageinfo->eval_progress, 0, 99 );
-			gtk_widget_show( 
-				GTK_WIDGET( imageinfo->eval_progress ) );
-
-			while( g_main_context_iteration( NULL, FALSE ) )
-				;
-
-			imageinfo->eval_last = latest;
-		}
+		imageinfo->eval_last = latest;
 	}
 
 	return( 0 );

@@ -36,14 +36,6 @@
 static ViewClass *parent_class = NULL;
 
 static void
-workspacedefs_destroy( GtkObject *object )
-{
-	Workspacedefs *workspacedefs = WORKSPACEDEFS( object );
-
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
-}
-
-static void
 workspacedefs_text_changed( GtkTextBuffer *buffer, 
 	Workspacedefs *workspacedefs )
 {
@@ -124,12 +116,9 @@ workspacedefs_refresh( vObject *vobject )
 static void
 workspacedefs_class_init( WorkspacedefsClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
-
-	object_class->destroy = workspacedefs_destroy;
 
 	vobject_class->refresh = workspacedefs_refresh;
 }

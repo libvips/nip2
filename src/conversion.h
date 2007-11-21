@@ -116,3 +116,6 @@ void conversion_set_mag( Conversion *conv, int mag );
 void conversion_set_synchronous( Conversion *conv, gboolean synchronous );
 void conversion_set_params( Conversion *conv, gboolean enabled,
 	double scale, double offset, gboolean falsecolour, gboolean type );
+
+void conversion_header_dialog( Conversion *conv, 
+	const char *name, GtkWidget *parent );

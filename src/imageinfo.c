@@ -420,16 +420,25 @@ imageinfo_undo_free( Imageinfo *imageinfo )
 }
 
 static void
-imageinfo_dispose_eval( Imageinfo *imageinfo )
+imageinfo_set_eval_parent( Imageinfo *imageinfo, GtkWidget *eval_parent )
 {
-	DESTROY_GTK( imageinfo->eval_progress );
 	if( imageinfo->eval_parent ) {
 		g_object_remove_weak_pointer( 
 			G_OBJECT( imageinfo->eval_parent ), 
 			(gpointer *) &imageinfo->eval_parent );
 		imageinfo->eval_parent = NULL;
 	}
+	imageinfo->eval_parent = eval_parent;
+	if( imageinfo->eval_parent ) 
+		g_object_add_weak_pointer( G_OBJECT( eval_parent ), 
+			(gpointer *) &imageinfo->eval_parent );
+}
 
+static void
+imageinfo_dispose_eval( Imageinfo *imageinfo )
+{
+	DESTROY_GTK( imageinfo->eval_progress );
+	imageinfo_set_eval_parent( imageinfo, NULL );
 	imageinfo->monitored = FALSE;
 }
 
@@ -719,21 +728,15 @@ imageinfo_progress_add( Imageinfo *imageinfo, GtkWidget *eval_parent )
 	if( !main_window_top )
 		return;
 
-	/* Always update this.
+	/* Always update eval_parent. 
 	 */
-	imageinfo->eval_parent = eval_parent;
+	imageinfo_set_eval_parent( imageinfo, eval_parent );
 
-	/* Already being monitored. Just update eval_parent.
+	/* Already being monitored?
 	 */
 	if( imageinfo->monitored ) 
 		return;
-
 	imageinfo->monitored = TRUE;
-
-	imageinfo->eval_parent = eval_parent;
-	if( eval_parent )
-		g_object_add_weak_pointer( G_OBJECT( eval_parent ), 
-			(gpointer *) &imageinfo->eval_parent );
 
         /* Call to animate countdown. 
          */ 

@@ -1,3 +1,6 @@
+started 7.12.3
+- oop, save image was broken, weakrefs were not being updated
+
 started 7.13.2
 - remove Application from nip2.desktop.in
 - revised progress system ... works for "max" now!

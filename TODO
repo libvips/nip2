@@ -34,9 +34,124 @@
   	fred (a:x) = x
 	fred [a, b, c] = 
 	fred [a, b, ...] =
+	fred [] =
 	fred (a, b) = 
 	fred [(a, b), (c, d), ...] = 
 	fred [Image x, Matrix y] =
+	fred 12 =
+	fred (1, 2) =
+	fred "hello world!" =
+
+  do we need to have initial cap for constructors? not clear ... the pattern
+  is just TK_IDENT TK_IDENT, for name-of-class, arg to bind
+
+  also for LHS
+
+  	[a, b] = ...
+
+  also for LHS of generator in lcomps
+
+  	[fred | [a, b] <- zip2 l1 l2]
+
+  multiple definitions of the same function are allowed, provided they all
+  have the same number of arguments, and provided only one of them has no
+  argument pattern matching
+
+  example:
+
+  	fred [a, b] = a * b;
+	fred (Image x) = rot90 x;
+	fred z = error "what";
+
+  any of these can have locals, those locals just apply to that one
+  definition
+
+  this compiles to:
+
+  	$$fred1 $$a1 
+		= a * b
+	{
+		a = $$a?0;
+		b = $$a?1;
+	}
+	$$fred2 $$a2 
+		= rot90 x
+	{
+		x = $$a2;
+	}
+	$$fred3 $$a3 
+		= error "what";
+
+	fred $$a4 
+		= $$fred1 $$a4, is_list $$a4 && len $$a4 == 2
+		= $$fred2 $$a4, is_Image $$a4
+		= $$fred3 $$a4;
+
+  so each pattern-matching definition generates a condition and an action
+
+  the action goes into a private function, the conditions are joined together
+  in the function wrapper
+
+  the no-pattern case (if present) becomes the action for the "otherwise"
+  clause in the wrapper
+
+  if not present, we generate (error "pattern match failed") or somesuch for 
+  the default case
+
+  we will need to regenerate the wrapper function every time a definition of
+  fred is added or removed ... can we do this easily?
+
+  when are two definitions considered equal? should we warn about this? "fred
+  x" could occur in two files, for example
+
+  pattern type summary:
+
+  	fred a = 
+
+		TK_IDENT 
+
+	fred 12 =
+	fred "hello" =
+
+		TK_CONST
+
+  	fred (a:x) = 
+  	fred [] = 
+
+		TK_IDENT ':' pattern
+		'[' ']'
+
+	fred [a, b, c] = 
+		
+		'[' list_pattern ']'
+		list_pattern: pattern | list_pattern ',' pattern
+		/* could allow '..' as part of a pattern? */
+
+	fred (a, b) = 
+
+		'(' TK_IDENT ',' TK_IDENT ')'
+		/* IDENT not pattern, since complex numbers can only be
+		 * numbers */
+
+	fred (Image x) =
+		TK_IDENT TK_IDENT 
+		'(' pattern ')'
+
+
+
+  example:
+
+  	[a, b] = fred 1 2;
+
+  compiles to:
+
+	$$v1 = fred 1 2
+  	a	= $$v1?0, is_list $$v1 && len $$v1 == 2
+		= error "pattern match failed";
+  	b	= $$v1?1, is_list $$v1 && len $$v1 == 2
+		= error "pattern match failed";
+
+ 
 
 
 

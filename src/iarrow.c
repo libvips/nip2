@@ -116,7 +116,7 @@ iarrow_generate_caption( iObject *iobject )
 		!result )
 		return( _( "No image" ) );
 
-	if( HEAPMODEL( iarrow )->row->ws->compatibility ) 
+	if( HEAPMODEL( iarrow )->row->ws->compat_78 ) 
 		names = names_compatibility;
 	else
 		names = names_current;

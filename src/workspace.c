@@ -1145,9 +1145,8 @@ workspace_top_load( Filemodel *filemodel,
 
 			/* Do we need broken region handling?
 			 */
-			if( filemodel->major == 7 || 
-				filemodel->minor == 8 ) 
-				ws->compatibility = TRUE;
+			if( filemodel->major == 7 && filemodel->minor == 8 ) 
+				ws->compat_78 = TRUE;
 		}
 
 		if( model_load( MODEL( ws ), state, parent, xnode ) )
@@ -1309,7 +1308,7 @@ workspace_init( Workspace *ws )
 	ws->errors = NULL;
         ws->mode = WORKSPACE_MODE_REGULAR;
 
-	ws->compatibility = FALSE;
+	ws->compat_78 = FALSE;
 	ws->compat_major = 0;
 	ws->compat_minor = 0;
 

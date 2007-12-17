@@ -766,7 +766,7 @@ regionview_get_compatibility( Regionview *regionview )
 
 	if( classmodel && HEAPMODEL( classmodel )->row &&
 		HEAPMODEL( classmodel )->row->ws )
-		return( HEAPMODEL( classmodel )->row->ws->compatibility );
+		return( HEAPMODEL( classmodel )->row->ws->compat_78 );
 
 	return( FALSE );
 }

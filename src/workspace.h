@@ -83,12 +83,12 @@ struct _Workspace {
 	GSList *errors;		/* Rows with errors */
         WorkspaceMode mode;	/* Display mode */
 
-	/* Compatibility. 7.8.x used different names for Marks, and had strange
-	 * position behaviour
+	/* Compatibility. 7.8.x used different names for Marks and had strange
+	 * position behaviour.
 	 */
-	gboolean compatibility;	/* In 7.8.x compatibility mode */
+	gboolean compat_78;	/* In 7.8.x compatibility mode */
 
-	/* Other versions (7.10 etc.) need special compat toolkits. 0 here for
+	/* Some versions (7.10 etc.) need special compat toolkits. 0 here for
 	 * no compat toolkits loaded.
 	 */
 	int compat_major;

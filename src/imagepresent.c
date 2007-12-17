@@ -1024,7 +1024,7 @@ imagepresent_left_release( Imagepresent *ip, GdkEvent *ev, int x, int y )
 			/* In compatibility mode, we need to un-offset, since
 			 * mark/etc. will re-offset.
 			 */
-			if( row->ws->compatibility ) {
+			if( row->ws->compat_78 ) {
 				Conversion *conv = ip->id->conv;
 				IMAGE *im = imageinfo_get( FALSE, conv->ii );
 
@@ -1039,7 +1039,7 @@ imagepresent_left_release( Imagepresent *ip, GdkEvent *ev, int x, int y )
 				/* How annoying, this used to be called
 				 * "Point".
 				 */
-				if( row->ws->compatibility )
+				if( row->ws->compat_78 )
 					buf_appends( &buf, "Point " );
 				else
 					buf_appendf( &buf, "%s ", CLASS_MARK );

@@ -204,8 +204,7 @@ workspacedefs_hide_cb( GtkWidget *wid, Workspacedefs *workspacedefs )
 	Mainw *mainw = workspacedefs->mainw;
 	Workspace *ws = mainw->ws;
 
-	ws->lpane_open = FALSE;
-	iobject_changed( IOBJECT( ws ) );
+	pane_set_open( mainw->lpane, FALSE );
 }
 
 static gboolean

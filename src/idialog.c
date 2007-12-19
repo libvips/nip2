@@ -492,19 +492,18 @@ idialog_build( GtkWidget *widget )
 static void
 idialog_class_init( iDialogClass *class )
 {
-	GtkObjectClass *object_class;
-	GtkWidgetClass *widget_class;
-	iWindowClass *iwindow_class;
-
-	object_class = (GtkObjectClass *) class;
-	widget_class = (GtkWidgetClass *) class;
-	iwindow_class = (iWindowClass *) class;
+	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
+	iWindowClass *iwindow_class = (iWindowClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
 
 	object_class->destroy = idialog_destroy;
+
 	widget_class->realize = idialog_realize;
+
 	iwindow_class->build = idialog_build;
+	iwindow_class->transient = TRUE;
 
 	/* Create signals.
 	 */

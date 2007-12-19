@@ -760,6 +760,44 @@ reduce_list_length( Reduce *rc, PElement *base )
 	return( i );
 }
 
+/* Find the length of a list, with a bailout for the largest size we test.
+ * Handy for avoiding finding the length of "[1..]".
+ */
+int
+reduce_list_length_max( Reduce *rc, PElement *base, int max_length )
+{
+	PElement p;
+	int i;
+
+	/* Reduce to first element.
+	 */
+	p = *base;
+	reduce_spine( rc, &p );
+
+	/* Does it look like the start of a list? 
+	 */
+	if( !PEISLIST( &p ) ) 
+		reduce_error_typecheck( rc, &p, _( "List length" ), "list" );
+
+	/* Loop down list.
+	 */
+	for( i = 0; PEISFLIST( &p ); i++ ) {
+		HeapNode *hn;
+
+		if( i > max_length ) 
+			reduce_error_toobig( rc, "list" );
+
+		hn = PEGETVAL( &p );
+		PEPOINTRIGHT( hn, &p );
+
+		reduce_spine( rc, &p );
+	}
+
+	assert( PEISELIST( &p ) );
+
+	return( i );
+}
+
 /* Point "out" at the nth element of a list. Index from 0.
  */
 void

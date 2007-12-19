@@ -3,11 +3,6 @@
   <Workspace filename="/home/john/CVS_DEVEL/nip2-7.11/share/nip2/start/Preferences.ws" view="WORKSPACE_MODE_NOEDIT" scale="1" offset="0" window_width="680" window_height="1159">
     <Column x="0" y="2799" open="false" selected="false" sform="false" next="99" name="B" caption="Interface column -- don't touch this!">
       <Subcolumn vislevel="2">
-        <Row popup="false" name="WINDOW_INFRONT">
-          <Rhs vislevel="1" flags="4">
-            <iText formula="E27.value"/>
-          </Rhs>
-        </Row>
         <Row popup="false" name="CSV_SEPARATOR">
           <Rhs vislevel="1" flags="4">
             <iText formula="O1.value"/>
@@ -797,13 +792,6 @@
             <Toggle/>
             <Subcolumn vislevel="0"/>
             <iText formula="Toggle &quot;Auto image window pop up&quot; false"/>
-          </Rhs>
-        </Row>
-        <Row popup="false" name="E27">
-          <Rhs vislevel="1" flags="1">
-            <Toggle/>
-            <Subcolumn vislevel="0"/>
-            <iText formula="Toggle &quot;Keep child windows in front of parents&quot; true"/>
           </Rhs>
         </Row>
       </Subcolumn>

@@ -464,7 +464,3 @@ const char *watch_string_get( Watchgroup *,
 #define PROGRAM_PANE_POSITION \
 	(watch_double_get( main_watchgroup, "PROGRAM_PANE_POSITION", 200 ))
 
-/* Child windows locked in front of parents (dialogs are always in front).
- */
-#define WINDOW_INFRONT \
-	(watch_bool_get( main_watchgroup, "WINDOW_INFRONT", TRUE ))

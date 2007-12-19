@@ -1,6 +1,10 @@
 started 7.12.3
-- oop, save image was broken, weakrefs were not being updated
-- oop, wrongly setting vips-7.8 region compat mode on all old WS load
+- save image was broken, weakrefs were not being updated
+- wrongly setting vips-7.8 region compat mode on all old WS load
+- "Close" in ws defs pane menu was not working
+- removed image window / plot window transient-for behaviour, we lost maximise
+  buttons :(
+- block ungroup of things larger than 100 elements
 
 started 7.13.2
 - remove Application from nip2.desktop.in

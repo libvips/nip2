@@ -198,6 +198,7 @@ gboolean reduce_is_realvec( Reduce *rc, PElement *base );
 gboolean reduce_is_matrix( Reduce *rc, PElement *base );
 gboolean reduce_is_class( Reduce *rc, PElement *klass );
 int reduce_list_length( Reduce *rc, PElement *base );
+int reduce_list_length_max( Reduce *rc, PElement *base, int max_length );
 void reduce_list_index( Reduce *rc, PElement *base, int n, PElement *out );
 gboolean reduce_is_instanceof_exact( Reduce *rc, 
 	const char *name, PElement *instance );

@@ -1576,6 +1576,19 @@ heap_list_length( PElement *base )
 	return( result );
 }
 
+int
+heap_list_length_max( PElement *base, int max_length )
+{
+	Reduce *rc = reduce_context;
+	int result;
+
+	REDUCE_CATCH_START( -1 );
+	result = reduce_list_length_max( rc, base, max_length );
+	REDUCE_CATCH_STOP; 
+
+	return( result );
+}
+
 gboolean
 heap_list_index( PElement *base, int n, PElement *out )
 {

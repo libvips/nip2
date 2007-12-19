@@ -139,6 +139,14 @@ floatwindow_class_init( FloatwindowClass *class )
 	iwindow_class->build = floatwindow_build;
 	iwindow_class->popdown = floatwindow_popdown;
 
+	/* Hmm, this rather negates the point of this class. If we make plot
+	 * and image windows transient for the main window, we don't get
+	 * maximise buttons :-( (on gnome and win anyway).
+	 *
+	 * Keep this class around for now, maybe it'll still be useful.
+	 */
+	iwindow_class->transient = FALSE;
+
 	/* Create signals.
 	 */
 

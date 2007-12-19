@@ -190,6 +190,11 @@ typedef struct _iWindowClass {
 	 */
 	void (*build)( GtkWidget * );
 	void (*popdown)( GtkWidget * );
+
+	/* Whether windows of this class should be marked as transient for
+	 * their parents (eg. dialogs usually are).
+	 */
+	gboolean transient;
 } iWindowClass;
 
 int iwindow_number( void );

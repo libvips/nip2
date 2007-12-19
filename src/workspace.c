@@ -1778,7 +1778,7 @@ workspace_ungroup_row( Row *row )
 		return( row );
 	if( result ) {
 		if( !class_get_member( root, MEMBER_VALUE, NULL, &value ) || 
-			(length = heap_list_length( &value )) < 0 ) 
+			(length = heap_list_length_max( &value, 100 )) < 0 ) 
 			return( row );
 
 		for( i = 0; i < length; i++ )
@@ -1790,7 +1790,7 @@ workspace_ungroup_row( Row *row )
 		if( !heap_is_list( root, &result ) )
 			return( row );
 		if( result ) {
-			if( (length = heap_list_length( root )) < 0 ) 
+			if( (length = heap_list_length_max( root, 100 )) < 0 ) 
 				return( row );
 
 			for( i = 0; i < length; i++ )

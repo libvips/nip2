@@ -433,6 +433,7 @@ gboolean heap_is_instanceof_exact( const char *name, PElement *klass,
 gboolean heap_is_instanceof( const char *name, PElement *klass, gboolean *out );
 
 int heap_list_length( PElement *base );
+int heap_list_length_max( PElement *base, int max_length );
 gboolean heap_list_index( PElement *base, int n, PElement *out );
 gboolean heap_reduce_strict( PElement *base );
 

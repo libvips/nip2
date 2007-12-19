@@ -718,9 +718,7 @@ iwindow_real_build( GtkWidget *widget )
 	/* Link to parent.
 	 */
         if( iwnd->parent_window ) {
-		/* Child windows locked in front of parents?
-		 */
-		if( WINDOW_INFRONT )
+		if( IWINDOW_GET_CLASS( iwnd )->transient )
 			gtk_window_set_transient_for( GTK_WINDOW( iwnd ),
 				GTK_WINDOW( iwnd->parent_window ) );
 
@@ -763,6 +761,8 @@ iwindow_class_init( iWindowClass *class )
 
 	class->build = iwindow_real_build;
 	class->popdown = iwindow_real_popdown;
+
+	class->transient = FALSE;
 
 	/* Create signals.
 	 */

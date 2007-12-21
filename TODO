@@ -1,3 +1,17 @@
+- don't offer to clear temps if there's been a crash
+
+  need to be able to test for process-still-running by PID
+
+  does win even have pids?
+
+- make +, = also zoom in; -, _ also zoom out
+
+- add merge ws to right button workspace menu
+
+  merge ws gets position wrong? how odd
+
+  could have "open image" and "open matrix" in there too I guess
+
 - autoarrange after every column resize or move
 
   animate movement, so columns slither out of the way and in to place when 

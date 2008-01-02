@@ -1379,7 +1379,11 @@ imagepresent_key_press_event_cb( GtkWidget *widget, GdkEventKey *event,
 		handled = TRUE;
 		break;
 
+	/* FIXME + and = are not always on the same key, of course :( 
+	 */
 	case GDK_i:
+	case GDK_plus:
+	case GDK_equal:
 		if( ip->inside ) 
 			imagepresent_zoom_in( ip, ip->last_x, ip->last_y );
 		else 
@@ -1387,13 +1391,14 @@ imagepresent_key_press_event_cb( GtkWidget *widget, GdkEventKey *event,
 		handled = TRUE;
 		break;
 
-	case GDK_0:
-		conversion_set_mag( conv, 0 );
+	case GDK_o: 
+	case GDK_minus:
+		imagepresent_zoom_out( ip );
 		handled = TRUE;
 		break;
 
-	case GDK_o: 
-		imagepresent_zoom_out( ip );
+	case GDK_0:
+		conversion_set_mag( conv, 0 );
 		handled = TRUE;
 		break;
 

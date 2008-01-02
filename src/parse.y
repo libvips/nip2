@@ -493,6 +493,8 @@ input_pop( void )
 %token TK_SEPARATOR TK_DIALOG TK_LSHIFT TK_RSHIFT
 
 %type <yy_node> expr binop uop rhs listex comma_list body 
+%type <yy_node> pattern simple_pattern complex_pattern list_pattern
+%type <yy_node> leaf_pattern
 %type <yy_node> crhs cexprlist prhs lambda
 %type <yy_const> TK_CONST 
 %type <yy_name> TK_IDENT TK_TAG
@@ -651,32 +653,63 @@ topdef:
 /* Parse a new defining occurence.
  */
 def: 
-   	TK_IDENT {	
+   	pattern {	
 		Symbol *sym;
 
-		/* Is this a top-level definition? Check we've not defined 
-		 * any other top-level syms with this name in this parse action.
-		 */
-		if( current_symbol == root_symbol ) 
-			if( (sym = slist_map( parse_sofar,
-				(SListMapFn) iobject_test_name, $1 )) )
-				symbol_error_redefine( sym );
+		g_assert( $1->type == NODE_PATTERN );
 
-		/* Make defining occurence.
+		/* Two forms: <name pattern-list rhs>, or <pattern rhs>.
+		 * Enforce the no-args-to-pattern-assignment rule in the arg
+		 * pattern parser.
 		 */
-		sym = symbol_new_defining( current_compile, $1 );
-		(void) symbol_user_init( sym );
-		(void) compile_new_local( sym->expr );
-		IM_FREE( $1 );
+		if( $1->arg1->type == NODE_LEAF ) {
+			const char *name = IOBJECT( $1->arg1->leaf )->name;
 
-		/* If this is to be a top-level-definition, make a note of it.
-		 */
-		if( current_symbol == root_symbol ) {
-			last_top_sym = sym;
-
-			/* Also note on list of syms for this action.
+			/* Is this a top-level definition? Check we've not 
+			 * defined any other top-level syms with this name 
+			 * in this parse action.
 			 */
-			parse_sofar = g_slist_prepend( parse_sofar, sym );
+			if( current_symbol == root_symbol ) 
+				if( (sym = slist_map( parse_sofar,
+					(SListMapFn) iobject_test_name, 
+					(void *) name )) )
+					symbol_error_redefine( sym );
+
+			/* Make defining occurence.
+			 */
+			sym = symbol_new_defining( current_compile, name );
+			(void) symbol_user_init( sym );
+			(void) compile_new_local( sym->expr );
+
+			/* If this is to be a top-level-definition, make a 
+			 * note of it.
+			 */
+			if( current_symbol == root_symbol ) {
+				last_top_sym = sym;
+
+				/* Also note on list of syms for this action.
+				 */
+				parse_sofar = g_slist_prepend( parse_sofar, 
+					sym );
+			}
+		}
+		else {
+			static int count = 0;
+			char name[256];
+
+			/* We have <pattern rhs>. Make an anon symbol for this
+			 * value, then the variables in the pattern become
+			 * toplevels which index that.
+			 */
+			im_snprintf( name, 256, "$$pattern_lhs%d", count++ );
+			sym = symbol_new_defining( current_compile, name );
+			sym->generated = TRUE;
+			(void) symbol_user_init( sym );
+			(void) compile_new_local( sym->expr );
+
+			/* Generate the code for the pattern elements.
+			 */
+			compile_pattern_lhs( current_compile, sym, $1->arg1 );
 		}
 
 		/* Initialise symbol parsing variables. Save old current symbol,
@@ -1220,6 +1253,69 @@ uop:
 	}
 	;
 
+pattern:
+	simple_pattern {
+		$$ = tree_pattern_new( current_compile );
+		$$->arg1 = $1;
+	}
+	;
+
+/* Stuff that can appear on the LHS of an equals, or as a parameter pattern.
+ */
+simple_pattern:
+	leaf_pattern | 
+	'(' leaf_pattern ',' leaf_pattern ')' {
+		$$ = tree_binop_new( current_compile, BI_COMMA, $2, $4 );
+	} |
+	simple_pattern ':' simple_pattern { 
+		$$ = tree_binop_new( current_compile, BI_CONS, $1, $3 );
+	} |
+	'(' complex_pattern ')' {
+		$$ = $2;
+	} | 
+	'[' list_pattern ']' {
+		$$ = $2;
+	} |
+	'[' ']' {
+		ParseConst elist;
+
+		elist.type = PARSE_CONST_ELIST;
+		$$ = tree_const_new( current_compile, elist );
+	}  
+	;
+
+/* Stuff that can appear in a complex (a, b) pattern.
+ */
+leaf_pattern:
+	TK_IDENT {
+		$$ = tree_leaf_new( current_compile, $1 );
+		IM_FREE( $1 );
+	} | 
+	TK_CONST {
+		$$ = tree_const_new( current_compile, $1 );
+	} 
+	;
+
+/* What can appear in round brackets or a comma list.
+ */
+complex_pattern:
+	TK_IDENT TK_IDENT {
+		$$ = tree_pattern_class_new( current_compile, $1, $2 );
+		IM_FREE( $1 );
+		IM_FREE( $2 );
+	} |
+	simple_pattern
+	;
+
+list_pattern:
+     	complex_pattern ',' list_pattern {
+		$$ = tree_lconst_extend( current_compile, $3, $1 );
+	} | 
+	complex_pattern {
+		$$ = tree_lconst_new( current_compile, $1 );
+	}
+	;
+
 %%
 
 /* Interface to parser. 
@@ -1448,5 +1544,3 @@ parse_set_symbol( void )
 
 	return( sym );
 }
-
-

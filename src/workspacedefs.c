@@ -202,7 +202,6 @@ static void
 workspacedefs_hide_cb( GtkWidget *wid, Workspacedefs *workspacedefs )
 {
 	Mainw *mainw = workspacedefs->mainw;
-	Workspace *ws = mainw->ws;
 
 	pane_set_open( mainw->lpane, FALSE );
 }

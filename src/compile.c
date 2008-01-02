@@ -2349,3 +2349,104 @@ compile_lcomp( Compile *compile )
 
 	g_slist_free( children );
 }
+
+/* Compile a pattern LHS. Generate a sym for each pattern variable, each of
+ * which checks and accesses sym. For example:
+ *
+ *	[a] = x;
+ *
+ * compiles to:
+ *
+ * 	sym = x;
+ * 	a = if is_list sym && len sym == 1 then sym?0 else error "..";
+ */
+
+/* Depth of trail we keep as we walk the pattern.
+ */
+#define MAX_TRAIL (10)
+
+typedef struct _PatternLhs {
+	Compile *compile;
+	Symbol *sym;
+
+	ParseNode *trail[MAX_TRAIL];
+	int depth;
+} PatternLhs;
+
+/* Generate one reference.
+ */
+static void
+compile_pattern_lhs_leaf( PatternLhs *lhs, Symbol *leaf )
+{
+	Symbol *sym;
+	ParseNode *node;
+	int i;
+
+	sym = symbol_new_defining( lhs->compile, IOBJECT( leaf )->name );
+	sym->generated = TRUE;
+	(void) symbol_user_init( sym );
+	(void) compile_new_local( sym->expr );
+
+	/*
+	node = tree_ifthe
+
+	for( i = 0; i < lhs->depth; i++ )
+	 */
+}
+
+/* Recurse over the pattern generating references.
+ */
+static void *
+compile_pattern_lhs_sub( ParseNode *node, PatternLhs *lhs )
+{
+	lhs->trail[lhs->depth++] = node;
+
+	switch( node->type ) {
+	case NODE_LEAF:
+		compile_pattern_lhs_leaf( lhs, node->leaf );
+		break;
+
+	case NODE_BINOP:
+		compile_pattern_lhs_sub( node->arg1, lhs );
+		compile_pattern_lhs_sub( node->arg2, lhs );
+		break;
+
+	case NODE_LISTCONST:
+		slist_map( node->elist,
+			(SListMapFn) compile_pattern_lhs_sub, lhs );
+		break;
+
+	case NODE_CONST:
+	case NODE_PATTERN_CLASS:
+		break;
+
+	case NODE_NONE:
+	case NODE_APPLY:
+	case NODE_UOP:
+	case NODE_CLASS:
+	case NODE_TAG:
+	case NODE_GENERATOR:
+	case NODE_COMPOSE:
+	case NODE_SUPER:
+	case NODE_PATTERN:
+		g_assert( 0 );
+	}
+
+	lhs->depth--;
+
+	return( NULL );
+}
+
+void
+compile_pattern_lhs( Compile *compile, Symbol *sym, ParseNode *node )
+{
+	PatternLhs lhs;
+
+	lhs.compile = compile;
+	lhs.sym = sym;
+	lhs.depth = 0;
+
+	compile_pattern_lhs_sub( node, &lhs );
+
+	g_assert( lhs.depth == 0 );
+}

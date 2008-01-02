@@ -1,16 +1,83 @@
+- the old code for "a = 12" needs to go into tree.c ... the LEAF bit of
+  pattern should make a defining occurence, not a reference
+
+  ... actually, no, make a ref, then make the defining occurence in a later
+  pass
+
+- syntax allows
+
+	12 = fred 99;
+
+  but of course we will not ever eval this, except at the top level
+
+  is this OK? we could disallow defs like this in a later pass
+
+- do we put ws-locals in their own toolkit? can't remember
+
+  we should if we don't, so that old defs are removed when you press 'process'
+
+- currently have 
+
+	def: 
+		TK_IDENT sdef
+
+  needs to be split to
+
+	def:
+		IDENT { start } pattern-list sdef { stop } |
+		pattern { start } sdef { stop }
+
+  but IDENT is a valid pattern :( maybe just have
+
+	def:
+		pattern { start } pattern-list sdef { stop } 
+
+  and in { start } (or later?) have something to stop the pattern-list if 
+  pattern isn't just an ident
+
+  also, 
+
+  	Image x
+
+  id a valid pattern, need to ensure this is bracketed I guess
+
+  atm sdef does params ... this should move out
+
+  also,
+
+	x <- expr
+
+  needs to become
+
+  	pattern <- expr
+
+  do we allow
+
+  	Image x <- expr
+
+  or does this have to be bracketed?
+
+  could allow
+
+  	a:x = fred ... ;
+
+  not ambigious, why not? also
+
+  	fred a:x b:y = ...
+
+  would not be ambigious
+
+  really, it's just (Image x) that must be bracketed
+
+- Filter / Blend items have extra blends in the name
+
+- image blend should have an invert mask option?
+
 - don't offer to clear temps if there's been a crash
 
   need to be able to test for process-still-running by PID
 
   does win even have pids?
-
-- make +, = also zoom in; -, _ also zoom out
-
-- add merge ws to right button workspace menu
-
-  merge ws gets position wrong? how odd
-
-  could have "open image" and "open matrix" in there too I guess
 
 - autoarrange after every column resize or move
 
@@ -43,16 +110,6 @@
 
 - pattern matching
 
-  	fred (Image x) = rot90 x
-
-  is equivalent to
-
-  	fred x
-		= rot90 x, is_Image x
-		= error "bad args"
-
-  also for list and complex
-
   	fred (a:x) = x
 	fred [a, b, c] = 
 	fred [a, b, ...] =
@@ -66,6 +123,8 @@
 
   do we need to have initial cap for constructors? not clear ... the pattern
   is just TK_IDENT TK_IDENT, for name-of-class, arg to bind
+
+  should allow (IDENT . IDENT . IDENT) too? 
 
   also for LHS
 
@@ -106,7 +165,7 @@
 
 	fred $$a4 
 		= $$fred1 $$a4, is_list $$a4 && len $$a4 == 2
-		= $$fred2 $$a4, is_Image $$a4
+		= $$fred2 $$a4, is_instance_of "Image" $$a4
 		= $$fred3 $$a4;
 
   so each pattern-matching definition generates a condition and an action
@@ -158,8 +217,6 @@
 	fred (Image x) =
 		TK_IDENT TK_IDENT 
 		'(' pattern ')'
-
-
 
   example:
 

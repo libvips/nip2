@@ -5,6 +5,10 @@ started 7.12.3
 - removed image window / plot window transient-for behaviour, we lost maximise
   buttons :(
 - block ungroup of things larger than 100 elements
+- allow +/- for zoom in and out shortcuts
+- mainw rmb menu has open/merge items
+- merge ws doesn't add extra space
+- started adding LHS patterns
 
 started 7.13.2
 - remove Application from nip2.desktop.in

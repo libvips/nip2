@@ -973,6 +973,12 @@ mainw_open_action_cb( GtkAction *action, Mainw *mainw )
 	mainw_open( mainw );
 }
 
+static void
+mainw_open_action_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
+{
+	mainw_open_action_cb( NULL, mainw );
+}
+
 /* Open one of the example workspaces ... just a shortcut.
  */
 static void
@@ -1205,6 +1211,13 @@ static void
 mainw_workspace_merge_action_cb( GtkAction *action, Mainw *mainw )
 {
 	mainw_workspace_merge( mainw );
+}
+
+static void
+mainw_workspace_merge_action_cb2( GtkWidget *wid, GtkWidget *host, 
+	Mainw *mainw )
+{
+	mainw_workspace_merge_action_cb( NULL, mainw );
 }
 
 /* Auto recover.
@@ -1962,6 +1975,11 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 		popup_add_pullright( mainw->popup, _( "Jump to _Column" ) ); 
 	popup_add_but( mainw->popup, _( "Align _Columns" ),
 		POPUP_FUNC( mainw_layout_action_cb2 ) ); 
+	menu_add_sep( mainw->popup );
+	popup_add_but( mainw->popup, GTK_STOCK_OPEN,
+		POPUP_FUNC( mainw_open_action_cb2 ) ); 
+	popup_add_but( mainw->popup, _( "_Merge Workspace" ),
+		POPUP_FUNC( mainw_workspace_merge_action_cb2 ) ); 
 	menu_add_sep( mainw->popup );
 	popup_add_but( mainw->popup, _( "_Group Selected" ),
 		POPUP_FUNC( mainw_group_action_cb2 ) ); 

@@ -516,14 +516,41 @@ workspace_load_file( Workspace *ws, const char *filename )
 	return( NULL );
 }
 
+/* Bounding box of columns to be saved. Though we only really set top/left.
+ */
+static void *
+workspace_selected_save_box( Column *col, Rect *box )
+{
+	if( model_save_test( MODEL( col ) ) ) {
+		if( im_rect_isempty( box ) ) {
+			box->left = col->x;
+			box->top = col->y;
+			box->width = 100;
+			box->height = 100;
+		}
+		else {
+			box->left = IM_MIN( box->left, col->x );
+			box->top = IM_MIN( box->top, col->y );
+		}
+	}
+
+	return( NULL );
+}
+
 /* Save just the selected objects.
  */
 gboolean
 workspace_selected_save( Workspace *ws, const char *filename )
 {
 	WorkspaceSaveType save = ws->save_type;
+	Rect box = { 0 };
 
 	ws->save_type = WORKSPACE_SAVE_SELECTED;
+
+	workspace_map_column( ws, 
+		(column_map_fn) workspace_selected_save_box, &box );
+	filemodel_set_offset( FILEMODEL( ws ), box.left, box.top );
+
 	if( !filemodel_save_all( FILEMODEL( ws ), filename ) ) {
 		ws->save_type = save;
 		unlinkf( "%s", filename );

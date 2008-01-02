@@ -41,6 +41,8 @@ typedef enum {
 	NODE_GENERATOR,		/* A list generator */
 	NODE_COMPOSE,		/* Function composition */
 	NODE_SUPER,		/* Superclass constructor */
+	NODE_PATTERN,		/* A pattern */
+	NODE_PATTERN_CLASS,	/* A class pattern match */
 	NODE_LISTCONST		/* A list expression "[1, 2, 3]" */
 } NodeTypes;
 
@@ -168,6 +170,11 @@ struct _ParseNode {
 	/* A constant.
 	 */
 	ParseConst con;
+
+	/* A class pattern.
+	 */
+	char *class_name;
+	char *bind_to;
 };
 
 void tree_const_destroy( ParseConst *pc );
@@ -190,6 +197,9 @@ ParseNode *tree_leafsym_new( Compile *compile, Symbol *sym );
 ParseNode *tree_const_new( Compile *compile, ParseConst n );
 ParseNode *tree_class_new( Compile *compile );
 ParseNode *tree_compose_new( Compile *compile, ParseNode *f, ParseNode *g );
+ParseNode *tree_pattern_new( Compile *compile );
+ParseNode *tree_pattern_class_new( Compile *compile, 
+	const char *class_name, const char *bind_to );
 
 void *tree_node_destroy( ParseNode *n );
 

@@ -37,6 +37,11 @@
 #define IS_WORKSPACEVIEW_CLASS( klass ) \
 	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_WORKSPACEVIEW ))
 
+/* Column margins.
+ */
+#define WORKSPACEVIEW_MARGIN_LEFT (3)
+#define WORKSPACEVIEW_MARGIN_TOP (3)
+
 struct _Workspaceview {
 	View view;
 

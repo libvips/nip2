@@ -2361,6 +2361,34 @@ compile_lcomp( Compile *compile )
  * 	a = if is_list sym && len sym == 1 then sym?0 else error "..";
  */
 
+/* Generate a parsetree for the condition test. The array of nodes represents
+ * the set of condtions we have to test, left to right.
+ */
+static ParseNode *
+compile_pattern_condition( Compile *compile, 
+	Symbol *leaf, ParseNode *trail[], int n )
+{
+	return( NULL );
+}
+
+/* Generate a parsetree for the action. The array of nodes represents
+ * the list of access operations we have to generate, left to right.
+ */
+static ParseNode *
+compile_pattern_action( Compile *compile, 
+	Symbol *leaf, ParseNode *trail[], int n )
+{
+	return( NULL );
+}
+
+/* Generate a parsetree for a "pattern match failed" error.
+ */
+static ParseNode *
+compile_pattern_error( Compile *compile, Symbol *leaf )
+{
+	return( NULL );
+}
+
 /* Depth of trail we keep as we walk the pattern.
  */
 #define MAX_TRAIL (10)
@@ -2379,19 +2407,19 @@ static void
 compile_pattern_lhs_leaf( PatternLhs *lhs, Symbol *leaf )
 {
 	Symbol *sym;
-	ParseNode *node;
-	int i;
+	Compile *compile;
 
 	sym = symbol_new_defining( lhs->compile, IOBJECT( leaf )->name );
 	sym->generated = TRUE;
 	(void) symbol_user_init( sym );
 	(void) compile_new_local( sym->expr );
+	compile = sym->expr->compile;
 
-	/*
-	node = tree_ifthe
-
-	for( i = 0; i < lhs->depth; i++ )
-	 */
+	compile->tree = tree_ifelse_new( compile, 
+		compile_pattern_condition( compile, 
+			leaf, lhs->trail, lhs->depth ),
+		compile_pattern_action( compile, leaf, lhs->trail, lhs->depth ),
+		compile_pattern_error( compile, leaf ) );
 }
 
 /* Recurse over the pattern generating references.

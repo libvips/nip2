@@ -1176,7 +1176,8 @@ mainw_workspace_merge( Mainw *mainw )
 {
 	GtkWidget *filesel = filesel_new();
 
-	iwindow_set_title( IWINDOW( filesel ), _( "Merge Workspace" ) );
+	iwindow_set_title( IWINDOW( filesel ), 
+		_( "Merge Workspace from File" ) );
 	filesel_set_flags( FILESEL( filesel ), FALSE, FALSE );
 	filesel_set_filetype( FILESEL( filesel ), filesel_type_workspace, 0 ); 
 	iwindow_set_parent( IWINDOW( filesel ), GTK_WIDGET( mainw ) );
@@ -1978,7 +1979,7 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	menu_add_sep( mainw->popup );
 	popup_add_but( mainw->popup, GTK_STOCK_OPEN,
 		POPUP_FUNC( mainw_open_action_cb2 ) ); 
-	popup_add_but( mainw->popup, _( "_Merge Workspace" ),
+	popup_add_but( mainw->popup, _( "_Merge Workspace from File" ),
 		POPUP_FUNC( mainw_workspace_merge_action_cb2 ) ); 
 	menu_add_sep( mainw->popup );
 	popup_add_but( mainw->popup, _( "_Group Selected" ),

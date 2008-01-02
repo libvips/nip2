@@ -44,8 +44,8 @@ static ViewClass *parent_class = NULL;
 static const int workspaceview_layout_snap_threshold = 20;
 static const int workspaceview_layout_hspacing = 10;
 static const int workspaceview_layout_vspacing = 30;
-static const int workspaceview_layout_left = 3;
-static const int workspaceview_layout_top = 3;
+static const int workspaceview_layout_left = WORKSPACEVIEW_MARGIN_LEFT;
+static const int workspaceview_layout_top = WORKSPACEVIEW_MARGIN_TOP;
 
 static void
 workspaceview_scroll_to( Workspaceview *wview, int x, int y )

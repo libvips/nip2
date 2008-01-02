@@ -367,8 +367,8 @@ workspace_column_pick( Workspace *ws )
 	/* Make an empty column ... always at the top left.
 	 */
 	col = column_new( ws, "A" );
-	col->x = 3;
-	col->y = 3;
+	col->x = WORKSPACEVIEW_MARGIN_LEFT;
+	col->y = WORKSPACEVIEW_MARGIN_TOP;
 	workspace_column_select( ws, col );
 
 	return( col );
@@ -1425,6 +1425,24 @@ workspace_new( Workspacegroup *wsg, const char *name )
 	return( ws );
 }
 
+/* Load into an empty workspace.
+ */
+static gboolean
+workspace_load_empty( Workspace *ws, Workspacegroup *wsg, const char *filename )
+{
+	g_assert( workspace_is_empty( ws ) );
+
+	ws->load_type = WORKSPACE_LOAD_TOP;
+	column_set_offset( WORKSPACEVIEW_MARGIN_LEFT, 
+		WORKSPACEVIEW_MARGIN_TOP );
+	if( !filemodel_load_all( FILEMODEL( ws ), MODEL( wsg ), filename ) ) 
+		return( FALSE );
+	filemodel_set_modified( FILEMODEL( ws ), FALSE );
+	filemodel_set_filename( FILEMODEL( ws ), filename );
+
+	return( TRUE );
+}
+
 /* New workspace from a file.
  */
 Workspace *
@@ -1437,18 +1455,10 @@ workspace_new_from_file( Workspacegroup *wsg, const char *filename )
 #endif /*DEBUG*/
 
 	ws = WORKSPACE( g_object_new( TYPE_WORKSPACE, NULL ) );
-	ws->load_type = WORKSPACE_LOAD_TOP;
-	if( !filemodel_load_all( FILEMODEL( ws ), MODEL( wsg ), filename ) ) {
+	if( !workspace_load_empty( ws, wsg, filename ) ) {
 		g_object_unref( G_OBJECT( ws ) );
 		return( NULL );
 	}
-
-	filemodel_set_modified( FILEMODEL( ws ), FALSE );
-	filemodel_set_filename( FILEMODEL( ws ), filename );
-
-#ifdef DEBUG
-	printf( "(set name = %s)\n", IOBJECT( ws )->name );
-#endif /*DEBUG*/
 
 	return( ws );
 }
@@ -1507,17 +1517,16 @@ workspace_merge_file( Workspace *ws, const char *filename )
 	if( workspace_is_empty( ws ) ) {
 		model_empty( MODEL( ws ) );
 
-		ws->load_type = WORKSPACE_LOAD_TOP;
-		if( !filemodel_load_all( FILEMODEL( ws ), 
-			MODEL( ICONTAINER( ws )->parent ), filename ) ) 
+		if( !workspace_load_empty( ws, 
+			WORKSPACEGROUP( ICONTAINER( ws )->parent ), 
+			filename ) ) 
 			return( FALSE );
-
-		filemodel_set_modified( FILEMODEL( ws ), FALSE );
-		filemodel_set_filename( FILEMODEL( ws ), filename );
 	}
 	else {
 		ws->load_type = WORKSPACE_LOAD_COLUMNS;
-		column_set_offset( IM_RECT_RIGHT( &ws->area ), 0 );
+		column_set_offset( 
+			IM_RECT_RIGHT( &ws->area ) + WORKSPACEVIEW_MARGIN_LEFT,
+			WORKSPACEVIEW_MARGIN_TOP );
 		if( !filemodel_load_all( FILEMODEL( ws ), 
 			MODEL( ICONTAINER( ws )->parent ), filename ) ) 
 			return( FALSE );

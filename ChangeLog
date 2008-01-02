@@ -9,6 +9,7 @@ started 7.12.3
 - mainw rmb menu has open/merge items
 - merge ws doesn't add extra space
 - started adding LHS patterns
+- better spacing in merge ws / load ws
 
 started 7.13.2
 - remove Application from nip2.desktop.in

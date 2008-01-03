@@ -2361,22 +2361,166 @@ compile_lcomp( Compile *compile )
  * 	a = if is_list sym && len sym == 1 then sym?0 else error "..";
  */
 
+/* Generate code to access element n of a pattern trail. Eg, pattern is
+ * 	[[[a]]]
+ * the trail will be 
+ * 	0) LISTCONST 1) LISTCONST 2) LISTCONST 3) LEAF
+ * then access(0) will be
+ * 	leaf
+ * and access(1) will be
+ * 	leaf?0
+ * and access(3) (to get the value for a) will be
+ * 	leaf?0?0?0
+ */
+static ParseNode *
+compile_pattern_access( Compile *compile, 
+	Symbol *leaf, ParseNode **trail, int n )
+{
+	ParseNode *node;
+	ParseNode *left;
+	ParseNode *right;
+	ParseConst c;
+	int i;
+
+	/* The initial leaf ref we access from.
+	 */
+	node = tree_leafsym_new( compile, leaf );
+
+	for( i = 0; i < n; i++ )
+		switch( trail[i]->type ) {
+		case NODE_LEAF:
+			break;
+
+		case NODE_BINOP:
+			switch( node->biop ) {
+			case BI_COMMA:
+				/* Generate re or im?
+				 */
+				if( trail[i]->arg1 == trail[n + 1] )
+					left = tree_leaf_new( compile, "re" );
+				else
+					left = tree_leaf_new( compile, "im" );
+				node = tree_appl_new( compile, left, node );
+				break;
+
+			case BI_CONS:
+				/* Generate hd or tl?
+				 */
+				if( trail[i]->arg1 == trail[n + 1] )
+					left = tree_leaf_new( compile, "hd" );
+				else
+					left = tree_leaf_new( compile, "tl" );
+				node = tree_appl_new( compile, left, node );
+				break;
+
+			default:
+				g_assert( 0 );
+			}
+			break;
+
+		case NODE_LISTCONST:
+			/* Which list element do we need? Look for the next
+			 * item in the trail in the list of elements.
+			 */
+			c.type = PARSE_CONST_NUM;
+			c.val.num = g_slist_index( node->elist, trail[n + 1] );
+			right = tree_const_new( compile, c );
+			node = tree_binop_new( compile, 
+				BI_SELECT, node, right );
+			break;
+
+		case NODE_CONST:
+		case NODE_PATTERN_CLASS:
+			break;
+
+		default:
+			g_assert( 0 );
+		}
+
+	return( node );
+}
+
 /* Generate a parsetree for the condition test. The array of nodes represents
- * the set of condtions we have to test, left to right.
+ * the set of conditions we have to test, left to right. The last one is a
+ * NODE_LEAF.
  */
 static ParseNode *
 compile_pattern_condition( Compile *compile, 
-	Symbol *leaf, ParseNode *trail[], int n )
+	Symbol *leaf, ParseNode **trail, int depth )
 {
-	return( NULL );
+	ParseConst n;
+	ParseNode *node;
+	ParseNode *node2;
+	ParseNode *left;
+	ParseNode *right;
+	int i;
+
+	n.type = PARSE_CONST_BOOL;
+	n.val.bool = TRUE;
+	node = tree_const_new( compile, n );
+
+	for( i = depth; i >= 0; i-- ) {
+		switch( trail[i]->type ) {
+		case NODE_LEAF:
+			break;
+
+		case NODE_BINOP:
+			switch( node->biop ) {
+			case BI_COMMA:
+				/* Generate is_complex x.
+				 */
+				break;
+
+			case BI_CONS:
+				/* Generate is_list x && x != [].
+				 */
+				break;
+
+			default:
+				g_assert( 0 );
+			}
+			break;
+
+		case NODE_LISTCONST:
+			/* Generate is_list x && len x == n.
+			 */
+			left = tree_leaf_new( compile, "is_list" );
+			right = compile_pattern_access( compile, 
+				leaf, trail, i );
+			node2 = tree_appl_new( compile, left, right );
+			node = tree_binop_new( compile, BI_LAND, node2, node );
+
+			left = tree_leaf_new( compile, "len" );
+			right = compile_pattern_access( compile, 
+				leaf, trail, i );
+			left = tree_appl_new( compile, left, right );
+
+			n.type = PARSE_CONST_NUM;
+			n.val.num = g_slist_length( node->elist );
+			right = tree_const_new( compile, n );
+
+			node2 = tree_binop_new( compile, BI_EQ, left, right );
+			node = tree_binop_new( compile, BI_LAND, node2, node );
+			break;
+
+		case NODE_CONST:
+		case NODE_PATTERN_CLASS:
+			break;
+
+		default:
+			g_assert( 0 );
+		}
+	}
+
+	return( node );
 }
 
 /* Generate a parsetree for the action. The array of nodes represents
- * the list of access operations we have to generate, left to right.
+ * the list of access operations we have to generate, left to right. The last
+ * one is a NODE_LEAF.
  */
 static ParseNode *
-compile_pattern_action( Compile *compile, 
-	Symbol *leaf, ParseNode *trail[], int n )
+compile_pattern_action( Compile *compile, Symbol *leaf, ParseNode **trail )
 {
 	return( NULL );
 }
@@ -2418,7 +2562,7 @@ compile_pattern_lhs_leaf( PatternLhs *lhs, Symbol *leaf )
 	compile->tree = tree_ifelse_new( compile, 
 		compile_pattern_condition( compile, 
 			leaf, lhs->trail, lhs->depth ),
-		compile_pattern_action( compile, leaf, lhs->trail, lhs->depth ),
+		compile_pattern_action( compile, leaf, lhs->trail ),
 		compile_pattern_error( compile, leaf ) );
 }
 
@@ -2448,15 +2592,7 @@ compile_pattern_lhs_sub( ParseNode *node, PatternLhs *lhs )
 	case NODE_PATTERN_CLASS:
 		break;
 
-	case NODE_NONE:
-	case NODE_APPLY:
-	case NODE_UOP:
-	case NODE_CLASS:
-	case NODE_TAG:
-	case NODE_GENERATOR:
-	case NODE_COMPOSE:
-	case NODE_SUPER:
-	case NODE_PATTERN:
+	default:
 		g_assert( 0 );
 	}
 

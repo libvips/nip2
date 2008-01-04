@@ -106,7 +106,7 @@ Compile *compile_new( Expr *expr );
 Compile *compile_new_toplevel( Expr *expr );
 Compile *compile_new_local( Expr *expr );
 
-void *compile_symbol( Symbol *sym );
+void *compile_object( Compile *compile );
 
 void compile_error_set( Compile *compile );
 gboolean compile_check( Compile *compile );

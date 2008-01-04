@@ -41,12 +41,12 @@
  */
 
 /* show what everything compiled to
- */
 #define DEBUG_RESULT
+ */
 
 /* 
- */
 #define DEBUG
+ */
 
 #include "ip.h"
 
@@ -1595,42 +1595,46 @@ compile_heap( Compile *compile )
 	return( NULL );
 }
 
-/* Compile a symbol.
- */
+static void *compile_object_sub( Compile *compile );
+
 static void *
 compile_symbol_sub( Symbol *sym )
 {
 	Compile *compile;
 
-	if( sym->expr && (compile = sym->expr->compile) ) {
-		if( icontainer_map( ICONTAINER( compile ),
-			(icontainer_map_fn) compile_symbol_sub, NULL, NULL ) )
+	if( sym->expr && (compile = sym->expr->compile) )
+		if( compile_object_sub( compile ) )
 			return( sym );
-
-		if( compile_heap( compile ) )
-			return( sym );
-	}
 
 	return( NULL );
 }
 
-/* Top-level compile a thing entry.
+static void *
+compile_object_sub( Compile *compile )
+{
+	if( icontainer_map( ICONTAINER( compile ),
+		(icontainer_map_fn) compile_symbol_sub, NULL, NULL ) )
+		return( sym );
+
+	if( compile_heap( compile ) )
+		return( sym );
+
+	return( NULL );
+}
+
+/* Top-level compile a thing entry point.
  */
 void *
-compile_symbol( Symbol *sym )
+compile_object( Compile *compile )
 {
-	Compile *compile;
+	/* Walk this tree of symbols computing the secret lists.
+	 */
+	secret_build( compile );
 
-	if( sym->expr && (compile = sym->expr->compile) ) {
-		/* Walk this tree of symbols computing the secret lists.
-		 */
-		secret_build( compile );
-
-		/* Compile all definitions from the inside out.
-		 */
-		if( compile_symbol_sub( sym ) )
-			return( sym );
-	}
+	/* Compile all definitions from the inside out.
+	 */
+	if( compile_object_sub( compile ) )
+		return( compile );
 
 	return( NULL );
 }
@@ -2647,11 +2651,6 @@ compile_pattern_lhs_leaf( PatternLhs *lhs, Symbol *leaf )
 
 	symbol_made( sym );
 
-	if( compile_symbol( sym ) )
-		/* Can this ever fail? Shouldn't.
-		 */
-		error( "what" );
-
 #ifdef DEBUG
 	printf( "compile_pattern_lhs_leaf: generated\n" );
 	dump_compile( compile );
@@ -2695,7 +2694,7 @@ compile_pattern_lhs_sub( ParseNode *node, PatternLhs *lhs )
 
 /* Something like "[a] = [1];". sym is the $$pattern we are generating access 
  * syms for, node is the pattern tree, compile is the scope in which we
- * generate the new defining symbols. 
+ * generate the new defining symbols. Note the syms we make on sofar.
  */
 void
 compile_pattern_lhs( Compile *compile, Symbol *sym, ParseNode *node )

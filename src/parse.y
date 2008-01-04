@@ -58,11 +58,6 @@ jmp_buf parse_error_point;
 static Compile *current_compile = NULL;
 static ParseNode *current_parsenode = NULL;
 
-/* A list of the top-level symbols we've defined so far in this parse action. 
- * We don't allow a single parse action to define a symbol more than once.
- */
-static GSList *parse_sofar = NULL;
-
 /* The kit we are adding new symbols to.
  */
 static Toolkit *current_kit;
@@ -498,7 +493,7 @@ input_pop( void )
 %type <yy_node> crhs cexprlist prhs lambda
 %type <yy_const> TK_CONST 
 %type <yy_name> TK_IDENT TK_TAG
-%type <yy_sym> topdef
+%type <yy_sym> toplevel_definition
 
 %left TK_LAMBDA 
 %nonassoc TK_IF 
@@ -526,8 +521,8 @@ input_pop( void )
 
 select: 
       	',' main | 
-	'^' onedef | 
-	'*' sdef optsemi {
+	'^' single_definition | 
+	'*' params_plus_rhs optsemi {
 		compile_check( current_compile );
 	} | 
 	prhs {
@@ -560,14 +555,14 @@ prhs:
 
 main: 
     	/* Empty */ | 
-	main onedef
+	main single_definition
 	;
 
-onedef: 
+single_definition: 
       	directive {
 		tool_position += 1;
 	} | 
-	topdef optsemi {
+	toplevel_definition optsemi {
 		tool_position += 1;
 	}
 	;
@@ -610,14 +605,14 @@ directive:
 	}
 	;
 
-topdef: 
+toplevel_definition: 
 	{
 		last_top_sym = NULL;
 		last_top_lineno = input_state.lineno;
 		scope_reset();
 		current_compile = root_symbol->expr->compile;
 	}
-	def {
+	definition {
 		Symbol *sym = last_top_sym;
 		Tool *tool;
 
@@ -625,20 +620,12 @@ topdef:
 
 		/* Add to the current kit.
 		 */
-		if( current_kit ) {
-			tool = tool_new_sym( current_kit, tool_position, sym );
-			tool->lineno = last_top_lineno;
-		}
+		tool = tool_new_sym( current_kit, tool_position, sym );
+		tool->lineno = last_top_lineno;
 
 		/* Finished with this symbol.
 		 */
 		symbol_made( sym );
-
-		/* Compile.
-		 */
-		if( compile_symbol( sym ) )
-			yyerror( _( "Unable to compile \"%s\"\n%s." ),
-				IOBJECT( sym )->name, error_get_sub() );
 
 		input_reset();
 
@@ -646,9 +633,9 @@ topdef:
 	}
 	;
 
-/* Parse a new defining occurence.
+/* Parse a new defining occurence. This can be a local or a top-level.
  */
-def: 
+definition: 
    	simple_pattern {	
 		Symbol *sym;
 
@@ -658,16 +645,6 @@ def:
 		 */
 		if( $1->type == NODE_LEAF ) {
 			const char *name = IOBJECT( $1->leaf )->name;
-
-			/* Is this a top-level definition? Check we've not 
-			 * defined any other top-level syms with this name 
-			 * in this parse action.
-			 */
-			if( current_symbol == root_symbol ) 
-				if( (sym = slist_map( parse_sofar,
-					(SListMapFn) iobject_test_name, 
-					(void *) name )) )
-					symbol_error_redefine( sym );
 
 			/* Make defining occurence.
 			 */
@@ -697,14 +674,8 @@ def:
 		/* If this is to be a top-level-definition, make a 
 		 * note of it.
 		 */
-		if( current_symbol == root_symbol ) {
+		if( current_symbol == root_symbol ) 
 			last_top_sym = sym;
-
-			/* Also note on list of syms for this action.
-			 */
-			parse_sofar = g_slist_prepend( parse_sofar, 
-				sym );
-		}
 
 		/* Initialise symbol parsing variables. Save old current symbol,
 		 * add new one.
@@ -722,7 +693,7 @@ def:
 		IM_FREE( current_compile->prhstext );
 		IM_FREE( current_compile->rhstext );
 	}
-	sdef {
+	params_plus_rhs {
 		compile_check( current_compile );
 
 		/* Link unresolved names in to the outer scope.
@@ -736,7 +707,7 @@ def:
 
 /* Parse params/body/locals into current_expr
  */
-sdef: 
+params_plus_rhs: 
 	{	
 		input_push( 1 );
 
@@ -874,12 +845,12 @@ optsemi:
 	;
 
 deflist: 
-       	def {
+       	definition {
 		input_pop();
 		input_push( 5 );
 	}
 	optsemi | 
-	deflist def {
+	deflist definition {
 		input_pop();
 		input_push( 6 );
 	}
@@ -1331,16 +1302,38 @@ parse_input( int ch, Symbol *sym, Toolkit *kit, int pos )
 		if( current_compile ) 
 			compile_error_set( current_compile );
 
-		IM_FREEF( g_slist_free, parse_sofar );
-
 		return( FALSE );
 	}
 	yyparse();
-	IM_FREEF( g_slist_free, parse_sofar );
 
 	/* All ok.
 	 */
 	return( TRUE );
+}
+
+static void *
+compile_toolkit_sub( Tool *tool )
+{
+	Compile *compile;
+
+	if( tool->sym && tool->sym->expr && 
+		(compile = tool->sym->expr->compile )) 
+		/* Only if we have no code.
+		 */
+		if( compile->base.type == ELEMENT_NOVAL ) 
+			if( compile_object( compile ) )
+				return( tool );
+
+	return( NULL );
+}
+
+/* Scan a toolkit and make sure all the symbols have been compiled.
+ */
+static void *
+compile_toolkit( Toolkit *kit )
+{
+	return( toolkit_map( kit,
+		(tool_map_fn) compile_toolkit_sub, NULL, NULL ) );
 }
 
 /* Parse the input into a set of symbols at a position in a kit. 
@@ -1353,10 +1346,10 @@ parse_toplevel( Toolkit *kit, int pos )
 
 	current_compile = NULL;
 
-	result = parse_input( ',', kit->kitg->root, kit, pos );
+	result = parse_input( ',', kit->kitg->root, kit, pos ) &&
+		!compile_toolkit( kit );
 
-	if( kit )
-		iobject_changed( IOBJECT( kit ) );
+	iobject_changed( IOBJECT( kit ) );
 
 	return( result );
 }
@@ -1370,10 +1363,10 @@ parse_onedef( Toolkit *kit, int pos )
 
 	current_compile = NULL;
 
-	result = parse_input( '^', kit->kitg->root, kit, pos );
+	result = parse_input( '^', kit->kitg->root, kit, pos ) &&
+		!compile_toolkit( kit );
 
-	if( kit )
-		iobject_changed( IOBJECT( kit ) );
+	iobject_changed( IOBJECT( kit ) );
 
 	return( result );
 }
@@ -1411,7 +1404,7 @@ parse_rhs( Expr *expr, ParseRhsSyntax syntax )
 
 	/* Compile.
 	 */
-	if( compile_symbol( expr->sym ) )
+	if( compile_object( compile ) )
 		return( FALSE );
 
 	return( TRUE );

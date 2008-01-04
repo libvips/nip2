@@ -1,9 +1,8 @@
-- parse_sofar needs to include things made by LHS patterns 
+- [a]=[1]; in ws local pane still doesn't work :( do we compile a?
 
-  so we can stop stuff like
+- do we put ws-locals in their own toolkit? can't remember
 
-  	a = 42;
-	[a] = [42];
+  we should if we don't, so that old defs are removed when you press 'process'
 
 - this stuff appears a few times:
 
@@ -37,12 +36,6 @@
 
   needed to make nice pattern-match-failed error messages, see compile.c
 
-- the old code for "a = 12" needs to go into tree.c ... the LEAF bit of
-  pattern should make a defining occurence, not a reference
-
-  ... actually, no, make a ref, then make the defining occurence in a later
-  pass
-
 - syntax allows
 
 	12 = fred 99;
@@ -50,10 +43,6 @@
   but of course we will not ever eval this, except at the top level
 
   is this OK? we could disallow defs like this in a later pass
-
-- do we put ws-locals in their own toolkit? can't remember
-
-  we should if we don't, so that old defs are removed when you press 'process'
 
 - currently have 
 

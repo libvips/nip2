@@ -41,12 +41,12 @@
  */
 
 /* show what everything compiled to
-#define DEBUG_RESULT
  */
+#define DEBUG_RESULT
 
 /* 
-#define DEBUG
  */
+#define DEBUG
 
 #include "ip.h"
 
@@ -1507,11 +1507,9 @@ compile_remove_subexpr( Compile *compile, PElement *root )
 /* Top-level compiler driver.
  */
 
-static void *compile_symbol( Symbol *sym );
-
 /* Compile a symbol into a heap. 
  */
-void *
+static void *
 compile_heap( Compile *compile )
 {
 	PElement base;
@@ -1521,12 +1519,6 @@ compile_heap( Compile *compile )
 #endif /*DEBUG*/
 
 	PEPOINTE( &base, &compile->base );
-
-	/* Compile all our sub-definitions first.
-	 */
-	if( icontainer_map( ICONTAINER( compile ),
-		(icontainer_map_fn) compile_symbol, NULL, NULL ) )
-		return( compile->sym );
 
 	/* Is there an existing function base? GC it away.
 	 */
@@ -1606,10 +1598,39 @@ compile_heap( Compile *compile )
 /* Compile a symbol.
  */
 static void *
+compile_symbol_sub( Symbol *sym )
+{
+	Compile *compile;
+
+	if( sym->expr && (compile = sym->expr->compile) ) {
+		if( icontainer_map( ICONTAINER( compile ),
+			(icontainer_map_fn) compile_symbol_sub, NULL, NULL ) )
+			return( sym );
+
+		if( compile_heap( compile ) )
+			return( sym );
+	}
+
+	return( NULL );
+}
+
+/* Top-level compile a thing entry.
+ */
+void *
 compile_symbol( Symbol *sym )
 {
-	if( sym->expr && sym->expr->compile )
-		return( compile_heap( sym->expr->compile ) );
+	Compile *compile;
+
+	if( sym->expr && (compile = sym->expr->compile) ) {
+		/* Walk this tree of symbols computing the secret lists.
+		 */
+		secret_build( compile );
+
+		/* Compile all definitions from the inside out.
+		 */
+		if( compile_symbol_sub( sym ) )
+			return( sym );
+	}
 
 	return( NULL );
 }
@@ -2396,7 +2417,7 @@ compile_pattern_access( Compile *compile,
 			case BI_COMMA:
 				/* Generate re or im?
 				 */
-				if( trail[i]->arg1 == trail[n + 1] )
+				if( trail[i]->arg1 == trail[i + 1] )
 					left = tree_leaf_new( compile, "re" );
 				else
 					left = tree_leaf_new( compile, "im" );
@@ -2406,7 +2427,7 @@ compile_pattern_access( Compile *compile,
 			case BI_CONS:
 				/* Generate hd or tl?
 				 */
-				if( trail[i]->arg1 == trail[n + 1] )
+				if( trail[i]->arg1 == trail[i + 1] )
 					left = tree_leaf_new( compile, "hd" );
 				else
 					left = tree_leaf_new( compile, "tl" );
@@ -2423,7 +2444,8 @@ compile_pattern_access( Compile *compile,
 			 * item in the trail in the list of elements.
 			 */
 			c.type = PARSE_CONST_NUM;
-			c.val.num = g_slist_index( node->elist, trail[n + 1] );
+			c.val.num = g_slist_index( trail[i]->elist, 
+				trail[i + 1] );
 			right = tree_const_new( compile, c );
 			node = tree_binop_new( compile, 
 				BI_SELECT, node, right );
@@ -2441,8 +2463,7 @@ compile_pattern_access( Compile *compile,
 }
 
 /* Generate a parsetree for the condition test. The array of nodes represents
- * the set of conditions we have to test, left to right. The last one is a
- * NODE_LEAF.
+ * the set of conditions we have to test, left to right. 
  */
 static ParseNode *
 compile_pattern_condition( Compile *compile, 
@@ -2459,21 +2480,45 @@ compile_pattern_condition( Compile *compile,
 	n.val.bool = TRUE;
 	node = tree_const_new( compile, n );
 
-	for( i = depth; i >= 0; i-- ) {
+	for( i = depth - 1; i >= 0; i-- ) {
 		switch( trail[i]->type ) {
 		case NODE_LEAF:
 			break;
 
 		case NODE_BINOP:
-			switch( node->biop ) {
+			switch( trail[i]->biop ) {
 			case BI_COMMA:
 				/* Generate is_complex x.
 				 */
+				left = tree_leaf_new( compile, "is_complex" );
+				right = compile_pattern_access( compile, 
+					leaf, trail, i );
+				node2 = tree_appl_new( compile, left, right );
+
+				node = tree_binop_new( compile, 
+					BI_LAND, node2, node );
 				break;
 
 			case BI_CONS:
 				/* Generate is_list x && x != [].
 				 */
+				left = tree_leaf_new( compile, "is_list" );
+				right = compile_pattern_access( compile, 
+					leaf, trail, i );
+				node2 = tree_appl_new( compile, left, right );
+
+				node = tree_binop_new( compile, 
+					BI_LAND, node2, node );
+
+				left = compile_pattern_access( compile, 
+					leaf, trail, i );
+				n.type = PARSE_CONST_ELIST;
+				right = tree_const_new( compile, n );
+				node2 = tree_binop_new( compile, 
+					BI_NOTEQ, left, right );
+
+				node = tree_binop_new( compile, 
+					BI_LAND, node, node2 );
 				break;
 
 			default:
@@ -2488,6 +2533,7 @@ compile_pattern_condition( Compile *compile,
 			right = compile_pattern_access( compile, 
 				leaf, trail, i );
 			node2 = tree_appl_new( compile, left, right );
+
 			node = tree_binop_new( compile, BI_LAND, node2, node );
 
 			left = tree_leaf_new( compile, "len" );
@@ -2496,15 +2542,37 @@ compile_pattern_condition( Compile *compile,
 			left = tree_appl_new( compile, left, right );
 
 			n.type = PARSE_CONST_NUM;
-			n.val.num = g_slist_length( node->elist );
+			n.val.num = g_slist_length( trail[i]->elist );
 			right = tree_const_new( compile, n );
-
 			node2 = tree_binop_new( compile, BI_EQ, left, right );
-			node = tree_binop_new( compile, BI_LAND, node2, node );
+
+			node = tree_binop_new( compile, BI_LAND, node, node2 );
 			break;
 
 		case NODE_CONST:
+			/* Generate x == n.
+			 */
+			left = compile_pattern_access( compile, 
+				leaf, trail, i );
+			right = tree_const_new( compile, trail[i]->con );
+			node2 = tree_binop_new( compile, BI_EQ, left, right );
+
+			node = tree_binop_new( compile, BI_LAND, node2, node );
+			break;
+
 		case NODE_PATTERN_CLASS:
+			/* Generate is_instanceof "class-name" x.
+			 */
+			left = tree_leaf_new( compile, "is_instanceof" );
+			n.type = PARSE_CONST_STR;
+			n.val.str = im_strdupn( trail[i]->class_name );
+			right = tree_const_new( compile, n );
+			node2 = tree_appl_new( compile, left, right );
+			right = compile_pattern_access( compile, 
+				leaf, trail, i );
+			node2 = tree_appl_new( compile, node2, right );
+
+			node = tree_binop_new( compile, BI_LAND, node2, node );
 			break;
 
 		default:
@@ -2515,22 +2583,31 @@ compile_pattern_condition( Compile *compile,
 	return( node );
 }
 
-/* Generate a parsetree for the action. The array of nodes represents
- * the list of access operations we have to generate, left to right. The last
- * one is a NODE_LEAF.
- */
-static ParseNode *
-compile_pattern_action( Compile *compile, Symbol *leaf, ParseNode **trail )
-{
-	return( NULL );
-}
-
 /* Generate a parsetree for a "pattern match failed" error.
  */
 static ParseNode *
 compile_pattern_error( Compile *compile, Symbol *leaf )
 {
-	return( NULL );
+	BufInfo buf;
+	char txt[256];
+
+	ParseConst n;
+	ParseNode *node;
+	ParseNode *left;
+	ParseNode *right;
+
+	buf_init_static( &buf, txt, 256 );
+	buf_appends( &buf, _( "pattern match failed" ) );
+	buf_appends( &buf, "\n" );
+	buf_appendf( &buf, "%s", symbol_name( leaf ) );
+
+	left = tree_leaf_new( compile, "error" );
+	n.type = PARSE_CONST_STR;
+	n.val.str = im_strdupn( buf_all( &buf ) );
+	right = tree_const_new( compile, n );
+	node = tree_appl_new( compile, left, right );
+
+	return( node );
 }
 
 /* Depth of trail we keep as we walk the pattern.
@@ -2538,14 +2615,16 @@ compile_pattern_error( Compile *compile, Symbol *leaf )
 #define MAX_TRAIL (10)
 
 typedef struct _PatternLhs {
-	Compile *compile;
-	Symbol *sym;
+	Compile *compile;	/* Scope in which we generate new symbols */
+	Symbol *sym;		/* Thing we access */
 
+	/* The trail of nodes representing this slice of the pattern.
+	 */
 	ParseNode *trail[MAX_TRAIL];
 	int depth;
 } PatternLhs;
 
-/* Generate one reference.
+/* Generate one reference. leaf is the new sym we generate.
  */
 static void
 compile_pattern_lhs_leaf( PatternLhs *lhs, Symbol *leaf )
@@ -2561,9 +2640,22 @@ compile_pattern_lhs_leaf( PatternLhs *lhs, Symbol *leaf )
 
 	compile->tree = tree_ifelse_new( compile, 
 		compile_pattern_condition( compile, 
-			leaf, lhs->trail, lhs->depth ),
-		compile_pattern_action( compile, leaf, lhs->trail ),
+			lhs->sym, lhs->trail, lhs->depth ),
+		compile_pattern_access( compile, 
+			lhs->sym, lhs->trail, lhs->depth ),
 		compile_pattern_error( compile, leaf ) );
+
+	symbol_made( sym );
+
+	if( compile_symbol( sym ) )
+		/* Can this ever fail? Shouldn't.
+		 */
+		error( "what" );
+
+#ifdef DEBUG
+	printf( "compile_pattern_lhs_leaf: generated\n" );
+	dump_compile( compile );
+#endif /*DEBUG*/
 }
 
 /* Recurse over the pattern generating references.
@@ -2601,6 +2693,10 @@ compile_pattern_lhs_sub( ParseNode *node, PatternLhs *lhs )
 	return( NULL );
 }
 
+/* Something like "[a] = [1];". sym is the $$pattern we are generating access 
+ * syms for, node is the pattern tree, compile is the scope in which we
+ * generate the new defining symbols. 
+ */
 void
 compile_pattern_lhs( Compile *compile, Symbol *sym, ParseNode *node )
 {

@@ -493,7 +493,7 @@ input_pop( void )
 %token TK_SEPARATOR TK_DIALOG TK_LSHIFT TK_RSHIFT
 
 %type <yy_node> expr binop uop rhs listex comma_list body 
-%type <yy_node> pattern simple_pattern complex_pattern list_pattern
+%type <yy_node> simple_pattern complex_pattern list_pattern
 %type <yy_node> leaf_pattern
 %type <yy_node> crhs cexprlist prhs lambda
 %type <yy_const> TK_CONST 
@@ -623,10 +623,6 @@ topdef:
 
 		assert( sym );
 
-		/* Work out extra secret parameters for locals.
-		 */
-		secret_build( sym->expr->compile );
-
 		/* Add to the current kit.
 		 */
 		if( current_kit ) {
@@ -640,7 +636,7 @@ topdef:
 
 		/* Compile.
 		 */
-		if( compile_heap( sym->expr->compile ) )
+		if( compile_symbol( sym ) )
 			yyerror( _( "Unable to compile \"%s\"\n%s." ),
 				IOBJECT( sym )->name, error_get_sub() );
 
@@ -653,17 +649,15 @@ topdef:
 /* Parse a new defining occurence.
  */
 def: 
-   	pattern {	
+   	simple_pattern {	
 		Symbol *sym;
-
-		g_assert( $1->type == NODE_PATTERN );
 
 		/* Two forms: <name pattern-list rhs>, or <pattern rhs>.
 		 * Enforce the no-args-to-pattern-assignment rule in the arg
 		 * pattern parser.
 		 */
-		if( $1->arg1->type == NODE_LEAF ) {
-			const char *name = IOBJECT( $1->arg1->leaf )->name;
+		if( $1->type == NODE_LEAF ) {
+			const char *name = IOBJECT( $1->leaf )->name;
 
 			/* Is this a top-level definition? Check we've not 
 			 * defined any other top-level syms with this name 
@@ -680,18 +674,6 @@ def:
 			sym = symbol_new_defining( current_compile, name );
 			(void) symbol_user_init( sym );
 			(void) compile_new_local( sym->expr );
-
-			/* If this is to be a top-level-definition, make a 
-			 * note of it.
-			 */
-			if( current_symbol == root_symbol ) {
-				last_top_sym = sym;
-
-				/* Also note on list of syms for this action.
-				 */
-				parse_sofar = g_slist_prepend( parse_sofar, 
-					sym );
-			}
 		}
 		else {
 			static int count = 0;
@@ -699,7 +681,7 @@ def:
 
 			/* We have <pattern rhs>. Make an anon symbol for this
 			 * value, then the variables in the pattern become
-			 * toplevels which index that.
+			 * toplevels which access that.
 			 */
 			im_snprintf( name, 256, "$$pattern_lhs%d", count++ );
 			sym = symbol_new_defining( current_compile, name );
@@ -707,9 +689,21 @@ def:
 			(void) symbol_user_init( sym );
 			(void) compile_new_local( sym->expr );
 
-			/* Generate the code for the pattern elements.
+			/* Expand the pattern to set of extra defs.
 			 */
-			compile_pattern_lhs( current_compile, sym, $1->arg1 );
+			compile_pattern_lhs( current_compile, sym, $1 );
+		}
+
+		/* If this is to be a top-level-definition, make a 
+		 * note of it.
+		 */
+		if( current_symbol == root_symbol ) {
+			last_top_sym = sym;
+
+			/* Also note on list of syms for this action.
+			 */
+			parse_sofar = g_slist_prepend( parse_sofar, 
+				sym );
 		}
 
 		/* Initialise symbol parsing variables. Save old current symbol,
@@ -1253,13 +1247,6 @@ uop:
 	}
 	;
 
-pattern:
-	simple_pattern {
-		$$ = tree_pattern_new( current_compile );
-		$$->arg1 = $1;
-	}
-	;
-
 /* Stuff that can appear on the LHS of an equals, or as a parameter pattern.
  */
 simple_pattern:
@@ -1422,13 +1409,9 @@ parse_rhs( Expr *expr, ParseRhsSyntax syntax )
 	 */
 	expr_resolve( expr );
 
-	/* Work out extra secret parameters for locals.
-	 */
-	secret_build( compile );
-
 	/* Compile.
 	 */
-	if( compile_heap( compile ) )
+	if( compile_symbol( expr->sym ) )
 		return( FALSE );
 
 	return( TRUE );

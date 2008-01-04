@@ -41,7 +41,6 @@ typedef enum {
 	NODE_GENERATOR,		/* A list generator */
 	NODE_COMPOSE,		/* Function composition */
 	NODE_SUPER,		/* Superclass constructor */
-	NODE_PATTERN,		/* A pattern */
 	NODE_PATTERN_CLASS,	/* A class pattern match */
 	NODE_LISTCONST		/* A list expression "[1, 2, 3]" */
 } NodeTypes;

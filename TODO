@@ -1,3 +1,20 @@
+- parse_sofar needs to include things made by LHS patterns 
+
+  so we can stop stuff like
+
+  	a = 42;
+	[a] = [42];
+
+- something to make file.def:lineno error messages?
+
+  try 
+  
+  	grep ">lineno" *.c
+
+  we have this in several places now
+
+  needed to make nice pattern-match-failed error messages, see compile.c
+
 - the old code for "a = 12" needs to go into tree.c ... the LEAF bit of
   pattern should make a defining occurence, not a reference
 

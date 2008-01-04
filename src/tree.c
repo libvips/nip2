@@ -79,7 +79,6 @@ tree_node_destroy( ParseNode *n )
 	case NODE_GENERATOR:
 	case NODE_NONE:
 	case NODE_COMPOSE:
-	case NODE_PATTERN:
 		break;
 
 	default:
@@ -365,16 +364,6 @@ tree_appl_new( Compile *compile, ParseNode *l, ParseNode *r )
 	no->type = NODE_APPLY;
 	no->arg1 = l;
 	no->arg2 = r;
-
-	return( no );
-}
-
-ParseNode *
-tree_pattern_new( Compile *compile )
-{
-	ParseNode *no = tree_new( compile );
-
-	no->type = NODE_PATTERN;
 
 	return( no );
 }

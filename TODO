@@ -1,8 +1,17 @@
 - [a]=[1]; in ws local pane still doesn't work :( do we compile a?
 
-- do we put ws-locals in their own toolkit? can't remember
+- is workspace_local_set() destroying the old kit? confusing!
 
-  we should if we don't, so that old defs are removed when you press 'process'
+- we still aren't setting all the text parts of [a,b]= defs, this will cause
+  trouble when we have one of these inside a class
+
+  also, lineno? not sure this is being set
+
+- try compile-on-demand again ... put the compiler call iin heap_copy()
+  perhaps?
+
+  how much would it really help startup? unclear, since we have to eval a lot
+  now to get the menu names etc.
 
 - this stuff appears a few times:
 

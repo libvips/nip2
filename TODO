@@ -6,6 +6,11 @@
 
 - tool_error() added, use it more!
 
+  needs to report more stuff: it says little for ws-local defs ... it could
+  report the toolkit name
+
+- a bunch of errors in math.def, check the error log
+
 - look into [a,b]<- stuff
 
 - try compile-on-demand again ... put the compiler call iin heap_copy()

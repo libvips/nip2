@@ -119,6 +119,8 @@ typedef struct _ToolClass {
 	 */
 } ToolClass;
 
+void tool_error( Tool *tool, BufInfo *buf );
+
 GType tool_get_type( void );
 
 Tool *tool_new_sym( Toolkit *kit, int pos, Symbol *sym );

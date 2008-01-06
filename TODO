@@ -1,49 +1,18 @@
-- [a]=[1]; in ws local pane still doesn't work :( do we compile a?
+- try
 
-- is workspace_local_set() destroying the old kit? confusing!
+	a:x=[1];
 
-- we still aren't setting all the text parts of [a,b]= defs, this will cause
-  trouble when we have one of these inside a class
+  assert fails
 
-  also, lineno? not sure this is being set
+- tool_error() added, use it more!
+
+- look into [a,b]<- stuff
 
 - try compile-on-demand again ... put the compiler call iin heap_copy()
   perhaps?
 
   how much would it really help startup? unclear, since we have to eval a lot
   now to get the menu names etc.
-
-- this stuff appears a few times:
-
-		/* Add to the current kit.
-		 */
-		if( current_kit ) {
-			tool = tool_new_sym( current_kit, tool_position, sym );
-			tool->lineno = last_top_lineno;
-		}
-
-		/* Finished with this symbol.
-		 */
-		symbol_made( sym );
-
-		/* Compile.
-		 */
-		if( compile_symbol( sym ) )
-			yyerror( _( "Unable to compile \"%s\"\n%s." ),
-				IOBJECT( sym )->name, error_get_sub() );
-
-  it's in compile_pattern when we generate a toplevel, also in parse_rhs(),
-  sort of
-
-- something to make file.def:lineno error messages?
-
-  try 
-  
-  	grep ">lineno" *.c
-
-  we have this in several places now
-
-  needed to make nice pattern-match-failed error messages, see compile.c
 
 - syntax allows
 

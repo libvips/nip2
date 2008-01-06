@@ -8,7 +8,7 @@ started 7.12.3
 - allow +/- for zoom in and out shortcuts
 - mainw rmb menu has open/merge items
 - merge ws doesn't add extra space
-- started adding LHS patterns
+- added LHS patterns
 - better spacing in merge ws / load ws
 
 started 7.13.2

@@ -432,20 +432,9 @@ static void *
 symbol_not_defined_sub( Link *link, BufInfo *buf )
 {
 	symbol_qualified_name( link->parent, buf );
-	buf_appends( buf, " " );
 
-	if( link->parent->tool ) {
-		Tool *tool = link->parent->tool;
-
-		buf_appends( buf, "(" );
-		buf_appendf( buf, _( "defined in toolkit \"%s\"" ),
-			IOBJECT( tool->kit )->name );
-		if( tool->lineno != -1 ) {
-			buf_appends( buf, ", " );
-			buf_appendf( buf, _( "line %d" ), tool->lineno );
-		}
-		buf_appends( buf, ") " );
-	}
+	if( link->parent->tool ) 
+		tool_error( link->parent->tool, buf );
 
 	return( NULL );
 }

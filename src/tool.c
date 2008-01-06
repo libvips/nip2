@@ -42,6 +42,15 @@ static FilemodelClass *parent_class = NULL;
  */
 #define MAX_NAME (256)
 
+void
+tool_error( Tool *tool, BufInfo *buf )
+{
+	if( tool->lineno != -1 && FILEMODEL( tool->kit )->filename )
+		buf_appendf( buf, " (%s:%d)", 
+			FILEMODEL( tool->kit )->filename, 
+			tool->lineno );
+}
+
 /* Remove a tool. Also strip the sym, if any.
  */
 static void 

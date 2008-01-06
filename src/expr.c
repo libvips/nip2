@@ -65,14 +65,8 @@ expr_error_print_sub( Expr *expr, BufInfo *buf )
 		buf_appends( buf, "\n" );
 
 	buf_appendf( buf, _( "error in \"%s\"" ), IOBJECT( expr->sym )->name );
-	if( expr->sym->tool ) {
-		Tool *tool = expr->sym->tool;
-
-		if( tool->lineno != -1 && FILEMODEL( tool->kit )->filename )
-			buf_appendf( buf, " (%s:%d)", 
-				FILEMODEL( tool->kit )->filename, 
-				tool->lineno );
-	}
+	if( expr->sym->tool ) 
+		tool_error( expr->sym->tool, buf );
 	else if( expr->row ) {
 		Workspace *ws = expr->row->ws;
 

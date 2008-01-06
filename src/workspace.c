@@ -1916,8 +1916,9 @@ workspace_set_mode( Workspace *ws, WorkspaceMode mode )
 gboolean
 workspace_local_set( Workspace *ws, const char *txt )
 {
-	/* New kit for defs ... will destroy any old defs. Don't register it,
-	 * we don't want it to be autosaved on quit.
+	/* New kit for defs ... will destroy any old defs, since we can't have
+	 * two kits with the same name. Don't register it, we don't want it 
+	 * to be autosaved on quit.
 	 */
 	ws->local_kit = toolkit_new( ws->local_kitg, "Workspace Locals" );
 	filemodel_unregister( FILEMODEL( ws->local_kit ) );

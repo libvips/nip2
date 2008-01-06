@@ -2603,7 +2603,10 @@ compile_pattern_error( Compile *compile, Symbol *leaf )
 	buf_init_static( &buf, txt, 256 );
 	buf_appends( &buf, _( "pattern match failed" ) );
 	buf_appends( &buf, "\n" );
-	buf_appendf( &buf, "%s", symbol_name( leaf ) );
+
+	buf_appendf( &buf, _( "error in \"%s\"" ), IOBJECT( leaf )->name );
+	if( leaf->tool ) 
+		tool_error( leaf->tool, &buf );
 
 	left = tree_leaf_new( compile, "error" );
 	n.type = PARSE_CONST_STR;
@@ -2626,6 +2629,7 @@ typedef struct _PatternLhs {
 	 */
 	ParseNode *trail[MAX_TRAIL];
 	int depth;
+	GSList *built_syms;
 } PatternLhs;
 
 /* Generate one reference. leaf is the new sym we generate.
@@ -2640,6 +2644,7 @@ compile_pattern_lhs_leaf( PatternLhs *lhs, Symbol *leaf )
 	sym->generated = TRUE;
 	(void) symbol_user_init( sym );
 	(void) compile_new_local( sym->expr );
+	lhs->built_syms = g_slist_prepend( lhs->built_syms, sym );
 	compile = sym->expr->compile;
 
 	compile->tree = tree_ifelse_new( compile, 
@@ -2648,8 +2653,6 @@ compile_pattern_lhs_leaf( PatternLhs *lhs, Symbol *leaf )
 		compile_pattern_access( compile, 
 			lhs->sym, lhs->trail, lhs->depth ),
 		compile_pattern_error( compile, leaf ) );
-
-	symbol_made( sym );
 
 #ifdef DEBUG
 	printf( "compile_pattern_lhs_leaf: generated\n" );
@@ -2694,9 +2697,11 @@ compile_pattern_lhs_sub( ParseNode *node, PatternLhs *lhs )
 
 /* Something like "[a] = [1];". sym is the $$pattern we are generating access 
  * syms for, node is the pattern tree, compile is the scope in which we
- * generate the new defining symbols. Note the syms we make on sofar.
+ * generate the new defining symbols. Return a list of the syms we built: they
+ * will need any final finishing up and then having symbol_made() called on 
+ * them.
  */
-void
+GSList *
 compile_pattern_lhs( Compile *compile, Symbol *sym, ParseNode *node )
 {
 	PatternLhs lhs;
@@ -2704,8 +2709,11 @@ compile_pattern_lhs( Compile *compile, Symbol *sym, ParseNode *node )
 	lhs.compile = compile;
 	lhs.sym = sym;
 	lhs.depth = 0;
+	lhs.built_syms = NULL;
 
 	compile_pattern_lhs_sub( node, &lhs );
 
 	g_assert( lhs.depth == 0 );
+
+	return( lhs.built_syms );
 }

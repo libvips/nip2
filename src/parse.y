@@ -466,6 +466,40 @@ input_pop( void )
 	is->bspsp--;
 }
 
+/* End of top level parse. Fix up the symbol.
+ */
+static void *
+parse_toplevel_end( Symbol *sym )
+{
+	Tool *tool;
+
+	tool = tool_new_sym( current_kit, tool_position, sym );
+	tool->lineno = last_top_lineno;
+
+	/* Ony needed by toplevels.
+	 */
+	symbol_made( sym );
+
+	return( NULL );
+}
+
+
+/* Built a pattern access definition. Set the various text fragments from the
+ * def we are drived from.
+ */
+static void *
+parse_access_end( Symbol *sym, Symbol *main )
+{
+	IM_SETSTR( sym->expr->compile->rhstext, 
+		main->expr->compile->rhstext ); 
+	IM_SETSTR( sym->expr->compile->prhstext, 
+		main->expr->compile->prhstext ); 
+	IM_SETSTR( sym->expr->compile->text, 
+		main->expr->compile->text ); 
+
+	return( NULL );
+}
+
 %}
 
 %union {
@@ -487,7 +521,7 @@ input_pop( void )
 %token TK_INT TK_FLOAT TK_DOUBLE TK_SIGNED TK_UNSIGNED TK_COMPLEX
 %token TK_SEPARATOR TK_DIALOG TK_LSHIFT TK_RSHIFT
 
-%type <yy_node> expr binop uop rhs listex comma_list body 
+%type <yy_node> expr binop uop rhs list_expression comma_list body 
 %type <yy_node> simple_pattern complex_pattern list_pattern
 %type <yy_node> leaf_pattern
 %type <yy_node> crhs cexprlist prhs lambda
@@ -614,18 +648,13 @@ toplevel_definition:
 	}
 	definition {
 		Symbol *sym = last_top_sym;
-		Tool *tool;
 
 		assert( sym );
 
-		/* Add to the current kit.
+		/* Link unresolved names into the outer scope.
 		 */
-		tool = tool_new_sym( current_kit, tool_position, sym );
-		tool->lineno = last_top_lineno;
-
-		/* Finished with this symbol.
-		 */
-		symbol_made( sym );
+		compile_resolve_names( current_compile, 
+			compile_get_parent( current_compile ) );
 
 		input_reset();
 
@@ -665,10 +694,6 @@ definition:
 			sym->generated = TRUE;
 			(void) symbol_user_init( sym );
 			(void) compile_new_local( sym->expr );
-
-			/* Expand the pattern to set of extra defs.
-			 */
-			compile_pattern_lhs( current_compile, sym, $1 );
 		}
 
 		/* If this is to be a top-level-definition, make a 
@@ -696,10 +721,30 @@ definition:
 	params_plus_rhs {
 		compile_check( current_compile );
 
-		/* Link unresolved names in to the outer scope.
+		/* Is this the end of a top-level? Needs extra work to add to
+		 * the enclosing toolkit etc.
 		 */
-		compile_resolve_names( current_compile, 
-			compile_get_parent( current_compile ) );
+		if( symbol_get_parent( current_symbol ) == root_symbol ) 
+			parse_toplevel_end( current_symbol );
+
+		/* Is this a pattern definition? Expand the pattern to a
+		 * set of access defs.
+		 */
+		if( $1->type != NODE_LEAF ) {
+			Compile *parent = compile_get_parent( current_compile );
+			GSList *built_syms;
+
+			built_syms = compile_pattern_lhs( parent, 
+				current_symbol, $1 );
+
+			slist_map( built_syms,
+				(SListMapFn) parse_toplevel_end, NULL );
+			slist_map( built_syms,
+				(SListMapFn) parse_access_end, 
+				current_symbol );
+
+			g_slist_free( built_syms );
+		}
 
 		scope_pop();
 	}
@@ -892,7 +937,7 @@ expr:
 		$$ = tree_appl_new( current_compile, $1, $2 );
 	} | 
 	lambda | 
-	listex {
+	list_expression {
 		$$ = $1;
 	} | 
 	'(' expr ',' expr ')' {	
@@ -951,7 +996,7 @@ lambda:
 	}
 	;
 
-listex: 
+list_expression: 
       	'[' expr TK_DOTDOTDOT ']' {
 		$$ = tree_generator_new( current_compile, $2, NULL, NULL );
 	} | 

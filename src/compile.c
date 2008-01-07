@@ -1639,6 +1639,31 @@ compile_object( Compile *compile )
 	return( NULL );
 }
 
+static void *
+compile_toolkit_sub( Tool *tool )
+{
+	Compile *compile;
+
+	if( tool->sym && tool->sym->expr && 
+		(compile = tool->sym->expr->compile )) 
+		/* Only if we have no code.
+		 */
+		if( compile->base.type == ELEMENT_NOVAL ) 
+			if( compile_object( compile ) )
+				return( tool );
+
+	return( NULL );
+}
+
+/* Scan a toolkit and make sure all the symbols have been compiled.
+ */
+void *
+compile_toolkit( Toolkit *kit )
+{
+	return( toolkit_map( kit,
+		(tool_map_fn) compile_toolkit_sub, NULL, NULL ) );
+}
+
 /* Parse support.
  */
 
@@ -2413,11 +2438,13 @@ compile_pattern_access( Compile *compile,
 
 	for( i = 0; i < n; i++ )
 		switch( trail[i]->type ) {
+		case NODE_CONST:
+		case NODE_PATTERN_CLASS:
 		case NODE_LEAF:
 			break;
 
 		case NODE_BINOP:
-			switch( node->biop ) {
+			switch( trail[i]->biop ) {
 			case BI_COMMA:
 				/* Generate re or im?
 				 */
@@ -2453,10 +2480,6 @@ compile_pattern_access( Compile *compile,
 			right = tree_const_new( compile, c );
 			node = tree_binop_new( compile, 
 				BI_SELECT, node, right );
-			break;
-
-		case NODE_CONST:
-		case NODE_PATTERN_CLASS:
 			break;
 
 		default:
@@ -2531,7 +2554,7 @@ compile_pattern_condition( Compile *compile,
 			break;
 
 		case NODE_LISTCONST:
-			/* Generate is_list x && len x == n.
+			/* Generate is_list x && is_list_len n x.
 			 */
 			left = tree_leaf_new( compile, "is_list" );
 			right = compile_pattern_access( compile, 
@@ -2540,15 +2563,14 @@ compile_pattern_condition( Compile *compile,
 
 			node = tree_binop_new( compile, BI_LAND, node2, node );
 
-			left = tree_leaf_new( compile, "len" );
-			right = compile_pattern_access( compile, 
-				leaf, trail, i );
-			left = tree_appl_new( compile, left, right );
-
+			left = tree_leaf_new( compile, "is_list_len" );
 			n.type = PARSE_CONST_NUM;
 			n.val.num = g_slist_length( trail[i]->elist );
 			right = tree_const_new( compile, n );
-			node2 = tree_binop_new( compile, BI_EQ, left, right );
+			left = tree_appl_new( compile, left, right );
+			right = compile_pattern_access( compile, 
+				leaf, trail, i );
+			node2 = tree_appl_new( compile, left, right );
 
 			node = tree_binop_new( compile, BI_LAND, node, node2 );
 			break;
@@ -2569,7 +2591,7 @@ compile_pattern_condition( Compile *compile,
 			 */
 			left = tree_leaf_new( compile, "is_instanceof" );
 			n.type = PARSE_CONST_STR;
-			n.val.str = im_strdupn( trail[i]->class_name );
+			n.val.str = im_strdupn( trail[i]->tag );
 			right = tree_const_new( compile, n );
 			node2 = tree_appl_new( compile, left, right );
 			right = compile_pattern_access( compile, 
@@ -2592,25 +2614,14 @@ compile_pattern_condition( Compile *compile,
 static ParseNode *
 compile_pattern_error( Compile *compile, Symbol *leaf )
 {
-	BufInfo buf;
-	char txt[256];
-
-	ParseConst n;
-	ParseNode *node;
 	ParseNode *left;
+	ParseConst n;
 	ParseNode *right;
-
-	buf_init_static( &buf, txt, 256 );
-	buf_appends( &buf, _( "pattern match failed" ) );
-	buf_appends( &buf, "\n" );
-
-	buf_appendf( &buf, _( "error in \"%s\"" ), IOBJECT( leaf )->name );
-	if( leaf->tool ) 
-		tool_error( leaf->tool, &buf );
+	ParseNode *node;
 
 	left = tree_leaf_new( compile, "error" );
 	n.type = PARSE_CONST_STR;
-	n.val.str = im_strdupn( buf_all( &buf ) );
+	n.val.str = im_strdupn( _( "pattern match failed" ) );
 	right = tree_const_new( compile, n );
 	node = tree_appl_new( compile, left, right );
 
@@ -2672,6 +2683,10 @@ compile_pattern_lhs_sub( ParseNode *node, PatternLhs *lhs )
 		compile_pattern_lhs_leaf( lhs, node->leaf );
 		break;
 
+	case NODE_PATTERN_CLASS:
+		compile_pattern_lhs_sub( node->arg1, lhs );
+		break;
+
 	case NODE_BINOP:
 		compile_pattern_lhs_sub( node->arg1, lhs );
 		compile_pattern_lhs_sub( node->arg2, lhs );
@@ -2683,7 +2698,6 @@ compile_pattern_lhs_sub( ParseNode *node, PatternLhs *lhs )
 		break;
 
 	case NODE_CONST:
-	case NODE_PATTERN_CLASS:
 		break;
 
 	default:

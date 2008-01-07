@@ -45,10 +45,14 @@ static FilemodelClass *parent_class = NULL;
 void
 tool_error( Tool *tool, BufInfo *buf )
 {
-	if( tool->lineno != -1 && FILEMODEL( tool->kit )->filename )
-		buf_appendf( buf, " (%s:%d)", 
-			FILEMODEL( tool->kit )->filename, 
-			tool->lineno );
+	if( tool->lineno != -1 ) {
+		buf_appends( buf, " (" );
+		if( FILEMODEL( tool->kit )->filename )
+			buf_appends( buf, FILEMODEL( tool->kit )->filename );
+		else
+			buf_appends( buf, IOBJECT( tool->kit )->name );
+		buf_appendf( buf, ":%d)", tool->lineno );
+	}
 }
 
 /* Remove a tool. Also strip the sym, if any.

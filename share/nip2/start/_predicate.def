@@ -87,6 +87,23 @@ is_real_list l = is_listof is_real l;
  */
 is_string_list l = is_listof is_string l;
 
+/* Test list length ... quicker than len x == n for large lists.
+ */
+is_list_len n x
+	= true, x == [] && n == 0
+	= false, x == [] || n == 0
+	= is_list_len (n - 1) (tl x);
+
+is_list_len_more n x
+	= true, x != [] && n == 0
+	= false, x == [] || n == 0
+	= is_list_len_more (n - 1) (tl x);
+
+is_list_len_more_equal n x
+	= true, n == 0
+	= false, x == [] 
+	= is_list_len_more_equal (n - 1) (tl x);
+
 /* is_rectangular l: is l a rectangular data structure
  */
 is_rectangular l
@@ -95,13 +112,12 @@ is_rectangular l
 	= true, all (map is_list l) &&
 		all (map (not @ is_obj) l) &&
 		all (map is_rectangular l) &&
-		len l > 0 &&
-		all (map (equal (hd lengths)) (tl lengths))
+		is_list_len_more 0 l &&
+		all (map (is_list_len (len (hd l))) (tl l))
 	= false
 {
 	// treat strings as a base type, not [char]
 	is_obj x = !is_list x || is_string x;
-	lengths = map len l;
 }
 
 /* is_matrix l: is l a list of lists of real numbers, all the same length
@@ -114,7 +130,7 @@ is_matrix l = l != [] && is_listof is_real_list l && is_rectangular l;
  */
 is_square_matrix l
       = true, l == [[]]
-      = is_matrix l && len l == len (hd l);
+      = is_matrix l && is_list_len (len (hd l)) l;
 
 /* is_oddmatrix l: is l a matrix with odd-length sides
  */
@@ -175,7 +191,7 @@ is_String x = is_instanceof "String" x;
 is_xy_list l 
 	= is_list l && all (map xy l)
 {
-	xy l = is_real_list l && len l == 2;
+	xy l = is_real_list l && is_list_len 2 l;
 }
 
 // does a nested list structure contain a Group object?

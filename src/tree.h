@@ -169,11 +169,6 @@ struct _ParseNode {
 	/* A constant.
 	 */
 	ParseConst con;
-
-	/* A class pattern.
-	 */
-	char *class_name;
-	char *bind_to;
 };
 
 void tree_const_destroy( ParseConst *pc );
@@ -198,7 +193,7 @@ ParseNode *tree_class_new( Compile *compile );
 ParseNode *tree_compose_new( Compile *compile, ParseNode *f, ParseNode *g );
 ParseNode *tree_pattern_new( Compile *compile );
 ParseNode *tree_pattern_class_new( Compile *compile, 
-	const char *class_name, const char *bind_to );
+	const char *class_name, ParseNode *l );
 
 void *tree_node_destroy( ParseNode *n );
 

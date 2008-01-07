@@ -53,6 +53,7 @@ void *
 tree_node_destroy( ParseNode *n )
 {
 	switch( n->type ) {
+	case NODE_PATTERN_CLASS:
 	case NODE_TAG:
 		IM_FREE( n->tag );
 		break;
@@ -64,11 +65,6 @@ tree_node_destroy( ParseNode *n )
 	case NODE_LISTCONST:
 	case NODE_SUPER:
 		IM_FREEF( g_slist_free, n->elist );
-		break;
-
-	case NODE_PATTERN_CLASS:
-		IM_FREE( n->class_name );
-		IM_FREE( n->bind_to );
 		break;
 
 	case NODE_APPLY:
@@ -108,8 +104,6 @@ tree_new( Compile *compile )
 	no->klass = NULL;
 	no->elist = NULL;
 	no->tag = NULL;
-	no->class_name = NULL;
-	no->bind_to = NULL;
 	no->con.type = PARSE_CONST_NONE;
 	no->con.val.str = NULL;
 
@@ -369,14 +363,13 @@ tree_appl_new( Compile *compile, ParseNode *l, ParseNode *r )
 }
 
 ParseNode *
-tree_pattern_class_new( Compile *compile, 
-	const char *class_name, const char *bind_to )
+tree_pattern_class_new( Compile *compile, const char *class_name, ParseNode *l )
 {
 	ParseNode *no = tree_new( compile );
 
 	no->type = NODE_PATTERN_CLASS;
-	no->class_name = im_strdupn( class_name );
-	no->bind_to = im_strdupn( bind_to );
+	no->arg1 = l;
+	no->tag = im_strdupn( class_name );
 
 	return( no );
 }
@@ -454,30 +447,26 @@ tree_copy( Compile *compile, ParseNode *node )
 
 	switch( node->type ) {
 	case NODE_GENERATOR:
+	case NODE_APPLY:
+	case NODE_BINOP:
+	case NODE_COMPOSE:
+	case NODE_UOP:
+	case NODE_TAG:
+	case NODE_CONST:
+	case NODE_PATTERN_CLASS:
 		copy = tree_new( compile );
-		copy->arg1 = tree_copy( compile, node->arg1 );
+		copy->type = node->type;
+		copy->uop = node->uop;
+		copy->biop = node->biop;
+		if( node->tag )
+			copy->tag = im_strdupn( node->tag );
+		tree_const_copy( &node->con, &copy->con );
+		if( copy->arg1 )
+			copy->arg1 = tree_copy( compile, node->arg1 );
 		if( node->arg2 )
 			copy->arg2 = tree_copy( compile, node->arg2 );
 		if( node->arg3 )
 			copy->arg3 = tree_copy( compile, node->arg3 );
-		copy->type = node->type;
-		break;
-
-	case NODE_APPLY:
-	case NODE_BINOP:
-	case NODE_COMPOSE:
-		copy = tree_new( compile );
-		copy->arg1 = tree_copy( compile, node->arg1 );
-		copy->arg2 = tree_copy( compile, node->arg2 );
-		copy->type = node->type;
-		copy->biop = node->biop;
-		break;
-
-	case NODE_UOP:
-		copy = tree_new( compile );
-		copy->arg1 = tree_copy( compile, node->arg1 );
-		copy->type = node->type;
-		copy->uop = node->uop;
 		break;
 
 	case NODE_SUPER:
@@ -494,22 +483,6 @@ tree_copy( Compile *compile, ParseNode *node )
 
 	case NODE_CLASS:
 		copy = tree_class_new( compile );
-		break;
-
-	case NODE_TAG:
-	case NODE_CONST:
-		copy = tree_new( compile );
-		if( node->tag )
-			copy->tag = im_strdupn( node->tag );
-		tree_const_copy( &node->con, &copy->con );
-		copy->type = node->type;
-		break;
-
-	case NODE_PATTERN_CLASS:
-		copy = tree_new( compile );
-		copy->class_name = im_strdupn( node->class_name );
-		copy->bind_to = im_strdupn( node->bind_to );
-		copy->type = node->type;
 		break;
 
 	case NODE_LEAF:

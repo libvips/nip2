@@ -651,11 +651,6 @@ toplevel_definition:
 
 		assert( sym );
 
-		/* Link unresolved names into the outer scope.
-		 */
-		compile_resolve_names( current_compile, 
-			compile_get_parent( current_compile ) );
-
 		input_reset();
 
 		$$ = sym;
@@ -720,6 +715,11 @@ definition:
 	}
 	params_plus_rhs {
 		compile_check( current_compile );
+
+		/* Link unresolved names into the outer scope.
+		 */
+		compile_resolve_names( current_compile, 
+			compile_get_parent( current_compile ) );
 
 		/* Is this the end of a top-level? Needs extra work to add to
 		 * the enclosing toolkit etc.
@@ -1303,7 +1303,8 @@ leaf_pattern:
  */
 complex_pattern:
 	TK_IDENT TK_IDENT {
-		$$ = tree_pattern_class_new( current_compile, $1, $2 );
+		$$ = tree_pattern_class_new( current_compile, $1,
+			tree_leaf_new( current_compile, $2 ) );
 		IM_FREE( $1 );
 		IM_FREE( $2 );
 	} |
@@ -1354,31 +1355,6 @@ parse_input( int ch, Symbol *sym, Toolkit *kit, int pos )
 	/* All ok.
 	 */
 	return( TRUE );
-}
-
-static void *
-compile_toolkit_sub( Tool *tool )
-{
-	Compile *compile;
-
-	if( tool->sym && tool->sym->expr && 
-		(compile = tool->sym->expr->compile )) 
-		/* Only if we have no code.
-		 */
-		if( compile->base.type == ELEMENT_NOVAL ) 
-			if( compile_object( compile ) )
-				return( tool );
-
-	return( NULL );
-}
-
-/* Scan a toolkit and make sure all the symbols have been compiled.
- */
-static void *
-compile_toolkit( Toolkit *kit )
-{
-	return( toolkit_map( kit,
-		(tool_map_fn) compile_toolkit_sub, NULL, NULL ) );
 }
 
 /* Parse the input into a set of symbols at a position in a kit. 

@@ -1,19 +1,29 @@
-- try
+- use
+  
+  	is_list_length 4 x
 
-	a:x=[1];
+  and friends in more places ... most places we use len, in fact
 
-  assert fails
+- link report and error report need to be in scrollable windows, like trace
+
+  box_info() can have trouble displaying large amounts of data: it'll chop at a
+  boundary MAX_DIALOG_TEXT or something) which can cause markup to fail and
+  trigger gtk errors
+
+  make a baseclass from trace.c and derive error and link from that?
 
 - tool_error() added, use it more!
 
-  needs to report more stuff: it says little for ws-local defs ... it could
-  report the toolkit name
-
-- a bunch of errors in math.def, check the error log
-
 - look into [a,b]<- stuff
 
-- try compile-on-demand again ... put the compiler call iin heap_copy()
+  not clear how we're going to move the access defs to the right place ... how
+  do we recognise generators in compile_lcomp?
+
+  maybe name all generators as $$gen23, then after we make the foldr for one,
+  we search for any symbols which are tagged as having been generated as the
+  pattern acess functions for that sym
+
+- try compile-on-demand again ... put the compiler call in heap_copy()
   perhaps?
 
   how much would it really help startup? unclear, since we have to eval a lot
@@ -26,59 +36,6 @@
   but of course we will not ever eval this, except at the top level
 
   is this OK? we could disallow defs like this in a later pass
-
-- currently have 
-
-	def: 
-		TK_IDENT sdef
-
-  needs to be split to
-
-	def:
-		IDENT { start } pattern-list sdef { stop } |
-		pattern { start } sdef { stop }
-
-  but IDENT is a valid pattern :( maybe just have
-
-	def:
-		pattern { start } pattern-list sdef { stop } 
-
-  and in { start } (or later?) have something to stop the pattern-list if 
-  pattern isn't just an ident
-
-  also, 
-
-  	Image x
-
-  id a valid pattern, need to ensure this is bracketed I guess
-
-  atm sdef does params ... this should move out
-
-  also,
-
-	x <- expr
-
-  needs to become
-
-  	pattern <- expr
-
-  do we allow
-
-  	Image x <- expr
-
-  or does this have to be bracketed?
-
-  could allow
-
-  	a:x = fred ... ;
-
-  not ambigious, why not? also
-
-  	fred a:x b:y = ...
-
-  would not be ambigious
-
-  really, it's just (Image x) that must be bracketed
 
 - Filter / Blend items have extra blends in the name
 

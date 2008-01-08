@@ -8,7 +8,7 @@ started 7.12.3
 - allow +/- for zoom in and out shortcuts
 - mainw rmb menu has open/merge items
 - merge ws doesn't add extra space
-- added LHS patterns
+- added LHS patterns, eg. "[a, b] = fred 12;"
 - better spacing in merge ws / load ws
 - added is_list_len and friends ... faster then len for long lists
 - compile on demand, saves 25% of startup time

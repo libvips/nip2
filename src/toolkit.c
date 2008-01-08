@@ -338,18 +338,8 @@ toolkit_linkreport_sym_sym( Symbol *child,
 		buf_appendf( buf, "* " );
 		symbol_qualified_name( parent, buf );
 		buf_appendf( buf, ", " );
-		if( tool->lineno > 0 )
-			buf_appendf( buf, "%s:%d, ",
-				im_skip_dir( FILEMODEL( tool->kit )->filename ),
-				tool->lineno );
-		else {
-			buf_appendf( buf, _( "tool \"%s\"" ),
-				IOBJECT( tool )->name );
-			buf_appendf( buf, ", " );
-			buf_appendf( buf, _( "toolkit \"%s\"" ),
-				IOBJECT( tool->kit )->name );
-			buf_appendf( buf, ", " );
-		}
+		tool_error( tool, buf );
+
 		/* used as in "fred refers to undefined symbol jim"
 		 */
 		buf_appendf( buf, _( "refers to undefined symbol" ) );

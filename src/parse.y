@@ -1366,10 +1366,7 @@ parse_toplevel( Toolkit *kit, int pos )
 	gboolean result;
 
 	current_compile = NULL;
-
-	result = parse_input( ',', kit->kitg->root, kit, pos ) &&
-		!compile_toolkit( kit );
-
+	result = parse_input( ',', kit->kitg->root, kit, pos );
 	iobject_changed( IOBJECT( kit ) );
 
 	return( result );
@@ -1383,10 +1380,7 @@ parse_onedef( Toolkit *kit, int pos )
 	gboolean result;
 
 	current_compile = NULL;
-
-	result = parse_input( '^', kit->kitg->root, kit, pos ) &&
-		!compile_toolkit( kit );
-
+	result = parse_input( '^', kit->kitg->root, kit, pos );
 	iobject_changed( IOBJECT( kit ) );
 
 	return( result );

@@ -12,9 +12,22 @@
 
   make a baseclass from trace.c and derive error and link from that?
 
-- tool_error() added, use it more!
-
 - look into [a,b]<- stuff
+
+  we could compile
+
+  	[a,b] <- poop
+
+  into two parts
+
+  	$$pattern4 = [a,b]
+	$$generator4 = poop
+
+  the [a,b] parse tree would be attached to the wrong symbol, but it shouldn't
+  matter
+
+  we'd then use the '4' suffix to link thee two together, and only expand the
+  pattern into access definitions after moving it
 
   not clear how we're going to move the access defs to the right place ... how
   do we recognise generators in compile_lcomp?

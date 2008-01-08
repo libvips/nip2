@@ -1755,8 +1755,12 @@ heap_copy( Heap *heap, Compile *compile, PElement *out )
 		break;
 
 	case ELEMENT_NOVAL:
-		/* Nothing to copy. 
+		/* Not compiled yet: compile now, then copy.
 		 */
+		if( compile_object( compile ) )
+			return( FALSE );
+		if( !heap_copy( heap, compile, out ) )
+			return( FALSE );
 		break;
 
 	case ELEMENT_MANAGED:

@@ -77,7 +77,7 @@ to_colour x
 			(map mean (bandsplit (get_image x))),
 			has_image x && has_type x
 		= Colour "sRGB" [x, x, x], is_real x	// since Colour can't do mono
-		= Colour "sRGB" x, is_real_list x && len x == 3
+		= Colour "sRGB" x, is_real_list x && is_list_len 3 x
 		= map toc x, is_matrix x
 		= error (_ "bad arguments to " ++ "to_colour");
 
@@ -139,7 +139,7 @@ parse_pint l
 /* Parse an integer, with an optional sign character.
  */
 parse_int l
-	= error (_ "badly formed number"), len parts != 2
+	= error (_ "badly formed number"), !is_list_len 2 parts 
 	= sign * n
 {
 	parts = splitpl [member "+-", is_digit] l;
@@ -154,7 +154,7 @@ parse_int l
  *	[+-]?[0-9]*([.][0-9]*)?(e[0-9]+)?
  */
 parse_float l
-	= err, len parts != 4
+	= err, !is_list_len 4 parts 
 	= (ipart + fpart) * 10 ** exp
 {
 	err = error (_ "badly formed number");
@@ -188,7 +188,7 @@ but it's totally unreadable.
 
  */
 parse_time l
-	= error (_ "badly formed time"), len parts != 5
+	= error (_ "badly formed time"), !is_list_len 5 parts 
 	= s + 60 * m + 60 * 60 * h
 {
 	parts = splitpl [is_digit, equal ':', is_digit, equal ':', is_digit] l;

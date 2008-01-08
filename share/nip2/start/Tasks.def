@@ -305,7 +305,7 @@ Tasks_mosaic_item = class
 		= error "mosaic: not all points",
 			!is_listof is_Mark l
 		= error "mosaic: points not on two images",
-			len images != 2 
+			is_list_len 2 images
 		= error "mosaic: images do not match in format and coding",
 			!all_equal (map get_format l) || !all_equal (map get_coding l)
 		= error "mosaic: not same number of points on each image",

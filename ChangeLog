@@ -11,6 +11,7 @@ started 7.12.3
 - added LHS patterns
 - better spacing in merge ws / load ws
 - added is_list_len and friends ... faster then len for long lists
+- compile on demand, saves 25% of startup time
 
 started 7.13.2
 - remove Application from nip2.desktop.in

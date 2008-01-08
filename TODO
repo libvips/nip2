@@ -1,9 +1,3 @@
-- use
-  
-  	is_list_length 4 x
-
-  and friends in more places ... most places we use len, in fact
-
 - link report and error report need to be in scrollable windows, like trace
 
   box_info() can have trouble displaying large amounts of data: it'll chop at a
@@ -11,6 +5,8 @@
   trigger gtk errors
 
   make a baseclass from trace.c and derive error and link from that?
+
+  could also display as a tree I guess
 
 - look into [a,b]<- stuff
 
@@ -35,12 +31,6 @@
   maybe name all generators as $$gen23, then after we make the foldr for one,
   we search for any symbols which are tagged as having been generated as the
   pattern acess functions for that sym
-
-- try compile-on-demand again ... put the compiler call in heap_copy()
-  perhaps?
-
-  how much would it really help startup? unclear, since we have to eval a lot
-  now to get the menu names etc.
 
 - syntax allows
 

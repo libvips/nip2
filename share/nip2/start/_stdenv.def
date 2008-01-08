@@ -1904,6 +1904,6 @@ gammln xx
  */
 buildlut x
 	= Image (im_buildlut x), is_Matrix x && x.width > 1
-	= im_buildlut (Matrix x), is_matrix x && len x?0 > 1
+	= im_buildlut (Matrix x), is_matrix x && is_list_len_more 1 x?0
 	= error (_ "bad arguments to " ++ "buildlut");
 

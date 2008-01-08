@@ -142,6 +142,7 @@ last l
 	= last (tl l);
 
 /* len l: length of list l
+ * (see also is_list_len and friends in predicate.def)
  *
  * len :: [*] -> num
  */

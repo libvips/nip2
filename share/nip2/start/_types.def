@@ -836,7 +836,7 @@ Colour colour_space value = class
 		[colour_space, "colour_space", check_colour_space]
 	];
 	_check_all = [
-		[len value == 3, "len value == 3"]
+		[is_list_len 3 value, "len value == 3"]
 	];
 
 	Vector x = this.Colour colour_space x;

@@ -81,6 +81,10 @@ static Symbol *scope_stack_symbol[MAX_SSTACK];
 static Compile *scope_stack_compile[MAX_SSTACK];
 static int scope_sp = 0;
 
+/* Use to generate unique ids for anonymouse parse objects (eg. lambdas etc).
+ */
+static int parse_object_id = 0;
+
 /* Here for errors in parse. Can be called by some of the tree builders.
  */
 /*VARARGS1*/
@@ -677,14 +681,14 @@ definition:
 			(void) compile_new_local( sym->expr );
 		}
 		else {
-			static int count = 0;
 			char name[256];
 
 			/* We have <pattern rhs>. Make an anon symbol for this
 			 * value, then the variables in the pattern become
 			 * toplevels which access that.
 			 */
-			im_snprintf( name, 256, "$$pattern_lhs%d", count++ );
+			im_snprintf( name, 256, "$$pattern_lhs%d",
+				parse_object_id++ );
 			sym = symbol_new_defining( current_compile, name );
 			sym->generated = TRUE;
 			(void) symbol_user_init( sym );
@@ -949,14 +953,13 @@ expr:
 
 lambda:
 	TK_LAMBDA TK_IDENT %prec TK_LAMBDA {
-		static int count = 0;
 		char name[256];
 		Symbol *sym;
 
 		/* Make an anonymous symbol local to the current sym, compile
 		 * the expr inside that.
 		 */
-		im_snprintf( name, 256, "$$lambda%d", count++ );
+		im_snprintf( name, 256, "$$lambda%d", parse_object_id++ );
 		sym = symbol_new_defining( current_compile, name );
 		sym->generated = TRUE;
 		(void) symbol_user_init( sym );
@@ -1009,8 +1012,7 @@ list_expression:
 	'[' expr ',' expr TK_DOTDOTDOT expr ']' {
 		$$ = tree_generator_new( current_compile, $2, $4, $6 );
 	} | 
-	'[' expr TK_BOR TK_IDENT TK_FROM expr {
-		static int count = 0;
+	'[' expr TK_BOR simple_pattern TK_FROM expr {
 		char name[256];
 		Symbol *sym;
 		Compile *enclosing = current_compile;
@@ -1018,7 +1020,7 @@ list_expression:
 		/* Make an anonymous symbol local to the current sym, save
 		 * the map expr inside that. 
 		 */
-		im_snprintf( name, 256, "$$lcomp%d", count++ );
+		im_snprintf( name, 256, "$$lcomp%d", parse_object_id++ );
 		sym = symbol_new_defining( current_compile, name );
 		(void) symbol_user_init( sym );
 		sym->generated = TRUE;
@@ -1031,7 +1033,8 @@ list_expression:
 		current_symbol = sym;
 		current_compile = sym->expr->compile;
 
-		/* Somewhere to save the result expr
+		/* Somewhere to save the result expr. We have to copy the
+		 * expr, as we want it to be bound in $$lcomp's context.
 		 */
 		sym = symbol_new_defining( current_compile, "$$result" );
 		sym->generated = TRUE;
@@ -1040,15 +1043,25 @@ list_expression:
 		sym->expr->compile->tree = compile_copy_tree( enclosing, $2, 
 			sym->expr->compile );
 
-		/* Make the first "x <- expr" generator.
+		/* Make the first "x <- expr" generator. They need the same
+		 * id: be careful not to update the count. No need to copy the
+		 * pattern: we don't use the bindings.
 		 */
-		sym = symbol_new_defining( current_compile, $4 );
+		im_snprintf( name, 256, "$$pattern%d", parse_object_id );
+		sym = symbol_new_defining( current_compile, name );
+		(void) symbol_user_init( sym );
+		(void) compile_new_local( sym->expr );
+		sym->expr->compile->tree = $4;
+
+		/* But we do have to copy the generator. We want it's
+		 * variables bound in $$lcomp's context.
+		 */
+		im_snprintf( name, 256, "$$generator%d", parse_object_id++ );
+		sym = symbol_new_defining( current_compile, name );
 		(void) symbol_user_init( sym );
 		(void) compile_new_local( sym->expr );
 		sym->expr->compile->tree = compile_copy_tree( enclosing, $6, 
 			sym->expr->compile );
-
-		IM_FREE( $4 );
 	}
 	frompred_list ']' {
 		Symbol *sym;
@@ -1095,21 +1108,27 @@ frompred_list:
 	;
 
 frompred:
-       TK_IDENT TK_FROM expr {
-		Symbol *sym;
-
-		sym = symbol_new_defining( current_compile, $1 );
-		(void) symbol_user_init( sym );
-		(void) compile_new_local( sym->expr );
-		sym->expr->compile->tree = $3;
-		IM_FREE( $1 );
-       } |
-       expr {
-		static int count = 0;
+       simple_pattern TK_FROM expr {
 		char name[256];
 		Symbol *sym;
 
-		im_snprintf( name, 256, "$$filter%d", count++ );
+		im_snprintf( name, 256, "$$pattern%d", parse_object_id );
+		sym = symbol_new_defining( current_compile, name );
+		(void) symbol_user_init( sym );
+		(void) compile_new_local( sym->expr );
+		sym->expr->compile->tree = $1;
+
+		im_snprintf( name, 256, "$$generator%d", parse_object_id++ );
+		sym = symbol_new_defining( current_compile, name );
+		(void) symbol_user_init( sym );
+		(void) compile_new_local( sym->expr );
+		sym->expr->compile->tree = $3;
+       } |
+       expr {
+		char name[256];
+		Symbol *sym;
+
+		im_snprintf( name, 256, "$$filter%d", parse_object_id++ );
 		sym = symbol_new_defining( current_compile, name );
 		sym->generated = TRUE;
 		(void) symbol_user_init( sym );

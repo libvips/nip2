@@ -380,7 +380,7 @@ tree_map( Compile *compile, tree_map_fn fn, ParseNode *node, void *a, void *b )
 	ParseNode *result;
 	GSList *l;
 
-	assert( node );
+	g_assert( node );
 
 	if( (result = fn( compile, node, a, b )) )
 		return( result );
@@ -461,7 +461,7 @@ tree_copy( Compile *compile, ParseNode *node )
 		if( node->tag )
 			copy->tag = im_strdupn( node->tag );
 		tree_const_copy( &node->con, &copy->con );
-		if( copy->arg1 )
+		if( node->arg1 )
 			copy->arg1 = tree_copy( compile, node->arg1 );
 		if( node->arg2 )
 			copy->arg2 = tree_copy( compile, node->arg2 );

@@ -2209,8 +2209,30 @@ compile_lcomp_find( Symbol *sym, GSList **children )
 {
 	if( is_prefix( "$$filter", IOBJECT( sym )->name ) ||
 		is_prefix( "$$result", IOBJECT( sym )->name ) ||
-		is_value( sym ) )
+		is_prefix( "$$pattern", IOBJECT( sym )->name ) ||
+		is_prefix( "$$generator", IOBJECT( sym )->name ) )
 		*children = g_slist_append( *children, sym );
+
+	return( NULL );
+}
+
+static Symbol *
+compile_lcomp_find_pattern( GSList *children, const char *generator )
+{
+	int n;
+	char pattern[256];
+	GSList *p;
+
+	if( sscanf( generator, "$$generator%d", &n ) != 1 )
+		return( NULL );
+	im_snprintf( pattern, 256, "$$pattern%d", n );
+
+	for( p = children; p; p = p->next ) {
+		Symbol *sym = (Symbol *) p->data;
+
+		if( strcmp( IOBJECT( sym )->name, pattern ) == 0 )
+			return( sym );
+	}
 
 	return( NULL );
 }
@@ -2233,24 +2255,24 @@ compile_lcomp( Compile *compile )
 	ParseNode *n1, *n2, *n3;
 
 #ifdef DEBUG
+#endif /*DEBUG*/
 	printf( "before compile_lcomp:\n" );
 	dump_compile( compile );
-#endif /*DEBUG*/
 
-	/* Find all the elements of the lcomp, generators, filters and
-	 * $$result.
+	/* Find all the elements of the lcomp: generators, filters, patterns 
+	 * and $$result.
 	 */
 	children = NULL;
 	(void) icontainer_map( ICONTAINER( compile ), 
 		(icontainer_map_fn) compile_lcomp_find, &children, NULL );
 
 #ifdef DEBUG
+#endif /*DEBUG*/
 	printf( "list comp " );
 	compile_name_print( compile );
 	printf( " has children: " ); 
 	(void) slist_map( children, (SListMapFn) dump_tiny, NULL );
 	printf( "\n" ); 
-#endif /*DEBUG*/
 
 	/* As yet no list to build on.
 	 */
@@ -2265,6 +2287,8 @@ compile_lcomp( Compile *compile )
 	result = NULL;
 
 	/* Now generate code for each element, either a filter or a generator.
+	 * If we do a generator, we need to search for the associated pattern
+	 * and expand it.
 	 */
 	for( p = children; p; p = p->next ) {
 		Symbol *element = (Symbol *) p->data;
@@ -2295,20 +2319,30 @@ compile_lcomp( Compile *compile )
 			n1 = tree_ifelse_new( scope, n1, n2, n3 );
 			scope->tree = n1;
 		}
-		else {
-			Symbol *param;
+		else if( is_prefix( "$$gen", IOBJECT( element )->name ) ) {
+			Symbol *param1;
+			Symbol *param2;
+			Symbol *pattern;
 
-			/* A generator. Make the params first, so that the
-			 * tree can link to these locals when we copy.
+			/* A generator. 
 			 */
-			param = symbol_new_defining( child->expr->compile, 
+			param1 = symbol_new_defining( child->expr->compile, 
 				IOBJECT( element )->name );
-			symbol_parameter_init( param );
-			param = symbol_new_defining( child->expr->compile, 
+			symbol_parameter_init( param1 );
+			param2 = symbol_new_defining( child->expr->compile, 
 				"$$sofar" );
-			symbol_parameter_init( param );
+			symbol_parameter_init( param2 );
 
-			/* Make the tree.
+			/* Now expand the pattern: it will access parts of the
+			 * $$generator argument.
+			 */
+			pattern = compile_lcomp_find_pattern( children, 
+				IOBJECT( element )->name );
+			g_assert( pattern );
+			(void) compile_pattern_lhs( child->expr->compile, 
+				param1, pattern->expr->compile->tree );
+
+			/* Make the "foldr $$fn $sofar expr" tree.
 			 */
 			n1 = tree_leaf_new( scope, "foldr" );
 			n2 = tree_leafsym_new( scope, child );
@@ -2393,9 +2427,9 @@ compile_lcomp( Compile *compile )
 	}
 
 #ifdef DEBUG
+#endif /*DEBUG*/
 	printf( "after compile_lcomp:\n" );
 	dump_compile( compile );
-#endif /*DEBUG*/
 
 	g_slist_free( children );
 }

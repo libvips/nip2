@@ -1,3 +1,9 @@
+- try
+
+	[x|x<-[1..10]]
+
+  $$lcomp4 ends up with no tree, how odd
+
 - link report and error report need to be in scrollable windows, like trace
 
   box_info() can have trouble displaying large amounts of data: it'll chop at a
@@ -8,29 +14,13 @@
 
   could also display as a tree I guess
 
-- look into [a,b]<- stuff
+- add something to Symbol:
 
-  we could compile
+	Symbol *access_for;
 
-  	[a,b] <- poop
+  links generated access def to the $$thing4 which holds the RHS
 
-  into two parts
-
-  	$$pattern4 = [a,b]
-	$$generator4 = poop
-
-  the [a,b] parse tree would be attached to the wrong symbol, but it shouldn't
-  matter
-
-  we'd then use the '4' suffix to link thee two together, and only expand the
-  pattern into access definitions after moving it
-
-  not clear how we're going to move the access defs to the right place ... how
-  do we recognise generators in compile_lcomp?
-
-  maybe name all generators as $$gen23, then after we make the foldr for one,
-  we search for any symbols which are tagged as having been generated as the
-  pattern acess functions for that sym
+  handy for the program window, also maybe for lcomp code gen?
 
 - syntax allows
 

@@ -70,8 +70,6 @@
 
 #endif /*HAVE_FLEX*/
 
-#include "ip.h"
-
 /* Stuff from bison.
  */
 #include "parse.h"

@@ -1,8 +1,17 @@
-- try
+- start, then close, icontainer assert fails in icontainer_child_remove :(
 
-	[x|x<-[1..10]]
+	fred x = class {
+		[a] = [1];
+	}
 
-  $$lcomp4 ends up with no tree, how odd
+  seems to be when we dispose Tool "fred" ... it has a dead child on it's
+  child list
+
+- start to use pattern matching in defs
+
+- try using bison's location system
+
+	http://www.gnu.org/software/bison/manual/html_mono/bison.html#Locations
 
 - link report and error report need to be in scrollable windows, like trace
 

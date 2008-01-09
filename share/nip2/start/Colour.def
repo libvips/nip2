@@ -24,6 +24,7 @@ Colour_new_item = class
 			Colour space _result {
 			_vislevel = 3;
 
+			//[_L, _a, _b] = default_value;
 			_L = default_value?0;
 			_a = default_value?1;
 			_b = default_value?2;

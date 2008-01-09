@@ -349,6 +349,19 @@ else
 	$(CC) -c dummy.c -o $@
 endif
 
+# we have to replace the standard .y.c rule: we need to change 
+#	#include "y.tab.h"
+# to
+#	#include "parse.h"
+# in the generated .c file ... not clear why bison generates the wrong #include
+# in GLR mode
+# also, we need to make sure bison is in yacc-compatibility mode so ylwrap can
+# do it's file munging thing
+.y.c:
+	$(am__skipyacc) $(SHELL) $(YLWRAP) $< y.tab.c $@ y.tab.h $*.h y.output $*.output -- $(YACCCOMPILE) -y
+	$(SED) -e 's/include "y.tab.h"/include "parse.h"/' $*.c > temp
+	mv temp $*.c
+
 INCLUDES = @IP_CFLAGS@ 
 LDADD = @IP_CFLAGS@ @IP_LIBS@
 AM_LDFLAGS = @LDFLAGS@

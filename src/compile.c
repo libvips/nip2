@@ -2255,9 +2255,9 @@ compile_lcomp( Compile *compile )
 	ParseNode *n1, *n2, *n3;
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "before compile_lcomp:\n" );
 	dump_compile( compile );
+#endif /*DEBUG*/
 
 	/* Find all the elements of the lcomp: generators, filters, patterns 
 	 * and $$result.
@@ -2267,12 +2267,12 @@ compile_lcomp( Compile *compile )
 		(icontainer_map_fn) compile_lcomp_find, &children, NULL );
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "list comp " );
 	compile_name_print( compile );
 	printf( " has children: " ); 
 	(void) slist_map( children, (SListMapFn) dump_tiny, NULL );
 	printf( "\n" ); 
+#endif /*DEBUG*/
 
 	/* As yet no list to build on.
 	 */
@@ -2293,18 +2293,23 @@ compile_lcomp( Compile *compile )
 	for( p = children; p; p = p->next ) {
 		Symbol *element = (Symbol *) p->data;
 
-		/* Skip the result element ... we use it right at the end.
+		/* Just note the result element ... we use it right at the end.
 		 */
-		if( strcmp( "$$result", IOBJECT( element )->name ) == 0 ) {
+		if( strcmp( "$$result", IOBJECT( element )->name ) == 0 ) 
 			result = element;
+
+		/* And only process filter/gen.
+		 */
+		if( !is_prefix( "$$filter", IOBJECT( element )->name ) &&
+			!is_prefix( "$$gen", IOBJECT( element )->name ) ) 
 			continue;
-		}
 
 		/* Start the next nest in. child is the local we will make for
 		 * this scope.
 		 */
 		im_snprintf( name, 256, "$$fn%d", count++ );
 		child = symbol_new_defining( scope, name );
+		child->generated = TRUE;
 		(void) symbol_user_init( child );
 		(void) compile_new_local( child->expr );
 
@@ -2328,9 +2333,11 @@ compile_lcomp( Compile *compile )
 			 */
 			param1 = symbol_new_defining( child->expr->compile, 
 				IOBJECT( element )->name );
+			param1->generated = TRUE;
 			symbol_parameter_init( param1 );
 			param2 = symbol_new_defining( child->expr->compile, 
 				"$$sofar" );
+			param2->generated = TRUE;
 			symbol_parameter_init( param2 );
 
 			/* Now expand the pattern: it will access parts of the
@@ -2427,9 +2434,9 @@ compile_lcomp( Compile *compile )
 	}
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "after compile_lcomp:\n" );
 	dump_compile( compile );
+#endif /*DEBUG*/
 
 	g_slist_free( children );
 }

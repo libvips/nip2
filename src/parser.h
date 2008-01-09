@@ -82,6 +82,8 @@ typedef enum {
 
 extern Symbol *last_top_sym;
 
+extern jmp_buf parse_error_point;
+
 gboolean parse_toplevel( Toolkit *kit, int pos );
 gboolean parse_onedef( Toolkit *kit, int pos );
 gboolean parse_rhs( Expr *expr, ParseRhsSyntax syntax );

@@ -39,470 +39,73 @@
 #define DEBUG_CHARACTER
  */
 
-#define YYERROR_VERBOSE
-
-/* Last top-level symbol we made.
+/* The lexer from lex.l.
  */
-Symbol *last_top_sym;
+int yylex( void );
+void yyrestart( FILE *input_file );
+
+/* Declare file-private stuff, shared with the lexer. Bison will put this
+ * stuff into parse.h, so just declare, don't define. Sadly we can't have
+ * these things static :(
+ */
 
 /* Global .. the symbol whose definition we are currently parsing, the symbol
- * which all top defs in this parse action should be made local to,
- * and the return point if we find a syntax error.
+ * which all top defs in this parse action should be made local to.
  */
-static Symbol *current_symbol;
-static Symbol *root_symbol;
-jmp_buf parse_error_point;
+extern Symbol *current_symbol;
+extern Symbol *root_symbol;
 
 /* The current parse context.
  */
-static Compile *current_compile = NULL;
-static ParseNode *current_parsenode = NULL;
+extern Compile *current_compile;
+extern ParseNode *current_parsenode;
 
 /* The kit we are adding new symbols to.
  */
-static Toolkit *current_kit;
+extern Toolkit *current_kit;
 
 /* Where it should go in the kit.
  */
-static int tool_position;
+extern int tool_position;
 
 /* Lineno of start of last top-level def.
  */
-static int last_top_lineno;
+extern int last_top_lineno;
 
 /* Text we've gathered in this lex.
  */
-BufInfo lex_text;
-static char lex_text_buffer[MAX_STRSIZE];
+extern char lex_text_buffer[MAX_STRSIZE];
 
 /* Stack of symbols for parser - each represents a new scope level.
  */
-static Symbol *scope_stack_symbol[MAX_SSTACK];
-static Compile *scope_stack_compile[MAX_SSTACK];
-static int scope_sp = 0;
+extern Symbol *scope_stack_symbol[MAX_SSTACK];
+extern Compile *scope_stack_compile[MAX_SSTACK];
+extern int scope_sp;
 
 /* Use to generate unique ids for anonymouse parse objects (eg. lambdas etc).
  */
-static int parse_object_id = 0;
+extern int parse_object_id;
 
-/* Here for errors in parse. Can be called by some of the tree builders.
+/* Get text for parsed objects.
  */
-/*VARARGS1*/
-void
-yyerror( const char *sub, ... )
-{
-	va_list ap;
- 	char buf[4096];
+char *input_text( char *out );
+void input_reset( void );
+void input_push( int n );
+void input_backtoch( char ch );
+void input_back1( void );
+void input_pop( void );
 
-        va_start( ap, sub );
-        (void) im_vsnprintf( buf, 4096, sub, ap );
-        va_end( ap );
-
-	error_top( _( "Parse error." ) );
-
-	if( last_top_sym ) 
-		error_sub( _( "Error in %s: %s" ), 
-			IOBJECT( last_top_sym )->name, buf );
-	else
-		error_sub( _( "Error: %s" ), buf );
-
-	longjmp( parse_error_point, -1 );
-}
-
-InputState input_state;
-
-/* Attach yyinput to a file.
+/* Nest and unnest scopes.
  */
-void
-attach_input_file( iOpenFile *of )
-{
-	InputState *is = &input_state;
+void scope_push( void );
+void scope_pop( void );
+void scope_pop_all( void );
+void scope_reset( void );
 
-#ifdef DEBUG
-	printf( "attach_input_file: \"%s\"\n", of->fname );
-#endif /*DEBUG*/
-
-	/* Need to clear flex/bison's buffers in case we abandoned the
-	 * previous parse. 
-	 */
-	yyrestart( NULL );
-
-	is->of = of;
-	is->str = NULL;
-	is->strpos = NULL;
-	is->bwp = 0;
-	is->bspsp = 0;
-	is->bsp[is->bspsp] = 0;
-	is->lineno = 1;
-	is->charno = 0;
-	is->pcharno = 0;
-	is->charpos = 0;
-	is->oldchar = -1;
-
-	/* Init text gatherer.
-	 */
-	buf_init_static( &lex_text, lex_text_buffer, MAX_STRSIZE );
-}
-
-/* Attach yyinput to a string.
+/* Helper functions.
  */
-void
-attach_input_string( const char *str )
-{
-	InputState *is = &input_state;
-
-#ifdef DEBUG
-	printf( "attach_input_string: \"%s\"\n", str );
-#endif /*DEBUG*/
-
-	yyrestart( NULL );
-
-	is->of = NULL;
-	is->str = (char *) str;
-	is->strpos = (char *) str;
-	is->bwp = 0;
-	is->bspsp = 0;
-	is->bsp[is->bspsp] = 0;
-	is->lineno = 1;
-	is->charno = 0;
-	is->pcharno = 0;
-	is->charpos = 0;
-	is->oldchar = -1;
-
-	/* Init text gatherer.
-	 */
-	buf_init_static( &lex_text, lex_text_buffer, MAX_STRSIZE );
-}
-
-/* Read a character from the input.
- */
-int
-ip_input( void ) 
-{
-	InputState *is = &input_state;
-	int ch;
-
-	if( is->oldchar >= 0 ) {
-		/* From unget buffer.
-		 */
-		ch = is->oldchar;
-		is->oldchar = -1;
-	}
-	else if( is->of ) {
-		/* Input from file. 
-		 */
-		if( (ch = getc( is->of->fp )) == EOF )
-			return( 0 );
-	}
-	else {
-		/* Input from string. 
-		 */
-		if( (ch = *is->strpos) )
-			is->strpos++;
-		else
-			/* No counts to update!
-			 */
-			return( 0 );
-	}
-
-	/* Update counts.
-	 */
-	if( ch == '\n' ) {
-		is->lineno++;
-		is->pcharno = is->charno + 1;
-		is->charno = 0;
-	}
-	is->charno++;
-	is->charpos++;
-
-	/* Add this character to the characters we have accumulated for this
-	 * definition.
-	 */
-	if( is->bwp >= MAX_STRSIZE )
-		yyerror( _( "definition is too long!" ) );
-	if( is->bwp >= 0 )
-		is->buf[is->bwp] = ch;
-	is->bwp++;
-
-	/* Add to lex text buffer.
-	 */
-	if( is->charno > 0 )
-		buf_appendc( &lex_text, ch );
-
-#ifdef DEBUG_CHARACTER
-	printf( "ip_input: returning '%c'\n", ch ); 
-#endif /*DEBUG_CHARACTER*/
-
-	return( ch );
-}
-
-/* Unget an input character.
- */
-void
-ip_unput( int ch )
-{
-	InputState *is = &input_state;
-
-#ifdef DEBUG_CHARACTER
-	printf( "ip_unput: ungetting '%c'\n", ch ); 
-#endif /*DEBUG_CHARACTER*/
-
-	/* Is lex trying to unget the end-of-file marker? Do nothing if it is.
-	 */
-	if( !ch )
-		return;
-
-	if( is->of ) {
-		if( ungetc( ch, is->of->fp ) == EOF )
-			error( "unget buffer overflow" );
-	}
-	else 
-		/* Save extra char here.
-		 */
-		is->oldchar = ch;
-
-	/* Redo counts.
-	 */
-	if( ch == '\n' ) {
-		is->lineno--;
-
-		/* Restore previous charno.
-		 */
-		is->charno = is->pcharno;
-		is->pcharno = 0;
-	}
-	is->charno--;
-	is->charpos--;
-	is->bwp--;
-
-	/* Unget from lex text buffer.
-	 */
-	if( is->charno > 0 )
-		buf_removec( &lex_text, ch );
-}
-
-/* Test for end-of-input.
- */
-gboolean
-is_EOF( void )
-{
-	InputState *is = &input_state;
-
-	if( is->of )
-		return( feof( is->of->fp ) );
-	else
-		return( *is->str == '\0' );
-}
-
-static void
-scope_push( void )
-{
-	if( scope_sp == MAX_SSTACK )
-		error( "sstack overflow" );
-
-	scope_stack_symbol[scope_sp] = current_symbol;
-	scope_stack_compile[scope_sp] = current_compile;
-	scope_sp += 1;
-}
-
-static void
-scope_pop( void )
-{
-	if( scope_sp <= 0 )
-		error( "sstack underflow" );
-
-	scope_sp -= 1;
-	current_symbol = scope_stack_symbol[scope_sp];
-	current_compile = scope_stack_compile[scope_sp];
-}
-
-/* Back to the outermost scope.
- */
-static void
-scope_pop_all( void )
-{
-	if( scope_sp > 0 ) {
-		scope_sp = 0;
-		current_symbol = scope_stack_symbol[scope_sp];
-		current_compile = scope_stack_compile[scope_sp];
-	}
-}
-
-/* Reset/push/pop parser stacks. 
- */
-static void
-scope_reset( void )
-{
-	scope_sp = 0;
-}
-
-/* Return the text we have accumulated for the current definition. Remove
- * leading and trailing whitespace and spare semicolons. out needs to be
- * MAX_STRSIZE.
- */
-static char *
-input_text( char *out )
-{
-	InputState *is = &input_state;
-	const char *buf = is->buf;
-
-	int start = is->bsp[is->bspsp];
-	int end = is->bwp;
-	int len;
-	int i;
-
-	for( i = start; i < end && 
-		(isspace( buf[i] ) || buf[i] == ';'); i++ )
-		;
-	start = i;
-	for( i = end - 1; i > start && 
-		(isspace( buf[i] ) || buf[i] == ';'); i-- )
-		;
-	end = i + 1;
-
-	len = end - start;
-
-	assert( len < MAX_STRSIZE - 1 );
-	im_strncpy( out, buf + start, len + 1 );
-	out[len] = '\0';
-
-#ifdef DEBUG_CHARACTER
-	printf( "input_text: level %d, returning \"%s\"\n", 
-		is->bspsp, out );
-#endif /*DEBUG_CHARACTER*/
-
-	return( out );
-}
-
-/* Reset/push/pop input stacks.
- */
-static void
-input_reset( void )
-{
-	InputState *is = &input_state;
-
-#ifdef DEBUG_CHARACTER
-	printf( "input_reset:\n" );
-#endif /*DEBUG_CHARACTER*/
-
-	is->bwp = 0;
-	is->bspsp = 0;
-	is->bsp[0] = 0;
-	buf_init_static( &lex_text, lex_text_buffer, MAX_STRSIZE );
-}
-
-static void
-input_push( int n )
-{
-	InputState *is = &input_state;
-
-#ifdef DEBUG_CHARACTER
-	printf( "input_push(%d): going to level %d, %d bytes into buffer\n", 
-		n, is->bspsp + 1, is->bwp );
-
-	{
-		const int len = IM_MIN( is->bwp, 20 );
-		int i;
-
-		for( i = is->bwp - len; i < is->bwp; i++ )
-			if( is->buf[i] == '\n' )
-				printf( "@" );
-			else if( is->buf[i] == ' ' || is->buf[i] == '\t' )
-				printf( "_" );
-			else
-				printf( "%c", is->buf[i] );
-		printf( "\n" );
-		for( i = 0; i < len; i++ )
-			printf( "-" );
-		printf( "^\n" );
-	}
-#endif /*DEBUG_CHARACTER*/
-
-	is->bspsp += 1;
-	if( is->bspsp >= MAX_SSTACK )
-		error( "bstack overflow" );
-
-	is->bsp[is->bspsp] = is->bwp;
-}
-
-/* Yuk! We've just done an input_push() to try to grab the RHS of a 
- * definition ... unfortunately, due to token readahead, we've probably 
- * already read the start of the RHS.
- *
- * Back up the start point to just after the last ch character.
- */
-static void
-input_backtoch( char ch )
-{
-	InputState *is = &input_state;
-	int i;
-
-	for( i = is->bsp[is->bspsp] - 1; i > 0 && is->buf[i] != ch; i-- )
-		;
-
-	if( is->buf[i] == ch )
-		is->bsp[is->bspsp] = i + 1;
-}
-
-/* Move the last input_push() point back 1 character.
- */
-static void
-input_back1( void )
-{
-	InputState *is = &input_state;
-
-	if( is->bsp[is->bspsp] > 0 )
-		is->bsp[is->bspsp] -= 1;
-}
-
-static void
-input_pop( void )
-{
-	InputState *is = &input_state;
-
-#ifdef DEBUG_CHARACTER
-	printf( "input_pop: %d bytes into buffer\n", input_state.bwp );
-#endif /*DEBUG_CHARACTER*/
-
-	if( is->bspsp <= 0 )
-		error( "bstack underflow" );
-
-	is->bspsp--;
-}
-
-/* End of top level parse. Fix up the symbol.
- */
-static void *
-parse_toplevel_end( Symbol *sym )
-{
-	Tool *tool;
-
-	tool = tool_new_sym( current_kit, tool_position, sym );
-	tool->lineno = last_top_lineno;
-
-	/* Ony needed by toplevels.
-	 */
-	symbol_made( sym );
-
-	return( NULL );
-}
-
-
-/* Built a pattern access definition. Set the various text fragments from the
- * def we are drived from.
- */
-static void *
-parse_access_end( Symbol *sym, Symbol *main )
-{
-	IM_SETSTR( sym->expr->compile->rhstext, 
-		main->expr->compile->rhstext ); 
-	IM_SETSTR( sym->expr->compile->prhstext, 
-		main->expr->compile->prhstext ); 
-	IM_SETSTR( sym->expr->compile->text, 
-		main->expr->compile->text ); 
-
-	return( NULL );
-}
+void *parse_toplevel_end( Symbol *sym );
+void *parse_access_end( Symbol *sym, Symbol *main );
 
 %}
 
@@ -554,6 +157,34 @@ parse_access_end( Symbol *sym, Symbol *main )
 %left '?' '.' 
 
 %start select
+
+/* 
+
+  Our syntax for list comprehensions is not LALR(1). We have:
+
+  	simple_pattern '<-' expr ';' |
+	expr ';'
+
+  simple_pattern can be something like
+
+	a:x
+
+  which is also an expr. We don't know which branch to take until we see a
+  '<' or a ';'.
+
+  Use bison's GLR system to parse this, and ignore the first 13 reduce/reduce
+  conflicts caused by this ambiguity.
+
+  FIXME ... we now depend on bison, but we still have some yacc compatibility
+  stuff in here, and we don't use all of bison's nice features (eg. for
+  tracking line numbers in the source file). Fix this up at some stage.
+
+ */
+
+%glr-parser
+%expect-rr 13
+
+%error-verbose
 
 %%
 
@@ -636,8 +267,10 @@ directive:
 			yyerror( error_get_sub() );
 		tool->lineno = input_state.lineno;
 
-		tree_const_destroy( &$2 );
-		tree_const_destroy( &$3 );
+		/* Cast away const here.
+		 */
+		tree_const_destroy( (ParseConst *) &$2 );
+		tree_const_destroy( (ParseConst *) &$3 );
 
 		input_reset();
 	}
@@ -815,7 +448,7 @@ params:
 		sym = symbol_new_defining( current_compile, $2 );
 		symbol_parameter_init( sym );
 
-		IM_FREE( $2 );
+		im_free( $2 );
 	}
 	;
 
@@ -924,11 +557,11 @@ expr:
 	} | 
 	TK_IDENT {
 		$$ = tree_leaf_new( current_compile, $1 );
-		IM_FREE( $1 );
+		im_free( $1 );
 	} | 
 	TK_TAG {
 		$$ = tree_tag_new( current_compile, $1 );
-		IM_FREE( $1 );
+		im_free( $1 );
 	} | 
 	TK_SCOPE {
 		$$ = tree_leaf_new( current_compile, 
@@ -976,7 +609,7 @@ lambda:
 		 */
 		sym = symbol_new_defining( current_compile, $2 );
 		symbol_parameter_init( sym );
-		IM_FREE( $2 );
+		im_free( $2 );
 	}
 	expr {
 		Symbol *sym;
@@ -1049,6 +682,7 @@ list_expression:
 		 */
 		im_snprintf( name, 256, "$$pattern%d", parse_object_id );
 		sym = symbol_new_defining( current_compile, name );
+		sym->generated = TRUE;
 		(void) symbol_user_init( sym );
 		(void) compile_new_local( sym->expr );
 		sym->expr->compile->tree = $4;
@@ -1058,6 +692,7 @@ list_expression:
 		 */
 		im_snprintf( name, 256, "$$generator%d", parse_object_id++ );
 		sym = symbol_new_defining( current_compile, name );
+		sym->generated = TRUE;
 		(void) symbol_user_init( sym );
 		(void) compile_new_local( sym->expr );
 		sym->expr->compile->tree = compile_copy_tree( enclosing, $6, 
@@ -1114,12 +749,14 @@ frompred:
 
 		im_snprintf( name, 256, "$$pattern%d", parse_object_id );
 		sym = symbol_new_defining( current_compile, name );
+		sym->generated = TRUE;
 		(void) symbol_user_init( sym );
 		(void) compile_new_local( sym->expr );
 		sym->expr->compile->tree = $1;
 
 		im_snprintf( name, 256, "$$generator%d", parse_object_id++ );
 		sym = symbol_new_defining( current_compile, name );
+		sym->generated = TRUE;
 		(void) symbol_user_init( sym );
 		(void) compile_new_local( sym->expr );
 		sym->expr->compile->tree = $3;
@@ -1311,7 +948,7 @@ simple_pattern:
 leaf_pattern:
 	TK_IDENT {
 		$$ = tree_leaf_new( current_compile, $1 );
-		IM_FREE( $1 );
+		im_free( $1 );
 	} | 
 	TK_CONST {
 		$$ = tree_const_new( current_compile, $1 );
@@ -1324,8 +961,8 @@ complex_pattern:
 	TK_IDENT TK_IDENT {
 		$$ = tree_pattern_class_new( current_compile, $1,
 			tree_leaf_new( current_compile, $2 ) );
-		IM_FREE( $1 );
-		IM_FREE( $2 );
+		im_free( $1 );
+		im_free( $2 );
 	} |
 	simple_pattern
 	;
@@ -1340,6 +977,458 @@ list_pattern:
 	;
 
 %%
+
+/* Last top-level symbol we made.
+ */
+Symbol *last_top_sym;
+
+/* Return point on syntax error.
+ */
+jmp_buf parse_error_point;
+
+/* Text we've lexed.
+ */
+BufInfo lex_text;
+
+/* State of input system.
+ */
+InputState input_state;
+
+/* Defintions for the static decls at the top. We have to put the defs down
+ * here to mkake sure they don't creep in to the generated parser.h.
+ */
+
+/* Actually, we can't make these static :-( since they are declared extern at
+ * the top of the file.
+ */
+Symbol *current_symbol;
+Symbol *root_symbol;
+Compile *current_compile = NULL;
+ParseNode *current_parsenode = NULL;
+Toolkit *current_kit;
+int tool_position;
+int last_top_lineno;
+char lex_text_buffer[MAX_STRSIZE];
+Symbol *scope_stack_symbol[MAX_SSTACK];
+Compile *scope_stack_compile[MAX_SSTACK];
+int scope_sp = 0;
+int parse_object_id = 0;
+
+/* Here for errors in parse. Can be called by some of the tree builders.
+ */
+/*VARARGS1*/
+void
+yyerror( const char *sub, ... )
+{
+	va_list ap;
+ 	char buf[4096];
+
+        va_start( ap, sub );
+        (void) im_vsnprintf( buf, 4096, sub, ap );
+        va_end( ap );
+
+	error_top( _( "Parse error." ) );
+
+	if( last_top_sym ) 
+		error_sub( _( "Error in %s: %s" ), 
+			IOBJECT( last_top_sym )->name, buf );
+	else
+		error_sub( _( "Error: %s" ), buf );
+
+	longjmp( parse_error_point, -1 );
+}
+
+/* Attach yyinput to a file.
+ */
+void
+attach_input_file( iOpenFile *of )
+{
+	InputState *is = &input_state;
+
+#ifdef DEBUG
+	printf( "attach_input_file: \"%s\"\n", of->fname );
+#endif /*DEBUG*/
+
+	/* Need to clear flex/bison's buffers in case we abandoned the
+	 * previous parse. 
+	 */
+	yyrestart( NULL );
+
+	is->of = of;
+	is->str = NULL;
+	is->strpos = NULL;
+	is->bwp = 0;
+	is->bspsp = 0;
+	is->bsp[is->bspsp] = 0;
+	is->lineno = 1;
+	is->charno = 0;
+	is->pcharno = 0;
+	is->charpos = 0;
+	is->oldchar = -1;
+
+	/* Init text gatherer.
+	 */
+	buf_init_static( &lex_text, lex_text_buffer, MAX_STRSIZE );
+}
+
+/* Attach yyinput to a string.
+ */
+void
+attach_input_string( const char *str )
+{
+	InputState *is = &input_state;
+
+#ifdef DEBUG
+	printf( "attach_input_string: \"%s\"\n", str );
+#endif /*DEBUG*/
+
+	yyrestart( NULL );
+
+	is->of = NULL;
+	is->str = (char *) str;
+	is->strpos = (char *) str;
+	is->bwp = 0;
+	is->bspsp = 0;
+	is->bsp[is->bspsp] = 0;
+	is->lineno = 1;
+	is->charno = 0;
+	is->pcharno = 0;
+	is->charpos = 0;
+	is->oldchar = -1;
+
+	/* Init text gatherer.
+	 */
+	buf_init_static( &lex_text, lex_text_buffer, MAX_STRSIZE );
+}
+
+/* Read a character from the input.
+ */
+int
+ip_input( void ) 
+{
+	InputState *is = &input_state;
+	int ch;
+
+	if( is->oldchar >= 0 ) {
+		/* From unget buffer.
+		 */
+		ch = is->oldchar;
+		is->oldchar = -1;
+	}
+	else if( is->of ) {
+		/* Input from file. 
+		 */
+		if( (ch = getc( is->of->fp )) == EOF )
+			return( 0 );
+	}
+	else {
+		/* Input from string. 
+		 */
+		if( (ch = *is->strpos) )
+			is->strpos++;
+		else
+			/* No counts to update!
+			 */
+			return( 0 );
+	}
+
+	/* Update counts.
+	 */
+	if( ch == '\n' ) {
+		is->lineno++;
+		is->pcharno = is->charno + 1;
+		is->charno = 0;
+	}
+	is->charno++;
+	is->charpos++;
+
+	/* Add this character to the characters we have accumulated for this
+	 * definition.
+	 */
+	if( is->bwp >= MAX_STRSIZE )
+		yyerror( _( "definition is too long!" ) );
+	if( is->bwp >= 0 )
+		is->buf[is->bwp] = ch;
+	is->bwp++;
+
+	/* Add to lex text buffer.
+	 */
+	if( is->charno > 0 )
+		buf_appendc( &lex_text, ch );
+
+#ifdef DEBUG_CHARACTER
+	printf( "ip_input: returning '%c'\n", ch ); 
+#endif /*DEBUG_CHARACTER*/
+
+	return( ch );
+}
+
+/* Unget an input character.
+ */
+void
+ip_unput( int ch )
+{
+	InputState *is = &input_state;
+
+#ifdef DEBUG_CHARACTER
+	printf( "ip_unput: ungetting '%c'\n", ch ); 
+#endif /*DEBUG_CHARACTER*/
+
+	/* Is lex trying to unget the end-of-file marker? Do nothing if it is.
+	 */
+	if( !ch )
+		return;
+
+	if( is->of ) {
+		if( ungetc( ch, is->of->fp ) == EOF )
+			error( "unget buffer overflow" );
+	}
+	else 
+		/* Save extra char here.
+		 */
+		is->oldchar = ch;
+
+	/* Redo counts.
+	 */
+	if( ch == '\n' ) {
+		is->lineno--;
+
+		/* Restore previous charno.
+		 */
+		is->charno = is->pcharno;
+		is->pcharno = 0;
+	}
+	is->charno--;
+	is->charpos--;
+	is->bwp--;
+
+	/* Unget from lex text buffer.
+	 */
+	if( is->charno > 0 )
+		buf_removec( &lex_text, ch );
+}
+
+/* Test for end-of-input.
+ */
+gboolean
+is_EOF( void )
+{
+	InputState *is = &input_state;
+
+	if( is->of )
+		return( feof( is->of->fp ) );
+	else
+		return( *is->str == '\0' );
+}
+
+/* Return the text we have accumulated for the current definition. Remove
+ * leading and trailing whitespace and spare semicolons. out needs to be
+ * MAX_STRSIZE.
+ */
+char *
+input_text( char *out )
+{
+	InputState *is = &input_state;
+	const char *buf = is->buf;
+
+	int start = is->bsp[is->bspsp];
+	int end = is->bwp;
+	int len;
+	int i;
+
+	for( i = start; i < end && 
+		(isspace( buf[i] ) || buf[i] == ';'); i++ )
+		;
+	start = i;
+	for( i = end - 1; i > start && 
+		(isspace( buf[i] ) || buf[i] == ';'); i-- )
+		;
+	end = i + 1;
+
+	len = end - start;
+
+	assert( len < MAX_STRSIZE - 1 );
+	im_strncpy( out, buf + start, len + 1 );
+	out[len] = '\0';
+
+#ifdef DEBUG_CHARACTER
+	printf( "input_text: level %d, returning \"%s\"\n", 
+		is->bspsp, out );
+#endif /*DEBUG_CHARACTER*/
+
+	return( out );
+}
+
+/* Reset/push/pop input stacks.
+ */
+void
+input_reset( void )
+{
+	InputState *is = &input_state;
+
+#ifdef DEBUG_CHARACTER
+	printf( "input_reset:\n" );
+#endif /*DEBUG_CHARACTER*/
+
+	is->bwp = 0;
+	is->bspsp = 0;
+	is->bsp[0] = 0;
+	buf_init_static( &lex_text, lex_text_buffer, MAX_STRSIZE );
+}
+
+void
+input_push( int n )
+{
+	InputState *is = &input_state;
+
+#ifdef DEBUG_CHARACTER
+	printf( "input_push(%d): going to level %d, %d bytes into buffer\n", 
+		n, is->bspsp + 1, is->bwp );
+
+	{
+		const int len = IM_MIN( is->bwp, 20 );
+		int i;
+
+		for( i = is->bwp - len; i < is->bwp; i++ )
+			if( is->buf[i] == '\n' )
+				printf( "@" );
+			else if( is->buf[i] == ' ' || is->buf[i] == '\t' )
+				printf( "_" );
+			else
+				printf( "%c", is->buf[i] );
+		printf( "\n" );
+		for( i = 0; i < len; i++ )
+			printf( "-" );
+		printf( "^\n" );
+	}
+#endif /*DEBUG_CHARACTER*/
+
+	is->bspsp += 1;
+	if( is->bspsp >= MAX_SSTACK )
+		error( "bstack overflow" );
+
+	is->bsp[is->bspsp] = is->bwp;
+}
+
+/* Yuk! We've just done an input_push() to try to grab the RHS of a 
+ * definition ... unfortunately, due to token readahead, we've probably 
+ * already read the start of the RHS.
+ *
+ * Back up the start point to just after the last ch character.
+ */
+void
+input_backtoch( char ch )
+{
+	InputState *is = &input_state;
+	int i;
+
+	for( i = is->bsp[is->bspsp] - 1; i > 0 && is->buf[i] != ch; i-- )
+		;
+
+	if( is->buf[i] == ch )
+		is->bsp[is->bspsp] = i + 1;
+}
+
+/* Move the last input_push() point back 1 character.
+ */
+void
+input_back1( void )
+{
+	InputState *is = &input_state;
+
+	if( is->bsp[is->bspsp] > 0 )
+		is->bsp[is->bspsp] -= 1;
+}
+
+void
+input_pop( void )
+{
+	InputState *is = &input_state;
+
+#ifdef DEBUG_CHARACTER
+	printf( "input_pop: %d bytes into buffer\n", input_state.bwp );
+#endif /*DEBUG_CHARACTER*/
+
+	if( is->bspsp <= 0 )
+		error( "bstack underflow" );
+
+	is->bspsp--;
+}
+
+void
+scope_push( void )
+{
+	if( scope_sp == MAX_SSTACK )
+		error( "sstack overflow" );
+
+	scope_stack_symbol[scope_sp] = current_symbol;
+	scope_stack_compile[scope_sp] = current_compile;
+	scope_sp += 1;
+}
+
+void
+scope_pop( void )
+{
+	if( scope_sp <= 0 )
+		error( "sstack underflow" );
+
+	scope_sp -= 1;
+	current_symbol = scope_stack_symbol[scope_sp];
+	current_compile = scope_stack_compile[scope_sp];
+}
+
+/* Back to the outermost scope.
+ */
+void
+scope_pop_all( void )
+{
+	if( scope_sp > 0 ) {
+		scope_sp = 0;
+		current_symbol = scope_stack_symbol[scope_sp];
+		current_compile = scope_stack_compile[scope_sp];
+	}
+}
+
+/* Reset/push/pop parser stacks. 
+ */
+void
+scope_reset( void )
+{
+	scope_sp = 0;
+}
+
+/* End of top level parse. Fix up the symbol.
+ */
+void *
+parse_toplevel_end( Symbol *sym )
+{
+	Tool *tool;
+
+	tool = tool_new_sym( current_kit, tool_position, sym );
+	tool->lineno = last_top_lineno;
+
+	/* Ony needed by toplevels.
+	 */
+	symbol_made( sym );
+
+	return( NULL );
+}
+
+/* Built a pattern access definition. Set the various text fragments from the
+ * def we are drived from.
+ */
+void *
+parse_access_end( Symbol *sym, Symbol *main )
+{
+	IM_SETSTR( sym->expr->compile->rhstext, 
+		main->expr->compile->rhstext ); 
+	IM_SETSTR( sym->expr->compile->prhstext, 
+		main->expr->compile->prhstext ); 
+	IM_SETSTR( sym->expr->compile->text, 
+		main->expr->compile->text ); 
+
+	return( NULL );
+}
 
 /* Interface to parser. 
  */

@@ -219,10 +219,6 @@ model_loadstate_rewrite_name( char *name )
 	return( NULL );
 }
 
-/* Need to set this! From parse.y.
- */
-extern jmp_buf parse_error_point;
-
 /* Use the lexer to rewrite an expression, swapping all symbols on the rewrite 
  * list.
  */

@@ -27,6 +27,11 @@
 
  */
 
+/* We can get multiple includes sometimes, gah, thank you bison.
+ */
+#ifndef IP_H
+#define IP_H
+
 /* Turn off VIPS's old and broken defines, we don't need them.
  */
 #define IM_NO_VIPS7_COMPAT
@@ -455,3 +460,5 @@ typedef void *(*tool_map_fn)( Tool *, void *, void * );
 #ifdef WITH_DMALLOC
 #include <dmalloc.h>
 #endif /*WITH_DMALLOC*/
+
+#endif /*IP_H*/

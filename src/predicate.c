@@ -38,6 +38,11 @@ is_system( Symbol *sym )
 {
 	Symbol *parent = symbol_get_parent( sym );
 
+	/* Something like $$lambda1 and friends.
+	 */
+	if( sym->generated )
+		return( TRUE );
+
 	if( strcmp( IOBJECT( sym )->name, MEMBER_CHECK ) == 0 ||
 		strcmp( IOBJECT( sym )->name, MEMBER_NAME ) == 0 ||
 		strcmp( IOBJECT( sym )->name, MEMBER_THIS ) == 0 ||

@@ -95,7 +95,6 @@ IP_CFLAGS="$NIP_DEBUG_FLAGS $IP_CFLAGS"
 AC_SYS_LARGEFILE
 
 # Checks for programs.
-# We are bison-only, so don't use AC_PROG_YACC
 AC_PROG_AWK
 AC_PROG_CC
 AM_PROG_LEX
@@ -108,12 +107,14 @@ AC_CHECK_TOOL(DLLTOOL, dlltool)
 AC_CHECK_TOOL(OBJDUMP, objdump)
 AC_CHECK_TOOL(RANLIB, ranlib)
 AC_CHECK_TOOL(STRIP, strip)
-AC_CHECK_TOOL(YACC, bison)
+AC_CHECK_TOOL(BISON, bison)
 AC_CHECK_TOOL(AR, ar)
 AC_CHECK_TOOL(AS, as)
 AC_CHECK_TOOL(LD, ld)
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
+
+# FIXME ... We are bison-only: we should check that YACC is set to "bison -y"
 
 # dmalloc option
 AM_WITH_DMALLOC

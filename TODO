@@ -1,3 +1,8 @@
+- compile should track the last sym added as a child, then use that to string
+  pattern defs together
+
+  get rid of last_top_sym as well?
+
 - start, then close, icontainer assert fails in icontainer_child_remove :(
 
 	fred x = class {

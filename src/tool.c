@@ -28,11 +28,11 @@
  */
 
 /*
+ */
 #define DEBUG_VERBOSE
 #define DEBUG_MENUS
 #define DEBUG
 #define DEBUG_TOOLITEM
- */
 
 #include "ip.h"
 

@@ -48,8 +48,6 @@
 struct _Compile {
 	iContainer parent_object;
 
-	/* My instance vars.
-	 */
 	Symbol *sym;		/* We are part of this symbol, scopewise */
 
 	GSList *exprs;		/* We are used by these expressions */
@@ -63,6 +61,7 @@ struct _Compile {
 
 	ParseNode *tree;	/* Parse tree we built */
 	GSList *treefrag;	/* List of tree bits for easy freeing */
+	Symbol *last_sym;	/* The last child we added in this context */
 
 	int nparam;		/* Number of real parameters */
 	GSList *param;		/* Pointers into locals for real params */

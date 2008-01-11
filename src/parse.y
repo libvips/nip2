@@ -278,13 +278,12 @@ directive:
 
 toplevel_definition: 
 	{
-		last_top_sym = NULL;
 		last_top_lineno = input_state.lineno;
 		scope_reset();
 		current_compile = root_symbol->expr->compile;
 	}
 	definition {
-		Symbol *sym = last_top_sym;
+		Symbol *sym = current_compile->last_sym;
 
 		assert( sym );
 
@@ -327,12 +326,6 @@ definition:
 			(void) symbol_user_init( sym );
 			(void) compile_new_local( sym->expr );
 		}
-
-		/* If this is to be a top-level-definition, make a 
-		 * note of it.
-		 */
-		if( current_symbol == root_symbol ) 
-			last_top_sym = sym;
 
 		/* Initialise symbol parsing variables. Save old current symbol,
 		 * add new one.
@@ -979,10 +972,6 @@ list_pattern:
 
 %%
 
-/* Last top-level symbol we made.
- */
-Symbol *last_top_sym;
-
 /* Return point on syntax error.
  */
 jmp_buf parse_error_point;
@@ -1030,9 +1019,9 @@ yyerror( const char *sub, ... )
 
 	error_top( _( "Parse error." ) );
 
-	if( last_top_sym ) 
+	if( current_compile && current_compile->last_sym ) 
 		error_sub( _( "Error in %s: %s" ), 
-			IOBJECT( last_top_sym )->name, buf );
+			IOBJECT(  current_compile->last_sym )->name, buf );
 	else
 		error_sub( _( "Error: %s" ), buf );
 
@@ -1440,7 +1429,6 @@ parse_input( int ch, Symbol *sym, Toolkit *kit, int pos )
 	current_symbol = sym;
 	root_symbol = sym;
 	tool_position = pos;
-	last_top_sym = NULL;
 
 	scope_reset();
 	input_reset();

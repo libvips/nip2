@@ -986,6 +986,7 @@ program_parse( Program *program )
 {
 	char *txt;
 	char buffer[MAX_STRSIZE];
+	Compile *compile;
 
 	if( !program->dirty )
 		return( TRUE );
@@ -1005,6 +1006,7 @@ program_parse( Program *program )
 	 */
 	if( !program->kit )
 		program_select_kit_sub( program, program->kit );
+	compile = program->kit->kitg->root->expr->compile;
 
 #ifdef DEBUG
 	printf( "program_parse: parsing to kit \"%s\", pos %d\n",
@@ -1023,10 +1025,10 @@ program_parse( Program *program )
 	program->dirty = FALSE;
 	filemodel_set_modified( FILEMODEL( program->kit ), TRUE );
 
-	/* Reselect last_top_sym, the last thing the parser saw. 
+	/* Reselect last_sym, the last thing the parser saw. 
 	 */
-	if( last_top_sym && last_top_sym->tool ) 
-		program_select_tool( program, last_top_sym->tool );
+	if( compile->last_sym && compile->last_sym->tool ) 
+		program_select_tool( program, compile->last_sym->tool );
 
 	symbol_recalculate_all();
 

@@ -80,8 +80,6 @@ typedef enum {
 	PARSE_SUPER 		/* eg. "fred c d" */
 } ParseRhsSyntax;
 
-extern Symbol *last_top_sym;
-
 extern jmp_buf parse_error_point;
 
 gboolean parse_toplevel( Toolkit *kit, int pos );

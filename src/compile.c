@@ -301,13 +301,41 @@ compile_finalize( GObject *gobject )
 }
 
 static void
+compile_child_add( iContainer *parent, iContainer *child, int pos )
+{
+	Compile *compile = COMPILE( parent );
+	Symbol *sym = SYMBOL( child );
+
+	if( sym ) 
+		compile->last_sym = sym;
+
+	ICONTAINER_CLASS( parent_class )->child_add( parent, child, pos );
+}
+
+static void 
+compile_child_remove( iContainer *parent, iContainer *child )
+{
+	Compile *compile = COMPILE( parent );
+	Symbol *sym = SYMBOL( child );
+
+	if( sym && compile->last_sym == sym )
+		compile->last_sym = NULL;
+
+	ICONTAINER_CLASS( parent_class )->child_remove( parent, child );
+}
+
+static void
 compile_class_init( CompileClass *class )
 {
 	GObjectClass *gobject_class = (GObjectClass *) class;
+	iContainerClass *icontainer_class = (iContainerClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
 
 	gobject_class->finalize = compile_finalize;
+
+	icontainer_class->child_add = compile_child_add;
+	icontainer_class->child_remove = compile_child_remove;
 
 	/* Create signals.
 	 */
@@ -334,6 +362,7 @@ compile_init( Compile *compile )
 
 	compile->tree = NULL;
 	compile->treefrag = NULL;
+	compile->last_sym = NULL;
 
 	compile->nparam = 0;
 	compile->param = NULL;

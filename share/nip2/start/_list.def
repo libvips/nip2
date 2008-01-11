@@ -161,9 +161,7 @@ limit l
 	= a, a == b
 	= limit (b : x)
 {
-	a = l?0;
-	b = l?1;
-	x = tl (tl l);
+	a:b:x = l;
 }
 
 /* Turn a function of n args into a function which takes a single arg of an 

@@ -28,11 +28,11 @@
  */
 
 /*
- */
 #define DEBUG_VERBOSE
 #define DEBUG_MENUS
 #define DEBUG
 #define DEBUG_TOOLITEM
+ */
 
 #include "ip.h"
 
@@ -89,7 +89,10 @@ tool_dispose( GObject *gobject )
 		 */
 	}
 
-	filemodel_set_modified( FILEMODEL( tool->kit ), TRUE );
+	if( tool->kit ) {
+		filemodel_set_modified( FILEMODEL( tool->kit ), TRUE );
+		tool->kit = NULL;
+	}
 
 	G_OBJECT_CLASS( parent_class )->dispose( gobject );
 }
@@ -240,6 +243,10 @@ tool_get_type( void )
 static void
 tool_link( Tool *tool, Toolkit *kit, int pos, const char *name )
 {
+#ifdef DEBUG
+	printf( "tool_link: %s\n", name );
+#endif /*DEBUG*/
+
 	filemodel_set_modified( FILEMODEL( kit ), TRUE );
 	iobject_set( IOBJECT( tool ), name, NULL );
 	icontainer_child_add( ICONTAINER( kit ), ICONTAINER( tool ), pos );

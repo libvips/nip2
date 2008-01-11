@@ -374,8 +374,9 @@ definition:
 			built_syms = compile_pattern_lhs( parent, 
 				current_symbol, $1 );
 
-			slist_map( built_syms,
-				(SListMapFn) parse_toplevel_end, NULL );
+			if( symbol_get_parent( current_symbol ) == root_symbol )
+				slist_map( built_syms,
+					(SListMapFn) parse_toplevel_end, NULL );
 			slist_map( built_syms,
 				(SListMapFn) parse_access_end, 
 				current_symbol );

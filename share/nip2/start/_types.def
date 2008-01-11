@@ -1363,13 +1363,9 @@ Image value = class
 			black = im_black width height target_bands;
 		}
 
-		then_image = to_image then_part;
-		else_image = to_image else_part;
-
-		then_image' = clip2fmt target_format then_image;
-		else_image' = clip2fmt target_format else_image;
-
-		ite_resized = size_alike [value, then_image', else_image'];
+		[then_image, else_image] = 
+			map (clip2fmt target_format @ to_image) [then_part, else_part];
+		ite_resized = size_alike [value, then_image, else_image];
 
 		ite_result_image = image_set_type target_type
 			(if ite_resized?0 then ite_resized?1 else ite_resized?2);

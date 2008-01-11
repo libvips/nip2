@@ -81,9 +81,7 @@ Hist_map_item = class
 		map a b
 			= hist_map hist im
 		{
-			args = sortc (const is_hist) [a, b];
-			im = args?0;
-			hist = args?1;
+			[im, hist] = sortc (const is_hist) [a, b];
 		}
 	}
 }

@@ -883,10 +883,7 @@ Filter_blend_item = class
 						get_format a > Image_format.UCHAR && 
 							get_format b == Image_format.UCHAR
 					= true;
-				args' = sortc compare [a, b, c];
-				condition = args'?0;
-				in1 = args'?1;
-				in2 = args'?2;
+				[condition, in1, in2] = sortc compare [a, b, c];
 			}
 		}
 	}
@@ -1248,9 +1245,8 @@ Filter_colourize_item = class
 				= colour_transform_to (get_type colour) colourized'
 			{
 				// get the mono thing first
-				args = sortc (const (is_colour_type @ get_type)) [a, b];
-				mono = args?0;
-				colour = args?1;
+				[mono, colour] = 
+					sortc (const (is_colour_type @ get_type)) [a, b];
 
 				colour' = tint * colour_transform_to Image_type.LAB colour;
 				mono' = colour_transform_to Image_type.B_W mono;

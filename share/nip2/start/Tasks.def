@@ -108,9 +108,7 @@ Tasks_capture_item = class
 				{
 					area x = x.width * x.height;
 					larger x y = area x > area y;
-					args = sortc larger [a, b];
-					image = args?0;
-					patch = args?1;
+					[image, patch] = sortc larger [a, b];
 					to_xyz = colour_transform_to Image_type.XYZ;
 			
 					// white balance in XYZ
@@ -245,9 +243,7 @@ Tasks_capture_item = class
 			calib_name = "Tasks_capture_item.Find_calib_item.action";
 
 			// get the Calibrate_chart arg first
-			args = sortc (const (is_instanceof calib_name)) [a, b];
-			calib = args?1;
-			image = args?0;
+			[image, calib] = sortc (const (is_instanceof calib_name)) [a, b];
 
 			// map the original image through the lineariser to get 
 			// linear 0-1 RGB image
@@ -390,9 +386,7 @@ Tasks_mosaic_item = class
 				= im_lrmerge a'.image.value b'.image.value
 					(b'.left - a'.left) (b'.top - a'.top) bw.value
 			{
-				sorted = mosaic_sort mosaic_sort_lr [a, b];
-				a' = sorted?0;
-				b' = sorted?1;
+				[a', b'] = mosaic_sort mosaic_sort_lr [a, b];
 			}
 		}
 
@@ -411,9 +405,7 @@ Tasks_mosaic_item = class
 				= im_tbmerge a'.image.value b'.image.value
 					(b'.left - a'.left) (b'.top - a'.top) bw.value
 			{
-				sorted = mosaic_sort mosaic_sort_tb [a, b];
-				a' = sorted?0;
-				b' = sorted?1;
+				[a', b'] = mosaic_sort mosaic_sort_tb [a, b];
 			}
 		}
 
@@ -482,11 +474,7 @@ Tasks_mosaic_item = class
 						c'.left c'.top d'.left d'.top
 						bw.value
 				{
-					sorted = mosaic_sort mosaic_sort_lr [a, b, c, d];
-					a' = sorted?0;
-					b' = sorted?1;
-					c' = sorted?2;
-					d' = sorted?3;
+					[a', b', c', d'] = mosaic_sort mosaic_sort_lr [a, b, c, d];
 				}
 			}
 		}
@@ -513,11 +501,7 @@ Tasks_mosaic_item = class
 						c'.left c'.top d'.left d'.top
 						bw.value
 				{
-					sorted = mosaic_sort mosaic_sort_tb [a, b, c, d];
-					a' = sorted?0;
-					b' = sorted?1;
-					c' = sorted?2;
-					d' = sorted?3;
+					[a', b', c', d'] = mosaic_sort mosaic_sort_tb [a, b, c, d];
 				}
 			}
 		}

@@ -99,9 +99,7 @@ Image_new_item = class
 							is_Region a && !is_Region b
 						= true;
 
-					args' = sortc compare [a, b];
-					target = args'?0;
-					x = args'?1;
+					[target, x] = sortc compare [a, b];
 				}
 			}
 		}
@@ -701,7 +699,7 @@ Image_transform_item = class
 				("find a transform which will map sample image onto " ++
 				"reference") {
 			action reference sample = class
-				_transform {
+				Transform trn reference.width reference.height {
 				_vislevel = 3;
 	
 				// controls
@@ -712,13 +710,10 @@ Image_transform_item = class
 				max_iter = Expression "Maximum iterations" 10;
 	
 				// transform
-				_result = transform_search max_err max_iter order interp wrap
-						sample reference;
-
-				transformed_image = Image _result?0;
-				_transform = Transform _result?1 
-					reference.width reference.height;
-				final_error = _result?2;
+				[sample', trn, err] = transform_search 
+					max_err max_iter order interp wrap
+					sample reference;
+				final_error = err;
 			}
 		}
 
@@ -739,9 +734,7 @@ Image_transform_item = class
 						= transform interp wrap t' i
 					{
 						// get the transform arg first
-						args = sortc (const is_Transform) [a, b];
-						i = args?0;
-						t = args?1;
+						[i, t] = sortc (const is_Transform) [a, b];
 						t' = t.rescale (i.width / t.image_width) 
 							(i.height / t.image_height);
 					}
@@ -992,9 +985,7 @@ Image_insert_item = class
 
 			// sort to get smallest first
 			_pred x y = x.width * x.height < y.width * y.height;
-			_sorted = sortc _pred [a, b];
-			_a' = _sorted?0;
-			_b' = _sorted?1;
+			[_a', _b'] = sortc _pred [a, b];
 
 			place 
 				= Area _b' left top width height

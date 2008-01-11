@@ -397,7 +397,8 @@ icontainer_child_remove( iContainer *child )
 	g_assert( ICONTAINER_IS_CHILD( parent, child ) );
 
 #ifdef DEBUG
-	printf( "icontainer_child_remove: %s \"%s\"\n",
+	printf( "icontainer_child_remove: (child %p)\n", child );
+	printf( "\tchild: %s \"%s\"\n",
 		G_OBJECT_TYPE_NAME( child ), 
 		NN( IOBJECT( child )->name ) );
 #endif /*DEBUG*/

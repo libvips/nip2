@@ -250,10 +250,7 @@ deviation x
 	deviation_list l 
 		= (abs (s2 - (s * s / n)) / (n - 1)) ** 0.5
 	{
-		totals = sum_sum2_list l;
-		n = totals?0;
-		s = totals?1;
-		s2 = totals?2;
+		[n, s, s2] = sum_sum2_list l;
 	}
 
 	// return n, sum, sum of squares for a list of reals
@@ -265,15 +262,8 @@ deviation x
 			= [n + n', s + s', s2 + s2'], is_list x
 			= error "sum_sum2_list: not real or [real]"
 		{
-			n = sofar?0;
-			s = sofar?1;
-			s2 = sofar?2;
-
-			sub_acc = sum_sum2_list x;
-
-			n' = sub_acc?0;
-			s' = sub_acc?1;
-			s2' = sub_acc?2;
+			[n, s, s2] = sofar;
+			[n', s', s2'] = sum_sum2_list x;
 		}
 	}
 }
@@ -290,10 +280,7 @@ deviationze x
 	deviationze_list l 
 		= (abs (s2 - (s * s / n)) / (n - 1)) ** 0.5
 	{
-		totals = sum_sum2_list l;
-		n = totals?0;
-		s = totals?1;
-		s2 = totals?2;
+		[n, s, s2] = sum_sum2_list l;
 	}
 
 	// return number of non-zero elements, sum, sum of squares for a list of 
@@ -307,15 +294,8 @@ deviationze x
 			= [n + n', s + s', s2 + s2'], is_list x
 			= error "sum_sum2_list: not real or [real]"
 		{
-			n = sofar?0;
-			s = sofar?1;
-			s2 = sofar?2;
-
-			sub_acc = sum_sum2_list x;
-
-			n' = sub_acc?0;
-			s' = sub_acc?1;
-			s2' = sub_acc?2;
+			[n, s, s2] = sofar;
+			[n', s', s2'] = sum_sum2_list x;
 		}
 	}
 	
@@ -903,8 +883,7 @@ blend cond in1 in2
 	blend_obj cond x
 		= blend_result_image
 	{
-		then_part = x?0;
-		else_part = x?1;
+		[then_part, else_part] = x;
 
 		// get things about our output from inputs in this order
 		objects = [then_part, else_part, cond];
@@ -924,43 +903,36 @@ blend cond in1 in2
 			black = im_black target_width target_height target_bands;
 		}
 
-		then_image = to_image then_part;
-		else_image = to_image else_part;
+		[then_image, else_image] = 
+			map (clip2fmt target_format @ to_image) [then_part, else_part];
+		[c, t, e] = size_alike [cond, then_image, else_image];
 
-		then_image' = clip2fmt target_format then_image;
-		else_image' = clip2fmt target_format else_image;
-
-		resized = size_alike [cond, then_image', else_image'];
-
-		blend_result_image = image_set_type target_type
-			(im_blend resized?0 resized?1 resized?2);
+		blend_result_image = image_set_type target_type (im_blend c t e);
 	}
 }
 
 insert x y small big
 	= oo_binary_function insert_op small big, is_class small
 	= oo_binary'_function insert_op small big, is_class big
-	= im_insert rebanded?1 rebanded?0 (to_real x) (to_real y), 
+	= im_insert big' small' (to_real x) (to_real y), 
 		is_image small && is_image big
 	= error (_ "bad arguments to " ++ "insert")
 {
 	insert_op = Operator "insert" 
 		(insert x y) Operator_type.COMPOUND_REWRAP false;
-
-	rebanded = bands_alike [small, big];
+	[small', big'] = bands_alike [small, big];
 }
 
 insert_noexpand x y small big
 	= oo_binary_function insert_noexpand_op small big, is_class small
 	= oo_binary'_function insert_noexpand_op small big, is_class big
-	= im_insert_noexpand rebanded?1 rebanded?0 (to_real x) (to_real y), 
+	= im_insert_noexpand big' small' (to_real x) (to_real y), 
 		is_image small && is_image big
 	= error (_ "bad arguments to " ++ "insert_noexpand")
 {
 	insert_noexpand_op = Operator "insert_noexpand" 
 		(insert_noexpand x y) Operator_type.COMPOUND_REWRAP false;
-
-	rebanded = bands_alike [small, big];
+	[small', big'] = bands_alike [small, big];
 }
 
 measure x y w h u v image

@@ -1292,28 +1292,35 @@ heap_map_dict_entry( PElement *head, HeapMapDict *map_dict )
 	void *result;
 
 	if( !reduce_pelement( rc, reduce_spine, head ) )
-		return( FALSE );
-	if( !PEISFLIST( head ) ) 
+		return( head );
+	if( !PEISFLIST( head ) ) {
 		heap_error_typecheck( head, "heap_map_dict", "list" );
+		return( head );
+	}
 	PEGETHD( &p1, head );
 	if( !heap_get_string( &p1, key, 256 ) )
-		return( FALSE );
+		return( head );
 
 	PEGETTL( &p2, head );
 	if( !reduce_pelement( rc, reduce_spine, &p2 ) )
-		return( FALSE );
-	if( !PEISFLIST( &p2 ) ) 
+		return( head );
+	if( !PEISFLIST( &p2 ) ) {
 		heap_error_typecheck( &p2, "heap_map_dict", "list" );
+		return( head );
+	}
 	PEGETHD( &p1, &p2 );
-	result = map_dict->fn( key, &p1, map_dict->a, map_dict->b );
+	if( (result = map_dict->fn( key, &p1, map_dict->a, map_dict->b )) )
+		return( result );
 
 	PEGETTL( &p1, &p2 );
 	if( !reduce_pelement( rc, reduce_spine, &p1 ) )
-		return( FALSE );
-	if( !PEISELIST( &p1 ) ) 
+		return( head );
+	if( !PEISELIST( &p1 ) ) {
 		heap_error_typecheck( &p1, "heap_map_dict", "[]" );
+		return( head );
+	}
 
-	return( result );
+	return( NULL );
 }
 
 /* Map over a list of ["key", value] pairs.

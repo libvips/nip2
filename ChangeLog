@@ -15,6 +15,7 @@ started 7.12.3
 - now bison only, we won't work with yacc (will package deps need updating?)
 - added lcomp patterns, eg. "[x*y|[x,y]<-zip2[1..10][11..20]]"
 - use LHS patterns in defs
+- oop, dist typechecking could segv
 
 started 7.13.2
 - remove Application from nip2.desktop.in

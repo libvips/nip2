@@ -1,8 +1,3 @@
-- compile should track the last sym added as a child, then use that to string
-  pattern defs together
-
-  get rid of last_top_sym as well?
-
 - try using bison's location system
 
 	http://www.gnu.org/software/bison/manual/html_mono/bison.html#Locations

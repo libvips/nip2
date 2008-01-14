@@ -8,8 +8,6 @@
   boundary MAX_DIALOG_TEXT or something) which can cause markup to fail and
   trigger gtk errors
 
-  make a baseclass from trace.c and derive error and link from that?
-
   could also display as a tree I guess
 
 - add something to Symbol:

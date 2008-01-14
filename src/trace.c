@@ -37,7 +37,7 @@
  */
 TraceFlags trace_flags = (TraceFlags) 0;
 
-static iWindowClass *parent_class = NULL;
+static LogClass *parent_class = NULL;
 
 /* All trace windows.
  */
@@ -235,9 +235,9 @@ trace_init( Trace *trace )
 GtkType
 trace_get_type( void )
 {
-	static GtkType trace_type = 0;
+	static GtkType type = 0;
 
-	if( !trace_type ) {
+	if( !type ) {
 		static const GtkTypeInfo info = {
 			"Trace",
 			sizeof( Trace ),
@@ -249,19 +249,10 @@ trace_get_type( void )
 			(GtkClassInitFunc) NULL,
 		};
 
-		trace_type = gtk_type_unique( TYPE_IWINDOW, &info );
+		type = gtk_type_unique( TYPE_LOG, &info );
 	}
 
-	return( trace_type );
-}
-
-static void
-trace_clear_action_cb( GtkAction *action, Trace *trace )
-{
-	GtkTextView *text_view = GTK_TEXT_VIEW( trace->view );
-	GtkTextBuffer *text_buffer = gtk_text_view_get_buffer( text_view );
-
-	gtk_text_buffer_set_text( text_buffer, "", 0 );
+	return( type );
 }
 
 static void
@@ -291,7 +282,7 @@ static GtkActionEntry trace_actions[] = {
 	{ "Clear", 
 		NULL, N_( "_Clear" ), NULL, 
 		N_( "Clear trace window" ), 
-		G_CALLBACK( trace_clear_action_cb ) },
+		G_CALLBACK( log_clear_action_cb ) },
 
 	{ "Close", 
 		GTK_STOCK_CLOSE, N_( "_Close" ), NULL, 
@@ -360,8 +351,6 @@ trace_build( Trace *trace, GtkWidget *vbox )
 	GtkAccelGroup *accel_group;
 	GError *error;
 	GtkWidget *mbar;
-	GtkWidget *swin;
-	PangoFontDescription *font_desc;
 
         /* Make main menu bar
          */
@@ -383,7 +372,7 @@ trace_build( Trace *trace, GtkWidget *vbox )
 
 	error = NULL;
 	if( !gtk_ui_manager_add_ui_from_string( ui_manager,
-			trace_menubar_ui_description, -1, &error ) ) {
+		trace_menubar_ui_description, -1, &error ) ) {
 		g_message( "building menus failed: %s", error->message );
 		g_error_free( error );
 		exit( EXIT_FAILURE );
@@ -393,23 +382,6 @@ trace_build( Trace *trace, GtkWidget *vbox )
 		"/TraceMenubar" );
 	gtk_box_pack_start( GTK_BOX( vbox ), mbar, FALSE, FALSE, 0 );
         gtk_widget_show( mbar );
-
-	swin = gtk_scrolled_window_new( NULL, NULL );
-	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( swin ),
-		GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
-	gtk_box_pack_start( GTK_BOX( vbox ), swin, TRUE, TRUE, 0 );
-	gtk_widget_show( swin );
-
-	trace->view = gtk_text_view_new();
-	gtk_text_view_set_editable( GTK_TEXT_VIEW( trace->view ), FALSE );
-	gtk_text_view_set_cursor_visible( GTK_TEXT_VIEW( trace->view ), 
-		FALSE );
-	font_desc = pango_font_description_from_string( "Mono" );
-	gtk_widget_modify_font( trace->view, font_desc );
-	pango_font_description_free( font_desc );
-
-	gtk_container_add( GTK_CONTAINER( swin ), trace->view );
-	gtk_widget_show( trace->view );
 }
 
 static void
@@ -440,19 +412,8 @@ trace_new( void )
 static void *
 trace_text_sub( Trace *trace, const char *buf, TraceFlags flags )
 {
-	if( !trace_block_count && trace->flags & flags ) {
-		GtkTextView *text_view = GTK_TEXT_VIEW( trace->view );
-		GtkTextBuffer *text_buffer = 
-			gtk_text_view_get_buffer( text_view );
-		GtkTextMark *mark = gtk_text_buffer_get_insert( text_buffer );
-		GtkTextIter iter;
-
-		gtk_text_buffer_get_end_iter( text_buffer, &iter );
-		gtk_text_buffer_move_mark( text_buffer, mark, &iter );
-		gtk_text_buffer_insert_at_cursor( text_buffer, buf, -1 );
-		gtk_text_view_scroll_to_mark( text_view, mark, 
-			0.0, TRUE, 0.5, 1 );
-	}
+	if( !trace_block_count && trace->flags & flags ) 
+		log_text( LOG( trace ), buf );
 
 	return( NULL );
 }

@@ -45,15 +45,13 @@ typedef enum {
 } TraceFlags;
 
 struct _Trace {
-	iWindow parent_class;
+	Log parent_class;
 
 	TraceFlags flags;
-
-	GtkWidget *view;
 };
 
 typedef struct _TraceClass {
-	iWindowClass parent_class;
+	LogClass parent_class;
 
 	/* My methods.
 	 */

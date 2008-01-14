@@ -89,7 +89,7 @@ floatwindow_build( GtkWidget *widget )
 
 	/* Must be set with floatmodel_link before build.
 	 */
-	assert( floatwindow->classmodel );
+	g_assert( floatwindow->classmodel );
 
 	/* Position and size to restore? Come here after parent build, so we
 	 * can override any default settings from there.

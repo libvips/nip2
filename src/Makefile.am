@@ -147,6 +147,8 @@ nip2_SOURCES = \
 	iimageview.h \
 	imagedisplay.c \
 	imagedisplay.h \
+	log.c \
+	log.h \
 	managed.c \
 	managed.h \
 	managedfile.c \

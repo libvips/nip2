@@ -1606,16 +1606,10 @@ program_linkreport_action_cb( GtkAction *action, Program *program )
 static void
 program_errorreport_action_cb( GtkAction *action, Program *program )
 {
-	BufInfo buf;
-	char txt[MAX_STRSIZE];
+	Error *error;
 
-	buf_init_static( &buf, txt, MAX_STRSIZE );
-	expr_error_print_all( &buf );
-	if( buf_is_empty( &buf ) )
-		buf_appendf( &buf, _( "No errors found." ) );
-
-	box_info( GTK_WIDGET( program ), _( "Error report." ), 
-		"%s", buf_all( &buf ) );
+	error = error_new();
+	gtk_widget_show( GTK_WIDGET( error ) ); 
 
 #ifdef DEBUG
 	/* Dump VIPS memory usage info for debugging.

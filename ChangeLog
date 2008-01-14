@@ -17,6 +17,7 @@ started 7.12.3
 - use LHS patterns in defs
 - oop, dist typechecking could segv
 - split trace.c to make log.c, base class for logging windows
+- added error ... error logging window
 
 started 7.13.2
 - remove Application from nip2.desktop.in

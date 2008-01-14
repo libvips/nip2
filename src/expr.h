@@ -81,7 +81,9 @@ typedef struct _ExprClass {
 	void (*new_value)( Expr *expr );
 } ExprClass;
 
-void expr_error_print_all( BufInfo *buf );
+extern GSList *expr_error_all;
+
+void *expr_error_print( Expr *expr, BufInfo *buf );
 
 typedef void *(*map_expr_fn)( Expr *, void *, void * );
 Expr *expr_map_all( Expr *expr, map_expr_fn fn, void *a );

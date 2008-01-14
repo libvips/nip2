@@ -195,7 +195,8 @@ main_error_exit( const char *fmt, ... )
 		char txt[MAX_STRSIZE];
 
 		buf_init_static( &buf, txt, MAX_STRSIZE );
-		expr_error_print_all( &buf );
+		slist_map( expr_error_all,
+			(SListMapFn) expr_error_print, &buf );
 		fprintf( stderr, "%s\n", buf_all( &buf ) );
 	}
 

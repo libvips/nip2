@@ -54,10 +54,10 @@ static guint expr_signals[SIG_LAST] = { 0 };
 
 /* Set of expressions containing errors.
  */
-static GSList *expr_error_all = NULL;
+GSList *expr_error_all = NULL;
 
-static void *
-expr_error_print_sub( Expr *expr, BufInfo *buf )
+void *
+expr_error_print( Expr *expr, BufInfo *buf )
 {
 	assert( expr->err );
 
@@ -80,13 +80,6 @@ expr_error_print_sub( Expr *expr, BufInfo *buf )
 	buf_appendf( buf, ": %s\n%s", expr->error_top, expr->error_sub );
 
 	return( NULL );
-}
-
-void
-expr_error_print_all( BufInfo *buf )
-{
-	slist_map( expr_error_all, 
-		(SListMapFn) expr_error_print_sub, buf );
 }
 
 static Expr *

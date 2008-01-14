@@ -301,6 +301,7 @@ typedef struct _Toolkitgroupview Toolkitgroupview;
 typedef struct _Toolkitview Toolkitview;
 typedef struct _Toolview Toolview;
 typedef struct _Trace Trace;
+typedef struct _Error Error;
 typedef struct _Log Log;
 typedef struct _vObject vObject;
 typedef struct _View View;
@@ -398,6 +399,7 @@ typedef void *(*tool_map_fn)( Tool *, void *, void * );
 #include "workspacedefs.h"
 #include "toolkitbrowser.h"
 #include "log.h"
+#include "error.h"
 #include "trace.h"
 #include "program.h"
 #include "conversionview.h"

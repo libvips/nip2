@@ -1,3 +1,7 @@
+- is Error working? never seems to say anything
+
+  can we get VIPS errors reported here too?
+
 - try using bison's location system
 
 	http://www.gnu.org/software/bison/manual/html_mono/bison.html#Locations

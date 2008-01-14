@@ -1,6 +1,101 @@
-- is Error working? never seems to say anything
+- can we get VIPS errors reported in Error too?
 
-  can we get VIPS errors reported here too?
+- use compile->last_sym to spot chains of defs
+
+  multiple definitions of the same function are allowed, provided they all
+  have the same number of arguments, and provided only one of them has no
+  argument pattern matching
+
+  example:
+
+  	fred [a, b] = a * b;
+	fred (Image x) = rot90 x;
+	fred z = error "what";
+
+  any of these can have locals, those locals just apply to that one
+  definition
+
+  this compiles to:
+
+	fred $$a4 
+		= $$fred1, is_list $$a4 && len $$a4 == 2
+		= $$fred2, is_instance_of "Image" $$a4
+		= $$fred3
+	{
+		$$fred1 
+			= a * b
+		{
+			a = $$a4?0;
+			b = $$a4?1;
+		}
+		$$fred2 
+			= rot90 x
+		{
+			x = $$a4;
+		}
+		$$fred3 
+			= error "what";
+		{
+			z = $$a4;
+		}
+	}
+
+  so each pattern-matching definition generates a condition and an action
+
+  the action goes into a private function, the conditions are joined together
+  in the function wrapper
+
+  the no-pattern case (if present) becomes the action for the "otherwise"
+  clause in the wrapper
+
+  if not present, we generate (error "pattern match failed") or somesuch for 
+  the default case
+
+  we will need to regenerate the wrapper function every time a definition of
+  fred is added or removed ... can we do this easily?
+
+  when are two definitions considered equal? should we warn about this? "fred
+  x" could occur in two files, for example
+
+  process:
+ 
+	* we see a "fred arg-list" incoming
+	* does the arg list contain any patterns?
+	  yes:
+		* do we already have a fred in this scope?
+		  yes: 	
+			* the existing fred must be the wrapper, this must be 
+			  a new possible RHS
+			* check that the number of args matches
+		  no:
+		  	* generate a fred to act as the wrapper
+			* add args called $$arg1 etc. to the main fred
+		* add this new fred as a $$fredn local to the current
+		  fred
+		* expand the patterns as local references to the main
+		  fred's arguments
+		* parse the rest of the def in that context
+		* keep the pattern list around, we'll need it to generate the
+		  ifs for the wrapper later
+	  no:
+	  	* do we have a fred in this scope?
+		  yes:
+		  	* check the previous fred was a pattern matcher
+		  	* check the number of args matches
+		  	* check there isn't already a default case
+			* add as above
+		  no:
+		  	* add as a regular non-pattern definition
+
+  issues:
+
+  	* where do we store the pattern lists? we can't expand them at
+	  parse-time, since we need them to make the wrapper (which we can't
+	  make until we've seen all the candidate RHS)
+	* when one of the RHS is changed, we need to regenerate the wrapper,
+	  how do we do this? (could nuke the generated code in the compile
+	  when we see a new RHS, then rebuuild the wrapper in compile on the
+	  next heap_copy?)
 
 - try using bison's location system
 
@@ -28,7 +123,7 @@
 
 	12 = fred 99;
 
-  but of course we will not ever eval this, except at the top level
+  but of course we will never eval this, except at the top level
 
   is this OK? we could disallow defs like this in a later pass
 
@@ -70,133 +165,6 @@
 - add (*) (operator sections) ... need a binup / uop production? can't
   do this without losing precedence stuff, it'll need a separate production
   for sections
-
-- pattern matching
-
-  	fred (a:x) = x
-	fred [a, b, c] = 
-	fred [a, b, ...] =
-	fred [] =
-	fred (a, b) = 
-	fred [(a, b), (c, d), ...] = 
-	fred [Image x, Matrix y] =
-	fred 12 =
-	fred (1, 2) =
-	fred "hello world!" =
-
-  do we need to have initial cap for constructors? not clear ... the pattern
-  is just TK_IDENT TK_IDENT, for name-of-class, arg to bind
-
-  should allow (IDENT . IDENT . IDENT) too? 
-
-  also for LHS
-
-  	[a, b] = ...
-
-  also for LHS of generator in lcomps
-
-  	[fred | [a, b] <- zip2 l1 l2]
-
-  multiple definitions of the same function are allowed, provided they all
-  have the same number of arguments, and provided only one of them has no
-  argument pattern matching
-
-  example:
-
-  	fred [a, b] = a * b;
-	fred (Image x) = rot90 x;
-	fred z = error "what";
-
-  any of these can have locals, those locals just apply to that one
-  definition
-
-  this compiles to:
-
-  	$$fred1 $$a1 
-		= a * b
-	{
-		a = $$a?0;
-		b = $$a?1;
-	}
-	$$fred2 $$a2 
-		= rot90 x
-	{
-		x = $$a2;
-	}
-	$$fred3 $$a3 
-		= error "what";
-
-	fred $$a4 
-		= $$fred1 $$a4, is_list $$a4 && len $$a4 == 2
-		= $$fred2 $$a4, is_instance_of "Image" $$a4
-		= $$fred3 $$a4;
-
-  so each pattern-matching definition generates a condition and an action
-
-  the action goes into a private function, the conditions are joined together
-  in the function wrapper
-
-  the no-pattern case (if present) becomes the action for the "otherwise"
-  clause in the wrapper
-
-  if not present, we generate (error "pattern match failed") or somesuch for 
-  the default case
-
-  we will need to regenerate the wrapper function every time a definition of
-  fred is added or removed ... can we do this easily?
-
-  when are two definitions considered equal? should we warn about this? "fred
-  x" could occur in two files, for example
-
-  pattern type summary:
-
-  	fred a = 
-
-		TK_IDENT 
-
-	fred 12 =
-	fred "hello" =
-
-		TK_CONST
-
-  	fred (a:x) = 
-  	fred [] = 
-
-		TK_IDENT ':' pattern
-		'[' ']'
-
-	fred [a, b, c] = 
-		
-		'[' list_pattern ']'
-		list_pattern: pattern | list_pattern ',' pattern
-		/* could allow '..' as part of a pattern? */
-
-	fred (a, b) = 
-
-		'(' TK_IDENT ',' TK_IDENT ')'
-		/* IDENT not pattern, since complex numbers can only be
-		 * numbers */
-
-	fred (Image x) =
-		TK_IDENT TK_IDENT 
-		'(' pattern ')'
-
-  example:
-
-  	[a, b] = fred 1 2;
-
-  compiles to:
-
-	$$v1 = fred 1 2
-  	a	= $$v1?0, is_list $$v1 && len $$v1 == 2
-		= error "pattern match failed";
-  	b	= $$v1?1, is_list $$v1 && len $$v1 == 2
-		= error "pattern match failed";
-
- 
-
-
-
 
 - which gtk are we using for the windows build? new gtks come from the main gtk
   site now, rather than tor's homepage:

@@ -1,4 +1,4 @@
-/* error window
+/* Show unresolved symbols
  */
 
 /*
@@ -36,42 +36,42 @@
 static LogClass *parent_class = NULL;
 
 static void *
-error_print( Expr *expr, Error *error, gboolean *found )
+unresolved_print( Toolkit *kit, Unresolved *unresolved, gboolean *found )
 {
 	BufInfo buf;
 	char txt[512];
 
 	buf_init_static( &buf, txt, 512 );
-	expr_error_print( expr, &buf );
-	log_text( LOG( error ), buf_all( &buf ) );
-	*found = TRUE;
+	toolkit_linkreport( kit, &buf, found );
+	log_text( LOG( unresolved ), buf_all( &buf ) );
 
 	return( NULL );
 }
 
 static void
-error_show_all( Error *error )
+unresolved_show_all( Unresolved *unresolved )
 {
 	gboolean found;
 
 	found = FALSE;
-	slist_map2( expr_error_all,
-		(SListMap2Fn) error_print, error, &found );
+	(void) toolkitgroup_map( unresolved->kitg,
+		(toolkit_map_fn) unresolved_print, unresolved, &found );
 	if( !found ) {
-		log_text( LOG( error ), _( "No errors found." ) );
+		log_text( LOG( unresolved ), 
+			_( "No unresolved symbols found." ) );
 		log_text( LOG( error ), "\n" );
 	}
 }
 
 static void
-error_show_all_action_cb( GtkAction *action, Error *error )
+unresolved_show_all_action_cb( GtkAction *action, Unresolved *unresolved )
 {
-	error_show_all( error );
+	unresolved_show_all( unresolved );
 }
 
 /* Our actions.
  */
-static GtkActionEntry error_actions[] = {
+static GtkActionEntry unresolved_actions[] = {
 	/* Menu items.
 	 */
 	{ "FileMenu", NULL, "_File" },
@@ -82,17 +82,17 @@ static GtkActionEntry error_actions[] = {
 	 */
 	{ "Clear", 
 		NULL, N_( "_Clear" ), NULL, 
-		N_( "Clear error window" ), 
+		N_( "Clear unresolved window" ), 
 		G_CALLBACK( log_clear_action_cb ) },
 
-	{ "Errors", 
-		NULL, N_( "Search for _Errors" ), NULL, 
-		N_( "Search for all errors" ), 
-		G_CALLBACK( error_show_all_action_cb ) },
+	{ "Unresolveds", 
+		NULL, N_( "Find _Unresolved" ), NULL, 
+		N_( "Search for all unresolved symbols" ), 
+		G_CALLBACK( unresolved_show_all_action_cb ) },
 
 	{ "Close", 
 		GTK_STOCK_CLOSE, N_( "_Close" ), NULL, 
-		N_( "Close error window" ), 
+		N_( "Close unresolved window" ), 
 		G_CALLBACK( iwindow_kill_action_cb ) },
 
 	{ "Guide", 
@@ -106,16 +106,16 @@ static GtkActionEntry error_actions[] = {
 		G_CALLBACK( mainw_about_action_cb ) }
 };
 
-static const char *error_menubar_ui_description =
+static const char *unresolved_menubar_ui_description =
 "<ui>"
-"  <menubar name='ErrorMenubar'>"
+"  <menubar name='UnresolvedMenubar'>"
 "    <menu action='FileMenu'>"
 "      <menuitem action='Clear'/>"
 "      <separator/>"
 "      <menuitem action='Close'/>"
 "    </menu>"
 "    <menu action='ViewMenu'>"
-"      <menuitem action='Errors'/>"
+"      <menuitem action='Unresolveds'/>"
 "    </menu>"
 "    <menu action='HelpMenu'>"
 "      <menuitem action='Guide'/>"
@@ -125,36 +125,36 @@ static const char *error_menubar_ui_description =
 "</ui>";
 
 static void
-error_class_init( ErrorClass *class )
+unresolved_class_init( UnresolvedClass *class )
 {
 	LogClass *log_class = (LogClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
 
-	log_class->actions = error_actions;
-	log_class->n_actions = IM_NUMBER( error_actions );
-	log_class->action_name = "ErrorActions";
-	log_class->ui_description = error_menubar_ui_description;
-	log_class->menu_bar_name = "/ErrorMenubar";
+	log_class->actions = unresolved_actions;
+	log_class->n_actions = IM_NUMBER( unresolved_actions );
+	log_class->action_name = "UnresolvedActions";
+	log_class->ui_description = unresolved_menubar_ui_description;
+	log_class->menu_bar_name = "/UnresolvedMenubar";
 }
 
 static void
-error_init( Error *error )
+unresolved_init( Unresolved *unresolved )
 {
 }
 
 GtkType
-error_get_type( void )
+unresolved_get_type( void )
 {
 	static GtkType type = 0;
 
 	if( !type ) {
 		static const GtkTypeInfo info = {
-			"Error",
-			sizeof( Error ),
-			sizeof( ErrorClass ),
-			(GtkClassInitFunc) error_class_init,
-			(GtkObjectInitFunc) error_init,
+			"Unresolved",
+			sizeof( Unresolved ),
+			sizeof( UnresolvedClass ),
+			(GtkClassInitFunc) unresolved_class_init,
+			(GtkObjectInitFunc) unresolved_init,
 			/* reserved_1 */ NULL,
 			/* reserved_2 */ NULL,
 			(GtkClassInitFunc) NULL,
@@ -167,22 +167,24 @@ error_get_type( void )
 }
 
 static void
-error_link( Error *error )
+unresolved_link( Unresolved *unresolved, Toolkitgroup *kitg )
 {
-        iwindow_set_title( IWINDOW( error ), _( "Error" ) );
-	gtk_window_set_default_size( GTK_WINDOW( error ), 640, 480 );
-	iwindow_set_size_prefs( IWINDOW( error ), 
-		"ERROR_WIDTH", "ERROR_HEIGHT" );
-	iwindow_build( IWINDOW( error ) );
+	unresolved->kitg = kitg;
+
+        iwindow_set_title( IWINDOW( unresolved ), _( "Unresolved" ) );
+	gtk_window_set_default_size( GTK_WINDOW( unresolved ), 640, 480 );
+	iwindow_set_size_prefs( IWINDOW( unresolved ), 
+		"UNRESOLVED_WIDTH", "UNRESOLVED_HEIGHT" );
+	iwindow_build( IWINDOW( unresolved ) );
 }
 
-Error *
-error_new( void )
+Unresolved *
+unresolved_new( Toolkitgroup *kitg )
 {
-	Error *error = gtk_type_new( TYPE_ERROR );
+	Unresolved *unresolved = gtk_type_new( TYPE_UNRESOLVED );
 
-	error_link( error );
-	error_show_all( error );
+	unresolved_link( unresolved, kitg );
+	unresolved_show_all( unresolved );
 
-	return( error );
+	return( unresolved );
 }

@@ -40,11 +40,46 @@ log_build( GtkWidget *widget )
 {
 	Log *log = LOG( widget );
 	iWindow *iwnd = IWINDOW( widget );
+	LogClass *log_class = LOG_GET_CLASS( log );
+
+	GtkActionGroup *action_group;
+	GtkUIManager *ui_manager;
+	GtkAccelGroup *accel_group;
+	GError *error;
+	GtkWidget *mbar;
 
 	GtkWidget *swin;
 	PangoFontDescription *font_desc;
 
 	IWINDOW_CLASS( parent_class )->build( widget );
+
+	action_group = gtk_action_group_new( log_class->action_name );
+	gtk_action_group_set_translation_domain( action_group, 
+		GETTEXT_PACKAGE );
+	gtk_action_group_add_actions( action_group, 
+		log_class->actions, log_class->n_actions, 
+		GTK_WINDOW( log ) );
+	gtk_action_group_add_toggle_actions( action_group, 
+		log_class->toggle_actions, log_class->n_toggle_actions, 
+		GTK_WINDOW( log ) );
+
+	ui_manager = gtk_ui_manager_new();
+	gtk_ui_manager_insert_action_group( ui_manager, action_group, 0 );
+
+	accel_group = gtk_ui_manager_get_accel_group( ui_manager );
+	gtk_window_add_accel_group( GTK_WINDOW( log ), accel_group );
+
+	if( !gtk_ui_manager_add_ui_from_string( ui_manager,
+		log_class->ui_description, -1, &error ) ) {
+		g_message( "building menus failed: %s", error->message );
+		g_error_free( error );
+		exit( EXIT_FAILURE );
+	}
+
+	mbar = gtk_ui_manager_get_widget( ui_manager, 
+		log_class->menu_bar_name );
+	gtk_box_pack_start( GTK_BOX( iwnd->work ), mbar, FALSE, FALSE, 0 );
+        gtk_widget_show( mbar );
 
 	swin = gtk_scrolled_window_new( NULL, NULL );
 	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( swin ),
@@ -73,11 +108,13 @@ log_class_init( LogClass *class )
 
 	iwindow_class->build = log_build;
 
-	/* Create signals.
-	 */
-
-	/* Init methods.
-	 */
+	class->actions = NULL;
+	class->n_actions = 0;
+	class->toggle_actions = NULL;
+	class->n_toggle_actions = 0;
+	class->action_name = NULL;
+	class->ui_description = NULL;
+	class->menu_bar_name = NULL;
 }
 
 static void

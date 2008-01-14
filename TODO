@@ -1,4 +1,10 @@
+- "unresolved" could say what toolkitgroup it is reporting for?
+
+  also, needs to close if that toolkitgroup closes
+
 - can we get VIPS errors reported in Error too?
+
+  we'd need to add logging to vips I think
 
 - use compile->last_sym to spot chains of defs
 

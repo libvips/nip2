@@ -330,16 +330,15 @@ toolkit_by_name( Toolkitgroup *kitg, const char *name )
 
 static void *
 toolkit_linkreport_sym_sym( Symbol *child, 
-	Symbol *parent, BufInfo *buf, gboolean *bad_links )
+	Symbol *parent, BufInfo *buf, gboolean *found )
 {
 	if( child->type == SYM_ZOMBIE && !compile_resolve_top( child ) ) {
 		Tool *tool = symbol_get_tool( parent );
 
-		buf_appendf( buf, "* " );
 		symbol_qualified_name( parent, buf );
-		buf_appendf( buf, ", " );
 		tool_error( tool, buf );
 
+		buf_appendf( buf, " " );
 		/* used as in "fred refers to undefined symbol jim"
 		 */
 		buf_appendf( buf, _( "refers to undefined symbol" ) );
@@ -347,25 +346,25 @@ toolkit_linkreport_sym_sym( Symbol *child,
 		symbol_qualified_name( child, buf );
 		buf_appendf( buf, "\n" );
 
-		*bad_links = TRUE;
+		*found = TRUE;
 	}
 
 	return( NULL );
 }
 
 static void *
-toolkit_linkreport_sym( Symbol *sym, BufInfo *buf, gboolean *bad_links )
+toolkit_linkreport_sym( Symbol *sym, BufInfo *buf, gboolean *found )
 {
 	if( sym->expr )
 		return( slist_map3( sym->expr->compile->children,
 			(SListMap3Fn) toolkit_linkreport_sym_sym, 
-			sym, buf, bad_links ) );
+			sym, buf, found ) );
 
 	return( NULL );
 }
 
 static void *
-toolkit_linkreport_tool( Tool *tool, BufInfo *buf, gboolean *bad_links )
+toolkit_linkreport_tool( Tool *tool, BufInfo *buf, gboolean *found )
 {
 	Symbol *sym;
 
@@ -374,14 +373,14 @@ toolkit_linkreport_tool( Tool *tool, BufInfo *buf, gboolean *bad_links )
 	sym = tool->sym;
 
 	return( symbol_map_all( tool->sym, 
-		(symbol_map_fn) toolkit_linkreport_sym, buf, bad_links ) );
+		(symbol_map_fn) toolkit_linkreport_sym, buf, found ) );
 }
 
 void *
-toolkit_linkreport( Toolkit *kit, BufInfo *buf, gboolean *bad_links )
+toolkit_linkreport( Toolkit *kit, BufInfo *buf, gboolean *found )
 {
 	return( icontainer_map( ICONTAINER( kit ), 
-		(icontainer_map_fn) toolkit_linkreport_tool, buf, bad_links ) );
+		(icontainer_map_fn) toolkit_linkreport_tool, buf, found ) );
 }
 
 

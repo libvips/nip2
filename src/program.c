@@ -1588,19 +1588,10 @@ program_trace_action_cb( GtkAction *action, Program *program )
 static void
 program_linkreport_action_cb( GtkAction *action, Program *program )
 {
-	BufInfo buf;
-	char txt[MAX_STRSIZE];
-	gboolean bad_links;
+	Unresolved *unresolved;
 
-	buf_init_static( &buf, txt, MAX_STRSIZE );
-	bad_links = FALSE;
-	(void) toolkitgroup_map( program->kitg,
-		(toolkit_map_fn) toolkit_linkreport, &buf, &bad_links );
-	if( !bad_links )
-		buf_appendf( &buf, _( "No unresolved symbols found." ) );
-
-	box_info( GTK_WIDGET( program ), _( "Link report." ), 
-		"%s", buf_all( &buf ) );
+	unresolved = unresolved_new( program->kitg );
+	gtk_widget_show( GTK_WIDGET( unresolved ) ); 
 }
 
 static void

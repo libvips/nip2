@@ -211,51 +211,6 @@ trace_destroy( GtkObject *object )
 }
 
 static void
-trace_class_init( TraceClass *class )
-{
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
-
-	object_class->destroy = trace_destroy;
-
-	/* Create signals.
-	 */
-
-	/* Init methods.
-	 */
-}
-
-static void
-trace_init( Trace *trace )
-{
-	trace->flags = 0;
-}
-
-GtkType
-trace_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type ) {
-		static const GtkTypeInfo info = {
-			"Trace",
-			sizeof( Trace ),
-			sizeof( TraceClass ),
-			(GtkClassInitFunc) trace_class_init,
-			(GtkObjectInitFunc) trace_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( TYPE_LOG, &info );
-	}
-
-	return( type );
-}
-
-static void
 trace_view_action_cb( GtkToggleAction *action, Trace *trace )
 {
 	TraceFlags flag = trace_get_trace_flag( GTK_ACTION( action ) );
@@ -344,44 +299,51 @@ static const char *trace_menubar_ui_description =
 "</ui>";
 
 static void
-trace_build( Trace *trace, GtkWidget *vbox )
+trace_class_init( TraceClass *class )
 {
-	GtkActionGroup *action_group;
-	GtkUIManager *ui_manager;
-	GtkAccelGroup *accel_group;
-	GError *error;
-	GtkWidget *mbar;
+	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	LogClass *log_class = (LogClass *) class;
 
-        /* Make main menu bar
-         */
-	action_group = gtk_action_group_new( "TraceActions" );
-	gtk_action_group_set_translation_domain( action_group, 
-		GETTEXT_PACKAGE );
-	gtk_action_group_add_actions( action_group, 
-		trace_actions, G_N_ELEMENTS( trace_actions ), 
-		GTK_WINDOW( trace ) );
-	gtk_action_group_add_toggle_actions( action_group, 
-		trace_toggle_actions, G_N_ELEMENTS( trace_toggle_actions ), 
-		GTK_WINDOW( trace ) );
+	parent_class = g_type_class_peek_parent( class );
 
-	ui_manager = gtk_ui_manager_new();
-	gtk_ui_manager_insert_action_group( ui_manager, action_group, 0 );
+	object_class->destroy = trace_destroy;
 
-	accel_group = gtk_ui_manager_get_accel_group( ui_manager );
-	gtk_window_add_accel_group( GTK_WINDOW( trace ), accel_group );
+	log_class->actions = trace_actions;
+	log_class->n_actions = IM_NUMBER( trace_actions );
+	log_class->toggle_actions = trace_toggle_actions;
+	log_class->n_toggle_actions = IM_NUMBER( trace_toggle_actions );
+	log_class->action_name = "TraceActions";
+	log_class->ui_description = trace_menubar_ui_description;
+	log_class->menu_bar_name = "/TraceMenubar";
+}
 
-	error = NULL;
-	if( !gtk_ui_manager_add_ui_from_string( ui_manager,
-		trace_menubar_ui_description, -1, &error ) ) {
-		g_message( "building menus failed: %s", error->message );
-		g_error_free( error );
-		exit( EXIT_FAILURE );
+static void
+trace_init( Trace *trace )
+{
+	trace->flags = 0;
+}
+
+GtkType
+trace_get_type( void )
+{
+	static GtkType type = 0;
+
+	if( !type ) {
+		static const GtkTypeInfo info = {
+			"Trace",
+			sizeof( Trace ),
+			sizeof( TraceClass ),
+			(GtkClassInitFunc) trace_class_init,
+			(GtkObjectInitFunc) trace_init,
+			/* reserved_1 */ NULL,
+			/* reserved_2 */ NULL,
+			(GtkClassInitFunc) NULL,
+		};
+
+		type = gtk_type_unique( TYPE_LOG, &info );
 	}
 
-	mbar = gtk_ui_manager_get_widget( ui_manager, 
-		"/TraceMenubar" );
-	gtk_box_pack_start( GTK_BOX( vbox ), mbar, FALSE, FALSE, 0 );
-        gtk_widget_show( mbar );
+	return( type );
 }
 
 static void
@@ -389,8 +351,6 @@ trace_link( Trace *trace )
 {
         iwindow_set_title( IWINDOW( trace ), _( "Trace" ) );
 	gtk_window_set_default_size( GTK_WINDOW( trace ), 640, 480 );
-	iwindow_set_build( IWINDOW( trace ), 
-		(iWindowBuildFn) trace_build, NULL, NULL, NULL );
 	iwindow_set_size_prefs( IWINDOW( trace ), 
 		"TRACE_WIDTH", "TRACE_HEIGHT" );
 	iwindow_build( IWINDOW( trace ) );

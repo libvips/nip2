@@ -18,7 +18,7 @@ started 7.12.3
 - oop, dist typechecking could segv
 - split trace.c to make log.c, base class for logging windows
 - added error ... error logging window
-- added unresolved ... link logging window
+- added destory_if_destroyed() and done some cleanups
 
 started 7.13.2
 - remove Application from nip2.desktop.in

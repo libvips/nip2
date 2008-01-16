@@ -1164,3 +1164,71 @@ text_view_select_text( GtkTextView *text_view, int start, int end )
 	gtk_text_buffer_select_range( text_buffer, &start_iter, &end_iter );
 	gtk_text_view_scroll_mark_onscreen( text_view, mark );
 }
+
+/* If parent dies, kill us too. Parent can be anything, but child must be an
+ * iobject.
+ */
+typedef struct _DestroyIfDestroyed {
+	GObject *child;
+	GObject *parent;
+	DestroyFn destroy_fn;
+} DestroyIfDestroyed;
+
+static void destroy_if_destroyed_parent_cb( DestroyIfDestroyed *difd, 
+	GObject *parent );
+static void destroy_if_destroyed_child_cb( DestroyIfDestroyed *difd, 
+	GObject *child );
+
+static void
+destroy_if_destroyed_parent_cb( DestroyIfDestroyed *difd, GObject *parent )
+{
+	GObject *child;
+	DestroyFn destroy_fn;
+
+	printf( "destroy_if_destroyed_parent_cb: %p\n", difd );
+
+	/* Destroying the child will trigger the other half of difd, make sure
+	 * we remove the link first.
+	 */
+	child = difd->child;
+	destroy_fn = difd->destroy_fn;
+	g_object_weak_unref( difd->child, 
+		(GWeakNotify) destroy_if_destroyed_child_cb, difd );
+	destroy_fn( child );
+
+	difd->child = NULL;
+	difd->parent = NULL;
+	difd->destroy_fn = NULL;
+	g_free( difd );
+}
+
+static void
+destroy_if_destroyed_child_cb( DestroyIfDestroyed *difd, GObject *child )
+{
+	printf( "destroy_if_destroyed_child_cb: %p\n", difd );
+
+	g_object_weak_unref( difd->parent, 
+		(GWeakNotify) destroy_if_destroyed_parent_cb, difd );
+
+	difd->child = NULL;
+	difd->parent = NULL;
+	difd->destroy_fn = NULL;
+	g_free( difd );
+}
+
+void
+destroy_if_destroyed( GObject *child, GObject *parent, DestroyFn destroy_fn )
+{
+	DestroyIfDestroyed *difd = g_new( DestroyIfDestroyed, 1 );
+
+	difd->child = child;
+	difd->parent = parent;
+	difd->destroy_fn = destroy_fn;
+
+	g_object_weak_ref( parent, 
+		(GWeakNotify) destroy_if_destroyed_parent_cb, difd );
+	g_object_weak_ref( child, 
+		(GWeakNotify) destroy_if_destroyed_child_cb, difd );
+
+	printf( "destroy_if_destroyed: %p\n", difd );
+}

@@ -37,6 +37,8 @@
 
 struct _Error {
 	Log parent_class;
+
+	Toolkitgroup *kitg;	/* Where we search for link errors */
 };
 
 typedef struct _ErrorClass {
@@ -47,5 +49,5 @@ typedef struct _ErrorClass {
 } ErrorClass;
 
 GtkType error_get_type( void );
-Error *error_new( void );
+Error *error_new( Toolkitgroup *kitg );
 

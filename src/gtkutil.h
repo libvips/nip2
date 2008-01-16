@@ -150,3 +150,7 @@ char *text_view_get_text( GtkTextView *text_view );
 void text_view_set_text( GtkTextView *text_view, 
 	const char *text, gboolean editable );
 void text_view_select_text( GtkTextView *text_view, int start, int end );
+
+typedef void (*DestroyFn)( GObject * );
+void destroy_if_destroyed( GObject *child, GObject *parent, 
+	DestroyFn destroy_fn );

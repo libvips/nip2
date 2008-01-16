@@ -69,6 +69,39 @@ error_show_all_action_cb( GtkAction *action, Error *error )
 	error_show_all( error );
 }
 
+static void *
+unresolved_print( Toolkit *kit, Error *error, gboolean *found )
+{
+	BufInfo buf;
+	char txt[512];
+
+	buf_init_static( &buf, txt, 512 );
+	toolkit_linkreport( kit, &buf, found );
+	log_text( LOG( error ), buf_all( &buf ) );
+
+	return( NULL );
+}
+
+static void
+unresolved_show_all( Error *error )
+{
+	gboolean found;
+
+	found = FALSE;
+	(void) toolkitgroup_map( error->kitg,
+		(toolkit_map_fn) unresolved_print, error, &found );
+	if( !found ) {
+		log_text( LOG( error ), _( "No unresolved symbols found." ) );
+		log_text( LOG( error ), "\n" );
+	}
+}
+
+static void
+unresolved_show_all_action_cb( GtkAction *action, Error *error )
+{
+	unresolved_show_all( error );
+}
+
 /* Our actions.
  */
 static GtkActionEntry error_actions[] = {
@@ -86,9 +119,14 @@ static GtkActionEntry error_actions[] = {
 		G_CALLBACK( log_clear_action_cb ) },
 
 	{ "Errors", 
-		NULL, N_( "Search for _Errors" ), NULL, 
+		NULL, N_( "List _Errors" ), NULL, 
 		N_( "Search for all errors" ), 
 		G_CALLBACK( error_show_all_action_cb ) },
+
+	{ "Unresolved", 
+		NULL, N_( "List _Unresolved" ), NULL, 
+		N_( "Search for all unresolved references" ), 
+		G_CALLBACK( unresolved_show_all_action_cb ) },
 
 	{ "Close", 
 		GTK_STOCK_CLOSE, N_( "_Close" ), NULL, 
@@ -116,6 +154,7 @@ static const char *error_menubar_ui_description =
 "    </menu>"
 "    <menu action='ViewMenu'>"
 "      <menuitem action='Errors'/>"
+"      <menuitem action='Unresolved'/>"
 "    </menu>"
 "    <menu action='HelpMenu'>"
 "      <menuitem action='Guide'/>"
@@ -167,9 +206,14 @@ error_get_type( void )
 }
 
 static void
-error_link( Error *error )
+error_link( Error *error, Toolkitgroup *kitg )
 {
-        iwindow_set_title( IWINDOW( error ), _( "Error" ) );
+	error->kitg = kitg;
+
+	destroy_if_destroyed( G_OBJECT( error ), 
+		G_OBJECT( kitg ), (DestroyFn) gtk_widget_destroy );
+        iwindow_set_title( IWINDOW( error ), 
+		_( "Error - %s" ), IOBJECT( kitg )->name );
 	gtk_window_set_default_size( GTK_WINDOW( error ), 640, 480 );
 	iwindow_set_size_prefs( IWINDOW( error ), 
 		"ERROR_WIDTH", "ERROR_HEIGHT" );
@@ -177,12 +221,13 @@ error_link( Error *error )
 }
 
 Error *
-error_new( void )
+error_new( Toolkitgroup *kitg )
 {
 	Error *error = gtk_type_new( TYPE_ERROR );
 
-	error_link( error );
+	error_link( error, kitg );
 	error_show_all( error );
+	unresolved_show_all( error );
 
 	return( error );
 }

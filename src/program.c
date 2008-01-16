@@ -1586,20 +1586,11 @@ program_trace_action_cb( GtkAction *action, Program *program )
 }
 
 static void
-program_linkreport_action_cb( GtkAction *action, Program *program )
-{
-	Unresolved *unresolved;
-
-	unresolved = unresolved_new( program->kitg );
-	gtk_widget_show( GTK_WIDGET( unresolved ) ); 
-}
-
-static void
 program_errorreport_action_cb( GtkAction *action, Program *program )
 {
 	Error *error;
 
-	error = error_new();
+	error = error_new( program->kitg );
 	gtk_widget_show( GTK_WIDGET( error ) ); 
 
 #ifdef DEBUG
@@ -1780,11 +1771,6 @@ static GtkActionEntry program_actions[] = {
 		N_( "Make a new trace window" ), 
 		G_CALLBACK( program_trace_action_cb ) },
 
-	{ "Link", 
-		NULL, N_( "_Link" ), NULL,
-		N_( "Show a link report" ), 
-		G_CALLBACK( program_linkreport_action_cb ) },
-
 	{ "Errors", 
 		NULL, N_( "_Errors" ), NULL,
 		N_( "Show all errors" ), 
@@ -1848,7 +1834,6 @@ static const char *program_menubar_ui_description =
 "    </menu>"
 "    <menu action='DebugMenu'>"
 "      <menuitem action='Trace'/>"
-"      <menuitem action='Link'/>"
 "      <menuitem action='Errors'/>"
 "    </menu>"
 "    <menu action='HelpMenu'>"

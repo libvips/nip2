@@ -1,3 +1,9 @@
+- use destroy_if_destroyed() in more places? 
+
+	grep destroy_ *.h
+
+  also, more testing
+
 - "unresolved" could say what toolkitgroup it is reporting for?
 
   also, needs to close if that toolkitgroup closes

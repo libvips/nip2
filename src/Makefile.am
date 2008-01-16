@@ -149,8 +149,6 @@ nip2_SOURCES = \
 	imagedisplay.h \
 	log.c \
 	log.h \
-	unresolved.c \
-	unresolved.h \
 	error.c \
 	error.h \
 	managed.c \

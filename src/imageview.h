@@ -42,7 +42,6 @@ typedef struct _Imageview {
 	 */
 	Imagemodel *imagemodel;
 	guint imagemodel_changed_sid;
-	guint imagemodel_destroy_sid;
 
 	Imagepresent *ip;
 	Conversionview *cv;

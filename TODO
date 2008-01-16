@@ -2,15 +2,6 @@
 
 	grep destroy_ *.h
 
-  also, more testing
-
-- "unresolved" could say what toolkitgroup it is reporting for?
-
-  also, needs to close if that toolkitgroup closes
-
-  unresolved and error should use the same window, just add another option to
-  the View menu
-
 - can we get VIPS errors reported in Error too?
 
   we'd need to add logging to vips I think

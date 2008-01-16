@@ -42,7 +42,6 @@ typedef struct _Floatwindow {
 	/* Model stuff here.
 	 */
 	Classmodel *classmodel;
-	guint destroy_sid;
 } Floatwindow;
 
 typedef struct _FloatwindowClass {

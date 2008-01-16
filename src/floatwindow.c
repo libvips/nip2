@@ -51,7 +51,6 @@ floatwindow_destroy( GtkObject *object )
 
 	/* My instance destroy stuff.
 	 */
-	FREESID( floatwindow->destroy_sid, floatwindow->classmodel );
 
 	GTK_OBJECT_CLASS( parent_class )->destroy( object );
 }
@@ -158,7 +157,6 @@ static void
 floatwindow_init( Floatwindow *floatwindow )
 {
 	floatwindow->classmodel = NULL;
-	floatwindow->destroy_sid = 0;
 }
 
 GtkType
@@ -184,20 +182,10 @@ floatwindow_get_type( void )
 	return( type );
 }
 
-/* The model has been destroyed ... kill us too.
- */
-static void
-floatwindow_classmodel_destroy_cb( Classmodel *classmodel, 
-	Floatwindow *floatwindow )
-{
-	gtk_widget_destroy( GTK_WIDGET( floatwindow ) );
-}
-
 void
 floatwindow_link( Floatwindow *floatwindow, Classmodel *classmodel )
 {
 	floatwindow->classmodel = classmodel;
-	floatwindow->destroy_sid = g_signal_connect( 
-		G_OBJECT( classmodel ), "destroy", 
-		G_CALLBACK( floatwindow_classmodel_destroy_cb ), floatwindow );
+	destroy_if_destroyed( G_OBJECT( floatwindow ), 
+		G_OBJECT( classmodel ), (DestroyFn) gtk_widget_destroy );
 }

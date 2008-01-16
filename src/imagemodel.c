@@ -124,7 +124,6 @@ imagemodel_dispose( GObject *gobject )
 #endif /*DEBUG*/
 
 	FREESID( imagemodel->iimage_changed_sid, imagemodel->iimage );
-	FREESID( imagemodel->iimage_destroy_sid, imagemodel->iimage );
 	FREESID( imagemodel->conv_changed_sid, imagemodel->conv );
 	FREESID( imagemodel->conv_imageinfo_changed_sid, imagemodel->conv );
 	UNREF( imagemodel->conv );
@@ -331,12 +330,6 @@ imagemodel_iimage_changed_cb( iImage *iimage, Imagemodel *imagemodel )
 }
 
 static void
-imagemodel_iimage_destroy_cb( iImage *iimage, Imagemodel *imagemodel )
-{
-	iobject_destroy( IOBJECT( imagemodel ) );
-}
-
-static void
 imagemodel_link( Imagemodel *imagemodel, iImage *iimage )
 {
 	Row *row = HEAPMODEL( iimage )->row;
@@ -345,9 +338,8 @@ imagemodel_link( Imagemodel *imagemodel, iImage *iimage )
 	imagemodel->iimage_changed_sid = g_signal_connect( G_OBJECT( iimage ), 
 		"changed", 
 		G_CALLBACK( imagemodel_iimage_changed_cb ), imagemodel );
-	imagemodel->iimage_destroy_sid = g_signal_connect( G_OBJECT( iimage ), 
-		"destroy", 
-		G_CALLBACK( imagemodel_iimage_destroy_cb ), imagemodel );
+	destroy_if_destroyed( G_OBJECT( imagemodel ), 
+		G_OBJECT( iimage ), (DestroyFn) iobject_destroy );
 	imagemodel->scale = row->ws->scale;
 	imagemodel->offset = row->ws->offset;
 

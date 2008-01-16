@@ -74,11 +74,11 @@ vec op_name im vec
 		op_name == "power" 
 	= im_remainderconst_vec im vec,
 		op_name == "remainder" 
-	= im_and_vec im vec,
+	= im_andimage_vec im vec,
 		op_name == "bitwise_and" || op_name == "bitwise_and'"
-	= im_or_vec im vec,
+	= im_orimage_vec im vec,
 		op_name == "bitwise_or" || op_name == "bitwise_or'"
-	= im_eor_vec im vec,
+	= im_eorimage_vec im vec,
 		op_name == "eor" || op_name == "eor'"
 	= im_equal_vec im vec,
 		op_name == "equal" || op_name == "equal'"

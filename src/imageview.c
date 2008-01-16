@@ -197,14 +197,6 @@ imageview_imagemodel_changed_cb( Imagemodel *imagemodel, Imageview *iv )
 	imageview_refresh_title( iv );
 }
 
-/* The model has been destroyed ... kill us too.
- */
-static void
-imageview_imagemodel_destroy_cb( Imagemodel *imagemodel, Imageview *iv )
-{
-	gtk_widget_destroy( GTK_WIDGET( iv ) );
-}
-
 /* Region class names indexed by iRegionType.
  */
 static const char *imageview_region_name[] = {
@@ -722,9 +714,8 @@ imageview_build( Imageview *iv, GtkWidget *vbox, iImage *iimage )
 	iv->imagemodel_changed_sid = g_signal_connect( 
 		G_OBJECT( iv->imagemodel ), "changed", 
 		G_CALLBACK( imageview_imagemodel_changed_cb ), iv );
-	iv->imagemodel_destroy_sid = g_signal_connect( 
-		G_OBJECT( iv->imagemodel ), "destroy", 
-		G_CALLBACK( imageview_imagemodel_destroy_cb ), iv );
+	destroy_if_destroyed( G_OBJECT( iv ), 
+		G_OBJECT( iv->imagemodel ), (DestroyFn) gtk_widget_destroy );
 
         /* Make main menu bar
          */

@@ -19,6 +19,7 @@ started 7.12.3
 - split trace.c to make log.c, base class for logging windows
 - added error ... error logging window
 - added destory_if_destroyed() and done some cleanups
+- oop, im_and_image etc. refs remaining in compat
 
 started 7.13.2
 - remove Application from nip2.desktop.in

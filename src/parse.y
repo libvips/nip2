@@ -320,8 +320,8 @@ definition:
 			 * toplevels which access that.
 			 */
 			if( !compile_pattern_has_leaf( $1 ) )
-				yyerror( _( "no names in left-hand-side "
-					"pattern" ) );
+				yyerror( _( "left-hand-side pattern "
+					"contains no identifiers" ) );
 			im_snprintf( name, 256, "$$pattern_lhs%d",
 				parse_object_id++ );
 			sym = symbol_new_defining( current_compile, name );

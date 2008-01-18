@@ -306,9 +306,26 @@ definition:
 		if( $1->type == NODE_LEAF ) {
 			const char *name = IOBJECT( $1->leaf )->name;
 
-			/* Make defining occurence.
+			/* Was the previous def the same name? This is an
+			 * overloaded def if it is. Parse in as a local of the
+			 * previous def.
 			 */
-			sym = symbol_new_defining( current_compile, name );
+			if( (sym = compile_lookup( current_compile, name )) &&
+				is_value( sym ) &&
+				current_compile->last_sym == sym ) {
+				char txt[256];
+
+				im_snprintf( txt, 256, "$$alternate%d",
+					parse_object_id++ );
+				sym = symbol_new_defining( sym->expr->compile, 
+					txt );
+			}
+			else 
+				/* Make a new defining occurence.
+			 	 */
+				sym = symbol_new_defining( current_compile, 
+					name );
+
 			(void) symbol_user_init( sym );
 			(void) compile_new_local( sym->expr );
 		}
@@ -399,7 +416,7 @@ params_plus_rhs:
 		input_push( 2 );
 		input_backtoch( '=' );
 	}
-	body {	
+	body {
 		current_compile->tree = $4;
 		assert( current_compile->tree );
 		input_push( 4 );
@@ -439,13 +456,44 @@ params_plus_rhs:
 	
 params: 
       	/* Empty */ | 
-	params TK_IDENT {
+	params simple_pattern {
 		Symbol *sym;
 
-		sym = symbol_new_defining( current_compile, $2 );
-		symbol_parameter_init( sym );
+		/* If the pattern is just an identifier, make it a direct
+		 * parameter. Otherwise make an anon param and put the pattern
+		 * in as a local with the same id.
+		 *
+		 *	fred [a] = 12;
+		 *
+		 * parses to:
+		 *
+		 *	fred $$arg42 = 12 { $$patt42 = [a]; }
+		 * 
+		 * A later pass creates the "a = $$arg42?0" definition.
+		 */
+		if( $2->type == NODE_LEAF ) {
+			const char *name = IOBJECT( $2->leaf )->name;
 
-		im_free( $2 );
+			/* Make defining occurence.
+			 */
+			sym = symbol_new_defining( current_compile, name );
+			(void) symbol_parameter_init( sym );
+		}
+		else {
+			char name[256];
+
+			im_snprintf( name, 256, "$$arg%d", parse_object_id );
+			sym = symbol_new_defining( current_compile, name );
+			sym->generated = TRUE;
+			(void) symbol_parameter_init( sym );
+
+			im_snprintf( name, 256, "$$patt%d", parse_object_id++ );
+			sym = symbol_new_defining( current_compile, name );
+			sym->generated = TRUE;
+			(void) symbol_user_init( sym );
+			(void) compile_new_local( sym->expr );
+			sym->expr->compile->tree = $2;
+		}
 	}
 	;
 

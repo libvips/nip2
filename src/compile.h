@@ -125,3 +125,4 @@ void compile_lcomp( Compile *compile );
 
 GSList *compile_pattern_lhs( Compile *compile, Symbol *sym, ParseNode *node );
 gboolean compile_pattern_has_leaf( ParseNode *node );
+gboolean compile_pattern_has_args( Compile *compile );

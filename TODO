@@ -1,3 +1,7 @@
+- do we enforce no-args-to-LHS-pattern anywhere? try
+
+	[a,b] a b = 12;
+
 - use destroy_if_destroyed() in more places? 
 
 	grep destroy_ *.h
@@ -98,12 +102,37 @@
 	  make until we've seen all the candidate RHS)
 	* when one of the RHS is changed, we need to regenerate the wrapper,
 	  how do we do this? (could nuke the generated code in the compile
-	  when we see a new RHS, then rebuuild the wrapper in compile on the
+	  when we see a new RHS, then rebuild the wrapper in compile on the
 	  next heap_copy?)
 	* our current condition generator won't work ... we need to test
 	  consts as well, and it'll be rather inefficient as we'll repeatedly
 	  test the trunk as we loop over the leaves --- instead, walk the 
 	  pattern recursively top-down testing each node
+
+  process:
+
+  * see "fred" (as opposed to simple_pattern)
+  	* is there already a fred in scope? 
+	  yes:
+	  	* was current_compile->last_sym also a "fred"?
+		  yes:
+			* another definition
+	  yes:
+	  	* this must be an alternative definition
+
+
+- we put the 2nd fred in as a local of the first, but then the 2nd can see all
+  the stuff the first has as locals
+
+	  z = 42;
+	  fred 1 = 12 { z = 99; }
+	  fred 2 = z;
+
+  "fred 2" will return 99 :(
+
+
+
+
 
 - try using bison's location system
 
@@ -119,23 +148,30 @@
 
   also for row edits
 
-- syntax allows
-
-	12 = fred 99;
-
-  but of course we will never eval this, except at the top level
-
-  is this OK? we could disallow or warn of defs like this in a later pass
-
 - Filter / Blend items have extra blends in the name
 
 - image blend should have an invert mask option?
 
-- don't offer to clear temps if there's been a crash
+- don't offer to clear temps if there's been a crash 
 
   need to be able to test for process-still-running by PID
 
-  does win even have pids?
+  try
+
+  	http://msdn2.microsoft.com/en-us/library/ms886766.aspx
+
+	gboolean
+	process_running( int pid )
+	{
+		HANDLE handle;
+
+		if( (handle = OpenProcess( 0, FALSE, pid )) ) {
+			CloseHandle( handle );
+			return( TRUE );
+		}
+
+		return( FALSE );
+	}
 
 - autoarrange after every column resize or move
 

@@ -2820,5 +2820,5 @@ compile_pattern_has_leaf( ParseNode *node )
 {
 	return( tree_map( NULL, 
 		(tree_map_fn) compile_pattern_has_leaf_sub, node, 
-		NULL, NULL ) );
+		NULL, NULL ) != NULL );
 }

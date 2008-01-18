@@ -120,6 +120,8 @@ const char *compile_get_member_string( Compile *compile, const char *name );
 
 ParseNode *compile_copy_tree( Compile *fromscope, ParseNode *tree,
 	Compile *toscope );
+
 void compile_lcomp( Compile *compile );
 
 GSList *compile_pattern_lhs( Compile *compile, Symbol *sym, ParseNode *node );
+gboolean compile_pattern_has_leaf( ParseNode *node );

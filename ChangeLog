@@ -20,6 +20,7 @@ started 7.12.3
 - added error ... error logging window
 - added destory_if_destroyed() and done some cleanups
 - oop, im_and_image etc. refs remaining in compat
+- disallow const-only LHS patterns, eg. "12 = fred;" 
 
 started 7.13.2
 - remove Application from nip2.desktop.in

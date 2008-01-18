@@ -2,10 +2,6 @@
 
 	grep destroy_ *.h
 
-- can we get VIPS errors reported in Error too?
-
-  we'd need to add logging to vips I think
-
 - use compile->last_sym to spot chains of defs
 
   multiple definitions of the same function are allowed, provided they all
@@ -14,7 +10,7 @@
 
   example:
 
-  	fred [a, b] = a * b;
+  	fred [a, b, 1] = a * b;
 	fred (Image x) = rot90 x;
 	fred z = error "what";
 
@@ -24,7 +20,7 @@
   this compiles to:
 
 	fred $$a4 
-		= $$fred1, is_list $$a4 && len $$a4 == 2
+		= $$fred1, is_list $$a4 && len $$a4 == 2 && $$a4?2 == 1
 		= $$fred2, is_instance_of "Image" $$a4
 		= $$fred3
 	{
@@ -47,6 +43,8 @@
 	}
 
   so each pattern-matching definition generates a condition and an action
+
+  constants in patterns become part of the condition test
 
   the action goes into a private function, the conditions are joined together
   in the function wrapper
@@ -102,18 +100,14 @@
 	  how do we do this? (could nuke the generated code in the compile
 	  when we see a new RHS, then rebuuild the wrapper in compile on the
 	  next heap_copy?)
+	* our current condition generator won't work ... we need to test
+	  consts as well, and it'll be rather inefficient as we'll repeatedly
+	  test the trunk as we loop over the leaves --- instead, walk the 
+	  pattern recursively top-down testing each node
 
 - try using bison's location system
 
 	http://www.gnu.org/software/bison/manual/html_mono/bison.html#Locations
-
-- link report and error report need to be in scrollable windows, like trace
-
-  box_info() can have trouble displaying large amounts of data: it'll chop at a
-  boundary MAX_DIALOG_TEXT or something) which can cause markup to fail and
-  trigger gtk errors
-
-  could also display as a tree I guess
 
 - add something to Symbol:
 
@@ -131,7 +125,7 @@
 
   but of course we will never eval this, except at the top level
 
-  is this OK? we could disallow defs like this in a later pass
+  is this OK? we could disallow or warn of defs like this in a later pass
 
 - Filter / Blend items have extra blends in the name
 
@@ -194,6 +188,10 @@
 
 WONTFIX
 =======
+
+- can we get VIPS errors reported in Error too?
+
+  we'd need to add logging to vips I think
 
 - toolkits / find doesn't find builtins on their name ... eg. search for
   "im_add"

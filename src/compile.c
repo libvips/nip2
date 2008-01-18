@@ -2801,3 +2801,24 @@ compile_pattern_lhs( Compile *compile, Symbol *sym, ParseNode *node )
 
 	return( lhs.built_syms );
 }
+
+static ParseNode *
+compile_pattern_has_leaf_sub( Compile *compile, 
+	ParseNode *node, void *a, void *b )
+{
+	if( node->type == NODE_LEAF )
+		return( node );
+
+	return( NULL );
+}
+
+/* Does a pattern contain a leaf? We don't allow const-only patterns in
+ * definitions.
+ */
+gboolean
+compile_pattern_has_leaf( ParseNode *node )
+{
+	return( tree_map( NULL, 
+		(tree_map_fn) compile_pattern_has_leaf_sub, node, 
+		NULL, NULL ) );
+}

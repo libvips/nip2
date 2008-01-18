@@ -1074,6 +1074,7 @@ Rect left top width height = class
 /* Values for Compression field in image.
  */
 Image_compression = class {
+	NONE = 0;
 	NO_COMPRESSION = 0;
 	TCSF_COMPRESSION = 1;
 	JPEG_COMPRESSION = 2;
@@ -1085,6 +1086,7 @@ Image_compression = class {
 /* Values for Coding field in image.
  */
 Image_coding = class {
+	NONE = 0;
 	NOCODING = 0;
 	COLQUANT = 1;
 	LABPACK = 2;

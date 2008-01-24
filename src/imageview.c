@@ -714,8 +714,6 @@ imageview_build( Imageview *iv, GtkWidget *vbox, iImage *iimage )
 	iv->imagemodel_changed_sid = g_signal_connect( 
 		G_OBJECT( iv->imagemodel ), "changed", 
 		G_CALLBACK( imageview_imagemodel_changed_cb ), iv );
-	destroy_if_destroyed( G_OBJECT( iv ), 
-		G_OBJECT( iv->imagemodel ), (DestroyFn) gtk_widget_destroy );
 
         /* Make main menu bar
          */
@@ -848,6 +846,8 @@ imageview_build( Imageview *iv, GtkWidget *vbox, iImage *iimage )
 	focus_chain = g_list_append( focus_chain, iv->cv );
 	focus_chain = g_list_append( focus_chain, iv->pbv );
 	gtk_container_set_focus_chain( GTK_CONTAINER( vbox ), focus_chain );
+	g_list_free( focus_chain );
+
 	gtk_widget_grab_focus( GTK_WIDGET( iv->ip->id ) );
 }
 

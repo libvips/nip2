@@ -41,7 +41,7 @@ iimage_dispose( GObject *gobject )
 	iImage *iimage;
 
 #ifdef DEBUG
-	printf( "iimage_dispose\n" );
+	printf( "iimage_dispose %p\n", gobject );
 #endif /*DEBUG*/
 
 	g_return_if_fail( gobject != NULL );

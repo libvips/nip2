@@ -30,3 +30,4 @@ s/Image_region_item.VGuide_item/Image_new_item.Image_region_item.VGuide_item/
 s/Colour_image_to_colour_item/Colour_to_colour_item/
 s/Matrix_convert_to_image_item/Image_convert_to_image_item/
 s/Matrix_from_image_item/Matrix_to_matrix_item/
+s/Hist_new_item.action/Hist_new_item.Hist_item.action/

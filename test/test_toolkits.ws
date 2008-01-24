@@ -2436,7 +2436,7 @@
         <Row popup="false" name="Z2">
           <Rhs vislevel="3" flags="7">
             <Subcolumn vislevel="1"/>
-            <iText formula="Hist_new_item.action"/>
+            <iText formula="Hist_new_item.Hist_item.action"/>
             <Plot plot_left="0" plot_top="0" plot_mag="100" show_status="false"/>
           </Rhs>
         </Row>

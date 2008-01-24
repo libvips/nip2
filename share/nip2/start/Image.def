@@ -699,7 +699,7 @@ Image_transform_item = class
 				("find a transform which will map sample image onto " ++
 				"reference") {
 			action reference sample = class
-				Transform trn reference.width reference.height {
+				_trn {
 				_vislevel = 3;
 	
 				// controls
@@ -713,6 +713,8 @@ Image_transform_item = class
 				[sample', trn, err] = transform_search 
 					max_err max_iter order interp wrap
 					sample reference;
+				transformed_image = Image sample';
+				_trn = Transform trn reference.width reference.height;
 				final_error = err;
 			}
 		}

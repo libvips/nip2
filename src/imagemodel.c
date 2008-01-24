@@ -119,11 +119,10 @@ imagemodel_dispose( GObject *gobject )
 	imagemodel = IMAGEMODEL( gobject );
 
 #ifdef DEBUG
-	printf( "imagemodel_dispose: " );
+	printf( "imagemodel_dispose %p: ", imagemodel );
 	iobject_print( IOBJECT( imagemodel ) );
 #endif /*DEBUG*/
 
-	FREESID( imagemodel->iimage_changed_sid, imagemodel->iimage );
 	FREESID( imagemodel->conv_changed_sid, imagemodel->conv );
 	FREESID( imagemodel->conv_imageinfo_changed_sid, imagemodel->conv );
 	UNREF( imagemodel->conv );
@@ -338,8 +337,6 @@ imagemodel_link( Imagemodel *imagemodel, iImage *iimage )
 	imagemodel->iimage_changed_sid = g_signal_connect( G_OBJECT( iimage ), 
 		"changed", 
 		G_CALLBACK( imagemodel_iimage_changed_cb ), imagemodel );
-	destroy_if_destroyed( G_OBJECT( imagemodel ), 
-		G_OBJECT( iimage ), (DestroyFn) iobject_destroy );
 	imagemodel->scale = row->ws->scale;
 	imagemodel->offset = row->ws->offset;
 

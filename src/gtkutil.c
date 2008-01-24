@@ -1185,6 +1185,10 @@ destroy_if_destroyed_parent_cb( DestroyIfDestroyed *difd, GObject *parent )
 	GObject *child;
 	DestroyFn destroy_fn;
 
+#ifdef DEBUG
+	printf( "destroy_if_destroyed_parent_cb: %p\n", difd );
+#endif /*DEBUG*/
+
 	/* Destroying the child will trigger the other half of difd, make sure
 	 * we remove the link first.
 	 */
@@ -1203,6 +1207,10 @@ destroy_if_destroyed_parent_cb( DestroyIfDestroyed *difd, GObject *parent )
 static void
 destroy_if_destroyed_child_cb( DestroyIfDestroyed *difd, GObject *child )
 {
+#ifdef DEBUG
+	printf( "destroy_if_destroyed_child_cb: %p\n", difd );
+#endif /*DEBUG*/
+
 	g_object_weak_unref( difd->parent, 
 		(GWeakNotify) destroy_if_destroyed_parent_cb, difd );
 
@@ -1216,6 +1224,11 @@ void
 destroy_if_destroyed( GObject *child, GObject *parent, DestroyFn destroy_fn )
 {
 	DestroyIfDestroyed *difd = g_new( DestroyIfDestroyed, 1 );
+
+#ifdef DEBUG
+	printf( "destroy_if_destroyed %p: parent=%p, child=%p\n", 
+		difd, parent, child );
+#endif /*DEBUG*/
 
 	difd->child = child;
 	difd->parent = parent;

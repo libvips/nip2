@@ -133,6 +133,78 @@
 
 
 
+- try:
+
+        Find_item = class
+            Menuaction "_Find"
+                ("find a transform which will map sample image onto " ++
+                "reference") {
+            action reference sample = class
+                Transform b reference.width reference.height {
+                _vislevel = 3;
+
+                // controls
+                order = rubber_order;
+                interp = rubber_interp;
+                wrap = rubber_wrap;
+                max_err = Expression "Maximum error" 0.3;
+                max_iter = Expression "Maximum iterations" 10;
+
+                // transform
+                [a,b,c] = transform_search max_err max_iter order interp wrap
+                        sample reference;
+
+                transformed_image = Image a;
+                final_error = c;
+            }
+        }
+
+  fails with 
+
+	Bad superclass.
+
+	Superclass constructor 
+	"Image_transform_item.Image_rubber_item.Transform"
+	should have no secret arguments.
+
+  but this:
+
+        Find_item = class
+            Menuaction "_Find"
+                ("find a transform which will map sample image onto " ++
+                "reference") {
+            action reference sample = class
+                _t {
+                _vislevel = 3;
+
+                // controls
+                order = rubber_order;
+                interp = rubber_interp;
+                wrap = rubber_wrap;
+                max_err = Expression "Maximum error" 0.3;
+                max_iter = Expression "Maximum iterations" 10;
+
+                // transform
+                [a,b,c] = transform_search max_err max_iter order interp wrap
+                        sample reference;
+
+                transformed_image = Image a;
+		_t = Transform b reference.width reference.height;
+                final_error = c;
+            }
+        }
+
+  (ie. make the superclass constructor into a member) works fine
+
+- after pressing "Process" in the edit window, we always select last_sym,
+  which is often not what we want
+
+  make it jump less after a process ... eg. try editing something in the
+  middle of Image/Transform, very annoying
+
+
+
+
 
 - try using bison's location system
 

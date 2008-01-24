@@ -131,9 +131,77 @@
   "fred 2" will return 99 :(
 
 
+  we need to make "fred 2 = z" into another fred at the same level, eg
 
+  	$$alternate42$fred 2 = z;
 
 - try:
+
+
+
+
+  Nope, then how do we link the freds together for remove etc.?
+
+  Better:
+
+  	see a new sym (fred), create it
+
+	parse args with simple names becoming params, patterns becoming
+	$$arg42 plus a local $$patt42 holding the pattern source
+
+	expand the pattern to an access def as well, so our children can bind
+	to it
+
+	at the = sign, test for any pattern args present .. if there are none,
+	carry on as before
+
+	otherwise, make a new local called $$alternate42 or whatever and parse
+	the RHS into that
+
+	at the end of parse, need to resolve outwards twice, since we nest in
+	twice
+
+	now if we see another fred, check that the number of args matches and
+	then parse in as $$alternate99
+
+  what abut
+
+  	fred 2 a = 12;
+	fred 1 b = 32;
+
+  the first fred will make a top-level with
+
+  	fred $$arg12 a
+		=
+	{
+		$$alernate42 = 12;
+		$$patt12 = 2;
+	}
+
+  then when we parse the 2nd fred the name of the 2nd param is wrong :(
+
+
+  Even betterer:
+
+  	use GLR to split off the four cases for us
+
+		ident = 
+		pattern = 
+		ident ident_list = 
+		ident pattern_list =
+
+	change pattern syntax so that ident is not part of simple_pattern
+
+	need to change lcomp as well
+
+	so we need to check why PARSE_PARAMS gets used: can we do without the
+	params part? yes, it's used so we can edit functions, but we no longer
+	do this
+
+	these days all we need is expr I think, but we'd need a small action
+	wrapper around it to wipe out any existing tree and locals
+
+
 
         Find_item = class
             Menuaction "_Find"
@@ -201,8 +269,6 @@
 
   make it jump less after a process ... eg. try editing something in the
   middle of Image/Transform, very annoying
-
-
 
 
 

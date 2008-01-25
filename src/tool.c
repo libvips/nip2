@@ -55,6 +55,8 @@ tool_error( Tool *tool, BufInfo *buf )
 	}
 }
 
+static void *toolitem_free( Toolitem *toolitem );
+
 /* Remove a tool. Also strip the sym, if any.
  */
 static void 
@@ -93,6 +95,8 @@ tool_dispose( GObject *gobject )
 		filemodel_set_modified( FILEMODEL( tool->kit ), TRUE );
 		tool->kit = NULL;
 	}
+
+	IM_FREEF( toolitem_free, tool->toolitem );
 
 	G_OBJECT_CLASS( parent_class )->dispose( gobject );
 }

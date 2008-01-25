@@ -1,3 +1,5 @@
+- random crashes :(
+
 - do we enforce no-args-to-LHS-pattern anywhere? try
 
 	[a,b] a b = 12;

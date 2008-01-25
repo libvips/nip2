@@ -1,0 +1,128 @@
+Format_duplicate_item = class
+	Menuaction "_Duplicate" "take a copy of an object" {
+	action x = map_unary copy x;
+}
+
+#separator
+
+Format_list_to_group_item = class
+	Menuaction "_List to Group" "turn a list of objects into a group" {
+	action x = to_group x;
+}
+
+Format_group_to_list_item = class
+	Menuaction "_Group to List" "turn a group into a list of objects" {
+	action x = to_list x;
+}
+
+#separator
+
+Format_break_item = class
+	Menuaction "_Break Up Object" 
+		"break an object into a list of components" {
+	action x
+		= map_unary break x
+	{
+		break x
+			= bandsplit x, is_Image x
+			= map Vector x.value, is_Matrix x
+			= x.value, is_Vector x || is_Real x
+			= error "Breakup: not Image/Matrix/Vector/Real";
+	}
+}
+
+Format_assemble_item = class
+	Menuaction "_Assemble Objects" 
+		"assemble a list (or group) of objects into a single object" {
+	action x
+		= map_unary ass x
+	{
+		ass x
+			= [], x == []
+			= Vector x, is_real_list x
+			= Matrix x, is_matrix x
+			= bandjoin x, is_listof is_Image x
+			= Vector (map get_value x), is_listof is_Real x
+			= Matrix (map get_value x), is_listof is_Vector x
+			= error "Assemble: not list of Image/Vector/Real/image/real";
+	}
+}
+
+#separator
+
+Format_csv_import_item = class
+	Menuaction "_CSV Import" "read a file of comma-separated values" {
+	action = class 
+		_result {
+		_vislevel = 3;
+
+		path = Pathname "File to load" "empty";
+		start_line = Expression "Start at line" 1;
+		rows = Expression "Lines to read (-1 for whole file)" (-1);
+		whitespace = String "Whitespace characters" " \"";
+		separator = String "Separator characters" ",;\t";
+
+		_result
+			= Image blank, path.value == "empty"
+			= Image (im_csv2vips filename)
+		{
+			filename = search (expand path.value) ++ ":" ++
+				"skip:" ++ print (start_line.expr - 1) ++ "," ++
+				"whi:" ++ escape whitespace.value ++ "," ++
+				"sep:" ++ escape separator.value ++ "," ++
+				"line:" ++ print rows.expr;
+
+			// prefix any ',' with a '\' in the separators line
+			escape x 
+				= foldr prefix [] x
+			{
+				prefix x l
+					= '\\' : x : l, x == ','
+					= x : l;
+			}
+
+			blank = image_new 1 1 1 
+				Image_format.DOUBLE Image_coding.NOCODING Image_type.B_W 
+				0 0 0;
+		}
+	}
+}
+
+// interpret Analyze header for layout and calibration
+Interpret_header_item = class
+	Menuaction "_Interpret Analyze 7 Header" 
+		"examine the Analyze header and set layout and value" {
+	action x 
+		= x'''
+	{
+		// read bits of header
+		dim n = get_header ("dsr-image_dimension.dim[" ++ print n ++ "]");
+		dim0 = dim 0 x;
+		dim1 = dim 1 x;
+		dim2 = dim 2 x;
+		dim3 = dim 3 x;
+		dim4 = dim 4 x;
+		dim5 = dim 5 x;
+		dim6 = dim 6 x;
+		dim7 = dim 7 x;
+		glmax = get_header "dsr-image_dimension.glmax" x;
+		cal_max = get_header "dsr-image_dimension.cal_max" x;
+
+		// oops, now a nop
+		x' = x;
+
+		// lay out higher dimensions width-ways
+		x'' 
+			= grid dim2 dim3 1 x', dim0 == 3
+			= grid dim2 dim3 dim4 x', dim0 == 4
+			= grid (dim2 * dim4) dim5 1 (grid dim2 dim3 dim4) x', dim0 == 5
+			= grid (dim2 * dim4) dim5 dim6 (grid dim2 dim3 dim4) x', dim0 == 6
+			= grid (dim2 * dim4 * dim6) dim7 1 
+				(grid (dim2 * dim4) dim5 dim6 (grid dim2 dim3 dim4)) x', 
+					dim0 == 7
+			= error (_ "unsupported dimension " ++ dim0);
+
+		// multiply by scale factor to get kBeq
+		x''' = x'' * (cal_max / glmax);
+	}
+}

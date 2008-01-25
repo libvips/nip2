@@ -31,9 +31,11 @@ install-exec-hook:
 	-rm -rf ${DESTDIR}$(datadir)/doc/nip2/html/CVS
 	-rm -rf ${DESTDIR}$(datadir)/doc/nip2/pdf/CVS
 
+if UPDATE_DESKTOP
 install-data-hook:
 	-$(UPDATE_MIME_DATABASE) ${DESTDIR}$(datadir)/mime
 	-$(UPDATE_DESKTOP_DATABASE) ${DESTDIR}$(datadir)/applications
+endif
 
 dist-hook:
 # make sure we don't get any .svn dirs from EXTRA_DIST

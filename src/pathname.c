@@ -35,6 +35,20 @@
 
 static ClassmodelClass *parent_class = NULL;
 
+static void
+pathname_dispose( GObject *gobject )
+{
+	Pathname *pathname = PATHNAME( gobject );
+
+#ifdef DEBUG
+	printf( "pathname_dispose\n" );
+#endif /*DEBUG*/
+
+	IM_FREE( pathname->value );
+
+	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+}
+
 static View *
 pathname_view_new( Model *model, View *parent )
 {
@@ -74,6 +88,7 @@ static ClassmodelMember pathname_members[] = {
 static void
 pathname_class_init( PathnameClass *class )
 {
+	GObjectClass *gobject_class = (GObjectClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 	HeapmodelClass *heapmodel_class = (HeapmodelClass *) class;
 	ClassmodelClass *classmodel_class = (ClassmodelClass *) class;
@@ -85,6 +100,8 @@ pathname_class_init( PathnameClass *class )
 
 	/* Init methods.
 	 */
+	gobject_class->dispose = pathname_dispose;
+
 	model_class->view_new = pathname_view_new;
 
 	heapmodel_class->update_model = pathname_update_model;

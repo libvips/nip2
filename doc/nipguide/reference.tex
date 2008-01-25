@@ -187,9 +187,14 @@ a series of images.
 \section{Image processing window}
 \mylabel{sec:ipwindow}
 
-\fref{fg:startup} show's \nip{}'s main image processing window. Drag with the
-middle mouse button to scroll the workspace window. Drop a file on to the
-workspace background (from your file manager) to load that file. 
+\fref{fg:startup} show's \nip{}'s main image processing window. The centre
+area is the workspace, the left-hand area is a pane you can reveal to write
+custom definitions for this workspace (see \ctr{View}\ct{Workspace
+Definitions}), and the right-hand pane is the toolkit browser (see
+\ctr{View}\ct{Toolkit Browser}).
+
+Drag with the middle mouse button to scroll the workspace window. Drop a file
+on to the workspace background (from your file manager) to load that file.
 If you right-click on the workspace background, a useful menu will appear.
 
 \begin{figure}
@@ -237,6 +242,11 @@ arguments the operation expects.
 This side panel shows all the image processing operations again, but this time
 as a large flat list you can easily browse. Type into the search box at the
 top to filter operations by keyword. Doubleclick on an item to activate it.
+
+\item[Workspace Definitions]
+This side pane shows private definitions for this workspace. Programs you
+write here are loaded and saved with this workspace. See the Programming
+chapter for details on \nip{}'s programming language.
 
 \item[Free space]
 This displays the amount of disc space you have left in your temporary
@@ -292,7 +302,12 @@ example, try entering the following expressions, and pressing Return:
 2 + 2
 A1 + 120
 "My cat likes\nlasagne"
+fred = 12
 \end{verbatim}
+
+\noindent
+The last example shows custom button name creation. Normaly \nip{} will pick a
+name for you, but you can chose your own.
 
 \end{description}
 
@@ -313,7 +328,7 @@ control which parts of the row are visible.
 \begin{description}
 
 \item[Row name button]
-Each row has a name. The name is formed from the name of the current
+Each row has a name. The name is normally formed from the name of the current
 column, plus a number.
 
 If you double-left-click on the row name button, \nip{} will pop up a viewer
@@ -378,9 +393,9 @@ You can select additional objects with Ctrl-left-click and
 Shift-left-click. This is necessary if you want to use an image
 processing operation that takes more than one argument.
 
-Once you have selected the rows (sometimes you need to select them in a
-certain order), click on the
-processing operation you want from the \ct{Toolkits} menu.
+Once you have selected the rows (sometimes you need to select them in
+a certain order), click on the processing operation you want from the
+\ct{Toolkits} menu.
 
 \item
 If there are no objects selected when you click on an image processing
@@ -617,12 +632,11 @@ then then clips the result back to the same format as the original image
 appropriate for small images or simple calculations. But for complex
 operations, or operations on large images, this mode can be very useful.
 
-\subsection{Using \ct{--set}}}
+\subsection{Using \ct{--set}}
 
-The \ct{--set} option (which can be abbreviated to \ct{-=}) lets you make 
-changes to a workspace after loading it.
-Suppose the workspace \ct{test.ws} has a row called \ct{A1} with the value 12.
-Then entering:
+The \ct{--set} option (which can be abbreviated to \ct{-=}) lets you make
+changes to a workspace after loading it.  Suppose the workspace \ct{test.ws}
+has a row called \ct{A1} with the value 12.  Then entering:
 
 \begin{verbatim}
 nip2 test.ws --set Workspaces.test.A1=45
@@ -630,8 +644,8 @@ nip2 test.ws --set Workspaces.test.A1=45
 
 \noindent
 Will, as normal, start \nip{} and load \ct{test.ws}. But before the first
-recalculation, \nip{} will change the value of \ct{A1} to be 45. You can use
-\ct{--set} to create new symbols as well.
+recalculation, \nip{} will change the value of \ct{A1} to be 45.  You can
+use \ct{--set} to create new symbols as well.
 
 \subsection{Other modes}
 

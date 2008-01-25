@@ -1,0 +1,1531 @@
+Filter_conv_item = class
+	Menupullright "_Convolution" "various spatial convolution filters" {
+	/* Some useful masks.
+	 */
+	filter_blur = Matrix_con 9 0 [[1, 1, 1], [1, 1, 1], [1, 1, 1]];
+	filter_sharp = Matrix_con 8 0 [[-1, -1, -1], [-1, 16, -1], [-1, -1, -1]];
+	filter_emboss = Matrix_con 1 128 [[-1, 0], [0, 1]];
+	filter_laplacian = Matrix_con 1 128 
+		[[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]];
+	filter_sobel = Matrix_con 1 128 [[1, 2, 1], [0, 0, 0], [-1, -2, -1]];
+	filter_lindet = Matrix_con 1 0 [[1, 1, 1], [-2, -2, -2], [1, 1, 1]];
+
+	Blur_item = class
+		Menuaction "_Blur" "3x3 blur of image" {
+		action x = map_unary (conv filter_blur) x;
+	}
+
+	Sharpen_item = class
+		Menuaction "_Sharpen" "3x3 sharpen of image" {
+		action x = map_unary (conv filter_sharp) x;
+	}
+
+	Emboss_item = class
+		Menuaction "_Emboss" "1 pixel displace emboss" {
+		action x = map_unary (conv filter_emboss) x;
+	}
+
+	Laplacian_item = class
+		Menuaction "_Laplacian" "3x3 laplacian edge detect" {
+		action x = map_unary (conv filter_laplacian) x;
+	}
+
+	Sobel_item = class
+		Menuaction "So_bel" "3x3 Sobel edge detect" {
+		action x 
+			= map_unary sobel x
+		{
+			sobel im
+				= abs (a - 128) + abs (b - 128)
+			{
+				a = conv filter_sobel im;
+				b = conv (rot270 filter_sobel) im;
+			}
+		}
+	}
+
+/* 3x3 line detect of image
+diagonals should be scaled down by root(2) I guess
+Kirk 
+*/
+	Linedet_item = class
+		Menuaction "Li_ne Detect" "3x3 line detect" {
+		action x 
+			= map_unary lindet x
+		{
+			lindet im
+				= foldr1 max_pair images
+			{
+				masks = take 4 (iterate rot45 filter_lindet);
+				images = map (converse conv im) masks;
+			}
+		}
+	}
+
+	Usharp_item = class
+		Menuaction "_Unsharp Mask" "cored sharpen of L only in LAB image" {
+		action x = class
+			_result {
+			_vislevel = 3;
+	
+			size = Option "Radius" [
+				"3 pixels",
+				"5 pixels",
+				"7 pixels",
+				"9 pixels",
+				"11 pixels",
+				"51 pixels"
+			] 0;
+	
+			st = Scale "Smoothness threshold" 0 5 1.5;
+			bm = Scale "Brighten by at most" 1 50 10;
+			dm = Scale "Darken by at most" 1 50 50;
+			fs = Scale "Sharpen flat areas by" (-2) 5 1;
+			js = Scale "Sharpen jaggy areas by" (-2) 5 2;
+	
+			_result
+				= map_unary process x
+			{
+				process in
+					= Image in'''
+				{
+					in' = colour_transform_to Image_type.LABS in.value;
+					in'' = sharpen [3, 5, 7, 9, 11, 51]?size st bm dm fs js in';
+					in''' = colour_transform_to (get_type in) in'';
+				}
+			}
+		}
+	}
+
+	sep1 = Menuseparator;
+
+	Custom_blur_item = class
+		Menuaction "Custom B_lur / Sharpen" 
+			"blur or sharpen with tuneable parameters" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			type = Option "Type" ["Blur", "Sharpen"] 0;
+			r = Scale "Radius" 1 100 1;
+			fac = Scale "Amount" 0 1 1;
+			shape = Option "Mask shape" [
+				"Square",
+				"Gaussian"
+			] 0;
+			prec = Option "Precision" ["Int", "Float"] 0;
+
+			_result 
+				= map_unary process x
+			{
+				process in
+					= clip2fmt blur.format proc
+				{
+					mask
+						= matrix_blur r.value, shape.value == 0
+						= matrix_gaussian_blur r.value;
+					blur = [convsep, convsepf]?prec mask in;
+					proc
+						= in + fac * (in - blur), type == 1
+						= blur * fac + in * (1 - fac);
+				}
+			}
+		}
+	}
+
+	Custom_conv_item = class
+		Menuaction "Custom C_onvolution" 
+			"convolution filter with tuneable parameters" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			matrix = Matrix_con 1 0 [[0, 0, 0], [0, 1, 0], [0, 0, 0]];
+			separable 
+				= Toggle "Seperable convolution" false, 
+					matrix.width == 1 || matrix.height == 1
+				= false;
+			type = Option "Convolution type" ["Int", "Float"] 0;
+
+			_result 
+				= map_unary process x
+			{
+				process in
+					= in.Image in'
+				{
+					conv_fn 
+						= im_conv, !separable && type == 0
+						= im_convsep, separable && type == 0
+						= im_convf, !separable && type == 1
+						= im_convsepf, separable && type == 1
+						= error "boink!";
+					in' = conv_fn in.value matrix;
+				}
+			}
+		}
+	}
+}
+
+Filter_rank_item = class
+	Menupullright "_Rank" "various rank filters" {
+	Median_item = class
+		Menuaction "_Median" "3x3 median rank filter" {
+		action x = map_unary (rank 3 3 5) x;
+	}
+
+	Image_rank_item = class
+		Menuaction "_Image Rank" "pixelwise rank a list or group of images" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			select 
+				= Expression "Rank" ((int) (guess_size / 2))
+			{
+				guess_size
+					= len x, is_list x
+					= len x.value, is_Group x
+					= 0;
+			}
+
+			// can't really iterate over groups ... since we allow a group
+			// argument
+			_result = rank_image select x;
+		}
+	}
+
+	Custom_rank_item = class
+		Menuaction "Custom _Rank" "rank filter with tuneable parameters" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			window_width = Expression "Window width" 3;
+			window_height = Expression "Window height" 3;
+			select = Expression "Rank" 
+				((int) ((to_real window_width * to_real window_height + 1) / 2));
+
+			_result 
+				= map_unary process x
+			{
+				process in
+					= rank window_width window_height select in;
+			}
+		}
+	}
+}
+
+Filter_morphology_item = class
+	Menupullright "_Morphology" "various morphological filters" {
+	/* Some useful masks.
+	 */
+	mask8 = Matrix_mor [[255, 255, 255], [255, 255, 255], [255, 255, 255]];
+	mask4 = Matrix_mor [[128, 255, 128], [255, 255, 255], [128, 255, 128]];
+	mask1 = Matrix_mor [[0, 0, 0], [0, 255, 0], [0, 0, 0]];
+	thin = Matrix_mor [[0, 0, 0], [128, 255, 128], [255, 255, 255]];
+
+	Threshold_item = Select_item.Threshold_item;
+
+	sep1 = Menuseparator;
+
+	Dilate_item = class
+		Menupullright "_Dilate" "morphological dilate" {
+		Dilate8_item = class
+			Menuaction "_8-connected" "dilate with an 8-connected mask" {
+			action x = map_unary (dilate mask8) x;
+		}
+
+		Dilate4_item = class
+			Menuaction "_4-connected" "dilate with a 4-connected mask" {
+			action x = map_unary (dilate mask4) x;
+		}
+	}
+
+	Erode_item = class
+		Menupullright "_Erode" "morphological erode" {
+		Erode8_item = class
+			Menuaction "_8-connected" "erode with an 8-connected mask" {
+			action x = map_unary (erode mask8) x;
+		}
+
+		Erode4_item = class
+			Menuaction "_4-connected" "erode with a 4-connected mask" {
+			action x = map_unary (erode mask4) x;
+		}
+	}
+
+	Custom_morph_item = class
+		Menuaction "Custom _Morphology" 
+			"convolution morphological operator" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			mask = mask4;
+			type = Option "Operation" ["Erode", "Dilate"] 1;
+			apply = Expression "Number of times to apply mask" 1;
+
+			_result 
+				= map_unary morph x
+			{
+				morph image
+					= Image value'
+				{
+					fatmask = (iterate (dilate mask) mask)?(to_real apply - 1);
+
+					value'
+						= im_erode image.value fatmask, type.value == 0
+						= im_dilate image.value fatmask;
+				}
+			}
+		}
+	}
+
+	sep2 = Menuseparator;
+
+	Open_item = class
+		Menuaction "_Open" "open with an 8-connected mask" {
+		action x = map_unary (dilate mask8 @ erode mask8) x;
+	}
+
+	Close_item = class
+		Menuaction "_Close" "close with an 8-connected mask" {
+		action x = map_unary (erode mask8 @ dilate mask8) x;
+	}
+
+	Clean_item = class
+		Menuaction "C_lean" "remove 8-connected isolated points" {
+		action x 
+			= map_unary clean x
+		{
+			clean x = x ^ erode mask1 x;
+		}
+	}
+
+	Thin_item = class
+		Menuaction "_Thin" "thin once" {
+		action x 
+			= map_unary thinall x
+		{
+			masks = take 8 (iterate rot45 thin);
+			thin1 m x = x ^ erode m x;
+			thinall x = foldr thin1 x masks;
+		}
+	}
+}
+
+Filter_fourier_item = class
+	Menupullright "_Fourier" "various Fourier filters" {
+	preview_size = 64;
+
+	sense_option = Option "Sense" [
+		"Pass", 
+		"Reject"
+	] 0;
+
+	// make a visualisation image 
+	make_vis fn = (Image @ image_set_type Image_type.FOURIER @ rotquad @ fn)
+		(im_create_fmask preview_size preview_size);
+
+	// make the process function
+	process fn in
+		= (Image @ fn) (im_flt_image_freq in.value);
+
+	New_ideal_item = class 
+		Menupullright "_Ideal" "various ideal Fourier filters" {
+		High_low_item = class 
+			Menuaction "_High or Low Pass" 
+				"highpass/lowpass ideal Fourier filter" {
+			action x = class
+				_result {
+				_vislevel = 3;
+
+				sense = sense_option;
+				fc = Scale "Frequency cutoff" 0.01 0.99 0.5;
+
+				// call a freq func with our parameters
+				_params f = f sense.value fc.value 0 0 0 0;
+
+				visualize_mask = make_vis _params;
+
+				_result = map_unary (process _params) x;
+			}
+		}
+
+		Ring_item = class 
+			Menuaction "_Ring Pass or Ring Reject"
+				"ring pass/reject ideal Fourier filter" {
+			action x = class
+				_result {
+				_vislevel = 3;
+
+				sense = sense_option;
+				fc = Scale "Frequency cutoff" 0.01 0.99 0.5;
+				rw = Scale "Ring width" 0.01 0.99 0.5;
+
+				// call a freq func with our parameters
+				_params f = f (sense.value + 6) fc.value 
+					rw.value 0 0 0;
+
+				visualize_mask = make_vis _params;
+
+				_result = map_unary (process _params) x;
+			}
+		}
+
+		Band_item = class 
+			Menuaction "_Band Pass or Band Reject"
+				"band pass/reject ideal Fourier filter" {
+			action x = class
+				_result {
+				_vislevel = 3;
+
+				sense = sense_option;
+				fcx = Scale "Horizontal frequency cutoff" 0.01 0.99 0.5;
+				fcy = Scale "Vertical frequency cutoff" 0.01 0.99 0.5;
+				r = Scale "Radius" 0.01 0.99 0.5;
+
+				// call a freq func with our parameters
+				_params f = f (sense.value + 12) fcx.value fcy.value
+					r.value 0 0;
+
+				visualize_mask = make_vis _params;
+
+				_result = map_unary (process _params) x;
+			}
+		}
+	}
+
+	New_gaussian_item = class 
+		Menupullright "_Gaussian" "various Gaussian Fourier filters" {
+		High_low_item = class 
+			Menuaction "_High or Low Pass" 
+				"highpass/lowpass Gaussian Fourier filter" {
+			action x = class
+				_result {
+				_vislevel = 3;
+
+				sense = sense_option;
+				fc = Scale "Frequency cutoff" 0.01 0.99 0.5;
+				ac = Scale "Amplitude cutoff" 0.01 0.99 0.5;
+
+				// call a freq func with our parameters
+				_params f = f (sense.value + 4) fc.value 
+					ac.value 0 0 0;
+
+				visualize_mask = make_vis _params;
+
+				_result = map_unary (process _params) x;
+			}
+		}
+
+		Ring_item = class 
+			Menuaction "_Ring Pass or Ring Reject"
+				"ring pass/reject Gaussian Fourier filter" {
+			action x = class
+				_result {
+				_vislevel = 3;
+
+				sense = sense_option;
+				fc = Scale "Frequency cutoff" 0.01 0.99 0.5;
+				ac = Scale "Amplitude cutoff" 0.01 0.99 0.5;
+				rw = Scale "Ring width" 0.01 0.99 0.5;
+
+				// call a freq func with our parameters
+				_params f = f (sense.value + 10) fc.value 
+					rw.value ac.value 0 0;
+
+				visualize_mask = make_vis _params;
+
+				_result = map_unary (process _params) x;
+			}
+		}
+
+		Band_item = class 
+			Menuaction "_Band Pass or Band Reject"
+				"band pass/reject Gaussian Fourier filter" {
+			action x = class
+				_result {
+				_vislevel = 3;
+
+				sense = sense_option;
+				fcx = Scale "Horizontal frequency cutoff" 0.01 0.99 0.5;
+				fcy = Scale "Vertical frequency cutoff" 0.01 0.99 0.5;
+				r = Scale "Radius" 0.01 0.99 0.5;
+				ac = Scale "Amplitude cutoff" 0.01 0.99 0.5;
+
+				// call a freq func with our parameters
+				_params f = f (sense.value + 16) fcx.value fcy.value 
+					r.value ac.value 0;
+
+				visualize_mask = make_vis _params;
+
+				_result = map_unary (process _params) x;
+			}
+		}
+	}
+
+	New_butterworth_item = class 
+		Menupullright "_Butterworth" 
+			"various Butterworth Fourier filters" {
+		High_low_item = class 
+			Menuaction "_High or Low Pass" 
+				"highpass/lowpass Butterworth Fourier filter" {
+			action x = class
+				_result {
+				_vislevel = 3;
+
+				sense = sense_option;
+				fc = Scale "Frequency cutoff" 0.01 0.99 0.5;
+				ac = Scale "Amplitude cutoff" 0.01 0.99 0.5;
+				o = Scale "Order" 1 10 2;
+
+				// call a freq func with our parameters
+				_params f = f (sense.value + 2) o.value fc.value ac.value
+						0 0;
+
+				visualize_mask = make_vis _params;
+
+				_result = map_unary (process _params) x;
+			}
+		}
+
+		Ring_item = class 
+			Menuaction "_Ring Pass or Ring Reject"
+				"ring pass/reject Butterworth Fourier filter" {
+			action x = class
+				_result {
+				_vislevel = 3;
+
+				sense = sense_option;
+				fc = Scale "Frequency cutoff" 0.01 0.99 0.5;
+				ac = Scale "Amplitude cutoff" 0.01 0.99 0.5;
+				rw = Scale "Ring width" 0.01 0.99 0.5;
+				o = Scale "Order" 1 10 2;
+
+				// call a freq func with our parameters
+				_params f = f (sense.value + 8) o.value fc.value rw.value 
+					ac.value 0;
+
+				visualize_mask = make_vis _params;
+
+				_result = map_unary (process _params) x;
+			}
+		}
+
+		Band_item = class 
+			Menuaction "_Band Pass or Band Reject"
+				"band pass/reject Butterworth Fourier filter" {
+			action x = class
+				_result {
+				_vislevel = 3;
+
+				sense = sense_option;
+				fcx = Scale "Horizontal frequency cutoff" 0.01 0.99 0.5;
+				fcy = Scale "Vertical frequency cutoff" 0.01 0.99 0.5;
+				r = Scale "Radius" 0.01 0.99 0.5;
+				ac = Scale "Amplitude cutoff" 0.01 0.99 0.5;
+				o = Scale "Order" 1 10 2;
+
+				// call a freq func with our parameters
+				_params f = f (sense.value + 14) o.value fcx.value fcy.value
+						r.value ac.value;
+
+				visualize_mask = make_vis _params;
+
+				_result = map_unary (process _params) x;
+			}
+		}
+	}
+}
+
+Filter_enhance_item = class
+	Menupullright "_Enhance" "various enhancement filters" {
+	Falsecolour_item = class
+		Menuaction "_False Colour" "false colour a mono image" {
+		action x = class
+			_result {
+			_vislevel = 3;
+	
+			o = Scale "Offset" (-255) 255 0;
+			clip = Toggle "Clip colour range" false;
+	
+			_result 
+				= map_unary process x
+			{
+				process im
+					= falsecolour mono''
+				{
+					mono = colour_transform_to Image_type.B_W im;
+					mono' = mono + o;
+					mono'' 
+						= (unsigned char) mono', clip
+						= (unsigned char) (mono' & 0xff);
+				}
+			}
+		}
+	}
+
+	Statistical_diff_item = class
+		Menuaction "_Statistical Difference" 
+			"statistical difference of an image" {
+		action x = class
+			_result {
+			_vislevel = 3;
+	
+			wsize = Expression "Window size" 11;
+			tmean = Expression "Target mean" 128;
+			mean_weight = Scale "Mean weight" 0 1 0.8;
+			tdev = Expression "Target deviation" 50;
+			dev_weight = Scale "Deviation weight" 0 1 0.8;
+			border = Toggle "Output image matches input image in size" true;
+	
+			_result 
+				= map_unary process x
+			{
+				process in 
+					= Image in''
+				{
+					in' = colour_transform_to Image_type.B_W in.value;
+					fn
+						= im_stdif, border
+						= im_stdif_raw;
+					in'' = fn in'
+						mean_weight.value tmean.expr
+						dev_weight.value tdev.expr
+						wsize.expr wsize.expr;
+				}
+			}
+		}
+	}
+
+	Hist_equal_item = class
+		Menupullright "_Equalise Histogram" "equalise contrast" {
+		Global_item = class
+			Menuaction "_Global" "equalise contrast globally" {
+			action x = map_unary hist_equalize x;
+		}
+
+		Local_item = class
+			Menuaction "_Local" "equalise contrast within a roving window" {
+			action x = class 
+				_result {
+				_vislevel = 3;
+	
+				window_width = Expression "Window width" 20;
+				window_height = Expression "Window height" 20;
+	
+				_result 
+					= map_unary process x
+				{
+					process in 
+						= hist_equalize_local 
+							window_width.expr window_height.expr in;
+				}
+			}
+		}
+	}
+}
+
+Filter_correlate_item = class
+	Menupullright "Spatial _Correlation" "calculate correlation surfaces" {
+	Correlate_item = class
+		Menuaction "_Correlate" "calculate correlation coefficient" {
+		action a b 
+			= map_binary corr a b
+		{
+			corr a b
+				= correlate a b, 
+					a.width <= b.width && a.height <= b.height
+				= correlate b a;
+		}
+	}
+
+	Correlate_fast_item = class
+		Menuaction "_Simple Difference" 
+			"calculate sum of squares of differences" {
+		action a b 
+			= map_binary corr a b
+		{
+			corr a b
+				= correlate_fast a b, 
+					a.width <= b.width && a.height <= b.height
+				= correlate_fast b a;
+		}
+	}
+}
+
+#separator
+
+Filter_tilt_item = class
+	Menupullright "Ti_lt Brightness" "tilt brightness" {
+	Left_right_item = class
+		Menuaction "_Left to Right" "linear left-right brighten" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			tilt = Scale "Left-right tilt" (-1) 1 0;
+
+			_result
+					= map_unary tilt_lr x
+			{
+				tilt_lr image
+					= image * scale
+				{
+					ramp = im_fgrey image.width image.height;
+					scale = (ramp - 0.5) * tilt + 1;
+				}
+			}
+		}
+	}
+
+	Top_bottom_item = class
+		Menuaction "_Top to Bottom" "linear top-bottom brighten" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			tilt = Scale "Top-bottom tilt" (-1) 1 0;
+
+			_result
+				= map_unary tilt_tb x
+			{
+				tilt_tb image 
+					= image * scale
+				{
+					ramp = rot90 
+						(im_fgrey image.height image.width);
+					scale = (ramp - 0.5) * tilt + 1;
+				}
+			}
+		}
+	}
+
+	sep1 = Menuseparator;
+
+	Left_right_cos_item = class
+		Menuaction "Cosine Left-_right" "cosine left-right brighten" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			tilt = Scale "Left-right tilt" (-1) 1 0;
+			shift = Scale "Shift by" (-1) 1 0;
+
+			_result
+					= map_unary tilt_lr x
+			{
+				tilt_lr image
+					= image * scale
+				{
+					ramp = im_fgrey image.width image.height - 0.5 -
+							shift.value;
+					scale = 0.5 * tilt.value * cos (ramp * 180) + 1;
+				}
+			}
+		}
+	}
+
+	Top_bottom_cos_item = class
+		Menuaction "Cosine Top-_bottom" "cosine top-bottom brighten" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			tilt = Scale "Top-bottom tilt" (-1) 1 0;
+			shift = Scale "Shift by" (-1) 1 0;
+
+			_result
+				= map_unary tilt_tb x
+			{
+				tilt_tb image 
+					= image * scale
+				{
+					ramp = rot90 (im_fgrey image.height image.width) - 0.5 -
+							shift.value;
+					scale = 0.5 * tilt.value * cos (ramp * 180) + 1;
+				}
+			}
+		}
+	}
+
+	sep2 = Menuseparator;
+
+	Circular_item = class
+		Menuaction "_Circular" "circular brighten" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			tilt = Scale "Tilt" (-1) 1 0;
+			hshift = Scale "Horizontal shift by" (-1) 1 0;
+			vshift = Scale "Vertical shift by" (-1) 1 0;
+
+			_result
+				= map_unary tilt_tb x
+			{
+				tilt_tb image 
+					= image * scale
+				{
+					hramp = im_fgrey image.width image.height - 0.5 -
+						hshift.value;
+					vramp = rot90 (im_fgrey image.height image.width) - 0.5 -
+						vshift.value;
+					ramp = (hramp ** 2 + vramp ** 2) ** 0.5;
+					scale = 0.5 * tilt.value * cos (ramp * 180) + 1;
+				}
+			}
+		}
+	}
+}
+
+Filter_blend_item = class
+	Menupullright "_Blend" "blend objects together" {
+	Scale_blend_item = class
+		Menuaction "_Scale Blend" "blend two objects together with a scale" {
+		action a b = class
+			_result {
+			_vislevel = 3;
+
+			p = Scale "Blend position" 0 1 0.5;
+
+			_result
+				= map_binary process a b
+			{
+				process im1 im2 = im1 * (1 - p.value) + im2 * p.value;
+			}
+		}
+	}
+
+	Image_blend_item = class
+		Menuaction "_Image Blend" "use an image to blend two objects" {
+		action a b c 
+				= map_trinary process a b c
+		{
+			process a b c 
+				= blend condition in1 in2
+			{
+				compare a b
+					// prefer image as the condition
+					= false, 
+						!has_image a && has_image b
+					// prefer mono images as the condition
+					= false, 
+						has_bands a && has_bands b && 
+						get_bands a > 1 && get_bands b == 1
+					// prefer uchar as the condition
+					= false,
+						has_format a && has_format b && 
+						get_format a > Image_format.UCHAR && 
+							get_format b == Image_format.UCHAR
+					= true;
+				args' = sortc compare [a, b, c];
+				condition = args'?0;
+				in1 = args'?1;
+				in2 = args'?2;
+			}
+		}
+	}
+
+	Line_blend_item = class
+		Menuaction "_Along Line" 
+			"blend between image a and image b along a line" {
+		action a b = class
+			_result {
+			_vislevel = 3;
+
+			orientation = Option "Orientation" [
+				"Left to Right",
+				"Top to Bottom"
+			] 0;
+			blend_position = Scale "Blend position" 0 1 0.5;
+			blend_width = Scale "Blend width" 0 1 0.05;
+
+			_result
+				= map_binary process a b
+            {
+                process a b 
+					= blend (Image condition) b a
+                {
+					output_width = max_pair a.width b.width;
+					output_height = max_pair a.height b.height;
+					range
+						= output_width, orientation == 0
+						= output_height;
+					blend_position' 
+						= floor (range * blend_position.value);
+					blend_width' 
+						= 1, blend_width.value == 0
+						= floor (range * blend_width.value);
+                   	start = blend_position' - blend_width' / 2;
+
+					background = (make_xy output_width output_height) >= 
+						blend_position';
+                   	ramp 
+						= im_grey blend_width' output_height, orientation == 0
+                        = rot90 (im_grey blend_width' output_width);
+					condition 
+						= insert_noexpand start 0 ramp background?0, 
+							orientation == 0
+						= insert_noexpand 0 start ramp background?1;
+               	}
+			}
+		}
+	} 
+
+	Blend_alpha_item = class
+		Menuaction "_Alpha Blend" "blend images with optional alpha channels" {
+		// usage: layerit foreground background
+		// input images must be either 1 or 3 bands, optionally + 1 band 
+		// which is used as the alpha channel
+		// rich lott
+	
+		scale_mask im opacity
+			= (unsigned char) (to_real opacity / 255 * im);
+	
+		// to mono
+		intensity = colour_transform_to Image_type.B_W;
+	
+		// All the blend functions
+		// I am grateful to this page
+		// http://www.pegtop.net/delphi/blendmodes/
+		// for most of the formulae.
+	
+		blend_normal mask opacity fg bg
+			= blend (scale_mask mask opacity) fg bg;
+	
+		blend_iflighter mask opacity fg bg
+			= blend (if fg' > bg' then mask' else 0) fg bg
+		{ 
+			fg' = intensity fg;
+			bg' = intensity bg;
+			mask' = scale_mask mask opacity ;
+		}
+	
+		blend_ifdarker mask opacity fg bg
+			= blend (if fg' < bg' then mask' else 0) fg bg
+		{ 
+			fg' = intensity fg ;
+			bg' = intensity bg ;	
+			mask' = scale_mask mask opacity ;
+		}
+	
+		blend_multiply mask opacity fg bg
+			= blend (scale_mask mask opacity) fg' bg
+		{
+			fg' = fg / 255 * bg;
+		}
+	
+		blend_add mask opacity fg bg
+			= blend mask fg' bg		
+		{
+			fg' = opacity / 255 * fg + bg;
+		}
+	
+		blend_subtract mask opacity fg bg
+			= blend mask fg' bg 
+		{
+			fg' = bg - opacity / 255 * fg;
+		}
+	
+		blend_screen mask opacity fg bg
+			= blend mask fg' bg 
+		{
+			fg' = 255 - (255 - bg) * (255 - (opacity / 255 * fg)) / 255;
+		}
+	
+		blend_burn mask opacity fg bg
+			= blend mask fg'' bg
+		{
+			// fades to white which has no effect.
+			fg' = (255 - opacity) + opacity * fg / 255;
+			fg'' = 255 - 255 * (255 - bg) / fg';
+		}
+	
+		blend_softlight mask opacity fg bg
+			= blend mask' fg' bg
+		{
+			mask' = scale_mask mask opacity;
+			fg' = (2 * bg * fg + bg * bg * (1 - 2 * fg / 255)) / 255;
+		}
+	
+		blend_hardlight mask opacity fg bg
+			= blend mask' fg' bg		
+		{
+			mask' = scale_mask mask opacity;
+			fg'
+				= 2 / 255 * fg * bg, bg < 129
+				= 255 - 2 * (255 - bg) * (255 - fg) / 255;
+		}
+	
+		blend_lighten mask opacity fg bg
+			= blend mask' fg' bg 		
+		{
+			mask' = scale_mask mask opacity;
+			fg' = if bg < fg then fg else bg;
+		}
+	
+		blend_darken mask opacity fg bg
+			= blend mask' fg' bg		
+		{
+			mask' = scale_mask mask opacity;
+			fg' = if bg > fg then fg else bg;
+		}
+	
+		blend_dodge mask opacity fg bg
+			= blend mask fg'' bg 
+		{
+			// one added to avoid divide by zero
+			fg' = 1 + 255 - (opacity / 255 * fg); 
+			fg'' = bg * 255 / fg';
+		}
+	
+		blend_reflect mask opacity fg bg
+			= blend mask' fg' bg 
+		{
+			mask' = scale_mask mask opacity;
+			fg' = bg * bg / (255 - fg);
+		}
+	
+		blend_freeze mask opacity fg bg
+			= blend mask' fg' bg
+		{
+			mask' = scale_mask mask opacity;
+			fg' = 255 - (255 - bg) * (255 - bg) / (1 + fg);
+		}
+	
+		blend_or mask opacity fg bg
+			= bg | (unsigned char) fg'
+		{
+			mask' = scale_mask mask opacity;
+			fg' = fg * mask' / 255;
+		}
+	
+		blend_and mask opacity fg bg
+			= bg & (unsigned char) fg'
+		{
+			mask' = scale_mask mask opacity;
+			fg' = fg * mask' / 255;
+		}
+	
+		// blend types
+		NORMAL = 0;
+		IFLIGHTER = 1;
+		IFDARKER = 2;
+		MULTIPLY = 3;
+		ADD = 4;
+		SUBTRACT = 5;
+		SCREEN = 6;
+		BURN = 7;
+		DODGE = 8;
+		HARDLIGHT = 9;
+		SOFTLIGHT = 10;
+		LIGHTEN = 11;
+		DARKEN = 12;
+		REFLECT = 13;
+		FREEZE = 14;
+		OR = 15;
+		AND = 16;
+	
+		// names we show the user for blend types
+		names = Enum [
+			["Normal", NORMAL],
+			["If Lighter", IFLIGHTER],
+			["If Darker", IFDARKER],
+			["Multiply", MULTIPLY],
+			["Add", ADD],
+			["Subtract", SUBTRACT],
+			["Screen", SCREEN],
+			["Burn", BURN],
+			["Soft Light", SOFTLIGHT],
+			["Hard Light", HARDLIGHT],
+			["Lighten", LIGHTEN],
+			["Darken", DARKEN],
+			["Dodge", DODGE],
+			["Reflect", REFLECT],
+			["Freeze", FREEZE],
+			["Bitwise OR", OR],
+			["Bitwise AND", AND]
+		];
+	
+		// functions we call for each blend type
+		actions = Table [
+			[NORMAL, blend_normal],
+			[IFLIGHTER, blend_iflighter],
+			[IFDARKER, blend_ifdarker],
+			[MULTIPLY, blend_multiply],
+			[ADD, blend_add],
+			[SUBTRACT, blend_subtract],
+			[SCREEN, blend_screen],
+			[BURN, blend_burn],
+			[SOFTLIGHT, blend_softlight],
+			[HARDLIGHT, blend_hardlight],
+			[LIGHTEN, blend_lighten],
+			[DARKEN, blend_darken],
+			[DODGE, blend_dodge],
+			[REFLECT, blend_reflect],
+			[FREEZE, blend_freeze],
+			[OR, blend_or],
+			[AND, blend_and]
+		];
+	
+		// make sure im has an alpha channel (set opaque if it hasn't)
+		put_alpha im
+			= im, im.bands == 4 || im.bands == 2 
+			= im ++ 255;
+	
+		// make sure im has no alpha channel 
+		lose_alpha im
+			= extract_bands 0 3 im, im.bands == 4 
+			= im?0, im.bands == 2 
+			= im;
+	
+		// does im have al alpha channel?
+		has_alpha im = im.bands == 2 || im.bands == 4;
+	
+		// get the alpha (set opaque if no alpha)
+		get_alpha img
+			= img'?3, img.bands == 4 
+			= img'?1
+		{
+			img' = put_alpha img;
+		}
+	
+		// add an alpha ... cast the alpha image to match the main image
+		append_alpha im alpha
+			= im ++ clip2fmt im.format alpha;
+	
+		// makes fg the same size as bg, displaced with u, v pixel offset
+		moveit fg bg u v
+			= insert_noexpand u v fg bg'
+		{
+			bg' = image_new bg.width bg.height 
+				fg.bands fg.format fg.coding fg.type 0 0 0;
+		}
+	
+		action bg fg = class 
+			_value {
+			_vislevel = 3;
+	
+			method = Option_enum names "Blend mode" "Normal";
+			opacity = Scale "Opacity" 0 255 255;
+			hmove = Scale "Horizontal move by" (-bg.width) (bg.width) 0; 
+			vmove = Scale "Vertical move by" (-bg.height) (bg.height) 0; 		
+	
+			_value
+				= append_alpha blended merged_alpha, has_alpha bg
+				= blended 
+			{
+				// displace and resize fg (need to displace alpha too)
+				fg' = moveit (put_alpha fg) bg hmove vmove;
+	
+				// transform to sRGB
+				fg'' = colour_transform_to Image_type.sRGB (lose_alpha fg');
+				bg' = colour_transform_to Image_type.sRGB (lose_alpha bg);
+	
+				// alphas merged
+				merged_alpha = get_alpha bg | get_alpha fg';
+	
+				// blend together
+				blended = (actions.lookup 0 1 method.value_thing) 
+					(get_alpha fg') opacity.value fg'' bg';
+			}
+		}
+	}
+}
+
+Filter_overlay_header_item = class
+	Menuaction "_Overlay" 
+		"make a colour overlay of two monochrome images" {
+	action  a b = class 
+		_result {
+		_vislevel = 3;
+
+		colour = Option "Colour overlay as" [
+			"Green over Red",
+			"Blue over Red",
+			"Red over Green",
+			"Red over Blue",
+			"Blue over Green",
+			"Green over Blue"
+		] 0;
+
+		_result
+			= map_binary overlay a b
+		{
+			overlay a b
+				= image_set_type Image_type.sRGB 
+					[(a' ++ b' ++ 0), 
+						(a' ++ 0 ++ b'), 
+						(b' ++ a' ++ 0), 
+						(b' ++ 0 ++ a'), 
+						(0 ++ a' ++ b'), 
+						(0 ++ b' ++ a')]?colour
+			{
+				a' = colour_transform_to Image_type.B_W a;
+				b' = colour_transform_to Image_type.B_W b;
+			}
+		}
+	}
+}
+
+Filter_colourize_item = class 
+	Menuaction "_Colourize" "use a colour image or patch to tint a mono image" {
+	action a b = class
+		_result {
+		_vislevel = 3;
+
+		tint = Scale "Tint" 0 1 0.6;
+
+		_result
+			= map_binary tintit a b
+		{
+			tintit a b
+				= colour_transform_to (get_type colour) colourized'
+			{
+				// get the mono thing first
+				args = sortc (const (is_colour_type @ get_type)) [a, b];
+				mono = args?0;
+				colour = args?1;
+
+				colour' = tint * colour_transform_to Image_type.LAB colour;
+				mono' = colour_transform_to Image_type.B_W mono;
+				colourized = (mono' / 2.55) ++ colour'?1 ++ colour'?2;
+				colourized' = image_set_type Image_type.LAB colourized;
+			}
+		}
+	}
+}
+
+Filter_browse_multiband_item = class 
+	Menupullright "Bro_wse" "browse though an image, bitwise or bandwise" {
+	Bandwise_item = class
+		Menuaction "B_andwise" "browse through the bands of a multiband image" {
+		action image = class  
+        	_result {
+			_vislevel = 3;
+
+        	band = Scale "Band" 0 (image.bands - 1) 0;
+       		display = Option "Display as" [
+				"Grey",
+				"Green over Red",
+				"Blue over Red",
+				"Red over Green",
+				"Red over Blue",
+				"Blue over Green",
+				"Green over Blue"
+			] 0;
+	
+        	_result 
+				= output
+			{
+				down = (int) band.value;
+				up = down + 1;
+				remainder = band.value - down;
+
+				fade x a
+					= Vector [0], x == 0
+					= a * x;
+
+				a = fade remainder image?up;
+				b = fade (1 - remainder) image?down;
+
+				output = [
+					a + b, 
+					a ++ b ++ 0, 
+					a ++ 0 ++ b, 
+					b ++ a ++ 0,
+					b ++ 0 ++ a, 
+					0 ++ a ++ b, 
+					0 ++ b ++ a
+				] ? display;
+			}
+		}
+	}
+
+	Bitwise_item = class
+		Menuaction "Bi_twise" "browse through the bits of an image" {
+		action x = class  
+        	_result {
+			_vislevel = 3;
+
+        	bit 
+				= Islider "Bit" 0 (nbits - 1) (nbits - 1)
+			{
+				nbits 
+					= x.bits, is_Image x
+					= 8;
+				Islider c f t v = class 
+					scope.Scale c f t ((int) v) {
+					Scale = Islider;
+				}
+			}
+
+        	_result 
+				= map_unary process x
+			{
+				process im = (im & (0x1 << bit.value)) != 0;
+			}
+		}
+	}
+}
+
+#separator
+
+Filter_negative_item = class
+	Menuaction "Photographic _Negative" "swap black and white" {
+	action x 
+		= map_unary invert x
+	{
+		invert in
+			= clip2fmt in.format (colour_transform_to (get_type in) rgb')
+		{
+			rgb = colour_transform_to Image_type.sRGB in;
+			rgb' = 255 - rgb;
+		}
+	}
+}
+
+Filter_solarize_item = class
+	Menuaction "_Solarise" "invert colours above a threshold" {
+	action x = class
+		_result {
+		_vislevel = 3;
+		
+		kink = Scale "Kink" 0 1 0.5;
+
+		_result
+			= map_unary process x
+		{
+			process image
+				= hist_map tab'''' image
+			{
+				// max pixel value for this format
+				mx = Image_format.maxval image.format;
+
+				// make a LUT ... just 8 and 16 bit
+				tab 
+					= im_identity_ushort image.bands mx,
+						image.format == 
+							Image_format.USHORT
+					= im_identity image.bands;
+				tab' = Image tab;
+
+				// make basic ^ shape
+				tab'' 
+					= tab' * (1 / kink), tab' < mx * kink
+					= (mx - tab') / (1 - kink);
+				tab''' = clip2fmt image.format tab'';
+
+				// smooth a bit
+				mask = matrix_blur (tab'''.width / 8);
+				tab'''' = convsep mask tab''';
+			}
+		}
+	}
+}
+
+Filter_diffuse_glow_item = class
+	Menuaction "_Diffuse Glow" "add a halo to highlights" {
+	action x = class
+		_result {
+		_vislevel = 3;
+		
+		r = Scale "Radius" 0 50 5;
+		highlights = Scale "Highlights" 0 100 95;
+		glow = Scale "Glow" 0 1 0.5;
+		colour = Colour_new_item.Widget_colour_item.action;
+
+		_result
+			= map_unary process x
+		{
+			process image
+				= image'
+			{
+				mono = (unsigned char) (colour_transform_to 
+					Image_type.B_W image);
+				thresh = hist_thresh (highlights.value / 100) mono;
+				mask = mono > thresh;
+				blur = convsep (matrix_gaussian_blur r.value) mask;
+				colour' = colour_transform_to image.type colour;
+				image' = image + colour' * glow * (blur / 255);
+			}
+		}
+	}
+}
+
+Filter_drop_shadow_item = class
+	Menuaction "Drop S_hadow" "add a drop shadow to an image" {
+	action x = class
+        _result {
+        _vislevel = 3;
+
+        sx = Scale "Horizontal shadow" (-50) 50 5;
+        sy = Scale "Vertical shadow" (-50) 50 5;
+        ss = Scale "Shadow softness" 0 20 5;
+        bg_colour = Expression "Background colour" 255;
+        sd_colour = Expression "Shadow colour" 128;
+        alpha = Toggle "Shadow in alpha channel" false;
+        transparent = Toggle "Zero pixels are transparent" false;
+
+        _result
+            = map_unary shadow x
+        {
+            shadow image
+            	= Image final
+            {
+                blur_size = ss.value * 2 + 1;
+
+                // matrix we blur with to soften shadows
+                blur_matrix = matrix_gaussian_blur blur_size;
+                matrix_size = blur_matrix.width;
+                matrix_radius = (int) (matrix_size / 2) + 1;
+
+                // position and size of shadow image in input cods
+                // before and after fuzzing
+                shadow_rect = Rect sx.value sy.value 
+					image.width image.height;
+                fuzzy_shadow_rect = shadow_rect.margin_adjust matrix_radius;
+
+                // size and pos of final image, in input cods
+                final_rect = image.rect.union fuzzy_shadow_rect;
+
+                // hard part of shadow in output cods
+                shadow_rect' = Rect 
+                    (shadow_rect.left - final_rect.left)
+                    (shadow_rect.top - final_rect.top)
+                    shadow_rect.width shadow_rect.height;
+
+                // make the shadow mask ... true for parts which cast
+                // a shadow
+                mask 
+                    = (foldr1 bitwise_and @ bandsplit) (image.value != 0), 
+                		transparent
+                    = image_new image.width image.height 1 Image_format.UCHAR
+                        Image_coding.NOCODING Image_type.B_W 255 0 0;
+                mask' = embed 0 shadow_rect'.left shadow_rect'.top
+                        final_rect.width final_rect.height mask;
+				mask'' = convsep blur_matrix mask';
+
+                // use mask to fade between bg and shadow colour
+                mk_background colour = image_new 
+                	final_rect.width final_rect.height
+                    image.bands image.format image.coding image.type
+                    colour 0 0;
+
+                bg_image = mk_background bg_colour.expr;
+                shadow_image = mk_background sd_colour.expr;
+                bg = blend mask'' shadow_image bg_image;
+
+                // make a full size mask 
+                fg_mask = embed 0
+                    (image.rect.left - final_rect.left)
+                    (image.rect.top - final_rect.top)
+                    final_rect.width final_rect.height mask;
+
+                // wrap up the input image ... put the shadow colour
+                // around it, so if we are outputting a separate
+                // alpha the shadow colour will be set correctly
+                fg = insert (image.rect.left - final_rect.left)
+                    (image.rect.top - final_rect.top)
+                    image.value shadow_image;
+
+                final
+                    // make a separate alpha
+                    = fg ++ mask'', alpha
+
+                    // paste image over shadow
+                    = if fg_mask then fg else bg;
+            }
+        }
+    }
+}
+
+Filter_paint_text_item = class 
+	Menuaction "_Paint Text" "paint text into an image" {
+	action x 
+		= paint_position, is_Group x
+		= paint_area
+	{
+		paint_area = class
+			_result {
+			_check_args = [
+				[x, "x", check_Image]
+			];
+			_vislevel = 3;
+		
+			text = String "Text to paint" "<i>Hello</i> world!";
+			font = Fontname "Use font" Workspaces.Preferences.PAINTBOX_FONT;
+			align = Option "Alignment" ["Left", "Centre", "Right"] 0;
+			dpi = Expression "DPI" 300;
+			colour = Expression "Text colour" 255;
+			place = Region x (x.width / 4) (x.height / 4) 
+				(x.width / 2) (x.height / 2);
+	
+			_result
+				= insert_noexpand place.left place.top (blend txt' fg place) x
+			{
+				fg = image_new place.width place.height x.bands x.format 
+					x.coding x.type colour.expr 0 0;
+				txt = Image (im_text text.value font.value 
+					place.width align.value (to_real dpi));
+	            bg = im_black place.width place.height 1;
+				txt' = insert_noexpand 0 0 txt bg;
+			}
+		}
+	
+		paint_position = class
+			_result {
+			_vislevel = 3;
+	
+			text = Pattern_images_item.Text_item.action;
+			colour = Expression "Text colour" 255;
+			position = Option "Position" [
+				"North-west",
+				"North",
+				"North-east",
+				"West",
+				"Centre",
+				"East",
+				"South-west",
+				"South",
+				"South-east",
+				"Specify in pixels"
+			] 4;
+			left = Expression "Pixels from left" 0;
+			top = Expression "Pixels from top" 0;
+	
+			_result
+				= map_unary paint x
+			{
+				paint image
+					= insert_noexpand x' y' place' image
+				{
+					xr = image.width - text.width;
+					yr = image.height - text.height;
+					x 
+						= left.expr, position == 9
+						= [0, xr / 2, xr]?(position % 3);
+					y
+						= top.expr, position == 9
+						= [0, yr / 2, yr]?(position / 3);
+					x' = range 0 x (image.width - 1);
+					y' = range 0 y (image.height - 1);
+					w' = range 1 text.width (image.width - x');
+					h' = range 1 text.height (image.height - y');
+	
+					place = extract_area x' y' w' h' image;
+					text' = insert_noexpand 0 0 text (im_black w' h' 1);
+					fg = image_new w' h' image.bands image.format 
+						image.coding image.type colour.expr 0 0;
+					place' = blend text' fg place;
+				}
+			}
+		}
+	}
+}
+
+Filter_draw_line_item = class 
+	Menuaction "Draw _Line" "draw a line using an arrow as a guide" {
+}

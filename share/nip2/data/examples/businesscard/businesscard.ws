@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.12.0">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.14.0">
   <Workspace filename="/home/john/bus.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1680" window_height="1015" name="bus" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="true" sform="false" next="3" name="A" caption="source images">
       <Subcolumn vislevel="3">
@@ -417,7 +417,7 @@
                 </Rhs>
               </Row>
             </Subcolumn>
-            <iText formula="Image_transform_item.Resize_item.Resize_canvas_item.action C4"/>
+            <iText formula="Image_transform_item.Resize_item.Resize_item.Resize_canvas_item.action C4"/>
           </Rhs>
         </Row>
       </Subcolumn>

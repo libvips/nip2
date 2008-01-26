@@ -3,6 +3,7 @@ started 7.14.0
 - added 7.12 compat
 - check for update-mime-database and friends (thanks Tom)
 - more leak fixes
+- updated examples and prefs workspaces
 
 started 7.13.3
 - save image was broken, weakrefs were not being updated

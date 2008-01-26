@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.12.0">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.14.0">
   <Workspace filename="/home/john/lg.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1670" window_height="1011" name="lg" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="12" name="A" caption="render text">
       <Subcolumn vislevel="3">
@@ -757,7 +757,7 @@
                 </Rhs>
               </Row>
             </Subcolumn>
-            <iText formula="Image_transform_item.Resize_item.Resize_canvas_item.action C7"/>
+            <iText formula="Image_transform_item.Resize_item.Resize_item.Resize_canvas_item.action C7"/>
           </Rhs>
         </Row>
         <Row popup="false" name="C26">
@@ -990,7 +990,7 @@
                 </Rhs>
               </Row>
             </Subcolumn>
-            <iText formula="Image_transform_item.Resize_item.Resize_canvas_item.action C18"/>
+            <iText formula="Image_transform_item.Resize_item.Resize_item.Resize_canvas_item.action C18"/>
           </Rhs>
         </Row>
       </Subcolumn>
@@ -1116,7 +1116,7 @@
                 </Rhs>
               </Row>
             </Subcolumn>
-            <iText formula="Image_transform_item.Resize_item.Resize_canvas_item.action D10"/>
+            <iText formula="Image_transform_item.Resize_item.Resize_item.Resize_canvas_item.action D10"/>
           </Rhs>
         </Row>
         <Row popup="false" name="D15">
@@ -1212,7 +1212,7 @@
                 </Rhs>
               </Row>
             </Subcolumn>
-            <iText formula="Image_transform_item.Resize_item.Resize_canvas_item.action D9"/>
+            <iText formula="Image_transform_item.Resize_item.Resize_item.Resize_canvas_item.action D9"/>
           </Rhs>
         </Row>
         <Row popup="false" name="D16">

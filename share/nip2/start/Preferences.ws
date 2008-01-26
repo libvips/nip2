@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.12.0">
-  <Workspace filename="/home/john/CVS_DEVEL/nip2-7.11/share/nip2/start/Preferences.ws" view="WORKSPACE_MODE_NOEDIT" scale="1" offset="0" window_width="680" window_height="1159">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.14.0">
+  <Workspace filename="Preferences.ws" view="WORKSPACE_MODE_NOEDIT" scale="1" offset="0" window_width="680" window_height="1159">
     <Column x="0" y="2799" open="false" selected="false" sform="false" next="99" name="B" caption="Interface column -- don't touch this!">
       <Subcolumn vislevel="2">
         <Row popup="false" name="CSV_SEPARATOR">

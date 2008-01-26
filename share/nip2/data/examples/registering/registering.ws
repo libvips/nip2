@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.12.4">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.14.4">
   <Workspace filename="/home/john/reg.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1680" window_height="1015" name="reg" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="5" name="A" caption="Original Images">
       <Subcolumn vislevel="3">

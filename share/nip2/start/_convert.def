@@ -597,6 +597,24 @@ bands_alike l
 		= x;
 }
 
+/* Given a list of things, try to match the formats. Don't touch non-image
+ * objects.
+ */
+formats_alike l
+	= map upformat l
+{
+	max_format = foldr (test_prop has_format get_format) Image_format.UCHAR l;
+
+	test_prop has get x best
+		= best, !has x
+		= max_pair best (get x);
+
+	upformat x
+		= clip2fmt max_format x,
+			has_format x 
+		= x;
+}
+
 /* String for path separator on this platform.
  */
 path_separator = expand "$SEP";

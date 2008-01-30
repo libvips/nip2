@@ -1,10 +1,18 @@
 Various test workspaces and images to excercise nip and VIPS
 
-also convert.sed, a sed script which should update 7.10 and 7.11 workspaces to
-work with 7.12
+also convert.sed, a sed script which should update older workspaces to
+work with 7.14
 
 usage:
 
 	sed -f convert.sed oldworkspace.ws > newworkspace.ws
 
+or
+
+	#!/bin/bash
+
+	for i in $*; do
+		sed -f /home/john/SVN/vips/nip2/trunk/test/convert.sed $i > fred
+		mv fred $i
+	done
 

@@ -21,7 +21,7 @@ s/Filter_morphology_item.Erode8_item/Filter_morphology_item.Erode_item.Erode8_it
 s/Filter_morphology_item.Erode4_item/Filter_morphology_item.Erode_item.Erode4_item/
 s/Resize_canvas_item/Resize_item.Resize_canvas_item/
 s/Image_edit_header_item/Image_header_item.Image_edit_header_item/
-s/Image_new_item/Image_new_item.Image_black_item/
+s/Image_new_item.action/Image_new_item.Image_black_item.action/
 s/Image_new_from_image_item/Image_new_item.Image_new_from_image_item/
 s/Image_region_item.Region_item/Image_new_item.Image_region_item.Region_item/
 s/Image_region_item.Mark_item/Image_new_item.Image_region_item.Mark_item/

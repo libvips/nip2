@@ -18,6 +18,7 @@ start_DATA = \
 	_list.def \
 	_predicate.def \
 	_stdenv.def \
+	_Object.def \
 	_types.def 
 
 EXTRA_DIST = $(start_DATA)

@@ -1,3 +1,12 @@
+- Join / Bandwise should be in the Band menu, surely?
+
+- try:
+
+	cd /data/john/gel
+	nip2 t00977/t00977.ws crash.ws
+
+  seems to crash every time
+
 - random crashes :(
 
 - do we enforce no-args-to-LHS-pattern anywhere? try

@@ -206,10 +206,15 @@ member l x = any (map (equal x) l);
  *
  * merge :: [bool] -> [*] -> [*] -> [*]
  */
-merge b l r
-	= [], b == [] || l == [] || r == []
-	= hd l : merge (tl b) (tl l) (tl r), hd b
-	= hd r : merge (tl b) (tl l) (tl r);
+merge p l r
+	= [], p == [] || l == [] || r == []
+	= a : merge z x y, c
+	= b : merge z x y
+{
+	a:x = l;
+	b:y = r;
+	c:z = p;
+}
 
 /* mkset eq l: remove duplicates from list l using equality function
  *
@@ -219,8 +224,7 @@ mkset eq l
 	= [], l == []
 	= a : filter (not @ eq a) (mkset eq x)
 {
-	a = hd l;
-	x = tl l;
+	a:x = l;
 }
 
 /* postfix l r: add r to the end of list l
@@ -258,7 +262,10 @@ scan fn
 {
 	g st l
 		= [st], l == []
-		= st : g (fn st (hd l)) (tl l);
+		= st : g (fn st a) x
+	{
+		a:x = l;
+	}
 }
 
 /* sort l: sort list l into ascending order
@@ -288,10 +295,8 @@ sortc comp l
 		= a : merge x (b : y), comp a b
 		= b : merge (a : x) y
 	{
-		a = hd l1;
-		x = tl l1;
-		b = hd l2;
-		y = tl l2;
+		a:x = l1;
+		b:y = l2;
 	}
 }
 

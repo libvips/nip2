@@ -220,7 +220,9 @@ main_print_main( Symbol *sym )
 		char filename[FILENAME_MAX];
 
 		im_strncpy( filename, main_option_output, FILENAME_MAX );
-		(void) save_objects( root, filename );
+		if( save_objects( root, filename ) )
+			main_error_exit( _( "error calculating \"%s\"" ), 
+				symbol_name( sym ) );
 	}
 
 	if( main_option_print_main )

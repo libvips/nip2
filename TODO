@@ -1,13 +1,18 @@
 - Join / Bandwise should be in the Band menu, surely?
 
-- try:
-
-	cd /data/john/gel
-	nip2 t00977/t00977.ws crash.ws
-
-  seems to crash every time
-
 - random crashes :(
+
+  some at laest seem to be due to IMAGEs generating eval callbacks after the
+  managing imageinfo has been disposed
+
+  we can't remove eval callbacks :-( maybe we need at ref the imageinfo on
+  evalstart and unref on evalend? sounds very leaky :-(
+
+  maybe unref on close?
+
+  see
+
+	imageinfo_progress_eval
 
 - do we enforce no-args-to-LHS-pattern anywhere? try
 

@@ -664,8 +664,16 @@ imageinfo_progress_eval( Imageinfo *imageinfo )
 {
         const double update_threshold = 0.2;
 
-	double latest = g_timer_elapsed( imageinfo->im->time->start, NULL );
-	double elapsed = latest - imageinfo->eval_last;
+	double latest;
+	double elapsed;
+
+	/* Make sure VIPS hasn't called us after we're dead :-(
+	 */
+	if( !imageinfo->im )
+		return( 0 );
+
+	latest = g_timer_elapsed( imageinfo->im->time->start, NULL );
+	elapsed = latest - imageinfo->eval_last;
 
 	if( imageinfo->im->time->eta > 1 &&
 		!imageinfo->eval_progress ) {

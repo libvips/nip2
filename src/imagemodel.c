@@ -123,6 +123,7 @@ imagemodel_dispose( GObject *gobject )
 	iobject_print( IOBJECT( imagemodel ) );
 #endif /*DEBUG*/
 
+	FREESID( imagemodel->iimage_changed_sid, imagemodel->iimage ); 
 	FREESID( imagemodel->conv_changed_sid, imagemodel->conv );
 	FREESID( imagemodel->conv_imageinfo_changed_sid, imagemodel->conv );
 	UNREF( imagemodel->conv );

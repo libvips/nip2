@@ -1,16 +1,3 @@
-- search for xdg-open in configure and use that to open the help browser
-
-  gah,how do we do this?
-
-    AC_DEFINE(XDG_OPEN,${XDG_OPEN},[path of xdg-open binary])
-
-  nope, not expanded, tried:
-
-    XDG_OPEN
-    $(XDG_OPEN)
-    ${XDG_OPEN}
-    "$(XDG_OPEN)"
-
 - Join / Bandwise should be in the Band menu, surely?
 
 - do we enforce no-args-to-LHS-pattern anywhere? try

@@ -6,6 +6,7 @@ started 7.14.0
 - updated examples and prefs workspaces
 - break _Object.def out of _types.def
 - better "if image then constant else constant" behaviour
+- fied segvs with IMAGE lifetime and progress dialogs
 
 started 7.13.3
 - save image was broken, weakrefs were not being updated

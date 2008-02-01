@@ -212,7 +212,15 @@ if test "x$with_vips8" != "xno"; then
   IP_LIBS="$VIPS8_LIBS $IP_LIBS"
 fi
 
-# optional ... update mines and stuff after install
+# optional ... use this to open the help browser, if available
+AC_PATH_PROG(XDG_OPEN, xdg-open, no)
+
+if test "x$XDG_OPEN" != "xno"; then
+  AC_DEFINE(HAVE_XDG_OPEN,1,[define if you have xdg-open])
+  AC_DEFINE(XDG_OPEN,${XDG_OPEN},[path of xdg-open binary])
+fi
+
+# optional ... use these to update desktop after install
 AC_PATH_PROG(UPDATE_MIME_DATABASE, update-mime-database, no)
 AC_PATH_PROG(UPDATE_DESKTOP_DATABASE, update-desktop-database, no)
 

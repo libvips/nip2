@@ -100,6 +100,15 @@ typedef struct _Undobuffer {
 	Rect bbox;			/* Bounding box for frags */
 } Undobuffer;
 
+/* Attach one of these to any IMAGE we monitor. It has the same lifetime as
+ * the IMAGE and gets zapped by the imageinfo on dispose. This lets us spot
+ * IMAGE events after the holding Imageinfo has gone.
+ */
+typedef struct _ImageinfoIMAGE {
+	IMAGE *im;
+	Imageinfo *imageinfo;
+} ImageinfoIMAGE;
+
 /* A VIPS image wrapped up nicely.
  */
 struct _Imageinfo {
@@ -109,6 +118,7 @@ struct _Imageinfo {
 	IMAGE *mapped_im;	/* Cache image mapped-thru-lut here */
 	IMAGE *identity_lut;	/* For base images, keep an id lut if poss */
 	Imageinfo *underlying;	/* If we're a LUT, the image we are a LUT of */
+	ImageinfoIMAGE *proxy;	/* Proxy for IMAGE callbacks */
 
 	gboolean dfile;		/* delete_file on final close */
 

@@ -1,18 +1,17 @@
+- search for xdg-open in configure and use that to open the help browser
+
+  gah,how do we do this?
+
+    AC_DEFINE(XDG_OPEN,${XDG_OPEN},[path of xdg-open binary])
+
+  nope, not expanded, tried:
+
+    XDG_OPEN
+    $(XDG_OPEN)
+    ${XDG_OPEN}
+    "$(XDG_OPEN)"
+
 - Join / Bandwise should be in the Band menu, surely?
-
-- random crashes :(
-
-  some at laest seem to be due to IMAGEs generating eval callbacks after the
-  managing imageinfo has been disposed
-
-  we can't remove eval callbacks :-( maybe we need at ref the imageinfo on
-  evalstart and unref on evalend? sounds very leaky :-(
-
-  maybe unref on close?
-
-  see
-
-	imageinfo_progress_eval
 
 - do we enforce no-args-to-LHS-pattern anywhere? try
 
@@ -21,6 +20,12 @@
 - use destroy_if_destroyed() in more places? 
 
 	grep destroy_ *.h
+
+- after pressing "Process" in the edit window, we always select last_sym,
+  which is often not what we want
+
+  make it jump less after a process ... eg. try editing something in the
+  middle of Image/Transform, very annoying
 
 - use compile->last_sym to spot chains of defs
 
@@ -151,10 +156,6 @@
 
   	$$alternate42$fred 2 = z;
 
-- try:
-
-
-
 
   Nope, then how do we link the freds together for remove etc.?
 
@@ -279,12 +280,6 @@
         }
 
   (ie. make the superclass constructor into a member) works fine
-
-- after pressing "Process" in the edit window, we always select last_sym,
-  which is often not what we want
-
-  make it jump less after a process ... eg. try editing something in the
-  middle of Image/Transform, very annoying
 
 
 

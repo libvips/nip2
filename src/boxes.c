@@ -937,7 +937,22 @@ box_url( GtkWidget *par, const char *url )
 			"This may take a few seconds." ), url );
 		shown = TRUE;
 	}
-#else /*unix-y*/
+#elif defined HAVE_XDG_OPEN
+	static gboolean shown = FALSE;
+
+	if( systemf( "%s %s", XDG_OPEN, url ) ) {
+		error_top( _( "Unable to open location." ) );
+		error_sub( _( "Attempt to view URL with xdg-open failed :(" ) );
+		box_alert( par );
+	}
+	else if( !shown ) {
+		box_info( par, _( "Browser window opened." ),
+			_( "Opened window for URL:\n"
+			"  %s\n"
+			"This may take a few seconds." ), url );
+		shown = TRUE;
+	}
+#else /*default unix-y*/
 	static gboolean shown = FALSE;
 
 	BufInfo buf;

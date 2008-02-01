@@ -440,6 +440,13 @@ imageinfo_dispose_eval( Imageinfo *imageinfo )
 	DESTROY_GTK( imageinfo->eval_progress );
 	imageinfo_set_eval_parent( imageinfo, NULL );
 	imageinfo->monitored = FALSE;
+
+	/* Make sure any callbacks from the IMAGE stop working.
+	 */
+	if( imageinfo->proxy ) {
+		imageinfo->proxy->imageinfo = NULL;
+		imageinfo->proxy = NULL;
+	}
 }
 
 static void
@@ -607,6 +614,8 @@ imageinfo_init( Imageinfo *imageinfo )
 	imageinfo->mapped_im = NULL;
 	imageinfo->identity_lut = NULL;
 	imageinfo->underlying = NULL;
+	imageinfo->proxy = NULL;
+
 	imageinfo->dfile = FALSE;
 	imageinfo->from_file = FALSE;
 	imageinfo->mtime = 0;
@@ -649,79 +658,85 @@ imageinfo_get_type( void )
 }
 
 static int
-imageinfo_progress_start( Imageinfo *imageinfo )
+imageinfo_progress_start( ImageinfoIMAGE *proxy )
 {
-	/* Note the start time.
-	 */
-	imageinfo->eval_last = 
-		g_timer_elapsed( imageinfo->im->time->start, NULL );
+	Imageinfo *imageinfo = proxy->imageinfo;
+
+	if( imageinfo )
+		/* Note the start time.
+		 */
+		imageinfo->eval_last = 
+			g_timer_elapsed( imageinfo->im->time->start, NULL );
 
 	return( 0 );
 }
 
 static int
-imageinfo_progress_eval( Imageinfo *imageinfo )
+imageinfo_progress_eval( ImageinfoIMAGE *proxy )
 {
         const double update_threshold = 0.2;
+	Imageinfo *imageinfo = proxy->imageinfo;
 
-	double latest;
-	double elapsed;
+	if( imageinfo ) {
+		double latest = 
+			g_timer_elapsed( imageinfo->im->time->start, NULL );
+		double elapsed = latest - imageinfo->eval_last;
 
-	/* Make sure VIPS hasn't called us after we're dead :-(
-	 */
-	if( !imageinfo->im )
-		return( 0 );
+		if( imageinfo->im->time->eta > 1 &&
+			!imageinfo->eval_progress ) {
+			imageinfo->eval_progress = progress_new( imageinfo );
+			iwindow_set_parent( IWINDOW( imageinfo->eval_progress ),
+				imageinfo->eval_parent );
+			idialog_set_iobject( 
+				IDIALOG( imageinfo->eval_progress ), 
+				IOBJECT( imageinfo ) );
+			iwindow_build( IWINDOW( imageinfo->eval_progress ) );
+			gtk_widget_show( 
+				GTK_WIDGET( imageinfo->eval_progress ) );
+		}
 
-	latest = g_timer_elapsed( imageinfo->im->time->start, NULL );
-	elapsed = latest - imageinfo->eval_last;
+		if( elapsed > update_threshold ) {
+			if( imageinfo->eval_progress ) 
+				progress_update( imageinfo->eval_progress,
+					imageinfo->im->time->percent,
+					imageinfo->im->time->eta );
 
-	if( imageinfo->im->time->eta > 1 &&
-		!imageinfo->eval_progress ) {
-		imageinfo->eval_progress = progress_new( imageinfo );
-		iwindow_set_parent( IWINDOW( imageinfo->eval_progress ),
-			imageinfo->eval_parent );
-		idialog_set_iobject( 
-			IDIALOG( imageinfo->eval_progress ), 
-			IOBJECT( imageinfo ) );
-		iwindow_build( IWINDOW( imageinfo->eval_progress ) );
-		gtk_widget_show( GTK_WIDGET( imageinfo->eval_progress ) );
-	}
+			while( g_main_context_iteration( NULL, FALSE ) )
+				;
 
-	if( elapsed > update_threshold ) {
-		if( imageinfo->eval_progress ) 
-			progress_update( imageinfo->eval_progress,
-				imageinfo->im->time->percent,
-				imageinfo->im->time->eta );
+			if( imageinfo->eval_progress &&
+				imageinfo->eval_progress->cancelled )
+				imageinfo->im->kill = 1;
 
-		while( g_main_context_iteration( NULL, FALSE ) )
-			;
-
-		if( imageinfo->eval_progress &&
-			imageinfo->eval_progress->cancelled )
-			imageinfo->im->kill = 1;
-
-		imageinfo->eval_last = latest;
+			imageinfo->eval_last = latest;
+		}
 	}
 
 	return( 0 );
 }
 
 static int
-imageinfo_progress_stop( Imageinfo *imageinfo )
+imageinfo_progress_stop( ImageinfoIMAGE *proxy )
 {
+	Imageinfo *imageinfo = proxy->imageinfo;
+
 	/* Pop down the dialog.
 	 */
-	DESTROY_GTK( imageinfo->eval_progress );
+	if( imageinfo ) 
+		DESTROY_GTK( imageinfo->eval_progress );
 
 	return( 0 );
 }
 
 static int
-imageinfo_progress_close( Imageinfo *imageinfo )
+imageinfo_progress_close( ImageinfoIMAGE *proxy )
 {
+	Imageinfo *imageinfo = proxy->imageinfo;
+
 	/* Remove everything related to progress.
 	 */
-	imageinfo_dispose_eval( imageinfo );
+	if( imageinfo ) 
+		imageinfo_dispose_eval( imageinfo );
 
 	return( 0 );
 }
@@ -746,19 +761,29 @@ imageinfo_progress_add( Imageinfo *imageinfo, GtkWidget *eval_parent )
 		return;
 	imageinfo->monitored = TRUE;
 
-        /* Call to animate countdown. 
+        /* Need a proxy on IMAGE.
          */ 
+	g_assert( !imageinfo->proxy );
+	if( !(imageinfo->proxy = IM_NEW( imageinfo->im, ImageinfoIMAGE )) )
+		return;
+	imageinfo->proxy->im = imageinfo->im;
+	imageinfo->proxy->imageinfo = imageinfo;
+
 	(void) im_add_evalstart_callback( imageinfo->im, 
-		(im_callback_fn) imageinfo_progress_start, imageinfo, NULL );
+		(im_callback_fn) imageinfo_progress_start, 
+		imageinfo->proxy, NULL );
 	(void) im_add_eval_callback( imageinfo->im, 
-		(im_callback_fn) imageinfo_progress_eval, imageinfo, NULL );
+		(im_callback_fn) imageinfo_progress_eval, 
+		imageinfo->proxy, NULL );
 	(void) im_add_evalend_callback( imageinfo->im, 
-		(im_callback_fn) imageinfo_progress_stop, imageinfo, NULL );
+		(im_callback_fn) imageinfo_progress_stop, 
+		imageinfo->proxy, NULL );
 
 	/* On close, remove everything.
 	 */
 	(void) im_add_close_callback( imageinfo->im, 
-		(im_callback_fn) imageinfo_progress_close, imageinfo, NULL );
+		(im_callback_fn) imageinfo_progress_close, 
+		imageinfo->proxy, NULL );
 }
 
 /* Make a basic imageinfo. No refs, will be destroyed on next GC. If name is

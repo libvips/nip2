@@ -217,7 +217,7 @@ AC_PATH_PROG(XDG_OPEN, xdg-open, no)
 
 if test "x$XDG_OPEN" != "xno"; then
   AC_DEFINE(HAVE_XDG_OPEN,1,[define if you have xdg-open])
-  AC_DEFINE(XDG_OPEN,${XDG_OPEN},[path of xdg-open binary])
+  AC_DEFINE_UNQUOTED(XDG_OPEN, "$XDG_OPEN", [path of xdg-open binary])
 fi
 
 # optional ... use these to update desktop after install

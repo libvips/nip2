@@ -1643,10 +1643,10 @@ compile_object_sub( Compile *compile )
 {
 	if( icontainer_map( ICONTAINER( compile ),
 		(icontainer_map_fn) compile_symbol_sub, NULL, NULL ) )
-		return( sym );
+		return( compile );
 
 	if( compile_heap( compile ) )
-		return( sym );
+		return( compile );
 
 	return( NULL );
 }
@@ -2821,25 +2821,4 @@ compile_pattern_has_leaf( ParseNode *node )
 	return( tree_map( NULL, 
 		(tree_map_fn) compile_pattern_has_leaf_sub, node, 
 		NULL, NULL ) != NULL );
-}
-
-static Symbol *
-compile_pattern_has_args_sub( Symbol *sym )
-{
-	g_assert( sym->type == SYM_PARAM );
-
-	if( is_prefix( "$$patt", IOBJECT( sym )->name ) )
-		return( sym );
-
-	return( NULL );
-}
-
-/* Does a definition have any pattern arguments? Look for things called
- * "$$patt" in the arg list.
- */
-gboolean
-compile_pattern_has_args( Compile *compile )
-{
-	return( slist_map( compile->param,
-		(SListMapFn) compile_pattern_has_args_sub, NULL ) != NULL );
 }

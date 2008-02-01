@@ -30,8 +30,8 @@
 #include "ip.h"
 
 /* A lot of this file is just for debugging.
- */
 #define DEBUG
+ */
 
 /* Dump a binary operator.
  */

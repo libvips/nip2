@@ -187,7 +187,7 @@ typedef void VipsObject;
 				/* XML namespace ... note, not nip2! */
 #define MAX_LINELENGTH (120)	/* Max chars we display of value */
 #define MAX_RECENT (10)		/* Number of recent items in file menu */
-#define NIP_COPYRIGHT "%s: (c) 2007 Imperial College, London"
+#define NIP_COPYRIGHT "%s: (c) 2008 Imperial College, London"
 
 /* Our stock_ids.
  */

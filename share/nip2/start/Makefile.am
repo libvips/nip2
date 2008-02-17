@@ -5,7 +5,7 @@ start_DATA = \
 	Image.def \
 	Colour.def \
 	Tasks.def \
-	Format.def \
+	Object.def \
 	Filter.def \
 	Matrix.def \
 	Widgets.def \

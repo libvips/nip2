@@ -1,4 +1,34 @@
-- Join / Bandwise should be in the Band menu, surely?
+- Blend / Image seems broken for inverted masks? how odd
+
+  try ~/test.ws
+
+
+- which gtk are we using for the windows build? new gtks come from the main gtk
+  site now, rather than tor's homepage:
+
+	http://ftp.gnome.org/pub/GNOME/binaries/win32/
+
+  should be all zips, so we could automate?
+
+- quit while a thumbnail is painting: IMAGEs are leaked? seems esp. bad with
+  greyc, perhaps just because it's so slow
+
+- have a toggle in find colour calib for "linearise"
+
+  another option that uses the greyscale to set the zero, but does not adjust
+  gamma?
+
+  need to break linear regression out into a separate function ... se Math.def
+
+  half-done colour calib thing
+
+- apply calib should work for groups
+
+
+
+
+WONTFIX
+=======
 
 - do we enforce no-args-to-LHS-pattern anywhere? try
 
@@ -284,10 +314,6 @@
 
   also for row edits
 
-- Filter / Blend items have extra blends in the name
-
-- image blend should have an invert mask option?
-
 - don't offer to clear temps if there's been a crash 
 
   need to be able to test for process-still-running by PID
@@ -317,33 +343,12 @@
   duplicate column placement would be odd: maybe place duplicate below? also
   new column? what about dropping an image on to the ws background?
 
-- have a toggle in find colour calib for "linearise"
-
-  another option that uses the greyscale to set the zero, but does not adjust
-  gamma?
-
-  need to break linear regression out into a separate function ... se Math.def
-
-  half-done colour calib thing
-
-- apply calib should work for groups
-
-- quit while a thumbnail is painting: IMAGEs are leaked? seems esp. bad with
-  greyc, perhaps just because it's so slow
-
 - there's some left-recursion in the parser, eg. comma_list, is this easily
   fixable?
 
 - add (*) (operator sections) ... need a binup / uop production? can't
   do this without losing precedence stuff, it'll need a separate production
   for sections
-
-- which gtk are we using for the windows build? new gtks come from the main gtk
-  site now, rather than tor's homepage:
-
-	http://ftp.gnome.org/pub/GNOME/binaries/win32/
-
-  should be all zips, so we could automate?
 
 - magic definition maker could make a workspace-local def, rather cool
 
@@ -357,9 +362,6 @@
 	classmodel_buildedit_member( ... model -> build widget set 
 
   part of the [["key",value]] arg type
-
-WONTFIX
-=======
 
 - can we get VIPS errors reported in Error too?
 

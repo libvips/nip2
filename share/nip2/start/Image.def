@@ -14,11 +14,11 @@ Image_new_item = class
 			"64-bit float - DOUBLE", 			// 8
 			"128-bit complex - DPCOMPLEX" 		// 9
 		];
-	
+
 		action = class 
 			Image _result {
 			_vislevel = 3;
-	
+
 			nwidth = Expression "Image width (pixels)" 64;
 			nheight = Expression "Image height (pixels)" 64;
 			nbands = Expression "Image bands" 1;
@@ -26,28 +26,28 @@ Image_new_item = class
 			type_option = Option_enum 
 				Image_type.type_names "Image type" "B_W";
 			pixel = Expression "Pixel value" 0;
-	
+
 			_result
 				= image_new (to_real nwidth) (to_real nheight) (to_real nbands) 
 					(to_real format_option) Image_coding.NOCODING 
 					type_option.value_thing pixel.expr 0 0;
 		}
 	}
-	
+
 	Image_new_from_image_item = class
 		Menuaction "_From Image" "make a new image based on image x" {
 		action x = class
 			Image _result {
 				_vislevel = 3;
-	
+
 				pixel = Expression "Pixel value" 0;
-	
+
 				_result
 					= image_new x.width x.height x.bands
 						x.format x.coding x.type pixel.expr x.xoffset x.yoffset;
 		}
 	} 
-	
+
 	Image_region_item = class 
 		Menupullright "_Region on Image" "make a new region on an image" {
 		Region_item = class 
@@ -111,26 +111,92 @@ Image_convert_to_image_item = class
 	action x = to_image x;
 }
 
-#separator
+Image_number_format_item = class
+	Menupullright "_Format" "convert numeric format" {
+
+	U8_item = class
+		Menuaction "_8 bit unsigned" "convert to unsigned 8 bit [0, 255]" {
+		action x = map_unary cast_unsigned_char x;
+	}
+
+	U16_item = class
+		Menuaction "1_6 bit unsigned" 
+			"convert to unsigned 16 bit [0, 65535]" {
+		action x = map_unary cast_unsigned_short x;
+	}
+
+	U32_item = class
+		Menuaction "_32 bit unsigned" 
+			"convert to unsigned 32 bit [0, 4294967295]" {
+		action x = map_unary cast_unsigned_int x;
+	}
+
+    sep1 = Menuseparator;
+
+	S8_item = class
+		Menuaction "8 _bit signed" "convert to signed 8 bit [-128, 127]" {
+		action x = map_unary cast_signed_char x;
+	}
+
+	S16_item = class
+		Menuaction "16 b_it signed" 
+			"convert to signed 16 bit [-32768, 32767]" {
+		action x = map_unary cast_signed_short x;
+	}
+
+	S32_item = class
+		Menuaction "32 bi_t signed" 
+			"convert to signed 32 bit [-2147483648, 2147483647]" {
+		action x = map_unary cast_signed_int x;
+	}
+
+    sep2 = Menuseparator;
+
+	Float_item = class
+		Menuaction "_Single precision float" 
+			"convert to IEEE 32 bit float" {
+		action x = map_unary cast_float x;
+	}
+
+	Double_item = class
+		Menuaction "_Double precision float" 
+			"convert to IEEE 64 bit float" {
+		action x = map_unary cast_double x;
+	}
+
+    sep3 = Menuseparator;
+
+	Scmplxitem = class
+		Menuaction "Single _precision complex" 
+			"convert to 2 x IEEE 32 bit float" {
+		action x = map_unary cast_complex x;
+	}
+
+	Dcmplx_item = class
+		Menuaction "Double p_recision complex" 
+			"convert to 2 x IEEE 64 bit float" {
+		action x = map_unary cast_double_complex x;
+	}
+}
 
 Image_header_item = class 
-Menupullright "_Header" "do stuff to the image header" {
+	Menupullright "_Header" "do stuff to the image header" {
 
-Image_get_item = class
-Menupullright "_Get" "get header fields" {
+	Image_get_item = class
+		Menupullright "_Get" "get header fields" {
 
-// the header fields we can get
-fields = class {
-	type = 0;
-	width = 1;
-	height = 2;
-	format = 3;
-	bands = 4;
-	xres = 5;
-	yres = 6;
-	xoffset = 7;
-	yoffset = 8;
-	coding = 9;
+		// the header fields we can get
+		fields = class {
+			type = 0;
+			width = 1;
+			height = 2;
+			format = 3;
+			bands = 4;
+			xres = 5;
+			yres = 6;
+			xoffset = 7;
+			yoffset = 8;
+			coding = 9;
 
 			field_names = Enum [
 				["width", width],
@@ -282,73 +348,7 @@ fields = class {
 	}
 }
 
-Image_number_format_item = class
-	Menupullright "Set _Format" "convert numeric format" {
-
-	U8_item = class
-		Menuaction "_8 bit unsigned" "convert to unsigned 8 bit [0, 255]" {
-		action x = map_unary cast_unsigned_char x;
-	}
-
-	U16_item = class
-		Menuaction "1_6 bit unsigned" 
-			"convert to unsigned 16 bit [0, 65535]" {
-		action x = map_unary cast_unsigned_short x;
-	}
-
-	U32_item = class
-		Menuaction "_32 bit unsigned" 
-			"convert to unsigned 32 bit [0, 4294967295]" {
-		action x = map_unary cast_unsigned_int x;
-	}
-
-    sep1 = Menuseparator;
-
-	S8_item = class
-		Menuaction "8 _bit signed" "convert to signed 8 bit [-128, 127]" {
-		action x = map_unary cast_signed_char x;
-	}
-
-	S16_item = class
-		Menuaction "16 b_it signed" 
-			"convert to signed 16 bit [-32768, 32767]" {
-		action x = map_unary cast_signed_short x;
-	}
-
-	S32_item = class
-		Menuaction "32 bi_t signed" 
-			"convert to signed 32 bit [-2147483648, 2147483647]" {
-		action x = map_unary cast_signed_int x;
-	}
-
-    sep2 = Menuseparator;
-
-	Float_item = class
-		Menuaction "_Single precision float" 
-			"convert to IEEE 32 bit float" {
-		action x = map_unary cast_float x;
-	}
-
-	Double_item = class
-		Menuaction "_Double precision float" 
-			"convert to IEEE 64 bit float" {
-		action x = map_unary cast_double x;
-	}
-
-    sep3 = Menuseparator;
-
-	Scmplxitem = class
-		Menuaction "Single _precision complex" 
-			"convert to 2 x IEEE 32 bit float" {
-		action x = map_unary cast_complex x;
-	}
-
-	Dcmplx_item = class
-		Menuaction "Double p_recision complex" 
-			"convert to 2 x IEEE 64 bit float" {
-		action x = map_unary cast_double_complex x;
-	}
-}
+#separator
 
 Image_levels_item = class 
 	Menupullright "_Levels" "change image levels" {
@@ -883,6 +883,8 @@ Image_band_item = class
 			}
 		}
 	}
+
+	Bandwise_item = Image_join_item.Bandwise_item;
 
     sep1 = Menuseparator;
 

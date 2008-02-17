@@ -956,6 +956,15 @@ extract_bands b n obj
 		(extract_bands b n) Operator_type.COMPOUND_REWRAP false;
 }
 
+invert x
+	= oo_unary_function invert_op x, is_class x
+	= im_invert x, is_image x
+	= 255 - x, is_real x
+	= error (_ "bad arguments to " ++ "invert")
+{
+	invert_op = Operator "invert" invert Operator_type.COMPOUND false;
+}
+
 transform ipol wrap params image
 	= oo_unary_function transform_op image, is_class image
 	= im_transform image 

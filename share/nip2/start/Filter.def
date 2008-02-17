@@ -846,7 +846,7 @@ Filter_tilt_item = class
 Filter_blend_item = class
 	Menupullright "_Blend" "blend objects together" {
 	Scale_blend_item = class
-		Menuaction "_Scale Blend" "blend two objects together with a scale" {
+		Menuaction "_Scale" "blend two objects together with a scale" {
 		action a b = class
 			_result {
 			_vislevel = 3;
@@ -862,28 +862,36 @@ Filter_blend_item = class
 	}
 
 	Image_blend_item = class
-		Menuaction "_Image Blend" "use an image to blend two objects" {
-		action a b c 
+		Menuaction "_Image" "use an image to blend two objects" {
+		action a b c = class
+			_result {
+			_vislevel = 3;
+
+			i = Toggle "Invert mask" false;
+
+			_result 
 				= map_trinary process a b c
-		{
-			process a b c 
-				= blend condition in1 in2
 			{
-				compare a b
-					// prefer image as the condition
-					= false, 
-						!has_image a && has_image b
-					// prefer mono images as the condition
-					= false, 
-						has_bands a && has_bands b && 
-						get_bands a > 1 && get_bands b == 1
-					// prefer uchar as the condition
-					= false,
-						has_format a && has_format b && 
-						get_format a > Image_format.UCHAR && 
-							get_format b == Image_format.UCHAR
-					= true;
-				[condition, in1, in2] = sortc compare [a, b, c];
+				process a b c 
+					= blend condition in1 in2, !i
+					= blend (invert condition) in1 in2
+				{
+					compare a b
+						// prefer image as the condition
+						= false, 
+							!has_image a && has_image b
+						// prefer mono images as the condition
+						= false, 
+							has_bands a && has_bands b && 
+							get_bands a > 1 && get_bands b == 1
+						// prefer uchar as the condition
+						= false,
+							has_format a && has_format b && 
+							get_format a > Image_format.UCHAR && 
+								get_format b == Image_format.UCHAR
+						= true;
+					[condition, in1, in2] = sortc compare [a, b, c];
+				}
 			}
 		}
 	}
@@ -935,7 +943,7 @@ Filter_blend_item = class
 	} 
 
 	Blend_alpha_item = class
-		Menuaction "_Alpha Blend" "blend images with optional alpha channels" {
+		Menuaction "_Alpha" "blend images with optional alpha channels" {
 		// usage: layerit foreground background
 		// input images must be either 1 or 3 bands, optionally + 1 band 
 		// which is used as the alpha channel

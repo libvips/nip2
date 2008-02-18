@@ -7,6 +7,8 @@ started 7.14.0
 - break _Object.def out of _types.def
 - better "if image then constant else constant" behaviour
 - fixed segvs with IMAGE lifetime and progress dialogs
+- use xdg-open to show help pages, if available
+- fixed segvs with IMAGE lifetime and progress dialogs
 - fixed segvs with outdated iimage change callbacks
 - some tweaking of the toolkits menu
 

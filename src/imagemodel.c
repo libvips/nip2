@@ -124,6 +124,7 @@ imagemodel_dispose( GObject *gobject )
 #endif /*DEBUG*/
 
 	FREESID( imagemodel->iimage_changed_sid, imagemodel->iimage ); 
+	FREESID( imagemodel->iimage_destroy_sid, imagemodel->iimage ); 
 	FREESID( imagemodel->conv_changed_sid, imagemodel->conv );
 	FREESID( imagemodel->conv_imageinfo_changed_sid, imagemodel->conv );
 	UNREF( imagemodel->conv );
@@ -264,6 +265,10 @@ imagemodel_conv_imageinfo_changed_cb( Conversion *conv, Imagemodel *imagemodel )
 static void
 imagemodel_init( Imagemodel *imagemodel )
 {
+	imagemodel->iimage = NULL;
+	imagemodel->iimage_changed_sid = 0;
+	imagemodel->iimage_destroy_sid = 0;
+
 	imagemodel->conv = conversion_new( NULL );
 	g_object_ref( G_OBJECT( imagemodel->conv ) );
 	iobject_sink( IOBJECT( imagemodel->conv ) );
@@ -324,6 +329,14 @@ imagemodel_get_type( void )
 }
 
 static void
+imagemodel_iimage_destroy_cb( iImage *iimage, Imagemodel *imagemodel )
+{
+	imagemodel->iimage = NULL;
+	imagemodel->iimage_destroy_sid = 0;
+	imagemodel->iimage_changed_sid = 0;
+}
+
+static void
 imagemodel_iimage_changed_cb( iImage *iimage, Imagemodel *imagemodel )
 {
 	conversion_set_image( imagemodel->conv, iimage->value.ii );
@@ -335,6 +348,9 @@ imagemodel_link( Imagemodel *imagemodel, iImage *iimage )
 	Row *row = HEAPMODEL( iimage )->row;
 
 	imagemodel->iimage = iimage;
+	imagemodel->iimage_destroy_sid = g_signal_connect( G_OBJECT( iimage ), 
+		"destroy", 
+		G_CALLBACK( imagemodel_iimage_destroy_cb ), imagemodel );
 	imagemodel->iimage_changed_sid = g_signal_connect( G_OBJECT( iimage ), 
 		"changed", 
 		G_CALLBACK( imagemodel_iimage_changed_cb ), imagemodel );

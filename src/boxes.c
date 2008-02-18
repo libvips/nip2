@@ -949,7 +949,8 @@ box_url( GtkWidget *par, const char *url )
 		box_info( par, _( "Browser window opened." ),
 			_( "Opened window for URL:\n"
 			"  %s\n"
-			"This may take a few seconds." ), url );
+			"You may need to switch desktops to see the "
+			"new window." ), url );
 		shown = TRUE;
 	}
 #else /*default unix-y*/

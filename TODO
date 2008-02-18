@@ -1,8 +1,3 @@
-- Blend / Image seems broken for inverted masks? how odd
-
-  try ~/test.ws
-
-
 - which gtk are we using for the windows build? new gtks come from the main gtk
   site now, rather than tor's homepage:
 

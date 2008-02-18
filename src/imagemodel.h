@@ -82,6 +82,7 @@ struct _Imagemodel {
 	 */
 	iImage *iimage;			/* iImage we represent, if any */
 	guint iimage_changed_sid;
+	guint iimage_destroy_sid;
 
 	/* State held in sub-objects.
 	 */

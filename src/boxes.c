@@ -920,37 +920,26 @@ box_url( GtkWidget *par, const char *url )
 	expand_variables( url, url2 );
 	v = (int) ShellExecute( NULL, "open", url2, NULL, NULL, SW_SHOWNORMAL );
 	if( v <= 32 ) {
-		error_top( _( "Unable to open location." ) );
+		error_top( _( "Unable to view help file." ) );
 		error_sub( _( "Unable to open URL \"%s\", "
 			"windows error code = %d." ), url, v );
 		box_alert( par );
 	}
 #elif defined OS_DARWIN
-	static gboolean shown = FALSE;
-
 	(void) systemf( "open %s", url );
-
-	if( !shown ) {
-		box_info( par, _( "Browser window opened." ),
-			_( "Opened window for URL:\n"
-			"  %s\n"
-			"This may take a few seconds." ), url );
-		shown = TRUE;
-	}
 #elif defined HAVE_XDG_OPEN
 	static gboolean shown = FALSE;
 
 	if( systemf( "%s %s", XDG_OPEN, url ) ) {
-		error_top( _( "Unable to open location." ) );
-		error_sub( _( "Attempt to view URL with xdg-open failed :(" ) );
+		error_top( _( "Unable to view help file." ) );
+		error_sub( _( "Attempt to view URL with xdg-open failed\n%s" ),
+			url );
 		box_alert( par );
 	}
 	else if( !shown ) {
 		box_info( par, _( "Browser window opened." ),
-			_( "Opened window for URL:\n"
-			"  %s\n"
-			"You may need to switch desktops to see the "
-			"new window." ), url );
+			_( "You may need to switch desktops to see the "
+			"new window." ) );
 		shown = TRUE;
 	}
 #else /*default unix-y*/
@@ -971,7 +960,7 @@ box_url( GtkWidget *par, const char *url )
 	buf_appendf( &buf2, buf_all( &buf ), url2 );
 
 	if( systemf( "%s", buf_all( &buf2 ) ) ) {
-		error_top( _( "Unable to open location." ) );
+		error_top( _( "Unable to view help file." ) );
 		error_sub( _( 
 			"Attempted to launch browser with command:\n"
 			"  %s\n"
@@ -982,17 +971,11 @@ box_url( GtkWidget *par, const char *url )
 	else if( !shown ) {
 		box_info( par, 
 			_( "Browser window opened." ),
-			_( "Opened window for URL:\n"
-			"  %s\n"
-			"You may need to switch desktops to see the "
-			"new window." ), 
-			url2 );
-
-		/* Only show 1st time.
-		 */
+			_( "You may need to switch desktops to see the "
+			"new window." ) );
 		shown = TRUE;
 	}
-#endif /*OS_WIN32*/
+#endif /*lots*/
 }
 
 /* Progress dialog.

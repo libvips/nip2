@@ -522,80 +522,15 @@ Math_stats_item = class
 
 	sep3 = Menuseparator;
 
-	// from s15.2, p 665 NR in C
 	Linear_regression_item = class
 		Menuaction "_Linear Regression" "fit a line to a set of points" {
-		action xes yes = class {
-			_vislevel = 3;
-
-			/* Hide these by default.
-			 */
-			details = class {
-					ss = len xes;
-					sx = sum xes;
-					sy = sum yes;
-					sxoss = sx / ss;
-
-					t = map (converse subtract sxoss) xes;
-					st2 = sum (map (converse power 2) t);
-			}
-
-			slope = sum (map2 multiply details.t yes) / details.st2;
-			intercept = (details.sy - details.sx * slope) / details.ss;
-
-			chi2 = sum 
-				(map (converse power 2)
-						(map2 subtract
-								(map (converse subtract intercept) yes) 
-								(map (multiply slope) xes)));
-
-			siga = (chi2 / (details.ss - 2)) ** 0.5 * 
-				((1 + details.sx ** 2 / 
-				(details.ss * details.st2)) / details.ss) ** 0.5;
-			sigb = (chi2 / (details.ss - 2)) ** 0.5 * 
-				(1 / details.st2) ** 0.5;
-
-			q = 1.0;
-		}
+		action xes yes = linreg xes yes;
 	}
 
 	Weighted_linear_regression_item = class
 		Menuaction "_Weighted Linear Regression" 
 			"fit a line to a set of points and deviations" {
-		action xes yes devs = class {
-			_vislevel = 3;
-
-			/* Hide these by default.
-			 */
-			details = class {
-				wt = map (converse power (-0.5)) devs;
-
-				ss = sum wt;
-				sx = sum (map2 multiply xes wt);
-				sy = sum (map2 multiply yes wt);
-				sxoss = sx / ss;
-
-				t = map2 divide (map (converse subtract sxoss) xes) devs;
-				st2 = sum (map (converse power 2) t);
-			}
-
-			slope = sum (map2 divide (map2 multiply details.t yes) devs) /
-				details.st2;
-			intercept = (details.sy - details.sx * slope) / details.ss;
-
-			siga = ((1 + details.sx * details.sx / 
-				(details.ss * details.st2)) / details.ss) ** 0.5;
-			sigb = (1 / details.st2) ** 0.5;
-
-			chi2 = sum 
-				(map (converse power 2)
-					(map2 divide
-						(map2 subtract
-								(map (converse subtract intercept) yes) 
-								(map (multiply slope) xes))
-						devs));
-			q = gammq (0.5 * (len xes - 2)) (0.5 * chi2);
-		}
+		action xes yes devs = linregw xes yes devs;
 	}
 }
 

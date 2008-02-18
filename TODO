@@ -1,3 +1,20 @@
+- put this in test.def
+
+	linreg = t;
+	 
+	linregw
+	    = st2
+        {   
+            tes = [x | x <- devs];
+	    st2 = [t | t <- tes];
+	}
+
+  dies with
+
+  nip2: compile.c:1830: compile_patch_pointers_sub: Assertion `*pnt == osym'
+  failed.
+
+
 - which gtk are we using for the windows build? new gtks come from the main gtk
   site now, rather than tor's homepage:
 

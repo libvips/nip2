@@ -304,7 +304,7 @@ Tasks_capture_item = class
 					print _max_dE ++ " dE)"
 			{
 				name i 
-					= macbeth_names?i, i >= 0
+					= macbeth_names?i, i >= 0 && i < len macbeth_names
 					= "Unknown";
 			}
 		}

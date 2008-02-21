@@ -44,6 +44,14 @@
 #define DEBUG_RESULT
  */
 
+/* trace list comp compile
+ */
+#define DEBUG_LCOMP
+
+/* trace pattern LHS generation
+ */
+#define DEBUG_PATTERN
+
 /* 
 #define DEBUG
  */
@@ -2283,10 +2291,10 @@ compile_lcomp( Compile *compile )
 	char name[256];
 	ParseNode *n1, *n2, *n3;
 
-#ifdef DEBUG
+#ifdef DEBUG_LCOMP
 	printf( "before compile_lcomp:\n" );
 	dump_compile( compile );
-#endif /*DEBUG*/
+#endif /*DEBUG_LCOMP*/
 
 	/* Find all the elements of the lcomp: generators, filters, patterns 
 	 * and $$result.
@@ -2295,13 +2303,13 @@ compile_lcomp( Compile *compile )
 	(void) icontainer_map( ICONTAINER( compile ), 
 		(icontainer_map_fn) compile_lcomp_find, &children, NULL );
 
-#ifdef DEBUG
+#ifdef DEBUG_LCOMP
 	printf( "list comp " );
 	compile_name_print( compile );
 	printf( " has children: " ); 
 	(void) slist_map( children, (SListMapFn) dump_tiny, NULL );
 	printf( "\n" ); 
-#endif /*DEBUG*/
+#endif /*DEBUG_LCOMP*/
 
 	/* As yet no list to build on.
 	 */
@@ -2324,8 +2332,10 @@ compile_lcomp( Compile *compile )
 
 		/* Just note the result element ... we use it right at the end.
 		 */
-		if( strcmp( "$$result", IOBJECT( element )->name ) == 0 ) 
+		if( strcmp( "$$result", IOBJECT( element )->name ) == 0 ) {
 			result = element;
+			continue;
+		}
 
 		/* And only process filter/gen.
 		 */
@@ -2453,19 +2463,19 @@ compile_lcomp( Compile *compile )
 			compile_link_break( parent, element );
 		}
 
-#ifdef DEBUG
+#ifdef DEBUG_LCOMP
 		printf( "** zombie-ing (%p) ", element );
 		symbol_name_print( element );
 		printf( "\n" );
-#endif /*DEBUG*/
+#endif /*DEBUG_LCOMP*/
 
 		element->type = SYM_ZOMBIE;
 	}
 
-#ifdef DEBUG
+#ifdef DEBUG_LCOMP
 	printf( "after compile_lcomp:\n" );
 	dump_compile( compile );
-#endif /*DEBUG*/
+#endif /*DEBUG_LCOMP*/
 
 	g_slist_free( children );
 }
@@ -2735,10 +2745,10 @@ compile_pattern_lhs_leaf( PatternLhs *lhs, Symbol *leaf )
 			lhs->sym, lhs->trail, lhs->depth ),
 		compile_pattern_error( compile, leaf ) );
 
-#ifdef DEBUG
+#ifdef DEBUG_PATTERN
 	printf( "compile_pattern_lhs_leaf: generated\n" );
 	dump_compile( compile );
-#endif /*DEBUG*/
+#endif /*DEBUG_PATTERN*/
 }
 
 /* Recurse over the pattern generating references.
@@ -2789,6 +2799,11 @@ GSList *
 compile_pattern_lhs( Compile *compile, Symbol *sym, ParseNode *node )
 {
 	PatternLhs lhs;
+
+#ifdef DEBUG_PATTERN
+	printf( "compile_pattern_lhs: building access fns for %s\n", 
+		symbol_name( sym ) );
+#endif /*DEBUG_PATTERN*/
 
 	lhs.compile = compile;
 	lhs.sym = sym;

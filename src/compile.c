@@ -28,8 +28,8 @@
  */
 
 /* 
-#define DEBUG_RESOLVE
  */
+#define DEBUG_RESOLVE
 
 /* regular (and very slow) sanity checks on symbols ... needs DEBUG in
  * symbol.c as well
@@ -45,12 +45,12 @@
  */
 
 /* trace list comp compile
- */
 #define DEBUG_LCOMP
+ */
 
 /* trace pattern LHS generation
- */
 #define DEBUG_PATTERN
+ */
 
 /* 
 #define DEBUG
@@ -1834,8 +1834,20 @@ compile_error_set( Compile *compile )
  */
 static void *
 compile_patch_pointers_sub( void **pnt, void *nsym, void *osym )
-{	
+{
+	/*
 	assert( *pnt == osym );
+	 */
+
+	if( *pnt != osym ) {
+		printf( "trying to patch pointers to %s\n", 
+			symbol_name( osym ) );
+		printf( "to point to %s instead\n", 
+			symbol_name( nsym ) );
+		printf( "but instead the old pointer points at %p\n",
+			*pnt );
+		assert( 0 );
+	}
 
 	*pnt = nsym;
 

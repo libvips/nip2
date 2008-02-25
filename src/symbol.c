@@ -239,6 +239,7 @@ symbol_clear( Symbol *sym )
 	sym->leaf = FALSE;
 
 	sym->generated = FALSE;
+	sym->placeholder = FALSE;
 
 	sym->tool = NULL;
 

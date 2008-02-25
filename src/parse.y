@@ -716,6 +716,7 @@ list_expression:
 		 */
 		sym = symbol_new_defining( current_compile, "$$result" );
 		sym->generated = TRUE;
+		sym->placeholder = TRUE;
 		(void) symbol_user_init( sym );
 		(void) compile_new_local( sym->expr );
 		sym->expr->compile->tree = compile_copy_tree( enclosing, $2, 
@@ -728,6 +729,7 @@ list_expression:
 		im_snprintf( name, 256, "$$pattern%d", parse_object_id );
 		sym = symbol_new_defining( current_compile, name );
 		sym->generated = TRUE;
+		sym->placeholder = TRUE;
 		(void) symbol_user_init( sym );
 		(void) compile_new_local( sym->expr );
 		sym->expr->compile->tree = $4;
@@ -738,6 +740,7 @@ list_expression:
 		im_snprintf( name, 256, "$$generator%d", parse_object_id++ );
 		sym = symbol_new_defining( current_compile, name );
 		sym->generated = TRUE;
+		sym->placeholder = TRUE;
 		(void) symbol_user_init( sym );
 		(void) compile_new_local( sym->expr );
 		sym->expr->compile->tree = compile_copy_tree( enclosing, $6, 
@@ -795,6 +798,7 @@ frompred:
 		im_snprintf( name, 256, "$$pattern%d", parse_object_id );
 		sym = symbol_new_defining( current_compile, name );
 		sym->generated = TRUE;
+		sym->placeholder = TRUE;
 		(void) symbol_user_init( sym );
 		(void) compile_new_local( sym->expr );
 		sym->expr->compile->tree = $1;
@@ -802,6 +806,7 @@ frompred:
 		im_snprintf( name, 256, "$$generator%d", parse_object_id++ );
 		sym = symbol_new_defining( current_compile, name );
 		sym->generated = TRUE;
+		sym->placeholder = TRUE;
 		(void) symbol_user_init( sym );
 		(void) compile_new_local( sym->expr );
 		sym->expr->compile->tree = $3;
@@ -813,6 +818,7 @@ frompred:
 		im_snprintf( name, 256, "$$filter%d", parse_object_id++ );
 		sym = symbol_new_defining( current_compile, name );
 		sym->generated = TRUE;
+		sym->placeholder = TRUE;
 		(void) symbol_user_init( sym );
 		(void) compile_new_local( sym->expr );
 		sym->expr->compile->tree = $1;

@@ -57,7 +57,9 @@ typedef enum {
 struct _Symbol {
 	Filemodel parent_class;
 
-	SymbolType type; 	/* The type of this symbol */
+	/* The type of this symbol.
+	 */
+	SymbolType type;
 
 	/* Track during parse. A list of pointers to pointers to this
 	 * symbol which we need to patch if we resolve to an outer scope.
@@ -88,6 +90,11 @@ struct _Symbol {
 	/* This is a generated symbol, like $$result, $$fn1, whatever.
 	 */
 	gboolean generated;
+
+	/* A temporary intermediate symbol generated during parse to hold 
+	 * stuff until we need it. Don't generate code for these.
+	 */
+	gboolean placeholder;
 
 	/* X-tras for definitions.
 	 */

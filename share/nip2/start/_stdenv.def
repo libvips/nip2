@@ -1891,48 +1891,6 @@ buildlut x
 /* Linear regression. Return a class with the stuff we need in.
  * from s15.2, p 665 NR in C
  */
-linreg xes yes 
-	= obj
-{
-	obj = class {
-		// in case we ever get shown in the workspace
-		_vislevel = 2;
-
-		slope = sum (map2 multiply tes yes) / st2;
-		intercept = (sy - sx * slope) / ss;
-
-		chi2 = sum 
-			(map (converse power 2)
-					(map2 subtract
-							(map (converse subtract intercept) yes) 
-							(map (multiply slope) xes)));
-
-		siga = (chi2 / (ss - 2)) ** 0.5 * 
-			((1 + sx ** 2 / (ss * st2)) / ss) ** 0.5;
-		sigb = (chi2 / (ss - 2)) ** 0.5 * (1 / st2) ** 0.5;
-
-		// for compat with linregw, see below
-		q = 1.0;
-	}
-
-	ss = len xes;
-	sx = sum xes;
-	sy = sum yes;
-	sxoss = sx / ss;
-
-	tes = map (converse subtract sxoss) xes;
-	st2 = sum (map (converse power 2) tes);
-}
-
-/* Linear regression. Return a class with the stuff we need in.
- * from s15.2, p 665 NR in C
-
-	FIXME ... this version dies with 
-
-nip2: compile.c:1830: compile_patch_pointers_sub: Assertion `*pnt == osym' failed.
-
-	how odd
-
 linreg xes yes
     = obj
 {
@@ -1961,7 +1919,6 @@ linreg xes yes
     tes = [x - sxoss | x <- xes];
     st2 = sum [t ** 2 | t <- tes];
 }
- */
 
 /* Weighted linear regression. Xes, yes and a list of deviations.
  */

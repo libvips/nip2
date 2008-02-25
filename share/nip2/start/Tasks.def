@@ -240,10 +240,10 @@ Tasks_capture_item = class
 				"$VIPSHOME/share/$PACKAGE/data/macbeth_lab_d65.mat";
 
 			mode = Option "Input LUT" [
-				"Linearize input from chart greyscale",
-				"Set black from chart greyscale",
-				"Linear input"
-			] 0;
+				"Linear input",
+				"Fit intercept from chart greyscale",
+				"Linearize input from chart greyscale"
+			] 2;
 
 			// get max of input image
 			_max_value = Image_format.maxval image.format;
@@ -266,14 +266,22 @@ Tasks_capture_item = class
 			_camera_grey' = map (map (multiply (1 / _max_value))) _camera_grey;
 			_true_grey_Y' = map (multiply (1 / 100)) _true_grey_Y;
 			_comb 
-				= Matrix (map2 cons _true_grey_Y' _camera_grey'), mode == 0
-				= Matrix [[0, 0], [1, 1]];
+				= Matrix [[0, 0], [1, 1]], mode == 0
+				= Matrix [0: intercepts, replicate (_camera.width + 1) 1], 
+					mode == 1
+				= Matrix (map2 cons _true_grey_Y' _camera_grey')
+			{
+				intercepts = [(linreg _true_grey_Y' cam).intercept | 
+					cam <- transpose _camera_grey'];
+			}
 
 			// make a linearising lut ... zero on left
 			_linear_lut = im_invertlut _comb (_max_value + 1);
 
 			// and display it
-			linearising_lut = Plot [] _linear_lut;
+			// plot from 0 explicitly so we see the effect of mode1 (intercept
+			// from greyscale)
+			linearising_lut = Plot [["ymin", 0]] _linear_lut;
 
 			// map the original image through the lineariser to 
 			// get linear 0-1 RGB image

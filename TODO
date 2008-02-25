@@ -8,19 +8,22 @@
 - quit while a thumbnail is painting: IMAGEs are leaked? seems esp. bad with
   greyc, perhaps just because it's so slow
 
-- have a toggle in find colour calib for "linearise"
-
-  another option that uses the greyscale to set the zero, but does not adjust
-  gamma?
-
-  need to break linear regression out into a separate function ... se Math.def
-
-  half-done colour calib thing
-
 - apply calib should work for groups
 
+- try
 
+	nip2 ~/Desktop/lars/apply_transform.ws 
 
+  change main to be [G10] and got:
+
+	  nip2: parse.y:288: yyuserAction: Assertion `sym' failed.
+	  Aborted (core dumped)
+
+- try
+
+	nip2 -bp calibrate.ws
+
+  fails??
 
 WONTFIX
 =======

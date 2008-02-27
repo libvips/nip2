@@ -10,23 +10,6 @@
 
 - apply calib should work for groups
 
-- try
-
-	$  nip2 -bpV --set 'main=im_read_dmask"macb.mat"'
-	error calculating "main"
-	No value. Symbol "Matrix_base" has no value
-	error in "main": No value.
-	Symbol "Matrix_base" has no value
-
-- try
-
-	nip2 ~/Desktop/lars/apply_transform.ws 
-
-  change main to be [G10] and got:
-
-	  nip2: parse.y:288: yyuserAction: Assertion `sym' failed.
-	  Aborted (core dumped)
-
 WONTFIX
 =======
 

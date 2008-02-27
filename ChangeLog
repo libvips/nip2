@@ -13,6 +13,8 @@ started 7.14.0
 - some tweaking of the toolkits menu
 - fixed another lcomp bug
 - intercept from greyscale option in find_calib
+- removed unnecessaary assert() from parser
+- recomp all on startup even in batch mode fixes some strange bugs
 
 started 7.13.3
 - save image was broken, weakrefs were not being updated

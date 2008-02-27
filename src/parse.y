@@ -112,7 +112,6 @@ void *parse_access_end( Symbol *sym, Symbol *main );
 %union {
 	struct sym_table *yy_symtab;
 	ParseNode *yy_node;
-	Symbol *yy_sym;
 	char *yy_name;
 	ParseConst yy_const;
 	UnOp yy_uop;
@@ -134,7 +133,6 @@ void *parse_access_end( Symbol *sym, Symbol *main );
 %type <yy_node> crhs cexprlist prhs lambda
 %type <yy_const> TK_CONST 
 %type <yy_name> TK_IDENT TK_TAG
-%type <yy_sym> toplevel_definition
 
 %left TK_LAMBDA 
 %nonassoc TK_IF 
@@ -283,13 +281,7 @@ toplevel_definition:
 		current_compile = root_symbol->expr->compile;
 	}
 	definition {
-		Symbol *sym = current_compile->last_sym;
-
-		assert( sym );
-
 		input_reset();
-
-		$$ = sym;
 	}
 	;
 

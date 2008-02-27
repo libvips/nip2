@@ -1317,12 +1317,12 @@ main( int argc, char *argv[] )
 	 */
 	main_load_startup();
 
-	/* Recalc to build all classes.
+	/* Recalc to build all classes. We have to do this in batch
+	 * mode since we can find dirties through dynamic lookups. Even though
+	 * you might think we could just follow recomps.
 	 */
-	if( !main_option_batch ) {
-		main_splash_update( "%s", _( "First recalculation ..." ) );
-		symbol_recalculate_all();
-	}
+	main_splash_update( "%s", _( "First recalculation ..." ) );
+	symbol_recalculate_all();
 
 	/* Measure amount of stuff in temp area ... need this for checking
 	 * temps later. We pop a diglog if there are too many, so only useful

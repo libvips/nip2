@@ -15,6 +15,7 @@ started 7.14.0
 - intercept from greyscale option in find_calib
 - removed unnecessaary assert() from parser
 - recomp all on startup even in batch mode fixes some strange bugs
+- apply calib works for groups of images
 
 started 7.13.3
 - save image was broken, weakrefs were not being updated

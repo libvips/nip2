@@ -5,13 +5,11 @@
 
   should be all zips, so we could automate?
 
-- quit while a thumbnail is painting: IMAGEs are leaked? seems esp. bad with
-  greyc, perhaps just because it's so slow
-
-- apply calib should work for groups
-
 WONTFIX
 =======
+
+- quit while a thumbnail is painting: IMAGEs are leaked? seems esp. bad with
+  greyc, perhaps just because it's so slow
 
 - do we enforce no-args-to-LHS-pattern anywhere? try
 

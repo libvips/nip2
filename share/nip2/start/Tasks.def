@@ -321,23 +321,27 @@ Tasks_capture_item = class
 	Apply_calib_item = class 
 		Menuaction "_Apply Colour Calibration" 
 			"apply an RGB -> LAB transform to an image" {
-		action a b 
-			= result, is_instanceof calib_name calib && is_Image image
-			= error (_ "bad arguments to " ++ "Calibrate_image")
-		{
-			// the name of the calib object we need
-			calib_name = "Tasks_capture_item.Find_calib_item.action";
+		action a b = class
+			(map_binary process a b) {
+			process a b
+				= result, is_instanceof calib_name calib && is_Image image
+				= error (_ "bad arguments to " ++ "Calibrate_image")
+			{
+				// the name of the calib object we need
+				calib_name = "Tasks_capture_item.Find_calib_item.action";
 
-			// get the Calibrate_chart arg first
-			[image, calib] = sortc (const (is_instanceof calib_name)) [a, b];
+				// get the Calibrate_chart arg first
+				[image, calib] = sortc (const (is_instanceof calib_name)) 
+					[a, b];
 
-			// map the original image through the lineariser to get 
-			// linear 0-1 RGB image
-			image' = hist_map calib.linearising_lut image;
+				// map the original image through the lineariser to get 
+				// linear 0-1 RGB image
+				image' = hist_map calib.linearising_lut image;
 
-			// convert linear RGB camera to Lab 
-			result = colour_transform Image_type.XYZ Image_type.LAB 
-				((float) (recomb calib.M image'));
+				// convert linear RGB camera to Lab 
+				result = colour_transform Image_type.XYZ Image_type.LAB 
+					((float) (recomb calib.M image'));
+			}
 		}
 	}
 

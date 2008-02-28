@@ -1,3 +1,5 @@
+- unsharp should work on GREY16? shuld be easy to add GREY16->LABS
+
 - which gtk are we using for the windows build? new gtks come from the main gtk
   site now, rather than tor's homepage:
 

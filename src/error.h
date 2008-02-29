@@ -1,4 +1,4 @@
-/* Decls for error.c ... show all errors
+/* Decls for ierror.c ... show all ierrors
  */
 
 /*
@@ -27,27 +27,27 @@
 
  */
 
-#define TYPE_ERROR (error_get_type())
-#define ERROR( obj ) (GTK_CHECK_CAST( (obj), TYPE_ERROR, Error ))
-#define ERROR_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_ERROR, ErrorClass ))
-#define IS_ERROR( obj ) (GTK_CHECK_TYPE( (obj), TYPE_ERROR ))
-#define IS_ERROR_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_ERROR ))
+#define TYPE_IERROR (ierror_get_type())
+#define IERROR( obj ) (GTK_CHECK_CAST( (obj), TYPE_IERROR, iError ))
+#define IERROR_CLASS( klass ) \
+	(GTK_CHECK_CLASS_CAST( (klass), TYPE_IERROR, iErrorClass ))
+#define IS_IERROR( obj ) (GTK_CHECK_TYPE( (obj), TYPE_IERROR ))
+#define IS_IERROR_CLASS( klass ) \
+	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_IERROR ))
 
-struct _Error {
+struct _iError {
 	Log parent_class;
 
-	Toolkitgroup *kitg;	/* Where we search for link errors */
+	Toolkitgroup *kitg;	/* Where we search for link ierrors */
 };
 
-typedef struct _ErrorClass {
+typedef struct _iErrorClass {
 	LogClass parent_class;
 
 	/* My methods.
 	 */
-} ErrorClass;
+} iErrorClass;
 
-GtkType error_get_type( void );
-Error *error_new( Toolkitgroup *kitg );
+GtkType ierror_get_type( void );
+iError *ierror_new( Toolkitgroup *kitg );
 

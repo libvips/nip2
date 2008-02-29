@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.12.19">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.14.19">
   <Workspace filename="test_toolkits.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1920" window_height="1163" name="test_toolkits" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="10" name="A" caption="Colour / New">
       <Subcolumn vislevel="3">
@@ -2316,31 +2316,31 @@
           <Rhs vislevel="1" flags="1">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Format_duplicate_item.action X1"/>
+            <iText formula="Object_duplicate_item.action X1"/>
           </Rhs>
         </Row>
         <Row popup="false" name="X4">
           <Rhs vislevel="1" flags="4">
-            <iText formula="Format_break_item.action X1"/>
+            <iText formula="Object_break_item.action X1"/>
           </Rhs>
         </Row>
         <Row popup="false" name="X6">
           <Rhs vislevel="1" flags="1">
-            <iText formula="Format_list_to_group_item.action X4"/>
+            <iText formula="Object_list_to_group_item.action X4"/>
             <Group/>
             <Subcolumn vislevel="0"/>
           </Rhs>
         </Row>
         <Row popup="false" name="X9">
           <Rhs vislevel="1" flags="4">
-            <iText formula="Format_group_to_list_item.action X6"/>
+            <iText formula="Object_group_to_list_item.action X6"/>
           </Rhs>
         </Row>
         <Row popup="false" name="X10">
           <Rhs vislevel="1" flags="1">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Format_assemble_item.action X9"/>
+            <iText formula="Object_assemble_item.action X9"/>
           </Rhs>
         </Row>
       </Subcolumn>
@@ -2635,7 +2635,7 @@
           <Rhs vislevel="3" flags="7">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="1"/>
-            <iText formula="Image_new_item.Image_new_from_image_item.action AB1"/>
+            <iText formula="Image_new_item.Image_new_item.Image_new_from_image_item.action AB1"/>
           </Rhs>
         </Row>
         <Row popup="false" name="AB3">
@@ -2644,7 +2644,7 @@
               <iRegiongroup/>
             </iRegion>
             <Subcolumn vislevel="0"/>
-            <iText formula="Image_new_item.Image_region_item.Region_item.action AB1"/>
+            <iText formula="Image_new_item.Image_new_item.Image_region_item.Region_item.action AB1"/>
           </Rhs>
         </Row>
         <Row popup="false" name="AB4">
@@ -2653,7 +2653,7 @@
               <iRegiongroup/>
             </iArrow>
             <Subcolumn vislevel="0"/>
-            <iText formula="Image_new_item.Image_region_item.Mark_item.action AB1"/>
+            <iText formula="Image_new_item.Image_new_item.Image_region_item.Mark_item.action AB1"/>
           </Rhs>
         </Row>
         <Row popup="false" name="AB5">
@@ -2662,7 +2662,7 @@
               <iRegiongroup/>
             </iArrow>
             <Subcolumn vislevel="0"/>
-            <iText formula="Image_new_item.Image_region_item.Arrow_item.action AB1"/>
+            <iText formula="Image_new_item.Image_new_item.Image_region_item.Arrow_item.action AB1"/>
           </Rhs>
         </Row>
         <Row popup="false" name="AB6">
@@ -2671,7 +2671,7 @@
               <iRegiongroup/>
             </iArrow>
             <Subcolumn vislevel="0"/>
-            <iText formula="Image_new_item.Image_region_item.HGuide_item.action AB1"/>
+            <iText formula="Image_new_item.Image_new_item.Image_region_item.HGuide_item.action AB1"/>
           </Rhs>
         </Row>
         <Row popup="false" name="AB7">
@@ -2680,7 +2680,7 @@
               <iRegiongroup/>
             </iArrow>
             <Subcolumn vislevel="0"/>
-            <iText formula="Image_new_item.Image_region_item.VGuide_item.action AB1"/>
+            <iText formula="Image_new_item.Image_new_item.Image_region_item.VGuide_item.action AB1"/>
           </Rhs>
         </Row>
       </Subcolumn>
@@ -3838,14 +3838,14 @@
                 </Rhs>
               </Row>
             </Subcolumn>
-            <iText formula="Image_transform_item.Resize_item.Resize_canvas_item.action FB1"/>
+            <iText formula="Image_transform_item.Resize_item.Resize_item.Resize_canvas_item.action FB1"/>
           </Rhs>
         </Row>
         <Row popup="false" name="FB18">
           <Rhs vislevel="3" flags="7">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="1"/>
-            <iText formula="Image_header_item.Image_edit_header_item.action FB17"/>
+            <iText formula="Image_header_item.Image_header_item.Image_edit_header_item.action FB17"/>
           </Rhs>
         </Row>
       </Subcolumn>

@@ -301,7 +301,7 @@ typedef struct _Toolkitgroupview Toolkitgroupview;
 typedef struct _Toolkitview Toolkitview;
 typedef struct _Toolview Toolview;
 typedef struct _Trace Trace;
-typedef struct _Error Error;
+typedef struct _iError iError;
 typedef struct _Log Log;
 typedef struct _vObject vObject;
 typedef struct _View View;

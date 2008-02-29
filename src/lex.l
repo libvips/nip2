@@ -28,17 +28,14 @@
 
 */
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif /*HAVE_CONFIG_H*/
+#include "ip.h"
 
 #ifdef HAVE_FLEX
 
 /* Flex has a different input mechanism :(
  */
 
-#define YY_INPUT(buf,result,max_size) \
-{ \
+#define YY_INPUT(buf,result,max_size) { \
 	extern int ip_input( void ); \
 	int c = ip_input(); \
 	result = (c == 0) ? YY_NULL : (buf[0] = c, 1); \

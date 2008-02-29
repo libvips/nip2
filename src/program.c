@@ -1588,10 +1588,10 @@ program_trace_action_cb( GtkAction *action, Program *program )
 static void
 program_errorreport_action_cb( GtkAction *action, Program *program )
 {
-	Error *error;
+	iError *ierror;
 
-	error = error_new( program->kitg );
-	gtk_widget_show( GTK_WIDGET( error ) ); 
+	ierror = ierror_new( program->kitg );
+	gtk_widget_show( GTK_WIDGET( ierror ) ); 
 
 #ifdef DEBUG
 	/* Dump VIPS memory usage info for debugging.

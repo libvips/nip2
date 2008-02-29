@@ -1,14 +1,5 @@
-- unsharp should work on GREY16? shuld be easy to add GREY16->LABS
-
-- which gtk are we using for the windows build? new gtks come from the main gtk
-  site now, rather than tor's homepage:
-
-	http://ftp.gnome.org/pub/GNOME/binaries/win32/
-
-  should be all zips, so we could automate?
-
-WONTFIX
-=======
+WONTFIX for 7.14
+================
 
 - quit while a thumbnail is painting: IMAGEs are leaked? seems esp. bad with
   greyc, perhaps just because it's so slow

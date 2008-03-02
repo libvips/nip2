@@ -18,6 +18,7 @@ started 7.14.0
 - apply calib works for groups of images
 - renamed Error as iError to help windows
 - more small windows fixes
+- more small os x fixes
 
 started 7.13.3
 - save image was broken, weakrefs were not being updated

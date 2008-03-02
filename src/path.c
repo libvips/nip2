@@ -79,10 +79,10 @@ path_parse( const char *path )
 	return( op );
 }
 
-/* Free a path.
+/* Free a path. path_free() is reserved n OS X :(
  */
 void
-path_free( GSList *path )
+path_free2( GSList *path )
 {
 	slist_map( path, (SListMapFn) im_free, NULL );
 	g_slist_free( path );

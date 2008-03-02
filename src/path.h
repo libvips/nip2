@@ -41,7 +41,7 @@ typedef void *(*path_map_fn)( const char *, void *, void *, void * );
 
 GSList *path_parse( const char *path );
 char *path_unparse( GSList *path );
-void path_free( GSList *path );
+void path_free2( GSList *path );
 void *path_map_exact( GSList *path, 
 	const char *patt, path_map_fn fn, void *a );
 void *path_map( GSList *path, const char *patt, path_map_fn fn, void *a );

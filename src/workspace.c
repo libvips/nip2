@@ -1116,10 +1116,10 @@ workspace_load_compat( Workspace *ws, int major, int minor )
 	path = path_parse( pathname );
 	if( path_map_exact( path, "*.def", 
 		(path_map_fn) workspace_load_toolkit, ws->kitg ) ) {
-		path_free( path );
+		path_free2( path );
 		return( FALSE );
 	}
-	path_free( path );
+	path_free2( path );
 
 	ws->compat_major = major;
 	ws->compat_minor = minor;

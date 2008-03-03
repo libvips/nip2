@@ -985,12 +985,20 @@ Image value = class
 		target_bands = get_member_list has_bands get_bands objects;
 		target_type = get_member_list has_type get_type objects;
 
+		// if one of then/else is an image, get the target format from that
+		// otherwise, let the non-image objects set the target
+		target_format 
+			= get_member_list has_format get_format x, 
+				has_member_list has_format x
+			= [];
+
 		to_image x
 			= x, is_image x
 			= x.value, is_Image x
-			= black + x
+			= clip2fmt target_format im, target_format != []
+			= im
 		{
-			black = im_black width height target_bands;
+			im = im_black width height target_bands + x;
 		}
 
 		[if_size, then_size, else_size] = 

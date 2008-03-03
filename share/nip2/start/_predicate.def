@@ -372,7 +372,7 @@ get_top x
 	= x.top, has_member "top" x
 	= error ("get_top: unable to get top from " ++ print x);
 
-// like has/get member,but first in a lst of objects
+// like has/get member, but first in a lst of objects
 has_member_list has objects
 	= filter has objects != [];
 

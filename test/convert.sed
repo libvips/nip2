@@ -32,6 +32,7 @@ s/Colour_image_to_colour_item/Colour_to_colour_item/
 s/Matrix_convert_to_image_item/Image_convert_to_image_item/
 s/Matrix_from_image_item/Matrix_to_matrix_item/
 s/Hist_new_item.action/Hist_new_item.Hist_item.action/
+s/Hist_from_image_item.action/Hist_new_item.Hist_from_image_item.action/
 s/Format_csv_import_item/Tasks_capture_item.Csv_import_item/
 s/Interpret_header_item/Tasks_capture_item.Analyze7_header_item/
 s/Format_duplicate_item/Object_duplicate_item/

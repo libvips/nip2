@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.14.19">
-  <Workspace filename="test_toolkits.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1920" window_height="1163" name="test_toolkits" caption="Default empty workspace">
+  <Workspace filename="test/test_toolkits.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1920" window_height="1165" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_toolkits" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="10" name="A" caption="Colour / New">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
@@ -960,7 +960,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="776" y="0" open="true" selected="false" sform="false" next="18" name="H" caption="Filter / Convolution">
+    <Column x="777" y="0" open="true" selected="false" sform="false" next="18" name="H" caption="Filter / Convolution">
       <Subcolumn vislevel="3">
         <Row popup="false" name="H1">
           <Rhs vislevel="1" flags="1">
@@ -1137,7 +1137,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="776" y="1418" open="true" selected="false" sform="false" next="6" name="K" caption="Filter / Rank">
+    <Column x="777" y="1418" open="true" selected="false" sform="false" next="6" name="K" caption="Filter / Rank">
       <Subcolumn vislevel="3">
         <Row popup="false" name="K1">
           <Rhs vislevel="1" flags="1">
@@ -1176,7 +1176,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="776" y="2024" open="true" selected="false" sform="false" next="12" name="M" caption="Filter / Morphology">
+    <Column x="777" y="2024" open="true" selected="false" sform="false" next="12" name="M" caption="Filter / Morphology">
       <Subcolumn vislevel="3">
         <Row popup="false" name="M1">
           <Rhs vislevel="1" flags="1">
@@ -1257,7 +1257,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="776" y="3207" open="true" selected="false" sform="false" next="6" name="N" caption="Filter / Fourier / Ideal">
+    <Column x="777" y="3207" open="true" selected="false" sform="false" next="6" name="N" caption="Filter / Fourier / Ideal">
       <Subcolumn vislevel="3">
         <Row popup="false" name="N1">
           <Rhs vislevel="1" flags="1">
@@ -1380,7 +1380,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="776" y="4269" open="true" selected="false" sform="false" next="9" name="O" caption="Filter / Fourier / Gaussian">
+    <Column x="777" y="4269" open="true" selected="false" sform="false" next="9" name="O" caption="Filter / Fourier / Gaussian">
       <Subcolumn vislevel="3">
         <Row popup="false" name="O1">
           <Rhs vislevel="1" flags="1">
@@ -1462,7 +1462,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="776" y="5421" open="true" selected="false" sform="false" next="9" name="P" caption="Filter / Fourier / Butterworth">
+    <Column x="777" y="5421" open="true" selected="false" sform="false" next="9" name="P" caption="Filter / Fourier / Butterworth">
       <Subcolumn vislevel="3">
         <Row popup="false" name="P1">
           <Rhs vislevel="1" flags="1">
@@ -1551,7 +1551,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="776" y="6663" open="true" selected="false" sform="false" next="7" name="Q" caption="Filter / Enhance">
+    <Column x="777" y="6663" open="true" selected="false" sform="false" next="7" name="Q" caption="Filter / Enhance">
       <Subcolumn vislevel="3">
         <Row popup="false" name="Q1">
           <Rhs vislevel="1" flags="1">
@@ -1597,7 +1597,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="776" y="7611" open="true" selected="false" sform="false" next="7" name="R" caption="Filter / Tilt Brightness">
+    <Column x="777" y="7611" open="true" selected="false" sform="false" next="7" name="R" caption="Filter / Tilt Brightness">
       <Subcolumn vislevel="3">
         <Row popup="false" name="R1">
           <Rhs vislevel="1" flags="1">
@@ -1771,7 +1771,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="776" y="8580" open="true" selected="false" sform="false" next="12" name="S" caption="Filter / Blend">
+    <Column x="777" y="8580" open="true" selected="false" sform="false" next="12" name="S" caption="Filter / Blend">
       <Subcolumn vislevel="3">
         <Row popup="false" name="S1">
           <Rhs vislevel="1" flags="1">
@@ -1966,7 +1966,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="776" y="9822" open="true" selected="false" sform="false" next="5" name="T" caption="Filter / Overlay">
+    <Column x="777" y="9822" open="true" selected="false" sform="false" next="5" name="T" caption="Filter / Overlay">
       <Subcolumn vislevel="3">
         <Row popup="false" name="T1">
           <Rhs vislevel="1" flags="1">
@@ -2023,7 +2023,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="776" y="10264" open="true" selected="false" sform="false" next="5" name="U" caption="Filter / Colorize">
+    <Column x="777" y="10264" open="true" selected="false" sform="false" next="5" name="U" caption="Filter / Colorize">
       <Subcolumn vislevel="3">
         <Row popup="false" name="U1">
           <Rhs vislevel="1" flags="1">
@@ -2055,7 +2055,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="776" y="10802" open="true" selected="false" sform="false" next="4" name="V" caption="Filter / Browse">
+    <Column x="777" y="10802" open="true" selected="false" sform="false" next="4" name="V" caption="Filter / Browse">
       <Subcolumn vislevel="3">
         <Row popup="false" name="V1">
           <Rhs vislevel="1" flags="1">
@@ -2127,7 +2127,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="776" y="11259" open="true" selected="false" sform="false" next="7" name="W" caption="Filter / Photographic">
+    <Column x="777" y="11259" open="true" selected="false" sform="false" next="7" name="W" caption="Filter / Photographic">
       <Subcolumn vislevel="3">
         <Row popup="false" name="W1">
           <Rhs vislevel="1" flags="1">
@@ -2303,7 +2303,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1622" y="0" open="true" selected="false" sform="false" next="12" name="X" caption="Format">
+    <Column x="1624" y="0" open="true" selected="false" sform="false" next="12" name="X" caption="Format">
       <Subcolumn vislevel="3">
         <Row popup="false" name="X1">
           <Rhs vislevel="1" flags="1">
@@ -2345,7 +2345,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3978" y="0" open="true" selected="false" sform="false" next="15" name="Y" caption="Math / Arithmetic">
+    <Column x="3982" y="0" open="true" selected="false" sform="false" next="15" name="Y" caption="Math / Arithmetic">
       <Subcolumn vislevel="3">
         <Row popup="false" name="Y1">
           <Rhs vislevel="1" flags="1">
@@ -2431,7 +2431,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="2409" y="0" open="true" selected="false" sform="false" next="19" name="Z" caption="Histogram">
+    <Column x="2411" y="0" open="true" selected="false" sform="false" next="19" name="Z" caption="Histogram">
       <Subcolumn vislevel="3">
         <Row popup="false" name="Z2">
           <Rhs vislevel="3" flags="7">
@@ -2555,7 +2555,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3194" y="0" open="true" selected="false" sform="false" next="8" name="AB" caption="Image / New">
+    <Column x="3197" y="0" open="true" selected="false" sform="false" next="8" name="AB" caption="Image / New">
       <Subcolumn vislevel="3">
         <Row popup="false" name="AB1">
           <Rhs vislevel="3" flags="7">
@@ -2685,7 +2685,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3194" y="713" open="true" selected="false" sform="false" next="18" name="BB" caption="Image / Format">
+    <Column x="3197" y="713" open="true" selected="false" sform="false" next="18" name="BB" caption="Image / Format">
       <Subcolumn vislevel="3">
         <Row popup="false" name="BB1">
           <Rhs vislevel="1" flags="1">
@@ -3015,7 +3015,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3194" y="2501" open="true" selected="false" sform="false" next="10" name="CB" caption="Image / Join">
+    <Column x="3197" y="2501" open="true" selected="false" sform="false" next="10" name="CB" caption="Image / Join">
       <Subcolumn vislevel="3">
         <Row popup="false" name="CB1">
           <Rhs vislevel="1" flags="1">
@@ -3214,7 +3214,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3194" y="3666" open="true" selected="false" sform="false" next="5" name="DB" caption="Image / Tile">
+    <Column x="3197" y="3666" open="true" selected="false" sform="false" next="5" name="DB" caption="Image / Tile">
       <Subcolumn vislevel="3">
         <Row popup="false" name="DB1">
           <Rhs vislevel="1" flags="1">
@@ -3333,7 +3333,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3194" y="4463" open="true" selected="false" sform="false" next="6" name="EB" caption="Image / Levels">
+    <Column x="3197" y="4463" open="true" selected="false" sform="false" next="6" name="EB" caption="Image / Levels">
       <Subcolumn vislevel="3">
         <Row popup="false" name="EB1">
           <Rhs vislevel="1" flags="1">
@@ -3431,7 +3431,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3194" y="5492" open="true" selected="false" sform="false" next="19" name="FB" caption="Image / Transform">
+    <Column x="3197" y="5492" open="true" selected="false" sform="false" next="19" name="FB" caption="Image / Transform">
       <Subcolumn vislevel="3">
         <Row popup="false" name="FB1">
           <Rhs vislevel="1" flags="1">
@@ -3850,7 +3850,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3194" y="8631" open="true" selected="false" sform="false" next="18" name="GB" caption="Image / Patterns">
+    <Column x="3197" y="8631" open="true" selected="false" sform="false" next="18" name="GB" caption="Image / Patterns">
       <Subcolumn vislevel="3">
         <Row popup="false" name="GB1">
           <Rhs vislevel="3" flags="7">
@@ -3973,7 +3973,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3194" y="13004" open="true" selected="false" sform="false" next="8" name="HB" caption="Image / Test">
+    <Column x="3197" y="13004" open="true" selected="false" sform="false" next="8" name="HB" caption="Image / Test">
       <Subcolumn vislevel="3">
         <Row popup="false" name="HB1">
           <Rhs vislevel="3" flags="7">
@@ -4026,7 +4026,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3978" y="990" open="true" selected="false" sform="false" next="15" name="JB" caption="Math / Trig">
+    <Column x="3982" y="990" open="true" selected="false" sform="false" next="15" name="JB" caption="Math / Trig">
       <Subcolumn vislevel="3">
         <Row popup="false" name="JB1">
           <Rhs vislevel="1" flags="1">
@@ -4117,7 +4117,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3978" y="1980" open="true" selected="false" sform="false" next="10" name="KB" caption="Math / Log">
+    <Column x="3982" y="1980" open="true" selected="false" sform="false" next="10" name="KB" caption="Math / Log">
       <Subcolumn vislevel="3">
         <Row popup="false" name="KB1">
           <Rhs vislevel="1" flags="1">
@@ -4168,7 +4168,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3978" y="2547" open="true" selected="false" sform="false" next="8" name="LB" caption="Math / Complex">
+    <Column x="3982" y="2547" open="true" selected="false" sform="false" next="8" name="LB" caption="Math / Complex">
       <Subcolumn vislevel="3">
         <Row popup="false" name="LB1">
           <Rhs vislevel="1" flags="4">
@@ -4207,7 +4207,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3978" y="2844" open="true" selected="false" sform="false" next="19" name="MB" caption="Math / Boolean">
+    <Column x="3982" y="2844" open="true" selected="false" sform="false" next="19" name="MB" caption="Math / Boolean">
       <Subcolumn vislevel="3">
         <Row popup="false" name="MB1">
           <Rhs vislevel="1" flags="1">
@@ -4305,7 +4305,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3978" y="3912" open="true" selected="false" sform="false" next="9" name="NB" caption="Math / Relational">
+    <Column x="3982" y="3912" open="true" selected="false" sform="false" next="9" name="NB" caption="Math / Relational">
       <Subcolumn vislevel="3">
         <Row popup="false" name="NB1">
           <Rhs vislevel="1" flags="1">
@@ -4365,7 +4365,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3978" y="4602" open="true" selected="false" sform="false" next="23" name="OB" caption="Math / List ">
+    <Column x="3982" y="4602" open="true" selected="false" sform="false" next="23" name="OB" caption="Math / List ">
       <Subcolumn vislevel="3">
         <Row popup="false" name="OB1">
           <Rhs vislevel="1" flags="4">
@@ -4469,7 +4469,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3978" y="5328" open="true" selected="false" sform="false" next="5" name="PB" caption="Math / Round">
+    <Column x="3982" y="5328" open="true" selected="false" sform="false" next="5" name="PB" caption="Math / Round">
       <Subcolumn vislevel="3">
         <Row popup="false" name="PB1">
           <Rhs vislevel="1" flags="1">
@@ -4501,7 +4501,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3978" y="5706" open="true" selected="false" sform="false" next="6" name="QB" caption="Math / Fourier">
+    <Column x="3982" y="5706" open="true" selected="false" sform="false" next="6" name="QB" caption="Math / Fourier">
       <Subcolumn vislevel="3">
         <Row popup="false" name="QB1">
           <Rhs vislevel="1" flags="1">
@@ -4542,7 +4542,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3978" y="6162" open="true" selected="false" sform="false" next="16" name="RB" caption="Math / Statistics">
+    <Column x="3982" y="6162" open="true" selected="false" sform="false" next="16" name="RB" caption="Math / Statistics">
       <Subcolumn vislevel="3">
         <Row popup="false" name="RB1">
           <Rhs vislevel="1" flags="1">
@@ -4614,7 +4614,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3978" y="6843" open="true" selected="false" sform="false" next="8" name="SB" caption="Math / Base">
+    <Column x="3982" y="6843" open="true" selected="false" sform="false" next="8" name="SB" caption="Math / Base">
       <Subcolumn vislevel="3">
         <Row popup="false" name="SB1">
           <Rhs vislevel="1" flags="4">
@@ -4638,7 +4638,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="4536" y="0" open="true" selected="false" sform="false" next="7" name="TB" caption="Matrix / New">
+    <Column x="4540" y="0" open="true" selected="false" sform="false" next="7" name="TB" caption="Matrix / New">
       <Subcolumn vislevel="3">
         <Row popup="false" name="TB1">
           <Rhs vislevel="1" flags="1">
@@ -4713,7 +4713,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="4536" y="1047" open="true" selected="false" sform="false" next="5" name="VB" caption="Matrix / Extract">
+    <Column x="4540" y="1047" open="true" selected="false" sform="false" next="5" name="VB" caption="Matrix / Extract">
       <Subcolumn vislevel="3">
         <Row popup="false" name="VB1">
           <Rhs vislevel="1" flags="1">
@@ -4745,7 +4745,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="4536" y="1625" open="true" selected="false" sform="false" next="4" name="WB" caption="Matrix / Insert">
+    <Column x="4540" y="1625" open="true" selected="false" sform="false" next="4" name="WB" caption="Matrix / Insert">
       <Subcolumn vislevel="3">
         <Row popup="false" name="WB1">
           <Rhs vislevel="1" flags="1">
@@ -4770,7 +4770,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="4536" y="2205" open="true" selected="false" sform="false" next="4" name="XB" caption="Matrix / Delete">
+    <Column x="4540" y="2205" open="true" selected="false" sform="false" next="4" name="XB" caption="Matrix / Delete">
       <Subcolumn vislevel="3">
         <Row popup="false" name="XB1">
           <Rhs vislevel="1" flags="1">
@@ -4795,7 +4795,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="4536" y="2669" open="true" selected="false" sform="false" next="6" name="YB" caption="Matrix / Rotate">
+    <Column x="4540" y="2669" open="true" selected="false" sform="false" next="6" name="YB" caption="Matrix / Rotate">
       <Subcolumn vislevel="3">
         <Row popup="false" name="YB1">
           <Rhs vislevel="1" flags="1">
@@ -4834,7 +4834,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="4536" y="3302" open="true" selected="false" sform="false" next="4" name="ZB" caption="Matrix / Flip">
+    <Column x="4540" y="3302" open="true" selected="false" sform="false" next="4" name="ZB" caption="Matrix / Flip">
       <Subcolumn vislevel="3">
         <Row popup="false" name="ZB1">
           <Rhs vislevel="1" flags="1">
@@ -4859,7 +4859,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="4536" y="3593" open="true" selected="false" sform="false" next="13" name="AC" caption="Matrix">
+    <Column x="4540" y="3593" open="true" selected="false" sform="false" next="13" name="AC" caption="Matrix">
       <Subcolumn vislevel="3">
         <Row popup="false" name="AC1">
           <Rhs vislevel="1" flags="1">
@@ -4922,7 +4922,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="5165" y="0" open="true" selected="false" sform="false" next="33" name="BC" caption="Tasks / Capture">
+    <Column x="5170" y="0" open="true" selected="false" sform="false" next="33" name="BC" caption="Tasks / Capture">
       <Subcolumn vislevel="3">
         <Row popup="false" name="BC2">
           <Rhs vislevel="1" flags="1">
@@ -5323,7 +5323,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="5165" y="3148" open="true" selected="false" sform="false" next="31" name="UB" caption="Tasks / Mosaic / Onepoint|Twopoint">
+    <Column x="5170" y="3148" open="true" selected="false" sform="false" next="31" name="UB" caption="Tasks / Mosaic / Onepoint|Twopoint">
       <Subcolumn vislevel="3">
         <Row popup="false" name="UB1">
           <Rhs vislevel="1" flags="1">
@@ -5527,7 +5527,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="5990" y="0" open="true" selected="true" sform="false" next="11" name="CC" caption="Widgets">
+    <Column x="6005" y="0" open="true" selected="true" sform="false" next="11" name="CC" caption="Widgets">
       <Subcolumn vislevel="3">
         <Row popup="false" name="CC1">
           <Rhs vislevel="1" flags="1">
@@ -5580,14 +5580,14 @@
         </Row>
         <Row popup="false" name="CC10">
           <Rhs vislevel="1" flags="1">
-            <Clock interval="1" value="339.95003400000002"/>
+            <Clock interval="1" value="1444.7167530440001"/>
             <Subcolumn vislevel="0"/>
             <iText formula="Widget_clock_item.action"/>
           </Rhs>
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="5165" y="4606" open="true" selected="false" sform="false" next="12" name="IB" caption="Tasks / Mosaic / Manual Balance">
+    <Column x="5170" y="4606" open="true" selected="false" sform="false" next="12" name="IB" caption="Tasks / Mosaic / Manual Balance">
       <Subcolumn vislevel="3">
         <Row popup="false" name="IB8">
           <Rhs vislevel="1" flags="4">
@@ -5714,7 +5714,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="5165" y="5872" open="true" selected="false" sform="false" next="6" name="EC" caption="Tasks / Mosaic / Clone">
+    <Column x="5170" y="5872" open="true" selected="false" sform="false" next="6" name="EC" caption="Tasks / Mosaic / Clone">
       <Subcolumn vislevel="3">
         <Row popup="false" name="EC4">
           <Rhs vislevel="1" flags="4">
@@ -5791,7 +5791,7 @@
                     </Row>
                     <Row name="pause">
                       <Rhs vislevel="1" flags="1">
-                        <Toggle caption="Pause process" value="false"/>
+                        <Toggle caption="Pause process" value="true"/>
                         <Subcolumn vislevel="0"/>
                         <iText/>
                       </Rhs>
@@ -5834,7 +5834,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="6384" y="0" open="true" selected="false" sform="false" next="6" name="GC" caption="untitled">
+    <Column x="6399" y="0" open="true" selected="false" sform="false" next="6" name="GC" caption="untitled">
       <Subcolumn vislevel="3">
         <Row popup="false" name="GC5">
           <Rhs vislevel="1" flags="4">
@@ -5871,7 +5871,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="6384" y="411" open="true" selected="false" sform="false" next="2" name="HC" caption="Straighten Frame">
+    <Column x="6399" y="411" open="true" selected="false" sform="false" next="2" name="HC" caption="Straighten Frame">
       <Subcolumn vislevel="3">
         <Row popup="false" name="HC1">
           <Rhs vislevel="3" flags="7">
@@ -5938,7 +5938,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="6904" y="0" open="true" selected="false" sform="false" next="2" name="IC" caption="Painting with Simple Frame">
+    <Column x="6919" y="0" open="true" selected="false" sform="false" next="2" name="IC" caption="Painting with Simple Frame">
       <Subcolumn vislevel="3">
         <Row popup="false" name="IC1">
           <Rhs vislevel="3" flags="7">
@@ -6017,7 +6017,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="6904" y="387" open="true" selected="false" sform="false" next="2" name="JC" caption="Painting with Complex Frame, with adjusted variables">
+    <Column x="6919" y="387" open="true" selected="false" sform="false" next="2" name="JC" caption="Painting with Complex Frame, with adjusted variables">
       <Subcolumn vislevel="3">
         <Row popup="false" name="JC1">
           <Rhs vislevel="3" flags="7">
@@ -6088,7 +6088,7 @@
                     </Row>
                     <Row name="corner_section">
                       <Rhs vislevel="1" flags="1">
-                        <Slider caption="" from="0.10000000000000001" to="1" value="0.25"/>
+                        <Slider caption="Corner section" from="0.10000000000000001" to="1" value="0.5"/>
                         <Subcolumn vislevel="0"/>
                         <iText/>
                       </Rhs>
@@ -6109,7 +6109,7 @@
                     </Row>
                     <Row name="blend_fraction">
                       <Rhs vislevel="1" flags="1">
-                        <Slider caption="" from="0.10000000000000001" to="0.90000000000000002" value="0.5"/>
+                        <Slider caption="Blend fraction" from="0.10000000000000001" to="0.90000000000000002" value="0.10000000000000001"/>
                         <Subcolumn vislevel="0"/>
                         <iText/>
                       </Rhs>
@@ -6144,7 +6144,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="7583" y="0" open="true" selected="false" sform="false" next="2" name="KC" caption="Painting with frame corner, and coloured mount">
+    <Column x="7598" y="0" open="true" selected="false" sform="false" next="2" name="KC" caption="Painting with frame corner, and coloured mount">
       <Subcolumn vislevel="3">
         <Row popup="false" name="KC1">
           <Rhs vislevel="3" flags="7">
@@ -6231,7 +6231,7 @@
                     </Row>
                     <Row name="apply">
                       <Rhs vislevel="1" flags="1">
-                        <Toggle caption="Apply mount options" value="true"/>
+                        <Toggle caption="Apply mount options" value="false"/>
                         <Subcolumn vislevel="0"/>
                         <iText/>
                       </Rhs>
@@ -6262,7 +6262,7 @@
                     </Row>
                     <Row name="mount_colour">
                       <Rhs vislevel="3" flags="7">
-                        <Colour colour_space="sRGB" value0="0" value1="64" value2="0"/>
+                        <Colour colour_space="sRGB" value0="0" value1="0" value2="0"/>
                         <Subcolumn vislevel="1"/>
                         <iText/>
                       </Rhs>
@@ -6284,7 +6284,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="8164" y="0" open="true" selected="false" sform="false" next="8" name="DC" caption="test im_affine">
+    <Column x="8189" y="0" open="true" selected="false" sform="false" next="8" name="DC" caption="test im_affine">
       <Subcolumn vislevel="3">
         <Row popup="false" name="DC1">
           <Rhs vislevel="1" flags="1">

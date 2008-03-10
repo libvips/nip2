@@ -1,3 +1,6 @@
+started 7.15.0
+- fixed segv with making tools for non-toplevels 
+
 started 7.14.0
 - updated docs
 - added 7.12 compat

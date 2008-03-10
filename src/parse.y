@@ -50,7 +50,7 @@ void yyrestart( FILE *input_file );
  */
 
 /* Global .. the symbol whose definition we are currently parsing, the symbol
- * which all top defs in this parse action should be made local to.
+ * which all defs in this parse action should be made local to.
  */
 extern Symbol *current_symbol;
 extern Symbol *root_symbol;
@@ -366,7 +366,7 @@ definition:
 		/* Is this the end of a top-level? Needs extra work to add to
 		 * the enclosing toolkit etc.
 		 */
-		if( symbol_get_parent( current_symbol ) == root_symbol ) 
+		if( is_scope( symbol_get_parent( current_symbol ) ) ) 
 			parse_toplevel_end( current_symbol );
 
 		/* Is this a pattern definition? Expand the pattern to a
@@ -379,7 +379,7 @@ definition:
 			built_syms = compile_pattern_lhs( parent, 
 				current_symbol, $1 );
 
-			if( symbol_get_parent( current_symbol ) == root_symbol )
+			if( is_scope( symbol_get_parent( current_symbol ) ) )
 				slist_map( built_syms,
 					(SListMapFn) parse_toplevel_end, NULL );
 			slist_map( built_syms,
@@ -1445,9 +1445,6 @@ parse_toplevel_end( Symbol *sym )
 
 	tool = tool_new_sym( current_kit, tool_position, sym );
 	tool->lineno = last_top_lineno;
-
-	/* Ony needed by toplevels.
-	 */
 	symbol_made( sym );
 
 	return( NULL );

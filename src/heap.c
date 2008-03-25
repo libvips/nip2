@@ -828,7 +828,7 @@ heap_getmem( Heap *heap )
 	/* Is heap over x% full? Add another heap block if we can.
 	 */
 	pcused = 100 * (heap->ncells - heap->nfree) / heap->ncells;
-	if( pcused > 70 ) {
+	if( pcused > 50 ) {
 		if( !heapblock_create( heap, heap->rsz ) )
 			return( NULL );
 	}

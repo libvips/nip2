@@ -136,7 +136,7 @@ main (int argc, char **argv)
   startUpInfo.cb = sizeof (STARTUPINFO);
   startUpInfo.lpReserved = NULL;
   startUpInfo.lpDesktop = NULL;
-  startUpInfo.lpTitle = "nip2 (Batch)";
+  startUpInfo.lpTitle = NULL;
   startUpInfo.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
   startUpInfo.hStdOutput = hChildStdoutWr;
   startUpInfo.hStdError = hChildStdoutWr;

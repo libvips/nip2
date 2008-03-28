@@ -28,7 +28,7 @@
 
  */
 
-/* Adapted from SurfMyBatchUp by Leo Davidson, with the author's permission.
+/* Adapted from sample code by Leo Davidson, with the author's permission.
  */
 
 /* Windows does not let a single exe run in both command-line and GUI mode. To

@@ -146,13 +146,12 @@ main (int argc, char **argv)
   if (!CreateProcess (NULL, command, NULL,	/* default security */
 		      NULL,			/* default thread security */
 		      TRUE,			/* inherit handles */
-		      CREATE_DEFAULT_ERROR_MODE | NORMAL_PRIORITY_CLASS | 
-		      	DETACHED_PROCESS, 
+		      CREATE_DEFAULT_ERROR_MODE | DETACHED_PROCESS, 
 		      NULL,			/* use default environment */
 		      NULL,			/* set default directory */
 		      &startUpInfo, &processInformation))
     {
-      fprintf (stderr, "Failed to run command \"%s\", error %d\n", command,
+      fprintf (stderr, "failed to run command \"%s\", error %d\n", command,
 	       GetLastError ());
       exit (1);
     }

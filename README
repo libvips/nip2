@@ -1,5 +1,5 @@
-nip 7.12
-========
+nip2
+====
 
 nip2 is a user interface for the VIPS image processing library. 
 
@@ -43,13 +43,9 @@ Microsoft toolchain. See the README in there for details.
 Building nip2 on OS X
 ---------------------
 
-I used macports to install all the dependencies. Fink also works.
+I used macports to help, see:
 
-	http://www.macports.org
-
-You need to tell configure to use the msgfmt from macports. Something like:
-
-	GMSGFMT="/opt/local/bin/msgfmt" ./configure --prefix=/Users/john/vips
+	http://www.vips.ecs.soton.ac.uk/index.php?title=Build_on_OS_X
 
 Dependencies
 ============

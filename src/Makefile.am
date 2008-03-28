@@ -1,13 +1,24 @@
 SUBDIRS = BITMAPS
 
-YACC = @YACC@ -d
-
-bin_PROGRAMS = nip2 
-
 bin_SCRIPTS = run-nip2.sh
+
+# need this to keep autoconf quiet, but we don't actually use it ... see the
+# bison rule below
+YACC = bison
 
 # windows resource files ... see .rc.o rule later
 SUFFIXES = .rc
+
+# only build the cli wrapper on win32
+if OS_WIN32 
+bin_PROGRAMS = nip2 nip2-cli
+nip2_cli_SOURCES = nip2-cli.c
+nip2_CFLAGS="-mwindows"
+CLI_DIST = 
+else
+bin_PROGRAMS = nip2 
+CLI_DIST = nip2-cli.c
+endif
 
 nip2_SOURCES = \
 	plotmodel.c \
@@ -369,4 +380,5 @@ CLEANFILES = parse.c parse.h lex.c tags
 
 EXTRA_DIST = makehelpindex.pl helpindex.h run-nip2.sh \
 	nipmarshal.h nipmarshal.c nipmarshal.list \
-	gtkextra-marshal.h gtkextra-marshal.c gtkextra-marshal.list
+	gtkextra-marshal.h gtkextra-marshal.c gtkextra-marshal.list \
+	$(CLI_DIST)

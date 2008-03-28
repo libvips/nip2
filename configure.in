@@ -43,9 +43,8 @@ AC_MSG_RESULT([$nip_os_win32])
 if test x"$nip_os_win32" = "xyes"; then
   AC_DEFINE(OS_WIN32,1,[native win32])
 
-  # stops command window popping up if not started from command line
   # makes gcc use win native alignment
-  IP_CFLAGS="-mwindows -mms-bitfields $IP_CFLAGS"
+  IP_CFLAGS="-mms-bitfields $IP_CFLAGS"
 fi
 
 # src/Makeile.am uses this to add an icon to the .exe
@@ -97,6 +96,7 @@ AC_SYS_LARGEFILE
 # Checks for programs.
 AC_PROG_AWK
 AC_PROG_CC
+AM_PROG_CC_C_O
 AM_PROG_LEX
 IP_LIBS="$IP_LIBS $LEXLIBS"
 AC_PROG_INSTALL

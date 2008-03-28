@@ -1,6 +1,8 @@
 started 7.15.0
 - fixed segv with making tools for non-toplevels 
 - expand the heap if more than 50% full after a GC (was 70%)
+- added nip2-cli.c (thanks Leo)
+- updated README
 
 started 7.14.0
 - updated docs

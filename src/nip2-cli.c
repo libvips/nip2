@@ -36,16 +36,30 @@
  * which starts the main nip2 exe, connecting stdin/out/err appropriately.
  */
 
-/*
-#define DEBUG
- */
-
 #include <windows.h>
 #include <stdio.h>
 #include <io.h>
 #include <ctype.h>
 
 #include <glib.h>
+
+void
+print_last_error ()
+{
+  char *buf;
+
+  if (FormatMessageA (FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		      FORMAT_MESSAGE_IGNORE_INSERTS |
+		      FORMAT_MESSAGE_FROM_SYSTEM,
+		      NULL,
+		      GetLastError (),
+		      MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
+		      (LPSTR) & buf, 0, NULL))
+    {
+      fprintf (stderr, "%s", buf);
+      LocalFree (buf);
+    }
+}
 
 int
 main (int argc, char **argv)
@@ -114,10 +128,6 @@ main (int argc, char **argv)
       exit (1);
     }
 
-#ifdef DEBUG
-  printf ("running: %s\n", command);
-#endif /*DEBUG*/
-
   /* Create a pipe for the child process's STDOUT. 
    */
   hChildStdoutRd = NULL;
@@ -127,7 +137,9 @@ main (int argc, char **argv)
   saAttr.lpSecurityDescriptor = NULL;
   if (!CreatePipe (&hChildStdoutRd, &hChildStdoutWr, &saAttr, 0))
     {
-      fprintf (stderr, "CreatePipe failed: %d\n", GetLastError ());
+      fprintf (stderr, "CreatePipe failed: ");
+      print_last_error ();
+      fprintf (stderr, "\n");
       exit (1);
     }
 
@@ -144,15 +156,15 @@ main (int argc, char **argv)
   startUpInfo.lpReserved2 = NULL;
   startUpInfo.wShowWindow = SW_SHOWNORMAL;
   if (!CreateProcess (NULL, command, NULL,	/* default security */
-		      NULL,			/* default thread security */
-		      TRUE,			/* inherit handles */
-		      CREATE_DEFAULT_ERROR_MODE | DETACHED_PROCESS, 
-		      NULL,			/* use default environment */
-		      NULL,			/* set default directory */
+		      NULL,	/* default thread security */
+		      TRUE,	/* inherit handles */
+		      CREATE_DEFAULT_ERROR_MODE | DETACHED_PROCESS, NULL,	/* use default environment */
+		      NULL,	/* set default directory */
 		      &startUpInfo, &processInformation))
     {
-      fprintf (stderr, "failed to run command \"%s\", error %d\n", command,
-	       GetLastError ());
+      fprintf (stderr, "error running \"%s\": ", command);
+      print_last_error ();
+      fprintf (stderr, "\n");
       exit (1);
     }
 

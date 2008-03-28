@@ -47,15 +47,11 @@
 
 #include <glib.h>
 
-/* The largest command-line we can build.
- */
-#define MAX_COMMAND (2048)
-
 int
 main (int argc, char **argv)
 {
   char *dirname;
-  char command[MAX_COMMAND];
+  char command[2048];
   gboolean quote;
   int i, j;
 
@@ -79,7 +75,7 @@ main (int argc, char **argv)
 
   if (_access (argv[0], 00))
     {
-      fprintf (stderr, "Cannot access \"%s\"\n", argv[0]);
+      fprintf (stderr, "cannot access \"%s\"\n", argv[0]);
       exit (1);
     }
 
@@ -99,22 +95,22 @@ main (int argc, char **argv)
 	}
       if (i > 0)
 	{
-	  strncat (command, " ", MAX_COMMAND - 1);
+	  strncat (command, " ", sizeof (command) - 1);
 	}
       if (quote)
 	{
-	  strncat (command, "\"", MAX_COMMAND - 1);
+	  strncat (command, "\"", sizeof (command) - 1);
 	}
-      strncat (command, argv[i], MAX_COMMAND - 1);
+      strncat (command, argv[i], sizeof (command) - 1);
       if (quote)
 	{
-	  strncat (command, "\"", MAX_COMMAND - 1);
+	  strncat (command, "\"", sizeof (command) - 1);
 	}
     }
 
-  if (strlen (command) == MAX_COMMAND - 1)
+  if (strlen (command) == sizeof (command) - 1)
     {
-      fprintf (stderr, "Command too long\n");
+      fprintf (stderr, "command too long\n");
       exit (1);
     }
 
@@ -135,7 +131,7 @@ main (int argc, char **argv)
       exit (1);
     }
 
-  /* run command
+  /* Run command.
    */
   startUpInfo.cb = sizeof (STARTUPINFO);
   startUpInfo.lpReserved = NULL;
@@ -164,7 +160,6 @@ main (int argc, char **argv)
   /* Close the write end of the pipe before reading from the read end.
    */
   CloseHandle (hChildStdoutWr);
-  hChildStdoutWr = NULL;
 
   while (ReadFile (hChildStdoutRd, buf, sizeof (buf) - 1, &dwRead, NULL) &&
 	 dwRead > 0)
@@ -173,14 +168,7 @@ main (int argc, char **argv)
       printf ("%s", buf);
     }
 
-  /* WaitForSingleObject(processInformation.hProcess, INFINITE); */
   CloseHandle (hChildStdoutRd);
-  hChildStdoutRd = NULL;
-
-  if (hChildStdoutRd)
-    CloseHandle (hChildStdoutRd);
-  if (hChildStdoutWr)
-    CloseHandle (hChildStdoutWr);
 
   return (0);
 }

@@ -3,6 +3,7 @@ started 7.15.0
 - expand the heap if more than 50% full after a GC (was 70%)
 - added nip2-cli.c (thanks Leo)
 - updated README
+- more HIGgy titlebar text in mainw/program
 
 started 7.14.0
 - updated docs

@@ -354,6 +354,8 @@ mainw_title_update( Mainw *mainw )
 	char txt[512];
 
 	buf_init_static( &buf, txt, 512 );
+	if( FILEMODEL( mainw->ws )->modified ) 
+		buf_appendf( &buf, "*" ); 
 	buf_appendf( &buf, "%s", NN( IOBJECT( mainw->ws->sym )->name ) );
 	if( mainw->ws->compat_major ) {
 		buf_appends( &buf, " - " );
@@ -364,10 +366,9 @@ mainw_title_update( Mainw *mainw )
 	}
 	if( FILEMODEL( mainw->ws )->filename )
 		buf_appendf( &buf, " - %s", FILEMODEL( mainw->ws )->filename );
-	if( FILEMODEL( mainw->ws )->modified ) {
-		buf_appendf( &buf, " [" ); 
-		buf_appendf( &buf, _( "modified" ) ); 
-		buf_appendf( &buf, "]" ); 
+	else {
+		buf_appends( &buf, " - " );
+		buf_appends( &buf, _( "unsaved workspace" ) );
 	}
 
 	iwindow_set_title( IWINDOW( mainw ), buf_all( &buf ) );

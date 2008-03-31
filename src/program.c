@@ -251,16 +251,11 @@ program_title( Program *program )
 	char txt[512];
 
 	buf_init_static( &buf, txt, 512 );
+	if( program->kit && FILEMODEL( program->kit )->modified ) 
+		buf_appendf( &buf, "*" ); 
 	buf_appendf( &buf, IOBJECT( program->kitg )->name );
-	if( program->kit ) {
+	if( program->kit ) 
 		buf_appendf( &buf, " - %s", IOBJECT( program->kit )->name );
-
-		if( FILEMODEL( program->kit )->modified ) {
-			buf_appendf( &buf, " [" );
-			buf_appendf( &buf, _( "modified" ) );
-			buf_appendf( &buf, "]" );
-		}
-	}
 	if( program->tool ) {
 		buf_appendf( &buf, " - %s", IOBJECT( program->tool )->name );
 

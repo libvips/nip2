@@ -583,8 +583,8 @@ conversion_make_repaint( Conversion *conv, IMAGE *in )
 	if( !out )
 		return( NULL );
 
-	/* Special case: if this is a IM_CODING_LABQ, and the display control 
-	 * bar is turned off, we can go straight to RGB for speed.
+	/* Special case: if this is a IM_CODING_LABQ and the display control 
+	 * bar is turned off we can go straight to RGB for speed.
 	 */
 	if( in->Coding == IM_CODING_LABQ && !(conv && conv->enabled) ) {
 		IMAGE *t = im_open_local( out, "conv:1", "p" );

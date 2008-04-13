@@ -40,6 +40,10 @@
 #define DEBUG_STATIC
  */
 
+/* Count GCs and %full, handy for tuning.
+#define DEBUG_GETMEM
+ */
+
 #include "ip.h"
 
 static iObjectClass *parent_class = NULL;
@@ -806,6 +810,9 @@ heap_getmem( Heap *heap )
 {
 	HeapNode *hn;
 	int pcused;
+#ifdef DEBUG_GETMEM
+	static int n_heap_getmem = 0;
+#endif /*DEBUG_GETMEM*/
 
 	/* Easy case ... this should be handled by the NEWNODE macro, but do
 	 * it here as well just in case.
@@ -828,9 +835,21 @@ heap_getmem( Heap *heap )
 	/* Is heap over x% full? Add another heap block if we can.
 	 */
 	pcused = 100 * (heap->ncells - heap->nfree) / heap->ncells;
+#ifdef DEBUG_GETMEM
+	n_heap_getmem += 1;
+	printf( "heap_getmem: %d%% (%d)\n", pcused, n_heap_getmem );
+#endif /*DEBUG_GETMEM*/
+
 	if( pcused > 50 ) {
-		if( !heapblock_create( heap, heap->rsz ) )
-			return( NULL );
+		int nblocks = 1 + (heap->ncells - heap->nfree) / heap->rsz;
+		int i;
+
+#ifdef DEBUG_GETMEM
+		printf( "heap_getmem: %d more blocks added\n", nblocks );
+#endif /*DEBUG_GETMEM*/
+		for( i = 0; i < nblocks; i++ )
+			if( !heapblock_create( heap, heap->rsz ) )
+				return( NULL );
 	}
 
 	if( !heap->free ) {

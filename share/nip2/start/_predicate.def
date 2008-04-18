@@ -220,14 +220,18 @@ get_type x
 	// the rest of the image
 
 	// we often have Type set wrong, hence the ugly guessing :-(
+	// can have alpha, hence we let bands be one more than you might think
+
 	get_type_im im
 		= Image_type.LABQ, coding == Image_coding.LABPACK
-		= type, bands == 1 && type == Image_type.GREY16
-		= type, type == Image_type.HISTOGRAM && (width == 1 || height == 1)
-		= Image_type.B_W, bands == 1
-		= type, bands == 3 && is_colorimetric
-		= Image_type.sRGB, bands == 3 && !is_colorimetric
-		= Image_type.MULTIBAND, bands != 3 && !is_colorimetric
+		= Image_type.GREY16, type == Image_type.GREY16 && is_bands 1
+		= Image_type.HISTOGRAM, type == Image_type.HISTOGRAM && 
+			(width == 1 || height == 1)
+		= Image_type.B_W, is_bands 1 
+		= Image_type.CMYK, type == Image_type.CMYK && is_bands 4
+		= type, is_colorimetric && is_bands 3
+		= Image_type.sRGB, !is_colorimetric && is_bands 3
+		= Image_type.MULTIBAND, !is_colorimetric && !is_bands 3
 		= type
 	{
 		type = get_header "Type" im;
@@ -250,6 +254,9 @@ get_type x
 			Image_type.UCS
 		];
 		is_colorimetric = member ok_types type;
+
+		// is bands n, with an optional alpha (ie. can be n + 1 too)
+		is_bands n = bands == n || bands == n + 1;
 	}
 }
 

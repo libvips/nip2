@@ -911,7 +911,7 @@ imageview_popdown( iWindow *iwnd, void *client,
 		iobject_changed( IOBJECT( iimage ) );
 	}
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 static void

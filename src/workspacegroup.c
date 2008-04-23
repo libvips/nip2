@@ -199,7 +199,7 @@ workspacegroup_workspace_new_done_cb( iWindow *iwnd, void *client,
 	mainw = mainw_new( ws );
 	gtk_widget_show( GTK_WIDGET( mainw ) );
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 void

@@ -612,7 +612,7 @@ program_edit_dia_done_cb( iWindow *iwnd, void *client,
 		return;
 	}
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 static void
@@ -1081,7 +1081,7 @@ program_toolkit_new_done_cb( iWindow *iwnd, void *client,
 
 	program_select_kit( program, kit );
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 static void
@@ -1155,7 +1155,7 @@ program_column_item_new_done_cb( iWindow *iwnd, void *client,
 	tool = tool_new_dia( program->kit, pos + 1, name_text, file_text );
 	program_select_tool( program, tool );
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 static void
@@ -1230,7 +1230,7 @@ program_load_file_cb( iWindow *iwnd,
 
 	symbol_recalculate_all();
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 static void
@@ -1281,7 +1281,7 @@ program_reload_menus_cb( iWindow *iwnd,
 	main_reload();
 	symbol_recalculate_all();
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 /* Reload all menus.
@@ -1442,7 +1442,7 @@ program_find_done_cb( iWindow *iwnd, void *client,
 		return;
 	}
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 static void
@@ -1527,7 +1527,7 @@ program_goto_done_cb( iWindow *iwnd, void *client,
 		return;
 	}
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 static void
@@ -2260,7 +2260,7 @@ program_popdown( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys )
         if( program->dirty && !program_parse( program ) )
                 nfn( sys, IWINDOW_ERROR );
         else
-                nfn( sys, IWINDOW_TRUE );
+                nfn( sys, IWINDOW_YES );
 }
 
 static void

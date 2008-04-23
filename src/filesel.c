@@ -1057,7 +1057,7 @@ filesel_trigger2( void *sys, iWindowResult result )
 	if( filesel->save && result != IWINDOW_ERROR )
 		filesel_refresh_all();
 
-	if( result != IWINDOW_TRUE ) {
+	if( result != IWINDOW_YES ) {
 		/* Failure ... bomb out.
 		 */
 		iwindow_susp_return( susp, result );

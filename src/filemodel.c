@@ -631,7 +631,7 @@ filemodel_inter_save_cb( iWindow *iwnd,
 
 		if( filemodel_save_all( filemodel, filename ) ) {
 			filemodel_set_modified( filemodel, FALSE );
-			nfn( sys, IWINDOW_TRUE );
+			nfn( sys, IWINDOW_YES );
 		}
 		else
 			nfn( sys, IWINDOW_ERROR );
@@ -702,7 +702,7 @@ filemodel_inter_empty_cb( iWindow *iwnd, void *client,
 	(void) model_empty( MODEL( filemodel ) );
 	filemodel_set_modified( filemodel, FALSE );
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 static void
@@ -768,7 +768,7 @@ filemodel_inter_close_cb( iWindow *iwnd, void *client,
 
 	IDESTROY( filemodel );
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 void
@@ -805,7 +805,7 @@ filemodel_inter_load_cb( iWindow *iwnd,
 
 		if( filemodel_load_all( filemodel, 
 			MODEL( parent ), filename ) ) 
-			nfn( sys, IWINDOW_TRUE );
+			nfn( sys, IWINDOW_YES );
 		else
 			nfn( sys, IWINDOW_ERROR );
 
@@ -884,7 +884,7 @@ filemodel_inter_close_registered_cb( iWindow *iwnd, void *client,
 			iwindow_susp_comp, susp );
 	}
 	else
-		nfn( sys, IWINDOW_TRUE );
+		nfn( sys, IWINDOW_YES );
 }
 
 /* Mark something as having been loaded (or made) during startup. If we loaded

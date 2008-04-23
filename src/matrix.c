@@ -129,7 +129,7 @@ matrix_done_cb( iWindow *iwnd, void *client,
 	classmodel_update( CLASSMODEL( eds->matrix ) );
 	symbol_recalculate_all();
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 /* Build the insides of matrix edit.

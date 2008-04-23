@@ -786,7 +786,7 @@ mainw_selected_recalc_dia( iWindow *iwnd, void *client,
 	Mainw *mainw = MAINW( client );
 
 	if( workspace_selected_recalc( mainw->ws ) )
-		nfn( sys, IWINDOW_TRUE );
+		nfn( sys, IWINDOW_YES );
 	else
 		nfn( sys, IWINDOW_ERROR );
 }
@@ -943,7 +943,7 @@ mainw_open_done_cb( iWindow *iwnd, void *client,
 		return;
 	}
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 /* Show an open file dialog ... any type, but default to one of the image
@@ -1167,7 +1167,7 @@ mainw_workspace_merge_done_cb( iWindow *iwnd,
 
 	symbol_recalculate_all();
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 /* Merge ws file into current ws.
@@ -1284,7 +1284,7 @@ mainw_column_new_cb( iWindow *iwnd, void *client,
 	iobject_set( IOBJECT( col ), NULL, caption_text );
 	workspace_column_select( mainw->ws, col );
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 /* Make a new column with a specified name.
@@ -1428,7 +1428,7 @@ mainw_revert_ok_cb( iWindow *iwnd, void *client,
 		symbol_recalculate_all();
 	}
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 void 

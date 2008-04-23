@@ -93,10 +93,10 @@ idialog_popdown_notify( void *sys, iWindowResult result )
         iWindowSusp *susp = IWINDOW_SUSP( sys );
 	iDialog *idlg = IDIALOG( susp->client );
 
-	if( result == IWINDOW_TRUE ) 
+	if( result == IWINDOW_YES ) 
 		/* If our caller hasn't been notified yet, post off a FALSE.
 		 */
-		idialog_notify_parent( idlg, IWINDOW_FALSE );
+		idialog_notify_parent( idlg, IWINDOW_NO );
 
 	/* Pass result on to our suspension (ie. back to iwindow).
 	 */
@@ -141,7 +141,7 @@ idialog_done_notify( void *sys, iWindowResult result )
 
 	/* If all ok, popdown and tell our parent.
 	 */
-	if( result == IWINDOW_TRUE ) {
+	if( result == IWINDOW_YES ) {
 		/* Unless we're pinned up, that is.
 		 */
 		if( !(idlg->tog_pin && 
@@ -198,8 +198,8 @@ idialog_cancel_notify( void *sys, iWindowResult result )
 
 	/* Send cancel message back to parent if our client cancel was OK.
 	 */
-	if( result == IWINDOW_TRUE ) {
-		idialog_notify_parent( idlg, IWINDOW_FALSE );
+	if( result == IWINDOW_YES ) {
+		idialog_notify_parent( idlg, IWINDOW_NO );
 		iwindow_kill( IWINDOW( idlg ) );
 	}
 

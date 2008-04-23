@@ -221,7 +221,7 @@ colour_done_cb( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys )
 
 	colour_set_rgb( colour, rgb );
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 /* Build the insides of colour edit.

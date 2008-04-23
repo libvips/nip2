@@ -455,7 +455,7 @@ plotwindow_popdown( iWindow *iwnd, void *client,
 		&plot->mag, &plot->left, &plot->top );
 	plot->show_status = plotmodel->show_status;
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 static void

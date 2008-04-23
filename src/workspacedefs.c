@@ -165,7 +165,7 @@ workspacedefs_load_file_cb( iWindow *iwnd,
 		g_free( fname );
 	}
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 static void

@@ -189,7 +189,7 @@ paintboxview_clear_cb2( iWindow *iwnd, void *client,
 
 	imageinfo_undo_clear( pbv->ii );
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 static void

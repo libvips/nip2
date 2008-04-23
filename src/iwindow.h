@@ -108,9 +108,9 @@ typedef struct {
 /* The result from a window/dialog/whatever ... not just a bool.
  */
 typedef enum iwindow_result {
-	IWINDOW_ERROR = 0,		/* Tried to YES, but failed */
-	IWINDOW_TRUE,			/* Success! */
-	IWINDOW_FALSE			/* Cancelled */
+	IWINDOW_ERROR = 0,		/* Tried but failed */
+	IWINDOW_YES,			/* User tried the action */
+	IWINDOW_NO			/* User cancelled */
 } iWindowResult;
 
 /* Our callbacks don't return iWindowResult, instead

@@ -1022,7 +1022,7 @@ progress_cancel_cb( iWindow *iwnd, void *client,
 	progress->cancelled = TRUE;
 	progress_set_status( progress, _( "Cancelling" ) );
 
-	nfn( sys, IWINDOW_FALSE );
+	nfn( sys, IWINDOW_NO );
 }
 
 static void
@@ -1439,7 +1439,7 @@ fontbutton_ok_cb( iWindow *iwnd, void *client,
 	fontbutton_set_font_name( fontbutton, font_name );
 	g_free( font_name );
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 static void 
@@ -1450,7 +1450,7 @@ fontbutton_popdown_cb( iWindow *iwnd, void *client,
 
 	fontbutton->fontchooser = NULL;
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 static void

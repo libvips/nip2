@@ -107,7 +107,7 @@ columnview_save_as_sub( iWindow *iwnd,
 	if( (filename = filesel_get_filename( filesel )) ) {
 		if( workspace_selected_save( ws, filename ) ) {
 			workspace_deselect_all( ws );
-			nfn( sys, IWINDOW_TRUE );
+			nfn( sys, IWINDOW_YES );
 		}
 		else
 			nfn( sys, IWINDOW_ERROR );
@@ -213,7 +213,7 @@ columnview_to_menu_done_cb( iWindow *iwnd, void *client,
 
 	IM_SETSTR( columnview_to_menu_last_toolkit, toolkit_text );
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 /* Make a column into a menu item. 

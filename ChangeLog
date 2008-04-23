@@ -4,6 +4,7 @@ started 7.15.0
 - added nip2-cli.c (thanks Leo)
 - updated README
 - more HIGgy titlebar text in mainw/program
+- refactor: IWINDOW_TRUE/_FALSE renamed to _YES/_NO
 
 started 7.14.0
 - updated docs

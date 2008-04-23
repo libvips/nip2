@@ -732,7 +732,7 @@ workspace_auto_recover_load( iWindow *iwnd,
 		IM_FREE( filemodel->filename );
 		iobject_changed( IOBJECT( filemodel ) );
 
-		nfn( sys, IWINDOW_TRUE );
+		nfn( sys, IWINDOW_YES );
 	}
 	else
 		nfn( sys, IWINDOW_ERROR );
@@ -1757,7 +1757,7 @@ workspace_selected_remove_yesno_cb( iWindow *iwnd, void *client,
 	Workspace *ws = WORKSPACE( client );
 
 	if( workspace_selected_remove( ws ) )
-		nfn( sys, IWINDOW_TRUE );
+		nfn( sys, IWINDOW_YES );
 	else
 		nfn( sys, IWINDOW_ERROR );
 }

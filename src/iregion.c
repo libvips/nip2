@@ -197,7 +197,7 @@ iregion_done_cb( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys )
 		symbol_recalculate_all();
 	}
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 static View *

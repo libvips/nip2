@@ -122,7 +122,7 @@ pathnameview_edit_ok( iWindow *iwnd,
 
 		g_free( fname );
 
-		nfn( sys, IWINDOW_TRUE );
+		nfn( sys, IWINDOW_YES );
 	}
 	else
 		nfn( sys, IWINDOW_ERROR );

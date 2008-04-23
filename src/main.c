@@ -357,7 +357,7 @@ main_quit( void )
 static void
 main_quit_test_cb( void *sys, iWindowResult result )
 {
-	if( result == IWINDOW_TRUE )
+	if( result == IWINDOW_YES )
 		/* No return from this.
 		 */
 		main_quit();
@@ -845,7 +845,7 @@ main_toobig_done( iWindow *iwnd,
 	if( main_imageinfogroup )
 		iobject_changed( IOBJECT( main_imageinfogroup ) );
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 /* Test for a bunch of stuff in the TMP area. Need to do this before

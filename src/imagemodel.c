@@ -395,7 +395,7 @@ imagemodel_set_paintbox_cb( void *client, iWindowResult result )
 		imagemodel_state( imagemodel->pend_state ) );
 #endif /*DEBUG*/
 
-	if( result == IWINDOW_TRUE ) {
+	if( result == IWINDOW_YES ) {
 		imagemodel_set_paintbox( imagemodel, TRUE );
 
 		if( imagemodel->state != imagemodel->pend_state ) {

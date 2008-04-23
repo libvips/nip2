@@ -41,7 +41,7 @@
     	iwindow_kill()
 
 		'cancellable' kill ... user popdown can return IWINDOW_ERROR
-		or IWINDOW_FALSE to prevent popdown
+		or IWINDOW_NO to prevent popdown
 
 	gtk_widget_destroy()
 
@@ -463,7 +463,7 @@ iwindow_susp_comp( void *sys, iWindowResult result )
 {
 	iWindowSusp *susp = IWINDOW_SUSP( sys );
 
-	if( result == IWINDOW_TRUE ) {
+	if( result == IWINDOW_YES ) {
 		susp->fn( susp->iwnd, susp->client, susp->nfn, susp->sys );
 		im_free( susp );
 	}
@@ -476,13 +476,13 @@ iwindow_susp_comp( void *sys, iWindowResult result )
 void 
 iwindow_true_cb( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys ) 
 { 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 void 
 iwindow_false_cb( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys ) 
 { 
-	nfn( sys, IWINDOW_FALSE );
+	nfn( sys, IWINDOW_NO );
 }
 
 /* Null notify callback.
@@ -543,7 +543,7 @@ iwindow_notify_send( iWindow *iwnd,
 	if( fn )
 		fn( iwnd, client, back, sys );
 	else
-		back( sys, IWINDOW_TRUE );
+		back( sys, IWINDOW_YES );
 }
 
 static void
@@ -594,10 +594,10 @@ iwindow_popdown_notify( iWindow *iwnd, iWindowResult result )
 
 	if( result == IWINDOW_ERROR )
 		box_alert( GTK_WIDGET( iwnd ) );
-	else if( result == IWINDOW_TRUE )
+	else if( result == IWINDOW_YES )
 		iwindow_kill( iwnd );
 
-	if( result != IWINDOW_TRUE ) {
+	if( result != IWINDOW_YES ) {
 #ifdef DEBUG
 		printf( "iwindow_popdown_notify: %s: kill cancelled!\n", 
 			iwnd->title );

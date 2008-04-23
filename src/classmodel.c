@@ -131,7 +131,7 @@ classmodel_graphic_save_cb( iWindow *iwnd,
 			IM_SETSTR( classmodel->filename, filename );
 			iobject_changed( IOBJECT( classmodel ) );
 
-			nfn( sys, IWINDOW_TRUE );
+			nfn( sys, IWINDOW_YES );
 		}
 		else
 			nfn( sys, IWINDOW_ERROR );
@@ -205,7 +205,7 @@ classmodel_graphic_replace_cb( iWindow *iwnd,
 
 			g_object_unref( G_OBJECT( classmodel ) );
 
-			nfn( sys, IWINDOW_TRUE );
+			nfn( sys, IWINDOW_YES );
 		}
 		else
 			nfn( sys, IWINDOW_ERROR );
@@ -676,7 +676,7 @@ classmodel_done_cb( iWindow *iwnd, void *client,
 	classmodel_update( classmodel );
 	symbol_recalculate_all();
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 static GtkWidget *

@@ -943,7 +943,7 @@ regionview_remove_yes( iWindow *iwnd, void *client,
 
 	IDESTROY( row->sym );
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 static void

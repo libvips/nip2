@@ -1459,7 +1459,7 @@ imageinfo_check_paintable_cb( iWindow *iwnd, void *client,
 		return;
 	}
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 /* Check painting is OK. nfn() called on "ok!". Returns FALSE if it's
@@ -1499,7 +1499,7 @@ imageinfo_check_paintable( Imageinfo *imageinfo, GtkWidget *parent,
 		}
 	}
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 
 	return( TRUE );
 }
@@ -2699,7 +2699,7 @@ imageinfo_colour_done_cb( iWindow *iwnd, void *client,
 	 */
 	imageinfo_from_rgb( imageinfo, rgb );
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 /* Build the insides of colour edit.

@@ -633,7 +633,7 @@ model_check_destroy_sub( iWindow *iwnd, void *client,
 	IDESTROY( mcd->model );
 	symbol_recalculate_all();
 
-	nfn( sys, IWINDOW_TRUE );
+	nfn( sys, IWINDOW_YES );
 }
 
 /* The model we are watching has been killed, maybe by us.

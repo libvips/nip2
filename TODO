@@ -13,6 +13,12 @@
 - a bit of GUI for "cache" would be nice ... set tilesize, MB for cache (inc.
   "unlimited"), etc.
 
+- look at using goffice instead of gtkplot for graphs
+
+	http://ftp.gnome.org/pub/gnome/sources/goffice/
+
+  also in synaptic
+
 WONTFIX for 7.14
 ================
 

@@ -1,3 +1,19 @@
+- drag from an image thumbnail to the ws background and you get a new column
+  with "A2" or whgatever in
+
+  does not work for plot thumbnails! how annoying
+
+- need GUI for 
+
+	MB24 = get_header "magick-dcm:RescaleSlope" MB2
+	MB54 = (split is_space MB24)?0
+	MB55 = parse_float MB54
+
+  split removed leading and trailing whitespace
+  options to parse_int, parse_pint etc as well
+
+  Image / Header / Get / Custom ?
+
 - gah, get rid of the 'calculating ..' popup, it's focus-stealing behaviour is
   very annoying
 

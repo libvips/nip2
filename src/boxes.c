@@ -777,6 +777,8 @@ imageheader_build( GtkWidget *widget )
 
 	GtkWidget *label;
 	GtkWidget *swin;
+	GtkWidget *pane;
+	GtkWidget *vbox;
 	PangoFontDescription *font_desc;
 
 #ifdef DEBUG
@@ -788,29 +790,36 @@ imageheader_build( GtkWidget *widget )
 	if( IWINDOW_CLASS( imageheader_parent_class )->build )
 		(*IWINDOW_CLASS( imageheader_parent_class )->build)( widget );
 
+	pane = gtk_vpaned_new();
+        gtk_box_pack_start( GTK_BOX( idlg->work ), pane, TRUE, TRUE, 2 );
+
 	/* Scrolled area to hold fields.
 	 */
+	vbox = gtk_vbox_new( FALSE, 2 );
+	gtk_paned_pack1( GTK_PANED( pane ), vbox, TRUE, FALSE );
 	label = gtk_label_new( _( "Image header fields" ) );
 	gtk_misc_set_alignment( GTK_MISC( label ), 0.0, 0.5 );
-        gtk_box_pack_start( GTK_BOX( idlg->work ), label, FALSE, FALSE, 2 );
+        gtk_box_pack_start( GTK_BOX( vbox ), label, FALSE, FALSE, 2 );
 	imageheader->swin_fields = gtk_scrolled_window_new( NULL, NULL );
 	gtk_scrolled_window_set_policy( 
 		GTK_SCROLLED_WINDOW( imageheader->swin_fields ),
 		GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
-        gtk_box_pack_start( GTK_BOX( idlg->work ), 
+        gtk_box_pack_start( GTK_BOX( vbox ), 
 		imageheader->swin_fields, TRUE, TRUE, 2 );
 
 	/* Created in _refresh()
 	 */
 	imageheader->fields = NULL;
 
+	vbox = gtk_vbox_new( FALSE, 2 );
+	gtk_paned_pack2( GTK_PANED( pane ), vbox, TRUE, FALSE );
 	label = gtk_label_new( _( "Image history" ) );
 	gtk_misc_set_alignment( GTK_MISC( label ), 0.0, 0.5 );
-        gtk_box_pack_start( GTK_BOX( idlg->work ), label, FALSE, FALSE, 2 );
+        gtk_box_pack_start( GTK_BOX( vbox ), label, FALSE, FALSE, 2 );
 	swin = gtk_scrolled_window_new( NULL, NULL );
 	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( swin ),
 		GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
-        gtk_box_pack_end( GTK_BOX( idlg->work ), swin, TRUE, TRUE, 2 );
+        gtk_box_pack_end( GTK_BOX( vbox ), swin, TRUE, TRUE, 2 );
 	imageheader->history = gtk_text_view_new();
 	gtk_text_view_set_editable( GTK_TEXT_VIEW( imageheader->history ), 
 		FALSE );

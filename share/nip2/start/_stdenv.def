@@ -1296,7 +1296,19 @@ hist_diff hist
 	hist_diff_op = Operator "hist_diff" 
 		hist_diff Operator_type.COMPOUND_REWRAP false;
 
-	im_histdiff h = conv (Matrix [[-1, 1]]) h;
+	im_histdiff h 
+		= (conv (Matrix [[-1, 1]]) @ clip2fmt (fmt (get_format h))) h
+	{
+		// up the format so it can represent the whole range of
+		// possible values from this mask
+		fmt x
+			= Image_format.SHORT, 
+				x == Image_format.UCHAR || x == Image_format.CHAR
+			= Image_format.INT, 
+				x == Image_format.USHORT || x == Image_format.SHORT ||
+				x == Image_format.UINT 
+			= x;
+	}
 }
 
 hist_norm hist 

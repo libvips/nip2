@@ -2369,6 +2369,7 @@ compile_lcomp( Compile *compile )
 			Symbol *param1;
 			Symbol *param2;
 			Symbol *pattern;
+			GSList *built_syms;
 
 			/* A generator. 
 			 */
@@ -2387,8 +2388,9 @@ compile_lcomp( Compile *compile )
 			pattern = compile_lcomp_find_pattern( children, 
 				IOBJECT( element )->name );
 			g_assert( pattern );
-			(void) compile_pattern_lhs( child->expr->compile, 
+			built_syms = compile_pattern_lhs( child->expr->compile, 
 				param1, pattern->expr->compile->tree );
+			g_slist_free( built_syms );
 
 			/* Make the "foldr $$fn $sofar expr" tree.
 			 */
@@ -2766,7 +2768,7 @@ compile_pattern_lhs_sub( ParseNode *node, PatternLhs *lhs )
  * syms for, node is the pattern tree, compile is the scope in which we
  * generate the new defining symbols. Return a list of the syms we built: they
  * will need any final finishing up and then having symbol_made() called on 
- * them.
+ * them. You need to free the list, too.
  */
 GSList *
 compile_pattern_lhs( Compile *compile, Symbol *sym, ParseNode *node )

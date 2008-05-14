@@ -7,6 +7,7 @@ started 7.15.0
 - refactor: IWINDOW_TRUE/_FALSE renamed to _YES/_NO
 - adjustable panes in image header view
 - histdif was broken for unsigned image types
+- fix memleak in compile_lcomp()
 
 started 7.14.0
 - updated docs

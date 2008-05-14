@@ -8,6 +8,7 @@ started 7.15.0
 - adjustable panes in image header view
 - histdif was broken for unsigned image types
 - fix memleak in compile_lcomp()
+- better --help text
 
 started 7.14.0
 - updated docs

@@ -113,7 +113,7 @@ static GOptionEntry main_option[] = {
 		&main_option_no_load_menus, 
 		N_( "don't load menu definitions" ), NULL },
 	{ "no-load-args", 'a', 0, G_OPTION_ARG_NONE, &main_option_no_load_args, 
-		N_( "don't try to load extra cmd-line args as files" ), NULL },
+		N_( "don't try to load command-line arguments" ), NULL },
 	{ "stdin-ws", 'w', 0, G_OPTION_ARG_NONE, &main_option_stdin_ws, 
 		N_( "load stdin as a workspace" ), NULL },
 	{ "stdin-def", 'd', 0, G_OPTION_ARG_NONE, &main_option_stdin_def, 

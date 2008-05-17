@@ -11,10 +11,7 @@ EXTRA_DIST = \
 	proj \
 	acinclude.m4 \
 	nip2.desktop.in \
-	nip2.xml \
-	intltool-extract.in \
-	intltool-merge.in \
-	intltool-update.in
+	nip2.xml 
 
 nip2appdir = $(datadir)/applications
 
@@ -40,12 +37,6 @@ endif
 dist-hook:
 # make sure we don't get any .svn dirs from EXTRA_DIST
 	-find $(distdir) -name .svn -exec rm -rf {} \;
-
-distclean-local:
-# need to remove expanded intltool files in build area to pass distcheck
-	-rm ${top_builddir}/intltool-extract \
-		${top_builddir}/intltool-merge \
-		${top_builddir}/intltool-update
 
 uninstall-hook:
 # make sure we have write permission for 'rm'

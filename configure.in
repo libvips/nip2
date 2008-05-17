@@ -125,7 +125,6 @@ AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
 	[The prefix for our gettext translation domains.])
 ALL_LINGUAS="en_GB malkovich"
-AC_PROG_INTLTOOL
 AM_GLIB_GNU_GETTEXT
 
 # check for flex ... nip needs to adjust itself a bit

@@ -9,6 +9,7 @@ started 7.15.0
 - histdif was broken for unsigned image types
 - fix memleak in compile_lcomp()
 - better --help text
+- get rid of intltool
 
 started 7.14.0
 - updated docs

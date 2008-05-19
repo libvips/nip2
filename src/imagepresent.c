@@ -85,13 +85,22 @@ static void
 imagepresent_destroy( GtkObject *object )
 {
 	Imagepresent *ip = IMAGEPRESENT( object );
-	iImage *iimage = ip->imagemodel->iimage;
+
+#ifdef DEBUG
+	printf( "imagepresent_destroy\n" );
+#endif /*DEBUG*/
 
 	IM_FREEF( g_source_remove, ip->scroll_tid );
 	IM_FREEF( iwindow_cursor_context_destroy, ip->cntxt );
 	DESTROY_GTK( ip->ruler_menu );
-	if( iimage ) 
-		iimage->views = g_slist_remove( iimage->views, ip );
+
+	if( ip->imagemodel ) {
+		iImage *iimage = ip->imagemodel->iimage;
+
+		if( iimage ) 
+			iimage->views = g_slist_remove( iimage->views, ip );
+		UNREF( ip->imagemodel );
+	}
 
 	GTK_OBJECT_CLASS( parent_class )->destroy( object );
 
@@ -1650,6 +1659,9 @@ static void
 imagepresent_link( Imagepresent *ip, Imagemodel *imagemodel )
 {
 	ip->imagemodel = imagemodel;
+	g_object_ref( G_OBJECT( ip->imagemodel ) );
+	iobject_sink( IOBJECT( ip->imagemodel ) );
+
 	g_signal_connect( G_OBJECT( imagemodel ), "changed", 
 		G_CALLBACK( imagepresent_imagemodel_changed_cb ), ip );
 	g_signal_connect( G_OBJECT( imagemodel ), "imageinfo_changed", 

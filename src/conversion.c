@@ -53,11 +53,6 @@ typedef struct _ConversionUpdate {
 	Rect area;
 } ConversionUpdate;
 
-/* Queue we use for worker threads to tell us about updates.
- */
-static GAsyncQueue *conversion_update_queue = NULL;
-static GSource *conversion_update_source = NULL;
-
 /* All active conversions.
  */
 static GSList *conversion_all = NULL;
@@ -203,41 +198,24 @@ conversion_make_visualise( Conversion *conv, IMAGE *in )
 	return( out );
 }
 
-static void
-conversion_paint_callback( IMAGE *im, Rect *area, void *client )
-{
-	ConversionUpdate *update = g_new( ConversionUpdate, 1 );
-
-	/* Can't use CONVERSION() in this thread ... the GUI thread will check 
-	 * this pointer for us when it reads from the queue.
-	 */
-	update->conv = (Conversion *) client;
-	update->im = im;
-	update->area = *area;
-
-	g_async_queue_push( conversion_update_queue, update );
-
-	/* Don't need g_main_context_wakeup( NULL ); ... not sure it's
-	 * reentrant anyway.
-	 */
-}
-
 static gboolean
-conversion_update_callback( gpointer data )
+conversion_render_idle_cb( gpointer data )
 {
 	ConversionUpdate *update = (ConversionUpdate *) data;
 	Conversion *conv = update->conv;
 	Rect image;
 
-	/* Must be a valid conversion, must be for the image that conversion
-	 * is still using for display.
+	/* Must be a valid conversion, must be for the image that that 
+	 * conversion is still using for display.
 	 */
 	if( !g_slist_find( conversion_all, conv ) ||
 		imageinfo_get( FALSE, conv->display_ii ) != update->im ) {
 #ifdef DEBUG
-		g_print( "conversion_update_callback: skipping dead update\n" );
+		g_print( "conversion_render_idle_cb: skipping dead update\n" );
 #endif /*DEBUG*/
-		return( TRUE );
+		g_free( update );
+
+		return( FALSE );
 	}
 
 #ifdef DEBUG
@@ -264,43 +242,27 @@ conversion_update_callback( gpointer data )
 
 	imageinfo_area_changed( conv->ii, &image );
 
-	return( TRUE );
-}
-
-static gboolean
-conversion_update_prepare( GSource *source, gint *timeout )
-{
-	*timeout = -1;
-
-	return( g_async_queue_length( conversion_update_queue ) > 0 );
-}
-
-static gboolean
-conversion_update_check( GSource *source )
-{
-	return( g_async_queue_length( conversion_update_queue ) > 0 );
-}
-
-static gboolean
-conversion_update_dispatch( GSource *source, GSourceFunc callback, 
-	gpointer user_data )
-{
-	ConversionUpdate *update;
-	gboolean result;
-
-	update = g_async_queue_pop( conversion_update_queue );
-	result = callback( update );
 	g_free( update );
 
-	return( result );
+	return( FALSE );
 }
 
-static GSourceFuncs conversion_update_functions = {
-	conversion_update_prepare,
-	conversion_update_check,
-	conversion_update_dispatch,
-	NULL,
-};
+/* Here from the im_render() background thread.
+ */
+static void
+conversion_render_notify_cb( IMAGE *im, Rect *area, void *client )
+{
+	ConversionUpdate *update = g_new( ConversionUpdate, 1 );
+
+	/* Can't use CONVERSION() in this thread ... the GUI thread will check 
+	 * this pointer for us when it reads from the queue.
+	 */
+	update->conv = (Conversion *) client;
+	update->im = im;
+	update->area = *area;
+
+	g_idle_add( conversion_render_idle_cb, update );
+}
 
 /* How many tiles should we ask for? A bit more than the number needed to 
  * paint the screen.
@@ -361,18 +323,6 @@ conversion_make_display( Conversion *conv, IMAGE *in, IMAGE **mask_out )
 		in = t;
 	}
 
-	/* Build the queue we use for comms, if it's not there.
-	 */
-	if( !conversion_update_queue ) {
-		conversion_update_queue = g_async_queue_new();
-
-		conversion_update_source = g_source_new(
-			&conversion_update_functions, sizeof( GSource ) );
-		g_source_set_callback( conversion_update_source, 
-			conversion_update_callback, NULL, NULL );
-		g_source_attach( conversion_update_source, NULL );
-	}
-
 	/* Cache it.
 	 */
 	if( conv->synchronous ) {
@@ -387,7 +337,7 @@ conversion_make_display( Conversion *conv, IMAGE *in, IMAGE **mask_out )
 				conversion_get_default_tiles( conv ),
 			20, conv->fade_steps,
 			conv->priority,
-			conversion_paint_callback, conv ) ) {
+			conversion_render_notify_cb, conv ) ) {
 			im_close( out );
 			return( NULL );
 		}

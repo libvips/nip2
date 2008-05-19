@@ -10,6 +10,8 @@ started 7.15.0
 - fix memleak in compile_lcomp()
 - better --help text
 - get rid of intltool
+- use g_idle_add() instead of GAsyncQueue for render notify
+- fix a segv in imageview destroy
 
 started 7.14.0
 - updated docs

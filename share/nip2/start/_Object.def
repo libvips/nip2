@@ -285,6 +285,8 @@ oo_method_lookup table = map (extract 0) (filter (extract 1) table);
    - a.oo_binary_search "add'" (converse (+)) b
    - b.oo_binary_search "add" (+) a, is_class b
 
+   if those fail as well, but this is ==, do pointer equals as a fallback
+
  */
 oo_binary_function op a b
 	= matches1?0, 
@@ -295,6 +297,10 @@ oo_binary_function op a b
 		op.symmetric && matches3 != []
 	= matches4?0, 
 		op.symmetric && is_class b && matches4 != []
+	= pointer_equal a b,
+		op.op_name == "equal" || op.op_name == "equal'"
+	= not_pointer_equal a b,
+		op.op_name == "not_equal" || op.op_name == "not_equal'"
 	= error (_ "No method found for binary operator." ++ "\n" ++
 		_ "left" ++ " = " ++ print a ++ "\n" ++
 		_ "operator" ++ " = " ++ op.op_name ++ "\n" ++
@@ -317,10 +323,16 @@ oo_binary_function op a b
 
    - b.oo_binary_search "add" (+) a, is_class b
 
+   if that fails as well, but this is ==, do pointer equals as a fallback
+
  */
 oo_binary'_function op a b
 	= matches1?0, matches1 != []
 	= matches2?0, op.symmetric && matches2 != []
+	= pointer_equal a b,
+		op.op_name == "equal" || op.op_name == "equal'"
+	= not_pointer_equal a b,
+		op.op_name == "not_equal" || op.op_name == "not_equal'"
 	= error (_ "No method found for binary operator." ++ "\n" ++
 		_ "left" ++ " = " ++ print a ++ "\n" ++
 		_ "operator" ++ " = " ++ op.op_name ++ "\n" ++
@@ -354,15 +366,6 @@ _Object = class {
 	oo_binary' op x = oo_binary'_function (oo_binary_lookup op) x this;
 	oo_unary op = oo_unary_function (oo_unary_lookup op) this;
 
-	/* Provide a fallback for class == thing ... just use pointer
-	 * equality.
-	 */
-	oo_binary_table op x = [
-		[pointer_equal this x,
-			op.op_name == "equal" || op.op_name == "equal'"],
-		[not_pointer_equal this x,
-			op.op_name == "not_equal" || 
-				op.op_name == "not_equal'"]
-	];
+	oo_binary_table op x = [];
 	oo_unary_table op = [];
 }

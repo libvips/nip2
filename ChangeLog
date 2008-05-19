@@ -12,6 +12,7 @@ started 7.15.0
 - get rid of intltool
 - use g_idle_add() instead of GAsyncQueue for render notify
 - fix a segv in imageview destroy
+- == did not always find the best method
 
 started 7.14.0
 - updated docs

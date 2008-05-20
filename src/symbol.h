@@ -149,6 +149,8 @@ void symbol_qualified_name_relative( Symbol *context,
 	Symbol *sym, BufInfo *buf );
 const char *symbol_name( Symbol *sym );
 void symbol_name_print( Symbol *sym );
+const char *symbol_name_scope( Symbol *sym );
+void symbol_name_scope_print( Symbol *sym );
 
 void symbol_new_value( Symbol *sym );
 

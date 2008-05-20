@@ -200,6 +200,33 @@ symbol_name_print( Symbol *sym )
 	printf( "%s", symbol_name( sym ) );
 }
 
+/* Print a symbol's name, including the enclosing static scope. Return value
+ * is a pointer to a static buffer :(
+ */
+const char *
+symbol_name_scope( Symbol *sym )
+{
+	Symbol *scope = symbol_get_scope( sym );
+
+	static BufInfo buf;
+	static char txt[200];
+
+	buf_init_static( &buf, txt, 200 );
+	buf_appends( &buf, NN( IOBJECT( scope )->name ) );
+	buf_appends( &buf, "." );
+	symbol_qualified_name_relative( scope, sym, &buf );
+
+	return( buf_all( &buf ) );
+}
+
+/* Convenience ... print a qual name to stdout.
+ */
+void
+symbol_name_scope_print( Symbol *sym )
+{
+	printf( "%s", symbol_name_scope( sym ) );
+}
+
 void 
 symbol_new_value( Symbol *sym )
 {
@@ -928,8 +955,8 @@ symbol_recalculate_sub( Symbol *sym )
 
 #ifdef DEBUG_TIME
 	printf( "symbol_recalculate_sub: " );
-	symbol_name_print( sym );
-	printf( " - %gs\n", g_timer_elapsed( timer, NULL ) );
+	symbol_name_scope_print( sym );
+	printf( " %g\n", g_timer_elapsed( timer, NULL ) );
 #endif /*DEBUG_TIME*/
 
 	return( result );

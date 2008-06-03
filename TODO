@@ -1,3 +1,5 @@
+- "close without saving" should be discard? cf. gnumeric
+
 - "insert" should format-alike ... cast the sub image to the same type as the
   bg image
 

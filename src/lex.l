@@ -160,190 +160,200 @@ read_char( void )
 
 %option noyywrap
 %%
-\/\*			{ 
-				int ch;
+\/\* { 
+	int ch;
 
-				while( (ch = input()) != EOF )
-					if( ch == '*' ) {
-						if( (ch = input()) == '/' )
-							break;
-						else
-							unput( ch );
-					}
-					else if( ch == '/' ) {
-						if( (ch = input()) == '*' ) 
-							yyerror( _( "nested "
-								"comment!" ) );
-						else
-							unput( ch );
-					}
+	while( (ch = input()) != EOF )
+		if( ch == '*' ) {
+			if( (ch = input()) == '/' )
+				break;
+			else
+				unput( ch );
+		}
+		else if( ch == '/' ) {
+			if( (ch = input()) == '*' ) 
+				yyerror( _( "nested comment!" ) );
+			else
+				unput( ch );
+		}
 
-				if( ch == EOF )
-					yyerror( _( "no end of comment!" ) );
-			}
-\#separator		{ BEGIN 0; return( TK_SEPARATOR ); }
-\#dialog		{ BEGIN 0; return( TK_DIALOG ); }
-#			|
-(\/\/)			{ 
-				int ch;
+	if( ch == EOF )
+		yyerror( _( "no end of comment!" ) );
+}
+# |
+(\/\/) { 
+	int ch;
 
-				/* Read string up to \n, EOF.
-				 */
-				while( (ch = input()) != EOF && ch != '\n' )
-					;
-			}
-class			{ BEGIN 0; return( TK_CLASS ); }
-scope			{ BEGIN 0; return( TK_SCOPE ); }
-char			{ BEGIN 0; return( TK_CHAR ); }
-short			{ BEGIN 0; return( TK_SHORT ); }
-int			{ BEGIN 0; return( TK_INT ); }
-float			{ BEGIN 0; return( TK_FLOAT ); }
-double			{ BEGIN 0; return( TK_DOUBLE ); }
-signed			{ BEGIN 0; return( TK_SIGNED ); }
-unsigned		{ BEGIN 0; return( TK_UNSIGNED ); }
-complex			{ BEGIN 0; return( TK_COMPLEX ); }
-if			{ BEGIN 0; return( TK_IF ); }
-then			{ BEGIN 0; return( TK_THEN ); }
-else			{ BEGIN 0; return( TK_ELSE ); }
-\.\.\.			{ BEGIN 0; return( TK_DOTDOTDOT ); }
-\.\.			{ BEGIN 0; return( TK_DOTDOTDOT ); }
-true			|
-TRUE			{ 	
-				BEGIN BINARY;
+	/* Read string up to \n, EOF.
+	 */
+	while( (ch = input()) != EOF && ch != '\n' )
+		;
+}
 
-				yylval.yy_const.type = PARSE_CONST_BOOL;
-				yylval.yy_const.val.bool = TRUE;
+\#separator { BEGIN 0; return( TK_SEPARATOR ); }
+\#dialog { BEGIN 0; return( TK_DIALOG ); }
+class { BEGIN 0; return( TK_CLASS ); }
+scope { BEGIN 0; return( TK_SCOPE ); }
+char { BEGIN 0; return( TK_CHAR ); }
+short { BEGIN 0; return( TK_SHORT ); }
+int { BEGIN 0; return( TK_INT ); }
+float { BEGIN 0; return( TK_FLOAT ); }
+double { BEGIN 0; return( TK_DOUBLE ); }
+signed { BEGIN 0; return( TK_SIGNED ); }
+unsigned { BEGIN 0; return( TK_UNSIGNED ); }
+complex	{ BEGIN 0; return( TK_COMPLEX ); }
+if { BEGIN 0; return( TK_IF ); }
+then { BEGIN 0; return( TK_THEN ); }
+else { BEGIN 0; return( TK_ELSE ); }
+\.\.\. { BEGIN 0; return( TK_DOTDOTDOT ); }
+\.\. { BEGIN 0; return( TK_DOTDOTDOT ); }
 
-				return( TK_CONST );
-			}
-false			|
-FALSE			{ 	
-				BEGIN BINARY;
+true |
+TRUE { 	
+	BEGIN BINARY;
 
-				yylval.yy_const.type = PARSE_CONST_BOOL;
-				yylval.yy_const.val.bool = FALSE;
+	yylval.yy_const.type = PARSE_CONST_BOOL;
+	yylval.yy_const.val.bool = TRUE;
 
-				return( TK_CONST );
-			}
+	return( TK_CONST );
+}
+false |
+FALSE { 	
+	BEGIN BINARY;
+
+	yylval.yy_const.type = PARSE_CONST_BOOL;
+	yylval.yy_const.val.bool = FALSE;
+
+	return( TK_CONST );
+}
 
 <DOT>[a-zA-Z_][a-zA-Z0-9_']* {
-				BEGIN BINARY;
+	BEGIN BINARY;
 
-				yylval.yy_name = im_strdupn( yytext );
+	yylval.yy_name = im_strdupn( yytext );
 
-				return( TK_TAG );
-			}
+	return( TK_TAG );
+}
+[a-zA-Z_][a-zA-Z0-9_']* {
+	char *name = model_loadstate_rewrite_name( yytext );
 
-[a-zA-Z_][a-zA-Z0-9_']*	{
-				char *name = model_loadstate_rewrite_name( 
-					yytext );
+	BEGIN BINARY;
 
-				BEGIN BINARY;
+	if( name ) {
+		yylval.yy_name = im_strdupn( name );
+		buf_change( &lex_text, yytext, name );
+	}
+	else 
+		yylval.yy_name = im_strdupn( yytext );
 
-				if( name ) {
-					yylval.yy_name = im_strdupn( name );
-					buf_change( &lex_text, yytext, name );
-				}
-				else 
-					yylval.yy_name = im_strdupn( yytext );
+	return( TK_IDENT );
+}
+\$[a-zA-Z_][a-zA-Z0-9_']* {
+	BEGIN BINARY;
 
-				return( TK_IDENT );
-			}
+	yylval.yy_const.type = PARSE_CONST_STR;
+	yylval.yy_const.val.str = im_strdupn( yytext + 1 );
 
-\(			{ BEGIN 0; return( '(' ); }
-\)			{ BEGIN BINARY; return( ')' ); }
-\+\+			{ BEGIN 0; return( TK_JOIN ); }
-<BINARY>\+		|
-<BINARY>\-		{ BEGIN 0; return( *yytext ); }
-\-			{ BEGIN 0; return( TK_UMINUS ); }
-\+			{ BEGIN 0; return( TK_UPLUS ); }
-\<			{ BEGIN 0; return( TK_LESS ); }
-\<\=			{ BEGIN 0; return( TK_LESSEQ ); }
-\>			{ BEGIN 0; return( TK_MORE ); }
-\>\=			{ BEGIN 0; return( TK_MOREEQ ); }
-\&			{ BEGIN 0; return( TK_BAND ); }
-\&\&			{ BEGIN 0; return( TK_LAND ); }
-\*\*			{ BEGIN 0; return( TK_POW ); }
-\>\>			{ BEGIN 0; return( TK_RSHIFT ); }
-\<\<			{ BEGIN 0; return( TK_LSHIFT ); }
-\<\-			{ BEGIN 0; return( TK_FROM ); }
-\|			{ BEGIN 0; return( TK_BOR ); }
-\|\|			{ BEGIN 0; return( TK_LOR ); }
-\=\=			{ BEGIN 0; return( TK_EQ ); }
-\=\=\=			{ BEGIN 0; return( TK_PEQ ); }
-\!\=			{ BEGIN 0; return( TK_NOTEQ ); }
-\!\=\=			{ BEGIN 0; return( TK_PNOTEQ ); }
-\\			{ BEGIN 0; return( TK_LAMBDA ); }
-\^			|
-\?			|
-\*			|
-\/			|
-\%			|
-\,			|
-\!			|
-\;			|
-\[			|
-\:			|
-\=			|
-\~			|
-\@			|
-\{			|
-\}			{ BEGIN 0; return( *yytext ); }
-\.			{ BEGIN DOT; return( *yytext ); }
-\]			{ BEGIN BINARY; return( *yytext ); }
-0x[0-9a-fA-F]+		{
-				unsigned int i;
+	return( TK_CONST );
+}
 
-				BEGIN BINARY;
+\( { BEGIN 0; return( '(' ); }
+\) { BEGIN BINARY; return( ')' ); }
+\+\+ { BEGIN 0; return( TK_JOIN ); }
+<BINARY>\+ |
+<BINARY>\- { BEGIN 0; return( *yytext ); }
+\- { BEGIN 0; return( TK_UMINUS ); }
+\+ { BEGIN 0; return( TK_UPLUS ); }
+\< { BEGIN 0; return( TK_LESS ); }
+\<\= { BEGIN 0; return( TK_LESSEQ ); }
+\> { BEGIN 0; return( TK_MORE ); }
+\>\= { BEGIN 0; return( TK_MOREEQ ); }
+\=\> { BEGIN 0; return( TK_TO ); }
+\& { BEGIN 0; return( TK_BAND ); }
+\&\& { BEGIN 0; return( TK_LAND ); }
+\*\* { BEGIN 0; return( TK_POW ); }
+\>\> { BEGIN 0; return( TK_RSHIFT ); }
+\<\< { BEGIN 0; return( TK_LSHIFT ); }
+\<\- { BEGIN 0; return( TK_FROM ); }
+\| { BEGIN 0; return( TK_BOR ); }
+\|\| { BEGIN 0; return( TK_LOR ); }
+\=\= { BEGIN 0; return( TK_EQ ); }
+\=\=\= { BEGIN 0; return( TK_PEQ ); }
+\!\= { BEGIN 0; return( TK_NOTEQ ); }
+\!\=\= { BEGIN 0; return( TK_PNOTEQ ); }
+\\ { BEGIN 0; return( TK_LAMBDA ); }
+\^ |
+\? |
+\* |
+\/ |
+\% |
+\, |
+\! |
+\; |
+\[ |
+\: |
+\= |
+\~ |
+\@ |
+\{ |
+\} { BEGIN 0; return( *yytext ); }
+\. { BEGIN DOT; return( *yytext ); }
+\] { BEGIN BINARY; return( *yytext ); }
 
-				if( sscanf( yytext, "0x%x", &i ) != 1 )
-					yyerror( _( "bad number %s" ), yytext );
+0x[0-9a-fA-F]+ {
+	unsigned int i;
 
-				yylval.yy_const.type = PARSE_CONST_NUM;
-				yylval.yy_const.val.num = i;
+	BEGIN BINARY;
 
-				return( TK_CONST );
-			}
-[0-9]*(\.[0-9]+)?([eE][+-]?[0-9]+)?[ij]?	{
-				double d;
-				int ch;
+	if( sscanf( yytext, "0x%x", &i ) != 1 )
+		yyerror( _( "bad number %s" ), yytext );
 
-				BEGIN BINARY;
+	yylval.yy_const.type = PARSE_CONST_NUM;
+	yylval.yy_const.val.num = i;
 
-				d = g_ascii_strtod( yytext, NULL );
+	return( TK_CONST );
+}
+[0-9]*(\.[0-9]+)?([eE][+-]?[0-9]+)?[ij]? {
+	double d;
+	int ch;
 
-				yylval.yy_const.type = PARSE_CONST_NUM;
-				yylval.yy_const.val.num = d;
+	BEGIN BINARY;
 
-				ch = yytext[strlen( yytext ) - 1];
-				if( ch == 'i' || ch == 'j' )
-					yylval.yy_const.type = 
-						PARSE_CONST_COMPLEX;
+	d = g_ascii_strtod( yytext, NULL );
 
-				return( TK_CONST );
-			}
-\'			{
-				BEGIN BINARY;
+	yylval.yy_const.type = PARSE_CONST_NUM;
+	yylval.yy_const.val.num = d;
 
-				yylval.yy_const.type = PARSE_CONST_CHAR;
-				yylval.yy_const.val.ch = read_char();
+	ch = yytext[strlen( yytext ) - 1];
+	if( ch == 'i' || ch == 'j' )
+		yylval.yy_const.type = PARSE_CONST_COMPLEX;
 
-				return( TK_CONST );
-			}
-\"			{ 
-				char buf[MAX_STRSIZE];
+	return( TK_CONST );
+}
 
-				BEGIN BINARY;
+\' {
+	BEGIN BINARY;
 
-				read_string( buf );
+	yylval.yy_const.type = PARSE_CONST_CHAR;
+	yylval.yy_const.val.ch = read_char();
 
-				yylval.yy_const.type = PARSE_CONST_STR;
-				yylval.yy_const.val.str = im_strdupn( buf );
+	return( TK_CONST );
+}
+\" { 
+	char buf[MAX_STRSIZE];
 
-				return( TK_CONST );
-			}
-[ \t\n\r\m\01]		;
-.			{
-				yyerror( _( "illegal character \"%c\"" ), 
-					*yytext );
-			}
+	BEGIN BINARY;
+
+	read_string( buf );
+
+	yylval.yy_const.type = PARSE_CONST_STR;
+	yylval.yy_const.val.str = im_strdupn( buf );
+
+	return( TK_CONST );
+}
+
+[ \t\n\r\m\01] ;
+
+. {
+	yyerror( _( "illegal character \"%c\"" ), *yytext );
+}

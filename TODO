@@ -1,3 +1,44 @@
+- try
+
+  	[a || b | a <- [1..10]; b <- [1..10]]
+
+  syntax error!
+
+  BOR has higher precedence than LOR, so this is parsed as
+
+  	[a || (b | a) <- [1..10]; b <- [1..10]]
+
+  error is
+
+	  Parse error.
+
+	  Error in b: syntax error, unexpected TK_FROM, expecting ']'
+
+- add syntax for list of name/value pairs
+
+  eg. 
+  
+  	["fred" => 12, "poop" => 45]
+
+  could get rid of one quite if we have a syntax for :identifier, like Ruby
+
+  eg.
+
+  	[$fred => 12, $poop => 45]
+
+  is exactly equivalent to:
+
+  	[["fred", 12], ["poop", 45]]
+
+  should be useable from list comps, eg.
+
+  	[name => value | name <- ["a", "b", "c"]; value <- [1, 2, 3]]
+
+
+
+
+
+
 - "close without saving" should be discard? cf. gnumeric
 
 - "insert" should format-alike ... cast the sub image to the same type as the

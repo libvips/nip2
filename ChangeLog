@@ -14,6 +14,7 @@ started 7.15.0
 - fix a segv in imageview destroy
 - == did not always find the best method
 - better time debugging in symbol recalc
+- added $name syntax
 
 started 7.14.0
 - updated docs

@@ -103,6 +103,11 @@ vec op_name im vec
 	inv = map (multiply (-1)) vec;
 }
 
+// make a name value pair
+mknvpair n v
+	= [n, v], is_string n
+	= error "not [char] on LHS of =>";
+
 /* Macbeth chart patch names.
  */
 macbeth_names = [

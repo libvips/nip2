@@ -264,10 +264,10 @@ vips_hash( VipsInfo *vi )
 				im_mask_object *mo = vi->vargv[i];
 				DOUBLEMASK *mask = mo->mask;
 				int ne = mask->xsize * mask->ysize;
-				int i;
+				int j;
 
-				for( i = 0; i < ne; i++ )
-					HASH_D( mask->coeff[i] );
+				for( j = 0; j < ne; j++ )
+					HASH_D( mask->coeff[j] );
 				HASH_D( mask->scale );
 				HASH_D( mask->offset );
 
@@ -279,10 +279,10 @@ vips_hash( VipsInfo *vi )
 				im_mask_object *mo = vi->vargv[i];
 				INTMASK *mask = mo->mask;
 				int ne = mask->xsize * mask->ysize;
-				int i;
+				int j;
 
-				for( i = 0; i < ne; i++ )
-					HASH_I( mask->coeff[i] );
+				for( j = 0; j < ne; j++ )
+					HASH_I( mask->coeff[j] );
 				HASH_I( mask->scale );
 				HASH_I( mask->offset );
 

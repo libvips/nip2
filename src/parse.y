@@ -118,7 +118,7 @@ void *parse_access_end( Symbol *sym, Symbol *main );
 	BinOp yy_binop;
 }
 
-%token TK_TAG TK_IDENT TK_CONST TK_DOTDOTDOT TK_LAMBDA TK_FROM
+%token TK_TAG TK_IDENT TK_CONST TK_DOTDOTDOT TK_LAMBDA TK_FROM TK_TO
 %token TK_UMINUS TK_UPLUS TK_POW 
 %token TK_LESS TK_LESSEQ TK_MORE TK_MOREEQ TK_NOTEQ
 %token TK_LAND TK_LOR TK_BAND TK_BOR TK_JOIN
@@ -137,6 +137,7 @@ void *parse_access_end( Symbol *sym, Symbol *main );
 %left TK_LAMBDA 
 %nonassoc TK_IF 
 %left ',' 
+%left TK_TO 
 %left TK_LOR 
 %left TK_LAND '@'
 %left TK_BOR
@@ -682,7 +683,7 @@ list_expression:
 	'[' expr ',' expr TK_DOTDOTDOT expr ']' {
 		$$ = tree_generator_new( current_compile, $2, $4, $6 );
 	} | 
-	'[' expr TK_BOR simple_pattern TK_FROM expr {
+	'[' expr TK_BOR simple_pattern TK_FROM expr %prec TK_LAMBDA {
 		char name[256];
 		Symbol *sym;
 		Compile *enclosing = current_compile;
@@ -904,6 +905,15 @@ binop:
 	} | 
 	expr '.' expr {
 		$$ = tree_binop_new( current_compile, BI_DOT, $1, $3 );
+	} |
+	expr TK_TO expr {
+		ParseNode *pn;
+
+		pn = tree_leaf_new( current_compile, "mknvpair" );
+		pn = tree_appl_new( current_compile, pn, $1 );
+		pn = tree_appl_new( current_compile, pn, $3 );
+
+		$$ = pn;
 	}
 	;
 

@@ -184,7 +184,7 @@ vips_type_find( im_arg_type type )
 	return( VIPS_NONE );
 }
 
-/* Hash from a vargv ... just look at input args.
+/* Hash from a vargv ... just look at input args and the function name.
  */
 static unsigned int
 vips_hash( VipsInfo *vi )
@@ -207,6 +207,11 @@ vips_hash( VipsInfo *vi )
 #define HASH_D( D ) hash = (hash << 1) | ((unsigned int) (D));
 #define HASH_P( P ) hash = (hash << 1) | (GPOINTER_TO_UINT( P ));
 #define HASH_S( S ) hash = (hash << 1) | g_str_hash( S );
+
+	/* Add the function to the hash. We often call many functions on
+	 * the same args, we'd like these calls to hash to different numbers.
+	 */
+	HASH_P( vi->fn );
 
         for( i = 0; i < vi->fn->argc; i++ ) {
                 im_type_desc *vips = vi->fn->argv[i].desc;
@@ -263,13 +268,20 @@ vips_hash( VipsInfo *vi )
 			{
 				im_mask_object *mo = vi->vargv[i];
 				DOUBLEMASK *mask = mo->mask;
-				int ne = mask->xsize * mask->ysize;
-				int j;
 
-				for( j = 0; j < ne; j++ )
-					HASH_D( mask->coeff[j] );
-				HASH_D( mask->scale );
-				HASH_D( mask->offset );
+				/* mask can be NULL if we are called after 
+				 * vips_new() but before we've built the arg
+				 * list.
+				 */
+				if( mask ) {
+					int ne = mask->xsize * mask->ysize;
+					int j;
+
+					for( j = 0; j < ne; j++ )
+						HASH_D( mask->coeff[j] );
+					HASH_D( mask->scale );
+					HASH_D( mask->offset );
+				}
 
 				break;
 			}
@@ -278,13 +290,20 @@ vips_hash( VipsInfo *vi )
 			{
 				im_mask_object *mo = vi->vargv[i];
 				INTMASK *mask = mo->mask;
-				int ne = mask->xsize * mask->ysize;
-				int j;
 
-				for( j = 0; j < ne; j++ )
-					HASH_I( mask->coeff[j] );
-				HASH_I( mask->scale );
-				HASH_I( mask->offset );
+				/* mask can be NULL if we are called after 
+				 * vips_new() but before we've built the arg
+				 * list.
+				 */
+				if( mask ) {
+					int ne = mask->xsize * mask->ysize;
+					int j;
+
+					for( j = 0; j < ne; j++ )
+						HASH_I( mask->coeff[j] );
+					HASH_I( mask->scale );
+					HASH_I( mask->offset );
+				}
 
 				break;
 			}

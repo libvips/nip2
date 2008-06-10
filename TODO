@@ -1,3 +1,11 @@
+- try oprofile again? while loading hazel's workspace
+
+  is vips_call.c in the top whatever?
+
+- add a switch so we can run test_toolkits.ws in batch mode
+
+  maybe eval every symbol and print the error log?
+
 - try
 
   	[a || b | a <- [1..10]; b <- [1..10]]

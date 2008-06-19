@@ -32,6 +32,7 @@
 /*
 #define DEBUG_TIME
 #define DEBUG
+#define DEBUG_HISTORY_SANITY
 #define DEBUG_HISTORY_MISS
 #define DEBUG_HISTORY
  */
@@ -41,10 +42,10 @@
  */
 
 /* Often want it off ... we get spurious complaints about leaks if an
- * operation has no images in or out (eg. im_version) becausew it'll never
+ * operation has no images in or out (eg. im_version) because it'll never
  * get GCed.
- */
 #undef DEBUG_LEAK
+ */
 
 /* Maxiumum number of args to a VIPS function.
  */
@@ -507,11 +508,11 @@ vips_equal( VipsInfo *vi1, VipsInfo *vi2 )
 	return( TRUE );
 }
 
-#ifdef DEBUG_HISTORY
+#ifdef DEBUG_HISTORY_SANITY
 static void
 vips_history_sanity_sub( VipsInfo *vi )
 {
-	assert( g_slist_find( vips_history_lru->list, vi ) );
+	g_assert( g_slist_find( vips_history_lru->list, vi ) );
 }
 
 static void
@@ -527,11 +528,11 @@ vips_history_sanity( void )
 	for( p = vips_history_lru->list; p; p = p->next ) {
 		VipsInfo *vi = (VipsInfo *) p->data;
 
-		assert( g_hash_table_lookup( vips_history_table, vi ) );
+		g_assert( g_hash_table_lookup( vips_history_table, vi ) );
 
-		assert( vi->fn );
-		assert( vi->fn->argc > 0 && vi->fn->argc < 100 );
-		assert( vi->in_cache );
+		g_assert( vi->fn );
+		g_assert( vi->fn->argc > 0 && vi->fn->argc < 100 );
+		g_assert( vi->in_cache );
 	}
 
 	/* Everything that's on the history table should be in the LRU.
@@ -548,7 +549,7 @@ vips_history_sanity( void )
 		/* Need to build with DEBUG on before vips_info_all is
 		 * maintained.
 		 */
-		assert( g_slist_find( vips_info_all, vi ) );
+		g_assert( g_slist_find( vips_info_all, vi ) );
 	}
 
 	/* Everything on vips_info_all that's not in vips_history_table should
@@ -558,10 +559,10 @@ vips_history_sanity( void )
 		VipsInfo *vi = (VipsInfo *) p->data;
 
 		if( !g_hash_table_lookup( vips_history_table, vi ) )
-			assert( !vi->in_cache );
+			g_assert( !vi->in_cache );
 	}
 }
-#endif /*DEBUG_HISTORY*/
+#endif /*DEBUG_HISTORY_SANITY*/
 
 /* Is a function call in our history? Return the old one. 
  */
@@ -581,8 +582,10 @@ vips_history_lookup( VipsInfo *vi )
 #ifdef DEBUG_HISTORY
 	if( old_vi ) 
 		printf( "vips_history_lookup: found \"%s\"\n", old_vi->name );
-	vips_history_sanity();
 #endif /*DEBUG_HISTORY*/
+#ifdef DEBUG_HISTORY_SANITY
+	vips_history_sanity();
+#endif /*DEBUG_HISTORY_SANITY*/
 
 	return( old_vi );
 }
@@ -592,13 +595,15 @@ vips_history_lookup( VipsInfo *vi )
 static void
 vips_history_touch( VipsInfo *vi )
 {
-	assert( vi->in_cache );
+	g_assert( vi->in_cache );
 
 	queue_remove( vips_history_lru, vi );
 	queue_add( vips_history_lru, vi );
 
-#ifdef DEBUG_HISTORY
+#ifdef DEBUG_HISTORY_SANITY
 	vips_history_sanity();
+#endif /*DEBUG_HISTORY_SANITY*/
+#ifdef DEBUG_HISTORY
 	printf( "vips_history_touch: bumping \"%s\"\n", vi->name );
 #endif /*DEBUG_HISTORY*/
 }
@@ -606,19 +611,21 @@ vips_history_touch( VipsInfo *vi )
 static void
 vips_history_insert( VipsInfo *vi )
 {
-	assert( !g_hash_table_lookup( vips_history_table, vi ) );
-	assert( !vi->in_cache );
+	g_assert( !g_hash_table_lookup( vips_history_table, vi ) );
+	g_assert( !vi->in_cache );
 
 	g_hash_table_insert( vips_history_table, vi, vi );
 	vips_history_size += 1;
 
-	assert( g_hash_table_lookup( vips_history_table, vi ) );
+	g_assert( g_hash_table_lookup( vips_history_table, vi ) );
 
 	queue_add( vips_history_lru, vi );
 	vi->in_cache = TRUE;
 
-#ifdef DEBUG_HISTORY
+#ifdef DEBUG_HISTORY_SANITY
 	vips_history_sanity();
+#endif /*DEBUG_HISTORY_SANITY*/
+#ifdef DEBUG_HISTORY
 	printf( "vips_history_insert: adding \"%s\"\n", vi->name );
 #endif /*DEBUG_HISTORY*/
 }
@@ -639,9 +646,9 @@ vips_history_remove( VipsInfo *vi )
 #endif /*DEBUG_HISTORY*/
 	}
 
-#ifdef DEBUG_HISTORY
+#ifdef DEBUG_HISTORY_SANITY
 	vips_history_sanity();
-#endif /*DEBUG_HISTORY*/
+#endif /*DEBUG_HISTORY_SANITY*/
 }
 
 static void
@@ -650,7 +657,7 @@ vips_destroy( VipsInfo *vi )
 	int i;
 
 #ifdef DEBUG_HISTORY
-	printf( "vips_destroy: destroying \"%s\"\n", vi->name );
+	printf( "vips_destroy: destroying \"%s\" (%p)\n", vi->name, vi );
 #endif /*DEBUG_HISTORY*/
 
 	/* Are we in the history? Remove us.
@@ -733,7 +740,7 @@ vips_destroy( VipsInfo *vi )
 			break;
 
 		default:
-			assert( FALSE );
+			g_assert( FALSE );
 		}
 	}
 
@@ -757,9 +764,9 @@ vips_history_remove_lru( void )
 
 	vips_destroy( vi );
 
-#ifdef DEBUG_HISTORY
+#ifdef DEBUG_HISTORY_SANITY
 	vips_history_sanity();
-#endif /*DEBUG_HISTORY*/
+#endif /*DEBUG_HISTORY_SANITY*/
 }
 
 static void
@@ -791,17 +798,9 @@ vips_history_add( VipsInfo *vi )
 {
 	int i;
 
-	/* Is this function call already in the history? If it is, just touch
-	 * the time.
-	 */
-	if( vips_history_lookup( vi ) ) {
-		vips_history_touch( vi );
-		return;
-	}
-
 #ifdef DEBUG_HISTORY
-	printf( "vips_history_add: adding \"%s\", hash = 0x%x\n", 
-		vi->name, vi->hash );
+	printf( "vips_history_add: adding \"%s\" (%p), hash = %u\n", 
+		vi->name, vi, vi->hash );
 #endif /*DEBUG_HISTORY*/
 
 	vips_history_insert( vi );
@@ -893,7 +892,7 @@ vips_tochar( VipsInfo *vi, int i, BufInfo *buf )
 	}
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 }
 
@@ -1077,7 +1076,7 @@ vips_new( Reduce *rc, im_function *fn )
 	VipsInfo *vi;
 	int i;
 
-	assert( fn->argc < MAX_VIPS_ARGS - 1 );
+	g_assert( fn->argc < MAX_VIPS_ARGS - 1 );
 
 	if( !fn || !(vi = INEW( NULL, VipsInfo )) )
 		return( NULL );
@@ -1430,7 +1429,7 @@ vips_fromip( Reduce *rc, PElement *arg,
 	}
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 
 	return( TRUE );
@@ -1530,7 +1529,7 @@ vips_toip( VipsInfo *vi, int i, int *outiiindex, PElement *arg )
 
 	case VIPS_IMAGEVEC:
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 
 #ifdef DEBUG
@@ -1635,7 +1634,7 @@ vips_tobuf( VipsInfo *vi, int i, BufInfo *buf )
 		break;
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 }
 
@@ -1776,7 +1775,7 @@ vips_build_output( VipsInfo *vi, int i )
 	}
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 }
 
@@ -2142,7 +2141,7 @@ vips_fillva( VipsInfo *vi, va_list ap )
 		}
 
 		else
-			assert( FALSE );
+			g_assert( FALSE );
 	}
 }
 
@@ -2173,7 +2172,7 @@ vips_dispatch( VipsInfo *vi, PElement *out )
 #endif /*DEBUG_HISTORY*/
 	}
 	else {
-		/* No: call function and save result in history.
+		/* No: call function.
 		 */
 		int result;
 
@@ -2189,6 +2188,9 @@ vips_dispatch( VipsInfo *vi, PElement *out )
 		printf( "vips_dispatch: calling %s\n", vi->name );
 #endif /*DEBUG_HISTORY_MISS*/
 
+		/* Be careful. This may well call back into nip2 via progress
+		 * feedback and result in a recursive invocation of vips_call.
+		 */
 		result = vi->fn->disp( vi->vargv );
 
 #ifdef DEBUG_TIME
@@ -2215,10 +2217,23 @@ vips_dispatch( VipsInfo *vi, PElement *out )
 		reduce_throw( rc );
 	}
 
-	/* Can we cache this operation? Memoise or destroy.
+	/* Add to our operation cache, if necessary.
 	 */
-	if( vi->fn->flags & IM_FN_NOCACHE )
+	if( vi->fn->flags & IM_FN_NOCACHE ) 
+		/* Uncacheable operation.
+		 */
 		vips_destroy( vi );
+	else if( vi->in_cache ) 
+		/* Already in the history. Just touch the time.
+		 */
+		vips_history_touch( vi );
+	else if( (old_vi = vips_history_lookup( vi )) ) {
+		/* We have an equal but older item there? This can happen with
+		 * nested calls. Touch the old one and destroy this one.
+		 */
+		vips_history_touch( old_vi );
+		vips_destroy( vi );
+	}
 	else
 		vips_history_add( vi );
 }
@@ -2289,6 +2304,10 @@ vips_run( Reduce *rc, Compile *compile,
 #ifdef DEBUG
 	printf( "vips_run: starting for %s\n", name );
 #endif /*DEBUG*/
+
+#ifdef DEBUG_HISTORY_SANITY
+	vips_history_sanity();
+#endif /*DEBUG_HISTORY_SANITY*/
 
 	if( !(vi = vips_new( rc, function )) )
 		reduce_throw( rc );

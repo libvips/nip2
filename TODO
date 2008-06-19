@@ -2,6 +2,18 @@
 
   is vips_call.c in the top whatever?
 
+- for rows made by typing stuff, always show the formula as well as the value
+
+  by default anyway?
+
+  we'd need to always show the up/down arrows, not just for classes
+
+- Matrix -> [Vector], either row-wise or column-wise 
+
+  ... and the inverse [Vector] -> Matrix
+
+- Matrix / Join / Left-right needs args swapping
+
 - add a switch so we can run test_toolkits.ws in batch mode
 
   maybe eval every symbol and print the error log?

@@ -368,12 +368,12 @@ Matrix_plot_scatter_item = class
 			= Plot options ((x2b @ get_image @ to_image) x)
 		{
 			options
-				= [["style", Plot_style.POINT], 
-					["format", Plot_format.XYYY]] ++ range;
+				= [$style => Plot_style.POINT, $format => Plot_format.XYYY] ++ 
+					range;
 			range
 				= [], auto
-				= [["xmin", xmin.expr], ["xmax", xmax.expr], 
-					["ymin", ymin.expr], ["ymax", ymax.expr]]; 
+				= [$xmin => xmin.expr, $xmax => xmax.expr, 
+					$ymin => ymin.expr, $ymax => ymax.expr]; 
 
 			// matrix to image makes a 1-band mxn image
 			// we need to put columns into bands

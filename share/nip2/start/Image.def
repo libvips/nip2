@@ -199,16 +199,16 @@ Image_header_item = class
 			coding = 9;
 
 			field_names = Enum [
-				["width", width],
-				["height", height],
-				["bands", bands],
-				["format", format],
-				["type", type],
-				["xres", xres],
-				["yres", yres],
-				["xoffset", xoffset],
-				["yoffset", yoffset],
-				["coding", coding]
+				$width => width,
+				$height => height,
+				$bands => bands,
+				$format => format,
+				$type => type,
+				$xres => xres,
+				$yres => yres,
+				$xoffset => xoffset,
+				$yoffset => yoffset,
+				$coding => coding
 			];
 
 			field_option name = Option_enum field_names (_ "Field") name;

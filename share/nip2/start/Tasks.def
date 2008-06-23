@@ -271,7 +271,7 @@ Tasks_capture_item = class
 					mode == 1
 				= Matrix (map2 cons _true_grey_Y' _camera_grey')
 			{
-				intercepts = [(linreg _true_grey_Y' cam).intercept | 
+				intercepts = [(linreg _true_grey_Y' cam).intercept :: 
 					cam <- transpose _camera_grey'];
 			}
 
@@ -281,7 +281,7 @@ Tasks_capture_item = class
 			// and display it
 			// plot from 0 explicitly so we see the effect of mode1 (intercept
 			// from greyscale)
-			linearising_lut = Plot [["ymin", 0]] _linear_lut;
+			linearising_lut = Plot [$ymin => 0] _linear_lut;
 
 			// map the original image through the lineariser to 
 			// get linear 0-1 RGB image
@@ -365,9 +365,9 @@ Tasks_capture_item = class
 				= Plot options (to_image (bands (image x))).value
 			{
 				options
-					= [["style", style.value]] ++ 
+					= [$style => style.value] ++ 
 						if auto then [] else 
-							[["ymin", ymin.expr], ["ymax", ymax.expr]]; 
+							[$ymin => ymin.expr, $ymax => ymax.expr]; 
 
 				// try to make something image-like from it
 				image x

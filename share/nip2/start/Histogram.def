@@ -302,11 +302,11 @@ Hist_plot_item = class
 			= Plot options (image x)
 		{
 			options
-				= [["style", style.value], ["format", format.value]] ++ range;
+				= [$style => style.value, $format => format.value] ++ range;
 			range
 				= [], auto
-				= [["xmin", xmin.expr], ["xmax", xmax.expr], 
-					["ymin", ymin.expr], ["ymax", ymax.expr]]; 
+				= [$xmin => xmin.expr, $xmax => xmax.expr, 
+					$ymin => ymin.expr, $ymax => ymax.expr]; 
 
 			image x
 				= image (extract_arrow x), is_Arrow x

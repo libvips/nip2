@@ -1098,23 +1098,23 @@ Filter_blend_item = class
 	
 		// names we show the user for blend types
 		names = Enum [
-			["Normal", NORMAL],
-			["If Lighter", IFLIGHTER],
-			["If Darker", IFDARKER],
-			["Multiply", MULTIPLY],
-			["Add", ADD],
-			["Subtract", SUBTRACT],
-			["Screen", SCREEN],
-			["Burn", BURN],
-			["Soft Light", SOFTLIGHT],
-			["Hard Light", HARDLIGHT],
-			["Lighten", LIGHTEN],
-			["Darken", DARKEN],
-			["Dodge", DODGE],
-			["Reflect", REFLECT],
-			["Freeze", FREEZE],
-			["Bitwise OR", OR],
-			["Bitwise AND", AND]
+			[_ "Normal", NORMAL],
+			[_ "If Lighter", IFLIGHTER],
+			[_ "If Darker", IFDARKER],
+			[_ "Multiply", MULTIPLY],
+			[_ "Add", ADD],
+			[_ "Subtract", SUBTRACT],
+			[_ "Screen", SCREEN],
+			[_ "Burn", BURN],
+			[_ "Soft Light", SOFTLIGHT],
+			[_ "Hard Light", HARDLIGHT],
+			[_ "Lighten", LIGHTEN],
+			[_ "Darken", DARKEN],
+			[_ "Dodge", DODGE],
+			[_ "Reflect", REFLECT],
+			[_ "Freeze", FREEZE],
+			[_ "Bitwise OR", OR],
+			[_ "Bitwise AND", AND]
 		];
 	
 		// functions we call for each blend type
@@ -1211,12 +1211,12 @@ Filter_overlay_header_item = class
 		_vislevel = 3;
 
 		colour = Option "Colour overlay as" [
-			"Green over Red",
-			"Blue over Red",
-			"Red over Green",
-			"Red over Blue",
-			"Blue over Green",
-			"Green over Blue"
+			_ "Green over Red",
+			_ "Blue over Red",
+			_ "Red over Green",
+			_ "Red over Blue",
+			_ "Blue over Green",
+			_ "Green over Blue"
 		] 0;
 
 		_result
@@ -1275,13 +1275,13 @@ Filter_browse_multiband_item = class
 
         	band = Scale "Band" 0 (image.bands - 1) 0;
        		display = Option "Display as" [
-				"Grey",
-				"Green over Red",
-				"Blue over Red",
-				"Red over Green",
-				"Red over Blue",
-				"Blue over Green",
-				"Green over Blue"
+				_ "Grey",
+				_ "Green over Red",
+				_ "Blue over Red",
+				_ "Red over Green",
+				_ "Red over Blue",
+				_ "Blue over Green",
+				_ "Green over Blue"
 			] 0;
 	
         	_result 
@@ -1549,16 +1549,16 @@ Filter_paint_text_item = class
 			text = Pattern_images_item.Text_item.action;
 			colour = Expression "Text colour" 255;
 			position = Option "Position" [
-				"North-west",
-				"North",
-				"North-east",
-				"West",
-				"Centre",
-				"East",
-				"South-west",
-				"South",
-				"South-east",
-				"Specify in pixels"
+				_ "North-west",
+				_ "North",
+				_ "North-east",
+				_ "West",
+				_ "Centre",
+				_ "East",
+				_ "South-west",
+				_ "South",
+				_ "South-east",
+				_ "Specify in pixels"
 			] 4;
 			left = Expression "Pixels from left" 0;
 			top = Expression "Pixels from top" 0;

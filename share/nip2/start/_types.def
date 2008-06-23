@@ -837,32 +837,32 @@ Image_type = class {
 	/* Table to get names <-> numbers.
 	 */
 	type_names = Enum [
-		["MULTIBAND", MULTIBAND],
-		["B_W", B_W],
-		["LUMINANCE", LUMINANCE],
-		["XRAY", XRAY],
-		["IR", IR],
-		["YUV", YUV],
-		["RED_ONLY", RED_ONLY],
-		["GREEN_ONLY", GREEN_ONLY],
-		["BLUE_ONLY", BLUE_ONLY],
-		["POWER_SPECTRUM", POWER_SPECTRUM],
-		["HISTOGRAM", HISTOGRAM],
-		["LUT", LUT],
-		["XYZ", XYZ],
-		["LAB", LAB],
-		["CMC", CMC],
-		["CMYK", CMYK],
-		["LABQ", LABQ],
-		["RGB", RGB],
-		["UCS", UCS],
-		["LCH", LCH],
-		["LABS", LABS],
-		["sRGB", sRGB],
-		["YXY", YXY],
-		["FOURIER", FOURIER],
-		["RGB16", RGB16],
-		["GREY16", GREY16]
+		$MULTIBAND => MULTIBAND,
+		$B_W => B_W,
+		$LUMINANCE => LUMINANCE,
+		$XRAY => XRAY,
+		$IR => IR,
+		$YUV => YUV,
+		$RED_ONLY => RED_ONLY,
+		$GREEN_ONLY => GREEN_ONLY,
+		$BLUE_ONLY => BLUE_ONLY,
+		$POWER_SPECTRUM => POWER_SPECTRUM,
+		$HISTOGRAM => HISTOGRAM,
+		$LUT => LUT,
+		$XYZ => XYZ,
+		$LAB => LAB,
+		$CMC => CMC,
+		$CMYK => CMYK,
+		$LABQ => LABQ,
+		$RGB => RGB,
+		$UCS => UCS,
+		$LCH => LCH,
+		$LABS => LABS,
+		$sRGB => sRGB,
+		$YXY => YXY,
+		$FOURIER => FOURIER,
+		$RGB16 => RGB16,
+		$GREY16 => GREY16
 	];
 
 	/* Table relating nip's colour space names and VIPS's Type numbers.
@@ -870,29 +870,29 @@ Image_type = class {
 	 * Colour menu.
 	 */
 	colour_spaces = Enum [
-		["sRGB", sRGB],
-		["Lab", LAB],
-		["LCh", LCH],
-		["XYZ", XYZ],
-		["Yxy", YXY],
-		["UCS", UCS]
+		$sRGB => sRGB,
+		$Lab => LAB,
+		$LCh => LCH,
+		$XYZ => XYZ,
+		$Yxy => YXY,
+		$UCS => UCS
 	];
 
 	/* A slightly larger table ... the types of colorimetric image we can
 	 * have. Add mono, and the S and Q forms of LAB.
 	 */
 	image_colour_spaces = Enum [
-		["Mono", B_W],
-		["sRGB", sRGB],
-		["RGB16", RGB16],
-		["GREY16", GREY16],
-		["Lab", LAB],
-		["LabQ", LABQ],
-		["LabS", LABS],
-		["LCh", LCH],
-		["XYZ", XYZ],
-		["Yxy", YXY],
-		["UCS", UCS]
+		$Mono => B_W,
+		$sRGB => sRGB,
+		$RGB16 => RGB16,
+		$GREY16 => GREY16,
+		$Lab => LAB,
+		$LabQ => LABQ,
+		$LabS => LABS,
+		$LCh => LCH,
+		$XYZ => XYZ,
+		$Yxy => YXY,
+		$UCS => UCS
 	];
 }
 
@@ -1232,5 +1232,5 @@ Plot_histogram value = class
 }
 
 Plot_xy value = class
-	scope.Plot [["format", Plot_format.XYYY]] value {
+	scope.Plot [$format => Plot_format.XYYY] value {
 }

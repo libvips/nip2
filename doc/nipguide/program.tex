@@ -393,7 +393,7 @@ writing interactive functions.
 Operator & Associativity & Description \\
 \hline
 \ct{if then else}	& Right			& If-then-else construct \\
-\ct{,}			& Left			& List/complex separator \\
+\ct{=>}			& Left			& Form name/value pair \\
 \verb+||+		& Left			& Logical or \\
 \ct{\&\&}		& Left			& Logical and \\
 \ct{@}			& 			& Function composition 
@@ -562,6 +562,77 @@ Lists may be infinite:
 Infinite lists are useful for expressing unbounded iteration.
 See \pref{sec:lazy}.
 
+You can write list comprehensions like this:
+
+\begin{verbatim}
+[x :: x <- [1..]; x % 2 == 0]
+\end{verbatim}
+
+\noindent
+This could be read as \emph{All x such that x is in \verb+[1..]+ and x is
+even}, that is, the list of even numbers. 
+
+You can have any number of semicolon-separated qualifiers and each one can be
+either a generator (like \verb"x <- [1..]") introducing a new variable or
+pattern (see \pref{sec:pattern}),
+or a predicate (like \verb"x % 2 == 0") which filters the generators to the
+left of it. 
+
+Later generators change more rapidly, so for example:
+
+\begin{verbatim}
+[(x, y) :: x <- [1..3]; y <- [x..3]] ==
+  [(1, 1), (1, 2), (1, 3), 
+    (2, 2), (2, 3), (3, 3)]
+\end{verbatim}
+
+You can nest list comprehensions to generate more complex data structures. For
+example:
+
+\begin{verbatim}
+[[x * y :: x <- [1..10]] :: 
+  y <- [1..10]]
+\end{verbatim}
+
+\noindent
+will generate a times-table.
+
+You can use pattern-matching (see \pref{sec:pattern}) to loop over several 
+generators at the same time. For example:
+
+\begin{verbatim}
+[(x, y) :: [x, y] <- 
+  zip2 [1..3] [1..3]] == 
+    [(1, 1), (2, 2), (3, 3)]
+\end{verbatim}
+
+As a convenience, lists of characters may be written enclosed in double
+quotes:
+
+\begin{verbatim}
+"abc" == ['a','b','c']
+\end{verbatim}
+
+You can define a string constant which has the same form as a variable name 
+(that is, letters, numbers, underscore and apostrophy only) with a \verb+$+
+prefix. For example:
+
+\begin{verbatim}
+$form7 == "form7"
+\end{verbatim}
+
+\noindent
+\nip{} often uses these in option lists.
+
+You can define a name, value pair with the \ct{=>} operator. 
+
+\begin{verbatim}
+$fred => 12 == ["fred", 12]
+\end{verbatim}
+
+\noindent
+Again, these pairs are frequently used to pass options to objects.
+
 A list may contain any object:
 
 \begin{verbatim}
@@ -574,13 +645,6 @@ want to group a set of diverse objects, define a class instead,
 see \pref{sec:class}.
 
 Lists of lists of reals are useful for representing arrays.
-
-As a convenience, lists of characters may be written enclosed in double
-quotes:
-
-\begin{verbatim}
-"abc" == ['a','b','c']
-\end{verbatim}
 
 You can use the list index operator (\ct{?}) to extract an element from a
 position in a list:
@@ -595,50 +659,6 @@ end-to-end.
 
 \begin{verbatim}
 [1,2,3] ++ [4,5,6] == [1,2,3,4,5,6]
-\end{verbatim}
-
-You can write list comprehensions like this:
-
-\begin{verbatim}
-[x | x <- [1..]; x % 2 == 0]
-\end{verbatim}
-
-\noindent
-This could be read as \emph{All x such that x is in [1..] and x is
-even}, that is, the list of even numbers.
-
-You can have any number of semicolon-separated qualifiers and each one can be
-either a generator (like \verb"x <- [1..]") introducing a new variable or
-pattern (see \pref{sec:pattern}),
-or a predicate (like \verb"x % 2 == 0") which filters the generators to the
-left of it. 
-
-Later generators change more rapidly, so for example:
-
-\begin{verbatim}
-[(x, y) | x <- [1..3]; y <- [x..3]] ==
-  [(1, 1), (1, 2), (1, 3), 
-    (2, 2), (2, 3), (3, 3)]
-\end{verbatim}
-
-You can nest list comprehensions to generate more complex data structures. For
-example:
-
-\begin{verbatim}
-[[x * y | x <- [1..10]] | 
-  y <- [1..10]]
-\end{verbatim}
-
-\noindent
-will generate a times-table.
-
-You can use pattern-matching (see \pref{sec:pattern}) to loop over several 
-generators at the same time. For example:
-
-\begin{verbatim}
-[(x, y) | [x, y] <- 
-  zip2 [1..3] [1..3]] == 
-    [(1, 1), (2, 2), (3, 3)]
 \end{verbatim}
 
 \subsection{The function type}

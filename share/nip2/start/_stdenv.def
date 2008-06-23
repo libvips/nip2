@@ -1915,10 +1915,10 @@ linreg xes yes
         // in case we ever get shown in the workspace
         _vislevel = 2;
 
-        slope = sum [t * y | [t, y] <- zip2 tes yes] / st2;
+        slope = sum [t * y :: [t, y] <- zip2 tes yes] / st2;
         intercept = (sy - sx * slope) / ss;
 
-        chi2 = sum [(y - intercept - slope * x) ** 2 | [x, y] <- zip2 xes yes];
+        chi2 = sum [(y - intercept - slope * x) ** 2 :: [x, y] <- zip2 xes yes];
 
         siga = (chi2 / (ss - 2)) ** 0.5 *
             ((1 + sx ** 2 / (ss * st2)) / ss) ** 0.5;
@@ -1933,8 +1933,8 @@ linreg xes yes
     sy = sum yes;
     sxoss = sx / ss;
 
-    tes = [x - sxoss | x <- xes];
-    st2 = sum [t ** 2 | t <- tes];
+    tes = [x - sxoss :: x <- xes];
+    st2 = sum [t ** 2 :: t <- tes];
 }
 
 /* Weighted linear regression. Xes, yes and a list of deviations.
@@ -1946,10 +1946,10 @@ linregw xes yes devs
 		// in case we ever get shown in the workspace
 		_vislevel = 2;
 
-		slope = sum [(t * y) / sd | [t, y, sd] <- zip3 tes yes devs] / st2;
+		slope = sum [(t * y) / sd :: [t, y, sd] <- zip3 tes yes devs] / st2;
 		intercept = (sy - sx * slope) / ss;
 
-		chi2 = sum [((y - intercept - slope * x) / sd) ** 2 | 
+		chi2 = sum [((y - intercept - slope * x) / sd) ** 2 :: 
 			[x, y, sd] <- zip3 xes yes devs];
 
 		siga = ((1 + sx * sx / (ss * st2)) / ss) ** 0.5;
@@ -1958,13 +1958,13 @@ linregw xes yes devs
 		q = gammq (0.5 * (len xes - 2)) (0.5 * chi2);
 	}
 
-	wt = [sd ** -0.5 | sd <- devs];
+	wt = [sd ** -0.5 :: sd <- devs];
 
 	ss = sum wt;
-	sx = sum [x * w | [x, w] <- zip2 xes wt];
-	sy = sum [y * w | [y, w] <- zip2 yes wt];
+	sx = sum [x * w :: [x, w] <- zip2 xes wt];
+	sy = sum [y * w :: [y, w] <- zip2 yes wt];
 	sxoss = sx / ss;
 
-	tes = [(x - sxoss) / sd | [x, sd] <- zip2 xes devs];
-	st2 = sum [t ** 2 | t <- tes];
+	tes = [(x - sxoss) / sd :: [x, sd] <- zip2 xes devs];
+	st2 = sum [t ** 2 :: t <- tes];
 }

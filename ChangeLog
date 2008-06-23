@@ -15,9 +15,12 @@ started 7.15.0
 - == did not always find the best method
 - better time debugging in symbol recalc
 - added $name syntax
+- added a => b syntax
 - fixed recursive invocation bug in vips_call.c
 - much better hashing of vips calls
 - configure shows a summary at the end
+- syntax change :-( lcomps now use [expr :: generators] to reduce ambiguity
+  the old syntax failed for things like [a || b | a <- [true]; b <- [false]]
 
 started 7.14.0
 - updated docs

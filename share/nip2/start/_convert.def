@@ -230,16 +230,16 @@ E_whitepoint = Vector [100, 100, 100];			// ill. free
 D3250_whitepoint = Vector [105.6590, 100, 45.8501];
 
 Whitepoints = Enum [
-	["D93", D93_whitepoint],
-	["D75", D75_whitepoint],
-	["D65", D65_whitepoint],
-	["D55", D55_whitepoint],
-	["D50", D50_whitepoint],
-	["A", A_whitepoint],
-	["B", B_whitepoint],
-	["C", C_whitepoint],
-	["E", E_whitepoint],
-	["D3250", D3250_whitepoint]
+	$D93 => D93_whitepoint,
+	$D75 => D75_whitepoint,
+	$D65 => D65_whitepoint,
+	$D55 => D55_whitepoint,
+	$D50 => D50_whitepoint,
+	$A => A_whitepoint,
+	$B => B_whitepoint,
+	$C => C_whitepoint,
+	$E => E_whitepoint,
+	$D3250 => D3250_whitepoint
 ];
 
 /* Convert D50 XYZ to D65 using the bradford chromatic adaptation approx.

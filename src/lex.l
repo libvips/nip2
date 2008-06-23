@@ -271,6 +271,7 @@ FALSE {
 \=\> { BEGIN 0; return( TK_TO ); }
 \& { BEGIN 0; return( TK_BAND ); }
 \&\& { BEGIN 0; return( TK_LAND ); }
+\:\: { BEGIN 0; return( TK_SUCHTHAT ); }
 \*\* { BEGIN 0; return( TK_POW ); }
 \>\> { BEGIN 0; return( TK_RSHIFT ); }
 \<\< { BEGIN 0; return( TK_LSHIFT ); }

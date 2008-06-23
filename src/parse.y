@@ -118,7 +118,7 @@ void *parse_access_end( Symbol *sym, Symbol *main );
 	BinOp yy_binop;
 }
 
-%token TK_TAG TK_IDENT TK_CONST TK_DOTDOTDOT TK_LAMBDA TK_FROM TK_TO
+%token TK_TAG TK_IDENT TK_CONST TK_DOTDOTDOT TK_LAMBDA TK_FROM TK_TO TK_SUCHTHAT
 %token TK_UMINUS TK_UPLUS TK_POW 
 %token TK_LESS TK_LESSEQ TK_MORE TK_MOREEQ TK_NOTEQ
 %token TK_LAND TK_LOR TK_BAND TK_BOR TK_JOIN
@@ -134,6 +134,7 @@ void *parse_access_end( Symbol *sym, Symbol *main );
 %type <yy_const> TK_CONST 
 %type <yy_name> TK_IDENT TK_TAG
 
+%left TK_SUCHTHAT 
 %left TK_LAMBDA 
 %nonassoc TK_IF 
 %left ',' 
@@ -683,7 +684,7 @@ list_expression:
 	'[' expr ',' expr TK_DOTDOTDOT expr ']' {
 		$$ = tree_generator_new( current_compile, $2, $4, $6 );
 	} | 
-	'[' expr TK_BOR simple_pattern TK_FROM expr %prec TK_LAMBDA {
+	'[' expr TK_SUCHTHAT {
 		char name[256];
 		Symbol *sym;
 		Compile *enclosing = current_compile;
@@ -697,15 +698,15 @@ list_expression:
 		sym->generated = TRUE;
 		(void) compile_new_local( sym->expr );
 
-		/* Initialise symbol parsing variables. Save old current symbol,
-		 * add new one.
+		/* Push a new scope.
 		 */
 		scope_push();
 		current_symbol = sym;
 		current_compile = sym->expr->compile;
 
 		/* Somewhere to save the result expr. We have to copy the
-		 * expr, as we want it to be bound in $$lcomp's context.
+		 * expr, as we want it to be bound in $$lcomp's context so
+		 * that it can see the generators.
 		 */
 		sym = symbol_new_defining( current_compile, "$$result" );
 		sym->generated = TRUE;
@@ -714,32 +715,8 @@ list_expression:
 		(void) compile_new_local( sym->expr );
 		sym->expr->compile->tree = compile_copy_tree( enclosing, $2, 
 			sym->expr->compile );
-
-		/* Make the first "x <- expr" generator. They need the same
-		 * id: be careful not to update the count. No need to copy the
-		 * pattern: we don't use the bindings.
-		 */
-		im_snprintf( name, 256, "$$pattern%d", parse_object_id );
-		sym = symbol_new_defining( current_compile, name );
-		sym->generated = TRUE;
-		sym->placeholder = TRUE;
-		(void) symbol_user_init( sym );
-		(void) compile_new_local( sym->expr );
-		sym->expr->compile->tree = $4;
-
-		/* But we do have to copy the generator. We want it's
-		 * variables bound in $$lcomp's context.
-		 */
-		im_snprintf( name, 256, "$$generator%d", parse_object_id++ );
-		sym = symbol_new_defining( current_compile, name );
-		sym->generated = TRUE;
-		sym->placeholder = TRUE;
-		(void) symbol_user_init( sym );
-		(void) compile_new_local( sym->expr );
-		sym->expr->compile->tree = compile_copy_tree( enclosing, $6, 
-			sym->expr->compile );
 	}
-	frompred_list ']' {
+	generator frompred_list ']' {
 		Symbol *sym;
 
 		/* The map expr can refer to generator names. Resolve inwards
@@ -783,7 +760,7 @@ frompred_list:
 	}
 	;
 
-frompred:
+generator:
        simple_pattern TK_FROM expr {
 		char name[256];
 		Symbol *sym;
@@ -803,7 +780,11 @@ frompred:
 		(void) symbol_user_init( sym );
 		(void) compile_new_local( sym->expr );
 		sym->expr->compile->tree = $3;
-       } |
+       }
+       ;
+
+frompred:
+       generator |
        expr {
 		char name[256];
 		Symbol *sym;

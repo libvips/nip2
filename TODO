@@ -1,6 +1,4 @@
-- try oprofile again? while loading hazel's workspace
-
-  is vips_call.c in the top whatever?
+- configure no longers sets GMSGFMT, is this OK? test on OS X
 
 - for rows made by typing stuff, always show the formula as well as the value
 

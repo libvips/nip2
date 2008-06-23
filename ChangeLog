@@ -17,6 +17,7 @@ started 7.15.0
 - added $name syntax
 - fixed recursive invocation bug in vips_call.c
 - much better hashing of vips calls
+- configure shows a summary at the end
 
 started 7.14.0
 - updated docs

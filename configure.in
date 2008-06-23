@@ -64,11 +64,6 @@ if test x"$nip_os_darwin" = "xyes"; then
   AC_DEFINE(OS_DARWIN,1,[native Mac OS X])
 fi
 
-if test x"$nip_os_darwin" = "xyes"; then
-  # need this env setting on darwin, for some reason
-  export GMSGFMT=msgfmt
-fi
-
 # disable debugging by default for production releases
 m4_define([debug_default],
   m4_if(m4_eval(nip_minor_version() % 2), [1], [yes], [minimum]))
@@ -129,7 +124,7 @@ AM_GLIB_GNU_GETTEXT
 
 # check for flex ... nip needs to adjust itself a bit
 if test "${LEX}" = "flex"; then
-	AC_DEFINE(HAVE_FLEX,1,[using flex, rather than lex])
+  AC_DEFINE(HAVE_FLEX,1,[using flex, rather than lex])
 fi
 
 # get packages we need
@@ -154,10 +149,10 @@ IP_LIBS="$PKGFLAGS_LIBS $IP_LIBS"
 
 # Check for the function strccpy in libgen
 AC_CHECK_HEADER(libgen.h, 
-	AC_CHECK_LIB(gen, strccpy, 
-		AC_DEFINE(HAVE_STRCCPY,1,[have strccpy() in -lgen]) 
-		IP_LIBS="$IP_LIBS -lgen" 
-	), 
+  AC_CHECK_LIB(gen, strccpy, 
+    AC_DEFINE(HAVE_STRCCPY,1,[have strccpy() in -lgen]) 
+    IP_LIBS="$IP_LIBS -lgen" 
+  ), 
 )
 
 # Checks for header files.
@@ -184,8 +179,12 @@ AC_ARG_WITH([fftw3], AS_HELP_STRING([--without-fftw3], [build without fftw3 (def
 
 if test "x$with_fftw3" != "xno"; then
   PKG_CHECK_MODULES(FFTW3, fftw3,
-    [AC_DEFINE(HAVE_FFTW3,1,[define if you have fftw3 installed.])],
-    [AC_MSG_WARN([fftw3 not found; disabling fftw support])])
+    [AC_DEFINE(HAVE_FFTW3,1,[define if you have fftw3 installed.])
+     with_fftw3=yes
+    ],
+    [AC_MSG_WARN([fftw3 not found; disabling fftw support])
+     with_fftw3=no
+    ])
   IP_CFLAGS="$FFTW_INCLUDES $FFTW3_CFLAGS $IP_CFLAGS"
 fi
 
@@ -194,8 +193,12 @@ AC_ARG_WITH([gsl], AS_HELP_STRING([--without-gsl], [build without gsl (default: 
 
 if test "x$with_gsl" != "xno"; then
   PKG_CHECK_MODULES(GSL, gsl,
-    [AC_DEFINE(HAVE_GSL,1,[define if you have gsl installed.])],
-    [AC_MSG_WARN([gsl not found; disabling extra numerical functions])])
+    [AC_DEFINE(HAVE_GSL,1,[define if you have gsl installed.])
+     with_gsl=yes
+    ],
+    [AC_MSG_WARN([gsl not found; disabling extra numerical functions])
+     with_gsl=no
+    ])
   IP_CFLAGS="$GSL_CFLAGS $IP_CFLAGS"
   IP_LIBS="$GSL_LIBS $IP_LIBS"
 fi
@@ -205,8 +208,12 @@ AC_ARG_WITH([vips8], AS_HELP_STRING([--without-vips8], [build without vips8 (def
 
 if test "x$with_vips8" != "xno"; then
   PKG_CHECK_MODULES(VIPS8, vips-8.0,
-    [AC_DEFINE(HAVE_VIPS8,1,[define if you have vips8 installed.])],
-    [AC_MSG_WARN([vips8 not found; disabling library testing])])
+    [AC_DEFINE(HAVE_VIPS8,1,[define if you have vips8 installed.])
+     with_vips8=yes
+    ],
+    [AC_MSG_WARN([vips8 not found; disabling library testing])
+     with_vips8=no
+    ])
   IP_CFLAGS="$VIPS8_CFLAGS $IP_CFLAGS"
   IP_LIBS="$VIPS8_LIBS $IP_LIBS"
 fi
@@ -223,14 +230,14 @@ fi
 AC_PATH_PROG(UPDATE_MIME_DATABASE, update-mime-database, no)
 AC_PATH_PROG(UPDATE_DESKTOP_DATABASE, update-desktop-database, no)
 
-update=no
+nip_desktop_update=no
 if test "x$UPDATE_MIME_DATABASE" != "xno"; then
   if test "x$UPDATE_DESKTOP_DATABASE" != "xno"; then
-    update=yes
+    nip_desktop_update=yes
   fi
 fi
 
-if test x"$update" = "xyes"; then
+if test x"$nip_desktop_update" = "xyes"; then
   AM_CONDITIONAL(UPDATE_DESKTOP, true)
 else
   AM_CONDITIONAL(UPDATE_DESKTOP, false)
@@ -257,4 +264,16 @@ AC_OUTPUT([
 	src/BITMAPS/Makefile 
 	src/Makefile
 	po/Makefile.in
+])
+
+AC_MSG_RESULT([
+native win32:			$nip_os_win32
+native os x:			$nip_os_darwin
+debug: 				$enable_debug
+
+use fftw3 for FFT: 		$with_fftw3
+use gsl for numeric functions:	$with_gsl
+build vips8 interface:		$with_vips8
+display help files with xdg:	$XDG_OPEN
+update desktop after install: 	$nip_desktop_update
 ])

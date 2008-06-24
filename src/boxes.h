@@ -153,38 +153,6 @@ GtkWidget *imageheader_new( Conversion *conv );
 
 void box_url( GtkWidget *par, const char *url );
 
-/* Progress dialog.
- */
-#define TYPE_PROGRESS (progress_get_type())
-#define PROGRESS( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_PROGRESS, Progress ))
-#define PROGRESS_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_PROGRESS, ProgressClass ))
-#define IS_PROGRESS( obj ) (GTK_CHECK_TYPE( (obj), TYPE_PROGRESS ))
-#define IS_PROGRESS_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_PROGRESS ))
-
-typedef struct _Progress {
-	iDialog parent_object;
-
-	Imageinfo *imageinfo;
-	gboolean cancelled;		/* Set if cancel pushed */
-
-	GtkWidget *bar;
-	GtkWidget *status;
-} Progress;
-
-typedef struct _ProgressClass {
-	iDialogClass parent_class;
-
-	/* My methods.
-	 */
-} ProgressClass;
-
-GtkType progress_get_type( void );
-Progress *progress_new( Imageinfo *imageinfo );
-void progress_update( Progress *progress, int percent, int eta );
-
 /* Splash window.
  */
 #define TYPE_SPLASH (splash_get_type())

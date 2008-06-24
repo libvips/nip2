@@ -980,17 +980,14 @@ reduce_spine( Reduce *rc, PElement *out )
 
 reduce_start:
 	reduce_total_recomputations += 1;
-	/*
-
-		FIXME ... where could we show the progress box?
-
-	if( (reduce_total_recomputations % 1000) == 0 ) {
-
-
-		if( mainw_countdown_animate( 99 ) )
+	if( (reduce_total_recomputations % 100000) == 0 ) {
+		mainw_progress_update( 0, 0 );
+		if( mainw_cancel ) {
+			error_top( _( "Cancelled." ) );
+			error_sub( _( "Evaluation cancelled." ) );
 			reduce_throw( rc );
+		}
 	}
-	 */
 
 	switch( PEGETTYPE( &np ) ) {
 	case ELEMENT_CHAR:

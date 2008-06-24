@@ -94,6 +94,8 @@ struct _Mainw {
 	GtkWidget *statusbar;
 	GtkWidget *space_free;	
 	GtkWidget *space_free_eb;	
+	GtkWidget *progress_box;
+	GtkWidget *progress;
 
 	/* Left and right panes ... program window and toolkit browser.
 	 */
@@ -113,6 +115,11 @@ extern GSList *mainw_recent_image;
 extern GSList *mainw_recent_matrix;
 
 extern gboolean mainw_auto_recalc;
+
+extern gboolean mainw_cancel;
+
+void mainw_progress_end( void );
+void mainw_progress_update( int percent, int eta );
 
 void mainw_startup( void );
 void mainw_shutdown( void );

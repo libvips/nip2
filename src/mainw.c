@@ -50,6 +50,24 @@ GSList *mainw_recent_matrix = NULL;
  */
 gboolean mainw_auto_recalc = TRUE;
 
+/* Cancel buttons in mainwes set this, tested by imageinfo and others.
+ */
+gboolean mainw_cancel = FALSE;
+
+/* Time evaluation events ... zero the timer when we see the first eval event,
+ * show progress feedback if we eval for a while, only update progress a few
+ * times a second, destroy the timer at the end of eval.
+ */
+static GTimer *mainw_progress_timer = NULL;
+
+/* When we last updated progress feedback.
+ */
+static double mainw_progress_last;
+
+/* Are we currently displaying progress/cancel.
+ */
+static gboolean mainw_progress_visible;
+
 static iWindowClass *parent_class = NULL;
 
 /* All the mainw.
@@ -243,6 +261,8 @@ mainw_init( Mainw *mainw )
 	mainw->statusbar = NULL;
 	mainw->space_free = NULL;
 	mainw->space_free_eb = NULL;
+	mainw->progress_box = NULL;
+	mainw->progress = NULL;
 
 	mainw->lpane = NULL;
 	mainw->rpane = NULL;
@@ -273,6 +293,103 @@ mainw_get_type( void )
 	}
 
 	return( type );
+}
+
+static void  *
+mainw_progress_hide( Mainw *mainw )
+{
+        gtk_widget_hide( mainw->progress_box );
+
+	return( NULL );
+}
+
+/* End of eval.
+ */
+void
+mainw_progress_end( void )
+{
+	slist_map( mainw_all, 
+		(SListMapFn) mainw_progress_hide, NULL ); 
+	mainw_cancel = FALSE;
+	IM_FREEF( g_timer_destroy, mainw_progress_timer );
+	mainw_progress_visible = FALSE;
+}
+
+static void  *
+mainw_progress_update_mainw( Mainw *mainw, char *text, int *percent )
+{
+	gtk_progress_bar_set_text( GTK_PROGRESS_BAR( mainw->progress ), text );
+	gtk_progress_bar_set_fraction( GTK_PROGRESS_BAR( mainw->progress ), 
+		IM_CLIP( 0.0, (double) *percent / 100.0, 1.0 ) );
+        gtk_widget_show( mainw->progress_box );
+
+	return( NULL );
+}
+
+/* Evaluation is progressing.
+ */
+void
+mainw_progress_update( int percent, int eta )
+{
+	double latest;
+	double elapsed;
+
+	if( !mainw_progress_timer ) {
+		/* Start of a new eval. Shut down any old eval, start again.
+		 */
+		mainw_progress_end();
+		mainw_progress_timer = g_timer_new();
+		mainw_progress_last = 0;
+	}
+
+	latest = g_timer_elapsed( mainw_progress_timer, NULL );
+	elapsed = latest - mainw_progress_last;
+
+	if( !mainw_progress_visible && elapsed > 0.5 ) 
+		/* Start displaying eval feedback.
+		 */
+		mainw_progress_visible = TRUE;
+
+	if( mainw_progress_visible && elapsed > 0.2 ) {
+		/* Update progress feedback.
+		 */
+		char buf[1000];
+
+		if( mainw_cancel )
+			sprintf( buf, _( "Cancelling ..." ) );
+		else if( eta > 30 ) {
+			int minutes = (eta + 30) / 60;
+
+			im_snprintf( buf, 1000, ngettext( 
+				"%d minute left", 
+				"%d minutes left", 
+				minutes ), minutes );
+		}
+		else if( eta == 0 )
+			/* A magic number reduce.c uses for eval feedback.
+			 */
+			sprintf( buf, _( "Calculating ..." ) );
+		else
+			im_snprintf( buf, 1000, _( "%d seconds left" ), eta );
+
+		slist_map2( mainw_all, 
+			(SListMap2Fn) mainw_progress_update_mainw, 
+			buf, &percent );
+
+		animate_hourglass();
+
+		while( g_main_context_iteration( NULL, FALSE ) )
+			;
+
+		mainw_progress_last = latest;
+	} 
+}
+
+static void
+mainw_cancel_cb( GtkWidget *wid, Columnview *cview )
+{
+	mainw_cancel = TRUE;
+	mainw_progress_update( 0, 0 );
 }
 
 static void
@@ -377,15 +494,7 @@ mainw_title_update( Mainw *mainw )
 static void 
 mainw_status_update( Mainw *mainw )
 {
-	Workspace *ws = mainw->ws;
-
-	gtk_statusbar_pop( GTK_STATUSBAR( mainw->statusbar ), 0 );
-	if( symbol_busy() )
-		gtk_statusbar_push( GTK_STATUSBAR( mainw->statusbar ), 0, 
-			_( "Calculating ..." ) );
-	else if( ws->status )
-		gtk_statusbar_push( GTK_STATUSBAR( mainw->statusbar ), 0, 
-			ws->status );
+	gtk_label_set_text( GTK_LABEL( mainw->statusbar ), mainw->ws->status ); 
 }
 
 static gint
@@ -1829,6 +1938,7 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	GtkWidget *ebox;
 	GtkAccelGroup *accel_group;
 	GError *error;
+	GtkWidget *cancel;
 	GtkWidget *item;
 
 #ifdef DEBUG
@@ -1900,7 +2010,7 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	 */
         mainw->statusbar_main = gtk_hbox_new( FALSE, 2 );
         gtk_box_pack_end( GTK_BOX( vbox ), 
-		mainw->statusbar_main, FALSE, FALSE, 0 );
+		mainw->statusbar_main, FALSE, FALSE, 2 );
         widget_visible( mainw->statusbar_main, MAINW_STATUSBAR );
 
 	/* Make space free label.
@@ -1931,14 +2041,34 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 
 	/* Make message label.
 	 */
-	mainw->statusbar = gtk_statusbar_new();
+	mainw->statusbar = gtk_label_new( "" );
+	gtk_label_set_ellipsize( GTK_LABEL( mainw->statusbar ), 
+		PANGO_ELLIPSIZE_MIDDLE );
+	/* 6 is enough to stop the statusbar changing height when the progress
+	 * indicator changes visibility.
+	 */
+	gtk_misc_set_padding( GTK_MISC( mainw->statusbar ), 2, 6 );
+	gtk_misc_set_alignment( GTK_MISC( mainw->statusbar ), 0.0, 0.5 );
         gtk_box_pack_start( GTK_BOX( mainw->statusbar_main ), 
 		mainw->statusbar, TRUE, TRUE, 0 );
-	/* Yuk!
-	 */
-	gtk_misc_set_padding( 
-		GTK_MISC( GTK_STATUSBAR( mainw->statusbar )->label ), 2, 2 );
         gtk_widget_show( mainw->statusbar );
+
+        mainw->progress_box = gtk_hbox_new( FALSE, 2 );
+
+	mainw->progress = gtk_progress_bar_new();
+        gtk_box_pack_end( GTK_BOX( mainw->progress_box ), mainw->progress, 
+		FALSE, TRUE, 0 );
+        gtk_widget_show( mainw->progress );
+
+        cancel = gtk_button_new_with_label( "Cancel" );
+        g_signal_connect( cancel, "clicked",
+                G_CALLBACK( mainw_cancel_cb ), NULL );
+        gtk_box_pack_end( GTK_BOX( mainw->progress_box ), cancel, 
+		FALSE, TRUE, 0 );
+        gtk_widget_show( cancel );
+
+        gtk_box_pack_end( GTK_BOX( mainw->statusbar_main ), 
+		mainw->progress_box, FALSE, TRUE, 0 );
 
 	/* Make toolkit/workspace displays.
 	 */

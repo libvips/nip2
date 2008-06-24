@@ -420,25 +420,8 @@ imageinfo_undo_free( Imageinfo *imageinfo )
 }
 
 static void
-imageinfo_set_eval_parent( Imageinfo *imageinfo, GtkWidget *eval_parent )
-{
-	if( imageinfo->eval_parent ) {
-		g_object_remove_weak_pointer( 
-			G_OBJECT( imageinfo->eval_parent ), 
-			(gpointer *) &imageinfo->eval_parent );
-		imageinfo->eval_parent = NULL;
-	}
-	imageinfo->eval_parent = eval_parent;
-	if( imageinfo->eval_parent ) 
-		g_object_add_weak_pointer( G_OBJECT( eval_parent ), 
-			(gpointer *) &imageinfo->eval_parent );
-}
-
-static void
 imageinfo_dispose_eval( Imageinfo *imageinfo )
 {
-	DESTROY_GTK( imageinfo->eval_progress );
-	imageinfo_set_eval_parent( imageinfo, NULL );
 	imageinfo->monitored = FALSE;
 
 	/* Make sure any callbacks from the IMAGE stop working.
@@ -626,7 +609,6 @@ imageinfo_init( Imageinfo *imageinfo )
 	imageinfo->cundo = NULL;
 
 	imageinfo->monitored = FALSE;
-	imageinfo->eval_progress = NULL;
 
 	imageinfo->check_mtime = 0;
 	imageinfo->check_tid = 0;
@@ -658,72 +640,17 @@ imageinfo_get_type( void )
 }
 
 static int
-imageinfo_progress_start( ImageinfoIMAGE *proxy )
-{
-	Imageinfo *imageinfo = proxy->imageinfo;
-
-	if( imageinfo )
-		/* Note the start time.
-		 */
-		imageinfo->eval_last = 
-			g_timer_elapsed( imageinfo->im->time->start, NULL );
-
-	return( 0 );
-}
-
-static int
 imageinfo_progress_eval( ImageinfoIMAGE *proxy )
 {
-        const double update_threshold = 0.2;
 	Imageinfo *imageinfo = proxy->imageinfo;
 
 	if( imageinfo ) {
-		double latest = 
-			g_timer_elapsed( imageinfo->im->time->start, NULL );
-		double elapsed = latest - imageinfo->eval_last;
+		mainw_progress_update( imageinfo->im->time->percent,
+			imageinfo->im->time->eta );
 
-		if( imageinfo->im->time->eta > 1 &&
-			!imageinfo->eval_progress ) {
-			imageinfo->eval_progress = progress_new( imageinfo );
-			iwindow_set_parent( IWINDOW( imageinfo->eval_progress ),
-				imageinfo->eval_parent );
-			idialog_set_iobject( 
-				IDIALOG( imageinfo->eval_progress ), 
-				IOBJECT( imageinfo ) );
-			iwindow_build( IWINDOW( imageinfo->eval_progress ) );
-			gtk_widget_show( 
-				GTK_WIDGET( imageinfo->eval_progress ) );
-		}
-
-		if( elapsed > update_threshold ) {
-			if( imageinfo->eval_progress ) 
-				progress_update( imageinfo->eval_progress,
-					imageinfo->im->time->percent,
-					imageinfo->im->time->eta );
-
-			while( g_main_context_iteration( NULL, FALSE ) )
-				;
-
-			if( imageinfo->eval_progress &&
-				imageinfo->eval_progress->cancelled )
-				imageinfo->im->kill = 1;
-
-			imageinfo->eval_last = latest;
-		}
+		if( mainw_cancel )
+			imageinfo->im->kill = 1;
 	}
-
-	return( 0 );
-}
-
-static int
-imageinfo_progress_stop( ImageinfoIMAGE *proxy )
-{
-	Imageinfo *imageinfo = proxy->imageinfo;
-
-	/* Pop down the dialog.
-	 */
-	if( imageinfo ) 
-		DESTROY_GTK( imageinfo->eval_progress );
 
 	return( 0 );
 }
@@ -741,19 +668,15 @@ imageinfo_progress_close( ImageinfoIMAGE *proxy )
 	return( 0 );
 }
 
-/* Add a progress box for an image evaluation.
+/* Add progress stuff for image evaluation.
  */
 static void
-imageinfo_progress_add( Imageinfo *imageinfo, GtkWidget *eval_parent )
+imageinfo_progress_add( Imageinfo *imageinfo )
 {
 	/* Only if we're running interactively.
 	 */
 	if( !main_window_top )
 		return;
-
-	/* Always update eval_parent. 
-	 */
-	imageinfo_set_eval_parent( imageinfo, eval_parent );
 
 	/* Already being monitored?
 	 */
@@ -769,14 +692,8 @@ imageinfo_progress_add( Imageinfo *imageinfo, GtkWidget *eval_parent )
 	imageinfo->proxy->im = imageinfo->im;
 	imageinfo->proxy->imageinfo = imageinfo;
 
-	(void) im_add_evalstart_callback( imageinfo->im, 
-		(im_callback_fn) imageinfo_progress_start, 
-		imageinfo->proxy, NULL );
 	(void) im_add_eval_callback( imageinfo->im, 
 		(im_callback_fn) imageinfo_progress_eval, 
-		imageinfo->proxy, NULL );
-	(void) im_add_evalend_callback( imageinfo->im, 
-		(im_callback_fn) imageinfo_progress_stop, 
 		imageinfo->proxy, NULL );
 
 	/* On close, remove everything.
@@ -820,10 +737,7 @@ imageinfo_new( Imageinfogroup *imageinfogroup,
 
 	icontainer_child_add( ICONTAINER( imageinfogroup ),
 		ICONTAINER( imageinfo ), -1 );
-	
-	/* Sometimes overridden later to set a real parent.
-	 */
-	imageinfo_progress_add( imageinfo, NULL );
+	imageinfo_progress_add( imageinfo );
 
 	return( imageinfo );
 }
@@ -1082,7 +996,7 @@ imageinfo_open_image_input( const char *filename, ImageinfoOpen *open )
 	/* The rewind will have removed everything from the IMAGE. Reattach
 	 * progress.
 	 */
-	imageinfo_progress_add( imageinfo, NULL );
+	imageinfo_progress_add( imageinfo );
 
 	/* Attach the original filename ... pick this up again later as a
 	 * save default.
@@ -1372,7 +1286,7 @@ imageinfo_write( Imageinfo *imageinfo, GtkWidget *parent, const char *filename )
 	if( !(out = imageinfo_new_output( imageinfogroup, heap, filename )) ) 
 		return( FALSE );
 	managed_sub_add( MANAGED( out ), MANAGED( imageinfo ) );
-	imageinfo_progress_add( out, parent );
+	imageinfo_progress_add( out );
 
 	if( imageinfo_write_im( out, in ) ) {
 		MANAGED_UNREF( out );

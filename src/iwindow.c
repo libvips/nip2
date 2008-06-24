@@ -377,9 +377,11 @@ set_pointer( void )
 
 	iwindow_hglass_count -= 1;
 
-	if( !iwindow_hglass_count ) 
+	if( !iwindow_hglass_count ) {
 		iwindow_map_all( (iWindowMapFn) iwindow_cursor_set, 
 			(void *) IWINDOW_SHAPE_NONE );
+		mainw_progress_end();
+	}
 }
 
 iWindowCursorContext *

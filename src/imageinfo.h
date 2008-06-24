@@ -141,12 +141,9 @@ struct _Imageinfo {
 	GSList *redo;			/* List of redo buffers */
 	Undobuffer *cundo;		/* Current buffer */
 
-	/* A progress dialog popped up for eval on this ->im.
+	/* Have we attached progress stuff to this ii?
 	 */
-	gboolean monitored;		/* Have we attached callbacks */
-	double eval_last;		/* When we last updated */
-	Progress *eval_progress;	/* The progress box */
-	GtkWidget *eval_parent;		/* ... as child of */
+	gboolean monitored;
 
 	/* If we're from a file, the timestamp on the file we loaded from ...
 	 * used to spot changes.

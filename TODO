@@ -1,3 +1,13 @@
+- progress indicator show show "Calculating A1" or somesuch for reduce
+  feedback
+
+- try
+
+	last [1..]
+
+  then CTRL-W ... we can quit the app, but it's still evaling and the prompt
+  never comes back
+
 - configure no longers sets GMSGFMT, is this OK? test on OS X
 
 - for rows made by typing stuff, always show the formula as well as the value
@@ -34,18 +44,6 @@
   options to parse_int, parse_pint etc as well
 
   Image / Header / Get / Custom ?
-
-- gah, get rid of the 'calculating ..' popup, it's focus-stealing behaviour is
-  very annoying
-
-  where do we display the progress/cancel bar? in the status bar? which
-  mainw of the many we have should show it? all of them? 
-
-  nice if we could say "calculating A1" or somesuch ... how would we link an
-  image to the thing being recalced? the recalcer should set a hint for the
-  name of the object it's working on
-
-  could use that to link to the mainw to display the progress bar on
 
 - a bit of GUI for "cache" would be nice ... set tilesize, MB for cache (inc.
   "unlimited"), etc.

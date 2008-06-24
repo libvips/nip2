@@ -1065,7 +1065,6 @@ symbol_recalculate_idle_cb( void )
 			/* Nothing more to do: shut down idle recomp.
 			 */
 			symbol_idle_id = 0;
-
 			run_again = FALSE;
 		}
 

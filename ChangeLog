@@ -24,7 +24,7 @@ started 7.15.0
 - added --test, so we can check test_toolkits automatically
 - added --prefix, so we can run without installing
 - added "make check" support
-- got rid of the progress popup, it's back in the status bar now
+- got rid of the annoying progress popup, it's back in the status bar now
 
 started 7.14.0
 - updated docs

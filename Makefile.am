@@ -45,4 +45,9 @@ uninstall-hook:
 	-$(UPDATE_MIME_DATABASE) ${DESTDIR}$(datadir)/mime
 	-$(UPDATE_DESKTOP_DATABASE) ${DESTDIR}$(datadir)/applications
 
+TESTS = test_toolkits
+
+test_toolkits: all
+	echo ${top_srcdir}/src/nip2 --prefix=${top_srcdir} --test ${top_srcdir}/test/test_toolkits.ws > test_toolkits
+	chmod +x test_toolkits
 

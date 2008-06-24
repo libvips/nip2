@@ -21,6 +21,9 @@ started 7.15.0
 - configure shows a summary at the end
 - syntax change :-( lcomps now use [expr :: generators] to reduce ambiguity
   the old syntax failed for things like [a || b | a <- [true]; b <- [false]]
+- added --test, so we can check test_toolkits automatically
+- added --prefix, so we can run without installing
+- added "make check" support
 
 started 7.14.0
 - updated docs

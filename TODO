@@ -12,10 +12,6 @@
 
 - Matrix / Join / Left-right needs args swapping
 
-- add a switch so we can run test_toolkits.ws in batch mode
-
-  maybe eval every symbol and print the error log?
-
 - "insert" should format-alike ... cast the sub image to the same type as the
   bg image
 

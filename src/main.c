@@ -93,6 +93,8 @@ gboolean main_option_i18n = FALSE;
 static gboolean main_option_print_main = FALSE;
 static gboolean main_option_version = FALSE;
 static gboolean main_option_verbose = FALSE;
+static gboolean main_option_test = FALSE;
+static char *main_option_prefix = NULL;
 
 static GOptionEntry main_option[] = {
 	{ "expression", 'e', 0, G_OPTION_ARG_STRING, &main_option_expression, 
@@ -127,12 +129,16 @@ static GOptionEntry main_option[] = {
 	{ "time-save", 't', 0, G_OPTION_ARG_NONE, &main_option_time_save, 
 		N_( "time image save operations" ), 
 		NULL },
+	{ "prefix", 'x', 0, G_OPTION_ARG_FILENAME, &main_option_prefix, 
+		N_( "start as if installed to PREFIX" ), "PREFIX" },
 	{ "i18n", 'i', 0, G_OPTION_ARG_NONE, &main_option_i18n, 
 		N_( "output strings for internationalisation" ), 
 		NULL },
 	{ "version", 'v', 0, G_OPTION_ARG_NONE, &main_option_version, 
 		N_( "print version number" ), 
 		NULL },
+	{ "test", 'T', 0, G_OPTION_ARG_NONE, &main_option_test, 
+		N_( "test for errors and quit" ), NULL },
 	{ NULL }
 };
 
@@ -1072,15 +1078,6 @@ main( int argc, char *argv[] )
 	bindtextdomain( GETTEXT_PACKAGE, name );
 	bind_textdomain_codeset( GETTEXT_PACKAGE, "UTF-8" );
 
-#ifdef G_THREADS_ENABLED
-	/* If VIPS has been configured without threads, we will need to start
-	 * the thread system ourselves so that we can make the async queue in
-	 * conversion.c
-	 */
-        if( !g_thread_supported() )
-                g_thread_init( NULL );
-#endif /*G_THREADS_ENABLED*/
-
 	context = g_option_context_new( _( "- image processing spreadsheet" ) );
 	g_option_context_add_main_entries( context, 
 		main_option, GETTEXT_PACKAGE );
@@ -1099,12 +1096,25 @@ main( int argc, char *argv[] )
 
 	g_option_context_free( context );
 
+	/* Override the install guess from vips. This won't pick up msg
+	 * cats sadly :( since we have to init i18n before arg parsing. Handy
+	 * for testing without installing.
+	 */
+	if( main_option_prefix ) {
+		char tmp[FILENAME_MAX];
+
+		im_strncpy( tmp, main_option_prefix, FILENAME_MAX );
+		nativeize_path( tmp );
+		absoluteize_path( tmp );
+		prefix = im_strdupn( tmp );
+		setenvf( "VIPSHOME", "%s", prefix );
+	}
+
 	if( main_option_version ) {
 		printf( "%s-%s", PACKAGE, VERSION );
 		printf( "\n" );
 
-		printf( _( "linked to vips-%s" ), 
-			im_version_string() );
+		printf( _( "linked to vips-%s" ), im_version_string() );
 		printf( "\n" );
 
 		exit( 0 );
@@ -1237,6 +1247,11 @@ main( int argc, char *argv[] )
 		main_option_no_load_menus = TRUE;
 		main_option_no_load_args = TRUE;
 		main_option_print_main = TRUE;
+	}
+
+	if( main_option_test ) {
+		main_option_batch = TRUE;
+		main_option_verbose = TRUE;
 	}
 
 	if( main_option_expression ) {
@@ -1461,6 +1476,11 @@ _( "A new directory has been created in your home directory to hold startup, "
 		gtk_main();
 	}
 
+	if( main_option_test && expr_error_all )
+		main_error_exit( "--test: errors found" );
+
+	/* No return from this.
+	 */
 	main_quit();
 
 	return( 0 );

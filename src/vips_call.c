@@ -148,6 +148,7 @@ vips_check_all_destroyed( void )
 
 		printf( "** %d VipsInfo leaked!\n", 
 			g_slist_length( vips_info_all ) );
+		printf( "(operations with no image args are not leaks)\n" );
 
 		for( p = vips_info_all; p; p = p->next ) {
 			VipsInfo *vi = (VipsInfo *) p->data;

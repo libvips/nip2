@@ -1,4 +1,6 @@
-- progress indicator show show "Calculating A1" or somesuch for reduce
+- click math / fourier / fwd, cancel bar does not vanish
+
+- progress indicator should show "Calculating A1" or somesuch for reduce
   feedback
 
 - try

@@ -57,6 +57,11 @@ negate x = !x;
 complement x = ~x;
 unary_plus x = +x;
 
+// the function we call for "a -> v" expressions
+mksvpair s v
+	= [s, v], is_string s
+	= error "not str on lhs of ->";
+
 // the vector ops ... im is an image, vec is a real_list
 vec op_name im vec
 	= im_lintra_vec ones im vec,

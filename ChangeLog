@@ -14,8 +14,8 @@ started 7.15.0
 - fix a segv in imageview destroy
 - == did not always find the best method
 - better time debugging in symbol recalc
-- added $name syntax
-- added a => b syntax
+- added $var for string constants
+- added s => v syntax
 - fixed recursive invocation bug in vips_call.c
 - much better hashing of vips calls
 - configure shows a summary at the end

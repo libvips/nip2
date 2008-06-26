@@ -118,6 +118,7 @@ extern gboolean mainw_auto_recalc;
 
 extern gboolean mainw_cancel;
 
+void mainw_progress_set_expr( Expr *expr );
 void mainw_progress_end( void );
 void mainw_progress_update( int percent, int eta );
 

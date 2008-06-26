@@ -1,7 +1,14 @@
 - click math / fourier / fwd, cancel bar does not vanish
 
-- progress indicator should show "Calculating A1" or somesuch for reduce
-  feedback
+- vips_call.c caches based on imageinfo ... wrong!
+
+  several imageinfo can share a single IMAGE* ... at the moment we have to
+  uncache if the imageinfo goes, whereas we could uncache on a close callback
+
+  break the cache system out of vips_call.c and put in a new one at a lower 
+  level
+
+- segv in test_toolkits on laptop ???!? valgrinds cleanly on work machine
 
 - try
 

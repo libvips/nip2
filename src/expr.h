@@ -89,6 +89,7 @@ typedef void *(*map_expr_fn)( Expr *, void *, void * );
 Expr *expr_map_all( Expr *expr, map_expr_fn fn, void *a );
 
 void *expr_name_print( Expr *expr );
+void expr_name( Expr *expr, BufInfo *buf );
 
 Expr *expr_get_parent( Expr *expr );
 Expr *expr_get_root( Expr *expr );

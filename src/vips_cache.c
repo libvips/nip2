@@ -1,4 +1,4 @@
-/* Call vips functions from the graph reducer.
+/* Cache the most recent n call to vips operations
  */
 
 /*
@@ -53,12 +53,10 @@
 
 /* Stuff we hold about a call to a VIPS function.
  */
-typedef struct _VipsInfo {
+typedef struct _VipsCall {
 	/* Environment.
 	 */
-	const char *name;
 	im_function *fn;		/* Function we call */
-	Reduce *rc;			/* RC we run inside */
 
 	/* Args we build. Images in vargv are IMAGE* pointers.
 	 */
@@ -83,48 +81,11 @@ typedef struct _VipsInfo {
 	Imageinfo *outii[MAX_VIPS_ARGS];
 	unsigned int outii_destroy_sid[MAX_VIPS_ARGS];
 
-	gboolean use_lut;		/* TRUE for using a lut */
-
 	/* Cache hash code here.
 	 */
 	unsigned int hash;
 	gboolean found_hash;
-
-	/* Set if we're in the history cache.
-	 */
-	gboolean in_cache;
-} VipsInfo;
-
-/* VIPS argument types we support. Keep order in sync with VipsArgumentType.
- */
-static im_arg_type vips_supported[] = {
-	IM_TYPE_DOUBLE,		
-	IM_TYPE_INT,	
-	IM_TYPE_COMPLEX,
-	IM_TYPE_STRING,
-	IM_TYPE_IMAGE,
-	IM_TYPE_DOUBLEVEC,
-	IM_TYPE_DMASK,
-	IM_TYPE_IMASK,
-	IM_TYPE_IMAGEVEC,
-	IM_TYPE_INTVEC,
-	IM_TYPE_GVALUE
-};
-
-typedef enum _VipsArgumentType {
-	VIPS_NONE = -1,
-	VIPS_DOUBLE = 0,
-	VIPS_INT,
-	VIPS_COMPLEX,
-	VIPS_STRING,
-	VIPS_IMAGE,
-	VIPS_DOUBLEVEC,
-	VIPS_DMASK,
-	VIPS_IMASK,
-	VIPS_IMAGEVEC,
-	VIPS_INTVEC,
-	VIPS_GVALUE
-} VipsArgumentType;
+} VipsCall;
 
 /* The previous function calls we are caching, plus an LRU queue for flushing.
  */

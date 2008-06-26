@@ -1958,13 +1958,19 @@ reduce_regenerate( Expr *expr, PElement *out )
 }
 #endif /*DEBUG_REGEN*/
 
-	/* Do initial reduction.
+	/* Do initial reduction. Tell mainw about the expr we are reducing, it
+	 * uses it to generate helpful notes during computation feedback. We
+	 * must be very careful to clear the expr again to avoid dangling
+	 * pointers.
 	 */
+	mainw_progress_set_expr( expr );
 	if( !reduce_pelement( rc, reduce_spine, out ) ) {
+		mainw_progress_set_expr( NULL );
 		expr_error_set( expr );
 		(void) heap_gc( heap );
 		return( FALSE );
 	}
+	mainw_progress_set_expr( NULL );
 
 #ifdef DEBUG_REGEN
 {

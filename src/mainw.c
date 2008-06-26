@@ -68,6 +68,10 @@ static double mainw_progress_last;
  */
 static gboolean mainw_progress_visible;
 
+/* The expr we are calculating inside, if any.
+ */
+static Expr *mainw_progress_expr = NULL;
+
 static iWindowClass *parent_class = NULL;
 
 /* All the mainw.
@@ -295,6 +299,12 @@ mainw_get_type( void )
 	return( type );
 }
 
+void
+mainw_progress_set_expr( Expr *expr )
+{
+	mainw_progress_expr = expr;
+}
+
 static void  *
 mainw_progress_hide( Mainw *mainw )
 {
@@ -353,28 +363,41 @@ mainw_progress_update( int percent, int eta )
 	if( mainw_progress_visible && elapsed > 0.2 ) {
 		/* Update progress feedback.
 		 */
-		char buf[1000];
+		char msg[100];
 
 		if( mainw_cancel )
-			sprintf( buf, _( "Cancelling ..." ) );
+			sprintf( msg, _( "Cancelling ..." ) );
 		else if( eta > 30 ) {
 			int minutes = (eta + 30) / 60;
 
-			im_snprintf( buf, 1000, ngettext( 
+			im_snprintf( msg, 100, ngettext( 
 				"%d minute left", 
 				"%d minutes left", 
 				minutes ), minutes );
 		}
-		else if( eta == 0 )
+		else if( eta == 0 ) {
 			/* A magic number reduce.c uses for eval feedback.
 			 */
-			sprintf( buf, _( "Calculating ..." ) );
+			BufInfo buf;
+
+			buf_init_static( &buf, msg, 100 );
+			/* Becomes eg. "Calculating A7.height ..."
+			 */
+			buf_appends( &buf, _( "Calculating" ) );
+			buf_appends( &buf, " " );
+			if( mainw_progress_expr ) {
+				expr_name( mainw_progress_expr, &buf );
+				buf_appends( &buf, " " );
+			}
+			buf_appends( &buf, "..." );
+			buf_all( &buf );
+		}
 		else
-			im_snprintf( buf, 1000, _( "%d seconds left" ), eta );
+			im_snprintf( msg, 100, _( "%d seconds left" ), eta );
 
 		slist_map2( mainw_all, 
 			(SListMap2Fn) mainw_progress_update_mainw, 
-			buf, &percent );
+			msg, &percent );
 
 		animate_hourglass();
 

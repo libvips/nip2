@@ -130,6 +130,15 @@ expr_name_print( Expr *expr )
 	return( NULL );
 }
 
+void
+expr_name( Expr *expr, BufInfo *buf )
+{
+	if( expr->row ) 
+		row_qualified_name( expr->row, buf );
+	else
+		symbol_qualified_name( expr->sym, buf );
+}
+
 Expr *
 expr_get_parent( Expr *expr )
 {
@@ -624,12 +633,8 @@ expr_tip_sub( Expr *expr, BufInfo *buf )
 void
 expr_tip( Expr *expr, BufInfo *buf )
 {
-	if( expr->row )
-		row_qualified_name( expr->row, buf );
-	else
-		symbol_qualified_name( expr->sym, buf );
+	expr_name( expr, buf ); 
 	buf_appends( buf, ": " );
-
 	expr_tip_sub( expr, buf );
 }
 

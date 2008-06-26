@@ -31,6 +31,10 @@
 #define DEBUG
  */
 
+/* Send log to stdout as well
+ */
+#define DEBUG_FILE
+
 #include "ip.h"
 
 static iWindowClass *parent_class = NULL;
@@ -167,6 +171,10 @@ log_text( Log *log, const char *buf )
 	gtk_text_buffer_insert_at_cursor( text_buffer, buf, -1 );
 	gtk_text_view_scroll_to_mark( text_view, mark, 
 		0.0, TRUE, 0.5, 1 );
+
+#ifdef DEBUG_FILE
+	printf( "%s", buf );
+#endif 
 }
 
 void

@@ -78,13 +78,13 @@ conversionview_scale_cb( GtkWidget *wid, Conversionview *cv )
 	Imagemodel *imagemodel = cv->imagemodel;
 	double min, max;
 
-	set_hourglass();
+	busy_start();
 	if( !conversionview_findmaxmin( imagemodel, &min, &max ) ) {
-		set_pointer();
+		busy_stop();
 		box_alert( wid );
 		return;
 	}
-	set_pointer();
+	busy_stop();
 
         if( max - min < 1e-20 ) {
                 error_top( _( "Unable to scale image." ) );

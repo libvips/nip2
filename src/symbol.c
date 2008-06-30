@@ -1059,7 +1059,7 @@ symbol_recalculate_idle_cb( void )
 	run_again = TRUE;
 
 	if( !symbol_running ) {
-		set_hourglass();
+		busy_start();
 
 		if( !symbol_recalculate_leaf() ) {
 			/* Nothing more to do: shut down idle recomp.
@@ -1068,7 +1068,7 @@ symbol_recalculate_idle_cb( void )
 			run_again = FALSE;
 		}
 
-		set_pointer();
+		busy_stop();
 	}
 
 	return( run_again );
@@ -1094,12 +1094,12 @@ symbol_recalculate_all_force( gboolean now )
 		 */
 		;
 	else if( main_option_batch || now ) {
-		set_hourglass();
+		busy_start();
 
 		while( symbol_recalculate_leaf() )
 			;
 
-		set_pointer();
+		busy_stop();
 	}
 	else if( !symbol_idle_id ) 
 		symbol_idle_id = g_idle_add( 

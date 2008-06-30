@@ -581,14 +581,14 @@ workspace_clone_selected( Workspace *ws )
 
 	/* Try to load the clone file back again.
 	 */
-        set_hourglass();
+        busy_start();
 	if( !workspace_merge_column_file( ws, filename ) ) {
-		set_pointer();
+		busy_stop();
 		unlinkf( "%s", filename );
 
 		return( FALSE );
 	}
-	set_pointer();
+	busy_stop();
 	unlinkf( "%s", filename );
 
 	return( TRUE );
@@ -720,9 +720,9 @@ workspace_auto_recover_load( iWindow *iwnd,
 
 	/* Load ws file.
 	 */
-        set_hourglass();
+        busy_start();
 	filemodel = mainw_open_file( mainw, filename );
-	set_pointer();
+	busy_stop();
 
 	if( filemodel ) {
 		/* The filename will be something like

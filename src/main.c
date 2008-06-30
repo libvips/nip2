@@ -403,7 +403,7 @@ main_splash_update( const char *fmt, ... )
 		va_end( ap );
 	}
 
-	animate_hourglass();
+	busy_progress( 0, 0 );
 }
 
 static void
@@ -623,7 +623,7 @@ main_junk_auto_load( Filemodel *filemodel )
 void
 main_reload( void )
 {
-	set_hourglass();
+	busy_start();
 
 	/* Remove.
 	 */
@@ -641,7 +641,7 @@ main_reload( void )
 	 */
 	watch_relink_all();
 
-	set_pointer();
+	busy_stop();
 }
 
 /* Use a file to paint a named stock item.

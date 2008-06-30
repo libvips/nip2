@@ -645,7 +645,7 @@ imageinfo_progress_eval( ImageinfoIMAGE *proxy )
 	Imageinfo *imageinfo = proxy->imageinfo;
 
 	if( imageinfo ) {
-		mainw_progress_update( imageinfo->im->time->percent,
+		busy_progress( imageinfo->im->time->percent,
 			imageinfo->im->time->eta );
 
 		if( mainw_cancel )

@@ -981,7 +981,7 @@ reduce_spine( Reduce *rc, PElement *out )
 reduce_start:
 	reduce_total_recomputations += 1;
 	if( (reduce_total_recomputations % 100000) == 0 ) {
-		mainw_progress_update( 0, 0 );
+		busy_progress( 0, 0 );
 		if( mainw_cancel ) {
 			error_top( _( "Cancelled." ) );
 			error_sub( _( "Evaluation cancelled." ) );

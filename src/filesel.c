@@ -1049,7 +1049,7 @@ filesel_trigger2( void *sys, iWindowResult result )
 
 	/* Back from the user function ... restore the pointer.
 	 */
-	set_pointer();
+	busy_stop();
 
 	/* If this is a save, assume that there is now a new file, 
 	 * and ask all fsb's to update.
@@ -1092,7 +1092,7 @@ filesel_trigger( Filesel *filesel, iWindow *iwnd,
 		prefs_set( filesel->type_pref, 
 			"%d", filesel_get_filetype( filesel ) );
 
-	set_hourglass();
+	busy_start();
 	filesel->done_cb( IWINDOW( filesel ), 
 		filesel->client, filesel_trigger2, susp );
 }

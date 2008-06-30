@@ -1622,7 +1622,7 @@ row_recomp_row( Row *row )
 			return( FALSE );
 	}
 
-	animate_hourglass();
+	busy_progress( 0, 0 );
 
 	return( TRUE );
 }

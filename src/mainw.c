@@ -50,25 +50,12 @@ GSList *mainw_recent_matrix = NULL;
  */
 gboolean mainw_auto_recalc = TRUE;
 
-/* Cancel buttons in mainwes set this, tested by imageinfo and others.
+/* Cancel buttons in mainws set this, tested by imageinfo and others.
  */
 gboolean mainw_cancel = FALSE;
 
-/* Time evaluation events ... zero the timer when we see the first eval event,
- * show progress feedback if we eval for a while, only update progress a few
- * times a second, destroy the timer at the end of eval.
- */
-static GTimer *mainw_progress_timer = NULL;
-
-/* When we last updated progress feedback.
- */
-static double mainw_progress_last;
-
-/* Are we currently displaying progress/cancel.
- */
-static gboolean mainw_progress_visible;
-
-/* The expr we are calculating inside, if any.
+/* The expr we are calculating inside, if any. Set as a hint to help feedback
+ * display.
  */
 static Expr *mainw_progress_expr = NULL;
 
@@ -315,14 +302,12 @@ mainw_progress_hide( Mainw *mainw )
 
 /* End of eval.
  */
-void
+static void
 mainw_progress_end( void )
 {
 	slist_map( mainw_all, 
 		(SListMapFn) mainw_progress_hide, NULL ); 
 	mainw_cancel = FALSE;
-	IM_FREEF( g_timer_destroy, mainw_progress_timer );
-	mainw_progress_visible = FALSE;
 }
 
 static void  *
@@ -338,75 +323,45 @@ mainw_progress_update_mainw( Mainw *mainw, char *text, int *percent )
 
 /* Evaluation is progressing.
  */
-void
+static void
 mainw_progress_update( int percent, int eta )
 {
-	double latest;
-	double elapsed;
+	char msg[100];
 
-	if( !mainw_progress_timer ) {
-		/* Start of a new eval. Shut down any old eval, start again.
-		 */
-		mainw_progress_end();
-		mainw_progress_timer = g_timer_new();
-		mainw_progress_last = 0;
+	if( mainw_cancel )
+		sprintf( msg, _( "Cancelling ..." ) );
+	else if( eta > 30 ) {
+		int minutes = (eta + 30) / 60;
+
+		im_snprintf( msg, 100, ngettext( 
+			"%d minute left", 
+			"%d minutes left", 
+			minutes ), minutes );
 	}
-
-	latest = g_timer_elapsed( mainw_progress_timer, NULL );
-	elapsed = latest - mainw_progress_last;
-
-	if( !mainw_progress_visible && elapsed > 0.5 ) 
-		/* Start displaying eval feedback.
+	else if( eta == 0 ) {
+		/* A magic number reduce.c uses for eval feedback.
 		 */
-		mainw_progress_visible = TRUE;
+		BufInfo buf;
 
-	if( mainw_progress_visible && elapsed > 0.2 ) {
-		/* Update progress feedback.
+		buf_init_static( &buf, msg, 100 );
+		/* Becomes eg. "Calculating A7.height ..."
 		 */
-		char msg[100];
-
-		if( mainw_cancel )
-			sprintf( msg, _( "Cancelling ..." ) );
-		else if( eta > 30 ) {
-			int minutes = (eta + 30) / 60;
-
-			im_snprintf( msg, 100, ngettext( 
-				"%d minute left", 
-				"%d minutes left", 
-				minutes ), minutes );
-		}
-		else if( eta == 0 ) {
-			/* A magic number reduce.c uses for eval feedback.
-			 */
-			BufInfo buf;
-
-			buf_init_static( &buf, msg, 100 );
-			/* Becomes eg. "Calculating A7.height ..."
-			 */
-			buf_appends( &buf, _( "Calculating" ) );
+		buf_appends( &buf, _( "Calculating" ) );
+		buf_appends( &buf, " " );
+		if( mainw_progress_expr ) {
+			expr_name( mainw_progress_expr, &buf );
 			buf_appends( &buf, " " );
-			if( mainw_progress_expr ) {
-				expr_name( mainw_progress_expr, &buf );
-				buf_appends( &buf, " " );
-			}
-			buf_appends( &buf, "..." );
-			buf_all( &buf );
 		}
-		else
-			im_snprintf( msg, 100, _( "%d seconds left" ), eta );
+		buf_appends( &buf, "..." );
+		buf_all( &buf );
+	}
+	else
+		im_snprintf( msg, 100, _( "%d seconds left" ), eta );
 
-		slist_map2( mainw_all, 
-			(SListMap2Fn) mainw_progress_update_mainw, 
-			msg, &percent );
-
-		animate_hourglass();
-
-		while( g_main_context_iteration( NULL, FALSE ) )
-			;
-
-		mainw_progress_last = latest;
-	} 
-}
+	slist_map2( mainw_all, 
+		(SListMap2Fn) mainw_progress_update_mainw, 
+		msg, &percent );
+} 
 
 static void
 mainw_cancel_cb( GtkWidget *wid, Columnview *cview )
@@ -747,15 +702,15 @@ mainw_clone( Mainw *mainw )
 
 	/* Clone selected symbols.
 	 */
-	set_hourglass();
+	busy_start();
 	if( !workspace_clone_selected( ws ) ) { 
 		box_alert( GTK_WIDGET( mainw ) );
-		set_pointer();
+		busy_stop();
 		return;
 	}
 	symbol_recalculate_all();
 	workspace_deselect_all( ws );
-	set_pointer();
+	busy_stop();
 
 	model_scrollto( MODEL( ws->current ), MODEL_SCROLL_TOP );
 }
@@ -771,10 +726,10 @@ mainw_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 static void
 mainw_ungroup_action_cb( GtkAction *action, Mainw *mainw )
 {
-	set_hourglass();
+	busy_start();
 	if( !workspace_selected_ungroup( mainw->ws ) )
 		box_alert( GTK_WIDGET( mainw ) );
-	set_pointer();
+	busy_stop();
 }
 
 /* Group the selected object(s).
@@ -1153,13 +1108,13 @@ mainw_recent_open_cb( GtkWidget *widget, const char *filename )
 {
 	Mainw *mainw = MAINW( iwindow_get_root( widget ) );
 
-	set_hourglass();
+	busy_start();
 	if( !mainw_open_file( mainw, filename ) ) {
 		box_alert( widget );
-		set_pointer();
+		busy_stop();
 		return;
 	}
-	set_pointer();
+	busy_stop();
 
 	symbol_recalculate_all();
 }
@@ -1328,14 +1283,14 @@ mainw_workspace_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 	Workspace *new_ws;
 	Mainw *new_mainw;
 
-        set_hourglass();
+        busy_start();
 	if( !(new_ws = workspace_clone( mainw->ws )) ) {
-		set_pointer();
+		busy_stop();
 		box_alert( GTK_WIDGET( mainw ) );
 		return;
 	}
 	symbol_recalculate_all();
-	set_pointer();
+	busy_stop();
 
 	new_mainw = mainw_new( new_ws );
 	gtk_widget_show( GTK_WIDGET( new_mainw ) );
@@ -2243,4 +2198,73 @@ mainw_new( Workspace *ws )
 	mainw_link( mainw, ws );
 
 	return( mainw );
+}
+
+/* Busy handling. Come here from everywhere, handle delay and dispatch of busy
+ * events to the cursor change system and to the busy ticker on mainw.
+ */
+
+static int mainw_busy_count = 0;
+static GTimer *mainw_busy_timer = NULL;
+static GTimer *mainw_busy_update_timer = NULL;
+
+/* Delay before we start showing busy feedback.
+ */
+static const double mainw_busy_delay = 0.2;
+
+/* Delay between busy updates.
+ */
+static const double mainw_busy_update = 0.2;
+
+void
+busy_progress( int percent, int eta )
+{
+	if( mainw_busy_count &&
+		g_timer_elapsed( mainw_busy_timer, NULL ) > 
+			mainw_busy_delay ) {
+
+		if( g_timer_elapsed( mainw_busy_update_timer, NULL ) > 
+			mainw_busy_update ) {
+			animate_hourglass();
+			mainw_progress_update( percent, eta );
+
+			while( g_main_context_iteration( NULL, FALSE ) )
+				;
+
+			g_timer_start( mainw_busy_update_timer );
+		}
+	}
+}
+
+void
+busy_start( void )
+{
+	assert( mainw_busy_count >= 0 );
+
+	mainw_busy_count += 1;
+
+	if( mainw_busy_count == 1 ) {
+		if( !mainw_busy_timer )
+			mainw_busy_timer = g_timer_new();
+		if( !mainw_busy_update_timer )
+			mainw_busy_update_timer = g_timer_new();
+
+		g_timer_start( mainw_busy_timer );
+		g_timer_start( mainw_busy_update_timer );
+
+		set_pointer();
+	}
+}
+
+void
+busy_stop( void )
+{
+	assert( mainw_busy_count > 0 );
+
+	mainw_busy_count -= 1;
+
+	if( !mainw_busy_count ) {
+		set_hourglass();
+		mainw_progress_end();
+	}
 }

@@ -119,8 +119,6 @@ extern gboolean mainw_auto_recalc;
 extern gboolean mainw_cancel;
 
 void mainw_progress_set_expr( Expr *expr );
-void mainw_progress_end( void );
-void mainw_progress_update( int percent, int eta );
 
 void mainw_startup( void );
 void mainw_shutdown( void );
@@ -136,3 +134,6 @@ void mainw_guide_action_cb( GtkAction *action, iWindow *iwnd );
 Filemodel *mainw_open_file( Mainw *mainw, const char *filename );
 Mainw *mainw_new( Workspace *ws );
 
+void busy_progress( int percent, int eta );
+void busy_start( void );
+void busy_stop( void );

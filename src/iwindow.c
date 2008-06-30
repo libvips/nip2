@@ -315,73 +315,29 @@ iwindow_cursor_set( iWindow *iwnd, iWindowShape shape )
 	return( NULL );
 }
 
-static int iwindow_hglass_count = 0;
-static GTimer *iwindow_hglass_timer = NULL;
-static GTimer *iwindow_hglass_update_timer = NULL;
-
-/* Delay before we start showing the spinning hglass.
- */
-static const double iwindow_hglass_delay = 0.2;
-
-/* Delay between cursor updates.
- */
-static const double iwindow_hglass_update = 0.5;
-
 void
 animate_hourglass( void )
 {
 	static iWindowShape shape = IWINDOW_SHAPE_HGLASS1;
 
-	if( iwindow_hglass_count &&
-		g_timer_elapsed( iwindow_hglass_timer, NULL ) > 
-			iwindow_hglass_delay ) {
+	iwindow_map_all( (iWindowMapFn) iwindow_cursor_set, (void *) shape );
 
-		if( g_timer_elapsed( iwindow_hglass_update_timer, NULL ) > 
-			iwindow_hglass_update ) {
-			iwindow_map_all( 
-				(iWindowMapFn) iwindow_cursor_set, 
-				(void *) shape );
-			g_timer_start( iwindow_hglass_update_timer );
-
-			shape += 1;
-			if( shape > IWINDOW_SHAPE_HGLASS8 )
-				shape = IWINDOW_SHAPE_HGLASS1;
-		}
-	}
+	shape += 1;
+	if( shape > IWINDOW_SHAPE_HGLASS8 )
+		shape = IWINDOW_SHAPE_HGLASS1;
 }
 
 void
 set_hourglass( void )
 {
-	assert( iwindow_hglass_count >= 0 );
-
-	iwindow_hglass_count += 1;
-
-	if( iwindow_hglass_count == 1 ) {
-		if( !iwindow_hglass_timer )
-			iwindow_hglass_timer = g_timer_new();
-		if( !iwindow_hglass_update_timer )
-			iwindow_hglass_update_timer = g_timer_new();
-
-		g_timer_start( iwindow_hglass_timer );
-		g_timer_start( iwindow_hglass_update_timer );
-
-		animate_hourglass();
-	}
+	animate_hourglass();
 }
 
 void
 set_pointer( void )
 {
-	assert( iwindow_hglass_count > 0 );
-
-	iwindow_hglass_count -= 1;
-
-	if( !iwindow_hglass_count ) {
-		iwindow_map_all( (iWindowMapFn) iwindow_cursor_set, 
-			(void *) IWINDOW_SHAPE_NONE );
-		mainw_progress_end();
-	}
+	iwindow_map_all( (iWindowMapFn) iwindow_cursor_set, 
+		(void *) IWINDOW_SHAPE_NONE );
 }
 
 iWindowCursorContext *

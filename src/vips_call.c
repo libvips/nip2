@@ -111,21 +111,6 @@ static im_arg_type vips_supported[] = {
 	IM_TYPE_GVALUE
 };
 
-typedef enum _VipsArgumentType {
-	VIPS_NONE = -1,
-	VIPS_DOUBLE = 0,
-	VIPS_INT,
-	VIPS_COMPLEX,
-	VIPS_STRING,
-	VIPS_IMAGE,
-	VIPS_DOUBLEVEC,
-	VIPS_DMASK,
-	VIPS_IMASK,
-	VIPS_IMAGEVEC,
-	VIPS_INTVEC,
-	VIPS_GVALUE
-} VipsArgumentType;
-
 /* The previous function calls we are caching, plus an LRU queue for flushing.
  */
 static GHashTable *vips_history_table = NULL;
@@ -134,7 +119,7 @@ int vips_history_size = 0;
 
 #ifdef DEBUG_LEAK
 /* All the VipsInfo we make ... for leak testing. Build this file with 
- * DEBUG_LEAK to enable add/remove. to this list.
+ * DEBUG_LEAK to enable add/remove to this list.
  */
 static GSList *vips_info_all = NULL;
 #endif /*DEBUG_LEAK*/
@@ -171,7 +156,7 @@ vips_error( VipsInfo *vi )
 
 /* Look up a VIPS type. 
  */
-static VipsArgumentType
+VipsArgumentType
 vips_type_find( im_arg_type type )
 {
 	int i;
@@ -353,6 +338,9 @@ vips_equal( VipsInfo *vi1, VipsInfo *vi2 )
 	if( vi1->fn != vi2->fn )
 		return( FALSE );
 
+	if( vi1->found_hash && vi2->found_hash && vi1->hash != vi2->hash )
+		return( FALSE );
+
         for( i = 0; i < fn->argc; i++ ) {
                 im_type_desc *vips = fn->argv[i].desc;
 		VipsArgumentType vt = vips_type_find( vips->type );
@@ -430,14 +418,14 @@ vips_equal( VipsInfo *vi1, VipsInfo *vi2 )
 				DOUBLEMASK *mask1 = mo1->mask;
 				DOUBLEMASK *mask2 = mo2->mask;
 				int ne = mask1->xsize * mask2->ysize;
-				int i;
+				int j;
 	
 				if( mask1->xsize != mask2->xsize ||
 					mask1->ysize != mask2->ysize )
 					return( FALSE );
 
-				for( i = 0; i < ne; i++ )
-					if( mask1->coeff[i] != mask2->coeff[i] )
+				for( j = 0; j < ne; j++ )
+					if( mask1->coeff[j] != mask2->coeff[j] )
 						return( FALSE );
 
 				if( mask1->scale != mask2->scale )
@@ -457,14 +445,14 @@ vips_equal( VipsInfo *vi1, VipsInfo *vi2 )
 				INTMASK *mask1 = mo1->mask;
 				INTMASK *mask2 = mo2->mask;
 				int ne = mask1->xsize * mask2->ysize;
-				int i;
+				int j;
 	
 				if( mask1->xsize != mask2->xsize ||
 					mask1->ysize != mask2->ysize )
 					return( FALSE );
 
-				for( i = 0; i < ne; i++ )
-					if( mask1->coeff[i] != mask2->coeff[i] )
+				for( j = 0; j < ne; j++ )
+					if( mask1->coeff[j] != mask2->coeff[j] )
 						return( FALSE );
 
 				if( mask1->scale != mask2->scale )

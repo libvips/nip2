@@ -29,6 +29,25 @@
 
 extern int vips_history_size;
 
+/* Keep in sync with vips_supported[].
+ */
+typedef enum _VipsArgumentType {
+	VIPS_NONE = -1,
+	VIPS_DOUBLE = 0,
+	VIPS_INT,
+	VIPS_COMPLEX,
+	VIPS_STRING,
+	VIPS_IMAGE,
+	VIPS_DOUBLEVEC,
+	VIPS_DMASK,
+	VIPS_IMASK,
+	VIPS_IMAGEVEC,
+	VIPS_INTVEC,
+	VIPS_GVALUE
+} VipsArgumentType;
+
+VipsArgumentType vips_type_find( im_arg_type type );
+
 void vips_check_all_destroyed( void );
 gboolean vips_is_callable( im_function *fn );
 int vips_n_args( im_function *fn );

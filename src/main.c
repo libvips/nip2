@@ -37,8 +37,12 @@
 #define DEBUG_NOAUTO
  */
 
-/* stop on any gtk error/warning/whatever
+/* Stop on any gtk error/warning/whatever. Usually set by configure for dev
+ * builds. 
 #define DEBUG_FATAL
+ */
+/* But some themes can trigger warnings, argh, so sometimes we need to
+ * undef it.
  */
 #undef DEBUG_FATAL
 

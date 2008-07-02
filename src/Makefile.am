@@ -315,6 +315,8 @@ nip2_SOURCES = \
 	util.h \
 	view.c \
 	view.h \
+	vips.c \
+	vips.h \
 	vips_call.c \
 	vips_call.h \
 	call8.c \

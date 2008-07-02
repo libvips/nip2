@@ -648,8 +648,7 @@ mainw_space_free_tooltip_generate( GtkWidget *widget, BufInfo *buf,
 		g_slist_length( ICONTAINER( sym->expr->compile )->children ) );
         buf_appends( buf, ", " );
 
-        buf_appendf( buf, _( "%d vips calls cached" ),
-		vips_history_size );
+        buf_appendf( buf, _( "%d vips calls cached" ), vips_call_size );
 }
 
 static void

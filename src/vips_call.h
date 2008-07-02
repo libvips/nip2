@@ -1,4 +1,4 @@
-/* Call vips functions from the graph reducer.
+/* Call recent vips operations
  */
 
 /*
@@ -27,33 +27,41 @@
 
 */
 
-extern int vips_history_size;
-
-/* Keep in sync with vips_supported[].
+/* Stuff we hold about a call to a VIPS function.
  */
-typedef enum _VipsArgumentType {
-	VIPS_NONE = -1,
-	VIPS_DOUBLE = 0,
-	VIPS_INT,
-	VIPS_COMPLEX,
-	VIPS_STRING,
-	VIPS_IMAGE,
-	VIPS_DOUBLEVEC,
-	VIPS_DMASK,
-	VIPS_IMASK,
-	VIPS_IMAGEVEC,
-	VIPS_INTVEC,
-	VIPS_GVALUE
-} VipsArgumentType;
+typedef struct _VipsCall {
+	/* Environment.
+	 */
+	im_function *fn;		/* Function we call */
+	int result;			/* What we got from calling it */
 
-VipsArgumentType vips_type_find( im_arg_type type );
+	/* Args we build. Images in vargv are IMAGE* pointers.
+	 */
+	im_object *vargv;
 
-void vips_check_all_destroyed( void );
-gboolean vips_is_callable( im_function *fn );
-int vips_n_args( im_function *fn );
-void vips_usage( BufInfo *buf, im_function *fn );
-void vips_spine( Reduce *rc, const char *name, HeapNode **arg, PElement *out );
-void vips_run( Reduce *rc, Compile *compile,
-	int op, const char *name, HeapNode **arg, PElement *out,
-	im_function *function );
-void vipsva( Reduce *rc, PElement *out, const char *name, ... );
+	/* Call hash code here.
+	 */
+	unsigned int hash;
+	gboolean found_hash;
+
+	/* Set if we're in the cache. vips_call_new() makes a VipsCall not in
+	 * the cache, then we marshall args into it and lookup. If we find a
+	 * previous call, this VipsCall will be junked without ever making it
+	 * into the cache.
+	 */
+	gboolean in_cache;
+
+	/* List of the proxys linked to this VipsCall. When we destroy this
+	 * VipsCall we need to zap the ->call members in all the associated
+	 * proxys.
+	 */
+	GSList *proxys;
+} VipsCall;
+
+extern int vips_call_size;
+
+VipsCall *vips_call_start( im_function *fn );
+VipsCall *vips_call_dispatch( VipsCall *call );
+void vips_call_stop( VipsCall *call );
+
+void vips_call_check_all_destroyed( void );

@@ -1,3 +1,35 @@
+- Imageinfo "area_painted" must trigger im_invalidate() to knock thngs out of
+  the cache ... does it do this?
+
+- almost done on vips_cache.c
+
+  doing vips_cache_add() ... should we bother with inim[]? we only use it in
+  this one place
+
+  how to use vips_cache:
+
+  	call = vips_cache_new( fn )
+
+	fill call->argv, on error vips_cache_destroy( call )
+
+	// look up call, return previous value if present and destroy call
+	// otherwise, call the operation and save call for next time
+	call2 = vips_cache_dispatch( call )
+
+	extract args from call back to C or to nip2
+
+	if( !call->in_cache )
+		destroy call
+
+  what about IM_FN_NOCACHE operations? we need to return a call, so that our
+  caller can extract the result, but our caller must know that the call
+  needs to be destroyed after this has happened
+
+  don't return NULL on error, have a call->result member with the operation's
+  return code
+
+- should inplace ops trigger im_invalidate() automatically?
+
 - click math / fourier / fwd, cancel bar does not vanish
 
 - vips_call.c caches based on imageinfo ... wrong!

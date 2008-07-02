@@ -458,6 +458,7 @@ typedef void *(*tool_map_fn)( Tool *, void *, void * );
 #include "toggle.h"
 #include "toggleview.h"
 #include "vips_call.h"
+#include "vips.h"
 #include "call8.h"
 #include "parser.h"
 

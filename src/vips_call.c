@@ -32,10 +32,10 @@
 /*
 #define DEBUG_TIME
 #define DEBUG
- */
 #define DEBUG_HISTORY_SANITY
 #define DEBUG_HISTORY_MISS
 #define DEBUG_HISTORY
+ */
 
 /* This is usually turned on from a -D in cflags.
 #define DEBUG_LEAK

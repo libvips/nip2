@@ -328,12 +328,6 @@ animate_hourglass( void )
 }
 
 void
-set_hourglass( void )
-{
-	animate_hourglass();
-}
-
-void
 set_pointer( void )
 {
 	iwindow_map_all( (iWindowMapFn) iwindow_cursor_set, 

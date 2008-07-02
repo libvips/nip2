@@ -702,15 +702,15 @@ mainw_clone( Mainw *mainw )
 
 	/* Clone selected symbols.
 	 */
-	busy_start();
+	busy_begin();
 	if( !workspace_clone_selected( ws ) ) { 
 		box_alert( GTK_WIDGET( mainw ) );
-		busy_stop();
+		busy_end();
 		return;
 	}
 	symbol_recalculate_all();
 	workspace_deselect_all( ws );
-	busy_stop();
+	busy_end();
 
 	model_scrollto( MODEL( ws->current ), MODEL_SCROLL_TOP );
 }
@@ -726,10 +726,10 @@ mainw_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 static void
 mainw_ungroup_action_cb( GtkAction *action, Mainw *mainw )
 {
-	busy_start();
+	busy_begin();
 	if( !workspace_selected_ungroup( mainw->ws ) )
 		box_alert( GTK_WIDGET( mainw ) );
-	busy_stop();
+	busy_end();
 }
 
 /* Group the selected object(s).
@@ -1108,13 +1108,13 @@ mainw_recent_open_cb( GtkWidget *widget, const char *filename )
 {
 	Mainw *mainw = MAINW( iwindow_get_root( widget ) );
 
-	busy_start();
+	busy_begin();
 	if( !mainw_open_file( mainw, filename ) ) {
 		box_alert( widget );
-		busy_stop();
+		busy_end();
 		return;
 	}
-	busy_stop();
+	busy_end();
 
 	symbol_recalculate_all();
 }
@@ -1283,14 +1283,14 @@ mainw_workspace_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 	Workspace *new_ws;
 	Mainw *new_mainw;
 
-        busy_start();
+        busy_begin();
 	if( !(new_ws = workspace_clone( mainw->ws )) ) {
-		busy_stop();
+		busy_end();
 		box_alert( GTK_WIDGET( mainw ) );
 		return;
 	}
 	symbol_recalculate_all();
-	busy_stop();
+	busy_end();
 
 	new_mainw = mainw_new( new_ws );
 	gtk_widget_show( GTK_WIDGET( new_mainw ) );
@@ -2237,7 +2237,7 @@ busy_progress( int percent, int eta )
 }
 
 void
-busy_start( void )
+busy_begin( void )
 {
 	assert( mainw_busy_count >= 0 );
 
@@ -2251,20 +2251,18 @@ busy_start( void )
 
 		g_timer_start( mainw_busy_timer );
 		g_timer_start( mainw_busy_update_timer );
-
-		set_pointer();
 	}
 }
 
 void
-busy_stop( void )
+busy_end( void )
 {
 	assert( mainw_busy_count > 0 );
 
 	mainw_busy_count -= 1;
 
 	if( !mainw_busy_count ) {
-		set_hourglass();
+		set_pointer();
 		mainw_progress_end();
 	}
 }

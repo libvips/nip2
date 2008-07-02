@@ -40,6 +40,7 @@
 /* stop on any gtk error/warning/whatever
 #define DEBUG_FATAL
  */
+#undef DEBUG_FATAL
 
 /* Time startup.
 #define DEBUG_TIME
@@ -623,7 +624,7 @@ main_junk_auto_load( Filemodel *filemodel )
 void
 main_reload( void )
 {
-	busy_start();
+	busy_begin();
 
 	/* Remove.
 	 */
@@ -641,7 +642,7 @@ main_reload( void )
 	 */
 	watch_relink_all();
 
-	busy_stop();
+	busy_end();
 }
 
 /* Use a file to paint a named stock item.

@@ -1059,7 +1059,7 @@ symbol_recalculate_idle_cb( void )
 	run_again = TRUE;
 
 	if( !symbol_running ) {
-		busy_start();
+		busy_begin();
 
 		if( !symbol_recalculate_leaf() ) {
 			/* Nothing more to do: shut down idle recomp.
@@ -1068,7 +1068,7 @@ symbol_recalculate_idle_cb( void )
 			run_again = FALSE;
 		}
 
-		busy_stop();
+		busy_end();
 	}
 
 	return( run_again );
@@ -1094,12 +1094,12 @@ symbol_recalculate_all_force( gboolean now )
 		 */
 		;
 	else if( main_option_batch || now ) {
-		busy_start();
+		busy_begin();
 
 		while( symbol_recalculate_leaf() )
 			;
 
-		busy_stop();
+		busy_end();
 	}
 	else if( !symbol_idle_id ) 
 		symbol_idle_id = g_idle_add( 

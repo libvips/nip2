@@ -135,5 +135,5 @@ Filemodel *mainw_open_file( Mainw *mainw, const char *filename );
 Mainw *mainw_new( Workspace *ws );
 
 void busy_progress( int percent, int eta );
-void busy_start( void );
-void busy_stop( void );
+void busy_begin( void );
+void busy_end( void );

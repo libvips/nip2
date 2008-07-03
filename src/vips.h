@@ -46,7 +46,6 @@ typedef enum _VipsArgumentType {
 
 VipsArgumentType vips_type_find( im_arg_type type );
 
-void vips_check_all_destroyed( void );
 gboolean vips_is_callable( im_function *fn );
 int vips_n_args( im_function *fn );
 void vips_usage( BufInfo *buf, im_function *fn );

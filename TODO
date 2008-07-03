@@ -1,3 +1,5 @@
+- can vips.c allocate VipsInfo on the stack?
+
 - Imageinfo "area_painted" must trigger im_invalidate() to knock thngs out of
   the cache ... does it do this?
 

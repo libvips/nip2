@@ -69,19 +69,12 @@ typedef struct _VipsInfo {
 	int inpos[MAX_VIPS_ARGS];	/* Positions of inputs */
 	int outpos[MAX_VIPS_ARGS];	/* Positions of outputs */
 
-	/* Input images. Need to track "destroy" on each one (and kill us
-	 * in turn). 
+	/* Input and output images. 
 	 */
 	int ninii;			
 	Imageinfo *inii[MAX_VIPS_ARGS];	
-	unsigned int inii_destroy_sid[MAX_VIPS_ARGS];
-	unsigned int inii_paint_sid[MAX_VIPS_ARGS];
-
-	/* Output images. 
-	 */
 	int noutii;
 	Imageinfo *outii[MAX_VIPS_ARGS];
-	unsigned int outii_destroy_sid[MAX_VIPS_ARGS];
 
 	gboolean use_lut;		/* TRUE for using a lut */
 } VipsInfo;
@@ -101,33 +94,6 @@ static im_arg_type vips_supported[] = {
 	IM_TYPE_INTVEC,
 	IM_TYPE_GVALUE
 };
-
-#ifdef DEBUG_LEAK
-/* All the VipsInfo we make ... for leak testing. Build this file with 
- * DEBUG_LEAK to enable add/remove to this list.
- */
-static GSList *vips_info_all = NULL;
-#endif /*DEBUG_LEAK*/
-
-void
-vips_check_all_destroyed( void )
-{
-#ifdef DEBUG_LEAK
-	if( vips_info_all != NULL ) {
-		GSList *p;
-
-		printf( "** %d VipsInfo leaked!\n", 
-			g_slist_length( vips_info_all ) );
-		printf( "(operations with no image args are not leaks)\n" );
-
-		for( p = vips_info_all; p; p = p->next ) {
-			VipsInfo *vi = (VipsInfo *) p->data;
-
-			printf( "\t%s\n", vi->name );
-		}
-	}
-#endif /*DEBUG_LEAK*/
-}
 
 /* Error early on .. we can't print args yet.
  */
@@ -156,114 +122,12 @@ vips_type_find( im_arg_type type )
 	return( VIPS_NONE );
 }
 
-static void
-vips_destroy( VipsInfo *vi )
-{
-	int i;
-
-#ifdef DEBUG_HISTORY
-	printf( "vips_destroy: destroying \"%s\" (%p)\n", vi->name, vi );
-#endif /*DEBUG_HISTORY*/
-
-	/* Are we in the history? Remove us.
-	 */
-	vips_history_remove( vi ); 
-#ifdef DEBUG_LEAK
-	vips_info_all = g_slist_remove( vips_info_all, vi );
-#endif /*DEBUG_LEAK*/
-
-	/* Break "destroy" links to iis.
-	 */
-	for( i = 0; i < vi->ninii; i++ ) 
-		FREESID( vi->inii_destroy_sid[i], vi->inii[i] ); 
-	for( i = 0; i < vi->noutii; i++ ) 
-		FREESID( vi->outii_destroy_sid[i], vi->outii[i] ); 
-
-	/* Break paint links.
-	 */
-	for( i = 0; i < vi->ninii; i++ ) 
-		FREESID( vi->inii_paint_sid[i], vi->inii[i] ); 
-
-	/* Free any VIPS args we built and haven't used.
-	 */
-	for( i = 0; i < vi->fn->argc; i++ ) {
-		im_type_desc *ty = vi->fn->argv[i].desc;
-		im_object *obj = vi->vargv[i];
-		VipsArgumentType vt;
-
-		/* Make sure we don't damage any error magessage we might
-		 * have.
-		 */
-		error_block();
-		vt = vips_type_find( ty->type );
-		error_unblock();
-
-		switch( vt ) {
-		case VIPS_NONE:		/* IM_TYPE_DISPLAY */
-		case VIPS_DOUBLE:
-		case VIPS_INT: 	
-		case VIPS_COMPLEX: 
-		case VIPS_IMAGEVEC: 	/* Input only, so no freeing reqd */
-		case VIPS_GVALUE:
-			/* Do nothing.
-			 */
-			break;
-
-		case VIPS_STRING:
-			IM_FREE( obj );
-			break;
-
-		case VIPS_IMAGE:
-			/* Input images are from the heap; do nothing.
-			 * Output image we made ... close if there.
-			 */
-			if( ty->flags & IM_TYPE_OUTPUT ) {
-				IMAGE **im = (IMAGE **) &obj;
-
-				IM_FREEF( im_close, *im );
-			}
-			break;
-
-		case VIPS_DOUBLEVEC:
-			IM_FREE( ((im_doublevec_object *) obj)->vec );
-			break;
-
-		case VIPS_INTVEC:
-			IM_FREE( ((im_intvec_object *) obj)->vec );
-			break;
-
-		case VIPS_DMASK:
-			IM_FREE( ((im_mask_object *) obj)->name );
-			IM_FREEF( im_free_dmask, 
-				((im_mask_object *) obj)->mask );
-			break;
-
-		case VIPS_IMASK:
-			IM_FREE( ((im_mask_object *) obj)->name );
-			IM_FREEF( im_free_imask, 
-				((im_mask_object *) obj)->mask );
-			break;
-
-		default:
-			g_assert( FALSE );
-		}
-	}
-
-	if( vi->vargv ) {
-		im_free_vargv( vi->fn, vi->vargv );
-		IM_FREE( vi->vargv );
-	}
-	IM_FREE( vi );
-}
-
 /* VIPS types -> a buffer. For tracing calls.
  */
 static void
-vips_tochar( VipsInfo *vi, int i, BufInfo *buf )
+vips_tochar( im_type_desc *type, im_object obj, BufInfo *buf )
 {
-	im_object obj = vi->vargv[i];
-	im_type_desc *vips = vi->fn->argv[i].desc;
-	VipsArgumentType vt = vips_type_find( vips->type );
+	VipsArgumentType vt = vips_type_find( type->type );
 
 	switch( vt ) {
 	case VIPS_DOUBLE:
@@ -323,6 +187,55 @@ vips_tochar( VipsInfo *vi, int i, BufInfo *buf )
 	}
 }
 
+/* Make an im_doublevec_object.
+ */
+static int
+vips_make_doublevec( im_doublevec_object *dv, int n, double *vec )
+{
+	int i;
+
+	dv->n = n;
+	if( !(dv->vec = IARRAY( NULL, n, double )) )
+		return( -1 );
+	for( i = 0; i < n; i++ )
+		dv->vec[i] = vec[i];
+
+	return( 0 );
+}
+
+/* Make an im_intvec_object. Make from a vec of doubles, because that's what
+ * we get from nip.
+ */
+static int
+vips_make_intvec( im_intvec_object *dv, int n, double *vec )
+{
+	int i;
+
+	dv->n = n;
+	if( !(dv->vec = IARRAY( NULL, n, int )) )
+		return( -1 );
+	for( i = 0; i < n; i++ )
+		dv->vec[i] = vec[i];
+
+	return( 0 );
+}
+
+/* Make an im_imagevec_object.
+ */
+static int
+vips_make_imagevec( im_imagevec_object *iv, int n, IMAGE **vec )
+{
+	int i;
+
+	iv->n = n;
+	if( !(iv->vec = IARRAY( NULL, n, IMAGE * )) )
+		return( -1 );
+	for( i = 0; i < n; i++ )
+		iv->vec[i] = vec[i];
+
+	return( 0 );
+}
+
 /* Get the args from the heap.
  */
 static void
@@ -359,7 +272,7 @@ vips_args_vips( VipsInfo *vi, BufInfo *buf )
                 if( !(type->flags & IM_TYPE_OUTPUT)  &&
                         strcmp( type->type, IM_TYPE_DISPLAY ) != 0 ) {
                         buf_appendf( buf, "   %s - ", name );
-                        vips_tochar( vi, i, buf );
+                        vips_tochar( type, vi->call->vargv[i], buf );
                         buf_appendf( buf, "\n" );
                 }
         }
@@ -497,31 +410,34 @@ vips_error_fn_vips( VipsInfo *vi )
 	error_sub( "%s", buf_all( &buf ) );
 }
 
-static VipsInfo *
-vips_new( Reduce *rc, im_function *fn )
+static gboolean
+vips_init( VipsInfo *vi, Reduce *rc, const char *name )
 {
-	VipsInfo *vi;
+	im_function *fn;
+	VipsCall *call;
 	int i;
 
 	g_assert( fn->argc < MAX_VIPS_ARGS - 1 );
 
-	if( !fn || !(vi = INEW( NULL, VipsInfo )) )
-		return( NULL );
+	if( !(fn = im_find_function( name )) ) {
+		error_top( _( "No such operation." ) );
+		error_sub( _( "No VIPS operation \"%s\" found.", name ) ) ;
+		return( FALSE );
+	}
+
+	if( !(call = vips_call_start( fn )) )
+		return( FALSE );
+
 	vi->name = fn->name;
 	vi->fn = fn;
 	vi->rc = rc;
-	vi->vargv = NULL;
+	vi->call = call;
 	vi->nargs = 0;
 	vi->nres = 0;
 	vi->nires = 0;
 	vi->ninii = 0;
 	vi->noutii = 0;
 	vi->use_lut = FALSE;		/* Set this properly later */
-	vi->found_hash = FALSE;
-	vi->in_cache = FALSE;
-#ifdef DEBUG_LEAK
-	vips_info_all = g_slist_prepend( vips_info_all, vi );
-#endif /*DEBUG_LEAK*/
 
 	/* Look over the args ... count the number of inputs we need, and 
 	 * the number of outputs we generate. Note the position of each.
@@ -548,26 +464,13 @@ vips_new( Reduce *rc, im_function *fn )
 		}
 	}
 
-	/* Need to zero all the signals ... we don't always have signals for
-	 * vi that aren't in the history yet. Can't just loop to argc, since
-	 * some args may be IMAGEVEC.
-	 */
-	for( i = 0; i < MAX_VIPS_ARGS; i++ ) {
-		vi->outii_destroy_sid[i] = 0;
-		vi->inii_destroy_sid[i] = 0;
-		vi->inii_paint_sid[i] = 0;
-	}
+	return( TRUE );
+}
 
-	/* Make the call spine, alloc memory. 
-	 */
-	if( !(vi->vargv = IM_ARRAY( NULL, vi->fn->argc + 1, im_object )) ||
-		im_allocate_vargv( vi->fn, vi->vargv ) ) {
-		vips_error( vi );
-		vips_destroy( vi );
-		return( NULL );
-	}
-
-	return( vi );
+static void
+vips_destroy( VipsInfo *vi )
+{
+	IM_FREEF( vips_call_stop, vi->call );
 }
 
 /* Is this the sort of VIPS funtion we can call?
@@ -646,60 +549,10 @@ vips_n_args( im_function *fn )
 	return( nin );
 }
 
-/* Make an im_doublevec_object.
- */
-static int
-vips_make_doublevec( im_doublevec_object *dv, int n, double *vec )
-{
-	int i;
-
-	dv->n = n;
-	if( !(dv->vec = IARRAY( NULL, n, double )) )
-		return( -1 );
-	for( i = 0; i < n; i++ )
-		dv->vec[i] = vec[i];
-
-	return( 0 );
-}
-
-/* Make an im_intvec_object. Make from a vec of doubles, because that's what
- * we get from nip.
- */
-static int
-vips_make_intvec( im_intvec_object *dv, int n, double *vec )
-{
-	int i;
-
-	dv->n = n;
-	if( !(dv->vec = IARRAY( NULL, n, int )) )
-		return( -1 );
-	for( i = 0; i < n; i++ )
-		dv->vec[i] = vec[i];
-
-	return( 0 );
-}
-
-/* Make an im_imagevec_object.
- */
-static int
-vips_make_imagevec( im_imagevec_object *iv, int n, IMAGE **vec )
-{
-	int i;
-
-	iv->n = n;
-	if( !(iv->vec = IARRAY( NULL, n, IMAGE * )) )
-		return( -1 );
-	for( i = 0; i < n; i++ )
-		iv->vec[i] = vec[i];
-
-	return( 0 );
-}
-
 /* ip types -> VIPS types. Write to obj. FALSE for no conversion possible.
  */
 static gboolean
-vips_fromip( Reduce *rc, PElement *arg, 
-	im_type_desc *vips, im_object *obj )
+vips_fromip( Reduce *rc, PElement *arg, im_type_desc *vips, im_object *obj )
 {
 	VipsArgumentType vt = vips_type_find( vips->type );
 
@@ -868,7 +721,7 @@ vips_fromip( Reduce *rc, PElement *arg,
 static void
 vips_toip( VipsInfo *vi, int i, int *outiiindex, PElement *arg )
 {
-	im_object obj = vi->vargv[i];
+	im_object obj = vi->call->vargv[i];
 	im_type_desc *vips = vi->fn->argv[i].desc;
 	VipsArgumentType vt = vips_type_find( vips->type );
 
@@ -978,14 +831,14 @@ vips_gather( VipsInfo *vi )
 
 		if( strcmp( ty->type, IM_TYPE_IMAGE ) == 0 && 
 			!(ty->flags & IM_TYPE_OUTPUT) ) {
-			vi->inii[vi->ninii] = vi->vargv[i];
+			vi->inii[vi->ninii] = vi->call->vargv[i];
 			vi->ninii += 1;
 		}
 
 		if( strcmp( ty->type, IM_TYPE_IMAGEVEC ) == 0 && 
 			!(ty->flags & IM_TYPE_OUTPUT) ) {
 			im_imagevec_object *iv = 
-				(im_imagevec_object *) vi->vargv[i];
+				(im_imagevec_object *) vi->call->vargv[i];
 
 			for( j = 0; j < iv->n; j++ ) {
 				vi->inii[vi->ninii] = IMAGEINFO( iv->vec[j] );
@@ -1017,15 +870,15 @@ vips_gather( VipsInfo *vi )
 
 		if( strcmp( ty->type, IM_TYPE_IMAGE ) == 0 && 
 			!(ty->flags & IM_TYPE_OUTPUT) ) {
-			if( !(vi->vargv[i] = 
-				imageinfo_get( vi->use_lut, vi->vargv[i] )) )
+			if( !(vi->call->vargv[i] = imageinfo_get( 
+				vi->use_lut, vi->call->vargv[i] )) )
 				reduce_throw( vi->rc );
 		}
 
 		if( strcmp( ty->type, IM_TYPE_IMAGEVEC ) == 0 && 
 			!(ty->flags & IM_TYPE_OUTPUT) ) {
 			im_imagevec_object *iv = 
-				(im_imagevec_object *) vi->vargv[i];
+				(im_imagevec_object *) vi->call->vargv[i];
 
 			/* Found an input image vector. Add all the imageinfo
 			 * in the vector.
@@ -1061,7 +914,7 @@ vips_build_output( VipsInfo *vi, int i )
 
 	case VIPS_IMAGE:
 		if( !temp_name( tname, "v" ) || 
-			!(vi->vargv[i] = im_open( tname, "p" )) ) {
+			!(vi->call->vargv[i] = im_open( tname, "p" )) ) {
 			vips_error( vi );
 			reduce_throw( vi->rc );
 		}
@@ -1070,7 +923,7 @@ vips_build_output( VipsInfo *vi, int i )
 	case VIPS_DMASK:
 	case VIPS_IMASK:
 	{
-		im_mask_object *mo = vi->vargv[i];
+		im_mask_object *mo = vi->call->vargv[i];
 
 		mo->mask = NULL;
 		mo->name = im_strdup( NULL, "" );
@@ -1080,7 +933,7 @@ vips_build_output( VipsInfo *vi, int i )
 
 	case VIPS_GVALUE:
 	{
-		GValue *value = vi->vargv[i];
+		GValue *value = vi->call->vargv[i];
 
 		memset( value, 0, sizeof( GValue ) );
 
@@ -1092,7 +945,7 @@ vips_build_output( VipsInfo *vi, int i )
 	{
 		/* intvev is also int + pointer.
 		 */
-		im_doublevec_object *dv = vi->vargv[i];
+		im_doublevec_object *dv = vi->call->vargv[i];
 
 		dv->n = 0;
 		dv->vec = NULL;
@@ -1134,7 +987,7 @@ vips_fill_spine( VipsInfo *vi, HeapNode **arg )
 			 * argument for it.
 			 */
 			(void) vips_fromip( vi->rc, 
-				NULL, varg->desc, &vi->vargv[i] );
+				NULL, varg->desc, &vi->call->vargv[i] );
 		}
 		else {
 			PElement rhs;
@@ -1148,7 +1001,7 @@ vips_fill_spine( VipsInfo *vi, HeapNode **arg )
 			 */
 			PEPOINTRIGHT( arg[vi->nargs - j - 1], &rhs );
 			if( !vips_fromip( vi->rc, 
-				&rhs, varg->desc, &vi->vargv[i] ) ) {
+				&rhs, varg->desc, &vi->call->vargv[i] ) ) {
 				vips_error_arg( vi, arg, j );
 				reduce_throw( vi->rc );
 			}
@@ -1222,7 +1075,7 @@ vips_wrap_output( VipsInfo *vi )
 
 	for( i = 0; i < vi->nres; i++ ) {
 		int j = vi->outpos[i];
-		IMAGE *im = (IMAGE *) vi->vargv[j];
+		IMAGE *im = (IMAGE *) vi->call->vargv[j];
 		im_type_desc *vips = vi->fn->argv[j].desc;
 		VipsArgumentType vt = vips_type_find( vips->type );
 		Imageinfo *outii;
@@ -1250,7 +1103,7 @@ vips_wrap_output( VipsInfo *vi )
 
 		/* Junk the pointer in vargv to stop im_close() on vips end.
 		 */
-		vi->vargv[j] = NULL;
+		vi->call->vargv[j] = NULL;
 
 		/* Rewind the image.
 		 */
@@ -1285,7 +1138,7 @@ vips_fillva( VipsInfo *vi, va_list ap )
 		else if( strcmp( ty->type, IM_TYPE_DISPLAY ) == 0 ) {
 			/* DISPLAY argument ... just IM_TYPE_sRGB.
 			 */
-			vi->vargv[i] = im_col_displays( 7 );
+			vi->call->vargv[i] = im_col_displays( 7 );
 #ifdef DEBUG
 			printf( "ip-display-calib\n" );
 #endif /*DEBUG*/
@@ -1293,7 +1146,7 @@ vips_fillva( VipsInfo *vi, va_list ap )
 		else if( vt == VIPS_DOUBLE ) {
 			double v = va_arg( ap, double );
 
-			*((double*)vi->vargv[i]) = v;
+			*((double*)vi->call->vargv[i]) = v;
 
 			if( trace_flags & TRACE_VIPS ) 
 				buf_appendf( trace_current(), "%g ", v );
@@ -1301,7 +1154,7 @@ vips_fillva( VipsInfo *vi, va_list ap )
 		else if( vt == VIPS_INT ) {
 			int v = va_arg( ap, int );
 
-			*((int*)vi->vargv[i]) = v;
+			*((int*)vi->call->vargv[i]) = v;
 
 			if( trace_flags & TRACE_VIPS ) 
 				buf_appendf( trace_current(), "%d ", v );
@@ -1309,7 +1162,7 @@ vips_fillva( VipsInfo *vi, va_list ap )
 		else if( vt == VIPS_GVALUE ) {
 			GValue *value = va_arg( ap, GValue * );
 
-			vi->vargv[i] = value;
+			vi->call->vargv[i] = value;
 
 			if( trace_flags & TRACE_VIPS ) {
 				buf_appendgv( trace_current(), value );
@@ -1319,7 +1172,7 @@ vips_fillva( VipsInfo *vi, va_list ap )
 		else if( vt == VIPS_IMAGE ) {
 			Imageinfo *ii = va_arg( ap, Imageinfo * );
 
-			vi->vargv[i] = ii;
+			vi->call->vargv[i] = ii;
 
 			if( trace_flags & TRACE_VIPS ) {
 				BufInfo *buf = trace_current();
@@ -1341,16 +1194,16 @@ vips_fillva( VipsInfo *vi, va_list ap )
 			int n = va_arg( ap, int );
 			double *vec = va_arg( ap, double * );
 
-			if( vips_make_doublevec( vi->vargv[i], n, vec ) )
+			if( vips_make_doublevec( vi->call->vargv[i], n, vec ) )
 				reduce_throw( vi->rc );
 			if( trace_flags & TRACE_VIPS ) {
 				BufInfo *buf = trace_current();
-				int i;
+				int k;
 
 				buf_appendf( buf, "<" );
 				buf_appendf( buf, _( "doublevec" ) );
-				for( i = 0; i < n; i++ )
-					buf_appendf( buf, " %g", vec[i] );
+				for( k = 0; k < n; k++ )
+					buf_appendf( buf, " %g", vec[k] );
 				buf_appends( buf, "> " );
 			}
 		}
@@ -1363,19 +1216,19 @@ vips_fillva( VipsInfo *vi, va_list ap )
 			int n = va_arg( ap, int );
 			Imageinfo **vec = va_arg( ap, Imageinfo ** );
 
-			if( vips_make_imagevec( vi->vargv[i], 
+			if( vips_make_imagevec( vi->call->vargv[i], 
 				n, (IMAGE **) vec ) )
 				reduce_throw( vi->rc );
 			if( trace_flags & TRACE_VIPS ) {
 				BufInfo *buf = trace_current();
-				int i;
+				int k;
 
 				buf_appendf( buf, "<" );
 				buf_appendf( buf, _( "imagevec" ) );
-				for( i = 0; i < n; i++ ) {
+				for( k = 0; k < n; k++ ) {
 					buf_appendf( buf, " <" );
 					buf_appendf( buf, _( "image \"%s\"" ),
-						vec[i]->im->filename );
+						vec[k]->im->filename );
 					buf_appendf( buf, ">" );
 				}
 				buf_appends( buf, "> " );
@@ -1398,86 +1251,33 @@ vips_dispatch( VipsInfo *vi, PElement *out )
 	 */
 	vips_gather( vi );
 
-	/* Is this function call in the history?
-	 */
-	if( (old_vi = vips_history_lookup( vi )) ) {
-		/* Yes: reuse!
-		 */
-		vips_destroy( vi );
-		vi = old_vi;
-
-		if( trace_flags & TRACE_VIPS ) 
+	if( trace_flags & TRACE_VIPS ) 
+		if( vips_call_cached( vi->call ) )
 			buf_appendf( trace_current(), "(from cache) " );
 
 #ifdef DEBUG_HISTORY
+	if( vips_call_cached( vi->call ) )
 		printf( "vips_dispatch: found %s in history\n", vi->name );
 #endif /*DEBUG_HISTORY*/
-	}
-	else {
-		/* No: call function.
-		 */
-		int result;
 
-#ifdef DEBUG_TIME
-		static GTimer *timer = NULL;
-
-		if( !timer )
-			timer = g_timer_new();
-		g_timer_reset( timer );
-#endif /*DEBUG_TIME*/
-
-#ifdef DEBUG_HISTORY_MISS
-		printf( "vips_dispatch: calling %s\n", vi->name );
-#endif /*DEBUG_HISTORY_MISS*/
-
-		/* Be careful. This may well call back into nip2 via progress
-		 * feedback and result in a recursive invocation of vips_call.
-		 */
-		result = vi->fn->disp( vi->vargv );
-
-#ifdef DEBUG_TIME
-		printf( "vips_dispatch: %s - %g\n", 
-			vi->name, g_timer_elapsed( timer, NULL ) );
-#endif /*DEBUG_TIME*/
-
-		if( result ) {
-			vips_error_fn_vips( vi );
-			vips_destroy( vi );
-			reduce_throw( rc );
-		}
-		vips_update_hist( vi );
-
-		/* Transform output IMAGE back into Imageinfo.
-		 */
-		vips_wrap_output( vi );
-	}
-
-	/* Write result back to heap. 
+	/* Be careful. This may well call back into nip2 via progress
+	 * feedback and result in a recursive invocation of vips_call.
 	 */
-	if( !vips_write_result( vi, out ) ) {
-		vips_destroy( vi );
+	vi->call = vips_call_dispatch( vi->call );
+
+	if( call->result ) {
+		vips_error_fn_vips( vi );
 		reduce_throw( rc );
 	}
 
-	/* Add to our operation cache, if necessary.
+	/* Transform output IMAGE back into Imageinfo.
 	 */
-	if( vi->fn->flags & IM_FN_NOCACHE ) 
-		/* Uncacheable operation.
-		 */
-		vips_destroy( vi );
-	else if( vi->in_cache ) 
-		/* Already in the history. Just touch the time.
-		 */
-		vips_history_touch( vi );
-	else if( (old_vi = vips_history_lookup( vi )) ) {
-		/* We have an equal but older item there? This can happen with
-		 * nested calls. Touch the old one and destroy this one.
-		 */
-		vips_history_touch( old_vi );
-		vips_destroy( vi );
-	}
-	else
-		vips_history_add( vi );
+	vips_wrap_output( vi );
+
+	/* Write result back to heap. 
+	 */
+	if( !vips_write_result( vi, out ) ) 
+		reduce_throw( rc );
 }
 
 static gboolean
@@ -1501,24 +1301,26 @@ vips_spine_sub( VipsInfo *vi, PElement *out, HeapNode **arg )
 void
 vips_spine( Reduce *rc, const char *name, HeapNode **arg, PElement *out )
 {
-	VipsInfo *vi;
+	VipsInfo vi;
 	gboolean res;
 
 #ifdef DEBUG
 	printf( "vips_spine: starting for %s\n", name );
 #endif /*DEBUG*/
 
-	if( !(vi = vips_new( rc, im_find_function( name ) )) )
+	if( !vips_init( &vi, rc, name ) )
 		reduce_throw( rc );
 
 	if( trace_flags & TRACE_VIPS ) {
 		BufInfo *buf = trace_push();
 
 		buf_appendf( buf, "\"%s\" ", name );
-		trace_args( arg, vi->nargs );
+		trace_args( arg, vi.nargs );
 	}
 
-	res = vips_spine_sub( vi, out, arg );
+	res = vips_spine_sub( &vi, out, arg );
+
+	vips_destroy( &vi );
 
 	if( !res )
 		reduce_throw( rc );
@@ -1540,7 +1342,7 @@ vips_run( Reduce *rc, Compile *compile,
 	int op, const char *name, HeapNode **arg, PElement *out,
 	im_function *function )
 {
-	VipsInfo *vi;
+	VipsInfo vi;
 	gboolean res;
 
 #ifdef DEBUG
@@ -1551,17 +1353,19 @@ vips_run( Reduce *rc, Compile *compile,
 	vips_history_sanity();
 #endif /*DEBUG_HISTORY_SANITY*/
 
-	if( !(vi = vips_new( rc, function )) )
+	if( !vips_init( &vi, rc, name ) )
 		reduce_throw( rc );
 
 	if( trace_flags & TRACE_VIPS ) {
 		BufInfo *buf = trace_push();
 
 		buf_appendf( buf, "\"%s\" ", name );
-		trace_args( arg, vi->nargs );
+		trace_args( arg, vi.nargs );
 	}
 
-	res = vips_spine_sub( vi, out, arg );
+	res = vips_spine_sub( &vi, out, arg );
+
+	vips_destroy( &vi );
 
 	if( !res )
 		reduce_throw( rc );
@@ -1603,7 +1407,7 @@ void
 vipsva( Reduce *rc, PElement *out, const char *name, ... )
 {
 	va_list ap;
-	VipsInfo *vi;
+	VipsInfo vi;
 	gboolean res;
 
 	if( trace_flags & TRACE_VIPS ) 
@@ -1613,11 +1417,14 @@ vipsva( Reduce *rc, PElement *out, const char *name, ... )
 	printf( "vipsva: starting for %s\n", name );
 #endif /*DEBUG*/
 
-	if( !(vi = vips_new( rc, im_find_function( name ) )) )
+	if( !vips_init( &vi, rc, name ) )
 		reduce_throw( rc );
+
         va_start( ap, name );
-	res = vipsva_sub( vi, out, ap );
+	res = vipsva_sub( &vi, out, ap );
         va_end( ap );
+
+	vips_destroy( &vi );
 
 	if( !res )
 		reduce_throw( rc );

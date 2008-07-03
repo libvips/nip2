@@ -421,7 +421,7 @@ vips_init( VipsInfo *vi, Reduce *rc, const char *name )
 
 	if( !(fn = im_find_function( name )) ) {
 		error_top( _( "No such operation." ) );
-		error_sub( _( "No VIPS operation \"%s\" found.", name ) ) ;
+		error_sub( _( "No VIPS operation \"%s\" found." ), name ) ;
 		return( FALSE );
 	}
 
@@ -1244,7 +1244,6 @@ static void
 vips_dispatch( VipsInfo *vi, PElement *out )
 {
 	Reduce *rc = vi->rc;
-	VipsInfo *old_vi;
 
 	/* Look over the images we have ... turn input Imageinfo to IMAGE.
 	 * If we can do this with a lut, set all that up.
@@ -1252,11 +1251,11 @@ vips_dispatch( VipsInfo *vi, PElement *out )
 	vips_gather( vi );
 
 	if( trace_flags & TRACE_VIPS ) 
-		if( vips_call_cached( vi->call ) )
+		if( vips_call_lookup( vi->call ) )
 			buf_appendf( trace_current(), "(from cache) " );
 
 #ifdef DEBUG_HISTORY
-	if( vips_call_cached( vi->call ) )
+	if( vips_call_lookup( vi->call ) )
 		printf( "vips_dispatch: found %s in history\n", vi->name );
 #endif /*DEBUG_HISTORY*/
 
@@ -1265,7 +1264,7 @@ vips_dispatch( VipsInfo *vi, PElement *out )
 	 */
 	vi->call = vips_call_dispatch( vi->call );
 
-	if( call->result ) {
+	if( vi->call->result ) {
 		vips_error_fn_vips( vi );
 		reduce_throw( rc );
 	}

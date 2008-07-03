@@ -454,7 +454,7 @@ vips_call_sanity( void )
 
 /* Is a function call in our history? Return the old one, if any. 
  */
-static VipsCall *
+VipsCall *
 vips_call_lookup( VipsCall *call )
 {
 	VipsCall *old_call;

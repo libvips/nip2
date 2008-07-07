@@ -189,7 +189,7 @@ colour_set_rgb( Colour *colour, double rgb[4] )
 		double value[3];
 		int i;
 
-		/* Setting as RGB can't express small differences, since we're
+		/* Setting as RGB can't express small differences since we're
 		 * going via 8 bit RGB. So only accept the new value if it's 
 		 * sufficiently different from
 		 * what we have now.

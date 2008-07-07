@@ -30,22 +30,8 @@
 #include "ip.h"
 
 /*
-#define DEBUG_TIME
+ */
 #define DEBUG
-#define DEBUG_HISTORY_SANITY
-#define DEBUG_HISTORY_MISS
-#define DEBUG_HISTORY
- */
-
-/* This is usually turned on from a -D in cflags.
-#define DEBUG_LEAK
- */
-
-/* Often want it off ... we get spurious complaints about leaks if an
- * operation has no images in or out (eg. im_version) because it'll never
- * get GCed.
-#undef DEBUG_LEAK
- */
 
 /* Maxiumum number of args to a VIPS function.
  */
@@ -93,16 +79,6 @@ static im_arg_type vips_supported[] = {
 	IM_TYPE_INTVEC,
 	IM_TYPE_GVALUE
 };
-
-/* Error early on .. we can't print args yet.
- */
-static void
-vips_error( VipsInfo *vi )
-{
-	error_top( _( "VIPS library error." ) );
-	error_sub( _( "Error calling library function \"%s\" (%s)." ), 
-		vi->name, vi->fn->desc );
-}
 
 /* Look up a VIPS type. 
  */
@@ -466,6 +442,12 @@ vips_init( VipsInfo *vi, Reduce *rc, const char *name )
 static void
 vips_destroy( VipsInfo *vi )
 {
+	int i;
+
+	for( i = 0; i < vi->noutii; i++ ) {
+		MANAGED_UNREF( vi->outii[i] );
+	}
+	vi->noutii = 0;
 	IM_FREEF( vips_call_end, vi->call );
 }
 
@@ -830,7 +812,7 @@ vips_gather( VipsInfo *vi )
 			!(ty->flags & IM_TYPE_OUTPUT) ) 
 			vi->inii[vi->ninii++] = vi->call->vargv[i];
 
-		if( strcmp( ty->type, IM_TYPE_IMAGEVEC ) &&
+		if( strcmp( ty->type, IM_TYPE_IMAGEVEC ) == 0 &&
 			!(ty->flags & IM_TYPE_OUTPUT) ) {
 			im_imagevec_object *iv = 
 				(im_imagevec_object *) vi->call->vargv[i];
@@ -892,88 +874,119 @@ vips_gather( VipsInfo *vi )
 static void
 vips_image_output( VipsInfo *vi ) 
 {
-	int i, j;
+	int i;
+	int n;
 
-	/* Find all the output imageinfo.
+	g_assert( vi->noutii == 0 );
+
+	/* Count the the output imageinfo.
 	 */
-	for( i = 0; i < vi->fn->argc; i++ ) {
+	for( n = 0, i = 0; i < vi->fn->argc; i++ ) {
 		im_type_desc *ty = vi->fn->argv[i].desc;
 
 		if( strcmp( ty->type, IM_TYPE_IMAGE ) == 0 &&
 			ty->flags & IM_TYPE_OUTPUT ) 
-			vi->inii[vi->ninii++] = vi->call->vargv[i];
+			n += 1;
 
-		if( strcmp( ty->type, IM_TYPE_IMAGEVEC ) &&
-			!(ty->flags & IM_TYPE_OUTPUT) ) {
-			im_imagevec_object *iv = 
-				(im_imagevec_object *) vi->call->vargv[i];
-
-			for( j = 0; j < iv->n; j++ ) 
-				vi->inii[vi->ninii++] = IMAGEINFO( iv->vec[j] );
-		}
+		if( strcmp( ty->type, IM_TYPE_IMAGEVEC ) == 0 &&
+			ty->flags & IM_TYPE_OUTPUT ) 
+			n += ((im_imagevec_object *) vi->call->vargv[i])->n;
 	}
 
-/* Init an output slot in vargv.
+	/* Build and ref all the output images. These get unreffed when we
+	 * vips_destroy(), but by then the ones we need will have been reffed
+	 * when they get written back by vips_write_result().
+	 */
+	for( i = 0; i < n; i++ ) {
+		Imageinfo *ii;
+
+		if( !(ii = imageinfo_new_temp( main_imageinfogroup, 
+			vi->rc->heap, NULL, "p" )) )
+			reduce_throw( vi->rc );
+
+		/* If we are using a LUT, the output image needs to be 
+		 * linked to the input.
+		 */
+		if( vi->use_lut ) 
+			imageinfo_set_underlying( ii, vi->inii[0] );
+
+		vi->outii[vi->noutii] = ii;
+		vi->noutii += 1;
+		MANAGED_REF( ii );
+
+#ifdef DEBUG
+		printf( "vips_image_output: outii[%d] = %p\n", 
+				i, ii );
+#endif /*DEBUG*/
+	}
+}
+
+/* Init all the output slots in call->vargv.
  */
 static void
-vips_build_output( VipsInfo *vi, int i )
+vips_init_output( VipsInfo *vi )
 {
-	im_type_desc *ty = vi->fn->argv[i].desc;
-	VipsArgumentType vt = vips_type_find( ty->type );
-	char tname[FILENAME_MAX];
+	int i, j;
 
-	/* Provide output objects for the function to write to.
-	 */
-	switch( vt ) {
-	case VIPS_DOUBLE:
-	case VIPS_INT:
-	case VIPS_COMPLEX:
-	case VIPS_STRING:
-		break;
+	for( j = 0, i = 0; i < vi->fn->argc; i++ ) {
+		im_type_desc *ty = vi->fn->argv[i].desc;
+		VipsArgumentType vt = vips_type_find( ty->type );
 
-	case VIPS_IMAGE:
-		if( !temp_name( tname, "v" ) || 
-			!(vi->call->vargv[i] = im_open( tname, "p" )) ) {
-			vips_error( vi );
-			reduce_throw( vi->rc );
-		}
-		break;
-
-	case VIPS_DMASK:
-	case VIPS_IMASK:
-	{
-		im_mask_object *mo = vi->call->vargv[i];
-
-		mo->mask = NULL;
-		mo->name = im_strdup( NULL, "" );
-
-		break;
-	}
-
-	case VIPS_GVALUE:
-	{
-		GValue *value = vi->call->vargv[i];
-
-		memset( value, 0, sizeof( GValue ) );
-
-		break;
-	}
-
-	case VIPS_DOUBLEVEC:
-	case VIPS_INTVEC:
-	{
-		/* intvev is also int + pointer.
+		/* Output args only.
 		 */
-		im_doublevec_object *dv = vi->call->vargv[i];
+		if( !(ty->flags & IM_TYPE_OUTPUT) ) 
+			continue;
 
-		dv->n = 0;
-		dv->vec = NULL;
+		switch( vt ) {
+		case VIPS_DOUBLE:
+		case VIPS_INT:
+		case VIPS_COMPLEX:
+		case VIPS_STRING:
+			break;
 
-		break;
-	}
+		case VIPS_IMAGE:
+			g_assert( j < vi->noutii );
+			vi->call->vargv[i] = 
+				imageinfo_get( vi->use_lut, vi->outii[j] );
+			j += 1;
+			break;
 
-	default:
-		g_assert( FALSE );
+		case VIPS_DMASK:
+		case VIPS_IMASK:
+		{
+			im_mask_object *mo = vi->call->vargv[i];
+
+			mo->mask = NULL;
+			mo->name = im_strdup( NULL, "" );
+
+			break;
+		}
+
+		case VIPS_GVALUE:
+		{
+			GValue *value = vi->call->vargv[i];
+
+			memset( value, 0, sizeof( GValue ) );
+
+			break;
+		}
+
+		case VIPS_DOUBLEVEC:
+		case VIPS_INTVEC:
+		{
+			/* intvec is also int + pointer.
+			 */
+			im_doublevec_object *dv = vi->call->vargv[i];
+
+			dv->n = 0;
+			dv->vec = NULL;
+
+			break;
+		}
+
+		default:
+			g_assert( FALSE );
+		}
 	}
 }
 
@@ -999,8 +1012,11 @@ vips_fill_spine( VipsInfo *vi, HeapNode **arg )
 	for( j = 0, i = 0; i < vi->fn->argc; i++ ) {
 		im_arg_desc *varg = &vi->fn->argv[i];
 
+		/* Init output args in a separate pass.
+		 */
 		if( varg->desc->flags & IM_TYPE_OUTPUT ) 
-			vips_build_output( vi, i ); 
+			continue;
+
 		else if( strcmp( varg->desc->type, IM_TYPE_DISPLAY ) == 0 ) {
 			/* Special DISPLAY argument - don't fetch another ip
 			 * argument for it.
@@ -1024,6 +1040,10 @@ vips_fill_spine( VipsInfo *vi, HeapNode **arg )
 				vips_error_arg( vi, arg, j );
 				reduce_throw( vi->rc );
 			}
+
+#ifdef DEBUG
+			pgraph( &rhs );
+#endif /*DEBUG*/
 
 			j += 1;
 		}
@@ -1085,76 +1105,29 @@ vips_write_result( VipsInfo *vi, PElement *out )
 	return( TRUE );
 }
 
-/* Loop over the output IMAGEs, transforming them into Imageinfo.
- */
-static void
-vips_wrap_output( VipsInfo *vi )
-{
-	int i;
-
-	for( i = 0; i < vi->nres; i++ ) {
-		int j = vi->outpos[i];
-		IMAGE *im = (IMAGE *) vi->call->vargv[j];
-		im_type_desc *vips = vi->fn->argv[j].desc;
-		VipsArgumentType vt = vips_type_find( vips->type );
-		Imageinfo *outii;
-
-		if( vt != VIPS_IMAGE )
-			continue;
-
-		if( vi->use_lut ) {
-			/* We are using a LUT. 
-			 */
-			if( !(outii = imageinfo_new_modlut( main_imageinfogroup,
-				vi->rc->heap, vi->inii[0], im )) )
-				reduce_throw( vi->rc );
-		}
-		else {
-			if( !(outii = imageinfo_new( main_imageinfogroup, 
-				vi->rc->heap, im, NULL )) )
-				reduce_throw( vi->rc );
-		}
-
-		/* This output ii depends upon all of the input images.
-		 */
-		managed_sub_add_all( MANAGED( outii ), 
-			vi->ninii, (Managed **) vi->inii );
-
-		/* Junk the pointer in vargv to stop im_close() on vips end.
-		vi->call->vargv[j] = NULL;
-		 */
-
-		/* Rewind the image.
-		 */
-		if( im_pincheck( im ) ) {
-			vips_error( vi );
-			reduce_throw( vi->rc );
-		}
-
-		/* Record on output ii table.
-		 */
-		vi->outii[vi->noutii++] = outii;
-	}
-}
-
 /* Fill an argument vector from the C stack.
  */
 static void
 vips_fillva( VipsInfo *vi, va_list ap )
 {
 	int i, j;
+	int outiiindex;
 
+	outiiindex = 0;
 	for( j = 0, i = 0; i < vi->fn->argc; i++ ) {
 		im_type_desc *ty = vi->fn->argv[i].desc;
 		VipsArgumentType vt = vips_type_find( ty->type );
+
+		/* Init output args in a separate pass.
+		 */
+		if( ty->flags & IM_TYPE_OUTPUT ) 
+			continue;
 
 #ifdef DEBUG
 		printf( "vips_fillva: arg[%d] (%s) = ", i, ty->type );
 #endif /*DEBUG*/
 
-		if( ty->flags & IM_TYPE_OUTPUT ) 
-			vips_build_output( vi, i );
-		else if( strcmp( ty->type, IM_TYPE_DISPLAY ) == 0 ) {
+		if( strcmp( ty->type, IM_TYPE_DISPLAY ) == 0 ) {
 			/* DISPLAY argument ... just IM_TYPE_sRGB.
 			 */
 			vi->call->vargv[i] = im_col_displays( 7 );
@@ -1299,6 +1272,10 @@ vips_dispatch( VipsInfo *vi, PElement *out )
 	 */
 	vips_image_output( vi );
 
+	/* Init all the output arguments.
+	 */
+	vips_init_output( vi );
+
 	if( trace_flags & TRACE_VIPS ) 
 		if( vips_call_lookup( vi->call ) )
 			buf_appendf( trace_current(), "(from cache) " );
@@ -1317,10 +1294,6 @@ vips_dispatch( VipsInfo *vi, PElement *out )
 		vips_error_fn_vips( vi );
 		reduce_throw( rc );
 	}
-
-	/* Transform output IMAGE back into Imageinfo.
-	 */
-	vips_wrap_output( vi );
 
 	/* Write result back to heap. 
 	 */

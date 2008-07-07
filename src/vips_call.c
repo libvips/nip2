@@ -462,6 +462,34 @@ vips_call_sanity( void )
 			g_assert( !proxy->call || proxy->call == call );
 		}
 	}
+
+	/* Every image argument on every in-cache call should be sane.
+	 */
+	for( p = vips_call_all; p; p = p->next ) {
+		VipsCall *call = (VipsCall *) p->data;
+		int i;
+
+		if( !call->in_cache )
+			continue;
+
+		for( i = 0; i < call->fn->argc; i++ ) {
+			im_type_desc *ty = call->fn->argv[i].desc;
+
+			if( strcmp( ty->type, IM_TYPE_IMAGE ) == 0 ) {
+				IMAGE *im = (IMAGE *) call->vargv[i];
+
+				g_assert( !im_image_sanity( im ) );
+			}
+			else if( strcmp( ty->type, IM_TYPE_IMAGEVEC ) == 0 ) {
+				im_imagevec_object *iv = 
+					(im_imagevec_object *) call->vargv[i];
+				int j;
+
+				for( j = 0; j < iv->n; j++ )
+					g_assert( !im_image_sanity( iv->vec[j] ) );
+			}
+		}
+	}
 }
 #endif /*DEBUG_HISTORY_SANITY*/
 
@@ -710,10 +738,11 @@ vips_call_invalidate_cb( VipsProxy *proxy, IMAGE *im )
 	return( 0 );
 }
 
-/* Associate an IMAGE with a VipsCall via a proxy.
+/* If this image goes, remove us from the cache. If invalidate is true, remove
+ * on invalidate as well (eg. input images).
  */
 static VipsProxy *
-vips_call_proxy( VipsCall *call, IMAGE *im )
+vips_call_track( VipsCall *call, IMAGE *im, gboolean invalidate )
 {
 	VipsProxy *proxy;
 
@@ -733,9 +762,10 @@ vips_call_proxy( VipsCall *call, IMAGE *im )
 	if( im_add_close_callback( im, 
 		(im_callback_fn) vips_call_close_cb, proxy, im ) )
 		return( NULL );
-	if( im_add_invalidate_callback( im, 
-		(im_callback_fn) vips_call_invalidate_cb, proxy, im ) )
-		return( NULL );
+	if( invalidate )
+		if( im_add_invalidate_callback( im, 
+			(im_callback_fn) vips_call_invalidate_cb, proxy, im ) )
+			return( NULL );
 
 #ifdef DEBUG_HISTORY_SANITY
 	vips_call_sanity();
@@ -764,18 +794,22 @@ vips_call_add( VipsCall *call )
 	for( i = 0; i < call->fn->argc; i++ ) {
 		im_type_desc *ty = call->fn->argv[i].desc;
 
-		if( strcmp( ty->type, IM_TYPE_IMAGE ) == 0 && 
-			!(ty->flags & IM_TYPE_OUTPUT) ) 
-			(void) vips_call_proxy( call, call->vargv[i] );
+		/* Watch invalidate for input images.
+		 */
+		gboolean invalidate = !(ty->flags & IM_TYPE_OUTPUT);
 
-		if( strcmp( ty->type, IM_TYPE_IMAGEVEC ) == 0 && 
-			!(ty->flags & IM_TYPE_OUTPUT) ) {
+		if( strcmp( ty->type, IM_TYPE_IMAGE ) == 0 )
+			(void) vips_call_track( call, 
+				call->vargv[i], invalidate );
+
+		if( strcmp( ty->type, IM_TYPE_IMAGEVEC ) == 0 ) {
 			im_imagevec_object *iv = 
 				(im_imagevec_object *) call->vargv[i];
 			int j;
 
 			for( j = 0; j < iv->n; j++ ) 
-				(void) vips_call_proxy( call, iv->vec[j] );
+				(void) vips_call_track( call, 
+					iv->vec[j], invalidate );
 		}
 	}
 
@@ -1003,6 +1037,16 @@ vips_call_dispatch( VipsCall *call )
 {
 	VipsCall *old_call;
 
+#ifdef DEBUG
+	printf( "vips_call_dispatch: starting for %s\n", call->fn->name );
+	if( strcmp( call->fn->name, "im_extract_area" ) == 0 )
+		printf( "poop!\n" );
+#endif /*DEBUG*/
+
+#ifdef DEBUG_HISTORY_SANITY
+	vips_call_sanity();
+#endif /*DEBUG_HISTORY_SANITY*/
+
 	/* Is this function call in the history?
 	 */
 	if( (old_call = vips_call_lookup( call )) ) {
@@ -1012,7 +1056,8 @@ vips_call_dispatch( VipsCall *call )
 		call = old_call;
 
 #ifdef DEBUG_HISTORY
-		printf( "vips_dispatch: found %s in history\n", call->fn->name );
+		printf( "vips_call_dispatch: found %s in history\n", 
+			call->fn->name );
 #endif /*DEBUG_HISTORY*/
 	}
 	else {
@@ -1027,7 +1072,7 @@ vips_call_dispatch( VipsCall *call )
 #endif /*DEBUG_TIME*/
 
 #ifdef DEBUG_HISTORY_MISS
-		printf( "vips_dispatch: calling %s\n", call->fn->name );
+		printf( "vips_call_dispatch: calling %s\n", call->fn->name );
 #endif /*DEBUG_HISTORY_MISS*/
 
 		/* Be careful. Eval callbacks from this may do anything,
@@ -1036,7 +1081,7 @@ vips_call_dispatch( VipsCall *call )
 		call->result = call->fn->disp( call->vargv );
 
 #ifdef DEBUG_TIME
-		printf( "vips_dispatch: %s - %g\n", 
+		printf( "vips_call_dispatch: %s - %g secs\n", 
 			call->fn->name, g_timer_elapsed( timer, NULL ) );
 #endif /*DEBUG_TIME*/
 
@@ -1068,6 +1113,10 @@ vips_call_dispatch( VipsCall *call )
 	}
 	else
 		vips_call_add( call );
+
+#ifdef DEBUG_HISTORY_SANITY
+	vips_call_sanity();
+#endif /*DEBUG_HISTORY_SANITY*/
 
 	return( call );
 }

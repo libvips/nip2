@@ -742,24 +742,15 @@ imageinfo_new( Imageinfogroup *imageinfogroup,
 	return( imageinfo );
 }
 
-/* An image is a transformed LUT (eg. after passing a LUT from above through
- * VIPS) ... wrap it around the underlying image.
+/* An image is a result of a LUT operation on an earlier imageinfo.
  */
-Imageinfo *
-imageinfo_new_modlut( Imageinfogroup *imageinfogroup, 
-	Heap *heap, Imageinfo *imageinfo, IMAGE *im )
+void
+imageinfo_set_underlying( Imageinfo *top_imageinfo, Imageinfo *imageinfo )
 {
-	Imageinfo *top_imageinfo;
+	g_assert( !top_imageinfo->underlying );
 
-	if( !(top_imageinfo = imageinfo_new( imageinfogroup, heap, im, NULL )) )
-		return( NULL );
-
-	/* Link together.
-	 */
 	top_imageinfo->underlying = imageinfo;
 	MANAGED_REF( top_imageinfo->underlying );
-
-	return( top_imageinfo );
 }
 
 /* Make a temp image. Deleted on close. No refs: closed on next GC. If you
@@ -770,8 +761,8 @@ imageinfo_new_temp( Imageinfogroup *imageinfogroup,
 	Heap *heap, const char *name, const char *mode )
 {
 	IMAGE *im;
-	Imageinfo *imageinfo;
 	char tname[FILENAME_MAX];
+	Imageinfo *imageinfo;
 
 	if( !temp_name( tname, "v" ) || !(im = im_open( tname, mode )) )
 		return( NULL );

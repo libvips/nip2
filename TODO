@@ -1,3 +1,29 @@
+- if vips_call_dispatch() returns an old vargv, all of inii/outii are invalid
+
+  we need to go back to putting a plain im_open(,"p") into vargv and then
+  wrapping after _dispatch comes back
+
+  or can we subclass vipscall and put the outii in there?
+
+
+
+- vips.c overview:
+
+	collect all input arguments into vargv, images as Imageinfo
+
+	scan over input imageinfo and replace with IMAGE*, lutting if
+	necessary (vips_gather)
+
+	count image outputs, allocate output imageinfo, LUTs if necessary
+	(vips_image_output)
+
+	init all outputs, output images come from the outii
+
+- lots of annoying strcmp in vips.c, go to int once and stick with it
+
+  even better, put all the ops on a type together as a bunch of callbacks and
+  don't use switch at all
+
 - image lifetime confusion
 
   vips.c inits output slots in vargv with im_open("","p"), but vips_call.c 

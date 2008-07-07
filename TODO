@@ -1,4 +1,35 @@
-- can vips.c allocate VipsInfo on the stack?
+- image lifetime confusion
+
+  vips.c inits output slots in vargv with im_open("","p"), but vips_call.c 
+  does im_close on flush
+
+  we need to move the im_close()s back to vips.c, it knows about image 
+  lifetime and vips_call.c does not
+
+  we copy masks (and gvalues?) though, so vips_call.c does need to free them
+
+  vips_call_begin() should just do a vargv allocate, and it should just do
+  vargv free on destroy
+
+  vips_call.c needs to _destroy if any of the output images are closed, not
+  just input
+
+  no need to check invalidate on output though
+
+  general principle:
+
+  	- when filling vargv, make copies of values
+	- vips_call_destroy() will free on flush
+
+	- ... except! image values, where vips_call takes a reference and
+	  watches the object for "close"
+	  (conceptually a weakref)
+
+	could we make this work for all Managed objects?
+
+  so vips.c needs to make real imageinfos for the outputs and manage their
+  lifetimes ... make a ref and junk the ref on destr, if the output gets used,
+  it'll live on
 
 - Imageinfo "area_painted" must trigger im_invalidate() to knock thngs out of
   the cache ... does it do this?

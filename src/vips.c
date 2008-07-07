@@ -65,7 +65,6 @@ typedef struct _VipsInfo {
 	VipsCall *call;			/* Call handle */
 	int nargs;			/* Number of args needed from ip */
 	int nres;			/* Number of objects we write back */
-	int nires;			/* Number of images we write back */
 	int inpos[MAX_VIPS_ARGS];	/* Positions of inputs */
 	int outpos[MAX_VIPS_ARGS];	/* Positions of outputs */
 
@@ -417,15 +416,15 @@ vips_init( VipsInfo *vi, Reduce *rc, const char *name )
 	VipsCall *call;
 	int i;
 
-	g_assert( fn->argc < MAX_VIPS_ARGS - 1 );
-
 	if( !(fn = im_find_function( name )) ) {
 		error_top( _( "No such operation." ) );
-		error_sub( _( "No VIPS operation \"%s\" found." ), name ) ;
+		error_sub( _( "Unknown VIPS operation \"%s\"." ), name ) ;
 		return( FALSE );
 	}
 
-	if( !(call = vips_call_start( fn )) )
+	g_assert( fn->argc < MAX_VIPS_ARGS - 1 );
+
+	if( !(call = vips_call_begin( fn )) )
 		return( FALSE );
 
 	vi->name = fn->name;
@@ -434,10 +433,12 @@ vips_init( VipsInfo *vi, Reduce *rc, const char *name )
 	vi->call = call;
 	vi->nargs = 0;
 	vi->nres = 0;
-	vi->nires = 0;
+
+	/* Set these after we've marshalled the args into vargv.
+	 */
 	vi->ninii = 0;
 	vi->noutii = 0;
-	vi->use_lut = FALSE;		/* Set this properly later */
+	vi->use_lut = FALSE;
 
 	/* Look over the args ... count the number of inputs we need, and 
 	 * the number of outputs we generate. Note the position of each.
@@ -450,11 +451,6 @@ vips_init( VipsInfo *vi, Reduce *rc, const char *name )
 			 */
 			vi->outpos[vi->nres] = i;
 			vi->nres += 1; 
-
-			/* Image output.
-			 */
-			if( strcmp( ty->type, IM_TYPE_IMAGE ) == 0 ) 
-				vi->nires += 1;
 		}
 		else if( strcmp( ty->type, IM_TYPE_DISPLAY ) != 0 ) {
 			/* Found an input object.
@@ -470,7 +466,7 @@ vips_init( VipsInfo *vi, Reduce *rc, const char *name )
 static void
 vips_destroy( VipsInfo *vi )
 {
-	IM_FREEF( vips_call_stop, vi->call );
+	IM_FREEF( vips_call_end, vi->call );
 }
 
 /* Is this the sort of VIPS funtion we can call?
@@ -817,33 +813,30 @@ vips_toip( VipsInfo *vi, int i, int *outiiindex, PElement *arg )
 #endif /*DEBUG*/
 }
 
-/* Sort out the input images. Can we do this with a LUT?
+/* Sort out the input image arguments. Replace the imageinfo we collected
+ * during marshalling with the underlying IMAGE*, use LUTs if we can.
  */
 static void
 vips_gather( VipsInfo *vi ) 
 {
 	int i, j;
 
-	/* Find all the input images.
+	/* Find all the input imageinfo.
 	 */
 	for( i = 0; i < vi->fn->argc; i++ ) {
 		im_type_desc *ty = vi->fn->argv[i].desc;
 
-		if( strcmp( ty->type, IM_TYPE_IMAGE ) == 0 && 
-			!(ty->flags & IM_TYPE_OUTPUT) ) {
-			vi->inii[vi->ninii] = vi->call->vargv[i];
-			vi->ninii += 1;
-		}
+		if( strcmp( ty->type, IM_TYPE_IMAGE ) == 0 &&
+			!(ty->flags & IM_TYPE_OUTPUT) ) 
+			vi->inii[vi->ninii++] = vi->call->vargv[i];
 
-		if( strcmp( ty->type, IM_TYPE_IMAGEVEC ) == 0 && 
+		if( strcmp( ty->type, IM_TYPE_IMAGEVEC ) &&
 			!(ty->flags & IM_TYPE_OUTPUT) ) {
 			im_imagevec_object *iv = 
 				(im_imagevec_object *) vi->call->vargv[i];
 
-			for( j = 0; j < iv->n; j++ ) {
-				vi->inii[vi->ninii] = IMAGEINFO( iv->vec[j] );
-				vi->ninii += 1;
-			}
+			for( j = 0; j < iv->n; j++ ) 
+				vi->inii[vi->ninii++] = IMAGEINFO( iv->vec[j] );
 		}
 	}
 
@@ -853,7 +846,7 @@ vips_gather( VipsInfo *vi )
 		return;
 
 	/* Can we LUT? Function needs to be LUTable, all input images
-	 * have to be the same underlying image, and image must be uncoded
+	 * have to be the same underlying image, and the image must be uncoded
 	 * IM_BANDFMT_UCHAR.
 	 */
 	vi->use_lut = (vi->fn->flags & IM_FN_PTOP) && 
@@ -893,6 +886,32 @@ vips_gather( VipsInfo *vi )
 		}
 	}
 }
+
+/* Build all the output images, link them to the inputs.
+ */
+static void
+vips_image_output( VipsInfo *vi ) 
+{
+	int i, j;
+
+	/* Find all the output imageinfo.
+	 */
+	for( i = 0; i < vi->fn->argc; i++ ) {
+		im_type_desc *ty = vi->fn->argv[i].desc;
+
+		if( strcmp( ty->type, IM_TYPE_IMAGE ) == 0 &&
+			ty->flags & IM_TYPE_OUTPUT ) 
+			vi->inii[vi->ninii++] = vi->call->vargv[i];
+
+		if( strcmp( ty->type, IM_TYPE_IMAGEVEC ) &&
+			!(ty->flags & IM_TYPE_OUTPUT) ) {
+			im_imagevec_object *iv = 
+				(im_imagevec_object *) vi->call->vargv[i];
+
+			for( j = 0; j < iv->n; j++ ) 
+				vi->inii[vi->ninii++] = IMAGEINFO( iv->vec[j] );
+		}
+	}
 
 /* Init an output slot in vargv.
  */
@@ -1102,8 +1121,8 @@ vips_wrap_output( VipsInfo *vi )
 			vi->ninii, (Managed **) vi->inii );
 
 		/* Junk the pointer in vargv to stop im_close() on vips end.
-		 */
 		vi->call->vargv[j] = NULL;
+		 */
 
 		/* Rewind the image.
 		 */
@@ -1143,23 +1162,33 @@ vips_fillva( VipsInfo *vi, va_list ap )
 			printf( "ip-display-calib\n" );
 #endif /*DEBUG*/
 		}
-		else if( vt == VIPS_DOUBLE ) {
+		else switch( vt ) {
+		case VIPS_DOUBLE:
+		{
 			double v = va_arg( ap, double );
 
 			*((double*)vi->call->vargv[i]) = v;
 
 			if( trace_flags & TRACE_VIPS ) 
 				buf_appendf( trace_current(), "%g ", v );
+
+			break;
 		}
-		else if( vt == VIPS_INT ) {
+
+		case VIPS_INT:
+		{
 			int v = va_arg( ap, int );
 
 			*((int*)vi->call->vargv[i]) = v;
 
 			if( trace_flags & TRACE_VIPS ) 
 				buf_appendf( trace_current(), "%d ", v );
+
+			break;
 		}
-		else if( vt == VIPS_GVALUE ) {
+
+		case VIPS_GVALUE:
+		{
 			GValue *value = va_arg( ap, GValue * );
 
 			vi->call->vargv[i] = value;
@@ -1168,8 +1197,12 @@ vips_fillva( VipsInfo *vi, va_list ap )
 				buf_appendgv( trace_current(), value );
 				buf_appends( trace_current(), " " );
 			}
+
+			break;
 		}
-		else if( vt == VIPS_IMAGE ) {
+
+		case VIPS_IMAGE:
+		{
 			Imageinfo *ii = va_arg( ap, Imageinfo * );
 
 			vi->call->vargv[i] = ii;
@@ -1189,8 +1222,12 @@ vips_fillva( VipsInfo *vi, va_list ap )
 					buf_appends( buf, "> " );
 				}
 			}
+
+			break;
 	    	}
-		else if( vt == VIPS_DOUBLEVEC ) {
+
+		case VIPS_DOUBLEVEC:
+		{
 			int n = va_arg( ap, int );
 			double *vec = va_arg( ap, double * );
 
@@ -1206,13 +1243,12 @@ vips_fillva( VipsInfo *vi, va_list ap )
 					buf_appendf( buf, " %g", vec[k] );
 				buf_appends( buf, "> " );
 			}
+
+			break;
 		}
-		/* 
 
-			FIXME ... add intvec perhaps
-
-		 */
-		else if( vt == VIPS_IMAGEVEC ) {
+		case VIPS_IMAGEVEC:
+		{
 			int n = va_arg( ap, int );
 			Imageinfo **vec = va_arg( ap, Imageinfo ** );
 
@@ -1233,10 +1269,19 @@ vips_fillva( VipsInfo *vi, va_list ap )
 				}
 				buf_appends( buf, "> " );
 			}
+
+			break;
 		}
 
-		else
+		/* 
+
+			FIXME ... add intvec perhaps
+
+		 */
+
+		default:
 			g_assert( FALSE );
+		}
 	}
 }
 
@@ -1245,10 +1290,14 @@ vips_dispatch( VipsInfo *vi, PElement *out )
 {
 	Reduce *rc = vi->rc;
 
-	/* Look over the images we have ... turn input Imageinfo to IMAGE.
+	/* Look over the input images we have ... turn input Imageinfo to IMAGE.
 	 * If we can do this with a lut, set all that up.
 	 */
 	vips_gather( vi );
+
+	/* Build all the output images and link to input.
+	 */
+	vips_image_output( vi );
 
 	if( trace_flags & TRACE_VIPS ) 
 		if( vips_call_lookup( vi->call ) )

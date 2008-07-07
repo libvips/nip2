@@ -30,12 +30,12 @@
 #include "ip.h"
 
 /*
+ */
 #define DEBUG_TIME
 #define DEBUG
 #define DEBUG_HISTORY_SANITY
 #define DEBUG_HISTORY_MISS
 #define DEBUG_HISTORY
- */
 
 /* This is usually turned on from a -D in cflags.
 #define DEBUG_LEAK
@@ -449,6 +449,19 @@ vips_call_sanity( void )
 		if( !g_hash_table_lookup( vips_call_table, call ) )
 			g_assert( !call->in_cache );
 	}
+
+	/* Every proxy on every call should be sane.
+	 */
+	for( p = vips_call_all; p; p = p->next ) {
+		VipsCall *call = (VipsCall *) p->data;
+		GSList *q;
+
+		for( q = call->proxys; q; q = q->next ) {
+			VipsProxy *proxy = (VipsProxy *) q->data;
+
+			g_assert( !proxy->call || proxy->call == call );
+		}
+	}
 }
 #endif /*DEBUG_HISTORY_SANITY*/
 
@@ -470,7 +483,8 @@ vips_call_lookup( VipsCall *call )
 
 #ifdef DEBUG_HISTORY
 	if( old_call ) 
-		printf( "vips_call_lookup: found \"%s\"\n", old_call->fn->name );
+		printf( "vips_call_lookup: found \"%s\"\n", 
+			old_call->fn->name );
 #endif /*DEBUG_HISTORY*/
 #ifdef DEBUG_HISTORY_SANITY
 	vips_call_sanity();
@@ -551,6 +565,10 @@ vips_call_destroy( VipsCall *call )
 		call->fn->name, call );
 #endif /*DEBUG_HISTORY*/
 
+#ifdef DEBUG_HISTORY_SANITY
+	vips_call_sanity();
+#endif /*DEBUG_HISTORY_SANITY*/
+
 	/* Are we in the history? Remove us.
 	 */
 	vips_call_remove( call ); 
@@ -563,7 +581,8 @@ vips_call_destroy( VipsCall *call )
 	for( p = call->proxys; p; p = p->next ) {
 		VipsProxy *proxy = (VipsProxy *) p->data;
 
-		g_assert( proxy->call == call );
+		g_assert( !proxy->call || proxy->call == call );
+
 		proxy->call = NULL;
 	}
 	IM_FREEF( g_slist_free, call->proxys );
@@ -598,14 +617,8 @@ vips_call_destroy( VipsCall *call )
 			break;
 
 		case VIPS_IMAGE:
-			/* Input images are from the heap; do nothing.
-			 * Output image we made ... close if there.
+			/* Our caller manages image lifetime, do nothing.
 			 */
-			if( ty->flags & IM_TYPE_OUTPUT ) {
-				IMAGE **im = (IMAGE **) &obj;
-
-				IM_FREEF( im_close, *im );
-			}
 			break;
 
 		case VIPS_DOUBLEVEC:
@@ -638,6 +651,10 @@ vips_call_destroy( VipsCall *call )
 		IM_FREE( call->vargv );
 	}
 	IM_FREE( call );
+
+#ifdef DEBUG_HISTORY_SANITY
+	vips_call_sanity();
+#endif /*DEBUG_HISTORY_SANITY*/
 }
 
 static void
@@ -669,7 +686,7 @@ vips_call_close_cb( VipsProxy *proxy, IMAGE *im )
 			proxy->call->fn->name );
 #endif /*DEBUG_HISTORY*/
 
-		vips_call_destroy( proxy->call );
+		IM_FREEF( vips_call_destroy, proxy->call );
 	}
 
 	return( 0 );
@@ -687,7 +704,7 @@ vips_call_invalidate_cb( VipsProxy *proxy, IMAGE *im )
 			proxy->call->fn->name );
 #endif /*DEBUG_HISTORY*/
 
-		vips_call_destroy( proxy->call );
+		IM_FREEF( vips_call_destroy, proxy->call );
 	}
 
 	return( 0 );
@@ -699,6 +716,13 @@ static VipsProxy *
 vips_call_proxy( VipsCall *call, IMAGE *im )
 {
 	VipsProxy *proxy;
+
+	g_assert( call );
+	g_assert( im );
+
+#ifdef DEBUG_HISTORY_SANITY
+	vips_call_sanity();
+#endif /*DEBUG_HISTORY_SANITY*/
 
 	if( !(proxy = IM_NEW( im, VipsProxy )) )
 		return( NULL );
@@ -712,6 +736,10 @@ vips_call_proxy( VipsCall *call, IMAGE *im )
 	if( im_add_invalidate_callback( im, 
 		(im_callback_fn) vips_call_invalidate_cb, proxy, im ) )
 		return( NULL );
+
+#ifdef DEBUG_HISTORY_SANITY
+	vips_call_sanity();
+#endif /*DEBUG_HISTORY_SANITY*/
 
 	return( proxy );
 }
@@ -758,7 +786,7 @@ vips_call_add( VipsCall *call )
 }
 
 VipsCall *
-vips_call_start( im_function *fn )
+vips_call_begin( im_function *fn )
 {
 	VipsCall *call;
 
@@ -768,6 +796,7 @@ vips_call_start( im_function *fn )
 	call->vargv = NULL;
 	call->found_hash = FALSE;
 	call->in_cache = FALSE;
+	call->proxys = NULL;
 #ifdef DEBUG_LEAK
 	vips_call_all = g_slist_prepend( vips_call_all, call );
 #endif /*DEBUG_LEAK*/
@@ -1044,7 +1073,7 @@ vips_call_dispatch( VipsCall *call )
 }
 
 void
-vips_call_stop( VipsCall *call )
+vips_call_end( VipsCall *call )
 {
 	if( !call->in_cache )
 		vips_call_destroy( call );

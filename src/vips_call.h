@@ -61,8 +61,8 @@ typedef struct _VipsCall {
 extern int vips_call_size;
 
 VipsCall *vips_call_lookup( VipsCall *call );
-VipsCall *vips_call_start( im_function *fn );
+VipsCall *vips_call_begin( im_function *fn );
 VipsCall *vips_call_dispatch( VipsCall *call );
-void vips_call_stop( VipsCall *call );
+void vips_call_end( VipsCall *call );
 
 void vips_call_check_all_destroyed( void );

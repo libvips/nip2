@@ -30,8 +30,8 @@
 #include "ip.h"
 
 /*
- */
 #define DEBUG
+ */
 
 /* Maxiumum number of args to a VIPS function.
  */
@@ -79,6 +79,16 @@ static im_arg_type vips_supported[] = {
 	IM_TYPE_INTVEC,
 	IM_TYPE_GVALUE
 };
+
+/* Track which Imageinfo is holding which IMAGE*. We need this to go from
+ * output IMAGE* in VipsCall back to the Imageinfo which we originally
+ * wrapped around it.
+
+ 	FIXME ... or we could subclass or extend VipsCall somehow to put the 
+	info there. This is just a quick hack for testing.
+
+ */
+static GHashTable *vips_image_to_imageinfo = NULL;
 
 /* Look up a VIPS type. 
  */
@@ -751,8 +761,19 @@ vips_toip( VipsInfo *vi, int i, int *outiiindex, PElement *arg )
 	{
 		Imageinfo *outii;
 
+		/*
+		 
+		   	Nope, outii will have the IMAGE* for the Vipsinfo we 
+			made for this call, not for the possibly cached 
+			VipsCall we are looking at now. Use a hash instead
+			until we fix this.
+
 		outii = vi->outii[*outiiindex];
 		*outiiindex += 1;
+		 */
+		outii = g_hash_table_lookup( vips_image_to_imageinfo, obj );
+
+		g_assert( outii );
 
 		PEPUTP( arg, ELEMENT_MANAGED, outii );
 		break;
@@ -913,6 +934,12 @@ vips_image_output( VipsInfo *vi )
 		vi->outii[vi->noutii] = ii;
 		vi->noutii += 1;
 		MANAGED_REF( ii );
+
+		if( !vips_image_to_imageinfo )
+			vips_image_to_imageinfo = 
+				g_hash_table_new( NULL, g_direct_equal );
+		g_hash_table_insert( vips_image_to_imageinfo, 
+			imageinfo_get( vi->use_lut, ii ), ii );
 
 #ifdef DEBUG
 		printf( "vips_image_output: outii[%d] = %p\n", 

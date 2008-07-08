@@ -1,3 +1,5 @@
+- more testing! try with a large spreadsheet
+
 - if vips_call_dispatch() returns an old vargv, all of inii/outii are invalid
 
   we need to go back to putting a plain im_open(,"p") into vargv and then
@@ -5,6 +7,7 @@
 
   or can we subclass vipscall and put the outii in there?
 
+  or have a GHasshTable which maps IMAGE* to Imageinfo*?
 
 
 - vips.c overview:

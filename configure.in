@@ -237,6 +237,12 @@ if test "x$UPDATE_MIME_DATABASE" != "xno"; then
   fi
 fi
 
+# stop the DBs being updated: useful for packagers
+AC_ARG_ENABLE(update-desktop,
+  AC_HELP_STRING([--disable-update-desktop],
+    [disable update of desktop database]),
+  [nip_desktop_update=$enableval],)
+
 if test x"$nip_desktop_update" = "xyes"; then
   AM_CONDITIONAL(UPDATE_DESKTOP, true)
 else

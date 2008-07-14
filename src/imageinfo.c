@@ -31,7 +31,8 @@
 
 jobs:
 
-- reference counting layer ... in Managed base class
+- reference counting layer ... in Managed base class, plus links to heap 
+  garbage collection
 
 - filesystem tracking: we stat open files and signal file_changed if we see a 
   change
@@ -56,10 +57,6 @@ jobs:
   to display in the right image ... see expr_real_new_value()
 
 - paint stuff: also undo/redo buffers, each with a "*_changed" signal
-
-every Imageinfo is associated with a heap: when we GC a heap, we
-imageinfo_mark() any references to images inside that heap; after GC we
-imageinfo_destroy_heap() any unreferenced imageinfo
 
  */
 
@@ -92,8 +89,8 @@ most of the jobs above are pushed down into vips8 now ... except for
 #define DEBUG
 #define DEBUG_RGB
 #define DEBUG_CHECK
-#define DEBUG_MAKE
  */
+#define DEBUG_MAKE
 
 static iContainerClass *imageinfogroup_parent_class = NULL;
 

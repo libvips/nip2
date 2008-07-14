@@ -1,3 +1,13 @@
+- try
+
+	load image
+	flip lr
+	join lr with original
+
+	... segv!
+
+- add cluster code from /gel
+
 - more testing! try with a large spreadsheet
 
 - if vips_call_dispatch() returns an old vargv, all of inii/outii are invalid

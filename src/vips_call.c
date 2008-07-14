@@ -34,8 +34,8 @@
 #define DEBUG
 #define DEBUG_HISTORY_SANITY
 #define DEBUG_HISTORY_MISS
-#define DEBUG_HISTORY
  */
+#define DEBUG_HISTORY
 
 /* This is usually turned on from a -D in cflags.
 #define DEBUG_LEAK
@@ -710,7 +710,9 @@ vips_call_close_cb( VipsProxy *proxy, IMAGE *im )
 
 	if( proxy->call ) {
 #ifdef DEBUG_HISTORY
-		printf( "vips_call_close_cb: on close, uncaching \"%s\"\n", 
+		printf( "vips_call_close_cb: on im_close( %p ), uncaching\n"
+			"\t\"%s\"\n", 
+			im,
 			proxy->call->fn->name );
 #endif /*DEBUG_HISTORY*/
 
@@ -728,7 +730,9 @@ vips_call_invalidate_cb( VipsProxy *proxy, IMAGE *im )
 	if( proxy->call ) {
 #ifdef DEBUG_HISTORY
 		printf( "vips_call_invalidate_cb: "
-			"on invalidate, uncaching \"%s\"\n", 
+			"on im_invalidate( %p ), uncaching\n"
+			"\t\"%s\"\n", 
+			im,
 			proxy->call->fn->name );
 #endif /*DEBUG_HISTORY*/
 

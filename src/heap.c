@@ -216,6 +216,12 @@ heapblock_free( HeapBlock *hb )
 	IM_FREE( hb );
 }
 
+static void
+heap_set_flush( Heap *heap, gboolean flush )
+{
+	heap->flush = flush;
+}
+
 static void 
 heap_dispose_print( void *key, void *value )
 { 
@@ -233,6 +239,7 @@ heap_dispose( GObject *gobject )
 	 * closes, so we need to loop until done.
 	 */
 	managed_clear( heap );
+	heap_set_flush( heap, TRUE );
 	while( managed_free_unused( heap ) )
 		;
 
@@ -420,6 +427,8 @@ heap_init( Heap *heap )
 	heap->statics = g_hash_table_new( g_str_hash, g_str_equal );
 
 	heap->gc_tid = 0;
+
+	heap->flush = FALSE;
 
 	heap_all = g_slist_prepend( heap_all, heap );
 }

@@ -325,10 +325,15 @@ struct _Heap {
 
 	GHashTable *emark;	/* Set of elements to mark on GC */
 	GHashTable *rmark;	/* Set of Reduce to mark on GC */
-	GHashTable *mtable;	/* Managed associated with this heap */
 	GHashTable *statics;	/* Static string table */
+	GHashTable *mtable;	/* Managed associated with this heap */
 
         guint gc_tid;		/* id of gc delay timer */
+
+	/* Set this to force unreffed objects out immediately. Handy for leak 
+	 * testing.
+	 */
+	gboolean flush;
 };
 
 typedef struct _HeapClass {

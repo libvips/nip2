@@ -148,6 +148,8 @@ vips_check_all_destroyed( void )
 
 		printf( "** %d VipsInfo leaked!\n", 
 			g_slist_length( vips_info_all ) );
+		printf( "(ignore operations which do not take "
+			"image arguments)\n" );
 
 		for( p = vips_info_all; p; p = p->next ) {
 			VipsInfo *vi = (VipsInfo *) p->data;
@@ -844,7 +846,7 @@ vips_history_add( VipsInfo *vi )
 			"destroy", 
 			G_CALLBACK( vips_history_destroy_cb ), vi );
 
-	/* If any of our input ii are painted on, we must also invalidate.
+	/* If any of our input ii are painted on, we must also uncache.
 	 */
 	for( i = 0; i < vi->ninii; i++ )
 		vi->inii_paint_sid[i] = g_signal_connect( vi->inii[i], 
@@ -2209,6 +2211,9 @@ vips_dispatch( VipsInfo *vi, PElement *out )
 		printf( "vips_dispatch: calling %s\n", vi->name );
 #endif /*DEBUG_HISTORY_MISS*/
 
+		/* Be careful. Eval callbacks from this may do anything,
+		 * including call vips_dispatch().
+		 */
 		result = vi->fn->disp( vi->vargv );
 
 #ifdef DEBUG_TIME

@@ -1,5 +1,6 @@
-- don't junk Managed on GC, keep imageinfo around up to the max, for better
-  caching in vips_call.c
+- try with the keepalive turned down, use study2 as a benchmark
+
+- study2 is failing to run in match mode, for some reason, check the output
 
 - connect to invalidate signal and remove from vips_call cache
 

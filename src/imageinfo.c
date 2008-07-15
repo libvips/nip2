@@ -533,6 +533,7 @@ imageinfo_class_init( ImageinfoClass *class )
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
 	iObjectClass *iobject_class = IOBJECT_CLASS( class );
+	ManagedClass *managed_class = MANAGED_CLASS( class );
 
 	parent_class = g_type_class_peek_parent( class );
 
@@ -540,6 +541,10 @@ imageinfo_class_init( ImageinfoClass *class )
 	gobject_class->finalize = imageinfo_finalize;
 
 	iobject_class->info = imageinfo_info;
+
+	/* Timeout on unreffed images.
+	 */
+	managed_class->keepalive = 60.0;
 
 	class->area_changed = imageinfo_real_area_changed;
 	class->area_painted = imageinfo_real_area_painted;

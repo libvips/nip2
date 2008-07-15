@@ -1,7 +1,7 @@
-/* managed objects ... things like Managed which are lifetime managed by
- * both the GC and by pointers from C: we need to mark/sweep and refcount
+/* managed objects ... things like Imageinfo which are lifetime managed by
+ * both the GC and by pointers from C: we need to both mark/sweep and refcount
  * 
- * abstract class: Managed and Managedgvalue build off this
+ * abstract class: Managedgvalue, Imageinfo, etc. build off this
  */
 
 /*
@@ -170,6 +170,8 @@ managed_class_init( ManagedClass *class )
 	gobject_class->finalize = managed_finalize;
 
 	iobject_class->info = managed_info;
+
+	class->keepalive = 0;
 }
 
 static void
@@ -189,6 +191,13 @@ managed_init( Managed *managed )
 	 * on the next GC unless our caller refs us.
 	 */
 	managed->count = 0;
+
+	/* When we're unreffed, become a zombie first, then destroy after a
+	 * (possibly zero) interval.
+	 */
+	managed->zombie = FALSE;
+	managed->time = 0;
+
 	managed->sub = NULL;
 
 #ifdef DEBUG_LEAK
@@ -323,16 +332,64 @@ managed_mark( Managed *managed )
 	}
 }
 
+/* Use a timer to remove unreffed keepalive objects after some
+ * interval.
+ */
+static GTimer *zombie_timer = NULL;
+static double zombie_elapsed;
+
 static gboolean 
 managed_free_unused_sub( void *key, Managed *managed, gboolean *changed )
 { 
+	ManagedClass *managed_class = MANAGED_GET_CLASS( managed );
+	Heap *heap = managed->heap;
+	gboolean remove = FALSE;
+
 	if( !managed->marked && !managed->count ) {
+		if( !managed->zombie ) {
+			/* Unreffed, but not marked as a zombie.
+			 */
+#ifdef DEBUG
+			printf( "managed_free: zombiefying: " );
+			iobject_print( IOBJECT( managed ) );
+#endif /*DEBUG*/
+
+			managed->zombie = TRUE;
+			managed->time = zombie_elapsed;
+		}
+	}
+	else {
+		if( managed->zombie ) {
+			/* Reffed, but marked as a zombie. Back to life again.
+			 */
+#ifdef DEBUG
+			printf( "managed_free: resuscitating: " );
+			iobject_print( IOBJECT( managed ) );
+#endif /*DEBUG*/
+			
+			managed->zombie = FALSE;
+			managed->time = 0;
+		}
+	}
+
+	/* Is this an old zombie? Or a not-so-old one and we're flushing?
+	 * Junk.
+	 */
+	if( managed->zombie && 
+		zombie_elapsed - managed->time >= managed_class->keepalive ) 
+		remove = TRUE;
+	if( managed->zombie && heap->flush )
+		remove = TRUE;
+
+	if( remove ) {
 #ifdef DEBUG
 		printf( "managed_free: closing unreferenced object: " );
 		iobject_print( IOBJECT( managed ) );
+		printf( "managed_free: after %g s as a zombie\n", 
+			zombie_elapsed - managed->time );
 #endif /*DEBUG*/
 
-		/* We will return TRUE to unlink us from the hash table. Stop
+		/* We will return TRUE to unlink us from the hash table. Stop 
 		 * managed_dispose unlinking for us, and drop the hash table's
 		 * reference.
 		 */
@@ -341,11 +398,9 @@ managed_free_unused_sub( void *key, Managed *managed, gboolean *changed )
 		g_object_unref( G_OBJECT( managed ) );
 
 		*changed = TRUE;
-
-		return( TRUE );
 	}
-	else
-		return( FALSE );
+
+	return( remove );
 }
 
 /* Make one sweep and destroy all unused managed objects. Return TRUE if we 
@@ -355,6 +410,10 @@ gboolean
 managed_free_unused( Heap *heap ) 
 {
 	gboolean changed;
+
+	if( !zombie_timer )
+		zombie_timer = g_timer_new();
+	zombie_elapsed = g_timer_elapsed( zombie_timer, NULL );
 
 	changed = FALSE;
 	g_hash_table_foreach_remove( heap->mtable, 

@@ -1,7 +1,7 @@
-/* managed objects ... things like Managed which are lifetime managed by
- * both the GC and by pointers from C: we need to mark/sweep and refcount
+/* managed objects ... things like Imageinfo which are lifetime managed by
+ * both the GC and by pointers from C: we need to both mark/sweep and refcount
  * 
- * abstract class: Managed and Managedgvalue build off this
+ * abstract class: Managedgvalue, Imageinfo, etc. build off this
  */
 
 /*
@@ -57,6 +57,8 @@ struct _Managed {
 
 	gboolean marked;	/* For mark-sweep */
 	int count;		/* Number of non-heap pointers to us */
+	gboolean zombie;	/* Unreffed, but being kept alive */
+	double time;		/* When we became a zombie */
 
 	/* 
 
@@ -70,6 +72,9 @@ struct _Managed {
 typedef struct _ManagedClass {
 	iContainerClass parent_class;
 
+	/* How long after zombiefying before we unref.
+	 */
+	double keepalive;
 } ManagedClass;
 
 void managed_check_all_destroyed( void );

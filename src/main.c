@@ -346,7 +346,7 @@ main_quit( void )
 	im__print_all();
 	managed_check_all_destroyed();
 	util_check_all_destroyed();
-	vips_call_check_all_destroyed();
+	vips_check_all_destroyed();
 #ifdef HAVE_VIPS8
 	vips_object_print_all();
 #endif /*HAVE_VIPS8*/

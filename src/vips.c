@@ -30,8 +30,8 @@
 #include "ip.h"
 
 /*
- */
 #define DEBUG
+ */
 
 /* Maxiumum number of args to a VIPS function.
  */
@@ -759,7 +759,10 @@ vips_toip( VipsInfo *vi, int i, int *outiiindex, PElement *arg )
 
 	case VIPS_IMAGE:
 	{
+		IMAGE *im = (IMAGE *) obj;
 		Imageinfo *outii;
+
+		g_assert( !im_image_sanity( im ) );
 
 		/*
 		 
@@ -772,10 +775,10 @@ vips_toip( VipsInfo *vi, int i, int *outiiindex, PElement *arg )
 		*outiiindex += 1;
 		 */
 		outii = IMAGEINFO( 
-			g_hash_table_lookup( vips_image_to_imageinfo, obj ) );;
+			g_hash_table_lookup( vips_image_to_imageinfo, im ) );
 
 		g_assert( outii );
-		im_image_sanity( outii->im );
+		g_assert( !im_image_sanity( outii->im ) );
 
 		PEPUTP( arg, ELEMENT_MANAGED, outii );
 		break;

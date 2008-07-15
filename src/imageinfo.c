@@ -76,9 +76,6 @@ most of the jobs above are pushed down into vips8 now ... except for
 - cache: several open( "fred.v" )s share a single Imageinfo, provided their 
   mtimes are all the same
 
-
-- 
-
  */
 
 
@@ -89,8 +86,8 @@ most of the jobs above are pushed down into vips8 now ... except for
 #define DEBUG
 #define DEBUG_RGB
 #define DEBUG_CHECK
- */
 #define DEBUG_MAKE
+ */
 
 static iContainerClass *imageinfogroup_parent_class = NULL;
 

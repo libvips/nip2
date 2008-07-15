@@ -28,6 +28,7 @@ started 7.15.0
 - status bar tells you which sym it is computing
 - revised busy system does all busy feedback
 - configure switch to stop update of desktop database (thanks Adam)
+- vips_call hashing improvements
 
 started 7.14.0
 - updated docs

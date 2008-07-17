@@ -1,6 +1,4 @@
-- try with the keepalive turned down, use study2 as a benchmark
-
-- study2 is failing to run in match mode, for some reason, check the output
+- make a 7.14 compat area
 
 - connect to invalidate signal and remove from vips_call cache
 

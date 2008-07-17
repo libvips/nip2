@@ -865,7 +865,7 @@
           <Rhs vislevel="1" flags="1">
             <Number/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Number &quot;Number of VIPS functions to memoise&quot; 10000"/>
+            <iText formula="Number &quot;Number of VIPS functions to memoise&quot; 20000"/>
           </Rhs>
         </Row>
         <Row popup="false" name="D44">

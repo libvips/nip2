@@ -974,7 +974,7 @@ void *
 symbol_recalculate_check( Symbol *sym )
 {
 #ifdef DEBUG
-	printf( "symbol_recalculate_check: %s\n", symbol_name( sym ) );
+	printf( "symbol_recalculate_check: %s\n", symbol_name_scope( sym ) );
 #endif /*DEBUG*/
 
 	error_clear();

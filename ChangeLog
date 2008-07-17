@@ -29,6 +29,8 @@ started 7.15.0
 - revised busy system does all busy feedback
 - configure switch to stop update of desktop database (thanks Adam)
 - vips_call hashing improvements
+- images are GCd after 60s of inactivity, rather than immediately, giving
+  the call cache a chance to revive them ... speedup in some cases
 
 started 7.14.0
 - updated docs

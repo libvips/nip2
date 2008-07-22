@@ -1,0 +1,906 @@
+Tasks_capture_item = class
+	Menupullright "_Capture" 
+		"useful stuff for capturing and preprocessing images" {
+
+	Csv_import_item = class
+		Menuaction "_CSV Import" "read a file of comma-separated values" {
+		action = class 
+			_result {
+			_vislevel = 3;
+
+			path = Pathname "File to load" "empty";
+			start_line = Expression "Start at line" 1;
+			rows = Expression "Lines to read (-1 for whole file)" (-1);
+			whitespace = String "Whitespace characters" " \"";
+			separator = String "Separator characters" ",;\t";
+
+			_result
+				= Image blank, path.value == "empty"
+				= Image (im_csv2vips filename)
+			{
+				filename = search (expand path.value) ++ ":" ++
+					"skip:" ++ print (start_line.expr - 1) ++ "," ++
+					"whi:" ++ escape whitespace.value ++ "," ++
+					"sep:" ++ escape separator.value ++ "," ++
+					"line:" ++ print rows.expr;
+
+				// prefix any ',' with a '\' in the separators line
+				escape x 
+					= foldr prefix [] x
+				{
+					prefix x l
+						= '\\' : x : l, x == ','
+						= x : l;
+				}
+
+				blank = image_new 1 1 1 
+					Image_format.DOUBLE Image_coding.NOCODING Image_type.B_W 
+					0 0 0;
+			}
+		}
+	}
+
+	// interpret Analyze header for layout and calibration
+	Analyze7_header_item = class
+		Menuaction "_Interpret Analyze 7 Header" 
+			"examine the Analyze header and set layout and value" {
+		action x 
+			= x'''
+		{
+			// read bits of header
+			dim n = get_header ("dsr-image_dimension.dim[" ++ print n ++ "]");
+			dim0 = dim 0 x;
+			dim1 = dim 1 x;
+			dim2 = dim 2 x;
+			dim3 = dim 3 x;
+			dim4 = dim 4 x;
+			dim5 = dim 5 x;
+			dim6 = dim 6 x;
+			dim7 = dim 7 x;
+			glmax = get_header "dsr-image_dimension.glmax" x;
+			cal_max = get_header "dsr-image_dimension.cal_max" x;
+	
+			// oops, now a nop
+			x' = x;
+	
+			// lay out higher dimensions width-ways
+			x'' 
+				= grid dim2 dim3 1 x', dim0 == 3
+				= grid dim2 dim3 dim4 x', dim0 == 4
+				= grid (dim2 * dim4) dim5 1 (grid dim2 dim3 dim4) x', dim0 == 5
+				= grid (dim2 * dim4) dim5 dim6 (grid dim2 dim3 dim4) x', dim0 == 6
+				= grid (dim2 * dim4 * dim6) dim7 1 
+					(grid (dim2 * dim4) dim5 dim6 (grid dim2 dim3 dim4)) x', 
+						dim0 == 7
+				= error (_ "unsupported dimension " ++ dim0);
+	
+			// multiply by scale factor to get kBeq
+			x''' = x'' * (cal_max / glmax);
+		}
+	}
+
+	Video_item = class 
+		Menuaction "Capture _Video Frame" "capture a frame of still video" {
+		// shortcut to prefs
+		prefs = Workspaces.Preferences;
+
+		action = class
+			_result {
+			_vislevel = 3;
+
+			device = prefs.VIDEO_DEVICE;
+			channel = Option "Input channel" [
+				"TV",
+				"Composite 1",
+				"Composite 2",
+				"Composite 3"
+			] prefs.VIDEO_CHANNEL;
+			b = Scale "Brightness" 0 32767 prefs.VIDEO_BRIGHTNESS;
+			col = Scale "Colour" 0 32767 prefs.VIDEO_COLOUR;
+			con = Scale "Contrast" 0 32767 prefs.VIDEO_CONTRAST;
+			hue = Scale "Hue" 0 32767 prefs.VIDEO_HUE;
+			frames = Scale "Frames to average" 0 100 prefs.VIDEO_FRAMES;
+			mono = Toggle "Monochrome grab" prefs.VIDEO_MONO;
+			crop = Toggle "Crop image" prefs.VIDEO_CROP;
+
+			// grab, but hide it ... if we let the crop edit
+			_raw_grab = Image (im_video_v4l1 device channel.value
+				b.value col.value con.value 
+				hue.value frames.value);
+
+			edit_crop
+				= Region _raw_grab left top width height
+			{
+				left = prefs.VIDEO_CROP_LEFT;
+				top = prefs.VIDEO_CROP_TOP;
+				width = min_pair 
+					prefs.VIDEO_CROP_WIDTH (_raw_grab.width + left);
+				height = min_pair
+					prefs.VIDEO_CROP_HEIGHT (_raw_grab.height + top);
+			}
+
+			aspect_ratio = Expression "Stretch vertically by"
+				prefs.VIDEO_ASPECT;
+
+			_result 
+				= frame'
+			{
+				frame 
+					= edit_crop, crop
+					= _raw_grab;
+
+				frame' 
+					= colour_transform_to Image_type.B_W frame, mono
+					= frame;
+			}
+		}
+	}
+
+	Smooth_image_item = class 
+		Menuaction "_Smooth" "remove small features from image" {
+		action in = class
+			_result {
+			_vislevel = 3;
+
+			feature = Scale "Minimum feature size" 1 50 20;
+
+			_result = map_unary (smooth feature.value) in;
+		}
+	}
+
+	Light_correct_item = class
+		Menuaction "_Flatfield" "use white image w to flatfield image i" {
+		action w i
+			= map_binary wc w i
+		{
+			wc w i
+				= clip2fmt i.format (w' * i)
+			{
+				fac = mean w / max w;
+				w' = fac * (max w / w);
+			}
+		}
+	}
+
+	Image_rank_item = Filter_rank_item.Image_rank_item;
+
+	Tilt_item = Filter_tilt_item;
+
+	sep1 = Menuseparator;
+
+	White_balance_item = class
+		Menuaction "_White Balance" 
+			"use average of small image to set white of large image" {
+		action a b = class
+			_result {
+			_vislevel = 3;
+
+			white_hint = "Set image white to:";
+			white = Colour_picker "Lab" [100, 0, 0];
+
+			_result
+					= map_binary wb a b
+			{
+				wb a b
+					= colour_transform_to (get_type image) image_xyz'
+				{
+					area x = x.width * x.height;
+					larger x y = area x > area y;
+					[image, patch] = sortc larger [a, b];
+					to_xyz = colour_transform_to Image_type.XYZ;
+			
+					// white balance in XYZ
+					patch_xyz = to_colour (to_xyz patch);
+					white_xyz = to_xyz white;
+
+					facs = (mean patch_xyz / mean white_xyz) * 
+						(white_xyz / patch_xyz);
+
+					image_xyz = to_xyz image;
+					image_xyz' = image_xyz * facs;
+				}
+			}
+		}
+	}
+
+	Gamma_item = Image_levels_item.Gamma_item;
+
+	Tone_item = Image_levels_item.Tone_item;
+
+	sep2 = Menuseparator;
+
+	Crop_item = Image_crop_item;
+
+	Rotate_item = Image_transform_item.Rotate_item;
+
+	Flip_item = Image_transform_item.Flip_item;
+
+	Resize_item = Image_transform_item.Resize_item;
+
+	Rubber_item = Image_transform_item.Image_rubber_item;
+
+	sep3 = Menuseparator;
+
+	ICC_item = Colour_icc_item;
+
+	Temp_item = Colour_temperature_item;
+
+	Find_calib_item = class 
+		Menuaction "Find _Colour Calibration" 
+			"find an RGB -> XYZ transform from an image of a colour chart" {
+		action image = class
+			_result {
+			_check_args = [
+				[image, "image", check_Image]
+			];
+			_vislevel = 3;
+
+			// get macbeth data file to use
+			macbeth = Pathname "Pick a Macbeth data file" 
+				"$VIPSHOME/share/$PACKAGE/data/macbeth_lab_d65.mat";
+
+			mode = Option "Input LUT" [
+				"Linear input",
+				"Fit intercept from chart greyscale",
+				"Linearize input from chart greyscale"
+			] 2;
+
+			// get max of input image
+			_max_value = Image_format.maxval image.format;
+
+			// measure chart image
+			_camera = measure 0 0 image.width image.height 6 4 image.value;
+
+			// load true values
+			_true_Lab = Matrix_file macbeth.value;
+			_true_XYZ = colour_transform 
+				Image_type.LAB Image_type.XYZ _true_Lab;
+
+			// get Ys of greyscale
+			_true_grey_Y = map (extract 1) (drop 18 _true_XYZ.value);
+
+			// camera greyscale (all bands)
+			_camera_grey = drop 18 _camera.value;
+
+			// normalise both to 0-1 and combine
+			_camera_grey' = map (map (multiply (1 / _max_value))) _camera_grey;
+			_true_grey_Y' = map (multiply (1 / 100)) _true_grey_Y;
+			_comb 
+				= Matrix [[0, 0], [1, 1]], mode == 0
+				= Matrix [0: intercepts, replicate (_camera.width + 1) 1], 
+					mode == 1
+				= Matrix (map2 cons _true_grey_Y' _camera_grey')
+			{
+				intercepts = [(linreg _true_grey_Y' cam).intercept :: 
+					cam <- transpose _camera_grey'];
+			}
+
+			// make a linearising lut ... zero on left
+			_linear_lut = im_invertlut _comb (_max_value + 1);
+
+			// and display it
+			// plot from 0 explicitly so we see the effect of mode1 (intercept
+			// from greyscale)
+			linearising_lut = Plot [$ymin => 0] _linear_lut;
+
+			// map the original image through the lineariser to 
+			// get linear 0-1 RGB image
+			_image' = hist_map linearising_lut.value image.value;
+
+			// remeasure and solve for RGB -> XYZ
+			_camera' = im_measure _image' 0 0 image.width image.height 6 4;
+			_pinv = (transpose _camera' * _camera') ** -1;
+			M = transpose (_pinv * transpose _camera' * _true_XYZ);
+
+			// convert linear RGB camera to Lab 
+			_result = (Image @
+				colour_transform Image_type.XYZ Image_type.LAB @
+				cast_float @
+				recomb M) _image';
+
+			// measure again and compute dE76
+			_camera'' = im_measure _result.value 0 0 
+				image.width image.height 6 4;
+
+			_dEs = map abs_vec (_camera'' - _true_Lab).value;
+			final_dE76 = mean _dEs;
+			_max_dE = foldr max_pair 0 _dEs;
+			_worst = index (equal _max_dE) _dEs;
+			worst_patch 
+				= name _worst ++ " (patch " ++ 
+					print (_worst + 1) ++ ", " ++ 
+					print _max_dE ++ " dE)"
+			{
+				name i 
+					= macbeth_names?i, i >= 0 && i < len macbeth_names
+					= "Unknown";
+			}
+		}
+	}
+
+	Apply_calib_item = class 
+		Menuaction "_Apply Colour Calibration" 
+			"apply an RGB -> LAB transform to an image" {
+		action a b = class
+			(map_binary process a b) {
+			process a b
+				= result, is_instanceof calib_name calib && is_Image image
+				= error (_ "bad arguments to " ++ "Calibrate_image")
+			{
+				// the name of the calib object we need
+				calib_name = "Tasks_capture_item.Find_calib_item.action";
+
+				// get the Calibrate_chart arg first
+				[image, calib] = sortc (const (is_instanceof calib_name)) 
+					[a, b];
+
+				// map the original image through the lineariser to get 
+				// linear 0-1 RGB image
+				image' = hist_map calib.linearising_lut image;
+
+				// convert linear RGB camera to Lab 
+				result = colour_transform Image_type.XYZ Image_type.LAB 
+					((float) (recomb calib.M image'));
+			}
+		}
+	}
+
+	sep4 = Menuseparator;
+
+	Graph_hist_item = Hist_find_item;
+
+	Graph_bands_item = class
+		Menuaction "Plot _Bands" "show image bands as a graph" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			style = Option_enum Plot_style.names "Style" "Line";
+
+			auto = Toggle "Auto Range" true;
+			ymin = Expression "Y range minimum" 0;
+			ymax = Expression "Y range maximum" 1;
+
+			_result
+				= Plot options (to_image (bands (image x))).value
+			{
+				options
+					= [$style => style.value] ++ 
+						if auto then [] else 
+							[$ymin => ymin.expr, $ymax => ymax.expr]; 
+
+				// try to make something image-like from it
+				image x
+					= extract_area x.left x.top 1 1 x.image, is_Mark x
+					= get_image x, has_image x
+					= get_image (to_image x);
+
+				// get as [[1],[2],[3]]
+				bands x
+					= transpose [map mean (bandsplit x)];
+			}
+		}
+	}
+}
+
+Tasks_mosaic_item = class
+	Menupullright "_Mosaic" "build image mosaics" {
+	/* Check and group a point list by image.
+	 */
+	mosaic_sort_test l
+		= error "mosaic: not all points",
+			!is_listof is_Mark l
+		= error "mosaic: points not on two images",
+			!is_list_len 2 images
+		= error "mosaic: images do not match in format and coding",
+			!all_equal (map get_format l) || !all_equal (map get_coding l)
+		= error "mosaic: not same number of points on each image",
+			!foldr1 equal (map len l') 
+		= l'
+	{
+		// test for all elements of a list equal
+		all_equal l = all (map (equal (hd l)) (tl l));
+	
+		// all the different images
+		images = mkset pointer_equal (map get_image l);
+	
+		// find all points defined on image
+		test_image image p = (get_image p) === image;
+		find l image = filter (test_image image) l;
+	
+		// group point list by image
+		l' = map (find l) images;
+	}
+
+	/* Sort a point group to get right before left, and within each group to 
+	 * get above before below.
+	 */
+	mosaic_sort_lr l
+		= l''
+	{
+		// sort to get upper point first
+		above a b = a.top < b.top;
+		l' = map (sortc above) l;
+	
+		// sort to get right group before left group
+		right a b = a?0.left > b?0.left;
+		l'' = sortc right l';
+	}
+
+	/* Sort a point group to get top before bottom, and within each group to 
+	 * get left before right.
+	 */
+	mosaic_sort_tb l
+		= l''
+	{
+		// sort to get upper point first
+		left a b = a.left < b.left;
+		l' = map (sortc left) l;
+	
+		// sort to get right group before left group
+		below a b = a?0.top > b?0.top;
+		l'' = sortc below l';
+	}
+	
+	/* Put 'em together! Group by image, sort vertically (or horizontally) with
+	 * one of the above, transpose to get pairs matched up, and flatten again.
+	 */
+	mosaic_sort fn = concat @ transpose @ fn @ mosaic_sort_test;
+
+	Mosaic_1point_item = class 
+		Menupullright "_One Point" "join two images with a single tie point" {
+		check_ab_args a b = [
+			[a, "a", check_Mark],
+			[b, "b", check_Mark]
+		];
+	
+		// shortcut to prefs
+		prefs = Workspaces.Preferences;
+		search_area = prefs.MOSAIC_WINDOW_SIZE;
+		object_size = prefs.MOSAIC_OBJECT_SIZE;
+		blend_width_widget = Scale "Maximum blend width" 0 100 prefs.MOSAIC_MAX_BLEND_WIDTH;
+		refine_widget = Toggle "Refine selected tie-points" prefs.MOSAIC_REFINE;
+
+		lr_mos _refine a b = class 
+			Image _result {
+			_check_args = check_ab_args a b;
+	
+			bw = blend_width_widget;
+			refine = _refine;
+	
+			_result 
+				= im_lrmosaic a'.image.value b'.image.value 0 
+					a'.left a'.top b'.left b'.top
+					(object_size / 2) (search_area / 2) 0 bw.value,
+						refine
+				= im_lrmerge a'.image.value b'.image.value
+					(b'.left - a'.left) (b'.top - a'.top) bw.value
+			{
+				[a', b'] = mosaic_sort mosaic_sort_lr [a, b];
+			}
+		}
+
+		tb_mos _refine a b = class
+			Image _result {
+			_check_args = check_ab_args a b;
+	
+			bw = blend_width_widget;
+			refine = _refine;
+	
+			_result 
+				= im_tbmosaic a'.image.value b'.image.value 0 
+					a'.left a'.top b'.left b'.top
+					(object_size / 2) (search_area / 2) 0 bw.value,
+						refine
+				= im_tbmerge a'.image.value b'.image.value
+					(b'.left - a'.left) (b'.top - a'.top) bw.value
+			{
+				[a', b'] = mosaic_sort mosaic_sort_tb [a, b];
+			}
+		}
+
+		Left_right_item = class 
+			Menuaction "_Left to Right" 
+				"join two images left-right with a single tie point" {
+			action a b = lr_mos refine_widget a b;
+		}
+
+		Top_bottom_item = class 
+			Menuaction "_Top to Bottom" 
+				"join two images top-bottom with a single tie point" {
+			action a b = tb_mos refine_widget a b;
+		}
+	
+		sep1 = Menuseparator;
+
+		Left_right_manual_item = class 
+			Menuaction "Manual L_eft to Right" 
+				"join left-right, no auto-adjust of tie points" {
+			action a b = lr_mos false a b;
+		}
+
+		Top_bottom_manual_item = class 
+			Menuaction "Manual T_op to Bottom" 
+				"join top-bottom, no auto-adjust of tie points" {
+			action a b = tb_mos false a b;
+		}
+	}
+
+	Mosaic_2point_item = class 
+		Menupullright "_Two Point" "join two images with two tie points" {
+		check_abcd_args a b c d = [
+			[a, "a", check_Mark],
+			[b, "b", check_Mark],
+			[c, "c", check_Mark],
+			[d, "d", check_Mark]
+		];
+	
+		// shortcut to prefs
+		prefs = Workspaces.Preferences;
+		search_area = prefs.MOSAIC_WINDOW_SIZE;
+		object_size = prefs.MOSAIC_OBJECT_SIZE;
+		blend_width_widget = Scale "Maximum blend width" 0 100 prefs.MOSAIC_MAX_BLEND_WIDTH;
+		refine_widget = Toggle "Refine selected tie-points" prefs.MOSAIC_REFINE;
+
+		Left_right_item = class 
+			Menuaction "_Left to Right" 
+				"join two images left-right with a pair of tie points" {
+			action a b c d = class 
+				Image _result {
+				_check_args = check_abcd_args a b c d;
+	
+				bw = blend_width_widget;
+				refine = refine_widget;
+	
+				_result 
+					= im_lrmosaic1 a'.image.value b'.image.value 0
+						a'.left a'.top b'.left b'.top
+						c'.left c'.top d'.left d'.top
+						(object_size / 2) (search_area / 2)
+						0 bw.value,
+							refine
+					= im_lrmerge1 a'.image.value b'.image.value
+						a'.left a'.top b'.left b'.top
+						c'.left c'.top d'.left d'.top
+						bw.value
+				{
+					[a', b', c', d'] = mosaic_sort mosaic_sort_lr [a, b, c, d];
+				}
+			}
+		}
+
+		Top_bottom_item = class 
+			Menuaction "_Top to Bottom" 
+				"join two images top-bottom with a pair of tie points" {
+			action a b c d = class 
+				Image _result {
+				_check_args = check_abcd_args a b c d;
+	
+				bw = blend_width_widget;
+				refine = refine_widget;
+	
+				_result 
+					= im_tbmosaic1 a'.image.value b'.image.value 0
+						a'.left a'.top b'.left b'.top
+						c'.left c'.top d'.left d'.top
+						(object_size / 2) (search_area / 2)
+						0 bw.value,
+							refine
+					= im_tbmerge1 a'.image.value b'.image.value
+						a'.left a'.top b'.left b'.top
+						c'.left c'.top d'.left d'.top
+						bw.value
+				{
+					[a', b', c', d'] = mosaic_sort mosaic_sort_tb [a, b, c, d];
+				}
+			}
+		}
+	}
+	
+	sep1 = Menuseparator;
+
+	Balance_item = class 
+		Menuaction "Mosaic _Balance" 
+			"disassemble mosaic, scale brightness to match, reassemble" {
+		action x 
+			= map_unary balance x
+		{
+			balance x
+				= oo_unary_function balance_op x, is_class x
+				= im_global_balancef x 
+					Workspaces.Preferences.MOSAIC_BALANCE_GAMMA, 
+					is_image x
+				= error (_ "bad arguments to " ++ "balance")
+			{
+				balance_op = Operator "balance" balance 
+					Operator_type.COMPOUND_REWRAP false;
+			}
+		}
+	}
+
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+Manual_balance_item = class
+	Menupullright "Manual B_alance" "balance tonality of user defined areas" {
+	prefs = Workspaces.Preferences;
+	
+	////////////////////////////////////////////////////////////////////////////////////
+	Balance_find_item = class
+		Menuaction "_Find Values"
+			 "calculates values required to scale and offset balance user defined areas in a given image"
+			 /* Outputs a matrix of scale and offset values. Eg. Values required to balance the secondary 
+			  * structure in an X-ray image.  Takes an X-ray image an 8-bit control mask and a list of 
+			  * 8-bit reference masks, where the masks are white on a black background.
+			  */
+	{
+		action im_in m_control m_group = class
+			Matrix values{
+			_vislevel = 1;
+
+			_control_im = if m_control then im_in else 0;
+			_control_meanmax = so_meanmax _control_im;
+			_group_check = is_Group m_group;
+			_m_list = m_group.value, _group_check
+		     		= m_group;
+
+			process m_current mat_in = mat_out
+				{so_values  = so_calculate _control_meanmax im_in m_current;
+				 mat_out = join [so_values] mat_in;}
+		
+			values = (foldr process [] _m_list);
+		}
+	}
+	
+	////////////////////////////////////////////////////////////////////////////////////
+	Balance_check_item = class 
+		Menuaction "_Check Values"
+			 "allows calculated set of scale and offset values to be checked and adjusted if required" 
+			 /* Outputs adjusted matrix of scale and offset values and scale and offset image maps.
+			  * Eg. Check values required to balance the secondary structure in an X-ray image.  
+			  * Takes an X-ray image an 8-bit control mask and a list of 8-bit reference masks, 
+			  * where the masks are white on a black background. 
+			  */
+	{
+		action im_in m_matrix m_group = class
+			Image value 
+			{
+			_vislevel = 3;
+			
+			blur = Scale "Blur" 1 10 1;
+			_blur = (blur.value/2 + 0.5), blur.value > 1
+				  =  1;
+		
+			_group_check = is_Group m_group;
+			_m_list = m_group.value, _group_check
+		     		= m_group;
+						
+			adjust = Matrix_rec mat_a
+				{
+				no_masks = len _m_list;
+				mat_a = replicate no_masks [0, 0];
+				}
+			
+		// Apply the user defined adjustments to the inputted matrix of scale and offset values	 
+			_adjusted = map2 fn_adjust m_matrix.value adjust.value;
+				fn_adjust a b = [(a?0 + b?0), (a?1 + (a?1 * b?1))];
+				
+			_scaled_ims = map (fn_so_apply im_in) _adjusted;
+				fn_so_apply im so = map_unary adj im
+					{adj im = im * (so?0) + (so?1);}			
+			_im_pairs = zip2 _m_list _scaled_ims;
+			
+		// Prepare black images as starting point. ////////////
+			_blank = image_new (_m_list?0).width (_m_list?0).height 1 6 Image_coding.NOCODING 1 0 0 0;
+			_pair_start = [(_blank + 1), _blank];
+			
+			Build = Toggle "Build Scale and Offset Correction Images" false;
+			
+			Output = class
+				{ 
+				_vislevel = 1;
+				scale_im = _build?0;
+				offset_im = _build?1;	
+				so_values = Matrix _adjusted;
+				
+				_build = [Image so_images?0, Image so_images?1], Build
+				       = ["Scale image not built.", "Offset image not built."]
+					{
+					m_list' = transpose [_m_list];			
+					m_all = map2 join m_list' _adjusted;					
+					so_images = foldr process_2 _pair_start m_all;					
+					}
+				}
+				  
+			value = (foldr process_1 im_in_b _im_pairs).value
+				{im_in_b = map_unary cast_float im_in;}
+				
+			process_1 m_current im_start 
+				= im_out
+				{ 
+				bl_mask    = convsep (matrix_blur _blur) (get_image m_current?0);
+				blended_im  = im_blend bl_mask (m_current?1).value im_start.value;
+				im_out      = Image (clip2fmt im_start.format blended_im);
+				}			
+			
+			// Process for building scale and offset image. 
+			process_2 current p_start 
+				= p_out
+				{ 
+				im_s = if ((current?0) > 128) then current?1 else _blank;
+				im_o = if ((current?0) > 128) then current?2 else _blank;
+				
+				im_s' = convsep (matrix_blur _blur) (im_s != 0);
+				im_o' = convsep (matrix_blur _blur) (im_o != 0);
+				
+				im_s'' = im_blend im_s'.value im_s.value p_start?0;
+				im_o'' = im_blend im_o'.value im_o.value p_start?1;
+				
+				p_out  = [im_s'', im_o''];
+				}
+		}
+	}
+	
+	////////////////////////////////////////////////////////////////////////////////////
+	Balance_apply_item = class 
+		Menuaction "_Apply Values" 
+			 "apply scale and offset corrections, defined as image maps, to a given image" 
+			 /* Outputs the balanced image. Eg. Balance the secondary structure in an X-ray image.  Takes an 
+			  * X-ray image an 32-bit float scale image and a 32-bit offset image.
+			  */
+	{
+		action im_in scale_im offset_im = class
+			Image value 
+			{
+			_vislevel = 1;
+
+			xfactor = im_in.width/scale_im.width;
+			yfactor = im_in.height/scale_im.height;
+			
+			_scale_im = resize xfactor yfactor 1 scale_im;
+			_offset_im = resize xfactor yfactor 1 offset_im;
+			
+			value = get_image ( clip2fmt im_in.format ( ( im_in * _scale_im ) +  _offset_im ) ); 	
+			}
+		}
+}
+
+    Tilt_item = Filter_tilt_item;
+
+	sep2 = Menuseparator;
+
+	Rebuild_item = class 
+		Menuaction "_Rebuild" 
+			"disassemble mosaic, substitute image files and reassemble" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+	
+			old = String "In each filename, replace" "foo";
+			new = String "With" "bar";
+	
+			_result
+				= map_unary remosaic x
+			{
+				remosaic image 
+					= Image (im_remosaic image.value old.value new.value);
+			}
+		}
+	}
+
+	sep3 = Menuseparator;
+
+Clone_area_item = class
+   Menuaction "_Clone Area"
+       "replace dark or light section of im1 with pixels from im2"
+   {
+   action im1 im2 = class
+       _result {
+       _check_args = [
+           [im1, "im1", check_Image],
+           [im2, "im2", check_Image]
+       ];
+                 _vislevel = 3;                            /* Region on first
+image placed in the top left hand corner,
+        * positioned and size relative to the height and width of im1.
+        */
+       r1 = Region_relative im1 0.05 0.05 0.05 0.05;
+             /* Mark on second image placed in the top left hand corner,
+        * positioned relative to the height and width of im2. Used to
+        * define _r2, the region from which the section of image is cloned
+        * from.
+        */
+       p2 = Mark_relative im2 0.05 0.05;              _r2 = Region im2 p2.left
+p2.top r1.width r1.height;
+             mask = [r1 <= Options.sc, r1 >=
+Options.sc]?(Options.replace);
+                 Options = class
+           {
+           _vislevel = 3;
+                     pause = Toggle "Pause process" true;
+                         /* Option toggle used to define whether the user is
+            * replacing a dark or a light area.
+            */
+           replace = Option "Replace" [ "A Dark Area", "A Light Area" ] 1;
+
+           // Used to select the area to be replaced.
+            sc = Scale "Scale cutoff" 0.01 mx (mx / 2)
+               {mx = Image_format.maxval im1.format;}
+             //Allows replacement with scale&offset balanced gaussian noise.
+           balance = Toggle "Balance cloned data to match surroundings." true;
+                             //Allows replacement with scale&offset balanced
+                             //gaussian noise.
+           process = Toggle "Replace area with Gaussian noise." false;
+           }
+                     _result    = im1, Options.pause
+               = Image (im_insert im1.value patch r1.left r1.top)
+           {              r2 = Region im2 p2.left p2.top r1.width r1.height;
+           ref_meanmax = so_meanmax (if mask then 0 else r1);
+                     mask8 = Matrix_mor [[255, 255, 255], [255, 255, 255],
+[255, 255, 255]];
+           mask_a = map_unary (dilate mask8) mask;
+           mask_b = convsep (matrix_blur 2) mask_a;
+                     patch = so_balance ref_meanmax r1 r2 mask_b
+Options.process, Options.balance
+                 = so_balance ref_meanmax r1 r2 mask_b Options.process,
+Options.process
+                 = im_blend (get_image mask_b) (get_image r2) (get_image r1);
+           }
+       }
+   } 
+}
+
+Tasks_frame_item = Frame_item;
+
+Tasks_print_item = class
+	Menupullright "_Print" "useful stuff for image output" {
+
+	Rotate_item = Image_transform_item.Rotate_item;
+
+	Flip_item = Image_transform_item.Flip_item;
+
+	Resize_item = Image_transform_item.Resize_item;
+
+	Tone_item = Image_levels_item.Tone_item; 
+
+	Sharpen_item = class 
+		Menuaction "_Sharpen" 
+			"unsharp filter tuned for typical inkjet printers" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+	
+			target_dpi = Option "Sharpen for print at" [
+				"400 dpi",
+				"300 dpi",
+				"150 dpi",
+				"75 dpi"
+			] 1;
+	
+			_result
+				= map_unary process x
+			{
+				process image
+					= sharpen params?0 params?1 
+						params?2 params?3 params?4 params?5
+						(colour_transform_to Image_type.LABQ image)
+				{
+					// sharpen params for various dpi
+					// just change the size of the area we search
+					param_table = [
+						[7, 2.5, 40, 20, 0.5, 1.5],
+						[5, 2.5, 40, 20, 0.5, 1.5],
+						[3, 2.5, 40, 20, 0.5, 1.5],
+						[11, 2.5, 40, 20, 0.5, 1.5]
+					];
+					params = param_table?target_dpi;
+				}
+			}
+		}
+	}
+
+	sep1 = Menuseparator;
+
+	Temp_item = Colour_temperature_item;
+
+	ICC_item = Colour_icc_item;
+}

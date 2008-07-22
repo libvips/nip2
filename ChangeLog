@@ -31,6 +31,7 @@ started 7.15.0
 - vips_call hashing improvements
 - images are GCd after 60s of inactivity, rather than immediately, giving
   the call cache a chance to revive them ... speedup in some cases
+- added a 7.14 compat area
 
 started 7.14.0
 - updated docs

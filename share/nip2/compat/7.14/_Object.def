@@ -1,0 +1,371 @@
+/* Lots of little arg checks. Global for convenience.
+ */
+
+check_any = [(const true), _ "any"];
+check_bool = [is_bool, _ "boolean"];
+check_real = [is_real, _ "real"];
+check_ureal = [is_ureal, _ "unsigned real"];
+check_preal = [is_preal, _ "positive real"];
+check_list = [is_list, _ "list"];
+check_real_list = [is_real_list, _ "list of real"];
+check_string = [is_string, _ "string"];
+check_string_list = [is_string_list, _ "list of string"];
+check_int = [is_int, _ "integer"];
+check_uint = [is_uint, _ "unsigned integer"];
+check_pint = [is_pint, _ "positive integer"];
+check_matrix = [is_matrix, _ "rectangular array of real"];
+check_matrix_display = [Matrix_display.is_display, _ "0, 1, 2 or 3"];
+check_image = [is_image, _ "image"];
+check_xy_list = [is_xy_list, _ "list of form [[1, 2], [3, 4], [5, 6], ...]"];
+check_instance name = [is_instanceof name, name];
+check_Image = check_instance "Image";
+check_Matrix = [is_Matrix, _ "Matrix"];
+check_colour_space = [is_colour_space, "colour_space"];
+check_rectangular = [is_rectangular, _ "rectangular [[*]]"];
+check_Guide = [is_Guide, _ "HGuide or VGuide"];
+check_Colour = check_instance (_ "Colour");
+check_Mark = check_instance (_ "Mark");
+
+/* Check a set of args to a class. Two members to look at: _check_args and
+ * _check_all.
+ *
+ * - each line in _check_args is [arg, "arg name", [test_fn, "arg type"]]
+ *   same number of lines as there are args
+ *
+ *   stuff like "arg 2 must be real"
+ *
+ * - each line in _check_all is [test, "description"]
+ *   any number of lines 
+ *
+ *   stuff like "to must be greater than from"
+ *
+ * generate an error dialog with a helpful message on failure.
+ *
+ * Have as a separate function to try to keep the size of _Object down a bit.
+ */
+check_args x
+	= error message, badargs != [] || badalls != []
+ 	= check_args x.super, x.super != []
+	= x
+{
+	argcheck = x._check_args;
+	allcheck = x._check_all;
+
+	// join two strings up with a separator string
+	join_sep j a b = a ++ j ++ b;
+
+	// indent string
+	indent = "    ";
+
+	// test for a condition in a check line fails
+	test_fail x = ! x?0;
+
+	// set of failed argcheck indexes
+	badargs = map (extract 1) 
+		(filter test_fail (zip2 (map testarg argcheck) [0..]))
+	{
+		testarg x = x?2?0 x?0;
+	}
+
+	// set of failed allcheck indexes
+	badalls = map (extract 1) 
+		(filter test_fail (zip2 (map hd allcheck) [0..]));
+
+	// the error message
+	message = _ "bad arguments to " ++ "\"" ++ x.name ++ "\"\n" ++
+		argmsg ++ allmsg ++ "\n" ++
+		_ "usage" ++ "\n" ++ indent ++ usage ++ "\n" ++ _ "where" ++ "\n" ++ 
+		arg_types ++ extra;
+
+	// make the failed argcheck messages ... eg.  ""value" should be 
+	// real, you passed <function>" etc.
+	argmsg = concat (map fmt badargs)
+	{
+		fmt n = indent ++ "\"" ++ argcheck?n?1 ++ "\"" ++
+			_ " should be of type " ++ argcheck?n?2?1 ++ ", " ++
+			_ "you passed" ++ ":\n" ++ 
+			indent ++ indent ++ print argcheck?n?0 ++ "\n";
+	}
+
+	// make the failed allcheck messages ... eg "condition failed:
+	// x < y" ... don't make a message if any typechecks have 
+	// failed, as we'll probably error horribly
+	allmsg 
+		= [], badargs != []
+		= concat (map fmt badalls) ++ 
+			_ "you passed" ++ "\n" ++
+			concat (map fmt_arg argcheck)
+	{
+		fmt n = _ "condition failed" ++ ": " ++ allcheck?n?1 ++ "\n";
+		fmt_arg l = indent ++ l?1 ++ " = " ++ print l?0 ++ "\n";
+	}
+
+	// make usage note
+	usage = x.name ++ " " ++ 
+		foldr (join_sep " ") [] (map (extract 1) argcheck);
+
+	// make arg type notes
+	arg_types = foldr (join_sep "\n") [] (map fmt argcheck)
+	{
+		fmt l = indent ++ l?1 ++ " is of type " ++ l?2?1;
+	}
+
+	// extra bit at the bottom, if we have any conditions
+	extra 
+		= [], allcheck == []
+		= _ "and" ++ "\n" ++ all_desc;
+
+	// make a list of all the allcheck descriptions, with a few 
+	// spaces in front
+	all_desc_list = map (join indent @ extract 1) allcheck;
+
+	// join em up to make a set of condition notes
+	all_desc = foldr (join_sep "\n") [] all_desc_list;
+}
+
+/* Operator overloading stuff.
+ */
+
+Operator_type = class {
+	ARITHMETIC = 1;			// eg. add
+	RELATIONAL = 2;			// eg. less
+	COMPOUND = 3;			// eg. max/mean/etc.
+	COMPOUND_REWRAP = 4;	// eg. transpose
+}
+
+Operator op_name fn type symmetric = class {
+}
+
+/* Form the converse of an Operator.
+ */
+oo_converse op 
+	= Operator (converse_name op.op_name) 
+		(converse op.fn) op.type op.symmetric
+{
+	converse_name x
+		= init x, last x == last "'"
+		= x ++ "'";
+}
+
+/* Given an operator name, look up the definition.
+ */
+oo_binary_lookup op_name
+	= matches?0, matches != []
+	= error (_ "unknown binary operator" ++ ": " ++ print op_name)
+{
+	operator_table = [
+		Operator "add" add 
+			Operator_type.ARITHMETIC true,
+		Operator "subtract" subtract 
+			Operator_type.ARITHMETIC false,
+		Operator "remainder" remainder 
+			Operator_type.ARITHMETIC false,
+		Operator "power" power 
+			Operator_type.ARITHMETIC false,
+		Operator "subscript" subscript 
+			Operator_type.ARITHMETIC false,
+		Operator "left_shift" left_shift 
+			Operator_type.ARITHMETIC false,
+		Operator "right_shift" right_shift 
+			Operator_type.ARITHMETIC false,
+		Operator "divide" divide 
+			Operator_type.ARITHMETIC false,
+		Operator "join" join 
+			Operator_type.ARITHMETIC false,
+		Operator "multiply" multiply 
+			Operator_type.ARITHMETIC true,
+		Operator "logical_and" logical_and 
+			Operator_type.ARITHMETIC true,
+		Operator "logical_or" logical_or 
+			Operator_type.ARITHMETIC true,
+		Operator "bitwise_and" bitwise_and 
+			Operator_type.ARITHMETIC true,
+		Operator "bitwise_or" bitwise_or 
+			Operator_type.ARITHMETIC true,
+		Operator "eor" eor 
+			Operator_type.ARITHMETIC true,
+		Operator "comma" comma 
+			Operator_type.ARITHMETIC false,
+		Operator "if_then_else" if_then_else 
+			Operator_type.ARITHMETIC false,
+		Operator "equal" equal 
+			Operator_type.RELATIONAL true,
+		Operator "not_equal" not_equal 
+			Operator_type.RELATIONAL true,
+		Operator "less" less 
+			Operator_type.RELATIONAL false,
+		Operator "less_equal" less_equal 
+			Operator_type.RELATIONAL false
+	];
+
+	matches = filter test_name operator_table;
+	test_name x = x.op_name == op_name;
+}
+
+/* Given an operator name, look up a function that implements that
+ * operator.
+ */
+oo_unary_lookup op_name
+	= matches?0, matches != []
+	= error (_ "unknown unary operator" ++ ": " ++ print op_name)
+{
+	operator_table = [
+		/* Operators.
+		 */
+		Operator "cast_signed_char" cast_signed_char 
+		Operator_type.ARITHMETIC false,
+		Operator "cast_unsigned_char" cast_unsigned_char 
+		Operator_type.ARITHMETIC false,
+		Operator "cast_signed_short" cast_signed_short 
+		Operator_type.ARITHMETIC false,
+		Operator "cast_unsigned_short" cast_unsigned_short 
+		Operator_type.ARITHMETIC false,
+		Operator "cast_signed_int" cast_signed_int 
+		Operator_type.ARITHMETIC false,
+		Operator "cast_unsigned_int" cast_unsigned_int 
+		Operator_type.ARITHMETIC false,
+		Operator "cast_float" cast_float 
+		Operator_type.ARITHMETIC false,
+		Operator "cast_double" cast_double 
+		Operator_type.ARITHMETIC false,
+		Operator "cast_complex" cast_complex 
+		Operator_type.ARITHMETIC false,
+		Operator "cast_double_complex" cast_double_complex 
+		Operator_type.ARITHMETIC false,
+		Operator "unary_minus" unary_minus 
+		Operator_type.ARITHMETIC false,
+		Operator "negate" negate 
+		Operator_type.RELATIONAL false,
+		Operator "complement" complement 
+		Operator_type.ARITHMETIC false,
+		Operator "unary_plus" unary_plus 
+		Operator_type.ARITHMETIC false,
+
+		/* Built in projections.
+ 		 */
+		Operator "re" re Operator_type.ARITHMETIC false,
+		Operator "im" im Operator_type.ARITHMETIC false,
+		Operator "hd" hd Operator_type.ARITHMETIC false,
+		Operator "tl" tl Operator_type.ARITHMETIC false,
+
+		/* Maths builtins.
+		 */
+		Operator "sin" sin Operator_type.ARITHMETIC false,
+		Operator "cos" cos Operator_type.ARITHMETIC false,
+		Operator "tan" tan Operator_type.ARITHMETIC false,
+		Operator "asin" asin Operator_type.ARITHMETIC false,
+		Operator "acos" acos Operator_type.ARITHMETIC false,
+		Operator "atan" atan Operator_type.ARITHMETIC false,
+		Operator "log" log Operator_type.ARITHMETIC false,
+		Operator "log10" log10 Operator_type.ARITHMETIC false,
+		Operator "exp" exp Operator_type.ARITHMETIC false,
+		Operator "exp10" exp10 Operator_type.ARITHMETIC false,
+		Operator "ceil" ceil Operator_type.ARITHMETIC false,
+		Operator "floor" floor Operator_type.ARITHMETIC false
+	];
+
+	matches = filter test_name operator_table;
+	test_name x = x.op_name == op_name;
+}
+
+/* Find the matching methods in a method table.
+ */
+oo_method_lookup table = map (extract 0) (filter (extract 1) table);
+
+/* A binary op: a is a class, b may be a class ... eg. "add" a b
+
+   two obvious ways to find a method:
+
+   - a.oo_binary_search "add" (+) b
+   - b.oo_binary_search "add'" (converse (+)) a, is_class b
+
+   if these fail but op is a symmetric operator (eg. a + b == b + a), we can
+   also try reversing the args
+
+   - a.oo_binary_search "add'" (converse (+)) b
+   - b.oo_binary_search "add" (+) a, is_class b
+
+   if those fail as well, but this is ==, do pointer equals as a fallback
+
+ */
+oo_binary_function op a b
+	= matches1?0, 
+		matches1 != []
+	= matches2?0, 
+		is_class b && matches2 != []
+	= matches3?0, 
+		op.symmetric && matches3 != []
+	= matches4?0, 
+		op.symmetric && is_class b && matches4 != []
+	= pointer_equal a b,
+		op.op_name == "equal" || op.op_name == "equal'"
+	= not_pointer_equal a b,
+		op.op_name == "not_equal" || op.op_name == "not_equal'"
+	= error (_ "No method found for binary operator." ++ "\n" ++
+		_ "left" ++ " = " ++ print a ++ "\n" ++
+		_ "operator" ++ " = " ++ op.op_name ++ "\n" ++
+		_ "right" ++ " = " ++ print b)
+{
+	matches1 = oo_method_lookup (a.oo_binary_table op b);
+	matches2 = oo_method_lookup (b.oo_binary_table (oo_converse op) a);
+	matches3 = oo_method_lookup (a.oo_binary_table (oo_converse op) b);
+	matches4 = oo_method_lookup (b.oo_binary_table op a);
+}
+
+/* A binary op: a is not a class, b is a class ... eg. "subtract" a b
+
+   only one way to find a method:
+
+   - b.oo_binary_search "subtract'" (converse (-)) a
+
+   if this fails but op is a symmetric operator (eg. a + b == b + a), we can
+   try reversing the args
+
+   - b.oo_binary_search "add" (+) a, is_class b
+
+   if that fails as well, but this is ==, do pointer equals as a fallback
+
+ */
+oo_binary'_function op a b
+	= matches1?0, matches1 != []
+	= matches2?0, op.symmetric && matches2 != []
+	= pointer_equal a b,
+		op.op_name == "equal" || op.op_name == "equal'"
+	= not_pointer_equal a b,
+		op.op_name == "not_equal" || op.op_name == "not_equal'"
+	= error (_ "No method found for binary operator." ++ "\n" ++
+		_ "left" ++ " = " ++ print a ++ "\n" ++
+		_ "operator" ++ " = " ++ op.op_name ++ "\n" ++
+		_ "right" ++ " = " ++ print b)
+{
+	matches1 = oo_method_lookup (b.oo_binary_table (oo_converse op) a);
+	matches2 = oo_method_lookup (b.oo_binary_table op a);
+}
+
+oo_unary_function op x
+	= matches?0, matches != []
+	= error (_ "No method found for unary operator." ++ "\n" ++ 
+		_ "operator" ++ " = " ++ op.op_name ++ "\n" ++
+		_ "argument" ++ " = " ++ print x)
+{
+	matches = oo_method_lookup (x.oo_unary_table op);
+}
+
+/* Base class for nip's built-in classes ... base check function, base
+ * operator overload functions.
+ */
+_Object = class {
+	check = check_args this;
+
+	_check_args = [];
+	_check_all = [];
+
+	/* Operator overloading stuff.
+	 */
+	oo_binary op x = oo_binary_function (oo_binary_lookup op) this x;
+	oo_binary' op x = oo_binary'_function (oo_binary_lookup op) x this;
+	oo_unary op = oo_unary_function (oo_unary_lookup op) this;
+
+	oo_binary_table op x = [];
+	oo_unary_table op = [];
+}

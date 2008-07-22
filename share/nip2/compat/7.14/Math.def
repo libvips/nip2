@@ -1,0 +1,553 @@
+Math_arithmetic_item = class 
+	Menupullright "_Arithmetic" "basic arithmetic for objects" {
+	Add_item = class
+		Menuaction "_Add" "add a and b" {
+		action a b = map_binary add a b;
+	}
+
+	Subtract_item = class
+		Menuaction "_Subtract" "subtract b from a" {
+		action a b = map_binary subtract a b;
+	}
+
+	Multiply_item = class
+		Menuaction "_Multiply" "multiply a by b" {
+		action a b = map_binary multiply a b;
+	}
+
+	Divide_item = class
+		Menuaction "_Divide" "divide a by b" {
+		action a b = map_binary divide a b;
+	}
+
+	Remainder_item = class
+		Menuaction "_Remainder" 
+			"remainder after integer division of a by b" {
+		action a b = map_binary remainder a b;
+	}
+
+	sep1 = Menuseparator;
+
+	Absolute_value_item = class
+		Menuaction "A_bsolute Value" "absolute value of x" {
+		action x = map_unary abs x;
+	}
+
+	Absolute_value_vector_item = class
+		Menuaction "Absolute Value _Vector" 
+			"like Absolute Value, but treat pixels as vectors" {
+		action x = map_unary abs_vec x;
+	}
+
+	Sign_item = class
+		Menuaction "S_ign" "unit vector" {
+		action x = map_unary sign x;
+	}
+
+	Negate_item = class
+		Menuaction "_Negate" "multiply by -1" {
+		action x = map_unary unary_minus x;
+	}
+}
+
+Math_trig_item = class 
+	Menupullright "_Trigonometry" "trigonometry operations (all in degrees)" {
+	Sin_item = class
+		Menuaction "_Sine" "calculate sine x" {
+		action x = map_unary sin x;
+	}
+
+	Cos_item = class
+		Menuaction "_Cosine" "calculate cosine x" {
+		action x = map_unary cos x;
+	}
+
+	Tan_item = class
+		Menuaction "_Tangent" "calculate tangent x" {
+		action x = map_unary tan x;
+	}
+
+	sep1 = Menuseparator;
+
+	Asin_item = class
+		Menuaction "Arc S_ine" "calculate arc sine x" {
+		action x = map_unary asin x;
+	}
+
+	Acos_item = class
+		Menuaction "Arc C_osine" "calculate arc cosine x" {
+		action x = map_unary acos x;
+	}
+
+	Atan_item = class
+		Menuaction "Arc T_angent" "calculate arc tangent x" {
+		action x = map_unary atan x;
+	}
+
+	sep2 = Menuseparator;
+
+	Rad_item = class
+		Menuaction "_Degrees to Radians" "convert degrees to radians" {
+		action x = map_unary rad x;
+	}
+
+	Deg_item = class
+		Menuaction "_Radians to Degrees" "convert radians to degrees" {
+		action x = map_unary deg x;
+	}
+
+	sep3 = Menuseparator;
+
+	Angle_range_item = class
+		Menuaction "Angle i_n Range" 
+			"is angle within t degrees of r, mod 360" {
+		action t r angle
+		      =	clock (max - angle) < 2*r
+		{
+			max = clock (t + r);
+
+			clock a 
+			      =	a + 360, a < 0;
+			      =	a - 360, a >= 360;
+			      = a;
+		}
+	}
+}
+
+Math_log_item = class 
+	Menupullright "_Log" "logarithms and anti-logs" {
+	Exponential_item = class
+		Menuaction "_Exponential" "calculate e ** x" {
+		action x = map_unary (power e) x;
+	}
+
+	Log_natural_item = class
+		Menuaction "Natural _Log" "log base e of x" {
+		action x = map_unary log x;
+	}
+
+	sep1 = Menuseparator;
+
+	Exponential10_item = class
+		Menuaction "E_xponential base 10" "calculate 10 ** x" {
+		action x = map_unary (power 10) x;
+	}
+
+	Log10_item = class
+		Menuaction "L_og Base 10" "log base 10 of x" {
+		action x = map_unary log10 x;
+	}
+
+	sep2 = Menuseparator;
+
+	Raise_to_power_item = class
+		Menuaction "_Raise to Power" "calculate x ** y" {
+		action x y = map_binary power x y;
+	}
+}
+
+Math_complex_item = class 
+	Menupullright "_Complex" "operations on complex numbers and images" {
+	Complex_extract = class 
+		Menupullright "_Extract" "extract fields from complex" {
+		Real_item = class 
+			Menuaction "_Real" 
+				"extract real part of complex" {
+			action in = map_unary re in;
+		}
+
+		Imaginary_item = class 
+			Menuaction "_Imaginary" 
+				"extract imaginary part of complex" {
+			action in = map_unary im in;
+		}
+	}
+
+	Complex_build_item = class 
+		Menuaction "_Build" "join a and b to make a complex" {
+		action a b = map_binary comma a b;
+	}
+
+	sep1 = Menuseparator;
+
+	Polar_item = class 
+		Menuaction "_Polar" 
+			"convert real and imag to amplitude and phase" {
+		action a = map_unary polar a;
+	}
+
+	Rectangular_item = class 
+		Menuaction "_Rectagular" 
+			("convert (amplitude, phase) image to rectangular " ++
+			"coordinates") {
+		action x = map_unary rectangular x;
+	}
+
+	sep2 = Menuseparator;
+
+	Conjugate_item = class 
+		Menuaction "_Conjugate" "invert imaginary part" {
+		action x = map_unary conj x;
+	}
+}
+
+Math_boolean_item = class 
+	Menupullright "_Boolean" "bitwise boolean operations for integer objects" {
+	And_item = class 
+		Menuaction "_And" "bitwise and of a and b" {
+		action a b = map_binary bitwise_and a b;
+	}
+
+	Or_item = class 
+		Menuaction "_Or" "bitwise or of a and b" {
+		action a b = map_binary bitwise_or a b;
+	}
+
+	Eor_item = class 
+		Menuaction "E_xclusive Or" "bitwise exclusive or of a and b" {
+		action a b = map_binary eor a b;
+	}
+
+	Not_item = class 
+		Menuaction "_Not" "invert a" {
+		action a = map_unary not a;
+	}
+
+	sep1 = Menuseparator;
+
+	Right_shift_item = class 
+		Menuaction "Shift _Right" "shift a right by b bits" {
+		action a b = map_binary right_shift a b;
+	}
+
+	Left_shift_item = class 
+		Menuaction "Shift _Left" "shift a left by b bits" {
+		action a b = map_binary left_shift a b;
+	}
+
+	sep2 = Menuseparator;
+
+	If_then_else_item = class 
+		Menuaction "_If Then Else" 
+			"b where a is non-zero, c elsewhere" {
+		action a b c 
+			= map_trinary ite a b c
+		{
+			// can't use if_then_else, we need a true trinary
+			ite a b c = if a then b else c;
+		}
+	}
+
+	Band_or_item = class 
+		Menuaction "Band O_r" "or the bands of an image together" {
+		action im = map_unary (foldr1 bitwise_or @ bandsplit) im;
+	}
+
+	Band_and_item = class 
+		Menuaction "Band A_nd" "and the bands of an image together" {
+		action im = map_unary (foldr1 bitwise_and @ bandsplit) im;
+	}
+}
+
+Math_relational_item = class 
+	Menupullright "R_elational" "comparison operations" {
+	Equal_item = class 
+		Menuaction "_Equal to" "test a equal to b" {
+		action a b = map_binary equal a b;
+	}
+
+	Not_equal_item = class 
+		Menuaction "_Not Equal to" "test a not equal to b" {
+		action a b = map_binary not_equal a b;
+	}
+
+	sep1 = Menuseparator;
+
+	More_item = class 
+		Menuaction "_More Than" "test a strictly greater than b" {
+		action a b = map_binary more a b;
+	}
+
+	Less_item = class 
+		Menuaction "_Less Than" "test a strictly less than b" {
+		action a b = map_binary less a b;
+	}
+
+	sep2 = Menuseparator;
+
+	More_equal_item = class 
+		Menuaction "M_ore Than or Equal to" 
+			"test a greater than or equal to b" {
+		action a b = map_binary more_equal a b;
+	}
+
+	Less_equal_item = class 
+		Menuaction "L_ess Than or Equal to" 
+			"test a less than or equal to b" {
+		action a b = map_binary less_equal a b;
+	}
+}
+
+Math_list_item = class 
+	Menupullright "L_ist" "operations on lists" {
+	Head_item = class 
+		Menuaction "_Head" "first element in list" {
+		action x = map_unary hd x;
+	}
+
+	Tail_item = class 
+		Menuaction "_Tail" "list without the first element" {
+		action x = map_unary tl x;
+	}
+
+	Last_item = class 
+		Menuaction "_Last" "last element in list" {
+		action x = map_unary last x;
+	}
+
+	Init_item = class 
+		Menuaction "_Init" "list without the last element" {
+		action x = map_unary init x;
+	}
+
+	sep1 = Menuseparator;
+
+	Reverse_item = class 
+		Menuaction "_Reverse" "reverse order of elements in list" {
+		action x = map_unary reverse x;
+	}
+
+	Sort_item = class 
+		Menuaction "_Sort" "sort list into ascending order" {
+		action x = map_unary sort x;
+	}
+
+	Make_set_item = class 
+		Menuaction "_Make Set" "remove duplicates from list" {
+		action x = map_unary mkset equal x;
+	}
+
+	Transpose_list_item = class 
+		Menuaction "Tr_anspose" 
+			"exchange rows and columns in a list of lists" {
+		action x = map_unary transpose x;
+	}
+
+	Concat_item = class 
+		Menuaction "_Concat" 
+			"flatten a list of lists into a single list" {
+		action l = map_unary concat l;
+	}
+
+	sep2 = Menuseparator;
+
+	Length_item = class 
+		Menuaction "L_ength" "find the length of list" {
+		action x = map_unary len x;
+	}
+
+	Subscript_item = class 
+		Menuaction "S_ubscript" 
+			"return element n from list (index from zero)" {
+		action n x = map_binary subscript n x;
+	}
+
+	Take_item = class 
+		Menuaction "_Take" "take the first n elements of list x" {
+		action n x = map_binary take n x;
+	}
+
+	Drop_item = class 
+		Menuaction "_Drop" "drop the first n elements of list x" {
+		action n x = map_binary drop n x;
+	}
+
+	sep3 = Menuseparator;
+
+	Join_item = class 
+		Menuaction "_Join" "join two lists end to end" {
+		action a b = map_binary join a b;
+	}
+
+	Cons_item = class 
+		Menuaction "C_ons" "put element a on the front of list x" {
+		action a x = map_binary cons a x;
+	}
+
+	Zip_item = class 
+		Menuaction "_Zip" "join two lists, pairwise" {
+		action a b = map_binary zip2 a b;
+	}
+}
+
+Math_round_item = class 
+	Menupullright "_Round" "various rounding operations" {
+	/* smallest integral value not less than x 
+	 */
+	Ceil_item = class 
+		Menuaction "_Ceil" "smallest integral value not less than x" {
+		action x = map_unary ceil x;
+	}
+
+	Floor_item = class 
+		Menuaction "_Floor" 
+			"largest integral value not greater than x" {
+		action x = map_unary floor x;
+	}
+
+	Rint_item = class 
+		Menuaction "_Round to Nearest" "round to nearest integer" {
+		action x = map_unary rint x;
+	}
+}
+
+Math_fourier_item = class 
+	Menupullright "_Fourier" "Fourier transform" {
+	Forward_item = class 
+		Menuaction "_Forward" "fourier transform of image" {
+		action a = map_unary (rotquad @ fwfft) a;
+	}
+
+	Reverse_item = class 
+		Menuaction "_Reverse" "inverse fourier transform of image" {
+		action a = map_unary (invfft @ rotquad) a;
+	}
+
+	Rotate_quadrants_item = class 
+		Menuaction "Rotate _Quadrants" "rotate quadrants" {
+		action a = map_unary rotquad a;
+	}
+}
+
+Math_stats_item = class 
+	Menupullright "_Statistics" "measure various statistics of objects" {
+	Mean_item = class 
+		Menuaction "_Mean" "arithmetic mean value" {
+		action a = map_unary mean a;
+	}
+
+	Gmean_item = class 
+		Menuaction "_Geometric Mean" "geometric mean value" {
+		action a = map_unary meang a;
+	}
+
+	Zmean_item = class 
+		Menuaction "_Zero-excluding Mean" "mean value of non-zero elements" {
+		action a = map_unary meanze a;
+	}
+
+	Deviation_item = class 
+		Menuaction "_Standard Deviation" "standard deviation of object" {
+		action a = map_unary deviation a;
+	}
+
+	Zdeviation_item = class 
+		Menuaction "Z_ero-excluding Standard Deviation" 
+			"standard deviation of non-zero elements" {
+		action a = map_unary deviationze a;
+	}
+
+	Stats_item = class 
+		Menuaction "Ma_ny Stats" "calculate many stats in a single pass" {
+		action a = map_unary stats a;
+	}
+
+	sep1 = Menuseparator;
+
+	Max_item = class 
+		Menuaction "M_aximum" "maximum of object" {
+		action a = map_unary max a;
+	}
+
+	Min_item = class 
+		Menuaction "M_inimum" "minimum of object" {
+		action a = map_unary min a;
+	}
+
+	Maxpos_item = class 
+		Menuaction "_Position of Maximum" "position of maximum in object" {
+		action a = map_unary maxpos a;
+	}
+
+	Minpos_item = class 
+		Menuaction "P_osition of Minimum" "position of minimum in object" {
+		action a = map_unary minpos a;
+	}
+
+	Gravity_item = class 
+		Menuaction "Centre of _Gravity" "position of centre of gravity" {
+		action a = map_unary gravity a;
+	}
+
+	sep2 = Menuseparator;
+
+	Count_set_item = class 
+		Menuaction "_Non-zeros" "number of non-zero elements in object" {
+		action a 
+			= map_unary cset a
+		{
+			cset i = (mean (i != 0) * i.width * i.height) / 255;
+		}
+	}
+
+	Count_clear_item = class 
+		Menuaction "_Zeros" "number of zero elements in object" {
+		action a 
+			= map_unary cclear a
+		{
+			cclear i = (mean (i == 0) * i.width * i.height) / 255;
+		}
+	}
+
+	Count_edges_item = class 
+		Menuaction "_Edges" 
+			"count average edges across or down image" {
+		action x = class  
+			_result {
+			_vislevel = 3;
+	
+			edge = Option "Count" [
+				"Horizontal lines", 
+				"Vertical lines"
+			] 0;
+	
+			_result
+				= map_unary process x
+			{
+				process image = Number (edge.labels?edge) 
+					(im_cntlines image.value edge.value);
+			}
+		}
+	}
+
+	sep3 = Menuseparator;
+
+	Linear_regression_item = class
+		Menuaction "_Linear Regression" "fit a line to a set of points" {
+		action xes yes = linreg xes yes;
+	}
+
+	Weighted_linear_regression_item = class
+		Menuaction "_Weighted Linear Regression" 
+			"fit a line to a set of points and deviations" {
+		action xes yes devs = linregw xes yes devs;
+	}
+}
+
+Math_base_item = class 
+	Menupullright "Bas_e" "convert number bases" {
+	Hexadecimal_item = class 
+		Menuaction "_Hexadecimal" "convert to hexadecimal (base 16)" {
+		action a = map_unary (print_base 16) a;
+	}
+
+	Binary_item = class 
+		Menuaction "_Binary" "convert to binary (base 2)" {
+		action a = map_unary (print_base 2) a;
+	}
+
+	Octal_item = class 
+		Menuaction "_Octal" "convert to octal (base 8)" {
+		action a = map_unary (print_base 8) a;
+	}
+}

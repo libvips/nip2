@@ -35,6 +35,8 @@ started 7.15.0
 - join_lr/_tb args swapped 
 - check_args now does not recurse up a class, instead all _check members have 
   to chain up ... much quicker
+- watch "invalidate" in vips_call.c cache ... so paint actions now decache
+  results
 
 started 7.14.0
 - updated docs

@@ -75,7 +75,7 @@ typedef struct _VipsInfo {
 	int ninii;			
 	Imageinfo *inii[MAX_VIPS_ARGS];	
 	unsigned int inii_destroy_sid[MAX_VIPS_ARGS];
-	unsigned int inii_paint_sid[MAX_VIPS_ARGS];
+	unsigned int inii_invalidate_sid[MAX_VIPS_ARGS];
 
 	/* Output images. 
 	 */
@@ -697,17 +697,14 @@ vips_destroy( VipsInfo *vi )
 	vips_info_all = g_slist_remove( vips_info_all, vi );
 #endif /*DEBUG_LEAK*/
 
-	/* Break "destroy" links to iis.
+	/* Remove signals.
 	 */
-	for( i = 0; i < vi->ninii; i++ ) 
-		FREESID( vi->inii_destroy_sid[i], vi->inii[i] ); 
 	for( i = 0; i < vi->noutii; i++ ) 
 		FREESID( vi->outii_destroy_sid[i], vi->outii[i] ); 
-
-	/* Break paint links.
-	 */
-	for( i = 0; i < vi->ninii; i++ ) 
-		FREESID( vi->inii_paint_sid[i], vi->inii[i] ); 
+	for( i = 0; i < vi->ninii; i++ ) {
+		FREESID( vi->inii_destroy_sid[i], vi->inii[i] ); 
+		FREESID( vi->inii_invalidate_sid[i], vi->inii[i] ); 
+	}
 
 	/* Free any VIPS args we built and haven't used.
 	 */
@@ -811,12 +808,12 @@ vips_history_destroy_cb( Imageinfo *ii, VipsInfo *vi )
 }
 
 static void
-vips_history_painted_cb( Imageinfo *ii, Rect *dirty, VipsInfo *vi )
+vips_history_invalidate_cb( Imageinfo *ii, VipsInfo *vi )
 {
 #ifdef DEBUG_HISTORY
-	printf( "vips_history_painted_cb: "
-		"on paint of ii, uncaching \"%s\"\n", vi->name );
 #endif /*DEBUG_HISTORY*/
+	printf( "vips_history_invalidate_cb: "
+		"on invalidate of ii, uncaching \"%s\"\n", vi->name );
 
 	vips_destroy( vi );
 }
@@ -848,10 +845,11 @@ vips_history_add( VipsInfo *vi )
 
 	/* If any of our input ii are painted on, we must also uncache.
 	 */
-	for( i = 0; i < vi->ninii; i++ )
-		vi->inii_paint_sid[i] = g_signal_connect( vi->inii[i], 
-			"area_painted", 
-			G_CALLBACK( vips_history_painted_cb ), vi );
+	for( i = 0; i < vi->ninii; i++ ) {
+		vi->inii_invalidate_sid[i] = g_signal_connect( vi->inii[i], 
+			"invalidate", 
+			G_CALLBACK( vips_history_invalidate_cb ), vi );
+	}
 
 	/* History too big? Flush!
 	 */
@@ -1158,7 +1156,7 @@ vips_new( Reduce *rc, im_function *fn )
 	for( i = 0; i < MAX_VIPS_ARGS; i++ ) {
 		vi->outii_destroy_sid[i] = 0;
 		vi->inii_destroy_sid[i] = 0;
-		vi->inii_paint_sid[i] = 0;
+		vi->inii_invalidate_sid[i] = 0;
 	}
 
 	/* Make the call spine, alloc memory. 

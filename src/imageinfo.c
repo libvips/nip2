@@ -246,6 +246,7 @@ enum {
 	SIG_AREA_PAINTED,	/* Area of image has been painted */
 	SIG_UNDO_CHANGED,	/* Undo/redo state has changed */
 	SIG_FILE_CHANGED,	/* Underlying file seems to have changed */
+	SIG_INVALIDATE,		/* IMAGE* has been invalidated */
 	SIG_LAST
 };
 
@@ -322,6 +323,22 @@ imageinfo_file_changed( Imageinfo *imageinfo )
 
 	g_signal_emit( G_OBJECT( imageinfo ), 
 		imageinfo_signals[SIG_FILE_CHANGED], 0 );
+
+	return( NULL );
+}
+
+static void *
+imageinfo_invalidate( Imageinfo *imageinfo )
+{
+	assert( IS_IMAGEINFO( imageinfo ) );
+
+#ifdef DEBUG_CHECK
+	printf( "imageinfo_invalidate:" );
+	imageinfo_print( imageinfo );
+#endif /*DEBUG_CHECK*/
+
+	g_signal_emit( G_OBJECT( imageinfo ), 
+		imageinfo_signals[SIG_INVALIDATE], 0 );
 
 	return( NULL );
 }
@@ -529,6 +546,11 @@ imageinfo_real_file_changed( Imageinfo *imageinfo )
 }
 
 static void
+imageinfo_real_invalidate( Imageinfo *imageinfo )
+{
+}
+
+static void
 imageinfo_class_init( ImageinfoClass *class )
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
@@ -550,6 +572,7 @@ imageinfo_class_init( ImageinfoClass *class )
 	class->area_painted = imageinfo_real_area_painted;
 	class->undo_changed = imageinfo_real_undo_changed;
 	class->file_changed = imageinfo_real_file_changed;
+	class->invalidate = imageinfo_real_invalidate;
 
 	/* Create signals.
 	 */
@@ -557,14 +580,6 @@ imageinfo_class_init( ImageinfoClass *class )
 		G_OBJECT_CLASS_TYPE( gobject_class ),
 		G_SIGNAL_RUN_FIRST,
 		G_STRUCT_OFFSET( ImageinfoClass, area_changed ),
-		NULL, NULL,
-		g_cclosure_marshal_VOID__POINTER,
-		G_TYPE_NONE, 1,
-		G_TYPE_POINTER );
-	imageinfo_signals[SIG_AREA_PAINTED] = g_signal_new( "area_painted",
-		G_OBJECT_CLASS_TYPE( gobject_class ),
-		G_SIGNAL_RUN_FIRST,
-		G_STRUCT_OFFSET( ImageinfoClass, area_painted ),
 		NULL, NULL,
 		g_cclosure_marshal_VOID__POINTER,
 		G_TYPE_NONE, 1,
@@ -580,6 +595,13 @@ imageinfo_class_init( ImageinfoClass *class )
 		G_OBJECT_CLASS_TYPE( gobject_class ),
 		G_SIGNAL_RUN_FIRST,
 		G_STRUCT_OFFSET( ImageinfoClass, file_changed ),
+		NULL, NULL,
+		g_cclosure_marshal_VOID__VOID,
+		G_TYPE_NONE, 0 );
+	imageinfo_signals[SIG_INVALIDATE] = g_signal_new( "invalidate",
+		G_OBJECT_CLASS_TYPE( gobject_class ),
+		G_SIGNAL_RUN_FIRST,
+		G_STRUCT_OFFSET( ImageinfoClass, invalidate ),
 		NULL, NULL,
 		g_cclosure_marshal_VOID__VOID,
 		G_TYPE_NONE, 0 );
@@ -639,7 +661,7 @@ imageinfo_get_type( void )
 }
 
 static int
-imageinfo_progress_eval( ImageinfoIMAGE *proxy )
+imageinfo_proxy_eval( Imageinfoproxy *proxy )
 {
 	Imageinfo *imageinfo = proxy->imageinfo;
 
@@ -655,7 +677,18 @@ imageinfo_progress_eval( ImageinfoIMAGE *proxy )
 }
 
 static int
-imageinfo_progress_close( ImageinfoIMAGE *proxy )
+imageinfo_proxy_invalidate( Imageinfoproxy *proxy )
+{
+	Imageinfo *imageinfo = proxy->imageinfo;
+
+	if( imageinfo ) 
+		imageinfo_invalidate( imageinfo );
+
+	return( 0 );
+}
+
+static int
+imageinfo_proxy_close( Imageinfoproxy *proxy )
 {
 	Imageinfo *imageinfo = proxy->imageinfo;
 
@@ -667,10 +700,10 @@ imageinfo_progress_close( ImageinfoIMAGE *proxy )
 	return( 0 );
 }
 
-/* Add progress stuff for image evaluation.
+/* Add a proxy to track IMAGE events.
  */
 static void
-imageinfo_progress_add( Imageinfo *imageinfo )
+imageinfo_proxy_add( Imageinfo *imageinfo )
 {
 	/* Only if we're running interactively.
 	 */
@@ -686,19 +719,21 @@ imageinfo_progress_add( Imageinfo *imageinfo )
         /* Need a proxy on IMAGE.
          */ 
 	g_assert( !imageinfo->proxy );
-	if( !(imageinfo->proxy = IM_NEW( imageinfo->im, ImageinfoIMAGE )) )
+	if( !(imageinfo->proxy = IM_NEW( imageinfo->im, Imageinfoproxy )) )
 		return;
 	imageinfo->proxy->im = imageinfo->im;
 	imageinfo->proxy->imageinfo = imageinfo;
 
 	(void) im_add_eval_callback( imageinfo->im, 
-		(im_callback_fn) imageinfo_progress_eval, 
+		(im_callback_fn) imageinfo_proxy_eval, 
 		imageinfo->proxy, NULL );
 
-	/* On close, remove everything.
-	 */
+	(void) im_add_invalidate_callback( imageinfo->im, 
+		(im_callback_fn) imageinfo_proxy_invalidate, 
+		imageinfo->proxy, NULL );
+
 	(void) im_add_close_callback( imageinfo->im, 
-		(im_callback_fn) imageinfo_progress_close, 
+		(im_callback_fn) imageinfo_proxy_close, 
 		imageinfo->proxy, NULL );
 }
 
@@ -736,7 +771,7 @@ imageinfo_new( Imageinfogroup *imageinfogroup,
 
 	icontainer_child_add( ICONTAINER( imageinfogroup ),
 		ICONTAINER( imageinfo ), -1 );
-	imageinfo_progress_add( imageinfo );
+	imageinfo_proxy_add( imageinfo );
 
 	return( imageinfo );
 }
@@ -986,7 +1021,7 @@ imageinfo_open_image_input( const char *filename, ImageinfoOpen *open )
 	/* The rewind will have removed everything from the IMAGE. Reattach
 	 * progress.
 	 */
-	imageinfo_progress_add( imageinfo );
+	imageinfo_proxy_add( imageinfo );
 
 	/* Attach the original filename ... pick this up again later as a
 	 * save default.
@@ -1276,7 +1311,6 @@ imageinfo_write( Imageinfo *imageinfo, GtkWidget *parent, const char *filename )
 	if( !(out = imageinfo_new_output( imageinfogroup, heap, filename )) ) 
 		return( FALSE );
 	managed_sub_add( MANAGED( out ), MANAGED( imageinfo ) );
-	imageinfo_progress_add( out );
 
 	if( imageinfo_write_im( out, in ) ) {
 		MANAGED_UNREF( out );

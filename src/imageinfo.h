@@ -104,10 +104,10 @@ typedef struct _Undobuffer {
  * the IMAGE and gets zapped by the imageinfo on dispose. This lets us spot
  * IMAGE events after the holding Imageinfo has gone.
  */
-typedef struct _ImageinfoIMAGE {
+typedef struct _Imageinfoproxy {
 	IMAGE *im;
 	Imageinfo *imageinfo;
-} ImageinfoIMAGE;
+} Imageinfoproxy;
 
 /* A VIPS image wrapped up nicely.
  */
@@ -118,7 +118,7 @@ struct _Imageinfo {
 	IMAGE *mapped_im;	/* Cache image mapped-thru-lut here */
 	IMAGE *identity_lut;	/* For base images, keep an id lut if poss */
 	Imageinfo *underlying;	/* If we're a LUT, the image we are a LUT of */
-	ImageinfoIMAGE *proxy;	/* Proxy for IMAGE callbacks */
+	Imageinfoproxy *proxy;	/* Proxy for IMAGE callbacks */
 
 	gboolean dfile;		/* delete_file on final close */
 
@@ -172,6 +172,10 @@ typedef struct _ImageinfoClass {
 	 * reload.
 	 */
 	void (*file_changed)( Imageinfo * );
+
+	/* One of the IMAGE* we manage has signaled "invalidate".
+	 */
+	void (*invalidate)( Imageinfo * );
 } ImageinfoClass;
 
 void *imageinfo_area_changed( Imageinfo *imageinfo, Rect *dirty );

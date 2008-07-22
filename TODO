@@ -1,9 +1,10 @@
-- connect to invalidate signal and remove from vips_call cache
+- test new remove from cache on invalidate logic
 
-- Imageinfo "area_painted" must trigger im_invalidate() to knock thngs out of
-  the cache ... does it do this?
+- "usage" message from check_all isn't really usage, it's the set of
+  paramaters that this class hierarchy needs and is not related to the args to
+  the top-level constructor
 
-- should inplace ops trigger im_invalidate() automatically?
+  reword to reduce confusion
 
 - add cluster code from /gel
 

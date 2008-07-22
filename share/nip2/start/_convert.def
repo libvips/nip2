@@ -623,11 +623,7 @@ path_separator = expand "$SEP";
  * 	path_relative ["home", "john"] == "home/john"
  * 	path_relative [] == ""
  */
-path_relative l
-	= foldl1 fn l
-{
-	fn a b = a ++ path_separator ++ b;
-}
+path_relative l = join_sep path_separator l;
 
 /* Form an absolute pathname. 
  * 	path_absolute ["home", "john"] == "/home/john"

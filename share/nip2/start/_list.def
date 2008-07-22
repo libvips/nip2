@@ -131,6 +131,17 @@ init l
  */
 iterate f x = x : iterate f (f x);
 
+/* join_sep sep l: join a list with a separator
+ *
+ * join_sep ", " (map print [1 .. 4]) == "1, 2, 3, 4"
+ * join_sep :: [*] -> [[*]] -> [*]
+ */
+join_sep sep l
+	= foldl1 fn l
+{
+	fn a b = a ++ sep ++ b;
+}
+
 /* last l: return the last element of list l
  *
  * The dual of hd. last [1,2,3] == 3

@@ -1033,7 +1033,7 @@ join_lr a b
 			is_matrix a && is_matrix b 
 		= error (_ "bad arguments to " ++ "join_lr");
 
-	join_im a b	= insert (get_width b) 0 a b;
+	join_im a b	= insert (get_width a) 0 b a;
 }
 
 join_tb a b
@@ -1050,7 +1050,7 @@ join_tb a b
 			is_matrix a && is_matrix b 
 		= error (_ "bad arguments to " ++ "join_tb");
 
-	join_im a b	= insert 0 (get_height b) a b;
+	join_im a b	= insert 0 (get_height a) b a;
 }
 
 conj x

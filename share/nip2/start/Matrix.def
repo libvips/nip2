@@ -178,7 +178,7 @@ Matrix_insert_item = class
 				= map_unary process x
 			{
 				process x
-					= foldl1 (converse join_tb) (concat [top, new, bottom])
+					= foldl1 join_tb (concat [top, new, bottom])
 				{
 					top 
 						= [extract_area 0 0 w f x], f > 0
@@ -211,7 +211,7 @@ Matrix_insert_item = class
 				= map_unary process x
 			{
 				process x
-					= foldl1 (converse join_lr) (concat [left, new, right])
+					= foldl1 join_lr (concat [left, new, right])
 				{
 					left 
 						= [extract_area 0 0 f h x], f > 0
@@ -251,7 +251,7 @@ Matrix_delete_item = class
 				= map_unary process x
 			{
 				process x
-					= foldl1 (converse join_tb) (concat [top, bottom])
+					= foldl1 join_tb (concat [top, bottom])
 				{
 					top 
 						= [extract_area 0 0 w f x], f > 0
@@ -283,7 +283,7 @@ Matrix_delete_item = class
 				= map_unary process x
 			{
 				process x
-					= foldl1 (converse join_lr) (concat [left, right])
+					= foldl1 join_lr (concat [left, right])
 				{
 					left 
 						= [extract_area 0 0 f h x], f > 0
@@ -355,7 +355,7 @@ Matrix_plot_scatter_item = class
 		_result {
 		_check_args = [
 			[x, "x", check_Matrix]
-		];
+		] ++ super._check_args;
 		_vislevel = 3;
 
 		auto = Toggle "Auto Range" true;
@@ -398,7 +398,7 @@ Matrix_buildlut_item = class
 		_result {
 		_check_args = [
 			[x, "x", check_Matrix]
-		];
+		] ++ super._check_args;
 		_result = buildlut x;
 	}
 }

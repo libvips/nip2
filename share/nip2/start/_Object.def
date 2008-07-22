@@ -14,15 +14,16 @@ check_int = [is_int, _ "integer"];
 check_uint = [is_uint, _ "unsigned integer"];
 check_pint = [is_pint, _ "positive integer"];
 check_matrix = [is_matrix, _ "rectangular array of real"];
-check_matrix_display = [Matrix_display.is_display, _ "0, 1, 2 or 3"];
+check_matrix_display = [Matrix_display.is_display, _ "0|1|2|3"];
 check_image = [is_image, _ "image"];
 check_xy_list = [is_xy_list, _ "list of form [[1, 2], [3, 4], [5, 6], ...]"];
 check_instance name = [is_instanceof name, name];
 check_Image = check_instance "Image";
 check_Matrix = [is_Matrix, _ "Matrix"];
-check_colour_space = [is_colour_space, "colour_space"];
+check_colour_space = [is_colour_space, 
+	join_sep "|" Image_type.colour_spaces.names];
 check_rectangular = [is_rectangular, _ "rectangular [[*]]"];
-check_Guide = [is_Guide, _ "HGuide or VGuide"];
+check_Guide = [is_Guide, _ "HGuide|VGuide"];
 check_Colour = check_instance (_ "Colour");
 check_Mark = check_instance (_ "Mark");
 
@@ -45,14 +46,10 @@ check_Mark = check_instance (_ "Mark");
  */
 check_args x
 	= error message, badargs != [] || badalls != []
- 	= check_args x.super, x.super != []
 	= x
 {
 	argcheck = x._check_args;
 	allcheck = x._check_all;
-
-	// join two strings up with a separator string
-	join_sep j a b = a ++ j ++ b;
 
 	// indent string
 	indent = "    ";
@@ -101,11 +98,10 @@ check_args x
 	}
 
 	// make usage note
-	usage = x.name ++ " " ++ 
-		foldr (join_sep " ") [] (map (extract 1) argcheck);
+	usage = x.name ++ " " ++ join_sep " " (map (extract 1) argcheck);
 
 	// make arg type notes
-	arg_types = foldr (join_sep "\n") [] (map fmt argcheck)
+	arg_types = join_sep "\n" (map fmt argcheck)
 	{
 		fmt l = indent ++ l?1 ++ " is of type " ++ l?2?1;
 	}
@@ -113,14 +109,14 @@ check_args x
 	// extra bit at the bottom, if we have any conditions
 	extra 
 		= [], allcheck == []
-		= _ "and" ++ "\n" ++ all_desc;
+		= "\n" ++ _ "and" ++ "\n" ++ all_desc;
 
 	// make a list of all the allcheck descriptions, with a few 
 	// spaces in front
 	all_desc_list = map (join indent @ extract 1) allcheck;
 
 	// join em up to make a set of condition notes
-	all_desc = foldr (join_sep "\n") [] all_desc_list;
+	all_desc = join_sep "\n" all_desc_list;
 }
 
 /* Operator overloading stuff.
@@ -357,6 +353,7 @@ oo_unary_function op x
 _Object = class {
 	check = check_args this;
 
+	// these should always be defined
 	_check_args = [];
 	_check_all = [];
 

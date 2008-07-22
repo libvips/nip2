@@ -232,7 +232,7 @@ Tasks_capture_item = class
 			_result {
 			_check_args = [
 				[image, "image", check_Image]
-			];
+			] ++ super._check_args;
 			_vislevel = 3;
 
 			// get macbeth data file to use
@@ -463,7 +463,7 @@ Tasks_mosaic_item = class
 
 		lr_mos _refine a b = class 
 			Image _result {
-			_check_args = check_ab_args a b;
+			_check_args = check_ab_args a b ++ super._check_args;
 	
 			bw = blend_width_widget;
 			refine = _refine;
@@ -482,7 +482,7 @@ Tasks_mosaic_item = class
 
 		tb_mos _refine a b = class
 			Image _result {
-			_check_args = check_ab_args a b;
+			_check_args = check_ab_args a b ++ super._check_args;
 	
 			bw = blend_width_widget;
 			refine = _refine;
@@ -547,7 +547,7 @@ Tasks_mosaic_item = class
 				"join two images left-right with a pair of tie points" {
 			action a b c d = class 
 				Image _result {
-				_check_args = check_abcd_args a b c d;
+				_check_args = check_abcd_args a b c d ++ super._check_args;
 	
 				bw = blend_width_widget;
 				refine = refine_widget;
@@ -574,7 +574,7 @@ Tasks_mosaic_item = class
 				"join two images top-bottom with a pair of tie points" {
 			action a b c d = class 
 				Image _result {
-				_check_args = check_abcd_args a b c d;
+				_check_args = check_abcd_args a b c d ++ super._check_args;
 	
 				bw = blend_width_widget;
 				refine = refine_widget;

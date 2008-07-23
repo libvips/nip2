@@ -584,6 +584,14 @@ imageinfo_class_init( ImageinfoClass *class )
 		g_cclosure_marshal_VOID__POINTER,
 		G_TYPE_NONE, 1,
 		G_TYPE_POINTER );
+	imageinfo_signals[SIG_AREA_PAINTED] = g_signal_new( "area_painted",
+		G_OBJECT_CLASS_TYPE( gobject_class ),
+		G_SIGNAL_RUN_FIRST,
+		G_STRUCT_OFFSET( ImageinfoClass, area_painted ),
+		NULL, NULL,
+		g_cclosure_marshal_VOID__POINTER,
+		G_TYPE_NONE, 1,
+		G_TYPE_POINTER );
 	imageinfo_signals[SIG_UNDO_CHANGED] = g_signal_new( "undo_changed",
 		G_OBJECT_CLASS_TYPE( gobject_class ),
 		G_SIGNAL_RUN_FIRST,
@@ -688,7 +696,7 @@ imageinfo_proxy_invalidate( Imageinfoproxy *proxy )
 }
 
 static int
-imageinfo_proxy_close( Imageinfoproxy *proxy )
+imageinfo_proxy_preclose( Imageinfoproxy *proxy )
 {
 	Imageinfo *imageinfo = proxy->imageinfo;
 
@@ -720,6 +728,7 @@ imageinfo_proxy_add( Imageinfo *imageinfo )
          */ 
 	g_assert( !imageinfo->proxy );
 	if( !(imageinfo->proxy = IM_NEW( imageinfo->im, Imageinfoproxy )) )
+	if( !(imageinfo->proxy = IM_NEW( NULL, Imageinfoproxy )) )
 		return;
 	imageinfo->proxy->im = imageinfo->im;
 	imageinfo->proxy->imageinfo = imageinfo;
@@ -732,8 +741,11 @@ imageinfo_proxy_add( Imageinfo *imageinfo )
 		(im_callback_fn) imageinfo_proxy_invalidate, 
 		imageinfo->proxy, NULL );
 
-	(void) im_add_close_callback( imageinfo->im, 
-		(im_callback_fn) imageinfo_proxy_close, 
+	/* Has to be preclose, because we want to be sure we disconnect before 
+	 * the proxy is freed on a close callback.
+	 */
+	(void) im_add_preclose_callback( imageinfo->im, 
+		(im_callback_fn) imageinfo_proxy_preclose, 
 		imageinfo->proxy, NULL );
 }
 

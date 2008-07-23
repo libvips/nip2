@@ -1,8 +1,6 @@
-- test new remove from cache on invalidate logic
-
 - "usage" message from check_all isn't really usage, it's the set of
-  paramaters that this class hierarchy needs and is not related to the args to
-  the top-level constructor
+  paramaters that this whole class hierarchy needs for construction and is
+  not (directly) related to the args to the top-level constructor
 
   reword to reduce confusion
 

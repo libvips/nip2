@@ -811,9 +811,9 @@ static void
 vips_history_invalidate_cb( Imageinfo *ii, VipsInfo *vi )
 {
 #ifdef DEBUG_HISTORY
-#endif /*DEBUG_HISTORY*/
 	printf( "vips_history_invalidate_cb: "
 		"on invalidate of ii, uncaching \"%s\"\n", vi->name );
+#endif /*DEBUG_HISTORY*/
 
 	vips_destroy( vi );
 }
@@ -834,18 +834,18 @@ vips_history_add( VipsInfo *vi )
 
 	/* If any of our ii are destroyed, we must go too.
 	 */
-	for( i = 0; i < vi->ninii; i++ )
-		vi->inii_destroy_sid[i] = g_signal_connect( vi->inii[i], 
-			"destroy", 
-			G_CALLBACK( vips_history_destroy_cb ), vi );
 	for( i = 0; i < vi->noutii; i++ )
 		vi->outii_destroy_sid[i] = g_signal_connect( vi->outii[i], 
 			"destroy", 
 			G_CALLBACK( vips_history_destroy_cb ), vi );
 
-	/* If any of our input ii are painted on, we must also uncache.
+	/* If any of our input ii are destroyed or painted on, we must also 
+	 * uncache.
 	 */
 	for( i = 0; i < vi->ninii; i++ ) {
+		vi->inii_destroy_sid[i] = g_signal_connect( vi->inii[i], 
+			"destroy", 
+			G_CALLBACK( vips_history_destroy_cb ), vi );
 		vi->inii_invalidate_sid[i] = g_signal_connect( vi->inii[i], 
 			"invalidate", 
 			G_CALLBACK( vips_history_invalidate_cb ), vi );

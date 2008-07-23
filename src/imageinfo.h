@@ -155,7 +155,9 @@ struct _Imageinfo {
 typedef struct _ImageinfoClass {
 	ManagedClass parent_class;
 
-	/* An area of the screen needs repainting.
+	/* An area of the screen needs repainting. This can happen for regions
+	 * being dragged, for example, and doesn't always mean pixels have
+	 * changed.
 	 */
 	void (*area_changed)( Imageinfo *, Rect * );
 
@@ -163,6 +165,12 @@ typedef struct _ImageinfoClass {
 	 * trigger area_changed.
 	 */
 	void (*area_painted)( Imageinfo *, Rect * );
+
+	/* Our IMAGE* has signaled "invalidate". This can happen indirectly:
+	 * if we paint on an image, im_invalidate() will trigger on that image
+	 * and all derived images.
+	 */
+	void (*invalidate)( Imageinfo * );
 
 	/* Update undo/redo button sensitivities.
 	 */
@@ -172,10 +180,6 @@ typedef struct _ImageinfoClass {
 	 * reload.
 	 */
 	void (*file_changed)( Imageinfo * );
-
-	/* One of the IMAGE* we manage has signaled "invalidate".
-	 */
-	void (*invalidate)( Imageinfo * );
 } ImageinfoClass;
 
 void *imageinfo_area_changed( Imageinfo *imageinfo, Rect *dirty );

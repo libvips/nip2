@@ -267,6 +267,7 @@ AC_OUTPUT([
 	share/nip2/compat/7.9/Makefile
 	share/nip2/compat/7.10/Makefile
 	share/nip2/compat/7.12/Makefile
+	share/nip2/compat/7.14/Makefile
 	src/BITMAPS/Makefile 
 	src/Makefile
 	po/Makefile.in

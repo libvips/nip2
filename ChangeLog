@@ -37,6 +37,7 @@ started 7.15.0
   to chain up ... much quicker
 - watch "invalidate" in vips_call.c cache ... so paint actions now decache
   results
+- added Math / Cluster, though it needs a bit of work
 
 started 7.14.0
 - updated docs

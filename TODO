@@ -1,10 +1,7 @@
-- "usage" message from check_all isn't really usage, it's the set of
-  paramaters that this whole class hierarchy needs for construction and is
-  not (directly) related to the args to the top-level constructor
+- Math / Cluster is a bit useless, will it work for complex numbers? vectors?
+  colours? groups?
 
-  reword to reduce confusion
-
-- add cluster code from /gel
+  what would we have to do to get it to work for these other types?
 
 - lots of annoying strcmp in vips.c, go to int once and stick with it
 

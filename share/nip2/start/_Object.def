@@ -69,10 +69,9 @@ check_args x
 		(filter test_fail (zip2 (map hd allcheck) [0..]));
 
 	// the error message
-	message = _ "bad arguments to " ++ "\"" ++ x.name ++ "\"\n" ++
+	message = _ "bad properties for " ++ "\"" ++ x.name ++ "\"\n" ++
 		argmsg ++ allmsg ++ "\n" ++
-		_ "usage" ++ "\n" ++ indent ++ usage ++ "\n" ++ _ "where" ++ "\n" ++ 
-		arg_types ++ extra;
+		_ "where" ++ "\n" ++ arg_types ++ extra;
 
 	// make the failed argcheck messages ... eg.  ""value" should be 
 	// real, you passed <function>" etc.
@@ -96,9 +95,6 @@ check_args x
 		fmt n = _ "condition failed" ++ ": " ++ allcheck?n?1 ++ "\n";
 		fmt_arg l = indent ++ l?1 ++ " = " ++ print l?0 ++ "\n";
 	}
-
-	// make usage note
-	usage = x.name ++ " " ++ join_sep " " (map (extract 1) argcheck);
 
 	// make arg type notes
 	arg_types = join_sep "\n" (map fmt argcheck)

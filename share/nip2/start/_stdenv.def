@@ -1973,3 +1973,66 @@ linregw xes yes devs
 	tes = [(x - sxoss) / sd :: [x, sd] <- zip2 xes devs];
 	st2 = sum [t ** 2 :: t <- tes];
 }
+
+/* Clustering: pass in a list of points, repeatedly merge the
+ * closest two points until no two points are closer than the threshold.
+ * Return [merged-points, corresponding-weights]. A weight is a list of the
+ * indexes we merged to make that point, ie. len weight == how significant
+ * this point is.
+ *
+ * eg. 
+ *	cluster 12 [152,154,155,42,159] == 
+ *		[[155,42],[[1,2,0,4],[3]]]
+ */
+cluster thresh points
+	= oo_unary_function cluster_op points, is_class points
+	// can't use [0..len points - 1], in case len points == 0
+	= merge [points, map (converse cons []) (take (len points) [0 ..])],
+		is_list points
+	= error (_ "bad arguments to " ++ "cluster")
+{
+	cluster_op = Operator "cluster" 
+		(cluster thresh) Operator_type.COMPOUND false;
+
+	merge x
+		= x, m < 2 || d > thresh
+		= merge [points', weights']
+	{
+		[points, weights] = x;
+		m = len points;
+
+		// generate indexes of all possible pairs, avoiding comparing a thing 
+		// to itself, and assuming that dist is reflexive
+		// first index is always less than 2nd index
+		// the +1,+2 makes sure we have an increasing generator, otherwise we
+		// can get [3 .. 4] (for example), which will make a decreasing
+		// sequence
+		pairs = [[x, y] :: x <- [0 .. m - 1]; y <- [x + 1, x + 2 .. m - 1]];
+
+		// distance function
+		// arg is eg. [3,1], meaning get distance from point 3 to point 1
+		dist x 
+			= abs (points?i - points?j)
+		{
+			[i, j] = x;
+		}
+
+		// smallest distance, then the two points we merge
+		p = minpos (map dist pairs);
+		d = dist pairs?p;
+		[i, j] = pairs?p;
+
+		// new point and new weight
+		nw = weights?i ++ weights?j;
+		np = (points?i * len weights?i + points?j * len weights?j) / len nw;
+
+		// remove element i from a list
+		remove i l = take i l ++ drop (i + 1) l;
+
+		// remove two old points, add the new merged one
+		// i < j (see "pairs", above)
+		points' = np : remove i (remove j points);
+		weights' = nw : remove i (remove j weights);
+	}
+}
+

@@ -34,10 +34,13 @@ started 7.15.0
 - added a 7.14 compat area
 - join_lr/_tb args swapped 
 - check_args now does not recurse up a class, instead all _check members have 
-  to chain up ... much quicker
+  to chain up ... a bit quicker
 - watch "invalidate" in vips_call.c cache ... so paint actions now decache
-  results
+  indirect results as well
 - added Math / Cluster, though it needs a bit of work
+- insert now format-alikes
+- another go at removing refresh flicker ... region dragging flickers a bit
+  instead
 
 started 7.14.0
 - updated docs

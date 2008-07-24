@@ -2209,7 +2209,7 @@ static GTimer *mainw_busy_update_timer = NULL;
 
 /* Delay before we start showing busy feedback.
  */
-static const double mainw_busy_delay = 0.2;
+static const double mainw_busy_delay = 2.0;
 
 /* Delay between busy updates.
  */

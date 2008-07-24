@@ -45,14 +45,6 @@ static guint conversion_signals[SIG_LAST] = { 0 };
 
 static ModelClass *parent_class = NULL;
 
-/* What we send down the queue.
- */
-typedef struct _ConversionUpdate {
-	Conversion *conv;
-	IMAGE *im;
-	Rect area;
-} ConversionUpdate;
-
 /* All active conversions.
  */
 static GSList *conversion_all = NULL;
@@ -110,6 +102,7 @@ conversion_finalize( GObject *gobject )
 	conversion_all = g_slist_remove( conversion_all, conv );
 
 	IM_FREEF( im_region_free, conv->ireg );
+	IM_FREEF( im_region_free, conv->mreg );
 	IM_FREEF( im_region_free, conv->reg );
 
 	MANAGED_UNREF( conv->repaint_ii );
@@ -198,6 +191,15 @@ conversion_make_visualise( Conversion *conv, IMAGE *in )
 	return( out );
 }
 
+/* What we send from the notify callback to the main GUI thread.
+ */
+typedef struct _ConversionUpdate {
+	Conversion *conv;
+
+	IMAGE *im;		
+	Rect area;
+} ConversionUpdate;
+
 static gboolean
 conversion_render_idle_cb( gpointer data )
 {
@@ -283,7 +285,6 @@ static IMAGE *
 conversion_make_display( Conversion *conv, IMAGE *in, IMAGE **mask_out )
 {
 	IMAGE *out = im_open( "conversion_display:1", "p" );
-	IMAGE *mask = im_open_local( out, "conv:1a", "p" );
 
 	if( !out )
 		return( NULL );
@@ -331,7 +332,9 @@ conversion_make_display( Conversion *conv, IMAGE *in, IMAGE **mask_out )
 			return( NULL );
 		}
 	}
-	else
+	else {
+		IMAGE *mask = im_open_local( out, "conv:1a", "p" );
+
 		if( im_render_fade( in, out, mask, 
 			conv->tile_size, conv->tile_size, 
 				conversion_get_default_tiles( conv ),
@@ -342,8 +345,9 @@ conversion_make_display( Conversion *conv, IMAGE *in, IMAGE **mask_out )
 			return( NULL );
 		}
 
-	if( mask_out )
-		*mask_out = mask;
+		if( mask_out )
+			*mask_out = mask;
+	}
 
 	return( out );
 }
@@ -852,6 +856,7 @@ conversion_rebuild_display( Conversion *conv )
 	IMAGE *new_display_im;
 	Imageinfo *new_display_ii;
 	IMAGE *mask;
+	REGION *new_mreg;
 
 #ifdef DEBUG
 	g_print( "conversion_remake_display: %p\n", conv );
@@ -866,6 +871,8 @@ conversion_rebuild_display( Conversion *conv )
 	 */
 	new_display_ii = NULL;
 	new_display_im = NULL;
+	new_mreg = NULL;
+	mask = NULL;
 
 	/* Make the new stuff first.
 	 */
@@ -880,13 +887,18 @@ conversion_rebuild_display( Conversion *conv )
 		}
 		managed_sub_add( MANAGED( new_display_ii ), 
 			MANAGED( conv->visual_ii ) );
+		if( mask && 
+			!(new_mreg = im_region_create( mask )) ) 
+			return;
 	}
 
+	IM_FREEF( im_region_free, conv->mreg );
 	MANAGED_UNREF( conv->display_ii );
 
 	if( visual_im ) {
 		conv->display_ii = new_display_ii;
 		conv->mask = mask;
+		conv->mreg = new_mreg;
 		MANAGED_REF( conv->display_ii );
 
 		conv->canvas.width = new_display_im->Xsize;
@@ -931,10 +943,8 @@ conversion_rebuild_visual( Conversion *conv )
 		managed_sub_add( MANAGED( new_visual_ii ), 
 			MANAGED( conv->ii ) );
 
-		if( !(new_reg = im_region_create( im )) ) {
-			IM_FREEF( im_region_free, new_reg );
+		if( !(new_reg = im_region_create( im )) ) 
 			return;
-		}
 	}
 
 	/* Junk old stuff.
@@ -1047,6 +1057,7 @@ conversion_init( Conversion *conv )
 	conv->display_mag = 99999999;
 	conv->repaint_ii = NULL;
 	conv->ireg = NULL;
+	conv->mreg = NULL;
 
 	/* Default tile size ... OK for image display, too big for
 	 * thumbnails.

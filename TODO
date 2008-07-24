@@ -8,7 +8,8 @@
   even better, put all the ops on a type together as a bunch of callbacks and
   don't use switch at all
 
-- segv in test_toolkits on laptop ???!? valgrinds cleanly on work machine
+- segv in test_toolkits on laptop (inside fftw3) ???!? valgrinds cleanly on 
+  work machine
 
 - try
 
@@ -25,17 +26,13 @@
 
   we'd need to always show the up/down arrows, not just for classes
 
-- "insert" should format-alike ... cast the sub image to the same type as the
-  bg image
-
-  it could to_image the sub and main args as well, I guess
-
-  add to_image elsewhere? we have to_real ina  bunch of places
-
 - drag from an image thumbnail to the ws background and you get a new column
   with "A2" or whgatever in
 
   does not work for plot thumbnails! how annoying
+
+- right-click on image background to get a context menu with
+  save/replace/header? same as row thumbnail context?
 
 - need GUI for 
 

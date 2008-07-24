@@ -981,10 +981,6 @@ Image_insert_item = class
 				[a, "a", check_Image],
 				[b, "b", check_Image]
 			] ++ super._check_args;
-			_check_all = [
-				[a.coding == b.coding && a.bands == b.bands, 
-					"a.coding == b.coding && a.bands == b.bands"]
-			] ++ super._check_all;
 			_vislevel = 3;
 
 			// sort to get smallest first

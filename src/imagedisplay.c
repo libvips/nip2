@@ -36,10 +36,6 @@
 #define DEBUG_PAINT
  */
 
-/* Make paints slow and flickery so we can see what's going on.
-#define DEBUG_SLOW_PAINT
- */
-
 /*
 #define DEBUG_GEO
  */
@@ -62,6 +58,39 @@ imagedisplay_queue_draw_area( Imagedisplay *id, Rect *area )
 {
 	gtk_widget_queue_draw_area( GTK_WIDGET( id ),
 		area->left, area->top, area->width, area->height ); 
+}
+
+/* Does an area need painting? Test the mask for non-zero pixels.
+ */
+static gboolean
+imagedisplay_needs_painting( Imagedisplay *id, Rect *area )
+{
+	Conversion *conv = id->conv;
+	guchar *buf;
+	int lsk;
+	int x, y;
+
+	/* No mask? Always paint.
+	 */
+	if( !conv->mreg )
+		return( TRUE );
+
+	/* If the mask is all zero, don't paint. This can leave old pixels on
+	 * the screen, but it does stop a lot of flicker and makes updates
+	 * look cleaner.
+	 */
+	if( im_prepare( conv->mreg, area ) )
+		return( TRUE );
+        buf = (guchar *) IM_REGION_ADDR( conv->mreg, area->left, area->top );
+        lsk = IM_REGION_LSKIP( conv->mreg );
+	for( y = 0; y < area->height; y++ ) {
+		for( x = 0; x < area->width; x++ )
+			if( buf[x] )
+				return( TRUE );
+		buf += lsk;
+	}
+
+	return( FALSE );
 }
 
 /* Repaint an area of the image.
@@ -93,28 +122,31 @@ imagedisplay_repaint_area( Imagedisplay *id, GdkRectangle *expose )
 	if( !gdk_rectangle_intersect( expose, &canvas, &clip ) )
 		return;
 
+	/* Pixels we need.
+	 */
+	vclip.left = clip.x;
+	vclip.top = clip.y;
+	vclip.width = clip.width;
+	vclip.height = clip.height;
+
+	/* Test for paintability.
+	 */
+	if( !imagedisplay_needs_painting( id, &vclip ) )
+		return;
+
 #ifdef DEBUG_PAINT
 	g_print( "imagedisplay_repaint_area: at %d x %d, size %d x %d ",
 		clip.x, clip.y, clip.width, clip.height );
 	gobject_print( G_OBJECT( id ) );
 #endif /*DEBUG_PAINT*/
 
-	/* Generate pixels we need. 
-	 */
-	vclip.left = clip.x;
-	vclip.top = clip.y;
-	vclip.width = clip.width;
-	vclip.height = clip.height;
 	if( im_prepare( conv->ireg, &vclip ) )
 		return;
-
-        /* Find a pointer to the start of the data, plus a line skip value.
-         */
-        buf = (guchar *) IM_REGION_ADDR( conv->ireg, vclip.left, vclip.top );
-        lsk = IM_REGION_LSKIP( conv->ireg );
+	buf = (guchar *) IM_REGION_ADDR( conv->ireg, vclip.left, vclip.top );
+	lsk = IM_REGION_LSKIP( conv->ireg );
 
 	/* Paint into window.
- 	 */
+	 */
 	if( conv->ireg->im->Bands == 3 )
 		gdk_draw_rgb_image( GTK_WIDGET( id )->window,
 			GTK_WIDGET( id )->style->white_gc,
@@ -149,35 +181,26 @@ imagedisplay_paint_background( Imagedisplay *id, GdkRectangle *expose )
 static void
 imagedisplay_paint_background_clipped( Imagedisplay *id, GdkRectangle *expose )
 {
-#ifdef DEBUG_SLOW_PAINT
-	/* Paint entire expose.
-	 */
-	imagedisplay_paint_background( id, expose );
-#else /*!DEBUG_SLOW_PAINT*/
+	Conversion *conv = id->conv;
 	GdkRectangle area, clip;
 
 	/* Any stuff to the right of the image?
 	 */
-	area.x = GTK_WIDGET( id )->requisition.width;
+	area.x = conv->canvas.width;
 	area.y = 0;
-	area.width = IM_MAX( 0, 
-		GTK_WIDGET( id )->allocation.width -
-		GTK_WIDGET( id )->requisition.width ); 
-	area.height = GTK_WIDGET( id )->allocation.height;
+	area.width = IM_MAX( 0, conv->visible.width - conv->canvas.width );
+	area.height = conv->visible.height;
 	if( gdk_rectangle_intersect( expose, &area, &clip ) )
 		imagedisplay_paint_background( id, &clip );
 
 	/* Any stuff below the image?
 	 */
 	area.x = 0;
-	area.y = GTK_WIDGET( id )->requisition.height;
-	area.width = GTK_WIDGET( id )->requisition.width;
-	area.height = IM_MAX( 0, 
-		GTK_WIDGET( id )->allocation.height - 
-		GTK_WIDGET( id )->requisition.height );
+	area.y = conv->canvas.height;
+	area.width = conv->canvas.width;
+	area.height = IM_MAX( 0, conv->visible.height - conv->canvas.height );
 	if( gdk_rectangle_intersect( expose, &area, &clip ) )
 		imagedisplay_paint_background( id, &clip );
-#endif /*DEBUG_SLOW_PAINT*/
 }
 
 static void
@@ -187,11 +210,6 @@ imagedisplay_paint( Imagedisplay *id, GdkRectangle *area )
 	g_print( "imagedisplay_repaint: at %d x %d, size %d x %d\n",
 		area->x, area->y, area->width, area->height );
 #endif /*DEBUG_PAINT*/
-#ifdef DEBUG_SLOW_PAINT
-	imagedisplay_paint_background_clipped( id, area );
-	gdk_flush();
-	usleep( 50000 );
-#endif /*DEBUG_SLOW_PAINT*/
 
 	/* Clear to background. Always do this, to make sure we paint 
 	 * outside the image area.
@@ -327,6 +345,15 @@ imagedisplay_real_area_changed( Imagedisplay *id, Rect *dirty )
 	imagedisplay_queue_draw_area( id, dirty );
 }
 
+static void
+imagedisplay_realize( GtkWidget *widget )
+{
+	GTK_WIDGET_CLASS( parent_class )->realize( widget );
+
+	gdk_window_set_back_pixmap( widget->window, NULL, FALSE );
+	gtk_widget_set_double_buffered( widget, FALSE );
+}
+
 /* Init Imagedisplay class.
  */
 static void
@@ -341,6 +368,7 @@ imagedisplay_class_init( ImagedisplayClass *class )
 
 	widget_class->expose_event = imagedisplay_expose;
 	widget_class->configure_event = imagedisplay_configure_event;
+	widget_class->realize = imagedisplay_realize;
 
 	class->conversion_changed = imagedisplay_real_conversion_changed;
 	class->area_changed = imagedisplay_real_area_changed;

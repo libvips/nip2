@@ -930,7 +930,7 @@ insert x y small big
 {
 	insert_op = Operator "insert" 
 		(insert x y) Operator_type.COMPOUND_REWRAP false;
-	[small', big'] = bands_alike [small, big];
+	[small', big'] = (formats_alike @ bands_alike) [small, big];
 }
 
 insert_noexpand x y small big
@@ -942,7 +942,7 @@ insert_noexpand x y small big
 {
 	insert_noexpand_op = Operator "insert_noexpand" 
 		(insert_noexpand x y) Operator_type.COMPOUND_REWRAP false;
-	[small', big'] = bands_alike [small, big];
+	[small', big'] = (formats_alike @ bands_alike) [small, big];
 }
 
 measure x y w h u v image

@@ -1,3 +1,10 @@
+- insert could do type-alike? eg. so we can insert a LAB image into an RGB
+  image?
+
+  what about coding-alike, so we can do labq as well?
+
+  how does ifthenelse handle this?
+
 - Math / Cluster is a bit useless, will it work for complex numbers? vectors?
   colours? groups?
 

@@ -287,6 +287,56 @@ Image_header_item = class
 			Menuaction "_Coding" "get coding" {
 			action x = get_field "coding" x;
 		}
+
+    	sep1 = Menuseparator;
+
+		Custom_item = class
+			Menuaction "C_ustom" "get any header field" {
+			action x = class
+				_result {
+				_vislevel = 3;
+
+				field = String "Field" "Xsize";
+				parse = Option "Parse" [
+					"No parsing",
+					"Parse string as integer",
+					"Parse string as real",
+					"Parse string as hh:mm:ss"
+				] 0;
+
+				_result
+					= map_unary (wrap @ process @ get_header field.value) x
+				{
+					parse_str parse str = parse (split is_space str)?0;
+
+					parse_field name cast parse x
+						= cast x, is_number x
+						= parse_str parse x, is_string x
+						= error ("not " ++ name);
+
+					get_int = parse_field "int" cast_int parse_int;
+					get_float = parse_field "float" cast_float parse_float;
+					get_time = parse_field "hh:mm:ss" cast_int parse_time;
+
+					wrap x
+						= Real x, is_real x
+						= Vector x, is_real_list x
+						= Image x, is_image x
+						= Bool x, is_bool x
+						= Matrix x, is_matrix x
+						= String "String" x, is_string x
+						= List x, is_list x
+						= x;
+
+					process = [
+						id,
+						get_int, 
+						get_float,
+						get_time
+					]?parse;
+				}
+			}
+		}
 	}
 
     sep1 = Menuseparator;

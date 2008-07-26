@@ -504,7 +504,7 @@ Math_stats_item = class
 			"count average edges across or down image" {
 		action x = class  
 			_result {
-			_vislevel = 2;
+			_vislevel = 3;
 	
 			edge = Option "Count" [
 				"Horizontal lines", 

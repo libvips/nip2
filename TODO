@@ -41,17 +41,6 @@
 - right-click on image background to get a context menu with
   save/replace/header? same as row thumbnail context?
 
-- need GUI for 
-
-	MB24 = get_header "magick-dcm:RescaleSlope" MB2
-	MB54 = (split is_space MB24)?0
-	MB55 = parse_float MB54
-
-  split removed leading and trailing whitespace
-  options to parse_int, parse_pint etc as well
-
-  Image / Header / Get / Custom ?
-
 - a bit of GUI for "cache" would be nice ... set tilesize, MB for cache (inc.
   "unlimited"), etc.
 

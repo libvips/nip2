@@ -41,6 +41,7 @@ started 7.15.0
 - insert now format-alikes
 - another go at removing refresh flicker ... region dragging flickers a bit
   instead
+- added Image / Header / Get / Custom
 
 started 7.14.0
 - updated docs

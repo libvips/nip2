@@ -42,6 +42,7 @@ started 7.15.0
 - another go at removing refresh flicker ... region dragging flickers a bit
   instead
 - added Image / Header / Get / Custom
+- recurse for save groups of groups
 
 started 7.14.0
 - updated docs

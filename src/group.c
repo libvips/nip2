@@ -64,6 +64,16 @@ group_save_item( PElement *item, GtkWidget *parent, char *filename )
 	gboolean result;
 	Imageinfo *ii;
 
+	if( !heap_is_instanceof( CLASS_GROUP, item, &result ) )
+		return( FALSE );
+	if( result ) {
+		PElement value;
+
+		if( !class_get_member( item, MEMBER_VALUE, NULL, &value ) ||
+			!group_save_list( &value, parent, filename ) )
+			return( FALSE );
+	}
+
 	if( !heap_is_instanceof( CLASS_IMAGE, item, &result ) )
 		return( FALSE );
 	if( result ) {
@@ -124,7 +134,7 @@ group_save_list( PElement *list, GtkWidget *parent, char *filename )
 
 		increment_filename( filename );
 	}
-	
+
 	return( TRUE );
 }
 
@@ -136,17 +146,13 @@ group_graphic_save( Classmodel *classmodel,
 	Row *row = HEAPMODEL( group )->row;
 	PElement *root = &row->expr->root;
 	char buf[FILENAME_MAX];
-	PElement value;
 
 	/* We are going to increment the filename ... make sure there's some
 	 * space at the end of the string.
 	 */
 	im_strncpy( buf, filename, FILENAME_MAX - 5 );
 
-	if( !class_get_member( root, MEMBER_VALUE, NULL, &value ) )
-		return( FALSE );
-
-	if( !group_save_list( &value, parent, buf ) )
+	if( !group_save_item( root, parent, buf ) )
 		return( FALSE );
 
 	return( TRUE );

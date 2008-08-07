@@ -1406,7 +1406,7 @@ row_recomp_sort_func( Row *a, Row *b )
 			row_name_print( a );
 			printf( "and " );
 			row_name_print( b );
-			printf( "independant\n" );
+			printf( "independent\n" );
 		}
 #endif /*DEBUG_SORT_VERBOSE*/
 
@@ -1422,7 +1422,6 @@ row_recomp_sort_func( Row *a, Row *b )
 
 	return( order );
 }
-
 
 /* Insert-sort an slist.
  */
@@ -1476,7 +1475,7 @@ row_recomp_sort( Row *row )
 	assert( row == row->top_row );
 
 	/* Nope, can't use g_slist_sort(). We have a partial order and
-	 * g_slist_sort() uses an algorith that assumes a full order. Do a
+	 * g_slist_sort() uses an algorithm that assumes a full order. Do a
 	 * simple insert-sort, it'll do enough comparisons that we won't miss
 	 * things.
 

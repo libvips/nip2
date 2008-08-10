@@ -43,6 +43,7 @@ started 7.15.0
   instead
 - added Image / Header / Get / Custom
 - recurse for save groups of groups
+- added Image / Cache menu item
 
 started 7.14.0
 - updated docs

@@ -398,6 +398,41 @@ Image_header_item = class
 	}
 }
 
+Image_cache_item = class
+	Menuaction "C_ache" "cache calculated image pixels" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		tile_width = Number "Tile width" 128;
+		tile_height = Number "Tile height" 128;
+		max_tiles = Number "Maximum number of tiles to cache" (-1);
+
+		_result
+			= map_unary process x
+		{
+			process image
+				= cache (to_real tile_width) (to_real tile_height) 
+					(to_real max_tiles) image;
+		}
+	}
+}
+
+#separator
+
+Image_levels_item = class 
+	Menupullright "_Levels" "change image levels" {
+	Scale_item = class
+		Menuaction "_Scale to 0 - 255" "linear transform to fit 0 - 255 range" {
+		action x = map_unary scale x;
+	}
+
+	Linear_item = class
+		Menuaction "_Linear" "linear transform of image levels" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
 #separator
 
 Image_levels_item = class 

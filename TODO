@@ -1,9 +1,4 @@
-- insert could do type-alike? eg. so we can insert a LAB image into an RGB
-  image?
-
-  what about coding-alike, so we can do labq as well?
-
-  how does ifthenelse handle this?
+- numbering of group of group save seems to skip one at end of line?
 
 - Math / Cluster is a bit useless, will it work for complex numbers? vectors?
   colours? groups?
@@ -40,9 +35,6 @@
 
 - right-click on image background to get a context menu with
   save/replace/header? same as row thumbnail context?
-
-- a bit of GUI for "cache" would be nice ... set tilesize, MB for cache (inc.
-  "unlimited"), etc.
 
 - look at using goffice instead of gtkplot for graphs
 

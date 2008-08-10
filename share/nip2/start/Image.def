@@ -404,8 +404,8 @@ Image_cache_item = class
 		_result {
 		_vislevel = 3;
 
-		tile_width = Number "Tile width" 128;
-		tile_height = Number "Tile height" 128;
+		tile_width = Number "Tile width" 32;
+		tile_height = Number "Tile height" 32;
 		max_tiles = Number "Maximum number of tiles to cache" (-1);
 
 		_result
@@ -417,21 +417,6 @@ Image_cache_item = class
 		}
 	}
 }
-
-#separator
-
-Image_levels_item = class 
-	Menupullright "_Levels" "change image levels" {
-	Scale_item = class
-		Menuaction "_Scale to 0 - 255" "linear transform to fit 0 - 255 range" {
-		action x = map_unary scale x;
-	}
-
-	Linear_item = class
-		Menuaction "_Linear" "linear transform of image levels" {
-		action x = class
-			_result {
-			_vislevel = 3;
 
 #separator
 

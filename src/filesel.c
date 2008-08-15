@@ -169,7 +169,7 @@ build_image_file_type( void )
 	 */
 	types = NULL;
 	types = g_slist_append( types, &filesel_vfile_type );
-	im_map_formats( (VSListMap2Fn) build_vips_formats_sub, &types, NULL );
+	im_format_map( (VSListMap2Fn) build_vips_formats_sub, &types, NULL );
 
 	type_array = (FileselFileType **) slist_to_array( types );
 	g_slist_free( types );

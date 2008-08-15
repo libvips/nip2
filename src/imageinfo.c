@@ -862,8 +862,6 @@ imageinfo_open_image_input( const char *filename, ImageinfoOpen *open )
 			format->flags( filename ) : 0;
 		const char *mode = flags & IM_FORMAT_FLAG_PARTIAL ? "p" : "w";
 
-		/* Tiled TIFF - open and read partially.
-		 */
 		if( !(imageinfo = imageinfo_new_temp( open->imageinfogroup, 
 			open->heap, open->filename, mode )) )
 			return( NULL );
@@ -879,7 +877,6 @@ imageinfo_open_image_input( const char *filename, ImageinfoOpen *open )
 		printf( "imageinfo_open_image_input: "
 			"opened %s \"%s\"\n", format->name, filename );
 #endif /*DEBUG_OPEN*/
-
 	}
 	else {
 		im_error( "open", 

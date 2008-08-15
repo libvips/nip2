@@ -1654,38 +1654,14 @@ get_image_info( BufInfo *buf, const char *name )
 	if( S_ISDIR( st.st_mode ) )
 		buf_appends( buf, _( "directory" ) );
 	else if( S_ISREG( st.st_mode ) ) {
-		char *type;
+		IMAGE *im;
 
-		type = NULL;
-		if( im_istiff( name2 ) )
-			type = _( "TIFF image" );
-		else if( im_isjpeg( name2 ) )
-			type = _( "JPEG image" );
-		else if( im_ispng( name2 ) )
-			type = _( "PNG image" );
-		else if( im_isppm( name2 ) )
-			type = _( "PPM/PGM/PBM image" );
-		else if( im_isexr( name2 ) )
-			type = _( "OpenEXR image" );
-		else if( im_isanalyze( name2 ) )
-			type = _( "Analyze image" );
-		else if( im_ismagick( name2 ) )
-			type = _( "libMagick-supported image" );
-		else if( im_isvips( name2 ) ) 
-			type = _( "VIPS image" );
-
-		if( type ) {
-			IMAGE *im;
-
-			if( !(im = im_open( name2, "r" )) ) {
-				buf_appends( buf, im_errorstring() );
-				return;
-			}
+		if( (im = im_open( name2, "r" )) ) {
 			buf_appendi( buf, im ); 
 			im_close( im );
 		}
-		else 
-			/* No idea wtf this is, just put size in.
+		else
+			/* No idea wtf this is, just put the size in.
 			 */
 			to_size( buf, st.st_size );
 	}

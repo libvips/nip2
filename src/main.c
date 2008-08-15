@@ -1184,6 +1184,10 @@ main( int argc, char *argv[] )
 	}
 #endif /*HAVE_GETRLIMIT*/
 
+	/* Make our file types.
+	 */
+	filesel_startup();
+
 	/* Set default values for paths.
 	 */
 	path_init();

@@ -44,6 +44,7 @@ started 7.15.0
 - added Image / Header / Get / Custom
 - recurse for save groups of groups
 - added Image / Cache menu item
+- merged loadable-formats branch
 
 started 7.14.0
 - updated docs

@@ -837,170 +837,9 @@ static Imageinfo *
 imageinfo_open_image_input( const char *filename, ImageinfoOpen *open )
 {
 	Imageinfo *imageinfo;
+	im_format *format;
 
-	/*
-
-		FIXME ... very repetitive, replace with a proper file loader
-		plug in thing
-
-	 */
-
-	if( im_istiff( filename ) && im_istifftiled( filename ) ) {
-		/* Tiled TIFF - open and read partially.
-		 */
-		if( !(imageinfo = imageinfo_new_temp( open->imageinfogroup, 
-			open->heap, open->filename, "p" )) ||
-			im_tiff2vips( filename, imageinfo->im ) ||
-			im_histlin( imageinfo->im, "im_tiff2vips %s %s",
-				filename, imageinfo->im->filename ) ) 
-			return( NULL );
-
-#ifdef DEBUG_OPEN
-		printf( "imageinfo_open_image_input: "
-			"opened tiled TIFF \"%s\"\n", filename );
-#endif /*DEBUG_OPEN*/
-
-		MANAGED_REF( imageinfo );
-	}
-
-	else if( im_istiff( filename ) && !im_istifftiled( filename ) ) {
-		/* Plain TIFF ... convert to VIPS in a file.
-		 */
-		if( !(imageinfo = imageinfo_new_temp( open->imageinfogroup, 
-			open->heap, open->filename, "w" )) )
-			return( NULL );
-		MANAGED_REF( imageinfo );
-		if( im_tiff2vips( filename, imageinfo->im ) ||
-			im_histlin( imageinfo->im, "im_tiff2vips %s %s",
-				filename, imageinfo->im->filename ) ) {
-			MANAGED_UNREF( imageinfo );
-			return( NULL );
-		}
-
-#ifdef DEBUG_OPEN
-		printf( "imageinfo_open_image_input: "
-			"opened plain TIFF \"%s\"\n", filename );
-#endif /*DEBUG_OPEN*/
-	}
-
-	else if( im_isjpeg( filename ) ) {
-		if( !(imageinfo = imageinfo_new_temp( open->imageinfogroup, 
-			open->heap, open->filename, "w" )) )
-			return( NULL );
-		MANAGED_REF( imageinfo );
-		if( im_jpeg2vips( filename, imageinfo->im ) ||
-			im_histlin( imageinfo->im, "im_jpeg2vips %s %s",
-				filename, imageinfo->im->filename ) ) {
-			MANAGED_UNREF( imageinfo );
-			return( NULL );
-		}
-
-#ifdef DEBUG_OPEN
-		printf( "imageinfo_open_image_input: "
-			"opened JPEG \"%s\"\n", filename );
-#endif /*DEBUG_OPEN*/
-	}
-
-	else if( im_ispng( filename ) ) {
-		if( !(imageinfo = imageinfo_new_temp( open->imageinfogroup, 
-			open->heap, open->filename, "w" )) )
-			return( NULL );
-		MANAGED_REF( imageinfo );
-		if( im_png2vips( filename, imageinfo->im ) ||
-			im_histlin( imageinfo->im, "im_png2vips %s %s",
-				filename, imageinfo->im->filename ) ) {
-			MANAGED_UNREF( imageinfo );
-			return( NULL );
-		}
-
-#ifdef DEBUG_OPEN
-		printf( "imageinfo_open_image_input: "
-			"opened PNG \"%s\"\n", filename );
-#endif /*DEBUG_OPEN*/
-	}
-
-	else if( im_isppm( filename ) ) {
-		if( !(imageinfo = imageinfo_new_temp( open->imageinfogroup, 
-			open->heap, open->filename, "p" )) ||
-			im_ppm2vips( filename, imageinfo->im ) ||
-			im_histlin( imageinfo->im, "im_ppm2vips %s %s",
-				filename, imageinfo->im->filename ) ) 
-			return( NULL );
-		MANAGED_REF( imageinfo );
-
-#ifdef DEBUG_OPEN
-		printf( "imageinfo_open_image_input: "
-			"opened PPM \"%s\"\n", filename );
-#endif /*DEBUG_OPEN*/
-	}
-
-	else if( im_isexr( filename ) ) {
-		if( !(imageinfo = imageinfo_new_temp( open->imageinfogroup, 
-			open->heap, open->filename, "p" )) ||
-			im_exr2vips( filename, imageinfo->im ) ||
-			im_histlin( imageinfo->im, "im_exr2vips %s %s",
-				filename, imageinfo->im->filename ) ) 
-			return( NULL );
-		MANAGED_REF( imageinfo );
-
-#ifdef DEBUG_OPEN
-		printf( "imageinfo_open_image_input: "
-			"opened OpenEXR \"%s\"\n", filename );
-#endif /*DEBUG_OPEN*/
-	}
-
-	else if( im_isanalyze( filename ) ) {
-		if( !(imageinfo = imageinfo_new_temp( open->imageinfogroup, 
-			open->heap, open->filename, "p" )) ||
-			im_analyze2vips( filename, imageinfo->im ) ||
-			im_histlin( imageinfo->im, "im_analyze2vips %s %s",
-				filename, imageinfo->im->filename ) ) 
-			return( NULL );
-		MANAGED_REF( imageinfo );
-
-#ifdef DEBUG_OPEN
-		printf( "imageinfo_open_image_input: "
-			"opened Analyze \"%s\"\n", filename );
-#endif /*DEBUG_OPEN*/
-	}
-
-	/* CSV ... test off the filename.
-	 */
-	else if( is_file_type( &filesel_sfile_type, filename ) ) {
-		if( !(imageinfo = imageinfo_new_temp( open->imageinfogroup, 
-			open->heap, open->filename, "p" )) ||
-			im_csv2vips( filename, imageinfo->im ) ||
-			im_histlin( imageinfo->im, "im_csv2vips %s %s",
-				filename, imageinfo->im->filename ) ) 
-			return( NULL );
-		MANAGED_REF( imageinfo );
-
-#ifdef DEBUG_OPEN
-		printf( "imageinfo_open_image_input: "
-			"opened CSV \"%s\"\n", filename );
-#endif /*DEBUG_OPEN*/
-	}
-
-	else if( im_ismagick( filename ) ) {
-		if( !(imageinfo = imageinfo_new_temp( open->imageinfogroup, 
-			open->heap, open->filename, "w" )) )
-			return( NULL );
-		MANAGED_REF( imageinfo );
-		if( im_magick2vips( filename, imageinfo->im ) ||
-			im_histlin( imageinfo->im, "im_magick2vips %s %s",
-				filename, imageinfo->im->filename ) ) {
-			MANAGED_UNREF( imageinfo );
-			return( NULL );
-		}
-
-#ifdef DEBUG_OPEN
-		printf( "imageinfo_open_image_input: "
-			"opened via libMagick \"%s\"\n", 
-			filename );
-#endif /*DEBUG_OPEN*/
-	}
-
-	else if( im_isvips( filename ) ) {
+	if( im_isvips( filename ) ) {
 		IMAGE *im;
 
 		if( !(im = im_open( filename, "r" )) ) 
@@ -1018,10 +857,34 @@ imageinfo_open_image_input( const char *filename, ImageinfoOpen *open )
 			filename );
 #endif /*DEBUG_OPEN*/
 	}
+	else if( (format = im_format_for_file( filename )) ) {
+		im_format_flags flags = format->flags ? 
+			format->flags( filename ) : 0;
+		const char *mode = flags & IM_FORMAT_FLAG_PARTIAL ? "p" : "w";
 
+		/* Tiled TIFF - open and read partially.
+		 */
+		if( !(imageinfo = imageinfo_new_temp( open->imageinfogroup, 
+			open->heap, open->filename, mode )) )
+			return( NULL );
+		MANAGED_REF( imageinfo );
+		if( format->load( filename, imageinfo->im ) ||
+			im_histlin( imageinfo->im, "im_copy %s %s",
+				filename, imageinfo->im->filename ) ) {
+			MANAGED_UNREF( imageinfo );
+			return( NULL );
+		}
+
+#ifdef DEBUG_OPEN
+		printf( "imageinfo_open_image_input: "
+			"opened %s \"%s\"\n", format->name, filename );
+#endif /*DEBUG_OPEN*/
+
+	}
 	else {
-		im_error( "open", _( "\"%s\" is not in a supported "
-			"image file format" ), filename );
+		im_error( "open", 
+			_( "\"%s\" is not in a supported image file format" ), 
+			filename );
 		return( NULL );
 	}
 

@@ -178,8 +178,9 @@ typedef void VipsObject;
 #define MAX_TRACE (1024)	/* Biggest thing we print in trace */
 #define MAX_SSTACK (40)		/* Scope stack for parser */
 #define VIPS_HOMEPAGE "http://www.vips.ecs.soton.ac.uk"
+#define IP_NAME PACKAGE "-" VERSION
 #define NIP_DOCPATH "$VIPSHOME" G_DIR_SEPARATOR_S "share" G_DIR_SEPARATOR_S \
-	"doc" G_DIR_SEPARATOR_S PACKAGE G_DIR_SEPARATOR_S "html"
+        "doc" G_DIR_SEPARATOR_S IP_NAME G_DIR_SEPARATOR_S "html"
 #define VIPS_DOCPATH "$VIPSHOME" G_DIR_SEPARATOR_S "share" G_DIR_SEPARATOR_S \
 	"doc" G_DIR_SEPARATOR_S "vips" G_DIR_SEPARATOR_S "html"
 #define IP_NAME PACKAGE "-" VERSION

@@ -10,7 +10,7 @@ dnl
 
 m4_define([nip_major_version], [7])
 m4_define([nip_minor_version], [15])
-m4_define([nip_micro_version], [0])
+m4_define([nip_micro_version], [1])
 m4_define([nip_version],
           [nip_major_version.nip_minor_version.nip_micro_version])
 
@@ -271,16 +271,19 @@ AC_OUTPUT([
 	src/BITMAPS/Makefile 
 	src/Makefile
 	po/Makefile.in
+	nip2.spec
 ])
 
 AC_MSG_RESULT([
+* general build options
 native win32:			$nip_os_win32
 native os x:			$nip_os_darwin
+update desktop after install: 	$nip_desktop_update
 debug: 				$enable_debug
 
+* optional packages and modules
 use fftw3 for FFT: 		$with_fftw3
 use gsl for numeric functions:	$with_gsl
 build vips8 interface:		$with_vips8
 display help files with xdg:	$XDG_OPEN
-update desktop after install: 	$nip_desktop_update
 ])

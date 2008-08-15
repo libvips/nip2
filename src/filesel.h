@@ -48,20 +48,19 @@ typedef struct _FileselFileType {
 
 /* Basic types.
  */
-extern FileselFileType filesel_tfile_type, filesel_jfile_type, 
-       filesel_nfile_type, filesel_vfile_type, filesel_pfile_type, 
-       filesel_afile_type, filesel_wfile_type, filesel_rfile_type, 
+extern FileselFileType 
+	filesel_vfile_type, filesel_wfile_type, filesel_rfile_type, 
        filesel_mfile_type, filesel_cfile_type, filesel_xfile_type, 
-       filesel_dfile_type, filesel_ifile_type, filesel_sfile_type; 
+       filesel_dfile_type, filesel_ifile_type;
 
 /* Suffix sets we support.
  */
-extern FileselFileType *filesel_type_workspace[];
-extern FileselFileType *filesel_type_image[];
-extern FileselFileType *filesel_type_matrix[];
 extern FileselFileType *filesel_type_definition[];
-extern FileselFileType *filesel_type_any[];
-extern FileselFileType *filesel_type_mainw[];
+extern FileselFileType *filesel_type_workspace[];
+extern FileselFileType *filesel_type_matrix[];
+extern FileselFileType **filesel_type_image;
+extern FileselFileType **filesel_type_mainw;
+extern FileselFileType **filesel_type_any;
 
 /* Subclass off gtkfilesel2.c to make one of our fileselectors.
  */
@@ -117,6 +116,8 @@ typedef struct _FileselClass {
 	/* My methods.
 	 */
 } FileselClass;
+
+void filesel_startup( void );
 
 gboolean is_file_type( const FileselFileType *type, const char *filename );
 

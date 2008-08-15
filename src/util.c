@@ -3181,3 +3181,31 @@ get_savedir( void )
 #endif /*OS_WIN32*/
 }
 
+/* Turn an slist into a null-terminated array.
+ */
+void **
+slist_to_array( GSList *list )
+{
+	void **array;
+	int i;
+
+	array = g_new( void *, g_slist_length( list ) + 1 );
+	for( i = 0; list ; list = list->next, i++ )
+		array[i] = list->data;
+	array[i] = NULL;
+
+	return( array );
+}
+
+/* Length of a NULL-terminated array.
+ */
+int
+array_len( void **array )
+{
+	int i;
+
+	for( i = 0; array[i]; i++ )
+		;
+
+	return( i );
+}

@@ -342,3 +342,6 @@ void recent_free( GSList *recent );
 void recent_save( GSList *recent, const char *filename );
 
 const char *get_savedir( void );
+
+void **slist_to_array( GSList *list );
+int array_len( void **array );

@@ -72,12 +72,6 @@ static iDialogClass *parent_class = NULL;
  */
 static char *filesel_last_dir = NULL;
 
-static const char *tiff_suffs[] = { ".tif", ".tiff", NULL };
-static const char *jpeg_suffs[] = { ".jpg", ".jpeg", ".jpe", NULL };
-static const char *png_suffs[] = { ".png", NULL };
-static const char *ppm_suffs[] = { ".ppm", ".pgm", ".pbm", NULL };
-static const char *exr_suffs[] = { ".exr", NULL };
-static const char *analyze_suffs[] = { ".img", ".hdr", NULL };
 static const char *icc_suffs[] = { ".icc", ".icm", NULL };
 static const char *vips_suffs[] = { ".v", NULL };
 static const char *workspace_suffs[] = { ".ws", NULL };
@@ -86,24 +80,11 @@ static const char *mor_suffs[] = { ".mor", NULL };
 static const char *con_suffs[] = { ".con", NULL };
 static const char *mat_suffs[] = { ".mat", NULL };
 static const char *def_suffs[] = { ".def", NULL };
-static const char *csv_suffs[] = { ".csv", NULL };
 static const char *all_suffs[] = { "", NULL };
 
 FileselFileType
-        filesel_tfile_type = 
-		{ N_( "TIFF image files (*.tif, *.tiff)" ), tiff_suffs },
-        filesel_jfile_type = 
-		{ N_( "JPEG image files (*.jpg, *.jpeg, *.jpe)" ), jpeg_suffs },
-        filesel_nfile_type = 
-		{ N_( "PNG image files (*.png)" ), png_suffs },
         filesel_vfile_type = 
 		{ N_( "VIPS image files (*.v)" ), vips_suffs },
-        filesel_pfile_type = 
-		{ N_( "PPM image files (*.ppm, *.pgm, *.pbm)" ), ppm_suffs },
-        filesel_efile_type = 
-		{ N_( "OpenEXR image files (*.exr)" ), exr_suffs },
-        filesel_afile_type = 
-		{ N_( "Analyze image files (*.img, *.hdr)" ), analyze_suffs },
         filesel_wfile_type = 
 		{ N_( "Workspace files (*.ws)" ), workspace_suffs },
         filesel_rfile_type = 
@@ -118,51 +99,130 @@ FileselFileType
 		{ N_( "Definition files (*.def)" ), def_suffs },
         filesel_ifile_type = 
 		{ N_( "ICC profiles (*.icc, *.icm)" ), icc_suffs },
-        filesel_sfile_type = 
-		{ N_( "CSV files (*.csv)" ), csv_suffs },
         filesel_allfile_type = 
 		{ N_( "All files (*)" ), all_suffs };
 
 FileselFileType
         *filesel_type_definition[] = { 
-		&filesel_dfile_type, &filesel_allfile_type, NULL 
+		&filesel_dfile_type, NULL 
 	},
         *filesel_type_workspace[] = { 
-		&filesel_wfile_type, &filesel_allfile_type, NULL 
+		&filesel_wfile_type, NULL 
 	},
-        *filesel_type_image[] = { 
-		&filesel_vfile_type, &filesel_tfile_type, &filesel_jfile_type, 
-		&filesel_pfile_type, &filesel_nfile_type, 
-		&filesel_afile_type, &filesel_efile_type,
-		&filesel_sfile_type, 
-		&filesel_allfile_type, NULL 
-	},
+
         *filesel_type_matrix[] = { 
 		&filesel_xfile_type, &filesel_cfile_type, &filesel_rfile_type, 
-		&filesel_mfile_type, &filesel_allfile_type, NULL 
+		&filesel_mfile_type, NULL 
 	},
-        *filesel_type_mainw[] = { 
-		&filesel_vfile_type, &filesel_tfile_type, &filesel_jfile_type, 
-		&filesel_pfile_type, &filesel_nfile_type,
-		&filesel_afile_type, &filesel_efile_type,
-		&filesel_sfile_type, 
-		&filesel_xfile_type, &filesel_cfile_type, &filesel_rfile_type, 
-		&filesel_mfile_type, 
-		&filesel_wfile_type, 
-		&filesel_allfile_type, NULL 
-	},
-        *filesel_type_any[] = { 
-		&filesel_vfile_type, &filesel_tfile_type, &filesel_jfile_type, 
-		&filesel_pfile_type, &filesel_nfile_type,
-		&filesel_afile_type, &filesel_efile_type,
-		&filesel_sfile_type, 
-		&filesel_wfile_type, 
-		&filesel_dfile_type, 
-		&filesel_xfile_type, &filesel_cfile_type, &filesel_rfile_type, 
-		&filesel_mfile_type, 
-		&filesel_ifile_type, 
-		&filesel_allfile_type, NULL 
-	};
+
+	/* Set during startup.
+	 */
+        **filesel_type_image = NULL,
+        **filesel_type_mainw = NULL,
+        **filesel_type_any = NULL;
+
+static void *
+build_vips_formats_sub( im_format *format, GSList **types )
+{
+	FileselFileType *type = g_new( FileselFileType, 1 );
+	char txt[MAX_STRSIZE];
+	BufInfo buf;
+	const char **i;
+
+	buf_init_static( &buf, txt, MAX_STRSIZE );
+	buf_appendf( &buf, "%s ", format->name_user );
+	/* Used as eg. "VIPS image format (*.v)"
+	 */
+	buf_appends( &buf, _( "image files" ) );
+	buf_appends( &buf, " (" );
+	if( *format->suffs )
+		for( i = format->suffs; *i; i++ ) {
+			buf_appendf( &buf, "*%s", *i );
+			if( i[1] )
+				buf_appends( &buf, "; " );
+		}
+	else
+		/* No suffix means any allowed.
+		 */
+		buf_appendf( &buf, "*" );
+
+	buf_appends( &buf, ")" );
+
+	type->name = g_strdup( buf_all( &buf ) );
+	type->suffixes = format->suffs;
+
+	*types = g_slist_append( *types, type );
+
+	return( NULL );
+}
+
+/* Look at the registered VIPS formats, build a file type list. Call from
+ * filesel class init.
+ */
+static FileselFileType **
+build_image_file_type( void )
+{
+	GSList *types;
+	FileselFileType **type_array;
+
+	/* Add one for VIPS format ourselves.
+	 */
+	types = NULL;
+	types = g_slist_append( types, &filesel_vfile_type );
+	im_map_formats( (VSListMap2Fn) build_vips_formats_sub, &types, NULL );
+
+	type_array = (FileselFileType **) slist_to_array( types );
+	g_slist_free( types );
+
+	return( type_array );
+}
+
+/* Combine a NULL-terminated list of FileselFileType arrays into one.
+ */
+static FileselFileType **
+build_file_type_va( FileselFileType **first, ... )
+{
+	va_list args;
+	int len;
+	FileselFileType **i;
+	FileselFileType **array;
+	int j;
+	int k;
+
+	/* Count total number of items.
+	 */
+	len = 0;
+	va_start( args, first );
+	for( i = first; i; i = va_arg( args, FileselFileType ** ) )
+		len += array_len( (void **) i );
+	va_end( args );
+
+	/* Copy and NULL-terminate.
+	 */
+	array = g_new( FileselFileType *, len + 1 );
+	va_start( args, first );
+	j = 0;
+	for( i = first; i; i = va_arg( args, FileselFileType ** ) ) 
+		for( k = 0; i[k]; k++ )
+			array[j++] = i[k];
+	va_end( args );
+	array[j] = NULL;
+
+	return( array );
+}
+
+/* Here from main() during startup. We can't just put this in class_init,
+ * because we want to be sure this happens early on.
+ */
+void
+filesel_startup( void )
+{
+	filesel_type_image = build_image_file_type();
+	filesel_type_mainw = build_file_type_va( filesel_type_image, 
+		filesel_type_matrix, filesel_type_workspace, NULL );
+	filesel_type_any = build_file_type_va( filesel_type_mainw,
+		filesel_type_definition, NULL );
+}
 
 /* Is a file of type ... just look at the suffix.
  */
@@ -350,47 +410,57 @@ filesel_csv_mode( char *out )
 typedef void (*make_mode_fn)( char *buf );
 
 typedef struct {
-	FileselFileType *type;
-	const char *caption_filter;
+	const char *caption_filter;/* The nip2 column name for the format */
+	const char *name;	/* The vips name for the format */
 	make_mode_fn mode_fn;
 } FileselMode;
 
 static FileselMode filesel_mode_table[] = {
-	{ &filesel_jfile_type, "JPEG", filesel_jpeg_mode },
-	{ &filesel_nfile_type, "PNG", filesel_png_mode },
-	{ &filesel_tfile_type, "TIFF", filesel_tiff_mode },
-	{ &filesel_sfile_type, "CSV", filesel_csv_mode },
-	{ &filesel_pfile_type, "PPM", filesel_ppm_mode }
+	{ "JPEG", "jpeg", filesel_jpeg_mode },
+	{ "PNG", "png", filesel_png_mode },
+	{ "TIFF", "tiff", filesel_tiff_mode },
+	{ "CSV", "csv", filesel_csv_mode },
+	{ "PPM", "ppm", filesel_ppm_mode }
 };
+
+static FileselMode *
+filesel_get_mode( const char *filename )
+{
+	int i;
+	im_format *format;
+
+	if( (format = im_format_for_name( filename )) )
+		for( i = 0; i < IM_NUMBER( filesel_mode_table ); i++ )
+			if( strcmp( filesel_mode_table[i].name, 
+				format->name ) == 0 ) 
+				return( &filesel_mode_table[i] );
+
+	return( NULL );
+}
 
 /* Add our image save settings to the end of a filename.
  */
 void
 filesel_add_mode( char *filename )
 {
-	int i;
+	FileselMode *mode;
 
-	for( i = 0; i < IM_NUMBER( filesel_mode_table ); i++ )
-		if( is_file_type( filesel_mode_table[i].type, filename ) ) {
-			char mode[256];
-			int l = strlen( filename );
+	if( (mode = filesel_get_mode( filename )) ) {
+		char ext[256];
+		int l = strlen( filename );
 
-			filesel_mode_table[i].mode_fn( mode );
-			im_snprintf( filename + l, MAX_STRSIZE - l, 
-				":%s", mode );
-
-			return;
-		}
+		mode->mode_fn( ext );
+		im_snprintf( filename + l, MAX_STRSIZE - l, ":%s", ext );
+	}
 }
 
 static const char *
 filesel_get_filter( const char *filename )
 {
-	int i;
+	FileselMode *mode;
 
-	for( i = 0; i < IM_NUMBER( filesel_mode_table ); i++ )
-		if( is_file_type( filesel_mode_table[i].type, filename ) ) 
-			return( filesel_mode_table[i].caption_filter );
+	if( (mode = filesel_get_mode( filename )) ) 
+		return( mode->caption_filter );
 
 	return( NULL );
 }
@@ -771,13 +841,53 @@ browse_cb( GtkWidget *wid, Filesel *filesel )
 	}
 }
 
+static GtkFileFilter *
+file_filter_from_file_type( FileselFileType *type )
+{
+	GtkFileFilter *filter;
+	int j;
+	
+	filter = gtk_file_filter_new();
+	gtk_file_filter_set_name( filter, _( type->name ) );
+
+	if( type->suffixes[0] )
+		for( j = 0; type->suffixes[j]; j++ ) {
+			char buf[FILENAME_MAX];
+			BufInfo patt;
+
+			buf_init_static( &patt, buf, FILENAME_MAX );
+			filesel_suffix_to_glob( type->suffixes[j], &patt );
+			gtk_file_filter_add_pattern( filter, buf_all( &patt ) );
+		}
+	else
+		/* No suffix list means any suffix allowed.
+		 */
+		gtk_file_filter_add_pattern( filter, "*" );
+
+	return( filter );
+}
+
+static void
+filesel_add_filter( Filesel *filesel, FileselFileType *type, int i )
+{
+	filesel->filter[i] = file_filter_from_file_type( type );
+
+	gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( filesel->chooser ),
+		filesel->filter[i] );
+
+	if( i == filesel->default_type )
+		gtk_file_chooser_set_filter( 
+			GTK_FILE_CHOOSER( filesel->chooser ),
+			filesel->filter[i] );
+}
+
 static void
 filesel_build( GtkWidget *widget )
 {
 	Filesel *filesel = FILESEL( widget );
 	iDialog *idlg = IDIALOG( widget );
 
-	int i, j;
+	int i;
 	FileselFileType *type;
 	GtkWidget *vb;
 	GtkWidget *but;
@@ -806,32 +916,11 @@ filesel_build( GtkWidget *widget )
         slist_map( PATH_SEARCH,
 		(SListMapFn) filesel_add_volume, filesel );
 
-	/* Add all the supported file types.
+	/* Add all the supported file types. Add "all" to the end.
 	 */
-	for( i = 0; (type = filesel->type[i]); i++ ) {
-		char buf[FILENAME_MAX];
-		BufInfo patt;
-		
-		filesel->filter[i] = gtk_file_filter_new();
-
-		gtk_file_filter_set_name( filesel->filter[i], _( type->name ) );
-
-		for( j = 0; type->suffixes[j]; j++ ) {
-			buf_init_static( &patt, buf, FILENAME_MAX );
-			filesel_suffix_to_glob( type->suffixes[j], &patt );
-			gtk_file_filter_add_pattern( filesel->filter[i], 
-				buf_all( &patt ) );
-		}
-
-		gtk_file_chooser_add_filter( 
-			GTK_FILE_CHOOSER( filesel->chooser ),
-			filesel->filter[i] );
-
-		if( i == filesel->default_type )
-			gtk_file_chooser_set_filter( 
-				GTK_FILE_CHOOSER( filesel->chooser ),
-				filesel->filter[i] );
-	}
+	for( i = 0; (type = filesel->type[i]); i++ ) 
+		filesel_add_filter( filesel, type, i );
+	filesel_add_filter( filesel, &filesel_allfile_type, i );
 
         /* Spot changes.
          */
@@ -1212,9 +1301,7 @@ void
 filesel_set_filetype( Filesel *filesel, 
 	FileselFileType **type, int default_type )
 {
-	int i;
-
-	/* Reset the widget if it's there.
+	/* Reset the widget, if it's there.
 	 */
 	if( filesel->chooser )
 		gtk_file_chooser_set_filter( 
@@ -1222,11 +1309,8 @@ filesel_set_filetype( Filesel *filesel,
 			filesel->filter[default_type] );
 
 	filesel->type = type;
+	filesel->ntypes = array_len( (void **) type );
 	filesel->default_type = default_type;
-
-	for( i = 0; type[i]; i++ )
-		;
-	filesel->ntypes = i;
 }
 
 void 

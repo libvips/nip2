@@ -1,0 +1,168 @@
+Name:           @PACKAGE@
+Version:        @VERSION@
+Release:	1%{?dist}
+Summary:	Interactive tool for working with large images
+
+Group:		Applications/Multimedia
+License:	GPLv2+
+URL:		http://www.vips.ecs.soton.ac.uk/
+Source0:	http://www.vips.ecs.soton.ac.uk/supported/7.14/%{name}-%{version}.tar.gz
+
+BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+
+BuildRequires:	vips-devel = %{version}
+BuildRequires:	gtk2-devel shared-mime-info gnome-icon-theme
+BuildRequires:	flex bison intltool fftw-devel libxml2-devel gettext
+BuildRequires:	desktop-file-utils
+#Requires:
+
+
+# description taken from Debian package
+%description
+nip2 is a graphical front end to the VIPS package.
+With nip2, rather than directly editing images, you build
+relationships between objects in a spreadsheet-like fashion. When you
+make a change somewhere, nip2 recalculates the objects affected by
+that change. Since it is demand-driven this update is very fast, even
+for very, very large images. nip2 is very good at creating pipelines
+of image manipulation operations. It is not very good for image
+editing tasks like touching up photographs. For that, a tool like the
+GIMP should be used instead.
+
+
+%prep
+%setup -q
+
+# CVS dirs
+find . -name CVS -type d -print0 | xargs -0 rm -rf
+
+
+%build
+%configure
+make %{?_smp_mflags}
+
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make install DESTDIR=$RPM_BUILD_ROOT
+
+# delete doc (we will get it later with %doc)
+rm -rf $RPM_BUILD_ROOT%{_datadir}/doc/nip2
+
+# malkovich??
+rm -rf $RPM_BUILD_ROOT%{_datadir}/locale/malkovich
+
+# the nip2 post install hook seems to run update-mime-database, but we
+# need to run it in post
+rm -rf $RPM_BUILD_ROOT%{_datadir}/mime
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/mime/packages
+cp -a nip2.xml $RPM_BUILD_ROOT%{_datadir}/mime/packages
+
+# same with desktop file
+rm -rf $RPM_BUILD_ROOT%{_datadir}/applications
+
+# locale stuff
+%find_lang nip2
+
+# icon
+install -d $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/128x128/apps
+cp -a share/nip2/data/vips-128.png	\
+	$RPM_BUILD_ROOT%{_datadir}/icons/hicolor/128x128/apps/nip2.png
+
+# desktop file
+desktop-file-install --vendor fedora 			\
+	--dir $RPM_BUILD_ROOT%{_datadir}/applications	\
+	nip2.desktop
+
+
+%post
+# scriptlet for icons
+touch --no-create %{_datadir}/icons/hicolor || :
+if [ -x %{_bindir}/gtk-update-icon-cache ]; then
+	%{_bindir}/gtk-update-icon-cache --quiet %{_datadir}/icons/hicolor || :
+fi
+
+# scriptlet for desktop database
+update-desktop-database &> /dev/null || :
+
+# MIME
+update-mime-database %{_datadir}/mime &> /dev/null || :
+
+
+%postun
+# scriptlet for icons
+touch --no-create %{_datadir}/icons/hicolor || :
+if [ -x %{_bindir}/gtk-update-icon-cache ]; then
+	%{_bindir}/gtk-update-icon-cache --quiet %{_datadir}/icons/hicolor || :
+fi
+
+# scriptlet for desktop database
+update-desktop-database &> /dev/null || :
+
+# MIME
+update-mime-database %{_datadir}/mime &> /dev/null || :
+
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+
+%files -f nip2.lang
+%defattr(-,root,root,-)
+%doc doc/html doc/pdf AUTHORS ChangeLog COPYING NEWS THANKS TODO
+%{_bindir}/nip2
+%{_bindir}/run-nip2.sh
+%{_datadir}/nip2
+%{_mandir}/man1/nip2.1.gz
+%{_datadir}/icons/hicolor/*/apps/*
+%{_datadir}/applications/*
+%{_datadir}/mime/packages/nip2.xml
+
+
+%changelog
+* Sat Jul 19 2008 Jesper Friis <jesper.friis(at)sintef.no> - 7.15.0-1
+- Added this spec file from the Fedora source rpm
+
+* Sat Mar 15 2008 Adam Goode <adam@spicenitz.org> - 7.14.1-1
+- New release
+
+* Mon Mar 10 2008 Adam Goode <adam@spicenitz.org> - 7.14.0-1
+- New release
+
+* Sat Feb  9 2008 Adam Goode <adam@spicenitz.org> - 7.12.5-4
+- GCC 4.3 mass rebuild
+
+* Wed Dec  5 2007 Adam Goode <adam@spicenitz.org> - 7.12.5-3
+- Fix desktop file validation
+
+* Tue Oct 16 2007 Adam Goode <adam@spicenitz.org> - 7.12.5-2
+- Rebuild for OpenEXR soname change
+
+* Fri Sep 21 2007 Adam Goode <adam@spicenitz.org> - 7.12.5-1
+- New upstream release
+
+* Thu Aug 16 2007 Adam Goode <adam@spicenitz.org> - 7.12.4-1
+- New upstream release
+- Update License tag
+
+* Wed Jul 25 2007 Adam Goode <adam@spicenitz.org> - 7.12.2-1
+- New stable release 7.12
+
+* Sat May  5 2007 Adam Goode <adam@spicenitz.org> - 7.12.0-1
+- New upstream release
+- Update desktop file
+- Remove X-Fedora category
+
+* Thu Aug 31 2006 Adam Goode <adam@spicenitz.org> - 7.10.21-1
+- New upstream release
+
+* Sun Aug 13 2006 Adam Goode <adam@spicenitz.org> - 7.10.20-2
+- Fix location of documentation in program so help works
+- Semicolon-terminate Category entry in desktop file
+
+* Sat Jul 22 2006 Adam Goode <adam@spicenitz.org> - 7.10.20-1
+- New upstream release
+- Updated for FC5
+
+* Thu Jan 30 2003 John Cupitt <john.cupitt@ng-london.org.uk> 7.8.6-1
+- first stab at an rpm package for nip

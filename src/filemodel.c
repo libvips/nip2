@@ -368,6 +368,10 @@ filemodel_class_init( FilemodelClass *class )
 	class->top_load = filemodel_real_top_load;
 	class->set_modified = filemodel_real_set_modified;
 	class->save_all = filemodel_real_save_all;
+
+	/* NULL isn't an allowed value -- this gets overridden by our
+	 * subclasses.
+	 */
 	class->filetype = NULL;
 	class->filetype_pref = NULL;
 }

@@ -837,7 +837,7 @@ static Imageinfo *
 imageinfo_open_image_input( const char *filename, ImageinfoOpen *open )
 {
 	Imageinfo *imageinfo;
-	im_format *format;
+	im_format_t *format;
 
 	if( im_isvips( filename ) ) {
 		IMAGE *im;

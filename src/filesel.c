@@ -122,7 +122,7 @@ FileselFileType
         **filesel_type_any = NULL;
 
 static void *
-build_vips_formats_sub( im_format *format, GSList **types )
+build_vips_formats_sub( im_format_t *format, GSList **types )
 {
 	FileselFileType *type = g_new( FileselFileType, 1 );
 	char txt[MAX_STRSIZE];
@@ -427,7 +427,7 @@ static FileselMode *
 filesel_get_mode( const char *filename )
 {
 	int i;
-	im_format *format;
+	im_format_t *format;
 
 	if( (format = im_format_for_name( filename )) )
 		for( i = 0; i < IM_NUMBER( filesel_mode_table ); i++ )

@@ -1,3 +1,44 @@
+- toolkit load is where compiled code would go in
+
+  need to make load / parse / compile self-contained ... the only output is a
+  list of symbols, each with code and sub-symbols; there are no toolkits or
+  whatever made
+
+  after load / parse / compile, we need to walk the symbol list building tools
+  and all that stuff
+
+  we do:
+
+  	load toolkit:
+		get filesize, date last modified, md5sum
+		look in ~/.nip2-7.x.x/cache for a file named with that md5sum
+		if present, open and check first two fields: filesize and date
+		if match, load compiled code
+		if no match, load / parse / compile toolkit, then save compiled
+			code to ~/.nip2-7.x.x./cache
+		walk symbol list building tools and all that stuff
+
+  how much time will this really save? can we easily get an estimate?
+
+  steps to follow:
+
+  1.	make load / parse / compile self-contained, with separate pass to
+  	build tools etc.
+
+	this is a useful cleanup whatever else we do
+
+  2. 	now we know exactly what the output of load / parse / compile is, we
+  	should be able to write to a file
+
+	make our own binary format, don't use XML ... we want speed
+
+  3. 	try loading and benchmarking
+
+  	can we junk the splash screen?
+
+  4.	if the benchmarks look promising, harden and polish
+
+
 - numbering of group of group save seems to skip one at end of line?
 
 - Math / Cluster is a bit useless, will it work for complex numbers? vectors?

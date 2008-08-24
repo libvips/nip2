@@ -46,11 +46,6 @@
 
   what would we have to do to get it to work for these other types?
 
-- lots of annoying strcmp in vips.c, go to int once and stick with it
-
-  even better, put all the ops on a type together as a bunch of callbacks and
-  don't use switch at all
-
 - segv in test_toolkits on laptop (inside fftw3) ???!? valgrinds cleanly on 
   work machine
 

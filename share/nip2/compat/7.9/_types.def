@@ -713,9 +713,10 @@ Colour colour_space value = class
 
 /* Base slider type.
  */
-Scale from to value = class 
+Scale caption from to value = class 
 	scope.Real value {
 	_check_args = [
+		[caption, "caption", check_string],
 		[from, "from", check_real],
 		[to, "to", check_real]
 	] ++ super._check_args;

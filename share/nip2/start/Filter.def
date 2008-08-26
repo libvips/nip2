@@ -1592,7 +1592,3 @@ Filter_paint_text_item = class
 		}
 	}
 }
-
-Filter_draw_line_item = class 
-	Menuaction "Draw _Line" "draw a line using an arrow as a guide" {
-}

@@ -1892,8 +1892,13 @@ heap_ip_to_gvalue( PElement *in, GValue *out )
 
 			if( !heap_get_string( in, name, 256 ) )
 				return( FALSE );
-			g_value_init( out, G_TYPE_STRING );
-			g_value_set_string( out, name );
+
+			/* We want a refstring, not a G_TYPE_STRING, since
+			 * this GValue will (probably) be used by vips with
+			 * im_header_string() etc.
+			 */
+			g_value_init( out, IM_TYPE_REF_STRING );
+			im_ref_string_set( out, name );
 		}
 		else {
 			error_top( _( "Unimplemented list type." ) );
@@ -1975,6 +1980,19 @@ heap_gvalue_to_ip( GValue *in, PElement *out )
 		object = g_value_get_object( in );
 		managed = MANAGED( managedgobject_new( heap, object ) );
 		PEPUTP( out, ELEMENT_MANAGED, managed );
+	}
+	else if( g_value_type_transformable( G_VALUE_TYPE( in ), 
+		G_TYPE_STRING ) ) {
+		GValue temp = { 0 };
+
+		g_value_init( &temp, G_TYPE_STRING );
+		g_value_transform( in, &temp );
+		if( !heap_string_new( heap, 
+			g_value_get_string( &temp ), out ) ) {
+			return( FALSE );
+			g_value_unset( &temp );
+		}
+		g_value_unset( &temp );
 	}
 	else {
 		error_top( _( "Unimplemented type." ) );

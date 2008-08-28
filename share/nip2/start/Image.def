@@ -662,6 +662,51 @@ Image_transform_item = class
 			}
 		}
 
+		Size_within_item = class
+			Menuaction "Size _Within" "size to fit within a rectangle" {
+			action x = class 
+				_result {
+				_vislevel = 3;
+
+				// the rects we size to fit within
+				_rects = [
+					[2048, 1536], [1920, 1200], [1600, 1200], [1400, 1050], 
+					[1280, 1024], [1024, 768], [800, 600], [640, 480] 
+				];
+
+				within = Option "Fit within (pixels)" (
+					[print w ++ " x " ++ print h :: [w, h] <- _rects] ++
+					["Custom"]
+				) 4;
+				custom_width = Expression "Custom width" 1000;
+				custom_height = Expression "Custom height" 1000;
+			    size = Option "Page size" [
+					"Full page", "Half page", "Quarter page" 
+				] 0;
+				interp = _interp;
+
+			 	_result
+				 	= map_unary process x
+				{
+					xdiv = [1, 2, 2]?size;
+					ydiv = [1, 1, 2]?size;
+					allrect = _rects ++ [
+						[custom_width.expr, custom_height.expr]
+					];
+					[width, height] = allrect?within;
+
+					process x
+						= resize fac fac interp.value_thing x, fac < 1
+						= x
+					{
+						xfac = (width / xdiv) / x.width;
+						yfac = (height / ydiv) / x.height;
+						fac = min_pair xfac yfac;
+					}
+				}
+			}
+		}
+
 		Resize_canvas_item = class
 			Menuaction "_Canvas" "change size of surrounding image" {
 			action x = class

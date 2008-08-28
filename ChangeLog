@@ -3,6 +3,7 @@ branch for 7.16
 - grey16/rgb16 not always set on colour space conversion
 - set GValue strings as refstrings
 - try to transform gvalues we get to strings, if we can
+- added Joe's shrink within macro
 
 started 7.15.0
 - fixed segv with making tools for non-toplevels 

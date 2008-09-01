@@ -475,7 +475,8 @@ Math_stats_item = class
 	}
 
 	Gravity_item = class 
-		Menuaction "Centre of _Gravity" "position of centre of gravity" {
+		Menuaction "Centre of _Gravity" 
+			"position of centre of gravity of histogram" {
 		action a = map_unary gravity a;
 	}
 

@@ -59,7 +59,6 @@ struct _Conversion {
 	REGION *ireg;		/* Region for input from repaint image */
 	REGION *mreg;		/* Region for input from repaint mask */
 	int tile_size;		/* Set smaller for thumbnails */
-	int fade_steps;		/* Set to 1 for thumbnails */
 
 	/* Basic geometry.
 	 */

@@ -338,7 +338,7 @@ conversion_make_display( Conversion *conv, IMAGE *in, IMAGE **mask_out )
 		if( im_render_fade( in, out, mask, 
 			conv->tile_size, conv->tile_size, 
 				conversion_get_default_tiles( conv ),
-			20, conv->fade_steps,
+			20, 0, 
 			conv->priority,
 			conversion_render_notify_cb, conv ) ) {
 			im_close( out );
@@ -350,41 +350,6 @@ conversion_make_display( Conversion *conv, IMAGE *in, IMAGE **mask_out )
 	}
 
 	return( out );
-}
-
-static int
-conversion_make_bg( Conversion *conv, IMAGE *repaint, IMAGE *out )
-{
-	IMAGE *tile = im_open_local( out, "tile", "t" );
-	IMAGE *t1 = im_open_local( out, "t1", "p" );
-	IMAGE *t2 = im_open_local( out, "t2", "p" );
-	int i;
-
-	/* Make a 2x2 pixel image with the tile pixels in.
-	 */
-	im_initdesc( tile, 2, 2,
-		repaint->Bands, IM_BBITS_BYTE, IM_BANDFMT_UCHAR,
-		IM_CODING_NONE, IM_TYPE_MULTIBAND, 
-		1.0, 1.0, 0, 0 );
-	if( im_setupout( tile ) )
-		return( -1 );
-	for( i = 0; i < tile->Bands; i++ ) {
-		((PEL *)(tile->data))[i] = 100;
-		((PEL *)(tile->data))[i + tile->Bands] = 90;
-		((PEL *)(tile->data))[i + tile->Bands * 2] = 90;
-		((PEL *)(tile->data))[i + tile->Bands * 3] = 100;
-	}
-
-	/* Blow it up, tile it and trim it.
-	 */
-	if( im_zoom( tile, t1, 16, 16 ) ||
-		im_replicate( t1, t2, 
-			1 + repaint->Xsize / 16, 1 + repaint->Ysize / 16 ) ||
-		im_extract_area( t2, out, 
-			0, 0, repaint->Xsize, repaint->Ysize ) )
-		return( -1 );
-
-	return( 0 );
 }
 
 /* Track during lintrauc.
@@ -519,7 +484,6 @@ static IMAGE *
 conversion_make_repaint( Conversion *conv, IMAGE *in )
 {
 	IMAGE *out = im_open( "conversion_apply:1", "p" );
-	IMAGE *bg = im_open_local( out, "bg", "p" );
 
 	/* 7 is sRGB.
 
@@ -775,20 +739,10 @@ conversion_make_repaint( Conversion *conv, IMAGE *in )
 		in = t1;
 	}
 
-	/* Combine with background checkerboard and mask to make final image.
-	 */
-	if( conv->synchronous ) {
-		if( im_copy( in, out ) ) {
-			im_close( out );
-			return( NULL );
-		}
+	if( im_copy( in, out ) ) {
+		im_close( out );
+		return( NULL );
 	}
-	else
-		if( conversion_make_bg( conv, in, bg ) ||
-			im_blend( conv->mask, in, bg, out ) ) {
-			im_close( out );
-			return( NULL );
-		}
 
 	return( out );
 }
@@ -1063,11 +1017,6 @@ conversion_init( Conversion *conv )
 	 * thumbnails.
 	 */
 	conv->tile_size = 128;
-
-	/* Default to the preference ... iimageview sets this to less to stop
-	 * the tile fade animation on thumbnails.
-	 */
-	conv->fade_steps = DISPLAY_FADE_STEPS;
 
 	conv->underlay = emptyrect;
 	conv->image = emptyrect;

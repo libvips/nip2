@@ -239,7 +239,6 @@ browse_add_image( Browse *browse, Imageinfo *ii )
 
 	conv = conversion_new( ii );
 	conv->tile_size = 16;
-	conv->fade_steps = 1;
 	id = imagedisplay_new( conv );
 	gtk_widget_set_size_request( GTK_WIDGET( id ), 64, 64 );
 	imagedisplay_set_shrink_to_fit( id, TRUE );

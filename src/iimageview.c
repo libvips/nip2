@@ -356,7 +356,6 @@ iimageview_init( iImageview *iimageview )
 
 	iimageview->conv = conversion_new( NULL );
 	iimageview->conv->tile_size = 16;
-	iimageview->conv->fade_steps = 1;
         iimageview->id = imagedisplay_new( iimageview->conv );
 	imagedisplay_set_shrink_to_fit( iimageview->id, TRUE );
         gtk_box_pack_start( GTK_BOX( vbox ), 

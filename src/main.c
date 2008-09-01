@@ -1162,9 +1162,12 @@ main( int argc, char *argv[] )
 	main_stdin = file_open_read_stdin();
 
 #ifdef HAVE_GETRLIMIT
-	/* Make sure we have lots of file descriptors.
+	/* Make sure we have lots of file descriptors. Some platforms have cur
+	 * as 256 and max at 1024 to keep stdio happy.
 	 */
 	if( getrlimit( RLIMIT_NOFILE, &rlp ) == 0 ) {
+		rlim_t old_limit = rlp.rlim_cur;
+
 		rlp.rlim_cur = rlp.rlim_max;
 		if( setrlimit( RLIMIT_NOFILE, &rlp ) == 0 ) {
 #ifdef DEBUG
@@ -1172,11 +1175,14 @@ main( int argc, char *argv[] )
 				(int) rlp.rlim_max );
 #endif /*DEBUG*/
 		}
-		else {
+		else if( (int) rlp.rlim_max != -1 ) {
+			/* -1 means can't-be-set, at least on os x, so don't
+			 * warn.
+			 */
 			g_warning( _( "unable to change max file "
 				"descriptors\n"
 				"max file descriptors still set to %d" ),
-				(int) rlp.rlim_cur );
+				(int) old_limit );
 		}
 	}
 	else {

@@ -630,10 +630,10 @@ filesel_get_filetype( Filesel *filesel )
 			GTK_FILE_CHOOSER( filesel->chooser ) );
 		assert( filter );
 
-		for( i = 0; filesel->type[i]; i++ ) 
+		for( i = 0; filesel->filter[i]; i++ ) 
 			if( filter == filesel->filter[i] )
 				break;
-		assert( filesel->type[i] );
+		assert( filesel->filter[i] );
 
 		return( i );
 	}
@@ -753,6 +753,20 @@ filesel_get_filename( Filesel *filesel )
 	return( name );
 }
 
+/* How many selected filenames.
+ */
+int
+filesel_nselected( Filesel *filesel )
+{
+	GSList *names = gtk_file_chooser_get_filenames( 
+		GTK_FILE_CHOOSER( filesel->chooser ) );
+	int n = g_slist_length( names );
+
+	IM_FREEF( slist_free_all, names );
+
+	return( n );
+}
+
 /* Get filename multi ... map over the selected filenames.
  */
 void *
@@ -802,7 +816,7 @@ filesel_selection_changed_cb( GtkWidget *widget, gpointer data )
 }
 
 static void
-filesel_file_sctivated_cb( GtkWidget *widget, gpointer data )
+filesel_file_activated_cb( GtkWidget *widget, gpointer data )
 {
 	idialog_done_trigger( IDIALOG( data ), 0 );
 }
@@ -932,7 +946,7 @@ filesel_build( GtkWidget *widget )
                 GTK_SIGNAL_FUNC( filesel_selection_changed_cb ), filesel );
         gtk_signal_connect( GTK_OBJECT( filesel->chooser ), 
 		"file-activated",
-                GTK_SIGNAL_FUNC( filesel_file_sctivated_cb ), filesel );
+                GTK_SIGNAL_FUNC( filesel_file_activated_cb ), filesel );
 
 	/* Pack extra widgets.
 	 */
@@ -1060,6 +1074,8 @@ filesel_refresh_all( void )
 static void
 filesel_init( Filesel *filesel )
 {
+	int i;
+
 #ifdef DEBUG
 	printf( "filesel_init: %s\n", NN( IWINDOW( filesel )->title ) );
 #endif /*DEBUG*/
@@ -1067,6 +1083,8 @@ filesel_init( Filesel *filesel )
 	filesel->chooser = NULL;
 	filesel->space = NULL;
 	filesel->info = NULL;
+	for( i = 0; i < FILESEL_MAX_FILTERS; i++ )
+		filesel->filter[i] = NULL;
 	filesel->incr = FALSE;
 	filesel->imls = FALSE;
 	filesel->save = FALSE;

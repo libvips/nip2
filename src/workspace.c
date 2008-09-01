@@ -486,6 +486,28 @@ workspace_add_def( Workspace *ws, const char *str )
 	return( sym );
 }
 
+gboolean
+workspace_load_file_buf( BufInfo *buf, const char *filename )
+{
+	if( !existsf( "%s", filename ) ) {
+		error_top( _( "File does not exist." ) );
+		error_sub( _( "File \"%s\" cannot be read." ), filename );
+
+		return( FALSE );
+	}
+
+	if( im_isvips( filename ) || im_format_for_file( filename ) ) 
+		buf_appends( buf, "Image_file" );
+	else
+		buf_appends( buf, "Matrix_file" );
+
+	buf_appends( buf, " \"" );
+	buf_appendsc( buf, TRUE, filename );
+	buf_appends( buf, "\"" );
+
+	return( TRUE );
+}
+
 Symbol *
 workspace_load_file( Workspace *ws, const char *filename )
 {
@@ -494,26 +516,13 @@ workspace_load_file( Workspace *ws, const char *filename )
 	Symbol *sym;
 
 	buf_init_static( &buf, txt, MAX_STRSIZE );
-	buf_appends( &buf, "Image_file \"" );
-	buf_appendsc( &buf, TRUE, filename );
-	buf_appends( &buf, "\"" );
-	if( (sym = workspace_add_def( ws, buf_all( &buf ) )) ) {
-		mainw_recent_add( &mainw_recent_image, filename );
-		return( sym );
-	}
-	error_clear();
+	if( !workspace_load_file_buf( &buf, filename ) )
+		return( NULL );
+	if( !(sym = workspace_add_def( ws, buf_all( &buf ) )) ) 
+		return( NULL );
+	mainw_recent_add( &mainw_recent_image, filename );
 
-	buf_init_static( &buf, txt, MAX_STRSIZE );
-	buf_appends( &buf, "Matrix_file \"" );
-	buf_appendsc( &buf, TRUE, filename );
-	buf_appends( &buf, "\"" );
-	if( (sym = workspace_add_def( ws, buf_all( &buf ) )) ) {
-		mainw_recent_add( &mainw_recent_matrix, filename );
-		return( sym );
-	}
-	error_clear();
-
-	return( NULL );
+	return( sym );
 }
 
 /* Bounding box of columns to be saved. Though we only really set top/left.
@@ -716,21 +725,21 @@ workspace_auto_recover_load( iWindow *iwnd,
 {
 	char *filename = (char *) client;
 	Mainw *mainw = MAINW( iwindow_get_root_noparent( GTK_WIDGET( iwnd ) ) );
-	Filemodel *filemodel;
+	Workspace *ws;
 
 	/* Load ws file.
 	 */
         busy_begin();
-	filemodel = mainw_open_file( mainw, filename );
+	ws = mainw_open_file_into_workspace( mainw, filename );
 	busy_end();
 
-	if( filemodel ) {
+	if( ws ) {
 		/* The filename will be something like
 		 * "~/.nip2-7.9.6/tmp/untitled-nip2-0-3904875.ws", very
 		 * unhelpful.
 		 */
-		IM_FREE( filemodel->filename );
-		iobject_changed( IOBJECT( filemodel ) );
+		IM_FREE( FILEMODEL( ws )->filename );
+		iobject_changed( IOBJECT( ws ) );
 
 		nfn( sys, IWINDOW_YES );
 	}

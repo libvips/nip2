@@ -169,6 +169,7 @@ Column *workspace_column_pick( Workspace *ws );
 void workspace_column_select( Workspace *ws, Column *col );
 
 Symbol *workspace_add_def( Workspace *ws, const char *str );
+gboolean workspace_load_file_buf( BufInfo *buf, const char *filename );
 Symbol *workspace_load_file( Workspace *ws, const char *filename );
 
 gboolean workspace_selected_save( Workspace *ws, const char *filename );

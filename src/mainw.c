@@ -922,7 +922,7 @@ mainw_workspace_save_as_action_cb( GtkAction *action, Mainw *mainw )
 	filemodel_inter_saveas( IWINDOW( mainw ), FILEMODEL( mainw->ws ) );
 }
 
-static Workspace *
+Workspace *
 mainw_open_file_into_workspace( Mainw *mainw, const char *filename )
 {
 	Workspacegroup *wsg = WORKSPACEGROUP( ICONTAINER( mainw->ws )->parent );
@@ -955,61 +955,49 @@ mainw_open_file_into_workspace( Mainw *mainw, const char *filename )
 		iwindow_kill( IWINDOW( mainw ) );
 	}
 
+	/* Can't rely on filename still being around ... read filename
+	 * from new ws instead.
+	 */
+	mainw_recent_add( &mainw_recent_workspace, 
+		FILEMODEL( new_ws )->filename );
+
+	/* Process some events to make sure we rethink the layout and
+	 * are able to get the append-at-RHS offsets.
+	 */
+	while( g_main_context_iteration( NULL, FALSE ) )
+		;
+
+	symbol_recalculate_all();
+
 	return( new_ws );
 }
 
-/* Try to open a file ... workspace, image or matrix.
+/* Track these during a load.
  */
-Filemodel *
-mainw_open_file( Mainw *mainw, const char *filename )
-{
-	Workspace *ws;
-	Symbol *sym;
-	char *utf8;
+typedef struct {
+	Mainw *mainw;
+	BufInfo *buf;
+	int nitems;
+} MainwLoad;
 
-	/* Do this first since into_ws needs to be able to spot blank
-	 * workspaces.
-	 */
-	if( (ws = mainw_open_file_into_workspace( mainw, filename )) ) {
-		/* Can't rely on filename still being around ... read filename
-		 * from new ws instead.
-		 */
-		mainw_recent_add( &mainw_recent_workspace, 
-			FILEMODEL( ws )->filename );
-
-		/* Process some events to make sure we rethink the layout and
-		 * are able to get the append-at-RHS offsets.
-		 */
-		while( g_main_context_iteration( NULL, FALSE ) )
-			;
-
-		symbol_recalculate_all();
-
-		return( FILEMODEL( ws ) );
-	}
-	error_clear();
-
-	if( (sym = workspace_load_file( mainw->ws, filename )) )
-		return( FILEMODEL( sym ) );
-
-	utf8 = f2utf8( filename );
-	error_top( _( "Load failed." ) );
-	error_sub( _( "Unable to load from file \"%s\". "
-		"Error loading as image, workspace or matrix." ), utf8 );
-	g_free( utf8 );
-
-	return( NULL );
-}
-
-/* Try to open a file ... Image or matrix.
+/* Try to open a file. Workspace files we load immediately, other ones we
+ * add the load to a buffer.
  */
 static void *
-mainw_open_fn( Filesel *filesel, const char *filename, void *a, void *b )
+mainw_open_fn( Filesel *filesel, const char *filename, MainwLoad *load )
 {
-	Mainw *mainw = MAINW( a );
-
-	if( !mainw_open_file( mainw, filename ) )
-		return( filesel );
+	if( is_file_type( &filesel_wfile_type, filename ) ) {
+		if( !mainw_open_file_into_workspace( load->mainw, filename ) )
+			return( filesel );
+	}
+	else {
+		if( load->nitems ) 
+			buf_appends( load->buf, ", " );
+		if( !workspace_load_file_buf( load->buf, filename ) )
+			return( filesel );
+		mainw_recent_add( &mainw_recent_image, filename );
+		load->nitems += 1;
+	}
 
 	return( NULL );
 }
@@ -1022,11 +1010,29 @@ mainw_open_done_cb( iWindow *iwnd, void *client,
 {
 	Mainw *mainw = MAINW( client );
 	Filesel *filesel = FILESEL( iwnd );
+	int nselected = filesel_nselected( filesel );
+	char txt[MAX_STRSIZE];
+	BufInfo buf;
+	MainwLoad load;
 
+	buf_init_static( &buf, txt, MAX_STRSIZE );
+	load.mainw = mainw;
+	load.buf = &buf;
+	load.nitems = 0;
+
+	if( nselected > 1 )
+		buf_appends( &buf, "Group [" );
 	if( filesel_map_filename_multi( filesel,
-		mainw_open_fn, mainw, NULL ) ) {
+		(FileselMapFn) mainw_open_fn, &load, NULL ) ) {
 		nfn( sys, IWINDOW_ERROR );
 		return;
+	}
+	if( nselected > 1 )
+		buf_appends( &buf, "]" );
+
+	if( !workspace_add_def( mainw->ws, buf_all( &buf ) ) ) {
+		error_top( _( "Load failed." ) );
+		nfn( sys, IWINDOW_ERROR );
 	}
 
 	nfn( sys, IWINDOW_YES );
@@ -1102,13 +1108,28 @@ mainw_open_examples_action_cb( GtkAction *action, Mainw *mainw )
 	mainw_open_examples( mainw );
 }
 
+static gboolean
+mainw_recent_open( Mainw *mainw, const char *filename )
+{
+	if( is_file_type( &filesel_wfile_type, filename ) ) {
+		if( !mainw_open_file_into_workspace( mainw, filename ) )
+			return( FALSE );
+	}
+	else {
+		if( !workspace_load_file( mainw->ws, filename ) )
+			return( FALSE );
+	}
+
+	return( TRUE );
+}
+
 static void
 mainw_recent_open_cb( GtkWidget *widget, const char *filename )
 {
 	Mainw *mainw = MAINW( iwindow_get_root( widget ) );
 
 	busy_begin();
-	if( !mainw_open_file( mainw, filename ) ) {
+	if( !mainw_recent_open( mainw, filename ) ) {
 		box_alert( widget );
 		busy_end();
 		return;

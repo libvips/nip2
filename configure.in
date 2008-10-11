@@ -129,7 +129,7 @@ fi
 
 # get packages we need
 # gtk before 2.4.9 crashes with the way we use combobox :-(
-PKG_CHECK_MODULES(PKGFLAGS, gthread-2.0 gtk+-2.0 >= 2.4.9 libxml-2.0 vips-7.15)
+PKG_CHECK_MODULES(PKGFLAGS, gthread-2.0 gtk+-2.0 >= 2.4.9 libxml-2.0 vips-7.17)
 IP_CFLAGS="$PKGFLAGS_CFLAGS $IP_CFLAGS"
 IP_LIBS="$PKGFLAGS_LIBS $IP_LIBS"
 

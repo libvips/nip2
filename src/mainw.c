@@ -100,7 +100,7 @@ mainw_recent_freeze( void )
 void
 mainw_recent_thaw( void )
 {
-	assert( mainw_recent_freeze_count > 0 );
+	g_assert( mainw_recent_freeze_count > 0 );
 
 	mainw_recent_freeze_count -= 1;
 }
@@ -189,7 +189,7 @@ mainw_map( GtkWidget *widget )
 {
 	Mainw *mainw = MAINW( widget );
 
-	assert( !mainw->compat_timeout );
+	g_assert( !mainw->compat_timeout );
 
 	if( mainw->ws->compat_major )
 		mainw->compat_timeout = g_timeout_add( 500, 
@@ -796,7 +796,7 @@ mainw_find_again_action_cb( GtkAction *action, Mainw *mainw )
 static Row *
 mainw_test_error( Row *row, Mainw *mainw, int *found )
 {
-	assert( row->err );
+	g_assert( row->err );
 
 	/* Found next?
 	 */
@@ -846,7 +846,7 @@ mainw_next_error_action_cb( GtkAction *action, Mainw *mainw )
 
 	/* *must* have one now.
 	 */
-	assert( mainw->row_last_error && mainw->row_last_error->err );
+	g_assert( mainw->row_last_error && mainw->row_last_error->err );
 
 	model_scrollto( MODEL( mainw->row_last_error ), MODEL_SCROLL_TOP );
 
@@ -1030,9 +1030,17 @@ mainw_open_done_cb( iWindow *iwnd, void *client,
 	if( nselected > 1 )
 		buf_appends( &buf, "]" );
 
-	if( !workspace_add_def( mainw->ws, buf_all( &buf ) ) ) {
+	/* We may have loaded a workspace and caused this workspace to
+	 * vanish, argh. mainw may no longer be valid, but check ->ws anyway.
+	 * We'll probably see a NULL if this ws has been junked.
+	 */
+	if( load.nitems && 
+		mainw->ws &&
+		!workspace_add_def( mainw->ws, buf_all( &buf ) ) ) {
 		error_top( _( "Load failed." ) );
+		error_sub( _( "Unable to execute:\n   %s" ), buf_all( &buf ) );
 		nfn( sys, IWINDOW_ERROR );
+		return;
 	}
 
 	nfn( sys, IWINDOW_YES );
@@ -2166,7 +2174,7 @@ mainw_popdown( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys )
 static void
 mainw_link( Mainw *mainw, Workspace *ws )
 {
-	assert( !mainw->ws );
+	g_assert( !mainw->ws );
 
 	mainw->ws = ws;
 	ws->iwnd = IWINDOW( mainw );
@@ -2259,7 +2267,11 @@ busy_progress( int percent, int eta )
 void
 busy_begin( void )
 {
-	assert( mainw_busy_count >= 0 );
+	g_assert( mainw_busy_count >= 0 );
+
+#ifdef DEBUG
+	printf( "busy_begin: %d\n", mainw_busy_count );
+#endif /*DEBUG*/
 
 	mainw_busy_count += 1;
 
@@ -2277,9 +2289,13 @@ busy_begin( void )
 void
 busy_end( void )
 {
-	assert( mainw_busy_count > 0 );
-
 	mainw_busy_count -= 1;
+
+#ifdef DEBUG
+	printf( "busy_end: %d\n", mainw_busy_count );
+#endif /*DEBUG*/
+
+	g_assert( mainw_busy_count >= 0 );
 
 	if( !mainw_busy_count ) {
 		set_pointer();

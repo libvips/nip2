@@ -238,7 +238,7 @@ symbol_new_value( Symbol *sym )
 void *
 symbol_patch_add( void **pnt, Symbol *sym )
 {
-	assert( sym->type == SYM_ZOMBIE );
+	g_assert( sym->type == SYM_ZOMBIE );
 
 	sym->patch = g_slist_prepend( sym->patch, pnt );
 
@@ -560,10 +560,10 @@ symbol_dispose( GObject *gobject )
 	 */
 	sym->type = SYM_ZOMBIE; 
 
-	assert( !sym->tool );
-	assert( !sym->parents );
-	assert( !sym->topparents );
-	assert( !sym->topchildren );
+	g_assert( !sym->tool );
+	g_assert( !sym->parents );
+	g_assert( !sym->topparents );
+	g_assert( !sym->topchildren );
 
 	IM_FREEF( g_slist_free, sym->patch );
 	IM_FREEF( g_slist_free, sym->parents );
@@ -796,7 +796,7 @@ symbol_link_break( Symbol *child, Compile *compile )
 gboolean
 symbol_user_init( Symbol *sym )
 {
-	assert( sym->type == SYM_ZOMBIE );
+	g_assert( sym->type == SYM_ZOMBIE );
 
 	sym->type = SYM_VALUE;
 	reduce_register( sym );
@@ -817,7 +817,7 @@ symbol_parameter_init( Symbol *sym )
 {
 	Compile *parent = COMPILE( ICONTAINER( sym )->parent );
 
-	assert( sym->type == SYM_ZOMBIE );
+	g_assert( sym->type == SYM_ZOMBIE );
 
 	sym->type = SYM_PARAM;
 	parent->param = g_slist_append( parent->param, sym );
@@ -832,7 +832,7 @@ symbol_parameter_init( Symbol *sym )
 gboolean
 symbol_parameter_builtin_init( Symbol *sym )
 {
-	assert( sym->type == SYM_ZOMBIE );
+	g_assert( sym->type == SYM_ZOMBIE );
 
 	sym->type = SYM_PARAM;
 	symbol_made( sym );
@@ -879,7 +879,7 @@ symbol_set_leaf( Symbol *sym, gboolean leaf )
 				g_slist_prepend( symbol_leaf_set, sym );
 		}
 		else {
-			assert( symbol_leaf_set );
+			g_assert( symbol_leaf_set );
 
 			symbol_leaf_set = 
 				g_slist_remove( symbol_leaf_set, sym );
@@ -901,7 +901,7 @@ symbol_set_leaf( Symbol *sym, gboolean leaf )
 void
 symbol_state_change( Symbol *sym )
 {
-	assert( sym->ndirtychildren >= 0 );
+	g_assert( sym->ndirtychildren >= 0 );
 
 	/* Used to do more ... now we just set leaf.
 	 */
@@ -993,13 +993,17 @@ symbol_recalculate_check( Symbol *sym )
 
 	reduce_context->heap->filled = FALSE;
 	symbol_running = TRUE;
+	busy_begin();
 	if( !symbol_recalculate_sub( sym ) || 
 		reduce_context->heap->filled ) {
 		expr_error_set( sym->expr );
 		symbol_running = FALSE;
+		busy_end();
+
 		return( sym );
 	}
 	symbol_running = FALSE;
+	busy_end();
 
 	return( NULL );
 }
@@ -1026,10 +1030,10 @@ symbol_recalculate_leaf( void )
 		/* Should be dirty with no dirty children. Unless it's a
 		 * function, in which case dirty kids are OK.
 		 */
-		assert( sym->dirty );
-		assert( !sym->expr->err );
-		assert( is_top( sym ) );
-		assert( symbol_ndirty( sym ) == 0 || is_value( sym ) );
+		g_assert( sym->dirty );
+		g_assert( !sym->expr->err );
+		g_assert( is_top( sym ) );
+		g_assert( symbol_ndirty( sym ) == 0 || is_value( sym ) );
 
 		/* Found a symbol!
 		 */

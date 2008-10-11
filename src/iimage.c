@@ -51,7 +51,7 @@ iimage_dispose( GObject *gobject )
 
 	slist_map( iimage->classmodels, 
 		(SListMapFn) classmodel_iimage_unlink, iimage );
-	assert( !iimage->classmodels );
+	g_assert( !iimage->classmodels );
 
 	G_OBJECT_CLASS( parent_class )->dispose( gobject );
 }
@@ -174,7 +174,7 @@ iimage_load( Model *model,
 {
         iImage *iimage = IIMAGE( model );
 
-	assert( IS_RHS( parent ) );
+	g_assert( IS_RHS( parent ) );
 
 	(void) get_iprop( xnode, "image_left", &iimage->image_left );
 	(void) get_iprop( xnode, "image_top", &iimage->image_top );
@@ -325,7 +325,7 @@ iimage_graphic_save( Classmodel *classmodel,
 	g_timer_reset( timer );
 
 	if( value->ii )
-		if( !imageinfo_write( value->ii, parent, buf ) )
+		if( !imageinfo_write( value->ii, buf ) )
 			return( FALSE );
 
 	mainw_recent_add( &mainw_recent_image, filename );

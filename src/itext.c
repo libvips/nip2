@@ -617,42 +617,50 @@ itext_update_heap( Heapmodel *heapmodel )
         Row *row = heapmodel->row;
 	Expr *expr = row->expr;
 
-	char txt[MAX_STRSIZE];
-	BufInfo buf;
-	ParseRhsSyntax syntax;
-
 #ifdef DEBUG
 	printf( "itext_update_heap: " );
 	row_name_print( HEAPMODEL( itext )->row );
 	printf( "\n" );
 #endif /*DEBUG*/
 
-	buf_init_static( &buf, txt, MAX_STRSIZE );
-	if( is_super( row->sym ) ) {
-		/* A super member ... special syntax.
-		 */
-		buf_appendf( &buf, "%s", itext->formula );
-
-		syntax = PARSE_SUPER;
-	}
-	else {
-		/* Build a new params + '=' + rhs string.
-		 */
-		if( expr->compile ) 
-			(void) slist_map( expr->compile->param, 
-				(SListMapFn) itext_update_heap_sub, &buf );
-		buf_appendf( &buf, "= %s;", itext->formula );
-
-		syntax = PARSE_PARAMS;
-	}
-
-	/* Parse and compile.
+	/* We can have no modified text, but come here anyway. For example, we
+	 * could try eval, find an error due to an undefined symbol, and have
+	 * to retry later. Clearing the row error later will mark us modified, 
+	 * even though we have no text of our own.
 	 */
-	expr_error_clear( expr );
-	attach_input_string( buf_all( &buf ) );
-	if( !parse_rhs( expr, syntax ) ) {
-		expr_error_set( expr );
-		return( heapmodel );
+	if( itext->formula ) {
+		char txt[MAX_STRSIZE];
+		BufInfo buf;
+		ParseRhsSyntax syntax;
+
+		buf_init_static( &buf, txt, MAX_STRSIZE );
+		if( is_super( row->sym ) ) {
+			/* A super member ... special syntax.
+			 */
+			buf_appendf( &buf, "%s", itext->formula );
+
+			syntax = PARSE_SUPER;
+		}
+		else {
+			/* Build a new params + '=' + rhs string.
+			 */
+			if( expr->compile ) 
+				(void) slist_map( expr->compile->param, 
+					(SListMapFn) itext_update_heap_sub, 
+					&buf );
+			buf_appendf( &buf, "= %s;", itext->formula );
+
+			syntax = PARSE_PARAMS;
+		}
+
+		/* Parse and compile.
+		 */
+		expr_error_clear( expr );
+		attach_input_string( buf_all( &buf ) );
+		if( !parse_rhs( expr, syntax ) ) {
+			expr_error_set( expr );
+			return( heapmodel );
+		}
 	}
 
 	/* Mark for recomp.
@@ -705,7 +713,7 @@ itext_parent_add( iContainer *child )
 	iText *itext = ITEXT( child );
 	Row *row;
 
-	assert( IS_RHS( child->parent ) );
+	g_assert( IS_RHS( child->parent ) );
 
 	ICONTAINER_CLASS( parent_class )->parent_add( child );
 
@@ -732,7 +740,7 @@ itext_load( Model *model,
 	char formula[MAX_STRSIZE];
 	char formula2[MAX_STRSIZE];
 
-	assert( IS_RHS( parent ) );
+	g_assert( IS_RHS( parent ) );
 
 	if( get_sprop( xnode, "formula", formula, MAX_STRSIZE ) ) {
 		model_loadstate_rewrite( state, formula, formula2 );
@@ -882,6 +890,12 @@ gboolean
 itext_set_formula( iText *itext, const char *formula )
 {
 	if( !itext->formula || strcmp( itext->formula, formula ) != 0 ) {
+#ifdef DEBUG
+		printf( "itext_set_formula: " );
+		row_name_print( HEAPMODEL( itext )->row );
+		printf( " \"%s\"\n", formula );
+#endif /*DEBUG*/
+
 		IM_SETSTR( itext->formula, formula );
 
 		heapmodel_set_modified( HEAPMODEL( itext ), TRUE );

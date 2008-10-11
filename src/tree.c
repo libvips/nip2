@@ -78,7 +78,7 @@ tree_node_destroy( ParseNode *n )
 		break;
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 
 	IM_FREE( n );
@@ -176,9 +176,9 @@ tree_class_new( Compile *compile )
 	ParseNode *no = tree_new( compile );
 	Symbol *this, *super, *name, *cons;
 
-	assert( !compile->is_klass );
-	assert( !compile->this );
-	assert( !compile->super );
+	g_assert( !compile->is_klass );
+	g_assert( !compile->this );
+	g_assert( !compile->super );
 
 	no->type = NODE_CLASS;
 	no->klass = compile;
@@ -304,7 +304,7 @@ tree_lconst_new( Compile *compile, ParseNode *a )
 ParseNode *
 tree_lconst_extend( Compile *compile, ParseNode *base, ParseNode *new )
 {
-	assert( base->type == NODE_LISTCONST );
+	g_assert( base->type == NODE_LISTCONST );
 
 	base->elist = g_slist_prepend( base->elist, new );
 
@@ -328,7 +328,7 @@ tree_super_new( Compile *compile )
 ParseNode *
 tree_super_extend( Compile *compile, ParseNode *base, ParseNode *new )
 {
-	assert( base->type == NODE_SUPER );
+	g_assert( base->type == NODE_SUPER );
 
 	base->elist = g_slist_append( base->elist, new );
 
@@ -428,7 +428,7 @@ tree_map( Compile *compile, tree_map_fn fn, ParseNode *node, void *a, void *b )
 
 	case NODE_NONE:
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 
 	return( NULL );
@@ -443,7 +443,7 @@ tree_copy( Compile *compile, ParseNode *node )
 	ParseNode *copy;
 	GSList *l;
 
-	assert( node );
+	g_assert( node );
 
 	switch( node->type ) {
 	case NODE_GENERATOR:
@@ -491,7 +491,7 @@ tree_copy( Compile *compile, ParseNode *node )
 
 	case NODE_NONE:
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 
 	return( copy );

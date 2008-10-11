@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.14.4">
-  <Workspace filename="/home/john/fr.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1680" window_height="1015" name="fr" caption="Default empty workspace">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.16.4">
+  <Workspace filename="framing.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="970" window_height="633" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="framing" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="5" name="A" caption="untitled">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
@@ -250,7 +250,7 @@
                     </Row>
                     <Row name="corner_section">
                       <Rhs vislevel="1" flags="1">
-                        <Slider caption="" from="0.10000000000000001" to="1" value="0.25"/>
+                        <Slider caption="Corner section" from="0.10000000000000001" to="1" value="0.5"/>
                         <Subcolumn vislevel="0"/>
                         <iText/>
                       </Rhs>
@@ -271,7 +271,7 @@
                     </Row>
                     <Row name="blend_fraction">
                       <Rhs vislevel="1" flags="1">
-                        <Slider caption="" from="0.10000000000000001" to="0.90000000000000002" value="0.5"/>
+                        <Slider caption="Blend fraction" from="0.10000000000000001" to="0.90000000000000002" value="0.10000000000000001"/>
                         <Subcolumn vislevel="0"/>
                         <iText/>
                       </Rhs>
@@ -393,7 +393,7 @@
                     </Row>
                     <Row name="apply">
                       <Rhs vislevel="1" flags="1">
-                        <Toggle caption="Apply mount options" value="true"/>
+                        <Toggle caption="Apply mount options" value="false"/>
                         <Subcolumn vislevel="0"/>
                         <iText/>
                       </Rhs>
@@ -424,7 +424,7 @@
                     </Row>
                     <Row name="mount_colour">
                       <Rhs vislevel="3" flags="7">
-                        <Colour colour_space="sRGB" value0="0" value1="64" value2="0"/>
+                        <Colour colour_space="sRGB" value0="0" value1="0" value2="0"/>
                         <Subcolumn vislevel="1"/>
                         <iText/>
                       </Rhs>

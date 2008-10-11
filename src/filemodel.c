@@ -911,7 +911,7 @@ filemodel_set_auto_load( Filemodel *filemodel )
 		char *p = strrchr( filemodel->filename, G_DIR_SEPARATOR );
 		char buf[FILENAME_MAX];
 
-		assert( p );
+		g_assert( p );
 
 		im_snprintf( buf, FILENAME_MAX, "$SAVEDIR" G_DIR_SEPARATOR_S
 			"start" G_DIR_SEPARATOR_S "%s", p + 1 );

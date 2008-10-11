@@ -278,7 +278,7 @@ model_register_loadable( ModelClass *model_class )
 void
 model_scrollto( Model *model, ModelScrollPosition position )
 {
-	assert( IS_MODEL( model ) );
+	g_assert( IS_MODEL( model ) );
 
 	g_signal_emit( G_OBJECT( model ), model_signals[SIG_SCROLLTO], 0, 
 		position );
@@ -287,7 +287,7 @@ model_scrollto( Model *model, ModelScrollPosition position )
 void
 model_layout( Model *model )
 {
-	assert( IS_MODEL( model ) );
+	g_assert( IS_MODEL( model ) );
 
 	g_signal_emit( G_OBJECT( model ), model_signals[SIG_LAYOUT], 0 );
 }
@@ -295,7 +295,7 @@ model_layout( Model *model )
 void *
 model_reset( Model *model )
 {
-	assert( IS_MODEL( model ) );
+	g_assert( IS_MODEL( model ) );
 
 	g_signal_emit( G_OBJECT( model ), model_signals[SIG_RESET], 0 );
 
@@ -641,9 +641,9 @@ model_check_destroy_sub( iWindow *iwnd, void *client,
 static void
 model_check_destroy_destroy_cb( Model *model, ModelCheckDestroy *mcd )
 {
-	assert( IS_MODEL( model ) );
-	assert( IS_MODEL( mcd->model ) );
-	assert( !mcd->idlg || IS_IDIALOG( mcd->idlg ) );
+	g_assert( IS_MODEL( model ) );
+	g_assert( IS_MODEL( mcd->model ) );
+	g_assert( !mcd->idlg || IS_IDIALOG( mcd->idlg ) );
 
 	mcd->model = NULL;
 	mcd->destroy_sid = 0;

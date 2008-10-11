@@ -15,4 +15,3 @@ or
 		sed -f /home/john/SVN/vips/nip2/trunk/test/convert.sed $i > fred
 		mv fred $i
 	done
-

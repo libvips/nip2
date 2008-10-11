@@ -158,6 +158,8 @@ is_Mark x = is_instanceof "Mark" x;
 
 is_Group x = is_instanceof "Group" x;
 
+is_NULL x = is_instanceof "NULL" x;
+
 is_List x = is_instanceof "List" x;
 
 is_Image x = is_instanceof "Image" x;

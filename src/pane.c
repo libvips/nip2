@@ -47,7 +47,7 @@ static guint pane_signals[SIG_LAST] = { 0 };
 static void
 pane_changed( Pane *pane )
 {
-	assert( IS_PANE( pane ) );
+	g_assert( IS_PANE( pane ) );
 
 #ifdef DEBUG
 	printf( "pane_changed:\n" );

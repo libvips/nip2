@@ -1863,13 +1863,13 @@ Test_images_item = class
                 offset = to_real nstep * step;
                 range c = [c - offset, c - offset + step ... c + offset]; 
                                 
-                mk_patch b a = image_new 150 150 3
+                mk_patch b a = image_new 8 8 3
                     Image_format.FLOAT Image_coding.NOCODING 
                     Image_type.LAB (Vector [base?0, a, b]) 0 0;
 
                 mk_strip b = map (mk_patch b) (range base?1);
                 mk_grid = map mk_strip (range base?2);
-                im = imagearray_assemble 15 15 mk_grid;
+                im = imagearray_assemble 1 1 mk_grid;
             }    
         }
     }

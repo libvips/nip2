@@ -179,7 +179,7 @@ prefs_workspace_destroy_cb( Workspace *ws, Prefs *prefs )
 static void
 prefs_link( Prefs *prefs, Workspace *ws )
 {
-	assert( !prefs->ws );
+	g_assert( !prefs->ws );
 
 	prefs->ws = ws;
 	prefs->ws->mode = WORKSPACE_MODE_NOEDIT;

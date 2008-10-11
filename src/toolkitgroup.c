@@ -132,7 +132,7 @@ toolkitgroup_link( Toolkitgroup *kitg, Symbol *root )
 {
 	char buf[256];
 
-	assert( root );
+	g_assert( root );
 
 	kitg->root = root;
 

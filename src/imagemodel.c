@@ -79,7 +79,7 @@ imagemodel_state_paint( ImagemodelState state )
 		TRUE		/* IMAGEMODEL_SMUDGE */
 	};
 
-	assert( state < IMAGEMODEL_LAST );
+	g_assert( state < IMAGEMODEL_LAST );
 
 	return( state_paint[state] );
 }
@@ -103,7 +103,7 @@ imagemodel_state( ImagemodelState state )
 	case IMAGEMODEL_SMUDGE: 	return( "IMAGEMODEL_SMUDGE" );
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 }
 #endif /*DEBUG*/

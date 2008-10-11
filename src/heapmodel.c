@@ -147,7 +147,7 @@ heapmodel_parent_add( iContainer *child )
 {
 	Heapmodel *heapmodel = HEAPMODEL( child );
 
-	assert( IS_HEAPMODEL( child->parent ) || 
+	g_assert( IS_HEAPMODEL( child->parent ) || 
 		IS_FILEMODEL( child->parent ) ); 
 
 	ICONTAINER_CLASS( parent_class )->parent_add( child );
@@ -177,7 +177,7 @@ heapmodel_real_update_model( Heapmodel *heapmodel )
 static void *
 heapmodel_real_update_heap( Heapmodel *heapmodel )
 {
-	assert( heapmodel->modified );
+	g_assert( heapmodel->modified );
 
 	heapmodel_set_modified( heapmodel, FALSE );
 
@@ -250,9 +250,15 @@ heapmodel_set_modified( Heapmodel *heapmodel, gboolean modified )
 {
 	if( heapmodel->modified != modified ) {
 #ifdef DEBUG
-		printf( "heapmodel_set_modified: " );
+{
+		HeapmodelClass *heapmodel_class = 
+			HEAPMODEL_GET_CLASS( heapmodel );
+
+		printf( "heapmodel_set_modified: %s::", 
+			G_OBJECT_CLASS_NAME( heapmodel_class ) );
 		row_name_print( heapmodel->row );
 		printf( " %s\n", bool_to_char( modified ) );
+}
 #endif /*DEBUG*/
 
 		heapmodel->modified = modified;

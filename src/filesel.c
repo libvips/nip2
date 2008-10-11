@@ -73,7 +73,6 @@ static iDialogClass *parent_class = NULL;
 static char *filesel_last_dir = NULL;
 
 static const char *icc_suffs[] = { ".icc", ".icm", NULL };
-static const char *vips_suffs[] = { ".v", NULL };
 static const char *workspace_suffs[] = { ".ws", NULL };
 static const char *rec_suffs[] = { ".rec", NULL };
 static const char *mor_suffs[] = { ".mor", NULL };
@@ -83,8 +82,6 @@ static const char *def_suffs[] = { ".def", NULL };
 static const char *all_suffs[] = { "", NULL };
 
 FileselFileType
-        filesel_vfile_type = 
-		{ N_( "VIPS image files (*.v)" ), vips_suffs },
         filesel_wfile_type = 
 		{ N_( "Workspace files (*.ws)" ), workspace_suffs },
         filesel_rfile_type = 
@@ -165,10 +162,7 @@ build_image_file_type( void )
 	GSList *types;
 	FileselFileType **type_array;
 
-	/* Add one for VIPS format ourselves.
-	 */
 	types = NULL;
-	types = g_slist_append( types, &filesel_vfile_type );
 	im_format_map( (VSListMap2Fn) build_vips_formats_sub, &types, NULL );
 
 	type_array = (FileselFileType **) slist_to_array( types );
@@ -429,11 +423,14 @@ filesel_get_mode( const char *filename )
 	int i;
 	im_format_t *format;
 
-	if( (format = im_format_for_name( filename )) )
+	if( (format = im_format_for_name( filename )) ) {
 		for( i = 0; i < IM_NUMBER( filesel_mode_table ); i++ )
 			if( strcmp( filesel_mode_table[i].name, 
 				format->name ) == 0 ) 
 				return( &filesel_mode_table[i] );
+	}
+	else
+		im_error_clear();
 
 	return( NULL );
 }
@@ -628,12 +625,12 @@ filesel_get_filetype( Filesel *filesel )
 
 		filter = gtk_file_chooser_get_filter( 
 			GTK_FILE_CHOOSER( filesel->chooser ) );
-		assert( filter );
+		g_assert( filter );
 
 		for( i = 0; filesel->filter[i]; i++ ) 
 			if( filter == filesel->filter[i] )
 				break;
-		assert( filesel->filter[i] );
+		g_assert( filesel->filter[i] );
 
 		return( i );
 	}
@@ -1154,8 +1151,6 @@ filesel_trigger2( void *sys, iWindowResult result )
 	iWindowSusp *susp = (iWindowSusp *) sys;
 	Filesel *filesel = FILESEL( susp->client );
 
-	/* Back from the user function ... restore the pointer.
-	 */
 	busy_end();
 
 	/* If this is a save, assume that there is now a new file, 

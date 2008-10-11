@@ -187,7 +187,7 @@ colourdisplay_drag_data_get( GtkWidget *widget, GdkDragContext *context,
 		break;
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 		break;
 	}
 }
@@ -248,7 +248,7 @@ colourdisplay_drag_data_received( GtkWidget *widget, GdkDragContext *context,
 		break;
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 		break;
 	}
 }

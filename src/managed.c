@@ -103,7 +103,7 @@ managed_unlink_heap( Managed *managed )
 void *
 managed_sub_remove( Managed *in, Managed *managed )
 {
-	assert( g_slist_find( managed->sub, in ) );
+	g_assert( g_slist_find( managed->sub, in ) );
 
 	managed->sub = g_slist_remove( managed->sub, in );
 	managed_destroy_nonheap( in );
@@ -121,12 +121,12 @@ managed_dispose( GObject *gobject )
 	iobject_print( IOBJECT( managed ) );
 #endif /*DEBUG*/
 
-	assert( managed->count == 0 );
+	g_assert( managed->count == 0 );
 
 	managed_unlink_heap( managed );
 	slist_map( managed->sub, 
 		(SListMapFn) managed_sub_remove, managed );
-	assert( !managed->sub );
+	g_assert( !managed->sub );
 
 	G_OBJECT_CLASS( parent_class )->dispose( gobject );
 }
@@ -252,7 +252,7 @@ managed_destroy_heap( Managed *managed )
 void
 managed_destroy_nonheap( Managed *managed )
 {
-	assert( managed->count > 0 );
+	g_assert( managed->count > 0 );
 
 #ifdef DEBUG
 	printf( "managed_destroy_nonheap: count = %d ", managed->count );
@@ -273,7 +273,7 @@ managed_destroy_nonheap( Managed *managed )
 void
 managed_dup_nonheap( Managed *managed )
 {
-	assert( managed->count >= 0 );
+	g_assert( managed->count >= 0 );
 
 	managed->count++;
 
@@ -288,7 +288,7 @@ managed_dup_nonheap( Managed *managed )
 void 
 managed_sub_add( Managed *managed, Managed *in )
 {
-	assert( managed && in );
+	g_assert( managed && in );
 
 	managed->sub = g_slist_prepend( managed->sub, in );
 	managed_dup_nonheap( in );

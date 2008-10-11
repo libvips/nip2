@@ -135,7 +135,7 @@ tool_save_text( Model *model, iOpenFile *of )
 		break;
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 
 	return( TRUE );
@@ -150,7 +150,7 @@ tool_type_to_char( Tooltype type )
 	case TOOL_SEP:	return( "separator" );
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 }
 
@@ -267,7 +267,7 @@ toolitem_free( Toolitem *toolitem )
 
 	slist_map( toolitem->children, (SListMapFn) toolitem_free, NULL );
 
-	assert( !toolitem->children );
+	g_assert( !toolitem->children );
 
 	if( parent ) {
 		parent->children = g_slist_remove( parent->children, toolitem );
@@ -708,7 +708,7 @@ tool_toolitem_rebuild( Tool *tool )
 		break;
 
 	default:
-		assert( 0 );
+		g_assert( 0 );
 	}
 
 	iobject_changed( IOBJECT( tool ) );
@@ -740,7 +740,7 @@ tool_new_sym( Toolkit *kit, int pos, Symbol *sym )
 {
 	Tool *tool;
 
-	assert( kit && sym );
+	g_assert( kit && sym );
 
 	/* Is there a tool we can reuse? Don't update pos .. assume we want to
 	 * keep the old one.
@@ -784,7 +784,7 @@ tool_new_sep( Toolkit *kit, int pos )
 {
 	Tool *tool;
 
-	assert( kit );
+	g_assert( kit );
 
 	tool = TOOL( g_object_new( TYPE_TOOL, NULL ) );
 	tool->type = TOOL_SEP;
@@ -813,7 +813,7 @@ tool_new_dia( Toolkit *kit, int pos,
 {
 	Tool *tool;
 
-	assert( kit && name && filename );
+	g_assert( kit && name && filename );
 
 	if( (tool = tool_find( kit, name )) ) {
 		if( tool->type != TOOL_DIA ) {

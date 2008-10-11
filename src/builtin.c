@@ -218,7 +218,7 @@ apply_list_call( Reduce *rc,
         PElement a;
 
 	PEPOINTRIGHT( arg[0], &rhs );
-	assert( PEISFLIST( &rhs ) );
+	g_assert( PEISFLIST( &rhs ) );
 
 	if( strcmp( name, "hd" ) == 0 ) {
 		PEGETHD( &a, &rhs );
@@ -386,7 +386,7 @@ apply_header_get_call( Reduce *rc,
 	PEPOINTRIGHT( arg[1], &rhs );
 	reduce_get_string( rc, &rhs, buf, 256 );
 	PEPOINTRIGHT( arg[0], &rhs );
-	assert( PEISMANAGEDGOBJECT( &rhs ) );
+	g_assert( PEISMANAGEDGOBJECT( &rhs ) );
 	object = PEGETMANAGEDGOBJECT( &rhs );
 
 	if( !VIPS_IS_OBJECT( object ) ) {
@@ -903,7 +903,7 @@ builtin_init( void )
 
 		sym = symbol_new( symbol_root->expr->compile,
 			builtin_table[i].name );
-		assert( sym->type == SYM_ZOMBIE );
+		g_assert( sym->type == SYM_ZOMBIE );
 		sym->type = SYM_BUILTIN;
 		sym->builtin = &builtin_table[i];
 		(void) tool_new_sym( kit, -1, sym );

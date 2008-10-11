@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.14.19">
-  <Workspace filename="test_transform.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1920" window_height="1165" lpane_position="0" lpane_open="false" rpane_position="1914" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_transform" caption="Default empty workspace">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.16.19">
+  <Workspace filename="test_transform.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1279" window_height="705" lpane_position="0" lpane_open="false" rpane_position="1914" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_transform" caption="Default empty workspace">
     <Column x="476" y="0" open="true" selected="false" sform="false" next="19" name="FB" caption="Image / Transform">
       <Subcolumn vislevel="3">
         <Row popup="false" name="FB1">

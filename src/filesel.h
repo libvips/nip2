@@ -49,9 +49,9 @@ typedef struct _FileselFileType {
 /* Basic types.
  */
 extern FileselFileType 
-	filesel_vfile_type, filesel_wfile_type, filesel_rfile_type, 
-       filesel_mfile_type, filesel_cfile_type, filesel_xfile_type, 
-       filesel_dfile_type, filesel_ifile_type;
+	filesel_wfile_type, filesel_rfile_type, 
+	filesel_mfile_type, filesel_cfile_type, filesel_xfile_type, 
+	filesel_dfile_type, filesel_ifile_type;
 
 /* Suffix sets we support.
  */
@@ -130,6 +130,7 @@ GtkWidget *filesel_new( void );
 
 gboolean filesel_set_filename( Filesel *filesel, const char *name );
 char *filesel_get_filename( Filesel *filesel );
+int filesel_nselected( Filesel *filesel );
 void *filesel_map_filename_multi( Filesel *filesel,
 	FileselMapFn fn, void *a, void *b );
 

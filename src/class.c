@@ -74,7 +74,7 @@ class_get_super( PElement *instance, PElement *out )
 
 	if( !(compile = class_get_compile( instance )) )
 		return( FALSE );
-	assert( compile->super );
+	g_assert( compile->super );
 
 	return( class_get_symbol( instance, compile->super, out ) );
 }
@@ -707,7 +707,7 @@ class_clone_super( Heap *heap, Compile *compile,
 	char str[MAX_STRSIZE];
 #endif /*DEBUG_VERBOSE*/
 
-	assert( nargs <= MAX_SYSTEM );
+	g_assert( nargs <= MAX_SYSTEM );
 
 #ifdef DEBUG_VERBOSE
 	buf_init_static( &buf, str, MAX_STRSIZE );
@@ -934,7 +934,7 @@ class_clone_args( Heap *heap, PElement *instance, PElement *out )
 	char str[MAX_STRSIZE];
 #endif /*DEBUG_VERBOSE*/
 
-	assert( nargs <= MAX_SYSTEM );
+	g_assert( nargs <= MAX_SYSTEM );
 
 #ifdef DEBUG_VERBOSE
 	buf_init_static( &buf, str, MAX_STRSIZE );
@@ -1011,7 +1011,7 @@ class_typecheck_error( PElement *instance, const char *name, const char *type )
 	char txt[1024];
 
 	res = class_get_member( instance, name, NULL, &val );
-	assert( res );
+	g_assert( res );
 
 	buf_init_static( &buf, txt, 1024 );
 	buf_appendf( &buf, _( "Member \"%s\" of class \"%s\" should be of type "

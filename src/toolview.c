@@ -90,7 +90,7 @@ toolview_activate_cb( GtkWidget *widget, Toolitem *toolitem )
 		break;
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 }
 
@@ -201,7 +201,7 @@ toolview_get_workspace( Toolview *tview )
 void
 toolview_destroy_cb( GtkWidget *widget, Toolview *tview )
 {
-	assert( tview->item == widget );
+	g_assert( tview->item == widget );
 
 	tview->item = NULL;
 }

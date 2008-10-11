@@ -305,7 +305,7 @@ imagedisplay_real_conversion_changed( Imagedisplay *id )
 	GtkRequisition *requisition = &GTK_WIDGET( id )->requisition;
 	Rect *canvas = &id->conv->canvas;
 
-	assert( IS_IMAGEDISPLAY( id ) );
+	g_assert( IS_IMAGEDISPLAY( id ) );
 
 #ifdef DEBUG
 	g_print( "imagedisplay_real_conversion_changed: " );
@@ -484,7 +484,7 @@ imagedisplay_conversion_area_changed_cb( Conversion *conv,
 void
 imagedisplay_set_conversion( Imagedisplay *id, Conversion *conv )
 {
-	assert( !id->conv );
+	g_assert( !id->conv );
 
 	if( conv ) {
 		id->conv = conv;

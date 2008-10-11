@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.14.0">
-  <Workspace filename="/home/john/lg.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1670" window_height="1011" name="lg" caption="Default empty workspace">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.16.0">
+  <Workspace filename="logo2.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1020" window_height="735" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="logo2" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="12" name="A" caption="render text">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
@@ -196,7 +196,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="545" y="0" open="true" selected="false" sform="false" next="15" name="B" caption="add texture">
+    <Column x="555" y="0" open="true" selected="false" sform="false" next="15" name="B" caption="add texture">
       <Subcolumn vislevel="3">
         <Row popup="false" name="B11">
           <Rhs vislevel="1" flags="1">
@@ -485,7 +485,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1003" y="0" open="true" selected="false" sform="false" next="27" name="C" caption="make shadow">
+    <Column x="1013" y="0" open="true" selected="false" sform="false" next="27" name="C" caption="make shadow">
       <Subcolumn vislevel="3">
         <Row popup="false" name="C7">
           <Rhs vislevel="0" flags="4">
@@ -757,7 +757,7 @@
                 </Rhs>
               </Row>
             </Subcolumn>
-            <iText formula="Image_transform_item.Resize_item.Resize_item.Resize_canvas_item.action C7"/>
+            <iText formula="Image_transform_item.Resize_item.Resize_item.Resize_item.Resize_canvas_item.action C7"/>
           </Rhs>
         </Row>
         <Row popup="false" name="C26">
@@ -990,12 +990,12 @@
                 </Rhs>
               </Row>
             </Subcolumn>
-            <iText formula="Image_transform_item.Resize_item.Resize_item.Resize_canvas_item.action C18"/>
+            <iText formula="Image_transform_item.Resize_item.Resize_item.Resize_item.Resize_canvas_item.action C18"/>
           </Rhs>
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1544" y="0" open="true" selected="false" sform="false" next="19" name="D" caption="position and blend layers">
+    <Column x="1687" y="0" open="true" selected="false" sform="false" next="19" name="D" caption="position and blend layers">
       <Subcolumn vislevel="3">
         <Row popup="false" name="D10">
           <Rhs vislevel="0" flags="4">
@@ -1116,7 +1116,7 @@
                 </Rhs>
               </Row>
             </Subcolumn>
-            <iText formula="Image_transform_item.Resize_item.Resize_item.Resize_canvas_item.action D10"/>
+            <iText formula="Image_transform_item.Resize_item.Resize_item.Resize_item.Resize_canvas_item.action D10"/>
           </Rhs>
         </Row>
         <Row popup="false" name="D15">
@@ -1212,12 +1212,12 @@
                 </Rhs>
               </Row>
             </Subcolumn>
-            <iText formula="Image_transform_item.Resize_item.Resize_item.Resize_canvas_item.action D9"/>
+            <iText formula="Image_transform_item.Resize_item.Resize_item.Resize_item.Resize_canvas_item.action D9"/>
           </Rhs>
         </Row>
         <Row popup="false" name="D16">
           <Rhs vislevel="1" flags="1">
-            <iImage window_x="618" window_y="605" window_width="617" window_height="382" image_left="300" image_top="151" image_mag="1" show_status="true" show_paintbox="false" show_convert="false" show_rulers="false" scale="1.44462" offset="-128" falsecolour="false" type="true"/>
+            <iImage window_x="602" window_y="662" window_width="985" window_height="382" image_left="485" image_top="155" image_mag="1" show_status="true" show_paintbox="false" show_convert="false" show_rulers="false" scale="1.44462" offset="-128" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
             <iText formula="Filter_blend_item.Image_blend_item.action D14 D15 D8"/>
           </Rhs>

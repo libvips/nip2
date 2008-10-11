@@ -565,7 +565,7 @@ watch_double_get( Watchgroup *watchgroup, const char *name, double fallback )
 	if( !(watch = watch_find( watchgroup, name )) )
 		watch = watch_double_new( watchgroup, name );
 
-	assert( IS_WATCH_DOUBLE( watch ) );
+	g_assert( IS_WATCH_DOUBLE( watch ) );
 
 	if( !watch_get( watch, &value ) ) 
 		return( fallback );
@@ -680,7 +680,7 @@ watch_int_get( Watchgroup *watchgroup, const char *name, int fallback )
 	if( !(watch = watch_find( watchgroup, name )) )
 		watch = watch_int_new( watchgroup, name );
 
-	assert( IS_WATCH_INT( watch ) );
+	g_assert( IS_WATCH_INT( watch ) );
 
 	if( !watch_get( watch, &value ) ) 
 		return( fallback );
@@ -811,7 +811,7 @@ watch_path_get( Watchgroup *watchgroup, const char *name, GSList *fallback )
 	if( !(watch = watch_find( watchgroup, name )) )
 		watch = watch_path_new( watchgroup, name );
 
-	assert( IS_WATCH_PATH( watch ) );
+	g_assert( IS_WATCH_PATH( watch ) );
 
 	if( !watch_get( watch, &value ) ) 
 		return( fallback );
@@ -920,7 +920,7 @@ watch_bool_get( Watchgroup *watchgroup, const char *name, gboolean fallback )
 	if( !(watch = watch_find( watchgroup, name )) )
 		watch = watch_bool_new( watchgroup, name );
 
-	assert( IS_WATCH_BOOL( watch ) );
+	g_assert( IS_WATCH_BOOL( watch ) );
 
 	if( !watch_get( watch, &value ) ) 
 		return( fallback );
@@ -1051,7 +1051,7 @@ watch_string_get( Watchgroup *watchgroup,
 	if( !(watch = watch_find( watchgroup, name )) )
 		watch = watch_string_new( watchgroup, name );
 
-	assert( IS_WATCH_STRING( watch ) );
+	g_assert( IS_WATCH_STRING( watch ) );
 
 	if( !watch_get( watch, &value ) ) 
 		return( fallback );

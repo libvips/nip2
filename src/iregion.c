@@ -303,7 +303,7 @@ iregion_load( Model *model,
 	iRegionInstance *instance = 
 		classmodel_get_instance( CLASSMODEL( model ) );
 
-	assert( IS_RHS( parent ) );
+	g_assert( IS_RHS( parent ) );
 
 	if( instance ) {
 		Rect *area = &instance->area;

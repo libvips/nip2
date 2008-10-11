@@ -349,7 +349,7 @@ columnview_left_press( Columnview *cview, GdkEvent *ev )
                 break;
 
         default:
-		assert( FALSE );
+		g_assert( FALSE );
         }
 }
 
@@ -468,7 +468,7 @@ columnview_left_motion( Columnview *cview, GdkEvent *ev )
                 break;
 
         default:
-                assert( FALSE );
+		g_assert( FALSE );
         }
 }
 
@@ -506,7 +506,7 @@ columnview_left_release( Columnview *cview, GdkEvent *ev )
                 break;
 
         default:
-                assert( FALSE );
+                g_assert( FALSE );
         }
 }
 

@@ -170,7 +170,7 @@ iarrow_generate_caption( iObject *iobject )
 				break;
 
 			default:
-				assert( 0 );
+				g_assert( 0 );
 			}
 
 			break;

@@ -547,8 +547,8 @@ rowview_child_add( View *parent, View *child )
 {
 	Rowview *rowview = ROWVIEW( parent );
 
-	assert( IS_RHSVIEW( child ) );
-	assert( !rowview->rhsview );
+	g_assert( IS_RHSVIEW( child ) );
+	g_assert( !rowview->rhsview );
 
 	rowview->rhsview = RHSVIEW( child );
 

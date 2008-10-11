@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.14.0">
-  <Workspace filename="/home/john/CVS_DEVEL/nip2-7.11/share/nip2/data/examples/1_point_mosiac/1pt_mosaic.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1497" window_height="1088" name="untitled1" caption="">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.16.0">
+  <Workspace filename="1pt_mosaic.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1046" window_height="748" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="pt_mosaic" caption="">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="9" name="A" caption="untitled">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">

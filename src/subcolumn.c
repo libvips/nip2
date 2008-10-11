@@ -227,7 +227,7 @@ subcolumn_class_new_heap( Subcolumn *scol, PElement *root )
 
 	/* Must be a class display.
 	 */
-	assert( !scol->is_top );
+	g_assert( !scol->is_top );
 	row = HEAPMODEL( scol )->row;
 	expr = row->expr;
 
@@ -417,7 +417,7 @@ subcolumn_child_remove( iContainer *parent, iContainer *child )
 static Column *
 subcolumn_get_column( Subcolumn *scol )
 {
-	assert( scol->is_top );
+	g_assert( scol->is_top );
 
 	return( COLUMN( ICONTAINER( scol )->parent ) );
 }
@@ -431,7 +431,7 @@ subcolumn_get_subcolumn( Subcolumn *scol )
 	Row *row;
 	Subcolumn *escol;
 
-	assert( !scol->is_top );
+	g_assert( !scol->is_top );
 
 	rhs = HEAPMODEL( scol )->rhs;
 	row = HEAPMODEL( rhs )->row;
@@ -477,8 +477,8 @@ subcolumn_parent_add( iContainer *child )
 
 	ICONTAINER_CLASS( parent_class )->parent_add( child );
 
-	assert( IS_COLUMN( child->parent ) || IS_RHS( child->parent ) );
-	assert( !IS_COLUMN( child->parent ) || 
+	g_assert( IS_COLUMN( child->parent ) || IS_RHS( child->parent ) );
+	g_assert( !IS_COLUMN( child->parent ) || 
 		g_slist_length( child->parent->children ) == 1 );
 
 	scol->is_top = IS_COLUMN( child->parent );
@@ -520,7 +520,7 @@ subcolumn_load( Model *model,
 {
 	Subcolumn *scol = SUBCOLUMN( model );
 
-	assert( IS_COLUMN( parent ) || IS_RHS( parent ) );
+	g_assert( IS_COLUMN( parent ) || IS_RHS( parent ) );
 
 	if( !get_iprop( xnode, "vislevel", &scol->vislevel ) )
 		return( FALSE );
@@ -629,7 +629,7 @@ subcolumn_get_type( void )
 static void
 subcolumn_link( Subcolumn *scol, Rhs *rhs, Column *col )
 {
-	assert( rhs == NULL || col == NULL );
+	g_assert( rhs == NULL || col == NULL );
 
 	/* parent_add() sets is_top for us.
 	 */

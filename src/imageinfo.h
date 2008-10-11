@@ -203,8 +203,7 @@ Imageinfo *imageinfo_new_input( Imageinfogroup *imageinfogroup,
 IMAGE *imageinfo_get( gboolean use_lut, Imageinfo *imageinfo );
 gboolean imageinfo_same_underlying( Imageinfo *imageinfo[], int n );
 
-gboolean imageinfo_write( Imageinfo *imageinfo, 
-	GtkWidget *parent, const char *filename );
+gboolean imageinfo_write( Imageinfo *imageinfo, const char *filename );
 gboolean imageinfo_check_paintable( Imageinfo *imageinfo, 
 	GtkWidget *parent, iWindowNotifyFn nfn, void *sys );
 

@@ -435,7 +435,7 @@ lintrauc_gen( PEL *in, PEL *out, int width, IMAGE *im, LintraInfo *inf )
 		LOOPCMPLX( double ); break;
 
         default:
-                assert( 0 );
+                g_assert( 0 );
         }
 
         return( 0 );
@@ -1158,7 +1158,7 @@ conversion_set_image( Conversion *conv, Imageinfo *ii )
 double
 conversion_dmag( int mag )
 {
-	assert( mag != 0 );
+	g_assert( mag != 0 );
 
 	if( mag > 0 )
 		return( mag );
@@ -1172,7 +1172,7 @@ conversion_dmag( int mag )
 int 
 conversion_double( int mag )
 {
-	assert( mag != -1 );
+	g_assert( mag != -1 );
 
 	if( mag == -3 )
 		return( -2 );
@@ -1187,7 +1187,7 @@ conversion_double( int mag )
 int 
 conversion_halve( int mag )
 {
-	assert( mag != -1 );
+	g_assert( mag != -1 );
 
 	if( mag == 1 )
 		return( -2 );

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.14.4">
-  <Workspace filename="/home/john/mb.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1680" window_height="1015" name="mb" caption="Default empty workspace">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.16.4">
+  <Workspace filename="manual_balance.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1193" window_height="683" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="manual_balance" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="true" sform="false" next="8" name="A" caption="Images">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
@@ -59,7 +59,7 @@
         <Row popup="false" name="B2">
           <Rhs vislevel="3" flags="7">
             <iImage image_left="-1" image_top="-1" image_mag="-1" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="-1" offset="-1" falsecolour="false" type="true"/>
-            <Subcolumn vislevel="1">
+            <Subcolumn vislevel="0">
               <Row name="im_in">
                 <Rhs vislevel="0" flags="4">
                   <iText/>
@@ -105,7 +105,7 @@
               </Row>
               <Row name="Output">
                 <Rhs vislevel="2" flags="6">
-                  <Subcolumn vislevel="1"/>
+                  <Subcolumn vislevel="0"/>
                   <iText/>
                 </Rhs>
               </Row>

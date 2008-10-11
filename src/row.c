@@ -249,7 +249,7 @@ row_dirty_clear( Row *row )
 	Row *top_row = row->top_row;
 
 	if( row->dirty )
-		assert( g_slist_find( top_row->recomp, row ) );
+		g_assert( g_slist_find( top_row->recomp, row ) );
 }
 #endif /*DEBUG_DIRTY*/
 
@@ -281,9 +281,9 @@ row_dirty_set_single( Row *row, gboolean clear_error )
 	Row *top_row = row->top_row;
 
 	if( row->dirty )
-		assert( g_slist_find( top_row->recomp, row ) );
+		g_assert( g_slist_find( top_row->recomp, row ) );
 	if( !row->dirty )
-		assert( !g_slist_find( top_row->recomp, row ) );
+		g_assert( !g_slist_find( top_row->recomp, row ) );
 }
 #endif /*DEBUG_DIRTY*/
 
@@ -317,7 +317,7 @@ row_dirty_set_sub( Model *model, gboolean clear_error )
 		Row *row = ROW( model );
 		Rhs *rhs = row->child_rhs;
 
-		assert( !rhs || IS_RHS( rhs ) );
+		g_assert( !rhs || IS_RHS( rhs ) );
 
 		if( rhs && rhs->itext && ITEXT( rhs->itext )->edited )
 			row_dirty_set_single( row, clear_error );
@@ -350,7 +350,7 @@ row_link_break( Row *parent, Row *child )
 {
 	/* Must be there.
 	 */
-	assert( g_slist_find( parent->children, child ) &&
+	g_assert( g_slist_find( parent->children, child ) &&
 		g_slist_find( child->parents, parent ) );
 
 	parent->children = g_slist_remove( parent->children, child );
@@ -400,17 +400,17 @@ row_dispose( GObject *gobject )
 	 */
 	slist_map( row->parents, (SListMapFn) row_link_break, row );
 	slist_map( row->children, (SListMapFn) row_link_break_rev, row );
-	assert( !row->parents && !row->children );
+	g_assert( !row->parents && !row->children );
 	(void) slist_map( row->recomp, (SListMapFn) row_dirty_clear, NULL );
 	if( row->top_row )
 		row->top_row->recomp_save = 
 			g_slist_remove( row->top_row->recomp_save, row );
 	IM_FREEF( g_slist_free, row->recomp_save );
 
-	assert( !row->recomp );
+	g_assert( !row->recomp );
 
 	if( row->expr ) {
-		assert( row->expr->row == row );
+		g_assert( row->expr->row == row );
 
 		/* If we're a local row, we will have a private expr 
 		 * allocated for us. Junk it.
@@ -531,7 +531,7 @@ row_info( iObject *iobject, BufInfo *buf )
 static Rhs *
 row_get_rhs( Row *row )
 {
-	assert( g_slist_length( ICONTAINER( row )->children ) == 1 );
+	g_assert( g_slist_length( ICONTAINER( row )->children ) == 1 );
 
 	return( RHS( ICONTAINER( row )->children->data ) );
 }
@@ -595,7 +595,7 @@ row_parent_add( iContainer *child )
 {
 	Row *row = ROW( child );
 
-	assert( IS_SUBCOLUMN( child->parent ) );
+	g_assert( IS_SUBCOLUMN( child->parent ) );
 
 	ICONTAINER_CLASS( parent_class )->parent_add( child );
 
@@ -658,7 +658,7 @@ row_load( Model *model,
 
 	char name[256];
 
-	assert( IS_SUBCOLUMN( parent ) );
+	g_assert( IS_SUBCOLUMN( parent ) );
 
 	if( !get_sprop( xnode, "name", name, 256 ) ) 
 		return( FALSE );
@@ -1046,9 +1046,9 @@ row_get_type( void )
 void
 row_link_symbol( Row *row, Symbol *sym, PElement *root )
 {
-	assert( !row->sym );
-	assert( !row->expr );
-	assert( !sym->expr || !sym->expr->row );
+	g_assert( !row->sym );
+	g_assert( !row->expr );
+	g_assert( !sym->expr || !sym->expr->row );
 
 	row->sym = sym;
 
@@ -1058,7 +1058,7 @@ row_link_symbol( Row *row, Symbol *sym, PElement *root )
 	 */
 	if( is_top( sym ) ) {
 		row->expr = sym->expr;
-		assert( !row->expr->row );
+		g_assert( !row->expr->row );
 		row->expr->row = row;
 	}
 	else {
@@ -1472,7 +1472,7 @@ row_recomp_sort( Row *row )
 	g_timer_reset( sort_timer );
 #endif /*DEBUG_TIME_SORT*/
 
-	assert( row == row->top_row );
+	g_assert( row == row->top_row );
 
 	/* Nope, can't use g_slist_sort(). We have a partial order and
 	 * g_slist_sort() uses an algorithm that assumes a full order. Do a
@@ -1811,8 +1811,8 @@ row_deselect( Row *row )
 	if( !row->selected )
 		return( NULL );
 
-	assert( ws && IS_WORKSPACE( ws ) );
-	assert( g_slist_find( ws->selected, row ) );
+	g_assert( ws && IS_WORKSPACE( ws ) );
+	g_assert( g_slist_find( ws->selected, row ) );
 
 	ws->selected = g_slist_remove( ws->selected, row );
 	row->selected = FALSE;
@@ -1899,7 +1899,7 @@ row_select_extend( Row *row )
 		int step = pos > pos_last ? 1 : -1;
 		int i;
 
-		assert( pos != -1 && pos_last != -1 );
+		g_assert( pos != -1 && pos_last != -1 );
 
 		for( i = pos_last; i != pos + step; i += step )
 			row_select2( ROW( g_slist_nth_data( rows, i ) ) );

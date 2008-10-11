@@ -59,7 +59,7 @@ GSList *expr_error_all = NULL;
 void *
 expr_error_print( Expr *expr, BufInfo *buf )
 {
-	assert( expr->err );
+	g_assert( expr->err );
 
 	if( !buf_is_empty( buf )  )
 		buf_appends( buf, "\n" );
@@ -244,8 +244,8 @@ expr_strip( Expr *expr )
 	if( slist_map( expr->dynamic_links, 
 		(SListMapFn) link_expr_destroy, NULL ) )
 		return( expr );
-	assert( !expr->static_links );
-	assert( !expr->dynamic_links );
+	g_assert( !expr->static_links );
+	g_assert( !expr->dynamic_links );
 
 	/* Junk error stuff. 
 	 */
@@ -505,8 +505,8 @@ expr_error_get( Expr *expr )
 	if( !expr->err )
 		error_clear();
 	else {
-		assert( expr->error_top );
-		assert( expr->error_sub );
+		g_assert( expr->error_top );
+		g_assert( expr->error_sub );
 
 		error_top( "%s", expr->error_top );
 		error_sub( "%s", expr->error_sub );

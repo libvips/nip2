@@ -231,7 +231,7 @@ imageview_get_region_type( GtkAction *action )
 		if( strcmp( name, action_names[i] ) == 0 )
 			return( (iRegionType) i );
 
-	assert( FALSE );
+	g_assert( FALSE );
 }
 
 static void
@@ -270,7 +270,7 @@ imageview_new_arrow2_action_cb( GtkAction *action, Imageview *iv )
 		break;
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 
 	if( !(sym = workspace_add_def( ws, buf_all( &buf ) )) ) {

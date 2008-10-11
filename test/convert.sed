@@ -1,7 +1,9 @@
 # update version number
-s/nip\/7.10/nip\/7.14/
-s/nip\/7.11/nip\/7.14/
-s/nip\/7.12/nip\/7.14/
+s/nip\/7.10/nip\/7.16/
+s/nip\/7.11/nip\/7.16/
+s/nip\/7.12/nip\/7.16/
+s/nip\/7.14/nip\/7.16/
+s/nip\/7.15/nip\/7.16/
 
 # renamed members
 s/Row name="green_red"/Row name="gr"/

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.14.4">
-  <Workspace filename="/home/john/cl.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1680" window_height="1015" name="cl" caption="Default empty workspace">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.16.4">
+  <Workspace filename="clone.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1019" window_height="625" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="clone" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="4" name="A" caption="Images">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A2">
@@ -77,7 +77,7 @@
                     </Row>
                     <Row name="pause">
                       <Rhs vislevel="1" flags="1">
-                        <Toggle caption="Pause process" value="false"/>
+                        <Toggle caption="Pause process" value="true"/>
                         <Subcolumn vislevel="0"/>
                         <iText/>
                       </Rhs>

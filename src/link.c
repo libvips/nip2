@@ -64,7 +64,7 @@ link_expr_new( Link *link, Expr *expr, gboolean dynamic )
 	GSList **elinks = dynamic ? &expr->dynamic_links : &expr->static_links;
         LinkExpr *le;
 
-	assert( expr_get_root_dynamic( expr )->sym == link->parent );
+	g_assert( expr_get_root_dynamic( expr )->sym == link->parent );
 
 #ifdef DEBUG
 	printf( "link_expr_new: expr " );
@@ -107,7 +107,7 @@ static void *symbol_dirty_set( Symbol *sym );
 static void *
 link_dirty_child( Link *link )
 {
-	assert( link->parent->ndirtychildren >= 0 );
+	g_assert( link->parent->ndirtychildren >= 0 );
 
 	link->parent->ndirtychildren += 1;
 
@@ -132,7 +132,7 @@ link_clean_child( Link *link )
 	/* One fewer dirty children!
 	 */
 	parent->ndirtychildren--;
-	assert( parent->ndirtychildren >= 0 );
+	g_assert( parent->ndirtychildren >= 0 );
 
 	/* Have we just cleaned the last dirty child of link->parent? If we
 	 * have and if link->parent has an error, clear the error so that
@@ -184,8 +184,8 @@ link_new( Symbol *child, Symbol *parent )
 {
         Link *link;
 
-	assert( is_top( parent ) && is_top( child ) );
-	assert( parent != child );
+	g_assert( is_top( parent ) && is_top( child ) );
+	g_assert( parent != child );
 
 #ifdef DEBUG
 	printf( "link_new: making link from " );
@@ -270,10 +270,10 @@ link_add( Symbol *child, Expr *expr, gboolean dynamic )
 	printf( "; dynamic = %s\n", bool_to_char( dynamic ) );
 #endif /*DEBUG*/
 
-	assert( parent );
-	assert( parent->sym );
-	assert( is_top( child ) && is_top( parent->sym ) );
-	assert( child != parent->sym );
+	g_assert( parent );
+	g_assert( parent->sym );
+	g_assert( is_top( child ) && is_top( parent->sym ) );
+	g_assert( child != parent->sym );
 
 	if( !(link = link_find_child( child, parent->sym )) ) {
 		if( !(link = link_new( child, parent->sym )) )
@@ -299,9 +299,9 @@ link_remove( Symbol *child, Expr *expr, gboolean dynamic )
 	Link *link = link_find_child( child, parent );
 	LinkExpr *le = link_expr_find_expr( link, expr, dynamic );
 
-	assert( is_top( parent ) && is_top( child ) );
-	assert( parent != child );
-	assert( link );
+	g_assert( is_top( parent ) && is_top( child ) );
+	g_assert( parent != child );
+	g_assert( link );
 
 	le->count--;
 	if( le->count == 0 ) {
@@ -423,7 +423,7 @@ symbol_fix_counts( Symbol *sym )
 
 	sym->ndirtychildren = symbol_ndirty( sym );
 
-	assert( sym->ndirtychildren == old_count );
+	g_assert( sym->ndirtychildren == old_count );
 
 	symbol_state_change( sym );
 
@@ -443,7 +443,7 @@ symbol_link_destroy( Symbol *sym )
 void
 symbol_link_build( Symbol *sym )
 {
-	assert( is_top( sym ) );
+	g_assert( is_top( sym ) );
 
         /* Make static links for our expr and all subexprs. If this symbol 
 	 * is being edited, get stuff from the edited value.
@@ -514,7 +514,7 @@ link_dirty_walk( Link *link, int serial )
 void *
 symbol_dirty_intrans( Symbol *sym, int serial )
 {
-	assert( is_top( sym ) );
+	g_assert( is_top( sym ) );
 
 	return( slist_map( sym->topparents, 
 		(SListMapFn) link_dirty_walk, GINT_TO_POINTER( serial ) ) );
@@ -523,7 +523,7 @@ symbol_dirty_intrans( Symbol *sym, int serial )
 static void *
 symbol_dirty_set( Symbol *sym )
 {
-	assert( is_top( sym ) );
+	g_assert( is_top( sym ) );
 
 	/* Clear error, to make sure we will recomp it.
 	 */
@@ -559,7 +559,7 @@ symbol_dirty_set( Symbol *sym )
 void *
 symbol_dirty( Symbol *sym, int serial )
 {
-	assert( is_top( sym ) );
+	g_assert( is_top( sym ) );
 
 	symbol_dirty_set( sym );
 
@@ -628,7 +628,7 @@ symbol_dirty_total( Symbol *sym, int serial )
 void *
 symbol_dirty_clear( Symbol *sym )
 {
-	assert( is_top( sym ) );
+	g_assert( is_top( sym ) );
 
 	if( sym->dirty ) {
 #ifdef DEBUG

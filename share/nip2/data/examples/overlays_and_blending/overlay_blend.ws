@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.14.3">
-  <Workspace filename="/home/john/ob.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1680" window_height="1015" name="ob" caption="Default empty workspace">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.16.3">
+  <Workspace filename="overlay_blend.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1115" window_height="806" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="overlay_blend" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="5" name="A" caption="Images">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
@@ -69,14 +69,14 @@
               </Row>
               <Row name="blend_position">
                 <Rhs vislevel="1" flags="1">
-                  <Slider caption="Blend position" from="0" to="1" value="0.33000000000000002"/>
+                  <Slider caption="Blend position" from="0" to="1" value="0.28767123287671231"/>
                   <Subcolumn vislevel="0"/>
                   <iText/>
                 </Rhs>
               </Row>
               <Row name="blend_width">
                 <Rhs vislevel="1" flags="1">
-                  <Slider/>
+                  <Slider caption="Blend width" from="0" to="1" value="0.20547945205479454"/>
                   <Subcolumn vislevel="0"/>
                   <iText/>
                 </Rhs>
@@ -115,7 +115,7 @@
               </Row>
               <Row name="blend_position">
                 <Rhs vislevel="1" flags="1">
-                  <Slider caption="Blend position" from="0" to="1" value="0.66000000000000003"/>
+                  <Slider caption="Blend position" from="0" to="1" value="0.71232876712328774"/>
                   <Subcolumn vislevel="0"/>
                   <iText/>
                 </Rhs>

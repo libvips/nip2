@@ -890,8 +890,8 @@ imageheader_get_type( void )
 static void
 imageheader_conv_changed( Model *model, Imageheader *imageheader )
 {
-	assert( IS_MODEL( model ) );
-	assert( IS_IMAGEHEADER( imageheader ) );
+	g_assert( IS_MODEL( model ) );
+	g_assert( IS_IMAGEHEADER( imageheader ) );
 
 	imageheader_refresh( imageheader );
 }

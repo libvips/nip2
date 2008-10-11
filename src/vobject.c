@@ -197,7 +197,7 @@ vobject_iobject_destroy( iObject *iobject, vObject *vobject )
 void 
 vobject_link( vObject *vobject, iObject *iobject )
 {
-	assert( !vobject->iobject );
+	g_assert( !vobject->iobject );
 
 	vobject->iobject = iobject;
 

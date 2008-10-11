@@ -285,7 +285,7 @@ iobject_set( iObject *iobject, const char *name, const char *caption )
 void
 iobject_sink( iObject *iobject )
 {
-	assert( IS_IOBJECT( iobject ) ); 
+	g_assert( IS_IOBJECT( iobject ) ); 
 
 	if( iobject->floating ) {
 		iobject->floating = FALSE;

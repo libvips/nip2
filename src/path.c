@@ -194,7 +194,7 @@ path_next_item( const char *filename,
 	const char *name = im_skip_dir( filename );
 	void *ru;
 
-	assert( name );
+	g_assert( name );
 	if( !slist_map( *previous, 
 		(SListMapFn) path_str_eq, (gpointer) name ) ) {
 		*previous = g_slist_prepend( *previous, g_strdup( name ) );

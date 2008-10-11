@@ -455,7 +455,7 @@ regionview_queue_draw( Regionview *regionview )
 		break;
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 
 	if( regionview->classmodel )
@@ -523,7 +523,7 @@ regionview_paint( Regionview *regionview )
 		break;
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 
 	if( regionview->classmodel ) 
@@ -538,7 +538,7 @@ static void
 regionview_detach( Regionview *regionview )
 {
 	if( regionview->grabbed ) {
-		assert( regionview->ip->grabbed == regionview );
+		g_assert( regionview->ip->grabbed == regionview );
 
 #ifdef DEBUG_GRAB
 		printf( "regionview_detach: %p\n", regionview );
@@ -734,7 +734,7 @@ regionview_position_label( Regionview *regionview )
 		break;
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 }
 
@@ -1177,7 +1177,7 @@ regionview_rect_touches_region( Regionview *regionview, Rect *expose )
 		break;
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 
 	return( FALSE );
@@ -1193,7 +1193,7 @@ regionview_expose( Regionview *regionview, Rect *expose )
 		expose->left, expose->top, expose->width, expose->height );
 #endif /*DEBUG_PAINT*/
 
-	assert( expose->width >= 0 && expose->height >= 0 );
+	g_assert( expose->width >= 0 && expose->height >= 0 );
 
 	/* If we've not finished init, don't paint.
 	 */
@@ -1346,7 +1346,7 @@ regionview_find_resize( Regionview *regionview, int x, int y )
 		break;
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 
 	return( REGIONVIEW_RESIZE_NONE );
@@ -1375,8 +1375,8 @@ regionview_attach( Regionview *regionview, int x, int y )
 	Conversion *conv = ip->id->conv;
 	int dx, dy;
 
-	assert( !regionview->grabbed );
-	assert( !regionview->ip->grabbed );
+	g_assert( !regionview->grabbed );
+	g_assert( !regionview->ip->grabbed );
 
 #ifdef DEBUG_GRAB
 	printf( "regionview_attach: %p\n", regionview );
@@ -1438,7 +1438,7 @@ regionview_left_press( Regionview *regionview, GdkEvent *ev, int x, int y )
 		break;
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 
 	return( handled );
@@ -1537,7 +1537,7 @@ regionview_resize_area( Regionview *regionview, int ix, int iy )
 			break;
 
 		default:
-			assert( FALSE );
+			g_assert( FALSE );
 		}
 
 		if( abs( our_area->width ) < th && 
@@ -1610,7 +1610,7 @@ regionview_resize_area( Regionview *regionview, int ix, int iy )
 				break;
 
 			default:
-				assert( FALSE );
+				g_assert( FALSE );
 			}
 			break;
 
@@ -1635,7 +1635,7 @@ regionview_resize_area( Regionview *regionview, int ix, int iy )
 				break;
 
 			default:
-				assert( FALSE );
+				g_assert( FALSE );
 			}
 			break;
 
@@ -1655,7 +1655,7 @@ regionview_resize_area( Regionview *regionview, int ix, int iy )
 			break;
 
 		default:
-			assert( FALSE );
+			g_assert( FALSE );
 		}
 	}
 }
@@ -1737,7 +1737,7 @@ regionview_motion_grab( Regionview *regionview, int x, int y )
 			break;
 
 		default:
-			assert( FALSE );
+			g_assert( FALSE );
 		}
 
 		snap = *our_area;
@@ -1829,7 +1829,7 @@ regionview_motion( Regionview *regionview, GdkEvent *ev, int x, int y )
 		break;
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 
 	return( FALSE );

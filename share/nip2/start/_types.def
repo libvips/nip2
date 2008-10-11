@@ -21,7 +21,7 @@ List value = class
 			is_list x'],
 		[this.List (map (apply2 op' x) value),
 			true]
-	]
+	] ++ super.oo_binary_table op x
 	{
 		op' = oo_converse op;
 
@@ -41,7 +41,7 @@ List value = class
 			op.op_name == "hd" || op.op_name == "tl"],
 		[this.List (map apply value),
 			true]
-	]
+	] ++ super.oo_unary_table op
 	{
 		apply x
 			= oo_unary_function op x, is_class x
@@ -58,7 +58,7 @@ Group value = class
 	] ++ super._check_args;
 
 	// methods
-    oo_binary_table op x = [
+	oo_binary_table op x = [
 		// if_then_else is really a trinary operator
 		[map_trinary ite this x?0 x?1,
 			op.op_name == "if_then_else"],
@@ -66,69 +66,42 @@ Group value = class
 			is_Group x],
 		[map_unary (\a op.fn a x) this,
 			true]
-	]
-	{
-		// need ite as a true trinary
-		ite a b c = if a then b else c;
-
-		// we can't call map_trinary directly, since it uses Group and we
-		// don't support mutually recursive top-level functions :-(
-		// copy-paste it here, keep in sync with the version in _stdenv
-		map_nary fn args
-			= fn args, groups == []
-			= Group (map process [0, 1 .. shortest - 1])
-		{
-			groups = filter is_Group args;
-
-			shortest = foldr1 min_pair (map (len @ get_value) groups);
-
-			process n
-				= [], any (map (is_noval n) args)
-				= map_nary fn (map (extract n) args)
-			{
-				extract n arg
-					= arg.value?n, is_Group arg
-					= arg;
-
-				is_noval n arg = is_Group arg && arg.value?n == [];
-			}
-		}
-
-		map_unary fn a = map_nary (list_1ary fn) [a];
-		map_binary fn a b = map_nary (list_2ary fn) [a, b];
-		map_trinary fn a b c = map_nary (list_3ary fn) [a, b, c];
-	}
+	] ++ super.oo_binary_table op x;
 
 	oo_unary_table op = [
 		[map_unary op.fn this,
 			true]
-	]
+	] ++ super.oo_unary_table op;
+
+	// we can't call map_trinary directly, since it uses Group and we
+	// don't support mutually recursive top-level functions :-(
+	// copy-paste it here, keep in sync with the version in _stdenv
+	map_nary fn args
+		= fn args, groups == []
+		= Group (map process [0, 1 .. shortest - 1])
 	{
-		// we can't call map_trinary directly, since it uses Group and we
-		// don't support mutually recursive top-level functions :-(
-		// copy-paste it here, keep in sync with the version in _stdenv
-		map_nary fn args
-			= fn args, groups == []
-			= Group (map process [0, 1 .. shortest - 1])
+		groups = filter is_Group args;
+	
+		shortest = foldr1 min_pair (map (len @ get_value) groups);
+	
+		process n
+			= NULL, any (map (is_noval n) args)
+			= map_nary fn (map (extract n) args)
 		{
-			groups = filter is_Group args;
-
-			shortest = foldr1 min_pair (map (len @ get_value) groups);
-
-			process n
-				= [], any (map (is_noval n) args)
-				= map_nary fn (map (extract n) args)
-			{
-				extract n arg
-					= arg.value?n, is_Group arg
-					= arg;
-
-				is_noval n arg = is_Group arg && arg.value?n == [];
-			}
+			extract n arg
+				= arg.value?n, is_Group arg
+				= arg;
+	
+			is_noval n arg = is_Group arg && arg.value?n == NULL;
 		}
-
-		map_unary fn a = map_nary (list_1ary fn) [a];
 	}
+
+	// need ite as a true trinary
+	ite a b c = if a then b else c;
+
+	map_unary fn a = map_nary (list_1ary fn) [a];
+	map_binary fn a b = map_nary (list_2ary fn) [a, b];
+	map_trinary fn a b c = map_nary (list_3ary fn) [a, b, c];
 }
 
 /* Single real number ... eg slider.
@@ -159,7 +132,7 @@ Real value = class
 			op.type == Operator_type.ARITHMETIC],
 		[op.fn this.value,
 			true]
-	];
+	] ++ super.oo_unary_table op;
 }
 
 /* Single bool ... eg Toggle.
@@ -186,7 +159,7 @@ Bool value = class
 			op.type == Operator_type.RELATIONAL],
 		[op.fn this.value,
 			true]
-	];
+	] ++ super.oo_unary_table op;
 }
 
 /* An editable string.
@@ -320,7 +293,7 @@ Vector value = class
 			op.type == Operator_type.COMPOUND_REWRAP],
 		[op.fn this.value,
 			true]
-	];
+	] ++ super.oo_unary_table op;
 
 	// turn an ip bool (or a number, for Vector) into VIPSs 255/0
 	bool_to_real x
@@ -410,7 +383,7 @@ Matrix_base value = class
 			op.type == Operator_type.COMPOUND_REWRAP],
 		[op.fn this.value,
 			true]
-	];
+	] ++ super.oo_unary_table op;
 }
 
 /* How to display a matrix: text, sliders, toggles, or text plus scale/offset.
@@ -1022,7 +995,7 @@ Image value = class
 			is_image result],
 		[result,
 			true]
-	]
+	] ++ super.oo_unary_table op
 	{
 		result = op.fn this.value;
 	}
@@ -1233,4 +1206,21 @@ Plot_histogram value = class
 
 Plot_xy value = class
 	scope.Plot [$format => Plot_format.XYYY] value {
+}
+
+/* A no-value type. Call it NULL for C-alike fun. Used by Group to indicate
+ * empty slots, for example.
+ */
+NULL = class 
+	_Object {
+	oo_binary_table op x = [
+		// the only operation we allow is equality .. use pointer equality,
+		// this lets us test a == NULL and a != NULL
+		[this === x, 
+			op.type == Operator_type.RELATIONAL &&
+			op.op_name == "equal"],
+		[this !== x, 
+			op.type == Operator_type.RELATIONAL &&
+			op.op_name == "not_equal"]
+	] ++ super.oo_binary_table op x;
 }

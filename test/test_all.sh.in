@@ -1,0 +1,10 @@
+#!/bin/sh
+
+for i in @TOP_SRCDIR@/test/workspaces/*.ws ; do
+	echo -n "testing `basename $i` ... "
+	if ! @TOP_SRCDIR@/src/nip2 --prefix=@TOP_SRCDIR@ --test $i ; then
+		exit 1
+	fi
+	echo ok
+done
+

@@ -379,7 +379,7 @@ workspace_column_pick( Workspace *ws )
 void
 workspace_column_select( Workspace *ws, Column *col )
 {
-	assert( !col || ICONTAINER_IS_CHILD( ws, col ) ); 
+	g_assert( !col || ICONTAINER_IS_CHILD( ws, col ) ); 
 
 	if( col && col == ws->current )
 		return;
@@ -496,7 +496,7 @@ workspace_load_file_buf( BufInfo *buf, const char *filename )
 		return( FALSE );
 	}
 
-	if( im_isvips( filename ) || im_format_for_file( filename ) ) 
+	if( im_format_for_file( filename ) ) 
 		buf_appends( buf, "Image_file" );
 	else
 		buf_appends( buf, "Matrix_file" );
@@ -944,7 +944,7 @@ workspace_load( Model *model,
 	char buf[256];
 	char *txt;
 
-	assert( IS_WORKSPACEGROUP( parent ) );
+	g_assert( IS_WORKSPACEGROUP( parent ) );
 
 	/* "view" is optional, for backwards compatibility.
 	 */
@@ -1250,7 +1250,7 @@ workspace_top_load( Filemodel *filemodel,
 		break;
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 
 	return( FILEMODEL_CLASS( parent_class )->top_load( filemodel, 

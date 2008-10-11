@@ -82,11 +82,11 @@ most of the jobs above are pushed down into vips8 now ... except for
 #include "ip.h"
 
 /*
-#define DEBUG_OPEN
 #define DEBUG
 #define DEBUG_RGB
 #define DEBUG_CHECK
 #define DEBUG_MAKE
+#define DEBUG_OPEN
  */
 
 static iContainerClass *imageinfogroup_parent_class = NULL;
@@ -129,7 +129,7 @@ imageinfogroup_child_remove( iContainer *parent, iContainer *child )
 
 	hits = (GSList *) g_hash_table_lookup( imageinfogroup->filename_hash,
 		name );
-	assert( hits );
+	g_assert( hits );
 	hits = g_slist_remove( hits, imageinfo );
 
 	/* child is going away (probably), so we don't want to link hits back
@@ -269,7 +269,7 @@ imageinfo_print( Imageinfo *imageinfo )
 void *
 imageinfo_area_changed( Imageinfo *imageinfo, Rect *dirty )
 {
-	assert( IS_IMAGEINFO( imageinfo ) );
+	g_assert( IS_IMAGEINFO( imageinfo ) );
 
 #ifdef DEBUG
 	printf( "imageinfo_area_changed: left = %d, top = %d, "
@@ -286,7 +286,7 @@ imageinfo_area_changed( Imageinfo *imageinfo, Rect *dirty )
 void *
 imageinfo_area_painted( Imageinfo *imageinfo, Rect *dirty )
 {
-	assert( IS_IMAGEINFO( imageinfo ) );
+	g_assert( IS_IMAGEINFO( imageinfo ) );
 
 #ifdef DEBUG
 	printf( "imageinfo_area_painted: left = %d, top = %d, "
@@ -303,7 +303,7 @@ imageinfo_area_painted( Imageinfo *imageinfo, Rect *dirty )
 static void *
 imageinfo_undo_changed( Imageinfo *imageinfo )
 {
-	assert( IS_IMAGEINFO( imageinfo ) );
+	g_assert( IS_IMAGEINFO( imageinfo ) );
 
 	g_signal_emit( G_OBJECT( imageinfo ), 
 		imageinfo_signals[SIG_UNDO_CHANGED], 0 );
@@ -314,7 +314,7 @@ imageinfo_undo_changed( Imageinfo *imageinfo )
 static void *
 imageinfo_file_changed( Imageinfo *imageinfo )
 {
-	assert( IS_IMAGEINFO( imageinfo ) );
+	g_assert( IS_IMAGEINFO( imageinfo ) );
 
 #ifdef DEBUG_CHECK
 	printf( "imageinfo_file_changed:" );
@@ -330,7 +330,7 @@ imageinfo_file_changed( Imageinfo *imageinfo )
 static void *
 imageinfo_invalidate( Imageinfo *imageinfo )
 {
-	assert( IS_IMAGEINFO( imageinfo ) );
+	g_assert( IS_IMAGEINFO( imageinfo ) );
 
 #ifdef DEBUG_CHECK
 	printf( "imageinfo_invalidate:" );
@@ -352,8 +352,8 @@ imageinfo_expr_add( Imageinfo *imageinfo, Expr *expr )
 	printf( "has imageinfo \"%s\" as value\n", imageinfo->im->filename );
 #endif /*DEBUG*/
 
-	assert( !g_slist_find( imageinfo->exprs, expr ) );
-	assert( !expr->imageinfo );
+	g_assert( !g_slist_find( imageinfo->exprs, expr ) );
+	g_assert( !expr->imageinfo );
 
 	expr->imageinfo = imageinfo;
 	imageinfo->exprs = g_slist_prepend( imageinfo->exprs, expr );
@@ -369,9 +369,9 @@ imageinfo_expr_remove( Expr *expr, Imageinfo *imageinfo )
 		imageinfo->im->filename );
 #endif /*DEBUG*/
 
-	assert( expr->imageinfo );
-	assert( g_slist_find( imageinfo->exprs, expr ) );
-	assert( expr->imageinfo == imageinfo );
+	g_assert( expr->imageinfo );
+	g_assert( g_slist_find( imageinfo->exprs, expr ) );
+	g_assert( expr->imageinfo == imageinfo );
 
 	expr->imageinfo = NULL;
 	imageinfo->exprs = g_slist_remove( imageinfo->exprs, expr );
@@ -455,7 +455,7 @@ imageinfo_dispose( GObject *gobject )
 
 	slist_map( imageinfo->exprs, 
 		(SListMapFn) imageinfo_expr_remove, imageinfo );
-	assert( !imageinfo->exprs );
+	g_assert( !imageinfo->exprs );
 
 	imageinfo_dispose_eval( imageinfo );
 
@@ -673,15 +673,16 @@ imageinfo_proxy_eval( Imageinfoproxy *proxy )
 {
 	Imageinfo *imageinfo = proxy->imageinfo;
 
-	if( imageinfo ) {
+	if( imageinfo ) 
 		busy_progress( imageinfo->im->time->percent,
 			imageinfo->im->time->eta );
 
-		if( mainw_cancel )
-			imageinfo->im->kill = 1;
-	}
-
-	return( 0 );
+	if( mainw_cancel )
+		/* Return non-zero to cancel evaluation.
+		 */
+		return( -1 );
+	else
+		return( 0 );
 }
 
 static int
@@ -761,7 +762,7 @@ imageinfo_new( Imageinfogroup *imageinfogroup,
 	char buf[FILENAME_MAX];
 
 #ifdef DEBUG_OPEN
-	printf( "imageinfo_new: \"%s\"\n", im->filename );
+	printf( "imageinfo_new: %p \"%s\"\n", imageinfo, im->filename );
 #endif /*DEBUG_OPEN*/
 
 	managed_link_heap( MANAGED( imageinfo ), heap );
@@ -839,7 +840,10 @@ imageinfo_open_image_input( const char *filename, ImageinfoOpen *open )
 	Imageinfo *imageinfo;
 	im_format_t *format;
 
-	if( im_isvips( filename ) ) {
+	if( !(format = im_format_for_file( filename )) ) 
+		return( NULL );
+
+	if( strcmp( format->name, "vips" ) == 0 ) {
 		IMAGE *im;
 
 		if( !(im = im_open( filename, "r" )) ) 
@@ -857,7 +861,7 @@ imageinfo_open_image_input( const char *filename, ImageinfoOpen *open )
 			filename );
 #endif /*DEBUG_OPEN*/
 	}
-	else if( (format = im_format_for_file( filename )) ) {
+	else {
 		im_format_flags flags = format->flags ? 
 			format->flags( filename ) : 0;
 		const char *mode = flags & IM_FORMAT_FLAG_PARTIAL ? "p" : "w";
@@ -878,12 +882,6 @@ imageinfo_open_image_input( const char *filename, ImageinfoOpen *open )
 			"opened %s \"%s\"\n", format->name, filename );
 #endif /*DEBUG_OPEN*/
 	}
-	else {
-		im_error( "open", 
-			_( "\"%s\" is not in a supported image file format" ), 
-			filename );
-		return( NULL );
-	}
 
 	/* Get ready for input.
  	 */
@@ -900,27 +898,6 @@ imageinfo_open_image_input( const char *filename, ImageinfoOpen *open )
 	 */
 	if( im_meta_set_string( imageinfo->im, ORIGINAL_FILENAME, filename ) )
 		return( NULL );
-
-	return( imageinfo );
-}
-
-/* Open for write ... returns a non-heap pointer, destroy if it goes in the
- * heap.
- */
-static Imageinfo *
-imageinfo_open_image_output( const char *filename,
-	Imageinfogroup *imageinfogroup, Heap *heap, const char *name )
-{
-	Imageinfo *imageinfo;
-	IMAGE *im;
-
-	if( !(im = im_open( filename, "w" )) )
-		return( NULL );
-	if( !(imageinfo = imageinfo_new( imageinfogroup, heap, im, name )) ) {
-		im_close( im );
-		return( NULL );
-	}
-	MANAGED_REF( imageinfo );
 
 	return( imageinfo );
 }
@@ -1010,39 +987,6 @@ imageinfo_new_input( Imageinfogroup *imageinfogroup, GtkWidget *parent,
 
 	imageinfo->from_file = TRUE;
 	imageinfo_attach_check( imageinfo );
-
-	return( imageinfo );
-}
-
-/* Open a filename for output.
- */
-static Imageinfo *
-imageinfo_new_output( Imageinfogroup *imageinfogroup, 
-	Heap *heap, const char *name )
-{
-	Imageinfo *imageinfo;
-	char filename[FILENAME_MAX];
-	char filemode[FILENAME_MAX];
-
-	im_filename_split( name, filename, filemode );
-	if( (imageinfo = imageinfogroup_lookup( imageinfogroup, filename )) ) {
-                error_top( _( "Unable to write to file." ) );
-		error_sub( _( "File \"%s\" is already open for read." ), 
-			filename );
-		error_vips();
-                return( NULL );
-	}
-
-        if( !(imageinfo = (Imageinfo *) callv_string_filename( 
-		(callv_string_fn) imageinfo_open_image_output, 
-		name, imageinfogroup, heap, (char *) filename )) ) {
-                error_top( _( "Unable to write to file." ) );
-		error_sub( _( "Unable to open \"%s\" for write." ), filename );
-		error_vips();
-                return( NULL );
-        }
-
-	imageinfo->from_file = TRUE;
 
 	return( imageinfo );
 }
@@ -1151,49 +1095,35 @@ imageinfo_same_underlying( Imageinfo *imageinfo[], int n )
 	}
 }
 
-static int
-imageinfo_write_im( Imageinfo *out, IMAGE *im )
-{
-	int result;
-
-	/* im_close() can fail if we write a TIFF on evalend. So close
-	 * ourselves, carefully. Zap out->im so it's not closed again when we
-	 * destroy out.
-	 */
-	if( im_copy( im, out->im ) )
-		return( -1 );
-
-	result = im_close( out->im );
-	out->im = NULL;
-
-	return( result );
-}
-
 /* Write to a filename.
  */
 gboolean
-imageinfo_write( Imageinfo *imageinfo, GtkWidget *parent, const char *filename )
+imageinfo_write( Imageinfo *imageinfo, const char *name )
 {
-	Heap *heap = MANAGED( imageinfo )->heap;
 	Imageinfogroup *imageinfogroup = 
 		IMAGEINFOGROUP( ICONTAINER( imageinfo )->parent );
-	IMAGE *in = imageinfo_get( FALSE, imageinfo );
-	Imageinfo *out;
+	IMAGE *im = imageinfo_get( FALSE, imageinfo );
+	char filename[FILENAME_MAX];
+	char filemode[FILENAME_MAX];
 
-	if( !(out = imageinfo_new_output( imageinfogroup, heap, filename )) ) 
-		return( FALSE );
-	managed_sub_add( MANAGED( out ), MANAGED( imageinfo ) );
+	im_filename_split( name, filename, filemode );
 
-	if( imageinfo_write_im( out, in ) ) {
-		MANAGED_UNREF( out );
+	if( (imageinfo = imageinfogroup_lookup( imageinfogroup, filename )) ) {
+                error_top( _( "Unable to write to file." ) );
+		error_sub( _( "File \"%s\" is already open for read." ), 
+			filename );
+
+                return( FALSE );
+	}
+
+	if( im_format_write( im, name ) ) {
 		error_top( _( "Unable to write to file." ) );
 		error_sub( _( "Error writing image to file \"%s\"." ), 
 			filename );
 		error_vips();
+
 		return( FALSE );
 	}
-
-	MANAGED_UNREF( out );
 
 	return( TRUE );
 }
@@ -1201,7 +1131,7 @@ imageinfo_write( Imageinfo *imageinfo, GtkWidget *parent, const char *filename )
 /* Change an imageinfo to be a file, rather than a memory object. 
  */
 static gboolean
-imageinfo_file( Imageinfo *imageinfo, GtkWidget *parent )
+imageinfo_file( Imageinfo *imageinfo )
 {
 	IMAGE *im;
 	char filename[FILENAME_MAX];
@@ -1217,7 +1147,7 @@ imageinfo_file( Imageinfo *imageinfo, GtkWidget *parent )
 	 */
 	if( !temp_name( filename, "v" ) )
 		return( FALSE );
-	if( !imageinfo_write( imageinfo, parent, filename ) )
+	if( !imageinfo_write( imageinfo, filename ) )
 		return( FALSE );
 	if( !(im = im_open( filename, "r" )) ) {
 		error_vips_all();
@@ -1240,9 +1170,9 @@ imageinfo_file( Imageinfo *imageinfo, GtkWidget *parent )
 }
 
 static gboolean
-imageinfo_make_paintable( Imageinfo *imageinfo, GtkWidget *parent )
+imageinfo_make_paintable( Imageinfo *imageinfo )
 {
-	if( !imageinfo_file( imageinfo, parent ) ) 
+	if( !imageinfo_file( imageinfo ) ) 
 		return( FALSE );
 	if( im_rwcheck( imageinfo->im ) ) {
 		error_top( _( "Unable to paint on image." ) );
@@ -1264,7 +1194,7 @@ imageinfo_check_paintable_cb( iWindow *iwnd, void *client,
 {
 	Imageinfo *imageinfo = IMAGEINFO( client );
 
-	if( !imageinfo_make_paintable( imageinfo, GTK_WIDGET( iwnd ) ) ) {
+	if( !imageinfo_make_paintable( imageinfo ) ) {
 		nfn( sys, IWINDOW_ERROR );
 		return;
 	}
@@ -1303,7 +1233,7 @@ imageinfo_check_paintable( Imageinfo *imageinfo, GtkWidget *parent,
 		return( FALSE );
 	}
 	else if( !im_isfile( im ) && !imageinfo->ok_to_paint ) {
-		if( !imageinfo_make_paintable( imageinfo, parent ) ) {
+		if( !imageinfo_make_paintable( imageinfo ) ) {
 			nfn( sys, IWINDOW_ERROR );
 			return( FALSE );
 		}
@@ -2459,7 +2389,7 @@ imageinfo_from_rgb( Imageinfo *imageinfo, double *rgb )
 				break;
 
 			default:
-				assert( FALSE );
+				g_assert( FALSE );
 			}
 	}
 	im_invalidate( im );

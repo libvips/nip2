@@ -177,7 +177,7 @@ idialog_done_trigger( iDialog *idlg, int pos )
 
 	/* Trigger user done callback.
 	 */
-	assert( fn );
+	g_assert( fn );
 	idialog_set_button_state( idlg, FALSE );
 	iwindow_notify_send( IWINDOW( idlg ), 
 		fn, idlg->client, idialog_done_notify, idlg );
@@ -234,7 +234,7 @@ idialog_done_cb( GtkWidget *w, iDialog *idlg )
 {
 	int pos = g_slist_index( idlg->ok_l, w );
 
-	assert( pos != -1 );
+	g_assert( pos != -1 );
 
 	idialog_done_trigger( idlg, pos );
 }

@@ -106,7 +106,7 @@ imagepresent_destroy( GtkObject *object )
 
 	/* Child views should all have removed themselves.
 	 */
-	assert( ip->regionviews == NULL );
+	g_assert( ip->regionviews == NULL );
 }
 
 static void
@@ -1089,7 +1089,7 @@ imagepresent_left_release( Imagepresent *ip, GdkEvent *ev, int x, int y )
 				break;
 
 			default:
-				assert( FALSE );
+				g_assert( FALSE );
 			}
 
 			DESTROY_GTK( ip->regionview );
@@ -1525,7 +1525,7 @@ imagepresent_init( Imagepresent *ip )
 		GTK_SIGNAL_FUNC( imagepresent_scroll_event_cb ), ip );
 
 	port = gtk_bin_get_child( GTK_BIN( ip->swin ) );
-	assert( GTK_IS_VIEWPORT( port ) );
+	g_assert( GTK_IS_VIEWPORT( port ) );
 	gtk_signal_connect( GTK_OBJECT( ip->hadj ), "changed",
 		GTK_SIGNAL_FUNC( imagepresent_hadj_changed_cb ), ip );
 	gtk_signal_connect( GTK_OBJECT( ip->hadj ), "value_changed",

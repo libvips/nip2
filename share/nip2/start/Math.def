@@ -533,6 +533,20 @@ Math_stats_item = class
 			"fit a line to a set of points and deviations" {
 		action xes yes devs = linregw xes yes devs;
 	}
+
+	Cluster_item = class 
+		Menuaction "_Cluster" "cluster a list of numbers" {
+		action l = class {
+			_vislevel = 2;
+	
+			thresh = Expression "Threshold" 10;
+	
+			[_r, _w] = cluster thresh.expr l;
+	
+			result = _r;
+			weights = _w;
+		}
+	}
 }
 
 Math_base_item = class 
@@ -550,19 +564,5 @@ Math_base_item = class
 	Octal_item = class 
 		Menuaction "_Octal" "convert to octal (base 8)" {
 		action a = map_unary (print_base 8) a;
-	}
-}
-
-Math_cluster_item = class 
-	Menuaction "_Cluster" "cluster a list of numbers" {
-	action l = class {
-		_vislevel = 2;
-
-		thresh = Expression "Threshold" 10;
-
-		[_r, _w] = cluster thresh.expr l;
-
-		result = _r;
-		weights = _w;
 	}
 }

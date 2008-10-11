@@ -338,7 +338,7 @@ conversionview_changed_cb( Imagemodel *imagemodel, Conversionview *cv )
 static void
 conversionview_link( Conversionview *cv, Imagemodel *imagemodel )
 {
-	assert( !cv->imagemodel );
+	g_assert( !cv->imagemodel );
 
 	cv->imagemodel = imagemodel;
 	g_signal_connect( G_OBJECT( cv->imagemodel ), 

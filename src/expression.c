@@ -124,7 +124,7 @@ expression_load( Model *model,
 {
 	char caption[MAX_STRSIZE];
 
-	assert( IS_RHS( parent ) );
+	g_assert( IS_RHS( parent ) );
 
 	if( get_sprop( xnode, "caption", caption, MAX_STRSIZE ) ) 
 		iobject_set( IOBJECT( model ), NULL, caption );

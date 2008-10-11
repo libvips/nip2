@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.14.4">
-  <Workspace filename="/home/john/reg.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1680" window_height="1015" name="reg" caption="Default empty workspace">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.16.4">
+  <Workspace filename="registering.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1353" window_height="722" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="registering" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="5" name="A" caption="Original Images">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">

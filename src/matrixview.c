@@ -331,7 +331,7 @@ matrixview_slider_change_cb( Tslider *tslider, Matrixview *matrixview )
 	int y = pos / matrixview->width;
 	int i = x + y * matrix->value.width;
 
-    	assert( pos >= 0 );
+    	g_assert( pos >= 0 );
 
     	/* Install value.
     	 */
@@ -997,7 +997,7 @@ matrixview_refresh( vObject *vobject )
 			break;
 
 		default:
-			assert( FALSE );
+			g_assert( FALSE );
 		}
 
 		if( hclip ) {
@@ -1052,7 +1052,7 @@ matrixview_refresh( vObject *vobject )
     		break;
 
     	default:
-    		assert( FALSE );
+    		g_assert( FALSE );
     	}
 
     	/* If we've built a new display, need to show after _refresh.

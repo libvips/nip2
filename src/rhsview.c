@@ -122,7 +122,7 @@ rhsview_refresh( vObject *vobject )
 		break;
 
 	default:
-		assert( 0 );
+		g_assert( 0 );
 	}
 
 	VOBJECT_CLASS( parent_class )->refresh( vobject );
@@ -164,7 +164,7 @@ rhsview_child_add( View *parent, View *child )
 		gtk_table_attach_defaults( GTK_TABLE( rhsview->table ),
 			GTK_WIDGET( child ), 0, 1, 0, 1 );
 		rhsview->graphic = child;
-		assert( IS_GRAPHICVIEW( child ) );
+		g_assert( IS_GRAPHICVIEW( child ) );
 	}
 
 	VIEW_CLASS( parent_class )->child_add( parent, child );

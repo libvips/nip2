@@ -1,3 +1,53 @@
+- argh, make check is failing on fourier, again
+
+- add more tests to exercise -o & friends
+
+WONTFIX for 7.16
+================
+
+- add Set menu to Math with mkset/union/intersection/difference ?
+
+  could do bit operations on images?
+
+- filesel guess-file-type-from-suffix needs fixing
+
+  copy the vips model of having a user_name which is just "Workspace" or
+  somesuch, and making "Workspace file (*.ws)" string at runtime
+
+  use this to identity file types in util.c as well: get_image_info() needs it
+
+- for rows made by typing stuff, always show the formula as well as the value
+
+  by default anyway?
+
+  we'd need to always show the up/down arrows, not just for classes
+
+- drag from an image thumbnail to the ws background and you get a new column
+  with "A2" or whgatever in
+
+  does not work for plot thumbnails! how annoying
+
+- right-click on image background to get a context menu with
+  save/replace/header? same as row thumbnail context?
+
+- look at using goffice instead of gtkplot for graphs
+
+	http://ftp.gnome.org/pub/gnome/sources/goffice/
+
+  also in synaptic
+
+- try
+
+	last [1..]
+
+  then CTRL-W ... we can quit the app, but it's still evaling and the prompt
+  never comes back
+
+- Math / Cluster is a bit useless, will it work for complex numbers? vectors?
+  colours? groups?
+
+  what would we have to do to get it to work for these other types?
+
 - toolkit load is where compiled code would go in
 
   need to make load / parse / compile self-contained ... the only output is a

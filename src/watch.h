@@ -283,8 +283,6 @@ const char *watch_string_get( Watchgroup *,
 	(watch_bool_get( main_watchgroup, "DISPLAY_STATUS", FALSE ))
 #define DISPLAY_CONVERSION \
 	(watch_bool_get( main_watchgroup, "DISPLAY_CONVERSION", FALSE ))
-#define DISPLAY_FADE_STEPS \
-	(watch_int_get( main_watchgroup, "DISPLAY_FADE_STEPS", 10 ))
 
 /* Display a crosshair on image windows ... turn-off-able, since some desktop
  * themes have almost invisible crosshairs.

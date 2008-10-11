@@ -301,7 +301,7 @@ lisp_node( BufInfo *buf, HeapNode *hn, GSList **back, gboolean fn, int indent )
 
 	case TAG_FREE:
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 }
 
@@ -487,65 +487,6 @@ graph_pointer( PElement *root )
 	printf( "%s\n", buf_all( &buf ) );
 }
 
-static void *
-save_image( Imageinfo *ii, char *filename )
-{
-#ifdef DEBUG
-	printf( "set_output: writing image to %s\n", filename );
-#endif /*DEBUG*/
-
-	if( !imageinfo_write( ii, NULL, filename ) ) 
-		return( ii );
-
-	increment_filename( filename );
-
-	return( NULL );
-}
-
-/* Write all images to files. Generate filenames with increment-file,
- * overwriting filename.
- */
-void *
-save_objects( PElement *base, char *filename )
-{
-	gboolean result;
-	Imageinfo *ii;
-
-	if( PEISIMAGE( base ) && (ii = PEGETII( base )) ) {
-		if( save_image( ii, filename ) )
-			return( base );
-	}
-	else if( PEISCLASS( base ) ) {
-		if( !heap_is_instanceof( CLASS_IMAGE, base, &result ) )
-			error( error_get_top() );
-		if( result ) {
-			if( !class_get_member_image( base, MEMBER_VALUE, &ii ) )
-				error( error_get_top() );
-			if( ii && save_image( ii, filename ) )
-				return( base );
-		}
-
-		if( !heap_is_instanceof( CLASS_MATRIX, base, &result ) )
-			error( error_get_top() );
-		if( result ) {
-			DOUBLEMASK *m;
-
-			if( !(m = matrix_ip_to_dmask( base )) ) 
-				error( error_get_top() );
-			if( im_write_dmask_name( m, filename ) ) 
-				error( error_get_top() );
-			increment_filename( filename );
-		}
-	}
-	else if( PEISLIST( base ) ) {
-		if( heap_map_list( base, 
-			(heap_map_list_fn) save_objects, filename, NULL ) )
-			return( base );
-	}
-
-	return( NULL );
-}
-
 /* Fwd ref.
  */
 static void shell_pelement( PElement *base );
@@ -611,7 +552,7 @@ shell_node( HeapNode *hn )
 
 	case TAG_FREE:
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 }
 
@@ -661,7 +602,7 @@ shell_pelement( PElement *base )
 		break;
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 }
 

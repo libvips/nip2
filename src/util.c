@@ -95,7 +95,7 @@ error_block( void )
 void
 error_unblock( void )
 {
-	assert( error_level );
+	g_assert( error_level );
 
 	error_level--;
 }
@@ -142,7 +142,7 @@ error_clear( void )
 {
 	if( !error_level ) {
 		error_clear_nip();
-		im_clear_error_string();
+		im_error_clear();
 	}
 }
 
@@ -181,7 +181,7 @@ error_vips( void )
 		if( !buf_is_empty( &error_sub_buf ) )
 			(void) buf_appendf( &error_sub_buf, "\n" );
 		(void) buf_appendf( &error_sub_buf, "%s", im_errorstring() );
-		im_clear_error_string();
+		im_error_clear();
 	}
 }
 
@@ -760,7 +760,7 @@ queue_head( Queue *q )
 {
 	void *data;
 
-	assert( q );
+	g_assert( q );
 
 	if( !q->list )	
 		return( NULL );
@@ -780,12 +780,12 @@ void
 queue_add( Queue *q, void *data )
 {
 	if( !q->tail ) {
-		assert( !q->list );
+		g_assert( !q->list );
 
 		q->list = q->tail = g_slist_append( q->list, data );
 	}
 	else {
-		assert( q->list );
+		g_assert( q->list );
 
 		q->tail = g_slist_append( q->tail, data );
 		q->tail = q->tail->next;
@@ -860,7 +860,7 @@ buf_destroy( BufInfo *buf )
 void
 buf_set_static( BufInfo *buf, char *base, int mx )
 {
-	assert( mx >= 4 );
+	g_assert( mx >= 4 );
 
 	buf_destroy( buf );
 
@@ -882,7 +882,7 @@ buf_init_static( BufInfo *buf, char *base, int mx )
 void
 buf_set_dynamic( BufInfo *buf, int mx )
 {
-	assert( mx >= 4 );
+	g_assert( mx >= 4 );
 
 	if( buf->mx == mx && buf->dynamic ) 
 		/* No change?
@@ -995,7 +995,7 @@ buf_change( BufInfo *buf, const char *old, const char *new )
 	for( i = buf->i - olen; i > 0; i-- )
 		if( is_prefix( old, buf->base + i ) )
 			break;
-	assert( i >= 0 );
+	g_assert( i >= 0 );
 
 	/* Move tail of buffer to make right-size space for new.
 	 */
@@ -1656,7 +1656,14 @@ get_image_info( BufInfo *buf, const char *name )
 	else if( S_ISREG( st.st_mode ) ) {
 		IMAGE *im;
 
-		if( (im = im_open( name2, "r" )) ) {
+		/* Spot workspace files from the filename. These are XML files
+		 * and if imagemagick sees them it'll try to load them as SVG
+		 * or somethiing awful like that.
+		 */
+		if( is_file_type( &filesel_wfile_type, name2 ) ) {
+			buf_appends( buf, _( "workspace" ) );
+		}
+		else if( (im = im_open( name2, "r" )) ) {
 			buf_appendi( buf, im ); 
 			im_close( im );
 		}
@@ -1758,7 +1765,7 @@ expand_variables( const char *in, char *out )
 	char *p1 = (char *) in;		/* Discard const, but safe */
 	char *p2 = out;
 
-	assert( in != out );
+	g_assert( in != out );
 
 	/* Expand any environment variables in component.
 	 */
@@ -1834,7 +1841,7 @@ canonicalize_path( char *path )
 {
 	gboolean found;
 
-	assert( is_absolute( path ) );
+	g_assert( is_absolute( path ) );
 
 	/* Any "/./" can go.
 	 */
@@ -2750,7 +2757,7 @@ to_size( BufInfo *buf, double sz )
 	};
 	int i;
 
-	assert( sz >= 0 );
+	g_assert( sz >= 0 );
 
 	for( i = 0; sz > 1024 && i < IM_NUMBER( size_names ); sz /= 1024, i++ )
 		;

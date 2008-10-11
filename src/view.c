@@ -49,7 +49,7 @@ view_scannable_register( View *view )
 {
 	/* Must have a scan method.
 	 */
-	assert( VIEW_GET_CLASS( view )->scan );
+	g_assert( VIEW_GET_CLASS( view )->scan );
 
 	if( !view->scannable ) {
 		view_scannable = g_slist_prepend( view_scannable, view );
@@ -82,7 +82,7 @@ view_resettable_register( View *view )
 {
 	/* Must have a reset method.
 	 */
-	assert( VIEW_GET_CLASS( view )->reset );
+	g_assert( VIEW_GET_CLASS( view )->reset );
 
 	if( !view->resettable ) {
 		view_resettable = g_slist_prepend( view_resettable, view );
@@ -289,9 +289,9 @@ view_child_front( View *child )
 void 
 view_unlink( View *view )
 {
-	assert( view != NULL );
-	assert( VOBJECT( view )->iobject != NULL );
-	assert( IS_VIEW( view ) && IS_MODEL( VOBJECT( view )->iobject ) );
+	g_assert( view != NULL );
+	g_assert( VOBJECT( view )->iobject != NULL );
+	g_assert( IS_VIEW( view ) && IS_MODEL( VOBJECT( view )->iobject ) );
 
 	FREESID( view->pos_changed_sid, VOBJECT( view )->iobject );
 	FREESID( view->scrollto_sid, VOBJECT( view )->iobject );
@@ -351,8 +351,8 @@ view_finalize( GObject *gobject )
 static void
 view_model_pos_changed( Model *model, View *view )
 {
-        assert( IS_MODEL( model ) );
-        assert( IS_VIEW( view ) );
+        g_assert( IS_MODEL( model ) );
+        g_assert( IS_VIEW( view ) );
 
 #ifdef DEBUG
         printf( "view_model_pos_changed: %s %s \"%s\"\n",
@@ -369,8 +369,8 @@ view_model_pos_changed( Model *model, View *view )
 static void
 view_model_scrollto( Model *model, ModelScrollPosition position, View *view )
 {
-	assert( IS_MODEL( model ) );
-	assert( IS_VIEW( view ) );
+	g_assert( IS_MODEL( model ) );
+	g_assert( IS_VIEW( view ) );
 
 #ifdef DEBUG
 	printf( "view_model_scrollto: %s\n", IOBJECT( model )->name );
@@ -384,8 +384,8 @@ view_model_scrollto( Model *model, ModelScrollPosition position, View *view )
 static void
 view_model_layout( Model *model, View *view )
 {
-	assert( IS_MODEL( model ) );
-	assert( IS_VIEW( view ) );
+	g_assert( IS_MODEL( model ) );
+	g_assert( IS_VIEW( view ) );
 
 #ifdef DEBUG
 	printf( "view_model_layout: %s\n", IOBJECT( model )->name );
@@ -399,8 +399,8 @@ view_model_layout( Model *model, View *view )
 static void
 view_model_reset( Model *model, View *view )
 {
-	assert( IS_MODEL( model ) );
-	assert( IS_VIEW( view ) );
+	g_assert( IS_MODEL( model ) );
+	g_assert( IS_VIEW( view ) );
 
 #ifdef DEBUG
 	printf( "view_model_reset: %s\n", IOBJECT( model )->name );
@@ -421,14 +421,14 @@ view_model_child_add( Model *parent, Model *child, int pos, View *parent_view )
 		G_OBJECT_TYPE_NAME( parent ), NN( IOBJECT( parent )->name ) );
 #endif /*DEBUG*/
 
-	assert( IS_MODEL( parent ) );
-	assert( IS_MODEL( child ) );
-	assert( IS_VIEW( parent_view ) );
+	g_assert( IS_MODEL( parent ) );
+	g_assert( IS_MODEL( child ) );
+	g_assert( IS_VIEW( parent_view ) );
 
 #ifdef DEBUG
 	viewchild = slist_map( parent_view->managed,
 		(SListMapFn) view_viewchild_test_child_model, child );
-	assert( !viewchild );
+	g_assert( !viewchild );
 #endif /*DEBUG*/
 
 	(void) view_viewchild_new( parent_view, child ); 
@@ -459,7 +459,7 @@ view_model_child_remove( iContainer *parent, iContainer *child,
 	viewchild = slist_map( parent_view->managed,
 		(SListMapFn) view_viewchild_test_child_model, child );
 
-	assert( viewchild );
+	g_assert( viewchild );
 
 	(void) view_viewchild_destroy( viewchild ); 
 }
@@ -477,9 +477,9 @@ view_real_link_sub( Model *child_model, View *parent_view )
 static void 
 view_real_link( View *view, Model *model, View *parent_view )
 {
-	assert( view != NULL );
-	assert( IS_VIEW( view ) && IS_MODEL( model ) );
-	assert( !VOBJECT( view )->iobject );
+	g_assert( view != NULL );
+	g_assert( IS_VIEW( view ) && IS_MODEL( model ) );
+	g_assert( !VOBJECT( view )->iobject );
 
 #ifdef DEBUG
 	printf( "view_real_link: linking %s to model %s \"%s\"\n", 
@@ -515,8 +515,8 @@ view_real_child_add( View *parent, View *child )
 {
 	ViewChild *viewchild;
 
-	assert( IS_VIEW( parent ) && IS_VIEW( child ) );
-	assert( child->parent == NULL );
+	g_assert( IS_VIEW( parent ) && IS_VIEW( child ) );
+	g_assert( child->parent == NULL );
 
 #ifdef DEBUG
 	printf( "view_real_child_add: parent %s, child %s\n", 
@@ -527,8 +527,8 @@ view_real_child_add( View *parent, View *child )
 		(SListMapFn) view_viewchild_test_child_model, 
 		VOBJECT( child)->iobject );
 
-	assert( viewchild );
-	assert( viewchild->child_view == NULL );
+	g_assert( viewchild );
+	g_assert( viewchild->child_view == NULL );
 
 	/* Not all views are true widgets (ie. get _ref()'s and _sink()'d by a
 	 * parent in gtk_container()). Ref and sink ourselves to ensure that
@@ -557,7 +557,7 @@ view_real_child_remove( View *parent, View *child )
 		VOBJECT( child )->iobject );
 
 	if( viewchild ) {
-		assert( viewchild->child_view == child );
+		g_assert( viewchild->child_view == child );
 
 		viewchild->child_view = NULL;
 		g_object_unref( G_OBJECT( child ) );

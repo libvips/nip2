@@ -488,7 +488,7 @@ classmodel_class_member_new( Classmodel *classmodel,
 	}
 
 	default:
-		assert( 0 );
+		g_assert( 0 );
 	}
 
 	return( TRUE );
@@ -592,7 +592,7 @@ classmodel_info( iObject *iobject, BufInfo *buf )
 static void
 classmodel_parent_add( iContainer *child )
 {
-	assert( IS_CLASSMODEL( child ) );
+	g_assert( IS_CLASSMODEL( child ) );
 
 	ICONTAINER_CLASS( parent_class )->parent_add( child );
 }
@@ -647,7 +647,7 @@ classmodel_done_member( Classmodel *classmodel,
 		break;
 
 	default:
-		assert( 0 );
+		g_assert( 0 );
 	}
 
 	return( TRUE );
@@ -720,7 +720,7 @@ classmodel_buildedit_member( Classmodel *classmodel,
 		break;
 
 	default:
-		assert( 0 );
+		g_assert( 0 );
 	}
 
 	return( widget );
@@ -861,7 +861,7 @@ classmodel_save_member( Classmodel *classmodel,
 		break;
 
 	default:
-		assert( 0 );
+		g_assert( 0 );
 	}
 
 	return( TRUE );
@@ -1022,7 +1022,7 @@ classmodel_load_member( Classmodel *classmodel,
 		break;
 
 	default:
-		assert( 0 );
+		g_assert( 0 );
 	}
 
 	return( found );
@@ -1156,7 +1156,7 @@ classmodel_get_item( Classmodel *classmodel,
 	}
 
 	case CLASSMODEL_MEMBER_REALVEC_FIXED:
-		assert( m->extent < 4 );
+		g_assert( m->extent < 4 );
 		if( (l = heap_get_realvec( value, vec, m->extent )) < 0 )
 			return( FALSE );
 		if( l != m->extent ) {
@@ -1192,7 +1192,7 @@ classmodel_get_item( Classmodel *classmodel,
 		/* If there are optional fields, we have to have a reset
 		 * method for clearing the ones we don't use.
 		 */
-		assert( class->reset );
+		g_assert( class->reset );
 
 		if( heap_map_dict( value, 
 			(heap_map_dict_fn) classmodel_parse_option, 
@@ -1218,7 +1218,7 @@ classmodel_get_item( Classmodel *classmodel,
 	}
 
 	default:
-		assert( 0 );
+		g_assert( 0 );
 	}
 
 	return( TRUE );

@@ -64,7 +64,6 @@
 #define ngettext(S, P, N) ((N) == 1 ? (S) : (P))
 #endif /* ENABLE_NLS */
 
-#include <assert.h>
 #include <time.h>
 #include <ctype.h>
 #include <errno.h>

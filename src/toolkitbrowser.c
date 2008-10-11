@@ -326,7 +326,7 @@ toolkitbrowser_get_type( void )
 void
 toolkitbrowser_set_mainw( Toolkitbrowser *toolkitbrowser, Mainw *mainw )
 {
-	assert( !toolkitbrowser->mainw );
+	g_assert( !toolkitbrowser->mainw );
 
 #ifdef DEBUG
 	printf( "toolkitbrowser_set_mainw:\n" );

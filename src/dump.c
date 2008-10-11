@@ -29,9 +29,10 @@
 
 #include "ip.h"
 
-/* A lot of this file is just for debugging.
- */
+/* A lot of this file is just for debugging. Uncomment to enable all the
+ * debugging code.
 #define DEBUG
+ */
 
 /* Dump a binary operator.
  */
@@ -69,7 +70,7 @@ decode_BinOp( BinOp op )
 	case BI_CONS:		return( ":" );
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 
 		/* Keep gcc happy.
 		 */
@@ -100,7 +101,7 @@ decode_UnOp( UnOp op )
 	case UN_PLUS:		return( "+" );
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 
 		/* Keep gcc happy.
 		 */
@@ -126,7 +127,7 @@ decode_NodeType( NodeType tag )
 	case TAG_REFERENCE:	return( "TAG_REFERENCE" );
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 
 		/* Keep gcc happy.
 		 */
@@ -147,7 +148,7 @@ decode_CombinatorType( CombinatorType comb )
 	case COMB_K:		return( "K" );
 	case COMB_GEN:		return( "G" );
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 
 		/* Keep gcc happy.
 		 */
@@ -171,7 +172,7 @@ decode_SymbolType( SymbolType t )
 	case SYM_BUILTIN:	return( "SYM_BUILTIN" );
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 		return( NULL );
 	}
 }
@@ -192,7 +193,7 @@ decode_SymbolType_user( SymbolType t )
 	case SYM_BUILTIN:	return( _( "built-in symbol" ) );
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 		return( NULL );
 	}
 }
@@ -441,7 +442,7 @@ dump_tiny_tool( Tool *tool )
 		break;
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 
 	return( NULL );
@@ -584,7 +585,7 @@ print_element( int nsp, EType type, void *arg )
 		break;
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 }
 
@@ -672,7 +673,7 @@ graph_heap( int nsp, HeapNode *hn )
 
 	case TAG_FREE:
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 }
 
@@ -706,7 +707,7 @@ dump_parseconst( ParseConst *pc )
 		break;
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 }
 
@@ -799,7 +800,7 @@ dump_tree( ParseNode *n )
 		break;
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 
 	return( NULL );

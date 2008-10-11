@@ -79,7 +79,7 @@ trace_get_trace_flag( GtkAction *action )
 		if( strcmp( name, trace_types[i].name ) == 0 )
 			return( trace_types[i].flag );
 
-	assert( FALSE );
+	g_assert( FALSE );
 }
 
 void
@@ -93,7 +93,7 @@ trace_unblock( void )
 {
 	trace_block_count -= 1;
 
-	assert( trace_block_count >= 0 );
+	g_assert( trace_block_count >= 0 );
 }
 
 void
@@ -110,7 +110,7 @@ trace_reset( void )
 void
 trace_check( void )
 {
-	assert( trace_buffer_stack_p == 0 );
+	g_assert( trace_buffer_stack_p == 0 );
 }
 
 BufInfo *
@@ -143,7 +143,7 @@ trace_pop( void )
 	printf( "trace_pop: %d\n", trace_buffer_stack_p );
 #endif 
 
-	assert( trace_buffer_stack_p > 0 );
+	g_assert( trace_buffer_stack_p > 0 );
 
 	i = --trace_buffer_stack_p;
 	buf_destroy( &trace_buffer_stack[i] );
@@ -152,7 +152,7 @@ trace_pop( void )
 BufInfo *
 trace_current( void )
 {
-	assert( trace_buffer_stack_p > 0 );
+	g_assert( trace_buffer_stack_p > 0 );
 
 	return( &trace_buffer_stack[trace_buffer_stack_p - 1] );
 }
@@ -166,7 +166,7 @@ trace_get_mark( void )
 void
 trace_pop_to( int n )
 {
-	assert( n >= 0 && n <= trace_buffer_stack_p );
+	g_assert( n >= 0 && n <= trace_buffer_stack_p );
 
 	while( trace_buffer_stack_p > n ) 
 		trace_pop();

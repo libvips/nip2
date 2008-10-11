@@ -620,7 +620,7 @@ program_edit_dia( Program *program, Tool *tool )
 {
 	GtkWidget *ss = stringset_new();
 
-	assert( tool->type == TOOL_DIA );
+	g_assert( tool->type == TOOL_DIA );
 
 	stringset_child_new( STRINGSET( ss ), 
 		_( "Name" ), IOBJECT( tool )->name, _( "Menu item text" ) );
@@ -825,7 +825,7 @@ program_kit_destroy( Toolkit *kit, Program *program )
 	printf( "program_kit_destroy:\n" );
 #endif /*DEBUG*/
 
-	assert( program->kit == kit );
+	g_assert( program->kit == kit );
 
 	program_detach( program );
 	program_refresh( program );
@@ -879,12 +879,12 @@ program_set_text_tool( Program *program, Tool *tool )
 			break;
 		
 		default:
-			assert( FALSE );
+			g_assert( FALSE );
 		}
 		break;
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 }
 
@@ -897,7 +897,7 @@ program_tool_destroy( Tool *tool, Program *program )
 	printf( "program_tool_destroy:\n" );
 #endif /*DEBUG*/
 
-	assert( program->tool == tool );
+	g_assert( program->tool == tool );
 
 	program_detach( program );
 	program_set_text( program, "", TRUE );

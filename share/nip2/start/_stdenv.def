@@ -1703,14 +1703,14 @@ map_nary fn args
 	// process index n ... pull that member from each argument
 	// recurse to handle application, so we work for nested groups too
 	process n
-		= [], any (map (is_noval n) args)
+		= NULL, any (map (is_noval n) args)
 		= map_nary fn (map (extract n) args)
 	{
 		extract n arg
 			= arg.value?n, is_Group arg
 			= arg;
 
-		is_noval n arg = is_Group arg && arg.value?n == [];
+		is_noval n arg = is_Group arg && arg.value?n == NULL;
 	}
 }
 

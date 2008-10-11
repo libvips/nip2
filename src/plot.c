@@ -155,7 +155,7 @@ plot_unpack( Plot *plot, DOUBLEMASK *mask )
 		break;
 
 	default:
-		assert( 0 );
+		g_assert( 0 );
 	}
 
 	if( plot->columns != columns || plot->rows != rows ) {
@@ -218,7 +218,7 @@ plot_unpack( Plot *plot, DOUBLEMASK *mask )
 		break;
 
 	default:
-		assert( 0 );
+		g_assert( 0 );
 	}
 
 	xmin = plot->xcolumn[0][0];
@@ -292,7 +292,7 @@ plot_load( Model *model,
 {
         Plot *plot = PLOT( model );
 
-	assert( IS_RHS( parent ) );
+	g_assert( IS_RHS( parent ) );
 
 	(void) get_iprop( xnode, "plot_left", &plot->left );
 	(void) get_iprop( xnode, "plot_top", &plot->top );
@@ -424,7 +424,7 @@ plot_graphic_save( Classmodel *classmodel,
 	filesel_add_mode( buf );
 
 	if( value->ii )
-		if( !imageinfo_write( value->ii, parent, buf ) )
+		if( !imageinfo_write( value->ii, buf ) )
 			return( FALSE );
 
 	mainw_recent_add( &mainw_recent_image, filename );

@@ -190,7 +190,7 @@ compile_link_break( Compile *compile, Symbol *child )
 
 	/* Must be there.
 	 */
-	assert( g_slist_find( compile->children, child ) &&
+	g_assert( g_slist_find( compile->children, child ) &&
 		g_slist_find( child->parents, compile ) );
 
 	compile->children = g_slist_remove( compile->children, child );
@@ -209,8 +209,8 @@ compile_link_break( Compile *compile, Symbol *child )
 void *
 compile_expr_link_break( Compile *compile, Expr *expr )
 {
-	assert( expr->compile == compile );
-	assert( g_slist_find( compile->exprs, expr ) );
+	g_assert( expr->compile == compile );
+	g_assert( g_slist_find( compile->exprs, expr ) );
 
 	expr->compile = NULL;
 	compile->exprs = g_slist_remove( compile->exprs, expr );
@@ -229,9 +229,9 @@ compile_expr_link_break_rev( Expr *expr, Compile *compile )
 void 
 compile_expr_link_make( Compile *compile, Expr *expr )
 {
-	assert( !expr->compile );
-	assert( !g_slist_find( compile->exprs, expr ) );
-	assert( compile->sym == expr->sym );
+	g_assert( !expr->compile );
+	g_assert( !g_slist_find( compile->exprs, expr ) );
+	g_assert( compile->sym == expr->sym );
 
 	expr->compile = compile;
 	compile->exprs = g_slist_prepend( compile->exprs, expr );
@@ -303,7 +303,7 @@ compile_finalize( GObject *gobject )
 	/* If we're being finalized, we must have a ref count of zero, so
 	 * there shouldn't be any exprs looking at us.
 	 */
-	assert( !compile->exprs );
+	g_assert( !compile->exprs );
 
 	G_OBJECT_CLASS( parent_class )->finalize( gobject );
 }
@@ -864,14 +864,14 @@ compile_graph( Compile *compile, ParseNode *pn, PElement *out )
 			break;
 
 		default:
-			assert( FALSE );
+			g_assert( FALSE );
 		}
 
 		break;
 
 	case NODE_NONE:
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 
 	return( TRUE );
@@ -948,7 +948,7 @@ compile_abstract_body( Compile *compile,
 		case TAG_FILE:
 		case TAG_FREE:	
 		default:
-			assert( FALSE );
+			g_assert( FALSE );
 		}
 
 		break;
@@ -988,7 +988,7 @@ compile_abstract_body( Compile *compile,
 	 */
 	case ELEMENT_MANAGED:
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 
 	return( 0 );
@@ -1221,7 +1221,7 @@ compile_share_scan_element( CompileShare *share, PElement *e )
 	case ELEMENT_NOVAL:
 	case ELEMENT_MANAGED:
 	default:
-		assert( 0 );
+		g_assert( 0 );
 	}
 
 	return( hash );
@@ -1266,7 +1266,7 @@ compile_share_scan_node( CompileShare *share, HeapNode *hn )
 	case TAG_SHARED:
 	case TAG_FREE:
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 
 	/* Add to accumulated table.
@@ -1312,7 +1312,7 @@ compile_equal_node( HeapNode *hn1, HeapNode *hn2 )
 
 	/* If compound type, something is wrong! Only built by reduce.
 	 */
-	assert( hn1->type != TAG_CLASS );
+	g_assert( hn1->type != TAG_CLASS );
 
 	/* In two parts, test tags.
 	 */
@@ -1422,7 +1422,7 @@ compile_share_trim( CompileShare *share, HeapNode *hn )
 	case TAG_FREE:
 	case TAG_FILE:
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 }
 
@@ -2106,12 +2106,12 @@ compile_copy_sym( Symbol *sym, Compile *dest )
 
 	/* Must be a different place.
 	 */
-	assert( symbol_get_parent( sym )->expr->compile != dest );
+	g_assert( symbol_get_parent( sym )->expr->compile != dest );
 
 	/* Must not be an existing sym of that name. Or if there is, it has to
 	 * be a zombie.
 	 */
-	assert( !compile_lookup( dest, name ) ||
+	g_assert( !compile_lookup( dest, name ) ||
 		compile_lookup( dest, name )->type == SYM_ZOMBIE );
 
 	switch( sym->type ) {
@@ -2153,7 +2153,7 @@ compile_copy_sym( Symbol *sym, Compile *dest )
 	case SYM_EXTERNAL:
 	case SYM_BUILTIN:
 	default:
-		assert( 0 );
+		g_assert( 0 );
 	}
 
 	return( NULL );
@@ -2424,7 +2424,7 @@ compile_lcomp( Compile *compile )
 
 	/* Copy the code for the final result.
 	 */
-	assert( result );
+	g_assert( result );
 
 	n1 = compile_copy_tree( result->expr->compile, 
 		result->expr->compile->tree, scope );

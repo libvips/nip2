@@ -203,7 +203,7 @@ workspaceview_scroll_event_cb( GtkWidget *widget,
 static void
 workspaceview_realize_cb( GtkWidget *wid, Workspaceview *wview )
 {
-	assert( wid->window );
+	g_assert( wid->window );
 
 	gtk_widget_add_events( wid, GDK_BUTTON_PRESS_MASK );
 }
@@ -528,7 +528,7 @@ workspaceview_child_size_cb( Columnview *cview,
 
 	int right, bottom;
 
-	assert( IS_WORKSPACEVIEW( wview ) );
+	g_assert( IS_WORKSPACEVIEW( wview ) );
 
 	/* Compute a new bounding box for our children.
 	 */

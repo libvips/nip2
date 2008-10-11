@@ -248,11 +248,6 @@
             <iText formula="E20.value"/>
           </Rhs>
         </Row>
-        <Row popup="false" name="DISPLAY_FADE_STEPS">
-          <Rhs vislevel="1" flags="4">
-            <iText formula="E26.value"/>
-          </Rhs>
-        </Row>
         <Row popup="false" name="DISPLAY_THUMBNAIL">
           <Rhs vislevel="1" flags="4">
             <iText formula="E21.value"/>
@@ -757,13 +752,6 @@
             <Toggle/>
             <Subcolumn vislevel="0"/>
             <iText formula="Toggle &quot;Use crosshair cursor in image windows&quot; true"/>
-          </Rhs>
-        </Row>
-        <Row popup="false" name="E26">
-          <Rhs vislevel="1" flags="1">
-            <Subcolumn vislevel="0"/>
-            <iText formula="Number &quot;Fade tiles in this many steps&quot; 10"/>
-            <Number caption="Fade tiles in this many steps" value="0"/>
           </Rhs>
         </Row>
         <Row popup="false" name="E21">

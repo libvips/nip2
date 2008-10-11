@@ -114,7 +114,7 @@ heap_map( HeapNode *hn, heap_map_fn fn, void *a, void *b )
 
 	case TAG_FREE:
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 
 		/* Keep gcc happy.
 		 */
@@ -146,7 +146,7 @@ heap_check_free( Heap *heap )
 	/* Check free list.
 	 */
 	for( hn = heap->free; hn; hn = GETLEFT( hn ) ) {
-		assert( hn->type == TAG_FREE );
+		g_assert( hn->type == TAG_FREE );
 
 		hn->flgs |= FLAG_DEBUG;
 	}
@@ -159,7 +159,7 @@ heap_check_free( Heap *heap )
 		for( i = 0; i < hb->sz; i++ ) {
 			HeapNode *hn = &hb->node[i];
 
-			assert( hn->type != TAG_FREE || 
+			g_assert( hn->type != TAG_FREE || 
 				(hn->flgs & FLAG_DEBUG) );
 		}
 	}
@@ -256,7 +256,7 @@ heap_dispose( GObject *gobject )
 static void
 heap_static_string_free( HeapStaticString *string )
 {
-	assert( string->count == 0 );
+	g_assert( string->count == 0 );
 
 	IM_FREE( string->text );
 	heap_unregister_element( string->heap, &string->e );
@@ -266,7 +266,7 @@ heap_static_string_free( HeapStaticString *string )
 static gboolean 
 heap_finalize_static_check( const char *text, HeapStaticString *string )
 {
-	assert( string->count == 0 );
+	g_assert( string->count == 0 );
 
 	heap_static_string_free( string );
 
@@ -587,7 +587,7 @@ heap_mark_tree( Heap *heap, HeapNode *hn )
 				break;
 
 			case TAG_FILE:
-				assert( GETLT( hn ) == ELEMENT_MANAGED );
+				g_assert( GETLT( hn ) == ELEMENT_MANAGED );
 				managed_mark( (Managed *) GETLEFT( hn ) );
 				break;
 
@@ -602,7 +602,7 @@ heap_mark_tree( Heap *heap, HeapNode *hn )
 
 			case TAG_FREE:
 			default:
-				assert( FALSE );
+				g_assert( FALSE );
 			}
 		}
 	}
@@ -1800,7 +1800,7 @@ heap_copy( Heap *heap, Compile *compile, PElement *out )
 
 	case ELEMENT_MANAGED:
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 
 	return( TRUE );
@@ -1838,7 +1838,7 @@ heap_static_string_new( Heap *heap, const char *text )
 		g_hash_table_insert( heap->statics, string->text, string );
 	}
 
-	assert( string->count >= 0 );
+	g_assert( string->count >= 0 );
 	string->count += 1;
 
 	return( string );
@@ -1847,9 +1847,9 @@ heap_static_string_new( Heap *heap, const char *text )
 void *
 heap_static_string_unref( HeapStaticString *string )
 {
-	assert( g_hash_table_lookup( string->heap->statics, string->text ) ==
+	g_assert( g_hash_table_lookup( string->heap->statics, string->text ) ==
 		string );
-	assert( string->count >= 0 );
+	g_assert( string->count >= 0 );
 
 	string->count -= 1;
 

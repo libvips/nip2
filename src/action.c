@@ -370,7 +370,7 @@ action_proc_dot( Reduce *rc, Compile *compile,
 				"is not scope" ), 
 				op, name, a, b );
 
-		assert( sym->expr );
+		g_assert( sym->expr );
 
 		if( PEISTAG( b ) ) 
 			child = compile_lookup( sym->expr->compile, 
@@ -520,7 +520,7 @@ action_node_equal( Reduce *rc, HeapNode *a, HeapNode *b )
 	case TAG_SHARED:
 	case TAG_REFERENCE:
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 
 		/* Keep gcc happy.
 		 */
@@ -541,7 +541,7 @@ action_image_equal( Reduce *rc, Imageinfo *a, Imageinfo *b )
 	 */
 	ii[0] = a;
 	ii[1] = b;
-	assert( !ii[0] && !ii[1] );
+	g_assert( !ii[0] && !ii[1] );
 	if( ii[0] == ii[1] )
 		/* Trivial!
 		 */
@@ -638,7 +638,7 @@ action_element_equal( Reduce *rc, PElement *p1, PElement *p2 )
 	case ELEMENT_NOVAL:
 	case ELEMENT_STATIC:
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 
 		/* Keep gcc happy.
 		 */
@@ -1916,7 +1916,7 @@ action_proc_class_unary( Reduce *rc, Compile *compile,
 	}
 
 	/* Look up a.dispatch_unary and build 
-	 * (a.dispatch_unary "minus") application.
+	 * (a.oo_unary "minus") application.
 	 */
 	if( !class_get_member( a, MEMBER_OO_UNARY, NULL, &fn ) )
 		action_uoperror( rc, compile, error_get_sub(), op, name, a );
@@ -1943,7 +1943,7 @@ action_dispatch( Reduce *rc, Compile *compile, ReduceFunction rfn,
 	/* Don't allow nargs == 0. We rely on having a bit of graph we can
 	 * replace with (I result) for caching.
 	 */
-	assert( nargs > 0 );
+	g_assert( nargs > 0 );
 
 	/* Reduce all the args.
 	 */

@@ -231,8 +231,8 @@ main_print_main( Symbol *sym )
 		char filename[FILENAME_MAX];
 
 		im_strncpy( filename, main_option_output, FILENAME_MAX );
-		if( save_objects( root, filename ) )
-			main_error_exit( _( "error calculating \"%s\"" ), 
+		if( !group_save_item( root, filename ) )
+			main_error_exit( _( "error saving \"%s\"" ), 
 				symbol_name( sym ) );
 	}
 
@@ -541,7 +541,7 @@ main_link_package( im_package *pack)
 
 			sym = symbol_new( symbol_root->expr->compile,
 				pack->table[i]->name );
-			assert( sym->type == SYM_ZOMBIE );
+			g_assert( sym->type == SYM_ZOMBIE );
 			sym->type = SYM_EXTERNAL;
 			sym->function = pack->table[i];
 			sym->fn_nargs = vips_n_args( pack->table[i] );
@@ -615,7 +615,7 @@ main_load_startup( void )
 static void *
 main_junk_auto_load( Filemodel *filemodel )
 {
-	assert( IS_FILEMODEL( filemodel ) );
+	g_assert( IS_FILEMODEL( filemodel ) );
 
 	if( filemodel->auto_load )
 		IDESTROY( filemodel );
@@ -1179,8 +1179,7 @@ main( int argc, char *argv[] )
 			/* -1 means can't-be-set, at least on os x, so don't
 			 * warn.
 			 */
-			g_warning( _( "unable to change max file "
-				"descriptors\n"
+			g_warning( _( "unable to change max file descriptors\n"
 				"max file descriptors still set to %d" ),
 				(int) old_limit );
 		}
@@ -1242,22 +1241,10 @@ main( int argc, char *argv[] )
 	g_object_ref( G_OBJECT( main_imageinfogroup ) );
 	iobject_sink( IOBJECT( main_imageinfogroup ) );
 
-#ifdef DEBUG
-	printf( "arg processing\n" );
-#endif/*DEBUG*/
-
-	/* Might make this from stdin/whatever if we have a special
-	 * command-line flag.
-	 */
-	ws = NULL;
-
-	/* Interpret compound options first: these imply other options.
+	/* First pass at command-line options. Just look at the flags that
+	 * imply other flags, don't do any processing yet.
 	 */
 	if( main_option_script ) {
-		if( !toolkit_new_from_file( main_toolkitgroup,
-			main_option_script ) )
-			main_log_add( "%s\n", error_get_sub() );
-
 		main_option_batch = TRUE;
 		main_option_no_load_menus = TRUE;
 		main_option_no_load_args = TRUE;
@@ -1270,15 +1257,6 @@ main( int argc, char *argv[] )
 	}
 
 	if( main_option_expression ) {
-		kit = toolkit_new( main_toolkitgroup, "_expression" );
-
-		buf_init_static( &buf, txt, MAX_STRSIZE );
-		buf_appendf( &buf, "main = %s;", main_option_expression );
-		attach_input_string( buf_all( &buf ) );
-		(void) parse_onedef( kit, -1 );
-
-		filemodel_set_modified( FILEMODEL( kit ), FALSE );
-
 		main_option_batch = TRUE;
 		main_option_no_load_menus = TRUE;
 		main_option_no_load_args = TRUE;
@@ -1298,18 +1276,58 @@ main( int argc, char *argv[] )
 		main_option_no_load_menus = FALSE;
 	}
 
+#ifdef DEBUG
+	if( main_option_batch ) 
+		printf( "non-interactive mode\n" );
+#endif /*DEBUG*/
+
+	/* Start the X connection. We need this before _load_all(), so that
+	 * we can pop up error dialogs.
+	 */
+	if( !main_option_batch )
+		main_x_init( &argc, &argv );
+
+	/* Load start-up stuff. Builtins, plugins, externals etc. We need to
+	 * do this before we load any user code so we can prevent redefinition
+	 * of builtins.
+	 */
+	main_load_startup();
+
+#ifdef DEBUG
+	printf( "arg processing\n" );
+#endif/*DEBUG*/
+
+	/* Might make this from stdin/whatever if we have a special
+	 * command-line flag.
+	 */
+	ws = NULL;
+
+	/* Second command-line pass. This time we do any actions.
+	 */
+	if( main_option_script ) {
+		if( !toolkit_new_from_file( main_toolkitgroup,
+			main_option_script ) )
+			main_log_add( "%s\n", error_get_sub() );
+	}
+
+	if( main_option_expression ) {
+		kit = toolkit_new( main_toolkitgroup, "_expression" );
+
+		buf_init_static( &buf, txt, MAX_STRSIZE );
+		buf_appendf( &buf, "main = %s;", main_option_expression );
+		attach_input_string( buf_all( &buf ) );
+		(void) parse_onedef( kit, -1 );
+
+		filemodel_set_modified( FILEMODEL( kit ), FALSE );
+	}
+
 	if( main_option_stdin_def ) {
-		/* Load stdin as a set of defs. Good for HEREIS 
-		 * shell scripts.
-		 */
 		if( !(kit = toolkit_new_from_openfile( 
 			main_toolkitgroup, main_stdin )) )
 			main_log_add( "%s\n", error_get_sub() );
 	}
 
 	if( main_option_stdin_ws ) {
-		/* Load stdin as a workspace.
-		 */
 		if( !(ws = workspace_new_from_openfile( 
 			main_workspacegroup, main_stdin )) ) 
 			main_log_add( "%s\n", error_get_sub() );
@@ -1326,26 +1344,11 @@ main( int argc, char *argv[] )
 		ws = workspace_new_blank( main_workspacegroup, name );
 	}
 
-#ifdef DEBUG
-	if( main_option_batch ) 
-		printf( "non-interactive mode\n" );
-#endif /*DEBUG*/
-
-	/* Start the X connection. We need this before _load_all(), so that
-	 * we can pop up error dialogs.
-	 */
-	if( !main_option_batch )
-		main_x_init( &argc, &argv );
-
 	/* Reset IM_CONCURRENCY if a watch changes. Need to do this after
 	 * parsing options so we skip in batch mode.
 	 */
 	g_signal_connect( main_watchgroup, "watch_changed", 
 		G_CALLBACK( main_watchgroup_changed_cb ), NULL );
-
-	/* Load start-up stuff.
-	 */
-	main_load_startup();
 
 	/* Recalc to build all classes. We have to do this in batch
 	 * mode since we can find dirties through dynamic lookups. Even though

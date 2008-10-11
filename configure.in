@@ -9,8 +9,8 @@ dnl of them.
 dnl
 
 m4_define([nip_major_version], [7])
-m4_define([nip_minor_version], [15])
-m4_define([nip_micro_version], [1])
+m4_define([nip_minor_version], [17])
+m4_define([nip_micro_version], [0])
 m4_define([nip_version],
           [nip_major_version.nip_minor_version.nip_micro_version])
 
@@ -252,6 +252,11 @@ fi
 AC_SUBST(IP_CFLAGS)
 AC_SUBST(IP_LIBS)
 
+# needed by test/test_all.sh
+# :( what's a better way to do this, argh
+TOP_SRCDIR=$ac_pwd
+AC_SUBST(TOP_SRCDIR)
+
 AC_OUTPUT([
 	nip2.desktop
 	Makefile
@@ -270,9 +275,14 @@ AC_OUTPUT([
 	share/nip2/compat/7.14/Makefile
 	src/BITMAPS/Makefile 
 	src/Makefile
+	test/Makefile
+	test/test_all.sh
 	po/Makefile.in
 	nip2.spec
 ])
+
+# generated script needs to be executable
+chmod +x test/test_all.sh
 
 AC_MSG_RESULT([
 * general build options

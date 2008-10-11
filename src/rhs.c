@@ -99,7 +99,7 @@ rhs_child_remove( iContainer *parent, iContainer *child )
 static void
 rhs_parent_add( iContainer *child )
 {
-	assert( IS_ROW( child->parent ) );
+	g_assert( IS_ROW( child->parent ) );
 
 	ICONTAINER_CLASS( parent_class )->parent_add( child );
 }
@@ -116,11 +116,11 @@ rhs_load( Model *model,
 {
 	Rhs *rhs = RHS( model );
 
-	assert( IS_ROW( parent ) );
+	g_assert( IS_ROW( parent ) );
 
 	/* Hmm. Is this guaranteed?
 	 */
-	assert( sizeof( RhsFlags ) == sizeof( int ) );
+	g_assert( sizeof( RhsFlags ) == sizeof( int ) );
 
 	if( !get_iprop( xnode, "vislevel", &rhs->vislevel ) ||
 		!get_iprop( xnode, "flags", (int *) &rhs->flags ) )

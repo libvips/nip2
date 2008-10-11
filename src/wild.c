@@ -96,7 +96,7 @@ wild_new( const char *patt )
 
 	/* How dumb.
 	 */
-	assert( strlen( patt ) < 4000 );
+	g_assert( strlen( patt ) < 4000 );
 
 	wild_translate_pattern( patt, tpatt );
 	wild = INEW( NULL, Wild );

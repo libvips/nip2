@@ -309,8 +309,10 @@ iwindow_cursor_update( iWindow *iwnd )
 static void *
 iwindow_cursor_set( iWindow *iwnd, iWindowShape shape )
 {
-	iwnd->shape = shape;
-	iwindow_cursor_update( iwnd );
+	if( iwnd->shape != shape ) {
+		iwnd->shape = shape;
+		iwindow_cursor_update( iwnd );
+	}
 
 	return( NULL );
 }
@@ -450,7 +452,7 @@ iwindow_final_death( iWindow *iwnd )
 	printf( "iwindow_final_death: %s\n", iwnd->title );
 #endif /*DEBUG*/
 
-	assert( iwnd->pending == 0 && iwnd->destroy );
+	g_assert( iwnd->pending == 0 && iwnd->destroy );
 
 	/* Clean up.
 	 */
@@ -468,7 +470,7 @@ iwindow_notify_return( iWindow *iwnd )
 		iwnd->title, iwnd->pending );
 #endif /*DEBUG*/
 
-	assert( iwnd->pending > 0 );
+	g_assert( iwnd->pending > 0 );
 
 	iwnd->pending--;
 	if( iwnd->destroy && iwnd->pending == 0 ) {
@@ -848,7 +850,7 @@ iwindow_set_work_window( iWindow *iwnd, GdkWindow *work_window )
 void 
 iwindow_set_parent( iWindow *iwnd, GtkWidget *parent )
 {
-	assert( !iwnd->parent );
+	g_assert( !iwnd->parent );
 
 	iwnd->parent = parent;
 

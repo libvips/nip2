@@ -97,7 +97,7 @@ column_select_symbols( Column *col )
 static Subcolumn *
 column_get_subcolumn( Column *col )
 {
-	assert( g_slist_length( ICONTAINER( col )->children ) == 1 );
+	g_assert( g_slist_length( ICONTAINER( col )->children ) == 1 );
 
 	return( SUBCOLUMN( ICONTAINER( col )->children->data ) );
 }
@@ -135,7 +135,7 @@ column_parent_add( iContainer *child )
 {
 	Column *col = COLUMN( child );
 
-	assert( IS_WORKSPACE( child->parent ) );
+	g_assert( IS_WORKSPACE( child->parent ) );
 
 	ICONTAINER_CLASS( parent_class )->parent_add( child );
 
@@ -206,7 +206,7 @@ column_load( Model *model,
 
 	char buf[256];
 
-	assert( IS_WORKSPACE( parent ) );
+	g_assert( IS_WORKSPACE( parent ) );
 
 	if( !get_iprop( xnode, "x", &x ) ||
 		!get_iprop( xnode, "y", &y ) ||
@@ -373,7 +373,7 @@ column_add_n_names( Column *col, const char *name, BufInfo *buf, int nparam )
 	int len = g_slist_length( children );
 	GSList *i;
 
-	assert( nparam >= 0 );
+	g_assert( nparam >= 0 );
 
 	if( nparam > 0 && nparam > len ) {
 		error_top( _( "Too few items." ) );

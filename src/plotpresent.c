@@ -716,7 +716,7 @@ plotpresent_build_data( Plot *plot, GtkWidget *widget )
 			break;
 
 		default:
-			assert( 0 );
+			g_assert( 0 );
 		}
 
 		gtk_plot_data_set_x( GTK_PLOT_DATA( data ), plot->xcolumn[i] );

@@ -1,8 +1,15 @@
 #
 
 PDF = nipguide.pdf 
-SRC = config.tex infrared.tex intro.tex program.tex \
-	reference.tex menus.tex tutorial.tex mydefs.tex
+SRC = \
+      	config.tex \
+	infrared.tex \
+	intro.tex \
+	program.tex \
+	reference.tex \
+	menus.tex \
+	tutorial.tex \
+	mydefs.tex
 
 mkinstalldirs = $(SHELL) ../../mkinstalldirs
 destdir = ../
@@ -29,6 +36,8 @@ html:
 	mkdir nipguide
 	htlatex nipguide.tex html.cfg,3 "" -dnipguide/
 	cp -r figs nipguide
+	-rm nipguide/*.jpg
+	-rm nipguide/*.png
 
 .PHONEY: clean 
 clean:

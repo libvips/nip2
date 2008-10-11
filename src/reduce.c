@@ -755,7 +755,7 @@ reduce_list_length( Reduce *rc, PElement *base )
 		reduce_spine( rc, &p );
 	}
 
-	assert( PEISELIST( &p ) );
+	g_assert( PEISELIST( &p ) );
 
 	return( i );
 }
@@ -793,7 +793,7 @@ reduce_list_length_max( Reduce *rc, PElement *base, int max_length )
 		reduce_spine( rc, &p );
 	}
 
-	assert( PEISELIST( &p ) );
+	g_assert( PEISELIST( &p ) );
 
 	return( i );
 }
@@ -827,7 +827,7 @@ reduce_list_index( Reduce *rc, PElement *base, int n, PElement *out )
 			reduce_throw( rc );
 		}
 
-		assert( PEISFLIST( &p ) );
+		g_assert( PEISFLIST( &p ) );
 
 		hn = PEGETVAL( &p );
 		PEPOINTRIGHT( hn, &p );
@@ -1017,7 +1017,7 @@ reduce_start:
 		/* Class constructor.
 		 */
 		compile = PEGETCOMPILE( &np );
-		assert( is_class( compile ) );
+		g_assert( is_class( compile ) );
 
 		/* Class args ... real params, secret params.
 		 */
@@ -1069,7 +1069,7 @@ reduce_start:
 	{
 		Symbol *sym = PEGETSYMBOL( &np );
 
-		assert( sym );
+		g_assert( sym );
 
 		switch( sym->type ) {
 		case SYM_VALUE:
@@ -1124,7 +1124,7 @@ reduce_start:
 		case SYM_PARAM:
 			/* All params should be taken out by var abstract.
 			 */
-			assert( FALSE );
+			g_assert( FALSE );
 			break;
 
 		case SYM_EXTERNAL:
@@ -1245,7 +1245,7 @@ reduce_start:
 			break;
 
 		default:
-			assert( FALSE );
+			g_assert( FALSE );
 		}
 
 		break;
@@ -1414,10 +1414,10 @@ reduce_start:
 		}
 
 		case TAG_FREE:
-			assert( FALSE );
+			g_assert( FALSE );
 
 		default:
-			assert( FALSE );
+			g_assert( FALSE );
 		}
 
 		break;
@@ -1647,7 +1647,7 @@ reduce_start:
 		}
 
 		default:
-			assert( FALSE );
+			g_assert( FALSE );
 		}
 
 		/* Find output element.
@@ -1787,7 +1787,7 @@ reduce_start:
 		break;
 
 	default:
-		assert( FALSE );
+		g_assert( FALSE );
 	}
 
 	/* Unwind stack, restore frame pointer.

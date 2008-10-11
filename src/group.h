@@ -48,3 +48,4 @@ typedef struct _GroupClass {
 } GroupClass;
 
 GType group_get_type( void );
+gboolean group_save_item( PElement *item, char *filename );

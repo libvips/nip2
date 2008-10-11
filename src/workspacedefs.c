@@ -155,15 +155,18 @@ workspacedefs_load_file_cb( iWindow *iwnd,
 	Workspacedefs *workspacedefs = WORKSPACEDEFS( client );
 	char *fname;
 
-	if( !(fname = filesel_get_filename( filesel )) ) 
+	if( !(fname = filesel_get_filename( filesel )) ) {
 		nfn( sys, IWINDOW_ERROR );
-	else {
-		if( !workspacedefs_set_text_from_file( workspacedefs, 
-			fname ) ) 
-			nfn( sys, IWINDOW_ERROR );
-
-		g_free( fname );
+		return;
 	}
+
+	if( !workspacedefs_set_text_from_file( workspacedefs, fname ) ) {
+		g_free( fname );
+		nfn( sys, IWINDOW_ERROR );
+		return;
+	}
+
+	g_free( fname );
 
 	nfn( sys, IWINDOW_YES );
 }

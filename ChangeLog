@@ -1,9 +1,37 @@
+started 7.17.0
+- merged 7.16 branch back into trunk
+- bumped version number
+
+started 7.16.3
+- fixed cancel system (again)
+
+started 7.16.2
+- argh, "-o" was broken
+- oops, some left over code for function overloading in the parser
+- init builtins earlier, so we can spot accidental redefinition
+- added a NULL type, Group now uses it to indicate an empty slot
+- another stab at fixing the order of startup actions
+
+started 7.16.1
+- better pointer set
+- fixed a couple of notify snafus
+- use g_assert() instead of assert() to avoid abort() death
+
 branch for 7.16 
 - bumped version
 - grey16/rgb16 not always set on colour space conversion
+- revamped test system
 - set GValue strings as refstrings
 - try to transform gvalues we get to strings, if we can
 - added Joe's shrink within macro
+- removed the last of the fade stuff for faster repaint
+- open multiple now makea a group, so we can process more files at once
+- revamped 'make check', much nicer and more useful
+- better file type guessing
+- better progress feedback
+- revised image write code gives better feedback
+- better group-save, again
+- fixed a problem with recalc backtracking
 
 started 7.15.0
 - fixed segv with making tools for non-toplevels 

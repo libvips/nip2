@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.14.0">
-  <Workspace filename="/home/john/bus.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1680" window_height="1015" name="bus" caption="Default empty workspace">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.16.0">
+  <Workspace filename="businesscard.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="948" window_height="694" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="businesscard" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="true" sform="false" next="3" name="A" caption="source images">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
@@ -187,7 +187,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="812" y="0" open="true" selected="false" sform="false" next="7" name="C" caption="make card">
+    <Column x="822" y="0" open="true" selected="false" sform="false" next="7" name="C" caption="make card">
       <Subcolumn vislevel="3">
         <Row popup="false" name="C1">
           <Rhs vislevel="1" flags="1">
@@ -417,12 +417,12 @@
                 </Rhs>
               </Row>
             </Subcolumn>
-            <iText formula="Image_transform_item.Resize_item.Resize_item.Resize_canvas_item.action C4"/>
+            <iText formula="Image_transform_item.Resize_item.Resize_item.Resize_item.Resize_canvas_item.action C4"/>
           </Rhs>
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1350" y="0" open="true" selected="false" sform="false" next="10" name="D" caption="make page of cards">
+    <Column x="1480" y="0" open="true" selected="false" sform="false" next="10" name="D" caption="make page of cards">
       <Subcolumn vislevel="3">
         <Row popup="false" name="D1">
           <Rhs vislevel="1" flags="1">

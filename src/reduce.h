@@ -146,7 +146,7 @@ struct _Reduce {
 	rc->fsps[rc->running] = rc->fsp; \
 	rc->tsp[rc->running] = trace_get_mark(); \
 	if( setjmp( rc->error[rc->running++] ) ) { \
-		assert( rc->running >= 0 ); \
+		g_assert( rc->running >= 0 ); \
 		rc->sp = rc->sps[rc->running]; \
 		rc->fsp = rc->fsps[rc->running]; \
 		trace_pop_to( rc->tsp[rc->running] ); \
@@ -159,7 +159,7 @@ struct _Reduce {
 #define REDUCE_CATCH_STOP \
 { \
 	rc->running -= 1; \
-	assert( rc->running >= 0 ); \
+	g_assert( rc->running >= 0 ); \
 }
 
 /* Util.

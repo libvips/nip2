@@ -300,25 +300,9 @@ definition:
 		if( $1->type == NODE_LEAF ) {
 			const char *name = IOBJECT( $1->leaf )->name;
 
-			/* Was the previous def the same name? This is an
-			 * overloaded def if it is. Parse in as a local of the
-			 * previous def.
+			/* Make a new defining occurence.
 			 */
-			if( (sym = compile_lookup( current_compile, name )) &&
-				is_value( sym ) &&
-				current_compile->last_sym == sym ) {
-				char txt[256];
-
-				im_snprintf( txt, 256, "$$alternate%d",
-					parse_object_id++ );
-				sym = symbol_new_defining( sym->expr->compile, 
-					txt );
-			}
-			else 
-				/* Make a new defining occurence.
-			 	 */
-				sym = symbol_new_defining( current_compile, 
-					name );
+			sym = symbol_new_defining( current_compile, name );
 
 			(void) symbol_user_init( sym );
 			(void) compile_new_local( sym->expr );
@@ -348,8 +332,8 @@ definition:
 		current_symbol = sym;
 		current_compile = sym->expr->compile;
 
-		assert( !current_compile->param );
-		assert( current_compile->nparam == 0 );
+		g_assert( !current_compile->param );
+		g_assert( current_compile->nparam == 0 );
 
 		/* Junk any old def text.
 		 */
@@ -412,7 +396,7 @@ params_plus_rhs:
 	}
 	body {
 		current_compile->tree = $4;
-		assert( current_compile->tree );
+		g_assert( current_compile->tree );
 		input_push( 4 );
 	}
 	locals {
@@ -1277,7 +1261,7 @@ input_text( char *out )
 
 	len = end - start;
 
-	assert( len < MAX_STRSIZE - 1 );
+	g_assert( len < MAX_STRSIZE - 1 );
 	im_strncpy( out, buf + start, len + 1 );
 	out[len] = '\0';
 

@@ -2,6 +2,8 @@
 
 - add more tests to exercise -o & friends
 
+- cancel should set err msg, vips should not add another one
+
 WONTFIX for 7.16
 ================
 

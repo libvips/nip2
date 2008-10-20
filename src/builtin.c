@@ -307,97 +307,6 @@ apply_image_call( Reduce *rc,
 	MANAGED_UNREF( ii );
 }
 
-/* Args for "vips_image_new". 
- */
-static BuiltinTypeSpot *image_new_args[] = { 
-	&string_spot,
-	&list_spot 
-};
-
-/* Do a image_new call.
- */
-static void
-apply_image_new_call( Reduce *rc, 
-	const char *name, HeapNode **arg, PElement *out )
-{
-	PElement rhs;
-	char buf[FILENAME_MAX];
-	Managed *managed;
-
-	/* Get string. 
-	 */
-	PEPOINTRIGHT( arg[1], &rhs );
-	(void) reduce_get_string( rc, &rhs, buf, FILENAME_MAX );
-
-	/* List of options.
-	 */
-	PEPOINTRIGHT( arg[0], &rhs );
-
-	managed = call8_image_new( rc, buf, &rhs );
-
-	PEPUTP( out, ELEMENT_MANAGED, managed );
-	managed_destroy_nonheap( managed );
-}
-
-/* Args for "vips_call". 
- */
-static BuiltinTypeSpot *call_args[] = { 
-	&string_spot,
-	&list_spot,
-	&list_spot 
-};
-
-/* Do a vips_call call.
- */
-static void
-apply_call_call( Reduce *rc, 
-	const char *name, HeapNode **arg, PElement *out )
-{
-	PElement rhs;
-	char buf[256];
-	PElement required;
-	PElement optional;
-
-	PEPOINTRIGHT( arg[2], &rhs );
-	reduce_get_string( rc, &rhs, buf, 256 );
-	PEPOINTRIGHT( arg[1], &required );
-	PEPOINTRIGHT( arg[0], &optional );
-
-	call8_vips( rc, buf, &required, &optional, out );
-}
-
-/* Args for "vips_header_get". 
- */
-static BuiltinTypeSpot *header_get_args[] = { 
-	&string_spot,
-	&gobject_spot
-};
-
-/* Do a vips_header_get call.
- */
-static void
-apply_header_get_call( Reduce *rc, 
-	const char *name, HeapNode **arg, PElement *out )
-{
-	PElement rhs;
-	char buf[256];
-	GObject *object;
-
-	PEPOINTRIGHT( arg[1], &rhs );
-	reduce_get_string( rc, &rhs, buf, 256 );
-	PEPOINTRIGHT( arg[0], &rhs );
-	g_assert( PEISMANAGEDGOBJECT( &rhs ) );
-	object = PEGETMANAGEDGOBJECT( &rhs );
-
-	if( !VIPS_IS_OBJECT( object ) ) {
-		error_top( _( "Bad argument." ) );
-		error_sub( _( "GObject is not a VipsObject." ) );
-		reduce_throw( rc );
-	}
-
-	call8_header_get( rc, buf, VIPS_OBJECT( object ), out );
-}
-
 /* Args for "read". 
  */
 static BuiltinTypeSpot *read_args[] = { 
@@ -793,15 +702,6 @@ static BuiltinInfo builtin_table[] = {
 	{ "name2gtype", FALSE, 1, &name2gtype_args[0], &apply_name2gtype_call },
 	{ "gtype2name", FALSE, 1, &gtype2name_args[0], &apply_gtype2name_call },
 	{ "_", FALSE, 1, &underscore_args[0], &apply_underscore_call },
-
-	/* vips8 wrapper.
-	 */
-	{ "vips8_image_new", FALSE,  IM_NUMBER( image_new_args ), 
-		&image_new_args[0], apply_image_new_call },
-	{ "vips8_call", FALSE,  IM_NUMBER( call_args ), 
-		&call_args[0], apply_call_call },
-	{ "vips8_header_get", FALSE,  IM_NUMBER( header_get_args ), 
-		&header_get_args[0], apply_header_get_call },
 
 	/* Predicates.
 	 */

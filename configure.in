@@ -203,21 +203,6 @@ if test "x$with_gsl" != "xno"; then
   IP_LIBS="$GSL_LIBS $IP_LIBS"
 fi
 
-# optional ... can build against vips8 for testing
-AC_ARG_WITH([vips8], AS_HELP_STRING([--without-vips8], [build without vips8 (default: test)]))
-
-if test "x$with_vips8" != "xno"; then
-  PKG_CHECK_MODULES(VIPS8, vips-8.0,
-    [AC_DEFINE(HAVE_VIPS8,1,[define if you have vips8 installed.])
-     with_vips8=yes
-    ],
-    [AC_MSG_WARN([vips8 not found; disabling library testing])
-     with_vips8=no
-    ])
-  IP_CFLAGS="$VIPS8_CFLAGS $IP_CFLAGS"
-  IP_LIBS="$VIPS8_LIBS $IP_LIBS"
-fi
-
 # optional ... use this to open the help browser, if available
 AC_PATH_PROG(XDG_OPEN, xdg-open, no)
 

@@ -317,8 +317,6 @@ nip2_SOURCES = \
 	view.h \
 	vips_call.c \
 	vips_call.h \
-	call8.c \
-	call8.h \
 	watch.c \
 	watch.h \
 	wild.c \

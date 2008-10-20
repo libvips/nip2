@@ -130,21 +130,6 @@ extern int statfs();
 
 #include <vips/vips.h>
 
-/* Experimental vips8 links.
- */
-#ifdef HAVE_VIPS8
-#include <vips8/vips.h>
-#else /*!HAVE_VIPS8*/
-/* Some typedefs so we can build code containing vips8 names without falling
- * over.
- */
-typedef void VipsImage;
-typedef void VipsObject;
-#define VIPS_OBJECT(O) (O)
-#define VIPS_IS_OBJECT(O) (O)
-#define VIPS_NN(O) (O)
-#endif /*HAVE_VIPS8*/
-
 #include <libxml/tree.h>
 #include <libxml/parser.h>
 
@@ -458,7 +443,6 @@ typedef void *(*tool_map_fn)( Tool *, void *, void * );
 #include "toggle.h"
 #include "toggleview.h"
 #include "vips_call.h"
-#include "call8.h"
 #include "parser.h"
 
 #ifdef WITH_DMALLOC

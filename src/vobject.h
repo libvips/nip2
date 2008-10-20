@@ -1,5 +1,5 @@
-/* abstract base class for a vobject object ... watch an iobject and call 
- * _refresh in idle if it changes.
+/* abstract base class for a view ... watch an iobject and call _refresh in 
+ * idle if it changes.
  */
 
 /*

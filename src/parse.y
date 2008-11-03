@@ -264,7 +264,7 @@ directive:
 		tool = tool_new_dia( current_kit, tool_position, 
 			$2.val.str, $3.val.str );
 		if( !tool )
-			yyerror( error_get_sub() );
+			yyerror( "%s", error_get_sub() );
 		tool->lineno = input_state.lineno;
 
 		/* Cast away const here.
@@ -640,7 +640,7 @@ lambda:
 		current_compile->tree = $4;
 
 		if( !compile_check( current_compile ) )
-			yyerror( error_get_sub() );
+			yyerror( "%s", error_get_sub() );
 
 		/* Link unresolved names in to the outer scope.
 		 */

@@ -170,9 +170,10 @@ column_save( Model *model, xmlNode *xnode )
 	 */
 	if( !set_prop( xthis, "x", "%d", x ) ||
 		!set_prop( xthis, "y", "%d", y ) ||
-		!set_prop( xthis, "open", bool_to_char( col->open ) ) ||
-		!set_prop( xthis, "selected", bool_to_char( col->selected ) ) ||
-		!set_prop( xthis, "sform", bool_to_char( FALSE ) ) ||
+		!set_sprop( xthis, "open", bool_to_char( col->open ) ) ||
+		!set_sprop( xthis, "selected",
+			bool_to_char( col->selected ) ) ||
+		!set_sprop( xthis, "sform", bool_to_char( FALSE ) ) ||
 		!set_prop( xthis, "next", "%d", col->next ) || 
 		!set_sprop( xthis, "name", IOBJECT( col )->name ) || 
 		!set_sprop( xthis, "caption", IOBJECT( col )->caption ) ) 

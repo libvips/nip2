@@ -465,5 +465,5 @@ trace_result( TraceFlags flags, PElement *out )
 	trace_pelement( out );
 	buf_appends( buf, "\n" ); 
 
-	trace_text( flags, buf_all( buf ) ); 
+	trace_text( flags, "%s", buf_all( buf ) ); 
 }

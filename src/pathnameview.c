@@ -134,7 +134,8 @@ pathnameview_clicked_cb( GtkWidget *widget, Pathnameview *pathnameview )
 	Pathname *pathname = PATHNAME( VOBJECT( pathnameview )->iobject );
 	GtkWidget *filesel = filesel_new();
 
-	iwindow_set_title( IWINDOW( filesel ), IOBJECT( pathname )->caption );
+	iwindow_set_title( IWINDOW( filesel ), 
+		"%s", IOBJECT( pathname )->caption );
 	filesel_set_flags( FILESEL( filesel ), TRUE, FALSE );
 	filesel_set_filetype( FILESEL( filesel ), filesel_type_any, 0 );
 	iwindow_set_parent( IWINDOW( filesel ), widget );

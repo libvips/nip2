@@ -279,7 +279,7 @@ plot_save( Model *model, xmlNode *xnode )
 	if( !set_prop( xthis, "plot_left", "%d", plot->left ) ||
 		!set_prop( xthis, "plot_top", "%d", plot->top ) ||
 		!set_prop( xthis, "plot_mag", "%d", plot->mag ) ||
-		!set_prop( xthis, "show_status", 
+		!set_sprop( xthis, "show_status", 
 			bool_to_char( plot->show_status ) ) )
 		return( NULL );
 

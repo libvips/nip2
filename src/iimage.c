@@ -150,19 +150,19 @@ iimage_save( Model *model, xmlNode *xnode )
 	if( !set_prop( xthis, "image_left", "%d", iimage->image_left ) ||
 		!set_prop( xthis, "image_top", "%d", iimage->image_top ) ||
 		!set_prop( xthis, "image_mag", "%d", iimage->image_mag ) ||
-		!set_prop( xthis, "show_status",
+		!set_sprop( xthis, "show_status",
 			bool_to_char( iimage->show_status ) ) ||
-		!set_prop( xthis, "show_paintbox",
+		!set_sprop( xthis, "show_paintbox",
 			bool_to_char( iimage->show_paintbox ) ) ||
-		!set_prop( xthis, "show_convert",
+		!set_sprop( xthis, "show_convert",
 			bool_to_char( iimage->show_convert ) ) ||
-		!set_prop( xthis, "show_rulers",
+		!set_sprop( xthis, "show_rulers",
 			bool_to_char( iimage->show_rulers ) ) ||
 		!set_dprop( xthis, "scale", iimage->scale ) ||
 		!set_dprop( xthis, "offset", iimage->offset ) ||
-		!set_prop( xthis, "falsecolour", "%s",
+		!set_sprop( xthis, "falsecolour", 
 			bool_to_char( iimage->falsecolour ) ) ||
-		!set_prop( xthis, "type", "%s", bool_to_char( iimage->type ) ) )
+		!set_sprop( xthis, "type", bool_to_char( iimage->type ) ) )
 		return( NULL );
 
 	return( xthis );

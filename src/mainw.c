@@ -466,7 +466,7 @@ mainw_title_update( Mainw *mainw )
 		buf_appends( &buf, _( "unsaved workspace" ) );
 	}
 
-	iwindow_set_title( IWINDOW( mainw ), buf_all( &buf ) );
+	iwindow_set_title( IWINDOW( mainw ), "%s", buf_all( &buf ) );
 }
 
 static void 
@@ -1165,7 +1165,7 @@ mainw_recent_build( GtkWidget *menu, GSList *recent )
 		item = gtk_menu_item_new_with_label( utf8 );
 		g_free( utf8 );
 		utf8 = f2utf8( filename );
-		set_tooltip( item, utf8 );
+		set_tooltip( item, "%s", utf8 );
 		g_free( utf8 );
 		gtk_menu_append( GTK_MENU( menu ), item );
 		gtk_widget_show( item );

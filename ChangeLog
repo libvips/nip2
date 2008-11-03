@@ -3,6 +3,7 @@ started 7.17.0
 - bumped version number
 - manual version number was wrong
 - removed vips8 link, we've started moving that stuff into vips7 now
+- patches for ubuntu 8.10
 
 started 7.16.3
 - fixed cancel system (again)

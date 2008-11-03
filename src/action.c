@@ -1618,7 +1618,7 @@ action_proc_class_binary( Reduce *rc, Compile *compile,
 		trace_pelement( b );
 		buf_appends( buf, "\n" );
 
-		trace_text( flags, buf_all( buf ) );
+		trace_text( flags, "%s", buf_all( buf ) );
 
 		trace_pop();
 	}
@@ -1654,7 +1654,7 @@ action_proc_class_binary2( Reduce *rc, Compile *compile,
 		trace_pelement( a );
 		buf_appends( buf, "\n" );
 
-		trace_text( flags, buf_all( buf ) );
+		trace_text( flags, "%s", buf_all( buf ) );
 
 		trace_pop();
 	}
@@ -1910,7 +1910,7 @@ action_proc_class_unary( Reduce *rc, Compile *compile,
 		trace_pelement( a );
 		buf_appendf( buf, ".%s \"%s\"\n", MEMBER_OO_UNARY, name );
 
-		trace_text( flags, buf_all( buf ) );
+		trace_text( flags, "%s", buf_all( buf ) );
 
 		trace_pop();
 	}

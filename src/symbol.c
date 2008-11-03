@@ -489,7 +489,7 @@ symbol_not_defined( Symbol *sym )
 			(SListMap2Fn) symbol_not_defined_sub, &buf, NULL );
 		buf_appends( &buf, "\n" );
 	}
-	error_sub( buf_all( &buf ) );
+	error_sub( "%s", buf_all( &buf ) );
 }
 
 /* Compile refers to sym, which is going ... mark compile as containing an 

@@ -1000,18 +1000,18 @@ workspace_save( Model *model, xmlNode *xnode )
 	if( !(xthis = MODEL_CLASS( parent_class )->save( model, xnode )) )
 		return( NULL );
 
-	if( !set_prop( xthis, "view", workspacemode_to_char( ws->mode ) ) ||
+	if( !set_sprop( xthis, "view", workspacemode_to_char( ws->mode ) ) ||
 		!set_dprop( xthis, "scale", ws->scale ) ||
 		!set_dprop( xthis, "offset", ws->offset ) ||
 		!set_prop( xthis, "window_width", "%d", ws->window_width ) ||
 		!set_prop( xthis, "window_height", "%d", ws->window_height ) ||
 		!set_prop( xthis, "lpane_position", "%d", 
 			ws->lpane_position ) ||
-		!set_prop( xthis, "lpane_open", 
+		!set_sprop( xthis, "lpane_open", 
 			bool_to_char( ws->lpane_open ) ) ||
 		!set_prop( xthis, "rpane_position", "%d", 
 			ws->rpane_position ) ||
-		!set_prop( xthis, "rpane_open", 
+		!set_sprop( xthis, "rpane_open", 
 			bool_to_char( ws->rpane_open ) ) ||
 		!set_sprop( xthis, "local_defs", ws->local_defs ) ||
 		!set_sprop( xthis, "name", IOBJECT( ws )->name ) ||
@@ -1046,7 +1046,7 @@ workspace_rename_row_node( ModelLoadState *state, Column *col, xmlNode *xnode )
 		char *new_name;
 
 		new_name = column_name_new( col );
-		(void) set_prop( xnode, "name", new_name );
+		(void) set_sprop( xnode, "name", new_name );
 		(void) model_loadstate_rename_new( state, name, new_name );
 		IM_FREE( new_name );
 	}
@@ -1079,7 +1079,7 @@ workspace_rename_column_node( Workspace *ws,
 			name, new_name );
 #endif /*DEBUG*/
 
-		(void) set_prop( xnode, "name", new_name );
+		(void) set_sprop( xnode, "name", new_name );
 		IM_FREE( new_name );
 
 		/* And allocate new names for all rows in the subcolumn.

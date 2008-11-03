@@ -298,7 +298,7 @@ paintboxview_init( Paintboxview *pbv )
 			GTK_SIGNAL_FUNC( paintboxview_tool_toggled_cb ), pbv );
 		image = gtk_image_new_from_stock( tool_names[i],
 			GTK_ICON_SIZE_BUTTON );
-		set_tooltip( pbv->tool[i], tool_tooltips[i] );
+		set_tooltip( pbv->tool[i], "%s", tool_tooltips[i] );
 		gtk_container_add( GTK_CONTAINER( pbv->tool[i] ), image );
 
 		gtk_box_pack_start( GTK_BOX( hb2 ), 
@@ -344,7 +344,7 @@ paintboxview_init( Paintboxview *pbv )
 			GTK_SIGNAL_FUNC( paintboxview_tool_toggled_cb ), pbv );
 		image = gtk_image_new_from_stock( tool_names[i],
 			GTK_ICON_SIZE_BUTTON );
-		set_tooltip( pbv->tool[i], tool_tooltips[i] );
+		set_tooltip( pbv->tool[i], "%s", tool_tooltips[i] );
 		gtk_container_add( GTK_CONTAINER( pbv->tool[i] ), image );
 
 		gtk_box_pack_start( GTK_BOX( hb2 ), 

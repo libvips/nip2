@@ -207,7 +207,7 @@ box_yesno( GtkWidget *par,
 		(iWindowBuildFn) box_build, 
 			buf, GTK_STOCK_DIALOG_QUESTION, NULL );
 	idialog_set_callbacks( IDIALOG( idlg ), cancelcb, NULL, NULL, client );
-	idialog_add_ok( IDIALOG( idlg ), okcb, yes_label );
+	idialog_add_ok( IDIALOG( idlg ), okcb, "%s", yes_label );
 	idialog_set_notify( IDIALOG( idlg ), nfn, sys );
 	iwindow_set_parent( IWINDOW( idlg ), box_pick_parent( par ) );
 	iwindow_build( IWINDOW( idlg ) );

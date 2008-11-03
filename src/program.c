@@ -253,7 +253,7 @@ program_title( Program *program )
 	buf_init_static( &buf, txt, 512 );
 	if( program->kit && FILEMODEL( program->kit )->modified ) 
 		buf_appendf( &buf, "*" ); 
-	buf_appendf( &buf, IOBJECT( program->kitg )->name );
+	buf_appends( &buf, IOBJECT( program->kitg )->name );
 	if( program->kit ) 
 		buf_appendf( &buf, " - %s", IOBJECT( program->kit )->name );
 	if( program->tool ) {
@@ -266,7 +266,7 @@ program_title( Program *program )
 		}
 	}
 
-	iwindow_set_title( IWINDOW( program ), buf_all( &buf ) );
+	iwindow_set_title( IWINDOW( program ), "%s", buf_all( &buf ) );
 }
 
 typedef struct _ProgramRowLookupInfo {

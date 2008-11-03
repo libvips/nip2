@@ -758,7 +758,7 @@ row_save( Model *model, xmlNode *xnode )
 	/* Top-level only.
 	 */
 	if( row->top_row == row ) 
-		if( !set_prop( xthis, "popup", bool_to_char( row->popup ) ) )
+		if( !set_sprop( xthis, "popup", bool_to_char( row->popup ) ) )
 			return( NULL );
 	if( !set_sprop( xthis, "name", IOBJECT( row )->name ) )
 		return( NULL );
@@ -1551,22 +1551,6 @@ row_regenerate( Row *row )
 	}
 
 	return( TRUE );
-}
-
-/* Does this row have a dirty enclosing row?
- */
-static gboolean 
-row_is_enclosing_dirty( Row *row )
-{
-	Row *enclosing;
-
-	if( row == row->top_row )
-		return( FALSE );
-
-	if( (enclosing = row_get_parent( row ))->dirty )
-		return( TRUE );
-
-	return( row_is_enclosing_dirty( enclosing ) );
 }
 
 static gboolean

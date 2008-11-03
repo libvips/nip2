@@ -1628,7 +1628,8 @@ reduce_start:
 				trace_node( arg[0] );
 				buf_appends( buf, "\n" ); 
 
-				trace_text( TRACE_OPERATOR, buf_all( buf ) ); 
+				trace_text( TRACE_OPERATOR, 
+					"%s", buf_all( buf ) ); 
 
 				trace_pop();
 			}
@@ -1712,7 +1713,8 @@ reduce_start:
 				trace_node( arg[0] );
 				buf_appends( buf, "\n" ); 
 
-				trace_text( TRACE_OPERATOR, buf_all( buf ) );
+				trace_text( TRACE_OPERATOR, 
+					"%s", buf_all( buf ) );
 
 				trace_pop();
 			}

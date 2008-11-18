@@ -1,6 +1,6 @@
-- rotate needs to be wired up to affine
+- straighten needs an interp option
 
-  straighten needs an interp option
+  any others?
 
 - argh, make check is failing on fourier, again
 

@@ -1103,16 +1103,20 @@ Mark_relative image u v
 		(image.height * v);
 
 Interpolate = class {
+	/* Add 1 to get the values im_affinei uses. FIXME yuk!
+	 */
 	NEAREST_NEIGHBOUR = 0;
 	BILINEAR = 1;
 	BICUBIC = 2;
+	YAFRSMOOTH = 3;
 
 	/* Table to map interpol numbers to descriptive strings
 	 */
 	names = Enum [
 		[_ "Nearest neighbour", NEAREST_NEIGHBOUR],
 		[_ "Bilinear", BILINEAR],
-		[_ "Bicubic", BICUBIC]
+		[_ "Bicubic", BICUBIC],
+		[_ "Bicubic plus edge enhance (yafr-smooth)", YAFRSMOOTH]
 	];
 }
 

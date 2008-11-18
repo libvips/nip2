@@ -1,3 +1,7 @@
+- rotate needs to be wired up to affine
+
+  straighten needs an interp option
+
 - argh, make check is failing on fourier, again
 
 - add more tests to exercise -o & friends

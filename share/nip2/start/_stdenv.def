@@ -1001,7 +1001,7 @@ transform_search max_error max_iterations order ipol wrap sample reference
 		Operator_type.COMPOUND false;
 }
 
-rotate angle image
+rotate interp angle image
 	= oo_binary_function rotate_op angle image, is_class angle
 	= oo_binary'_function rotate_op angle image, is_class image
 	= im_similarity image (cos angle) (sin angle) 0 0, 
@@ -1009,7 +1009,7 @@ rotate angle image
 	= error (_ "bad arguments to " ++ "rotate")
 {
 	rotate_op = Operator "rotate" 
-		rotate Operator_type.COMPOUND_REWRAP false;
+		(rotate interp) Operator_type.COMPOUND_REWRAP false;
 }
 
 matrix_binary fn a b
@@ -1425,30 +1425,26 @@ resize xfac yfac interp image
 			interp == Interpolate.NEAREST_NEIGHBOUR
 
 		// upscale by any factor, nearest neighbour 
-		// can't really do this right ... upscale by integer part, then
-		// bilinear to exact size
+		// upscale by integer part, then affine to exact size
 		= scale xg?1 yg?1 (im_zoom im xg?0 yg?0),
 			xfac' >= 1 && yfac' >= 1 &&
 			interp == Interpolate.NEAREST_NEIGHBOUR
 
 		// downscale by any factor, nearest neighbour 
-		// can't really do this right ... downscale by integer part, 
-		// then bilinear to exact size
+		// downscale by integer part, then affine to exact size
 		= scale xs?1 ys?1 (im_subsample im xs?0 ys?0),
 			rxfac' >= 1 && ryfac' >= 1 &&
 			interp == Interpolate.NEAREST_NEIGHBOUR
 
-		// upscale by any factor, bilinear
+		// upscale by any factor with affine
 		= scale xfac' yfac' im,
-			xfac' >= 1 && yfac' >= 1 &&
-			interp == Interpolate.BILINEAR
+			xfac' >= 1 && yfac' >= 1 
 
 		// downscale by any factor, bilinear
-		// block shrink by integer factor, then bilinear resample to 
-		// exact
+		// block shrink by integer factor, then resample to 
+		// exact with affine
 		= scale xs?1 ys?1 (im_shrink im xs?0 ys?0),
-			rxfac' >= 1 && ryfac' >= 1 &&
-			interp == Interpolate.BILINEAR
+			rxfac' >= 1 && ryfac' >= 1 
 
 		= error ("resize: unimplemented argument combination:\n" ++ 
 			"  xfac = " ++ print xfac' ++ "\n" ++
@@ -1495,9 +1491,9 @@ resize xfac yfac interp image
 		xs = rbreak width xfac';
 		ys = rbreak height yfac';
 
-		// binlinear resize
+		// resize
 		scale xfac yfac im
-			= im_affine im 
+			= im_affinei im (interp + 1)
 				xfac 0 0 yfac 
 				0 0 
 				0 0 

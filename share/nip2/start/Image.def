@@ -557,12 +557,14 @@ Image_transform_item = class
 				_vislevel = 3;
 	
 				angle = Scale "Angle" (-180) 180 0;
+				interp = Option_enum Interpolate.names 
+					"Interpolation" "Bilinear";
 	
 				_result
 					= map_unary process x
 				{
 					process image 
-						= rotate angle image;
+						= rotate interp.value_thing angle image;
 				}
 			}
 		}
@@ -575,7 +577,7 @@ Image_transform_item = class
 				= map_unary straighten x
 			{
 				straighten arrow
-					= rotate angle'' arrow.image
+					= rotate Interpolate.BILINEAR angle'' arrow.image
 				{
 					x = arrow.width;
 					y = arrow.height;

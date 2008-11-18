@@ -209,7 +209,7 @@ Hist_graph_item = class
 					= 180 - a, a > 90
 					= -a;
 
-				im' = rotate a' arrow.image;
+				im' = rotate Interpolate.BILINEAR a' arrow.image;
 
 				// look at the start and end of the arrow, pick the leftmost
 				p
@@ -260,7 +260,7 @@ Extract_arrow_item = class
 					= 180 - a, a > 90
 					= -a;
 
-				im' = rotate a' arrow.image;
+				im' = rotate Interpolate.BILINEAR a' arrow.image;
 
 				// look at the start and end of the arrow, pick the leftmost
 				p
@@ -341,7 +341,7 @@ Hist_plot_item = class
 					= 180 - a, a > 90
 					= -a;
 
-				im' = rotate a' arrow.image;
+				im' = rotate Interpolate.BILINEAR a' arrow.image;
 
 				// look at the start and end of the arrow, pick the leftmost
 				p

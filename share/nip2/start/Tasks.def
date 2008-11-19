@@ -756,8 +756,8 @@ Manual_balance_item = class
 			xfactor = im_in.width/scale_im.width;
 			yfactor = im_in.height/scale_im.height;
 			
-			_scale_im = resize xfactor yfactor 1 scale_im;
-			_offset_im = resize xfactor yfactor 1 offset_im;
+			_scale_im = resize Interpolate.BILINEAR xfactor yfactor scale_im;
+			_offset_im = resize Interpolate.BILINEAR xfactor yfactor offset_im;
 			
 			value = get_image ( clip2fmt im_in.format ( ( im_in * _scale_im ) +  _offset_im ) ); 	
 			}

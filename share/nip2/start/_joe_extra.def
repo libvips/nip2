@@ -66,7 +66,7 @@ Frame_item = class
 			//Scale frame image if required.
 			_a = a, _sf == 1;
 			   = a, _sf == 0;
-			   = Image (resize _sf _sf Interpolate.BILINEAR a.value);
+			   = Image (resize Interpolate.BILINEAR _sf _sf a.value);
 
 			_im_w = b.width;
 			_im_h = b.height + mount_options._los, mount_options.apply
@@ -146,7 +146,7 @@ Frame_item = class
 			//Scale frame image if required.
 			_a = a, _sf == 1;
 			   = a, _sf == 0;
-			   = Image (resize _sf _sf Interpolate.BILINEAR a.value);
+			   = Image (resize Interpolate.BILINEAR _sf _sf a.value);
 
 			_im_w = b.width;
 			_im_h = b.height + mount_options._los, mount_options.apply
@@ -227,7 +227,7 @@ Frame_item = class
 
 			_a = a, _sf == 1;
 			   = a, _sf == 0;
-			   = Image (resize _sf _sf Interpolate.BILINEAR a.value);
+			   = Image (resize Interpolate.BILINEAR _sf _sf a.value);
 
 			_im_w = b.width;
 			_im_h = b.height + mount_options._los, mount_options.apply
@@ -429,9 +429,9 @@ Perspective_match_item = class
 			
 			process a b = transform 1 0 trans b2
 				{
-				b2 = resize f1 f2 1 b, (f1 >= 1 && f2 >= 1) || (f1 >= 1 && f2 >= 1)
-			    	= resize f1 1 1 b1
-					{b1 = resize 1 f2 1 b;}
+				b2 = resize 1 f1 f2 b, (f1 >= 1 && f2 >= 1) || (f1 >= 1 && f2 >= 1)
+			    	= resize 1 f1 1 b1
+					{b1 = resize 1 1 f2 b;}
 				}
 			}
 		}

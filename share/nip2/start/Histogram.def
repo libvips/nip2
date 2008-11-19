@@ -199,36 +199,11 @@ Hist_graph_item = class
 			graph arrow
 				= hist_tag area'
 			{
-				// the line as a polar vector
-				pv = polar (arrow.width, arrow.height);
-				a = im pv;
-
-				// smallest rotation that will make the line horizontal
-				a'
-					= 360 - a, a > 270
-					= 180 - a, a > 90
-					= -a;
-
-				im' = rotate Interpolate.BILINEAR a' arrow.image;
-
-				// look at the start and end of the arrow, pick the leftmost
-				p
-					= (arrow.left, arrow.top), arrow.left <= arrow.right
-					= (arrow.right, arrow.bottom);
-
-				// transform that point to im' space
-				p' = rectangular (polar p + (0, a')) + 
-					(im'.xoffset, im'.yoffset);
-
-				// extract that area
-				area = extract_area 
-					(re p' + displace.value) 
-					(im p' - width.value / 2 + vdisplace.value) 
-					(re pv) width.value 
-					im';
+				area = extract_arrow Interpolate.BILINEAR 
+					displace.value vdisplace.value width.value arrow;
 
 				// squish vertically to get an average
-				area' = resize 1 (1 / width.value) Interpolate.BILINEAR area;
+				area' = resize Interpolate.BILINEAR 1 (1 / width.value) area;
 			}
 		}
 	}
@@ -245,40 +220,9 @@ Extract_arrow_item = class
 		vdisplace = Scale "Vertical displace" (-50) 50 0; 
 
 		_value
-			= map_unary graph x
-		{
-			graph arrow
-				= area
-			{
-				// the line as a polar vector
-				pv = polar (arrow.width, arrow.height);
-				a = im pv;
-
-				// smallest rotation that will make the line horizontal
-				a'
-					= 360 - a, a > 270
-					= 180 - a, a > 90
-					= -a;
-
-				im' = rotate Interpolate.BILINEAR a' arrow.image;
-
-				// look at the start and end of the arrow, pick the leftmost
-				p
-					= (arrow.left, arrow.top), arrow.left <= arrow.right
-					= (arrow.right, arrow.bottom);
-
-				// transform that point to im' space
-				p' = rectangular (polar p + (0, a')) + 
-					(im'.xoffset, im'.yoffset);
-
-				// extract that area
-				area = extract_area 
-					(re p' + displace.value) 
-					(im p' - width.value / 2 + vdisplace.value) 
-					(re pv) width.value 
-					im';
-			}
-		}
+			= map_unary (extract_arrow 
+				Interpolate.BILINEAR displace.value vdisplace.value
+				width.value) x;
 	}
 }
 
@@ -309,7 +253,7 @@ Hist_plot_item = class
 					$ymin => ymin.expr, $ymax => ymax.expr]; 
 
 			image x
-				= image (extract_arrow x), is_Arrow x
+				= image (extract_arrow Interpolate.BILINEAR 0 0 1 x), is_Arrow x
 				= get_image x, has_image x
 				= x2b im, b == 1
 				= im
@@ -326,31 +270,6 @@ Hist_plot_item = class
 				{
 						extract_col x = extract_area x 0 1 h im;
 				}
-			}
-
-			extract_arrow arrow
-				= extract_area (re p') (im p') (re pv) 1 im'
-			{
-				// the line as a polar vector
-				pv = polar (arrow.width, arrow.height);
-				a = im pv;
-
-				// smallest rotation that will make the line horizontal
-				a'
-					= 360 - a, a > 270
-					= 180 - a, a > 90
-					= -a;
-
-				im' = rotate Interpolate.BILINEAR a' arrow.image;
-
-				// look at the start and end of the arrow, pick the leftmost
-				p
-					= (arrow.left, arrow.top), arrow.left <= arrow.right
-					= (arrow.right, arrow.bottom);
-
-				// transform that point to im' space
-				p' = rectangular (polar p + (0, a')) + 
-					(im'.xoffset, im'.yoffset);
 			}
 		}
 	}

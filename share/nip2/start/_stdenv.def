@@ -1399,7 +1399,7 @@ zerox d x
 		(zerox d) Operator_type.COMPOUND_REWRAP false;
 }
 
-resize xfac yfac interp image
+resize interp xfac yfac image
 	= oo_unary_function resize_op image, is_class image
 	= resize_im image, is_image image
 	= error (_ "bad arguments to " ++ "resize")
@@ -2034,3 +2034,30 @@ cluster thresh points
 	}
 }
 
+/* Extract the area of an image around an arrow.
+ * Transform the image to make the arrow horizontal, then displace by hd and
+ * vd pxels, then cut out a bit h pixels high centered on the arrow.
+ */
+extract_arrow interp hd vd h arrow
+	= extract_area (re p' + hd) (im p' - h / 2 + vd) (re pv) h im'
+{
+	// the line as a polar vector
+	pv = polar (arrow.width, arrow.height);
+	a = im pv;
+
+	// smallest rotation that will make the line horizontal
+	a'
+		= 360 - a, a > 270
+		= 180 - a, a > 90
+		= -a;
+
+	im' = rotate interp a' arrow.image;
+
+	// look at the start and end of the arrow, pick the leftmost
+	p
+		= (arrow.left, arrow.top), arrow.left <= arrow.right
+		= (arrow.right, arrow.bottom);
+
+	// transform that point to im' space
+	p' = rectangular (polar p + (0, a')) + (im'.xoffset, im'.yoffset);
+}

@@ -573,25 +573,33 @@ Image_transform_item = class
 			Menuaction "_Straighten" 
 				("smallest rotation that makes an arrow either horizontal " ++
 				"or vertical") {
-			action x 
-				= map_unary straighten x
-			{
-				straighten arrow
-					= rotate Interpolate.BILINEAR angle'' arrow.image
+			action x = class
+				_result {
+				_vislevel = 3;
+
+				interp = Option_enum Interpolate.names 
+					"Interpolation" "Bilinear";
+
+				_result
+					= map_unary straighten x
 				{
-					x = arrow.width;
-					y = arrow.height;
-	
-					angle = im (polar (x, y));
-	
-					angle'
-						= angle - 360, angle > 315
-						= angle - 180, angle > 135
-						= angle;
-	
-					angle''
-						= -angle', angle' >= (-45) && angle' < 45
-						= 90 - angle';
+					straighten arrow
+						= rotate interp.value_thing angle'' arrow.image
+					{
+						x = arrow.width;
+						y = arrow.height;
+		
+						angle = im (polar (x, y));
+		
+						angle'
+							= angle - 360, angle > 315
+							= angle - 180, angle > 135
+							= angle;
+		
+						angle''
+							= -angle', angle' >= (-45) && angle' < 45
+							= 90 - angle';
+					}
 				}
 			}
 		}
@@ -628,7 +636,7 @@ Image_transform_item = class
 					= map_unary process x
 				{
 					process image 
-						= resize xfactor yfactor interp.value_thing image;
+						= resize interp.value_thing xfactor yfactor image;
 				}
 			}
 		}
@@ -652,7 +660,7 @@ Image_transform_item = class
 					= map_unary process x
 				{
 					process image
-						= resize fac fac interp.value_thing image
+						= resize interp.value_thing fac fac image
 					{
 						xfac = to_real size / image.width;
 						yfac = to_real size / image.height;
@@ -698,7 +706,7 @@ Image_transform_item = class
 					[width, height] = allrect?within;
 
 					process x
-						= resize fac fac interp.value_thing x, fac < 1
+						= resize interp.value_thing fac fac x, fac < 1
 						= x
 					{
 						xfac = (width / xdiv) / x.width;

@@ -617,23 +617,29 @@ filesel_info_update( Filesel *filesel, const char *name )
 int
 filesel_get_filetype( Filesel *filesel )
 {
-	if( !filesel->chooser )
-		return( filesel->default_type );
-	else {
-		GtkFileFilter *filter;
-		int i;
+	int type;
+	GtkFileFilter *filter;
 
-		filter = gtk_file_chooser_get_filter( 
-			GTK_FILE_CHOOSER( filesel->chooser ) );
-		g_assert( filter );
+	type = filesel->default_type;
+
+	if( filesel->chooser &&
+		(filter = gtk_file_chooser_get_filter( 
+			GTK_FILE_CHOOSER( filesel->chooser ) )) )  {
+		int i;
 
 		for( i = 0; filesel->filter[i]; i++ ) 
 			if( filter == filesel->filter[i] )
 				break;
 		g_assert( filesel->filter[i] );
 
-		return( i );
+		type = i;
 	}
+
+#ifdef DEBUG
+	printf( "filesel_get_filetype: %d\n", type ); 
+#endif /*DEBUG*/
+
+	return( type );
 }
 
 /* Find the index of the type which matches this filename.
@@ -655,8 +661,8 @@ static void
 filesel_set_filter( Filesel *filesel, GtkFileFilter *filter )
 {
 #ifdef DEBUG
+	printf( "filesel_set_filter: %p\n", filter ); 
 #endif /*DEBUG*/
-	printf( "filesel_set_filter:\n" ); 
 
 	g_assert( filter );
 
@@ -704,7 +710,6 @@ filesel_set_filename( Filesel *filesel, const char *name )
         expand_variables( name, buf );
         nativeize_path( buf );
 	absoluteize_path( buf );
-	filesel_set_filetype_from_filename( filesel, buf );
 
 #ifdef DEBUG
 	printf( "filesel_set_filename: %s\n", buf ); 
@@ -716,6 +721,7 @@ filesel_set_filename( Filesel *filesel, const char *name )
 	 */
 	gtk_file_chooser_set_filename( 
 		GTK_FILE_CHOOSER( filesel->chooser ), buf );
+
 	if( filesel->save )
 		gtk_file_chooser_set_current_name(
 			GTK_FILE_CHOOSER( filesel->chooser ), 
@@ -729,6 +735,8 @@ filesel_set_filename( Filesel *filesel, const char *name )
 		;
 
 	filesel->start_name = TRUE;
+
+	filesel_set_filetype_from_filename( filesel, buf );
 
 	return( TRUE );
 }
@@ -892,6 +900,10 @@ static void
 filesel_add_filter( Filesel *filesel, FileselFileType *type, int i )
 {
 	filesel->filter[i] = file_filter_from_file_type( type );
+
+#ifdef DEBUG
+	printf( "filesel_add_filter: %p (%d)\n", filesel->filter[i], i ); 
+#endif /*DEBUG*/
 
 	gtk_file_chooser_add_filter( GTK_FILE_CHOOSER( filesel->chooser ),
 		filesel->filter[i] );

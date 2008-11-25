@@ -9,6 +9,7 @@ started 7.17.0
 - revised "resize" to use new modes
 - transfom menu items have inter options
 - configure fails if bison is not found
+- fix the filesel filter after a filename change
 
 started 7.16.3
 - fixed cancel system (again)

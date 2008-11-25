@@ -1,12 +1,24 @@
 - funny bug where it looses the current file type
 
+  right click on a thumbnail, replace, OK
+
 - must fix the program window / last selected bug
+
+  might have done it --- test
+
+  also test sobel filter 
+
+
+
 
 - argh, make check is failing on fourier, again
 
 - add more tests to exercise -o & friends
 
 - cancel should set err msg, vips should not add another one
+
+  have we done this? not sure
+
 
 WONTFIX for 7.16
 ================

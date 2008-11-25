@@ -652,6 +652,19 @@ filesel_find_file_type( FileselFileType **type, const char *filename )
 }
 
 static void
+filesel_set_filter( Filesel *filesel, GtkFileFilter *filter )
+{
+#ifdef DEBUG
+#endif /*DEBUG*/
+	printf( "filesel_set_filter:\n" ); 
+
+	g_assert( filter );
+
+	gtk_file_chooser_set_filter( GTK_FILE_CHOOSER( filesel->chooser ),
+		filter );
+}
+
+static void
 filesel_set_filetype_from_filename( Filesel *filesel, const char *name )
 {
 	int type;
@@ -672,14 +685,11 @@ filesel_set_filetype_from_filename( Filesel *filesel, const char *name )
 		return;
 
 	if( (i = filesel_find_file_type( filesel->type, name )) >= 0 )
-		gtk_file_chooser_set_filter( 
-			GTK_FILE_CHOOSER( filesel->chooser ),
-			filesel->filter[i] );
+		filesel_set_filter( filesel, filesel->filter[i] );
 	else
 		/* No match, or no suffix. Set the last type (should be "All").
 		 */
-		gtk_file_chooser_set_filter( 
-			GTK_FILE_CHOOSER( filesel->chooser ),
+		filesel_set_filter( filesel, 
 			filesel->filter[filesel->ntypes - 1] );
 }
 
@@ -887,9 +897,7 @@ filesel_add_filter( Filesel *filesel, FileselFileType *type, int i )
 		filesel->filter[i] );
 
 	if( i == filesel->default_type )
-		gtk_file_chooser_set_filter( 
-			GTK_FILE_CHOOSER( filesel->chooser ),
-			filesel->filter[i] );
+		filesel_set_filter( filesel, filesel->filter[i] );
 }
 
 static void
@@ -1317,9 +1325,7 @@ filesel_set_filetype( Filesel *filesel,
 	/* Reset the widget, if it's there.
 	 */
 	if( filesel->chooser )
-		gtk_file_chooser_set_filter( 
-			GTK_FILE_CHOOSER( filesel->chooser ),
-			filesel->filter[default_type] );
+		filesel_set_filter( filesel, filesel->filter[default_type] );
 
 	filesel->type = type;
 	filesel->ntypes = array_len( (void **) type );

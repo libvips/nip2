@@ -325,6 +325,12 @@ definition:
 			(void) compile_new_local( sym->expr );
 		}
 
+		/* Note on the enclosing last_sym. Things like the program
+		 * window use this to work out what sym to display after a
+		 * parse. symbol_dispose() is careful to NULL this out.
+		 */
+		current_compile->last_sym = sym;
+
 		/* Initialise symbol parsing variables. Save old current symbol,
 		 * add new one.
 		 */

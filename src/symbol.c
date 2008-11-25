@@ -508,17 +508,24 @@ static void
 symbol_dispose( GObject *gobject )
 {
 	Symbol *sym;
+	Compile *compile;
 
 	g_return_if_fail( gobject != NULL );
 	g_return_if_fail( IS_SYMBOL( gobject ) );
 
 	sym = SYMBOL( gobject );
+	compile = COMPILE( ICONTAINER( sym )->parent );
 
 #ifdef DEBUG_MAKE
 	printf( "symbol_dispose: " );
 	symbol_name_print( sym );
 	printf( " (%p)\n", sym );
 #endif /*DEBUG_MAKE*/
+
+	/* Make sure we're not leaving last_sym dangling.
+	 */
+	if( compile && compile->last_sym == sym )
+		compile->last_sym = NULL;
 
 	/* Note the impending destruction of this symbol. It's a state
 	 * change, take off the leaf set if it's there.

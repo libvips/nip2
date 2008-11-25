@@ -1,6 +1,6 @@
-- straighten needs an interp option
+- funny bug where it loosed the current file type
 
-  any others?
+- must fix the program window / last selected bug
 
 - argh, make check is failing on fourier, again
 

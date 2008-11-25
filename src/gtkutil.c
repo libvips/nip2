@@ -598,7 +598,7 @@ get_geditable_name( GtkWidget *text, char *out, int sz )
 	if( !tname ) {
 		IM_FREEF( g_free, name );
 		error_top( _( "Bad identifier." ) );
-		error_top( 
+		error_sub( 
 			_( "Enter an identifier. Identifiers start with "
 			"a letter, and then contain only letters, numbers, "
 			"apostrophy and underscore." ) );

@@ -8,6 +8,7 @@ started 7.17.0
 - rotate etc. now have an interp param
 - revised "resize" to use new modes
 - transfom menu items have inter options
+- configure fails if bison is not found
 
 started 7.16.3
 - fixed cancel system (again)

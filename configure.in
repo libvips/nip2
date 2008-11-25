@@ -103,13 +103,17 @@ AC_CHECK_TOOL(OBJDUMP, objdump)
 AC_CHECK_TOOL(RANLIB, ranlib)
 AC_CHECK_TOOL(STRIP, strip)
 AC_CHECK_TOOL(BISON, bison)
+# we have to have bison :-( maybe we could ship the generated .c/.h files? not
+# clear on their portability
+if test x"$BISON" = x; then 
+  AC_MSG_ERROR([bison not found: $PACKAGE uses bison-only features])
+fi
 AC_CHECK_TOOL(AR, ar)
 AC_CHECK_TOOL(AS, as)
 AC_CHECK_TOOL(LD, ld)
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 
-# FIXME ... We are bison-only: we should check that YACC is set to "bison -y"
 
 # dmalloc option
 AM_WITH_DMALLOC

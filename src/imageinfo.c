@@ -677,12 +677,12 @@ imageinfo_proxy_eval( Imageinfoproxy *proxy )
 		busy_progress( imageinfo->im->time->percent,
 			imageinfo->im->time->eta );
 
-	if( mainw_cancel )
-		/* Return non-zero to cancel evaluation.
-		 */
+	if( mainw_cancel ) {
+		im_error( "nip2", _( "User cancelled operation" ) );
 		return( -1 );
-	else
-		return( 0 );
+	}
+
+	return( 0 );
 }
 
 static int

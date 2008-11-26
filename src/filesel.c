@@ -736,6 +736,8 @@ filesel_set_filename( Filesel *filesel, const char *name )
 
 	filesel->start_name = TRUE;
 
+	/* We have to set this after setting the filename.
+	 */
 	filesel_set_filetype_from_filename( filesel, buf );
 
 	return( TRUE );

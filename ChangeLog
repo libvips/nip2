@@ -10,6 +10,7 @@ started 7.17.0
 - transfom menu items have inter options
 - configure fails if bison is not found
 - fix the filesel filter after a filename change
+- nicer message on cancel
 
 started 7.16.3
 - fixed cancel system (again)

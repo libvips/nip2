@@ -838,12 +838,12 @@ static Imageinfo *
 imageinfo_open_image_input( const char *filename, ImageinfoOpen *open )
 {
 	Imageinfo *imageinfo;
-	im_format_t *format;
+	VipsFormatClass *format;
 
-	if( !(format = im_format_for_file( filename )) ) 
+	if( !(format = vips_format_for_file( filename )) ) 
 		return( NULL );
 
-	if( strcmp( format->name, "vips" ) == 0 ) {
+	if( strcmp( VIPS_OBJECT_CLASS( format )->nickname, "vips" ) == 0 ) {
 		IMAGE *im;
 
 		if( !(im = im_open( filename, "r" )) ) 
@@ -862,9 +862,9 @@ imageinfo_open_image_input( const char *filename, ImageinfoOpen *open )
 #endif /*DEBUG_OPEN*/
 	}
 	else {
-		im_format_flags flags = format->flags ? 
-			format->flags( filename ) : 0;
-		const char *mode = flags & IM_FORMAT_FLAG_PARTIAL ? "p" : "w";
+		VipsFormatFlags flags = format->get_flags ? 
+			format->get_flags( filename ) : 0;
+		const char *mode = flags & VIPS_FORMAT_FLAG_PARTIAL ? "p" : "w";
 
 		if( !(imageinfo = imageinfo_new_temp( open->imageinfogroup, 
 			open->heap, open->filename, mode )) )
@@ -1116,7 +1116,7 @@ imageinfo_write( Imageinfo *imageinfo, const char *name )
                 return( FALSE );
 	}
 
-	if( im_format_write( im, name ) ) {
+	if( vips_format_write( im, name ) ) {
 		error_top( _( "Unable to write to file." ) );
 		error_sub( _( "Error writing image to file \"%s\"." ), 
 			filename );

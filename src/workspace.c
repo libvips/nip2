@@ -496,7 +496,7 @@ workspace_load_file_buf( BufInfo *buf, const char *filename )
 		return( FALSE );
 	}
 
-	if( im_format_for_file( filename ) ) 
+	if( vips_format_for_file( filename ) ) 
 		buf_appends( buf, "Image_file" );
 	else
 		buf_appends( buf, "Matrix_file" );

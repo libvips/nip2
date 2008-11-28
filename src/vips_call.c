@@ -173,7 +173,7 @@ vips_error( VipsInfo *vi )
 /* Look up a VIPS type. 
  */
 static VipsArgumentType
-vips_type_find( im_arg_type type )
+vips_lookup_type( im_arg_type type )
 {
 	int i;
 
@@ -218,7 +218,7 @@ vips_hash( VipsInfo *vi )
 
         for( i = 0; i < vi->fn->argc; i++ ) {
                 im_type_desc *vips = vi->fn->argv[i].desc;
-		VipsArgumentType vt = vips_type_find( vips->type );
+		VipsArgumentType vt = vips_lookup_type( vips->type );
 
                 if( !(vips->flags & IM_TYPE_OUTPUT) ) {
 			switch( vt ) {
@@ -356,7 +356,7 @@ vips_equal( VipsInfo *vi1, VipsInfo *vi2 )
 
         for( i = 0; i < fn->argc; i++ ) {
                 im_type_desc *vips = fn->argv[i].desc;
-		VipsArgumentType vt = vips_type_find( vips->type );
+		VipsArgumentType vt = vips_lookup_type( vips->type );
 
                 if( !(vips->flags & IM_TYPE_OUTPUT) ) {
 			switch( vt ) {
@@ -717,7 +717,7 @@ vips_destroy( VipsInfo *vi )
 		 * have.
 		 */
 		error_block();
-		vt = vips_type_find( ty->type );
+		vt = vips_lookup_type( ty->type );
 		error_unblock();
 
 		switch( vt ) {
@@ -864,7 +864,7 @@ vips_tochar( VipsInfo *vi, int i, BufInfo *buf )
 {
 	im_object obj = vi->vargv[i];
 	im_type_desc *vips = vi->fn->argv[i].desc;
-	VipsArgumentType vt = vips_type_find( vips->type );
+	VipsArgumentType vt = vips_lookup_type( vips->type );
 
 	switch( vt ) {
 	case VIPS_DOUBLE:
@@ -1184,12 +1184,12 @@ vips_is_callable( im_function *fn )
 		return( FALSE );
 
         /* Check all argument types are supported. As well as the arg types
-         * spotted by vips_type_find, we also allow IM_TYPE_DISPLAY.
+         * spotted by vips_lookup_type, we also allow IM_TYPE_DISPLAY.
          */
         for( i = 0; i < fn->argc; i++ ) {
                 im_arg_desc *arg = &fn->argv[i];
                 im_arg_type vt = arg->desc->type;
-                VipsArgumentType t = vips_type_find( vt );
+                VipsArgumentType t = vips_lookup_type( vt );
 
                 if( t == VIPS_NONE ) {
                         /* Unknown type .. if DISPLAY it's OK.
@@ -1230,7 +1230,7 @@ vips_n_args( im_function *fn )
         for( nin = 0, i = 0; i < fn->argc; i++ ) {
                 im_arg_desc *arg = &fn->argv[i];
                 im_arg_type vt = arg->desc->type;
-                VipsArgumentType t = vips_type_find( vt );
+                VipsArgumentType t = vips_lookup_type( vt );
 
                 if( t == VIPS_NONE ) {
                         /* Unknown type .. if DISPLAY it's OK.
@@ -1302,9 +1302,9 @@ static gboolean
 vips_fromip( Reduce *rc, PElement *arg, 
 	im_type_desc *vips, im_object *obj )
 {
-	VipsArgumentType vt = vips_type_find( vips->type );
+	VipsArgumentType vt = vips_lookup_type( vips->type );
 
-	/* If vips_type_find failed, is it the special DISPLAY type?
+	/* If vips_lookup_type failed, is it the special DISPLAY type?
 	 */
 	if( vt == VIPS_NONE && strcmp( vips->type, IM_TYPE_DISPLAY ) != 0 ) 
 		/* Unknown type, and it's not DISPLAY. Flag an error.
@@ -1471,7 +1471,7 @@ vips_toip( VipsInfo *vi, int i, int *outiiindex, PElement *arg )
 {
 	im_object obj = vi->vargv[i];
 	im_type_desc *vips = vi->fn->argv[i].desc;
-	VipsArgumentType vt = vips_type_find( vips->type );
+	VipsArgumentType vt = vips_lookup_type( vips->type );
 
 #ifdef DEBUG
 	printf( "vips_toip: arg[%d] (%s) = ", i, vips->type );
@@ -1573,7 +1573,7 @@ vips_tobuf( VipsInfo *vi, int i, BufInfo *buf )
 {
 	im_object obj = vi->vargv[i];
 	im_type_desc *vips = vi->fn->argv[i].desc;
-	VipsArgumentType vt = vips_type_find( vips->type );
+	VipsArgumentType vt = vips_lookup_type( vips->type );
 
 	switch( vt ) {
 	case VIPS_DOUBLE:
@@ -1749,7 +1749,7 @@ static void
 vips_build_output( VipsInfo *vi, int i )
 {
 	im_type_desc *ty = vi->fn->argv[i].desc;
-	VipsArgumentType vt = vips_type_find( ty->type );
+	VipsArgumentType vt = vips_lookup_type( ty->type );
 	char tname[FILENAME_MAX];
 
 	/* Provide output objects for the function to write to.
@@ -1928,7 +1928,7 @@ vips_update_hist( VipsInfo *vi )
 	for( i = 0; i < vi->nres; i++ ) {
 		int j = vi->outpos[i];
 		im_type_desc *ty = vi->fn->argv[j].desc;
-		VipsArgumentType vt = vips_type_find( ty->type );
+		VipsArgumentType vt = vips_lookup_type( ty->type );
 
 		/* Image output.
 		 */
@@ -2010,7 +2010,7 @@ vips_wrap_output( VipsInfo *vi )
 		int j = vi->outpos[i];
 		IMAGE *im = (IMAGE *) vi->vargv[j];
 		im_type_desc *vips = vi->fn->argv[j].desc;
-		VipsArgumentType vt = vips_type_find( vips->type );
+		VipsArgumentType vt = vips_lookup_type( vips->type );
 		Imageinfo *outii;
 
 		if( vt != VIPS_IMAGE )
@@ -2053,7 +2053,7 @@ vips_fillva( VipsInfo *vi, va_list ap )
 
 	for( j = 0, i = 0; i < vi->fn->argc; i++ ) {
 		im_type_desc *ty = vi->fn->argv[i].desc;
-		VipsArgumentType vt = vips_type_find( ty->type );
+		VipsArgumentType vt = vips_lookup_type( ty->type );
 
 #ifdef DEBUG
 		printf( "vips_fillva: arg[%d] (%s) = ", i, ty->type );

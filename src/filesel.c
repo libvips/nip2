@@ -119,7 +119,7 @@ FileselFileType
         **filesel_type_any = NULL;
 
 static void *
-build_vips_formats_sub( im_format_t *format, GSList **types )
+build_vips_formats_sub( VipsFormatClass *format, GSList **types )
 {
 	FileselFileType *type = g_new( FileselFileType, 1 );
 	char txt[MAX_STRSIZE];
@@ -127,8 +127,8 @@ build_vips_formats_sub( im_format_t *format, GSList **types )
 	const char **i;
 
 	buf_init_static( &buf, txt, MAX_STRSIZE );
-	buf_appendf( &buf, "%s ", format->name_user );
-	/* Used as eg. "VIPS image format (*.v)"
+	buf_appendf( &buf, "%s ", VIPS_OBJECT_CLASS( format )->description );
+	/* Used as eg. "VIPS image files (*.v)"
 	 */
 	buf_appends( &buf, _( "image files" ) );
 	buf_appends( &buf, " (" );
@@ -163,7 +163,7 @@ build_image_file_type( void )
 	FileselFileType **type_array;
 
 	types = NULL;
-	im_format_map( (VSListMap2Fn) build_vips_formats_sub, &types, NULL );
+	vips_format_map( (VSListMap2Fn) build_vips_formats_sub, &types, NULL );
 
 	type_array = (FileselFileType **) slist_to_array( types );
 	g_slist_free( types );
@@ -404,9 +404,9 @@ filesel_csv_mode( char *out )
 typedef void (*make_mode_fn)( char *buf );
 
 typedef struct {
-	const char *caption_filter;/* The nip2 column name for the format */
-	const char *name;	/* The vips name for the format */
-	make_mode_fn mode_fn;
+	const char *caption_filter;	/* nip2 column name for the format */
+	const char *name;		/* vips nickname for the format */
+	make_mode_fn mode_fn;		/* Build a mode string */
 } FileselMode;
 
 static FileselMode filesel_mode_table[] = {
@@ -421,12 +421,14 @@ static FileselMode *
 filesel_get_mode( const char *filename )
 {
 	int i;
-	im_format_t *format;
+	VipsFormatClass *format;
 
-	if( (format = im_format_for_name( filename )) ) {
+	if( (format = vips_format_for_name( filename )) ) {
+		VipsObjectClass *object_class = VIPS_OBJECT_CLASS( format );
+
 		for( i = 0; i < IM_NUMBER( filesel_mode_table ); i++ )
 			if( strcmp( filesel_mode_table[i].name, 
-				format->name ) == 0 ) 
+				object_class->nickname ) == 0 ) 
 				return( &filesel_mode_table[i] );
 	}
 	else

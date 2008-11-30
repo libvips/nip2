@@ -557,7 +557,7 @@ Image_transform_item = class
 				_vislevel = 3;
 	
 				angle = Scale "Angle" (-180) 180 0;
-				interp = Option_enum Interpolate.names 
+				interp = Option_enum Interpolate.descriptions 
 					"Interpolation" "Bilinear";
 	
 				_result
@@ -577,7 +577,7 @@ Image_transform_item = class
 				_result {
 				_vislevel = 3;
 
-				interp = Option_enum Interpolate.names 
+				interp = Option_enum Interpolate.descriptions 
 					"Interpolation" "Bilinear";
 
 				_result
@@ -620,7 +620,8 @@ Image_transform_item = class
 
 	Resize_item = class 
 		Menupullright "_Resize" "change image size" {
-		_interp = Option_enum Interpolate.names "Interpolation" "Bilinear";
+		_interp = Option_enum Interpolate.descriptions 
+			"Interpolation" "Bilinear";
 
 		Scale_item = class
 			Menuaction "_Scale" "scale image size by a factor" {
@@ -789,8 +790,8 @@ Image_transform_item = class
 	Image_rubber_item = class 
 		Menupullright "Ru_bber Sheet" 
 			"automatically warp images to superposition" {
-		rubber_interp = Option "Interpolation"
-			(map (extract 0) Interpolate.names.value) Interpolate.BILINEAR;
+		rubber_interp = Option_enum Interpolate.descriptions 
+			"Interpolation" "Bilinear";
 		rubber_order = Option "Order" ["0", "1", "2", "3"] 1;
 		rubber_wrap = Toggle "Wrap image edges" false;
 

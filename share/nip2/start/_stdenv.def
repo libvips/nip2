@@ -1004,7 +1004,8 @@ transform_search max_error max_iterations order ipol wrap sample reference
 rotate interp angle image
 	= oo_binary_function rotate_op angle image, is_class angle
 	= oo_binary'_function rotate_op angle image, is_class image
-	= im_affinei_all image (interp + 1) a (-b) b a 0 0, 
+	= im_affinei_all image (Interpolate.nicknames.lookup 1 0 interp) 
+		a (-b) b a 0 0, 
 		is_real angle && is_image image 
 	= error (_ "bad arguments to " ++ "rotate")
 {

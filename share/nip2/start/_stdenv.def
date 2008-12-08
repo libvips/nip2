@@ -1496,7 +1496,7 @@ resize interp xfac yfac image
 
 		// resize
 		scale xfac yfac im
-			= im_affinei im (interp + 1)
+			= im_affinei im (Interpolate.nicknames.lookup 1 0 interp)
 				xfac 0 0 yfac 
 				0 0 
 				0 0 

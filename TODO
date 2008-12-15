@@ -1,6 +1,8 @@
 - CTRL-N new column, display (doubleclick to set title) for NULL column 
   captions
 
+- have a close button for the left and right drag out panels
+
 - argh, make check is failing on fourier, again
 
 - add more tests to exercise -o & friends

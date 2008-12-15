@@ -1,3 +1,6 @@
+- CTRL-N new column, display (doubleclick to set title) for NULL column 
+  captions
+
 - argh, make check is failing on fourier, again
 
 - add more tests to exercise -o & friends

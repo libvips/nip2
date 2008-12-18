@@ -3,6 +3,20 @@
 
 - have a close button for the left and right drag out panels
 
+- display control bar scale seems unreliable?
+
+  when zoomed out?
+
+- when zoomed in a bit, the centre of the + of a arrow seems to miss ... ends
+  up up and right of where it should be?
+
+- the thing that moves the region label it it's going to hit the image edge
+  should look for the window edge instead ... eg. if we are zoomed out and
+  have some background visible
+
+- portrait format, square window, zoom out from bottom leaves uncleared
+  background
+
 - argh, make check is failing on fourier, again
 
 - add more tests to exercise -o & friends

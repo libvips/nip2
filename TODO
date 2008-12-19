@@ -17,6 +17,8 @@
 - portrait format, square window, zoom out from bottom leaves uncleared
   background
 
+- Image_file "rgb.jpg" == vector [0,0,0] seem to be broken?
+
 - argh, make check is failing on fourier, again
 
 - add more tests to exercise -o & friends

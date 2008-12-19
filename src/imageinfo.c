@@ -862,8 +862,8 @@ imageinfo_open_image_input( const char *filename, ImageinfoOpen *open )
 #endif /*DEBUG_OPEN*/
 	}
 	else {
-		VipsFormatFlags flags = format->get_flags ? 
-			format->get_flags( filename ) : 0;
+		VipsFormatFlags flags = 
+			vips_format_get_flags( format, filename );
 		const char *mode = flags & VIPS_FORMAT_PARTIAL ? "p" : "w";
 
 		if( !(imageinfo = imageinfo_new_temp( open->imageinfogroup, 

@@ -12,6 +12,7 @@ started 7.17.0
 - fix the filesel filter after a filename change
 - nicer message on cancel
 - new VipsFormat stuff
+- LEXLIBS->LEXLIB (thanks Adam)
 
 started 7.16.3
 - fixed cancel system (again)

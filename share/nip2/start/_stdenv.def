@@ -1150,7 +1150,8 @@ erode mask image
 conv mask image
 	= oo_unary_function conv_op image, is_class image
 	= im_conv image (to_matrix mask), is_image image
-	= error (_ "bad arguments to " ++ "conv")
+	= error (_ "bad arguments to " ++ "conv" ++ ": " ++ 
+		"conv (" ++ print mask ++ ") (" ++ print image ++ ")")
 {
 	conv_op = Operator "conv" 
 		(conv mask) Operator_type.COMPOUND_REWRAP false;

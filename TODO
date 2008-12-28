@@ -1,3 +1,11 @@
+- how odd
+
+time ./nip2bench.sh wtc_tiled_small.tif -o wtc2.v
+
+  why is it half the speed of vipsbench.py?
+
+  header wtc2.v history only has the im_copy() for read? where's the rest?
+
 - CTRL-N new column, display (doubleclick to set title) for NULL column 
   captions
 

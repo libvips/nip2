@@ -31,9 +31,9 @@
 
 /*
 #define DEBUG_TIME
-#define DEBUG
 #define DEBUG_HISTORY_SANITY
 #define DEBUG_HISTORY_MISS
+#define DEBUG
 #define DEBUG_HISTORY
  */
 

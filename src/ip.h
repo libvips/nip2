@@ -248,6 +248,7 @@ typedef struct _Managed Managed;
 typedef struct _Managedfile Managedfile;
 typedef struct _Managedgvalue Managedgvalue;
 typedef struct _Managedgobject Managedgobject;
+typedef struct _Managedstring Managedstring;
 typedef struct _Imageinfo Imageinfo;
 typedef struct _Imagepresent Imagepresent;
 typedef struct _Imagemodel Imagemodel;
@@ -342,6 +343,7 @@ typedef void *(*tool_map_fn)( Tool *, void *, void * );
  */
 #include "tree.h"
 #include "heap.h"
+#include "managedstring.h"
 #include "class.h"
 #include "link.h"
 #include "expr.h"

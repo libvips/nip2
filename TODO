@@ -1,10 +1,10 @@
-- how odd
+- Managedstring needs finishing and using for something
 
-time ./nip2bench.sh wtc_tiled_small.tif -o wtc2.v
+  remove HeapStaticString
 
-  why is it half the speed of vipsbench.py?
 
-  header wtc2.v history only has the im_copy() for read? where's the rest?
+
+
 
 - CTRL-N new column, display (doubleclick to set title) for NULL column 
   captions

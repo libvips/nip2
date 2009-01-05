@@ -801,10 +801,9 @@ compile_graph( Compile *compile, ParseNode *pn, PElement *out )
 		{
 			HeapStaticString *string;
 
-			if( !(string = heap_static_string_new( 
+			string = heap_static_string_new( 
 				reduce_context->heap,
-				pn->con.val.str )) )
-				return( FALSE );
+				pn->con.val.str );
 			compile->statics = g_slist_prepend( compile->statics,
 				string );
 

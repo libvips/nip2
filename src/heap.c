@@ -1090,7 +1090,7 @@ heap_file_new( Heap *heap, const char *filename, PElement *out )
 	return( TRUE );
 }
 
-/* Make a string.
+/* Make a heap string.
  */
 gboolean
 heap_string_new( Heap *heap, const char *str, PElement *out )
@@ -1099,12 +1099,8 @@ heap_string_new( Heap *heap, const char *str, PElement *out )
 	const int n = strlen( str );
 	int i;
 
-	/* Make first RHS ... the end of the list. 
-	 */
 	heap_list_init( &list ); 
 
-	/* Build a CONS node for each element. 
-	 */
 	for( i = 0; i < n; i++ ) {
 		PElement t;
 

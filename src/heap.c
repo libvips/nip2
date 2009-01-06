@@ -1113,6 +1113,20 @@ heap_string_new( Heap *heap, const char *str, PElement *out )
 	return( TRUE );
 }
 
+/* Make a managed string.
+ */
+gboolean
+heap_managedstring_new( Heap *heap, const char *str, PElement *out )
+{
+	Managedstring *managedstring;
+		
+	if( !(managedstring = managedstring_find( heap, str )) )
+		return( FALSE );
+	PEPUTP( out, ELEMENT_MANAGEDSTRING, managedstring );
+
+	return( TRUE );
+}
+
 /* Make a [[char]].
  */
 gboolean
@@ -1780,6 +1794,7 @@ heap_copy( Heap *heap, Compile *compile, PElement *out )
 	case ELEMENT_TAG:
 	case ELEMENT_ELIST:
 	case ELEMENT_STATIC:
+	case ELEMENT_MANAGEDSTRING:
 		/* Copy value.
 		 */
 		PEPUTP( out, root->type, root->ele );

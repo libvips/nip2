@@ -576,6 +576,11 @@ print_element( int nsp, EType type, void *arg )
 			((HeapStaticString*)arg)->text ); 
 		break;
 
+	case ELEMENT_MANAGEDSTRING:
+		printf( "managed string \"%s\"", 
+			((Managedstring*)arg)->string ); 
+		break;
+
 	case ELEMENT_MANAGED:
 		printf( "Managed* %p", arg ); 
 		break;

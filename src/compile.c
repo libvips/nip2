@@ -798,6 +798,10 @@ compile_graph( Compile *compile, ParseNode *pn, PElement *out )
 		 */
 		switch( pn->con.type ) {
 		case PARSE_CONST_STR:
+			if( !heap_managedstring_new( heap, 
+				pn->con.val.str, out ) )
+				return( FALSE );
+			/*
 		{
 			HeapStaticString *string;
 
@@ -809,8 +813,9 @@ compile_graph( Compile *compile, ParseNode *pn, PElement *out )
 
 			PEPUTP( out, ELEMENT_STATIC, string );
 
-			break;
 		}
+			 */
+			break;
 
 		case PARSE_CONST_CHAR:
 			PEPUTP( out, ELEMENT_CHAR, pn->con.val.ch );
@@ -951,6 +956,7 @@ compile_abstract_body( Compile *compile,
 	case ELEMENT_NOVAL:
 	case ELEMENT_TAG:
 	case ELEMENT_STATIC:
+	case ELEMENT_MANAGEDSTRING:
 		/* Leave alone.
 		 */
 		break;
@@ -1187,6 +1193,11 @@ compile_share_scan_element( CompileShare *share, PElement *e )
 
 	case ELEMENT_STATIC:
 		hash = INT_TO_HASH( g_str_hash( PEGETSTATIC( e )->text ) );
+		break;
+
+	case ELEMENT_MANAGEDSTRING:
+		hash = INT_TO_HASH( g_str_hash( 
+			PEGETMANAGEDSTRING( e )->string ) );
 		break;
 
 	case ELEMENT_NOVAL:

@@ -81,6 +81,7 @@ managed_link_heap( Managed *managed, Heap *heap )
 		heap = reduce_context->heap;
 	managed->heap = heap;
 	g_hash_table_insert( heap->mtable, managed, managed );
+	managed->attached = TRUE;
 
 	/* The mtable owns our ref.
 	 */
@@ -91,9 +92,9 @@ managed_link_heap( Managed *managed, Heap *heap )
 static void 
 managed_unlink_heap( Managed *managed )
 {
-	if( managed->heap ) {
+	if( managed->attached && managed->heap ) {
 		g_hash_table_remove( managed->heap->mtable, managed );
-		managed->heap = NULL;
+		managed->attached = FALSE;
 		g_object_unref( G_OBJECT( managed ) );
 	}
 }
@@ -182,6 +183,7 @@ managed_init( Managed *managed )
 #endif /*DEBUG*/
 
 	managed->heap = NULL;
+	managed->attached = FALSE;
 
 	/* Init to TRUE, so we won't close until (at least) the next GC.
 	 */
@@ -393,7 +395,7 @@ managed_free_unused_sub( void *key, Managed *managed, gboolean *changed )
 		 * managed_dispose unlinking for us, and drop the hash table's
 		 * reference.
 		 */
-		managed->heap = NULL;
+		managed->attached = FALSE;
 		managed_destroy_heap( managed );
 		g_object_unref( G_OBJECT( managed ) );
 

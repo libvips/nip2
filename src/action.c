@@ -637,6 +637,7 @@ action_element_equal( Reduce *rc, PElement *p1, PElement *p2 )
 
 	case ELEMENT_NOVAL:
 	case ELEMENT_STATIC:
+	case ELEMENT_MANAGEDSTRING:
 	default:
 		g_assert( FALSE );
 

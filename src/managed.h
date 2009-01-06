@@ -53,7 +53,12 @@
 struct _Managed {
 	iContainer parent_object;
 
+	/* Can't just set ->heap = NULL to mean unattached, our subclasses
+	 * rely on ->heap being valid even during dispose.
+	 */
+
 	Heap *heap;		/* Heap we are attached to */
+	gboolean attached;	/* If we are attached to the heap */
 
 	gboolean marked;	/* For mark-sweep */
 	int count;		/* Number of non-heap pointers to us */

@@ -44,7 +44,7 @@
 struct _Managedstring {
 	Managed parent_object;
 
-	char *string;
+	const char *string;
 	Element e;		/* Points to compiled string */
 };
 
@@ -55,5 +55,4 @@ typedef struct _ManagedstringClass {
 
 GType managedstring_get_type( void );
 
-Managedstring *managedstring_new( Heap *heap, const char *string );
-int managedstring_getc( Managedstring *managedstring );
+Managedstring *managedstring_find( Heap *heap, const char *string );

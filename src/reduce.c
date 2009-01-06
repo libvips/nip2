@@ -1065,6 +1065,17 @@ reduce_start:
 		goto reduce_start;
 	}
 
+	case ELEMENT_MANAGEDSTRING:
+	{
+		Managedstring *managedstring = PEGETMANAGEDSTRING( &np );
+
+		/* Link to compiled string.
+		 */
+		PEPUTE( &np, &managedstring->e );
+
+		goto reduce_start;
+	}
+
 	case ELEMENT_SYMBOL:
 	{
 		Symbol *sym = PEGETSYMBOL( &np );

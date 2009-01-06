@@ -1,10 +1,4 @@
-- Managedstring needs finishing and using for something
-
-  remove HeapStaticString
-
-
-
-
+- get rid of ELEMENT_MANAGEDSTRING, just use ELEMENT_MANAGED
 
 - CTRL-N new column, display (doubleclick to set title) for NULL column 
   captions

@@ -170,6 +170,8 @@ nip2_SOURCES = \
 	managedgvalue.h \
 	managedgobject.c \
 	managedgobject.h \
+	managedstring.c \
+	managedstring.h \
 	imageinfo.c \
 	imageinfo.h \
 	imagemodel.c \

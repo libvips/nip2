@@ -61,6 +61,7 @@ typedef unsigned char EType;
 #define ELEMENT_CONSTRUCTOR (12)/* Class constructor */
 #define ELEMENT_ELIST (13)	/* Empty list */
 #define ELEMENT_STATIC (14)	/* A static string */
+#define ELEMENT_MANAGEDSTRING (15)/* A static string */
 
 /* Flags we attach to a node.
  */
@@ -235,6 +236,7 @@ typedef struct pelement {
 #define PEISREAL(P) (PEISNODE(P) && PEGETVAL(P)->type == TAG_DOUBLE)
 #define PEISSYMBOL(P) (PEGETTYPE(P) == ELEMENT_SYMBOL)
 #define PEISSTATIC(P) (PEGETTYPE(P) == ELEMENT_STATIC)
+#define PEISMANAGEDSTRING(P) (PEGETTYPE(P) == ELEMENT_MANAGEDSTRING)
 #define PEISSYMREF(P) (PEGETTYPE(P) == ELEMENT_SYMREF)
 #define PEISCOMPILEREF(P) (PEGETTYPE(P) == ELEMENT_COMPILEREF)
 #define PEISUNOP(P) (PEGETTYPE(P) == ELEMENT_UNOP)
@@ -242,6 +244,7 @@ typedef struct pelement {
 /* Extract bits of primitive compound types.
  */
 #define PEGETSTATIC(P) ((HeapStaticString*)PEGETVAL(P))
+#define PEGETMANAGEDSTRING(P) ((Managedstring*)PEGETVAL(P))
 #define PEGETSYMBOL(P) ((Symbol*)PEGETVAL(P))
 #define PEGETSYMREF(P) ((Symbol*)PEGETVAL(P))
 #define PEGETCOMPILE(P) ((Compile*)(PEGETVAL(P)))
@@ -405,6 +408,7 @@ gboolean heap_appl_add( Heap *heap, PElement *base, PElement *parm );
 gboolean heap_matrix_new( Heap *heap, 
 	int xsize, int ysize, double *vec, PElement *out );
 gboolean heap_string_new( Heap *heap, const char *str, PElement *out );
+gboolean heap_managedstring_new( Heap *heap, const char *str, PElement *out );
 gboolean heap_lstring_new( Heap *heap, GSList *labels, PElement *out );
 gboolean heap_file_new( Heap *heap, const char *filename, PElement *out );
 

@@ -30,25 +30,31 @@
 #include "ip.h"
 
 /* 
-#define DEBUG
  */
+#define DEBUG
 
 static ManagedClass *parent_class = NULL;
 
+/* Track all instances here. 
+ */
+static GHashTable *managedstring_all = NULL;
+
 static void
-managedstring_dispose( GObject *gobject )
+managedstring_finalize( GObject *gobject )
 {
 	Managedstring *managedstring = MANAGEDSTRING( gobject );
 
 #ifdef DEBUG
-	printf( "managedstring_dispose: " );
+	printf( "managedstring_finalize: \"%s\", ", managedstring->string );
 	iobject_print( IOBJECT( managedstring ) );
 #endif /*DEBUG*/
 
+	heap_unregister_element( MANAGED( managedstring )->heap, 
+		&managedstring->e );
+	g_hash_table_remove( managedstring_all, managedstring );
 	IM_FREE( managedstring->string );
-	heap_unregister_element( heap, &managedstring->e );
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( parent_class )->finalize( gobject );
 }
 
 static void
@@ -62,6 +68,32 @@ managedstring_info( iObject *iobject, BufInfo *buf )
 	IOBJECT_CLASS( parent_class )->info( iobject, buf );
 }
 
+/* Hash and equality for a managed string: we need the string and the heap to
+ * match.
+ */
+static unsigned int
+managedstring_hash( Managedstring *managedstring )
+{
+	return( g_str_hash( managedstring->string ) | 
+		GPOINTER_TO_UINT( ((Managed *) managedstring)->heap ) );
+}
+
+static gboolean
+managedstring_equal( Managedstring *a, Managedstring *b ) 
+{
+	return( ((Managed *) a)->heap == ((Managed *) b)->heap &&
+		g_str_equal( a->string, b->string ) );
+}
+
+static void
+managedstring_all_init( void )
+{
+	if( !managedstring_all )
+		managedstring_all = g_hash_table_new( 
+			(GHashFunc) managedstring_hash, 
+			(GEqualFunc) managedstring_equal );
+}
+
 static void
 managedstring_class_init( ManagedstringClass *class )
 {
@@ -70,9 +102,11 @@ managedstring_class_init( ManagedstringClass *class )
 
 	parent_class = g_type_class_peek_parent( class );
 
-	gobject_class->dispose = managedstring_dispose;
+	gobject_class->finalize = managedstring_finalize;
 
 	iobject_class->info = managedstring_info;
+
+	managedstring_all_init();
 }
 
 static void
@@ -85,13 +119,16 @@ managedstring_init( Managedstring *managedstring )
 	managedstring->string = NULL;
 	managedstring->e.type = ELEMENT_NOVAL;
 	managedstring->e.ele = NULL;
-	heap_register_element( heap, &string->e );
 }
 
 GType
 managedstring_get_type( void )
 {
 	static GType type = 0;
+
+#ifdef DEBUG
+	printf( "managedstring_get_type\n" );
+#endif /*DEBUG*/
 
 	if( !type ) {
 		static const GTypeInfo info = {
@@ -112,25 +149,60 @@ managedstring_get_type( void )
 	return( type );
 }
 
-Managedstring *
+static Managedstring *
 managedstring_new( Heap *heap, const char *string )
 {
 	Managedstring *managedstring;
 	PElement pe;
 
 #ifdef DEBUG
-	printf( "managedstring_new: %p: %s\n", managedstring, string );
+	printf( "managedstring_new: %p, %s\n", heap, string );
 #endif /*DEBUG*/
 
 	managedstring = g_object_new( TYPE_MANAGEDSTRING, NULL );
 	managed_link_heap( MANAGED( managedstring ), heap );
+	heap_register_element( heap, &managedstring->e );
+
+	/* We will vanish if there's a GC during allocate, so we have to ref
+	 * and unref.
+	 */
+	MANAGED_REF( managedstring );
 
 	PEPOINTE( &pe, &managedstring->e );
 	if( !(managedstring->string = im_strdup( NULL, string )) ||
 		!heap_string_new( heap, string, &pe ) ) {
-		g_object_unref( managedstring );
+		MANAGED_UNREF( managedstring );
 		return( NULL );
 	}
+
+	MANAGED_UNREF( managedstring );
+
+	g_assert( !g_hash_table_lookup( managedstring_all, managedstring ) );
+	g_hash_table_insert( managedstring_all, managedstring, managedstring );
+
+	return( managedstring );
+}
+
+Managedstring *
+managedstring_lookup( Heap *heap, const char *string )
+{
+	Managedstring managedstring;
+
+	((Managed *) &managedstring)->heap = heap;
+	managedstring.string = string;
+	managedstring_all_init();
+
+	return( g_hash_table_lookup( managedstring_all, &managedstring ) );
+}
+
+Managedstring *
+managedstring_find( Heap *heap, const char *string )
+{
+	Managedstring *managedstring;
+
+	if( !(managedstring = managedstring_lookup( heap, string )) )
+		if( !(managedstring = managedstring_new( heap, string )) )
+			return( NULL );
 
 	return( managedstring );
 }

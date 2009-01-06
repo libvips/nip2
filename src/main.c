@@ -41,10 +41,11 @@
  * builds. 
 #define DEBUG_FATAL
  */
+
 /* But some themes can trigger warnings, argh, so sometimes we need to
  * undef it.
- */
 #undef DEBUG_FATAL
+ */
 
 /* Time startup.
 #define DEBUG_TIME

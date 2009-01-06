@@ -590,6 +590,24 @@ action_image_equal( Reduce *rc, Imageinfo *a, Imageinfo *b )
 static gboolean
 action_element_equal( Reduce *rc, PElement *p1, PElement *p2 )
 {
+	/* We can often test for eg. "fred" == "fred" by just checking
+	 * pointers.
+	 */
+	if( PEGETTYPE( p1 ) == PEGETTYPE( p2 ) ) {
+		switch( PEGETTYPE( p1 ) ) {
+		case ELEMENT_CHAR:
+		case ELEMENT_NODE:
+		case ELEMENT_BOOL:
+		case ELEMENT_MANAGED:
+			if( PEGETVAL( p1 ) == PEGETVAL( p2 ) )
+				return( TRUE );
+			break;
+
+		case ELEMENT_ELIST:
+			return( TRUE );
+		}
+	}
+
 	/* Reduce a bit.
 	 */
 	reduce_spine( rc, p1 );
@@ -636,8 +654,6 @@ action_element_equal( Reduce *rc, PElement *p1, PElement *p2 )
 		return( TRUE );
 
 	case ELEMENT_NOVAL:
-	case ELEMENT_STATIC:
-	case ELEMENT_MANAGEDSTRING:
 	default:
 		g_assert( FALSE );
 
@@ -1590,7 +1606,7 @@ action_proc_class_binary_sub( Reduce *rc, PElement *pe,
 	base = *pe;
 	heap_appl_init( &base, fn );
 	if( !heap_appl_add( rc->heap, &base, &rhs ) ||
-		!heap_string_new( rc->heap, name, &rhs ) ||
+		!heap_managedstring_new( rc->heap, name, &rhs ) ||
 		!heap_appl_add( rc->heap, &base, &rhs ) ) 
 		return( out );
 
@@ -1888,7 +1904,7 @@ action_proc_class_unary_sub( Reduce *rc, PElement *pe,
 	base = *pe;
 	heap_appl_init( &base, fn );
 	if( !heap_appl_add( rc->heap, &base, &rhs ) ||
-		!heap_string_new( rc->heap, name, &rhs ) )
+		!heap_managedstring_new( rc->heap, name, &rhs ) )
 		return( out );
 
 	PEPUTPE( out, pe );

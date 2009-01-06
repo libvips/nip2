@@ -1396,7 +1396,9 @@ mainw_column_new_cb( iWindow *iwnd, void *client,
 		return;
 	}
 
-	iobject_set( IOBJECT( col ), NULL, caption_text );
+	if( strcmp( caption_text, "" ) != 0 )
+		iobject_set( IOBJECT( col ), NULL, caption_text );
+
 	workspace_column_select( mainw->ws, col );
 
 	nfn( sys, IWINDOW_YES );

@@ -400,7 +400,7 @@ classmodel_dict_new( Classmodel *classmodel,
 		if( !heap_list_add( heap, &list, &pair ) ||
 			!heap_list_add( heap, &pair, &key ) ||
 			!heap_list_add( heap, &pair, &value ) ||
-			!heap_string_new( heap, 
+			!heap_managedstring_new( heap, 
 				options[i].member_name, &key ) ||
 			!classmodel_class_member_new( classmodel,
 				&options[i], heap, &value ) )
@@ -440,7 +440,7 @@ classmodel_class_member_new( Classmodel *classmodel,
 		break;
 
 	case CLASSMODEL_MEMBER_STRING:
-		if( !heap_string_new( heap, 
+		if( !heap_managedstring_new( heap, 
 			G_STRUCT_MEMBER( char *, classmodel, m->offset ),
 			out ) )
 			return( FALSE );

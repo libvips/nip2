@@ -280,7 +280,7 @@ compile_finalize( GObject *gobject )
 	/* Remove static strings we created.
 	 */
 	slist_map( compile->statics, 
-		(SListMapFn) heap_static_string_unref, NULL );
+		(SListMapFn) managed_destroy_nonheap, NULL );
 	IM_FREEF( g_slist_free, compile->statics );
 
 	/* Junk heap.
@@ -798,23 +798,18 @@ compile_graph( Compile *compile, ParseNode *pn, PElement *out )
 		 */
 		switch( pn->con.type ) {
 		case PARSE_CONST_STR:
-			if( !heap_managedstring_new( heap, 
-				pn->con.val.str, out ) )
-				return( FALSE );
-			/*
 		{
-			HeapStaticString *string;
-
-			string = heap_static_string_new( 
-				reduce_context->heap,
-				pn->con.val.str );
+			Managedstring *managedstring;
+				
+			if( !(managedstring = managedstring_find( 
+				reduce_context->heap, 
+				pn->con.val.str )) )
+				return( FALSE );
+			MANAGED_REF( managedstring );
 			compile->statics = g_slist_prepend( compile->statics,
-				string );
-
-			PEPUTP( out, ELEMENT_STATIC, string );
-
+				managedstring );
+			PEPUTP( out, ELEMENT_MANAGED, managedstring );
 		}
-			 */
 			break;
 
 		case PARSE_CONST_CHAR:
@@ -945,6 +940,7 @@ compile_abstract_body( Compile *compile,
 		*used = TRUE;
 		break;
 
+	case ELEMENT_MANAGED:
 	case ELEMENT_CHAR:
 	case ELEMENT_BOOL:
 	case ELEMENT_BINOP:
@@ -955,15 +951,10 @@ compile_abstract_body( Compile *compile,
 	case ELEMENT_COMPILEREF:
 	case ELEMENT_NOVAL:
 	case ELEMENT_TAG:
-	case ELEMENT_STATIC:
-	case ELEMENT_MANAGEDSTRING:
 		/* Leave alone.
 		 */
 		break;
 
-	/* Should not exist at compile time.
-	 */
-	case ELEMENT_MANAGED:
 	default:
 		g_assert( FALSE );
 	}
@@ -1191,17 +1182,13 @@ compile_share_scan_element( CompileShare *share, PElement *e )
 		hash = INT_TO_HASH( g_str_hash( PEGETTAG( e ) ) );
 		break;
 
-	case ELEMENT_STATIC:
-		hash = INT_TO_HASH( g_str_hash( PEGETSTATIC( e )->text ) );
-		break;
-
-	case ELEMENT_MANAGEDSTRING:
-		hash = INT_TO_HASH( g_str_hash( 
-			PEGETMANAGEDSTRING( e )->string ) );
+	case ELEMENT_MANAGED:
+		if( PEISMANAGEDSTRING( e ) )
+			hash = INT_TO_HASH( g_str_hash( 
+				PEGETMANAGEDSTRING( e )->string ) );
 		break;
 
 	case ELEMENT_NOVAL:
-	case ELEMENT_MANAGED:
 	default:
 		g_assert( 0 );
 	}

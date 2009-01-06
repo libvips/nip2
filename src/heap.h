@@ -60,8 +60,6 @@ typedef unsigned char EType;
 #define ELEMENT_MANAGED (11)	/* A managed object */
 #define ELEMENT_CONSTRUCTOR (12)/* Class constructor */
 #define ELEMENT_ELIST (13)	/* Empty list */
-#define ELEMENT_STATIC (14)	/* A static string */
-#define ELEMENT_MANAGEDSTRING (15)/* A static string */
 
 /* Flags we attach to a node.
  */
@@ -225,6 +223,8 @@ typedef struct pelement {
 #define PEISMANAGED(P) (PEGETTYPE(P) == ELEMENT_MANAGED)
 #define PEISMANAGEDGOBJECT(P) (PEISMANAGED(P) && \
 	IS_MANAGEDGOBJECT( PEGETVAL(P) ))
+#define PEISMANAGEDSTRING(P) (PEISMANAGED(P) && \
+	IS_MANAGEDSTRING( PEGETVAL(P) ))
 #define PEISIMAGE(P) (PEISMANAGED(P) && IS_IMAGEINFO( PEGETVAL(P) ))
 #define PEISVIPSOBJECT(P) \
 	(PEISMANAGEDGOBJECT(P) && VIPS_IS_OBJECT( PEGETMANAGEDGOBJECT(P) )) 
@@ -235,16 +235,12 @@ typedef struct pelement {
 #define PEISNODE(P) (PEGETTYPE(P) == ELEMENT_NODE)
 #define PEISREAL(P) (PEISNODE(P) && PEGETVAL(P)->type == TAG_DOUBLE)
 #define PEISSYMBOL(P) (PEGETTYPE(P) == ELEMENT_SYMBOL)
-#define PEISSTATIC(P) (PEGETTYPE(P) == ELEMENT_STATIC)
-#define PEISMANAGEDSTRING(P) (PEGETTYPE(P) == ELEMENT_MANAGEDSTRING)
 #define PEISSYMREF(P) (PEGETTYPE(P) == ELEMENT_SYMREF)
 #define PEISCOMPILEREF(P) (PEGETTYPE(P) == ELEMENT_COMPILEREF)
 #define PEISUNOP(P) (PEGETTYPE(P) == ELEMENT_UNOP)
 
 /* Extract bits of primitive compound types.
  */
-#define PEGETSTATIC(P) ((HeapStaticString*)PEGETVAL(P))
-#define PEGETMANAGEDSTRING(P) ((Managedstring*)PEGETVAL(P))
 #define PEGETSYMBOL(P) ((Symbol*)PEGETVAL(P))
 #define PEGETSYMREF(P) ((Symbol*)PEGETVAL(P))
 #define PEGETCOMPILE(P) ((Compile*)(PEGETVAL(P)))
@@ -259,6 +255,7 @@ typedef struct pelement {
 #define PEGETII(P) ((Imageinfo*)PEGETVAL(P))
 #define PEGETFILE(P) ((Managedfile*)PEGETVAL(P))
 #define PEGETMANAGED(P) ((Managed*)PEGETVAL(P))
+#define PEGETMANAGEDSTRING(P) ((Managedstring*)PEGETVAL(P))
 #define PEGETMANAGEDGOBJECT(P) (((Managedgobject*)PEGETVAL(P))->object)
 #define PEGETVIPSOBJECT(P) \
 		((VipsObject*)(((Managedgobject*)PEGETVAL(P))->object))
@@ -281,17 +278,6 @@ struct _HeapBlock {
 	HeapNode *node;		/* Nodes on this block */
 	int sz;			/* Number of nodes in this block */
 };
-
-/* A static string. We compile these directly into the main heap and share
- * them between definitions.
- */
-typedef struct _HeapStaticString {
-	Heap *heap;		/* Heap we compiled into */
-
-	char *text;		/* Text of string */
-	int count;		/* Number of refs from Compiles to this */
-	Element e;		/* Points to compiled string */
-} HeapStaticString;
 
 /* Function to get max heap size.
  */
@@ -328,7 +314,6 @@ struct _Heap {
 
 	GHashTable *emark;	/* Set of elements to mark on GC */
 	GHashTable *rmark;	/* Set of Reduce to mark on GC */
-	GHashTable *statics;	/* Static string table */
 	GHashTable *mtable;	/* Managed associated with this heap */
 
         guint gc_tid;		/* id of gc delay timer */
@@ -447,9 +432,6 @@ gboolean heap_list_index( PElement *base, int n, PElement *out );
 gboolean heap_reduce_strict( PElement *base );
 
 gboolean heap_copy( Heap *heap, Compile *compile, PElement *out );
-
-HeapStaticString *heap_static_string_new( Heap *heap, const char *text );
-void *heap_static_string_unref( HeapStaticString *string );
 
 gboolean heap_ip_to_gvalue( PElement *in, GValue *out );
 gboolean heap_gvalue_to_ip( GValue *in, PElement *out );

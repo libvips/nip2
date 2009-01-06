@@ -175,9 +175,14 @@ column_save( Model *model, xmlNode *xnode )
 			bool_to_char( col->selected ) ) ||
 		!set_sprop( xthis, "sform", bool_to_char( FALSE ) ) ||
 		!set_prop( xthis, "next", "%d", col->next ) || 
-		!set_sprop( xthis, "name", IOBJECT( col )->name ) || 
-		!set_sprop( xthis, "caption", IOBJECT( col )->caption ) ) 
+		!set_sprop( xthis, "name", IOBJECT( col )->name ) )
 		return( NULL );
+
+	/* Caption can be NULL for untitled columns.
+	 */
+	if( IOBJECT( col )->caption )
+		if( !set_sprop( xthis, "caption", IOBJECT( col )->caption ) ) 
+			return( NULL );
 
 	return( xthis );
 }
@@ -326,7 +331,7 @@ column_new( Workspace *ws, const char *name )
 	}
 
 	col = COLUMN( g_object_new( TYPE_COLUMN, NULL ) );
-	iobject_set( IOBJECT( col ), name, "untitled" );
+	iobject_set( IOBJECT( col ), name, NULL );
 	icontainer_child_add( ICONTAINER( ws ), ICONTAINER( col ), -1 );
 
         subcolumn_new( NULL, col );

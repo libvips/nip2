@@ -30,8 +30,8 @@
 #include "ip.h"
 
 /* 
- */
 #define DEBUG
+ */
 
 static ManagedClass *parent_class = NULL;
 
@@ -62,7 +62,7 @@ managedstring_info( iObject *iobject, BufInfo *buf )
 {
 	Managedstring *managedstring = MANAGEDSTRING( iobject );
 
-	buf_appendf( buf, "managedstring->string = %s\n", 
+	buf_appendf( buf, "managedstring->string = \"%s\"\n", 
 		managedstring->string );
 
 	IOBJECT_CLASS( parent_class )->info( iobject, buf );
@@ -166,16 +166,16 @@ managedstring_new( Heap *heap, const char *string )
 	/* We will vanish if there's a GC during allocate, so we have to ref
 	 * and unref.
 	 */
-	MANAGED_REF( managedstring );
+	managed_dup_nonheap( MANAGED( managedstring ) );
 
 	PEPOINTE( &pe, &managedstring->e );
 	if( !(managedstring->string = im_strdup( NULL, string )) ||
 		!heap_string_new( heap, string, &pe ) ) {
-		MANAGED_UNREF( managedstring );
+		managed_destroy_nonheap( MANAGED( managedstring ) );
 		return( NULL );
 	}
 
-	MANAGED_UNREF( managedstring );
+	managed_destroy_nonheap( MANAGED( managedstring ) );
 
 	g_assert( !g_hash_table_lookup( managedstring_all, managedstring ) );
 	g_hash_table_insert( managedstring_all, managedstring, managedstring );

@@ -1,9 +1,29 @@
-- get rid of ELEMENT_MANAGEDSTRING, just use ELEMENT_MANAGED
-
-- CTRL-N new column, display (doubleclick to set title) for NULL column 
-  captions
 
 - have a close button for the left and right drag out panels
+
+  need a titlebar + close button, eg.:
+
+  	Toolkit Browser        x
+	Search: _________________
+
+
+  	Workspace Definitions  x
+	              Process  >
+
+
+  do we have a handy class we could put this into?
+
+  pane.c / pane.h
+
+
+- File / Open, click on a directory, click "Open", error:
+
+	Load failed.
+
+	Unable to execute:
+	   Matrix_file "/home/john/develop"
+
+  what a daft message
 
 - display control bar scale seems unreliable?
 
@@ -12,7 +32,7 @@
 - when zoomed in a bit, the centre of the + of a arrow seems to miss ... ends
   up up and right of where it should be?
 
-- the thing that moves the region label it it's going to hit the image edge
+- the thing that moves the region label, if it's going to hit the image edge,
   should look for the window edge instead ... eg. if we are zoomed out and
   have some background visible
 
@@ -23,7 +43,7 @@
 
 - argh, make check is failing on fourier, again
 
-- add more tests to exercise -o & friends
+- add more tests to exercise -o & friends, they often break
 
 WONTFIX for 7.16
 ================

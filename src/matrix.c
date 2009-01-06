@@ -487,7 +487,7 @@ matrix_dmask_to_heap( Heap *heap, DOUBLEMASK *dmask, PElement *out )
 		!heap_appl_add( heap, out, &rhs ) ||
 		!heap_real_new( heap, dmask->offset, &rhs ) ||
 		!heap_appl_add( heap, out, &rhs ) ||
-		!heap_string_new( heap, dmask->filename, &rhs ) ||
+		!heap_managedstring_new( heap, dmask->filename, &rhs ) ||
 		!heap_appl_add( heap, out, &rhs ) ||
 		!heap_real_new( heap, 
 			matrix_guess_display( dmask->filename ), &rhs ) )

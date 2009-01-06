@@ -490,7 +490,7 @@ class_new_single_name( Heap *heap, PElement *pe,
 	buf_init_static( &buf, str, 256 );
 	symbol_qualified_name( pbi->sym, &buf );
 	PEPUTP( pe, ELEMENT_ELIST, NULL );
-	if( !heap_string_new( heap, buf_all( &buf ), pe ) ) 
+	if( !heap_managedstring_new( heap, buf_all( &buf ), pe ) ) 
 		return( heap );
 
 	/* Add as a member.

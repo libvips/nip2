@@ -222,13 +222,13 @@ reduce_get_string( Reduce *rc, PElement *base, char *buf, int n )
 {
 	int sz = n - 1;
 
-	if( PEISSTATIC( base ) ) {
+	if( PEISMANAGEDSTRING( base ) ) {
 		/* A static string ... rather than expanding to a list and
 		 * parsing, we can copy directly.
 		 */
-		HeapStaticString *string = PEGETSTATIC( base );
+		Managedstring *managedstring = PEGETMANAGEDSTRING( base );
 
-		im_strncpy( buf, string->text, n );
+		im_strncpy( buf, managedstring->string, n );
 		sz -= strlen( buf );
 	}
 	else {
@@ -889,7 +889,7 @@ is_WHNF( PElement *out )
 		PEISCOMPLEX( out ) || PEISNUM( out ) || PEISCHAR( out ) ||
 		PEISBOOL( out ) || PEISTAG( out ) || PEISIMAGE( out ) ||
 		PEISLIST( out ) || PEISCLASS( out ) || PEISSYMREF( out ) ||
-		PEISCOMPILEREF( out ) || PEISNOVAL( out ) || PEISSTATIC( out ) )
+		PEISCOMPILEREF( out ) || PEISNOVAL( out ) )
 		return( TRUE );
 
 	/* Must be a function or generator ... loop down the spine, counting 
@@ -994,11 +994,28 @@ reduce_start:
 	case ELEMENT_BOOL:
 	case ELEMENT_ELIST:
 	case ELEMENT_TAG:
-	case ELEMENT_MANAGED:
 	case ELEMENT_SYMREF:
 	case ELEMENT_COMPILEREF:
 		/* Base type .. no more reduction needed.
 		 */
+
+		/* Should have no args.
+		 */
+		if( RSFRAMESIZE( rc ) != 0 ) 
+			argserror( rc, &np );
+
+		break;
+
+	case ELEMENT_MANAGED:
+		if( PEISMANAGEDSTRING( &np ) ) {
+			Managedstring *managedstring = 
+				PEGETMANAGEDSTRING( &np );
+
+			/* Link to compiled string. We know this will be fully
+			 * reduced: no need to recurse into it.
+			 */
+			PEPUTE( &np, &managedstring->e );
+		}
 
 		/* Should have no args.
 		 */
@@ -1050,28 +1067,6 @@ reduce_start:
 			PEPOINTLEFT( RSGET( rc, 0 ), &np );
 		PEPUTP( &np, 
 			GETRT( arg[0] ), GETRIGHT( arg[0] ) );
-
-		goto reduce_start;
-	}
-
-	case ELEMENT_STATIC:
-	{
-		HeapStaticString *string = PEGETSTATIC( &np );
-
-		/* Link to compiled string.
-		 */
-		PEPUTE( &np, &string->e );
-
-		goto reduce_start;
-	}
-
-	case ELEMENT_MANAGEDSTRING:
-	{
-		Managedstring *managedstring = PEGETMANAGEDSTRING( &np );
-
-		/* Link to compiled string.
-		 */
-		PEPUTE( &np, &managedstring->e );
 
 		goto reduce_start;
 	}

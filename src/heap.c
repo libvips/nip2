@@ -36,10 +36,6 @@
 #define DEBUG_HEAP_GC
  */
 
-/* Trace create/destroy of static strings.
-#define DEBUG_STATIC
- */
-
 /* Count GCs and %full, handy for tuning.
 #define DEBUG_GETMEM
  */
@@ -254,34 +250,9 @@ heap_dispose( GObject *gobject )
 }
 
 static void
-heap_static_string_free( HeapStaticString *string )
-{
-	g_assert( string->count == 0 );
-
-	IM_FREE( string->text );
-	heap_unregister_element( string->heap, &string->e );
-	IM_FREE( string );
-}
-
-static gboolean 
-heap_finalize_static_check( const char *text, HeapStaticString *string )
-{
-	g_assert( string->count == 0 );
-
-	heap_static_string_free( string );
-
-	return( TRUE );
-}
-
-static void
 heap_finalize( GObject *gobject )
 {
 	Heap *heap = HEAP( gobject );
-
-	if( heap->statics )
-		g_hash_table_foreach_remove( heap->statics, 
-			(GHRFunc) heap_finalize_static_check, NULL );
-	IM_FREEF( g_hash_table_destroy, heap->statics );
 
 	if( heap->hb )
 		heapblock_free( heap->hb );
@@ -424,7 +395,6 @@ heap_init( Heap *heap )
 	heap->emark = g_hash_table_new( NULL, g_direct_equal );
 	heap->rmark = g_hash_table_new( NULL, g_direct_equal );
 	heap->mtable = g_hash_table_new( NULL, g_direct_equal );
-	heap->statics = g_hash_table_new( g_str_hash, g_str_equal );
 
 	heap->gc_tid = 0;
 
@@ -651,24 +621,6 @@ mark_reduce( void *key, void *value, Heap *heap )
 	return( NULL );
 }
 
-/* Check for unreffed static strings.
- */
-static gboolean 
-heap_static_check( const char *text, HeapStaticString *string )
-{
-	if( string->count == 0 ) {
-#ifdef DEBUG_STATIC
-		printf( "heap_static_check: destroying \"%s\"\n", text );
-#endif /*DEBUG_STATIC*/
-
-		heap_static_string_free( string );
-
-		return( TRUE );
-	}
-	else
-		return( FALSE );
-}
-
 /* Do a garbage collect.
  */
 gboolean
@@ -693,11 +645,6 @@ heap_gc( Heap *heap )
 	/* Clear marks on managed objects. Nodes should all be clear already.
 	 */
 	managed_clear( heap );
-
-	/* Free all unreffed static strings.
-	 */
-	g_hash_table_foreach_remove( heap->statics, 
-		(GHRFunc) heap_static_check, NULL );
 
 	/* All flags should be clear, so just mark.
 	 */
@@ -1122,7 +1069,7 @@ heap_managedstring_new( Heap *heap, const char *str, PElement *out )
 		
 	if( !(managedstring = managedstring_find( heap, str )) )
 		return( FALSE );
-	PEPUTP( out, ELEMENT_MANAGEDSTRING, managedstring );
+	PEPUTP( out, ELEMENT_MANAGED, managedstring );
 
 	return( TRUE );
 }
@@ -1146,7 +1093,7 @@ heap_lstring_new( Heap *heap, GSList *labels, PElement *out )
 		PElement t;
 
 		if( !heap_list_add( heap, &list, &t ) ||
-			!heap_string_new( heap, 
+			!heap_managedstring_new( heap, 
 				g_slist_nth_data( labels, i ), &t ) )
 			return( FALSE );
 		(void) heap_list_next( &list );
@@ -1793,8 +1740,7 @@ heap_copy( Heap *heap, Compile *compile, PElement *out )
 	case ELEMENT_COMB:
 	case ELEMENT_TAG:
 	case ELEMENT_ELIST:
-	case ELEMENT_STATIC:
-	case ELEMENT_MANAGEDSTRING:
+	case ELEMENT_MANAGED:
 		/* Copy value.
 		 */
 		PEPUTP( out, root->type, root->ele );
@@ -1809,66 +1755,11 @@ heap_copy( Heap *heap, Compile *compile, PElement *out )
 			return( FALSE );
 		break;
 
-	case ELEMENT_MANAGED:
 	default:
 		g_assert( FALSE );
 	}
 
 	return( TRUE );
-}
-
-HeapStaticString *
-heap_static_string_new( Heap *heap, const char *text )
-{
-	HeapStaticString *string;
-
-	if( !(string = g_hash_table_lookup( heap->statics, text )) ) {
-		PElement pe;
-
-		if( !(string = INEW( NULL, HeapStaticString )) )
-			return( NULL );
-
-		string->heap = heap;
-		string->text = NULL;
-		string->count = 0;
-		string->e.type = ELEMENT_NOVAL;
-		string->e.ele = NULL;
-		heap_register_element( heap, &string->e );
-
-		PEPOINTE( &pe, &string->e );
-		if( !(string->text = im_strdup( NULL, text )) ||
-			!heap_string_new( heap, text, &pe ) ) {
-			heap_static_string_free( string );
-			return( NULL );
-		}
-
-#ifdef DEBUG_STATIC
-		printf( "heap_static_string_new: \"%s\"\n", text );
-#endif /*DEBUG_STATIC*/
-
-		g_hash_table_insert( heap->statics, string->text, string );
-	}
-
-	g_assert( string->count >= 0 );
-	string->count += 1;
-
-	return( string );
-}
-
-void *
-heap_static_string_unref( HeapStaticString *string )
-{
-	g_assert( g_hash_table_lookup( string->heap->statics, string->text ) ==
-		string );
-	g_assert( string->count >= 0 );
-
-	string->count -= 1;
-
-	/* Don't destroy on count == 0; GC frees statics for us next time it
-	 * runs.
-	 */
-
-	return( NULL );
 }
 
 /* Try to make a gvalue from a heap object. 
@@ -1981,7 +1872,8 @@ heap_gvalue_to_ip( GValue *in, PElement *out )
 			return( FALSE );
 	}
 	else if( G_VALUE_HOLDS_STRING( in ) ) {
-		if( !heap_string_new( heap, g_value_get_string( in ), out ) )
+		if( !heap_managedstring_new( heap, 
+			g_value_get_string( in ), out ) )
 			return( FALSE );
 	}
 	else if( G_VALUE_HOLDS_OBJECT( in ) ) {
@@ -1998,7 +1890,7 @@ heap_gvalue_to_ip( GValue *in, PElement *out )
 
 		g_value_init( &temp, G_TYPE_STRING );
 		g_value_transform( in, &temp );
-		if( !heap_string_new( heap, 
+		if( !heap_managedstring_new( heap, 
 			g_value_get_string( &temp ), out ) ) {
 			return( FALSE );
 			g_value_unset( &temp );

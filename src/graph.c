@@ -390,20 +390,6 @@ lisp_pelement( BufInfo *buf, PElement *base,
 		buf_appendf( buf, ">" );
 		break;
 
-	case ELEMENT_STATIC:
-		buf_appendf( buf, "<" );
-		buf_appendf( buf, _( "static string \"%s\"" ), 
-			PEGETSTATIC( base )->text );
-		buf_appendf( buf, ">" );
-		break;
-
-	case ELEMENT_MANAGEDSTRING:
-		buf_appendf( buf, "<" );
-		buf_appendf( buf, _( "managed string \"%s\"" ), 
-			PEGETMANAGEDSTRING( base )->string );
-		buf_appendf( buf, ">" );
-		break;
-
 	case ELEMENT_MANAGED:
 		buf_appendf( buf, "<Managed* %p>", PEGETVAL( base ) );
 		break;
@@ -589,14 +575,6 @@ shell_pelement( PElement *base )
 
 	case ELEMENT_CHAR:
 		printf( "%c", (int)PEGETCHAR( base ) );
-		break;
-
-	case ELEMENT_STATIC:
-		printf( "%s", PEGETSTATIC( base )->text );
-		break;
-
-	case ELEMENT_MANAGEDSTRING:
-		printf( "%s", PEGETMANAGEDSTRING( base )->string );
 		break;
 
 	case ELEMENT_BOOL:

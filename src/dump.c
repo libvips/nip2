@@ -571,16 +571,6 @@ print_element( int nsp, EType type, void *arg )
 		printf( "tag \"%s\"", (char*)arg ); 
 		break;
 
-	case ELEMENT_STATIC:
-		printf( "static string \"%s\"", 
-			((HeapStaticString*)arg)->text ); 
-		break;
-
-	case ELEMENT_MANAGEDSTRING:
-		printf( "managed string \"%s\"", 
-			((Managedstring*)arg)->string ); 
-		break;
-
 	case ELEMENT_MANAGED:
 		printf( "Managed* %p", arg ); 
 		break;

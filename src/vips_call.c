@@ -1513,7 +1513,7 @@ vips_toip( VipsInfo *vi, int i, int *outiiindex, PElement *arg )
 		break;
 
 	case VIPS_STRING:
-		if( !heap_string_new( vi->rc->heap, (char*)obj, arg ) )
+		if( !heap_managedstring_new( vi->rc->heap, (char *) obj, arg ) )
 			reduce_throw( vi->rc );
 		break;
 

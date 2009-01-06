@@ -87,7 +87,7 @@ void managed_check_all_destroyed( void );
 void managed_link_heap( Managed *managed, Heap *heap );
 
 void managed_destroy_heap( Managed *managed );
-void managed_destroy_nonheap( Managed *managed );
+void *managed_destroy_nonheap( Managed *managed );
 void managed_dup_nonheap( Managed *managed );
 
 void *managed_sub_remove( Managed *in, Managed *managed );

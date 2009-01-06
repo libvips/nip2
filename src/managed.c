@@ -156,7 +156,11 @@ managed_info( iObject *iobject, BufInfo *buf )
 {
 	Managed *managed = MANAGED( iobject );
 
-	buf_appendf( buf, "managed-object %p", managed );
+	buf_appendf( buf, "managed-object %p\n", managed );
+	buf_appendf( buf, "managed->count = %d\n", managed->count );
+	buf_appendf( buf, "managed->marked = %d\n", managed->marked );
+
+	IOBJECT_CLASS( parent_class )->info( iobject, buf );
 }
 
 static void
@@ -251,7 +255,7 @@ managed_destroy_heap( Managed *managed )
 
 /* destroy() for non-heap pointers.
  */
-void
+void *
 managed_destroy_nonheap( Managed *managed )
 {
 	g_assert( managed->count > 0 );
@@ -268,6 +272,8 @@ managed_destroy_nonheap( Managed *managed )
 	 * GC. Queue a GC to clean off stray manageds.
 	 */
 	heap_gc_request( managed->heap );
+
+	return( NULL );
 }
 
 /* Create a new non-heap pointer.

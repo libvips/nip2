@@ -604,7 +604,11 @@ columnview_caption_enter_cb( GtkWidget *wid, Columnview *cview )
 	Workspace *ws = col->ws;
 
         cview->state = COL_WAIT;
-	iobject_set( IOBJECT( col ), NULL, text );
+	iobject_changed( IOBJECT( col ) );
+
+	if( strcmp( text, "" ) != 0 ) 
+		iobject_set( IOBJECT( col ), NULL, text );
+
 	filemodel_set_modified( FILEMODEL( ws ), TRUE );
 
 	/* The ws view needs to update the jumpto menus.
@@ -743,7 +747,15 @@ columnview_refresh( vObject *vobject )
 	/* Update names.
 	 */
         set_glabel( cview->lab, "%s - ", IOBJECT( col )->name );
-        set_glabel( cview->head, "%s", IOBJECT( col )->caption );
+        if( IOBJECT( col )->caption )
+		set_glabel( cview->head, "%s", IOBJECT( col )->caption );
+	else {
+		char buf[256];
+
+		im_snprintf( buf, 256, "<i>%s</i>", 
+			_( "(doubleclick to set title)" ) );
+		gtk_label_set_markup( GTK_LABEL( cview->head ), buf );
+	}
 
 	/* Set open/closed.
 	 */
@@ -770,9 +782,13 @@ columnview_refresh( vObject *vobject )
                 gtk_widget_show( cview->capedit );
                 gtk_widget_hide( cview->headfr );
 
-                set_gentry( cview->capedit, "%s", IOBJECT( col )->caption );
-                gtk_editable_select_region( GTK_EDITABLE( cview->capedit ),
-                        0, strlen( IOBJECT( col )->caption ) );
+		if( IOBJECT( col )->caption ) {
+			set_gentry( cview->capedit, "%s", 
+				IOBJECT( col )->caption );
+			gtk_editable_select_region( 
+				GTK_EDITABLE( cview->capedit ),
+				0, strlen( IOBJECT( col )->caption ) );
+		}
                 gtk_widget_grab_focus( cview->capedit );
         }
         else {

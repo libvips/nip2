@@ -116,7 +116,7 @@ apply_underscore_call( Reduce *rc,
 
 	/* Pump though gettext.
 	 */
-	if( !heap_string_new( rc->heap, _( text ), out ) )
+	if( !heap_managedstring_new( rc->heap, _( text ), out ) )
 		reduce_throw( rc );
 }
 
@@ -509,7 +509,7 @@ apply_search_call( Reduce *rc, const char *name, HeapNode **arg, PElement *out )
 	if( !(fn = path_find_file( PATH_SEARCH, buf )) )
 		reduce_throw( rc );
 
-	if( !heap_string_new( rc->heap, fn, out ) ) {
+	if( !heap_managedstring_new( rc->heap, fn, out ) ) {
 		IM_FREE( fn );
 		reduce_throw( rc );
 	}
@@ -535,7 +535,7 @@ apply_print_call( Reduce *rc, const char *name, HeapNode **arg, PElement *out )
 	PEPOINTRIGHT( arg[0], &rhs );
 	itext_value_ev( rc, &buf, &rhs );
 
-	if( !heap_string_new( rc->heap, buf_all( &buf ), out ) )
+	if( !heap_managedstring_new( rc->heap, buf_all( &buf ), out ) )
 		reduce_throw( rc );
 }
 
@@ -552,7 +552,7 @@ dir_object_member( Symbol *sym, PElement *value,
 	PElement t;
 
 	if( !heap_list_add( rc->heap, list, &t ) ||
-		!heap_string_new( rc->heap, IOBJECT( sym )->name, &t ) )
+		!heap_managedstring_new( rc->heap, IOBJECT( sym )->name, &t ) )
 		reduce_throw( rc );
 	(void) heap_list_next( list );
 
@@ -581,7 +581,7 @@ dir_scope( Symbol *sym, Reduce *rc, PElement *list )
 	PElement t;
 
 	if( !heap_list_add( rc->heap, list, &t ) ||
-		!heap_string_new( rc->heap, IOBJECT( sym )->name, &t ) )
+		!heap_managedstring_new( rc->heap, IOBJECT( sym )->name, &t ) )
 		reduce_throw( rc );
 	(void) heap_list_next( list );
 
@@ -639,7 +639,7 @@ apply_expand_call( Reduce *rc, const char *name, HeapNode **arg, PElement *out )
 	(void) reduce_get_string( rc, &rhs, txt, FILENAME_MAX );
 	expand_variables( txt, txt2 );
 
-	if( !heap_string_new( rc->heap, txt2, out ) )
+	if( !heap_managedstring_new( rc->heap, txt2, out ) )
 		reduce_throw( rc );
 }
 
@@ -685,7 +685,7 @@ apply_gtype2name_call( Reduce *rc, const char *name,
 	PEPOINTRIGHT( arg[0], &rhs );
 	gtype = PEGETREAL( &rhs );
 
-	if( !heap_string_new( rc->heap, g_type_name( gtype ), out ) )
+	if( !heap_managedstring_new( rc->heap, g_type_name( gtype ), out ) )
 		reduce_throw( rc );
 }
 

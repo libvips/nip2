@@ -39,6 +39,13 @@ static ManagedClass *parent_class = NULL;
  */
 static GHashTable *managedstring_all = NULL;
 
+#ifdef DEBUG
+/* Number of managed strings, number we have expanded to the heap.
+ */
+int managed_total = 0;
+int managed_expanded = 0;
+#endif /*DEBUG*/
+
 static void
 managedstring_finalize( GObject *gobject )
 {
@@ -47,6 +54,17 @@ managedstring_finalize( GObject *gobject )
 #ifdef DEBUG
 	printf( "managedstring_finalize: \"%s\", ", managedstring->string );
 	iobject_print( IOBJECT( managedstring ) );
+#endif /*DEBUG*/
+
+#ifdef DEBUG
+{
+	PElement pe;
+
+	PEPOINTE( &pe, &managedstring->e );
+	if( !PEISNOVAL( &pe ) ) 
+		managed_expanded -= 1;
+	managed_total -= 1;
+}
 #endif /*DEBUG*/
 
 	heap_unregister_element( MANAGED( managedstring )->heap, 
@@ -116,6 +134,10 @@ managedstring_init( Managedstring *managedstring )
 	printf( "managedstring_init: %p\n", managedstring );
 #endif /*DEBUG*/
 
+#ifdef DEBUG
+	managed_total += 1;
+#endif /*DEBUG*/
+
 	managedstring->string = NULL;
 	managedstring->e.type = ELEMENT_NOVAL;
 	managedstring->e.ele = NULL;
@@ -125,10 +147,6 @@ GType
 managedstring_get_type( void )
 {
 	static GType type = 0;
-
-#ifdef DEBUG
-	printf( "managedstring_get_type\n" );
-#endif /*DEBUG*/
 
 	if( !type ) {
 		static const GTypeInfo info = {
@@ -200,10 +218,18 @@ managedstring_get( Managedstring *managedstring, PElement *out )
 	PElement pe;
 
 	PEPOINTE( &pe, &managedstring->e );
-	if( PEISNOVAL( &pe ) )
+	if( PEISNOVAL( &pe ) ) {
 		if( !heap_string_new( MANAGED( managedstring )->heap, 
 			managedstring->string, &pe ) ) 
 			return( FALSE );
+
+#ifdef DEBUG
+		managed_expanded += 1;
+		printf( "expanding %s to the heap\n", managedstring->string );
+		printf( "\t(%d of %d now expanded)\n", 
+			managed_expanded, managed_total );
+#endif /*DEBUG*/
+	}
 
 	PEPUTE( out, &managedstring->e );
 

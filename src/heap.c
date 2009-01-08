@@ -914,6 +914,20 @@ heap_complex_new( Heap *heap, double rp, double ip, PElement *out )
 	return( TRUE );
 }
 
+/* 'get' a list: convert a MANAGEDSTRING into a list, if necessary.
+ */
+gboolean
+heap_list_get( PElement *base )
+{
+	g_assert( PEISLIST( base ) );
+
+	if( PEISMANAGEDSTRING( base ) ) 
+		if( !managedstring_get( PEGETMANAGEDSTRING( base ), base ) )
+			return( FALSE );
+
+	return( TRUE );
+}
+
 /* Set list to [].
  */
 void
@@ -1066,10 +1080,15 @@ gboolean
 heap_managedstring_new( Heap *heap, const char *str, PElement *out )
 {
 	Managedstring *managedstring;
-		
-	if( !(managedstring = managedstring_find( heap, str )) )
-		return( FALSE );
-	PEPUTP( out, ELEMENT_MANAGED, managedstring );
+
+	if( strcmp( str, "" ) == 0 ) {
+		PEPUTP( out, ELEMENT_ELIST, NULL );
+	}
+	else {
+		if( !(managedstring = managedstring_find( heap, str )) )
+			return( FALSE );
+		PEPUTP( out, ELEMENT_MANAGED, managedstring );
+	}
 
 	return( TRUE );
 }
@@ -1215,9 +1234,12 @@ heap_map_list( PElement *base, heap_map_list_fn fn, void *a, void *b )
 		return( base );
 
 	if( !PEISLIST( &e ) ) {
-		heap_error_typecheck( &e, "heap_map_list", "list" );
+		heap_error_typecheck( &e, "heap_map_list", "[*]" );
 		return( base );
 	}
+
+	if( !heap_list_get( &e ) )
+		return( base );
 
 	while( PEISFLIST( &e ) ) {
 		PElement head;
@@ -1251,7 +1273,12 @@ heap_get_list_next( PElement *list, PElement *data )
 		return( FALSE );
 
 	if( PEISFLIST( list ) ) {
-		HeapNode *hn = PEGETVAL( list );
+		HeapNode *hn;
+
+		if( !heap_list_get( list ) )
+			return( FALSE );
+
+		hn = PEGETVAL( list );
 
 		PEPOINTRIGHT( hn, list );
 		PEPOINTLEFT( hn, data );
@@ -1279,9 +1306,11 @@ heap_map_dict_entry( PElement *head, HeapMapDict *map_dict )
 	if( !reduce_pelement( rc, reduce_spine, head ) )
 		return( head );
 	if( !PEISFLIST( head ) ) {
-		heap_error_typecheck( head, "heap_map_dict", "list" );
+		heap_error_typecheck( head, "heap_map_dict", "[*]" );
 		return( head );
 	}
+	if( !heap_list_get( head ) )
+		return( head );
 	PEGETHD( &p1, head );
 	if( !heap_get_string( &p1, key, 256 ) )
 		return( head );
@@ -1290,9 +1319,11 @@ heap_map_dict_entry( PElement *head, HeapMapDict *map_dict )
 	if( !reduce_pelement( rc, reduce_spine, &p2 ) )
 		return( head );
 	if( !PEISFLIST( &p2 ) ) {
-		heap_error_typecheck( &p2, "heap_map_dict", "list" );
+		heap_error_typecheck( &p2, "heap_map_dict", "[*]" );
 		return( head );
 	}
+	if( !heap_list_get( &p2 ) )
+		return( head );
 	PEGETHD( &p1, &p2 );
 	if( (result = map_dict->fn( key, &p1, map_dict->a, map_dict->b )) )
 		return( result );

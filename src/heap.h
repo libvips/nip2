@@ -217,18 +217,19 @@ typedef struct pelement {
 #define PEISCONSTRUCTOR(P) (PEGETTYPE(P) == ELEMENT_CONSTRUCTOR)
 #define PEISCOMB(P) (PEGETTYPE(P) == ELEMENT_COMB)
 #define PEISCOMPLEX(P) (PEISNODE(P) && PEGETVAL(P)->type == TAG_COMPLEX)
-#define PEISELIST(P) (PEGETTYPE(P) == ELEMENT_ELIST)
-#define PEISFLIST(P) (PEISNODE(P) && PEGETVAL(P)->type == TAG_CONS)
 #define PEISTAG(P) (PEGETTYPE(P) == ELEMENT_TAG)
 #define PEISMANAGED(P) (PEGETTYPE(P) == ELEMENT_MANAGED)
 #define PEISMANAGEDGOBJECT(P) (PEISMANAGED(P) && \
 	IS_MANAGEDGOBJECT( PEGETVAL(P) ))
 #define PEISMANAGEDSTRING(P) (PEISMANAGED(P) && \
-	IS_MANAGEDSTRING( PEGETVAL(P) ))
+	IS_MANAGEDSTRING(PEGETVAL(P)))
 #define PEISIMAGE(P) (PEISMANAGED(P) && IS_IMAGEINFO( PEGETVAL(P) ))
 #define PEISVIPSOBJECT(P) \
 	(PEISMANAGEDGOBJECT(P) && VIPS_IS_OBJECT( PEGETMANAGEDGOBJECT(P) )) 
-#define PEISFILE(P) (PEISMANAGED(P) && IS_MANAGEDFILE( PEGETVAL(P) ))
+#define PEISFILE(P) (PEISMANAGED(P) && IS_MANAGEDFILE(PEGETVAL(P)))
+#define PEISELIST(P) (PEGETTYPE(P) == ELEMENT_ELIST)
+#define PEISFLIST(P) ((PEISNODE(P) && PEGETVAL(P)->type == TAG_CONS) || \
+	PEISMANAGEDSTRING(P))
 #define PEISLIST(P) (PEISELIST(P) || PEISFLIST(P))
 #define PEISNOVAL(P) (PEGETTYPE(P) == ELEMENT_NOVAL)
 #define PEISNUM(P) (PEISREAL(P) || PEISCOMPLEX(P))
@@ -384,6 +385,7 @@ gboolean heap_complex_element_new( Heap *heap,
 gboolean heap_complex_new( Heap *heap, double rp, double ip, PElement *out );
 gboolean heap_realvec_new( Heap *heap, int n, double *vec, PElement *out );
 gboolean heap_intvec_new( Heap *heap, int n, int *vec, PElement *out );
+gboolean heap_list_get( PElement *base );
 void heap_list_init( PElement *list );
 gboolean heap_list_add( Heap *heap, PElement *list, PElement *data );
 gboolean heap_list_next( PElement *list );

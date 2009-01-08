@@ -194,6 +194,11 @@ itext_decompile_element( BufInfo *buf, PElement *base, gboolean top )
 	else if( PEISCOMPLEX( base ) ) 
 		itext_add_complex( PEGETREALPART( base ), PEGETIMAGPART( base ),
 			buf );
+	else if( PEISMANAGEDSTRING( base ) ) {
+		Managedstring *managedstring = PEGETMANAGEDSTRING( base );
+
+		buf_appendf( buf, "\"%s\"", managedstring->string );
+	}
 	else if( PEISELIST( base ) ) {
 		buf_appends( buf, "[ ]" );
 	}
@@ -239,11 +244,6 @@ itext_decompile_element( BufInfo *buf, PElement *base, gboolean top )
 		buf_appendf( buf, "<%s: %s>", object->name, object->caption );
 	}
 #endif /*HAVE_VIPS8*/
-	if( PEISMANAGEDSTRING( base ) ) {
-		Managedstring *managedstring = PEGETMANAGEDSTRING( base );
-
-		buf_appendf( buf, "\"%s\"", managedstring->string );
-	}
 	else if( PEISMANAGED( base ) ) {
 		Managed *managed = PEGETMANAGED( base );
 
@@ -343,6 +343,15 @@ itext_add_element( BufInfo *buf, PElement *base,
 		itext_add_complex( PEGETREALPART( base ), PEGETIMAGPART( base ),
 			buf );
 	}
+	else if( PEISMANAGEDSTRING( base ) ) {
+		Managedstring *managedstring = PEGETMANAGEDSTRING( base );
+
+		if( !top ) 
+			buf_appends( buf, "\"" );
+		buf_appends( buf, managedstring->string );
+		if( !top ) 
+			buf_appends( buf, "\"" );
+	}
 	else if( PEISELIST( base ) ) {
 		buf_appends( buf, "[ ]" );
 	}
@@ -387,15 +396,6 @@ itext_add_element( BufInfo *buf, PElement *base,
 		buf_appendf( buf, "<" );
 		buf_appendi( buf, imageinfo_get( FALSE, PEGETII( base ) ) );
 		buf_appendf( buf, ">" );
-	}
-	if( PEISMANAGEDSTRING( base ) ) {
-		Managedstring *managedstring = PEGETMANAGEDSTRING( base );
-
-		if( !top ) 
-			buf_appends( buf, "\"" );
-		buf_appends( buf, managedstring->string );
-		if( !top ) 
-			buf_appends( buf, "\"" );
 	}
 	else if( PEISMANAGED( base ) ) {
 		Managed *managed = PEGETMANAGED( base );

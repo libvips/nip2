@@ -1,22 +1,25 @@
-- don't reduce MANAGED in the reduction loop, only reduce with hd/tl
+- try
 
-  don't make heap strings in advance, wait for first use
+  	Option_enum Image_type.colour_spaces "Colour space" "Lab"
 
-  use managedstring_get() to build and get the list-form string
+  click on "srgb", fails mysteriously
 
-  various other bits will need tweaking too
+Option_enum enum caption value_name = class
+        Option caption enum.names (index (equal value_name) enum.names) {
+	// corresponding thing
+	value_thing = enum.get_thing value_name;
 
-  what about PEISLIST / PEISFLIST? do they need to know about MANAGEDSTRING?
-  any others?
-
-  are "" and [] equal? they should be
-
-  do we need to spot "" in heap_managedstring_new()? could make a [] if we see
-  one
-
+	Option_edit caption labels value 
+		= this.Option_enum enum caption (enum.names ? value);
+}
 
 
 
+
+
+
+
+- make the window that we drag for thumbnail drags transparent
 
 - have a close button for the left and right drag out panels
 
@@ -33,16 +36,6 @@
   do we have a handy class we could put this into?
 
   pane.c / pane.h
-
-- type
-
-	12
-
-  displays as
-
-  	12<function>
-
-  how odd
 
 - File / Open, click on a directory, click "Open", error:
 

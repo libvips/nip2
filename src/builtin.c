@@ -220,6 +220,8 @@ apply_list_call( Reduce *rc,
 	PEPOINTRIGHT( arg[0], &rhs );
 	g_assert( PEISFLIST( &rhs ) );
 
+	reduce_list_get( rc, &rhs );
+
 	if( strcmp( name, "hd" ) == 0 ) {
 		PEGETHD( &a, &rhs );
 		PEPUTPE( out, &a );

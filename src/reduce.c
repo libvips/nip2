@@ -126,6 +126,15 @@ reduce_error_toobig( Reduce *rc, const char *name )
 	reduce_throw( rc );
 }
 
+/* 'get' a list: convert a MANAGEDSTRING into a list, if necessary.
+ */
+void
+reduce_list_get( Reduce *rc, PElement *base )
+{
+	if( !heap_list_get( base ) )
+		reduce_throw( rc );
+}
+
 /* Map over a heap list. Reduce the list spine as we go, don't reduce the
  * heads. 
  */
@@ -139,6 +148,8 @@ reduce_map_list( Reduce *rc,
 
 	if( !PEISLIST( &e ) ) 
 		reduce_error_typecheck( rc, &e, "reduce_map_list", "list" );
+
+	reduce_list_get( rc, &e );
 
 	while( PEISFLIST( &e ) ) {
 		PElement head;
@@ -595,19 +606,25 @@ reduce_test_char( Reduce *rc, PElement *base, int *sz )
 static gboolean
 reduce_n_is_string( Reduce *rc, PElement *base, int sz )
 {
-	void *result;
-
 	reduce_spine( rc, base );
 	if( !PEISLIST( base ) ) 
 		return( FALSE );
 
-	result = reduce_map_list( rc, base, 
-		(reduce_map_list_fn) reduce_test_char, &sz, NULL );
+	/* We know managedstrings are strings without needing to expand them.
+	 */
+	if( PEISMANAGEDSTRING( base ) )
+		return( TRUE );
+	else {
+		void *result;
 
-	if( result == (void *) -1 )
-		return( FALSE );
+		result = reduce_map_list( rc, base, 
+			(reduce_map_list_fn) reduce_test_char, &sz, NULL );
 
-	return( TRUE );
+		if( result == (void *) -1 )
+			return( FALSE );
+
+		return( TRUE );
+	}
 }
 
 /* Test for object is string. Just test the first few elements, so we
@@ -726,40 +743,6 @@ reduce_is_instanceof( Reduce *rc, const char *name, PElement *instance )
 	return( FALSE );
 }
 
-/* Find the length of a list.
- */
-int
-reduce_list_length( Reduce *rc, PElement *base )
-{
-	PElement p;
-	int i;
-
-	/* Reduce to first element.
-	 */
-	p = *base;
-	reduce_spine( rc, &p );
-
-	/* Does it look like the start of a list? 
-	 */
-	if( !PEISLIST( &p ) ) 
-		reduce_error_typecheck( rc, &p, _( "List length" ), "list" );
-
-	/* Loop down list.
-	 */
-	for( i = 0; PEISFLIST( &p ); i++ ) {
-		HeapNode *hn;
-
-		hn = PEGETVAL( &p );
-		PEPOINTRIGHT( hn, &p );
-
-		reduce_spine( rc, &p );
-	}
-
-	g_assert( PEISELIST( &p ) );
-
-	return( i );
-}
-
 /* Find the length of a list, with a bailout for the largest size we test.
  * Handy for avoiding finding the length of "[1..]".
  */
@@ -779,23 +762,40 @@ reduce_list_length_max( Reduce *rc, PElement *base, int max_length )
 	if( !PEISLIST( &p ) ) 
 		reduce_error_typecheck( rc, &p, _( "List length" ), "list" );
 
-	/* Loop down list.
-	 */
-	for( i = 0; PEISFLIST( &p ); i++ ) {
-		HeapNode *hn;
+	if( PEISMANAGEDSTRING( &p ) ) {
+		Managedstring *managedstring = PEGETMANAGEDSTRING( &p );
 
-		if( i > max_length ) 
-			reduce_error_toobig( rc, "list" );
+		i = strlen( managedstring->string );
+	}
+	else {
+		reduce_list_get( rc, &p );
 
-		hn = PEGETVAL( &p );
-		PEPOINTRIGHT( hn, &p );
+		/* Loop down list.
+		 */
+		for( i = 0; PEISFLIST( &p ); i++ ) {
+			HeapNode *hn;
 
-		reduce_spine( rc, &p );
+			if( max_length != -1 && i > max_length ) 
+				reduce_error_toobig( rc, "list" );
+
+			hn = PEGETVAL( &p );
+			PEPOINTRIGHT( hn, &p );
+
+			reduce_spine( rc, &p );
+		}
+
+		g_assert( PEISELIST( &p ) );
 	}
 
-	g_assert( PEISELIST( &p ) );
-
 	return( i );
+}
+
+/* Find the length of a list.
+ */
+int
+reduce_list_length( Reduce *rc, PElement *base )
+{
+	return( reduce_list_length_max( rc, base, -1 ) );
 }
 
 /* Point "out" at the nth element of a list. Index from 0.
@@ -818,6 +818,8 @@ reduce_list_index( Reduce *rc, PElement *base, int n, PElement *out )
 
 	if( !PEISLIST( &p ) ) 
 		reduce_error_typecheck( rc, &p, _( "List index" ), "list" );
+
+	reduce_list_get( rc, &p );
 
 	for( i = n;; ) {
 		if( PEISELIST( &p ) ) {
@@ -1813,9 +1815,10 @@ reduce_spine_strict( Reduce *rc, PElement *np )
 	 */
 	reduce_spine( rc, np );
 
-	/* If it's a non-empty list, may need to reduce inside.
+	/* If it's a non-empty list, may need to reduce inside. Not managed
+	 * strings though, we can leave them unevaluated.
 	 */
-	if( PEISFLIST( np ) ) {
+	if( PEISFLIST( np ) && !PEISMANAGEDSTRING( np ) ) {
 		/* Recurse for head and tail.
 		 */
 		HeapNode *hn = PEGETVAL( np );

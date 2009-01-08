@@ -173,6 +173,7 @@ void *reduce_safe_pointer( Reduce *rc, reduce_safe_pointer_fn fn,
 
 void reduce_error_typecheck( Reduce *rc, 
 	PElement *e, const char *name, const char *type );
+void reduce_list_get( Reduce *rc, PElement *base );
 typedef void *(*reduce_map_list_fn)( Reduce *rc,
 	PElement *, void *, void * );
 void *reduce_map_list( Reduce *rc, 

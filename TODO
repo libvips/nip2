@@ -1,3 +1,22 @@
+- don't reduce MANAGED in the reduction loop, only reduce with hd/tl
+
+  don't make heap strings in advance, wait for first use
+
+  use managedstring_get() to build and get the list-form string
+
+  various other bits will need tweaking too
+
+  what about PEISLIST / PEISFLIST? do they need to know about MANAGEDSTRING?
+  any others?
+
+  are "" and [] equal? they should be
+
+  do we need to spot "" in heap_managedstring_new()? could make a [] if we see
+  one
+
+
+
+
 
 - have a close button for the left and right drag out panels
 
@@ -15,6 +34,15 @@
 
   pane.c / pane.h
 
+- type
+
+	12
+
+  displays as
+
+  	12<function>
+
+  how odd
 
 - File / Open, click on a directory, click "Open", error:
 

@@ -208,7 +208,7 @@ static BuiltinTypeSpot *flist_args[] = {
         &flist_spot
 };
 
-/* Do a complex op. Args already spotted.
+/* Do a list op. Args already spotted.
  */
 static void
 apply_list_call( Reduce *rc, 

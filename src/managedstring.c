@@ -153,7 +153,6 @@ static Managedstring *
 managedstring_new( Heap *heap, const char *string )
 {
 	Managedstring *managedstring;
-	PElement pe;
 
 #ifdef DEBUG
 	printf( "managedstring_new: %p, %s\n", heap, string );
@@ -162,20 +161,8 @@ managedstring_new( Heap *heap, const char *string )
 	managedstring = g_object_new( TYPE_MANAGEDSTRING, NULL );
 	managed_link_heap( MANAGED( managedstring ), heap );
 	heap_register_element( heap, &managedstring->e );
-
-	/* We will vanish if there's a GC during allocate, so we have to ref
-	 * and unref.
-	 */
-	managed_dup_nonheap( MANAGED( managedstring ) );
-
-	PEPOINTE( &pe, &managedstring->e );
-	if( !(managedstring->string = im_strdup( NULL, string )) ||
-		!heap_string_new( heap, string, &pe ) ) {
-		managed_destroy_nonheap( MANAGED( managedstring ) );
+	if( !(managedstring->string = im_strdup( NULL, string )) ) 
 		return( NULL );
-	}
-
-	managed_destroy_nonheap( MANAGED( managedstring ) );
 
 	g_assert( !g_hash_table_lookup( managedstring_all, managedstring ) );
 	g_hash_table_insert( managedstring_all, managedstring, managedstring );
@@ -207,3 +194,18 @@ managedstring_find( Heap *heap, const char *string )
 	return( managedstring );
 }
 
+gboolean
+managedstring_get( Managedstring *managedstring, PElement *out )
+{
+	PElement pe;
+
+	PEPOINTE( &pe, &managedstring->e );
+	if( PEISNOVAL( &pe ) )
+		if( !heap_string_new( MANAGED( managedstring )->heap, 
+			managedstring->string, &pe ) ) 
+			return( FALSE );
+
+	PEPUTE( out, &managedstring->e );
+
+	return( TRUE );
+}

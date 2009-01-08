@@ -996,26 +996,9 @@ reduce_start:
 	case ELEMENT_TAG:
 	case ELEMENT_SYMREF:
 	case ELEMENT_COMPILEREF:
+	case ELEMENT_MANAGED:
 		/* Base type .. no more reduction needed.
 		 */
-
-		/* Should have no args.
-		 */
-		if( RSFRAMESIZE( rc ) != 0 ) 
-			argserror( rc, &np );
-
-		break;
-
-	case ELEMENT_MANAGED:
-		if( PEISMANAGEDSTRING( &np ) ) {
-			Managedstring *managedstring = 
-				PEGETMANAGEDSTRING( &np );
-
-			/* Link to compiled string. We know this will be fully
-			 * reduced: no need to recurse into it.
-			 */
-			PEPUTE( &np, &managedstring->e );
-		}
 
 		/* Should have no args.
 		 */

@@ -56,3 +56,4 @@ typedef struct _ManagedstringClass {
 GType managedstring_get_type( void );
 
 Managedstring *managedstring_find( Heap *heap, const char *string );
+gboolean managedstring_get( Managedstring *managedstring, PElement *out );

@@ -914,16 +914,17 @@ heap_complex_new( Heap *heap, double rp, double ip, PElement *out )
 	return( TRUE );
 }
 
-/* 'get' a list: convert a MANAGEDSTRING into a list, if necessary.
+/* 'get' a list: move the PE to point at the list.
  */
 gboolean
-heap_list_get( PElement *base )
+heap_get_list( PElement *list )
 {
-	g_assert( PEISLIST( base ) );
+	g_assert( PEISLIST( list ) );
 
-	if( PEISMANAGEDSTRING( base ) ) 
-		if( !managedstring_get( PEGETMANAGEDSTRING( base ), base ) )
+	if( PEISMANAGEDSTRING( list ) ) {
+		if( !managedstring_get( PEGETMANAGEDSTRING( list ), list ) )
 			return( FALSE );
+	}
 
 	return( TRUE );
 }
@@ -1238,7 +1239,7 @@ heap_map_list( PElement *base, heap_map_list_fn fn, void *a, void *b )
 		return( base );
 	}
 
-	if( !heap_list_get( &e ) )
+	if( !heap_get_list( &e ) )
 		return( base );
 
 	while( PEISFLIST( &e ) ) {
@@ -1275,7 +1276,7 @@ heap_get_list_next( PElement *list, PElement *data )
 	if( PEISFLIST( list ) ) {
 		HeapNode *hn;
 
-		if( !heap_list_get( list ) )
+		if( !heap_get_list( list ) )
 			return( FALSE );
 
 		hn = PEGETVAL( list );
@@ -1309,7 +1310,7 @@ heap_map_dict_entry( PElement *head, HeapMapDict *map_dict )
 		heap_error_typecheck( head, "heap_map_dict", "[*]" );
 		return( head );
 	}
-	if( !heap_list_get( head ) )
+	if( !heap_get_list( head ) )
 		return( head );
 	PEGETHD( &p1, head );
 	if( !heap_get_string( &p1, key, 256 ) )
@@ -1322,7 +1323,7 @@ heap_map_dict_entry( PElement *head, HeapMapDict *map_dict )
 		heap_error_typecheck( &p2, "heap_map_dict", "[*]" );
 		return( head );
 	}
-	if( !heap_list_get( &p2 ) )
+	if( !heap_get_list( &p2 ) )
 		return( head );
 	PEGETHD( &p1, &p2 );
 	if( (result = map_dict->fn( key, &p1, map_dict->a, map_dict->b )) )

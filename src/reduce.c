@@ -129,9 +129,9 @@ reduce_error_toobig( Reduce *rc, const char *name )
 /* 'get' a list: convert a MANAGEDSTRING into a list, if necessary.
  */
 void
-reduce_list_get( Reduce *rc, PElement *base )
+reduce_get_list( Reduce *rc, PElement *list )
 {
-	if( !heap_list_get( base ) )
+	if( !heap_get_list( list ) )
 		reduce_throw( rc );
 }
 
@@ -149,7 +149,7 @@ reduce_map_list( Reduce *rc,
 	if( !PEISLIST( &e ) ) 
 		reduce_error_typecheck( rc, &e, "reduce_map_list", "list" );
 
-	reduce_list_get( rc, &e );
+	reduce_get_list( rc, &e );
 
 	while( PEISFLIST( &e ) ) {
 		PElement head;
@@ -232,6 +232,8 @@ int
 reduce_get_string( Reduce *rc, PElement *base, char *buf, int n )
 {
 	int sz = n - 1;
+
+	reduce_spine( rc, base );
 
 	if( PEISMANAGEDSTRING( base ) ) {
 		/* A static string ... rather than expanding to a list and
@@ -607,6 +609,7 @@ static gboolean
 reduce_n_is_string( Reduce *rc, PElement *base, int sz )
 {
 	reduce_spine( rc, base );
+
 	if( !PEISLIST( base ) ) 
 		return( FALSE );
 
@@ -762,14 +765,14 @@ reduce_list_length_max( Reduce *rc, PElement *base, int max_length )
 	if( !PEISLIST( &p ) ) 
 		reduce_error_typecheck( rc, &p, _( "List length" ), "list" );
 
+	reduce_get_list( rc, &p );
+
 	if( PEISMANAGEDSTRING( &p ) ) {
 		Managedstring *managedstring = PEGETMANAGEDSTRING( &p );
 
 		i = strlen( managedstring->string );
 	}
 	else {
-		reduce_list_get( rc, &p );
-
 		/* Loop down list.
 		 */
 		for( i = 0; PEISFLIST( &p ); i++ ) {
@@ -819,7 +822,7 @@ reduce_list_index( Reduce *rc, PElement *base, int n, PElement *out )
 	if( !PEISLIST( &p ) ) 
 		reduce_error_typecheck( rc, &p, _( "List index" ), "list" );
 
-	reduce_list_get( rc, &p );
+	reduce_get_list( rc, &p );
 
 	for( i = n;; ) {
 		if( PEISELIST( &p ) ) {

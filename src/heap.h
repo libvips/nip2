@@ -385,7 +385,6 @@ gboolean heap_complex_element_new( Heap *heap,
 gboolean heap_complex_new( Heap *heap, double rp, double ip, PElement *out );
 gboolean heap_realvec_new( Heap *heap, int n, double *vec, PElement *out );
 gboolean heap_intvec_new( Heap *heap, int n, int *vec, PElement *out );
-gboolean heap_list_get( PElement *base );
 void heap_list_init( PElement *list );
 gboolean heap_list_add( Heap *heap, PElement *list, PElement *data );
 gboolean heap_list_next( PElement *list );
@@ -406,6 +405,7 @@ void *heap_map_list( PElement *base, heap_map_list_fn fn, void *a, void *b );
 typedef void *(*heap_map_dict_fn)( const char *, PElement *, void *a, void *b );
 void *heap_map_dict( PElement *base, heap_map_dict_fn fn, void *a, void *b );
 
+gboolean heap_get_list( PElement *list );
 gboolean heap_get_list_next( PElement *list, PElement *data );
 gboolean heap_get_string( PElement *base, char *buf, int n );
 gboolean heap_get_lstring( PElement *base, GSList **labels );

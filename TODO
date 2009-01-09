@@ -1,19 +1,10 @@
 - try
 
-  	Option_enum Image_type.colour_spaces "Colour space" "Lab"
+	"a" ++ "b"
 
-  click on "srgb", fails mysteriously
+  get
 
-Option_enum enum caption value_name = class
-        Option caption enum.names (index (equal value_name) enum.names) {
-	// corresponding thing
-	value_thing = enum.get_thing value_name;
-
-	Option_edit caption labels value 
-		= this.Option_enum enum caption (enum.names ? value);
-}
-
-
+  	['a', no value]
 
 
 

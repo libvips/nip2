@@ -1,6 +1,3 @@
-- businesscard fails with "unimplemented vector op" in blend
-
-
 
 
 - make the window that we drag for thumbnail drags transparent

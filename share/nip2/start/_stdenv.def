@@ -100,7 +100,7 @@ vec op_name im vec
 		op_name == "less_equal" 
 	= im_more_vec im vec,
 		op_name == "less_equal'" 
-	= error "unimplemented vector operation"
+	= error ("unimplemented vector operation: " ++ op_name)
 {
 	zeros = replicate (len vec) 0;
 	ones = replicate (len vec) 1;

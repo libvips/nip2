@@ -585,11 +585,34 @@ action_image_equal( Reduce *rc, Imageinfo *a, Imageinfo *b )
 	return( mn == 255 );
 }
 
+/* One of p1/p2 is a managedstring. 
+ *
+ * This is pretty dumb. We could have a special loop down the list side which
+ * compared to the managedstring directly, but I doubt if this will ever be a
+ * performance issue.
+ */
+static gboolean
+action_string_equal( Reduce *rc, PElement *p1, PElement *p2 )
+{
+	char a_string[MAX_STRSIZE];
+	char b_string[MAX_STRSIZE];
+
+	reduce_get_string( rc, p1, a_string, MAX_STRSIZE );
+	reduce_get_string( rc, p2, b_string, MAX_STRSIZE );
+
+	return( strcmp( a_string, b_string ) == 0 );
+}
+
 /* Test two elements for equality. Force computation as required.
  */
 static gboolean
 action_element_equal( Reduce *rc, PElement *p1, PElement *p2 )
 {
+	/* Reduce a bit.
+	 */
+	reduce_spine( rc, p1 );
+	reduce_spine( rc, p2 );
+
 	/* We can often test for eg. "fred" == "fred" by just checking
 	 * pointers.
 	 */
@@ -608,12 +631,13 @@ action_element_equal( Reduce *rc, PElement *p1, PElement *p2 )
 		}
 	}
 
-	/* Reduce a bit.
+	/* Special case if either is a managedstring.
 	 */
-	reduce_spine( rc, p1 );
-	reduce_spine( rc, p2 );
+	if( PEISMANAGEDSTRING( p1 ) ||
+		PEISMANAGEDSTRING( p2 ) ) 
+		return( action_string_equal( rc, p1, p2 ) );
 
-	/* Easy!
+	/* No other implicit conversions, so types must match.
 	 */
 	if( PEGETTYPE( p1 ) != PEGETTYPE( p2 ) )
 		return( FALSE );

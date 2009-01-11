@@ -1,11 +1,4 @@
-- try
-
-	"a" ++ "b"
-
-  get
-
-  	['a', no value]
-
+- businesscard fails with "unimplemented vector op" in blend
 
 
 

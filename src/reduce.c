@@ -149,11 +149,11 @@ reduce_map_list( Reduce *rc,
 	if( !PEISLIST( &e ) ) 
 		reduce_error_typecheck( rc, &e, "reduce_map_list", "list" );
 
-	reduce_get_list( rc, &e );
-
 	while( PEISFLIST( &e ) ) {
 		PElement head;
 		void *res;
+
+		reduce_get_list( rc, &e );
 
 		/* Apply user function to the head.
 		 */
@@ -765,8 +765,6 @@ reduce_list_length_max( Reduce *rc, PElement *base, int max_length )
 	if( !PEISLIST( &p ) ) 
 		reduce_error_typecheck( rc, &p, _( "List length" ), "list" );
 
-	reduce_get_list( rc, &p );
-
 	if( PEISMANAGEDSTRING( &p ) ) {
 		Managedstring *managedstring = PEGETMANAGEDSTRING( &p );
 
@@ -780,6 +778,8 @@ reduce_list_length_max( Reduce *rc, PElement *base, int max_length )
 
 			if( max_length != -1 && i > max_length ) 
 				reduce_error_toobig( rc, "list" );
+
+			reduce_get_list( rc, &p );
 
 			hn = PEGETVAL( &p );
 			PEPOINTRIGHT( hn, &p );
@@ -822,8 +822,6 @@ reduce_list_index( Reduce *rc, PElement *base, int n, PElement *out )
 	if( !PEISLIST( &p ) ) 
 		reduce_error_typecheck( rc, &p, _( "List index" ), "list" );
 
-	reduce_get_list( rc, &p );
-
 	for( i = n;; ) {
 		if( PEISELIST( &p ) ) {
 			error_top( _( "Bad argument." ) );
@@ -833,6 +831,8 @@ reduce_list_index( Reduce *rc, PElement *base, int n, PElement *out )
 		}
 
 		g_assert( PEISFLIST( &p ) );
+
+		reduce_get_list( rc, &p );
 
 		hn = PEGETVAL( &p );
 		PEPOINTRIGHT( hn, &p );

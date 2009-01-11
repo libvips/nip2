@@ -1239,12 +1239,12 @@ heap_map_list( PElement *base, heap_map_list_fn fn, void *a, void *b )
 		return( base );
 	}
 
-	if( !heap_get_list( &e ) )
-		return( base );
-
 	while( PEISFLIST( &e ) ) {
 		PElement head;
 		void *res;
+
+		if( !heap_get_list( &e ) )
+			return( base );
 
 		/* Apply user function to the head.
 		 */

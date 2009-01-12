@@ -1,7 +1,6 @@
 - test
 
-	vips_object_new "VipsInterpolateYafrsmooth" [] [$sharpness => 12]
-	vips_object_new "VipsInterpolateYafrsmooth" [] [$sharpening => 12]
+	vips_object_new "VipsInterpolateYafrsmooth" [] [$sharpening => 2]
 
 GLib-GObject-WARNING **: IA__g_object_set_property: object class `VipsInterpolateYafrsmooth' has no property named `sharpness'
 

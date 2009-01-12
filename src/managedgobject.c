@@ -51,29 +51,13 @@ managedgobject_dispose( GObject *gobject )
 }
 
 static void
-managedgobject_info( iObject *iobject, BufInfo *buf )
-{
-	Managedgobject *managedgobject = MANAGEDGOBJECT( iobject );
-	GObject *object = managedgobject->object;
-
-	IOBJECT_CLASS( parent_class )->info( iobject, buf );
-
-	if( object ) 
-		buf_appendf( buf, "->object :: %s", 
-			G_OBJECT_TYPE_NAME( object ) );
-}
-
-static void
 managedgobject_class_init( ManagedgobjectClass *class )
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
-	iObjectClass *iobject_class = IOBJECT_CLASS( class );
 
 	parent_class = g_type_class_peek_parent( class );
 
 	gobject_class->dispose = managedgobject_dispose;
-
-	iobject_class->info = managedgobject_info;
 }
 
 static void

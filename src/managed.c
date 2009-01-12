@@ -151,16 +151,21 @@ managed_finalize( GObject *gobject )
 	G_OBJECT_CLASS( parent_class )->finalize( gobject );
 }
 
+/* _info() is used by itext.c to display managed objects. Don't chain
+ * up, don't print more than one line.
+ */
 static void
 managed_info( iObject *iobject, BufInfo *buf )
 {
+#ifdef DEBUG
 	Managed *managed = MANAGED( iobject );
 
 	buf_appendf( buf, "managed-object %p\n", managed );
 	buf_appendf( buf, "managed->count = %d\n", managed->count );
 	buf_appendf( buf, "managed->marked = %d\n", managed->marked );
+#endif /*DEBUG*/
 
-	IOBJECT_CLASS( parent_class )->info( iobject, buf );
+	buf_appendf( buf, "%s %p", G_OBJECT_TYPE_NAME( iobject ), iobject );
 }
 
 static void

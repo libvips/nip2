@@ -21,6 +21,8 @@ CLI_DIST = nip2-cli.c
 endif
 
 nip2_SOURCES = \
+	vipsobject.c \
+	vipsobject.h \
 	plotmodel.c \
 	plotmodel.h \
 	plotpresent.c \

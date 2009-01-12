@@ -178,6 +178,10 @@ typedef void *(*reduce_map_list_fn)( Reduce *rc,
 	PElement *, void *, void * );
 void *reduce_map_list( Reduce *rc, 
 	PElement *base, reduce_map_list_fn fn, void *a, void *b );
+typedef void *(*reduce_map_dict_fn)( Reduce *, 
+	const char *, PElement *, void *a, void *b );
+void *reduce_map_dict( Reduce *rc, 
+	PElement *base, reduce_map_dict_fn fn, void *a, void *b );
 void reduce_clone_list( Reduce *rc, PElement *base, PElement *out );
 int reduce_get_string( Reduce *rc, PElement *base, char *buf, int n );
 int reduce_get_lstring( Reduce *rc, PElement *base, GSList **labels );

@@ -1,5 +1,38 @@
-- make checkstill fails
+- minimum we need is 
 
+	vips_object_new "VipsInterpolateYafrsmooth" [$sharpness => 12] 
+
+  we have 
+
+	void
+	vo_object_new( Reduce *rc, const char *name,
+	        PElement *required, PElement *optional, PElement *out )
+
+  add a builtin for this
+
+
+
+
+
+
+  if we want full VipsObject introspection we will need a lot more
+
+	vips_object_arguments (name2gtype "VipsInterpolateYafrsmooth")
+		-> ["sharpness"]
+
+  need some equivalent for GParamSpec / VipsArgument
+
+  	VipsArgument name type .... = class {}
+
+  return a list of these from vips_object_arguments()?
+  
+
+
+- heap_map_dict() should be reduce_map_dict(), since it does reduction, argh
+
+
+- make check still fails ... im_affinei_all is not callable, see
+  vips_is_callable(), thanks to interpolation param
 
 - make the window that we drag for thumbnail drags transparent
 

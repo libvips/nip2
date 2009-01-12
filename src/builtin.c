@@ -590,6 +590,21 @@ dir_scope( Symbol *sym, Reduce *rc, PElement *list )
 	return( NULL );
 }
 
+static void *
+dir_gtype( GType type, void *a, void *b )
+{
+	Reduce *rc = (Reduce *) a;
+	PElement *list = (PElement *) b;
+	PElement t;
+
+	if( !heap_list_add( rc->heap, list, &t ) ||
+		!heap_real_new( rc->heap, type, &t ) )
+		return( rc );
+	(void) heap_list_next( list );
+
+	return( NULL );
+}
+
 /* Do "dir". 
  */
 static void
@@ -620,6 +635,29 @@ apply_dir_call( Reduce *rc, const char *name, HeapNode **arg, PElement *out )
 				(icontainer_map_fn) dir_scope, rc, &list );
 		}
 	}
+	else if( PEISREAL( &rhs ) ) {
+		/* Assume this is a gtype and try to get the children of that
+		 * type.
+		 */
+		GType type = PEGETREAL( &rhs );
+		PElement list;
+
+		list = *out;
+		heap_list_init( &list );
+
+		if( !g_type_name( type ) ) {
+			error_top( _( "No such type" ) );
+			error_sub( _( "GType %lu not found." ), type );
+			reduce_throw( rc );
+		}
+
+		if( vips_type_map( type, dir_gtype, rc, &list ) ) 
+			reduce_throw( rc );
+	}
+	else 
+		/* Just [], ie. no names possible.
+		 */
+		heap_list_init( out );
 }
 
 /* Args for "expand". 
@@ -691,6 +729,33 @@ apply_gtype2name_call( Reduce *rc, const char *name,
 		reduce_throw( rc );
 }
 
+/* Args for "vips_object_new". 
+ */
+static BuiltinTypeSpot *vo_new_args[] = { 
+	&string_spot,
+	&list_spot,
+	&list_spot 
+};
+
+/* Do a vips_object_new call.
+ */
+static void
+apply_vo_new_call( Reduce *rc, 
+	const char *name, HeapNode **arg, PElement *out )
+{
+	PElement rhs;
+	char buf[256];
+	PElement required;
+	PElement optional;
+
+	PEPOINTRIGHT( arg[2], &rhs );
+	reduce_get_string( rc, &rhs, buf, 256 );
+	PEPOINTRIGHT( arg[1], &required );
+	PEPOINTRIGHT( arg[0], &optional );
+
+	vo_object_new( rc, buf, &required, &optional, out );
+}
+
 /* All ip's builtin functions. 
  */
 static BuiltinInfo builtin_table[] = {
@@ -704,6 +769,11 @@ static BuiltinInfo builtin_table[] = {
 	{ "name2gtype", FALSE, 1, &name2gtype_args[0], &apply_name2gtype_call },
 	{ "gtype2name", FALSE, 1, &gtype2name_args[0], &apply_gtype2name_call },
 	{ "_", FALSE, 1, &underscore_args[0], &apply_underscore_call },
+
+	/* vips8 wrapper.
+	 */
+	{ "vips_object_new", FALSE, IM_NUMBER( vo_new_args ), 
+		&vo_new_args[0], apply_vo_new_call },
 
 	/* Predicates.
 	 */

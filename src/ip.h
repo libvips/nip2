@@ -361,6 +361,7 @@ typedef void *(*tool_map_fn)( Tool *, void *, void * );
 #include "action.h"
 #include "reduce.h"
 #include "vobject.h"
+#include "vipsobject.h"
 #include "view.h"
 #include "graphicview.h"
 #include "spin.h"

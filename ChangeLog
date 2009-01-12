@@ -14,9 +14,10 @@ started 7.17.0
 - new VipsFormat stuff
 - LEXLIBS->LEXLIB (thanks Adam)
 - added Managedstring, removed old static string system
-- equals on two managedstrngs just checks pointers
 - caption columns can be null, display "doubleclick to edit .." message if
   they are
+- added vipsobject builder from old call8 code
+- added vips_object_new builtin
 
 started 7.16.3
 - fixed cancel system (again)

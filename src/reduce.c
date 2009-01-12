@@ -170,6 +170,61 @@ reduce_map_list( Reduce *rc,
 	return( NULL );
 }
 
+typedef struct _ReduceMapDict {
+	reduce_map_dict_fn fn;
+	void *a;
+	void *b;
+} ReduceMapDict;
+
+static void *
+reduce_map_dict_entry( Reduce *rc, PElement *head, ReduceMapDict *map_dict )
+{
+	char key[256];
+	PElement p1, p2;
+	void *result;
+
+	reduce_spine( rc, head );
+	if( !PEISFLIST( head ) ) 
+		reduce_error_typecheck( rc, head, "reduce_map_dict", "[*]" );
+
+	reduce_get_list( rc, head );
+	PEGETHD( &p1, head );
+	reduce_get_string( rc, &p1, key, 256 );
+	PEGETTL( &p2, head );
+
+	reduce_spine( rc, &p2 );
+	if( !PEISFLIST( &p2 ) ) 
+		reduce_error_typecheck( rc, &p2, "reduce_map_dict", "[*]" );
+
+	reduce_get_list( rc, &p2 );
+	PEGETHD( &p1, &p2 );
+	if( (result = map_dict->fn( rc, key, &p1, map_dict->a, map_dict->b )) )
+		return( result );
+
+	PEGETTL( &p1, &p2 );
+	reduce_spine( rc, &p1 );
+	if( !PEISELIST( &p1 ) ) 
+		reduce_error_typecheck( rc, &p1, "reduce_map_dict", "[]" );
+
+	return( NULL );
+}
+
+/* Map over a list of ["key", value] pairs.
+ */
+void *
+reduce_map_dict( Reduce *rc, PElement *base, 
+	reduce_map_dict_fn fn, void *a, void *b )
+{
+	ReduceMapDict map_dict;
+
+	map_dict.fn = fn;
+	map_dict.a = a;
+	map_dict.b = b;
+
+	return( reduce_map_list( rc, base, 
+		(reduce_map_list_fn) reduce_map_dict_entry, &map_dict, NULL ) );
+}
+
 static void *
 reduce_clone_list_sub( Reduce *rc, PElement *data, PElement *out )
 {

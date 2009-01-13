@@ -56,10 +56,10 @@ toolkitbrowser_destroy( GtkObject *object )
 }
 
 static void *
-toolkitbrowser_rebuild_item_sub( Symbol *param, BufInfo *buf )
+toolkitbrowser_rebuild_item_sub( Symbol *param, VipsBuf *buf )
 {
-	buf_appends( buf, " " );
-	buf_appends( buf, IOBJECT( param )->name );
+	vips_buf_appends( buf, " " );
+	vips_buf_appends( buf, IOBJECT( param )->name );
 
 	return( NULL );
 }
@@ -72,10 +72,10 @@ toolkitbrowser_rebuild_item3( Toolitem *toolitem,
 		!toolitem->is_separator &&
 		toolitem->compile ) {
 		char txt[256];
-		BufInfo buf;
+		VipsBuf buf;
 		GtkTreeIter iter;
 
-		buf_init_static( &buf, txt, 256 );
+		vips_buf_init_static( &buf, txt, 256 );
 		if( toolitem->action_sym && 
 			toolitem->action_sym->expr &&
 			toolitem->action_sym->expr->compile->param ) 
@@ -87,7 +87,7 @@ toolkitbrowser_rebuild_item3( Toolitem *toolitem,
 		gtk_list_store_set( toolkitbrowser->store, &iter,
 			TOOLTIP_COLUMN, toolitem->tooltip,
 			MENU_COLUMN, toolitem->user_path,
-			NPARAM_COLUMN, buf_all( &buf ),
+			NPARAM_COLUMN, vips_buf_all( &buf ),
 			TOOLITEM_COLUMN, toolitem,
 			-1 );
 	}

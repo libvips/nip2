@@ -87,25 +87,25 @@ action_boperror( Reduce *rc, Compile *compile, const char *str,
 	const char *top_str = str ? str : _( "Bad arguments." );
 	const char *op_name = op >= 0 ? decode_BinOp( op ) : name;
 
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[MAX_ERROR_FRAG];
-	BufInfo buf2;
+	VipsBuf buf2;
 	char txt2[MAX_ERROR_FRAG];
-	BufInfo buf3;
+	VipsBuf buf3;
 	char txt3[MAX_ERROR_FRAG];
 
-	buf_init_static( &buf, txt, MAX_ERROR_FRAG );
+	vips_buf_init_static( &buf, txt, MAX_ERROR_FRAG );
 	itext_value_ev( rc, &buf, a );
 
-	buf_init_static( &buf2, txt2, MAX_ERROR_FRAG );
+	vips_buf_init_static( &buf2, txt2, MAX_ERROR_FRAG );
 	itext_value_ev( rc, &buf2, b );
 
-	buf_init_static( &buf3, txt3, MAX_ERROR_FRAG );
+	vips_buf_init_static( &buf3, txt3, MAX_ERROR_FRAG );
 	if( compile ) {
 		/* Expands to eg. 'bad args to "+", called from "fred"'
 		 */
-		buf_appends( &buf3, _( "Called from" ) );
-		buf_appends( &buf3, " " );
+		vips_buf_appends( &buf3, _( "Called from" ) );
+		vips_buf_appends( &buf3, " " );
 		compile_name( compile, &buf3 );
 	}
 
@@ -113,7 +113,7 @@ action_boperror( Reduce *rc, Compile *compile, const char *str,
 	error_sub( _( "Error in binary \"%s\".\n"
 		"left = %s\n"
 		"right = %s\n%s" ),
-		op_name, buf_all( &buf ), buf_all( &buf2 ), buf_all( &buf3 ) );
+		op_name, vips_buf_all( &buf ), vips_buf_all( &buf2 ), vips_buf_all( &buf3 ) );
 	reduce_throw( rc );
 }
 
@@ -122,16 +122,16 @@ action_boperror( Reduce *rc, Compile *compile, const char *str,
 static void
 action_nomerror( Reduce *rc, Compile *compile, PElement *a, PElement *b )
 {
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[500];
-	BufInfo buf2;
+	VipsBuf buf2;
 	char txt2[MAX_ERROR_FRAG];
-	BufInfo buf3;
+	VipsBuf buf3;
 	char txt3[MAX_ERROR_FRAG];
 
-	buf_init_static( &buf, txt, 500 );
-	buf_init_static( &buf2, txt2, MAX_ERROR_FRAG );
-	buf_init_static( &buf3, txt3, MAX_ERROR_FRAG );
+	vips_buf_init_static( &buf, txt, 500 );
+	vips_buf_init_static( &buf2, txt2, MAX_ERROR_FRAG );
+	vips_buf_init_static( &buf3, txt3, MAX_ERROR_FRAG );
 
 	if( PEISCLASS( a ) ) 
 		symbol_qualified_name( PEGETCLASSCOMPILE( a )->sym, &buf3 );
@@ -142,30 +142,30 @@ action_nomerror( Reduce *rc, Compile *compile, PElement *a, PElement *b )
 	else if( PEISCOMPILEREF( a ) ) 
 		symbol_qualified_name( PEGETCOMPILE( a )->sym, &buf3 );
 	else
-		buf_appends( &buf3, "<thing>" );
+		vips_buf_appends( &buf3, "<thing>" );
 	itext_value_ev( rc, &buf2, b );
-	buf_appendf( &buf, _( "Member \"%s\" not found in class \"%s\"." ),
-		buf_all( &buf2 ), buf_all( &buf3 ) );
-	buf_appendf( &buf, "\n" );
+	vips_buf_appendf( &buf, _( "Member \"%s\" not found in class \"%s\"." ),
+		vips_buf_all( &buf2 ), vips_buf_all( &buf3 ) );
+	vips_buf_appendf( &buf, "\n" );
 
-	buf_rewind( &buf3 );
+	vips_buf_rewind( &buf3 );
 	itext_value_ev( rc, &buf3, a );
-	buf_appendf( &buf, "  " );
-	buf_appendf( &buf, _( "object = %s" ), buf_all( &buf3 ) );
-	buf_appendf( &buf, "\n" );
+	vips_buf_appendf( &buf, "  " );
+	vips_buf_appendf( &buf, _( "object = %s" ), vips_buf_all( &buf3 ) );
+	vips_buf_appendf( &buf, "\n" );
 
-	buf_appendf( &buf, "  " );
-	buf_appendf( &buf, _( "tag = %s" ), buf_all( &buf2 ) );
-	buf_appendf( &buf, "\n" );
+	vips_buf_appendf( &buf, "  " );
+	vips_buf_appendf( &buf, _( "tag = %s" ), vips_buf_all( &buf2 ) );
+	vips_buf_appendf( &buf, "\n" );
 
-	buf_rewind( &buf3 );
+	vips_buf_rewind( &buf3 );
 	symbol_qualified_name( compile->sym, &buf3 );
-	buf_appendf( &buf, _( "Reference attempted in \"%s\"." ),
-		buf_all( &buf3 ) );
-	buf_appendf( &buf, "\n" );
+	vips_buf_appendf( &buf, _( "Reference attempted in \"%s\"." ),
+		vips_buf_all( &buf3 ) );
+	vips_buf_appendf( &buf, "\n" );
 
 	error_top( _( "Member not found." ) );
-	error_sub( "%s", buf_all( &buf ) );
+	error_sub( "%s", vips_buf_all( &buf ) );
 	reduce_throw( rc );
 }
 
@@ -178,27 +178,27 @@ action_uoperror( Reduce *rc, Compile *compile,
 	const char *top_str = str ? str : _( "Bad argument." );
 	const char *op_name = op >= 0 ? decode_UnOp( op ) : name;
 
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[MAX_ERROR_FRAG];
-	BufInfo buf2;
+	VipsBuf buf2;
 	char txt2[MAX_ERROR_FRAG];
 
-	buf_init_static( &buf, txt, MAX_ERROR_FRAG );
+	vips_buf_init_static( &buf, txt, MAX_ERROR_FRAG );
 	itext_value_ev( rc, &buf, a );
 
-	buf_init_static( &buf2, txt2, MAX_ERROR_FRAG );
+	vips_buf_init_static( &buf2, txt2, MAX_ERROR_FRAG );
 	if( compile ) {
 		/* Expands to eg. 'bad args to "+", called from "fred"'
 		 */
-		buf_appends( &buf2, _( "Called from" ) );
-		buf_appends( &buf2, " " );
+		vips_buf_appends( &buf2, _( "Called from" ) );
+		vips_buf_appends( &buf2, " " );
 		compile_name( compile, &buf2 );
 	}
 
 	error_top( "%s", top_str );
 	error_sub( _( "Error in unary \"%s\".\n"
 		"argument = %s\n%s" ),
-		op_name, buf_all( &buf ), buf_all( &buf2 ) );
+		op_name, vips_buf_all( &buf ), vips_buf_all( &buf2 ) );
 	reduce_throw( rc );
 }
 
@@ -1593,9 +1593,9 @@ action_proc_construct( Reduce *rc,
 	Compile *compile, HeapNode **arg, PElement *out )
 {
 	if( trace_flags & TRACE_CLASS_NEW ) {
-		BufInfo *buf = trace_push();
+		VipsBuf *buf = trace_push();
 
-		buf_appendf( buf, "constructor \"%s\" ", 
+		vips_buf_appendf( buf, "constructor \"%s\" ", 
 			IOBJECT( compile->sym )->name );
 		trace_args( arg, compile->nparam + compile->nsecret );
 	}
@@ -1650,16 +1650,16 @@ action_proc_class_binary( Reduce *rc, Compile *compile,
 	PElement fn;
 
 	if( trace_flags & flags ) {
-		BufInfo *buf = trace_push();
+		VipsBuf *buf = trace_push();
 
-		buf_appendf( buf, "%s\n", _( "invoking method:" ) );
-		buf_appends( buf, "     " );
+		vips_buf_appendf( buf, "%s\n", _( "invoking method:" ) );
+		vips_buf_appends( buf, "     " );
 		trace_pelement( a );
-		buf_appendf( buf, ".%s \"%s\" ", MEMBER_OO_BINARY, name );
+		vips_buf_appendf( buf, ".%s \"%s\" ", MEMBER_OO_BINARY, name );
 		trace_pelement( b );
-		buf_appends( buf, "\n" );
+		vips_buf_appends( buf, "\n" );
 
-		trace_text( flags, "%s", buf_all( buf ) );
+		trace_text( flags, "%s", vips_buf_all( buf ) );
 
 		trace_pop();
 	}
@@ -1686,16 +1686,16 @@ action_proc_class_binary2( Reduce *rc, Compile *compile,
 	PElement fn;
 
 	if( trace_flags & flags ) {
-		BufInfo *buf = trace_push();
+		VipsBuf *buf = trace_push();
 
-		buf_appendf( buf, "%s\n", _( "invoking method:" ) );
-		buf_appends( buf, "     " );
+		vips_buf_appendf( buf, "%s\n", _( "invoking method:" ) );
+		vips_buf_appends( buf, "     " );
 		trace_pelement( b );
-		buf_appendf( buf, ".%s \"%s\" ", MEMBER_OO_BINARY2, name );
+		vips_buf_appendf( buf, ".%s \"%s\" ", MEMBER_OO_BINARY2, name );
 		trace_pelement( a );
-		buf_appends( buf, "\n" );
+		vips_buf_appends( buf, "\n" );
 
-		trace_text( flags, "%s", buf_all( buf ) );
+		trace_text( flags, "%s", vips_buf_all( buf ) );
 
 		trace_pop();
 	}
@@ -1813,15 +1813,15 @@ action_if( Reduce *rc, Compile *compile,
 		 */
 		if( PEISBOOL( a ) ) {
 			if( trace_flags & TRACE_OPERATOR ) {
-				BufInfo *buf = trace_push();
+				VipsBuf *buf = trace_push();
 
-				buf_appendf( buf, "if " );
+				vips_buf_appendf( buf, "if " );
 				trace_pelement( a );
-				buf_appendf( buf, " then " );
+				vips_buf_appendf( buf, " then " );
 				trace_pelement( &t );
-				buf_appendf( buf, " else " );
+				vips_buf_appendf( buf, " else " );
 				trace_pelement( &e );
-				buf_appendf( buf, " ->\n" );
+				vips_buf_appendf( buf, " ->\n" );
 			}
 
 			if( PEGETBOOL( a ) ) {
@@ -1944,14 +1944,14 @@ action_proc_class_unary( Reduce *rc, Compile *compile,
 	PElement fn;
 
 	if( trace_flags & flags ) {
-		BufInfo *buf = trace_push();
+		VipsBuf *buf = trace_push();
 
-		buf_appendf( buf, "%s\n", _( "invoking method:" ) );
-		buf_appends( buf, "     " );
+		vips_buf_appendf( buf, "%s\n", _( "invoking method:" ) );
+		vips_buf_appends( buf, "     " );
 		trace_pelement( a );
-		buf_appendf( buf, ".%s \"%s\"\n", MEMBER_OO_UNARY, name );
+		vips_buf_appendf( buf, ".%s \"%s\"\n", MEMBER_OO_UNARY, name );
 
-		trace_text( flags, "%s", buf_all( buf ) );
+		trace_text( flags, "%s", vips_buf_all( buf ) );
 
 		trace_pop();
 	}
@@ -2005,9 +2005,9 @@ action_dispatch( Reduce *rc, Compile *compile, ReduceFunction rfn,
 	PEPOINTRIGHT( arg[1], &a );
 
 	if( trace_flags & flags ) {
-		BufInfo *buf = trace_push();
+		VipsBuf *buf = trace_push();
 
-		buf_appendf( buf, "\"%s\" ", name );
+		vips_buf_appendf( buf, "\"%s\" ", name );
 		trace_args( arg, nargs );
 	}
 

@@ -78,7 +78,7 @@ iobject_changed( iObject *iobject )
 }
 
 void *
-iobject_info( iObject *iobject, BufInfo *buf )
+iobject_info( iObject *iobject, VipsBuf *buf )
 {
 	iObjectClass *iobject_class = IOBJECT_GET_CLASS( iobject );
 
@@ -147,13 +147,13 @@ iobject_real_changed( iObject *iobject )
 }
 
 static void
-iobject_real_info( iObject *iobject, BufInfo *buf )
+iobject_real_info( iObject *iobject, VipsBuf *buf )
 {
 	if( iobject->name )
-		buf_appendf( buf, "name = \"%s\"\n", iobject->name );
+		vips_buf_appendf( buf, "name = \"%s\"\n", iobject->name );
 	if( iobject->caption )
-		buf_appendf( buf, "caption = \"%s\"\n", iobject->caption );
-	buf_appendf( buf, "iObject :: \"%s\"\n", 
+		vips_buf_appendf( buf, "caption = \"%s\"\n", iobject->caption );
+	vips_buf_appendf( buf, "iObject :: \"%s\"\n", 
 		G_OBJECT_TYPE_NAME( iobject ) );
 }
 
@@ -296,10 +296,10 @@ iobject_sink( iObject *iobject )
 void
 iobject_dump( iObject *iobject )
 {
-	BufInfo buf;
+	VipsBuf buf;
 	char str[1000];
 
-	buf_init_static( &buf, str, 1000 );
+	vips_buf_init_static( &buf, str, 1000 );
 	iobject_info( iobject, &buf );
-	printf( "%s", buf_all( &buf ) );
+	printf( "%s", vips_buf_all( &buf ) );
 }

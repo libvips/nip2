@@ -86,7 +86,7 @@ clock_edit( GtkWidget *parent, Model *model )
 	Clock *clock = CLOCK( model );
 	GtkWidget *ss = stringset_new();
 	char txt[256];
-	BufInfo buf;
+	VipsBuf buf;
 
 	im_snprintf( txt, 256, "%g", clock->interval );
 	stringset_child_new( STRINGSET( ss ), 
@@ -95,10 +95,10 @@ clock_edit( GtkWidget *parent, Model *model )
 	stringset_child_new( STRINGSET( ss ), 
 		_( "Elapsed time" ), txt, _( "Elapsed time (seconds)" ) );
 
-	buf_init_static( &buf, txt, 100 );
+	vips_buf_init_static( &buf, txt, 100 );
 	row_qualified_name( HEAPMODEL( clock )->row, &buf );
 	iwindow_set_title( IWINDOW( ss ), 
-		_( "Edit Clock \"%s\"" ), buf_all( &buf ) );
+		_( "Edit Clock \"%s\"" ), vips_buf_all( &buf ) );
 	idialog_set_callbacks( IDIALOG( ss ), 
 		iwindow_true_cb, NULL, NULL, clock );
 	idialog_add_ok( IDIALOG( ss ), 
@@ -174,14 +174,14 @@ clock_generate_caption( iObject *iobject )
 	Value *value = VALUE( iobject );
 	ValueClass *value_class = VALUE_GET_CLASS( value );
 	Clock *clock = CLOCK( iobject );
-	BufInfo *buf = &value->caption_buffer;
+	VipsBuf *buf = &value->caption_buffer;
 
-	buf_rewind( buf );
+	vips_buf_rewind( buf );
 	if( !heapmodel_name( HEAPMODEL( value ), buf ) ) 
-		buf_appends( buf, G_OBJECT_CLASS_NAME( value_class ) );
-	buf_appendf( buf, " %g %g", clock->interval, clock->value );
+		vips_buf_appends( buf, G_OBJECT_CLASS_NAME( value_class ) );
+	vips_buf_appendf( buf, " %g %g", clock->interval, clock->value );
 
-	return( buf_all( buf ) );
+	return( vips_buf_all( buf ) );
 }
 
 /* Members of clock we automate.

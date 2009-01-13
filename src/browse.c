@@ -234,7 +234,7 @@ browse_add_image( Browse *browse, Imageinfo *ii )
 	Imagedisplay *id;
 
 	GtkWidget *but;
-	BufInfo caption;
+	VipsBuf caption;
         char buf[MAX_LINELENGTH];
 
 	conv = conversion_new( ii );
@@ -251,9 +251,9 @@ browse_add_image( Browse *browse, Imageinfo *ii )
 		DOUBLECLICK_FUNC( button_single_cb ), browse, 
 		DOUBLECLICK_FUNC( button_double_cb ), browse );
 
-	buf_init_static( &caption, buf, MAX_LINELENGTH );
+	vips_buf_init_static( &caption, buf, MAX_LINELENGTH );
 	get_image_info( &caption, IOBJECT( ii )->name );
-	set_tooltip( but, "%s", buf_all( &caption ) );
+	set_tooltip( but, "%s", vips_buf_all( &caption ) );
 
 	browse_add_widget( browse, but );
 }
@@ -265,16 +265,16 @@ browse_add_error( Browse *browse, char *name )
 {
 	GtkWidget *but;
 	char txt[MAX_STRSIZE];
-	BufInfo buf;
+	VipsBuf buf;
 
 	but = gtk_button_new_with_label( im_skip_dir( name ) );
 	gtk_widget_show_all( but );
 
-	buf_init_static( &buf, txt, MAX_STRSIZE );
+	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 	get_image_info( &buf, name );
-	buf_appends( &buf, "\n" );
-	buf_appends( &buf, error_get_top() );
-	set_tooltip( but, "%s", buf_all( &buf ) );
+	vips_buf_appends( &buf, "\n" );
+	vips_buf_appends( &buf, error_get_top() );
+	set_tooltip( but, "%s", vips_buf_all( &buf ) );
 
 	browse_add_widget( browse, but );
 
@@ -361,7 +361,7 @@ browse_refresh( Browse *browse, const gchar *dirname )
 	int type = filesel_get_filetype( filesel );
 
 	char buf[FILENAME_MAX];
-	BufInfo patt;
+	VipsBuf patt;
 
 #ifdef DEBUG
 	printf( "browse_refresh: %s\n", dirname );
@@ -380,10 +380,10 @@ browse_refresh( Browse *browse, const gchar *dirname )
 		GTK_SCROLLED_WINDOW( browse->swin ), browse->table );
         gtk_widget_show( browse->table );
 
-	buf_init_static( &patt, buf, FILENAME_MAX );
+	vips_buf_init_static( &patt, buf, FILENAME_MAX );
 	filesel_make_patt( filesel->type[type], &patt );
 
-	(void) path_map_dir( dirname, buf_all( &patt ), 
+	(void) path_map_dir( dirname, vips_buf_all( &patt ), 
 		(path_map_fn) browse_add_file, browse );
 	browse->idle_id = gtk_idle_add( (GtkFunction) browse_idle, browse );
 

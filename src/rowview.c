@@ -627,12 +627,12 @@ rowview_focus_cb( GtkWidget *widget, GtkDirectionType dir, Rowview *rview )
 }
 
 static void
-rowview_tooltip_generate( GtkWidget *widget, BufInfo *buf, Rowview *rview )
+rowview_tooltip_generate( GtkWidget *widget, VipsBuf *buf, Rowview *rview )
 {
 	Row *row = ROW( VOBJECT( rview )->iobject );
 
 	iobject_info( IOBJECT( row ), buf );
-	buf_removec( buf, '\n' );
+	vips_buf_removec( buf, '\n' );
 }
 
 static void

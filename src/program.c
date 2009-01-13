@@ -66,18 +66,18 @@ program_get_selected( Program *program )
 }
 
 static void
-program_info( Program *program, BufInfo *buf )
+program_info( Program *program, VipsBuf *buf )
 {
 	Model *model = program_get_selected( program );
 
-	buf_appendf( buf, _( "Edit window" ) );
-	buf_appendf( buf, "\n" );
-	buf_appendf( buf, "dirty = \"%s\"\n", bool_to_char( program->dirty ) );
-	buf_appendf( buf, "\n" );
+	vips_buf_appendf( buf, _( "Edit window" ) );
+	vips_buf_appendf( buf, "\n" );
+	vips_buf_appendf( buf, "dirty = \"%s\"\n", bool_to_char( program->dirty ) );
+	vips_buf_appendf( buf, "\n" );
 
 	if( model ) {
 		iobject_info( IOBJECT( model ), buf );
-		buf_appendf( buf, "\n" );
+		vips_buf_appendf( buf, "\n" );
 	}
 }
 
@@ -247,26 +247,26 @@ program_refresh_kit( Toolkit *kit, Program *program, GtkTreePath *path )
 static void
 program_title( Program *program )
 {
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[512];
 
-	buf_init_static( &buf, txt, 512 );
+	vips_buf_init_static( &buf, txt, 512 );
 	if( program->kit && FILEMODEL( program->kit )->modified ) 
-		buf_appendf( &buf, "*" ); 
-	buf_appends( &buf, IOBJECT( program->kitg )->name );
+		vips_buf_appendf( &buf, "*" ); 
+	vips_buf_appends( &buf, IOBJECT( program->kitg )->name );
 	if( program->kit ) 
-		buf_appendf( &buf, " - %s", IOBJECT( program->kit )->name );
+		vips_buf_appendf( &buf, " - %s", IOBJECT( program->kit )->name );
 	if( program->tool ) {
-		buf_appendf( &buf, " - %s", IOBJECT( program->tool )->name );
+		vips_buf_appendf( &buf, " - %s", IOBJECT( program->tool )->name );
 
 		if( program->dirty ) {
-			buf_appendf( &buf, " [" );
-			buf_appendf( &buf, _( "modified" ) );
-			buf_appendf( &buf, "]" );
+			vips_buf_appendf( &buf, " [" );
+			vips_buf_appendf( &buf, _( "modified" ) );
+			vips_buf_appendf( &buf, "]" );
 		}
 	}
 
-	iwindow_set_title( IWINDOW( program ), "%s", buf_all( &buf ) );
+	iwindow_set_title( IWINDOW( program ), "%s", vips_buf_all( &buf ) );
 }
 
 typedef struct _ProgramRowLookupInfo {
@@ -851,7 +851,7 @@ static void
 program_set_text_tool( Program *program, Tool *tool )
 {
 	char str[MAX_STRSIZE];
-	BufInfo buf;
+	VipsBuf buf;
 
 	switch( tool->type ) {
 	case TOOL_DIA:
@@ -862,15 +862,15 @@ program_set_text_tool( Program *program, Tool *tool )
 	case TOOL_SYM:
 		switch( tool->sym->type ) {
 		case SYM_EXTERNAL:
-			buf_init_static( &buf, str, MAX_STRSIZE );
+			vips_buf_init_static( &buf, str, MAX_STRSIZE );
 			vips_usage( &buf, tool->sym->function );
-			program_set_text( program, buf_all( &buf ), FALSE );
+			program_set_text( program, vips_buf_all( &buf ), FALSE );
 			break;
 
 		case SYM_BUILTIN:
-			buf_init_static( &buf, str, MAX_STRSIZE );
+			vips_buf_init_static( &buf, str, MAX_STRSIZE );
 			builtin_usage( &buf, tool->sym->builtin );
-			program_set_text( program, buf_all( &buf ), FALSE );
+			program_set_text( program, vips_buf_all( &buf ), FALSE );
 			break;
 
 		case SYM_VALUE:
@@ -1053,7 +1053,7 @@ program_toolkit_new_done_cb( iWindow *iwnd, void *client,
 	Program *program = PROGRAM( client );
 
 	Toolkit *kit;
-	BufInfo buf;
+	VipsBuf buf;
 	char str[1024];
 	char name_text[1024];
 	char caption_text[1024];
@@ -1066,11 +1066,11 @@ program_toolkit_new_done_cb( iWindow *iwnd, void *client,
 
 	/* Make a filename from the name ... user start directory.
 	 */
-	buf_init_static( &buf, str, 1024 );
-	buf_appendf( &buf, "$SAVEDIR" G_DIR_SEPARATOR_S 
+	vips_buf_init_static( &buf, str, 1024 );
+	vips_buf_appendf( &buf, "$SAVEDIR" G_DIR_SEPARATOR_S 
 		"start" G_DIR_SEPARATOR_S "%s.def", 
 		name_text );
-	kit = toolkit_new_filename( main_toolkitgroup, buf_all( &buf ) );
+	kit = toolkit_new_filename( main_toolkitgroup, vips_buf_all( &buf ) );
 
 	/* Set caption.
 	 */
@@ -1565,13 +1565,13 @@ program_goto_action_cb( GtkAction *action, Program *program )
 static void
 program_info_action_cb( GtkAction *action, Program *program )
 {
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[MAX_STRSIZE];
 
-	buf_init_static( &buf, txt, MAX_STRSIZE );
+	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 	program_info( program, &buf );
 	box_info( GTK_WIDGET( program ), _( "Object information." ), 
-		"%s", buf_all( &buf ) );
+		"%s", vips_buf_all( &buf ) );
 }
 
 static void
@@ -1598,19 +1598,19 @@ program_errorreport_action_cb( GtkAction *action, Program *program )
 static void
 program_tool_help_action_cb( GtkAction *action, Program *program )
 {
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[512];
 
-	buf_init_static( &buf, txt, 512 );
+	vips_buf_init_static( &buf, txt, 512 );
 
 	if( program->tool && program->tool->type == TOOL_SYM && 
 		program->kit && program->kit->pseudo ) {
 		switch( program->tool->sym->type ) {
 		case SYM_EXTERNAL:
-			buf_appendf( &buf, "file://"
+			vips_buf_appendf( &buf, "file://"
 				VIPS_DOCPATH "/man/%s.3.html", 
 				IOBJECT( program->tool->sym )->name );
-			box_url( GTK_WIDGET( program ), buf_all( &buf ) );
+			box_url( GTK_WIDGET( program ), vips_buf_all( &buf ) );
 			break;
 
 		case SYM_BUILTIN:

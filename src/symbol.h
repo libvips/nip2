@@ -144,9 +144,9 @@ Workspace *symbol_get_workspace( Symbol *sym );
 Tool *symbol_get_tool( Symbol *sym );
 Symbol *symbol_get_scope( Symbol *sym );
 
-void symbol_qualified_name( Symbol *sym, BufInfo *buf );
+void symbol_qualified_name( Symbol *sym, VipsBuf *buf );
 void symbol_qualified_name_relative( Symbol *context, 
-	Symbol *sym, BufInfo *buf );
+	Symbol *sym, VipsBuf *buf );
 const char *symbol_name( Symbol *sym );
 void symbol_name_print( Symbol *sym );
 const char *symbol_name_scope( Symbol *sym );

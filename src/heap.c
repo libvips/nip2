@@ -269,30 +269,30 @@ heap_finalize( GObject *gobject )
 }
 
 static void
-heap_info( iObject *iobject, BufInfo *buf )
+heap_info( iObject *iobject, VipsBuf *buf )
 {
 	Heap *heap = HEAP( iobject );
 
-	buf_appendf( buf, "compile = " );
+	vips_buf_appendf( buf, "compile = " );
 	if( heap->compile )
 		if( heap->compile->sym ) {
 			symbol_qualified_name( heap->compile->sym, buf );
-			buf_appendf( buf, "(%p) (sym)\n", heap->compile->sym ); 
+			vips_buf_appendf( buf, "(%p) (sym)\n", heap->compile->sym ); 
 		}
 		else
-			buf_appendf( buf, "(compile, but no sym)\n" );
+			vips_buf_appendf( buf, "(compile, but no sym)\n" );
 	else
-		buf_appendf( buf, "(no compile)\n" );
-	buf_appendf( buf, "mxb (max blocks) = %d\n", heap->mxb );
-	buf_appendf( buf, "rsz (nodes per block) = %d\n", heap->rsz );
-	buf_appendf( buf, "nb (number of blocks) = %d\n", heap->nb );
-	buf_appendf( buf, "emark = %d pointers\n", 
+		vips_buf_appendf( buf, "(no compile)\n" );
+	vips_buf_appendf( buf, "mxb (max blocks) = %d\n", heap->mxb );
+	vips_buf_appendf( buf, "rsz (nodes per block) = %d\n", heap->rsz );
+	vips_buf_appendf( buf, "nb (number of blocks) = %d\n", heap->nb );
+	vips_buf_appendf( buf, "emark = %d pointers\n", 
 		g_hash_table_size( heap->emark ) );
-	buf_appendf( buf, "rmark = %d pointers\n", 
+	vips_buf_appendf( buf, "rmark = %d pointers\n", 
 		g_hash_table_size( heap->rmark ) );
-	buf_appendf( buf, "ncells (cells allocated) = %d\n", heap->ncells );
-	buf_appendf( buf, "nfree (cells free at last GC) = %d\n", heap->nfree );
-	buf_appendf( buf, "mtable (Managed blocks) = %d pointers\n", 
+	vips_buf_appendf( buf, "ncells (cells allocated) = %d\n", heap->ncells );
+	vips_buf_appendf( buf, "nfree (cells free at last GC) = %d\n", heap->nfree );
+	vips_buf_appendf( buf, "mtable (Managed blocks) = %d pointers\n", 
 		g_hash_table_size( heap->mtable ) );
 
 	IOBJECT_CLASS( parent_class )->info( iobject, buf );
@@ -811,14 +811,14 @@ heap_getmem( Heap *heap )
 	if( !heap->free ) {
 		error_top( _( "Heap full." ) );
 		if( heap->compile ) {
-			BufInfo buf;
+			VipsBuf buf;
 			char txt[100];
 
-			buf_init_static( &buf, txt, 100 );
+			vips_buf_init_static( &buf, txt, 100 );
 			compile_name( heap->compile, &buf );
 			error_sub( _( "The compile heap for %s has filled. "
 				"Make it smaller and less complicated." ),
-				buf_all( &buf ) );
+				vips_buf_all( &buf ) );
 		}
 		else
 			error_sub( _( "The main calculation heap has filled. "

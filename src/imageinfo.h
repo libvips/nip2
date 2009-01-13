@@ -236,7 +236,7 @@ gboolean imageinfo_paint_text( Imageinfo *imageinfo,
 gboolean imageinfo_paint_mask( Imageinfo *imageinfo, 
 	Imageinfo *ink, Imageinfo *mask, int x, int y );
 
-void imageinfo_to_text( Imageinfo *imageinfo, BufInfo *buf );
+void imageinfo_to_text( Imageinfo *imageinfo, VipsBuf *buf );
 gboolean imageinfo_from_text( Imageinfo *imageinfo, const char *text );
 void imageinfo_to_rgb( Imageinfo *imageinfo, double *rgb );
 void imageinfo_from_rgb( Imageinfo *imageinfo, double *rgb );

@@ -186,7 +186,7 @@ workspace_deselect_all( Workspace *ws )
 /* Track this while we build a names list.
  */
 typedef struct {
-	BufInfo *buf;
+	VipsBuf *buf;
 	const char *separator;
 	gboolean first;
 } NamesInfo;
@@ -197,7 +197,7 @@ static void *
 workspace_selected_names_sub( Row *row, NamesInfo *names )
 {
 	if( !names->first )
-		buf_appends( names->buf, names->separator );
+		vips_buf_appends( names->buf, names->separator );
 
 	/* Hack: if this is a matrix with selected cells, use an extract to
 	 * get those cells out. We should really have a row method for this I
@@ -208,9 +208,9 @@ workspace_selected_names_sub( Row *row, NamesInfo *names )
 		MATRIX( row->child_rhs->graphic )->selected ) {
 		Matrix *matrix = MATRIX( row->child_rhs->graphic );
 
-		buf_appends( names->buf, "(" );
+		vips_buf_appends( names->buf, "(" );
 		row_qualified_name( row, names->buf );
-		buf_appendf( names->buf, ".extract %d %d %d %d)",
+		vips_buf_appendf( names->buf, ".extract %d %d %d %d)",
 			matrix->range.left, 
 			matrix->range.top, 
 			matrix->range.width, 
@@ -227,7 +227,7 @@ workspace_selected_names_sub( Row *row, NamesInfo *names )
 /* Add a list of selected symbol names to a string. 
  */
 void
-workspace_selected_names( Workspace *ws, BufInfo *buf, const char *separator )
+workspace_selected_names( Workspace *ws, VipsBuf *buf, const char *separator )
 {
 	NamesInfo names;
 
@@ -240,7 +240,7 @@ workspace_selected_names( Workspace *ws, BufInfo *buf, const char *separator )
 }
 
 void
-workspace_column_names( Column *col, BufInfo *buf, const char *separator )
+workspace_column_names( Column *col, VipsBuf *buf, const char *separator )
 {
 	NamesInfo names;
 
@@ -487,7 +487,7 @@ workspace_add_def( Workspace *ws, const char *str )
 }
 
 gboolean
-workspace_load_file_buf( BufInfo *buf, const char *filename )
+workspace_load_file_buf( VipsBuf *buf, const char *filename )
 {
 	if( !existsf( "%s", filename ) ) {
 		error_top( _( "File does not exist." ) );
@@ -497,13 +497,13 @@ workspace_load_file_buf( BufInfo *buf, const char *filename )
 	}
 
 	if( vips_format_for_file( filename ) ) 
-		buf_appends( buf, "Image_file" );
+		vips_buf_appends( buf, "Image_file" );
 	else
-		buf_appends( buf, "Matrix_file" );
+		vips_buf_appends( buf, "Matrix_file" );
 
-	buf_appends( buf, " \"" );
-	buf_appendsc( buf, TRUE, filename );
-	buf_appends( buf, "\"" );
+	vips_buf_appends( buf, " \"" );
+	vips_buf_appendsc( buf, TRUE, filename );
+	vips_buf_appends( buf, "\"" );
 
 	return( TRUE );
 }
@@ -512,13 +512,13 @@ Symbol *
 workspace_load_file( Workspace *ws, const char *filename )
 {
 	char txt[MAX_STRSIZE];
-	BufInfo buf;
+	VipsBuf buf;
 	Symbol *sym;
 
-	buf_init_static( &buf, txt, MAX_STRSIZE );
+	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 	if( !workspace_load_file_buf( &buf, filename ) )
 		return( NULL );
-	if( !(sym = workspace_add_def( ws, buf_all( &buf ) )) ) 
+	if( !(sym = workspace_add_def( ws, vips_buf_all( &buf ) )) ) 
 		return( NULL );
 	mainw_recent_add( &mainw_recent_image, filename );
 
@@ -1577,12 +1577,12 @@ workspace_add_action( Workspace *ws,
 {
 	Column *col = workspace_column_pick( ws );
 	char str[1024];
-	BufInfo buf;
+	VipsBuf buf;
 
 	/* Are there any selected symbols?
 	 */
-	buf_init_static( &buf, str, 1024 );
-	buf_appends( &buf, action );
+	vips_buf_init_static( &buf, str, 1024 );
+	vips_buf_appends( &buf, action );
 	if( nparam > 0 && workspace_selected_any( ws ) ) {
 		if( nparam != workspace_selected_num( ws ) ) {
 			error_top( _( "Wrong number of arguments." ) );
@@ -1593,15 +1593,15 @@ workspace_add_action( Workspace *ws,
 			return( FALSE );
 		}
 
-		buf_appends( &buf, " " );
+		vips_buf_appends( &buf, " " );
 		workspace_selected_names( ws, &buf, " " );
-		if( buf_is_full( &buf ) ) {
+		if( vips_buf_is_full( &buf ) ) {
 			error_top( _( "Overflow error." ) );
 			error_sub( _( "Too many names selected." ) );
 			return( FALSE );
 		}
 
-		if( !workspace_add_def( ws, buf_all( &buf ) ) ) 
+		if( !workspace_add_def( ws, vips_buf_all( &buf ) ) ) 
 			return( FALSE );
 		workspace_deselect_all( ws );
 	}
@@ -1610,7 +1610,7 @@ workspace_add_action( Workspace *ws,
 		 * arguments. 
 		 */
 		if( !column_add_n_names( col, name, &buf, nparam ) || 
-			!workspace_add_def( ws, buf_all( &buf ) ) ) 
+			!workspace_add_def( ws, vips_buf_all( &buf ) ) ) 
 			return( FALSE );
 	}
 
@@ -1776,13 +1776,13 @@ workspace_selected_remove_yesno_cb( iWindow *iwnd, void *client,
 void
 workspace_selected_remove_yesno( Workspace *ws, GtkWidget *parent )
 {
-	BufInfo buf;
+	VipsBuf buf;
 	char str[30];
 
         if( !workspace_selected_any( ws ) ) 
 		return;
 
-	buf_init_static( &buf, str, 30 );
+	vips_buf_init_static( &buf, str, 30 );
 	workspace_selected_names( ws, &buf, ", " );
 
 	box_yesno( parent, 
@@ -1790,7 +1790,7 @@ workspace_selected_remove_yesno( Workspace *ws, GtkWidget *parent )
 		iwindow_notify_null, NULL,
 		GTK_STOCK_DELETE, 
 		_( "Delete selected objects?" ),
-		_( "Are you sure you want to delete %s?" ), buf_all( &buf ) );
+		_( "Are you sure you want to delete %s?" ), vips_buf_all( &buf ) );
 }
 
 /* Sub fn of below ... add a new index expression.
@@ -1798,13 +1798,13 @@ workspace_selected_remove_yesno( Workspace *ws, GtkWidget *parent )
 static gboolean
 workspace_ungroup_add_index( Row *row, const char *fmt, int i )
 {
-	static BufInfo buf;
+	static VipsBuf buf;
 	static char txt[200];
 
-	buf_init_static( &buf, txt, 200 );
+	vips_buf_init_static( &buf, txt, 200 );
 	row_qualified_name( row, &buf );
-	buf_appendf( &buf, fmt, i );
-	if( !workspace_add_def( row->ws, buf_all( &buf ) ) )
+	vips_buf_appendf( &buf, fmt, i );
+	if( !workspace_add_def( row->ws, vips_buf_all( &buf ) ) )
 		return( FALSE );
 
 	return( TRUE );
@@ -1844,14 +1844,14 @@ workspace_ungroup_row( Row *row )
 					return( row );
 		}
 		else {
-			BufInfo buf;
+			VipsBuf buf;
 			char txt[100];
 
-			buf_init_static( &buf, txt, 100 );
+			vips_buf_init_static( &buf, txt, 100 );
 			row_qualified_name( row, &buf );
 			error_top( _( "Unable to ungroup." ) );
 			error_sub( _( "Row \"%s\" is not a Group or a list." ), 
-				buf_all( &buf ) );  
+				vips_buf_all( &buf ) );  
 
 			return( row );
 		}

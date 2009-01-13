@@ -141,7 +141,7 @@ typedef struct _ClassmodelClass {
 void image_value_init( ImageValue *image, Classmodel *classmodel );
 void image_value_destroy( ImageValue *image );
 void image_value_set( ImageValue *image, Imageinfo *ii );
-void image_value_caption( ImageValue *value, BufInfo *buf );
+void image_value_caption( ImageValue *value, VipsBuf *buf );
 
 void *classmodel_get_instance( Classmodel *classmodel );
 void classmodel_graphic_save( Classmodel *classmodel, GtkWidget *parent );

@@ -108,7 +108,8 @@ static im_arg_type vips_supported[] = {
 	IM_TYPE_IMASK,
 	IM_TYPE_IMAGEVEC,
 	IM_TYPE_INTVEC,
-	IM_TYPE_GVALUE
+	IM_TYPE_GVALUE,
+	IM_TYPE_INTERPOLATE
 };
 
 typedef enum _VipsArgumentType {
@@ -123,7 +124,8 @@ typedef enum _VipsArgumentType {
 	VIPS_IMASK,
 	VIPS_IMAGEVEC,
 	VIPS_INTVEC,
-	VIPS_GVALUE
+	VIPS_GVALUE,
+	VIPS_INTERPOLATE
 } VipsArgumentType;
 
 /* The previous function calls we are caching, plus an LRU queue for flushing.
@@ -239,6 +241,8 @@ vips_hash( VipsInfo *vi )
 				HASH_S( (char *) vi->vargv[i] );
 				break;
 
+			case VIPS_GVALUE:
+			case VIPS_INTERPOLATE:
 			case VIPS_IMAGE:
 				HASH_P( vi->vargv[i] );
 				break;
@@ -322,10 +326,6 @@ vips_hash( VipsInfo *vi )
 
 				break;
 			}
-
-			case VIPS_GVALUE:
-				HASH_P( vi->vargv[i] );
-				break;
 
 			default:
 			case VIPS_NONE:
@@ -496,6 +496,11 @@ vips_equal( VipsInfo *vi1, VipsInfo *vi2 )
 			 * g_param_values_cmp() to test equality.
 			 */
 			case VIPS_GVALUE:
+				if( vi1->vargv[i] != vi2->vargv[i] )
+					return( FALSE );
+				break;
+
+			case VIPS_INTERPOLATE:
 				if( vi1->vargv[i] != vi2->vargv[i] )
 					return( FALSE );
 				break;
@@ -713,7 +718,7 @@ vips_destroy( VipsInfo *vi )
 		im_object *obj = vi->vargv[i];
 		VipsArgumentType vt;
 
-		/* Make sure we don't damage any error magessage we might
+		/* Make sure we don't damage any error message we might
 		 * have.
 		 */
 		error_block();
@@ -727,6 +732,7 @@ vips_destroy( VipsInfo *vi )
 		case VIPS_COMPLEX: 
 		case VIPS_IMAGEVEC: 	/* Input only, so no freeing reqd */
 		case VIPS_GVALUE:
+		case VIPS_INTERPOLATE:
 			/* Do nothing.
 			 */
 			break;
@@ -860,7 +866,7 @@ vips_history_add( VipsInfo *vi )
 /* VIPS types -> a buffer. For tracing calls.
  */
 static void
-vips_tochar( VipsInfo *vi, int i, BufInfo *buf )
+vips_tochar( VipsInfo *vi, int i, VipsBuf *buf )
 {
 	im_object obj = vi->vargv[i];
 	im_type_desc *vips = vi->fn->argv[i].desc;
@@ -868,56 +874,60 @@ vips_tochar( VipsInfo *vi, int i, BufInfo *buf )
 
 	switch( vt ) {
 	case VIPS_DOUBLE:
-		buf_appendf( buf, "%g", *((double*)obj) );
+		vips_buf_appendf( buf, "%g", *((double*)obj) );
 		break;
 
 	case VIPS_INT:
-		buf_appendf( buf, "%d", *((int*)obj) );
+		vips_buf_appendf( buf, "%d", *((int*)obj) );
 		break;
 
 	case VIPS_COMPLEX:
-		buf_appendf( buf, "(%g, %g)", 
+		vips_buf_appendf( buf, "(%g, %g)", 
 			((double*)obj)[0], ((double*)obj)[1] );
 		break;
 
 	case VIPS_STRING:
-		buf_appendf( buf, "\"%s\"", (char*) obj );
+		vips_buf_appendf( buf, "\"%s\"", (char*) obj );
 		break;
 
 	case VIPS_IMAGE:
-		buf_appendi( buf, (IMAGE *) obj );
+		vips_buf_appendi( buf, (IMAGE *) obj );
 		break;
 
 	case VIPS_DMASK:
-		buf_appendf( buf, "dmask" );
+		vips_buf_appendf( buf, "dmask" );
 		break;
 
 	case VIPS_IMASK:
-		buf_appendf( buf, "imask" );
+		vips_buf_appendf( buf, "imask" );
 		break;
 
 	case VIPS_DOUBLEVEC:
-		buf_appendf( buf, "doublevec" );
+		vips_buf_appendf( buf, "doublevec" );
 		break;
 
 	case VIPS_INTVEC:
-		buf_appendf( buf, "intvec" );
+		vips_buf_appendf( buf, "intvec" );
 		break;
 
 	case VIPS_IMAGEVEC:
-		buf_appendf( buf, "imagevec" );
+		vips_buf_appendf( buf, "imagevec" );
 		break;
 
 	case VIPS_GVALUE:
 	{
 		GValue *value = (GValue *) obj;
 
-		buf_appends( buf, "(gvalue" );
-		buf_appendgv( buf, value );
-		buf_appendf( buf, ")" );
+		vips_buf_appends( buf, "(gvalue" );
+		vips_buf_appendgv( buf, value );
+		vips_buf_appendf( buf, ")" );
 
 		break;
 	}
+
+	case VIPS_INTERPOLATE:
+		vips_object_to_string( VIPS_OBJECT( obj ), buf );
+		break;
 
 	default:
 		g_assert( FALSE );
@@ -927,41 +937,41 @@ vips_tochar( VipsInfo *vi, int i, BufInfo *buf )
 /* Get the args from the heap.
  */
 static void
-vips_args_heap( VipsInfo *vi, HeapNode **arg, BufInfo *buf )
+vips_args_heap( VipsInfo *vi, HeapNode **arg, VipsBuf *buf )
 {
 	int i;
 
-	buf_appendf( buf, _( "You passed:" ) );
-	buf_appendf( buf, "\n" );
+	vips_buf_appendf( buf, _( "You passed:" ) );
+	vips_buf_appendf( buf, "\n" );
 	for( i = 0; i < vi->nargs; i++ ) {
 		im_arg_desc *varg = &vi->fn->argv[vi->inpos[i]];
 		PElement rhs;
 
 		PEPOINTRIGHT( arg[vi->nargs - i - 1], &rhs );
-		buf_appendf( buf, "  %s - ", varg->name );
+		vips_buf_appendf( buf, "  %s - ", varg->name );
 		itext_value_ev( vi->rc, buf, &rhs );
-		buf_appendf( buf, "\n" );
+		vips_buf_appendf( buf, "\n" );
 	}
 }
 
 /* Get the args from the VIPS call buffer.
  */
 static void
-vips_args_vips( VipsInfo *vi, BufInfo *buf )
+vips_args_vips( VipsInfo *vi, VipsBuf *buf )
 {
 	int i;
 
-	buf_appendf( buf, _( "You passed:" ) );
-	buf_appendf( buf, "\n" );
+	vips_buf_appendf( buf, _( "You passed:" ) );
+	vips_buf_appendf( buf, "\n" );
         for( i = 0; i < vi->fn->argc; i++ ) {
                 im_type_desc *type = vi->fn->argv[i].desc;
                 char *name = vi->fn->argv[i].name;
 
                 if( !(type->flags & IM_TYPE_OUTPUT)  &&
                         strcmp( type->type, IM_TYPE_DISPLAY ) != 0 ) {
-                        buf_appendf( buf, "   %s - ", name );
+                        vips_buf_appendf( buf, "   %s - ", name );
                         vips_tochar( vi, i, buf );
-                        buf_appendf( buf, "\n" );
+                        vips_buf_appendf( buf, "\n" );
                 }
         }
 }
@@ -969,7 +979,7 @@ vips_args_vips( VipsInfo *vi, BufInfo *buf )
 /* Make a usage error for a VIPS function.
  */
 void
-vips_usage( BufInfo *buf, im_function *fn )
+vips_usage( VipsBuf *buf, im_function *fn )
 {
 	im_package *pack = im_package_of_function( fn->name );
 	char input[MAX_STRSIZE];
@@ -1004,53 +1014,53 @@ vips_usage( BufInfo *buf, im_function *fn )
 		}
 	}
 
-	buf_appendf( buf, _( "Usage:" ) );
-        buf_appends( buf, "\n" );
-        buf_appendf( buf, _( "VIPS operator \"%s\"" ), fn->name );
-        buf_appends( buf, "\n" );
-        buf_appendf( buf, _( "%s, from package \"%s\"" ), 
+	vips_buf_appendf( buf, _( "Usage:" ) );
+        vips_buf_appends( buf, "\n" );
+        vips_buf_appendf( buf, _( "VIPS operator \"%s\"" ), fn->name );
+        vips_buf_appends( buf, "\n" );
+        vips_buf_appendf( buf, _( "%s, from package \"%s\"" ), 
 		fn->desc, pack->name );
-        buf_appends( buf, "\n" );
+        vips_buf_appends( buf, "\n" );
 
-	buf_appendf( buf, 
+	vips_buf_appendf( buf, 
 		ngettext( "\"%s\" takes %d argument:",
 			"\"%s\" takes %d arguments:",
 			nin ),
 		fn->name, nin );
-        buf_appendf( buf, "\n%s", input );
+        vips_buf_appendf( buf, "\n%s", input );
 
-	buf_appendf( buf, 
+	vips_buf_appendf( buf, 
 		ngettext( "And produces %d result:",
 			"And produces %d results:",
 			nout ),
 		nout );
-	buf_appendf( buf, "\n%s", output );
+	vips_buf_appendf( buf, "\n%s", output );
 
         /* Print any flags this function has.
          */
-        buf_appendf( buf, _( "Flags:" ) );
-        buf_appends( buf, "\n" );
-	buf_appendf( buf, "   (" );
+        vips_buf_appendf( buf, _( "Flags:" ) );
+        vips_buf_appends( buf, "\n" );
+	vips_buf_appendf( buf, "   (" );
         if( fn->flags & IM_FN_PIO )
-                buf_appendf( buf, _( "PIO function" ) );
+                vips_buf_appendf( buf, _( "PIO function" ) );
         else
-                buf_appendf( buf, _( "WIO function" ) );
-	buf_appendf( buf, ") (" );
+                vips_buf_appendf( buf, _( "WIO function" ) );
+	vips_buf_appendf( buf, ") (" );
         if( fn->flags & IM_FN_TRANSFORM ) 
-                buf_appendf( buf, _( "coordinate transformer" ) );
+                vips_buf_appendf( buf, _( "coordinate transformer" ) );
         else
-                buf_appendf( buf, _( "no coordinate transformation" ) );
-	buf_appendf( buf, ") (" );
+                vips_buf_appendf( buf, _( "no coordinate transformation" ) );
+	vips_buf_appendf( buf, ") (" );
         if( fn->flags & IM_FN_PTOP )
-                buf_appendf( buf, _( "point-to-point operation" ) );
+                vips_buf_appendf( buf, _( "point-to-point operation" ) );
         else
-                buf_appendf( buf, _( "area operation" ) );
-	buf_appendf( buf, ") (" );
+                vips_buf_appendf( buf, _( "area operation" ) );
+	vips_buf_appendf( buf, ") (" );
         if( fn->flags & IM_FN_NOCACHE )
-                buf_appendf( buf, _( "uncacheable operation" ) );
+                vips_buf_appendf( buf, _( "uncacheable operation" ) );
         else
-                buf_appendf( buf, _( "operation can be cached" ) );
-        buf_appendf( buf, ")\n" );
+                vips_buf_appendf( buf, _( "operation can be cached" ) );
+        vips_buf_appendf( buf, ")\n" );
 }
 
 /* We know there's a problem exporting a particular arg to VIPS.
@@ -1058,20 +1068,20 @@ vips_usage( BufInfo *buf, im_function *fn )
 static void
 vips_error_arg( VipsInfo *vi, HeapNode **arg, int argi )
 {
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[1000];
 
 	error_top( _( "Bad argument." ) );
 
-	buf_init_static( &buf, txt, 1000 );
-	buf_appendf( &buf,
+	vips_buf_init_static( &buf, txt, 1000 );
+	vips_buf_appendf( &buf,
 		_( "Argument %d (%s) to \"%s\" is the wrong type." ),
 		argi + 1, vi->fn->argv[argi].name, vi->name );
-	buf_appendf( &buf, "\n" );
+	vips_buf_appendf( &buf, "\n" );
 	vips_args_heap( vi, arg, &buf );
-	buf_appendf( &buf, "\n" );
+	vips_buf_appendf( &buf, "\n" );
 	vips_usage( &buf, vi->fn );
-	error_sub( "%s", buf_all( &buf ) );
+	error_sub( "%s", vips_buf_all( &buf ) );
 }
 
 /* There's a problem calling the function. Show args from the vips call
@@ -1080,22 +1090,22 @@ vips_error_arg( VipsInfo *vi, HeapNode **arg, int argi )
 static void
 vips_error_fn_vips( VipsInfo *vi )
 {
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[1000];
 
 	error_top( _( "VIPS library error." ) );
 
-	buf_init_static( &buf, txt, 1000 );
-	buf_appendf( &buf, _( "Error calling library function \"%s\" (%s)." ),
+	vips_buf_init_static( &buf, txt, 1000 );
+	vips_buf_appendf( &buf, _( "Error calling library function \"%s\" (%s)." ),
 		vi->name, vi->fn->desc );
-	buf_appendf( &buf, "\n" );
-	buf_appendf( &buf, _( "VIPS library: %s" ),
+	vips_buf_appendf( &buf, "\n" );
+	vips_buf_appendf( &buf, _( "VIPS library: %s" ),
 		im_errorstring() );
-	buf_appendf( &buf, "\n" );
+	vips_buf_appendf( &buf, "\n" );
 	vips_args_vips( vi, &buf );
-	buf_appendf( &buf, "\n" );
+	vips_buf_appendf( &buf, "\n" );
 	vips_usage( &buf, vi->fn );
-	error_sub( "%s", buf_all( &buf ) );
+	error_sub( "%s", vips_buf_all( &buf ) );
 }
 
 static VipsInfo *
@@ -1456,6 +1466,12 @@ vips_fromip( Reduce *rc, PElement *arg,
 		break;
 	}
 
+	case VIPS_INTERPOLATE:
+		if( !PEISMANAGEDGOBJECT( arg ) )
+			return( FALSE );
+		*obj = PEGETMANAGEDGOBJECT( arg );
+		break;
+
 	default:
 		g_assert( FALSE );
 	}
@@ -1556,6 +1572,7 @@ vips_toip( VipsInfo *vi, int i, int *outiiindex, PElement *arg )
 		break;
 
 	case VIPS_IMAGEVEC:
+	case VIPS_INTERPOLATE:
 	default:
 		g_assert( FALSE );
 	}
@@ -1569,7 +1586,7 @@ vips_toip( VipsInfo *vi, int i, int *outiiindex, PElement *arg )
  * a method on object type.
  */
 static void
-vips_tobuf( VipsInfo *vi, int i, BufInfo *buf )
+vips_tobuf( VipsInfo *vi, int i, VipsBuf *buf )
 {
 	im_object obj = vi->vargv[i];
 	im_type_desc *vips = vi->fn->argv[i].desc;
@@ -1577,24 +1594,24 @@ vips_tobuf( VipsInfo *vi, int i, BufInfo *buf )
 
 	switch( vt ) {
 	case VIPS_DOUBLE:
-		buf_appendf( buf, "%g", *((double*)obj) );
+		vips_buf_appendf( buf, "%g", *((double*)obj) );
 		break;
 
 	case VIPS_INT:
-		buf_appendf( buf, "%d", *((int*)obj) );
+		vips_buf_appendf( buf, "%d", *((int*)obj) );
 		break;
 
 	case VIPS_COMPLEX:
-		buf_appendf( buf, "(%g, %g)", 
+		vips_buf_appendf( buf, "(%g, %g)", 
 			((double*)obj)[0], ((double*)obj)[1] );
 		break;
 
 	case VIPS_STRING:
-		buf_appendf( buf, "\"%s\"", (char*)obj );
+		vips_buf_appendf( buf, "\"%s\"", (char*)obj );
 		break;
 
 	case VIPS_IMAGE:
-		buf_appendf( buf, "%s", NN( ((IMAGE*)obj)->filename ) );
+		vips_buf_appendf( buf, "%s", NN( ((IMAGE*)obj)->filename ) );
 		break;
 
 	case VIPS_DMASK:
@@ -1602,7 +1619,7 @@ vips_tobuf( VipsInfo *vi, int i, BufInfo *buf )
 	{
 		im_mask_object *mo = obj;
 
-		buf_appendf( buf, "%s", NN( mo->name ) );
+		vips_buf_appendf( buf, "%s", NN( mo->name ) );
 		break;
 	}
 
@@ -1611,10 +1628,10 @@ vips_tobuf( VipsInfo *vi, int i, BufInfo *buf )
 		im_doublevec_object *v = (im_doublevec_object *) obj;
 		int j;
 
-		buf_appendf( buf, "\"" );
+		vips_buf_appendf( buf, "\"" );
 		for( j = 0; j < v->n; j++ )
-			buf_appendf( buf, "%g ", v->vec[j] );
-		buf_appendf( buf, "\"" );
+			vips_buf_appendf( buf, "%g ", v->vec[j] );
+		vips_buf_appendf( buf, "\"" );
 
 		break;
 	}
@@ -1624,10 +1641,10 @@ vips_tobuf( VipsInfo *vi, int i, BufInfo *buf )
 		im_intvec_object *v = (im_intvec_object *) obj;
 		int j;
 
-		buf_appendf( buf, "\"" );
+		vips_buf_appendf( buf, "\"" );
 		for( j = 0; j < v->n; j++ )
-			buf_appendf( buf, "%d ", v->vec[j] );
-		buf_appendf( buf, "\"" );
+			vips_buf_appendf( buf, "%d ", v->vec[j] );
+		vips_buf_appendf( buf, "\"" );
 
 		break;
 	}
@@ -1637,10 +1654,10 @@ vips_tobuf( VipsInfo *vi, int i, BufInfo *buf )
 		im_imagevec_object *v = (im_imagevec_object *) obj;
 		int j;
 
-		buf_appendf( buf, "\"" );
+		vips_buf_appendf( buf, "\"" );
 		for( j = 0; j < v->n; j++ )
-			buf_appendf( buf, "%s ", v->vec[j]->filename );
-		buf_appendf( buf, "\"" );
+			vips_buf_appendf( buf, "%s ", v->vec[j]->filename );
+		vips_buf_appendf( buf, "\"" );
 
 		break;
 	}
@@ -1649,16 +1666,20 @@ vips_tobuf( VipsInfo *vi, int i, BufInfo *buf )
 	{
 		GValue *value = (GValue *) obj;
 
-		buf_appendgv( buf, value );
+		vips_buf_appendgv( buf, value );
 
 		break;
 	}
+
+	case VIPS_INTERPOLATE:
+		vips_object_to_string( VIPS_OBJECT( obj ), buf );
+		break;
 
 	case VIPS_NONE:
 		if( strcmp( vips->type, IM_TYPE_DISPLAY ) == 0 ) 
 			/* Just assume sRGB.
 			 */
-			buf_appendf( buf, "sRGB" );
+			vips_buf_appendf( buf, "sRGB" );
 		break;
 
 	default:
@@ -1866,12 +1887,12 @@ vips_build_argv( VipsInfo *vi, char **argv )
 	int i;
 
 	for( i = 0; i < vi->fn->argc; i++ ) {
-		BufInfo buf;
+		VipsBuf buf;
 		char txt[512];
 
-		buf_init_static( &buf, txt, 512 );
+		vips_buf_init_static( &buf, txt, 512 );
 		vips_tobuf( vi, i, &buf );
-		if( !(argv[i] = im_strdup( NULL, buf_all( &buf ) )) )
+		if( !(argv[i] = im_strdup( NULL, vips_buf_all( &buf ) )) )
 			return( FALSE );
 	}
 
@@ -2075,7 +2096,7 @@ vips_fillva( VipsInfo *vi, va_list ap )
 			*((double*)vi->vargv[i]) = v;
 
 			if( trace_flags & TRACE_VIPS ) 
-				buf_appendf( trace_current(), "%g ", v );
+				vips_buf_appendf( trace_current(), "%g ", v );
 		}
 		else if( vt == VIPS_INT ) {
 			int v = va_arg( ap, int );
@@ -2083,36 +2104,51 @@ vips_fillva( VipsInfo *vi, va_list ap )
 			*((int*)vi->vargv[i]) = v;
 
 			if( trace_flags & TRACE_VIPS ) 
-				buf_appendf( trace_current(), "%d ", v );
+				vips_buf_appendf( trace_current(), "%d ", v );
 		}
+
 		else if( vt == VIPS_GVALUE ) {
 			GValue *value = va_arg( ap, GValue * );
 
 			vi->vargv[i] = value;
 
 			if( trace_flags & TRACE_VIPS ) {
-				buf_appendgv( trace_current(), value );
-				buf_appends( trace_current(), " " );
+				vips_buf_appendgv( trace_current(), value );
+				vips_buf_appends( trace_current(), " " );
 			}
 		}
+
+		else if( vt == VIPS_INTERPOLATE ) {
+			VipsInterpolate *value = 
+				va_arg( ap, VipsInterpolate * );
+
+			vi->vargv[i] = value;
+
+			if( trace_flags & TRACE_VIPS ) {
+				vips_object_to_string( VIPS_OBJECT( value ), 
+					trace_current() );
+				vips_buf_appends( trace_current(), " " );
+			}
+		}
+
 		else if( vt == VIPS_IMAGE ) {
 			Imageinfo *ii = va_arg( ap, Imageinfo * );
 
 			vi->vargv[i] = ii;
 
 			if( trace_flags & TRACE_VIPS ) {
-				BufInfo *buf = trace_current();
+				VipsBuf *buf = trace_current();
 
 				if( ii && ii->im ) {
-					buf_appends( buf, "<" );
-					buf_appendf( buf, _( "image \"%s\"" ),
+					vips_buf_appends( buf, "<" );
+					vips_buf_appendf( buf, _( "image \"%s\"" ),
 						ii->im->filename ); 
-					buf_appends( buf, "> " );
+					vips_buf_appends( buf, "> " );
 				}
 				else {
-					buf_appends( buf, "<" );
-					buf_appends( buf, _( "no image" ) );
-					buf_appends( buf, "> " );
+					vips_buf_appends( buf, "<" );
+					vips_buf_appends( buf, _( "no image" ) );
+					vips_buf_appends( buf, "> " );
 				}
 			}
 	    	}
@@ -2123,14 +2159,14 @@ vips_fillva( VipsInfo *vi, va_list ap )
 			if( vips_make_doublevec( vi->vargv[i], n, vec ) )
 				reduce_throw( vi->rc );
 			if( trace_flags & TRACE_VIPS ) {
-				BufInfo *buf = trace_current();
+				VipsBuf *buf = trace_current();
 				int i;
 
-				buf_appendf( buf, "<" );
-				buf_appendf( buf, _( "doublevec" ) );
+				vips_buf_appendf( buf, "<" );
+				vips_buf_appendf( buf, _( "doublevec" ) );
 				for( i = 0; i < n; i++ )
-					buf_appendf( buf, " %g", vec[i] );
-				buf_appends( buf, "> " );
+					vips_buf_appendf( buf, " %g", vec[i] );
+				vips_buf_appends( buf, "> " );
 			}
 		}
 		/* 
@@ -2146,18 +2182,18 @@ vips_fillva( VipsInfo *vi, va_list ap )
 				n, (IMAGE **) vec ) )
 				reduce_throw( vi->rc );
 			if( trace_flags & TRACE_VIPS ) {
-				BufInfo *buf = trace_current();
+				VipsBuf *buf = trace_current();
 				int i;
 
-				buf_appendf( buf, "<" );
-				buf_appendf( buf, _( "imagevec" ) );
+				vips_buf_appendf( buf, "<" );
+				vips_buf_appendf( buf, _( "imagevec" ) );
 				for( i = 0; i < n; i++ ) {
-					buf_appendf( buf, " <" );
-					buf_appendf( buf, _( "image \"%s\"" ),
+					vips_buf_appendf( buf, " <" );
+					vips_buf_appendf( buf, _( "image \"%s\"" ),
 						vec[i]->im->filename );
-					buf_appendf( buf, ">" );
+					vips_buf_appendf( buf, ">" );
 				}
-				buf_appends( buf, "> " );
+				vips_buf_appends( buf, "> " );
 			}
 		}
 
@@ -2186,7 +2222,7 @@ vips_dispatch( VipsInfo *vi, PElement *out )
 		vi = old_vi;
 
 		if( trace_flags & TRACE_VIPS ) 
-			buf_appendf( trace_current(), "(from cache) " );
+			vips_buf_appendf( trace_current(), "(from cache) " );
 
 #ifdef DEBUG_HISTORY
 		printf( "vips_dispatch: found %s in history\n", vi->name );
@@ -2291,9 +2327,9 @@ vips_spine( Reduce *rc, const char *name, HeapNode **arg, PElement *out )
 		reduce_throw( rc );
 
 	if( trace_flags & TRACE_VIPS ) {
-		BufInfo *buf = trace_push();
+		VipsBuf *buf = trace_push();
 
-		buf_appendf( buf, "\"%s\" ", name );
+		vips_buf_appendf( buf, "\"%s\" ", name );
 		trace_args( arg, vi->nargs );
 	}
 
@@ -2334,9 +2370,9 @@ vips_run( Reduce *rc, Compile *compile,
 		reduce_throw( rc );
 
 	if( trace_flags & TRACE_VIPS ) {
-		BufInfo *buf = trace_push();
+		VipsBuf *buf = trace_push();
 
-		buf_appendf( buf, "\"%s\" ", name );
+		vips_buf_appendf( buf, "\"%s\" ", name );
 		trace_args( arg, vi->nargs );
 	}
 
@@ -2359,7 +2395,7 @@ vipsva_sub( VipsInfo *vi, PElement *out, va_list ap )
 	REDUCE_CATCH_START( FALSE );
 
 	if( trace_flags & TRACE_VIPS ) 
-		buf_appendf( trace_current(), "\"%s\" ", vi->name );
+		vips_buf_appendf( trace_current(), "\"%s\" ", vi->name );
 
 	/* Fill argv ... input images go in as Imageinfo here, output as
 	 * IMAGE.
@@ -2367,7 +2403,7 @@ vipsva_sub( VipsInfo *vi, PElement *out, va_list ap )
 	vips_fillva( vi, ap );
 
 	if( trace_flags & TRACE_VIPS ) 
-		buf_appends( trace_current(), " ->\n" ); 
+		vips_buf_appends( trace_current(), " ->\n" ); 
 
 	vips_dispatch( vi, out );
 

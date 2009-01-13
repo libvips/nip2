@@ -105,15 +105,15 @@ void
 reduce_error_typecheck( Reduce *rc, 
 	PElement *e, const char *name, const char *type )
 {
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[1024];
 
 	error_top( _( "Typecheck error." ) );
-	buf_init_static( &buf, txt, 1024 );
-	buf_appendf( &buf, _( "%s expected %s, instead saw:" ), name, type );
-	buf_appends( &buf, "\n  " );
+	vips_buf_init_static( &buf, txt, 1024 );
+	vips_buf_appendf( &buf, _( "%s expected %s, instead saw:" ), name, type );
+	vips_buf_appends( &buf, "\n  " );
 	itext_value_ev( rc, &buf, e );
-	error_sub( "%s", buf_all( &buf ) );
+	error_sub( "%s", vips_buf_all( &buf ) );
 
 	reduce_throw( rc );
 }
@@ -769,15 +769,15 @@ reduce_is_class( Reduce *rc, PElement *klass )
 gboolean
 reduce_is_instanceof_exact( Reduce *rc, const char *name, PElement *instance )
 {
-        BufInfo buf;
+        VipsBuf buf;
         char txt[256];
 
 	if( !reduce_is_class( rc, instance ) )
 		return( FALSE );
 
-        buf_init_static( &buf, txt, 256 );
+        vips_buf_init_static( &buf, txt, 256 );
         symbol_qualified_name( PEGETCLASSCOMPILE( instance )->sym, &buf );
-        if( strcmp( name, buf_all( &buf ) ) == 0 )
+        if( strcmp( name, vips_buf_all( &buf ) ) == 0 )
                 return( TRUE );
 
 	return( FALSE );
@@ -899,10 +899,10 @@ reduce_list_index( Reduce *rc, PElement *base, int n, PElement *out )
 	}
 
 	if( trace_flags & TRACE_OPERATOR ) {
-		BufInfo *buf = trace_push();
+		VipsBuf *buf = trace_push();
 
 		trace_pelement( base );
-		buf_appendf( buf, " \"?\" %d ->\n", n );
+		vips_buf_appendf( buf, " \"?\" %d ->\n", n );
 	}
 
 	PEPOINTLEFT( hn, out );
@@ -918,15 +918,15 @@ reduce_list_index( Reduce *rc, PElement *base, int n, PElement *out )
 static void
 argserror( Reduce *rc,  PElement *a )
 {
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[MAX_ERROR_FRAG];
 
-	buf_init_static( &buf, txt, MAX_ERROR_FRAG );
+	vips_buf_init_static( &buf, txt, MAX_ERROR_FRAG );
 	itext_value_ev( rc, &buf, a );
 
 	error_top( _( "No arguments allowed." ) );
 	error_sub( _( "Object \"%s\" should have no arguments." ),
-		buf_all( &buf ) );
+		vips_buf_all( &buf ) );
 	reduce_throw( rc );
 }
 
@@ -1358,14 +1358,14 @@ reduce_start:
 				d3 = GETRIGHT( GETRIGHT( hn ) )->body.num;
 
 			if( trace_flags & TRACE_OPERATOR ) {
-				BufInfo *buf = trace_push();
+				VipsBuf *buf = trace_push();
 
 				if( limit )
-					buf_appendf( buf, 
+					vips_buf_appendf( buf, 
 						"generator %g %g %g ->\n",
 						d1, d2, d3 );
 				else
-					buf_appendf( buf, 
+					vips_buf_appendf( buf, 
 						"generator %g %g ->\n",
 						d1, d2 );
 			}
@@ -1618,9 +1618,9 @@ reduce_start:
 				d3 = PEGETREAL( &rhs3 ); 
 
 			if( trace_flags & TRACE_OPERATOR ) {
-				BufInfo *buf = trace_push();
+				VipsBuf *buf = trace_push();
 
-				buf_appends( buf, "generator constructor " );
+				vips_buf_appends( buf, "generator constructor " );
 				trace_args( arg, 3 );
 			}
 
@@ -1671,14 +1671,14 @@ reduce_start:
 				ELEMENT_NODE, hn2 );
 
 			if( trace_flags & TRACE_OPERATOR ) {
-				BufInfo *buf = trace_current();
+				VipsBuf *buf = trace_current();
 
-				buf_appends( buf, "    " ); 
+				vips_buf_appends( buf, "    " ); 
 				trace_node( arg[0] );
-				buf_appends( buf, "\n" ); 
+				vips_buf_appends( buf, "\n" ); 
 
 				trace_text( TRACE_OPERATOR, 
-					"%s", buf_all( buf ) ); 
+					"%s", vips_buf_all( buf ) ); 
 
 				trace_pop();
 			}
@@ -1756,14 +1756,14 @@ reduce_start:
 				PEGETTYPE( &rhs1 ), PEGETVAL( &rhs1 ) );
 
 			if( trace_flags & TRACE_OPERATOR ) {
-				BufInfo *buf = trace_current();
+				VipsBuf *buf = trace_current();
 
-				buf_appends( buf, "    " ); 
+				vips_buf_appends( buf, "    " ); 
 				trace_node( arg[0] );
-				buf_appends( buf, "\n" ); 
+				vips_buf_appends( buf, "\n" ); 
 
 				trace_text( TRACE_OPERATOR, 
-					"%s", buf_all( buf ) );
+					"%s", vips_buf_all( buf ) );
 
 				trace_pop();
 			}
@@ -1849,14 +1849,14 @@ reduce_start:
 	/* Should now be in WHNF ... test!
 	 */
 	if( !is_WHNF( out ) ) {
-		BufInfo buf;
+		VipsBuf buf;
 		char txt[1000];
 
-		buf_init_static( &buf, txt, 1000 );
+		vips_buf_init_static( &buf, txt, 1000 );
 		graph_pelement( heap, &buf, out, TRUE );
 		printf( "*** internal error:\n" );
 		printf( "result of reduce_spine not in WHNF: " );
-		printf( "%s\n", buf_all( &buf ) );
+		printf( "%s\n", vips_buf_all( &buf ) );
 		reduce_throw( rc );
 	}
 #endif /*WHNF_DEBUG*/
@@ -1999,14 +1999,14 @@ reduce_regenerate( Expr *expr, PElement *out )
 
 #ifdef DEBUG_REGEN
 {
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[1024];
 
-	buf_init_static( &buf, txt, 1024 );
+	vips_buf_init_static( &buf, txt, 1024 );
 	graph_pelement( heap, &buf, out, TRUE );
 	printf( "reduce_regenerate: reducing " );
 	expr_name_print( expr );
-	printf( "graph: %s\n", buf_all( &buf ) );
+	printf( "graph: %s\n", vips_buf_all( &buf ) );
 }
 #endif /*DEBUG_REGEN*/
 
@@ -2026,7 +2026,7 @@ reduce_regenerate( Expr *expr, PElement *out )
 
 #ifdef DEBUG_REGEN
 {
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[1024];
 
 	/* Force immediate GC to pick up any stray pointers.
@@ -2036,11 +2036,11 @@ reduce_regenerate( Expr *expr, PElement *out )
 		return( FALSE );
 	}
 
-	buf_init_static( &buf, txt, 1024 );
+	vips_buf_init_static( &buf, txt, 1024 );
 	graph_pelement( heap, &buf, out, TRUE );
 	printf( "reduce_regenerate: reduced " );
 	expr_name_print( expr );
-	printf( " to: %s\n", buf_all( &buf ) );
+	printf( " to: %s\n", vips_buf_all( &buf ) );
 }
 #endif /*DEBUG_REGEN*/
 
@@ -2077,14 +2077,14 @@ reduce_regenerate_member( Expr *expr, PElement *ths, PElement *out )
 
 #ifdef DEBUG_REGEN_MEMBER
 {
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[1024];
 
-	buf_init_static( &buf, txt, 1024 );
+	vips_buf_init_static( &buf, txt, 1024 );
 	graph_pelement( heap, &buf, out, TRUE );
 	printf( "reduce_regenerate_member: " );
 	expr_name_print( expr );
-	printf( " new code: %s\n", buf_all( &buf ) );
+	printf( " new code: %s\n", vips_buf_all( &buf ) );
 }
 #endif /*DEBUG_REGEN_MEMBER*/
 

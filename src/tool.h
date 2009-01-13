@@ -119,7 +119,7 @@ typedef struct _ToolClass {
 	 */
 } ToolClass;
 
-void tool_error( Tool *tool, BufInfo *buf );
+void tool_error( Tool *tool, VipsBuf *buf );
 
 GType tool_get_type( void );
 

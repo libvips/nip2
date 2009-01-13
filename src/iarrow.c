@@ -52,7 +52,7 @@ iarrow_finalize( GObject *gobject )
 	/* My instance finalize stuff.
 	 */
 	iregion_instance_destroy( &iarrow->instance );
-	buf_destroy( &iarrow->caption_buffer );
+	vips_buf_destroy( &iarrow->caption_buffer );
 
 	G_OBJECT_CLASS( parent_class )->finalize( gobject );
 }
@@ -71,7 +71,7 @@ iarrow_generate_caption_sub( iImage *iimage, iArrow *iarrow, gboolean *first )
 		if( *first )
 			*first = FALSE;
 		else 
-			buf_appends( &iarrow->caption_buffer, ", " );
+			vips_buf_appends( &iarrow->caption_buffer, ", " );
 
 		row_qualified_name_relative( ws->sym, row,
 			&iarrow->caption_buffer );
@@ -102,7 +102,7 @@ iarrow_generate_caption( iObject *iobject )
 	};
 
 	iArrow *iarrow = IARROW( iobject );
-	BufInfo *buf = &iarrow->caption_buffer;
+	VipsBuf *buf = &iarrow->caption_buffer;
 	const int nimages = g_slist_length( CLASSMODEL( iarrow )->iimages );
 	Expr *expr;
 	gboolean result;
@@ -121,22 +121,22 @@ iarrow_generate_caption( iObject *iobject )
 	else
 		names = names_current;
 
-	buf_rewind( buf );
+	vips_buf_rewind( buf );
 	heapmodel_name( HEAPMODEL( iarrow ), buf );
-	buf_appendf( buf, " " );
+	vips_buf_appendf( buf, " " );
 
 	/* Used in (eg.) "Mark at (10, 10) on [A1, A2]"
 	 */
-	buf_appendf( buf, _( "on" ) );
-	buf_appendf( buf, " " );
+	vips_buf_appendf( buf, _( "on" ) );
+	vips_buf_appendf( buf, " " );
 	if( nimages > 1 )
-		buf_appendf( buf, "[" );
+		vips_buf_appendf( buf, "[" );
 	first = TRUE;
 	slist_map2( CLASSMODEL( iarrow )->iimages,
 		(SListMap2Fn) iarrow_generate_caption_sub, iarrow, &first );
 	if( nimages > 1 )
-		buf_appendf( buf, "]" );
-	buf_appendf( buf, " " );
+		vips_buf_appendf( buf, "]" );
+	vips_buf_appendf( buf, " " );
 
 	for( i = 0; names[i]; i++ ) {
 		if( !heap_is_instanceof( names[i], &expr->root, &result ) )
@@ -145,23 +145,23 @@ iarrow_generate_caption( iObject *iobject )
 		if( result ) {
 			switch( i ) {
 			case 0:
-				buf_appendf( buf, _( "at %d" ),
+				vips_buf_appendf( buf, _( "at %d" ),
 					iarrow->instance.area.top );
 				break;
 
 			case 1:
-				buf_appendf( buf, _( "at %d" ),
+				vips_buf_appendf( buf, _( "at %d" ),
 					iarrow->instance.area.left );
 				break;
 
 			case 2:
-				buf_appendf( buf, _( "at (%d, %d)" ),
+				vips_buf_appendf( buf, _( "at (%d, %d)" ),
 					iarrow->instance.area.left,
 					iarrow->instance.area.top );
 				break;
 
 			case 3:
-				buf_appendf( buf, 
+				vips_buf_appendf( buf, 
 					_( "at (%d, %d), offset (%d, %d)" ),
 					iarrow->instance.area.left, 
 					iarrow->instance.area.top,
@@ -177,7 +177,7 @@ iarrow_generate_caption( iObject *iobject )
 		}
 	}
 
-	return( buf_all( buf ) );
+	return( vips_buf_all( buf ) );
 }
 
 static View *
@@ -267,7 +267,7 @@ static void
 iarrow_init( iArrow *iarrow )
 {
 	iregion_instance_init( &iarrow->instance, CLASSMODEL( iarrow ) );
-	buf_init_dynamic( &iarrow->caption_buffer, MAX_LINELENGTH );
+	vips_buf_init_dynamic( &iarrow->caption_buffer, MAX_LINELENGTH );
 
 	iobject_set( IOBJECT( iarrow ), CLASS_ARROW, NULL );
 }

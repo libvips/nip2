@@ -150,8 +150,8 @@ colourdisplay_drag_data_get( GtkWidget *widget, GdkDragContext *context,
 	Imageinfo *imageinfo = IMAGEDISPLAY( colourdisplay )->conv->ii;
 	double colours[3];
 	guint16 vals[4];
-	char buf_text[256];
-	BufInfo buf;
+	char vips_buf_text[256];
+	VipsBuf buf;
 
 	switch( info ) {
 	case TARGET_COLOUR:
@@ -173,12 +173,12 @@ colourdisplay_drag_data_get( GtkWidget *widget, GdkDragContext *context,
 		break;
 
 	case TARGET_TEXT:
-		buf_init_static( &buf, buf_text, 256 );
+		vips_buf_init_static( &buf, vips_buf_text, 256 );
 		imageinfo_to_text( imageinfo, &buf );
 
 		gtk_selection_data_set( selection_data,
 			gdk_atom_intern( "text/plain", FALSE ), 8, 
-			(guchar *) buf_all( &buf ), strlen( buf_all( &buf ) ) );
+			(guchar *) vips_buf_all( &buf ), strlen( vips_buf_all( &buf ) ) );
 
 #ifdef DEBUG
 		printf( "colourdisplay_drag_data_get: sending text/plain\n" );
@@ -254,14 +254,14 @@ colourdisplay_drag_data_received( GtkWidget *widget, GdkDragContext *context,
 }
 
 static void
-colourdisplay_generate_tooltip( Colourdisplay *colourdisplay, BufInfo *buf )
+colourdisplay_generate_tooltip( Colourdisplay *colourdisplay, VipsBuf *buf )
 {
 	Imagedisplay *id = IMAGEDISPLAY( colourdisplay );
 
 	if( id->conv && id->conv->ii ) {
 		imageinfo_to_text( id->conv->ii, buf );
-		buf_appends( buf, "\n" );
-		buf_appends( buf, _( "Double-click to edit this color, or "
+		vips_buf_appends( buf, "\n" );
+		vips_buf_appends( buf, _( "Double-click to edit this color, or "
 			"drag-and-drop between colors" ) );
 	}
 }

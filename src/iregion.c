@@ -130,7 +130,7 @@ iregion_generate_caption_sub( iImage *iimage,
 		if( *first )
 			*first = FALSE;
 		else 
-			buf_appends( &our_iimage->caption_buffer, ", " );
+			vips_buf_appends( &our_iimage->caption_buffer, ", " );
 
 		row_qualified_name_relative( ws->sym, 
 			row, &our_iimage->caption_buffer );
@@ -145,29 +145,29 @@ iregion_generate_caption( iObject *iobject )
 	iRegion *iregion = IREGION( iobject );
 	iImage *iimage = IIMAGE( iregion );
 	const int nimages = g_slist_length( CLASSMODEL( iregion )->iimages );
-	BufInfo *buf = &iimage->caption_buffer;
+	VipsBuf *buf = &iimage->caption_buffer;
 	gboolean first;
 
-	buf_rewind( buf );
+	vips_buf_rewind( buf );
 	heapmodel_name( HEAPMODEL( iregion ), buf );
-	buf_appendf( buf, " " );
+	vips_buf_appendf( buf, " " );
 	/* Expands to (eg.) "Region on A1 at (10, 10), size (50, 50)"
 	 */
-	buf_appendf( buf, _( "on" ) );
-	buf_appendf( buf, " " );
+	vips_buf_appendf( buf, _( "on" ) );
+	vips_buf_appendf( buf, " " );
 	if( nimages > 1 )
-		buf_appendf( buf, "[" );
+		vips_buf_appendf( buf, "[" );
 	first = TRUE;
 	slist_map2( CLASSMODEL( iregion )->iimages,
 		(SListMap2Fn) iregion_generate_caption_sub, iregion, &first );
 	if( nimages > 1 )
-		buf_appendf( buf, "]" );
-	buf_appendf( buf, " " );
-	buf_appendf( buf, _( "at (%d, %d), size (%d, %d)" ),
+		vips_buf_appendf( buf, "]" );
+	vips_buf_appendf( buf, " " );
+	vips_buf_appendf( buf, _( "at (%d, %d), size (%d, %d)" ),
 		iregion->instance.area.left, iregion->instance.area.top,
 		iregion->instance.area.width, iregion->instance.area.height );
 
-	return( buf_all( buf ) );
+	return( vips_buf_all( buf ) );
 }
 
 static void
@@ -215,7 +215,7 @@ iregion_edit( GtkWidget *parent, Model *model )
 	iRegionInstance *instance = classmodel_get_instance( classmodel );
 	GtkWidget *ss = stringset_new();
 	char txt[256];
-	BufInfo buf;
+	VipsBuf buf;
 
 	if( instance ) {
 		im_snprintf( txt, 256, "%d", instance->area.left );
@@ -232,10 +232,10 @@ iregion_edit( GtkWidget *parent, Model *model )
 			_( "Height" ), txt, _( "Height of region" ) );
 	}
 
-	buf_init_static( &buf, txt, 100 );
+	vips_buf_init_static( &buf, txt, 100 );
 	row_qualified_name( HEAPMODEL( model )->row, &buf );
 	iwindow_set_title( IWINDOW( ss ), 
-		_( "Edit \"%s\"" ), buf_all( &buf ) );
+		_( "Edit \"%s\"" ), vips_buf_all( &buf ) );
 	idialog_set_callbacks( IDIALOG( ss ), 
 		iwindow_true_cb, NULL, NULL, classmodel );
 	idialog_add_ok( IDIALOG( ss ), 

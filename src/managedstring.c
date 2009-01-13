@@ -76,11 +76,11 @@ managedstring_finalize( GObject *gobject )
 }
 
 static void
-managedstring_info( iObject *iobject, BufInfo *buf )
+managedstring_info( iObject *iobject, VipsBuf *buf )
 {
 	Managedstring *managedstring = MANAGEDSTRING( iobject );
 
-	buf_appendf( buf, "managedstring->string = \"%s\"\n", 
+	vips_buf_appendf( buf, "managedstring->string = \"%s\"\n", 
 		managedstring->string );
 
 	IOBJECT_CLASS( parent_class )->info( iobject, buf );

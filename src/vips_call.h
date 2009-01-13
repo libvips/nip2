@@ -32,7 +32,7 @@ extern int vips_history_size;
 void vips_check_all_destroyed( void );
 gboolean vips_is_callable( im_function *fn );
 int vips_n_args( im_function *fn );
-void vips_usage( BufInfo *buf, im_function *fn );
+void vips_usage( VipsBuf *buf, im_function *fn );
 void vips_spine( Reduce *rc, const char *name, HeapNode **arg, PElement *out );
 void vips_run( Reduce *rc, Compile *compile,
 	int op, const char *name, HeapNode **arg, PElement *out,

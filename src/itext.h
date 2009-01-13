@@ -42,10 +42,10 @@
 struct _iText {
 	Heapmodel parent_class;
 
-	BufInfo value;			/* The value displayed as a [char] */
+	VipsBuf value;			/* The value displayed as a [char] */
 	char *formula;			/* The formula we edit */
 	char *formula_default;		/* Formula we inherit */
-	BufInfo decompile;		/* The value decompiled to a [char] */
+	VipsBuf decompile;		/* The value decompiled to a [char] */
 
 	/* TRUE if the formula has been entered by the user and should be
 	 * saved.
@@ -66,9 +66,9 @@ typedef struct _iTextClass {
 GType itext_get_type( void );
 iText *itext_new( Rhs *rhs );
 
-gboolean itext_value( Reduce *rc, BufInfo *buf, PElement *root );
-void itext_value_ev( Reduce *rc, BufInfo *buf, PElement *root );
-gboolean itext_make_value_string( Expr *expr, BufInfo *buf );
+gboolean itext_value( Reduce *rc, VipsBuf *buf, PElement *root );
+void itext_value_ev( Reduce *rc, VipsBuf *buf, PElement *root );
+gboolean itext_make_value_string( Expr *expr, VipsBuf *buf );
 
 void itext_set_edited( iText *text, gboolean edited );
 gboolean itext_set_formula( iText *text, const char *formula );

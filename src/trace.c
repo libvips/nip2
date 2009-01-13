@@ -45,7 +45,7 @@ static GSList *trace_all = NULL;
 
 /* Trace buffer stack.
  */
-static BufInfo trace_buffer_stack[SPINE_SIZE];
+static VipsBuf trace_buffer_stack[SPINE_SIZE];
 static int trace_buffer_stack_p = 0;
 
 /* Number of active trace blocks.
@@ -102,7 +102,7 @@ trace_reset( void )
 	int i;
 
 	for( i = 0; i < trace_buffer_stack_p; i++ )
-		buf_destroy( &trace_buffer_stack[i] );
+		vips_buf_destroy( &trace_buffer_stack[i] );
 
 	trace_buffer_stack_p = 0;
 }
@@ -113,7 +113,7 @@ trace_check( void )
 	g_assert( trace_buffer_stack_p == 0 );
 }
 
-BufInfo *
+VipsBuf *
 trace_push( void )
 {
 	int i;
@@ -129,7 +129,7 @@ trace_push( void )
 	}
 
 	i = trace_buffer_stack_p++;
-	buf_init_dynamic( &trace_buffer_stack[i], MAX_TRACE );
+	vips_buf_init_dynamic( &trace_buffer_stack[i], MAX_TRACE );
 
 	return( &trace_buffer_stack[i] );
 }
@@ -146,10 +146,10 @@ trace_pop( void )
 	g_assert( trace_buffer_stack_p > 0 );
 
 	i = --trace_buffer_stack_p;
-	buf_destroy( &trace_buffer_stack[i] );
+	vips_buf_destroy( &trace_buffer_stack[i] );
 }
 
-BufInfo *
+VipsBuf *
 trace_current( void )
 {
 	g_assert( trace_buffer_stack_p > 0 );
@@ -398,7 +398,7 @@ trace_text( TraceFlags flags, const char *fmt, ... )
 void
 trace_pelement( PElement *pe )
 {
-	BufInfo *buf = trace_current();
+	VipsBuf *buf = trace_current();
 	Heap *heap = reduce_context->heap;
 
 	graph_pelement( heap, buf, pe, TRACE_FUNCTIONS );
@@ -418,7 +418,7 @@ trace_node( HeapNode *node )
 void
 trace_args( HeapNode **arg, int n )
 {
-	BufInfo *buf = trace_current();
+	VipsBuf *buf = trace_current();
 	int i;
 
 	for( i = n - 1; i >= 0; i-- ) {
@@ -426,44 +426,44 @@ trace_args( HeapNode **arg, int n )
 
 		PEPOINTRIGHT( arg[i], &rhs );
 		trace_pelement( &rhs ); 
-		buf_appends( buf, " " ); 
+		vips_buf_appends( buf, " " ); 
 	}
 
-	buf_appendf( buf, "->\n" ); 
+	vips_buf_appendf( buf, "->\n" ); 
 }
 
 void
 trace_binop( Compile *compile, PElement *left, BinOp bop, PElement *right )
 {
-	BufInfo *buf = trace_current();
+	VipsBuf *buf = trace_current();
 
-	buf_appendf( buf, "\"%s\" ", decode_BinOp( bop ) );
+	vips_buf_appendf( buf, "\"%s\" ", decode_BinOp( bop ) );
 	trace_pelement( left );
-	buf_appends( buf, " " );
+	vips_buf_appends( buf, " " );
 	trace_pelement( right );
-	buf_appends( buf, " -> (" );
+	vips_buf_appends( buf, " -> (" );
 	compile_name( compile, buf );
-	buf_appends( buf, ")\n" );
+	vips_buf_appends( buf, ")\n" );
 }
 
 void
 trace_uop( UnOp uop, PElement *arg )
 {
-	BufInfo *buf = trace_current();
+	VipsBuf *buf = trace_current();
 
-	buf_appendf( buf, "\"%s\" ", decode_UnOp( uop ) );
+	vips_buf_appendf( buf, "\"%s\" ", decode_UnOp( uop ) );
 	trace_pelement( arg );
-	buf_appends( buf, " ->\n" ); 
+	vips_buf_appends( buf, " ->\n" ); 
 }
 
 void
 trace_result( TraceFlags flags, PElement *out )
 {
-	BufInfo *buf = trace_current();
+	VipsBuf *buf = trace_current();
 
-	buf_appendf( buf, "    " ); 
+	vips_buf_appendf( buf, "    " ); 
 	trace_pelement( out );
-	buf_appends( buf, "\n" ); 
+	vips_buf_appends( buf, "\n" ); 
 
-	trace_text( flags, "%s", buf_all( buf ) ); 
+	trace_text( flags, "%s", vips_buf_all( buf ) ); 
 }

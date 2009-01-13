@@ -164,15 +164,15 @@ plotwindow_refresh_title( Plotwindow *plotwindow )
 	/* Can come here during ws destroy.
 	 */
 	if( ws ) {
-		BufInfo buf;
+		VipsBuf buf;
 		char txt[512];
 
-		buf_init_static( &buf, txt, 512 );
+		vips_buf_init_static( &buf, txt, 512 );
 		row_qualified_name_relative( ws->sym, row, &buf );
-		buf_appendf( &buf, " - %d%%", plotmodel->mag );
+		vips_buf_appendf( &buf, " - %d%%", plotmodel->mag );
 
 		iwindow_set_title( IWINDOW( plotwindow ), "%s", 
-			buf_all( &buf ) );
+			vips_buf_all( &buf ) );
 	}
 }
 

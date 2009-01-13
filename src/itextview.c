@@ -99,7 +99,7 @@ itextview_refresh( vObject *vobject )
 	if( row->is_class )
 		display = itext->formula;
 	else
-		display = buf_all( &itext->value );
+		display = vips_buf_all( &itext->value );
 
 	if( itextview->formula && itext->value.base )
 		formula_set_value_expr( itextview->formula,

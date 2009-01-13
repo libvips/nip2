@@ -139,6 +139,6 @@ void filesel_set_filetype( Filesel *filesel,
 	FileselFileType **type, int default_type );
 void filesel_set_filetype_pref( Filesel *filesel, const char *type_pref );
 int filesel_get_filetype( Filesel *filesel ); 
-void filesel_make_patt( FileselFileType *type, BufInfo *patt );
+void filesel_make_patt( FileselFileType *type, VipsBuf *patt );
 void filesel_set_flags( Filesel *filesel, gboolean imls, gboolean save );
 void filesel_set_multi( Filesel *filesel, gboolean multi );

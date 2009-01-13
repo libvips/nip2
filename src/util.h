@@ -65,50 +65,8 @@
 	(B) = swapp_t; \
 }
 
-/* A string in the process of being written to ... multiple calls to 
- * buf_append add to it, on overflow append "..." and block further writes.
- */
-typedef struct {
-	char *base;		/* String base */
-	int mx;			/* Maximum length */
-	int i;			/* Current write point */
-	gboolean full;		/* String has filled, block writes */
-	int lasti;		/* For read-recent */
-	gboolean dynamic;	/* We own the string with malloc() */
-} BufInfo;
-
-/* Static init of one of these.
- */
-#define BUF_STATIC( TEXT, MAX ) \
-	{ &TEXT[0], MAX, 0, FALSE, 0, FALSE }
-
-/* Init and append to one of the above.
- */
-void buf_rewind( BufInfo *buf );
-void buf_destroy( BufInfo *buf );
-void buf_init( BufInfo *buf );
-void buf_set_static( BufInfo *buf, char *base, int mx );
-void buf_set_dynamic( BufInfo *buf, int mx );
-void buf_init_static( BufInfo *buf, char *base, int mx );
-void buf_init_dynamic( BufInfo *buf, int mx );
-gboolean buf_appendns( BufInfo *buf, const char *str, int sz );
-gboolean buf_appends( BufInfo *buf, const char *str );
-gboolean buf_appendf( BufInfo *buf, const char *fmt, ... )
-	__attribute__((format(printf, 2, 3)));
-gboolean buf_vappendf( BufInfo *buf, const char *fmt, va_list ap );
-gboolean buf_appendc( BufInfo *buf, char ch );
-gboolean buf_appendsc( BufInfo *buf, gboolean quote, const char *str );
-void buf_appendi( BufInfo *buf, IMAGE *im );
-void buf_appendgv( BufInfo *buf, GValue *value );
-gboolean buf_removec( BufInfo *buf, char ch );
-gboolean buf_change( BufInfo *buf, const char *old, const char *new );
-gboolean buf_is_empty( BufInfo *buf );
-gboolean buf_is_full( BufInfo *buf );
-const char *buf_all( BufInfo *buf );
-const char *buf_firstline( BufInfo *buf );
-gboolean buf_appendg( BufInfo *buf, double g );
-gboolean buf_appendd( BufInfo *buf, int d );
-int buf_len( BufInfo *buf );
+void vips_buf_appendi( VipsBuf *buf, IMAGE *im );
+gboolean vips_buf_appendsc( VipsBuf *buf, gboolean quote, const char *str );
 
 gboolean set_prop( xmlNode *xnode, const char *name, const char *fmt, ... )
 	__attribute__((format(printf, 3, 4)));
@@ -118,7 +76,7 @@ gboolean set_slprop( xmlNode *xnode, const char *name, GSList *labels );
 gboolean set_dlprop( xmlNode *xnode, const char *name, double *values, int n );
 
 gboolean get_sprop( xmlNode *xnode, const char *name, char *buf, int sz );
-gboolean get_spropb( xmlNode *xnode, const char *name, BufInfo *buf );
+gboolean get_spropb( xmlNode *xnode, const char *name, VipsBuf *buf );
 gboolean get_iprop( xmlNode *xnode, const char *name, int *out );
 gboolean get_dprop( xmlNode *xnode, const char *name, double *out );
 gboolean get_bprop( xmlNode *xnode, const char *name, gboolean *out );
@@ -185,8 +143,8 @@ void queue_add( Queue *queue, void *data );
 gboolean queue_remove( Queue *q, void *data );
 int queue_length( Queue *q );
 
-extern BufInfo error_top_buf;
-extern BufInfo error_sub_buf;
+extern VipsBuf error_top_buf;
+extern VipsBuf error_sub_buf;
 
 void error( const char *fmt, ... )
 	__attribute__((noreturn, format(printf, 1, 2)));
@@ -223,7 +181,7 @@ void *get_element( REGION *ireg, int x, int y, int b );
 const char *decode_bandfmt( int f );
 const char *decode_type( int t );
 
-void get_image_info( BufInfo *buf, const char *name );
+void get_image_info( VipsBuf *buf, const char *name );
 
 void expand_variables( const char *in, char *out );
 void nativeize_path( char *buf );
@@ -317,7 +275,7 @@ const char *spc( int n );
 void number_to_string( int n, char *buf );
 
 double find_space( const char *name );
-void to_size( BufInfo *buf, double sz );
+void to_size( VipsBuf *buf, double sz );
 gboolean temp_name( char *name, const char *ext );
 int findmaxmin( IMAGE *in, 
 	int left, int top, int width, int height, double *min, double *max );

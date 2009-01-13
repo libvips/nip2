@@ -68,7 +68,7 @@ plot_finalize( GObject *gobject )
 	 */
 	image_value_destroy( &plot->value );
 	plot_free_columns( plot );
-	buf_destroy( &plot->caption_buffer );
+	vips_buf_destroy( &plot->caption_buffer );
 
 	G_OBJECT_CLASS( parent_class )->finalize( gobject );
 }
@@ -104,15 +104,15 @@ static const char *
 plot_generate_caption( iObject *iobject )
 {
 	Plot *plot = PLOT( iobject );
-	BufInfo *buf = &plot->caption_buffer;
+	VipsBuf *buf = &plot->caption_buffer;
 
-	buf_rewind( buf );
+	vips_buf_rewind( buf );
 	image_value_caption( &plot->value, buf );
-	buf_appendf( buf, ", %d series, %d points", plot->columns, plot->rows );
-	buf_appendf( buf, ", xrange [%g, %g]", plot->xmin, plot->xmax );
-	buf_appendf( buf, ", yrange [%g, %g]", plot->ymin, plot->ymax );
+	vips_buf_appendf( buf, ", %d series, %d points", plot->columns, plot->rows );
+	vips_buf_appendf( buf, ", xrange [%g, %g]", plot->xmin, plot->xmax );
+	vips_buf_appendf( buf, ", yrange [%g, %g]", plot->ymin, plot->ymax );
 
-	return( buf_all( buf ) );
+	return( vips_buf_all( buf ) );
 }
 
 /* Unpack all data formats to XYXYXY.
@@ -489,7 +489,7 @@ plot_init( Plot *plot )
 	plot->left = 0;
 	plot->top = 0;
 
-	buf_init_dynamic( &plot->caption_buffer, MAX_LINELENGTH );
+	vips_buf_init_dynamic( &plot->caption_buffer, MAX_LINELENGTH );
 
 	iobject_set( IOBJECT( plot ), CLASS_PLOT, NULL );
 

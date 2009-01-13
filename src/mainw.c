@@ -341,19 +341,19 @@ mainw_progress_update( int percent, int eta )
 	else if( eta == 0 ) {
 		/* A magic number reduce.c uses for eval feedback.
 		 */
-		BufInfo buf;
+		VipsBuf buf;
 
-		buf_init_static( &buf, msg, 100 );
+		vips_buf_init_static( &buf, msg, 100 );
 		/* Becomes eg. "Calculating A7.height ..."
 		 */
-		buf_appends( &buf, _( "Calculating" ) );
-		buf_appends( &buf, " " );
+		vips_buf_appends( &buf, _( "Calculating" ) );
+		vips_buf_appends( &buf, " " );
 		if( mainw_progress_expr ) {
 			expr_name( mainw_progress_expr, &buf );
-			buf_appends( &buf, " " );
+			vips_buf_appends( &buf, " " );
 		}
-		buf_appends( &buf, "..." );
-		buf_all( &buf );
+		vips_buf_appends( &buf, "..." );
+		vips_buf_all( &buf );
 	}
 	else
 		im_snprintf( msg, 100, _( "%d seconds left" ), eta );
@@ -381,24 +381,24 @@ mainw_workspace_destroy_cb( Workspace *ws, Mainw *mainw )
 }
 
 static void
-mainw_find_disc( BufInfo *buf )
+mainw_find_disc( VipsBuf *buf )
 {
 	double sz = find_space( PATH_TMP );
 
 	if( sz < 0 )
-		buf_appendf( buf, _( "No temp area" ) );
+		vips_buf_appendf( buf, _( "No temp area" ) );
 	else {
 		char txt[MAX_STRSIZE];
-		BufInfo buf2;
+		VipsBuf buf2;
 
-		buf_init_static( &buf2, txt, MAX_STRSIZE );
+		vips_buf_init_static( &buf2, txt, MAX_STRSIZE );
 		to_size( &buf2, sz );
-		buf_appendf( buf, _( "%s free" ), buf_all( &buf2 ) );
+		vips_buf_appendf( buf, _( "%s free" ), vips_buf_all( &buf2 ) );
 	}
 }
 
 static void
-mainw_find_heap( BufInfo *buf, Heap *heap )
+mainw_find_heap( VipsBuf *buf, Heap *heap )
 {
 	/* How much we can still expand the heap by ... this 
 	 * can be -ve if we've closed a workspace, or changed 
@@ -406,7 +406,7 @@ mainw_find_heap( BufInfo *buf, Heap *heap )
 	 */
 	int togo = IM_MAX( 0, (heap->mxb - heap->nb) * heap->rsz );
 
-	buf_appendf( buf, _( "%d cells free" ), heap->nfree + togo );
+	vips_buf_appendf( buf, _( "%d cells free" ), heap->nfree + togo );
 }
 
 /* Update the space remaining indicator. 
@@ -416,15 +416,15 @@ mainw_free_update( Mainw *mainw )
 {
 	Heap *heap = reduce_context->heap;
 	char txt[80];
-	BufInfo buf;
+	VipsBuf buf;
 
-	buf_init_static( &buf, txt, 80 );
+	vips_buf_init_static( &buf, txt, 80 );
 
 	if( workspace_selected_any( mainw->ws ) ) {
 		/* Display select message instead.
 		 */
-		buf_appends( &buf, _( "Selected:" ) );
-		buf_appends( &buf, " " );
+		vips_buf_appends( &buf, _( "Selected:" ) );
+		vips_buf_appends( &buf, " " );
 		workspace_selected_names( mainw->ws, &buf, ", " );
 	}
 	else {
@@ -439,34 +439,34 @@ mainw_free_update( Mainw *mainw )
 			mainw_find_disc( &buf );
 	}
 
-	set_glabel( mainw->space_free, "%s", buf_all( &buf ) );
+	set_glabel( mainw->space_free, "%s", vips_buf_all( &buf ) );
 }
 
 static void
 mainw_title_update( Mainw *mainw )
 {
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[512];
 
-	buf_init_static( &buf, txt, 512 );
+	vips_buf_init_static( &buf, txt, 512 );
 	if( FILEMODEL( mainw->ws )->modified ) 
-		buf_appendf( &buf, "*" ); 
-	buf_appendf( &buf, "%s", NN( IOBJECT( mainw->ws->sym )->name ) );
+		vips_buf_appendf( &buf, "*" ); 
+	vips_buf_appendf( &buf, "%s", NN( IOBJECT( mainw->ws->sym )->name ) );
 	if( mainw->ws->compat_major ) {
-		buf_appends( &buf, " - " );
-		buf_appends( &buf, _( "compatibility mode" ) );
-		buf_appendf( &buf, " %d.%d", 
+		vips_buf_appends( &buf, " - " );
+		vips_buf_appends( &buf, _( "compatibility mode" ) );
+		vips_buf_appendf( &buf, " %d.%d", 
 			mainw->ws->compat_major, 
 			mainw->ws->compat_minor ); 
 	}
 	if( FILEMODEL( mainw->ws )->filename )
-		buf_appendf( &buf, " - %s", FILEMODEL( mainw->ws )->filename );
+		vips_buf_appendf( &buf, " - %s", FILEMODEL( mainw->ws )->filename );
 	else {
-		buf_appends( &buf, " - " );
-		buf_appends( &buf, _( "unsaved workspace" ) );
+		vips_buf_appends( &buf, " - " );
+		vips_buf_appends( &buf, _( "unsaved workspace" ) );
 	}
 
-	iwindow_set_title( IWINDOW( mainw ), "%s", buf_all( &buf ) );
+	iwindow_set_title( IWINDOW( mainw ), "%s", vips_buf_all( &buf ) );
 }
 
 static void 
@@ -500,12 +500,12 @@ mainw_jump_build( Column *column, GtkWidget *menu )
 {
 	GtkWidget *item;
 	char txt[256];
-	BufInfo buf;
+	VipsBuf buf;
 
-	buf_init_static( &buf, txt, 256 );
-	buf_appendf( &buf, "%s - %s", 
+	vips_buf_init_static( &buf, txt, 256 );
+	vips_buf_appendf( &buf, "%s - %s", 
 		IOBJECT( column )->name, IOBJECT( column )->caption );
-	item = gtk_menu_item_new_with_label( buf_all( &buf ) );
+	item = gtk_menu_item_new_with_label( vips_buf_all( &buf ) );
 	g_signal_connect( item, "activate",
 		G_CALLBACK( mainw_jump_column_cb ), column );
 	gtk_menu_append( GTK_MENU( menu ), item );
@@ -628,7 +628,7 @@ mainw_space_free_event( GtkWidget *widget, GdkEvent *ev, Mainw *mainw )
 }
 
 static void
-mainw_space_free_tooltip_generate( GtkWidget *widget, BufInfo *buf, 
+mainw_space_free_tooltip_generate( GtkWidget *widget, VipsBuf *buf, 
 	Mainw *mainw )
 {
 	Heap *heap = reduce_context->heap;
@@ -636,19 +636,19 @@ mainw_space_free_tooltip_generate( GtkWidget *widget, BufInfo *buf,
 
 	mainw_find_disc( buf );
 	/* Expands to (eg.) "14GB free in /pics/tmp" */
-        buf_appendf( buf, _( " in \"%s\"" ), PATH_TMP );
-        buf_appends( buf, ", " );
+        vips_buf_appendf( buf, _( " in \"%s\"" ), PATH_TMP );
+        vips_buf_appends( buf, ", " );
 
-        buf_appendf( buf, 
+        vips_buf_appendf( buf, 
 		_( "%d cells in heap, %d cells free, %d cells maximum" ),
                 heap->ncells, heap->nfree, heap->max_fn( heap ) );
-        buf_appends( buf, ", " );
+        vips_buf_appends( buf, ", " );
 
-        buf_appendf( buf, _( "%d objects in workspace" ),
+        vips_buf_appendf( buf, _( "%d objects in workspace" ),
 		g_slist_length( ICONTAINER( sym->expr->compile )->children ) );
-        buf_appends( buf, ", " );
+        vips_buf_appends( buf, ", " );
 
-        buf_appendf( buf, _( "%d vips calls cached" ), vips_history_size );
+        vips_buf_appendf( buf, _( "%d vips calls cached" ), vips_history_size );
 }
 
 static void
@@ -737,7 +737,7 @@ static void
 mainw_group_action_cb( GtkAction *action, Mainw *mainw )
 {
 	Workspace *ws = mainw->ws;
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[MAX_STRSIZE];
 
 	if( !workspace_selected_any( ws ) ) {
@@ -752,11 +752,11 @@ mainw_group_action_cb( GtkAction *action, Mainw *mainw )
 		row_select( row );
 	}
 
-	buf_init_static( &buf, txt, MAX_STRSIZE );
-	buf_appends( &buf, "Group [" );
+	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
+	vips_buf_appends( &buf, "Group [" );
 	workspace_selected_names( ws, &buf, "," );
-	buf_appends( &buf, "]" );
-	if( !workspace_add_def( ws, buf_all( &buf ) ) ) {
+	vips_buf_appends( &buf, "]" );
+	if( !workspace_add_def( ws, vips_buf_all( &buf ) ) ) {
 		box_alert( GTK_WIDGET( mainw ) );
 		return;
 	}
@@ -818,7 +818,7 @@ mainw_test_error( Row *row, Mainw *mainw, int *found )
 static void
 mainw_next_error_action_cb( GtkAction *action, Mainw *mainw )
 {
-	BufInfo buf;
+	VipsBuf buf;
 	char str[MAX_LINELENGTH];
 
 	int found;
@@ -850,11 +850,11 @@ mainw_next_error_action_cb( GtkAction *action, Mainw *mainw )
 
 	model_scrollto( MODEL( mainw->row_last_error ), MODEL_SCROLL_TOP );
 
-	buf_init_static( &buf, str, MAX_LINELENGTH );
+	vips_buf_init_static( &buf, str, MAX_LINELENGTH );
 	row_qualified_name( mainw->row_last_error->expr->row, &buf );
-	buf_appends( &buf, ": " );
-	buf_appends( &buf, mainw->row_last_error->expr->error_top );
-	workspace_set_status( mainw->ws, "%s", buf_firstline( &buf ) );
+	vips_buf_appends( &buf, ": " );
+	vips_buf_appends( &buf, mainw->row_last_error->expr->error_top );
+	workspace_set_status( mainw->ws, "%s", vips_buf_firstline( &buf ) );
 }
 
 static void
@@ -886,10 +886,10 @@ mainw_force_calc_action_cb( GtkAction *action, Mainw *mainw )
 	Workspace *ws = mainw->ws;
 
         if( workspace_selected_any( ws ) ) {
-		BufInfo buf;
+		VipsBuf buf;
 		char str[30];
 
-		buf_init_static( &buf, str, 30 );
+		vips_buf_init_static( &buf, str, 30 );
 		workspace_selected_names( ws, &buf, ", " );
 
 		box_yesno( GTK_WIDGET( mainw ), 
@@ -898,7 +898,7 @@ mainw_force_calc_action_cb( GtkAction *action, Mainw *mainw )
 			_( "Recalculate" ), 
 			_( "Completely recalculate?" ),
 			( "Are you sure you want to "
-			"completely recalculate %s?" ), buf_all( &buf ) );
+			"completely recalculate %s?" ), vips_buf_all( &buf ) );
 	}
 	else 
 		/* Recalculate.
@@ -976,7 +976,7 @@ mainw_open_file_into_workspace( Mainw *mainw, const char *filename )
  */
 typedef struct {
 	Mainw *mainw;
-	BufInfo *buf;
+	VipsBuf *buf;
 	int nitems;
 } MainwLoad;
 
@@ -992,7 +992,7 @@ mainw_open_fn( Filesel *filesel, const char *filename, MainwLoad *load )
 	}
 	else {
 		if( load->nitems ) 
-			buf_appends( load->buf, ", " );
+			vips_buf_appends( load->buf, ", " );
 		if( !workspace_load_file_buf( load->buf, filename ) )
 			return( filesel );
 		mainw_recent_add( &mainw_recent_image, filename );
@@ -1012,23 +1012,23 @@ mainw_open_done_cb( iWindow *iwnd, void *client,
 	Filesel *filesel = FILESEL( iwnd );
 	int nselected = filesel_nselected( filesel );
 	char txt[MAX_STRSIZE];
-	BufInfo buf;
+	VipsBuf buf;
 	MainwLoad load;
 
-	buf_init_static( &buf, txt, MAX_STRSIZE );
+	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 	load.mainw = mainw;
 	load.buf = &buf;
 	load.nitems = 0;
 
 	if( nselected > 1 )
-		buf_appends( &buf, "Group [" );
+		vips_buf_appends( &buf, "Group [" );
 	if( filesel_map_filename_multi( filesel,
 		(FileselMapFn) mainw_open_fn, &load, NULL ) ) {
 		nfn( sys, IWINDOW_ERROR );
 		return;
 	}
 	if( nselected > 1 )
-		buf_appends( &buf, "]" );
+		vips_buf_appends( &buf, "]" );
 
 	/* We may have loaded a workspace and caused this workspace to
 	 * vanish, argh. mainw may no longer be valid, but check ->ws anyway.
@@ -1036,9 +1036,9 @@ mainw_open_done_cb( iWindow *iwnd, void *client,
 	 */
 	if( load.nitems && 
 		mainw->ws &&
-		!workspace_add_def( mainw->ws, buf_all( &buf ) ) ) {
+		!workspace_add_def( mainw->ws, vips_buf_all( &buf ) ) ) {
 		error_top( _( "Load failed." ) );
-		error_sub( _( "Unable to execute:\n   %s" ), buf_all( &buf ) );
+		error_sub( _( "Unable to execute:\n   %s" ), vips_buf_all( &buf ) );
 		nfn( sys, IWINDOW_ERROR );
 		return;
 	}
@@ -1156,12 +1156,12 @@ mainw_recent_build( GtkWidget *menu, GSList *recent )
 		const char *filename = (const char *) p->data;
 		GtkWidget *item;
 		char txt[80];
-		BufInfo buf;
+		VipsBuf buf;
 		char *utf8;
 
-		buf_init_static( &buf, txt, 80 );
-		buf_appendf( &buf, "    %s", im_skip_dir( filename ) );
-		utf8 = f2utf8( buf_all( &buf ) );
+		vips_buf_init_static( &buf, txt, 80 );
+		vips_buf_appendf( &buf, "    %s", im_skip_dir( filename ) );
+		utf8 = f2utf8( vips_buf_all( &buf ) );
 		item = gtk_menu_item_new_with_label( utf8 );
 		g_free( utf8 );
 		utf8 = f2utf8( filename );

@@ -85,7 +85,7 @@ GType matrix_get_type( void );
 void matrix_select( Matrix *matrix, int left, int top, int width, int height );
 void matrix_deselect( Matrix *matrix );
 
-void matrix_dmask_to_ip( DOUBLEMASK *dmask, BufInfo *buf );
+void matrix_dmask_to_ip( DOUBLEMASK *dmask, VipsBuf *buf );
 gboolean matrix_dmask_to_heap( Heap *heap, DOUBLEMASK *dmask, PElement *out );
 DOUBLEMASK *matrix_imask_to_dmask( INTMASK *imask );
 INTMASK *matrix_dmask_to_imask( DOUBLEMASK *dmask );

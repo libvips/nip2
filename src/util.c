@@ -52,8 +52,8 @@
 static char error_top_text[MAX_STRSIZE];
 static char error_sub_text[MAX_STRSIZE];
 
-BufInfo error_top_buf = BUF_STATIC( error_top_text, MAX_STRSIZE );
-BufInfo error_sub_buf = BUF_STATIC( error_sub_text, MAX_STRSIZE );
+VipsBuf error_top_buf = VIPS_BUF_STATIC( error_top_text, MAX_STRSIZE );
+VipsBuf error_sub_buf = VIPS_BUF_STATIC( error_sub_text, MAX_STRSIZE );
 
 /* Useful: Error message and quit. Emergencies only ... we don't tidy up
  * properly.
@@ -103,23 +103,23 @@ error_unblock( void )
 /* Set an error buffer.
  */
 static void
-error_set( BufInfo *buf, const char *fmt, va_list ap )
+error_set( VipsBuf *buf, const char *fmt, va_list ap )
 {
 	if( !error_level ) {
 		char tmp_text[MAX_STRSIZE];
-		BufInfo tmp;
+		VipsBuf tmp;
 
 		/* The string we write may contain itself ... write to an
 		 * intermediate, then copy to main.
 		 */
-		buf_init_static( &tmp, tmp_text, MAX_STRSIZE );
-		buf_vappendf( &tmp, fmt, ap );
+		vips_buf_init_static( &tmp, tmp_text, MAX_STRSIZE );
+		vips_buf_vappendf( &tmp, fmt, ap );
 
-		buf_rewind( buf );
-		(void) buf_appends( buf, buf_all( &tmp ) );
+		vips_buf_rewind( buf );
+		(void) vips_buf_appends( buf, vips_buf_all( &tmp ) );
 
 #ifdef DEBUG_ERROR
-		printf( "error: %p %s\n", buf, buf_all( buf ) );
+		printf( "error: %p %s\n", buf, vips_buf_all( buf ) );
 #endif /*DEBUG_ERROR*/
 	}
 }
@@ -128,8 +128,8 @@ void
 error_clear_nip( void )
 {
 	if( !error_level ) {
-		buf_rewind( &error_top_buf );
-		buf_rewind( &error_sub_buf );
+		vips_buf_rewind( &error_top_buf );
+		vips_buf_rewind( &error_sub_buf );
 
 #ifdef DEBUG_ERROR
 		printf( "error_clear_nip\n" );
@@ -159,7 +159,7 @@ error_top( const char *fmt, ... )
 	 * fails if the arg to us uses the contents of either error buffer.
 	 */
 	if( !error_level ) 
-		buf_rewind( &error_sub_buf );
+		vips_buf_rewind( &error_sub_buf );
 }
 
 void
@@ -178,9 +178,9 @@ void
 error_vips( void )
 {	
 	if( !error_level && strlen( im_errorstring() ) > 0 ) {
-		if( !buf_is_empty( &error_sub_buf ) )
-			(void) buf_appendf( &error_sub_buf, "\n" );
-		(void) buf_appendf( &error_sub_buf, "%s", im_errorstring() );
+		if( !vips_buf_is_empty( &error_sub_buf ) )
+			(void) vips_buf_appendf( &error_sub_buf, "\n" );
+		(void) vips_buf_appendf( &error_sub_buf, "%s", im_errorstring() );
 		im_error_clear();
 	}
 }
@@ -192,8 +192,8 @@ error_vips_all( void )
 	error_vips();
 }
 
-const char *error_get_top( void ) { return( buf_all( &error_top_buf ) ); }
-const char *error_get_sub( void ) { return( buf_all( &error_sub_buf ) ); }
+const char *error_get_top( void ) { return( vips_buf_all( &error_top_buf ) ); }
+const char *error_get_sub( void ) { return( vips_buf_all( &error_sub_buf ) ); }
 
 /* Set an xml property printf() style.
  */
@@ -304,14 +304,14 @@ get_sprop( xmlNode *xnode, const char *name, char *buf, int sz )
 }
 
 gboolean
-get_spropb( xmlNode *xnode, const char *name, BufInfo *buf )
+get_spropb( xmlNode *xnode, const char *name, VipsBuf *buf )
 {
 	char *value = (char *) xmlGetProp( xnode, (xmlChar *) name );
 
 	if( !value ) 
 		return( FALSE );
 
-	buf_appends( buf, value );
+	vips_buf_appends( buf, value );
 	IM_FREEF( xmlFree, value );
 
 	return( TRUE );
@@ -821,265 +821,36 @@ queue_length( Queue *q )
 	return( q->length );
 }
 
-void
-buf_rewind( BufInfo *buf )
-{
-	buf->i = 0;
-	buf->lasti = 0;
-	buf->full = FALSE;
-
-	if( buf->base )
-		buf->base[0] = '\0';
-}
-
-/* Power on init.
+/* Make an info string about an image.
  */
 void
-buf_init( BufInfo *buf )
+vips_buf_appendi( VipsBuf *buf, IMAGE *im )
 {
-	buf->base = NULL;
-	buf->mx = 0;
-	buf->dynamic = FALSE;
-	buf_rewind( buf );
-}
-
-/* Reset to power on state ... only needed for dynamic bufs.
- */
-void
-buf_destroy( BufInfo *buf )
-{
-	if( buf->dynamic ) {
-		IM_FREE( buf->base );
+	if( !im ) {
+		vips_buf_appends( buf, _( "(no image)" ) );
+		return;
 	}
 
-	buf_init( buf );
-}
-
-/* Set to a static string.
- */
-void
-buf_set_static( BufInfo *buf, char *base, int mx )
-{
-	g_assert( mx >= 4 );
-
-	buf_destroy( buf );
-
-	buf->base = base;
-	buf->mx = mx;
-	buf->dynamic = FALSE;
-	buf_rewind( buf );
-}
-
-void
-buf_init_static( BufInfo *buf, char *base, int mx )
-{
-	buf_init( buf );
-	buf_set_static( buf, base, mx );
-}
-
-/* Set to a dynamic string.
- */
-void
-buf_set_dynamic( BufInfo *buf, int mx )
-{
-	g_assert( mx >= 4 );
-
-	if( buf->mx == mx && buf->dynamic ) 
-		/* No change?
-		 */
-		buf_rewind( buf );
-	else {
-		buf_destroy( buf );
-
-		if( !(buf->base = IARRAY( NULL, mx, char )) )
-			/* No error return, so just block writes.
-			 */
-			buf->full = TRUE;
-		else {
-			buf->mx = mx;
-			buf->dynamic = TRUE;
-			buf_rewind( buf );
-		}
-	}
-}
-
-void
-buf_init_dynamic( BufInfo *buf, int mx )
-{
-	buf_init( buf );
-	buf_set_dynamic( buf, mx );
-}
-
-/* Append at most sz chars from string to buf. sz < 0 means unlimited.
- * Error on overflow.
- */
-gboolean
-buf_appendns( BufInfo *buf, const char *str, int sz )
-{
-	int len;
-	int n;
-	int avail;
-	int cpy;
-
-	if( buf->full )
-		return( FALSE );
-
-	/* Amount we want to copy.
+	/* Coded? Special warning.
 	 */
-	len = strlen( str );
-	if( sz >= 0 )
-		n = IM_MIN( sz, len );
-	else
-		n = len;
+	if( im->Coding != IM_CODING_NONE )
+		vips_buf_appendf( buf, "%s, ", 
+			NN( im_Coding2char( im->Coding ) ) );
 
-	/* Space available.
+	/* Format string expands to (eg.) 
+	 * "2000x3000 128-bit complex, 3 bands, Lab" 
 	 */
-	avail = buf->mx - buf->i - 4;
-
-	/* Amount we actually copy.
-	 */
-	cpy = IM_MIN( n, avail );
-
-	strncpy( buf->base + buf->i, str, cpy );
-	buf->i += cpy;
-
-	if( buf->i >= buf->mx - 4 ) {
-		buf->full = TRUE;
-		strcpy( buf->base + buf->mx - 4, "..." );
-		buf->i = buf->mx - 1;
-		return( FALSE );
-	}
-
-	return( TRUE );
-}
-
-/* Append a string to a buf. Error on overflow.
- */
-gboolean
-buf_appends( BufInfo *buf, const char *str )
-{
-	return( buf_appendns( buf, str, -1 ) );
-}
-
-/* Append a character to a buf. Error on overflow.
- */
-gboolean
-buf_appendc( BufInfo *buf, char ch )
-{
-	char tiny[2];
-
-	tiny[0] = ch;
-	tiny[1] = '\0';
-
-	return( buf_appendns( buf, tiny, 1 ) );
-}
-
-/* Swap the rightmost occurence of old for new.
- */
-gboolean
-buf_change( BufInfo *buf, const char *old, const char *new )
-{
-	int olen = strlen( old );
-	int nlen = strlen( new );
-	int i;
-
-	if( buf->full )
-		return( FALSE );
-	if( buf->i - olen + nlen > buf->mx - 4 ) {
-		buf->full = TRUE;
-		return( FALSE );
-	}
-
-	/* Find pos of old.
-	 */
-	for( i = buf->i - olen; i > 0; i-- )
-		if( is_prefix( old, buf->base + i ) )
-			break;
-	g_assert( i >= 0 );
-
-	/* Move tail of buffer to make right-size space for new.
-	 */
-	memmove( buf->base + i + nlen, buf->base + i + olen,
-		buf->i - i - olen );
-
-	/* Copy new in.
-	 */
-	memcpy( buf->base + i, new, nlen );
-	buf->i = i + nlen + (buf->i - i - olen);
-
-	return( TRUE );
-}
-
-/* Remove the last character, if it's ch.
- */
-gboolean
-buf_removec( BufInfo *buf, char ch )
-{
-	if( buf->full )
-		return( FALSE );
-	if( buf->i <= 0 ) 
-		return( FALSE );
-	if( buf->base[buf->i - 1] == ch )
-		buf->i -= 1;
-
-	return( TRUE );
-}
-
-/* Append to a buf, args as printf. Error on overflow.
- */
-gboolean
-buf_appendf( BufInfo *buf, const char *fmt, ... )
-{
-	char str[MAX_STRSIZE];
-	va_list ap;
-
-        va_start( ap, fmt );
-        (void) im_vsnprintf( str, MAX_STRSIZE, fmt, ap );
-        va_end( ap );
-
-	return( buf_appends( buf, str ) );
-}
-
-/* Append to a buf, args as vprintf. Error on overflow.
- */
-gboolean
-buf_vappendf( BufInfo *buf, const char *fmt, va_list ap )
-{
-	char str[MAX_STRSIZE];
-
-        (void) im_vsnprintf( str, MAX_STRSIZE, fmt, ap );
-
-	return( buf_appends( buf, str ) );
-}
-
-/* Append a double, non-localised. Useful for config files etc.
- */
-gboolean
-buf_appendg( BufInfo *buf, double g )
-{
-	char text[G_ASCII_DTOSTR_BUF_SIZE];
-
-	g_ascii_dtostr( text, sizeof( text ), g );
-
-	return( buf_appends( buf, text ) );
-}
-
-/* Append a number ... if the number is -ve, add brackets. Needed for
- * building function arguments.
- */
-gboolean
-buf_appendd( BufInfo *buf, int d )
-{
-	if( d < 0 )
-		return( buf_appendf( buf, " (%d)", d ) );
-	else
-		return( buf_appendf( buf, " %d", d ) );
+	vips_buf_appendf( buf, 
+		ngettext( "%dx%d %s, %d band, %s", 
+			"%dx%d %s, %d bands, %s", im->Bands ),
+		im->Xsize, im->Ysize, decode_bandfmt( im->BandFmt ),
+		im->Bands, decode_type( im->Type ) );
 }
 
 /* Append a string, escaping C stuff. Escape double quotes if quote is set.
  */
 gboolean
-buf_appendsc( BufInfo *buf, gboolean quote, const char *str )
+vips_buf_appendsc( VipsBuf *buf, gboolean quote, const char *str )
 {
 	char buffer[FILENAME_MAX];
 	char buffer2[FILENAME_MAX];
@@ -1088,97 +859,11 @@ buf_appendsc( BufInfo *buf, gboolean quote, const char *str )
 	 */
 	im_strncpy( buffer, str, FILENAME_MAX / 2 );
 
-	/* 
-
-		FIXME ... possible buffer overflow :-(
-
+	/* FIXME ... possible buffer overflow :-(
 	 */
 	my_strecpy( buffer2, buffer, quote );
 
-	return( buf_appends( buf, buffer2 ) );
-}
-
-/* Make an info string about an image.
- */
-void
-buf_appendi( BufInfo *buf, IMAGE *im )
-{
-	if( !im ) {
-		buf_appends( buf, _( "(no image)" ) );
-		return;
-	}
-
-	/* Coded? Special warning.
-	 */
-	if( im->Coding != IM_CODING_NONE ) 
-		buf_appendf( buf, "%s, ", NN( im_Coding2char( im->Coding ) ) );
-
-	/* Format string expands to (eg.) "2000x3000 128-bit
-	 * complex, 3 bands, Lab"
-	 */
-	buf_appendf( buf, ngettext( 
-			"%dx%d %s, %d band, %s",
-			"%dx%d %s, %d bands, %s",
-			im->Bands ),
-		im->Xsize, im->Ysize, decode_bandfmt( im->BandFmt ),
-		im->Bands, decode_type( im->Type ) );
-}
-
-void
-buf_appendgv( BufInfo *buf, GValue *value )
-{
-	char *str_value;
-
-	str_value = g_strdup_value_contents( value );
-	buf_appends( buf, str_value );
-	g_free( str_value );
-}
-
-/* Read all text from buffer.
- */
-const char *
-buf_all( BufInfo *buf )
-{
-	buf->base[buf->i] = '\0';
-
-	return( buf->base );
-}
-
-/* Trim to just the first line (excluding "\n").
- */
-const char *
-buf_firstline( BufInfo *buf )
-{
-	char *p;
-
-	if( (p = strchr( buf_all( buf ), '\n' )) )
-		*p = '\0';
-
-	return( buf_all( buf ) );
-}
-
-/* Test for buffer empty.
- */
-gboolean
-buf_is_empty( BufInfo *buf )
-{
-	return( buf->i == 0 );
-}
-
-/* Test for buffer full.
- */
-gboolean
-buf_is_full( BufInfo *buf )
-{
-	return( buf->full );
-}
-
-/* Buffer length ... still need to do buf_all().
- */
-int
-buf_len( BufInfo *buf )
-{
-	return( buf->i );
+	return( vips_buf_appends( buf, buffer2 ) );
 }
 
 /* Test for string a ends string b. 
@@ -1636,23 +1321,23 @@ decode_type( int t )
 /* Make an info string about a file.
  */
 void
-get_image_info( BufInfo *buf, const char *name )
+get_image_info( VipsBuf *buf, const char *name )
 {
 	char name2[FILENAME_MAX];
 	struct stat st;
 
 	expand_variables( name, name2 );
-	buf_appendf( buf, "%s, ", im_skip_dir( name ) );
+	vips_buf_appendf( buf, "%s, ", im_skip_dir( name ) );
 
 	/* Read size and file/dir.
 	 */
 	if( stat( name2, &st ) == -1 ) {
-		buf_appendf( buf, "%s", g_strerror( errno ) );
+		vips_buf_appendf( buf, "%s", g_strerror( errno ) );
 		return;
 	}
 
 	if( S_ISDIR( st.st_mode ) )
-		buf_appends( buf, _( "directory" ) );
+		vips_buf_appends( buf, _( "directory" ) );
 	else if( S_ISREG( st.st_mode ) ) {
 		IMAGE *im;
 
@@ -1661,10 +1346,10 @@ get_image_info( BufInfo *buf, const char *name )
 		 * or somethiing awful like that.
 		 */
 		if( is_file_type( &filesel_wfile_type, name2 ) ) {
-			buf_appends( buf, _( "workspace" ) );
+			vips_buf_appends( buf, _( "workspace" ) );
 		}
 		else if( (im = im_open( name2, "r" )) ) {
-			buf_appendi( buf, im ); 
+			vips_buf_appendi( buf, im ); 
 			im_close( im );
 		}
 		else
@@ -2732,7 +2417,7 @@ find_space( const char *name )
  * "12GB" etc.
  */
 void
-to_size( BufInfo *buf, double sz )
+to_size( VipsBuf *buf, double sz )
 {
 	const static char *size_names[] = { 
 		/* File length unit.
@@ -2765,9 +2450,9 @@ to_size( BufInfo *buf, double sz )
 	if( i == 0 )
 		/* No decimal places for bytes.
 		 */
-		buf_appendf( buf, "%g %s", sz, _( size_names[i] ) );
+		vips_buf_appendf( buf, "%g %s", sz, _( size_names[i] ) );
 	else
-		buf_appendf( buf, "%.2f %s", sz, _( size_names[i] ) );
+		vips_buf_appendf( buf, "%.2f %s", sz, _( size_names[i] ) );
 }
 
 
@@ -3000,13 +2685,13 @@ imalloc( IMAGE *im, size_t len )
 
 	if( !(mem = im_malloc( im, len )) ) {
 		char txt[256];
-		BufInfo buf;
+		VipsBuf buf;
 
-		buf_init_static( &buf, txt, 256 );
+		vips_buf_init_static( &buf, txt, 256 );
 		to_size( &buf, len );
 		error_top( _( "Out of memory." ) );
 		error_sub( _( "Request for %s of RAM triggered memory "
-			"allocation failure." ), buf_all( &buf ) );
+			"allocation failure." ), vips_buf_all( &buf ) );
 		error_vips();
 
 		return( NULL );

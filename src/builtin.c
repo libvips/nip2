@@ -530,14 +530,14 @@ static void
 apply_print_call( Reduce *rc, const char *name, HeapNode **arg, PElement *out )
 {
 	PElement rhs;
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[MAX_STRSIZE];
 
-	buf_init_static( &buf, txt, MAX_STRSIZE );
+	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 	PEPOINTRIGHT( arg[0], &rhs );
 	itext_value_ev( rc, &buf, &rhs );
 
-	if( !heap_managedstring_new( rc->heap, buf_all( &buf ), out ) )
+	if( !heap_managedstring_new( rc->heap, vips_buf_all( &buf ), out ) )
 		reduce_throw( rc );
 }
 
@@ -896,19 +896,19 @@ builtin_init( void )
 /* Make a usage error.
  */
 void
-builtin_usage( BufInfo *buf, BuiltinInfo *builtin )
+builtin_usage( VipsBuf *buf, BuiltinInfo *builtin )
 {
 	int i;
 
-	buf_appendf( buf, 
+	vips_buf_appendf( buf, 
 		ngettext( "Builtin \"%s\" takes %d argument.", 
 			"Builtin \"%s\" takes %d arguments.", 
 			builtin->nargs ),
 		builtin->name, builtin->nargs );
-        buf_appends( buf, "\n" );
+        vips_buf_appends( buf, "\n" );
 
 	for( i = 0; i < builtin->nargs; i++ )
-		buf_appendf( buf, "    %d - %s\n", 
+		vips_buf_appendf( buf, "    %d - %s\n", 
 		i + 1,
 		builtin->args[i]->name );
 }
@@ -918,21 +918,21 @@ static void
 builtin_trace_args( Heap *heap, const char *name, int n, HeapNode **arg )
 {
 	int i;
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[100];
 
-	buf_init_static( &buf, txt, 100 );
+	vips_buf_init_static( &buf, txt, 100 );
 
 	for( i = 0; i < n; i++ ) {
 		PElement t;
 
 		PEPOINTRIGHT( arg[n - i - 1], &t );
-		buf_appends( &buf, "(" );
+		vips_buf_appends( &buf, "(" );
 		graph_pelement( hi, &buf, &t, FALSE );
-		buf_appends( &buf, ") " );
+		vips_buf_appends( &buf, ") " );
 	}
 
-	printf( "builtin: %s %s\n", name, buf_all( &buf ) );
+	printf( "builtin: %s %s\n", name, vips_buf_all( &buf ) );
 }
 #endif /*DEBUG*/
 
@@ -953,16 +953,16 @@ builtin_run( Reduce *rc, Compile *compile,
 
 		PEPOINTRIGHT( arg[builtin->nargs - i - 1], &base );
 		if( !ts->pred( rc, &base ) ) {
-			BufInfo buf;
+			VipsBuf buf;
 			char txt[100];
 
-			buf_init_static( &buf, txt, 100 );
+			vips_buf_init_static( &buf, txt, 100 );
 			itext_value_ev( rc, &buf, &base );
 			error_top( _( "Bad argument." ) );
 			error_sub( _( "Argument %d to builtin \"%s\" should "
 				"be \"%s\", you passed:\n  %s" ),
 				i + 1, name, ts->name,
-				buf_all( &buf ) );
+				vips_buf_all( &buf ) );
 			reduce_throw( rc );
 		}
 	}

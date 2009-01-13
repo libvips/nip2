@@ -265,26 +265,26 @@ about_build( iDialog *idlg, GtkWidget *work )
 	GtkWidget *lab;
 	char txt[MAX_DIALOG_TEXT];
 	char txt2[MAX_DIALOG_TEXT];
-	BufInfo buf;
+	VipsBuf buf;
 	GtkWidget *image;
 
-	buf_init_static( &buf, txt, MAX_DIALOG_TEXT );
+	vips_buf_init_static( &buf, txt, MAX_DIALOG_TEXT );
 
 	im_snprintf( txt2, MAX_DIALOG_TEXT, _( "About %s." ), PACKAGE );
-	buf_appendf( &buf, "<b><big>%s</big></b>\n\n", txt2 );
+	vips_buf_appendf( &buf, "<b><big>%s</big></b>\n\n", txt2 );
 	im_snprintf( txt2, MAX_DIALOG_TEXT, 
 		_( "%s is an image processing package." ), PACKAGE );
-	buf_appendf( &buf, "%s\n\n", txt2 );
+	vips_buf_appendf( &buf, "%s\n\n", txt2 );
 
 	im_snprintf( txt2, MAX_DIALOG_TEXT, 
 		_( "%s comes with ABSOLUTELY NO WARRANTY. This is "
 		"free software and you are welcome to redistribute "
 		"it under certain conditions, see http://www.gnu.org." ), 
 		PACKAGE );
-	buf_appendf( &buf, "%s\n\n", txt2 );
+	vips_buf_appendf( &buf, "%s\n\n", txt2 );
 
 	im_snprintf( txt2, MAX_DIALOG_TEXT, _( NIP_COPYRIGHT ), PACKAGE );
-	buf_appendf( &buf, "%s\n", txt2 );
+	vips_buf_appendf( &buf, "%s\n", txt2 );
 
 {
 	char buf1[FILENAME_MAX];
@@ -294,32 +294,32 @@ about_build( iDialog *idlg, GtkWidget *work )
 		get_savedir() );
 	expand_variables( buf1, buf2 );
         nativeize_path( buf2 );
-	buf_appendf( &buf, "%s %s\n", _( "Personal start folder:" ), buf2 );
+	vips_buf_appendf( &buf, "%s %s\n", _( "Personal start folder:" ), buf2 );
 }
 
-	buf_appendf( &buf, "%s %s\n", _( "Homepage:" ), VIPS_HOMEPAGE );
+	vips_buf_appendf( &buf, "%s %s\n", _( "Homepage:" ), VIPS_HOMEPAGE );
 	escape_markup( im_version_string(), txt2, MAX_DIALOG_TEXT );
-	buf_appendf( &buf, "%s %s\n", 
+	vips_buf_appendf( &buf, "%s %s\n", 
 		_( "Linked to VIPS:" ), txt2 );
 	escape_markup( IM_VERSION_STRING, txt2, MAX_DIALOG_TEXT );
-	buf_appendf( &buf, "%s %s\n", 
+	vips_buf_appendf( &buf, "%s %s\n", 
 		_( "Built against VIPS:" ), txt2 );
 	escape_markup( PACKAGE, txt2, MAX_DIALOG_TEXT );
-	buf_appendf( &buf, "$PACKAGE: %s\n", txt2 );
+	vips_buf_appendf( &buf, "$PACKAGE: %s\n", txt2 );
 	escape_markup( VERSION, txt2, MAX_DIALOG_TEXT );
-	buf_appendf( &buf, "$VERSION: %s\n", txt2 );
+	vips_buf_appendf( &buf, "$VERSION: %s\n", txt2 );
 	escape_markup( NN( g_getenv( "VIPSHOME" ) ), txt2, MAX_DIALOG_TEXT );
-	buf_appendf( &buf, "$VIPSHOME: %s\n", txt2 );
+	vips_buf_appendf( &buf, "$VIPSHOME: %s\n", txt2 );
 	escape_markup( NN( g_getenv( "HOME" ) ), txt2, MAX_DIALOG_TEXT );
-	buf_appendf( &buf, "$HOME: %s\n", txt2 );
+	vips_buf_appendf( &buf, "$HOME: %s\n", txt2 );
 	escape_markup( NN( g_getenv( "SAVEDIR" ) ), txt2, MAX_DIALOG_TEXT );
-	buf_appendf( &buf, "$SAVEDIR: %s\n", txt2 );
+	vips_buf_appendf( &buf, "$SAVEDIR: %s\n", txt2 );
 	escape_markup( PATH_TMP, txt2, MAX_DIALOG_TEXT );
-	buf_appendf( &buf, "%s %s", 
+	vips_buf_appendf( &buf, "%s %s", 
 		_( "Temp files in:" ), txt2 );
 	if( strcmp( translator_credits, "translator_credits" ) != 0 ) {
-		buf_appendf( &buf, "\n" ); 
-		buf_appends( &buf, translator_credits );
+		vips_buf_appendf( &buf, "\n" ); 
+		vips_buf_appends( &buf, translator_credits );
 	}
 
 	hb = gtk_hbox_new( FALSE, 0 );
@@ -333,7 +333,7 @@ about_build( iDialog *idlg, GtkWidget *work )
 	gtk_widget_show( image );
 
 	lab = gtk_label_new( "" );
-	gtk_label_set_markup( GTK_LABEL( lab ), buf_all( &buf ) );
+	gtk_label_set_markup( GTK_LABEL( lab ), vips_buf_all( &buf ) );
         gtk_label_set_justify( GTK_LABEL( lab ), GTK_JUSTIFY_LEFT );
         gtk_label_set_selectable( GTK_LABEL( lab ), TRUE );
 	gtk_label_set_line_wrap( GTK_LABEL( lab ), TRUE );
@@ -954,27 +954,27 @@ box_url( GtkWidget *par, const char *url )
 #else /*default unix-y*/
 	static gboolean shown = FALSE;
 
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[512];
-	BufInfo buf2;
+	VipsBuf buf2;
 	char txt2[512];
 
 	char url2[FILENAME_MAX];
 
 	expand_variables( url, url2 );
 
-	buf_init_static( &buf, txt, 512 );
-	buf_appendf( &buf, "%s %s", BOX_BROWSER, BOX_BROWSER_REMOTE );
-	buf_init_static( &buf2, txt2, 512 );
-	buf_appendf( &buf2, buf_all( &buf ), url2 );
+	vips_buf_init_static( &buf, txt, 512 );
+	vips_buf_appendf( &buf, "%s %s", BOX_BROWSER, BOX_BROWSER_REMOTE );
+	vips_buf_init_static( &buf2, txt2, 512 );
+	vips_buf_appendf( &buf2, vips_buf_all( &buf ), url2 );
 
-	if( systemf( "%s", buf_all( &buf2 ) ) ) {
+	if( systemf( "%s", vips_buf_all( &buf2 ) ) ) {
 		error_top( _( "Unable to view help file." ) );
 		error_sub( _( 
 			"Attempted to launch browser with command:\n"
 			"  %s\n"
 			"You can change this command in Preferences." ),
-			buf_all( &buf2 ) );
+			vips_buf_all( &buf2 ) );
 		box_alert( par );
 	}
 	else if( !shown ) {

@@ -127,7 +127,7 @@ expressionview_refresh( vObject *vobject )
 		row->ws->mode == WORKSPACE_MODE_FORMULA );
 	if( itext ) 
 		formula_set_value_expr( expressionview->formula,
-			buf_all( &itext->value ), itext->formula );
+			vips_buf_all( &itext->value ), itext->formula );
 	if( vobject->iobject->caption )
 		formula_set_caption( expressionview->formula,
 			vobject->iobject->caption );

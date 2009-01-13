@@ -109,17 +109,17 @@ iimageview_drag_data_get( GtkWidget *widget, GdkDragContext *context,
 		iImageview *iimageview = IIMAGEVIEW( widget );
 		iImage *iimage = IIMAGE( VOBJECT( iimageview )->iobject );
 		Row *row = HEAPMODEL( iimage )->row;
-		char buf_text[256];
-		BufInfo buf;
+		char vips_buf_text[256];
+		VipsBuf buf;
 
 		/* Drag the fully-qualified row name.
 		 */
-		buf_init_static( &buf, buf_text, 256 );
+		vips_buf_init_static( &buf, vips_buf_text, 256 );
 		row_qualified_name_relative( main_workspacegroup->sym, 
 			row, &buf );
 		gtk_selection_data_set( selection_data,
 			gdk_atom_intern( "text/symbol", FALSE ), 8, 
-			(guchar *) buf_all( &buf ), strlen( buf_all( &buf ) ) );
+			(guchar *) vips_buf_all( &buf ), strlen( vips_buf_all( &buf ) ) );
 	}
 }
 
@@ -152,17 +152,17 @@ iimageview_drag_data_received( GtkWidget *widget, GdkDragContext *context,
 			from_row_path )) && 
 			from_row != row ) {
 			iText *itext = ITEXT( HEAPMODEL( iimage )->rhs->itext );
-			char buf_text[256];
-			BufInfo buf;
+			char vips_buf_text[256];
+			VipsBuf buf;
 
 			/* Qualify relative to us. We don't want to embed
 			 * workspace names unless we have to.
 			 */
-			buf_init_static( &buf, buf_text, 256 );
+			vips_buf_init_static( &buf, vips_buf_text, 256 );
 			row_qualified_name_relative( row->top_row->sym, 
 				from_row, &buf );
 
-			if( itext_set_formula( itext, buf_all( &buf ) ) ) {
+			if( itext_set_formula( itext, vips_buf_all( &buf ) ) ) {
 				itext_set_edited( itext, TRUE );
 				(void) expr_dirty( row->expr, 
 					link_serial_new() );
@@ -321,20 +321,20 @@ iimageview_filedrop( iImageview *iimageview, const char *file )
 
 static void
 iimageview_tooltip_generate( GtkWidget *widget, 
-	BufInfo *buf, iImageview *iimageview )
+	VipsBuf *buf, iImageview *iimageview )
 {
 	iImage *iimage = IIMAGE( VOBJECT( iimageview )->iobject );
 	Imageinfo *ii = iimage->value.ii;
 	IMAGE *im = imageinfo_get( FALSE, ii );
 
-	buf_rewind( buf );
-	buf_appends( buf, buf_all( &iimage->caption_buffer ) );
+	vips_buf_rewind( buf );
+	vips_buf_appends( buf, vips_buf_all( &iimage->caption_buffer ) );
 	if( im ) {
 		double size = (double) im->Ysize * IM_IMAGE_SIZEOF_LINE( im );
 
-		buf_appends( buf, ", " );
+		vips_buf_appends( buf, ", " );
 		to_size( buf, size );
-		buf_appendf( buf, ", %.3gx%.3g p/mm", im->Xres, im->Yres );
+		vips_buf_appendf( buf, ", %.3gx%.3g p/mm", im->Xres, im->Yres );
 	}
 }
 

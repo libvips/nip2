@@ -151,8 +151,8 @@ static GOptionEntry main_option[] = {
 /* Accumulate startup errors here.
  */
 static char main_start_error_txt[MAX_STRSIZE];
-static BufInfo main_start_error = 
-	BUF_STATIC( main_start_error_txt, MAX_STRSIZE );
+static VipsBuf main_start_error = 
+	VIPS_BUF_STATIC( main_start_error_txt, MAX_STRSIZE );
 
 static void
 main_log_add( const char *fmt, ... )
@@ -160,20 +160,20 @@ main_log_add( const char *fmt, ... )
 	va_list ap;
 
         va_start( ap, fmt );
-	buf_vappendf( &main_start_error, fmt, ap );
+	vips_buf_vappendf( &main_start_error, fmt, ap );
         va_end( ap );
 }
 
 static const char *
 main_log_get( void )
 {
-	return( buf_all( &main_start_error ) );
+	return( vips_buf_all( &main_start_error ) );
 }
 
 static gboolean
 main_log_is_empty( void )
 {
-	return( buf_is_empty( &main_start_error ) );
+	return( vips_buf_is_empty( &main_start_error ) );
 }
 
 /* NULL log handler. Used to suppress output on win32 without DEBUG_FATAL.
@@ -203,13 +203,13 @@ main_error_exit( const char *fmt, ... )
 		error_get_top(), error_get_sub() );
 
 	if( main_option_verbose ) {
-		BufInfo buf;
+		VipsBuf buf;
 		char txt[MAX_STRSIZE];
 
-		buf_init_static( &buf, txt, MAX_STRSIZE );
+		vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 		slist_map( expr_error_all,
 			(SListMapFn) expr_error_print, &buf );
-		fprintf( stderr, "%s\n", buf_all( &buf ) );
+		fprintf( stderr, "%s\n", vips_buf_all( &buf ) );
 	}
 
 	exit( 1 );
@@ -870,14 +870,14 @@ main_check_temp( double total )
 {
 	if( total > 10 * 1024 * 1024 ) {
 		char txt[256];
-		BufInfo buf;
+		VipsBuf buf;
 		char tmp[FILENAME_MAX];
 
 		expand_variables( PATH_TMP, tmp );
 		nativeize_path( tmp );
 		absoluteize_path( tmp );
 
-		buf_init_static( &buf, txt, 256 );
+		vips_buf_init_static( &buf, txt, 256 );
 		to_size( &buf, total );
 
 		box_yesno( NULL,
@@ -889,7 +889,7 @@ main_check_temp( double total )
 			"Would you like to empty the temp area? "
 			"This will delete any workspace backups and "
 			"cannot be undone." ),
-			tmp, buf_all( &buf ) );
+			tmp, vips_buf_all( &buf ) );
 	}
 }
 
@@ -976,7 +976,7 @@ main( int argc, char *argv[] )
 #endif /*HAVE_FFTW*/
 	Toolkit *kit;
 	char txt[MAX_STRSIZE];
-	BufInfo buf;
+	VipsBuf buf;
 
 #ifdef DEBUG_LEAK
 #ifdef PROFILE
@@ -1314,9 +1314,9 @@ main( int argc, char *argv[] )
 	if( main_option_expression ) {
 		kit = toolkit_new( main_toolkitgroup, "_expression" );
 
-		buf_init_static( &buf, txt, MAX_STRSIZE );
-		buf_appendf( &buf, "main = %s;", main_option_expression );
-		attach_input_string( buf_all( &buf ) );
+		vips_buf_init_static( &buf, txt, MAX_STRSIZE );
+		vips_buf_appendf( &buf, "main = %s;", main_option_expression );
+		attach_input_string( vips_buf_all( &buf ) );
 		(void) parse_onedef( kit, -1 );
 
 		filemodel_set_modified( FILEMODEL( kit ), FALSE );
@@ -1368,21 +1368,21 @@ main( int argc, char *argv[] )
 	/* Make nip's argc/argv[].
 	 */
 	kit = toolkit_new( main_toolkitgroup, "_args" );
-	buf_init_static( &buf, txt, MAX_STRSIZE );
-	buf_appendf( &buf, "argc = %d;", argc );
-	attach_input_string( buf_all( &buf ) );
+	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
+	vips_buf_appendf( &buf, "argc = %d;", argc );
+	attach_input_string( vips_buf_all( &buf ) );
 	(void) parse_onedef( kit, -1 );
 
-	buf_init_static( &buf, txt, MAX_STRSIZE );
-	buf_appendf( &buf, "argv = [" );
+	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
+	vips_buf_appendf( &buf, "argv = [" );
 	for( i = 0; i < argc; i++ ) {
 		if( i > 0 )
-			buf_appendf( &buf, ", " );
-		buf_appendf( &buf, "\"%s\"", argv[i] );
+			vips_buf_appendf( &buf, ", " );
+		vips_buf_appendf( &buf, "\"%s\"", argv[i] );
 	}
-	buf_appendf( &buf, "];" );
+	vips_buf_appendf( &buf, "];" );
 
-	attach_input_string( buf_all( &buf ) );
+	attach_input_string( vips_buf_all( &buf ) );
 	if( !parse_onedef( kit, -1 ) ) 
 		main_log_add( "%s\n", error_get_sub() );
 

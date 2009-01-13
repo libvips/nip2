@@ -69,7 +69,7 @@ colour_finalize( GObject *gobject )
 	Colour *colour = COLOUR( gobject );
 
 	IM_FREE( colour->colour_space );
-	buf_destroy( &colour->caption );
+	vips_buf_destroy( &colour->caption );
 
 	G_OBJECT_CLASS( parent_class )->finalize( gobject );
 }
@@ -113,8 +113,8 @@ colour_get_vips_type( Colour *colour )
 static void
 colour_refresh( Colour *colour )
 {
-	buf_rewind( &colour->caption );
-	buf_appendf( &colour->caption, CLASS_COLOUR " %s [%g, %g, %g]",
+	vips_buf_rewind( &colour->caption );
+	vips_buf_appendf( &colour->caption, CLASS_COLOUR " %s [%g, %g, %g]",
 		NN( colour->colour_space ),
 		colour->value[0], colour->value[1], colour->value[2] );
 }
@@ -250,16 +250,16 @@ colour_edit( GtkWidget *parent, Model *model )
 	Colour *colour = COLOUR( model );
 	ColourEdit *eds = INEW( NULL, ColourEdit );
 	GtkWidget *idlg;
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[100];
 
 	eds->colour = colour;
 
 	idlg = idialog_new();
-	buf_init_static( &buf, txt, 100 );
+	vips_buf_init_static( &buf, txt, 100 );
 	row_qualified_name( HEAPMODEL( colour )->row, &buf );
 	iwindow_set_title( IWINDOW( idlg ), 
-		_( "Edit Color \"%s\"" ), buf_all( &buf ) );
+		_( "Edit Color \"%s\"" ), vips_buf_all( &buf ) );
 	idialog_set_build( IDIALOG( idlg ), 
 		(iWindowBuildFn) colour_buildedit, eds, NULL, NULL );
 	idialog_set_callbacks( IDIALOG( idlg ), 
@@ -341,7 +341,7 @@ colour_init( Colour *colour )
 	colour->value[1] = 0.0;
 	colour->value[2] = 0.0;
 	colour->colour_space = NULL;
-	buf_init_dynamic( &colour->caption, MAX_LINELENGTH );
+	vips_buf_init_dynamic( &colour->caption, MAX_LINELENGTH );
 
 	iobject_set( IOBJECT( colour ), CLASS_COLOUR, NULL );
 }

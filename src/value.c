@@ -51,7 +51,7 @@ value_finalize( GObject *gobject )
 
 	/* My instance finalize stuff.
 	 */
-	buf_destroy( &value->caption_buffer );
+	vips_buf_destroy( &value->caption_buffer );
 
 	G_OBJECT_CLASS( parent_class )->finalize( gobject );
 }
@@ -63,15 +63,15 @@ value_generate_caption( iObject *iobject )
 {
 	Value *value = VALUE( iobject );
 	ValueClass *value_class = VALUE_GET_CLASS( value );
-	BufInfo *buf = &value->caption_buffer;
+	VipsBuf *buf = &value->caption_buffer;
 
-	buf_rewind( buf );
+	vips_buf_rewind( buf );
 	if( !heapmodel_name( HEAPMODEL( value ), buf ) ) 
-		buf_appends( buf, G_OBJECT_CLASS_NAME( value_class ) );
-	buf_appends( buf, " " );
+		vips_buf_appends( buf, G_OBJECT_CLASS_NAME( value_class ) );
+	vips_buf_appends( buf, " " );
 	heapmodel_value( HEAPMODEL( value ), buf );
 
-	return( buf_all( buf ) );
+	return( vips_buf_all( buf ) );
 }
 
 static View *
@@ -102,7 +102,7 @@ value_class_init( ValueClass *class )
 static void
 value_init( Value *value )
 {
-	buf_init_dynamic( &value->caption_buffer, MAX_LINELENGTH );
+	vips_buf_init_dynamic( &value->caption_buffer, MAX_LINELENGTH );
 }
 
 GType

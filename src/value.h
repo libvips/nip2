@@ -44,7 +44,7 @@ typedef struct _Value {
 
 	/* Build caption buffer here.
 	 */
-	BufInfo caption_buffer;
+	VipsBuf caption_buffer;
 } Value;
 
 typedef struct _ValueClass {

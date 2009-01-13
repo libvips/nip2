@@ -57,27 +57,27 @@ static guint expr_signals[SIG_LAST] = { 0 };
 GSList *expr_error_all = NULL;
 
 void *
-expr_error_print( Expr *expr, BufInfo *buf )
+expr_error_print( Expr *expr, VipsBuf *buf )
 {
 	g_assert( expr->err );
 
-	if( !buf_is_empty( buf )  )
-		buf_appends( buf, "\n" );
+	if( !vips_buf_is_empty( buf )  )
+		vips_buf_appends( buf, "\n" );
 
-	buf_appendf( buf, _( "error in \"%s\"" ), IOBJECT( expr->sym )->name );
+	vips_buf_appendf( buf, _( "error in \"%s\"" ), IOBJECT( expr->sym )->name );
 	if( expr->sym->tool ) 
 		tool_error( expr->sym->tool, buf );
 	else if( expr->row ) {
 		Workspace *ws = expr->row->ws;
 
-		buf_appendf( buf, " (" );
+		vips_buf_appendf( buf, " (" );
 		row_qualified_name( expr->row, buf );
 		if( FILEMODEL( ws )->filename )
-			buf_appendf( buf, " - %s", FILEMODEL( ws )->filename );
-		buf_appendf( buf, ")" );
+			vips_buf_appendf( buf, " - %s", FILEMODEL( ws )->filename );
+		vips_buf_appendf( buf, ")" );
 	}
 
-	buf_appendf( buf, ": %s\n%s", expr->error_top, expr->error_sub );
+	vips_buf_appendf( buf, ": %s\n%s", expr->error_top, expr->error_sub );
 
 	return( NULL );
 }
@@ -131,7 +131,7 @@ expr_name_print( Expr *expr )
 }
 
 void
-expr_name( Expr *expr, BufInfo *buf )
+expr_name( Expr *expr, VipsBuf *buf )
 {
 	if( expr->row ) 
 		row_qualified_name( expr->row, buf );
@@ -317,13 +317,13 @@ expr_dispose( GObject *gobject )
 }
 
 static void
-expr_info( iObject *iobject, BufInfo *buf )
+expr_info( iObject *iobject, VipsBuf *buf )
 {
 	Expr *expr = EXPR( iobject );
 
 	if( expr->err ) {
-		buf_appends( buf, _( "Error" ) );
-		buf_appendf( buf, ": %s\n%s\n", 
+		vips_buf_appends( buf, _( "Error" ) );
+		vips_buf_appendf( buf, ": %s\n%s\n", 
 			expr->error_top, expr->error_sub );
 	}
 }
@@ -576,54 +576,54 @@ expr_dirty_intrans( Expr *expr, int serial )
 }
 
 void
-expr_tip_sub( Expr *expr, BufInfo *buf )
+expr_tip_sub( Expr *expr, VipsBuf *buf )
 {
 	Compile *compile = expr->compile;
 
 	if( is_top( expr->sym ) ) {
-		buf_appends( buf, _( "top level" ) );
-		buf_appends( buf, " " );
+		vips_buf_appends( buf, _( "top level" ) );
+		vips_buf_appends( buf, " " );
 	}
 
 	if( compile && is_class( compile ) ) {
-		buf_appends( buf, _( "class" ) );
-		buf_appends( buf, " " );
+		vips_buf_appends( buf, _( "class" ) );
+		vips_buf_appends( buf, " " );
 		if( compile->nparam == 0 ) {
-			buf_appends( buf, _( "instance" ) );
-			buf_appends( buf, " " );
+			vips_buf_appends( buf, _( "instance" ) );
+			vips_buf_appends( buf, " " );
 		}
 		else {
-			buf_appends( buf, _( "definition" ) );
-			buf_appends( buf, " " );
+			vips_buf_appends( buf, _( "definition" ) );
+			vips_buf_appends( buf, " " );
 		}
 
-		buf_appendf( buf, "\"%s\"", IOBJECT( expr->sym )->name );
+		vips_buf_appendf( buf, "\"%s\"", IOBJECT( expr->sym )->name );
 	}
 	else if( expr->sym->type == SYM_PARAM )
-		buf_appendf( buf, _( "parameter \"%s\"" ), 
+		vips_buf_appendf( buf, _( "parameter \"%s\"" ), 
 			IOBJECT( expr->sym )->name );
 	else {
 		if( is_member( expr->sym ) ) {
-			buf_appends( buf, _( "member" ) );
-			buf_appends( buf, " " );
+			vips_buf_appends( buf, _( "member" ) );
+			vips_buf_appends( buf, " " );
 		}
 
 		if( compile->nparam == 0 ) {
-			buf_appends( buf, _( "value" ) );
-			buf_appends( buf, " " );
+			vips_buf_appends( buf, _( "value" ) );
+			vips_buf_appends( buf, " " );
 		}
 		else {
-			buf_appends( buf, _( "function" ) );
-			buf_appends( buf, " " );
+			vips_buf_appends( buf, _( "function" ) );
+			vips_buf_appends( buf, " " );
 		}
 
-		buf_appendf( buf, "\"%s\"", IOBJECT( expr->sym )->name );
+		vips_buf_appendf( buf, "\"%s\"", IOBJECT( expr->sym )->name );
 	}
 
 	if( !is_top( expr->sym ) ) {
-		buf_appends( buf, " " );
-		buf_appends( buf, _( "of" ) );
-		buf_appends( buf, " " );
+		vips_buf_appends( buf, " " );
+		vips_buf_appends( buf, _( "of" ) );
+		vips_buf_appends( buf, " " );
 		expr_tip_sub( expr_get_parent( expr ), buf );
 	}
 }
@@ -631,10 +631,10 @@ expr_tip_sub( Expr *expr, BufInfo *buf )
 /* Look at an expr, make a tooltip.
  */
 void
-expr_tip( Expr *expr, BufInfo *buf )
+expr_tip( Expr *expr, VipsBuf *buf )
 {
 	expr_name( expr, buf ); 
-	buf_appends( buf, ": " );
+	vips_buf_appends( buf, ": " );
 	expr_tip_sub( expr, buf );
 }
 

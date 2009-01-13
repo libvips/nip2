@@ -229,20 +229,20 @@ plotview_class_init( PlotviewClass *class )
 }
 
 static void
-plotview_tooltip_generate( GtkWidget *widget, BufInfo *buf, Plotview *plotview )
+plotview_tooltip_generate( GtkWidget *widget, VipsBuf *buf, Plotview *plotview )
 {
 	Plot *plot = PLOT( VOBJECT( plotview )->iobject );
 	IMAGE *im;
 
-	buf_rewind( buf );
-	buf_appends( buf, buf_all( &plot->caption_buffer ) );
+	vips_buf_rewind( buf );
+	vips_buf_appends( buf, vips_buf_all( &plot->caption_buffer ) );
 
-	buf_appendf( buf, ", %s, %s", 
+	vips_buf_appendf( buf, ", %s, %s", 
 		plot_f2c( plot->format ), plot_s2c( plot->style ) );
 
 	if( (im = imageinfo_get( FALSE, plot->value.ii )) ) {
-		buf_appends( buf, ", " );
-		buf_appendi( buf, im );
+		vips_buf_appends( buf, ", " );
+		vips_buf_appendi( buf, im );
 	}
 }
 

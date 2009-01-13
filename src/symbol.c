@@ -149,32 +149,32 @@ symbol_get_scope( Symbol *sym )
  * static scopes.
  */
 void
-symbol_qualified_name( Symbol *sym, BufInfo *buf )
+symbol_qualified_name( Symbol *sym, VipsBuf *buf )
 {
 	Symbol *parent = symbol_get_parent( sym );
 
 	if( parent && !is_scope( parent ) ) {
 		symbol_qualified_name( parent, buf );
-		buf_appends( buf, "." );
+		vips_buf_appends( buf, "." );
 	}
 
-	buf_appends( buf, NN( IOBJECT( sym )->name ) );
+	vips_buf_appends( buf, NN( IOBJECT( sym )->name ) );
 }
 
 /* Make a symbol name relative to a scope context ... ie. from the point of
  * view of a local of context, what name will find sym.
  */
 void
-symbol_qualified_name_relative( Symbol *context, Symbol *sym, BufInfo *buf )
+symbol_qualified_name_relative( Symbol *context, Symbol *sym, VipsBuf *buf )
 {
 	Symbol *parent = symbol_get_parent( sym );
 
 	if( parent && !is_ancestor( context, parent ) ) {
 		symbol_qualified_name_relative( context, parent, buf );
-		buf_appends( buf, "." );
+		vips_buf_appends( buf, "." );
 	}
 
-	buf_appends( buf, NN( IOBJECT( sym )->name ) );
+	vips_buf_appends( buf, NN( IOBJECT( sym )->name ) );
 }
 
 /* Handy for error messages ... but nowt else. Return string overwritten on
@@ -183,13 +183,13 @@ symbol_qualified_name_relative( Symbol *context, Symbol *sym, BufInfo *buf )
 const char *
 symbol_name( Symbol *sym )
 {
-	static BufInfo buf;
+	static VipsBuf buf;
 	static char txt[200];
 
-	buf_init_static( &buf, txt, 200 );
+	vips_buf_init_static( &buf, txt, 200 );
 	symbol_qualified_name( sym, &buf );
 
-	return( buf_all( &buf ) );
+	return( vips_buf_all( &buf ) );
 }
 
 /* Convenience ... print a qual name to stdout.
@@ -208,15 +208,15 @@ symbol_name_scope( Symbol *sym )
 {
 	Symbol *scope = symbol_get_scope( sym );
 
-	static BufInfo buf;
+	static VipsBuf buf;
 	static char txt[200];
 
-	buf_init_static( &buf, txt, 200 );
-	buf_appends( &buf, NN( IOBJECT( scope )->name ) );
-	buf_appends( &buf, "." );
+	vips_buf_init_static( &buf, txt, 200 );
+	vips_buf_appends( &buf, NN( IOBJECT( scope )->name ) );
+	vips_buf_appends( &buf, "." );
 	symbol_qualified_name_relative( scope, sym, &buf );
 
-	return( buf_all( &buf ) );
+	return( vips_buf_all( &buf ) );
 }
 
 /* Convenience ... print a qual name to stdout.
@@ -457,7 +457,7 @@ symbol_made( Symbol *sym )
 }
 
 static void *
-symbol_not_defined_sub( Link *link, BufInfo *buf )
+symbol_not_defined_sub( Link *link, VipsBuf *buf )
 {
 	symbol_qualified_name( link->parent, buf );
 
@@ -474,22 +474,22 @@ void
 symbol_not_defined( Symbol *sym )
 {
 	char txt[256];
-	BufInfo buf;
+	VipsBuf buf;
 
 	error_top( _( "Not found." ) );
-	buf_init_static( &buf, txt, 256 );
-	buf_appendf( &buf, _( "Symbol %s is not defined." ), 
+	vips_buf_init_static( &buf, txt, 256 );
+	vips_buf_appendf( &buf, _( "Symbol %s is not defined." ), 
 		symbol_name( sym ) );
-	buf_appends( &buf, "\n" );
+	vips_buf_appends( &buf, "\n" );
 	if( sym->topparents ) {
-		buf_appendf( &buf, _( "%s is referred to by" ),
+		vips_buf_appendf( &buf, _( "%s is referred to by" ),
 			symbol_name( sym ) );
-		buf_appends( &buf, ": " );
+		vips_buf_appends( &buf, ": " );
 		slist_map2( sym->topparents,
 			(SListMap2Fn) symbol_not_defined_sub, &buf, NULL );
-		buf_appends( &buf, "\n" );
+		vips_buf_appends( &buf, "\n" );
 	}
-	error_sub( "%s", buf_all( &buf ) );
+	error_sub( "%s", vips_buf_all( &buf ) );
 }
 
 /* Compile refers to sym, which is going ... mark compile as containing an 
@@ -694,19 +694,19 @@ symbol_new( Compile *compile, const char *name )
 void
 symbol_error_redefine( Symbol *sym )
 {
-	static BufInfo buf;
+	static VipsBuf buf;
 	static char txt[200];
 
-	buf_init_static( &buf, txt, 200 );
-	buf_appendf( &buf, _( "Redefinition of \"%s\"." ), 
+	vips_buf_init_static( &buf, txt, 200 );
+	vips_buf_appendf( &buf, _( "Redefinition of \"%s\"." ), 
 		IOBJECT( sym )->name );
 	if( sym->tool && sym->tool->lineno != -1 ) {
-		buf_appendf( &buf, "\n" );
-		buf_appendf( &buf, _( "Previously defined at line %d." ),
+		vips_buf_appendf( &buf, "\n" );
+		vips_buf_appendf( &buf, _( "Previously defined at line %d." ),
 			sym->tool->lineno );
 	}
 
-	yyerror( "%s", buf_all( &buf ) );
+	yyerror( "%s", vips_buf_all( &buf ) );
 }
 
 /* Name in defining occurence. If this is a top-level definition, clean the

@@ -424,7 +424,7 @@ typedef struct _TooltipGenerate {
 	void *a;
 	void *b;
 
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[256];
 } TooltipGenerate;
 
@@ -446,9 +446,9 @@ tooltip_generate_rebuild( GtkWidget *widget,
 	gboolean handled = FALSE;
 
 	if( gen->widget ) {
-		buf_rewind( &gen->buf );
+		vips_buf_rewind( &gen->buf );
 		gen->generate( widget, &gen->buf, gen->a, gen->b );
-		set_tooltip( gen->widget, "%s", buf_all( &gen->buf ) );
+		set_tooltip( gen->widget, "%s", vips_buf_all( &gen->buf ) );
 	}
 
 	return( handled );
@@ -483,7 +483,7 @@ set_tooltip_generate( GtkWidget *widget,
 	gen->generate = generate;
 	gen->a = a;
 	gen->b = b;
-	buf_init_static( &gen->buf, gen->txt, 256 );
+	vips_buf_init_static( &gen->buf, gen->txt, 256 );
 	g_signal_connect( widget, "destroy", 
 		G_CALLBACK( tooltip_generate_free ), gen );
 
@@ -558,14 +558,14 @@ set_glabel1( GtkWidget *label, const char *fmt, ... )
 {
 	va_list ap;
 	char txt[1000];
-	BufInfo buf;
+	VipsBuf buf;
 
 	va_start( ap, fmt );
-	buf_init_static( &buf, txt, 1000 );
-	buf_vappendf( &buf, fmt, ap );
+	vips_buf_init_static( &buf, txt, 1000 );
+	vips_buf_vappendf( &buf, fmt, ap );
 	va_end( ap );
 
-	gtk_label_set_text( GTK_LABEL( label ), buf_firstline( &buf ) );
+	gtk_label_set_text( GTK_LABEL( label ), vips_buf_firstline( &buf ) );
 }
 
 /* Like set_glabel, but do it caption-style.

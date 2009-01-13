@@ -88,5 +88,5 @@ void *heapmodel_clear_edited( Heapmodel *heapmodel );
 GType heapmodel_get_type( void );
 
 void heapmodel_set_modified( Heapmodel *heapmodel, gboolean modified );
-gboolean heapmodel_name( Heapmodel *heapmodel, BufInfo *buf );
-gboolean heapmodel_value( Heapmodel *heapmodel, BufInfo *buf );
+gboolean heapmodel_name( Heapmodel *heapmodel, VipsBuf *buf );
+gboolean heapmodel_value( Heapmodel *heapmodel, VipsBuf *buf );

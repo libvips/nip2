@@ -18,6 +18,8 @@ started 7.17.0
   they are
 - added vipsobject builder from old call8 code
 - added vips_object_new builtin
+- moved BufInfo down into vips
+- added IM_INTERPOLATE to vips_call
 
 started 7.16.3
 - fixed cancel system (again)

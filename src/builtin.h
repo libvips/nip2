@@ -49,7 +49,7 @@ struct _BuiltinInfo {
 };
 
 void builtin_init( void );
-void builtin_usage( BufInfo *buf, BuiltinInfo *builtin );
+void builtin_usage( VipsBuf *buf, BuiltinInfo *builtin );
 void builtin_run( Reduce *rc, Compile *compile,
 	int op, const char *name, HeapNode **arg, PElement *out,
 	BuiltinInfo *builtin );

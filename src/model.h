@@ -69,7 +69,7 @@ typedef struct _ModelLoadState {
 	/* Log error messages here.
 	 */
 	char error_log_buffer[MAX_STRSIZE];
-	BufInfo error_log;
+	VipsBuf error_log;
 } ModelLoadState;
 
 #define TYPE_MODEL (model_get_type())

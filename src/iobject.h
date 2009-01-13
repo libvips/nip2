@@ -82,7 +82,7 @@ typedef struct _iObjectClass {
 
 	/* Try and say something useful about us.
 	 */
-	void (*info)( iObject *, BufInfo * );
+	void (*info)( iObject *, VipsBuf * );
 
 	/* Called on _changed() to update the caption. Define this if you want
 	 * the caption to be an explanatory note about the object. 
@@ -92,7 +92,7 @@ typedef struct _iObjectClass {
 
 void *iobject_destroy( iObject *iobject );
 void *iobject_changed( iObject *iobject );
-void *iobject_info( iObject *iobject, BufInfo * );
+void *iobject_info( iObject *iobject, VipsBuf * );
 
 GType iobject_get_type( void );
 

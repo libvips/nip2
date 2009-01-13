@@ -87,8 +87,8 @@ typedef struct _RowClass {
 } RowClass;
 
 const char *row_name( Row *row );
-void row_qualified_name_relative( Symbol *context, Row *row, BufInfo *buf );
-void row_qualified_name( Row *row, BufInfo *buf );
+void row_qualified_name_relative( Symbol *context, Row *row, VipsBuf *buf );
+void row_qualified_name( Row *row, VipsBuf *buf );
 void *row_name_print( Row *row );
 
 void row_error_set( Row *row );

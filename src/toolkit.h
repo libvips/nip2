@@ -72,4 +72,4 @@ Toolkit *toolkit_new_filename( Toolkitgroup *kitg, const char *filename );
 Toolkit *toolkit_new_from_file( Toolkitgroup *kitg, const char *filename );
 Toolkit *toolkit_new_from_openfile( Toolkitgroup *kitg, iOpenFile *of );
 
-void *toolkit_linkreport( Toolkit *kit, BufInfo *buf, gboolean *bad_links );
+void *toolkit_linkreport( Toolkit *kit, VipsBuf *buf, gboolean *bad_links );

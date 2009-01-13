@@ -1027,7 +1027,7 @@ imagepresent_left_release( Imagepresent *ip, GdkEvent *ev, int x, int y )
 			/* Make a new region.
 			 */
 			char txt[MAX_STRSIZE];
-			BufInfo buf;
+			VipsBuf buf;
 			Symbol *sym;
 
 			/* In compatibility mode, we need to un-offset, since
@@ -1041,7 +1041,7 @@ imagepresent_left_release( Imagepresent *ip, GdkEvent *ev, int x, int y )
 				ip->floating.top -= im->Yoffset;
 			}
 
-			buf_init_static( &buf, txt, MAX_STRSIZE );
+			vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 
 			switch( ip->regionview->type ) {
 			case REGIONVIEW_MARK:
@@ -1049,43 +1049,43 @@ imagepresent_left_release( Imagepresent *ip, GdkEvent *ev, int x, int y )
 				 * "Point".
 				 */
 				if( row->ws->compat_78 )
-					buf_appends( &buf, "Point " );
+					vips_buf_appends( &buf, "Point " );
 				else
-					buf_appendf( &buf, "%s ", CLASS_MARK );
+					vips_buf_appendf( &buf, "%s ", CLASS_MARK );
 
 				row_qualified_name( row, &buf );
-				buf_appendd( &buf, ip->floating.left );
-				buf_appendd( &buf, ip->floating.top );
+				vips_buf_appendd( &buf, ip->floating.left );
+				vips_buf_appendd( &buf, ip->floating.top );
 				break;
 
 			case REGIONVIEW_REGION:
-				buf_appendf( &buf, "%s ", CLASS_REGION );
+				vips_buf_appendf( &buf, "%s ", CLASS_REGION );
 				row_qualified_name( row, &buf );
-				buf_appendd( &buf, ip->floating.left );
-				buf_appendd( &buf, ip->floating.top );
-				buf_appendd( &buf, ip->floating.width );
-				buf_appendd( &buf, ip->floating.height );
+				vips_buf_appendd( &buf, ip->floating.left );
+				vips_buf_appendd( &buf, ip->floating.top );
+				vips_buf_appendd( &buf, ip->floating.width );
+				vips_buf_appendd( &buf, ip->floating.height );
 				break;
 
 			case REGIONVIEW_ARROW:
-				buf_appendf( &buf, "%s ", CLASS_ARROW );
+				vips_buf_appendf( &buf, "%s ", CLASS_ARROW );
 				row_qualified_name( row, &buf );
-				buf_appendd( &buf, ip->floating.left );
-				buf_appendd( &buf, ip->floating.top );
-				buf_appendd( &buf, ip->floating.width );
-				buf_appendd( &buf, ip->floating.height );
+				vips_buf_appendd( &buf, ip->floating.left );
+				vips_buf_appendd( &buf, ip->floating.top );
+				vips_buf_appendd( &buf, ip->floating.width );
+				vips_buf_appendd( &buf, ip->floating.height );
 				break;
 
 			case REGIONVIEW_HGUIDE:
-				buf_appendf( &buf, "%s ", CLASS_HGUIDE );
+				vips_buf_appendf( &buf, "%s ", CLASS_HGUIDE );
 				row_qualified_name( row, &buf );
-				buf_appendd( &buf, ip->floating.top );
+				vips_buf_appendd( &buf, ip->floating.top );
 				break;
 
 			case REGIONVIEW_VGUIDE:
-				buf_appendf( &buf, "%s ", CLASS_VGUIDE );
+				vips_buf_appendf( &buf, "%s ", CLASS_VGUIDE );
 				row_qualified_name( row, &buf );
-				buf_appendd( &buf, ip->floating.left );
+				vips_buf_appendd( &buf, ip->floating.left );
 				break;
 
 			default:
@@ -1095,7 +1095,7 @@ imagepresent_left_release( Imagepresent *ip, GdkEvent *ev, int x, int y )
 			DESTROY_GTK( ip->regionview );
 
 			if( !(sym = workspace_add_def( row->ws, 
-				buf_all( &buf ) )) ) 
+				vips_buf_all( &buf ) )) ) 
 				box_alert( GTK_WIDGET( ip ) );
 
 			workspace_deselect_all( row->ws );

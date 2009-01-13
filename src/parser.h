@@ -58,7 +58,7 @@ extern int yyleng;			/* lex stuff */
 
 /* Lex gathers tokens here for workspace.c
  */
-extern BufInfo lex_text;
+extern VipsBuf lex_text;
 
 /* Attach input for lex.
  */

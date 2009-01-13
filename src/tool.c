@@ -43,15 +43,15 @@ static FilemodelClass *parent_class = NULL;
 #define MAX_NAME (256)
 
 void
-tool_error( Tool *tool, BufInfo *buf )
+tool_error( Tool *tool, VipsBuf *buf )
 {
 	if( tool->lineno != -1 ) {
-		buf_appends( buf, " (" );
+		vips_buf_appends( buf, " (" );
 		if( FILEMODEL( tool->kit )->filename )
-			buf_appends( buf, FILEMODEL( tool->kit )->filename );
+			vips_buf_appends( buf, FILEMODEL( tool->kit )->filename );
 		else
-			buf_appends( buf, IOBJECT( tool->kit )->name );
-		buf_appendf( buf, ":%d)", tool->lineno );
+			vips_buf_appends( buf, IOBJECT( tool->kit )->name );
+		vips_buf_appendf( buf, ":%d)", tool->lineno );
 	}
 }
 
@@ -155,20 +155,20 @@ tool_type_to_char( Tooltype type )
 }
 
 static void
-tool_info( iObject *iobject, BufInfo *buf )
+tool_info( iObject *iobject, VipsBuf *buf )
 {
 	Tool *tool = TOOL( iobject );
 
 	IOBJECT_CLASS( parent_class )->info( iobject, buf );
 
-	buf_appendf( buf, "type = \"%s\"\n", tool_type_to_char( tool->type ) );
+	vips_buf_appendf( buf, "type = \"%s\"\n", tool_type_to_char( tool->type ) );
 	if( tool->type == TOOL_SYM )
-		buf_appendf( buf, "symbol = \"%s\"\n", 
+		vips_buf_appendf( buf, "symbol = \"%s\"\n", 
 			IOBJECT( tool->sym )->name );
 	if( tool->lineno != -1 )
-		buf_appendf( buf, "lineno = %d\n", tool->lineno );
+		vips_buf_appendf( buf, "lineno = %d\n", tool->lineno );
 	if( tool->kit )
-		buf_appendf( buf, "toolkit = \"%s\"\n", 
+		vips_buf_appendf( buf, "toolkit = \"%s\"\n", 
 			IOBJECT( tool->kit )->name );
 }
 
@@ -448,13 +448,13 @@ toolitem_set_action( Toolitem *toolitem, PElement *root )
 {
 	gboolean result;
 	char txt[256];
-	BufInfo buf;
+	VipsBuf buf;
 
-	buf_init_static( &buf, txt, 256 );
+	vips_buf_init_static( &buf, txt, 256 );
 
 	if( toolitem->parent )
-		buf_appendf( &buf, "%s.", toolitem->parent->action );
-	buf_appendf( &buf, "%s", IOBJECT( toolitem->compile->sym )->name );
+		vips_buf_appendf( &buf, "%s.", toolitem->parent->action );
+	vips_buf_appendf( &buf, "%s", IOBJECT( toolitem->compile->sym )->name );
 
 	/* If this is a Menuaction, we need the action member.
 	 */
@@ -471,9 +471,9 @@ toolitem_set_action( Toolitem *toolitem, PElement *root )
 	/* If there's an action member, use that. 
 	 */
 	if( toolitem->is_action )
-		buf_appends( &buf, "." MEMBER_ACTION ); 
+		vips_buf_appends( &buf, "." MEMBER_ACTION ); 
 
-	IM_SETSTR( toolitem->action, buf_all( &buf ) );
+	IM_SETSTR( toolitem->action, vips_buf_all( &buf ) );
 
 	/* No action member found and this is an item (ie. not a pullright)?
 	 * Default to the sym itself.
@@ -486,38 +486,38 @@ static void
 toolitem_set_path( Toolitem *toolitem )
 {
 	char txt[256];
-	BufInfo buf;
+	VipsBuf buf;
 
-	buf_init_static( &buf, txt, 256 );
+	vips_buf_init_static( &buf, txt, 256 );
 	if( toolitem->parent )
-		buf_appendf( &buf, "%s", toolitem->parent->path );
+		vips_buf_appendf( &buf, "%s", toolitem->parent->path );
 	else 
-		buf_appendf( &buf, "<mainw>/Toolkits/%s", 
+		vips_buf_appendf( &buf, "<mainw>/Toolkits/%s", 
 			IOBJECT( toolitem->tool->kit )->name );
-	buf_appendf( &buf, "/%s", toolitem->name );
-	IM_SETSTR( toolitem->path, buf_all( &buf ) );
+	vips_buf_appendf( &buf, "/%s", toolitem->name );
+	IM_SETSTR( toolitem->path, vips_buf_all( &buf ) );
 }
 
 static void
 toolitem_set_user_path( Toolitem *toolitem )
 {
 	char txt[256];
-	BufInfo buf;
+	VipsBuf buf;
 
-	buf_init_static( &buf, txt, 256 );
+	vips_buf_init_static( &buf, txt, 256 );
 	if( toolitem->parent )
-		buf_appends( &buf, toolitem->parent->user_path );
+		vips_buf_appends( &buf, toolitem->parent->user_path );
 	else
-		buf_appends( &buf, IOBJECT( toolitem->tool->kit )->name );
-	buf_appendf( &buf, " / %s", toolitem->name );
-	IM_SETSTR( toolitem->user_path, buf_all( &buf ) );
+		vips_buf_appends( &buf, IOBJECT( toolitem->tool->kit )->name );
+	vips_buf_appendf( &buf, " / %s", toolitem->name );
+	IM_SETSTR( toolitem->user_path, vips_buf_all( &buf ) );
 }
 
 static void *
-toolitem_set_help_sub( Symbol *param, BufInfo *buf )
+toolitem_set_help_sub( Symbol *param, VipsBuf *buf )
 {
-	buf_appends( buf, " " );
-	buf_appends( buf, IOBJECT( param )->name );
+	vips_buf_appends( buf, " " );
+	vips_buf_appends( buf, IOBJECT( param )->name );
 
 	return( NULL );
 }
@@ -526,10 +526,10 @@ static void
 toolitem_set_help( Toolitem *toolitem )
 {
 	char txt[256];
-	BufInfo buf;
+	VipsBuf buf;
 
-	buf_init_static( &buf, txt, 256 );
-	buf_appends( &buf, toolitem->name );
+	vips_buf_init_static( &buf, txt, 256 );
+	vips_buf_appends( &buf, toolitem->name );
 
 	/* Get the params from the action member if we can.
 	 */
@@ -539,10 +539,10 @@ toolitem_set_help( Toolitem *toolitem )
 		slist_map( toolitem->action_sym->expr->compile->param,
 			(SListMapFn) toolitem_set_help_sub, &buf );
 
-	buf_appends( &buf, ": " );
+	vips_buf_appends( &buf, ": " );
 	if( toolitem->tooltip )
-		buf_appends( &buf, toolitem->tooltip );
-	IM_SETSTR( toolitem->help, buf_firstline( &buf ) );
+		vips_buf_appends( &buf, toolitem->tooltip );
+	IM_SETSTR( toolitem->help, vips_buf_firstline( &buf ) );
 }
 
 static Toolitem *

@@ -1,16 +1,8 @@
-- test
-
-	vips_object_new "VipsInterpolateYafrsmooth" [] [$sharpening => 2]
-
-  we have 
-
-	void
-	vo_object_new( Reduce *rc, const char *name,
-	        PElement *required, PElement *optional, PElement *out )
-
-  add a builtin for this
 
 
+- vips_is_callable() needs to know about IM_INPUT_INTERPOLATE
+
+- vips_object_new "VipsInterpolateYafrsmooth" [] [$sharpening => 2]
 
 
 

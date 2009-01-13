@@ -117,7 +117,7 @@ model_loadstate_error( ModelLoadState *state, const char *fmt, ... )
 	va_list ap;
 
 	va_start( ap, fmt );
-	(void) buf_vappendf( &state->error_log, fmt, ap );
+	(void) vips_buf_vappendf( &state->error_log, fmt, ap );
 	va_end( ap );
 }
 
@@ -126,7 +126,7 @@ model_loadstate_error_get( ModelLoadState *state )
 {
 	char *utf8;
 
-	utf8 = f2utf8( buf_all( &state->error_log ) );
+	utf8 = f2utf8( vips_buf_all( &state->error_log ) );
 	error_top( _( "Load failed." ) );
 	error_sub( _( "Unable to load from file \"%s\". Error log is:\n%s" ),
 		state->filename, utf8 );
@@ -149,7 +149,7 @@ model_loadstate_new( const char *filename )
 		model_loadstate_destroy( state );
 		return( NULL );
 	}
-	buf_init_static( &state->error_log, 
+	vips_buf_init_static( &state->error_log, 
 		state->error_log_buffer, MAX_STRSIZE );
 
 	xmlSetGenericErrorFunc( state, 
@@ -179,7 +179,7 @@ model_loadstate_new_openfile( iOpenFile *of )
 		model_loadstate_destroy( state );
 		return( NULL );
 	}
-	buf_init_static( &state->error_log, 
+	vips_buf_init_static( &state->error_log, 
 		state->error_log_buffer, MAX_STRSIZE );
 
 	xmlSetGenericErrorFunc( state, 
@@ -247,7 +247,7 @@ model_loadstate_rewrite( ModelLoadState *state, char *old_rhs, char *new_rhs )
 
 	/* Take copy of lexed and rewritten stuff.
 	 */
-	im_strncpy( new_rhs, buf_all( &lex_text ), MAX_STRSIZE );
+	im_strncpy( new_rhs, vips_buf_all( &lex_text ), MAX_STRSIZE );
 }
 
 View *
@@ -670,7 +670,7 @@ model_check_destroy_finished( void *client, iWindowResult result )
 void
 model_check_destroy( GtkWidget *parent, Model *model )
 {
-	BufInfo buf;
+	VipsBuf buf;
 	char str[30];
 	const char *name;
 
@@ -680,9 +680,9 @@ model_check_destroy( GtkWidget *parent, Model *model )
 	mcd->model = model;
 
 	if( IS_SYMBOL( model ) ) {
-		buf_init_static( &buf, str, 30 );
+		vips_buf_init_static( &buf, str, 30 );
 		symbol_qualified_name( SYMBOL( model ), &buf );
-		name = buf_all( &buf );
+		name = vips_buf_all( &buf );
 	}
 	else
 		name = IOBJECT( model )->name;

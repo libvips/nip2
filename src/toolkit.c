@@ -95,13 +95,13 @@ toolkit_changed( iObject *iobject )
 }
 
 static void
-toolkit_info( iObject *iobject, BufInfo *buf )
+toolkit_info( iObject *iobject, VipsBuf *buf )
 {
 	Toolkit *kit = TOOLKIT( iobject );
 
 	IOBJECT_CLASS( parent_class )->info( iobject, buf );
 
-	buf_appendf( buf, "group = \"%s\"\n", IOBJECT( kit->kitg )->name );
+	vips_buf_appendf( buf, "group = \"%s\"\n", IOBJECT( kit->kitg )->name );
 }
 
 static View *
@@ -330,7 +330,7 @@ toolkit_by_name( Toolkitgroup *kitg, const char *name )
 
 static void *
 toolkit_linkreport_sym_sym( Symbol *child, 
-	Symbol *parent, BufInfo *buf, gboolean *found )
+	Symbol *parent, VipsBuf *buf, gboolean *found )
 {
 	if( child->type == SYM_ZOMBIE && !compile_resolve_top( child ) ) {
 		Tool *tool = symbol_get_tool( parent );
@@ -338,13 +338,13 @@ toolkit_linkreport_sym_sym( Symbol *child,
 		symbol_qualified_name( parent, buf );
 		tool_error( tool, buf );
 
-		buf_appendf( buf, " " );
+		vips_buf_appendf( buf, " " );
 		/* used as in "fred refers to undefined symbol jim"
 		 */
-		buf_appendf( buf, _( "refers to undefined symbol" ) );
-		buf_appendf( buf, " " );
+		vips_buf_appendf( buf, _( "refers to undefined symbol" ) );
+		vips_buf_appendf( buf, " " );
 		symbol_qualified_name( child, buf );
-		buf_appendf( buf, "\n" );
+		vips_buf_appendf( buf, "\n" );
 
 		*found = TRUE;
 	}
@@ -353,7 +353,7 @@ toolkit_linkreport_sym_sym( Symbol *child,
 }
 
 static void *
-toolkit_linkreport_sym( Symbol *sym, BufInfo *buf, gboolean *found )
+toolkit_linkreport_sym( Symbol *sym, VipsBuf *buf, gboolean *found )
 {
 	if( sym->expr )
 		return( slist_map3( sym->expr->compile->children,
@@ -364,7 +364,7 @@ toolkit_linkreport_sym( Symbol *sym, BufInfo *buf, gboolean *found )
 }
 
 static void *
-toolkit_linkreport_tool( Tool *tool, BufInfo *buf, gboolean *found )
+toolkit_linkreport_tool( Tool *tool, VipsBuf *buf, gboolean *found )
 {
 	Symbol *sym;
 
@@ -377,7 +377,7 @@ toolkit_linkreport_tool( Tool *tool, BufInfo *buf, gboolean *found )
 }
 
 void *
-toolkit_linkreport( Toolkit *kit, BufInfo *buf, gboolean *found )
+toolkit_linkreport( Toolkit *kit, VipsBuf *buf, gboolean *found )
 {
 	return( icontainer_map( ICONTAINER( kit ), 
 		(icontainer_map_fn) toolkit_linkreport_tool, buf, found ) );

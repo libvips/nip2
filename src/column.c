@@ -372,7 +372,7 @@ column_get_bottom( Column *col )
  * there.
  */
 gboolean
-column_add_n_names( Column *col, const char *name, BufInfo *buf, int nparam )
+column_add_n_names( Column *col, const char *name, VipsBuf *buf, int nparam )
 {
 	Subcolumn *scol = col->scol;
 	GSList *children = ICONTAINER( scol )->children;
@@ -391,8 +391,8 @@ column_add_n_names( Column *col, const char *name, BufInfo *buf, int nparam )
 	for( i = g_slist_nth( children, len - nparam ); i; i = i->next ) {
 		Row *row = ROW( i->data );
 
-		buf_appends( buf, " " );
-		buf_appends( buf, IOBJECT( row->sym )->name );
+		vips_buf_appends( buf, " " );
+		vips_buf_appends( buf, IOBJECT( row->sym )->name );
 	}
 
 	return( TRUE );

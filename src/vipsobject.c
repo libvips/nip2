@@ -30,10 +30,8 @@
 #include "ip.h"
 
 /*
-#define DEBUG
-#define DEBUG_HISTORY_MISS
-#define DEBUG_HISTORY
  */
+#define DEBUG
 
 /* Maxiumum number of args to constructor.
  */
@@ -287,6 +285,17 @@ vo_object_new( Reduce *rc, const char *name,
 		vo_free( vo );
 		reduce_throw( rc );
 	}
+
+#ifdef DEBUG
+{
+	VipsBuf buf;
+	char txt[1000];
+
+	vips_buf_init_static( &buf, txt, 1000 );
+	vips_object_to_string( vo->object, &buf );
+	printf( "vo_object_new: built %s\n", vips_buf_all( &buf ) );
+}
+#endif /*DEBUG*/
 
 	vo_free( vo );
 }

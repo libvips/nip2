@@ -70,7 +70,7 @@ colourview_refresh( vObject *vobject )
 #endif /*DEBUG*/
 
 	conversion_set_image( colourview->conv, colour_ii_new( colour ) );
-	set_gcaption( colourview->label, "%s", buf_all( &colour->caption ) );
+	set_gcaption( colourview->label, "%s", vips_buf_all( &colour->caption ) );
 
 	VOBJECT_CLASS( parent_class )->refresh( vobject );
 }

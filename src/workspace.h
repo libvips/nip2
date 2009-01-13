@@ -156,9 +156,9 @@ gboolean workspace_selected_sym( Workspace *ws, Symbol *sym );
 Row *workspace_selected_one( Workspace *ws );
 void workspace_deselect_all( Workspace *ws );
 void workspace_selected_names( Workspace *ws, 
-	BufInfo *buf, const char *separator );
+	VipsBuf *buf, const char *separator );
 void workspace_column_names( Column *col, 
-	BufInfo *buf, const char *separator );
+	VipsBuf *buf, const char *separator );
 void workspace_select_all( Workspace *ws );
 Column *workspace_is_one_empty( Workspace *ws );
 
@@ -169,7 +169,7 @@ Column *workspace_column_pick( Workspace *ws );
 void workspace_column_select( Workspace *ws, Column *col );
 
 Symbol *workspace_add_def( Workspace *ws, const char *str );
-gboolean workspace_load_file_buf( BufInfo *buf, const char *filename );
+gboolean workspace_load_file_buf( VipsBuf *buf, const char *filename );
 Symbol *workspace_load_file( Workspace *ws, const char *filename );
 
 gboolean workspace_selected_save( Workspace *ws, const char *filename );

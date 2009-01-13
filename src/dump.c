@@ -209,15 +209,15 @@ decode_SymbolType_user( SymbolType t )
 void *
 dump_tiny( Symbol *sym )
 {
-	BufInfo buf;
+	VipsBuf buf;
 	char str[100];
 
 	printf( "(%p) ", sym );
-	buf_init_static( &buf, str, 100 );
+	vips_buf_init_static( &buf, str, 100 );
 	symbol_qualified_name( sym, &buf );
 	if( sym->dirty )
 		printf( "*" );
-	printf( "%s %s; ", decode_SymbolType( sym->type ), buf_all( &buf ) );
+	printf( "%s %s; ", decode_SymbolType( sym->type ), vips_buf_all( &buf ) );
 
 	return( NULL );
 }
@@ -288,7 +288,7 @@ dump_compile( Compile *compile )
 {
 	Symbol *sym = compile->sym;
 #ifdef VERBOSE
-	BufInfo buf;
+	VipsBuf buf;
 	char str[100];
 #endif /*VERBOSE*/
 
@@ -352,10 +352,10 @@ dump_compile( Compile *compile )
 	(void) slist_map( compile->children, (SListMapFn) dump_tiny, NULL );
 	printf( "\n" );
 
-	buf_init_static( &buf, str, 80 );
+	vips_buf_init_static( &buf, str, 80 );
 	graph_element( compile->heap, &buf, &compile->base, FALSE );
 	printf( "%s->compile->base = %s\n", 
-		IOBJECT( sym )->name, buf_all( &buf ) );
+		IOBJECT( sym )->name, vips_buf_all( &buf ) );
 	if( compile->heap )
 		iobject_dump( IOBJECT( compile->heap ) );
 #endif /*VERBOSE*/
@@ -488,12 +488,12 @@ psym( char *name )
 void 
 pgraph( PElement *graph )
 {	
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[10240];
 
-	buf_init_static( &buf, txt, 10240 );
+	vips_buf_init_static( &buf, txt, 10240 );
 	graph_pelement( reduce_context->heap, &buf, graph, TRUE );
-	printf( "%s\n", buf_all( &buf ) );
+	printf( "%s\n", vips_buf_all( &buf ) );
 }
 
 /* Print symbol value from name.
@@ -501,15 +501,15 @@ pgraph( PElement *graph )
 void 
 psymv( char *name )
 {	
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[1024];
 	Symbol *s = sym( name );
 
 	if( s ) {
-		buf_init_static( &buf, txt, 1024 );
+		vips_buf_init_static( &buf, txt, 1024 );
 		graph_pelement( reduce_context->heap, 
 			&buf, &s->expr->root, TRUE );
-		printf( "%s = %s\n", name, buf_all( &buf ) );
+		printf( "%s = %s\n", name, vips_buf_all( &buf ) );
 	}
 }
 

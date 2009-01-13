@@ -472,8 +472,8 @@ workspaceview_drag_data_received( GtkWidget *widget, GdkDragContext *context,
 		IM_FREE( name );
 
 		if( col ) {
-			char buf_text[256];
-			BufInfo buf;
+			char vips_buf_text[256];
+			VipsBuf buf;
 			Symbol *sym;
 
 			col->x = x;
@@ -483,12 +483,12 @@ workspaceview_drag_data_received( GtkWidget *widget, GdkDragContext *context,
 			/* Qualify relative to us. We don't want to embed
 			 * workspace names unless we have to.
 			 */
-			buf_init_static( &buf, buf_text, 256 );
+			vips_buf_init_static( &buf, vips_buf_text, 256 );
 			row_qualified_name_relative( ws->sym, 
 				from_row, &buf );
 
 			if( !(sym = workspace_add_def( ws, 
-				buf_all( &buf ) )) ) 
+				vips_buf_all( &buf ) )) ) 
 				box_alert( widget );
 
 			symbol_recalculate_all();

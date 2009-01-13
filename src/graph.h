@@ -27,9 +27,9 @@
 
 */
 
-void graph_node( Heap *heap, BufInfo *buf, HeapNode *root, gboolean fn );
-void graph_pelement( Heap *heap, BufInfo *buf, PElement *root, gboolean fn );
-void graph_element( Heap *heap, BufInfo *buf, Element *root, gboolean fn );
+void graph_node( Heap *heap, VipsBuf *buf, HeapNode *root, gboolean fn );
+void graph_pelement( Heap *heap, VipsBuf *buf, PElement *root, gboolean fn );
+void graph_element( Heap *heap, VipsBuf *buf, Element *root, gboolean fn );
 void graph_pointer( PElement *root );
 
 /* Reduce and print, csh-style output.

@@ -49,7 +49,7 @@ struct _Colour {
 
 	/* Build view caption here.
 	 */
-	BufInfo caption;
+	VipsBuf caption;
 };
 
 typedef struct _ColourClass {

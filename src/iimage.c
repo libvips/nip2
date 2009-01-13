@@ -72,7 +72,7 @@ iimage_finalize( GObject *gobject )
 
 	image_value_destroy( &iimage->value );
 	IM_FREEF( g_slist_free, iimage->views );
-	buf_destroy( &iimage->caption_buffer );
+	vips_buf_destroy( &iimage->caption_buffer );
 
 	G_OBJECT_CLASS( parent_class )->finalize( gobject );
 }
@@ -84,22 +84,22 @@ iimage_generate_caption( iObject *iobject )
 {
 	iImage *iimage = IIMAGE( iobject );
 	Imageinfo *ii = iimage->value.ii;
-	BufInfo *buf = &iimage->caption_buffer;
+	VipsBuf *buf = &iimage->caption_buffer;
 
-	buf_rewind( buf );
+	vips_buf_rewind( buf );
 
 	image_value_caption( &iimage->value, buf );
 
 	if( ii ) {
-		buf_appends( buf, ", " );
+		vips_buf_appends( buf, ", " );
 		iobject_info( IOBJECT( iimage->value.ii ), buf );
 	}
 
-	return( buf_all( buf ) );
+	return( vips_buf_all( buf ) );
 }
 
 static void
-iimage_info( iObject *iobject, BufInfo *buf )
+iimage_info( iObject *iobject, VipsBuf *buf )
 {
 	iImage *iimage = IIMAGE( iobject );
 	Imageinfo *ii = iimage->value.ii;
@@ -111,8 +111,8 @@ iimage_info( iObject *iobject, BufInfo *buf )
 		if( im_header_get_type( im, ORIGINAL_FILENAME ) != 0 ) {
 			if( !im_header_string( im, 
 				ORIGINAL_FILENAME, &filename ) ) {
-				buf_appends( buf, _( "Original filename" ) );
-				buf_appendf( buf, ": %s\n", filename );
+				vips_buf_appends( buf, _( "Original filename" ) );
+				vips_buf_appendf( buf, ": %s\n", filename );
 			}
 		}
 	}
@@ -349,14 +349,14 @@ iimage_replace( iImage *iimage, const char *filename )
 	Row *row = HEAPMODEL( iimage )->row;
 	iText *itext = ITEXT( HEAPMODEL( iimage )->rhs->itext );
 	char txt[MAX_STRSIZE];
-	BufInfo buf;
+	VipsBuf buf;
 
-	buf_init_static( &buf, txt, MAX_STRSIZE );
-	buf_appends( &buf, "Image_file \"" );
-	buf_appendsc( &buf, TRUE, filename );
-	buf_appends( &buf, "\"" );
+	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
+	vips_buf_appends( &buf, "Image_file \"" );
+	vips_buf_appendsc( &buf, TRUE, filename );
+	vips_buf_appends( &buf, "\"" );
 
-	if( itext_set_formula( itext, buf_all( &buf ) ) ) {
+	if( itext_set_formula( itext, vips_buf_all( &buf ) ) ) {
 		itext_set_edited( itext, TRUE );
 		(void) expr_dirty( row->expr, link_serial_new() );
 
@@ -439,7 +439,7 @@ iimage_init( iImage *iimage )
 	iimage->falsecolour = FALSE;
 	iimage->type = TRUE;
 
-	buf_init_dynamic( &iimage->caption_buffer, MAX_LINELENGTH );
+	vips_buf_init_dynamic( &iimage->caption_buffer, MAX_LINELENGTH );
 
 	iobject_set( IOBJECT( iimage ), CLASS_IMAGE, NULL );
 }

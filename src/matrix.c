@@ -183,15 +183,15 @@ matrix_edit( GtkWidget *parent, Model *model )
 	MatrixEdit *eds = INEW( NULL, MatrixEdit );
 	GtkWidget *idlg;
 	char txt[256];
-	BufInfo buf;
+	VipsBuf buf;
 
 	eds->matrix = matrix;
 
 	idlg = idialog_new();
-	buf_init_static( &buf, txt, 100 );
+	vips_buf_init_static( &buf, txt, 100 );
 	row_qualified_name( HEAPMODEL( matrix )->row, &buf );
 	iwindow_set_title( IWINDOW( idlg ), 
-		_( "Edit Matrix \"%s\"" ), buf_all( &buf ) );
+		_( "Edit Matrix \"%s\"" ), vips_buf_all( &buf ) );
 	idialog_set_build( IDIALOG( idlg ), 
 		(iWindowBuildFn) matrix_buildedit, eds, NULL, NULL );
 	idialog_set_callbacks( IDIALOG( idlg ), 
@@ -235,18 +235,18 @@ matrix_graphic_replace( Classmodel *classmodel,
 	iText *itext = ITEXT( HEAPMODEL( matrix )->rhs->itext );
 	DOUBLEMASK *dmask;
 	char txt[MAX_STRSIZE];
-	BufInfo buf;
+	VipsBuf buf;
 
 	if( !(dmask = im_read_dmask( filename )) ) {
 		error_vips_all();
 		return( FALSE );
 	}
 
-	buf_init_static( &buf, txt, MAX_STRSIZE );
+	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 	matrix_dmask_to_ip( dmask, &buf );
 	im_free_dmask( dmask );
 
-	if( itext_set_formula( itext, buf_all( &buf ) ) ) {
+	if( itext_set_formula( itext, vips_buf_all( &buf ) ) ) {
 		itext_set_edited( itext, TRUE );
 		(void) expr_dirty( row->expr, link_serial_new() );
 	}
@@ -437,30 +437,30 @@ matrix_guess_display( const char *fname )
 /* Make an ip definition out of a DOUBLEMASK.
  */
 void
-matrix_dmask_to_ip( DOUBLEMASK *dmask, BufInfo *buf )
+matrix_dmask_to_ip( DOUBLEMASK *dmask, VipsBuf *buf )
 {
 	int x, y;
 
 	/* Build matrix expression.
 	 */
-	buf_appends( buf, CLASS_MATRIX " " );
+	vips_buf_appends( buf, CLASS_MATRIX " " );
 
-	buf_appends( buf, "[" );
+	vips_buf_appends( buf, "[" );
 	for( y = 0; y < dmask->ysize; y++ ) {
-		buf_appends( buf, "[" );
+		vips_buf_appends( buf, "[" );
 		for( x = 0; x < dmask->xsize; x++ ) {
-			buf_appendf( buf, "%g", 
+			vips_buf_appendf( buf, "%g", 
 				dmask->coeff[x + y*dmask->xsize] );
 			if( x != dmask->xsize - 1 )
-				buf_appends( buf, "," );
+				vips_buf_appends( buf, "," );
 		}
-		buf_appends( buf, "]" );
+		vips_buf_appends( buf, "]" );
 		if( y != dmask->ysize - 1 )
-			buf_appends( buf, "," );
+			vips_buf_appends( buf, "," );
 	}
-	buf_appends( buf, "]" );
+	vips_buf_appends( buf, "]" );
 
-	buf_appendf( buf, "(%g) (%g) \"%s\" %d", 
+	vips_buf_appendf( buf, "(%g) (%g) \"%s\" %d", 
 		dmask->scale, dmask->offset, dmask->filename,
 		matrix_guess_display( dmask->filename ) );
 }

@@ -173,7 +173,7 @@ plotstatus_refresh( Plotstatus *plotstatus )
 {
 	Plotmodel *plotmodel = plotstatus->plotmodel;
 	Plot *plot = plotmodel->plot;
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[MAX_LINELENGTH];
 
 #ifdef DEBUG
@@ -191,7 +191,7 @@ plotstatus_refresh( Plotstatus *plotstatus )
 	set_glabel( plotstatus->mag, "%s %d%%", 
 		_( "Magnification" ), plotmodel->mag );
 
-	buf_init_static( &buf, txt, MAX_LINELENGTH );
+	vips_buf_init_static( &buf, txt, MAX_LINELENGTH );
 	set_gcaption( plotstatus->top, "%s", IOBJECT( plot )->caption );
 
 	if( plotstatus->columns != plot->columns ) {

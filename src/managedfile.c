@@ -51,14 +51,14 @@ managedfile_dispose( GObject *gobject )
 }
 
 static void
-managedfile_info( iObject *iobject, BufInfo *buf )
+managedfile_info( iObject *iobject, VipsBuf *buf )
 {
 	Managedfile *managedfile = MANAGEDFILE( iobject );
 
-	buf_appendf( buf, "managedfile->fp = %p\n", managedfile->file->fp );
-	buf_appendf( buf, "managedfile->file->filename = %s\n", 
+	vips_buf_appendf( buf, "managedfile->fp = %p\n", managedfile->file->fp );
+	vips_buf_appendf( buf, "managedfile->file->filename = %s\n", 
 		managedfile->file->fname );
-	buf_appendf( buf, "managedfile->file->last_errno = %d\n", 
+	vips_buf_appendf( buf, "managedfile->file->last_errno = %d\n", 
 		managedfile->file->last_errno );
 
 	IOBJECT_CLASS( parent_class )->info( iobject, buf );

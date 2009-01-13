@@ -53,38 +53,38 @@ itext_finalize( GObject *gobject )
 	 */
 	IM_FREE( itext->formula );
 	IM_FREE( itext->formula_default );
-	buf_destroy( &itext->value );
-	buf_destroy( &itext->decompile );
+	vips_buf_destroy( &itext->value );
+	vips_buf_destroy( &itext->decompile );
 
 	G_OBJECT_CLASS( parent_class )->finalize( gobject );
 }
 
 static void
-itext_info( iObject *iobject, BufInfo *buf )
+itext_info( iObject *iobject, VipsBuf *buf )
 {
 	iText *itext = ITEXT( iobject );
 
-	buf_appends( buf, _( "Formula" ) );
-	buf_appendf( buf, ": %s\n", NN( itext->formula ) );
+	vips_buf_appends( buf, _( "Formula" ) );
+	vips_buf_appendf( buf, ": %s\n", NN( itext->formula ) );
 }
 
 /* Fwd ref this.
  */
-static gboolean itext_add_element( BufInfo *buf, 
+static gboolean itext_add_element( VipsBuf *buf, 
 	PElement *base, gboolean top, gboolean bracket );
 
 /* Sub-fn of below, callback for list print. Eval and print the item into 
  * the buffer, separating with commas as required. 
  */
 static void *
-itext_add_list( PElement *base, BufInfo *buf, gboolean *first )
+itext_add_list( PElement *base, VipsBuf *buf, gboolean *first )
 {
 	Reduce *rc = reduce_context;
 
 	if( *first )
 		*first = FALSE;
 	else 
-		buf_appends( buf, ", " );
+		vips_buf_appends( buf, ", " );
 
 	/* Reduce the head, and print.
 	 */
@@ -105,7 +105,7 @@ itext_add_list( PElement *base, BufInfo *buf, gboolean *first )
  * buffer.
  */
 static void *
-itext_add_string( PElement *base, BufInfo *buf )
+itext_add_string( PElement *base, VipsBuf *buf )
 {
 	Reduce *rc = reduce_context;
 
@@ -116,11 +116,11 @@ itext_add_string( PElement *base, BufInfo *buf )
 	if( PEISCHAR( base ) )
 		/* Don't escape chars in string mode.
 		 */
-		buf_appendf( buf, "%c", PEGETCHAR( base ) );
+		vips_buf_appendf( buf, "%c", PEGETCHAR( base ) );
 	else {
 		/* Help! Fall back to ordinary item print.
 		 */
-		buf_appends( buf, ", " );
+		vips_buf_appends( buf, ", " );
 		if( !itext_add_element( buf, base, FALSE, FALSE ) )
 			return( base );
 	}
@@ -136,7 +136,7 @@ itext_add_string( PElement *base, BufInfo *buf )
 /* Print a char ... we need to escape \n etc.
  */
 static void
-itext_add_char( int ch, BufInfo *buf )
+itext_add_char( int ch, VipsBuf *buf )
 {
 	char in[2];
 	char out[3];
@@ -145,27 +145,27 @@ itext_add_char( int ch, BufInfo *buf )
 	in[1] = '\0';
 	my_strecpy( out, in, FALSE );
 
-	buf_appends( buf, out );
+	vips_buf_appends( buf, out );
 }
 
 /* Print a complex. 
  */
 static void
-itext_add_complex( double rp, double ip, BufInfo *buf )
+itext_add_complex( double rp, double ip, VipsBuf *buf )
 {
 	if( PRINT_CARTESIAN ) 
-		buf_appendf( buf, "(%.12g, %.12g)", rp, ip );
+		vips_buf_appendf( buf, "(%.12g, %.12g)", rp, ip );
 	else {
 		if( rp == 0 ) {
 			if( ip == 0 ) 
-				buf_appendf( buf, "0" );
+				vips_buf_appendf( buf, "0" );
 			else 
-				buf_appendf( buf, "%.12gj", ip );
+				vips_buf_appendf( buf, "%.12gj", ip );
 		}
 		else if( ip == 0 ) 
-			buf_appendf( buf, "%.12g", rp );
+			vips_buf_appendf( buf, "%.12g", rp );
 		else
-			buf_appendf( buf, "%.12g + %.12gj", rp, ip );
+			vips_buf_appendf( buf, "%.12g + %.12gj", rp, ip );
 
 	}
 }
@@ -173,7 +173,7 @@ itext_add_complex( double rp, double ip, BufInfo *buf )
 /* Try to decompile.
  */
 static gboolean
-itext_decompile_element( BufInfo *buf, PElement *base, gboolean top )
+itext_decompile_element( VipsBuf *buf, PElement *base, gboolean top )
 {
 	Reduce *rc = reduce_context;
 	gboolean result;
@@ -181,15 +181,15 @@ itext_decompile_element( BufInfo *buf, PElement *base, gboolean top )
 	/* Set the value label for a tally entry.
 	 */
 	if( PEISNOVAL( base ) ) 
-		buf_appends( buf, _( "no value" ) );
+		vips_buf_appends( buf, _( "no value" ) );
 	else if( PEISREAL( base ) ) 
-		buf_appendf( buf, "%g", PEGETREAL( base ) );
+		vips_buf_appendf( buf, "%g", PEGETREAL( base ) );
 	else if( PEISBOOL( base ) ) 
-		buf_appends( buf, bool_to_char( PEGETBOOL( base ) ) );
+		vips_buf_appends( buf, bool_to_char( PEGETBOOL( base ) ) );
 	else if( PEISCHAR( base ) ) {
-		buf_appends( buf, "'" );
+		vips_buf_appends( buf, "'" );
 		itext_add_char( (int) PEGETCHAR( base ), buf );
-		buf_appends( buf, "'" );
+		vips_buf_appends( buf, "'" );
 	}
 	else if( PEISCOMPLEX( base ) ) 
 		itext_add_complex( PEGETREALPART( base ), PEGETIMAGPART( base ),
@@ -197,59 +197,59 @@ itext_decompile_element( BufInfo *buf, PElement *base, gboolean top )
 	else if( PEISMANAGEDSTRING( base ) ) {
 		Managedstring *managedstring = PEGETMANAGEDSTRING( base );
 
-		buf_appendf( buf, "\"%s\"", managedstring->string );
+		vips_buf_appendf( buf, "\"%s\"", managedstring->string );
 	}
 	else if( PEISELIST( base ) ) {
-		buf_appends( buf, "[ ]" );
+		vips_buf_appends( buf, "[ ]" );
 	}
 	else if( !heap_is_string( base, &result ) ) 
 		/* Eval error.
 		 */
 		return( FALSE );
 	else if( result ) {
-		buf_appends( buf, "\"" );
+		vips_buf_appends( buf, "\"" );
 		if( heap_map_list( base,
 			(heap_map_list_fn) itext_add_string, buf, NULL ) )
 			return( FALSE );
-		buf_appends( buf, "\"" );
+		vips_buf_appends( buf, "\"" );
 	}
 	else if( PEISLIST( base ) ) {
 		gboolean first = TRUE;
 
-		buf_appends( buf, "[" );
+		vips_buf_appends( buf, "[" );
 		if( heap_map_list( base,
 			(heap_map_list_fn) itext_add_list, buf, &first ) )
 			return( FALSE );
-		buf_appends( buf, "]" );
+		vips_buf_appends( buf, "]" );
 	}
 	else if( PEISIMAGE( base ) ) {
 		Imageinfo *ii = PEGETII( base );
 
 		if( !top )
-			buf_appends( buf, "(" );
+			vips_buf_appends( buf, "(" );
 
 		if( ii && IOBJECT( ii )->name ) 
-			buf_appendf( buf, "vips_image \"%s\"", 
+			vips_buf_appendf( buf, "vips_image \"%s\"", 
 				IOBJECT( ii )->name );
 		else 
-			buf_appendf( buf, "vips_image <unknown>" );
+			vips_buf_appendf( buf, "vips_image <unknown>" );
 
 		if( !top )
-			buf_appends( buf, ")" );
+			vips_buf_appends( buf, ")" );
 	}
 #ifdef HAVE_VIPS8
 	else if( PEISVIPSOBJECT( base ) ) {
 		VipsObject *object = PEGETVIPSOBJECT( base );
 
-		buf_appendf( buf, "<%s: %s>", object->name, object->caption );
+		vips_buf_appendf( buf, "<%s: %s>", object->name, object->caption );
 	}
 #endif /*HAVE_VIPS8*/
 	else if( PEISMANAGED( base ) ) {
 		Managed *managed = PEGETMANAGED( base );
 
-		buf_appends( buf, "<" );
+		vips_buf_appends( buf, "<" );
 		iobject_info( IOBJECT( managed ), buf );
-		buf_appends( buf, ">" );
+		vips_buf_appends( buf, ">" );
 	}
 	else if( PEISCLASS( base ) ) {
 		Compile *compile = PEGETCLASSCOMPILE( base );
@@ -257,7 +257,7 @@ itext_decompile_element( BufInfo *buf, PElement *base, gboolean top )
 		int i;
 
 		if( !top )
-			buf_appends( buf, "(" );
+			vips_buf_appends( buf, "(" );
 
 		symbol_qualified_name( compile->sym, buf );
 
@@ -276,7 +276,7 @@ itext_decompile_element( BufInfo *buf, PElement *base, gboolean top )
 			PElement value;
 
 			PEPOINTRIGHT( sv, &value );
-			buf_appends( buf, " " );
+			vips_buf_appends( buf, " " );
 			if( !itext_decompile_element( buf, &value, FALSE ) )
 				return( FALSE );
 
@@ -284,13 +284,13 @@ itext_decompile_element( BufInfo *buf, PElement *base, gboolean top )
 		}
 
 		if( !top )
-			buf_appends( buf, ")" );
+			vips_buf_appends( buf, ")" );
 
 	}
 	else if( PEISSYMREF( base ) ) 
-		buf_appends( buf, IOBJECT( PEGETSYMREF( base ) )->name );
+		vips_buf_appends( buf, IOBJECT( PEGETSYMREF( base ) )->name );
 	else if( PEISTAG( base ) ) 
-		buf_appends( buf, PEGETTAG( base ) );
+		vips_buf_appends( buf, PEGETTAG( base ) );
 	else 
 		graph_pelement( rc->heap, buf, base, TRACE_FUNCTIONS );
 
@@ -301,7 +301,7 @@ itext_decompile_element( BufInfo *buf, PElement *base, gboolean top )
  * error.
  */
 static gboolean 
-itext_decompile( Reduce *rc, BufInfo *buf, PElement *root )
+itext_decompile( Reduce *rc, VipsBuf *buf, PElement *root )
 {
 	/* Evaluate and print off values.
 	 */
@@ -321,7 +321,7 @@ itext_decompile( Reduce *rc, BufInfo *buf, PElement *root )
  * output. bracket means we should bracket compound expressions.
  */
 static gboolean
-itext_add_element( BufInfo *buf, PElement *base, 
+itext_add_element( VipsBuf *buf, PElement *base, 
 	gboolean top, gboolean bracket )
 {
 	gboolean result;
@@ -329,15 +329,15 @@ itext_add_element( BufInfo *buf, PElement *base,
 	/* Set the value label for a tally entry.
 	 */
 	if( PEISNOVAL( base ) ) 
-		buf_appends( buf, _( "no value" ) );
+		vips_buf_appends( buf, _( "no value" ) );
 	else if( PEISREAL( base ) ) 
-		buf_appendf( buf, "%.7g", PEGETREAL( base ) );
+		vips_buf_appendf( buf, "%.7g", PEGETREAL( base ) );
 	else if( PEISBOOL( base ) ) 
-		buf_appends( buf, bool_to_char( PEGETBOOL( base ) ) );
+		vips_buf_appends( buf, bool_to_char( PEGETBOOL( base ) ) );
 	else if( PEISCHAR( base ) ) {
-		buf_appends( buf, "'" );
+		vips_buf_appends( buf, "'" );
 		itext_add_char( (int) PEGETCHAR( base ), buf );
-		buf_appends( buf, "'" );
+		vips_buf_appends( buf, "'" );
 	}
 	else if( PEISCOMPLEX( base ) ) {
 		itext_add_complex( PEGETREALPART( base ), PEGETIMAGPART( base ),
@@ -347,13 +347,13 @@ itext_add_element( BufInfo *buf, PElement *base,
 		Managedstring *managedstring = PEGETMANAGEDSTRING( base );
 
 		if( !top ) 
-			buf_appends( buf, "\"" );
-		buf_appends( buf, managedstring->string );
+			vips_buf_appends( buf, "\"" );
+		vips_buf_appends( buf, managedstring->string );
 		if( !top ) 
-			buf_appends( buf, "\"" );
+			vips_buf_appends( buf, "\"" );
 	}
 	else if( PEISELIST( base ) ) {
-		buf_appends( buf, "[ ]" );
+		vips_buf_appends( buf, "[ ]" );
 	}
 	else if( !heap_is_string( base, &result ) ) 
 		/* Eval error.
@@ -363,7 +363,7 @@ itext_add_element( BufInfo *buf, PElement *base,
 		/* Only generate quotes for non-top-level string objects.
 		 */
 		if( !top ) 
-			buf_appends( buf, "\"" );
+			vips_buf_appends( buf, "\"" );
 
 		/* Print string contents.
 		 */
@@ -372,37 +372,37 @@ itext_add_element( BufInfo *buf, PElement *base,
 			return( FALSE );
 
 		if( !top ) 
-			buf_appends( buf, "\"" );
+			vips_buf_appends( buf, "\"" );
 	}
 	else if( PEISLIST( base ) ) {
 		gboolean first = TRUE;
 
-		buf_appends( buf, "[" );
+		vips_buf_appends( buf, "[" );
 		if( heap_map_list( base,
 			(heap_map_list_fn) itext_add_list, buf, &first ) )
 			return( FALSE );
-		buf_appends( buf, "]" );
+		vips_buf_appends( buf, "]" );
 	}
 #ifdef HAVE_VIPS8
 	else if( PEISVIPSOBJECT( base ) ) {
 		VipsObject *object = PEGETVIPSOBJECT( base );
 
-		buf_appendf( buf, "<%s %s, %s>", 
+		vips_buf_appendf( buf, "<%s %s, %s>", 
 			G_OBJECT_TYPE_NAME( object ),
 			object->name, object->caption );
 	}
 #endif /*HAVE_VIPS8*/
 	else if( PEISIMAGE( base ) ) {
-		buf_appendf( buf, "<" );
-		buf_appendi( buf, imageinfo_get( FALSE, PEGETII( base ) ) );
-		buf_appendf( buf, ">" );
+		vips_buf_appendf( buf, "<" );
+		vips_buf_appendi( buf, imageinfo_get( FALSE, PEGETII( base ) ) );
+		vips_buf_appendf( buf, ">" );
 	}
 	else if( PEISMANAGED( base ) ) {
 		Managed *managed = PEGETMANAGED( base );
 
-		buf_appends( buf, "<" );
+		vips_buf_appends( buf, "<" );
 		iobject_info( IOBJECT( managed ), buf );
-		buf_appends( buf, ">" );
+		vips_buf_appends( buf, ">" );
 	}
 	else if( PEISCLASS( base ) ) {
 		Compile *compile = PEGETCLASSCOMPILE( base );
@@ -410,7 +410,7 @@ itext_add_element( BufInfo *buf, PElement *base,
 		int i;
 
 		if( bracket && compile->nparam )
-			buf_appends( buf, "(" );
+			vips_buf_appends( buf, "(" );
 
 		/* Name.
 		 */
@@ -431,7 +431,7 @@ itext_add_element( BufInfo *buf, PElement *base,
 			PElement value;
 
 			PEPOINTRIGHT( sv, &value );
-			buf_appends( buf, " " );
+			vips_buf_appends( buf, " " );
 			if( !itext_add_element( buf, &value, FALSE, TRUE ) )
 				return( FALSE );
 
@@ -439,28 +439,28 @@ itext_add_element( BufInfo *buf, PElement *base,
 		}
 
 		if( bracket && compile->nparam )
-			buf_appends( buf, ")" );
+			vips_buf_appends( buf, ")" );
 	}
 	else if( PEISSYMREF( base ) ) {
 		Symbol *sym = PEGETSYMREF( base );
 
 		if( is_scope( sym ) ) {
-			buf_appendf( buf, "<scope '" );
+			vips_buf_appendf( buf, "<scope '" );
 			symbol_qualified_name( sym, buf );
-			buf_appendf( buf, "'>" ); 
+			vips_buf_appendf( buf, "'>" ); 
 		}
 		else {
-			buf_appendf( buf, "<reference to symbol '" ), 
+			vips_buf_appendf( buf, "<reference to symbol '" ), 
 			symbol_qualified_name( sym, buf );
-			buf_appendf( buf, "'>" ); 
+			vips_buf_appendf( buf, "'>" ); 
 		}
 	}
 	else if( PEISTAG( base ) ) 
-		buf_appendf( buf, ".%s", PEGETTAG( base ) );
+		vips_buf_appendf( buf, ".%s", PEGETTAG( base ) );
 	else {
-		buf_appendf( buf, "<" ); 
-		buf_appends( buf, _( "function" ) );
-		buf_appendf( buf, ">" ); 
+		vips_buf_appendf( buf, "<" ); 
+		vips_buf_appends( buf, _( "function" ) );
+		vips_buf_appendf( buf, ">" ); 
 	}
 
 	return( TRUE );
@@ -470,7 +470,7 @@ itext_add_element( BufInfo *buf, PElement *base,
  * error.
  */
 gboolean 
-itext_value( Reduce *rc, BufInfo *buf, PElement *root )
+itext_value( Reduce *rc, VipsBuf *buf, PElement *root )
 {
 	/* Evaluate and print off values.
 	 */
@@ -489,7 +489,7 @@ itext_value( Reduce *rc, BufInfo *buf, PElement *root )
 /* Same, but everror on eval fail.
  */
 void
-itext_value_ev( Reduce *rc, BufInfo *buf, PElement *root )
+itext_value_ev( Reduce *rc, VipsBuf *buf, PElement *root )
 {
 	if( !itext_value( rc, buf, root ) )
 		reduce_throw( rc );
@@ -498,7 +498,7 @@ itext_value_ev( Reduce *rc, BufInfo *buf, PElement *root )
 /* Decompile an Expr.
  */
 static gboolean
-itext_make_decompiled_string( Expr *expr, BufInfo *buf )
+itext_make_decompiled_string( Expr *expr, VipsBuf *buf )
 {
 	/* Old error on this expression?
 	 */
@@ -516,7 +516,7 @@ itext_make_decompiled_string( Expr *expr, BufInfo *buf )
 
 	 */
 	if( expr->sym->dirty ) {
-		buf_appendf( buf, _( "Dirty value" ) );
+		vips_buf_appendf( buf, _( "Dirty value" ) );
 		return( TRUE );
 	}
 
@@ -531,7 +531,7 @@ itext_make_decompiled_string( Expr *expr, BufInfo *buf )
 /* Make a value string from an Expr.
  */
 gboolean
-itext_make_value_string( Expr *expr, BufInfo *buf )
+itext_make_value_string( Expr *expr, VipsBuf *buf )
 {
 	/* Old error on this expression?
 	 */
@@ -549,7 +549,7 @@ itext_make_value_string( Expr *expr, BufInfo *buf )
 
 	 */
 	if( expr->sym->dirty ) {
-		buf_appendf( buf, _( "Dirty value" ) );
+		vips_buf_appendf( buf, _( "Dirty value" ) );
 		return( TRUE );
 	}
 
@@ -576,8 +576,8 @@ itext_update_model( Heapmodel *heapmodel )
 	printf( "\n" );
 #endif /*DEBUG*/
 
-	buf_set_dynamic( &itext->value, LINELENGTH );
-	buf_set_dynamic( &itext->decompile, LINELENGTH );
+	vips_buf_set_dynamic( &itext->value, LINELENGTH );
+	vips_buf_set_dynamic( &itext->decompile, LINELENGTH );
 	if( expr ) {
 		if( !itext_make_value_string( expr, &itext->value ) ||
 			!itext_make_decompiled_string( expr, 
@@ -588,7 +588,7 @@ itext_update_model( Heapmodel *heapmodel )
 #ifdef DEBUG
 	printf( "itext_update_model: " );
 	row_name_print( row );
-	printf( " has value: %s\n", buf_all( &itext->value ) );
+	printf( " has value: %s\n", vips_buf_all( &itext->value ) );
 #endif /*DEBUG*/
 
 	/* If this is a non-edited row, update the source.
@@ -599,7 +599,7 @@ itext_update_model( Heapmodel *heapmodel )
 		if( expr && expr->compile && expr->compile->rhstext ) 
 			new_formula = expr->compile->rhstext;
 		else 
-			new_formula = buf_all( &itext->decompile );
+			new_formula = vips_buf_all( &itext->decompile );
 
 		IM_SETSTR( itext->formula_default, new_formula );
 
@@ -615,9 +615,9 @@ itext_update_model( Heapmodel *heapmodel )
 /* Build param lists.
  */
 static void *
-itext_update_heap_sub( Symbol *sym, BufInfo *buf )
+itext_update_heap_sub( Symbol *sym, VipsBuf *buf )
 {
-	buf_appendf( buf, "%s ", IOBJECT( sym )->name );
+	vips_buf_appendf( buf, "%s ", IOBJECT( sym )->name );
 
 	return( NULL );
 }
@@ -644,14 +644,14 @@ itext_update_heap( Heapmodel *heapmodel )
 	 */
 	if( itext->formula ) {
 		char txt[MAX_STRSIZE];
-		BufInfo buf;
+		VipsBuf buf;
 		ParseRhsSyntax syntax;
 
-		buf_init_static( &buf, txt, MAX_STRSIZE );
+		vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 		if( is_super( row->sym ) ) {
 			/* A super member ... special syntax.
 			 */
-			buf_appendf( &buf, "%s", itext->formula );
+			vips_buf_appendf( &buf, "%s", itext->formula );
 
 			syntax = PARSE_SUPER;
 		}
@@ -662,7 +662,7 @@ itext_update_heap( Heapmodel *heapmodel )
 				(void) slist_map( expr->compile->param, 
 					(SListMapFn) itext_update_heap_sub, 
 					&buf );
-			buf_appendf( &buf, "= %s;", itext->formula );
+			vips_buf_appendf( &buf, "= %s;", itext->formula );
 
 			syntax = PARSE_PARAMS;
 		}
@@ -670,7 +670,7 @@ itext_update_heap( Heapmodel *heapmodel )
 		/* Parse and compile.
 		 */
 		expr_error_clear( expr );
-		attach_input_string( buf_all( &buf ) );
+		attach_input_string( vips_buf_all( &buf ) );
 		if( !parse_rhs( expr, syntax ) ) {
 			expr_error_set( expr );
 			return( heapmodel );
@@ -834,10 +834,10 @@ itext_init( iText *itext )
 
 	itext->formula = NULL;
 	itext->formula_default = NULL;
-	buf_init( &itext->value );
-	buf_init( &itext->decompile );
-	buf_set_dynamic( &itext->value, LINELENGTH );
-	buf_set_dynamic( &itext->decompile, LINELENGTH );
+	vips_buf_init( &itext->value );
+	vips_buf_init( &itext->decompile );
+	vips_buf_set_dynamic( &itext->value, LINELENGTH );
+	vips_buf_set_dynamic( &itext->decompile, LINELENGTH );
 	itext->edited = FALSE;
 
 	/* Some defaults changed in _parent_add() above.

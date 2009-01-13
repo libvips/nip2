@@ -241,7 +241,7 @@ FALSE {
 
 	if( name ) {
 		yylval.yy_name = im_strdupn( name );
-		buf_change( &lex_text, yytext, name );
+		vips_buf_change( &lex_text, yytext, name );
 	}
 	else 
 		yylval.yy_name = im_strdupn( yytext );

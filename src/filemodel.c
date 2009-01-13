@@ -137,18 +137,18 @@ filemodel_save_all( Filemodel *filemodel, const char *filename )
 }
 
 static void
-filemodel_info( iObject *iobject, BufInfo *buf )
+filemodel_info( iObject *iobject, VipsBuf *buf )
 {
 	Filemodel *filemodel = FILEMODEL( iobject );
 
 	IOBJECT_CLASS( parent_class )->info( iobject, buf );
 
-	buf_appendf( buf, "filename = \"%s\"\n", NN( filemodel->filename ) );
-	buf_appendf( buf, "modified = \"%s\"\n", 
+	vips_buf_appendf( buf, "filename = \"%s\"\n", NN( filemodel->filename ) );
+	vips_buf_appendf( buf, "modified = \"%s\"\n", 
 		bool_to_char( filemodel->modified ) );
-	buf_appendf( buf, "registered = \"%s\"\n", 
+	vips_buf_appendf( buf, "registered = \"%s\"\n", 
 		bool_to_char( filemodel->registered ) );
-	buf_appendf( buf, "auto_load = \"%s\"\n", 
+	vips_buf_appendf( buf, "auto_load = \"%s\"\n", 
 		bool_to_char( filemodel->auto_load ) );
 }
 

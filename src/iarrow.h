@@ -48,7 +48,7 @@ struct _iArrow {
 
 	/* Private ... build iobject caption here.
 	 */
-	BufInfo caption_buffer;
+	VipsBuf caption_buffer;
 };
 
 typedef struct _iArrowClass {

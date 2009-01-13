@@ -127,7 +127,7 @@ struct _Regionview {
 
 	/* Text of label we display 
 	 */
-	BufInfo caption;
+	VipsBuf caption;
 };
 
 typedef struct _RegionviewClass {

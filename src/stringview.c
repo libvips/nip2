@@ -87,12 +87,12 @@ stringview_refresh( vObject *vobject )
 
 	if( string->value ) {
 		char txt[MAX_STRSIZE];
-		BufInfo buf;
+		VipsBuf buf;
 
-		buf_init_static( &buf, txt, MAX_STRSIZE );
-		buf_appendsc( &buf, FALSE, string->value );
+		vips_buf_init_static( &buf, txt, MAX_STRSIZE );
+		vips_buf_appendsc( &buf, FALSE, string->value );
 		editview_set_entry( EDITVIEW( stringview ), 
-			"%s", buf_all( &buf ) );
+			"%s", vips_buf_all( &buf ) );
 	}
 
 	VOBJECT_CLASS( parent_class )->refresh( vobject );

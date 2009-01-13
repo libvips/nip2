@@ -510,11 +510,11 @@ imageinfo_finalize( GObject *gobject )
 /* Make an info string about an imageinfo.
  */
 static void
-imageinfo_info( iObject *iobject, BufInfo *buf )
+imageinfo_info( iObject *iobject, VipsBuf *buf )
 {
 	Imageinfo *imageinfo = IMAGEINFO( iobject );
 
-	buf_appendi( buf, imageinfo_get( FALSE, imageinfo ) );
+	vips_buf_appendi( buf, imageinfo_get( FALSE, imageinfo ) );
 
 	/* Don't chain up to parent->info(), we don't want all the other
 	 * stuff, this is going to be used for a caption.
@@ -1981,18 +1981,18 @@ imageinfo_paint_mask( Imageinfo *imageinfo,
 /* Print a pixel. Output has to be parseable by imageinfo_from_text().
  */
 void 
-imageinfo_to_text( Imageinfo *imageinfo, BufInfo *buf )
+imageinfo_to_text( Imageinfo *imageinfo, VipsBuf *buf )
 {
 	IMAGE *im = imageinfo_get( FALSE, imageinfo );
 	PEL *p = (PEL *) im->data;
 	int i;
 
-#define PRINT_INT( T, I ) buf_appendf( buf, "%d", ((T *)p)[I] );
-#define PRINT_FLOAT( T, I ) buf_appendg( buf, ((T *)p)[I] );
+#define PRINT_INT( T, I ) vips_buf_appendf( buf, "%d", ((T *)p)[I] );
+#define PRINT_FLOAT( T, I ) vips_buf_appendg( buf, ((T *)p)[I] );
 
 	for( i = 0; i < im->Bands; i++ ) {
 		if( i )
-			buf_appends( buf, ", " );
+			vips_buf_appends( buf, ", " );
 
 		switch( im->BandFmt ) {
 		case IM_BANDFMT_UCHAR:
@@ -2024,11 +2024,11 @@ imageinfo_to_text( Imageinfo *imageinfo, BufInfo *buf )
 			break;
 			
 		case IM_BANDFMT_COMPLEX:
-			buf_appends( buf, "(" );
+			vips_buf_appends( buf, "(" );
 			PRINT_FLOAT( float, (i << 1) );
-			buf_appends( buf, ", " );
+			vips_buf_appends( buf, ", " );
 			PRINT_FLOAT( float, (i << 1) + 1 );
-			buf_appends( buf, ")" );
+			vips_buf_appends( buf, ")" );
 			break;
 			
 		case IM_BANDFMT_DOUBLE:
@@ -2036,15 +2036,15 @@ imageinfo_to_text( Imageinfo *imageinfo, BufInfo *buf )
 			break;
 			
 		case IM_BANDFMT_DPCOMPLEX:
-			buf_appends( buf, "(" );
+			vips_buf_appends( buf, "(" );
 			PRINT_FLOAT( double, i << 1 );
-			buf_appends( buf, ", " );
+			vips_buf_appends( buf, ", " );
 			PRINT_FLOAT( double, (i << 1) + 1 );
-			buf_appends( buf, ")" );
+			vips_buf_appends( buf, ")" );
 			break;
 
 		default:
-			buf_appends( buf, "???" );
+			vips_buf_appends( buf, "???" );
 			break;
 		}
 	}
@@ -2159,13 +2159,13 @@ imageinfo_from_text( Imageinfo *imageinfo, const char *text )
 
 #ifdef DEBUG_RGB
 {
-	char buf_text[256];
-	BufInfo buf;
+	char vips_buf_text[256];
+	VipsBuf buf;
 
 	printf( "imageinfo_from_text: out: " );
-	buf_init_static( &buf, buf_text, 256 );
+	vips_buf_init_static( &buf, vips_buf_text, 256 );
 	imageinfo_to_text( imageinfo, &buf );
-	printf( "%s\n", buf_all( &buf ) );
+	printf( "%s\n", vips_buf_all( &buf ) );
 }
 #endif /*DEBUG_RGB*/
 
@@ -2190,13 +2190,13 @@ imageinfo_to_rgb( Imageinfo *imageinfo, double *rgb )
 
 #ifdef DEBUG_RGB
 {
-	char buf_text[256];
-	BufInfo buf;
+	char vips_buf_text[256];
+	VipsBuf buf;
 
 	printf( "imageinfo_to_rgb: in: " );
-	buf_init_static( &buf, buf_text, 256 );
+	vips_buf_init_static( &buf, vips_buf_text, 256 );
 	imageinfo_to_text( imageinfo, &buf );
-	printf( "%s\n", buf_all( &buf ) );
+	printf( "%s\n", vips_buf_all( &buf ) );
 }
 #endif /*DEBUG_RGB*/
 
@@ -2396,13 +2396,13 @@ imageinfo_from_rgb( Imageinfo *imageinfo, double *rgb )
 
 #ifdef DEBUG_RGB
 {
-	char buf_text[256];
-	BufInfo buf;
+	char vips_buf_text[256];
+	VipsBuf buf;
 
 	printf( "imageinfo_from_rgb: out: " );
-	buf_init_static( &buf, buf_text, 256 );
+	vips_buf_init_static( &buf, vips_buf_text, 256 );
 	imageinfo_to_text( imageinfo, &buf );
-	printf( "%s\n", buf_all( &buf ) );
+	printf( "%s\n", vips_buf_all( &buf ) );
 }
 #endif /*DEBUG_RGB*/
 

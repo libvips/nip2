@@ -123,29 +123,29 @@ build_vips_formats_sub( VipsFormatClass *format, GSList **types )
 {
 	FileselFileType *type = g_new( FileselFileType, 1 );
 	char txt[MAX_STRSIZE];
-	BufInfo buf;
+	VipsBuf buf;
 	const char **i;
 
-	buf_init_static( &buf, txt, MAX_STRSIZE );
-	buf_appendf( &buf, "%s ", VIPS_OBJECT_CLASS( format )->description );
+	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
+	vips_buf_appendf( &buf, "%s ", VIPS_OBJECT_CLASS( format )->description );
 	/* Used as eg. "VIPS image files (*.v)"
 	 */
-	buf_appends( &buf, _( "image files" ) );
-	buf_appends( &buf, " (" );
+	vips_buf_appends( &buf, _( "image files" ) );
+	vips_buf_appends( &buf, " (" );
 	if( *format->suffs )
 		for( i = format->suffs; *i; i++ ) {
-			buf_appendf( &buf, "*%s", *i );
+			vips_buf_appendf( &buf, "*%s", *i );
 			if( i[1] )
-				buf_appends( &buf, "; " );
+				vips_buf_appends( &buf, "; " );
 		}
 	else
 		/* No suffix means any allowed.
 		 */
-		buf_appendf( &buf, "*" );
+		vips_buf_appendf( &buf, "*" );
 
-	buf_appends( &buf, ")" );
+	vips_buf_appends( &buf, ")" );
 
-	type->name = g_strdup( buf_all( &buf ) );
+	type->name = g_strdup( vips_buf_all( &buf ) );
 	type->suffixes = format->suffs;
 
 	*types = g_slist_append( *types, type );
@@ -495,15 +495,15 @@ filesel_space_update( Filesel *filesel, const char *dirname )
 				dirname );
 		else {
 			char txt[MAX_STRSIZE];
-			BufInfo buf;
+			VipsBuf buf;
 
-			buf_init_static( &buf, txt, MAX_STRSIZE );
+			vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 			to_size( &buf, sz );
-			buf_appendf( &buf, " " );
+			vips_buf_appendf( &buf, " " );
 			/* Expands to (eg.) '6GB free in "/pics/tmp"'
 			 */
-			buf_appendf( &buf, _( "free in \"%s\"" ), dirname );
-			set_glabel( filesel->space, "%s", buf_all( &buf ) );
+			vips_buf_appendf( &buf, _( "free in \"%s\"" ), dirname );
+			set_glabel( filesel->space, "%s", vips_buf_all( &buf ) );
 		}
 	}
 }
@@ -524,46 +524,46 @@ filesel_add_volume( const char *dir, Filesel *filesel )
 }
 
 static void
-filesel_suffix_to_glob( const char *suffix, BufInfo *patt )
+filesel_suffix_to_glob( const char *suffix, VipsBuf *patt )
 {
 	int i;
 	char ch;
 
-	buf_appends( patt, "*" );
+	vips_buf_appends( patt, "*" );
 
 	for( i = 0; (ch = suffix[i]); i++ ) {
 		if( isalpha( ch ) ) {
-			buf_appends( patt, "[" );
-			buf_appendf( patt, "%c", toupper( ch ) );
-			buf_appendf( patt, "%c", tolower( ch ) );
-			buf_appends( patt, "]" );
+			vips_buf_appends( patt, "[" );
+			vips_buf_appendf( patt, "%c", toupper( ch ) );
+			vips_buf_appendf( patt, "%c", tolower( ch ) );
+			vips_buf_appends( patt, "]" );
 		}
 		else
-			buf_appendf( patt, "%c", ch );
+			vips_buf_appendf( patt, "%c", ch );
 	}
 }
 
 /* Make a shell glob from a filetype.
  */
 void
-filesel_make_patt( FileselFileType *type, BufInfo *patt )
+filesel_make_patt( FileselFileType *type, VipsBuf *patt )
 {
 	int i;
 
 	/* Only use {} braces if there's more than one suffix to match.
 	 */
 	if( type->suffixes[1] )
-		buf_appends( patt, "{" );
+		vips_buf_appends( patt, "{" );
 
 	for( i = 0; type->suffixes[i]; i++ ) {
 		if( i > 0 )
-			buf_appends( patt, "," );
+			vips_buf_appends( patt, "," );
 
 		filesel_suffix_to_glob( type->suffixes[i], patt );
 	}
 
 	if( type->suffixes[1] )
-		buf_appends( patt, "}" );
+		vips_buf_appends( patt, "}" );
 }
 
 static char *
@@ -607,12 +607,12 @@ static void
 filesel_info_update( Filesel *filesel, const char *name )
 {
 	char txt[MAX_STRSIZE];
-	BufInfo buf;
+	VipsBuf buf;
 
 	if( filesel->info ) {
-		buf_init_static( &buf, txt, MAX_STRSIZE );
+		vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 		get_image_info( &buf, name );
-		set_glabel( filesel->info, "%s", buf_firstline( &buf ) );
+		set_glabel( filesel->info, "%s", vips_buf_firstline( &buf ) );
 	}
 }
 
@@ -886,11 +886,11 @@ file_filter_from_file_type( FileselFileType *type )
 	if( type->suffixes[0] )
 		for( j = 0; type->suffixes[j]; j++ ) {
 			char buf[FILENAME_MAX];
-			BufInfo patt;
+			VipsBuf patt;
 
-			buf_init_static( &patt, buf, FILENAME_MAX );
+			vips_buf_init_static( &patt, buf, FILENAME_MAX );
 			filesel_suffix_to_glob( type->suffixes[j], &patt );
-			gtk_file_filter_add_pattern( filter, buf_all( &patt ) );
+			gtk_file_filter_add_pattern( filter, vips_buf_all( &patt ) );
 		}
 	else
 		/* No suffix list means any suffix allowed.

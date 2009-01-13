@@ -44,10 +44,10 @@ static GSList *managed_all = NULL;
 
 #ifdef DEBUG_LEAK
 static void *
-managed_print_info( Managed *managed, BufInfo *buf )
+managed_print_info( Managed *managed, VipsBuf *buf )
 {
 	iobject_info( IOBJECT( managed ), buf );
-	buf_appends( buf, "\n" );
+	vips_buf_appends( buf, "\n" );
 
 	return( NULL );
 }
@@ -61,13 +61,13 @@ managed_check_all_destroyed( void )
 {
 #ifdef DEBUG_LEAK
 	if( managed_all ) {
-		BufInfo buf;
+		VipsBuf buf;
 		char str[1000];
 
 		printf( "managed_check_all_destroyed:\n" );
-		buf_init_static( &buf, str, 1000 );
+		vips_buf_init_static( &buf, str, 1000 );
 		slist_map( managed_all, (SListMapFn) managed_print_info, &buf );
-		printf( "%s", buf_all( &buf ) );
+		printf( "%s", vips_buf_all( &buf ) );
 	}
 #endif /*DEBUG_LEAK*/
 }
@@ -155,17 +155,17 @@ managed_finalize( GObject *gobject )
  * up, don't print more than one line.
  */
 static void
-managed_info( iObject *iobject, BufInfo *buf )
+managed_info( iObject *iobject, VipsBuf *buf )
 {
 #ifdef DEBUG
 	Managed *managed = MANAGED( iobject );
 
-	buf_appendf( buf, "managed-object %p\n", managed );
-	buf_appendf( buf, "managed->count = %d\n", managed->count );
-	buf_appendf( buf, "managed->marked = %d\n", managed->marked );
+	vips_buf_appendf( buf, "managed-object %p\n", managed );
+	vips_buf_appendf( buf, "managed->count = %d\n", managed->count );
+	vips_buf_appendf( buf, "managed->marked = %d\n", managed->marked );
 #endif /*DEBUG*/
 
-	buf_appendf( buf, "%s %p", G_OBJECT_TYPE_NAME( iobject ), iobject );
+	vips_buf_appendf( buf, "%s %p", G_OBJECT_TYPE_NAME( iobject ), iobject );
 }
 
 static void

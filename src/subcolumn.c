@@ -163,12 +163,12 @@ subcolumn_class_new_heap_sub( ClassRefreshInfo *cri,
 	Row *row;
 
 #ifdef DEBUG
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[200];
 
-	buf_init_static( &buf, txt, 200 );
+	vips_buf_init_static( &buf, txt, 200 );
 	symbol_qualified_name( sym, &buf );
-	printf( "subcolumn_class_new_heap_sub: %s\n", buf_all( &buf ) );
+	printf( "subcolumn_class_new_heap_sub: %s\n", vips_buf_all( &buf ) );
 #endif /*DEBUG*/
 
 	/* Do we have a row for this symbol?

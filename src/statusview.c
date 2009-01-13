@@ -204,7 +204,7 @@ statusview_changed_cb( Imagemodel *imagemodel, Statusview *sv )
 	double size = (double) im->Ysize * IM_IMAGE_SIZEOF_LINE( im );
 	unsigned int nb;
 	int fmt;
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[MAX_LINELENGTH];
 
 #ifdef DEBUG
@@ -225,12 +225,12 @@ statusview_changed_cb( Imagemodel *imagemodel, Statusview *sv )
 		set_glabel( sv->mag, "%s 1:%d", 
 			_( "Magnification" ), -conv->mag );
 
-	buf_init_static( &buf, txt, MAX_LINELENGTH );
-	buf_appendf( &buf, "%s, ", 
+	vips_buf_init_static( &buf, txt, MAX_LINELENGTH );
+	vips_buf_appendf( &buf, "%s, ", 
 		NN( IOBJECT( iimage )->caption ) );
 	to_size( &buf, size );
-	buf_appendf( &buf, ", %.3gx%.3g p/mm", im->Xres, im->Yres );
-	set_gcaption( sv->top, "%s", buf_all( &buf ) );
+	vips_buf_appendf( &buf, ", %.3gx%.3g p/mm", im->Xres, im->Yres );
+	set_gcaption( sv->top, "%s", vips_buf_all( &buf ) );
 
 	if( im->Coding == IM_CODING_LABQ ) {
 		nb = 3;

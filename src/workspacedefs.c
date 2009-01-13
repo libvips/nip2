@@ -63,7 +63,7 @@ workspacedefs_refresh( vObject *vobject )
 	Workspacedefs *workspacedefs = WORKSPACEDEFS( vobject );
 	Mainw *mainw = workspacedefs->mainw;
 	Workspace *ws = mainw->ws;
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[256];
 
 #ifdef DEBUG
@@ -90,25 +90,25 @@ workspacedefs_refresh( vObject *vobject )
 		}
 	}
 
-	buf_init_static( &buf, txt, 512 );
+	vips_buf_init_static( &buf, txt, 512 );
 	if( workspacedefs->mainw->ws->local_kit ) {
 		int n = icontainer_get_n_children( ICONTAINER( 
 			workspacedefs->mainw->ws->local_kit ) );
 
-		buf_appendf( &buf, ngettext( "%d definition", 
+		vips_buf_appendf( &buf, ngettext( "%d definition", 
 			"%d definitions", n ), n );
 	}
 	if( workspacedefs->errors ) {
-		if( !buf_is_empty( &buf ) )
-			buf_appendf( &buf, ", " ); 
-		buf_appendf( &buf, _( "errors" ) ); 
+		if( !vips_buf_is_empty( &buf ) )
+			vips_buf_appendf( &buf, ", " ); 
+		vips_buf_appendf( &buf, _( "errors" ) ); 
 	}
 	if( workspacedefs->changed ) {
-		if( !buf_is_empty( &buf ) )
-			buf_appendf( &buf, ", " ); 
-		buf_appendf( &buf, _( "modified" ) ); 
+		if( !vips_buf_is_empty( &buf ) )
+			vips_buf_appendf( &buf, ", " ); 
+		vips_buf_appendf( &buf, _( "modified" ) ); 
 	}
-	set_glabel( workspacedefs->status, "%s", buf_all( &buf ) );
+	set_glabel( workspacedefs->status, "%s", vips_buf_all( &buf ) );
 
 	VOBJECT_CLASS( parent_class )->refresh( vobject );
 }

@@ -85,7 +85,7 @@ typedef struct _CompileClass {
 
 Compile *compile_get_parent( Compile *compile );
 void *compile_name_print( Compile *compile );
-void compile_name( Compile *compile, BufInfo *buf );
+void compile_name( Compile *compile, VipsBuf *buf );
 
 typedef void *(*map_compile_fn)( Compile *, void * );
 Compile *compile_map_all( Compile *compile, map_compile_fn fn, void *a );

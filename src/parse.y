@@ -1008,7 +1008,7 @@ jmp_buf parse_error_point;
 
 /* Text we've lexed.
  */
-BufInfo lex_text;
+VipsBuf lex_text;
 
 /* State of input system.
  */
@@ -1088,7 +1088,7 @@ attach_input_file( iOpenFile *of )
 
 	/* Init text gatherer.
 	 */
-	buf_init_static( &lex_text, lex_text_buffer, MAX_STRSIZE );
+	vips_buf_init_static( &lex_text, lex_text_buffer, MAX_STRSIZE );
 }
 
 /* Attach yyinput to a string.
@@ -1118,7 +1118,7 @@ attach_input_string( const char *str )
 
 	/* Init text gatherer.
 	 */
-	buf_init_static( &lex_text, lex_text_buffer, MAX_STRSIZE );
+	vips_buf_init_static( &lex_text, lex_text_buffer, MAX_STRSIZE );
 }
 
 /* Read a character from the input.
@@ -1174,7 +1174,7 @@ ip_input( void )
 	/* Add to lex text buffer.
 	 */
 	if( is->charno > 0 )
-		buf_appendc( &lex_text, ch );
+		vips_buf_appendc( &lex_text, ch );
 
 #ifdef DEBUG_CHARACTER
 	printf( "ip_input: returning '%c'\n", ch ); 
@@ -1225,7 +1225,7 @@ ip_unput( int ch )
 	/* Unget from lex text buffer.
 	 */
 	if( is->charno > 0 )
-		buf_removec( &lex_text, ch );
+		vips_buf_removec( &lex_text, ch );
 }
 
 /* Test for end-of-input.
@@ -1293,7 +1293,7 @@ input_reset( void )
 	is->bwp = 0;
 	is->bspsp = 0;
 	is->bsp[0] = 0;
-	buf_init_static( &lex_text, lex_text_buffer, MAX_STRSIZE );
+	vips_buf_init_static( &lex_text, lex_text_buffer, MAX_STRSIZE );
 }
 
 void

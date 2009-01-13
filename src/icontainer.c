@@ -459,11 +459,11 @@ icontainer_finalize( GObject *gobject )
 }
 
 static void
-icontainer_info( iObject *iobject, BufInfo *buf )
+icontainer_info( iObject *iobject, VipsBuf *buf )
 {
 	iContainer *icontainer = ICONTAINER( iobject );
 
-	buf_appendf( buf, "pos = \"%d\"\n", icontainer->pos );
+	vips_buf_appendf( buf, "pos = \"%d\"\n", icontainer->pos );
 
 	IOBJECT_CLASS( parent_class )->info( iobject, buf );
 }

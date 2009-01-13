@@ -138,19 +138,19 @@ imageview_refresh_title( Imageview *iv )
 		Conversion *conv = imagemodel->conv;
 		Imageinfo *ii = iimage->value.ii;
 
-		BufInfo buf;
+		VipsBuf buf;
 		char txt[512];
 
-		buf_init_static( &buf, txt, 512 );
+		vips_buf_init_static( &buf, txt, 512 );
 		row_qualified_name_relative( ws->sym, row, &buf );
 
 		if( ii && imageinfo_is_from_file( ii ) )
-			buf_appendf( &buf, " - %s", IOBJECT( ii )->name );
+			vips_buf_appendf( &buf, " - %s", IOBJECT( ii )->name );
 
-		buf_appendf( &buf, " - %.0f%%", 
+		vips_buf_appendf( &buf, " - %.0f%%", 
 			100.0 * conversion_dmag( conv->mag ) );
 
-		iwindow_set_title( IWINDOW( iv ), "%s", buf_all( &buf ) );
+		iwindow_set_title( IWINDOW( iv ), "%s", vips_buf_all( &buf ) );
 	}
 }
 
@@ -247,33 +247,33 @@ imageview_new_arrow2_action_cb( GtkAction *action, Imageview *iv )
 	int dy = imagemodel->visible.top + imagemodel->visible.height / 2;
 
 	char txt[MAX_STRSIZE];
-	BufInfo buf;
+	VipsBuf buf;
 	Symbol *sym;
 	int ix, iy;
 
 	conversion_disp_to_im( conv, dx, dy, &ix, &iy );
 
-	buf_init_static( &buf, txt, MAX_STRSIZE );
-	buf_appendf( &buf, "%s ", imageview_region_name[rt] );
+	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
+	vips_buf_appendf( &buf, "%s ", imageview_region_name[rt] );
 	row_qualified_name_relative( ws->sym, row, &buf );
 	switch( rt ) {
 	case IREGION_MARK:
-		buf_appendf( &buf, " (%d) (%d)", ix, iy );
+		vips_buf_appendf( &buf, " (%d) (%d)", ix, iy );
 		break;
 
 	case IREGION_HGUIDE:
-		buf_appendf( &buf, " (%d)", iy );
+		vips_buf_appendf( &buf, " (%d)", iy );
 		break;
 
 	case IREGION_VGUIDE:
-		buf_appendf( &buf, " (%d)", ix );
+		vips_buf_appendf( &buf, " (%d)", ix );
 		break;
 
 	default:
 		g_assert( FALSE );
 	}
 
-	if( !(sym = workspace_add_def( ws, buf_all( &buf ) )) ) {
+	if( !(sym = workspace_add_def( ws, vips_buf_all( &buf ) )) ) {
 		box_alert( GTK_WIDGET( iv ) );
 		return;
 	}
@@ -293,7 +293,7 @@ imageview_new_arrow4_action_cb( GtkAction *action, Imageview *iv )
 
 	Rect dr, ir;
 	char txt[MAX_STRSIZE];
-	BufInfo buf;
+	VipsBuf buf;
 	Symbol *sym;
 	Column *col;
 
@@ -303,13 +303,13 @@ imageview_new_arrow4_action_cb( GtkAction *action, Imageview *iv )
 	dr.height = imagemodel->visible.height / 2;
 	conversion_disp_to_im_rect( conv, &dr, &ir );
 
-	buf_init_static( &buf, txt, MAX_STRSIZE );
-	buf_appendf( &buf, "%s ", imageview_region_name[rt] );
+	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
+	vips_buf_appendf( &buf, "%s ", imageview_region_name[rt] );
 	row_qualified_name_relative( ws->sym, row, &buf );
-	buf_appendf( &buf, " (%d) (%d) %d %d", 
+	vips_buf_appendf( &buf, " (%d) (%d) %d %d", 
 		ir.left, ir.top, ir.width, ir.height );
 
-	if( !(sym = workspace_add_def( ws, buf_all( &buf ) )) ) {
+	if( !(sym = workspace_add_def( ws, vips_buf_all( &buf ) )) ) {
 		box_alert( GTK_WIDGET( iv ) );
 		return;
 	}
@@ -357,13 +357,13 @@ imageview_header_action_cb( GtkAction *action, Imageview *iv )
 	iImage *iimage = imagemodel->iimage;
 	Row *row = HEAPMODEL( iimage )->row;
 	Workspace *ws = row_get_workspace( row );
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[512];
 
-	buf_init_static( &buf, txt, 512 );
+	vips_buf_init_static( &buf, txt, 512 );
 	row_qualified_name_relative( ws->sym, row, &buf );
 	conversion_header_dialog( imagemodel->conv, 
-		buf_all( &buf ), GTK_WIDGET( iv ) );
+		vips_buf_all( &buf ), GTK_WIDGET( iv ) );
 }
 
 static void

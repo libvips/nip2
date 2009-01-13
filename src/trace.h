@@ -64,9 +64,9 @@ void trace_unblock( void );
 
 void trace_reset( void );
 void trace_check( void );
-BufInfo *trace_push( void );
+VipsBuf *trace_push( void );
 void trace_pop( void );
-BufInfo *trace_current( void );
+VipsBuf *trace_current( void );
 void trace_pop_to( int n );
 int trace_get_mark( void );
 

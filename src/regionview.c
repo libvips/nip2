@@ -529,7 +529,7 @@ regionview_paint( Regionview *regionview )
 	if( regionview->classmodel ) 
 		regionview_paint_label( regionview,
 			draw, &regionview->label, regionview->ascent,
-			buf_all( &regionview->caption ) );
+			vips_buf_all( &regionview->caption ) );
 }
 
 /* Stop tracking.
@@ -583,7 +583,7 @@ regionview_destroy( GtkObject *object )
 	FREESID( regionview->model_changed_sid, regionview->classmodel ); 
 	IM_FREEF( g_source_remove, regionview->dash_crawl );
 	IM_FREEF( iwindow_cursor_context_destroy, regionview->cntxt );
-	buf_destroy( &regionview->caption );
+	vips_buf_destroy( &regionview->caption );
 
 	if( regionview->ip ) {
 		if( regionview->ip->regionview == regionview )
@@ -611,7 +611,7 @@ static void
 regionview_label_geo( Regionview *regionview )
 {
 	int n = regionview_label_border;
-	const char *str = buf_all( &regionview->caption );
+	const char *str = vips_buf_all( &regionview->caption );
 	int width, height;
 	PangoLayout *layout;
 
@@ -631,7 +631,7 @@ regionview_refresh_label( Regionview *regionview )
 	if( regionview->classmodel ) {
 		Row *row = HEAPMODEL( regionview->classmodel )->row;
 
-		buf_rewind( &regionview->caption );
+		vips_buf_rewind( &regionview->caption );
 		row_qualified_name_relative( row->ws->sym, row, 
 			&regionview->caption );
 		regionview_label_geo( regionview );
@@ -965,7 +965,7 @@ regionview_remove_cb( GtkWidget *menu,
 		GTK_STOCK_DELETE, 
 		_( "Delete Region?" ),
 		_( "Are you sure you want to delete Region \"%s\"?" ), 
-		buf_all( &regionview->caption ) );
+		vips_buf_all( &regionview->caption ) );
 }
 
 static void
@@ -1041,7 +1041,7 @@ regionview_init( Regionview *regionview )
 	regionview->first = TRUE;
 	regionview->label_geo = TRUE;
 
-	buf_init_dynamic( &regionview->caption, REGIONVIEW_LABEL_MAX );
+	vips_buf_init_dynamic( &regionview->caption, REGIONVIEW_LABEL_MAX );
 
 	gtk_widget_set_name( GTK_WIDGET( regionview ), "regionview_widget" );
 }

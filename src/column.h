@@ -79,7 +79,7 @@ Column *column_new( Workspace *ws, const char *name );
 
 Row *column_get_bottom( Column *col );
 gboolean column_add_n_names( Column *col, 
-	const char *name, BufInfo *buf, int nparam );
+	const char *name, VipsBuf *buf, int nparam );
 gboolean column_is_empty( Column *col );
 
 void column_set_offset( int x_off, int y_off );

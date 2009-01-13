@@ -83,13 +83,13 @@ typedef struct _ExprClass {
 
 extern GSList *expr_error_all;
 
-void *expr_error_print( Expr *expr, BufInfo *buf );
+void *expr_error_print( Expr *expr, VipsBuf *buf );
 
 typedef void *(*map_expr_fn)( Expr *, void *, void * );
 Expr *expr_map_all( Expr *expr, map_expr_fn fn, void *a );
 
 void *expr_name_print( Expr *expr );
-void expr_name( Expr *expr, BufInfo *buf );
+void expr_name( Expr *expr, VipsBuf *buf );
 
 Expr *expr_get_parent( Expr *expr );
 Expr *expr_get_root( Expr *expr );
@@ -111,7 +111,7 @@ void *expr_link_break( Expr *expr, Symbol *child );
 void *expr_dirty( Expr *expr, int serial );
 void *expr_dirty_intrans( Expr *expr, int serial );
 
-void expr_tip( Expr *expr, BufInfo *buf );
+void expr_tip( Expr *expr, VipsBuf *buf );
 
 void expr_new_value( Expr *expr );
 

@@ -38,12 +38,12 @@ static LogClass *parent_class = NULL;
 static void *
 ierror_print( Expr *expr, iError *ierror, gboolean *found )
 {
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[512];
 
-	buf_init_static( &buf, txt, 512 );
+	vips_buf_init_static( &buf, txt, 512 );
 	expr_error_print( expr, &buf );
-	log_text( LOG( ierror ), buf_all( &buf ) );
+	log_text( LOG( ierror ), vips_buf_all( &buf ) );
 	*found = TRUE;
 
 	return( NULL );
@@ -72,12 +72,12 @@ ierror_show_all_action_cb( GtkAction *action, iError *ierror )
 static void *
 unresolved_print( Toolkit *kit, iError *ierror, gboolean *found )
 {
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[512];
 
-	buf_init_static( &buf, txt, 512 );
+	vips_buf_init_static( &buf, txt, 512 );
 	toolkit_linkreport( kit, &buf, found );
-	log_text( LOG( ierror ), buf_all( &buf ) );
+	log_text( LOG( ierror ), vips_buf_all( &buf ) );
 
 	return( NULL );
 }

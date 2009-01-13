@@ -101,11 +101,11 @@ row_get_parent( Row *row )
  * a local of context.
  */
 void
-row_qualified_name_relative( Symbol *context, Row *row, BufInfo *buf )
+row_qualified_name_relative( Symbol *context, Row *row, VipsBuf *buf )
 {
 	if( !row_get_parent( row ) ) {
 		if( !row->sym )
-			buf_appends( buf, "(null)" );
+			vips_buf_appends( buf, "(null)" );
 		else
 			symbol_qualified_name_relative( context, 
 				row->sym, buf );
@@ -115,8 +115,8 @@ row_qualified_name_relative( Symbol *context, Row *row, BufInfo *buf )
 		 */
 		row_qualified_name_relative( context, 
 			row_get_parent( row ), buf );
-		buf_appends( buf, "." );
-		buf_appends( buf, row_name( row ) );
+		vips_buf_appends( buf, "." );
+		vips_buf_appends( buf, row_name( row ) );
 	}
 }
 
@@ -124,7 +124,7 @@ row_qualified_name_relative( Symbol *context, Row *row, BufInfo *buf )
  * hierarchy. eg. "A1.fred.x".
  */
 void
-row_qualified_name( Row *row, BufInfo *buf )
+row_qualified_name( Row *row, VipsBuf *buf )
 {
 	row_qualified_name_relative( row->ws->sym, row, buf );
 }
@@ -135,12 +135,12 @@ void *
 row_name_print( Row *row )
 {
 	if( row ) {
-		BufInfo buf;
+		VipsBuf buf;
 		char txt[100];
 
-		buf_init_static( &buf, txt, 100 );
+		vips_buf_init_static( &buf, txt, 100 );
 		row_qualified_name( row, &buf );
-		printf( "%s ", buf_all( &buf ) );
+		printf( "%s ", vips_buf_all( &buf ) );
 	}
 	else
 		printf( "(null)" );
@@ -178,10 +178,10 @@ row_error_set( Row *row )
 		 * recomp on this tree.
 		 */
 		if( row != row->top_row ) {
-			BufInfo buf;
+			VipsBuf buf;
 			char txt[100];
 
-			buf_init_static( &buf, txt, 100 );
+			vips_buf_init_static( &buf, txt, 100 );
 			row_qualified_name( row, &buf );
 
 			error_top( _( "Error in row." ) );
@@ -189,7 +189,7 @@ row_error_set( Row *row )
 			 * secondary error.
 			 */
 			error_sub( _( "Error in row %s: %s\n%s" ),	
-				buf_all( &buf ),
+				vips_buf_all( &buf ),
 				row->expr->error_top,
 				row->expr->error_sub );
 
@@ -437,51 +437,51 @@ row_dispose( GObject *gobject )
 }
 
 static void *
-row_add_parent_name( Link *link, BufInfo *buf )
+row_add_parent_name( Link *link, VipsBuf *buf )
 {
 	Row *row;
 
 	if( link->parent->expr && (row = link->parent->expr->row) ) {
 		row_qualified_name_relative( link->child, row, buf );
-		buf_appends( buf, " " );
+		vips_buf_appends( buf, " " );
 	}
 
 	return( NULL );
 }
 
 static void *
-row_add_child_name( Link *link, BufInfo *buf )
+row_add_child_name( Link *link, VipsBuf *buf )
 {
 	Row *row;
 
 	if( link->child->expr && (row = link->child->expr->row) ) {
 		row_qualified_name_relative( link->parent, row, buf );
-		buf_appends( buf, " " );
+		vips_buf_appends( buf, " " );
 	}
 
 	return( NULL );
 }
 
 static void *
-row_add_dirty_child_name( Link *link, BufInfo *buf )
+row_add_dirty_child_name( Link *link, VipsBuf *buf )
 {
 	if( link->child->dirty ) {
 		symbol_qualified_name( link->child, buf );
-		buf_appends( buf, " " );
+		vips_buf_appends( buf, " " );
 	}
 
 	return( NULL );
 }
 
 static void
-row_info( iObject *iobject, BufInfo *buf )
+row_info( iObject *iobject, VipsBuf *buf )
 {
 	Row *row = ROW( iobject );
 
-	buf_appends( buf, _( "Name" ) );
-	buf_appends( buf, ": " );
+	vips_buf_appends( buf, _( "Name" ) );
+	vips_buf_appends( buf, ": " );
 	row_qualified_name( row, buf );
-	buf_appends( buf, "\n" );
+	vips_buf_appends( buf, "\n" );
 
 	if( row->expr ) 
 		iobject_info( IOBJECT( row->expr ), buf );
@@ -492,25 +492,25 @@ row_info( iObject *iobject, BufInfo *buf )
 	if( row->top_row->sym ) {
 		if( row->top_row->sym->topchildren ) {
 			row_qualified_name( row, buf );
-			buf_appends( buf, " " );
+			vips_buf_appends( buf, " " );
 			/* Expands to eg. "B1 refers to: B2, B3".
 			 */
-			buf_appends( buf, _( "refers to" ) );
-			buf_appends( buf, ": " );
+			vips_buf_appends( buf, _( "refers to" ) );
+			vips_buf_appends( buf, ": " );
 			slist_map( row->top_row->sym->topchildren, 
 				(SListMapFn) row_add_child_name, buf );
-			buf_appends( buf, "\n" );
+			vips_buf_appends( buf, "\n" );
 		}
 		if( row->top_row->sym->topparents ) {
 			row_qualified_name( row, buf );
-			buf_appends( buf, " " );
+			vips_buf_appends( buf, " " );
 			/* Expands to eg. "B1 is referred to by: B2, B3".
 			 */
-			buf_appends( buf, _( "is referred to by" ) );
-			buf_appends( buf, ": " );
+			vips_buf_appends( buf, _( "is referred to by" ) );
+			vips_buf_appends( buf, ": " );
 			slist_map( row->top_row->sym->topparents, 
 				(SListMapFn) row_add_parent_name, buf );
-			buf_appends( buf, "\n" );
+			vips_buf_appends( buf, "\n" );
 		}
 	}
 	if( row == row->top_row && row->sym->dirty ) {
@@ -518,12 +518,12 @@ row_info( iObject *iobject, BufInfo *buf )
 
 		if( sym->ndirtychildren ) {
 			row_qualified_name( row, buf );
-			buf_appends( buf, " " );
-			buf_appends( buf, _( "is blocked on" ) );
-			buf_appends( buf, ": " );
+			vips_buf_appends( buf, " " );
+			vips_buf_appends( buf, _( "is blocked on" ) );
+			vips_buf_appends( buf, ": " );
 			slist_map( sym->topchildren,
 				(SListMapFn) row_add_dirty_child_name, buf );
-			buf_appends( buf, "\n" );
+			vips_buf_appends( buf, "\n" );
 		}
 	}
 }
@@ -2005,33 +2005,33 @@ row_set_status( Row *row )
 	Expr *expr = row->expr;
 
 	char str[MAX_LINELENGTH];
-	BufInfo buf;
+	VipsBuf buf;
 
 	/* No symbol? eg. on load error.
 	 */
 	if( !expr )
 		return;
 
-	buf_init_static( &buf, str, MAX_LINELENGTH );
+	vips_buf_init_static( &buf, str, MAX_LINELENGTH );
 
 	row_qualified_name( row, &buf );
 
 	if( expr->err ) {
-		buf_appends( &buf, ": " );
-		buf_appends( &buf, expr->error_top );
+		vips_buf_appends( &buf, ": " );
+		vips_buf_appends( &buf, expr->error_top );
 	}
 	else if( row->child_rhs->itext ) {
 		iText *itext = ITEXT( row->child_rhs->itext );
 
-		buf_appends( &buf, " = " );
+		vips_buf_appends( &buf, " = " );
 
 		if( row->ws->mode != WORKSPACE_MODE_FORMULA )
-			buf_appends( &buf, NN( itext->formula ) );
+			vips_buf_appends( &buf, NN( itext->formula ) );
 		else 
-			buf_appends( &buf, buf_all( &itext->value ) );
+			vips_buf_appends( &buf, vips_buf_all( &itext->value ) );
 	}
 
-	workspace_set_status( row->ws, "%s", buf_firstline( &buf ) );
+	workspace_set_status( row->ws, "%s", vips_buf_firstline( &buf ) );
 }
 
 /* Sub fn of below ... search inside a row hierarcy. Context is (eg.) row

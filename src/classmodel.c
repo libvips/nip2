@@ -88,7 +88,7 @@ image_value_set( ImageValue *image, Imageinfo *ii )
 /* Generate a descriptive name for an imagevalue. Used by plot.c etc. as well.
  */
 void
-image_value_caption( ImageValue *value, BufInfo *buf )
+image_value_caption( ImageValue *value, VipsBuf *buf )
 {
 	Imageinfo *ii = value->ii;
 	Classmodel *classmodel = value->classmodel;
@@ -97,11 +97,11 @@ image_value_caption( ImageValue *value, BufInfo *buf )
 	 * the class.
 	 */
 	if( ii && imageinfo_is_from_file( ii ) && classmodel->filename ) 
-		buf_appends( buf, im_skip_dir( classmodel->filename ) );
+		vips_buf_appends( buf, im_skip_dir( classmodel->filename ) );
 	else if( !heapmodel_name( HEAPMODEL( classmodel ), buf ) )
 		/* Only if there's no value, I think.
 		 */
-		buf_appends( buf, CLASS_IMAGE );
+		vips_buf_appends( buf, CLASS_IMAGE );
 }
 
 void *
@@ -147,7 +147,7 @@ classmodel_graphic_save( Classmodel *classmodel, GtkWidget *parent )
 {
 	ClassmodelClass *class = CLASSMODEL_GET_CLASS( classmodel );
 	GtkWidget *filesel;
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[100];
 
 	if( !class->graphic_save ) {
@@ -159,10 +159,10 @@ classmodel_graphic_save( Classmodel *classmodel, GtkWidget *parent )
 	}
 
 	filesel = filesel_new();
-	buf_init_static( &buf, txt, 100 );
+	vips_buf_init_static( &buf, txt, 100 );
 	row_qualified_name( HEAPMODEL( classmodel )->row, &buf );
 	iwindow_set_title( IWINDOW( filesel ), _( "Save %s \"%s\"" ), 
-		G_OBJECT_TYPE_NAME( classmodel ), buf_all( &buf ) );
+		G_OBJECT_TYPE_NAME( classmodel ), vips_buf_all( &buf ) );
 	filesel_set_flags( FILESEL( filesel ), TRUE, TRUE );
 	filesel_set_filetype( FILESEL( filesel ), 
 		class->filetype, 
@@ -221,7 +221,7 @@ classmodel_graphic_replace( Classmodel *classmodel, GtkWidget *parent )
 {
 	ClassmodelClass *class = CLASSMODEL_GET_CLASS( classmodel );
 	GtkWidget *filesel;
-	BufInfo buf;
+	VipsBuf buf;
 	char txt[100];
 
 	if( !class->graphic_replace ) {
@@ -233,11 +233,11 @@ classmodel_graphic_replace( Classmodel *classmodel, GtkWidget *parent )
 		return;
 	}
 
-	buf_init_static( &buf, txt, 100 );
+	vips_buf_init_static( &buf, txt, 100 );
 	row_qualified_name( HEAPMODEL( classmodel )->row, &buf );
 	filesel = filesel_new();
 	iwindow_set_title( IWINDOW( filesel ), _( "Replace %s \"%s\"" ), 
-		G_OBJECT_TYPE_NAME( classmodel ), buf_all( &buf ) );
+		G_OBJECT_TYPE_NAME( classmodel ), vips_buf_all( &buf ) );
 	filesel_set_flags( FILESEL( filesel ), TRUE, FALSE );
 	filesel_set_filetype( FILESEL( filesel ), 
 		class->filetype, 
@@ -585,7 +585,7 @@ classmodel_dispose( GObject *gobject )
  * Things like iImage define an _info() with useful stuff in.
  */
 static void
-classmodel_info( iObject *iobject, BufInfo *buf )
+classmodel_info( iObject *iobject, VipsBuf *buf )
 {
 }
 

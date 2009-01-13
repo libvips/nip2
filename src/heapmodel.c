@@ -269,7 +269,7 @@ heapmodel_set_modified( Heapmodel *heapmodel, gboolean modified )
 /* Generate a descriptive name for a heapmodel. Used for captions.
  */
 gboolean
-heapmodel_name( Heapmodel *heapmodel, BufInfo *buf )
+heapmodel_name( Heapmodel *heapmodel, VipsBuf *buf )
 {
 	Row *row = heapmodel->row;
 	Expr *expr;
@@ -284,7 +284,7 @@ heapmodel_name( Heapmodel *heapmodel, BufInfo *buf )
 	 * it's sym and get a descriptive label.
 	 */
 	if( (toolitem = toolitem_lookup( row->ws->kitg, sym )) )
-		buf_appends( buf, toolitem->name );
+		vips_buf_appends( buf, toolitem->name );
 	else 
 		symbol_qualified_name_relative( row->ws->sym, sym, buf );
 
@@ -294,7 +294,7 @@ heapmodel_name( Heapmodel *heapmodel, BufInfo *buf )
 /* Print the value member to a buf.
  */
 gboolean
-heapmodel_value( Heapmodel *heapmodel, BufInfo *buf )
+heapmodel_value( Heapmodel *heapmodel, VipsBuf *buf )
 {
 	Expr *expr;
 	PElement value;

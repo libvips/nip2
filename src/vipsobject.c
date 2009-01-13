@@ -30,8 +30,8 @@
 #include "ip.h"
 
 /*
- */
 #define DEBUG
+ */
 
 /* Maxiumum number of args to constructor.
  */

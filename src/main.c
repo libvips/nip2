@@ -43,9 +43,9 @@
  */
 
 /* But some themes can trigger warnings, argh, so sometimes we need to
- * undef it.
-#undef DEBUG_FATAL
+ * undef it. VipsObject sets can also trigger warnings.
  */
+#undef DEBUG_FATAL
 
 /* Time startup.
 #define DEBUG_TIME

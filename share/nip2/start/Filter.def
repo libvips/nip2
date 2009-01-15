@@ -711,7 +711,7 @@ Filter_greyc_item = class
 				(to_real dl) (to_real da) 
 				(to_real gauss_prec) (to_real interpolation) 
 				(to_real fast_approx) 
-					(resize Interpolate.BILINEAR
+					(resize Interpolate_bilinear
 						(to_real scale) (to_real scale) x);
 		}
 	}

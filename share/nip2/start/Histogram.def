@@ -199,11 +199,11 @@ Hist_graph_item = class
 			graph arrow
 				= hist_tag area'
 			{
-				area = extract_arrow Interpolate.BILINEAR 
+				area = extract_arrow Interpolate_bilinear 
 					displace.value vdisplace.value width.value arrow;
 
 				// squish vertically to get an average
-				area' = resize Interpolate.BILINEAR 1 (1 / width.value) area;
+				area' = resize Interpolate_bilinear 1 (1 / width.value) area;
 			}
 		}
 	}
@@ -221,7 +221,7 @@ Extract_arrow_item = class
 
 		_value
 			= map_unary (extract_arrow 
-				Interpolate.BILINEAR displace.value vdisplace.value
+				Interpolate_bilinear displace.value vdisplace.value
 				width.value) x;
 	}
 }
@@ -253,7 +253,7 @@ Hist_plot_item = class
 					$ymin => ymin.expr, $ymax => ymax.expr]; 
 
 			image x
-				= image (extract_arrow Interpolate.BILINEAR 0 0 1 x), is_Arrow x
+				= image (extract_arrow Interpolate_bilinear 0 0 1 x), is_Arrow x
 				= get_image x, has_image x
 				= x2b im, b == 1
 				= im

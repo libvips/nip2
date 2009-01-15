@@ -1004,8 +1004,7 @@ transform_search max_error max_iterations order ipol wrap sample reference
 rotate interp angle image
 	= oo_binary_function rotate_op angle image, is_class angle
 	= oo_binary'_function rotate_op angle image, is_class image
-	= im_affinei_all image (Interpolate.nicknames.lookup 1 0 interp) 
-		a (-b) b a 0 0, 
+	= im_affinei_all image interp.value a (-b) b a 0 0, 
 		is_real angle && is_image image 
 	= error (_ "bad arguments to " ++ "rotate")
 {
@@ -1415,30 +1414,33 @@ resize interp xfac yfac image
 	rxfac' = 1 / xfac';
 	ryfac' = 1 / yfac';
 
+	// is this interpolation nearest-neighbour?
+	is_nn x = x.type == Interpolate_type.NEAREST_NEIGHBOUR;
+
 	resize_im im
 		// upscale by integer factor, nearest neighbour
 		= im_zoom im xfac' yfac', 
 			is_int xfac' && is_int yfac' && 
 			xfac' >= 1 && yfac' >= 1 &&
-			interp == Interpolate.NEAREST_NEIGHBOUR
+			is_nn interp
 
 		// downscale by integer factor, nearest neighbour
 		= im_subsample im rxfac' ryfac', 
 			is_int rxfac' && is_int ryfac' && 
 			rxfac' >= 1 && ryfac' >= 1 &&
-			interp == Interpolate.NEAREST_NEIGHBOUR
+			is_nn interp
 
 		// upscale by any factor, nearest neighbour 
 		// upscale by integer part, then affine to exact size
 		= scale xg?1 yg?1 (im_zoom im xg?0 yg?0),
 			xfac' >= 1 && yfac' >= 1 &&
-			interp == Interpolate.NEAREST_NEIGHBOUR
+			is_nn interp
 
 		// downscale by any factor, nearest neighbour 
 		// downscale by integer part, then affine to exact size
 		= scale xs?1 ys?1 (im_subsample im xs?0 ys?0),
 			rxfac' >= 1 && ryfac' >= 1 &&
-			interp == Interpolate.NEAREST_NEIGHBOUR
+			is_nn interp
 
 		// upscale by any factor with affine
 		= scale xfac' yfac' im,
@@ -1454,7 +1456,7 @@ resize interp xfac yfac image
 			"  xfac = " ++ print xfac' ++ "\n" ++
 			"  yfac = " ++ print yfac' ++ "\n" ++
 			"  interp = " ++ print interp ++ " (" ++
-				Interpolate.names.lookup 1 0 interp ++ ")")
+				Interpolate_type.descriptions?interp.type ++ ")")
 	{
 		// convert a float scale to integer plus fraction
 		// eg. scale by 2.5 becomes [2, 1.25] (x * 2.5 == x * 2 * 1.25)
@@ -1497,12 +1499,7 @@ resize interp xfac yfac image
 
 		// resize
 		scale xfac yfac im
-			= im_affinei im (Interpolate.nicknames.lookup 1 0 interp)
-				xfac 0 0 yfac 
-				0 0 
-				0 0 
-				(rint (get_width im * xfac)) 
-				(rint (get_height im * yfac));
+			= im_affinei_all im interp.value xfac 0 0 yfac 0 0;
 	}
 }
 

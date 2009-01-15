@@ -2141,13 +2141,15 @@ vips_fillva( VipsInfo *vi, va_list ap )
 
 				if( ii && ii->im ) {
 					vips_buf_appends( buf, "<" );
-					vips_buf_appendf( buf, _( "image \"%s\"" ),
+					vips_buf_appendf( buf, 
+						_( "image \"%s\"" ),
 						ii->im->filename ); 
 					vips_buf_appends( buf, "> " );
 				}
 				else {
 					vips_buf_appends( buf, "<" );
-					vips_buf_appends( buf, _( "no image" ) );
+					vips_buf_appends( buf, 
+						_( "no image" ) );
 					vips_buf_appends( buf, "> " );
 				}
 			}

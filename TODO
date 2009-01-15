@@ -1,10 +1,5 @@
 
 
-- vips_is_callable() needs to know about IM_INPUT_INTERPOLATE
-
-- vips_object_new "VipsInterpolateYafrsmooth" [] [$sharpening => 2]
-
-
 
 
   if we want full VipsObject introspection we will need a lot more
@@ -23,8 +18,8 @@
 - heap_map_dict() should be reduce_map_dict(), since it does reduction, argh
 
 
-- make check still fails ... im_affinei_all is not callable, see
-  vips_is_callable(), thanks to interpolation param
+- try make check again
+
 
 - make the window that we drag for thumbnail drags transparent
 

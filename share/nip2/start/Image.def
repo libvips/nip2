@@ -557,14 +557,13 @@ Image_transform_item = class
 				_vislevel = 3;
 	
 				angle = Scale "Angle" (-180) 180 0;
-				interp = Option_enum Interpolate.descriptions 
-					"Interpolation" "Bilinear";
+				interp = Interpolate_picker Interpolate_type.BILINEAR;
 	
 				_result
 					= map_unary process x
 				{
 					process image 
-						= rotate interp.value_thing angle image;
+						= rotate interp angle image;
 				}
 			}
 		}
@@ -577,14 +576,13 @@ Image_transform_item = class
 				_result {
 				_vislevel = 3;
 
-				interp = Option_enum Interpolate.descriptions 
-					"Interpolation" "Bilinear";
+				interp = Interpolate_picker Interpolate_type.BILINEAR;
 
 				_result
 					= map_unary straighten x
 				{
 					straighten arrow
-						= rotate interp.value_thing angle'' arrow.image
+						= rotate interp angle'' arrow.image
 					{
 						x = arrow.width;
 						y = arrow.height;
@@ -620,9 +618,6 @@ Image_transform_item = class
 
 	Resize_item = class 
 		Menupullright "_Resize" "change image size" {
-		_interp = Option_enum Interpolate.descriptions 
-			"Interpolation" "Bilinear";
-
 		Scale_item = class
 			Menuaction "_Scale" "scale image size by a factor" {
 			action x = class
@@ -631,13 +626,13 @@ Image_transform_item = class
 
 				xfactor = Expression "Horizontal scale factor" 1;
 				yfactor = Expression "Vertical scale factor" 1;
-				interp = _interp;
+				interp = Interpolate_picker Interpolate_type.BILINEAR;
 
 				_result 
 					= map_unary process x
 				{
 					process image 
-						= resize interp.value_thing xfactor yfactor image;
+						= resize interp xfactor yfactor image;
 				}
 			}
 		}
@@ -655,13 +650,13 @@ Image_transform_item = class
 					"Vertical"
 				] 0;
 				size = Expression "Resize to (pixels)" 128;
-				interp = _interp;
+				interp = Interpolate_picker Interpolate_type.BILINEAR;
 
 				_result
 					= map_unary process x
 				{
 					process image
-						= resize interp.value_thing fac fac image
+						= resize interp fac fac image
 					{
 						xfac = to_real size / image.width;
 						yfac = to_real size / image.height;
@@ -694,7 +689,7 @@ Image_transform_item = class
 			    size = Option "Page size" [
 					"Full page", "Half page", "Quarter page" 
 				] 0;
-				interp = _interp;
+				interp = Interpolate_picker Interpolate_type.BILINEAR;
 
 			 	_result
 				 	= map_unary process x
@@ -707,7 +702,7 @@ Image_transform_item = class
 					[width, height] = allrect?within;
 
 					process x
-						= resize interp.value_thing fac fac x, fac < 1
+						= resize interp fac fac x, fac < 1
 						= x
 					{
 						xfac = (width / xdiv) / x.width;
@@ -790,8 +785,7 @@ Image_transform_item = class
 	Image_rubber_item = class 
 		Menupullright "Ru_bber Sheet" 
 			"automatically warp images to superposition" {
-		rubber_interp = Option_enum Interpolate.descriptions 
-			"Interpolation" "Bilinear";
+		rubber_interp = Option "Interpolation" ["Nearest", "Bilinear"] 1;
 		rubber_order = Option "Order" ["0", "1", "2", "3"] 1;
 		rubber_wrap = Toggle "Wrap image edges" false;
 

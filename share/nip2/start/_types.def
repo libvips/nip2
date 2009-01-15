@@ -734,9 +734,13 @@ Table value = class
 		[value, "value", check_rectangular]
 	] ++ super._check_args;
 
+	/* Extract a column.
+	 */
+	column n = map (extract n) value;
+
 	/* present col x: is there an x in column col
 	 */
-	present col x = member (map (extract col) value) x;
+	present col x = member (column col) x;
 
 	/* Look on column from, return matching item in column to.
 	 */
@@ -744,7 +748,7 @@ Table value = class
 		= value?n?to, n >= 0
 		= error (_ "item" ++ " " ++ print x ++ " " ++ _ "not in table")
 	{
-		n = index (equal x) (map (extract from) value);
+		n = index (equal x) (column from);
 	}
 }
 
@@ -765,8 +769,8 @@ Enum value = class
 	}
 
 	// handy ... all the names and things as lists
-	names = map (extract 0) value;
-	things = map (extract 1) value;
+	names = this.column 0; 
+	things = this.column 1; 
 
 	// is a legal name or thing
 	has_name x = this.present 1 x;
@@ -1102,31 +1106,48 @@ Mark_relative image u v
 		(image.width * u)
 		(image.height * v);
 
-Interpolate = class {
-	/* We should introspect to get the iinterpolators, FIXME.
-	 */
+Interpolate_type = class {
 	NEAREST_NEIGHBOUR = 0;
 	BILINEAR = 1;
 	BICUBIC = 2;
 	YAFRSMOOTH = 3;
 
+	// should introspect to get the list of interpolators :-( we can "dir" on
+	// VipsInterpolate to get a list of them, but we can't get i18n'd
+	// descriptions until we have more introspection stuff
+
 	/* Table to map interpol numbers to descriptive strings
 	 */
-	descriptions = Enum [
-		[_ "Nearest neighbour", NEAREST_NEIGHBOUR],
-		[_ "Bilinear", BILINEAR],
-		[_ "Bicubic", BICUBIC],
-		[_ "Bicubic plus edge enhance (yafr-smooth)", YAFRSMOOTH]
+	descriptions = [
+		_ "Nearest neighbour",
+		_ "Bilinear",
+		_ "Bicubic",
+		_ "Bicubic plus edge enhance (yafr-smooth)"
 	];
 
-	/* And to vips nicknames.
+	/* And to vips type names.
 	 */
-	nicknames = Enum [
-		$nearest => NEAREST_NEIGHBOUR,
-		$bilinear => BILINEAR,
-		$bicubic => BICUBIC,
-		$yafrsmooth => YAFRSMOOTH
+	types = [
+		"VipsInterpolateNearest",
+		"VipsInterpolateBilinear",
+		"VipsInterpolateBicubic",
+		"VipsInterpolateYafrsmooth"
 	];
+}
+
+Interpolate type options = class {
+	value = vips_object_new Interpolate_type.types?type [] options;
+}
+
+Interpolate_bilinear = Interpolate Interpolate_type.BILINEAR [];
+
+Interpolate_picker default = class 
+	Interpolate interpolation.value [$sharpening => sharpening.value] {
+	_vislevel = 3;
+
+	interpolation = Option "Interpolation" 
+		Interpolate_type.descriptions default;
+	sharpening = Scale "Sharpening" 0 4 1;
 }
 
 Render_intent = class {

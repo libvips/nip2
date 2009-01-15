@@ -20,6 +20,7 @@ started 7.17.0
 - added vips_object_new builtin
 - moved BufInfo down into vips
 - added IM_INTERPOLATE to vips_call
+- added Interpolate class and Interpolate_picker
 
 started 7.16.3
 - fixed cancel system (again)

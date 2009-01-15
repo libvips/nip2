@@ -121,6 +121,8 @@ typedef struct _ToolClass {
 
 void tool_error( Tool *tool, VipsBuf *buf );
 
+void *tool_linkreport_tool( Tool *tool, VipsBuf *buf, gboolean *found );
+
 GType tool_get_type( void );
 
 Tool *tool_new_sym( Toolkit *kit, int pos, Symbol *sym );

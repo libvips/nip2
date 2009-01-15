@@ -2037,7 +2037,7 @@ cluster thresh points
  * Transform the image to make the arrow horizontal, then displace by hd and
  * vd pxels, then cut out a bit h pixels high centered on the arrow.
  */
-extract_arrow interp hd vd h arrow
+extract_arrow hd vd h arrow
 	= extract_area (re p' + hd) (im p' - h / 2 + vd) (re pv) h im'
 {
 	// the line as a polar vector
@@ -2050,7 +2050,7 @@ extract_arrow interp hd vd h arrow
 		= 180 - a, a > 90
 		= -a;
 
-	im' = rotate interp a' arrow.image;
+	im' = rotate Interpolate_bilinear a' arrow.image;
 
 	// look at the start and end of the arrow, pick the leftmost
 	p

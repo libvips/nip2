@@ -48,11 +48,60 @@ tool_error( Tool *tool, VipsBuf *buf )
 	if( tool->lineno != -1 ) {
 		vips_buf_appends( buf, " (" );
 		if( FILEMODEL( tool->kit )->filename )
-			vips_buf_appends( buf, FILEMODEL( tool->kit )->filename );
+			vips_buf_appends( buf, 
+				FILEMODEL( tool->kit )->filename );
 		else
 			vips_buf_appends( buf, IOBJECT( tool->kit )->name );
 		vips_buf_appendf( buf, ":%d)", tool->lineno );
 	}
+}
+
+static void *
+tool_linkreport_sym_sym( Symbol *child, 
+	Symbol *parent, VipsBuf *buf, gboolean *found )
+{
+	if( child->type == SYM_ZOMBIE && !compile_resolve_top( child ) ) {
+		Tool *tool = symbol_get_tool( parent );
+
+		symbol_qualified_name( parent, buf );
+		tool_error( tool, buf );
+
+		vips_buf_appendf( buf, " " );
+		/* used as in "fred refers to undefined symbol jim"
+		 */
+		vips_buf_appendf( buf, _( "refers to undefined symbol" ) );
+		vips_buf_appendf( buf, " " );
+		symbol_qualified_name( child, buf );
+		vips_buf_appendf( buf, "\n" );
+
+		*found = TRUE;
+	}
+
+	return( NULL );
+}
+
+static void *
+tool_linkreport_sym( Symbol *sym, VipsBuf *buf, gboolean *found )
+{
+	if( sym->expr )
+		return( slist_map3( sym->expr->compile->children,
+			(SListMap3Fn) tool_linkreport_sym_sym, 
+			sym, buf, found ) );
+
+	return( NULL );
+}
+
+void *
+tool_linkreport_tool( Tool *tool, VipsBuf *buf, gboolean *found )
+{
+	Symbol *sym;
+
+	if( tool->type != TOOL_SYM )
+		return( NULL );
+	sym = tool->sym;
+
+	return( symbol_map_all( tool->sym, 
+		(symbol_map_fn) tool_linkreport_sym, buf, found ) );
 }
 
 static void *toolitem_free( Toolitem *toolitem );

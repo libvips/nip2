@@ -39,9 +39,9 @@ static void *
 ierror_print( Expr *expr, iError *ierror, gboolean *found )
 {
 	VipsBuf buf;
-	char txt[512];
+	char txt[1024];
 
-	vips_buf_init_static( &buf, txt, 512 );
+	vips_buf_init_static( &buf, txt, 1024 );
 	expr_error_print( expr, &buf );
 	log_text( LOG( ierror ), vips_buf_all( &buf ) );
 	*found = TRUE;
@@ -70,14 +70,22 @@ ierror_show_all_action_cb( GtkAction *action, iError *ierror )
 }
 
 static void *
-unresolved_print( Toolkit *kit, iError *ierror, gboolean *found )
+unresolved_print_tool( Tool *tool, iError *ierror, gboolean *found )
 {
 	VipsBuf buf;
-	char txt[512];
+	char txt[MAX_STRSIZE];
 
-	vips_buf_init_static( &buf, txt, 512 );
-	toolkit_linkreport( kit, &buf, found );
+	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
+	tool_linkreport_tool( tool, &buf, found );
 	log_text( LOG( ierror ), vips_buf_all( &buf ) );
+
+	return( NULL );
+}
+
+static void *
+unresolved_print( Toolkit *kit, iError *ierror, gboolean *found )
+{
+	toolkit_map( kit, (tool_map_fn) unresolved_print_tool, ierror, found );
 
 	return( NULL );
 }

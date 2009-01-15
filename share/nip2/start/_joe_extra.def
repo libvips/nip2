@@ -66,7 +66,7 @@ Frame_item = class
 			//Scale frame image if required.
 			_a = a, _sf == 1;
 			   = a, _sf == 0;
-			   = Image (resize Interpolate.BILINEAR _sf _sf a.value);
+			   = Image (resize Interpolate_bilinear _sf _sf a.value);
 
 			_im_w = b.width;
 			_im_h = b.height + mount_options._los, mount_options.apply
@@ -146,7 +146,7 @@ Frame_item = class
 			//Scale frame image if required.
 			_a = a, _sf == 1;
 			   = a, _sf == 0;
-			   = Image (resize Interpolate.BILINEAR _sf _sf a.value);
+			   = Image (resize Interpolate_bilinear _sf _sf a.value);
 
 			_im_w = b.width;
 			_im_h = b.height + mount_options._los, mount_options.apply
@@ -227,7 +227,7 @@ Frame_item = class
 
 			_a = a, _sf == 1;
 			   = a, _sf == 0;
-			   = Image (resize Interpolate.BILINEAR _sf _sf a.value);
+			   = Image (resize Interpolate_bilinear _sf _sf a.value);
 
 			_im_w = b.width;
 			_im_h = b.height + mount_options._los, mount_options.apply

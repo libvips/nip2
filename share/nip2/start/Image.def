@@ -314,9 +314,12 @@ Image_header_item = class
 						= parse_str parse x, is_string x
 						= error ("not " ++ name);
 
-					get_int = parse_field "int" cast_int parse_int;
-					get_float = parse_field "float" cast_float parse_float;
-					get_time = parse_field "hh:mm:ss" cast_int parse_time;
+					get_int = parse_field "int" 
+						cast_signed_int parse_int;
+					get_float = parse_field "float" 
+						cast_float parse_float;
+					get_time = parse_field "hh:mm:ss" 
+						cast_signed_int parse_time;
 
 					wrap x
 						= Real x, is_real x

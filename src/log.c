@@ -32,8 +32,8 @@
  */
 
 /* Send log to stdout as well
- */
 #define DEBUG_FILE
+ */
 
 #include "ip.h"
 

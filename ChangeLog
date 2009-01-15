@@ -21,6 +21,7 @@ started 7.17.0
 - moved BufInfo down into vips
 - added IM_INTERPOLATE to vips_call
 - added Interpolate class and Interpolate_picker
+- better error output
 
 started 7.16.3
 - fixed cancel system (again)

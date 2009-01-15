@@ -64,7 +64,8 @@ expr_error_print( Expr *expr, VipsBuf *buf )
 	if( !vips_buf_is_empty( buf )  )
 		vips_buf_appends( buf, "\n" );
 
-	vips_buf_appendf( buf, _( "error in \"%s\"" ), IOBJECT( expr->sym )->name );
+	vips_buf_appendf( buf, _( "error in \"%s\"" ), 
+		IOBJECT( expr->sym )->name );
 	if( expr->sym->tool ) 
 		tool_error( expr->sym->tool, buf );
 	else if( expr->row ) {
@@ -73,7 +74,8 @@ expr_error_print( Expr *expr, VipsBuf *buf )
 		vips_buf_appendf( buf, " (" );
 		row_qualified_name( expr->row, buf );
 		if( FILEMODEL( ws )->filename )
-			vips_buf_appendf( buf, " - %s", FILEMODEL( ws )->filename );
+			vips_buf_appendf( buf, " - %s", 
+				FILEMODEL( ws )->filename );
 		vips_buf_appendf( buf, ")" );
 	}
 

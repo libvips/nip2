@@ -1,4 +1,10 @@
 
+- Program window / Errors 
+
+	finds errors in lcomps too, argh, eg. 
+
+	Tasks_capture_item.Find_calib_item.action._comb.intercepts.$$lcomp22
+	($SAVEDIR/start/Tasks.def:1) refers to undefined symbol cam
 
 
 

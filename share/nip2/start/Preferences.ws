@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.14.0">
-  <Workspace filename="Preferences.ws" view="WORKSPACE_MODE_NOEDIT" scale="1" offset="0" window_width="680" window_height="1159">
-    <Column x="0" y="2799" open="false" selected="false" sform="false" next="99" name="B" caption="Interface column -- don't touch this!">
+  <Workspace filename="$HOME/.nip2-7.17.0/start/Preferences.ws" view="WORKSPACE_MODE_NOEDIT" scale="1" offset="0" window_width="680" window_height="1159" lpane_position="100" lpane_open="false" rpane_position="400" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="Preferences">
+    <Column x="51" y="2850" open="false" selected="false" sform="false" next="99" name="B" caption="Interface column -- don't touch this!">
       <Subcolumn vislevel="2">
         <Row popup="false" name="CSV_SEPARATOR">
           <Rhs vislevel="1" flags="4">
@@ -80,7 +80,7 @@
         </Row>
         <Row popup="false" name="IMAGE_FILE_TYPE">
           <Rhs vislevel="1" flags="4">
-            <iText formula="0"/>
+            <iText formula="2"/>
           </Rhs>
         </Row>
         <Row popup="false" name="MATRIX_FILE_TYPE">
@@ -235,12 +235,12 @@
         </Row>
         <Row popup="false" name="DISPLAY_CONVERSION">
           <Rhs vislevel="1" flags="4">
-            <iText formula="true"/>
+            <iText formula="false"/>
           </Rhs>
         </Row>
         <Row popup="false" name="DISPLAY_RULERS">
           <Rhs vislevel="1" flags="4">
-            <iText formula="true"/>
+            <iText formula="false"/>
           </Rhs>
         </Row>
         <Row popup="false" name="DISPLAY_CROSSHAIR">
@@ -360,7 +360,7 @@
         </Row>
         <Row popup="false" name="MAINW_WINDOW_HEIGHT">
           <Rhs vislevel="1" flags="4">
-            <iText formula="480"/>
+            <iText formula="1010"/>
           </Rhs>
         </Row>
         <Row popup="false" name="BROWSER">
@@ -400,7 +400,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="2581" open="true" selected="false" sform="false" next="10" name="I" caption="Mosaic defaults">
+    <Column x="51" y="2632" open="true" selected="false" sform="false" next="10" name="I" caption="Mosaic defaults">
       <Subcolumn vislevel="3">
         <Row popup="false" name="I2">
           <Rhs vislevel="1" flags="1">
@@ -439,7 +439,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="2272" open="true" selected="false" sform="false" next="15" name="J" caption="Video for linux">
+    <Column x="51" y="2323" open="true" selected="false" sform="false" next="15" name="J" caption="Video for linux">
       <Subcolumn vislevel="3">
         <Row popup="false" name="J2">
           <Rhs vislevel="1" flags="1">
@@ -499,7 +499,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="2014" open="true" selected="false" sform="false" next="12" name="K" caption="General video capture">
+    <Column x="51" y="2065" open="true" selected="false" sform="false" next="12" name="K" caption="General video capture">
       <Subcolumn vislevel="3">
         <Row popup="false" name="K1">
           <Rhs vislevel="1" flags="1">
@@ -545,7 +545,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="1887" open="true" selected="false" sform="false" next="3" name="M" caption="PNG save options">
+    <Column x="51" y="1938" open="true" selected="false" sform="false" next="3" name="M" caption="PNG save options">
       <Subcolumn vislevel="3">
         <Row popup="false" name="M1">
           <Rhs vislevel="1" flags="1">
@@ -563,7 +563,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="1790" open="true" selected="false" sform="false" next="12" name="G" caption="PPM/PGM/PBM save">
+    <Column x="51" y="1841" open="true" selected="false" sform="false" next="12" name="G" caption="PPM/PGM/PBM save">
       <Subcolumn vislevel="2">
         <Row popup="false" name="G1">
           <Rhs vislevel="1" flags="1">
@@ -574,7 +574,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="1508" open="true" selected="false" sform="false" next="25" name="C" caption="TIFF save">
+    <Column x="51" y="1559" open="true" selected="false" sform="false" next="25" name="C" caption="TIFF save">
       <Subcolumn vislevel="2">
         <Row popup="false" name="C1">
           <Rhs vislevel="1" flags="1">
@@ -594,12 +594,12 @@
           <Rhs vislevel="1" flags="1">
             <Option/>
             <Subcolumn vislevel="0"/>
-	    <iText formula="Option &quot;Deflate/LZW predictor&quot; [&quot;None&quot;,&quot;Horizontal difference&quot;,&quot;Floating-point&quot;] 0"/>
+            <iText formula="Option &quot;Deflate/LZW predictor&quot; [&quot;None&quot;,&quot;Horizontal difference&quot;,&quot;Floating-point&quot;] 0"/>
           </Rhs>
         </Row>
         <Row popup="false" name="C16">
           <Rhs vislevel="1" flags="1">
-            <Option/>
+            <Option caption="Layout" labelsn="2" labels0="Strip" labels1="Tile" value="0"/>
             <Subcolumn vislevel="0"/>
             <iText formula="Option &quot;Layout&quot; [&quot;Strip&quot;, &quot;Tile&quot;] 0"/>
           </Rhs>
@@ -634,7 +634,18 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="1226" open="true" selected="false" sform="false" next="9" name="A" caption="JPEG save">
+    <Column x="51" y="1435" open="true" selected="true" sform="false" next="4" name="O" caption="CSV save">
+      <Subcolumn vislevel="3">
+        <Row popup="false" name="O1">
+          <Rhs vislevel="1" flags="1">
+            <Subcolumn vislevel="0"/>
+            <iText formula="String &quot;Separator character&quot; &quot;\t&quot;"/>
+            <String/>
+          </Rhs>
+        </Row>
+      </Subcolumn>
+    </Column>
+    <Column x="51" y="1277" open="true" selected="false" sform="false" next="9" name="A" caption="JPEG save">
       <Subcolumn vislevel="2">
         <Row popup="false" name="A6">
           <Rhs vislevel="1" flags="1">
@@ -659,7 +670,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="1039" open="true" selected="false" sform="false" next="11" name="F" caption="Widgets">
+    <Column x="51" y="1090" open="true" selected="false" sform="false" next="11" name="F" caption="Widgets">
       <Subcolumn vislevel="2">
         <Row popup="false" name="F1">
           <Rhs vislevel="1" flags="1">
@@ -691,7 +702,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="943" open="true" selected="false" sform="false" next="4" name="H" caption="Debug options">
+    <Column x="51" y="994" open="true" selected="false" sform="false" next="4" name="H" caption="Debug options">
       <Subcolumn vislevel="2">
         <Row popup="false" name="H1">
           <Rhs vislevel="1" flags="1">
@@ -702,7 +713,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="815" open="true" selected="false" sform="false" next="5" name="L" caption="Help browser">
+    <Column x="51" y="866" open="true" selected="false" sform="false" next="5" name="L" caption="Help browser">
       <Subcolumn vislevel="3">
         <Row popup="false" name="L2">
           <Rhs vislevel="1" flags="1">
@@ -720,7 +731,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="657" open="true" selected="false" sform="false" next="5" name="N" caption="Paintbox ">
+    <Column x="51" y="708" open="true" selected="false" sform="false" next="5" name="N" caption="Paintbox ">
       <Subcolumn vislevel="3">
         <Row popup="false" name="N1">
           <Rhs vislevel="1" flags="1">
@@ -745,7 +756,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="407" open="true" selected="false" sform="false" next="26" name="E" caption="Image display">
+    <Column x="51" y="458" open="true" selected="false" sform="false" next="26" name="E" caption="Image display">
       <Subcolumn vislevel="2">
         <Row popup="false" name="E20">
           <Rhs vislevel="1" flags="1">
@@ -784,7 +795,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="0" open="true" selected="false" sform="false" next="45" name="D" caption="Calculation">
+    <Column x="51" y="51" open="true" selected="false" sform="false" next="45" name="D" caption="Calculation">
       <Subcolumn vislevel="2">
         <Row popup="false" name="D2">
           <Rhs vislevel="1" flags="1">
@@ -816,7 +827,7 @@
         </Row>
         <Row popup="false" name="D29">
           <Rhs vislevel="1" flags="1">
-            <Toggle caption="Update regions during drag" value="false"/>
+            <Toggle caption="Update regions during drag" value="true"/>
             <Subcolumn vislevel="0"/>
             <iText formula="Toggle &quot;Update regions during drag&quot; true"/>
           </Rhs>
@@ -861,17 +872,6 @@
             <Number/>
             <Subcolumn vislevel="0"/>
             <iText formula="Number &quot;Number of CPUs to use&quot; 1"/>
-          </Rhs>
-        </Row>
-      </Subcolumn>
-    </Column>
-    <Column x="0" y="1384" open="true" selected="true" sform="false" next="4" name="O" caption="CSV save">
-      <Subcolumn vislevel="3">
-        <Row popup="false" name="O1">
-          <Rhs vislevel="1" flags="1">
-            <Subcolumn vislevel="0"/>
-            <iText formula="String &quot;Separator character&quot; &quot;\t&quot;"/>
-            <String/>
           </Rhs>
         </Row>
       </Subcolumn>

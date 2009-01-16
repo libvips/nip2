@@ -23,6 +23,10 @@ started 7.17.0
 - added Interpolate class and Interpolate_picker
 - error window output no longer truncates on symbols with many errors
 - renamed 'Recover After Crash' as 'Search for Workspace Backups'
+- better Scale alignment in display
+- regions and scales default to live dragging
+- better image display defaults (no ruler, no display bar etc.)
+- thumbnails are transparent when you drag them
 
 started 7.16.3
 - fixed cancel system (again)

@@ -58,6 +58,22 @@ iimageview_realize( GtkWidget *widget )
 	set_symbol_drag_type( widget );
 }
 
+GtkWidget *
+iimageview_drag_window_new( int width, int height )
+{
+	GtkWidget *window;
+
+	window = gtk_window_new( GTK_WINDOW_POPUP );
+	gtk_widget_set_app_paintable( GTK_WIDGET( window ), TRUE );
+	gtk_widget_set_size_request( window, width, height );
+	gtk_widget_realize( window );
+#ifdef HAVE_SET_OPACITY
+	gdk_window_set_opacity( window->window, 0.5 );
+#endif /*HAVE_SET_OPACITY*/
+
+	return( window );
+}
+
 static void
 iimageview_drag_begin( GtkWidget *widget, GdkDragContext *context )
 {
@@ -70,19 +86,14 @@ iimageview_drag_begin( GtkWidget *widget, GdkDragContext *context )
 	printf( "iimageview_drag_begin: \n" );
 #endif /*DEBUG*/
 
-	window = gtk_window_new( GTK_WINDOW_POPUP );
-	gtk_widget_set_app_paintable( GTK_WIDGET( window ), TRUE );
-	gtk_widget_set_size_request( window, 
+	window = iimageview_drag_window_new( 
 		conv->canvas.width, conv->canvas.height );
-	gtk_widget_realize( window );
 	gtk_object_set_data_full( GTK_OBJECT( widget ),
-		"iimageview-drag-window", window,
+		"nip2-drag-window", window,
 		(GtkDestroyNotify) gtk_widget_destroy );
-
 	id = imagedisplay_new( conv );
 	gtk_container_add( GTK_CONTAINER( window ), GTK_WIDGET( id ) );
 	gtk_widget_show( GTK_WIDGET( id ) );
-
 	gtk_drag_set_icon_widget( context, window, -2, -2 );
 }
 
@@ -94,7 +105,7 @@ iimageview_drag_end( GtkWidget *widget, GdkDragContext *context )
 #endif /*DEBUG*/
 
 	gtk_object_set_data( GTK_OBJECT( widget ), 
-		"iimageview-drag-window", NULL );
+		"nip2-drag-window", NULL );
 }
 
 static void

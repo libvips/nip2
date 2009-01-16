@@ -1,3 +1,52 @@
+
+- load thumbnail, drag colun to right partially out of main window,
+  drag back, bg is not painted
+
+
+- have a close button for the left and right drag out panels
+
+  need a titlebar + close button, eg.:
+
+  	Toolkit Browser        x
+	Search: _________________
+
+
+  	Workspace Definitions  x
+	              Process  >
+
+
+  do we have a handy class we could put this into?
+
+  pane.c / pane.h
+
+- display control bar scale seems unreliable?
+
+  when zoomed out?
+
+- Image_file "rgb.jpg" == vector [0,0,0] seem to be broken?
+
+- File / Open, click on a directory, click "Open", error:
+
+	Load failed.
+
+	Unable to execute:
+	   Matrix_file "/home/john/develop"
+
+  what a daft message
+
+  ans then the directory gets added to 'recent images' !!
+
+- when zoomed in a bit, the centre of the + of a arrow seems to miss ... ends
+  up up and right of where it should be?
+
+- the thing that moves the region label, if it's going to hit the image edge,
+  should look for the window edge instead ... eg. if we are zoomed out and
+  have some background visible
+
+
+
+
+
 - lcomps like:
 
 	argh = [x :: x <- poop]
@@ -13,18 +62,7 @@
 
 
 
-- Program window / Errors 
-
-	finds errors in lcomps too, argh, eg. 
-
-	Tasks_capture_item.Find_calib_item.action._comb.intercepts.$$lcomp22
-	($SAVEDIR/start/Tasks.def:1) refers to undefined symbol cam
-
-	looks like this are just harmless leftovers: don't report errors on
-	auto symbols? check lcomp source
-
-
-  if we want full VipsObject introspection we will need a lot more
+- if we want full VipsObject introspection we will need a lot more
 
 	vips_object_arguments (name2gtype "VipsInterpolateYafrsmooth")
 		-> ["sharpness"]
@@ -43,59 +81,6 @@
 
   actually, remove all the reduce_ stuff, it's daft to have a distinction
 
-- try make check again
-
-- Scale needs a little extra padding on the left, it doesn't line up with an
-  Option nicely
-
-- make the window that we drag for thumbnail drags transparent
-
-- have a close button for the left and right drag out panels
-
-  need a titlebar + close button, eg.:
-
-  	Toolkit Browser        x
-	Search: _________________
-
-
-  	Workspace Definitions  x
-	              Process  >
-
-
-  do we have a handy class we could put this into?
-
-  pane.c / pane.h
-
-- File / Open, click on a directory, click "Open", error:
-
-	Load failed.
-
-	Unable to execute:
-	   Matrix_file "/home/john/develop"
-
-  what a daft message
-
-  ans then the directory gets added to 'recent images' !!
-
-- display control bar scale seems unreliable?
-
-  when zoomed out?
-
-- when zoomed in a bit, the centre of the + of a arrow seems to miss ... ends
-  up up and right of where it should be?
-
-- the thing that moves the region label, if it's going to hit the image edge,
-  should look for the window edge instead ... eg. if we are zoomed out and
-  have some background visible
-
-- portrait format, square window, zoom out from bottom leaves uncleared
-  background
-
-- Image_file "rgb.jpg" == vector [0,0,0] seem to be broken?
-
-- argh, make check is failing on fourier, again
-
-- add more tests to exercise -o & friends, they often break
 
 WONTFIX for 7.16
 ================

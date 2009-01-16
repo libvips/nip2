@@ -647,7 +647,8 @@ apply_dir_call( Reduce *rc, const char *name, HeapNode **arg, PElement *out )
 
 		if( !g_type_name( type ) ) {
 			error_top( _( "No such type" ) );
-			error_sub( _( "GType %lu not found." ), type );
+			error_sub( _( "GType %u not found." ), 
+				(unsigned int) type );
 			reduce_throw( rc );
 		}
 

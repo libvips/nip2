@@ -194,7 +194,7 @@ sliderview_init( Sliderview *sliderview )
 	sliderview->tslider = tslider_new();
 	tslider_set_conversions( sliderview->tslider, NULL, NULL );
         gtk_box_pack_start( GTK_BOX( hbox ), 
-		GTK_WIDGET( sliderview->tslider ), TRUE, TRUE, 0 );
+		GTK_WIDGET( sliderview->tslider ), TRUE, TRUE, 6 );
 
         gtk_signal_connect_object( GTK_OBJECT( sliderview->tslider ), 
 		"text_changed",

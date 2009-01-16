@@ -115,14 +115,10 @@ colourdisplay_drag_begin( GtkWidget *widget, GdkDragContext *context )
 	double colours[4];
 	GdkColor bg;
 
-	window = gtk_window_new( GTK_WINDOW_POPUP );
-	gtk_widget_set_app_paintable( GTK_WIDGET( window ), TRUE );
-	gtk_widget_set_size_request( window, 48, 32 );
-	gtk_widget_realize( window );
+	window = iimageview_drag_window_new( 48, 32 ); 
 	gtk_object_set_data_full( GTK_OBJECT( widget ),
-		"colourdisplay-drag-window", window,
+		"nip2-drag-window", window,
 		(GtkDestroyNotify) gtk_widget_destroy );
-
 #ifdef DEBUG
 	printf( "colourdisplay_drag_begin: generating drag swatch colour\n" );
 #endif /*DEBUG*/
@@ -139,7 +135,7 @@ static void
 colourdisplay_drag_end( GtkWidget *widget, GdkDragContext *context )
 {
 	gtk_object_set_data( GTK_OBJECT( widget ), 
-		"colourdisplay-drag-window", NULL );
+		"nip2-drag-window", NULL );
 }
 
 static void

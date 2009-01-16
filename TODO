@@ -1,6 +1,8 @@
 
-- load thumbnail, drag colun to right partially out of main window,
+- load thumbnail, drag column to right partially out of main window,
   drag back, bg is not painted
+
+  oh, now it works, how odd
 
 
 - have a close button for the left and right drag out panels
@@ -14,14 +16,9 @@
   	Workspace Definitions  x
 	              Process  >
 
-
   do we have a handy class we could put this into?
 
   pane.c / pane.h
-
-- display control bar scale seems unreliable?
-
-  when zoomed out?
 
 - Image_file "rgb.jpg" == vector [0,0,0] seem to be broken?
 
@@ -42,6 +39,12 @@
 - the thing that moves the region label, if it's going to hit the image edge,
   should look for the window edge instead ... eg. if we are zoomed out and
   have some background visible
+
+- display control bar scale seems unreliable?
+
+  when zoomed out?
+
+  hmm, seems ok, how odd
 
 
 

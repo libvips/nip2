@@ -2503,11 +2503,6 @@ findmaxmin( IMAGE *in,
 	DOUBLEMASK *msk;
 	IMAGE *t1;
 
-#ifdef DEBUG
-	printf( "findmaxmin: left = %d, top = %d, width = %d, height = %d\n",
-		left, top, width, height );
-#endif /*DEBUG*/
-
 	if( !(t1 = im_open( "temp", "p" )) )
 		return( -1 );
 	if( im_extract_area( in, t1, left, top, width, height ) ||
@@ -2519,6 +2514,12 @@ findmaxmin( IMAGE *in,
 	*max = msk->coeff[1];
 
 	im_free_dmask( msk );
+
+#ifdef DEBUG
+	printf( "findmaxmin: left = %d, top = %d, width = %d, height = %d\n",
+		left, top, width, height );
+	printf( "findmaxmin: max = %g, min = %g\n", *max, *min );
+#endif /*DEBUG*/
 
 	return( 0 );
 }

@@ -730,9 +730,8 @@ columnview_refresh( vObject *vobject )
 	widget_visible( cview->title, editable );
 	if( editable ) 
 		gtk_frame_set_label( GTK_FRAME( cview->frame ), NULL );
-	else {
-		GtkWidget *label = gtk_frame_get_label_widget( 
-			GTK_FRAME( cview->frame ) );
+	else if( IOBJECT( col )->caption ) {
+		GtkWidget *label;
 		char buf[256];
 		char buf2[256];
 

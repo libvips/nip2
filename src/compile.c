@@ -2179,7 +2179,7 @@ compile_copy_tree( Compile *fromscope, ParseNode *tree, Compile *toscope )
 
   Example: after parse we have:
 
-	[(x, y) | x <- [1..3]; y <- [x..3]; x + y > 3];
+	[(x, y) :: x <- [1..3]; y <- [x..3]; x + y > 3];
 
 	... $$lcomp1 ...
 	{

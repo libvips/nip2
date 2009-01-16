@@ -679,7 +679,7 @@ list_expression:
 		Symbol *sym;
 		Compile *enclosing = current_compile;
 
-		/* Make an anonymous symbol local to the current sym, save
+		/* Make an anonymous symbol local to the current sym, copy
 		 * the map expr inside that. 
 		 */
 		im_snprintf( name, 256, "$$lcomp%d", parse_object_id++ );

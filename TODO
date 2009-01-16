@@ -1,3 +1,17 @@
+- lcomps like:
+
+	argh = [x :: x <- poop]
+
+  the 'x' gets copied inside the lcomp, leaving a zombie 'x' attached to argh,
+  which Program / View / Errors then reports
+
+  turn the 'x' we copy into a 'generated'? when we copy the expr, how do we
+  know what zombies it made? we don't want to make all syms referenced by x
+  into zombies
+
+  what about nested lcomps? make sure they still work
+
+
 
 - Program window / Errors 
 
@@ -6,6 +20,8 @@
 	Tasks_capture_item.Find_calib_item.action._comb.intercepts.$$lcomp22
 	($SAVEDIR/start/Tasks.def:1) refers to undefined symbol cam
 
+	looks like this are just harmless leftovers: don't report errors on
+	auto symbols? check lcomp source
 
 
   if we want full VipsObject introspection we will need a lot more
@@ -23,9 +39,14 @@
 
 - heap_map_dict() should be reduce_map_dict(), since it does reduction, argh
 
+  redo heap_map_dict() in terms of reduce_map_dict()
+
+  actually, remove all the reduce_ stuff, it's daft to have a distinction
 
 - try make check again
 
+- Scale needs a little extra padding on the left, it doesn't line up with an
+  Option nicely
 
 - make the window that we drag for thumbnail drags transparent
 

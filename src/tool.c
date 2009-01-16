@@ -60,7 +60,12 @@ static void *
 tool_linkreport_sym_sym( Symbol *child, 
 	Symbol *parent, VipsBuf *buf, gboolean *found )
 {
-	if( child->type == SYM_ZOMBIE && !compile_resolve_top( child ) ) {
+	/* Don't report generated syms eg. from lcomps or pattern
+	 * matches.
+	 */
+	if( child->type == SYM_ZOMBIE && 
+		!child->generated && !parent->generated &&
+		!compile_resolve_top( child ) ) {
 		Tool *tool = symbol_get_tool( parent );
 
 		symbol_qualified_name( parent, buf );

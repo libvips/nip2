@@ -1143,7 +1143,7 @@ Interpolate_bilinear = Interpolate Interpolate_type.BILINEAR [];
 
 Interpolate_picker default = class 
 	Interpolate interpolation.value [$sharpening => sharpening.value] {
-	_vislevel = 3;
+	_vislevel = 2;
 
 	interpolation = Option "Interpolation" 
 		Interpolate_type.descriptions default;

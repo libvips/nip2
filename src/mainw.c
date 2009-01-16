@@ -1694,7 +1694,7 @@ static GtkActionEntry mainw_actions[] = {
 		G_CALLBACK( mainw_workspace_save_as_action_cb ) },
 
 	{ "Recover", 
-		NULL, N_( "Re_cover After Crash" ), NULL,
+		NULL, N_( "Search for Workspace _Backups" ), NULL,
 		N_( "Load last automatically backed-up workspace" ), 
 		G_CALLBACK( mainw_recover_action_cb ) },
 

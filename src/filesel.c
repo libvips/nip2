@@ -1303,6 +1303,9 @@ filesel_done_cb( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys )
 
 	if( !(filename = filesel_get_filename( filesel )) ) 
 		nfn( sys, IWINDOW_ERROR );
+	else if( isdir( "%s", filename ) ) {
+		nfn( sys, IWINDOW_NO );
+	}
 	else {
 		/* File exists and we are saving? Do a yesno before we carry on.
 		 */

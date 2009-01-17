@@ -1,19 +1,5 @@
 
 
-- File / Open, click on a directory, click "Open", error:
-
-	Load failed.
-
-	Unable to execute:
-	   Matrix_file "/home/john/develop"
-
-  what a daft message
-
-  ans then the directory gets added to 'recent images' !!
-
-- when zoomed in a bit, the centre of the + of a arrow seems to miss ... ends
-  up up and right of where it should be?
-
 - the thing that moves the region label, if it's going to hit the image edge,
   should look for the window edge instead ... eg. if we are zoomed out and
   have some background visible
@@ -61,6 +47,8 @@
   redo heap_map_dict() in terms of reduce_map_dict()
 
   actually, remove all the reduce_ stuff, it's daft to have a distinction
+
+  something to do when we break Snip out into libsnip
 
 
 WONTFIX for 7.16

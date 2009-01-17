@@ -1814,6 +1814,35 @@ existsf( const char *name, ... )
 	return( res );
 }
 
+int
+isdir_sub( const char *filename )
+{
+	struct stat st;
+
+	/* Read size and file/dir.
+	 */
+	if( stat( filename, &st ) == -1 ) 
+		return( FALSE );
+	if( !S_ISDIR( st.st_mode ) )
+		return( FALSE );
+
+	return( TRUE );
+}
+
+gboolean
+isdir( const char *filename, ... )
+{
+	va_list ap;
+	gboolean res;
+
+        va_start( ap, filename );
+        res = calli_string_filenameva( 
+		(calli_string_fn) isdir_sub, filename, ap, NULL, NULL, NULL );
+        va_end( ap );
+
+	return( res );
+}
+
 gboolean
 mkdirf( const char *name, ... )
 {

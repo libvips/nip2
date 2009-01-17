@@ -1,0 +1,156 @@
+/* The thing that sits in a pane showing the title and close button.
+ */
+
+/*
+
+    Copyright (C) 1991-2003 The National Gallery
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+ */
+
+/*
+
+    These files are distributed with VIPS - http://www.vips.ecs.soton.ac.uk 
+
+ */
+
+/*
+#define DEBUG
+ */
+
+#include "ip.h"
+
+static ViewClass *parent_class = NULL;
+
+static void
+panechild_finalize( GObject *gobject )
+{
+	Panechild *panechild = PANECHILD( gobject );
+
+#ifdef DEBUG
+	printf( "panechild_finalize\n" );
+#endif /*DEBUG*/
+
+	/* My instance finalize stuff.
+	 */
+	IM_FREE( panechild->title );
+
+	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+}
+
+static void
+panechild_refresh( vObject *vobject )
+{
+	Panechild *panechild = PANECHILD( vobject );
+
+#ifdef DEBUG
+	printf( "panechild_refresh:\n" );
+#endif /*DEBUG*/
+
+	set_glabel( panechild->label, "%s", panechild->title );
+
+	VOBJECT_CLASS( parent_class )->refresh( vobject );
+}
+
+static void
+panechild_class_init( PanechildClass *class )
+{
+	GObjectClass *gobject_class = (GObjectClass *) class;
+	vObjectClass *vobject_class = (vObjectClass *) class;
+
+	parent_class = g_type_class_peek_parent( class );
+
+	gobject_class->finalize = panechild_finalize;
+
+	vobject_class->refresh = panechild_refresh;
+}
+
+static void
+panechild_hide_cb( GtkWidget *wid, Panechild *panechild )
+{
+	pane_set_open( panechild->pane, FALSE );
+}
+
+static void
+panechild_init( Panechild *panechild )
+{
+	GtkWidget *hbox;
+	GtkWidget *but;
+        GtkWidget *icon;
+
+#ifdef DEBUG
+	printf( "panechild_init:\n" );
+#endif /*DEBUG*/
+
+	panechild->pane = NULL;
+	panechild->title = NULL;
+	panechild->label = NULL;
+
+	hbox = gtk_hbox_new( FALSE, 7 );
+	gtk_box_pack_start( GTK_BOX( panechild ), hbox, FALSE, FALSE, 0 );
+
+        but = gtk_button_new();
+        gtk_button_set_relief( GTK_BUTTON( but ), GTK_RELIEF_NONE );
+        gtk_box_pack_end( GTK_BOX( hbox ), but, FALSE, FALSE, 0 );
+        set_tooltip( but, _( "Close the pane" ) );
+	icon = gtk_image_new_from_stock( GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU );
+        gtk_container_add( GTK_CONTAINER( but ), icon );
+        gtk_signal_connect( GTK_OBJECT( but ), "clicked",
+                GTK_SIGNAL_FUNC( panechild_hide_cb ), panechild );
+
+        panechild->label = gtk_label_new( "" );
+	gtk_misc_set_alignment( GTK_MISC( panechild->label ), 0.0, 0.5 );
+        gtk_box_pack_start( GTK_BOX( hbox ), panechild->label, TRUE, TRUE, 2 );
+
+	gtk_widget_show_all( hbox );
+}
+
+GtkType
+panechild_get_type( void )
+{
+	static GType type = 0;
+
+	if( !type ) {
+		static const GTypeInfo info = {
+			sizeof( PanechildClass ),
+			NULL,           /* base_init */
+			NULL,           /* base_finalize */
+			(GClassInitFunc) panechild_class_init,
+			NULL,           /* class_finalize */
+			NULL,           /* class_data */
+			sizeof( Panechild ),
+			32,             /* n_preallocs */
+			(GInstanceInitFunc) panechild_init,
+		};
+
+		type = g_type_register_static( TYPE_VOBJECT,
+			"Panechild", &info, 0 );
+	}
+
+	return( type );
+}
+
+Panechild *
+panechild_new( Pane *pane, const char *title )
+{
+	Panechild *panechild = gtk_type_new( TYPE_PANECHILD );
+
+	panechild->pane = pane;
+	IM_SETSTR( panechild->title, title );
+
+	return( panechild );
+}
+

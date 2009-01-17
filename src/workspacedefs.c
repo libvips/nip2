@@ -201,14 +201,6 @@ workspacedefs_save_as_cb( GtkWidget *wid, Workspacedefs *workspacedefs )
 			FILEMODEL( ws->local_kit ) );
 }
 
-static void
-workspacedefs_hide_cb( GtkWidget *wid, Workspacedefs *workspacedefs )
-{
-	Mainw *mainw = workspacedefs->mainw;
-
-	pane_set_open( mainw->lpane, FALSE );
-}
-
 static gboolean
 workspacedefs_set_text( Workspacedefs *workspacedefs, const char *txt )
 {
@@ -272,9 +264,6 @@ workspacedefs_init( Workspacedefs *workspacedefs )
 		GTK_SIGNAL_FUNC( workspacedefs_replace_cb ), workspacedefs );
 	menu_add_but( pane, GTK_STOCK_SAVE_AS,
 		GTK_SIGNAL_FUNC( workspacedefs_save_as_cb ), workspacedefs );
-	menu_add_sep( pane );
-	menu_add_but( pane, GTK_STOCK_CLOSE,
-		GTK_SIGNAL_FUNC( workspacedefs_hide_cb ), workspacedefs );
 
 	hbox = gtk_hbox_new( FALSE, 7 );
 	gtk_box_pack_start( GTK_BOX( workspacedefs ), hbox, FALSE, FALSE, 0 );

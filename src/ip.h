@@ -381,6 +381,7 @@ typedef void *(*tool_map_fn)( Tool *, void *, void * );
 #include "toolview.h"
 #include "watch.h"
 #include "value.h"
+#include "panechild.h"
 
 /* Per module includes, any order
  */

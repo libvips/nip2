@@ -27,6 +27,7 @@ started 7.17.0
 - regions and scales default to live dragging
 - better image display defaults (no ruler, no display bar etc.)
 - thumbnails are transparent when you drag them
+- side panes have titlebars and close buttons
 
 started 7.16.3
 - fixed cancel system (again)

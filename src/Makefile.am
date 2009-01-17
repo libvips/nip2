@@ -25,6 +25,8 @@ nip2_SOURCES = \
 	vipsobject.h \
 	plotmodel.c \
 	plotmodel.h \
+	panechild.c \
+	panechild.h \
 	plotpresent.c \
 	plotpresent.h \
 	plotstatus.c \

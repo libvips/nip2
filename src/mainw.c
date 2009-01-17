@@ -1948,6 +1948,7 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	GError *error;
 	GtkWidget *cancel;
 	GtkWidget *item;
+	Panechild *panechild;
 
 #ifdef DEBUG
 	printf( "mainw_init: %p\n", mainw );
@@ -2128,11 +2129,18 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 		POPUP_FUNC( mainw_next_error_action_cb2 ) ); 
         popup_attach( mainw->wsview->fixed, mainw->popup, mainw );
 
+	/* Toolkit Browser pane.
+	 */
+	panechild = panechild_new( mainw->rpane, _( "Toolkit Browser" ) );
+	gtk_paned_pack2( GTK_PANED( mainw->rpane ), 
+		GTK_WIDGET( panechild ), TRUE, TRUE );
+	gtk_widget_show( GTK_WIDGET( panechild ) );
+
 	/* Have to put toolkitbrowser in an ebox so the search entry gets
 	 * clipped to the pane size.
 	 */
 	ebox = gtk_event_box_new();
-	gtk_paned_pack2( GTK_PANED( mainw->rpane ), ebox, TRUE, TRUE );
+	gtk_container_add( GTK_CONTAINER( panechild ), GTK_WIDGET( ebox ) );
 	gtk_widget_show( ebox );
 
 	mainw->toolkitbrowser = toolkitbrowser_new();
@@ -2145,10 +2153,15 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 
 	/* Workspace-local defs pane.
 	 */
+	panechild = panechild_new( mainw->lpane, _( "Workspace Definitions" ) );
+	gtk_paned_pack1( GTK_PANED( mainw->lpane ), 
+		GTK_WIDGET( panechild ), TRUE, TRUE );
+	gtk_widget_show( GTK_WIDGET( panechild ) );
+
 	mainw->workspacedefs = workspacedefs_new( mainw );
 	vobject_link( VOBJECT( mainw->workspacedefs ), IOBJECT( mainw->ws ) );
-	gtk_paned_pack1( GTK_PANED( mainw->lpane ), 
-		GTK_WIDGET( mainw->workspacedefs ), TRUE, TRUE );
+	gtk_container_add( GTK_CONTAINER( panechild ), 
+		GTK_WIDGET( mainw->workspacedefs ) );
 	gtk_widget_show( GTK_WIDGET( mainw->workspacedefs ) );
 
 	/* Set start state.

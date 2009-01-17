@@ -5,21 +5,6 @@
   oh, now it works, how odd
 
 
-- have a close button for the left and right drag out panels
-
-  need a titlebar + close button, eg.:
-
-  	Toolkit Browser        x
-	Search: _________________
-
-
-  	Workspace Definitions  x
-	              Process  >
-
-  do we have a handy class we could put this into?
-
-  pane.c / pane.h
-
 - Image_file "rgb.jpg" == vector [0,0,0] seem to be broken?
 
 - File / Open, click on a directory, click "Open", error:

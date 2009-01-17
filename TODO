@@ -1,11 +1,4 @@
 
-- load thumbnail, drag column to right partially out of main window,
-  drag back, bg is not painted
-
-  oh, now it works, how odd
-
-
-- Image_file "rgb.jpg" == vector [0,0,0] seem to be broken?
 
 - File / Open, click on a directory, click "Open", error:
 

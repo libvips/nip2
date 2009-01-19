@@ -96,7 +96,7 @@ imagedisplay_needs_painting( Imagedisplay *id, Rect *area )
 /* Repaint an area of the image.
  */
 static void
-imagedisplay_repaint_area( Imagedisplay *id, GdkRectangle *expose )
+imagedisplay_paint_image( Imagedisplay *id, GdkRectangle *expose )
 {
 	Conversion *conv = id->conv;
 
@@ -135,7 +135,7 @@ imagedisplay_repaint_area( Imagedisplay *id, GdkRectangle *expose )
 		return;
 
 #ifdef DEBUG_PAINT
-	g_print( "imagedisplay_repaint_area: at %d x %d, size %d x %d ",
+	g_print( "imagedisplay_paint_image: at %d x %d, size %d x %d ",
 		clip.x, clip.y, clip.width, clip.height );
 	gobject_print( G_OBJECT( id ) );
 #endif /*DEBUG_PAINT*/
@@ -184,21 +184,25 @@ imagedisplay_paint_background_clipped( Imagedisplay *id, GdkRectangle *expose )
 	Conversion *conv = id->conv;
 	GdkRectangle area, clip;
 
+#ifdef DEBUG_PAINT
+	g_print( "imagedisplay_paint_background_clipped: canvas %d x %d\n",
+		conv->canvas.width, conv->canvas.height );
+#endif /*DEBUG_PAINT*/
+
 	/* Any stuff to the right of the image?
 	 */
+	area = *expose;
 	area.x = conv->canvas.width;
-	area.y = 0;
-	area.width = IM_MAX( 0, conv->visible.width - conv->canvas.width );
-	area.height = conv->visible.height;
+	area.width -= conv->canvas.width;
 	if( gdk_rectangle_intersect( expose, &area, &clip ) )
 		imagedisplay_paint_background( id, &clip );
 
-	/* Any stuff below the image?
+	/* Any stuff strictly below the image?
 	 */
-	area.x = 0;
+	area = *expose;
 	area.y = conv->canvas.height;
-	area.width = conv->canvas.width;
-	area.height = IM_MAX( 0, conv->visible.height - conv->canvas.height );
+	area.height -= conv->canvas.height;
+	area.width -= (expose->x + expose->width) - conv->canvas.width;
 	if( gdk_rectangle_intersect( expose, &area, &clip ) )
 		imagedisplay_paint_background( id, &clip );
 }
@@ -207,7 +211,7 @@ static void
 imagedisplay_paint( Imagedisplay *id, GdkRectangle *area )
 {
 #ifdef DEBUG_PAINT
-	g_print( "imagedisplay_repaint: at %d x %d, size %d x %d\n",
+	g_print( "imagedisplay_paint: at %d x %d, size %d x %d\n",
 		area->x, area->y, area->width, area->height );
 #endif /*DEBUG_PAINT*/
 
@@ -218,7 +222,7 @@ imagedisplay_paint( Imagedisplay *id, GdkRectangle *area )
 
 	/* Paint image.
 	 */
-	imagedisplay_repaint_area( id, area );
+	imagedisplay_paint_image( id, area );
 }
 
 /* Expose signal handler.
@@ -235,6 +239,9 @@ imagedisplay_expose( GtkWidget *widget, GdkEventExpose *event )
 		return( FALSE );
 
 	gdk_region_get_rectangles( event->region, &rect, &n );
+#ifdef DEBUG_PAINT
+	g_print( "imagedisplay_expose: %d rectangles\n", n ); 
+#endif /*DEBUG_PAINT*/
 	for( i = 0; i < n; i++ ) 
 		imagedisplay_paint( id, &rect[i] );
 	g_free( rect );
@@ -250,12 +257,12 @@ imagedisplay_configure_event( GtkWidget *widget, GdkEventConfigure *event )
 	Imagedisplay *id = IMAGEDISPLAY( widget );
 
 #ifdef DEBUG_GEO
-	g_print( "imagedisplay_configure_event_cb: %d x %d:\n", 
+	g_print( "imagedisplay_configure_event: %d x %d:\n", 
 		event->width, event->height );
 #endif /*DEBUG_GEO*/
 
 	/* Note new size in visible hint. Except if parent is a viewport ...
-	 * if it's a viewport, someone else will have to track the visble
+	 * if it's a viewport, someone else will have to track the visible
 	 * area.
 	 */
 	if( !GTK_IS_VIEWPORT( gtk_widget_get_parent( widget ) ) ) { 

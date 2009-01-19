@@ -752,7 +752,7 @@ columnview_refresh( vObject *vobject )
 		char buf[256];
 
 		im_snprintf( buf, 256, "<i>%s</i>", 
-			_( "(doubleclick to set title)" ) );
+			_( "doubleclick to set title" ) );
 		gtk_label_set_markup( GTK_LABEL( cview->head ), buf );
 	}
 

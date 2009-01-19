@@ -270,7 +270,7 @@ workspacedefs_init( Workspacedefs *workspacedefs )
 	gtk_widget_show( hbox );
 
 	mb = gtk_menu_bar_new();
-	gtk_box_pack_end( GTK_BOX( hbox ), mb, FALSE, FALSE, 0 );
+	gtk_box_pack_start( GTK_BOX( hbox ), mb, FALSE, FALSE, 0 );
 	gtk_widget_show( mb );
 	but = gtk_menu_item_new();
 	gtk_menu_item_set_submenu( GTK_MENU_ITEM( but ), pane );
@@ -283,11 +283,11 @@ workspacedefs_init( Workspacedefs *workspacedefs )
 	but = gtk_button_new_with_label( _( "Process" ) );
         g_signal_connect( G_OBJECT( but ), "clicked",
                 G_CALLBACK( workspacedefs_process_cb ), workspacedefs );
-	gtk_box_pack_end( GTK_BOX( hbox ), but, FALSE, FALSE, 0 );
+	gtk_box_pack_start( GTK_BOX( hbox ), but, FALSE, FALSE, 0 );
 	gtk_widget_show( but );
 	workspacedefs->status = gtk_label_new( NULL );
-	gtk_misc_set_alignment( GTK_MISC( workspacedefs->status ), 1.0, 0.5 );
-	gtk_box_pack_end( GTK_BOX( hbox ), 
+	gtk_misc_set_alignment( GTK_MISC( workspacedefs->status ), 0, 0.5 );
+	gtk_box_pack_start( GTK_BOX( hbox ), 
 		workspacedefs->status, TRUE, TRUE, 0 );
 	gtk_widget_show( workspacedefs->status );
 

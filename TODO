@@ -1,19 +1,8 @@
 
-
 - the thing that moves the region label, if it's going to hit the image edge,
   should look for the window edge instead ... eg. if we are zoomed out and
   have some background visible
 
-- display control bar scale seems unreliable?
-
-  when zoomed out?
-
-  hmm, seems ok, how odd
-
-  could it be a 32 bit / 64-bit thing?? check all usage of
-
-  	GUINT_TO_POINTER
-	GPOINTER_TO_UINT
 
 
 

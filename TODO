@@ -10,6 +10,11 @@
 
   hmm, seems ok, how odd
 
+  could it be a 32 bit / 64-bit thing?? check all usage of
+
+  	GUINT_TO_POINTER
+	GPOINTER_TO_UINT
+
 
 
 

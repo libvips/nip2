@@ -284,7 +284,7 @@ about_build( iDialog *idlg, GtkWidget *work )
 	vips_buf_appendf( &buf, "%s\n\n", txt2 );
 
 	im_snprintf( txt2, MAX_DIALOG_TEXT, _( NIP_COPYRIGHT ), PACKAGE );
-	vips_buf_appendf( &buf, "%s\n", txt2 );
+	vips_buf_appendf( &buf, "%s\n\n", txt2 );
 
 {
 	char buf1[FILENAME_MAX];
@@ -294,29 +294,32 @@ about_build( iDialog *idlg, GtkWidget *work )
 		get_savedir() );
 	expand_variables( buf1, buf2 );
         nativeize_path( buf2 );
-	vips_buf_appendf( &buf, "%s %s\n", _( "Personal start folder:" ), buf2 );
+	escape_markup( buf2, buf1, FILENAME_MAX );
+	vips_buf_appendf( &buf, "<b>%s:</b> %s\n", 
+		_( "Personal start folder" ), buf1 );
 }
 
-	vips_buf_appendf( &buf, "%s %s\n", _( "Homepage:" ), VIPS_HOMEPAGE );
+	vips_buf_appendf( &buf, "<b>%s:</b> %s\n", 
+		_( "Homepage" ), VIPS_HOMEPAGE );
 	escape_markup( im_version_string(), txt2, MAX_DIALOG_TEXT );
-	vips_buf_appendf( &buf, "%s %s\n", 
-		_( "Linked to VIPS:" ), txt2 );
+	vips_buf_appendf( &buf, "<b>%s:</b> %s\n", 
+		_( "Linked to VIPS" ), txt2 );
 	escape_markup( IM_VERSION_STRING, txt2, MAX_DIALOG_TEXT );
-	vips_buf_appendf( &buf, "%s %s\n", 
-		_( "Built against VIPS:" ), txt2 );
+	vips_buf_appendf( &buf, "<b>%s:</b> %s\n", 
+		_( "Built against VIPS" ), txt2 );
 	escape_markup( PACKAGE, txt2, MAX_DIALOG_TEXT );
-	vips_buf_appendf( &buf, "$PACKAGE: %s\n", txt2 );
+	vips_buf_appendf( &buf, "<b>$PACKAGE:</b> %s\n", txt2 );
 	escape_markup( VERSION, txt2, MAX_DIALOG_TEXT );
-	vips_buf_appendf( &buf, "$VERSION: %s\n", txt2 );
+	vips_buf_appendf( &buf, "<b>$VERSION:</b> %s\n", txt2 );
 	escape_markup( NN( g_getenv( "VIPSHOME" ) ), txt2, MAX_DIALOG_TEXT );
-	vips_buf_appendf( &buf, "$VIPSHOME: %s\n", txt2 );
+	vips_buf_appendf( &buf, "<b>$VIPSHOME:</b> %s\n", txt2 );
 	escape_markup( NN( g_getenv( "HOME" ) ), txt2, MAX_DIALOG_TEXT );
-	vips_buf_appendf( &buf, "$HOME: %s\n", txt2 );
+	vips_buf_appendf( &buf, "<b>$HOME:</b> %s\n", txt2 );
 	escape_markup( NN( g_getenv( "SAVEDIR" ) ), txt2, MAX_DIALOG_TEXT );
-	vips_buf_appendf( &buf, "$SAVEDIR: %s\n", txt2 );
+	vips_buf_appendf( &buf, "<b>$SAVEDIR:</b> %s\n", txt2 );
 	escape_markup( PATH_TMP, txt2, MAX_DIALOG_TEXT );
-	vips_buf_appendf( &buf, "%s %s", 
-		_( "Temp files in:" ), txt2 );
+	vips_buf_appendf( &buf, "<b>%s:</b> %s", 
+		_( "Temp files in" ), txt2 );
 	if( strcmp( translator_credits, "translator_credits" ) != 0 ) {
 		vips_buf_appendf( &buf, "\n" ); 
 		vips_buf_appends( &buf, translator_credits );

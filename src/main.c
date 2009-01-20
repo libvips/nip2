@@ -33,6 +33,10 @@
 #define DEBUG
  */
 
+/* Show all paint actions with flashing stuff.
+#define DEBUG_UPDATES
+ */
+
 /* Stop startup creation of externs for all VIPS functions etc.
 #define DEBUG_NOAUTO
  */
@@ -808,10 +812,10 @@ main_x_init( int *argc, char ***argv )
         gtk_widget_realize( main_window_top );
 	main_window_gdk = main_window_top->window;
 
-#ifdef DEBUG
+#ifdef DEBUG_UPDATES
 	printf( "*** debug updates is on\n" );
 	gdk_window_set_debug_updates( TRUE );
-#endif /*DEBUG*/
+#endif /*DEBUG_UPDATES*/
 
 	main_register_icons();
 

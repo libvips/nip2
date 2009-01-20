@@ -472,7 +472,18 @@ mainw_title_update( Mainw *mainw )
 static void 
 mainw_status_update( Mainw *mainw )
 {
-	gtk_label_set_text( GTK_LABEL( mainw->statusbar ), mainw->ws->status ); 
+	if( mainw->ws->status ) {
+		gtk_label_set_text( GTK_LABEL( mainw->statusbar ), 
+			mainw->ws->status ); 
+	}
+	else {
+		char txt[256];
+
+		im_snprintf( txt, 256, 
+			_( "%s: &#0169;2009 Imperial College, London" ), 
+			PACKAGE );
+		gtk_label_set_markup( GTK_LABEL( mainw->statusbar ), txt );
+	}
 }
 
 static gint

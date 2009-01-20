@@ -182,29 +182,37 @@ static void
 imagedisplay_paint_background_clipped( Imagedisplay *id, GdkRectangle *expose )
 {
 	Conversion *conv = id->conv;
-	GdkRectangle area, clip;
+	GdkRectangle image, clip, area;
 
 #ifdef DEBUG_PAINT
 	g_print( "imagedisplay_paint_background_clipped: canvas %d x %d\n",
 		conv->canvas.width, conv->canvas.height );
 #endif /*DEBUG_PAINT*/
 
-	/* Any stuff to the right of the image?
+	/* If the expose touches the image, we cut it into two parts:
+	 * everything to the right of the image, and everything strictly
+	 * below.
 	 */
-	area = *expose;
-	area.x = conv->canvas.width;
-	area.width -= conv->canvas.width;
-	if( gdk_rectangle_intersect( expose, &area, &clip ) )
-		imagedisplay_paint_background( id, &clip );
+	image.x = 0;
+	image.y = 0;
+	image.width = conv->canvas.width;
+	image.height = conv->canvas.height;
+	if( gdk_rectangle_intersect( expose, &image, &clip ) ) {
+		area = *expose;
+		area.x = conv->canvas.width;
+		area.width -= clip.width;
+		if( area.width > 0 )
+			imagedisplay_paint_background( id, &area );
 
-	/* Any stuff strictly below the image?
-	 */
-	area = *expose;
-	area.y = conv->canvas.height;
-	area.height -= conv->canvas.height;
-	area.width -= (expose->x + expose->width) - conv->canvas.width;
-	if( gdk_rectangle_intersect( expose, &area, &clip ) )
-		imagedisplay_paint_background( id, &clip );
+		area = *expose;
+		area.y = conv->canvas.height;
+		area.width = clip.width;
+		area.height -= clip.height;
+		if( area.height > 0 )
+			imagedisplay_paint_background( id, &area );
+	}
+	else
+		imagedisplay_paint_background( id, expose );
 }
 
 static void

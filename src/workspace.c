@@ -1328,8 +1328,6 @@ workspace_class_init( WorkspaceClass *class )
 static void
 workspace_init( Workspace *ws )
 {
-	char txt[256];
-
 	ws->sym = NULL;
 
 	/* We default to using the main toolkitgroup for our definitions.
@@ -1369,8 +1367,6 @@ workspace_init( Workspace *ws )
 	ws->auto_save_timeout = 0;
 
 	ws->status = NULL;
-	im_snprintf( txt, 256, _( NIP_COPYRIGHT ), PACKAGE );
-	IM_SETSTR( ws->status, txt );
 
 	ws->scale = 1.0;
 	ws->offset = 0.0;

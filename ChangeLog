@@ -29,6 +29,8 @@ started 7.17.0
 - thumbnails are transparent when you drag them
 - side panes have titlebars and close buttons
 - block attempts to OK on directories in file dialogs
+- we have a copyright symbol! nicer 'about' box too
+- better region label positioning
 
 started 7.16.3
 - fixed cancel system (again)

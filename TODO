@@ -1,12 +1,4 @@
 
-- the thing that moves the region label, if it's going to hit the image edge,
-  should look for the window edge instead ... eg. if we are zoomed out and
-  have some background visible
-
-
-
-
-
 
 - lcomps like:
 

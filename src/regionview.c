@@ -527,8 +527,8 @@ regionview_paint( Regionview *regionview )
 	}
 
 	if( regionview->classmodel ) 
-		regionview_paint_label( regionview,
-			draw, &regionview->label, regionview->ascent,
+		regionview_paint_label( regionview, draw, 
+			&regionview->label, regionview->ascent,
 			vips_buf_all( &regionview->caption ) );
 }
 
@@ -638,7 +638,7 @@ regionview_refresh_label( Regionview *regionview )
 	}
 }
 
-/* Move label to try to keep it within the image, and away from the
+/* Move label to try to keep it within the window, and away from the
  * selected pixels.
  */
 static void
@@ -646,6 +646,7 @@ regionview_position_label( Regionview *regionview )
 {
 	Imagepresent *ip = regionview->ip;
 	Conversion *conv = ip->id->conv;
+	Rect *visible = &conv->visible;
 	Rect *label = &regionview->label;
 	const int b = regionview_border_width + 2;
 
@@ -662,27 +663,27 @@ regionview_position_label( Regionview *regionview )
 	case REGIONVIEW_REGION:
 	case REGIONVIEW_AREA:
 	case REGIONVIEW_BOX:
-		if( dr.top > label->height + b ) {
+		if( dr.top > visible->top + label->height + b ) {
 			/* Space above region for label.
 			 */
 			label->left = dr.left - b;
 			label->top = dr.top - label->height - b;
 		}
-		else if( dr.left > label->width + b ) {
+		else if( dr.left > visible->left + label->width + b ) {
 			/* Space to left of region for label
 			 */
 			label->left = dr.left - label->width - b;
 			label->top = dr.top - b;
 		}
-		else if( IM_RECT_RIGHT( &dr ) < conv->canvas.width - 
-			label->width - b ) {
+		else if( IM_RECT_RIGHT( &dr ) < 
+			IM_RECT_RIGHT( visible ) - label->width - b ) {
 			/* Space at right.
 			 */
 			label->left = IM_RECT_RIGHT( &dr ) + b;
 			label->top = dr.top - b;
 		}
-		else if( IM_RECT_BOTTOM( &dr ) < conv->canvas.height - 
-			label->height - b ) {
+		else if( IM_RECT_BOTTOM( &dr ) < 
+			IM_RECT_BOTTOM( visible ) - label->height - b ) {
 			/* Space at bottom.
 			 */
 			label->left = dr.left - b;
@@ -703,8 +704,8 @@ regionview_position_label( Regionview *regionview )
 	case REGIONVIEW_LINE:
 		/* Space above? 
 		 */
-		if( dr.top > label->height + b/2 + 2 ) {
-			if( dr.left > conv->canvas.width - 
+		if( dr.top > visible->top + label->height + b/2 + 2 ) {
+			if( dr.left > IM_RECT_RIGHT( visible ) - 
 				label->width - b/2 - 2 ) {
 				/* Above left.
 				 */
@@ -718,7 +719,7 @@ regionview_position_label( Regionview *regionview )
 				label->top = dr.top - b/2 - 2 - label->height;
 			}
 		}
-		else if( dr.left > conv->canvas.width - 
+		else if( dr.left > IM_RECT_RIGHT( visible ) -
 			label->width - b/2 - 2 ) {
 			/* Below left.
 			 */

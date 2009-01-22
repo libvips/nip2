@@ -325,6 +325,17 @@ action_proc_dot_add_link( Expr *expr, Symbol *child )
 	return( link_add( child, expr, TRUE ) );
 }
 
+static char *
+action_proc_dot_tag( PElement *b, char *tag, int n )
+{
+	if( PEISTAG( b ) ) 
+		return( PEGETTAG( b ) );
+	else if( heap_get_string( b, tag, n ) )
+		return( tag );
+
+	return( NULL );
+}
+
 /* Extract field from object. Be careful, a can be equal to out. 
  */
 static void
@@ -332,24 +343,19 @@ action_proc_dot( Reduce *rc, Compile *compile,
 	int op, const char *name, PElement *a, PElement *b, PElement *out )
 {
 	char tag[256];
+	char *p;
 
 	if( PEISCLASS( a ) ) {
 		PElement c;
 
-		if( PEISTAG( b ) ) {
-			if( !class_get_member( a, PEGETTAG( b ), NULL, &c ) )
+		if( (p = action_proc_dot_tag( b, tag, 256 )) ) {
+			if( !class_get_member( a, p, NULL, &c ) )
 				action_nomerror( rc, compile, a, b );
 
 			PEPUTPE( out, &c );
 		}
 		else if( PEISSYMREF( b ) ) {
 			if( !class_get_symbol( a, PEGETSYMREF( b ), &c ) )
-				action_nomerror( rc, compile, a, b );
-
-			PEPUTPE( out, &c );
-		}
-		else if( heap_get_string( b, tag, 256 ) ) {
-			if( !class_get_member( a, tag, NULL, &c ) )
 				action_nomerror( rc, compile, a, b );
 
 			PEPUTPE( out, &c );
@@ -372,17 +378,11 @@ action_proc_dot( Reduce *rc, Compile *compile,
 
 		g_assert( sym->expr );
 
-		if( PEISTAG( b ) ) 
-			child = compile_lookup( sym->expr->compile, 
-				PEGETTAG( b ) );
-		else if( heap_get_string( b, tag, 256 ) ) 
-			child = compile_lookup( sym->expr->compile, tag );
-		else
+		if( !(p = action_proc_dot_tag( b, tag, 256 )) ) 
 			action_boperror( rc, compile, 
 				_( "Bad right hand side of '.'." ),
 				op, name, a, b );
-
-		if( !child )
+		if( !(child = compile_lookup( sym->expr->compile, p )) )
 			action_nomerror( rc, compile, a, b );
 
 		/* Add all exprs which use compile to dynamic link graph.
@@ -401,6 +401,28 @@ action_proc_dot( Reduce *rc, Compile *compile,
 		else {
 			PEPUTP( out, ELEMENT_SYMREF, child );
 		}
+	}
+	else if( PEISMANAGEDGOBJECT( a ) ) {
+		GObject *gobject = PEGETMANAGEDGOBJECT( a );
+		GObjectClass *gclass = G_OBJECT_GET_CLASS( gobject );
+		GValue value = { 0 };
+		GParamSpec *pspec;
+
+		if( !(p = action_proc_dot_tag( b, tag, 256 )) || 
+			!(pspec = g_object_class_find_property( gclass, p )) )
+			action_boperror( rc, compile, 
+				_( "Bad right hand side of '.'." ),
+				op, name, a, b );
+
+		g_value_init( &value, G_PARAM_SPEC_VALUE_TYPE( pspec ) );
+		g_object_get_property( gobject, p, &value);
+
+		if( !heap_gvalue_to_ip( &value, out ) ) {
+			g_value_unset( &value );
+			reduce_throw( rc );
+		}
+
+		g_value_unset( &value );
 	}
 	else
 		action_boperror( rc, compile, _( "Bad left hand side of '.'." ),

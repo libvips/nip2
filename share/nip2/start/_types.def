@@ -1111,6 +1111,7 @@ Interpolate_type = class {
 	BILINEAR = 1;
 	BICUBIC = 2;
 	YAFRSMOOTH = 3;
+	NOHALO = 4;
 
 	// should introspect to get the list of interpolators :-( we can "dir" on
 	// VipsInterpolate to get a list of them, but we can't get i18n'd
@@ -1122,7 +1123,8 @@ Interpolate_type = class {
 		_ "Nearest neighbour",
 		_ "Bilinear",
 		_ "Bicubic",
-		_ "Bicubic plus edge enhance (yafr-smooth)"
+		_ "Bicubic plus edge enhance (yafr-smooth)",
+		_ "Bilinear plus edge enhance (nohalo)"
 	];
 
 	/* And to vips type names.
@@ -1131,7 +1133,8 @@ Interpolate_type = class {
 		"VipsInterpolateNearest",
 		"VipsInterpolateBilinear",
 		"VipsInterpolateBicubic",
-		"VipsInterpolateYafrsmooth"
+		"VipsInterpolateYafrsmooth",
+		"VipsInterpolateNohalo"
 	];
 }
 
@@ -1142,12 +1145,11 @@ Interpolate type options = class {
 Interpolate_bilinear = Interpolate Interpolate_type.BILINEAR [];
 
 Interpolate_picker default = class 
-	Interpolate interpolation.value [$sharpening => sharpening.value] {
+	Interpolate interp.value [$sharpening => sharp.value] {
 	_vislevel = 2;
 
-	interpolation = Option "Interpolation" 
-		Interpolate_type.descriptions default;
-	sharpening = Scale "Sharpening" 0 4 1;
+	interp = Option "Interpolation" Interpolate_type.descriptions default;
+	sharp = Scale "Sharpening" 0 4 1;
 }
 
 Render_intent = class {

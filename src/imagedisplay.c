@@ -140,8 +140,15 @@ imagedisplay_paint_image( Imagedisplay *id, GdkRectangle *expose )
 	gobject_print( G_OBJECT( id ) );
 #endif /*DEBUG_PAINT*/
 
-	if( im_prepare( conv->ireg, &vclip ) )
+	if( im_prepare( conv->ireg, &vclip ) ) {
+#ifdef DEBUG_PAINT
+#endif /*DEBUG_PAINT*/
+		printf( "imagedisplay_paint_image: paint error\n" );
+		im_error_buffer();
+		im_error_clear();
+
 		return;
+	}
 	buf = (guchar *) IM_REGION_ADDR( conv->ireg, vclip.left, vclip.top );
 	lsk = IM_REGION_LSKIP( conv->ireg );
 

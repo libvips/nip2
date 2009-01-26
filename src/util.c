@@ -177,10 +177,11 @@ error_sub( const char *fmt, ... )
 void
 error_vips( void )
 {	
-	if( !error_level && strlen( im_errorstring() ) > 0 ) {
+	if( !error_level && strlen( im_error_buffer() ) > 0 ) {
 		if( !vips_buf_is_empty( &error_sub_buf ) )
 			(void) vips_buf_appendf( &error_sub_buf, "\n" );
-		(void) vips_buf_appendf( &error_sub_buf, "%s", im_errorstring() );
+		(void) vips_buf_appendf( &error_sub_buf, 
+			"%s", im_error_buffer() );
 		im_error_clear();
 	}
 }

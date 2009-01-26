@@ -1096,11 +1096,12 @@ vips_error_fn_vips( VipsInfo *vi )
 	error_top( _( "VIPS library error." ) );
 
 	vips_buf_init_static( &buf, txt, 1000 );
-	vips_buf_appendf( &buf, _( "Error calling library function \"%s\" (%s)." ),
+	vips_buf_appendf( &buf, 
+		_( "Error calling library function \"%s\" (%s)." ),
 		vi->name, vi->fn->desc );
 	vips_buf_appendf( &buf, "\n" );
-	vips_buf_appendf( &buf, _( "VIPS library: %s" ),
-		im_errorstring() );
+	vips_buf_appendf( &buf, _( "VIPS library: %s" ), im_error_buffer() );
+	im_error_clear();
 	vips_buf_appendf( &buf, "\n" );
 	vips_args_vips( vi, &buf );
 	vips_buf_appendf( &buf, "\n" );

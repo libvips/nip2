@@ -681,17 +681,28 @@ conversion_make_repaint( Conversion *conv, IMAGE *in )
 		}
 	}
 
-	/* im_msb() only works for the int formats.
-	 */
 	if( tconv && 
-		(in->Type == IM_TYPE_RGB16 || in->Type == IM_TYPE_GREY16) &&
-		im_isint( in ) ) {
+		(in->Type == IM_TYPE_RGB16 || in->Type == IM_TYPE_GREY16) ) {
 		IMAGE *t[1];
 
-                if( im_open_local_array( out, t, 1, "conv-1", "p" ) ||
-			im_msb( in, t[0] ) ) {
+		if( im_open_local_array( out, t, 1, "conv-1", "p" ) ) {
 			im_close( out );
 			return( NULL );
+		}
+
+		/* im_msb() only works for the int formats.
+		 */
+		if( im_isint( in ) ) {
+			if( im_msb( in, t[0] ) ) {
+				im_close( out );
+				return( NULL );
+			}
+		}
+		else {
+			if( im_lintrauc( 1 / 256.0, in, 0.0, t[0] ) ) {
+				im_close( out );
+				return( NULL );
+			}
 		}
 
 		in = t[0];

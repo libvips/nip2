@@ -92,7 +92,11 @@ AC_SYS_LARGEFILE
 AC_PROG_AWK
 AC_PROG_CC
 AM_PROG_CC_C_O
-AM_PROG_LEX
+AC_PROG_LEX
+# we must have flex or lex
+if test x"$LEX" = x:; then 
+  AC_MSG_ERROR([lex/flex not found: $PACKAGE requires one of these])
+fi
 IP_LIBS="$IP_LIBS $LEXLIB"
 AC_PROG_INSTALL
 AC_PROG_LN_S

@@ -32,6 +32,7 @@ started 7.17.0
 - we have a copyright symbol! nicer 'about' box too
 - better region label positioning
 - double images ignored rgb16/grey16 hints
+- configure dies if flex/lex not found
 
 started 7.16.3
 - fixed cancel system (again)

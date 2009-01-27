@@ -1,3 +1,14 @@
+- try turning on syncronous im_render, then rotating a large image in nip2
+
+  it seems a lot quicker, argh!
+
+  why is the threaded one much slower? perhaps we should sort dirty tiles by 
+  their 'y' poition, then 'x'?
+
+
+
+
+
 - lcomps like:
 
 	argh = [x :: x <- poop]

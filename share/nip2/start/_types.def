@@ -1124,7 +1124,7 @@ Interpolate_type = class {
 		_ "Bilinear",
 		_ "Bicubic",
 		_ "Bicubic plus edge enhance (yafr-smooth)",
-		_ "Bilinear plus edge enhance (nohalo)"
+		_ "Bilinear plus edge enhance (nohalo-sharp-1)"
 	];
 
 	/* And to vips type names.

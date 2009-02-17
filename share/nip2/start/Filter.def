@@ -170,7 +170,7 @@ Filter_rank_item = class
 	Menupullright "_Rank" "various rank filters" {
 	Median_item = class
 		Menuaction "_Median" "3x3 median rank filter" {
-		action x = map_unary (rank 3 3 5) x;
+		action x = map_unary (rank 3 3 4) x;
 	}
 
 	Image_rank_item = class
@@ -203,7 +203,7 @@ Filter_rank_item = class
 			window_width = Expression "Window width" 3;
 			window_height = Expression "Window height" 3;
 			select = Expression "Rank" 
-				((int) ((to_real window_width * to_real window_height + 1) / 2));
+				((int) ((to_real window_width * to_real window_height) / 2));
 
 			_result 
 				= map_unary process x

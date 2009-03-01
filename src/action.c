@@ -408,10 +408,13 @@ action_proc_dot( Reduce *rc, Compile *compile,
 		GValue value = { 0 };
 		GParamSpec *pspec;
 
-		if( !(p = action_proc_dot_tag( b, tag, 256 )) || 
-			!(pspec = g_object_class_find_property( gclass, p )) )
+		if( !(p = action_proc_dot_tag( b, tag, 256 )) )
 			action_boperror( rc, compile, 
 				_( "Bad right hand side of '.'." ),
+				op, name, a, b );
+		if( !(pspec = g_object_class_find_property( gclass, p )) )
+			action_boperror( rc, compile, 
+				_( "Property not found." ),
 				op, name, a, b );
 
 		g_value_init( &value, G_PARAM_SPEC_VALUE_TYPE( pspec ) );

@@ -33,6 +33,8 @@ started 7.17.0
 - better region label positioning
 - double images ignored rgb16/grey16 hints
 - configure dies if flex/lex not found
+- Managedgobject."property" works
+- added (dir gtype), (dir gobject) 
 - oops, rank filters wree off by one by default
 
 started 7.16.3

@@ -91,7 +91,7 @@ vo_new( Reduce *rc, const char *name )
 	Vo *vo;
 
 	if( !(type = vips_type_find( "VipsObject", name )) ) {
-		error_top( _( "No such type" ) );
+		error_top( _( "No such type." ) );
 		error_sub( _( "Type \"%s\" not found as a subclass "
 			"of VipsObject." ), name );
 		return( NULL );

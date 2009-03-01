@@ -605,6 +605,27 @@ dir_gtype( GType type, void *a, void *b )
 	return( NULL );
 }
 
+static void
+dir_gobject( Reduce *rc, 
+	GParamSpec **properties, guint n_properties, PElement *out )
+{
+	int i;
+	PElement list;
+
+	list = *out;
+	heap_list_init( &list );
+
+	for( i = 0; i < n_properties; i++ ) {
+		PElement t;
+
+		if( !heap_list_add( rc->heap, &list, &t ) ||
+			!heap_managedstring_new( rc->heap, 
+				properties[i]->name, &t ) )
+			reduce_throw( rc );
+		(void) heap_list_next( &list );
+	}
+}
+
 /* Do "dir". 
  */
 static void
@@ -654,6 +675,17 @@ apply_dir_call( Reduce *rc, const char *name, HeapNode **arg, PElement *out )
 
 		if( vips_type_map( type, dir_gtype, rc, &list ) ) 
 			reduce_throw( rc );
+	}
+	else if( PEISMANAGEDGOBJECT( &rhs ) ) {
+		guint n_properties;
+		ManagedgobjectClass *class = 
+			MANAGEDGOBJECT_GET_CLASS( PEGETMANAGEDGOBJECT( &rhs ) ); 
+		GParamSpec **properties;
+
+		properties = g_object_class_list_properties( 
+			G_OBJECT_CLASS( class ), &n_properties );
+		dir_gobject( rc, properties, n_properties, out );
+		g_free( properties);
 	}
 	else 
 		/* Just [], ie. no names possible.

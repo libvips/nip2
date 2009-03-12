@@ -338,6 +338,7 @@ typedef void *(*tool_map_fn)( Tool *, void *, void * );
 #include "imageview.h"
 #include "tslider.h"
 #include "pane.h"
+#include "progress.h"
 
 /* Basic ip includes (order important).
  */

@@ -38,17 +38,144 @@ static iContainerClass *progress_parent_class = NULL;
 /* Our signals. 
  */
 enum {
-	SIG_WATCH_CHANGED,	/* "changed" on one of our watches */
+	SIG_BEGIN,		/* Switch to busy state */
+	SIG_UPDATE,		/* Busy progress update */
+	SIG_END,		/* End busy state */
 	SIG_LAST
 };
 
 static guint progress_signals[SIG_LAST] = { 0 };
 
-static void 
-progress_changed( Progress *progress, Watch *watch )
+/* Delay before we start showing busy feedback.
+ */
+static const double progress_busy_delay = 2.0;
+
+/* Delay between busy updates.
+ */
+static const double progress_update_interval = 0.2;
+
+void
+progress_begin( void )
 {
-	g_signal_emit( G_OBJECT( progress ), 
-		progress_signals[SIG_WATCH_CHANGED], 0, watch );
+	Progress *progress = progress_get();
+
+	g_assert( progress->count >= 0 );
+
+#ifdef DEBUG
+	printf( "progress_begin: %d\n", progress->count );
+#endif /*DEBUG*/
+
+	progress->count += 1;
+
+	if( progress->count == 1 ) {
+		g_timer_start( progress->busy_timer );
+		g_timer_start( progress->update_timer );
+
+		g_signal_emit( G_OBJECT( progress ), 
+			progress_signals[SIG_BEGIN], 0 );
+	}
+}
+
+static void
+progress_update_message( Progress *progress )
+{
+	vips_buf_rewind( &progress->feedback );
+
+	if( progress->cancel )
+		vips_buf_appends( &progress->feedback, _( "Cancelling ..." ) );
+	else if( progress->expr ) {
+		/* Becomes eg. "Calculating A7.height ..."
+		 */
+		vips_buf_appends( &progress->feedback, _( "Calculating" ) );
+		vips_buf_appends( &progress->feedback, " " );
+		expr_name( progress->expr, &progress->feedback );
+		vips_buf_appends( &progress->feedback, " ..." );
+	}
+	else if( progress->eta > 30 ) {
+		int minutes = (progress->eta + 30) / 60;
+
+		vips_buf_appendf( &progress->feedback, ngettext( 
+			"%d minute left", "%d minutes left", 
+			minutes ), minutes );
+	}
+	else
+		vips_buf_appendf( &progress->feedback, 
+			_( "%d seconds left" ), progress->eta );
+}
+
+static void
+progress_update( Progress *progress )
+{
+	if( progress->count &&
+		g_timer_elapsed( progress->busy_timer, NULL ) > 
+			progress_busy_delay ) {
+
+		if( g_timer_elapsed( progress->update_timer, NULL ) > 
+			progress_update_interval ) {
+			gboolean result;
+
+			progress_update_message( progress );
+			g_signal_emit( G_OBJECT( progress ), 
+				progress_signals[SIG_UPDATE], 
+				progress->percent, progress->eta, &result );
+
+			if( !result )
+				progress->cancel = TRUE;
+
+			while( g_main_context_iteration( NULL, FALSE ) )
+				;
+
+			g_timer_start( progress->update_timer );
+		}
+	}
+}
+
+gboolean
+progress_update_percent( int percent, int eta )
+{
+	Progress *progress = progress_get();
+
+	progress->percent = percent;
+	progress->eta = eta;
+	progress->expr = NULL;
+
+	progress_update( progress );
+
+	return( progress->cancel );
+}
+
+gboolean
+progress_update_expr( Expr *expr )
+{
+	Progress *progress = progress_get();
+
+	progress->percent = 0;
+	progress->eta = 0;
+	progress->expr = expr;
+
+	progress_update( progress );
+
+	return( progress->cancel );
+}
+
+void
+progress_end( void )
+{
+	Progress *progress = progress_get();
+
+	progress->count -= 1;
+
+#ifdef DEBUG
+	printf( "progress_end: %d\n", progress->count );
+#endif /*DEBUG*/
+
+	g_assert( progress->count >= 0 );
+
+	if( !progress->count ) {
+		progress->cancel = FALSE;
+		g_signal_emit( G_OBJECT( progress ), 
+			progress_signals[SIG_END], 0 );
+	}
 }
 
 static void
@@ -56,14 +183,31 @@ progress_class_init( ProgressClass *class )
 {
 	progress_parent_class = g_type_class_peek_parent( class );
 
-	progress_signals[SIG_WATCH_CHANGED] = g_signal_new( "watch_changed",
+	progress_signals[SIG_BEGIN] = g_signal_new( "begin",
 		G_OBJECT_CLASS_TYPE( class ),
 		G_SIGNAL_RUN_FIRST,
-		G_STRUCT_OFFSET( ProgressClass, watch_changed ),
+		G_STRUCT_OFFSET( ProgressClass, begin ),
 		NULL, NULL,
-		g_cclosure_marshal_VOID__POINTER,
-		G_TYPE_NONE, 1,
-		G_TYPE_POINTER );
+		g_cclosure_marshal_VOID__VOID,
+		G_TYPE_NONE, 0 );
+
+	progress_signals[SIG_BEGIN] = g_signal_new( "update",
+		G_OBJECT_CLASS_TYPE( class ),
+		G_SIGNAL_RUN_FIRST,
+		G_STRUCT_OFFSET( ProgressClass, begin ),
+		NULL, NULL,
+		nip_BOOLEAN__INT_INT,
+		G_TYPE_BOOLEAN, 2,
+		G_TYPE_INT,
+		G_TYPE_INT );
+
+	progress_signals[SIG_BEGIN] = g_signal_new( "end",
+		G_OBJECT_CLASS_TYPE( class ),
+		G_SIGNAL_RUN_FIRST,
+		G_STRUCT_OFFSET( ProgressClass, end ),
+		NULL, NULL,
+		g_cclosure_marshal_VOID__VOID,
+		G_TYPE_NONE, 0 );
 }
 
 static void
@@ -73,15 +217,22 @@ progress_init( Progress *progress )
 	printf( "progress_init\n" );
 #endif /*DEBUG*/
 
-	progress->auto_save_timeout = 0;
+	progress->count = 0;
+	progress->busy_timer = g_timer_new();
+	progress->update_timer = g_timer_new();
+	progress->cancel = FALSE;
+	progress->eta = 0;
+	progress->percent = 0;
+	vips_buf_init_static( &progress->feedback, 
+		progress->buf, PROGRESS_FEEDBACK_SIZE );
 }
 
 GType
 progress_get_type( void )
 {
-	static GType progress_type = 0;
+	static GType type = 0;
 
-	if( !progress_type ) {
+	if( !type ) {
 		static const GTypeInfo info = {
 			sizeof( ProgressClass ),
 			NULL,           /* base_init */
@@ -94,238 +245,28 @@ progress_get_type( void )
 			(GInstanceInitFunc) progress_init,
 		};
 
-		progress_type = g_type_register_static( TYPE_ICONTAINER, 
+		type = g_type_register_static( TYPE_IOBJECT, 
 			"Progress", &info, 0 );
 	}
 
-	return( progress_type );
+	return( type );
 }
 
-Progress *
-progress_new( Workspacegroup *workspacegroup, const char *name )
+static Progress *
+progress_new( void )
 {
-	Progress *progress = PROGRESS( 
-		g_object_new( TYPE_PROGRESS, NULL ) );
-
-	/* Assume it's a static string.
-	 */
-	progress->name = name;
-
-	progress->workspacegroup = workspacegroup;
-	icontainer_set_hash( ICONTAINER( progress ) );
+	Progress *progress = PROGRESS( g_object_new( TYPE_PROGRESS, NULL ) );
 
 	return( progress );
 }
 
-/* Get the ws we are storing prefs in, and check it looks OK.
- */
-static Workspace *
-progress_get_workspace( Progress *progress )
+Progress *
+progress_get( void ) 
 {
-	Compile *compile;
-	Symbol *sym;
+	static Progress *progress = NULL;
 
-	if( !progress->workspacegroup->sym )
-		return( NULL );
+	if( !progress )
+		progress = progress_new();
 
-	compile = progress->workspacegroup->sym->expr->compile;
-
-	if( !(sym = compile_lookup( compile, progress->name )) ||
-		!sym->expr->compile ||
-		sym->type != SYM_WORKSPACE ||
-		!sym->ws )
-		return( NULL );
-
-	return( sym->ws );
-}
-
-static void
-progress_save( Progress *progress )
-{
-	Workspace *ws;
-
-	if( (ws = progress_get_workspace( progress )) ) {
-		Filemodel *filemodel = FILEMODEL( ws );
-
-		if( filemodel->modified ) {
-			symbol_recalculate_all();
-
-			/* Ignore error returns ... hmm! Tricky: we can come
-			 * here during shutdown.
-			 */
-			(void) filemodel_save_all( filemodel, 
-				filemodel->filename );
-
-			filemodel_set_modified( filemodel, FALSE );
-		}
-	}
-}
-
-static gboolean
-progress_dirty_timeout_cb( Progress *progress )
-{
-	progress->auto_save_timeout = 0;
-
-	progress_save( progress );
-
-	return( FALSE );
-}
-
-void
-progress_dirty( Progress *progress )
-{
-	Workspace *ws;
-
-	/* Find the preferences workspace.
-	 */
-	if( (ws = progress_get_workspace( progress )) ) {
-		Filemodel *filemodel = FILEMODEL( ws );
-
-		/* Mark ws dirty, start save timer.
-		 */
-		filemodel_set_modified( filemodel, TRUE );
-
-		IM_FREEF( g_source_remove, progress->auto_save_timeout );
-		progress->auto_save_timeout = g_timeout_add( 1000, 
-			(GSourceFunc) progress_dirty_timeout_cb, progress );
-	}
-}
-
-void
-progress_flush( Progress *progress )
-{
-	/* Do we have a pending save?
-	 */
-	if( progress->auto_save_timeout ) {
-		progress_save( progress );
-
-		IM_FREEF( g_source_remove, progress->auto_save_timeout );
-	}
-}
-
-/* Evaluation is progressing.
- */
-static void
-mainw_progress_update( int percent, int eta )
-{
-	char msg[100];
-
-	if( mainw_cancel )
-		sprintf( msg, _( "Cancelling ..." ) );
-	else if( eta > 30 ) {
-		int minutes = (eta + 30) / 60;
-
-		im_snprintf( msg, 100, ngettext( 
-			"%d minute left", 
-			"%d minutes left", 
-			minutes ), minutes );
-	}
-	else if( eta == 0 ) {
-		/* A magic number reduce.c uses for eval feedback.
-		 */
-		VipsBuf buf;
-
-		vips_buf_init_static( &buf, msg, 100 );
-		/* Becomes eg. "Calculating A7.height ..."
-		 */
-		vips_buf_appends( &buf, _( "Calculating" ) );
-		vips_buf_appends( &buf, " " );
-		if( mainw_progress_expr ) {
-			expr_name( mainw_progress_expr, &buf );
-			vips_buf_appends( &buf, " " );
-		}
-		vips_buf_appends( &buf, "..." );
-		vips_buf_all( &buf );
-	}
-	else
-		im_snprintf( msg, 100, _( "%d seconds left" ), eta );
-
-	slist_map2( mainw_all, 
-		(SListMap2Fn) mainw_progress_update_mainw, 
-		msg, &percent );
-} 
-
-/* End of eval.
- */
-static void
-mainw_progress_end( void )
-{
-	slist_map( mainw_all, 
-		(SListMapFn) mainw_progress_hide, NULL ); 
-	mainw_cancel = FALSE;
-}
-
-/* Busy handling. Come here from everywhere, handle delay and dispatch of busy
- * events to the cursor change system and to the busy ticker on mainw.
- */
-
-static int mainw_busy_count = 0;
-static GTimer *mainw_busy_timer = NULL;
-static GTimer *mainw_busy_update_timer = NULL;
-
-/* Delay before we start showing busy feedback.
- */
-static const double mainw_busy_delay = 2.0;
-
-/* Delay between busy updates.
- */
-static const double mainw_busy_update = 0.2;
-
-void
-busy_progress( int percent, int eta )
-{
-	if( mainw_busy_count &&
-		g_timer_elapsed( mainw_busy_timer, NULL ) > 
-			mainw_busy_delay ) {
-
-		if( g_timer_elapsed( mainw_busy_update_timer, NULL ) > 
-			mainw_busy_update ) {
-			animate_hourglass();
-			mainw_progress_update( percent, eta );
-
-			while( g_main_context_iteration( NULL, FALSE ) )
-				;
-
-			g_timer_start( mainw_busy_update_timer );
-		}
-	}
-}
-
-void
-busy_begin( void )
-{
-	g_assert( mainw_busy_count >= 0 );
-
-#ifdef DEBUG
-	printf( "busy_begin: %d\n", mainw_busy_count );
-#endif /*DEBUG*/
-
-	mainw_busy_count += 1;
-
-	if( mainw_busy_count == 1 ) {
-		if( !mainw_busy_timer )
-			mainw_busy_timer = g_timer_new();
-		if( !mainw_busy_update_timer )
-			mainw_busy_update_timer = g_timer_new();
-
-		g_timer_start( mainw_busy_timer );
-		g_timer_start( mainw_busy_update_timer );
-	}
-}
-
-void
-busy_end( void )
-{
-	mainw_busy_count -= 1;
-
-#ifdef DEBUG
-	printf( "busy_end: %d\n", mainw_busy_count );
-#endif /*DEBUG*/
-
-	g_assert( mainw_busy_count >= 0 );
-
-	if( !mainw_busy_count ) {
-		set_pointer();
-		mainw_progress_end();
-	}
+	return( progress );
 }

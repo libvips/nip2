@@ -27,6 +27,10 @@
 
  */
 
+/* The max size of the feedback message.
+ */
+#define PROGRESS_FEEDBACK_SIZE (100)
+
 #define TYPE_PROGRESS (progress_get_type())
 #define PROGRESS( obj ) \
 	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_PROGRESS, Progress ))
@@ -42,24 +46,54 @@
 typedef struct _Progress {
 	iObject parent_object;
 
-	/* Nest busy_begin() calls with this.
+	/* Nest progress_begin() calls with this.
 	 */
-	int busy_count;
+	int count;
 
 	/* How long we've been busy, time since last update.
 	 */
-	busy_timer;
-	busy_update_timer;
+	GTimer *busy_timer;
+	GTimer *update_timer;
+
+	/* Trying to cancel.
+	 */
+	gboolean cancel;
+
+	/* The last hint we saw about what's being updated.
+	 */
+	int eta;
+	int percent;
+	Expr *expr;
+
+	/* The feedback message we suggest.
+	 */
+	VipsBuf feedback;
+	char buf[PROGRESS_FEEDBACK_SIZE];
 } Progress;
 
 typedef struct _ProgressClass {
 	iObjectClass parent_class;
 
+	/* Entering busy state: display progress bar, change cursor, etc.
+	 */
+	void (*begin)( Progress * );
+
+	/* Progress update. Return FALSE to cancel computation, eg. on a
+	 * button press.
+	 */
+	gboolean (*update)( Progress *, int percent, int eta );
+
+	/* End busy state. Restore screen.
+	 */
+	void (*end)( Progress * );
 } ProgressClass;
 
-GType progress_get_type( void );
-Progress *progress_new( void );
+/* Called from all over nip2 as computation proceeds.
+ */
+void progress_begin( void );
+gboolean progress_update_percent( int percent, int eta );
+gboolean progress_update_expr( Expr *expr );
+void progress_end( void );
 
-void busy_progress( int percent, int eta );
-void busy_begin( void );
-void busy_end( void );
+GType progress_get_type( void );
+Progress *progress_get( void );

@@ -8,6 +8,16 @@
 
 
 
+- progress feedback on the splash screen would be nice
+
+  have a 'progress' model, mainw and splash can contain view of the model
+
+  image eval and computation can update progress singleton
+ 
+  see progress.[hc]
+
+
+
 
 - lcomps like:
 

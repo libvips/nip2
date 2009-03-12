@@ -35,7 +35,8 @@ started 7.17.0
 - configure dies if flex/lex not found
 - Managedgobject."property" works
 - added (dir gtype), (dir gobject) 
-- oops, rank filters wree off by one by default
+- oops, rank filters were off by one by default
+- added progress.[hc] ready for a better progress/cancel system (again)
 
 started 7.16.3
 - fixed cancel system (again)

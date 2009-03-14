@@ -1175,7 +1175,7 @@ filesel_trigger2( void *sys, iWindowResult result )
 	iWindowSusp *susp = (iWindowSusp *) sys;
 	Filesel *filesel = FILESEL( susp->client );
 
-	busy_end();
+	progress_end();
 
 	/* If this is a save, assume that there is now a new file, 
 	 * and ask all fsb's to update.
@@ -1218,7 +1218,7 @@ filesel_trigger( Filesel *filesel, iWindow *iwnd,
 		prefs_set( filesel->type_pref, 
 			"%d", filesel_get_filetype( filesel ) );
 
-	busy_begin();
+	progress_begin();
 	filesel->done_cb( IWINDOW( filesel ), 
 		filesel->client, filesel_trigger2, susp );
 }

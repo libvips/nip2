@@ -112,14 +112,14 @@ progress_update( Progress *progress )
 
 		if( g_timer_elapsed( progress->update_timer, NULL ) > 
 			progress_update_interval ) {
-			gboolean result;
+			gboolean cancel;
 
 			progress_update_message( progress );
-			g_signal_emit( G_OBJECT( progress ), 
-				progress_signals[SIG_UPDATE], 
-				progress->percent, progress->eta, &result );
 
-			if( !result )
+			cancel = FALSE;
+			g_signal_emit( progress, 
+				progress_signals[SIG_UPDATE], 0, &cancel );
+			if( cancel )
 				progress->cancel = TRUE;
 
 			while( g_main_context_iteration( NULL, FALSE ) )
@@ -191,17 +191,16 @@ progress_class_init( ProgressClass *class )
 		g_cclosure_marshal_VOID__VOID,
 		G_TYPE_NONE, 0 );
 
-	progress_signals[SIG_BEGIN] = g_signal_new( "update",
+	progress_signals[SIG_UPDATE] = g_signal_new( "update",
 		G_OBJECT_CLASS_TYPE( class ),
 		G_SIGNAL_RUN_FIRST,
-		G_STRUCT_OFFSET( ProgressClass, begin ),
+		G_STRUCT_OFFSET( ProgressClass, update ),
 		NULL, NULL,
-		nip_BOOLEAN__INT_INT,
-		G_TYPE_BOOLEAN, 2,
-		G_TYPE_INT,
-		G_TYPE_INT );
+		g_cclosure_marshal_VOID__POINTER,
+		G_TYPE_NONE, 1,
+		G_TYPE_POINTER );
 
-	progress_signals[SIG_BEGIN] = g_signal_new( "end",
+	progress_signals[SIG_END] = g_signal_new( "end",
 		G_OBJECT_CLASS_TYPE( class ),
 		G_SIGNAL_RUN_FIRST,
 		G_STRUCT_OFFSET( ProgressClass, end ),

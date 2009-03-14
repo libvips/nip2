@@ -413,7 +413,7 @@ main_splash_update( const char *fmt, ... )
 		va_end( ap );
 	}
 
-	busy_progress( 0, 0 );
+	progress_update_percent( 0, 0 );
 }
 
 static void
@@ -633,7 +633,7 @@ main_junk_auto_load( Filemodel *filemodel )
 void
 main_reload( void )
 {
-	busy_begin();
+	progress_begin();
 
 	/* Remove.
 	 */
@@ -651,7 +651,7 @@ main_reload( void )
 	 */
 	watch_relink_all();
 
-	busy_end();
+	progress_end();
 }
 
 /* Use a file to paint a named stock item.

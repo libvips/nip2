@@ -78,10 +78,9 @@ typedef struct _ProgressClass {
 	 */
 	void (*begin)( Progress * );
 
-	/* Progress update. Return FALSE to cancel computation, eg. on a
-	 * button press.
+	/* Progress update. Set cancel to cancel computation.
 	 */
-	gboolean (*update)( Progress *, int percent, int eta );
+	void (*update)( Progress *, gboolean *cancel );
 
 	/* End busy state. Restore screen.
 	 */

@@ -1605,7 +1605,7 @@ row_recomp_row( Row *row )
 			return( FALSE );
 	}
 
-	busy_progress( 0, 0 );
+	progress_update_percent( 0, 0 );
 
 	return( TRUE );
 }

@@ -317,7 +317,7 @@ iwindow_cursor_set( iWindow *iwnd, iWindowShape shape )
 	return( NULL );
 }
 
-void
+static void
 animate_hourglass( void )
 {
 	static iWindowShape shape = IWINDOW_SHAPE_HGLASS1;
@@ -329,7 +329,7 @@ animate_hourglass( void )
 		shape = IWINDOW_SHAPE_HGLASS1;
 }
 
-void
+static void
 set_pointer( void )
 {
 	iwindow_map_all( (iWindowMapFn) iwindow_cursor_set, 
@@ -724,6 +724,11 @@ iwindow_class_init( iWindowClass *class )
 	/* Static class data init.
 	 */
 	iwindow_make_cursors();
+
+	/* Link to busy signals.
+	 */
+	g_signal_connect( progress_get(), "update", animate_hourglass, NULL );
+	g_signal_connect( progress_get(), "end", set_pointer, NULL );
 }
 
 static void

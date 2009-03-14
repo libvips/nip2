@@ -36,7 +36,7 @@ started 7.17.0
 - Managedgobject."property" works
 - added (dir gtype), (dir gobject) 
 - oops, rank filters were off by one by default
-- added progress.[hc] ready for a better progress/cancel system (again)
+- added progress.[hc] for a better progress/cancel system (again)
 
 started 7.16.3
 - fixed cancel system (again)

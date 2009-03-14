@@ -201,8 +201,6 @@ int iwindow_number( void );
 typedef void (*iWindowMapFn)( iWindow *, void * );
 void *iwindow_map_all( iWindowMapFn fn, void *a );
 
-void animate_hourglass( void );
-void set_pointer( void );
 iWindowCursorContext *iwindow_cursor_context_new( iWindow *, 
 	int, const char * );
 void iwindow_cursor_context_set_cursor( iWindowCursorContext *, iWindowShape );

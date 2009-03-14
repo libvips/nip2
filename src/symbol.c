@@ -1000,17 +1000,17 @@ symbol_recalculate_check( Symbol *sym )
 
 	reduce_context->heap->filled = FALSE;
 	symbol_running = TRUE;
-	busy_begin();
+	progress_begin();
 	if( !symbol_recalculate_sub( sym ) || 
 		reduce_context->heap->filled ) {
 		expr_error_set( sym->expr );
 		symbol_running = FALSE;
-		busy_end();
+		progress_end();
 
 		return( sym );
 	}
 	symbol_running = FALSE;
-	busy_end();
+	progress_end();
 
 	return( NULL );
 }
@@ -1070,7 +1070,7 @@ symbol_recalculate_idle_cb( void )
 	run_again = TRUE;
 
 	if( !symbol_running ) {
-		busy_begin();
+		progress_begin();
 
 		if( !symbol_recalculate_leaf() ) {
 			/* Nothing more to do: shut down idle recomp.
@@ -1079,7 +1079,7 @@ symbol_recalculate_idle_cb( void )
 			run_again = FALSE;
 		}
 
-		busy_end();
+		progress_end();
 	}
 
 	return( run_again );
@@ -1105,12 +1105,12 @@ symbol_recalculate_all_force( gboolean now )
 		 */
 		;
 	else if( main_option_batch || now ) {
-		busy_begin();
+		progress_begin();
 
 		while( symbol_recalculate_leaf() )
 			;
 
-		busy_end();
+		progress_end();
 	}
 	else if( !symbol_idle_id ) 
 		symbol_idle_id = g_idle_add( 

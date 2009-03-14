@@ -1,12 +1,11 @@
 
+- 
 
-- progress feedback on the splash screen would be nice
 
-  have a 'progress' model, mainw and splash can contain view of the model
+- add progress feedback on the splash screen 
 
-  image eval and computation can update progress singleton
- 
-  see progress.[hc]
+  see mainw for code to link to progress
+
 
 
 

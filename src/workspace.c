@@ -590,14 +590,14 @@ workspace_clone_selected( Workspace *ws )
 
 	/* Try to load the clone file back again.
 	 */
-        busy_begin();
+        progress_begin();
 	if( !workspace_merge_column_file( ws, filename ) ) {
-		busy_end();
+		progress_end();
 		unlinkf( "%s", filename );
 
 		return( FALSE );
 	}
-	busy_end();
+	progress_end();
 	unlinkf( "%s", filename );
 
 	return( TRUE );
@@ -729,9 +729,9 @@ workspace_auto_recover_load( iWindow *iwnd,
 
 	/* Load ws file.
 	 */
-        busy_begin();
+        progress_begin();
 	ws = mainw_open_file_into_workspace( mainw, filename );
-	busy_end();
+	progress_end();
 
 	if( ws ) {
 		/* The filename will be something like

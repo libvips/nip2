@@ -55,6 +55,13 @@ struct _Mainw {
 	guint heap_changed_sid;
 	guint watch_changed_sid;
 
+	/* Link to progress system.
+	 */
+	guint begin_sid;	
+	guint update_sid;	
+	guint end_sid;	
+	gboolean cancel;
+
 	/* Display MB free in tmp, or cells free in heap.
 	 */
 	gboolean free_type;
@@ -117,8 +124,6 @@ extern GSList *mainw_recent_matrix;
 extern gboolean mainw_auto_recalc;
 
 extern gboolean mainw_cancel;
-
-void mainw_progress_set_expr( Expr *expr );
 
 void mainw_startup( void );
 void mainw_shutdown( void );

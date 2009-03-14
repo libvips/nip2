@@ -50,15 +50,6 @@ GSList *mainw_recent_matrix = NULL;
  */
 gboolean mainw_auto_recalc = TRUE;
 
-/* Cancel buttons in mainws set this, tested by imageinfo and others.
- */
-gboolean mainw_cancel = FALSE;
-
-/* The expr we are calculating inside, if any. Set as a hint to help feedback
- * display.
- */
-static Expr *mainw_progress_expr = NULL;
-
 static iWindowClass *parent_class = NULL;
 
 /* All the mainw.
@@ -159,6 +150,9 @@ mainw_destroy( GtkObject *object )
 	FREESID( mainw->imageinfo_changed_sid, main_imageinfogroup );
 	FREESID( mainw->heap_changed_sid, reduce_context->heap );
 	FREESID( mainw->watch_changed_sid, main_watchgroup );
+	FREESID( mainw->begin_sid, progress_get() );
+	FREESID( mainw->update_sid, progress_get() );
+	FREESID( mainw->end_sid, progress_get() );
 	DESTROY_GTK( mainw->popup );
 	UNREF( mainw->kitgview );
 
@@ -225,6 +219,32 @@ mainw_class_init( MainwClass *class )
 }
 
 static void
+mainw_progress_begin( Progress *progress, Mainw *mainw )
+{
+	mainw->cancel = FALSE;
+        gtk_widget_show( mainw->progress_box );
+}
+
+static void
+mainw_progress_update( Progress *progress, gboolean *cancel, Mainw *mainw )
+{
+	gtk_progress_bar_set_text( GTK_PROGRESS_BAR( mainw->progress ), 
+		vips_buf_all( &progress->feedback ) );
+	gtk_progress_bar_set_fraction( GTK_PROGRESS_BAR( mainw->progress ), 
+		IM_CLIP( 0.0, (double) progress->percent / 100.0, 1.0 ) );
+
+	if( mainw->cancel )
+		*cancel = TRUE;
+} 
+
+static void
+mainw_progress_end( Progress *progress, Mainw *mainw )
+{
+        gtk_widget_hide( mainw->progress_box );
+	mainw->cancel = FALSE;
+}
+
+static void
 mainw_init( Mainw *mainw )
 {
 	mainw->ws = NULL;
@@ -233,6 +253,14 @@ mainw_init( Mainw *mainw )
 	mainw->imageinfo_changed_sid = 0;
 	mainw->heap_changed_sid = 0;
 	mainw->watch_changed_sid = 0;
+
+	mainw->begin_sid = g_signal_connect( progress_get(), "begin", 
+		G_CALLBACK( mainw_progress_begin ), mainw );
+	mainw->update_sid = g_signal_connect( progress_get(), "update", 
+		G_CALLBACK( mainw_progress_update ), mainw );
+	mainw->end_sid = g_signal_connect( progress_get(), "end", 
+		G_CALLBACK( mainw_progress_end ), mainw );
+	mainw->cancel = FALSE;
 
 	mainw->free_type = FALSE;
 
@@ -286,88 +314,10 @@ mainw_get_type( void )
 	return( type );
 }
 
-void
-mainw_progress_set_expr( Expr *expr )
-{
-	mainw_progress_expr = expr;
-}
-
-static void  *
-mainw_progress_hide( Mainw *mainw )
-{
-        gtk_widget_hide( mainw->progress_box );
-
-	return( NULL );
-}
-
-/* End of eval.
- */
 static void
-mainw_progress_end( void )
+mainw_cancel_cb( GtkWidget *wid, Mainw *mainw )
 {
-	slist_map( mainw_all, 
-		(SListMapFn) mainw_progress_hide, NULL ); 
-	mainw_cancel = FALSE;
-}
-
-static void  *
-mainw_progress_update_mainw( Mainw *mainw, char *text, int *percent )
-{
-	gtk_progress_bar_set_text( GTK_PROGRESS_BAR( mainw->progress ), text );
-	gtk_progress_bar_set_fraction( GTK_PROGRESS_BAR( mainw->progress ), 
-		IM_CLIP( 0.0, (double) *percent / 100.0, 1.0 ) );
-        gtk_widget_show( mainw->progress_box );
-
-	return( NULL );
-}
-
-/* Evaluation is progressing.
- */
-static void
-mainw_progress_update( int percent, int eta )
-{
-	char msg[100];
-
-	if( mainw_cancel )
-		sprintf( msg, _( "Cancelling ..." ) );
-	else if( eta > 30 ) {
-		int minutes = (eta + 30) / 60;
-
-		im_snprintf( msg, 100, ngettext( 
-			"%d minute left", 
-			"%d minutes left", 
-			minutes ), minutes );
-	}
-	else if( eta == 0 ) {
-		/* A magic number reduce.c uses for eval feedback.
-		 */
-		VipsBuf buf;
-
-		vips_buf_init_static( &buf, msg, 100 );
-		/* Becomes eg. "Calculating A7.height ..."
-		 */
-		vips_buf_appends( &buf, _( "Calculating" ) );
-		vips_buf_appends( &buf, " " );
-		if( mainw_progress_expr ) {
-			expr_name( mainw_progress_expr, &buf );
-			vips_buf_appends( &buf, " " );
-		}
-		vips_buf_appends( &buf, "..." );
-		vips_buf_all( &buf );
-	}
-	else
-		im_snprintf( msg, 100, _( "%d seconds left" ), eta );
-
-	slist_map2( mainw_all, 
-		(SListMap2Fn) mainw_progress_update_mainw, 
-		msg, &percent );
-} 
-
-static void
-mainw_cancel_cb( GtkWidget *wid, Columnview *cview )
-{
-	mainw_cancel = TRUE;
-	mainw_progress_update( 0, 0 );
+	mainw->cancel = TRUE;
 }
 
 static void
@@ -712,15 +662,15 @@ mainw_clone( Mainw *mainw )
 
 	/* Clone selected symbols.
 	 */
-	busy_begin();
+	progress_begin();
 	if( !workspace_clone_selected( ws ) ) { 
 		box_alert( GTK_WIDGET( mainw ) );
-		busy_end();
+		progress_end();
 		return;
 	}
 	symbol_recalculate_all();
 	workspace_deselect_all( ws );
-	busy_end();
+	progress_end();
 
 	model_scrollto( MODEL( ws->current ), MODEL_SCROLL_TOP );
 }
@@ -736,10 +686,10 @@ mainw_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 static void
 mainw_ungroup_action_cb( GtkAction *action, Mainw *mainw )
 {
-	busy_begin();
+	progress_begin();
 	if( !workspace_selected_ungroup( mainw->ws ) )
 		box_alert( GTK_WIDGET( mainw ) );
-	busy_end();
+	progress_end();
 }
 
 /* Group the selected object(s).
@@ -1147,13 +1097,13 @@ mainw_recent_open_cb( GtkWidget *widget, const char *filename )
 {
 	Mainw *mainw = MAINW( iwindow_get_root( widget ) );
 
-	busy_begin();
+	progress_begin();
 	if( !mainw_recent_open( mainw, filename ) ) {
 		box_alert( widget );
-		busy_end();
+		progress_end();
 		return;
 	}
-	busy_end();
+	progress_end();
 
 	symbol_recalculate_all();
 }
@@ -1322,14 +1272,14 @@ mainw_workspace_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 	Workspace *new_ws;
 	Mainw *new_mainw;
 
-        busy_begin();
+        progress_begin();
 	if( !(new_ws = workspace_clone( mainw->ws )) ) {
-		busy_end();
+		progress_end();
 		box_alert( GTK_WIDGET( mainw ) );
 		return;
 	}
 	symbol_recalculate_all();
-	busy_end();
+	progress_end();
 
 	new_mainw = mainw_new( new_ws );
 	gtk_widget_show( GTK_WIDGET( new_mainw ) );
@@ -2082,7 +2032,7 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 
         cancel = gtk_button_new_with_label( "Cancel" );
         g_signal_connect( cancel, "clicked",
-                G_CALLBACK( mainw_cancel_cb ), NULL );
+                G_CALLBACK( mainw_cancel_cb ), mainw );
         gtk_box_pack_end( GTK_BOX( mainw->progress_box ), cancel, 
 		FALSE, TRUE, 0 );
         gtk_widget_show( cancel );
@@ -2252,79 +2202,4 @@ mainw_new( Workspace *ws )
 	mainw_link( mainw, ws );
 
 	return( mainw );
-}
-
-/* Busy handling. Come here from everywhere, handle delay and dispatch of busy
- * events to the cursor change system and to the busy ticker on mainw.
- */
-
-static int mainw_busy_count = 0;
-static GTimer *mainw_busy_timer = NULL;
-static GTimer *mainw_busy_update_timer = NULL;
-
-/* Delay before we start showing busy feedback.
- */
-static const double mainw_busy_delay = 2.0;
-
-/* Delay between busy updates.
- */
-static const double mainw_busy_update = 0.2;
-
-void
-busy_progress( int percent, int eta )
-{
-	if( mainw_busy_count &&
-		g_timer_elapsed( mainw_busy_timer, NULL ) > 
-			mainw_busy_delay ) {
-
-		if( g_timer_elapsed( mainw_busy_update_timer, NULL ) > 
-			mainw_busy_update ) {
-			animate_hourglass();
-			mainw_progress_update( percent, eta );
-
-			while( g_main_context_iteration( NULL, FALSE ) )
-				;
-
-			g_timer_start( mainw_busy_update_timer );
-		}
-	}
-}
-
-void
-busy_begin( void )
-{
-	g_assert( mainw_busy_count >= 0 );
-
-#ifdef DEBUG
-	printf( "busy_begin: %d\n", mainw_busy_count );
-#endif /*DEBUG*/
-
-	mainw_busy_count += 1;
-
-	if( mainw_busy_count == 1 ) {
-		if( !mainw_busy_timer )
-			mainw_busy_timer = g_timer_new();
-		if( !mainw_busy_update_timer )
-			mainw_busy_update_timer = g_timer_new();
-
-		g_timer_start( mainw_busy_timer );
-		g_timer_start( mainw_busy_update_timer );
-	}
-}
-
-void
-busy_end( void )
-{
-	mainw_busy_count -= 1;
-
-#ifdef DEBUG
-	printf( "busy_end: %d\n", mainw_busy_count );
-#endif /*DEBUG*/
-
-	g_assert( mainw_busy_count >= 0 );
-
-	if( !mainw_busy_count ) {
-		set_pointer();
-		mainw_progress_end();
-	}
 }

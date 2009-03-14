@@ -67,6 +67,10 @@ static int nargs[] = {3, 3, 3, 1, 2, 3};
  */
 int reduce_total_recomputations = 0;
 
+/* The current expr being reduced. Used for computation feedback messages.
+ */
+static Expr *reduce_current_expr = NULL;
+
 /* Eval error here. Longjmp back a ways.
  */
 void
@@ -1041,8 +1045,7 @@ reduce_spine( Reduce *rc, PElement *out )
 reduce_start:
 	reduce_total_recomputations += 1;
 	if( (reduce_total_recomputations % 100000) == 0 ) {
-		busy_progress( 0, 0 );
-		if( mainw_cancel ) {
+		if( progress_update_expr( reduce_current_expr ) ) {
 			error_top( _( "Cancelled." ) );
 			error_sub( _( "Evaluation cancelled." ) );
 			reduce_throw( rc );
@@ -2010,19 +2013,14 @@ reduce_regenerate( Expr *expr, PElement *out )
 }
 #endif /*DEBUG_REGEN*/
 
-	/* Do initial reduction. Tell mainw about the expr we are reducing, it
-	 * uses it to generate helpful notes during computation feedback. We
-	 * must be very careful to clear the expr again to avoid dangling
-	 * pointers.
-	 */
-	mainw_progress_set_expr( expr );
+	reduce_current_expr = expr;
 	if( !reduce_pelement( rc, reduce_spine, out ) ) {
-		mainw_progress_set_expr( NULL );
+		reduce_current_expr = NULL;
 		expr_error_set( expr );
 		(void) heap_gc( heap );
 		return( FALSE );
 	}
-	mainw_progress_set_expr( NULL );
+	reduce_current_expr = NULL;
 
 #ifdef DEBUG_REGEN
 {

@@ -1,11 +1,5 @@
 
-- 
-
-
-- add progress feedback on the splash screen 
-
-  see mainw for code to link to progress
-
+- progress should update every 0.2s whatever, no initial delay
 
 
 

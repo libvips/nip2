@@ -76,58 +76,40 @@ progress_begin( void )
 	}
 }
 
-static void
-progress_update_message( Progress *progress )
+static gboolean
+progress_test_update( Progress *progress )
 {
-	vips_buf_rewind( &progress->feedback );
+	if( progress->count &&
+		g_timer_elapsed( progress->busy_timer, NULL ) > 
+			progress_busy_delay ) 
+		if( g_timer_elapsed( progress->update_timer, NULL ) > 
+			progress_update_interval ) {
+			g_timer_start( progress->update_timer );
+			return( TRUE );
+		}
 
-	if( progress->cancel )
-		vips_buf_appends( &progress->feedback, _( "Cancelling ..." ) );
-	else if( progress->expr ) {
-		/* Becomes eg. "Calculating A7.height ..."
-		 */
-		vips_buf_appends( &progress->feedback, _( "Calculating" ) );
-		vips_buf_appends( &progress->feedback, " " );
-		expr_name( progress->expr, &progress->feedback );
-		vips_buf_appends( &progress->feedback, " ..." );
-	}
-	else if( progress->eta > 30 ) {
-		int minutes = (progress->eta + 30) / 60;
-
-		vips_buf_appendf( &progress->feedback, ngettext( 
-			"%d minute left", "%d minutes left", 
-			minutes ), minutes );
-	}
-	else
-		vips_buf_appendf( &progress->feedback, 
-			_( "%d seconds left" ), progress->eta );
+	return( FALSE );
 }
 
 static void
 progress_update( Progress *progress )
 {
-	if( progress->count &&
-		g_timer_elapsed( progress->busy_timer, NULL ) > 
-			progress_busy_delay ) {
+	gboolean cancel;
 
-		if( g_timer_elapsed( progress->update_timer, NULL ) > 
-			progress_update_interval ) {
-			gboolean cancel;
-
-			progress_update_message( progress );
-
-			cancel = FALSE;
-			g_signal_emit( progress, 
-				progress_signals[SIG_UPDATE], 0, &cancel );
-			if( cancel )
-				progress->cancel = TRUE;
-
-			while( g_main_context_iteration( NULL, FALSE ) )
-				;
-
-			g_timer_start( progress->update_timer );
-		}
+	if( progress->cancel ) {
+		vips_buf_rewind( &progress->feedback );
+		vips_buf_appends( &progress->feedback, _( "Cancelling" ) );
+		vips_buf_appends( &progress->feedback, " ..." );
 	}
+
+	cancel = FALSE;
+	g_signal_emit( progress, 
+		progress_signals[SIG_UPDATE], 0, &cancel );
+	if( cancel )
+		progress->cancel = TRUE;
+
+	while( g_main_context_iteration( NULL, FALSE ) )
+		;
 }
 
 gboolean
@@ -135,11 +117,24 @@ progress_update_percent( int percent, int eta )
 {
 	Progress *progress = progress_get();
 
-	progress->percent = percent;
-	progress->eta = eta;
-	progress->expr = NULL;
+	if( progress_test_update( progress ) ) {
+		vips_buf_rewind( &progress->feedback );
 
-	progress_update( progress );
+		if( eta > 30 ) {
+			int minutes = (eta + 30) / 60;
+
+			vips_buf_appendf( &progress->feedback, ngettext( 
+				"%d minute left", "%d minutes left", 
+				minutes ), minutes );
+		}
+		else
+			vips_buf_appendf( &progress->feedback, ngettext( 
+				"%d second left", "%d seconds left", 
+				eta ), eta );
+		progress->percent = percent;
+
+		progress_update( progress );
+	}
 
 	return( progress->cancel );
 }
@@ -149,11 +144,33 @@ progress_update_expr( Expr *expr )
 {
 	Progress *progress = progress_get();
 
-	progress->percent = 0;
-	progress->eta = 0;
-	progress->expr = expr;
+	if( progress_test_update( progress ) ) {
+		vips_buf_rewind( &progress->feedback );
+		vips_buf_appends( &progress->feedback, _( "Calculating" ) );
+		vips_buf_appends( &progress->feedback, " " );
+		expr_name( expr, &progress->feedback );
+		vips_buf_appends( &progress->feedback, " ..." );
+		progress->percent = 0;
 
-	progress_update( progress );
+		progress_update( progress );
+	}
+
+	return( progress->cancel );
+}
+
+gboolean
+progress_update_loading( int percent, const char *filename )
+{
+	Progress *progress = progress_get();
+
+	if( progress_test_update( progress ) ) {
+		vips_buf_rewind( &progress->feedback );
+		vips_buf_appends( &progress->feedback, _( "Loading" ) );
+		vips_buf_appendf( &progress->feedback, " \"%s\"", filename );
+		progress->percent = percent;
+
+		progress_update( progress );
+	}
 
 	return( progress->cancel );
 }
@@ -220,8 +237,6 @@ progress_init( Progress *progress )
 	progress->busy_timer = g_timer_new();
 	progress->update_timer = g_timer_new();
 	progress->cancel = FALSE;
-	progress->eta = 0;
-	progress->percent = 0;
 	vips_buf_init_static( &progress->feedback, 
 		progress->buf, PROGRESS_FEEDBACK_SIZE );
 }

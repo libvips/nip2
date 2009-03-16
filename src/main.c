@@ -402,20 +402,6 @@ main_splash_enabled( void )
 		get_savedir(), NO_SPLASH ) );
 }
 
-void
-main_splash_update( const char *fmt, ... )
-{
-	if( main_splash ) {
-		va_list ap;
-
-		va_start( ap, fmt );
-		splash_updatev( main_splash, fmt, ap );
-		va_end( ap );
-	}
-
-	progress_update_percent( 0, 0 );
-}
-
 static void
 main_watchgroup_changed_cb( void )
 {
@@ -433,8 +419,6 @@ gboolean
 main_load( Workspace *ws, const char *filename )
 {
 	Workspace *new_ws;
-
-	main_splash_update( _( "Loading \"%s\"" ), im_skip_dir( filename ) );
 
 	if( (new_ws = 
 		workspace_new_from_file( main_workspacegroup, filename )) ) {
@@ -493,8 +477,7 @@ main_load_def( const char *filename )
 	Toolkit *kit;
 
 	if( !main_option_no_load_menus || im_skip_dir( filename )[0] == '_' ) {
-		main_splash_update( _( "Loading toolkit \"%s\"" ), 
-			im_skip_dir( filename ) );
+		progress_update_loading( 0, im_skip_dir( filename ) );
 
 		if( !(kit = toolkit_new_from_file( main_toolkitgroup, 
 			filename )) )
@@ -515,8 +498,7 @@ main_load_ws( const char *filename )
 	printf( "main_load_ws: %s\n", filename );
 #endif/*DEBUG*/
 
-	main_splash_update( _( "Loading workspace \"%s\"" ), 
-		im_skip_dir( filename ) );
+	progress_update_loading( 0, im_skip_dir( filename ) );
 
 	if( !(ws = workspace_new_from_file( main_workspacegroup, filename )) ) 
 		box_alert( NULL );
@@ -587,8 +569,6 @@ main_load_startup( void )
 #ifdef DEBUG
 	printf( "plug-ins init\n" );
 #endif/*DEBUG*/
-
-	main_splash_update( "%s", _( "Loading plugins" ) );
 
 	/* Load any plug-ins on PATH_START. 
 	 */
@@ -1359,7 +1339,6 @@ main( int argc, char *argv[] )
 	 * mode since we can find dirties through dynamic lookups. Even though
 	 * you might think we could just follow recomps.
 	 */
-	main_splash_update( "%s", _( "First recalculation ..." ) );
 	symbol_recalculate_all();
 
 	/* Measure amount of stuff in temp area ... need this for checking
@@ -1420,7 +1399,6 @@ main( int argc, char *argv[] )
 
 	/* Recalc to load any args.
 	 */
-	main_splash_update( "%s", _( "Final recalculation ..." ) );
 	symbol_recalculate_all();
 
 	/* Make sure our start ws doesn't have modified set. We may have
@@ -1442,7 +1420,6 @@ main( int argc, char *argv[] )
 		if( !workspace_is_empty( ws ) || mainw_number() == 0 ) {
 			Mainw *mainw;
 			
-			main_splash_update( _( "Building main window" ) );
 			mainw = mainw_new( ws );
 			gtk_widget_show( GTK_WIDGET( mainw ) );
 		}

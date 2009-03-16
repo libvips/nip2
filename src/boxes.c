@@ -996,10 +996,44 @@ box_url( GtkWidget *par, const char *url )
 static GtkWindowClass *splash_parent_class = NULL;
 
 static void
+splash_destroy( GtkObject *object )
+{
+	Splash *splash;
+
+	g_return_if_fail( object != NULL );
+	g_return_if_fail( IS_SPLASH( object ) );
+
+	splash = SPLASH( object );
+
+#ifdef DEBUG
+	printf( "splash_destroy\n" );
+#endif /*DEBUG*/
+
+	/* My instance destroy stuff.
+	 */
+	FREESID( splash->update_sid, progress_get() );
+
+	GTK_OBJECT_CLASS( splash_parent_class )->destroy( object );
+}
+
+static void
 splash_class_init( SplashClass *class )
 {
+	GtkObjectClass *object_class = (GtkObjectClass *) class;
+
 	splash_parent_class = g_type_class_peek_parent( class );
+
+	object_class->destroy = splash_destroy;
 }
+
+static void
+splash_progress_update( Progress *progress, gboolean *cancel, Splash *splash )
+{
+	gtk_progress_bar_set_text( GTK_PROGRESS_BAR( splash->progress ), 
+		vips_buf_all( &progress->feedback ) );
+	gtk_progress_bar_set_fraction( GTK_PROGRESS_BAR( splash->progress ), 
+		IM_CLIP( 0.0, (double) progress->percent / 100.0, 1.0 ) );
+} 
 
 static void
 splash_toggle_change_cb( GtkWidget *widget )
@@ -1050,9 +1084,12 @@ splash_init( Splash *splash )
 		"$VIPSHOME/share/$PACKAGE/data/vips-128.png" );
         gtk_box_pack_start( GTK_BOX( vbox ), image, FALSE, FALSE, 0 );
 
-	splash->label = gtk_label_new( NULL );
-	gtk_misc_set_alignment( GTK_MISC( splash->label ), 0.0, 0.5 );
-        gtk_box_pack_start( GTK_BOX( vbox ), splash->label, FALSE, FALSE, 0 );
+	splash->progress = gtk_progress_bar_new();
+        gtk_box_pack_start( GTK_BOX( vbox ), 
+		splash->progress, FALSE, FALSE, 0 );
+	splash->update_sid = g_signal_connect( progress_get(), "update", 
+		G_CALLBACK( splash_progress_update ), splash );
+        gtk_widget_show( splash->progress );
 
         toggle = build_gtoggle( GTK_WIDGET( vbox ), 
 		_( "Display this splash screen during startup" ) );
@@ -1092,39 +1129,10 @@ splash_get_type( void )
 	return( splash_type );
 }
 
-void 
-splash_updatev( Splash *splash, const char *fmt, va_list ap )
-{
-	char buf1[100];
-	char buf2[150];
-	char buf3[150];
-
-	(void) im_vsnprintf( buf1, 100, fmt, ap );
-	escape_markup( buf1, buf3, 150 );
-	(void) im_snprintf( buf2, 150, 
-		"<span style=\"italic\" size=\"smaller\">%s</span>" , buf3 );
-	gtk_label_set_markup( GTK_LABEL( splash->label ), buf2 );
-
-	while( g_main_context_iteration( NULL, FALSE ) )
-		;
-}
-
-void 
-splash_update( Splash *splash, const char *fmt, ... )
-{
-	va_list ap;
-
-	va_start( ap, fmt );
-	splash_updatev( splash, fmt, ap );
-	va_end( ap );
-}
-
 Splash *
 splash_new( void )
 {
 	Splash *splash = gtk_type_new( TYPE_SPLASH );
-
-	splash_update( splash, "%s", _( "Initialising toolkit" ) );
 
 	return( splash );
 }

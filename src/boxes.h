@@ -171,7 +171,8 @@ void box_url( GtkWidget *par, const char *url );
 typedef struct _Splash {
 	GtkWindow parent_object;
 
-	GtkWidget *label;		/* Display progress text here */
+	GtkWidget *progress;		/* Display progress here */
+	guint update_sid;		/* Link to update messages */
 } Splash;
 
 typedef struct _SplashClass {
@@ -182,9 +183,6 @@ typedef struct _SplashClass {
 } SplashClass;
 
 GtkType splash_get_type( void );
-void splash_updatev( Splash *splash, const char *fmt, va_list ap );
-void splash_update( Splash *progress, const char *fmt, ... )
-	__attribute__((format(printf, 2, 3)));
 Splash *splash_new( void );
 
 /* Font chooser window.

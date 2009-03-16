@@ -59,16 +59,11 @@ typedef struct _Progress {
 	 */
 	gboolean cancel;
 
-	/* The last hint we saw about what's being updated.
-	 */
-	int eta;
-	int percent;
-	Expr *expr;
-
-	/* The feedback message we suggest.
+	/* The feedback message we suggest, percent for progress bar.
 	 */
 	VipsBuf feedback;
 	char buf[PROGRESS_FEEDBACK_SIZE];
+	int percent;
 } Progress;
 
 typedef struct _ProgressClass {
@@ -92,6 +87,7 @@ typedef struct _ProgressClass {
 void progress_begin( void );
 gboolean progress_update_percent( int percent, int eta );
 gboolean progress_update_expr( Expr *expr );
+gboolean progress_update_loading( int percent, const char *filename );
 void progress_end( void );
 
 GType progress_get_type( void );

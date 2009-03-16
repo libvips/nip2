@@ -2011,6 +2011,10 @@ action_dispatch( Reduce *rc, Compile *compile, ReduceFunction rfn,
 	 */
 	g_assert( nargs > 0 );
 
+	/* We need to have the 
+	 */
+	g_assert( noperator_table == UN_LAST );
+
 	/* Reduce all the args.
 	 */
 	for( i = 0; i < nargs; i++ ) {

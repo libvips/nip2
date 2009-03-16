@@ -121,7 +121,7 @@ void *parse_access_end( Symbol *sym, Symbol *main );
 %token TK_TAG TK_IDENT TK_CONST TK_DOTDOTDOT TK_LAMBDA TK_FROM TK_TO TK_SUCHTHAT
 %token TK_UMINUS TK_UPLUS TK_POW 
 %token TK_LESS TK_LESSEQ TK_MORE TK_MOREEQ TK_NOTEQ
-%token TK_LAND TK_LOR TK_BAND TK_BOR TK_JOIN
+%token TK_LAND TK_LOR TK_BAND TK_BOR TK_JOIN TK_DIFF
 %token TK_IF TK_THEN TK_ELSE 
 %token TK_CHAR TK_SHORT TK_CLASS TK_SCOPE
 %token TK_INT TK_FLOAT TK_DOUBLE TK_SIGNED TK_UNSIGNED TK_COMPLEX
@@ -149,7 +149,7 @@ void *parse_access_end( Symbol *sym, Symbol *main );
 %left TK_LSHIFT TK_RSHIFT
 %left '+' '-'
 %left '*' '/' '%' 
-%left '!' '~' TK_JOIN TK_UMINUS TK_UPLUS 
+%left '!' '~' TK_JOIN TK_DIFF TK_UMINUS TK_UPLUS 
 %right TK_POW ':'
 %right TK_CONST '(' 
 %right TK_IDENT TK_TAG TK_SCOPE '['
@@ -798,6 +798,9 @@ comma_list:
 	}
 	;
 
+/* How odd, break the "'+' { BI_ADD } | ..." into a separate production and we
+ * get reduce/reduce conflits. Copypaste a lot instead.
+ */
 binop: 
      	expr '+' expr {	
 		$$ = tree_binop_new( current_compile, BI_ADD, $1, $3 );
@@ -877,6 +880,17 @@ binop:
 	expr '.' expr {
 		$$ = tree_binop_new( current_compile, BI_DOT, $1, $3 );
 	} |
+	expr TK_DIFF expr {	
+		ParseNode *pn1, *pn2;
+
+		pn1 = tree_leaf_new( current_compile, "difference" );
+		pn2 = tree_leaf_new( current_compile, "equal" );
+		pn1 = tree_appl_new( current_compile, pn1, pn2 );
+		pn1 = tree_appl_new( current_compile, pn1, $1 );
+		pn1 = tree_appl_new( current_compile, pn1, $3 );
+
+		$$ = pn1;
+	} | 
 	expr TK_TO expr {
 		ParseNode *pn;
 

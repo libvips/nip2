@@ -260,6 +260,7 @@ FALSE {
 \( { BEGIN 0; return( '(' ); }
 \) { BEGIN BINARY; return( ')' ); }
 \+\+ { BEGIN 0; return( TK_JOIN ); }
+\-\- { BEGIN 0; return( TK_DIFF ); }
 <BINARY>\+ |
 <BINARY>\- { BEGIN 0; return( *yytext ); }
 \- { BEGIN 0; return( TK_UMINUS ); }

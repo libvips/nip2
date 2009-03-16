@@ -1,5 +1,11 @@
 
-- tone adjust of LCh image fails? Oh, heh, Lab as well
+- add Set menu to Math with mkset/union/intersection/difference ?
+
+  could do bit operations on images?
+
+  do we have list difference? not sure we do
+
+  what about intersection? subtract?
 
 
 
@@ -57,14 +63,6 @@
 
 WONTFIX for 7.16
 ================
-
-- add Set menu to Math with mkset/union/intersection/difference ?
-
-  could do bit operations on images?
-
-  do we have list difference? not sure we do
-
-  what about intersection? subtract?
 
 - filesel guess-file-type-from-suffix needs fixing
 

@@ -61,7 +61,7 @@ typedef enum {
 	BI_LSHIFT,		/* Shift left */
 	BI_RSHIFT,		/* Shift right */
 	BI_DIV,			/* Divide by a constant */
-	BI_JOIN,		/* Join of two images */
+	BI_JOIN,		/* Join of two objects */
 	BI_DOT,			/* Projection operator */
 	BI_COMMA,		/* Form complex number */
 	BI_MUL,			/* Mult by a constant */
@@ -103,7 +103,8 @@ typedef enum {
 	UN_MINUS,		/* Unary minus */
 	UN_NEG,			/* Logical negation */
 	UN_COMPLEMENT,		/* 1s complement */
-	UN_PLUS			/* Unary plus */
+	UN_PLUS,		/* Unary plus */
+	UN_LAST			/* Sanity check with this */
 } UnOp;
 
 /* The sorts of constants we can have in expressions. 

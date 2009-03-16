@@ -19,6 +19,26 @@ all = foldr logical_and true;
  */
 concat l = foldr join [] l;
 
+/* delete eq x l: delete the first x from l
+ *
+ * delete equal 'b' "abcdb" == "acdb"
+ * delete :: (* -> bool) -> * -> [*] -> [*]
+ */
+delete eq a l
+	= [], l == []
+	= y, eq a b
+	= b : delete eq a y
+{
+	b:y = l;
+}
+
+/* difference eq a b: delete b from a
+ *
+ * difference equal "asdf" "ad" == "sf"
+ * difference :: (* -> bool) -> [*] -> [*] -> [*]
+ */
+difference = foldl @ converse @ delete;
+
 /* drop n l: drop the first n elements from list l
  *
  * drop 3 "abcd" == "d"
@@ -35,8 +55,11 @@ drop n l
  */
 dropwhile fn l
 	= [], l == []
-	= dropwhile fn (tl l), fn (hd l)
-	= l;
+	= dropwhile fn x, fn a
+	= l
+{
+	a:x = l;
+}
 
 /* extract n l: extract element at index n from list l
  */

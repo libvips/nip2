@@ -38,6 +38,7 @@ started 7.17.0
 - oops, rank filters were off by one by default
 - added progress.[hc] for a better progress/cancel system (again)
 - splash screen uses new progress system
+- added list delete, difference, "--" operator
 
 started 7.16.3
 - fixed cancel system (again)

@@ -1605,7 +1605,7 @@ row_recomp_row( Row *row )
 			return( FALSE );
 	}
 
-	progress_update_percent( 0, 0 );
+	progress_update_tick();
 
 	return( TRUE );
 }

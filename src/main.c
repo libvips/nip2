@@ -802,6 +802,12 @@ main_x_init( int *argc, char ***argv )
 	if( main_splash_enabled() ) {
 		main_splash = splash_new();
 		gtk_widget_show( GTK_WIDGET( main_splash ) );
+
+		/* Wait for the splashscreen to pop up. We want this to appear
+		 * as quickly as possible.
+		 */
+		while( g_main_context_iteration( NULL, FALSE ) )
+			;
 	}
 
 	/* Next window we make is end of startup.

@@ -1085,6 +1085,8 @@ splash_init( Splash *splash )
         gtk_box_pack_start( GTK_BOX( vbox ), image, FALSE, FALSE, 0 );
 
 	splash->progress = gtk_progress_bar_new();
+	gtk_progress_bar_set_text( GTK_PROGRESS_BAR( splash->progress ), 
+		_( "Starting ..." ) );
         gtk_box_pack_start( GTK_BOX( vbox ), 
 		splash->progress, FALSE, FALSE, 0 );
 	splash->update_sid = g_signal_connect( progress_get(), "update", 

@@ -59,6 +59,11 @@ typedef struct _Progress {
 	 */
 	gboolean cancel;
 
+	/* In the "busy" state, ie. we've emitted "begin" and so we need to
+	 * emit "end" on progress_end().
+	 */
+	gboolean busy;
+
 	/* The feedback message we suggest, percent for progress bar.
 	 */
 	VipsBuf feedback;
@@ -88,6 +93,7 @@ void progress_begin( void );
 gboolean progress_update_percent( int percent, int eta );
 gboolean progress_update_expr( Expr *expr );
 gboolean progress_update_loading( int percent, const char *filename );
+gboolean progress_update_tick( void );
 void progress_end( void );
 
 GType progress_get_type( void );

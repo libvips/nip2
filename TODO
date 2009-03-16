@@ -1,12 +1,15 @@
 
+- main3.ws fails to load ... set version to 7.14 and it works
+
+  try toolkits / edit / debug / errors
+
+  formatting problems too
+
+
+
 - add Set menu to Math with mkset/union/intersection/difference ?
 
   could do bit operations on images?
-
-  do we have list difference? not sure we do
-
-  what about intersection? subtract?
-
 
 
 

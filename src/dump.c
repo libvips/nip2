@@ -31,8 +31,8 @@
 
 /* A lot of this file is just for debugging. Uncomment to enable all the
  * debugging code.
-#define DEBUG
  */
+#define DEBUG
 
 /* Dump a binary operator.
  */
@@ -217,7 +217,8 @@ dump_tiny( Symbol *sym )
 	symbol_qualified_name( sym, &buf );
 	if( sym->dirty )
 		printf( "*" );
-	printf( "%s %s; ", decode_SymbolType( sym->type ), vips_buf_all( &buf ) );
+	printf( "%s %s; ", 
+		decode_SymbolType( sym->type ), vips_buf_all( &buf ) );
 
 	return( NULL );
 }
@@ -815,10 +816,14 @@ dump_link( Link *link )
 {
 	printf( "link->parent = " );
 	symbol_name_print( link->parent );
+	if( link->parent->dirty )
+		printf( " (dirty)" );
 	printf( "\n" );
 
 	printf( "link->child = " );
 	symbol_name_print( link->child );
+	if( link->child->dirty )
+		printf( " (dirty)" );
 	printf( "\n" );
 
 	printf( "link->serial = %d\n", link->serial );

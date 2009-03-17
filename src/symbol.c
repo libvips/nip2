@@ -41,15 +41,22 @@
 #define DEBUG_TIME
  */
 
+/* Show symbols as we recalc
+#define DEBUG_RECALC
+ */
+
 /* If DEBUG is on, make sure other debugs are on too.
  */
 #ifdef DEBUG
-#ifndef DEBUG_MAKE
-#define DEBUG_MAKE
-#endif
-#ifndef DEBUG_TIME
-#define DEBUG_TIME
-#endif
+# ifndef DEBUG_MAKE
+#  define DEBUG_MAKE
+# endif
+# ifndef DEBUG_TIME
+#  define DEBUG_TIME
+# endif
+# ifndef DEBUG_RECALC
+#  define DEBUG_RECALC
+# endif
 #endif
 
 /* Our signals. 
@@ -930,35 +937,22 @@ symbol_recalculate_sub( Symbol *sym )
 	g_timer_reset( timer );
 #endif /*DEBUG_TIME*/
 
-	if( is_value( sym ) ) {
-		if( sym->expr->row ) {
-			/* This is the root of a display ... use that recomp
-			 * mechanism.
-			 */
-			row_recomp( sym->expr->row );
-			if( sym->expr->row->err )
-				result = FALSE;
-		}
-		else if( sym->expr->compile->nparam > 0 ) {
-			/* This is a function ... just mark it clean and wait
-			 * until link time before we try to copy the code into
-			 * the heap.
-			 */
-			symbol_dirty_clear( sym );
-			expr_new_value( sym->expr );
-		}
-		else {
-			if( reduce_regenerate( sym->expr, &sym->expr->root ) ) {
-				symbol_dirty_clear( sym );
-				expr_new_value( sym->expr );
-			}
-			else
-				result = FALSE;
+	g_assert( is_value( sym ) );
 
-		}
+	if( sym->expr->row ) {
+		/* This is the root of a display ... use that recomp
+		 * mechanism. 
+		 */
+		row_recomp( sym->expr->row );
+		if( sym->expr->row->err )
+			result = FALSE;
 	}
-	else
-		symbol_dirty_clear( sym );
+	else if( sym->expr->compile->nparam == 0 ) {
+		/* No params: this ought to have a value.
+		 */
+		if( !reduce_regenerate( sym->expr, &sym->expr->root ) ) 
+			result = FALSE;
+	}
 
 #ifdef DEBUG_TIME
 	printf( "symbol_recalculate_sub: " );
@@ -980,13 +974,20 @@ static gboolean symbol_running = FALSE;
 void *
 symbol_recalculate_check( Symbol *sym )
 {
-#ifdef DEBUG
+#ifdef DEBUG_RECALC
 	printf( "symbol_recalculate_check: %s\n", symbol_name_scope( sym ) );
-#endif /*DEBUG*/
+	g_assert( symbol_is_leafable( sym ) );
+	g_assert( symbol_ndirty( sym ) == 0 );
+#endif /*DEBUG_RECALC*/
 
 	error_clear();
 	if( sym->expr->err ) {
 		expr_error_get( sym->expr );
+
+#ifdef DEBUG_RECALC
+		printf( "\t(error: previous error)\n" );
+#endif /*DEBUG_RECALC*/
+
 		return( sym );
 	}
 	if( !sym->dirty ) 
@@ -1007,10 +1008,32 @@ symbol_recalculate_check( Symbol *sym )
 		symbol_running = FALSE;
 		progress_end();
 
+#ifdef DEBUG_RECALC
+		printf( "\t(error: %s %s)\n", 
+			sym->expr->error_top, sym->expr->error_sub );
+#endif /*DEBUG_RECALC*/
+
 		return( sym );
 	}
 	symbol_running = FALSE;
 	progress_end();
+
+	/* Have we discovered any dirty children? If not, we've cleaned this
+	 * sym.
+	 */
+	if( !sym->ndirtychildren ) {
+		symbol_dirty_clear( sym );
+		expr_new_value( sym->expr );
+
+#ifdef DEBUG_RECALC
+		printf( "\t(success)\n" ); 
+#endif /*DEBUG_RECALC*/
+	}
+#ifdef DEBUG_RECALC
+	else {
+		printf( "\t(found dirty children)\n" );
+	}
+#endif /*DEBUG_RECALC*/
 
 	return( NULL );
 }

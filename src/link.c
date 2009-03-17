@@ -29,6 +29,7 @@
 
 /*
 #define DEBUG
+#define DEBUG_DIRTY
  */
 
 #include "ip.h"
@@ -531,11 +532,11 @@ symbol_dirty_set( Symbol *sym )
 		expr_error_clear( sym->expr );
 
 	if( !sym->dirty ) {
-#ifdef DEBUG
+#ifdef DEBUG_DIRTY
 		printf( "symbol_dirty_set: " );
 		symbol_name_print( sym );
-		printf( "\n" );
-#endif /*DEBUG*/
+		printf( " (%p)\n", sym );
+#endif /*DEBUG_DIRTY*/
 
 		/* Change of state.
 		 */
@@ -631,11 +632,11 @@ symbol_dirty_clear( Symbol *sym )
 	g_assert( is_top( sym ) );
 
 	if( sym->dirty ) {
-#ifdef DEBUG
+#ifdef DEBUG_DIRTY
 		printf( "symbol_dirty_clear: " );
 		symbol_name_print( sym );
-		printf( "\n" );
-#endif /*DEBUG*/
+		printf( " (%p)\n", sym );
+#endif /*DEBUG_DIRTY*/
 
 		/* Change of state.
 		 */

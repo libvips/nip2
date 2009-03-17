@@ -61,9 +61,6 @@ expr_error_print( Expr *expr, VipsBuf *buf )
 {
 	g_assert( expr->err );
 
-	if( !vips_buf_is_empty( buf )  )
-		vips_buf_appends( buf, "\n" );
-
 	vips_buf_appendf( buf, _( "error in \"%s\"" ), 
 		IOBJECT( expr->sym )->name );
 	if( expr->sym->tool ) 
@@ -79,7 +76,9 @@ expr_error_print( Expr *expr, VipsBuf *buf )
 		vips_buf_appendf( buf, ")" );
 	}
 
-	vips_buf_appendf( buf, ": %s\n%s", expr->error_top, expr->error_sub );
+	/* Don't show error_top, it's just a summary of error_sub.
+	 */
+	vips_buf_appendf( buf, ": %s\n", expr->error_sub );
 
 	return( NULL );
 }

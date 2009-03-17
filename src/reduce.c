@@ -1133,7 +1133,7 @@ reduce_start:
 			 */
 			if( sym->dirty ) {
 				error_top( _( "No value." ) );
-				error_sub( _( "Symbol \"%s\" has no value" ), 
+				error_sub( _( "Symbol \"%s\" has no value." ), 
 					symbol_name( sym ) );
 				reduce_throw( rc );
 			}

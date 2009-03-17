@@ -140,8 +140,6 @@ toolkit_load_text( Model *model, Model *parent, iOpenFile *of )
 			FILEMODEL( kit )->filename, input_state.lineno, 
 			error_get_sub() );
 
-	iobject_changed( IOBJECT( kit ) );
-
 #ifdef DEBUG
 	(void) dump_kit( kit );
 #endif /*DEBUG*/

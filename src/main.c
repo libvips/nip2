@@ -1345,10 +1345,10 @@ main( int argc, char *argv[] )
 	 * mode since we can find dirties through dynamic lookups. Even though
 	 * you might think we could just follow recomps.
 	 */
-	symbol_recalculate_all();
+	symbol_recalculate_all_force( TRUE );
 
 	/* Measure amount of stuff in temp area ... need this for checking
-	 * temps later. We pop a diglog if there are too many, so only useful
+	 * temps later. We pop a dialog if there are too many, so only useful
 	 * in interactive mode.
 	 */
 	if( !main_option_batch )
@@ -1405,7 +1405,7 @@ main( int argc, char *argv[] )
 
 	/* Recalc to load any args.
 	 */
-	symbol_recalculate_all();
+	symbol_recalculate_all_force( TRUE );
 
 	/* Make sure our start ws doesn't have modified set. We may have
 	 * loaded some images or whatever into it.

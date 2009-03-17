@@ -312,8 +312,6 @@ iwindow_cursor_set( iWindow *iwnd, iWindowShape *shape )
 	if( iwnd->shape != *shape ) {
 		iwnd->shape = *shape;
 		iwindow_cursor_update( iwnd );
-
-		printf( "iwnd %p -> shape = %d\n", iwnd, *shape );
 	}
 
 	return( NULL );

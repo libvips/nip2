@@ -307,33 +307,49 @@ iwindow_cursor_update( iWindow *iwnd )
 /* Set a global cursor for a window.
  */
 static void *
-iwindow_cursor_set( iWindow *iwnd, iWindowShape shape )
+iwindow_cursor_set( iWindow *iwnd, iWindowShape *shape )
 {
-	if( iwnd->shape != shape ) {
-		iwnd->shape = shape;
+	if( iwnd->shape != *shape ) {
+		iwnd->shape = *shape;
 		iwindow_cursor_update( iwnd );
+
+		printf( "iwnd %p -> shape = %d\n", iwnd, *shape );
 	}
 
 	return( NULL );
 }
 
+static gboolean hourglass_showing = FALSE;
+
 static void
-animate_hourglass( void )
+hourglass_begin( void )
 {
-	static iWindowShape shape = IWINDOW_SHAPE_HGLASS1;
-
-	iwindow_map_all( (iWindowMapFn) iwindow_cursor_set, (void *) shape );
-
-	shape += 1;
-	if( shape > IWINDOW_SHAPE_HGLASS8 )
-		shape = IWINDOW_SHAPE_HGLASS1;
+	hourglass_showing = TRUE;
 }
 
 static void
-set_pointer( void )
+hourglass_update( void )
 {
-	iwindow_map_all( (iWindowMapFn) iwindow_cursor_set, 
-		(void *) IWINDOW_SHAPE_NONE );
+	if( hourglass_showing ) {
+		static iWindowShape shape = IWINDOW_SHAPE_HGLASS1;
+
+		iwindow_map_all( (iWindowMapFn) iwindow_cursor_set, &shape );
+
+		shape += 1;
+		if( shape > IWINDOW_SHAPE_HGLASS8 )
+			shape = IWINDOW_SHAPE_HGLASS1;
+	}
+}
+
+static void
+hourglass_end( void )
+{
+	if( hourglass_showing ) {
+		iWindowShape shape = IWINDOW_SHAPE_NONE;
+
+		iwindow_map_all( (iWindowMapFn) iwindow_cursor_set, &shape );
+		hourglass_showing = FALSE;
+	}
 }
 
 iWindowCursorContext *
@@ -727,8 +743,9 @@ iwindow_class_init( iWindowClass *class )
 
 	/* Link to busy signals.
 	 */
-	g_signal_connect( progress_get(), "update", animate_hourglass, NULL );
-	g_signal_connect( progress_get(), "end", set_pointer, NULL );
+	g_signal_connect( progress_get(), "begin", hourglass_begin, NULL );
+	g_signal_connect( progress_get(), "update", hourglass_update, NULL );
+	g_signal_connect( progress_get(), "end", hourglass_end, NULL );
 }
 
 static void

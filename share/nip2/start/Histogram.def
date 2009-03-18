@@ -14,7 +14,7 @@ Hist_new_item = class
 	Hist_new_from_matrix = Matrix_buildlut_item; 
 
 	Hist_from_image_item = class
-		Menuaction "Ta_g Image As Histogram" "set image Type field to Histogram" {
+		Menuaction "Ta_g Image As Histogram" "set image Type to Histogram" {
 		action x = hist_tag x;
 	}
 

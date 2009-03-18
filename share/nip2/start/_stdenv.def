@@ -1903,7 +1903,7 @@ gammln xx
 /* make a LUT from a scatter
  */
 buildlut x
-	= Image (im_buildlut x), is_Matrix x && x.width > 1
+	= Plot_histogram (im_buildlut x), is_Matrix x && x.width > 1
 	= im_buildlut (Matrix x), is_matrix x && is_list_len_more 1 x?0
 	= error (_ "bad arguments to " ++ "buildlut");
 

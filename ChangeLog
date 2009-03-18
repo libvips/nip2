@@ -41,6 +41,7 @@ started 7.17.0
 - added list delete, difference, "--" operator
 - fixed a bug with startup recomps not happening (it was trying to do them 
   in the background, argh)
+- buildlut makes Plot, not Image
 
 started 7.16.3
 - fixed cancel system (again)

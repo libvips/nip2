@@ -90,8 +90,7 @@ image_white im
 matrix_gaussian_blur radius
         = Matrix_con mask_g_sum 0 [mask_g_line]
 {
-        mask_g = im_gauss_imask (radius / 3) 0.2;
-        mask_g_line = mask_g.value?(mask_g.height / 2);
+        mask_g_line = im_gauss_imask_sep (radius / 3) 0.2;
         mask_g_sum = sum mask_g_line;
 }
 

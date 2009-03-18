@@ -1,13 +1,20 @@
 
-- have a 1d case for custom blur/sharpen? use conv_sep, handy for LUTs
+- have a 1d case for custom blur/sharpen? handy for LUTs
 
-  make something to make a 1d gaussian as well
+  need something to make a 1d gaussian 
+
+  make as an image?
+
+  conv could take a matrix passed as an image?
 
 
 
 - LUT from scatter does not tag as histogram?
 
 
+
+- LUT from scatter with 0/65535 as the xrange 0/100 yrannge makes a 
+  0-65534 pixel image with 0-99 yvalue
 
 
 

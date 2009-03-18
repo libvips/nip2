@@ -1,4 +1,15 @@
 
+- have a 1d case for custom blur/sharpen? use conv_sep, handy for LUTs
+
+  make something to make a 1d gaussian as well
+
+
+
+- LUT from scatter does not tag as histogram?
+
+
+
+
 
 - add Set menu to Math with mkset/union/intersection/difference ?
 

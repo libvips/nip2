@@ -653,19 +653,29 @@ Image_transform_item = class
 					"Vertical"
 				] 0;
 				size = Expression "Resize to (pixels)" 128;
+				aspect = Toggle "Break aspect ratio" false;
 				interp = Interpolate_picker Interpolate_type.BILINEAR;
 
 				_result
 					= map_unary process x
 				{
 					process image
-						= resize interp fac fac image
+						= resize interp h v image, aspect
+						= resize interp x x image
 					{
-						xfac = to_real size / image.width;
-						yfac = to_real size / image.height;
-						max_factor = max_pair xfac yfac;
-						min_factor = min_pair xfac yfac;
-						fac = [max_factor, min_factor, xfac, yfac]?which;
+						xfac = [to_real size / image.width, 1];
+						yfac = [1, to_real size / image.height];
+						max_factor 
+							= [xfac, 1], xfac > yfac
+							= [1, yfac];
+						min_factor 
+							= [xfac, 1], xfac < yfac
+							= [1, yfac];
+						[h, v] = [max_factor, min_factor, xfac, yfac]?which;
+
+						x
+							= h, v == 1
+							= v;
 					}
 				}
 			}

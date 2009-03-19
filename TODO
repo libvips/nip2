@@ -1,12 +1,6 @@
 
-- have a 1d case for custom blur/sharpen? handy for LUTs
-
-  need something to make a 1d gaussian 
-
-  make as an image? show as Plot?
-
-  conv could take a matrix passed as an image?
-
+- "size to" with "break aspect ratio" does not always make images with the 
+  expected width ... eg. a 364 px wide image size to 400 becomes 401
 
 
 

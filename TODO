@@ -1,4 +1,20 @@
 
+- try:
+
+	[1, 2] > [2, 3]
+
+  error message is
+
+  	Typecheck error.
+
+	reduce_add_char expected char, instead saw:
+	  2
+
+  not very useful
+
+
+
+
 - "size to" with "break aspect ratio" does not always make images with the 
   expected width ... eg. a 364 px wide image size to 400 becomes 401
 

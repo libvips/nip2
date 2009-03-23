@@ -661,19 +661,23 @@ Image_transform_item = class
 				{
 					process image
 						= resize interp h v image, aspect
-						= resize interp x x image
+						= resize interp fac fac image
 					{
-						xfac = [to_real size / image.width, 1];
-						yfac = [1, to_real size / image.height];
+						xfac = to_real size / image.width;
+						yfac = to_real size / image.height;
 						max_factor 
 							= [xfac, 1], xfac > yfac
 							= [1, yfac];
 						min_factor 
 							= [xfac, 1], xfac < yfac
 							= [1, yfac];
-						[h, v] = [max_factor, min_factor, xfac, yfac]?which;
+						[h, v] = [
+							max_factor, 
+							min_factor, 
+							[xfac, 1], 
+							[1, yfac]]?which;
 
-						x
+						fac 
 							= h, v == 1
 							= v;
 					}

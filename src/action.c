@@ -444,7 +444,8 @@ action_proc_lesseq( Reduce *rc, Compile *compile,
 	else if( PEISCHAR( a ) && PEISCHAR( b ) ) {
 		PEPUTP( out, ELEMENT_BOOL, PEGETCHAR( a ) <= PEGETCHAR( b ) );
 	}
-	else if( PEISLIST( a ) && PEISLIST( b ) ) {
+	else if( PEISLIST( a ) && PEISLIST( b ) &&
+		reduce_is_string( rc, a ) && reduce_is_string( rc, b ) ) {
 		char a_string[MAX_STRSIZE];
 		char b_string[MAX_STRSIZE];
 
@@ -477,7 +478,8 @@ action_proc_less( Reduce *rc, Compile *compile,
 	else if( PEISCHAR( a ) && PEISCHAR( b ) ) {
 		PEPUTP( out, ELEMENT_BOOL, PEGETCHAR( a ) < PEGETCHAR( b ) );
 	}
-	else if( PEISLIST( a ) && PEISLIST( b ) ) {
+	else if( PEISLIST( a ) && PEISLIST( b ) &&
+		reduce_is_string( rc, a ) && reduce_is_string( rc, b ) ) {
 		char a_string[MAX_STRSIZE];
 		char b_string[MAX_STRSIZE];
 

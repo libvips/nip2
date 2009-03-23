@@ -1,3 +1,14 @@
+started 7.17.2
+- added progress.[hc] for a better progress/cancel system (again)
+- splash screen uses new progress system
+- added list delete, difference, "--" operator
+- fixed a bug with startup recomps not happening (it was trying to do them 
+  in the background, argh)
+- buildlut makes Plot, not Image
+- much faster gaussian mask build for large masks
+- "Size To" has a "break aspect ratio" option
+- better error message for "[1, 2] < [3, 4]"
+
 started 7.17.0
 - merged 7.16 branch back into trunk
 - bumped version number
@@ -36,14 +47,6 @@ started 7.17.0
 - Managedgobject."property" works
 - added (dir gtype), (dir gobject) 
 - oops, rank filters were off by one by default
-- added progress.[hc] for a better progress/cancel system (again)
-- splash screen uses new progress system
-- added list delete, difference, "--" operator
-- fixed a bug with startup recomps not happening (it was trying to do them 
-  in the background, argh)
-- buildlut makes Plot, not Image
-- much faster gaussian mask build for large masks
-- "Size To" has a "break aspect ratio" option
 
 started 7.16.3
 - fixed cancel system (again)

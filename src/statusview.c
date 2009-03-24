@@ -232,7 +232,8 @@ statusview_changed_cb( Imagemodel *imagemodel, Statusview *sv )
 	vips_buf_appendf( &buf, ", %.3gx%.3g p/mm", im->Xres, im->Yres );
 	set_gcaption( sv->top, "%s", vips_buf_all( &buf ) );
 
-	if( im->Coding == IM_CODING_LABQ ) {
+	if( im->Coding == IM_CODING_LABQ ||
+		im->Coding == IM_CODING_RAD ) {
 		nb = 3;
 		fmt = 6;
 	}
@@ -329,6 +330,40 @@ statusview_mouse_LABPACK( Statusview *sv, int x, int y )
 
 		set_glabel( b1->val, "%g", L );
 		set_glabel( b2->val, "%g", a );
+		set_glabel( b3->val, "%g", b );
+	}
+}
+
+/* Turn a IM_CODING_RAD 4-band image into three floats.
+ */
+static void
+statusview_mouse_RAD( Statusview *sv, int x, int y )
+{
+	Imagemodel *imagemodel = sv->imagemodel;
+	Conversion *conv = imagemodel->conv;
+	GSList *bands = sv->bands;
+
+	/* Three widgets we update.
+	 */
+	StatusviewBand *b1;
+	StatusviewBand *b2;
+	StatusviewBand *b3;
+
+	unsigned char *e = 
+		(unsigned char *) get_element( conv->reg, x, y, 0 );
+
+	double f = ldexp( 1.0, e[3] - (128 + 8) );
+	float r = (e[0] + 0.5) * f;
+	float g = (e[1] + 0.5) * f;
+	float b = (e[2] + 0.5) * f;
+
+	if( g_slist_length( sv->bands ) == 3 ) {
+		b1 = (StatusviewBand *) bands->data;
+		b2 = (StatusviewBand *) bands->next->data;
+		b3 = (StatusviewBand *) bands->next->next->data;
+
+		set_glabel( b1->val, "%g", r );
+		set_glabel( b2->val, "%g", g );
 		set_glabel( b3->val, "%g", b );
 	}
 }
@@ -443,6 +478,8 @@ statusview_mouse( Statusview *sv, int x, int y )
 	if( reg ) {
 		if( reg->im->Coding == IM_CODING_LABQ )
 			statusview_mouse_LABPACK( sv, x, y );
+		else if( reg->im->Coding == IM_CODING_RAD )
+			statusview_mouse_RAD( sv, x, y );
 		else
 			slist_map( sv->bands, 
 				(SListMapFn) statusview_mouse_band, 

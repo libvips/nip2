@@ -8,6 +8,8 @@ started 7.17.2
 - much faster gaussian mask build for large masks
 - "Size To" has a "break aspect ratio" option
 - better error message for "[1, 2] < [3, 4]"
+- support RAD coding
+- added Radiance menu
 
 started 7.17.0
 - merged 7.16 branch back into trunk

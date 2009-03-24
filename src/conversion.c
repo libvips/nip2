@@ -139,6 +139,17 @@ conversion_make_visualise( Conversion *conv, IMAGE *in )
 			in = t;
 		}
 
+		if( in->Coding == IM_CODING_RAD ) {
+			IMAGE *t = im_open_local( out, "conv:1", "p" );
+
+			if( !t || im_rad2float( in, t ) ) {
+				im_close( out );
+				return( NULL );
+			}
+
+			in = t;
+		}
+
                 if( im_open_local_array( out, t, 3, "conv-1", "p" ) ||
                         im_histnorm( in, t[0] ) ||
                         im_histplot( t[0], t[1] ) ) {
@@ -502,7 +513,7 @@ conversion_make_repaint( Conversion *conv, IMAGE *in )
 		return( NULL );
 
 	/* Special case: if this is a IM_CODING_LABQ and the display control 
-	 * bar is turned off we can go straight to RGB for speed.
+	 * bar is turned off, we can go straight to RGB for speed.
 	 */
 	if( in->Coding == IM_CODING_LABQ && !(conv && conv->enabled) ) {
 		IMAGE *t = im_open_local( out, "conv:1", "p" );
@@ -567,6 +578,17 @@ conversion_make_repaint( Conversion *conv, IMAGE *in )
 		IMAGE *t = im_open_local( out, "conv:1", "p" );
 
 		if( !t || im_LabQ2Lab( in, t ) ) {
+			im_close( out );
+			return( NULL );
+		}
+
+		in = t;
+	}
+
+	if( in->Coding == IM_CODING_RAD ) {
+		IMAGE *t = im_open_local( out, "conv:1", "p" );
+
+		if( !t || im_rad2float( in, t ) ) {
 			im_close( out );
 			return( NULL );
 		}

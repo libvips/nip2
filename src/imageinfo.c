@@ -2280,64 +2280,71 @@ imageinfo_from_rgb( Imageinfo *imageinfo, double *rgb )
 	for( i = 0; i < 3; i++ )
 		((PEL *) in->im->data)[i] = IM_RINT( rgb[i] * 255.0 );
 
-	/* To imageinfo->type. Make sure we get a float ... except for LABQ.
+	/* To imageinfo->type. Make sure we get a float ... except for LABQ
+	 * and RAD.
 	 */
-	switch( im->Type ) {
-	case IM_TYPE_XYZ:
-		if( im_disp2XYZ( in->im, out->im, display ) )
+	if( im->Coding == IM_CODING_LABQ ) {
+		if( im_disp2Lab( in->im, t1, display ) ||
+			im_Lab2LabQ( t1, out->im ) )
 			return;
-		break;
-
-	case IM_TYPE_YXY:
+	}
+	else if( im->Coding == IM_CODING_RAD ) {
 		if( im_disp2XYZ( in->im, t1, display ) ||
-			im_XYZ2Yxy( t1, out->im ) )
+			im_float2rad( t1, out->im ) )
 			return;
-		break;
-
-	case IM_TYPE_LAB:
-		if( imageinfo->im->Coding == IM_CODING_LABQ ) {
-			if( im_disp2Lab( in->im, t1, display ) ||
-				im_Lab2LabQ( t1, out->im ) )
+	}
+	else if( im->Coding == IM_CODING_NONE ) {
+		switch( im->Type ) {
+		case IM_TYPE_XYZ:
+			if( im_disp2XYZ( in->im, out->im, display ) )
 				return;
-		}
-		else {
+			break;
+
+		case IM_TYPE_YXY:
+			if( im_disp2XYZ( in->im, t1, display ) ||
+				im_XYZ2Yxy( t1, out->im ) )
+				return;
+			break;
+
+		case IM_TYPE_LAB:
 			if( im_disp2Lab( in->im, out->im, display ) )
 				return;
+			break;
+
+		case IM_TYPE_LCH:
+			if( im_disp2Lab( in->im, t1, display ) ||
+				im_Lab2LCh( t1, out->im ) )
+				return;
+			break;
+
+		case IM_TYPE_UCS:
+			if( im_disp2Lab( in->im, t1, display ) ||
+				im_Lab2LCh( t1, t2 ) ||
+				im_LCh2UCS( t2, out->im ) )
+				return;
+			break;
+
+		case IM_TYPE_RGB16:
+		case IM_TYPE_GREY16:
+			if( im_lintra( 1.0 / 256.0, in->im, 0.0, out->im ) )
+				return;
+			break;
+
+		case IM_TYPE_RGB:
+		case IM_TYPE_sRGB:
+		default:
+			if( im_clip2f( in->im, out->im ) )
+				return;
+			break;
 		}
-		break;
-
-	case IM_TYPE_LCH:
-		if( im_disp2Lab( in->im, t1, display ) ||
-			im_Lab2LCh( t1, out->im ) )
-			return;
-		break;
-
-	case IM_TYPE_UCS:
-		if( im_disp2Lab( in->im, t1, display ) ||
-			im_Lab2LCh( t1, t2 ) ||
-			im_LCh2UCS( t2, out->im ) )
-			return;
-		break;
-
-	case IM_TYPE_RGB16:
-	case IM_TYPE_GREY16:
-		if( im_lintra( 1.0 / 256.0, in->im, 0.0, out->im ) )
-			return;
-		break;
-
-	case IM_TYPE_RGB:
-	case IM_TYPE_sRGB:
-	default:
-		if( im_clip2f( in->im, out->im ) )
-			return;
-		break;
 	}
 
 #define SET( TYPE, i ) ((TYPE *) im->data)[i] = ((float *) out->im->data)[i];
 
 	/* Now ... overwrite imageinfo.
 	 */
-	if( im->Coding == IM_CODING_LABQ ) {
+	if( im->Coding == IM_CODING_LABQ ||
+		im->Coding == IM_CODING_RAD ) {
 		for( i = 0; i < im->Bands; i++ ) 
 			((PEL *) im->data)[i] = ((PEL *) out->im->data)[i];
 	}

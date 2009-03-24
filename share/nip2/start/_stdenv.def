@@ -2060,3 +2060,24 @@ extract_arrow hd vd h arrow
 	// transform that point to im' space
 	p' = rectangular (polar p + (0, a')) + (im'.xoffset, im'.yoffset);
 }
+
+/* You'd think these would go in _convert, but they are not really colour ops,
+ * so put them here.
+ */
+rad2float image
+	= oo_unary_function rad2float_op image, is_class image
+	= im_rad2float image, is_image image
+	= error (_ "bad arguments to " ++ "rad2float")
+{
+	rad2float_op = Operator "rad2float" 
+		rad2float Operator_type.COMPOUND_REWRAP false;
+}
+
+float2rad image
+	= oo_unary_function float2rad_op image, is_class image
+	= im_float2rad image, is_image image
+	= error (_ "bad arguments to " ++ "float2rad")
+{
+	float2rad_op = Operator "float2rad" 
+		float2rad Operator_type.COMPOUND_REWRAP false;
+}

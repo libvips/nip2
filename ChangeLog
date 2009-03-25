@@ -1,3 +1,6 @@
+started 7.18.0
+- bumped version numbers
+
 started 7.17.2
 - added progress.[hc] for a better progress/cancel system (again)
 - splash screen uses new progress system

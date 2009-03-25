@@ -1,28 +1,11 @@
+- check manual for 7.18 stuff
 
-
-
-
-
+WONTFIX for 7.18
+================
 
 - add Set menu to Math with mkset/union/intersection/difference ?
 
   could do bit operations on images?
-
-
-
-
-- try turning on syncronous im_render, then rotating a large image in nip2
-
-  it seems a lot quicker, argh!
-
-  why is the threaded one much slower? perhaps we should sort dirty tiles by 
-  their 'y' poition, then 'x'?
-
-
-
-
-
-
 
 - lcomps like:
 
@@ -37,8 +20,6 @@
 
   what about nested lcomps? make sure they still work
 
-
-
 - if we want full VipsObject introspection we will need a lot more
 
 	vips_object_arguments (name2gtype "VipsInterpolateYafrsmooth")
@@ -49,8 +30,6 @@
   	VipsArgument name type .... = class {}
 
   return a list of these from vips_object_arguments()?
-  
-
 
 - heap_map_dict() should be reduce_map_dict(), since it does reduction, argh
 
@@ -59,10 +38,6 @@
   actually, remove all the reduce_ stuff, it's daft to have a distinction
 
   something to do when we break Snip out into libsnip
-
-
-WONTFIX for 7.16
-================
 
 - Plot window should have image header menu item?
 

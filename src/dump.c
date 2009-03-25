@@ -31,8 +31,8 @@
 
 /* A lot of this file is just for debugging. Uncomment to enable all the
  * debugging code.
- */
 #define DEBUG
+ */
 
 /* Dump a binary operator.
  */

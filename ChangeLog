@@ -1,5 +1,6 @@
 started 7.18.0
 - bumped version numbers
+- added 7.16 compat mode
 
 started 7.17.2
 - added progress.[hc] for a better progress/cancel system (again)

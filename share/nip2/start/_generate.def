@@ -88,11 +88,7 @@ image_white im
 /* Make a seperable gaussian mask.
  */
 matrix_gaussian_blur radius
-        = Matrix_con mask_g_sum 0 [mask_g_line]
-{
-        mask_g_line = (im_gauss_imask_sep (radius / 3) 0.2).value?0;
-        mask_g_sum = sum mask_g_line;
-}
+        = im_gauss_imask_sep (radius / 3) 0.2;
 
 /* Make a seperable square mask.
  */

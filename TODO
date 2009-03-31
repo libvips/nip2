@@ -1,11 +1,3 @@
-- inkwell is broken
-
-- 'd' kb shortcut for the ink dropper is broken?
-
-- selecting a label changes the label alignment ... goes from centre
-  to top-right? if it's the only row in the column, the width changes
-  too
-
 WONTFIX for 7.18
 ================
 

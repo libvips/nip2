@@ -83,10 +83,10 @@ most of the jobs above are pushed down into vips8 now ... except for
 
 /*
 #define DEBUG
-#define DEBUG_RGB
 #define DEBUG_CHECK
 #define DEBUG_MAKE
 #define DEBUG_OPEN
+#define DEBUG_RGB
  */
 
 static iContainerClass *imageinfogroup_parent_class = NULL;
@@ -1880,6 +1880,7 @@ imageinfo_paint_dropper( Imageinfo *imageinfo, Imageinfo *ink, int x, int y )
 		error_vips_all();
 		return( FALSE );
 	}
+	im_invalidate( ink_im );
 
 	dirty.left = 0;
 	dirty.top = 0;

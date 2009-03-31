@@ -1,6 +1,6 @@
 
 # style for parent widgets
-style "parent_style" = "default"
+style "parent_style" 
 {
 	bg[NORMAL] = "#887FA3"
 	bg[PRELIGHT] = "#ADA7C8"
@@ -10,7 +10,7 @@ style "parent_style" = "default"
 }
 
 # style for child widgets
-style "child_style" = "default"
+style "child_style" 
 {
 	bg[NORMAL] = "#7590AE"
 	bg[PRELIGHT] = "#9DB8D2"
@@ -20,7 +20,7 @@ style "child_style" = "default"
 }
 
 # style for selected widgets
-style "selected_style" = "default"
+style "selected_style" 
 {
 	bg[NORMAL] = "#83A67F"
 	bg[PRELIGHT] = "#C5D2C8"
@@ -30,7 +30,7 @@ style "selected_style" = "default"
 }
 
 # style for unselected column headers
-style "column_style" = "default"
+style "column_style" 
 {
 	bg[NORMAL] = "#C5D2C8"
 	bg[PRELIGHT] = "#C5D2C8"
@@ -40,7 +40,7 @@ style "column_style" = "default"
 }
 
 # style for widgets with errors in them
-style "error_style" = "default"
+style "error_style" 
 {
 	bg[NORMAL] = "#C1665A"
 	bg[PRELIGHT] = "#E0B6AF"
@@ -50,7 +50,7 @@ style "error_style" = "default"
 }
 
 # style for dirty widgets (need recalculation)
-style "dirty_style" = "default"
+style "dirty_style" 
 {
 	bg[NORMAL] = "#E0C39E"
 	bg[PRELIGHT] = "#EFE0CD"
@@ -60,7 +60,7 @@ style "dirty_style" = "default"
 }
 
 # style for captions ... eg. the line of text under the image thumbnails
-style "caption_style" = "default"
+style "caption_style" 
 {
 	bg[NORMAL] = "#EED680"
 }

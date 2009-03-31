@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.16.19">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.18.0">
   <Workspace filename="test_matrix.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1920" window_height="1165" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_matrix" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="17" name="B" caption="Colour / Colourspace">
       <Subcolumn vislevel="3">

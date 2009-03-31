@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.16.19">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.18.0">
   <Workspace filename="test_image.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1920" window_height="1165" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_image" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="17" name="B" caption="Colour / Colourspace">
       <Subcolumn vislevel="3">
@@ -240,7 +240,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="4891" y="0" open="true" selected="true" sform="false" next="11" name="CB" caption="Image / Join">
+    <Column x="4924" y="0" open="true" selected="true" sform="false" next="11" name="CB" caption="Image / Join">
       <Subcolumn vislevel="3">
         <Row popup="false" name="CB1">
           <Rhs vislevel="0" flags="4">
@@ -496,7 +496,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="5500" y="0" open="true" selected="false" sform="false" next="5" name="DB" caption="Image / Tile">
+    <Column x="5541" y="0" open="true" selected="false" sform="false" next="5" name="DB" caption="Image / Tile">
       <Subcolumn vislevel="3">
         <Row popup="false" name="DB1">
           <Rhs vislevel="0" flags="4">
@@ -828,6 +828,12 @@
                   <iText/>
                 </Rhs>
               </Row>
+              <Row name="interp">
+                <Rhs vislevel="2" flags="6">
+                  <Subcolumn vislevel="1"/>
+                  <iText/>
+                </Rhs>
+              </Row>
             </Subcolumn>
             <iText formula="Image_transform_item.Rotate_item.Free_item.action FB1"/>
           </Rhs>
@@ -927,8 +933,7 @@
                 </Rhs>
               </Row>
               <Row name="interp">
-                <Rhs vislevel="1" flags="1">
-                  <Option/>
+                <Rhs vislevel="1" flags="4">
                   <Subcolumn vislevel="0"/>
                   <iText/>
                 </Rhs>
@@ -989,8 +994,7 @@
                 </Rhs>
               </Row>
               <Row name="interp">
-                <Rhs vislevel="1" flags="1">
-                  <Option/>
+                <Rhs vislevel="1" flags="4">
                   <Subcolumn vislevel="0"/>
                   <iText/>
                 </Rhs>
@@ -1172,7 +1176,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="6283" y="0" open="true" selected="false" sform="false" next="18" name="GB" caption="Image / Patterns">
+    <Column x="6324" y="0" open="true" selected="false" sform="false" next="18" name="GB" caption="Image / Patterns">
       <Subcolumn vislevel="3">
         <Row popup="false" name="GB1">
           <Rhs vislevel="3" flags="7">
@@ -1295,7 +1299,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="6800" y="0" open="true" selected="false" sform="false" next="8" name="HB" caption="Image / Test">
+    <Column x="6841" y="0" open="true" selected="false" sform="false" next="8" name="HB" caption="Image / Test">
       <Subcolumn vislevel="3">
         <Row popup="false" name="HB1">
           <Rhs vislevel="3" flags="7">
@@ -1348,7 +1352,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3537" y="0" open="true" selected="false" sform="false" next="23" name="A" caption="Image / Band">
+    <Column x="3570" y="0" open="true" selected="false" sform="false" next="23" name="A" caption="Image / Band">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
           <Rhs vislevel="0" flags="4">
@@ -1707,7 +1711,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="4101" y="0" open="true" selected="false" sform="false" next="20" name="D" caption="Image / Select">
+    <Column x="4134" y="0" open="true" selected="false" sform="false" next="20" name="D" caption="Image / Select">
       <Subcolumn vislevel="3">
         <Row popup="false" name="D17">
           <Rhs vislevel="0" flags="4">

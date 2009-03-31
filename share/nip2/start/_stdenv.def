@@ -31,6 +31,7 @@ remainder a b = a % b;
 cons a b = a : b;
 dot a b = a . ( b );
 join a b = a ++ b;
+// 'difference' is defined in _list
 subscript a b = a ? b;
 
 generate s n f = [s, n .. f];

@@ -61,14 +61,14 @@ Colour_convert_item = class
 		action x = conv Image_type.B_W x;
 	}
 
-	GREY16_item = class
-		Menuaction (_ "_GREY16") (_ "convert to GREY16 colourspace") {
-		action x = conv Image_type.GREY16 x;
-	}
-
 	sRGB_item = class
 		Menuaction (_ "_sRGB") (_ "convert to sRGB colourspace") {
 		action x = conv Image_type.sRGB x;
+	}
+
+	GREY16_item = class
+		Menuaction (_ "_GREY16") (_ "convert to GREY16 colourspace") {
+		action x = conv Image_type.GREY16 x;
 	}
 
 	RGB16_item = class

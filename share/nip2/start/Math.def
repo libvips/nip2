@@ -369,6 +369,11 @@ Math_list_item = class
 		action a b = map_binary join a b;
 	}
 
+	Difference_item = class 
+		Menuaction "_Difference" "difference of two lists" {
+		action a b = map_binary difference a b;
+	}
+
 	Cons_item = class 
 		Menuaction "C_ons" "put element a on the front of list x" {
 		action a x = map_binary cons a x;

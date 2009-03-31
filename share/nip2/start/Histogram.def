@@ -74,7 +74,7 @@ Hist_find_item = class
 }
 
 Hist_map_item = class 
-	Menuaction "_Map Histogram" "map an image through a histogram" {
+	Menuaction "_Map" "map an image through a histogram" {
 	action x y
 		= map_binary map x y
 	{
@@ -91,24 +91,24 @@ Hist_eq_item = Filter_enhance_item.Hist_equal_item;
 #separator
 
 Hist_cum_item = class 
-	Menuaction "_Cumulativise Histogram" 
+	Menuaction "_Cumulativise" 
 		"form cumulative histogram" {
 	action x = map_unary hist_cum x;
 }
 
 Hist_diff_item = class 
-	Menuaction "_Differentiate Histogram" 
+	Menuaction "_Differentiate" 
 		"find point-to-point differences (inverse of Cumulativise)" {
 	action x = map_unary hist_diff x;
 }
 
 Hist_norm_item = class 
-	Menuaction "N_ormalise Histogram" "normalise a histogram" {
+	Menuaction "N_ormalise" "normalise a histogram" {
 	action x = map_unary hist_norm x;
 }
 
 Hist_match_item = class 
-	Menuaction "Ma_tch Histogram" 
+	Menuaction "Ma_tch" 
 		"find LUT which will match first histogram to second" {
 	action in ref = map_binary hist_match in ref;
 }

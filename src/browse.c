@@ -189,7 +189,8 @@ button_single_cb( GtkWidget *wid, Browse *browse )
 {
 	Imagedisplay *id = IMAGEDISPLAY( GTK_BIN( wid )->child );
 
-	filesel_set_filename( browse->filesel, IOBJECT( id->conv->ii )->name );
+	filesel_set_filename( browse->filesel, 
+		IOBJECT( id->conv->ii )->name );
 }
 
 /* Double click on a button.
@@ -200,7 +201,8 @@ button_double_cb( GtkWidget *wid, Browse *browse )
 {
 	Imagedisplay *id = IMAGEDISPLAY( GTK_BIN( wid )->child );
 
-	filesel_set_filename( browse->filesel, IOBJECT( id->conv->ii )->name );
+	filesel_set_filename( browse->filesel, 
+		IOBJECT( id->conv->ii )->name );
 	idialog_done_trigger( IDIALOG( browse->filesel ), 0 ); 
 }
 

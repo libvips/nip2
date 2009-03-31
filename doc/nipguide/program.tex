@@ -328,7 +328,7 @@ factorial n = product [1..n]
 \end{verbatim}
 
 \noindent
-See \pref{sec:lists} for an explanation of the list syntax.
+See \pref{sec:listsyntax} for an explanation of the list syntax.
 
 \section{Operators}
 \mylabel{sec:operators}
@@ -349,17 +349,14 @@ differences are:
 	list, \nip{} uses \ct{?}
 
 \item
-	The \ct{:} operator is infix list cons, see \pref{sec:lists}
-
-\item
 	\nip{} adds \ct{@} for function composition, see \pref{sec:func}
 
 \item
-	The \ct{++} operator becomes an infix concatenation operator, again
-	see \pref{sec:lists}
+	The \ct{:} operator is infix list cons, see \pref{sec:lists}
 
 \item
-	\nip{} adds \ct{**} for raise to power
+	The \ct{++} operator becomes an infix concatenation operator, \ct{--}
+	becomes list difference. Again, see \pref{sec:listsyntax}
 
 \end{itemize}
 
@@ -422,16 +419,19 @@ $/$			& 			& Division \\
 \ct{\%}			& 			& Remainder after division \\
 \ct{!}			& Left			& Logical negation \\
 \verb+~+		& 			& One's complement \\
-\ct{++}			& 			& Join (see \pref{sec:lists}) \\
-\ct{--}			& 			& Unary minus \\
+\ct{++}			& 			& Join 
+						  (see \pref{sec:listsyntax}) \\
+\verb+--+		& 			& Difference 
+						  (see \pref{sec:listsyntax}) \\
+\ct{-}			& 			& Unary minus \\
 \ct{+}			& 			& Unary plus \\
 \ct{(}\emph{type}\ct{)}	& 			& Type cast expression \\
 \ct{**}			& Right			& Raise to power \\
 \ct{:}			& 			& List CONS
-						  (see \pref{sec:lists}) \\
+						  (see \pref{sec:listsyntax}) \\
 \emph{space}		& Left			& Function application \\
 \ct{?}			& Left			& List index 
-						  (see \pref{sec:lists}) \\
+						  (see \pref{sec:listsyntax}) \\
 \ct{.}			& Left			& Class project 
 						  (see \pref{sec:class}) \\
 \hline
@@ -660,6 +660,13 @@ end-to-end.
 
 \begin{verbatim}
 [1,2,3] ++ [4,5,6] == [1,2,3,4,5,6]
+\end{verbatim}
+
+You can use the list difference operator (\verb+--+) to remove elements of one 
+list from another.
+
+\begin{verbatim}
+[1..10] -- [4,5,6] == [1,2,3,7,8,9,10]
 \end{verbatim}
 
 \subsection{The function type}

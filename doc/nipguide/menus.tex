@@ -43,6 +43,11 @@ header as a hint on how to transform the numbers in the image into RGB for
 the display. The current \ct{Type} is displayed at the end of the caption
 line below an image thumbnail. 
 
+The \ct{Mono}, \ct{GREY16} and \ct{RGB16} types are not really calibrated
+themselves: they are usually whatever you get by loading an image from a file.
+You'll usually need an extra step, such as applying an embedded ICC profile,
+before you get accurate colour.
+
 \begin{tab2}
 \begin{center}
 \begin{tabular}{||l|l|l||}
@@ -50,9 +55,13 @@ line below an image thumbnail.
 Name & Format & Notes \\
 \hline
 \ct{Mono} & One band 8 bit & 
-	Not really calibrated at all \\
+	Not calibrated \\
 \ct{sRGB} & Three band 8 bit & 
 	Screen device space for the sRGB standard \\
+\ct{GREY16} & One band 16 bit & 
+	Not calibrated \\
+\ct{RGB16} & Three band 16 bit & 
+	Not calibrated \\
 \ct{Lab} & Three band float & 
 	The 1976 version of the CIE perceptual colourspace \\
 \ct{LabQ} & Four band 8 bit & 
@@ -116,6 +125,14 @@ Name & Format & Notes \\
 	All printers also work with relative colorimetry, and \nip{} is
 	generally absolute. Use \ct{Absolute to Relative} to scale an absolute
 	colorimetric image by a media white point.
+
+\item[\ct{Radiance}]
+	\nip{} can read and write images written by the Radiance family
+	of programs (usually with the suffix \ct{.hdr}), commonly used in
+	HDR photrography.
+
+	Images in this format used a packed floating point layout for their
+	pixels. Items in this menu pack and unpack pixels for you.
 
 \item[\ct{Difference}]
 	Calculate various colour difference metrics. You can mix patches of
@@ -207,6 +224,10 @@ photoshop sense.
 	calculate the correlation at each position. \ct{Simple Difference} is
 	the much faster unnormalised version.
 
+\item[\ct{GREYCstoration}]
+	VIPS includes a copy of the CImg library and you can use two useful
+	CImg operations from this menu: denoising and enlarging.
+
 \item[\ct{Tilt Brightness}]
 	A selection of tools for adjusting the brightness of an image across
 	it's surface. Useful for correcting lighting problems.
@@ -235,38 +256,7 @@ photoshop sense.
 	Look at either the bits or the bands of an image.
 
 \item[\ct{Photographic Negative} and friends]
-	A small selection of faintly photoshop-style filters. 
-
-\end{description}
-
-\section{Format}
-\mylabel{sec:menu-format}
-
-This groups a few items which had no obvious home and which change the format
-of objects.
-
-\begin{description}
-
-\item[\ct{Duplicate}]
-	Copy an object, stripping off any derived classes. For images, this
-	really takes a copy of the underlying object (using \ct{im\_copy()}).
-
-\item[\ct{List to Group}]
-	Changes lists (see \ctr{Math}\ct{List}) into Groups (see
-	\ctr{Edit}\ct{Group}) and back. A list os an ordered collection of
-	objects. A group is a list that \nip{} will automatically iterate
-	over.
-
-\item[\ct{Break Up Object}]
-	This tries to take an object apart. So a multi-band image becomes a
-	list of 1-band images. A matrix becomes a list of vectors, and so on.
-
-\item[\ct{CSV Import}]
-	Import an image from a CSV file, with a few controls.
-
-\item[\ct{Interpret Analyze 7 Header}]
-	Read the meta fields for volume layout and calibration from the
-	Analyze header and reformat the image appropriately.
+	A small selection of simple, faintly photoshop-style filters. 
 
 \end{description}
 
@@ -281,38 +271,41 @@ images.
 
 \begin{description}
 
-\item[\ct{New Histogram}]
+\item[\ct{New}]
 	This makes a new ramp histogram. A set of sliders let you adjust the
 	shape. Use \ct{Map Histogram} to apply your ramp to an image.
 
-\item[\ct{Build LUT from Scatter}]
-	Make a histogram from a set of $(x, y)$ values. 
+	\ct{Build LUT from Scatter} makes a histogram from a matrix of 
+	$(x, y)$ values. 
 
-\item[\ct{Tag Image as Histogram}]
-	Mark an image as actually being a histogram after all.
+	\ct{Tag Image as Histogram} marks an image as actually being a 
+	histogram after all.
 
-\item[\ct{Find Histogram}]
+	\ct{Tone Curve} builds a tone curve which you can later apply to an
+	image.
+
+\item[\ct{Find}]
 	A one dimensional histogram treats each band as an independent
 	variable. An $n$-dimensional histogram treats each pixel as a vector of
 	$n$ elements, where $n$ is the number of bands in the image.
 
-\item[\ct{Map Histogram}]
-	Looks up each pixel in the input in the histogram and send the found
+\item[\ct{Map}]
+	Looks up each pixel in the input in the histogram and sends the found
 	value to the output.
 
-\item[\ct{Equalise Histogram}]
+\item[\ct{Equalise}]
 	Find the global or locally histogram equalised image.
 
-\item[\ct{Cumulative Histogram}]
-	Use this and friends to calculate a cumulative histogram, normalise a
-	histogram and match two histograms.
+\item[\ct{Cumulative}]
+	Use this and friends to calculate a cumulative histogram (integrate), 
+	normalise a histogram and match two histograms. 
 
 \item[\ct{Find Profile}]
 	Searches from the edges of an image for the first non-zero pixel and
 	returns a profile histogram. 
 
 \item[\ct{Find Projections}]
-	Sum columns and rows.
+	Sum columns and rows in an image.
 
 \item[\ct{Plot Slice}]
 	Mark a guide on an image (drag from the
@@ -339,14 +332,15 @@ This menu groups operations which apply only to images.
 \item[\ct{Convert to Image}]
 	Try to make an image out of anything.
 
+\item[\ct{Format}]
+	Switch between the various precisions.
+
 \item[\ct{Header}]
 	Try to change or examine the image header in various ways.
 
-\item[\ct{Set Format}]
-	Switch between the various precisions.
-
-\item[\ct{Levels}]
-	A variety of things for adjusting the values of pixels globally.
+\item[\ct{Cache}]
+	This caches an image in RAM. Use this to save the results of a long
+	computation.
 
 \item[\ct{Levels}]
 	Various tools that change the levels in an image. \ct{Tone Curve} is
@@ -394,9 +388,9 @@ This menu groups operations which apply only to images.
 	areas.
 
 \item[\ct{Join}]
-	Use to join two images together bandswise, left/right or up/down. 
-	\ct{Array}
-	joins a list of lists of images together into a single large image.
+	Use to join two images together bandwise, left/right or up/down.
+	\ct{Array} joins a list of lists of images together into a single
+	large image.
 
 \item[\ct{Tile}]
 	Repeat an image horizontally and vertically to make a larger image, or
@@ -468,6 +462,31 @@ matrix operations will also work on images.
 
 \end{description}
 
+\section{Object}
+\mylabel{sec:menu-object}
+
+This groups a few items which had no obvious home and which change the format
+of objects.
+
+\begin{description}
+
+\item[\ct{Duplicate}]
+	Copy an object, stripping off any derived classes. For images, this
+	really takes a copy of the underlying object (using \ct{im\_copy()}).
+
+\item[\ct{List to Group}]
+	Changes lists (see \ctr{Math}\ct{List}) into Groups (see
+	\ctr{Edit}\ct{Group}) and back. A list os an ordered collection of
+	objects. A group is a list that \nip{} will automatically iterate
+	over.
+
+\item[\ct{Break Up Object}]
+	This tries to take an object apart. So a multi-band image becomes a
+	list of 1-band images. A matrix becomes a list of vectors, and so on.
+	\ct{Assemble Object} is the inverse.
+
+\end{description}
+
 \section{Tasks}
 \mylabel{sec:menu-tasks}
 
@@ -482,6 +501,13 @@ initial processing you might want to do to an image captured from another
 program.
 
 \begin{description}
+
+\item[\ct{CSV Import}]
+	Import an image from a CSV file, with a few controls.
+
+\item[\ct{Interpret Analyze 7 Header}]
+	Read the meta fields for volume layout and calibration from the
+	Analyze header and reformat the image appropriately.
 
 \item[\ct{Capture Video Frame}]
 	This menu item will currently only work on Linux machines with a

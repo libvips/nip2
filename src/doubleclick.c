@@ -189,13 +189,10 @@ doubleclick_destroy_cb( GtkWidget *wid, Doubleclick *click )
 #endif /*DEBUG*/
 
 	if( click->click ) {
-		/* There is a timeout pending - ie. there was a click
-		 * recently. Trigger a single click on our way out.
+		/* Don't trigger a single-click, even though there was one
+		 * recently, since our widget is being destroyed.
 		 */
 		FREEFI( g_source_remove, click->click );
-		if( click->single )
-			click->single( click->wid, click->clients, 
-				click->state );
 	}
 
 	doubleclick_free( click );

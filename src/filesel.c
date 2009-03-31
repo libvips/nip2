@@ -729,13 +729,6 @@ filesel_set_filename( Filesel *filesel, const char *name )
 			GTK_FILE_CHOOSER( filesel->chooser ), 
 			im_skip_dir( buf ) );
 
-	/* The file isn't actually selected until we hit the main loop again.
-	 * If we don't loop here, the next gtk_file_chooser_get_filename()
-	 * will fail.
-	 */
-	while( g_main_context_iteration( NULL, FALSE ) )
-		;
-
 	filesel->start_name = TRUE;
 
 	/* We have to set this after setting the filename.

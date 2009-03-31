@@ -1124,7 +1124,8 @@ Interpolate_type = class {
 		_ "Bilinear",
 		_ "Bicubic",
 		_ "Bicubic plus edge enhance (yafr-smooth)",
-		_ "Bilinear plus edge enhance (nohalo-sharp-1)"
+		_ "Bilinear plus edge enhance (nohalo-sharp-1)",
+		_ "Bilinear minus edge enhance (nohalo-smooth-1)"
 	];
 
 	/* And to vips type names.
@@ -1134,7 +1135,8 @@ Interpolate_type = class {
 		"VipsInterpolateBilinear",
 		"VipsInterpolateBicubic",
 		"VipsInterpolateYafrsmooth",
-		"VipsInterpolateNohalo"
+		"VipsInterpolateNohalo1",
+		"VipsInterpolateSnohalo1"
 	];
 }
 
@@ -1145,11 +1147,12 @@ Interpolate type options = class {
 Interpolate_bilinear = Interpolate Interpolate_type.BILINEAR [];
 
 Interpolate_picker default = class 
-	Interpolate interp.value [$sharpening => sharp.value] {
+	Interpolate interp.value [$sharpening => sharp.value, $blur => blur.value] {
 	_vislevel = 2;
 
 	interp = Option "Interpolation" Interpolate_type.descriptions default;
-	sharp = Scale "Sharpening" 0 4 1;
+	sharp = Scale "Yafrsmooth sharpening" 0 4 1;
+	blur = Scale "Snohalo1 blur" 0 4 1;
 }
 
 Render_intent = class {

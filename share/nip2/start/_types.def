@@ -1152,7 +1152,7 @@ Interpolate_picker default = class
 
 	interp = Option "Interpolation" Interpolate_type.descriptions default;
 	sharp = Scale "Yafrsmooth sharpening" 0 4 1;
-	blur = Scale "Snohalo1 blur" 0 4 1;
+	blur = Scale "Snohalo1 blur" 0 1 1;
 }
 
 Render_intent = class {

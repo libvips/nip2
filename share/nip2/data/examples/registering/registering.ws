@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.16.4">
-  <Workspace filename="registering.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1353" window_height="722" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="registering" caption="Default empty workspace">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.18.0">
+  <Workspace filename="registering/registering.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1353" window_height="722" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="registering" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="5" name="A" caption="Original Images">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
@@ -33,7 +33,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="448" y="0" open="true" selected="false" sform="false" next="4" name="B" caption="Images different size">
+    <Column x="460" y="0" open="true" selected="false" sform="false" next="4" name="B" caption="Images different size">
       <Subcolumn vislevel="3">
         <Row popup="false" name="B1">
           <Rhs vislevel="3" flags="7">
@@ -112,7 +112,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="448" y="354" open="true" selected="false" sform="false" next="2" name="C" caption="Correcting for slight rotation">
+    <Column x="460" y="357" open="true" selected="false" sform="false" next="2" name="C" caption="Correcting for slight rotation">
       <Subcolumn vislevel="3">
         <Row popup="false" name="C1">
           <Rhs vislevel="3" flags="7">
@@ -191,7 +191,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="448" y="708" open="true" selected="false" sform="false" next="2" name="D" caption="Correcting for perspective distortion">
+    <Column x="460" y="714" open="true" selected="false" sform="false" next="2" name="D" caption="Correcting for perspective distortion">
       <Subcolumn vislevel="3">
         <Row popup="false" name="D1">
           <Rhs vislevel="3" flags="7">
@@ -292,7 +292,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="955" y="0" open="true" selected="true" sform="false" next="4" name="E" caption="Comparisons after corrections">
+    <Column x="977" y="0" open="true" selected="true" sform="false" next="4" name="E" caption="Comparisons after corrections">
       <Subcolumn vislevel="3">
         <Row popup="false" name="E1">
           <Rhs vislevel="3" flags="7">
@@ -317,7 +317,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="374" open="true" selected="false" sform="false" next="4" name="H" caption="Comparisons before corrections">
+    <Column x="0" y="378" open="true" selected="false" sform="false" next="4" name="H" caption="Comparisons before corrections">
       <Subcolumn vislevel="3">
         <Row popup="false" name="H1">
           <Rhs vislevel="3" flags="7">

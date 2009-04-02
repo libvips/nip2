@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.16.4">
-  <Workspace filename="framing.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="970" window_height="633" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="framing" caption="Default empty workspace">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.18.0">
+  <Workspace filename="framing/framing.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="970" window_height="633" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="framing" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="5" name="A" caption="untitled">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
@@ -33,7 +33,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="374" open="true" selected="false" sform="false" next="2" name="B" caption="Staighten Frame">
+    <Column x="0" y="378" open="true" selected="false" sform="false" next="2" name="B" caption="Staighten Frame">
       <Subcolumn vislevel="3">
         <Row popup="false" name="B1">
           <Rhs vislevel="3" flags="7">
@@ -100,7 +100,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="441" y="0" open="true" selected="false" sform="false" next="2" name="C" caption="Painting with Simple Frame">
+    <Column x="510" y="0" open="true" selected="false" sform="false" next="2" name="C" caption="Painting with Simple Frame">
       <Subcolumn vislevel="3">
         <Row popup="false" name="C1">
           <Rhs vislevel="3" flags="7">
@@ -179,7 +179,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="441" y="375" open="true" selected="false" sform="false" next="2" name="D" caption="Painting with Complex Frame, with adjusted variables">
+    <Column x="510" y="387" open="true" selected="false" sform="false" next="2" name="D" caption="Painting with Complex Frame, with adjusted variables">
       <Subcolumn vislevel="3">
         <Row popup="false" name="D1">
           <Rhs vislevel="3" flags="7">
@@ -306,7 +306,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1118" y="0" open="true" selected="true" sform="false" next="2" name="E" caption="Painting with frame corner, and coloured mount">
+    <Column x="1199" y="0" open="true" selected="true" sform="false" next="2" name="E" caption="Painting with frame corner, and coloured mount">
       <Subcolumn vislevel="3">
         <Row popup="false" name="E1">
           <Rhs vislevel="3" flags="7">

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.16.0">
-  <Workspace filename="logo2.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1020" window_height="735" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="logo2" caption="Default empty workspace">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.18.0">
+  <Workspace filename="logo/logo2.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1020" window_height="735" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="logo2" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="12" name="A" caption="render text">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
@@ -485,7 +485,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1013" y="0" open="true" selected="false" sform="false" next="27" name="C" caption="make shadow">
+    <Column x="1060" y="0" open="true" selected="false" sform="false" next="27" name="C" caption="make shadow">
       <Subcolumn vislevel="3">
         <Row popup="false" name="C7">
           <Rhs vislevel="0" flags="4">
@@ -880,8 +880,7 @@
                 </Rhs>
               </Row>
               <Row name="interp">
-                <Rhs vislevel="1" flags="1">
-                  <Option/>
+                <Rhs vislevel="1" flags="4">
                   <Subcolumn vislevel="0"/>
                   <iText/>
                 </Rhs>
@@ -995,7 +994,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1687" y="0" open="true" selected="false" sform="false" next="19" name="D" caption="position and blend layers">
+    <Column x="1734" y="0" open="true" selected="false" sform="false" next="19" name="D" caption="position and blend layers">
       <Subcolumn vislevel="3">
         <Row popup="false" name="D10">
           <Rhs vislevel="0" flags="4">

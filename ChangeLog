@@ -5,6 +5,7 @@ started 7.18.0
 - added snohalo1 wrapper
 - dropper did not update inkwell picture
 - better button colour changes
+- fix examples
 
 started 7.17.2
 - added progress.[hc] for a better progress/cancel system (again)

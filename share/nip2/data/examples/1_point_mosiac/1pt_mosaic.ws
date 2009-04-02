@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.16.0">
-  <Workspace filename="1pt_mosaic.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1046" window_height="748" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="pt_mosaic" caption="">
-    <Column x="0" y="0" open="true" selected="false" sform="false" next="9" name="A" caption="untitled">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.18.0">
+  <Workspace filename="1_point_mosiac/1pt_mosaic.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1046" window_height="748" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="pt_mosaic" caption="">
+    <Column x="0" y="0" open="true" selected="false" sform="false" next="9" name="A" caption="source images">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
           <Rhs vislevel="1" flags="1">
@@ -61,7 +61,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="389" y="0" open="true" selected="false" sform="false" next="23" name="B" caption="">
+    <Column x="390" y="0" open="true" selected="true" sform="false" next="23" name="B" caption="assemble tiles, fix brick walling">
       <Subcolumn vislevel="3">
         <Row popup="false" name="B1">
           <Rhs vislevel="1" flags="1">
@@ -247,7 +247,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1019" y="0" open="true" selected="true" sform="false" next="6" name="C" caption="">
+    <Column x="1021" y="0" open="true" selected="false" sform="false" next="7" name="C" caption="correct lighting, sharpen">
       <Subcolumn vislevel="3">
         <Row popup="false" name="C1">
           <Rhs vislevel="0" flags="4">
@@ -312,7 +312,7 @@
         </Row>
         <Row popup="false" name="C4">
           <Rhs vislevel="3" flags="7">
-            <iImage window_x="114" window_y="6" window_width="1086" window_height="1100" image_left="263" image_top="260" image_mag="2" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
+            <iImage window_x="878" window_y="105" window_width="689" window_height="732" image_left="328" image_top="337" image_mag="1" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="1">
               <Row name="x">
                 <Rhs vislevel="3" flags="4">

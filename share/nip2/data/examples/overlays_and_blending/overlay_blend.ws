@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.16.3">
-  <Workspace filename="overlay_blend.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1115" window_height="806" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="overlay_blend" caption="Default empty workspace">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.18.0">
+  <Workspace filename="overlays_and_blending/overlay_blend.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1115" window_height="806" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="overlay_blend" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="5" name="A" caption="Images">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
@@ -26,7 +26,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="414" y="0" open="true" selected="false" sform="false" next="5" name="B" caption="Complete Transparency">
+    <Column x="478" y="0" open="true" selected="false" sform="false" next="5" name="B" caption="Complete Transparency">
       <Subcolumn vislevel="3">
         <Row popup="false" name="B1">
           <Rhs vislevel="3" flags="7">
@@ -37,7 +37,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="414" y="204" open="true" selected="true" sform="false" next="3" name="C" caption="Blending Between two, then three Images">
+    <Column x="478" y="207" open="true" selected="true" sform="false" next="3" name="C" caption="Blending Between two, then three Images">
       <Subcolumn vislevel="3">
         <Row popup="false" name="C1">
           <Rhs vislevel="3" flags="7">
@@ -133,7 +133,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="861" y="0" open="true" selected="false" sform="false" next="2" name="D" caption="Overlay">
+    <Column x="937" y="0" open="true" selected="false" sform="false" next="2" name="D" caption="Overlay">
       <Subcolumn vislevel="3">
         <Row popup="false" name="D1">
           <Rhs vislevel="3" flags="7">

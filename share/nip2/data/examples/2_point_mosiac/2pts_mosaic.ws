@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.16.0">
-  <Workspace filename="2pts_mosaic.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="793" window_height="671" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="pts_mosaic" caption="">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.18.0">
+  <Workspace filename="2_point_mosiac/2pts_mosaic.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="793" window_height="671" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="pts_mosaic" caption="">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="7" name="A" caption="untitled">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
@@ -47,7 +47,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="448" y="0" open="true" selected="false" sform="false" next="27" name="B" caption="">
+    <Column x="447" y="0" open="true" selected="false" sform="false" next="27" name="B" caption="">
       <Subcolumn vislevel="3">
         <Row popup="false" name="B1">
           <Rhs vislevel="1" flags="1">
@@ -266,7 +266,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="899" y="4" open="true" selected="true" sform="false" next="3" name="C" caption="untitled">
+    <Column x="879" y="0" open="true" selected="true" sform="false" next="3" name="C" caption="untitled">
       <Subcolumn vislevel="3">
         <Row popup="false" name="C1">
           <Rhs vislevel="0" flags="4">

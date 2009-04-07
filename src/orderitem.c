@@ -38,11 +38,11 @@
 #endif /*HAVE_UNISTD_H*/
 #include <string.h>
 
+#include <gtk/gtk.h>
+
 #include <vips/vips.h>
 #include <vips/util.h>
 
-#include <gtk/gtk.h>
-#include <gdk/gdkkeysyms.h>
 #include "orderitem.h"
 
 /* Debug msg.

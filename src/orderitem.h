@@ -30,9 +30,6 @@
 #ifndef ORDERITEM_H
 #define ORDERITEM_H
 
-#include <gdk/gdk.h>
-#include <gtk/gtkwindow.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */

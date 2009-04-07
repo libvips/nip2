@@ -1,3 +1,18 @@
+- gtk3.0 tests:
+
+	build with
+
+	#define G_DISABLE_DEPRECATED
+	#define G_DISABLE_SINGLE_INCLUDES
+	#define GDK_DISABLE_DEPRECATED 
+	#define GTK_DISABLE_DEPRECATED
+	#define GDK_DISABLE_SINGLE_INCLUDES 
+	#define GTK_DISABLE_SINGLE_INCLUDES
+
+	paste into config.h, somehow
+
+  orderitem fails because GtkList is deprecated
+
 WONTFIX for 7.18
 ================
 

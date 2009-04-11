@@ -233,10 +233,6 @@ nip2_SOURCES = \
 	option.h \
 	optionview.c \
 	optionview.h \
-	orderitem.c \
-	orderitem.h \
-	orderlist.c \
-	orderlist.h \
 	formula.c \
 	formula.h \
 	paintboxview.c \

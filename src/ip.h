@@ -144,8 +144,6 @@ extern int statfs();
 /* Our general widgets.
  */
 #include "formula.h"
-#include "orderitem.h"
-#include "orderlist.h"
 #include "doubleclick.h"
 
 /* Generated marshallers.

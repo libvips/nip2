@@ -77,7 +77,7 @@ void formula_set_sensitive( Formula *formula, gboolean sensitive );
 void formula_set_needs_focus( Formula *formula, gboolean needs_focus );
 gboolean formula_scan( Formula *formula );
 
-GtkType formula_get_type( void );
+GType formula_get_type( void );
 Formula *formula_new( void );
 
 void formula_set_caption( Formula *formula, const char *caption );

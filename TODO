@@ -11,7 +11,20 @@
 
 	paste into config.h, somehow
 
-  orderitem fails because GtkList is deprecated
+  need to remove:
+
+	GtkType
+	gtk_type_new
+	gtk_signal_connect
+	GTK_SIGNAL_FUNC
+	gtk_signal_handler_block_by_data
+`	gtk_signal_connect_object
+	GTK_CHECK_CAST
+	GTK_CHECK_TYPE
+	GtkSignalFunc
+
+  argh, in gtkplot as well! maybe this is a good time to move to another 
+  graph lib?
 
 WONTFIX for 7.18
 ================

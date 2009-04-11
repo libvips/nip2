@@ -1,4 +1,5 @@
 started 7.19.0
+- remove deprecated use of GtkList in option edit ... needs replacing
 
 started 7.18.0
 - bumped version numbers

@@ -1,3 +1,16 @@
+- have an idialog option to put the default action at the start of the button
+  list
+
+  so on win32, the quit dialog should be
+  
+  	save/dont'tsave/cancel 
+
+  and on gnome it should be
+
+  	don'tsave/cancel/save
+
+  see http://img145.imageshack.us/img145/7758/notepad.png
+
 - gtk3.0 tests:
 
 	build with

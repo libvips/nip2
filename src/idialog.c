@@ -331,6 +331,18 @@ idialog_build_ok( const char *txt, iDialog *idlg )
 	return( NULL );
 }
 
+static void *
+idialog_build_cancel( iDialog *idlg )
+{
+	idlg->but_cancel = build_button( idlg->cancel_text,
+		GTK_SIGNAL_FUNC( idialog_cancel_cb ), idlg );
+	gtk_box_pack_start( GTK_BOX( idlg->bb ),
+		idlg->but_cancel, TRUE, TRUE, 0 );
+	gtk_widget_show( idlg->but_cancel );
+
+	return( NULL );
+}
+
 /* Set a button to be the dialog default. Turn off button_focus for complex
  * dialogs like file_chooser which have their on focus systems.
  */
@@ -400,9 +412,13 @@ idialog_build( GtkWidget *widget )
         gtk_box_pack_end( GTK_BOX( idlg->hb ), idlg->bb, FALSE, FALSE, 0 );
         gtk_widget_show( idlg->bb );
 
-	/* Button order: 
+	/* Default button order: 
 	 *
 	 * Help        OK3 OK2 Cancel OK1
+	 *
+	 * win32 button order:
+	 *
+	 * Help        OK1 OK3 OK2 Cancel 
 	 */
 
         if( idlg->help_tag ) {
@@ -415,6 +431,34 @@ idialog_build( GtkWidget *widget )
                 gtk_widget_show( idlg->but_help );
         }
 
+#ifdef OS_WIN32
+
+	/* Make OK1
+	 */
+	if( idlg->ok_txt_l ) {
+		const char *ok1_txt = (const char *) (idlg->ok_txt_l->data);
+
+		idialog_build_ok( ok1_txt, idlg );
+	}
+
+	/* Add OK2, 3, etc., but backwards.
+	 */
+	if( idlg->ok_txt_l && idlg->ok_txt_l->next )
+		slist_map_rev( idlg->ok_txt_l->next,
+			(SListMapFn) idialog_build_ok, idlg );
+
+        if( idlg->cancel_cb ) {
+		idialog_build_cancel( idlg );
+
+		/* Cancel grabs default if it's the only button. Set focus
+		 * too; user build can change this later.
+		 */
+                if( !idlg->ok_l ) 
+			idialog_set_default( idlg, idlg->but_cancel );
+	}
+
+#else /*!OS_WIN32*/
+
 	/* Add OK2, 3, etc.
 	 */
 	if( idlg->ok_txt_l && idlg->ok_txt_l->next )
@@ -422,11 +466,7 @@ idialog_build( GtkWidget *widget )
 			(SListMapFn) idialog_build_ok, idlg );
 
         if( idlg->cancel_cb ) {
-                idlg->but_cancel = build_button( idlg->cancel_text,
-			GTK_SIGNAL_FUNC( idialog_cancel_cb ), idlg );
-                gtk_box_pack_start( GTK_BOX( idlg->bb ),
-                        idlg->but_cancel, TRUE, TRUE, 0 );
-                gtk_widget_show( idlg->but_cancel );
+		idialog_build_cancel( idlg );
 
 		/* Cancel grabs default if it's the only button. Set focus
 		 * too; user build can change this later.
@@ -442,6 +482,8 @@ idialog_build( GtkWidget *widget )
 
 		idialog_build_ok( ok1_txt, idlg );
 	}
+
+#endif /*lots*/
 
 	/* OK1 grabs the default.
 	 */

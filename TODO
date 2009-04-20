@@ -1,3 +1,6 @@
+- why does Filter / Blend / Alpha not give the same result if the args are
+  swapped?
+
 - have an idialog option to put the default action at the start of the button
   list
 

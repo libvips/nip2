@@ -128,6 +128,27 @@ extern int statfs();
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 
+#ifdef HAVE_LIBGOFFICE
+#include <goffice/goffice.h>
+
+#include <goffice/app/go-plugin.h>
+#include <goffice/app/go-plugin-loader-module.h>
+
+#include <goffice/data/go-data-simple.h>
+
+#include <goffice/graph/gog-data-set.h>
+#include <goffice/graph/gog-label.h>
+#include <goffice/graph/gog-object.h>
+#include <goffice/graph/gog-plot.h>
+#include <goffice/graph/gog-series.h>
+#include <goffice/graph/gog-style.h>
+
+#include <goffice/gtk/go-graph-widget.h>
+
+#include <goffice/utils/go-color.h>
+#include <goffice/utils/go-marker.h>
+#endif /*HAVE_LIBGOFFICE*/
+
 #include <vips/vips.h>
 
 #include <libxml/tree.h>
@@ -419,7 +440,9 @@ typedef void *(*tool_map_fn)( Tool *, void *, void * );
 #include "matrix.h"
 #include "matrixview.h"
 #include "plot.h"
+#ifdef HAVE_LIBGOFFICE
 #include "plotview.h"
+#endif /*HAVE_LIBGOFFICE*/
 #include "plotmodel.h"
 #include "plotpresent.h"
 #include "plotwindow.h"

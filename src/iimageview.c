@@ -130,7 +130,8 @@ iimageview_drag_data_get( GtkWidget *widget, GdkDragContext *context,
 			row, &buf );
 		gtk_selection_data_set( selection_data,
 			gdk_atom_intern( "text/symbol", FALSE ), 8, 
-			(guchar *) vips_buf_all( &buf ), strlen( vips_buf_all( &buf ) ) );
+			(guchar *) vips_buf_all( &buf ), 
+			strlen( vips_buf_all( &buf ) ) );
 	}
 }
 

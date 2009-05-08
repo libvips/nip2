@@ -34,15 +34,34 @@
 
 #include "ip.h"
 
-/* We have gtkplot patched into the nip sources as a temp measure, so call 
- * directly.
+#ifdef HAVE_LIBGOFFICE
+
+/* Choose line colours with this. RGB first, then mostly random.
  */
-#define HAVE_GTK_EXTRA
-#include "gtkplot.h"
-#include "gtkplotcanvas.h"
-#include "gtkplotcanvasplot.h"
-#include "gtkplotdata.h"
-#include "gtkplotbar.h"
+#define RGB(R, G, B) RGB_TO_RGBA( RGB_TO_UINT( R, G, B ), 0xff )
+static GOColor default_colour[] = {
+	RGB( 255, 0, 0 ),
+	RGB( 0, 255, 0 ),
+	RGB( 0, 0, 255 ),
+	RGB( 100, 0, 102 ),
+	RGB( 17, 0, 102 ),
+	RGB( 0, 0, 180 ),
+	RGB( 0, 53, 255 ),
+	RGB( 0, 104, 234 ),
+	RGB( 0, 150, 188 ),
+	RGB( 0, 205, 170 ),
+	RGB( 0, 255, 139 ),
+	RGB( 0, 255, 55 ),
+	RGB( 40, 255, 40 ),
+	RGB( 106, 255, 74 ),
+	RGB( 155, 255, 48 ),
+	RGB( 209, 255, 21 ),
+	RGB( 239, 255, 7 ),
+	RGB( 255, 176, 0 ),
+	RGB( 255, 110, 0 ),
+	RGB( 255, 50, 0 ),
+	RGB( 196, 0, 0 )
+};
 
 static GraphicviewClass *parent_class = NULL;
 
@@ -64,105 +83,15 @@ plotview_destroy( GtkObject *object )
 }
 
 static void
-plotview_size_allocate( GtkWidget *widget, GtkAllocation *allocation )
-{
-	Plotview *plotview = PLOTVIEW( widget );
-
-#ifdef DEBUG_GEO
-	printf( "plotview_size_allocate: %d x %d:\n", 
-		allocation->width, allocation->height );
-#endif /*DEBUG_GEO*/
-
-	/* Has the size changed? Queue a refresh ... on idle, we will rebuild 
-	 * our canvas for the new width.
-	 */
-	if( allocation->width != plotview->width ) 
-		vobject_refresh_queue( VOBJECT( plotview ) );
-
-	GTK_WIDGET_CLASS( parent_class )->size_allocate( widget, allocation );
-}
-
-static void
-plotview_build_plot( Plotview *plotview, int width, int height )
-{
-    	Plot *plot = PLOT( VOBJECT( plotview )->iobject );
-	GtkPlotAxis *axis;
-	GtkPlotCanvasChild *child;
-	double x1, y1, x2, y2;
-
-#ifdef DEBUG
-	printf( "plotview_refresh: building canvas: was %d, now %d\n",
-		plotview->width, width );
-#endif /*DEBUG*/
-
-	/* Destroying the canvas destroys the plot and the data.
-	 */
-	IM_FREEF( gtk_widget_destroy, plotview->canvas );
-	plotview->plot = NULL;
-	plotview->data = NULL;
-
-	plotview->canvas = gtk_plot_canvas_new( width, height, 1.0 );
-
-        gtk_box_pack_start( GTK_BOX( plotview->box ), 
-		plotview->canvas, FALSE, FALSE, 0 );
-
-	plotview->plot = gtk_plot_new_with_size( NULL, 1, 1 );
-	gtk_widget_show( plotview->plot );
-
-	/* Turn off (almost) everything ... this is just a thumbnail.
-	 */
-
-	/* gtkplot mallocs memory for every tick (!!) even if ticks
-	 * are off (!!!!) make sure it doesn't.
-	 */
-	gtk_plot_set_ticks( GTK_PLOT( plotview->plot ), 
-		GTK_PLOT_AXIS_X, plot->xmax - plot->xmin, 0 );
-	gtk_plot_set_ticks( GTK_PLOT( plotview->plot ), 
-		GTK_PLOT_AXIS_Y, plot->ymax - plot->ymin, 0 );
-
-	gtk_plot_hide_legends( GTK_PLOT( plotview->plot ) );
-
-	axis = gtk_plot_get_axis( GTK_PLOT( plotview->plot ),
-		GTK_PLOT_AXIS_RIGHT );
-	gtk_plot_axis_set_visible( axis, FALSE );
-
-	axis = gtk_plot_get_axis( GTK_PLOT( plotview->plot ),
-		GTK_PLOT_AXIS_TOP );
-	gtk_plot_axis_set_visible( axis, FALSE );
-
-	axis = gtk_plot_get_axis( GTK_PLOT( plotview->plot ),
-		GTK_PLOT_AXIS_LEFT );
-	gtk_plot_axis_hide_title( axis );
-	gtk_plot_axis_show_labels( axis, GTK_PLOT_LABEL_NONE );
-	gtk_plot_axis_show_ticks( axis, 
-		GTK_PLOT_TICKS_NONE, GTK_PLOT_TICKS_NONE );
-
-	axis = gtk_plot_get_axis( GTK_PLOT( plotview->plot ),
-		GTK_PLOT_AXIS_BOTTOM );
-	gtk_plot_axis_hide_title( axis );
-	gtk_plot_axis_show_labels( axis, GTK_PLOT_LABEL_NONE );
-	gtk_plot_axis_show_ticks( axis, 
-		GTK_PLOT_TICKS_NONE, GTK_PLOT_TICKS_NONE );
-
-	/* Position the plot: we want the position to be a certain number of
-	 * pixels, so we must scale by width.
-	 */
-	x1 = 3.0 / width;
-	y1 = 3.0 / height;
-	x2 = (width - 3.0) / width;
-	y2 = (height - 3.0)/ height;
-
-	child = gtk_plot_canvas_plot_new( GTK_PLOT( plotview->plot ) );
-	gtk_plot_canvas_put_child( GTK_PLOT_CANVAS( plotview->canvas ), 
-		child, x1, y1, x2, y2 );
-}
-
-static void
 plotview_refresh( vObject *vobject )
 {
     	Plotview *plotview = PLOTVIEW( vobject );
     	Plot *plot = PLOT( VOBJECT( plotview )->iobject );
-	GtkAllocation *allocation = &GTK_WIDGET( plotview )->allocation;
+
+	GSList *axes;
+	GogAxis *axis;
+
+	int i;
 
 #ifdef DEBUG
     	printf( "plotview_refresh\n" );
@@ -175,25 +104,105 @@ plotview_refresh( vObject *vobject )
 
 	set_gcaption( plotview->label, "%s", NN( IOBJECT( plot )->caption ) );
 
-	while( plotview->data ) {
-		GtkWidget *data = GTK_WIDGET( plotview->data->data );
+	/* FIXME
 
-		gtk_plot_remove_data( GTK_PLOT( plotview->plot ), 
-			GTK_PLOT_DATA( data ) );
-		plotview->data = g_slist_remove( plotview->data, data );
+		We always rebuild the plot. We could perhaps just reset the 
+		data in the series.
+
+		need to change the number of series too, can we do this 
+		without junking the plot?
+
+	 */
+
+	/* Junk the old plot child, how peculiar.
+	 */
+	if( plotview->gplot ) {
+		gog_object_clear_parent( GOG_OBJECT( plotview->gplot ) );
+		g_object_unref( plotview->gplot );
+		plotview->gplot = NULL;
 	}
 
-	if( !plotview->canvas || allocation->width != plotview->width ) {
-		plotview_build_plot( plotview, 
-			allocation->width, DISPLAY_THUMBNAIL );
-		plotview->width = allocation->width;
-	}
+	if( plot->style == PLOT_STYLE_BAR )
+		plotview->gplot = gog_plot_new_by_name( "GogHistogramPlot" );
+	else
+		plotview->gplot = gog_plot_new_by_name( "GogXYPlot" );
+	gog_object_add_by_name( GOG_OBJECT( plotview->gchart ), 
+		"Plot", GOG_OBJECT( plotview->gplot ) );
 
-	plotview->data = plotpresent_build_data( plot, plotview->plot );
+	axes = gog_chart_get_axes( plotview->gchart, GOG_AXIS_X );
+	axis = GOG_AXIS( axes->data );
+	g_object_set( axis, 
+		"major-tick-labeled", FALSE, 
+		"major-tick-size-pts", 0,
+		"pos", GOG_AXIS_CROSS,
+		NULL );
+	gog_axis_set_bounds( axis, plot->xmin, plot->xmax );
+	g_slist_free( axes );
+
+	axes = gog_chart_get_axes( plotview->gchart, GOG_AXIS_Y );
+	axis = GOG_AXIS( axes->data );
+	g_object_set( axis, 
+		"major-tick-labeled", FALSE, 
+		"major-tick-size-pts", 0,
+		"pos", GOG_AXIS_CROSS,
+		NULL );
+	gog_axis_set_bounds( axis, plot->ymin, plot->ymax );
+	g_slist_free( axes );
+
+	if( plot->style == PLOT_STYLE_POINT )
+		g_object_set( plotview->gplot,
+			"default-style-has-lines", FALSE,
+			NULL );
+	else if( plot->style != PLOT_STYLE_BAR )
+		g_object_set( plotview->gplot,
+			"default-style-has-markers", FALSE,
+			NULL );
+
+	if( plot->style == PLOT_STYLE_SPLINE )
+		g_object_set( plotview->gplot,
+			"use-splines", TRUE,
+			NULL );
+
+	for( i = 0; i < plot->columns; i++ ) {
+		GogSeries *series;
+		GOData *data;
+		GError *error;
+
+                series = gog_plot_new_series( plotview->gplot );
+		data = go_data_vector_val_new( plot->xcolumn[i], plot->rows, 
+			NULL );
+		gog_series_set_dim( series, 0, data, &error );
+		data = go_data_vector_val_new( plot->ycolumn[i], plot->rows, 
+			NULL );
+		gog_series_set_dim( series, 1, data, &error );
+
+		if( plot->style == PLOT_STYLE_BAR )
+			g_object_set( series,
+				"fill-type", "self",
+				NULL );
+
+		if( i < IM_NUMBER( default_colour ) ) {
+			GogStyle *style;
+
+			style = gog_styled_object_get_style( 
+				GOG_STYLED_OBJECT( series ) );
+
+			style->line.color = default_colour[i];
+			style->line.auto_color = FALSE;
+
+			go_marker_set_fill_color( style->marker.mark,
+				default_colour[i] );
+			style->marker.auto_fill_color = FALSE;
+
+			/* Could match fill, but black everywhere looks nicer.
+			 */
+			go_marker_set_outline_color( style->marker.mark,
+				RGBA_BLACK );
+			style->marker.auto_outline_color = FALSE;
+		}
+	}
 
 	gtk_widget_show_all( plotview->canvas );
-	gtk_plot_paint( GTK_PLOT( plotview->plot ) );
-	gtk_widget_queue_draw( plotview->canvas );
 
     	VOBJECT_CLASS( parent_class )->refresh( vobject );
 }
@@ -213,15 +222,12 @@ static void
 plotview_class_init( PlotviewClass *class )
 {
     	GtkObjectClass *object_class = (GtkObjectClass *) class;
-	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
     	vObjectClass *vobject_class = (vObjectClass *) class;
     	ViewClass *view_class = (ViewClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
 
     	object_class->destroy = plotview_destroy;
-
-	widget_class->size_allocate = plotview_size_allocate;
 
     	vobject_class->refresh = plotview_refresh;
 
@@ -287,10 +293,15 @@ plotview_init( Plotview *plotview )
         gtk_container_add( GTK_CONTAINER( eb ), plotview->box );
         gtk_widget_show( plotview->box );
 
-	plotview->canvas = NULL;
-	plotview->plot = NULL;
-	plotview->data = NULL;
-	plotview->width = 99999;
+	plotview->canvas = go_graph_widget_new( NULL );
+        gtk_box_pack_start( GTK_BOX( plotview->box ), 
+		plotview->canvas, FALSE, FALSE, 0 );
+	plotview->gchart = go_graph_widget_get_chart( 
+		GO_GRAPH_WIDGET( plotview->canvas ) );
+	gtk_widget_set_size_request( GTK_WIDGET( plotview->canvas ), 
+		DISPLAY_THUMBNAIL, DISPLAY_THUMBNAIL );
+
+	plotview->gplot = NULL;
 
 	plotview->label = gtk_label_new( "" );
         gtk_misc_set_alignment( GTK_MISC( plotview->label ), 0, 0.5 );
@@ -331,3 +342,4 @@ plotview_new( void )
     	return( VIEW( plotview ) );
 }
 
+#endif /*HAVE_LIBGOFFICE*/

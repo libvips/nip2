@@ -48,8 +48,8 @@
 
 /* But some themes can trigger warnings, argh, so sometimes we need to
  * undef it. VipsObject sets can also trigger warnings.
- */
 #undef DEBUG_FATAL
+ */
 
 /* Time startup.
 #define DEBUG_TIME
@@ -337,6 +337,10 @@ main_quit( void )
 	 */
 	if( main_icon_factory )
 		gtk_icon_factory_remove_default( main_icon_factory );
+
+	/* Not quite sure what this does.
+ 	 */
+	libgoffice_shutdown ();
 
 	/* Should have freed everything now.
 	 */
@@ -772,6 +776,10 @@ main_x_init( int *argc, char ***argv )
 			PACKAGE G_DIR_SEPARATOR_S "rc" G_DIR_SEPARATOR_S 
 			"ipgtkrc", NULL, NULL, NULL );
 	gtk_init( argc, argv );
+
+        libgoffice_init();
+	go_plugins_init( NULL, NULL, NULL, NULL, TRUE, 
+		GO_PLUGIN_LOADER_MODULE_TYPE );
 
 	/* Set the default icon. 
 	 */

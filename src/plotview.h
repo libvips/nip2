@@ -41,13 +41,9 @@ typedef struct _Plotview {
 	GtkWidget *box;
 	GtkWidget *label;
 	GtkWidget *canvas;
-	GtkWidget *plot;
-	GSList *data;		/* All the GtkPlotData we have added */
 
-	/* Track the last width/height we set for the canvas ... use this to
-	 * stop resize loops.
-	 */
-	int width;
+	GogChart *gchart;
+        GogPlot *gplot;
 } Plotview;
 
 typedef struct _PlotviewClass {

@@ -1,4 +1,4 @@
-/* a plot widget, plus some navigation stuff
+/* a gtkplot widget, plus some navigation stuff
  */
 
 /*
@@ -58,9 +58,11 @@ struct _Plotpresent {
 	 */
 	GtkWidget *swin;
 	GtkWidget *canvas;
-	GogChart *gchart;
-        GogPlot *gplot;
+	struct _GtkPlotCanvasChild *child;
+	GtkWidget *plot;
+	GSList *data;		/* All the GtkPlotData we have added */
 	iWindowCursorContext *cntxt;
+	guint resize_timeout;
 };
 
 typedef struct _PlotpresentClass {
@@ -79,5 +81,6 @@ void plotpresent_get_mag_position( Plotpresent *plotpresent,
 	int *mag, int *x, int *y );
 void plotpresent_set_mag_position( Plotpresent *plotpresent, 
 	int mag, int x, int y );
+GSList *plotpresent_build_data( Plot *plot, GtkWidget *widget );
 Plotpresent *plotpresent_new( Plotmodel *plotmodel );
 

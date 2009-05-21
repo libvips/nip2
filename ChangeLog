@@ -1,6 +1,7 @@
 started 7.19.0
 - remove deprecated use of GtkList in option edit ... needs replacing
 - reverse dialog button order on win32
+- join array didn't work on groups
 
 started 7.18.0
 - bumped version numbers

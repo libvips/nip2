@@ -1273,10 +1273,14 @@ Image_join_item = class
 			valign = Option "Vertical alignment" halign_names 1;
 
 			_result 
-				= (image_set_origin 0 0 @ 
-					foldl1 (join_tb vshim.value bg_colour.expr halign.value) @
-					map (foldl1 (join_lr hshim.value 
-						bg_colour.expr valign.value))) (to_list (to_list x));
+				= map_unary process x
+			{
+				process x
+					= (image_set_origin 0 0 @ 
+						foldl1 (join_tb vshim.value bg_colour.expr halign.value) @
+						map (foldl1 (join_lr hshim.value 
+							bg_colour.expr valign.value))) (to_list (to_list x));
+			}
 		}
 	}
 }

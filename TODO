@@ -1,4 +1,3 @@
-
 - why does Filter / Blend / Alpha not give the same result if the args are
   swapped?
 
@@ -536,8 +535,6 @@ WONTFIX for 7.14
   for sections
 
 - magic definition maker could make a workspace-local def, rather cool
-
-- do we leak for IMAGEVEC/DOUBLEVEC/etc. in vips_call.c? I think we might
 
 - test classmodel_dict_new() ... part of classmodel member automation
 

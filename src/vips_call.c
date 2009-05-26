@@ -730,7 +730,6 @@ vips_destroy( VipsInfo *vi )
 		case VIPS_DOUBLE:
 		case VIPS_INT: 	
 		case VIPS_COMPLEX: 
-		case VIPS_IMAGEVEC: 	/* Input only, so no freeing reqd */
 		case VIPS_GVALUE:
 		case VIPS_INTERPOLATE:
 			/* Do nothing.
@@ -750,6 +749,14 @@ vips_destroy( VipsInfo *vi )
 
 				IM_FREEF( im_close, *im );
 			}
+			break;
+
+		case VIPS_IMAGEVEC: 	
+			/* We only allow input IMAGEVEC, so we just need to
+			 * free the spine.
+			 */
+			g_assert( !(ty->flags & IM_TYPE_OUTPUT) );
+			IM_FREE( ((im_imagevec_object *) obj)->vec );
 			break;
 
 		case VIPS_DOUBLEVEC:

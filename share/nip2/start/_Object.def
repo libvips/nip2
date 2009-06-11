@@ -42,7 +42,7 @@ check_Mark = check_instance (_ "Mark");
  *
  * generate an error dialog with a helpful message on failure.
  *
- * Have as a separate function to try to keep the size of _Object down a bit.
+ * Have as a separate function to try to keep the size of _Object down.
  */
 check_args x
 	= error message, badargs != [] || badalls != []

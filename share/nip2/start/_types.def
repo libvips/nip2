@@ -8,7 +8,7 @@ List value = class
 	_Object {
 	_check_args = [
 		[value, "value", check_list]
-	] ++ super._check_args;
+	];
 
 	// methods
     oo_binary_table op x = [
@@ -55,7 +55,7 @@ Group value = class
 	_Object {
 	_check_args = [
 		[value, "value", check_list]
-	] ++ super._check_args;
+	];
 
 	// methods
 	oo_binary_table op x = [
@@ -110,7 +110,7 @@ Real value = class
 	_Object {
 	_check_args = [
 		[value, "value", check_real]
-	] ++ super._check_args;
+	];
 
 	// methods
 	oo_binary_table op x = [
@@ -141,7 +141,7 @@ Bool value = class
 	_Object {
 	_check_args = [
 		[value, "value", check_bool]
-	] ++ super._check_args;
+	];
 
 	// methods
 	oo_binary_table op x = [
@@ -169,7 +169,7 @@ String caption value = class
 	_check_args = [
 		[caption, "caption", check_string],
 		[value, "value", check_string]
-	] ++ super._check_args;
+	];
 }
 
 /* An editable real number.
@@ -178,7 +178,7 @@ Number caption value = class
 	scope.Real value {
 	_check_args = [
 		[caption, "caption", check_string]
-	] ++ super._check_args;
+	];
 
 	Real x = this.Number caption x;
 }
@@ -190,7 +190,7 @@ Expression caption expr = class
 	_check_args = [
 		[caption, "caption", check_string],
 		[expr, "expr", check_any]
-	] ++ super._check_args;
+	];
 }
 
 /* A ticking clock.
@@ -199,7 +199,7 @@ Clock interval value = class
 	scope.Real value {
 	_check_args = [
 		[interval, "interval", check_real]
-	] ++ super._check_args;
+	];
 
 	Real x = this.Clock interval x;
 }
@@ -211,7 +211,7 @@ Pathname caption value = class
 	_check_args = [
 		[caption, "caption", check_string],
 		[value, "value", check_string]
-	] ++ super._check_args;
+	];
 }
 
 /* An editable fontname.
@@ -221,7 +221,7 @@ Fontname caption value = class
 	_check_args = [
 		[caption, "caption", check_string],
 		[value, "value", check_string]
-	] ++ super._check_args;
+	];
 }
 
 /* Vector type ... just a finite list of real. Handy for wrapping an
@@ -231,7 +231,7 @@ Vector value = class
 	_Object {
 	_check_args = [
 		[value, "value", check_real_list]
-	] ++ super._check_args;
+	];
 
 	bands = len value;
 
@@ -308,7 +308,7 @@ Matrix_base value = class
 	_Object {
 	_check_args = [
 		[value, "value", check_matrix]
-	] ++ super._check_args;
+	];
 
 	// calculate these from value
 	width = len value?0;
@@ -407,7 +407,7 @@ Matrix_vips value scale offset filename display = class
 		[offset, "offset", check_real],
 		[filename, "filename", check_string],
 		[display, "display", check_matrix_display]
-	] ++ super._check_args;
+	];
 
 	Matrix_base x = this.Matrix_vips x scale offset filename display;
 }
@@ -437,10 +437,10 @@ Colour colour_space value = class
 	scope.Vector value {
 	_check_args = [
 		[colour_space, "colour_space", check_colour_space]
-	] ++ super._check_args;
+	];
 	_check_all = [
 		[is_list_len 3 value, "len value == 3"]
-	] ++ super._check_all;
+	];
 
 	Vector x = this.Colour colour_space x;
 
@@ -495,10 +495,10 @@ Scale caption from to value = class
 		[caption, "caption", check_string],
 		[from, "from", check_real],
 		[to, "to", check_real]
-	] ++ super._check_args;
+	];
 	_check_all = [
 		[from < to, "from < to"]
-	] ++ super._check_all;
+	];
 
 	Real x = this.Scale caption from to x;
 
@@ -522,7 +522,7 @@ Toggle caption value = class
 	_check_args = [
 		[caption, "caption", check_string],
 		[value, "value", check_bool]
-	] ++ super._check_args;
+	];
 
 	Bool x = this.Toggle caption x;
 }
@@ -535,7 +535,7 @@ Option caption labels value = class
 		[caption, "caption", check_string],
 		[labels, "labels", check_string_list],
 		[value, "value", check_uint]
-	] ++ super._check_args;
+	];
 }
 
 Option_enum enum caption value_name = class
@@ -556,7 +556,7 @@ Rect left top width height = class
 		[top, "top", check_real],
 		[width, "width", check_real],
 		[height, "height", check_real]
-	] ++ super._check_args;
+	];
 
 	// derived
 	right = left + width;
@@ -732,7 +732,7 @@ Table value = class
 	_Object {
 	_check_args = [
 		[value, "value", check_rectangular]
-	] ++ super._check_args;
+	];
 
 	/* Extract a column.
 	 */
@@ -760,7 +760,7 @@ Enum value = class
 	Table value {
 	_check_args = [
 		[value, "value", check_enum]
-	] ++ super._check_args
+	]
 	{
 		check_enum = [is_enum, _ "is [[char, *]]"];
 		is_enum x = 
@@ -879,7 +879,7 @@ Image value = class
 	_Object {
 	_check_args = [
 		[value, "value", check_image]
-	] ++ super._check_args;
+	];
 
 	// fields from VIPS header
 	width = get_width value;
@@ -1011,7 +1011,7 @@ Image_file filename = class
 	Image value {
 	_check_args = [
 		[filename, "filename", check_string]
-	] ++ super._check_args;
+	];
 
 	value = vips_image filename;
 }
@@ -1024,7 +1024,7 @@ Region image left top width height = class
 		[top, "top", check_real],
 		[width, "width", check_preal],
 		[height, "height", check_preal]
-	] ++ super._check_args;
+	];
 
 	// a rect for our coordinates
 	// region.rect gets the rect for the extracted image
@@ -1052,7 +1052,7 @@ Arrow image left top width height = class
 		[top, "top", check_real],
 		[width, "width", check_real],
 		[height, "height", check_real]
-	] ++ super._check_args;
+	];
 
 	Rect l t w h = this.Arrow image l t w h;
 }

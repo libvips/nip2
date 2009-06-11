@@ -1518,7 +1518,7 @@ Filter_paint_text_item = class
 			_result {
 			_check_args = [
 				[x, "x", check_Image]
-			] ++ super._check_args;
+			];
 			_vislevel = 3;
 		
 			text = String "Text to paint" "<i>Hello</i> world!";

@@ -355,7 +355,7 @@ Matrix_plot_scatter_item = class
 		_result {
 		_check_args = [
 			[x, "x", check_Matrix]
-		] ++ super._check_args;
+		];
 		_vislevel = 3;
 
 		auto = Toggle "Auto Range" true;
@@ -398,7 +398,7 @@ Matrix_buildlut_item = class
 		_result {
 		_check_args = [
 			[x, "x", check_Matrix]
-		] ++ super._check_args;
+		];
 		_result = buildlut x;
 	}
 }

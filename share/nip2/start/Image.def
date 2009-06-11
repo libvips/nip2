@@ -1117,7 +1117,7 @@ Image_insert_item = class
 			_check_args = [
 				[a, "a", check_Image],
 				[b, "b", check_Image]
-			] ++ super._check_args;
+			];
 			_vislevel = 3;
 
 			// sort to get smallest first

@@ -3,6 +3,8 @@ started 7.19.0
 - reverse dialog button order on win32
 - join array didn't work on groups
 - fix memleak with IMAGEVEC args to VIPS
+- _check_all etc. no longer chain up, for a slight speed increase
+- branch for treeview matrix
 
 started 7.18.0
 - bumped version numbers

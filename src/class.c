@@ -1014,8 +1014,8 @@ class_typecheck_error( PElement *instance, const char *name, const char *type )
 	g_assert( res );
 
 	vips_buf_init_static( &buf, txt, 1024 );
-	vips_buf_appendf( &buf, _( "Member \"%s\" of class \"%s\" should be of type "
-		"\"%s\", instead it's:" ), 
+	vips_buf_appendf( &buf, _( "Member \"%s\" of class \"%s\" "
+		"should be of type \"%s\", instead it's:" ), 
 		name, 
 		IOBJECT( PEGETCLASSCOMPILE( instance )->sym )->name, 
 		type );

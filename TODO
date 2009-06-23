@@ -1,18 +1,12 @@
+- right-click menu on row button should have items for "Jump to referrer / WC1
+  / JC1 ..." and "Jump to referred / ..."
+
+- make check under valgrind still reports a few problems
+
+- (if image then group else constant) doesn't work
+
 - why does Filter / Blend / Alpha not give the same result if the args are
   swapped?
-
-- have an idialog option to put the default action at the start of the button
-  list
-
-  so on win32, the quit dialog should be
-  
-  	save/dont'tsave/cancel 
-
-  and on gnome it should be
-
-  	don'tsave/cancel/save
-
-  see http://img145.imageshack.us/img145/7758/notepad.png
 
 - gtk3.0 tests:
 

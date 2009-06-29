@@ -55,7 +55,7 @@ nonzero_mean im = no_out
 	no_mean = mean im;
 	no_out = no_mean/(1 - (zero_mean/255));
 	};
-	
+
 ////////////////////////////////////////////////////////////////////////////////
 /* Calculates the max and nonzero mean of an image
  * 
@@ -73,7 +73,7 @@ so_meanmax im = result
 		
 	result = [mean_of_im, max_of_im];
 	};
-	
+
 ////////////////////////////////////////////////////////////////////////////////
 /* Calculates the scale and offset required to match a reference mean and max 
  * 
@@ -96,7 +96,7 @@ so_calculate ref_meanmax im mask = result
 	offset = mean_of_ref - (mean_of_im * scale);
 	result = [ scale, offset ];
 	};
-	
+
 ////////////////////////////////////////////////////////////////////////////////
 /* Extends or shortens the central sections of a simple frame to fit round a given image.
  * 
@@ -125,7 +125,7 @@ simple_frame frame im_w im_h ov cs ms bf option = result
 
 		result = build_frame r_tl r_tr r_bl r_br r_mt r_mb r_ml r_mr im_w im_h ov bf;
 		};
-	
+
 ////////////////////////////////////////////////////////////////////////////////
 /* Copies and extends a simple frame corner to produce a complete frame to fit round a given image.
  * 
@@ -148,7 +148,7 @@ corner_frame frame im_w im_h ov cs ms bf = result
 	r_mr = fliplr r_ml;
 	result = build_frame r_tl r_tr r_bl r_br r_mt r_mb r_ml r_mr im_w im_h ov bf;
 	};
-	
+
 ////////////////////////////////////////////////////////////////////////////////
 /* Completes the frame building process for simple_frame and corner_frame.
  *
@@ -190,7 +190,7 @@ build_frame r_tl r_tr r_bl r_br r_mt r_mb r_ml r_mr im_w im_h ov bf = result
 	result = frame_tb_min row_1 row_3 h_target blend, (h_target < (r_tl.height * 2))
 	 	   = merge_array blend [[row_1], [row_2], [row_3]];
 	};
-		
+
 ////////////////////////////////////////////////////////////////////////////////
 /* Extends or shortens the central sections of a frame, preserving any central details on each
  * edge, to fit round a given image.
@@ -254,7 +254,7 @@ complex_frame frame im_w im_h ov cs es ms bf option= result
 	result = frame_tb_min row_1 row_3 h_target blend, (h_target < (r_tl.height * 2))
 		   = merge_array blend [[row_1], [row_2], [row_3]];
 	};
-		
+
 ////////////////////////////////////////////////////////////////////////////////	
 /*  Function called by complex frame, used to produce section
  * 
@@ -285,7 +285,7 @@ complex_edge ra rb t bl d = rc
 	   = merge_array bl [[rb',ra,rb']], d == 0
 	   = merge_array bl [[rb'],[ra],[rb']]
 	   	{rb' = merge_to_scale rb t2 bl d;}
-	}
+	};
 
 //////////////////////////////////////////////////////////////////////////////
 /* Blends two images left/right to produce an image a specific width.
@@ -307,7 +307,7 @@ frame_lr_min r_l r_r target bw = result
 	//Merge the two image together with a bw*2 pixel overlap.
 	result = Image (im_lrmerge n_l n_r ((bw*2) - n_w) 0 bw);
 	};
-	
+
 //////////////////////////////////////////////////////////////////////////////
 /* Blends two images top/bottom to produce an image a specific width.
  *
@@ -328,7 +328,7 @@ frame_tb_min r_t r_b target bw = result
 	//Merge the two image together with a 50 pixel overlap.
 	result = Image (im_tbmerge n_t n_b 0 ((bw*2) -n_h) bw);
 	};
-	
+
 //////////////////////////////////////////////////////////////////////////////
 /* Resixe canvas of an image to accomodate a frame and possible mount 
  *
@@ -348,8 +348,7 @@ frame_position_image im ref os colour= result
 		yp = (ref.height - im.height - os)/2;
 		}
 	};
-		
-		
+
 //////////////////////////////////////////////////////////////////////////////
 /* Merges an array of images together according to blend width bw 
  *
@@ -377,8 +376,8 @@ merge_array bw arr = result
 			foldl1 (merge_tb bw) @
 			map (foldl1 (merge_lr bw))) arr;
 	result = Image im_out;
-	}
-	
+	};
+
 //////////////////////////////////////////////////////////////////////////////
 /* Repeatably top/bottom add clones of im, with a defined overlap, until final height > target
  *
@@ -422,7 +421,7 @@ merge_to_scale im target blend dir = result
 		    = process im no_loops;
 
 	result = Image (im_extract_area (get_image im_tmp) 0 0 var_w var_h);
-	}
+	};
 
 //////////////////////////////////////////////////////////////////////////////
 /* Selects an elispe based on a line and a width
@@ -432,7 +431,7 @@ merge_to_scale im target blend dir = result
  */  
 select_ellipse line width = mask
 	{
-	im = line.image;
+	im = Image (get_image line);
 	
 	//Make a 2 band image whose value equals its coordinates.
 	im_coor = Image (make_xy im.width im.height);	
@@ -456,8 +455,8 @@ select_ellipse line width = mask
 	y' = ( (cos angle) * im_cent?1) - ( (sin angle) * im_cent?0);
 	
 	mask =  ( (b**2) * (x'**2) ) +  ( (a**2) * (y'**2) ) <= (a * b)**2;
-	}
-	
+	};
+
 //////////////////////////////////////////////////////////////////////////////
 /* Selects a tetragon based on four points.
  *
@@ -509,8 +508,8 @@ select_tetragon p1 p2 p3 p4 = mask
 	
 		im_out = im_in & mask;
 		}
-	}
-	
+	};
+
 //////////////////////////////////////////////////////////////////////////////
 /* Selects a tetragon based on four points.
  *
@@ -523,7 +522,7 @@ select_polygon pt_list = mask
 	pt_l = pt_list.value, group_check
 		 = pt_list;
 			 
-	im = (pt_l?0).image;
+	im = Image (get_image (pt_l?0));
 	im_xy = Image (make_xy im.width im.height);
 	black = Image (image_new im_xy.width im_xy.height 1 0 Image_coding.NOCODING 1 0 0 0);
 
@@ -592,8 +591,8 @@ select_polygon pt_list = mask
 
 	line_m p1 p2 = (p2.top - p1.top)/(p2.left - p1.left), p2.left != p1.left
 	    		 = 0;
-	}
-	
+	};
+
 //////////////////////////////////////////////////////////////////////////////
 /* Selects a tetragon based on four points.
  *
@@ -652,10 +651,8 @@ perspective_transform to from = trans''
 					 [((trans'?0)?0 - 1), (trans'?4)?0		],
 					 [(trans'?1)?0, 	  ((trans'?5)?0 - 1)],
 					 [(trans'?2)?0, 	  (trans'?6)?0		]];
-	}
+	};
 
-
-	
 //////////////////////////////////////////////////////////////////////////////
 /* Sort a list of points into clockwise order.
  *
@@ -678,4 +675,31 @@ sort_pts_clockwise l = l''
 		l''_a = sortc f_left l'_a;
 		l''_b = sortc f_right l'_b;
 		l'' = join l''_a l''_b;
-		}
+		};
+
+Mount_options _ctype _ppcm = class 
+  {
+  _vislevel = 3;
+  apply = Toggle "Apply mount options" false;
+  ls = Expression "Lower mount section bigger by (cm)" 0;
+  mount_colour = Colour _ctype [0, 0, 0];
+  _los = ls.expr * _ppcm;
+  };
+
+Frame_variables comp = class
+  {
+  _vislevel = 3;
+
+  scale_factor = Expression "scale the size of the frame by" 1;
+
+  /* These sliders define the fraction of the frames width or height is extracted
+   * to produce each of the particular regions.
+   */
+  corner_section = Scale "Corner section" 0.1 1 0.5;
+  edge_section = Scale "Edge section" 0.1 1 0.2, comp > 0
+				  = "Only required for complex frames";
+  middle_section = Scale "Middle section" 0.1 1 0.2;
+  blend_fraction = Scale "Blend fraction" 0.1 0.9 0.1;
+  option = Toggle "Use mirror of left-side to make right" true;
+  };
+

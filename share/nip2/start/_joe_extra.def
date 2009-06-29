@@ -34,28 +34,12 @@ Frame_item = class
 			 * the image.
 			 */
 			overlap = Expression "Size of frame overlap in cm" 0;
-			variables = class
-				{
-				scale_factor = Expression "scale the size of the frame by" 1;
-
-				/* These sliders define the fraction of the frames width or height is extracted
-		 		 * to produce each of the particular regions.
-		 		 */
-				corner_section = Scale "Corner section" 0.1 1 0.5;
-				middle_section = Scale "Middle section" 0.1 1 0.2;
-				blend_fraction = Scale "Blend fraction" 0.1 0.9 0.1;
-				}
+			variables = Frame_variables 0;
 
 			_type = Image_type.colour_spaces.get_name b.type;
 
 			//If applied the count colour be seen for -ve values of overlap
-			mount_options = class
-				{
-				apply = Toggle "Apply mount options" false;
-				ls = Expression "Lower mount section bigger by (cm)" 0;
-				mount_colour = Colour _type [0, 0, 0];
-				_los = ls.expr * ppcm.expr;
-				}
+			mount_options = Mount_options _type ppcm.expr;
 
 			_cs = variables.corner_section.value;
 			_ms = variables.middle_section.value;
@@ -113,29 +97,11 @@ Frame_item = class
 			 * the image.
 			 */
 			overlap = Expression "Size of frame overlap in cm" 0;
-
-			variables = class
-				{
-				scale_factor = Expression "scale the size of the frame by" 1;
-
-				/* These sliders define the fraction of the frames width or height that
-				 * is extracted to produce each of the particular regions.
-		 		 */
-				corner_section = Scale "Corner section" 0.1 1 0.5;
-				middle_section = Scale "Middle section" 0.1 1 0.2;
-				blend_fraction = Scale "Blend fraction" 0.1 0.9 0.1;
-				option = Toggle "Use mirror of left-side to make right" true;
-				}
+			variables = Frame_variables 0;
 
 			_type = Image_type.colour_spaces.get_name b.type;
 			//If applied the count colour be seen for -ve values of overlap
-			mount_options = class
-				{
-				apply = Toggle "Apply mount options" false;
-				ls = Expression "Lower mount section bigger by (cm)" 0;
-				mount_colour = Colour _type [0, 0, 0];
-				_los = ls.expr * ppcm.expr;
-				}
+			mount_options = Mount_options _type ppcm.expr;
 
 			_cs = variables.corner_section.value;
 			_ms = variables.middle_section.value;
@@ -191,32 +157,12 @@ Frame_item = class
 			 * the image.
 			 */
 			overlap = Expression "Size of frame overlap in cm" 0;
-
-			variables = class
-				{
-				scale_factor = Expression "scale the size of the frame by" 1;
-
-				/* These sliders define the fraction of the frames width or height is extracted
-		 		 * to produce each of the particular regions.
-		 		 */
-				corner_section = Scale "Corner section" 0.1 1 0.5;
-				edge_section = Scale "Edge section" 0.1 1 0.2;
-				middle_section = Scale "Middle section" 0.1 1 0.2;
-				blend_fraction = Scale "Blend fraction" 0.1 0.9 0.1;
-				option = Toggle "Use mirror of left-side to make right" true;
-				}
-
+			variables = Frame_variables 1;
 
 			_type = Image_type.colour_spaces.get_name b.type;
 
 			//If applied the count colour be seen for -ve values of overlap
-			mount_options = class
-				{
-				apply = Toggle "Apply mount color" false;
-				ls = Expression "Lower mount section bigger by (cm)" 0;
-				colour = Colour _type [0, 0, 0];
-				_los = ls.expr * ppcm.expr;
-				}
+			mount_options = Mount_options _type ppcm.expr;
 
 			_cs = variables.corner_section.value;
 			_es = variables.edge_section.value;
@@ -271,7 +217,7 @@ Select_item = class
 	 	"Selection White",
 	 	"Background Black",
 	 	"Background White",
-		"Mask" ] 6;
+		"Mask" ] 4;
 
 
 	control_selection mask im no
@@ -315,7 +261,7 @@ Select_item = class
 			_result = control_selection mask im control
 				{
 				mask = select_tetragon a b c d;
-				im = a.image;
+				im = get_image a;
 				}
 			}
 
@@ -334,7 +280,7 @@ Select_item = class
 			_result = control_selection mask im control
 				{
 				mask = select_polygon pt_list;
-				im = ((pt_list.value)?0).image;
+				im = get_image ((pt_list.value)?0);
 				}
 			}
 		}
@@ -373,6 +319,7 @@ Select_item = class
 	}
 
 	};
+
 ////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
@@ -431,12 +378,12 @@ Perspective_match_item = class
 				{
 				b2 = resize Interpolate_bilinear f1 f2 b, (f1 >= 1 && f2 >= 1) || (f1 >= 1 && f2 >= 1)
 			    	= resize Interpolate_bilinear f1 1 b1
-					{b1 = resize 1 1 f2 b;}
+					{b1 = resize Interpolate_bilinear 1 f2 b;}
 				}
 			}
 		}
-	}
-	
+	};
+
 ////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 Perspective_item = class

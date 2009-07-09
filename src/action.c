@@ -87,20 +87,15 @@ action_boperror( Reduce *rc, Compile *compile, const char *str,
 	const char *top_str = str ? str : _( "Bad arguments." );
 	const char *op_name = op >= 0 ? decode_BinOp( op ) : name;
 
-	VipsBuf buf;
 	char txt[MAX_ERROR_FRAG];
-	VipsBuf buf2;
+	VipsBuf buf = VIPS_BUF_STATIC( txt )
 	char txt2[MAX_ERROR_FRAG];
-	VipsBuf buf3;
+	VipsBuf buf2 = VIPS_BUF_STATIC( txt2 )
 	char txt3[MAX_ERROR_FRAG];
+	VipsBuf buf3 = VIPS_BUF_STATIC( txt3 )
 
-	vips_buf_init_static( &buf, txt, MAX_ERROR_FRAG );
 	itext_value_ev( rc, &buf, a );
-
-	vips_buf_init_static( &buf2, txt2, MAX_ERROR_FRAG );
 	itext_value_ev( rc, &buf2, b );
-
-	vips_buf_init_static( &buf3, txt3, MAX_ERROR_FRAG );
 	if( compile ) {
 		/* Expands to eg. 'bad args to "+", called from "fred"'
 		 */
@@ -113,7 +108,11 @@ action_boperror( Reduce *rc, Compile *compile, const char *str,
 	error_sub( _( "Error in binary \"%s\".\n"
 		"left = %s\n"
 		"right = %s\n%s" ),
-		op_name, vips_buf_all( &buf ), vips_buf_all( &buf2 ), vips_buf_all( &buf3 ) );
+		op_name, 
+		vips_buf_all( &buf ), 
+		vips_buf_all( &buf2 ), 
+		vips_buf_all( &buf3 ) );
+
 	reduce_throw( rc );
 }
 
@@ -122,16 +121,12 @@ action_boperror( Reduce *rc, Compile *compile, const char *str,
 static void
 action_nomerror( Reduce *rc, Compile *compile, PElement *a, PElement *b )
 {
-	VipsBuf buf;
 	char txt[500];
-	VipsBuf buf2;
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 	char txt2[MAX_ERROR_FRAG];
-	VipsBuf buf3;
+	VipsBuf buf2 = VIPS_BUF_STATIC( txt2 );
 	char txt3[MAX_ERROR_FRAG];
-
-	vips_buf_init_static( &buf, txt, 500 );
-	vips_buf_init_static( &buf2, txt2, MAX_ERROR_FRAG );
-	vips_buf_init_static( &buf3, txt3, MAX_ERROR_FRAG );
+	VipsBuf buf3 = VIPS_BUF_STATIC( txt3 );
 
 	if( PEISCLASS( a ) ) 
 		symbol_qualified_name( PEGETCLASSCOMPILE( a )->sym, &buf3 );
@@ -178,15 +173,13 @@ action_uoperror( Reduce *rc, Compile *compile,
 	const char *top_str = str ? str : _( "Bad argument." );
 	const char *op_name = op >= 0 ? decode_UnOp( op ) : name;
 
-	VipsBuf buf;
 	char txt[MAX_ERROR_FRAG];
-	VipsBuf buf2;
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 	char txt2[MAX_ERROR_FRAG];
+	VipsBuf buf2 = VIPS_BUF_STATIC( txt2 );
 
-	vips_buf_init_static( &buf, txt, MAX_ERROR_FRAG );
 	itext_value_ev( rc, &buf, a );
 
-	vips_buf_init_static( &buf2, txt2, MAX_ERROR_FRAG );
 	if( compile ) {
 		/* Expands to eg. 'bad args to "+", called from "fred"'
 		 */
@@ -199,6 +192,7 @@ action_uoperror( Reduce *rc, Compile *compile,
 	error_sub( _( "Error in unary \"%s\".\n"
 		"argument = %s\n%s" ),
 		op_name, vips_buf_all( &buf ), vips_buf_all( &buf2 ) );
+
 	reduce_throw( rc );
 }
 

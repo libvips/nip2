@@ -41,14 +41,14 @@ static gboolean
 class_is_class( PElement *instance )
 {
 	if( !PEISCLASS( instance ) ) {
-		VipsBuf buf;
 		char txt[50];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-		vips_buf_init_static( &buf, txt, 50 );
 		if( !itext_value( reduce_context, &buf, instance ) )
 			return( FALSE );
 		error_top( _( "Bad argument." ) );
-		error_sub( _( "Object %s is not a class." ), vips_buf_all( &buf ) );
+		error_sub( _( "Object %s is not a class." ), 
+			vips_buf_all( &buf ) );
 
 		return( FALSE );
 	}
@@ -346,10 +346,9 @@ class_member_secret( ClassBuildInfo *pbi,
 #ifdef DEBUG_VERBOSE
 {
 	PElement p1;
-	VipsBuf buf;
 	char txt[1024];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, txt, 1024 );
 	PEPOINTRIGHT( apl, &p1 );
 	graph_pelement( pbi->heap, &buf, &p1, TRUE );
 	printf( "class_member_secret: secret arg \"" );
@@ -371,10 +370,6 @@ add_class_member( Symbol *sym, ClassBuildInfo *pbi, PElement *out )
 	Heap *heap = pbi->heap;
 	HeapNode *base, *sv;
 	PElement v;
-#ifdef DEBUG_VERBOSE
-	VipsBuf buf;
-	char txt[1024];
-#endif /*DEBUG_VERBOSE*/
 
 	/* Is this something that should be part of a class.
 	 */
@@ -405,11 +400,15 @@ add_class_member( Symbol *sym, ClassBuildInfo *pbi, PElement *out )
 		return( sym );
 
 #ifdef DEBUG_VERBOSE
-	vips_buf_init_static( &buf, txt, 1024 );
+{
+	char txt[1024];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
+
 	graph_pelement( heap, &buf, &v, TRUE );
 	printf( "add_class_member: member \"%s\" of class \"%s\" = %s\n",
 		IOBJECT( sym )->name, IOBJECT( pbi->sym )->name, 
 		vips_buf_all( &buf ) );
+}
 #endif /*DEBUG_VERBOSE*/
 
 	return( NULL );
@@ -423,18 +422,18 @@ add_class_svpair( ClassBuildInfo *pbi,
 {
 	Heap *heap = pbi->heap;
 	HeapNode *base, *sv;
-#ifdef DEBUG_VERBOSE
-	VipsBuf buf;
-	char txt[1024];
-#endif /*DEBUG_VERBOSE*/
 
 #ifdef DEBUG_VERBOSE
-	vips_buf_init_static( &buf, txt, 1024 );
+{
+	char txt[1024];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
+
 	graph_pelement( heap, &buf, val, TRUE );
 	printf( "add_class_svpair: adding parameter \"%s\" to class "
 		"\"%s\" = %s\n", 
 		IOBJECT( sym )->name, IOBJECT( pbi->sym )->name,
 		vips_buf_all( &buf ) );
+}
 #endif /*DEBUG_VERBOSE*/
 
 	/* Make new class-local-list element for this parameter.
@@ -482,12 +481,11 @@ class_new_single_name( Heap *heap, PElement *pe,
 	ClassBuildInfo *pbi, PElement *instance )
 {
 	Symbol *snm = compile_lookup( pbi->compile, MEMBER_NAME );
-	VipsBuf buf;
-	char str[256];
+	char txt[256];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	/* Make class name string.
 	 */
-	vips_buf_init_static( &buf, str, 256 );
 	symbol_qualified_name( pbi->sym, &buf );
 	PEPUTP( pe, ELEMENT_ELIST, NULL );
 	if( !heap_managedstring_new( heap, vips_buf_all( &buf ), pe ) ) 
@@ -525,19 +523,17 @@ class_new_single( Heap *heap,
 		compile->nsecret, compile->nparam );
 
 	for( i = 0; i < compile->nsecret; i++ ) {
-		VipsBuf buf;
-		char str[256];
+		char txt[256];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-		vips_buf_init_static( &buf, str, 256 );
 		graph_pelement( heap, &buf, &arg[i], TRUE );
 		printf( "\tsecret %2d = %s\n", i, vips_buf_all( &buf ) );
 	}
 
 	for( i = 0; i < compile->nparam; i++ ) {
-		VipsBuf buf;
-		char str[256];
+		char txt[256];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-		vips_buf_init_static( &buf, str, 256 );
 		graph_pelement( heap, &buf, &arg[i + compile->nsecret], TRUE );
 		printf( "\targ %2d = %s\n", i, vips_buf_all( &buf ) );
 	}
@@ -604,10 +600,9 @@ class_new_single( Heap *heap,
 
 #ifdef DEBUG
 {
-	VipsBuf buf;
-	char str[256];
+	char txt[256];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, str, 256 );
 	graph_pelement( heap, &buf, out, TRUE );
 	printf( "class_new_single: built instance of \"" );
 	symbol_name_print( sym );
@@ -702,18 +697,18 @@ class_clone_super( Heap *heap, Compile *compile,
 	const int nargs = compile->nsecret + compile->nparam;
 	PElement secret;
 	int i;
-#ifdef DEBUG_VERBOSE
-	VipsBuf buf;
-	char str[MAX_STRSIZE];
-#endif /*DEBUG_VERBOSE*/
 
 	g_assert( nargs <= MAX_SYSTEM );
 
 #ifdef DEBUG_VERBOSE
-	vips_buf_init_static( &buf, str, MAX_STRSIZE );
+{
+	char txt[MAX_STRSIZE];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
+
 	graph_pelement( heap, &buf, instance, TRUE );
 	printf( "class_new_clone: about to clone \"%s\": %s\n", 
 		IOBJECT( compile->sym )->name, vips_buf_all( &buf ) );
+}
 #endif /*DEBUG_VERBOSE*/
 
 	/* Pull out values of secrets and class args into arg[].
@@ -843,14 +838,14 @@ class_new_super( Heap *heap,
 				return( FALSE );
 		}
 		else {
-			VipsBuf buf1, buf2;
-			char txt1[300], txt2[300];
+			char txt1[300];
+			VipsBuf buf1 = VIPS_BUF_STATIC( txt1 );
+			char txt2[300];
+			VipsBuf buf2 = VIPS_BUF_STATIC( txt2 );
 
 			error_top( _( "Bad superclass." ) );
 
-			vips_buf_init_static( &buf1, txt1, 300 );
 			itext_value( reduce_context, &buf1, &arg0 );
-			vips_buf_init_static( &buf2, txt2, 300 );
 			vips_buf_appendf( &buf2,
 				_( "First element in superclass of \"%s\" "
 				"must be class or constructor." ),
@@ -905,10 +900,9 @@ class_new( Heap *heap, Compile *compile, HeapNode **arg, PElement *out )
 
 #ifdef DEBUG_BUILD
 {
-	VipsBuf buf;
-	char str[MAX_STRSIZE];
+	char txt[MAX_STRSIZE];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, str, MAX_STRSIZE );
 	graph_pelement( heap, &buf, out, TRUE );
 	printf( "class_new: built instance of \"%s\": %s\n", 
 		IOBJECT( compile->sym )->name, vips_buf_all( &buf ) );
@@ -929,18 +923,18 @@ class_clone_args( Heap *heap, PElement *instance, PElement *out )
 	const int nargs = compile->nsecret + compile->nparam;
 	PElement secret;
 	int i;
-#ifdef DEBUG_VERBOSE
-	VipsBuf buf;
-	char str[MAX_STRSIZE];
-#endif /*DEBUG_VERBOSE*/
 
 	g_assert( nargs <= MAX_SYSTEM );
 
 #ifdef DEBUG_VERBOSE
-	vips_buf_init_static( &buf, str, MAX_STRSIZE );
+{
+	char txt[MAX_STRSIZE];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
+
 	graph_pelement( heap, &buf, instance, TRUE );
 	printf( "class_clone_args: about to clone \"%s\": %s\n", 
 		IOBJECT( compile->sym )->name, vips_buf_all( &buf ) );
+}
 #endif /*DEBUG_VERBOSE*/
 
 	/* Pull out values of secrets and class args into RHS of arg[].
@@ -1007,13 +1001,12 @@ class_typecheck_error( PElement *instance, const char *name, const char *type )
 {
 	PElement val;
 	gboolean res;
-	VipsBuf buf;
 	char txt[1024];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	res = class_get_member( instance, name, NULL, &val );
 	g_assert( res );
 
-	vips_buf_init_static( &buf, txt, 1024 );
 	vips_buf_appendf( &buf, _( "Member \"%s\" of class \"%s\" "
 		"should be of type \"%s\", instead it's:" ), 
 		name, 

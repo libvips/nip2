@@ -265,10 +265,8 @@ about_build( iDialog *idlg, GtkWidget *work )
 	GtkWidget *lab;
 	char txt[MAX_DIALOG_TEXT];
 	char txt2[MAX_DIALOG_TEXT];
-	VipsBuf buf;
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 	GtkWidget *image;
-
-	vips_buf_init_static( &buf, txt, MAX_DIALOG_TEXT );
 
 	im_snprintf( txt2, MAX_DIALOG_TEXT, _( "About %s." ), PACKAGE );
 	vips_buf_appendf( &buf, "<b><big>%s</big></b>\n\n", txt2 );
@@ -957,18 +955,16 @@ box_url( GtkWidget *par, const char *url )
 #else /*default unix-y*/
 	static gboolean shown = FALSE;
 
-	VipsBuf buf;
 	char txt[512];
-	VipsBuf buf2;
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 	char txt2[512];
+	VipsBuf buf2 = VIPS_BUF_STATIC( txt2 );
 
 	char url2[FILENAME_MAX];
 
 	expand_variables( url, url2 );
 
-	vips_buf_init_static( &buf, txt, 512 );
 	vips_buf_appendf( &buf, "%s %s", BOX_BROWSER, BOX_BROWSER_REMOTE );
-	vips_buf_init_static( &buf2, txt2, 512 );
 	vips_buf_appendf( &buf2, vips_buf_all( &buf ), url2 );
 
 	if( systemf( "%s", vips_buf_all( &buf2 ) ) ) {

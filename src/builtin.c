@@ -530,10 +530,9 @@ static void
 apply_print_call( Reduce *rc, const char *name, HeapNode **arg, PElement *out )
 {
 	PElement rhs;
-	VipsBuf buf;
 	char txt[MAX_STRSIZE];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 	PEPOINTRIGHT( arg[0], &rhs );
 	itext_value_ev( rc, &buf, &rhs );
 
@@ -951,10 +950,8 @@ static void
 builtin_trace_args( Heap *heap, const char *name, int n, HeapNode **arg )
 {
 	int i;
-	VipsBuf buf;
 	char txt[100];
-
-	vips_buf_init_static( &buf, txt, 100 );
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	for( i = 0; i < n; i++ ) {
 		PElement t;
@@ -986,10 +983,9 @@ builtin_run( Reduce *rc, Compile *compile,
 
 		PEPOINTRIGHT( arg[builtin->nargs - i - 1], &base );
 		if( !ts->pred( rc, &base ) ) {
-			VipsBuf buf;
 			char txt[100];
+			VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-			vips_buf_init_static( &buf, txt, 100 );
 			itext_value_ev( rc, &buf, &base );
 			error_top( _( "Bad argument." ) );
 			error_sub( _( "Argument %d to builtin \"%s\" should "

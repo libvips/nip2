@@ -1,7 +1,7 @@
+- swap vips_buf_init_static() for VIPS_BUF_STATIC() ... reached classmodel.c
+
 - right-click menu on row button should have items for "Jump to referrer / WC1
   / JC1 ..." and "Jump to referred / ..."
-
-- make check under valgrind still reports a few problems
 
 - (if image then group else constant) doesn't work
 

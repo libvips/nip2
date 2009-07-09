@@ -155,8 +155,7 @@ static GOptionEntry main_option[] = {
 /* Accumulate startup errors here.
  */
 static char main_start_error_txt[MAX_STRSIZE];
-static VipsBuf main_start_error = 
-	VIPS_BUF_STATIC( main_start_error_txt, MAX_STRSIZE );
+static VipsBuf main_start_error = VIPS_BUF_STATIC( main_start_error_txt );
 
 static void
 main_log_add( const char *fmt, ... )

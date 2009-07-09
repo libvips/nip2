@@ -52,8 +52,8 @@
 static char error_top_text[MAX_STRSIZE];
 static char error_sub_text[MAX_STRSIZE];
 
-VipsBuf error_top_buf = VIPS_BUF_STATIC( error_top_text, MAX_STRSIZE );
-VipsBuf error_sub_buf = VIPS_BUF_STATIC( error_sub_text, MAX_STRSIZE );
+VipsBuf error_top_buf = VIPS_BUF_STATIC( error_top_text );
+VipsBuf error_sub_buf = VIPS_BUF_STATIC( error_sub_text );
 
 /* Useful: Error message and quit. Emergencies only ... we don't tidy up
  * properly.

@@ -120,12 +120,11 @@ iimageview_drag_data_get( GtkWidget *widget, GdkDragContext *context,
 		iImageview *iimageview = IIMAGEVIEW( widget );
 		iImage *iimage = IIMAGE( VOBJECT( iimageview )->iobject );
 		Row *row = HEAPMODEL( iimage )->row;
-		char vips_buf_text[256];
-		VipsBuf buf;
+		char txt[256];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 		/* Drag the fully-qualified row name.
 		 */
-		vips_buf_init_static( &buf, vips_buf_text, 256 );
 		row_qualified_name_relative( main_workspacegroup->sym, 
 			row, &buf );
 		gtk_selection_data_set( selection_data,
@@ -164,13 +163,12 @@ iimageview_drag_data_received( GtkWidget *widget, GdkDragContext *context,
 			from_row_path )) && 
 			from_row != row ) {
 			iText *itext = ITEXT( HEAPMODEL( iimage )->rhs->itext );
-			char vips_buf_text[256];
-			VipsBuf buf;
+			char txt[256];
+			VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 			/* Qualify relative to us. We don't want to embed
 			 * workspace names unless we have to.
 			 */
-			vips_buf_init_static( &buf, vips_buf_text, 256 );
 			row_qualified_name_relative( row->top_row->sym, 
 				from_row, &buf );
 

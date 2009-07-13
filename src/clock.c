@@ -86,7 +86,7 @@ clock_edit( GtkWidget *parent, Model *model )
 	Clock *clock = CLOCK( model );
 	GtkWidget *ss = stringset_new();
 	char txt[256];
-	VipsBuf buf;
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	im_snprintf( txt, 256, "%g", clock->interval );
 	stringset_child_new( STRINGSET( ss ), 
@@ -95,7 +95,6 @@ clock_edit( GtkWidget *parent, Model *model )
 	stringset_child_new( STRINGSET( ss ), 
 		_( "Elapsed time" ), txt, _( "Elapsed time (seconds)" ) );
 
-	vips_buf_init_static( &buf, txt, 100 );
 	row_qualified_name( HEAPMODEL( clock )->row, &buf );
 	iwindow_set_title( IWINDOW( ss ), 
 		_( "Edit Clock \"%s\"" ), vips_buf_all( &buf ) );

@@ -38,10 +38,9 @@ static LogClass *parent_class = NULL;
 static void *
 ierror_print( Expr *expr, iError *ierror, gboolean *found )
 {
-	VipsBuf buf;
 	char txt[1024];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, txt, 1024 );
 	expr_error_print( expr, &buf );
 	log_text( LOG( ierror ), vips_buf_all( &buf ) );
 	*found = TRUE;
@@ -72,10 +71,9 @@ ierror_show_all_action_cb( GtkAction *action, iError *ierror )
 static void *
 unresolved_print_tool( Tool *tool, iError *ierror, gboolean *found )
 {
-	VipsBuf buf;
 	char txt[MAX_STRSIZE];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 	tool_linkreport_tool( tool, &buf, found );
 	log_text( LOG( ierror ), vips_buf_all( &buf ) );
 

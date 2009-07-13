@@ -1075,12 +1075,11 @@ vips_usage( VipsBuf *buf, im_function *fn )
 static void
 vips_error_arg( VipsInfo *vi, HeapNode **arg, int argi )
 {
-	VipsBuf buf;
 	char txt[1000];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	error_top( _( "Bad argument." ) );
 
-	vips_buf_init_static( &buf, txt, 1000 );
 	vips_buf_appendf( &buf,
 		_( "Argument %d (%s) to \"%s\" is the wrong type." ),
 		argi + 1, vi->fn->argv[argi].name, vi->name );
@@ -1097,12 +1096,11 @@ vips_error_arg( VipsInfo *vi, HeapNode **arg, int argi )
 static void
 vips_error_fn_vips( VipsInfo *vi )
 {
-	VipsBuf buf;
 	char txt[1000];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	error_top( _( "VIPS library error." ) );
 
-	vips_buf_init_static( &buf, txt, 1000 );
 	vips_buf_appendf( &buf, 
 		_( "Error calling library function \"%s\" (%s)." ),
 		vi->name, vi->fn->desc );
@@ -1895,10 +1893,9 @@ vips_build_argv( VipsInfo *vi, char **argv )
 	int i;
 
 	for( i = 0; i < vi->fn->argc; i++ ) {
-		VipsBuf buf;
 		char txt[512];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-		vips_buf_init_static( &buf, txt, 512 );
 		vips_tobuf( vi, i, &buf );
 		if( !(argv[i] = im_strdup( NULL, vips_buf_all( &buf ) )) )
 			return( FALSE );

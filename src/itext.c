@@ -644,10 +644,9 @@ itext_update_heap( Heapmodel *heapmodel )
 	 */
 	if( itext->formula ) {
 		char txt[MAX_STRSIZE];
-		VipsBuf buf;
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
 		ParseRhsSyntax syntax;
 
-		vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 		if( is_super( row->sym ) ) {
 			/* A super member ... special syntax.
 			 */

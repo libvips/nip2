@@ -250,13 +250,12 @@ colour_edit( GtkWidget *parent, Model *model )
 	Colour *colour = COLOUR( model );
 	ColourEdit *eds = INEW( NULL, ColourEdit );
 	GtkWidget *idlg;
-	VipsBuf buf;
 	char txt[100];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	eds->colour = colour;
 
 	idlg = idialog_new();
-	vips_buf_init_static( &buf, txt, 100 );
 	row_qualified_name( HEAPMODEL( colour )->row, &buf );
 	iwindow_set_title( IWINDOW( idlg ), 
 		_( "Edit Color \"%s\"" ), vips_buf_all( &buf ) );

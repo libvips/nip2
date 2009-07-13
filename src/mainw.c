@@ -339,9 +339,8 @@ mainw_find_disc( VipsBuf *buf )
 		vips_buf_appendf( buf, _( "No temp area" ) );
 	else {
 		char txt[MAX_STRSIZE];
-		VipsBuf buf2;
+		VipsBuf buf2 = VIPS_BUF_STATIC( txt );
 
-		vips_buf_init_static( &buf2, txt, MAX_STRSIZE );
 		to_size( &buf2, sz );
 		vips_buf_appendf( buf, _( "%s free" ), vips_buf_all( &buf2 ) );
 	}
@@ -366,9 +365,7 @@ mainw_free_update( Mainw *mainw )
 {
 	Heap *heap = reduce_context->heap;
 	char txt[80];
-	VipsBuf buf;
-
-	vips_buf_init_static( &buf, txt, 80 );
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	if( workspace_selected_any( mainw->ws ) ) {
 		/* Display select message instead.
@@ -395,10 +392,9 @@ mainw_free_update( Mainw *mainw )
 static void
 mainw_title_update( Mainw *mainw )
 {
-	VipsBuf buf;
 	char txt[512];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, txt, 512 );
 	if( FILEMODEL( mainw->ws )->modified ) 
 		vips_buf_appendf( &buf, "*" ); 
 	vips_buf_appendf( &buf, "%s", NN( IOBJECT( mainw->ws->sym )->name ) );
@@ -461,9 +457,8 @@ mainw_jump_build( Column *column, GtkWidget *menu )
 {
 	GtkWidget *item;
 	char txt[256];
-	VipsBuf buf;
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, txt, 256 );
 	vips_buf_appendf( &buf, "%s - %s", 
 		IOBJECT( column )->name, IOBJECT( column )->caption );
 	item = gtk_menu_item_new_with_label( vips_buf_all( &buf ) );
@@ -698,8 +693,8 @@ static void
 mainw_group_action_cb( GtkAction *action, Mainw *mainw )
 {
 	Workspace *ws = mainw->ws;
-	VipsBuf buf;
 	char txt[MAX_STRSIZE];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	if( !workspace_selected_any( ws ) ) {
 		/* Nothing selected -- select bottom object.
@@ -713,7 +708,6 @@ mainw_group_action_cb( GtkAction *action, Mainw *mainw )
 		row_select( row );
 	}
 
-	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 	vips_buf_appends( &buf, "Group [" );
 	workspace_selected_names( ws, &buf, "," );
 	vips_buf_appends( &buf, "]" );
@@ -779,8 +773,8 @@ mainw_test_error( Row *row, Mainw *mainw, int *found )
 static void
 mainw_next_error_action_cb( GtkAction *action, Mainw *mainw )
 {
-	VipsBuf buf;
-	char str[MAX_LINELENGTH];
+	char txt[MAX_LINELENGTH];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	int found;
 
@@ -811,7 +805,6 @@ mainw_next_error_action_cb( GtkAction *action, Mainw *mainw )
 
 	model_scrollto( MODEL( mainw->row_last_error ), MODEL_SCROLL_TOP );
 
-	vips_buf_init_static( &buf, str, MAX_LINELENGTH );
 	row_qualified_name( mainw->row_last_error->expr->row, &buf );
 	vips_buf_appends( &buf, ": " );
 	vips_buf_appends( &buf, mainw->row_last_error->expr->error_top );
@@ -847,10 +840,9 @@ mainw_force_calc_action_cb( GtkAction *action, Mainw *mainw )
 	Workspace *ws = mainw->ws;
 
         if( workspace_selected_any( ws ) ) {
-		VipsBuf buf;
-		char str[30];
+		char txt[30];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-		vips_buf_init_static( &buf, str, 30 );
 		workspace_selected_names( ws, &buf, ", " );
 
 		box_yesno( GTK_WIDGET( mainw ), 
@@ -973,10 +965,9 @@ mainw_open_done_cb( iWindow *iwnd, void *client,
 	Filesel *filesel = FILESEL( iwnd );
 	int nselected = filesel_nselected( filesel );
 	char txt[MAX_STRSIZE];
-	VipsBuf buf;
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 	MainwLoad load;
 
-	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 	load.mainw = mainw;
 	load.buf = &buf;
 	load.nitems = 0;
@@ -1117,10 +1108,9 @@ mainw_recent_build( GtkWidget *menu, GSList *recent )
 		const char *filename = (const char *) p->data;
 		GtkWidget *item;
 		char txt[80];
-		VipsBuf buf;
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
 		char *utf8;
 
-		vips_buf_init_static( &buf, txt, 80 );
 		vips_buf_appendf( &buf, "    %s", im_skip_dir( filename ) );
 		utf8 = f2utf8( vips_buf_all( &buf ) );
 		item = gtk_menu_item_new_with_label( utf8 );

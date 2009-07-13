@@ -502,9 +502,7 @@ toolitem_set_action( Toolitem *toolitem, PElement *root )
 {
 	gboolean result;
 	char txt[256];
-	VipsBuf buf;
-
-	vips_buf_init_static( &buf, txt, 256 );
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	if( toolitem->parent )
 		vips_buf_appendf( &buf, "%s.", toolitem->parent->action );
@@ -540,9 +538,8 @@ static void
 toolitem_set_path( Toolitem *toolitem )
 {
 	char txt[256];
-	VipsBuf buf;
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, txt, 256 );
 	if( toolitem->parent )
 		vips_buf_appendf( &buf, "%s", toolitem->parent->path );
 	else 
@@ -556,9 +553,8 @@ static void
 toolitem_set_user_path( Toolitem *toolitem )
 {
 	char txt[256];
-	VipsBuf buf;
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, txt, 256 );
 	if( toolitem->parent )
 		vips_buf_appends( &buf, toolitem->parent->user_path );
 	else
@@ -580,9 +576,8 @@ static void
 toolitem_set_help( Toolitem *toolitem )
 {
 	char txt[256];
-	VipsBuf buf;
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, txt, 256 );
 	vips_buf_appends( &buf, toolitem->name );
 
 	/* Get the params from the action member if we can.

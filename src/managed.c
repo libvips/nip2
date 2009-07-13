@@ -61,11 +61,10 @@ managed_check_all_destroyed( void )
 {
 #ifdef DEBUG_LEAK
 	if( managed_all ) {
-		VipsBuf buf;
-		char str[1000];
+		char txt[1000];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 		printf( "managed_check_all_destroyed:\n" );
-		vips_buf_init_static( &buf, str, 1000 );
 		slist_map( managed_all, (SListMapFn) managed_print_info, &buf );
 		printf( "%s", vips_buf_all( &buf ) );
 	}

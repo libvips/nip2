@@ -237,7 +237,7 @@ browse_add_image( Browse *browse, Imageinfo *ii )
 
 	GtkWidget *but;
         char txt[MAX_LINELENGTH];
-	VipsBuf buf = VIPS_BUF_STATIC( buf );
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	conv = conversion_new( ii );
 	conv->tile_size = 16;

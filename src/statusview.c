@@ -204,8 +204,8 @@ statusview_changed_cb( Imagemodel *imagemodel, Statusview *sv )
 	double size = (double) im->Ysize * IM_IMAGE_SIZEOF_LINE( im );
 	unsigned int nb;
 	int fmt;
-	VipsBuf buf;
 	char txt[MAX_LINELENGTH];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 #ifdef DEBUG
 	printf( "statusview_changed_cb: %p\n", imagemodel );
@@ -225,7 +225,6 @@ statusview_changed_cb( Imagemodel *imagemodel, Statusview *sv )
 		set_glabel( sv->mag, "%s 1:%d", 
 			_( "Magnification" ), -conv->mag );
 
-	vips_buf_init_static( &buf, txt, MAX_LINELENGTH );
 	vips_buf_appendf( &buf, "%s, ", 
 		NN( IOBJECT( iimage )->caption ) );
 	to_size( &buf, size );

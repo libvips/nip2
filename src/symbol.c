@@ -190,10 +190,10 @@ symbol_qualified_name_relative( Symbol *context, Symbol *sym, VipsBuf *buf )
 const char *
 symbol_name( Symbol *sym )
 {
-	static VipsBuf buf;
 	static char txt[200];
+	static VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, txt, 200 );
+	vips_buf_rewind( &buf );
 	symbol_qualified_name( sym, &buf );
 
 	return( vips_buf_all( &buf ) );
@@ -215,10 +215,10 @@ symbol_name_scope( Symbol *sym )
 {
 	Symbol *scope = symbol_get_scope( sym );
 
-	static VipsBuf buf;
 	static char txt[200];
+	static VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, txt, 200 );
+	vips_buf_rewind( &buf );
 	vips_buf_appends( &buf, NN( IOBJECT( scope )->name ) );
 	vips_buf_appends( &buf, "." );
 	symbol_qualified_name_relative( scope, sym, &buf );
@@ -481,10 +481,9 @@ void
 symbol_not_defined( Symbol *sym )
 {
 	char txt[256];
-	VipsBuf buf;
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	error_top( _( "Not found." ) );
-	vips_buf_init_static( &buf, txt, 256 );
 	vips_buf_appendf( &buf, _( "Symbol %s is not defined." ), 
 		symbol_name( sym ) );
 	vips_buf_appends( &buf, "\n" );
@@ -701,10 +700,10 @@ symbol_new( Compile *compile, const char *name )
 void
 symbol_error_redefine( Symbol *sym )
 {
-	static VipsBuf buf;
 	static char txt[200];
+	static VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, txt, 200 );
+	vips_buf_rewind( &buf );
 	vips_buf_appendf( &buf, _( "Redefinition of \"%s\"." ), 
 		IOBJECT( sym )->name );
 	if( sym->tool && sym->tool->lineno != -1 ) {

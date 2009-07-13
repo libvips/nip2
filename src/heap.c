@@ -811,10 +811,9 @@ heap_getmem( Heap *heap )
 	if( !heap->free ) {
 		error_top( _( "Heap full." ) );
 		if( heap->compile ) {
-			VipsBuf buf;
 			char txt[100];
+			VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-			vips_buf_init_static( &buf, txt, 100 );
 			compile_name( heap->compile, &buf );
 			error_sub( _( "The compile heap for %s has filled. "
 				"Make it smaller and less complicated." ),

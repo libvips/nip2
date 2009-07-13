@@ -163,10 +163,9 @@ subcolumn_class_new_heap_sub( ClassRefreshInfo *cri,
 	Row *row;
 
 #ifdef DEBUG
-	VipsBuf buf;
 	char txt[200];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, txt, 200 );
 	symbol_qualified_name( sym, &buf );
 	printf( "subcolumn_class_new_heap_sub: %s\n", vips_buf_all( &buf ) );
 #endif /*DEBUG*/

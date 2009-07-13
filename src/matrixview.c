@@ -486,8 +486,8 @@ matrixview_text_traverse( GtkSheet *sheet,
 
     	char *new_text = gtk_sheet_cell_get_text( sheet, *new_row, *new_col );
 
-    	VipsBuf buf;
-    	char str[MAX_LINELENGTH];
+    	char txt[MAX_LINELENGTH];
+    	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	/* Make a note of what's in this cell before any editing ... "changed"
 	 * does a strcmp() on this to spot edit actions.
@@ -496,7 +496,6 @@ matrixview_text_traverse( GtkSheet *sheet,
 	matrixview->cell_row = *new_row;
 	matrixview->cell_col = *new_col;
 
-    	vips_buf_init_static( &buf, str, MAX_LINELENGTH );
     	row_qualified_name( row, &buf );
 	/* Expands to (eg) "A2: cell (1,2): 45" ... status line display during
 	 * matrix traverse.

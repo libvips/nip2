@@ -72,10 +72,9 @@ toolkitbrowser_rebuild_item3( Toolitem *toolitem,
 		!toolitem->is_separator &&
 		toolitem->compile ) {
 		char txt[256];
-		VipsBuf buf;
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
 		GtkTreeIter iter;
 
-		vips_buf_init_static( &buf, txt, 256 );
 		if( toolitem->action_sym && 
 			toolitem->action_sym->expr &&
 			toolitem->action_sym->expr->compile->param ) 

@@ -288,10 +288,9 @@ vo_object_new( Reduce *rc, const char *name,
 
 #ifdef DEBUG
 {
-	VipsBuf buf;
 	char txt[1000];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, txt, 1000 );
 	vips_object_to_string( vo->object, &buf );
 	printf( "vo_object_new: built %s\n", vips_buf_all( &buf ) );
 }

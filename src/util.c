@@ -106,13 +106,12 @@ static void
 error_set( VipsBuf *buf, const char *fmt, va_list ap )
 {
 	if( !error_level ) {
-		char tmp_text[MAX_STRSIZE];
-		VipsBuf tmp;
+		char txt[MAX_STRSIZE];
+		VipsBuf tmp = VIPS_BUF_STATIC( txt );
 
 		/* The string we write may contain itself ... write to an
 		 * intermediate, then copy to main.
 		 */
-		vips_buf_init_static( &tmp, tmp_text, MAX_STRSIZE );
 		vips_buf_vappendf( &tmp, fmt, ap );
 
 		vips_buf_rewind( buf );
@@ -2716,9 +2715,8 @@ imalloc( IMAGE *im, size_t len )
 
 	if( !(mem = im_malloc( im, len )) ) {
 		char txt[256];
-		VipsBuf buf;
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-		vips_buf_init_static( &buf, txt, 256 );
 		to_size( &buf, len );
 		error_top( _( "Out of memory." ) );
 		error_sub( _( "Request for %s of RAM triggered memory "

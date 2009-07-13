@@ -1027,7 +1027,7 @@ imagepresent_left_release( Imagepresent *ip, GdkEvent *ev, int x, int y )
 			/* Make a new region.
 			 */
 			char txt[MAX_STRSIZE];
-			VipsBuf buf;
+			VipsBuf buf = VIPS_BUF_STATIC( txt );
 			Symbol *sym;
 
 			/* In compatibility mode, we need to un-offset, since
@@ -1041,8 +1041,6 @@ imagepresent_left_release( Imagepresent *ip, GdkEvent *ev, int x, int y )
 				ip->floating.top -= im->Yoffset;
 			}
 
-			vips_buf_init_static( &buf, txt, MAX_STRSIZE );
-
 			switch( ip->regionview->type ) {
 			case REGIONVIEW_MARK:
 				/* How annoying, this used to be called
@@ -1051,7 +1049,8 @@ imagepresent_left_release( Imagepresent *ip, GdkEvent *ev, int x, int y )
 				if( row->ws->compat_78 )
 					vips_buf_appends( &buf, "Point " );
 				else
-					vips_buf_appendf( &buf, "%s ", CLASS_MARK );
+					vips_buf_appendf( &buf, "%s ", 
+						CLASS_MARK );
 
 				row_qualified_name( row, &buf );
 				vips_buf_appendd( &buf, ip->floating.left );

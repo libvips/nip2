@@ -558,10 +558,9 @@ set_glabel1( GtkWidget *label, const char *fmt, ... )
 {
 	va_list ap;
 	char txt[1000];
-	VipsBuf buf;
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	va_start( ap, fmt );
-	vips_buf_init_static( &buf, txt, 1000 );
 	vips_buf_vappendf( &buf, fmt, ap );
 	va_end( ap );
 

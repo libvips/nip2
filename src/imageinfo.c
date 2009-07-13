@@ -2158,11 +2158,10 @@ imageinfo_from_text( Imageinfo *imageinfo, const char *text )
 
 #ifdef DEBUG_RGB
 {
-	char vips_buf_text[256];
-	VipsBuf buf;
+	char txt[256];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	printf( "imageinfo_from_text: out: " );
-	vips_buf_init_static( &buf, vips_buf_text, 256 );
 	imageinfo_to_text( imageinfo, &buf );
 	printf( "%s\n", vips_buf_all( &buf ) );
 }
@@ -2189,11 +2188,10 @@ imageinfo_to_rgb( Imageinfo *imageinfo, double *rgb )
 
 #ifdef DEBUG_RGB
 {
-	char vips_buf_text[256];
-	VipsBuf buf;
+	char txt[256];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	printf( "imageinfo_to_rgb: in: " );
-	vips_buf_init_static( &buf, vips_buf_text, 256 );
 	imageinfo_to_text( imageinfo, &buf );
 	printf( "%s\n", vips_buf_all( &buf ) );
 }
@@ -2402,11 +2400,10 @@ imageinfo_from_rgb( Imageinfo *imageinfo, double *rgb )
 
 #ifdef DEBUG_RGB
 {
-	char vips_buf_text[256];
-	VipsBuf buf;
+	char txt[256];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	printf( "imageinfo_from_rgb: out: " );
-	vips_buf_init_static( &buf, vips_buf_text, 256 );
 	imageinfo_to_text( imageinfo, &buf );
 	printf( "%s\n", vips_buf_all( &buf ) );
 }

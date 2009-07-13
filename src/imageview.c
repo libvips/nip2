@@ -138,10 +138,9 @@ imageview_refresh_title( Imageview *iv )
 		Conversion *conv = imagemodel->conv;
 		Imageinfo *ii = iimage->value.ii;
 
-		VipsBuf buf;
 		char txt[512];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-		vips_buf_init_static( &buf, txt, 512 );
 		row_qualified_name_relative( ws->sym, row, &buf );
 
 		if( ii && imageinfo_is_from_file( ii ) )
@@ -247,13 +246,12 @@ imageview_new_arrow2_action_cb( GtkAction *action, Imageview *iv )
 	int dy = imagemodel->visible.top + imagemodel->visible.height / 2;
 
 	char txt[MAX_STRSIZE];
-	VipsBuf buf;
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 	Symbol *sym;
 	int ix, iy;
 
 	conversion_disp_to_im( conv, dx, dy, &ix, &iy );
 
-	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 	vips_buf_appendf( &buf, "%s ", imageview_region_name[rt] );
 	row_qualified_name_relative( ws->sym, row, &buf );
 	switch( rt ) {
@@ -293,7 +291,7 @@ imageview_new_arrow4_action_cb( GtkAction *action, Imageview *iv )
 
 	Rect dr, ir;
 	char txt[MAX_STRSIZE];
-	VipsBuf buf;
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 	Symbol *sym;
 	Column *col;
 
@@ -303,7 +301,6 @@ imageview_new_arrow4_action_cb( GtkAction *action, Imageview *iv )
 	dr.height = imagemodel->visible.height / 2;
 	conversion_disp_to_im_rect( conv, &dr, &ir );
 
-	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 	vips_buf_appendf( &buf, "%s ", imageview_region_name[rt] );
 	row_qualified_name_relative( ws->sym, row, &buf );
 	vips_buf_appendf( &buf, " (%d) (%d) %d %d", 
@@ -357,10 +354,9 @@ imageview_header_action_cb( GtkAction *action, Imageview *iv )
 	iImage *iimage = imagemodel->iimage;
 	Row *row = HEAPMODEL( iimage )->row;
 	Workspace *ws = row_get_workspace( row );
-	VipsBuf buf;
 	char txt[512];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, txt, 512 );
 	row_qualified_name_relative( ws->sym, row, &buf );
 	conversion_header_dialog( imagemodel->conv, 
 		vips_buf_all( &buf ), GTK_WIDGET( iv ) );

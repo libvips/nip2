@@ -209,11 +209,10 @@ decode_SymbolType_user( SymbolType t )
 void *
 dump_tiny( Symbol *sym )
 {
-	VipsBuf buf;
-	char str[100];
+	char txt[100];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	printf( "(%p) ", sym );
-	vips_buf_init_static( &buf, str, 100 );
 	symbol_qualified_name( sym, &buf );
 	if( sym->dirty )
 		printf( "*" );
@@ -288,10 +287,6 @@ void
 dump_compile( Compile *compile )
 {
 	Symbol *sym = compile->sym;
-#ifdef VERBOSE
-	VipsBuf buf;
-	char str[100];
-#endif /*VERBOSE*/
 
 	printf( "compile (%p)->sym->name = \"%s\"\n", 
 		compile, IOBJECT( sym )->name );
@@ -327,6 +322,10 @@ dump_compile( Compile *compile )
 	}
 
 #ifdef VERBOSE
+{
+	char txt[100];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
+
 	printf( "%s->compile->nparam = %d\n", 
 		IOBJECT( sym )->name, compile->nparam );
 	printf( "%s->compile->param = ", IOBJECT( sym )->name );
@@ -353,12 +352,12 @@ dump_compile( Compile *compile )
 	(void) slist_map( compile->children, (SListMapFn) dump_tiny, NULL );
 	printf( "\n" );
 
-	vips_buf_init_static( &buf, str, 80 );
 	graph_element( compile->heap, &buf, &compile->base, FALSE );
 	printf( "%s->compile->base = %s\n", 
 		IOBJECT( sym )->name, vips_buf_all( &buf ) );
 	if( compile->heap )
 		iobject_dump( IOBJECT( compile->heap ) );
+}
 #endif /*VERBOSE*/
 }
 
@@ -489,10 +488,9 @@ psym( char *name )
 void 
 pgraph( PElement *graph )
 {	
-	VipsBuf buf;
 	char txt[10240];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, txt, 10240 );
 	graph_pelement( reduce_context->heap, &buf, graph, TRUE );
 	printf( "%s\n", vips_buf_all( &buf ) );
 }
@@ -502,12 +500,12 @@ pgraph( PElement *graph )
 void 
 psymv( char *name )
 {	
-	VipsBuf buf;
-	char txt[1024];
-	Symbol *s = sym( name );
+	Symbol *s;
 
-	if( s ) {
-		vips_buf_init_static( &buf, txt, 1024 );
+	if( (s = sym( name )) ) {
+		char txt[1024];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
+
 		graph_pelement( reduce_context->heap, 
 			&buf, &s->expr->root, TRUE );
 		printf( "%s = %s\n", name, vips_buf_all( &buf ) );

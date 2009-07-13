@@ -215,7 +215,7 @@ iregion_edit( GtkWidget *parent, Model *model )
 	iRegionInstance *instance = classmodel_get_instance( classmodel );
 	GtkWidget *ss = stringset_new();
 	char txt[256];
-	VipsBuf buf;
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	if( instance ) {
 		im_snprintf( txt, 256, "%d", instance->area.left );
@@ -232,7 +232,6 @@ iregion_edit( GtkWidget *parent, Model *model )
 			_( "Height" ), txt, _( "Height of region" ) );
 	}
 
-	vips_buf_init_static( &buf, txt, 100 );
 	row_qualified_name( HEAPMODEL( model )->row, &buf );
 	iwindow_set_title( IWINDOW( ss ), 
 		_( "Edit \"%s\"" ), vips_buf_all( &buf ) );

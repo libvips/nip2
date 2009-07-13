@@ -512,10 +512,9 @@ Symbol *
 workspace_load_file( Workspace *ws, const char *filename )
 {
 	char txt[MAX_STRSIZE];
-	VipsBuf buf;
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 	Symbol *sym;
 
-	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 	if( !workspace_load_file_buf( &buf, filename ) )
 		return( NULL );
 	if( !(sym = workspace_add_def( ws, vips_buf_all( &buf ) )) ) 
@@ -1572,12 +1571,11 @@ workspace_add_action( Workspace *ws,
 	const char *name, const char *action, int nparam )
 {
 	Column *col = workspace_column_pick( ws );
-	char str[1024];
-	VipsBuf buf;
+	char txt[1024];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	/* Are there any selected symbols?
 	 */
-	vips_buf_init_static( &buf, str, 1024 );
 	vips_buf_appends( &buf, action );
 	if( nparam > 0 && workspace_selected_any( ws ) ) {
 		if( nparam != workspace_selected_num( ws ) ) {
@@ -1772,13 +1770,12 @@ workspace_selected_remove_yesno_cb( iWindow *iwnd, void *client,
 void
 workspace_selected_remove_yesno( Workspace *ws, GtkWidget *parent )
 {
-	VipsBuf buf;
-	char str[30];
+	char txt[30];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
         if( !workspace_selected_any( ws ) ) 
 		return;
 
-	vips_buf_init_static( &buf, str, 30 );
 	workspace_selected_names( ws, &buf, ", " );
 
 	box_yesno( parent, 
@@ -1794,10 +1791,10 @@ workspace_selected_remove_yesno( Workspace *ws, GtkWidget *parent )
 static gboolean
 workspace_ungroup_add_index( Row *row, const char *fmt, int i )
 {
-	static VipsBuf buf;
 	static char txt[200];
+	static VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, txt, 200 );
+	vips_buf_rewind( &buf );
 	row_qualified_name( row, &buf );
 	vips_buf_appendf( &buf, fmt, i );
 	if( !workspace_add_def( row->ws, vips_buf_all( &buf ) ) )
@@ -1840,10 +1837,9 @@ workspace_ungroup_row( Row *row )
 					return( row );
 		}
 		else {
-			VipsBuf buf;
 			char txt[100];
+			VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-			vips_buf_init_static( &buf, txt, 100 );
 			row_qualified_name( row, &buf );
 			error_top( _( "Unable to ungroup." ) );
 			error_sub( _( "Row \"%s\" is not a Group or a list." ), 

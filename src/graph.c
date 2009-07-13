@@ -412,8 +412,8 @@ void
 graph_node( Heap *heap, VipsBuf *buf, HeapNode *root, gboolean fn )
 {
 	GSList *back;
-	VipsBuf buf2;
 	char txt[4];
+	VipsBuf buf2 = VIPS_BUF_STATIC( txt );
 
 	/* May be called before heap is built.
 	 */
@@ -421,7 +421,6 @@ graph_node( Heap *heap, VipsBuf *buf, HeapNode *root, gboolean fn )
 		return;
 
 	back = NULL;
-	vips_buf_init_static( &buf2, txt, 4 );
 	heap_clear( heap, FLAG_PRINT );
 	lisp_node( &buf2, root, &back, fn, 0 );
 	heap_clear( heap, FLAG_PRINT );
@@ -435,8 +434,8 @@ void
 graph_pelement( Heap *heap, VipsBuf *buf, PElement *root, gboolean fn )
 {
 	GSList *back;
-	VipsBuf buf2;
 	char txt[4];
+	VipsBuf buf2 = VIPS_BUF_STATIC( txt );
 
 	/* May be called before heap is built.
 	 */
@@ -446,7 +445,6 @@ graph_pelement( Heap *heap, VipsBuf *buf, PElement *root, gboolean fn )
 	/* We print twice ... the first time through we build the list of back
 	 * pointers so we can label the graph correctly.
 	 */
-	vips_buf_init_static( &buf2, txt, 4 );
 	back = NULL;
 
 	heap_clear( heap, FLAG_PRINT );
@@ -472,10 +470,9 @@ graph_element( Heap *heap, VipsBuf *buf, Element *root, gboolean fn )
 void
 graph_pointer( PElement *root )
 {
-	VipsBuf buf;
 	char txt[1000];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, txt, 1000 );
 	graph_pelement( reduce_context->heap, &buf, root, TRUE );
 	printf( "%s\n", vips_buf_all( &buf ) );
 }

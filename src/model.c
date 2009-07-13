@@ -670,8 +670,8 @@ model_check_destroy_finished( void *client, iWindowResult result )
 void
 model_check_destroy( GtkWidget *parent, Model *model )
 {
-	VipsBuf buf;
-	char str[30];
+	char txt[30];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 	const char *name;
 
 	ModelCheckDestroy *mcd = INEW( NULL, ModelCheckDestroy );
@@ -680,7 +680,6 @@ model_check_destroy( GtkWidget *parent, Model *model )
 	mcd->model = model;
 
 	if( IS_SYMBOL( model ) ) {
-		vips_buf_init_static( &buf, str, 30 );
 		symbol_qualified_name( SYMBOL( model ), &buf );
 		name = vips_buf_all( &buf );
 	}

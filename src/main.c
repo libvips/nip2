@@ -206,10 +206,9 @@ main_error_exit( const char *fmt, ... )
 		error_get_top(), error_get_sub() );
 
 	if( main_option_verbose ) {
-		VipsBuf buf;
 		char txt[MAX_STRSIZE];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-		vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 		slist_map( expr_error_all,
 			(SListMapFn) expr_error_print, &buf );
 		fprintf( stderr, "%s\n", vips_buf_all( &buf ) );
@@ -859,14 +858,12 @@ main_check_temp( double total )
 {
 	if( total > 10 * 1024 * 1024 ) {
 		char txt[256];
-		VipsBuf buf;
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
 		char tmp[FILENAME_MAX];
 
 		expand_variables( PATH_TMP, tmp );
 		nativeize_path( tmp );
 		absoluteize_path( tmp );
-
-		vips_buf_init_static( &buf, txt, 256 );
 		to_size( &buf, total );
 
 		box_yesno( NULL,
@@ -965,7 +962,7 @@ main( int argc, char *argv[] )
 #endif /*HAVE_FFTW*/
 	Toolkit *kit;
 	char txt[MAX_STRSIZE];
-	VipsBuf buf;
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 #ifdef DEBUG_LEAK
 #ifdef PROFILE
@@ -1303,7 +1300,6 @@ main( int argc, char *argv[] )
 	if( main_option_expression ) {
 		kit = toolkit_new( main_toolkitgroup, "_expression" );
 
-		vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 		vips_buf_appendf( &buf, "main = %s;", main_option_expression );
 		attach_input_string( vips_buf_all( &buf ) );
 		(void) parse_onedef( kit, -1 );
@@ -1356,12 +1352,12 @@ main( int argc, char *argv[] )
 	/* Make nip's argc/argv[].
 	 */
 	kit = toolkit_new( main_toolkitgroup, "_args" );
-	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
+	vips_buf_rewind( &buf );
 	vips_buf_appendf( &buf, "argc = %d;", argc );
 	attach_input_string( vips_buf_all( &buf ) );
 	(void) parse_onedef( kit, -1 );
 
-	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
+	vips_buf_rewind( &buf );
 	vips_buf_appendf( &buf, "argv = [" );
 	for( i = 0; i < argc; i++ ) {
 		if( i > 0 )

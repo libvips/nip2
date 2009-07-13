@@ -94,14 +94,13 @@ compile_name_sub( Expr *expr, VipsBuf *buf )
 void
 compile_name( Compile *compile, VipsBuf *buf )
 {
-	VipsBuf buf2;
 	char txt[256];
+	VipsBuf buf2 = VIPS_BUF_STATIC( txt );
 
 	vips_buf_appends( buf, "\"" );
 	symbol_qualified_name( compile->sym, buf );
 	vips_buf_appends( buf, "\"" );
 
-	vips_buf_init_static( &buf2, txt, 256 );
 	slist_map( compile->exprs,
 		(SListMapFn) compile_name_sub, &buf2 );
 	if( !vips_buf_is_empty( &buf2 ) ) 
@@ -1318,15 +1317,14 @@ static int
 compile_transform_reference( Compile *compile, HeapNode *hn1, HeapNode *hn2 )
 {
 #ifdef DEBUG
+{
 	Heap *heap = compile->heap;
-	VipsBuf buf;
 	char txt[100];
-#endif /*DEBUG*/
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-#ifdef DEBUG
-	vips_buf_init_static( &buf, txt, 80 );
 	graph_node( heap, &buf, hn1, TRUE );
 	printf( "Found common subexpression: %s\n", vips_buf_all( &buf ) );
+}
 #endif /*DEBUG*/
 
 #ifdef DEBUG_COMMON
@@ -1420,11 +1418,6 @@ compile_transform_share( HeapNode *hn, Compile *compile )
 {
 	Heap *heap = compile->heap;
 
-#ifdef DEBUG
-	VipsBuf buf;
-	char txt[100];
-#endif /*DEBUG*/
-
 	if( hn->type == TAG_REFERENCE ) {
 		HeapNode *hn1 = GETLEFT( hn );
 
@@ -1432,9 +1425,14 @@ compile_transform_share( HeapNode *hn, Compile *compile )
 			HeapNode *hn2;
 
 #ifdef DEBUG
-			vips_buf_init_static( &buf, txt, 80 );
+{
+			char txt[100];
+			VipsBuf buf = VIPS_BUF_STATIC( txt );
+
 			graph_node( heap, &buf, hn1, TRUE );
-			printf( "Found shared code: %s\n", vips_buf_all( &buf ) );
+			printf( "Found shared code: %s\n", 
+				vips_buf_all( &buf ) );
+}
 #endif /*DEBUG*/
 
 			if( NEWNODE( heap, hn2 ) )
@@ -1519,10 +1517,6 @@ static void *
 compile_heap( Compile *compile )
 {
 	PElement base;
-#ifdef DEBUG
-	VipsBuf buf;
-	char txt[1024];
-#endif /*DEBUG*/
 
 	/* Don't generate code for parser temps.
 	 */
@@ -1560,10 +1554,14 @@ compile_heap( Compile *compile )
 	}
 
 #ifdef DEBUG
-	vips_buf_init_static( &buf, txt, 1024 );
+{
+	char txt[1024];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
+
 	graph_pelement( compile->heap, &buf, &base, TRUE );
 	printf( "before var abstraction, compiled \"%s\" to: %s\n", 
 		IOBJECT( compile->sym )->name, vips_buf_all( &buf ) );
+}
 #endif /*DEBUG*/
 
 	/* Abstract real parameters.
@@ -1591,13 +1589,12 @@ compile_heap( Compile *compile )
 
 #ifdef DEBUG_RESULT
 {
-	VipsBuf buf;
 	char txt[1024];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	printf( "compiled \"" );
 	symbol_name_print( compile->sym );
 	printf( "\" to: " );
-	vips_buf_init_static( &buf, txt, 1024 );
 	graph_pelement( compile->heap, &buf, &base, TRUE );
 	printf( "%s\n", vips_buf_all( &buf ) );
 }

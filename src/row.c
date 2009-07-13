@@ -135,10 +135,9 @@ void *
 row_name_print( Row *row )
 {
 	if( row ) {
-		VipsBuf buf;
 		char txt[100];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-		vips_buf_init_static( &buf, txt, 100 );
 		row_qualified_name( row, &buf );
 		printf( "%s ", vips_buf_all( &buf ) );
 	}
@@ -178,10 +177,9 @@ row_error_set( Row *row )
 		 * recomp on this tree.
 		 */
 		if( row != row->top_row ) {
-			VipsBuf buf;
 			char txt[100];
+			VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-			vips_buf_init_static( &buf, txt, 100 );
 			row_qualified_name( row, &buf );
 
 			error_top( _( "Error in row." ) );
@@ -2004,15 +2002,13 @@ row_set_status( Row *row )
 {
 	Expr *expr = row->expr;
 
-	char str[MAX_LINELENGTH];
-	VipsBuf buf;
+	char txt[MAX_LINELENGTH];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	/* No symbol? eg. on load error.
 	 */
 	if( !expr )
 		return;
-
-	vips_buf_init_static( &buf, str, MAX_LINELENGTH );
 
 	row_qualified_name( row, &buf );
 

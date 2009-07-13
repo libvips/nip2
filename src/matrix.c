@@ -183,13 +183,11 @@ matrix_edit( GtkWidget *parent, Model *model )
 	MatrixEdit *eds = INEW( NULL, MatrixEdit );
 	GtkWidget *idlg;
 	char txt[256];
-	VipsBuf buf;
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	eds->matrix = matrix;
 
 	idlg = idialog_new();
-	vips_buf_init_static( &buf, txt, 100 );
-	row_qualified_name( HEAPMODEL( matrix )->row, &buf );
 	iwindow_set_title( IWINDOW( idlg ), 
 		_( "Edit Matrix \"%s\"" ), vips_buf_all( &buf ) );
 	idialog_set_build( IDIALOG( idlg ), 
@@ -235,14 +233,13 @@ matrix_graphic_replace( Classmodel *classmodel,
 	iText *itext = ITEXT( HEAPMODEL( matrix )->rhs->itext );
 	DOUBLEMASK *dmask;
 	char txt[MAX_STRSIZE];
-	VipsBuf buf;
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	if( !(dmask = im_read_dmask( filename )) ) {
 		error_vips_all();
 		return( FALSE );
 	}
 
-	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 	matrix_dmask_to_ip( dmask, &buf );
 	im_free_dmask( dmask );
 

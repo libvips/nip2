@@ -123,11 +123,11 @@ build_vips_formats_sub( VipsFormatClass *format, GSList **types )
 {
 	FileselFileType *type = g_new( FileselFileType, 1 );
 	char txt[MAX_STRSIZE];
-	VipsBuf buf;
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 	const char **i;
 
-	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
-	vips_buf_appendf( &buf, "%s ", VIPS_OBJECT_CLASS( format )->description );
+	vips_buf_appendf( &buf, 
+		"%s ", VIPS_OBJECT_CLASS( format )->description );
 	/* Used as eg. "VIPS image files (*.v)"
 	 */
 	vips_buf_appends( &buf, _( "image files" ) );
@@ -495,9 +495,8 @@ filesel_space_update( Filesel *filesel, const char *dirname )
 				dirname );
 		else {
 			char txt[MAX_STRSIZE];
-			VipsBuf buf;
+			VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-			vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 			to_size( &buf, sz );
 			vips_buf_appendf( &buf, " " );
 			/* Expands to (eg.) '6GB free in "/pics/tmp"'
@@ -606,11 +605,10 @@ filesel_current_folder_changed_cb( GtkWidget *widget, gpointer data )
 static void
 filesel_info_update( Filesel *filesel, const char *name )
 {
-	char txt[MAX_STRSIZE];
-	VipsBuf buf;
-
 	if( filesel->info ) {
-		vips_buf_init_static( &buf, txt, MAX_STRSIZE );
+		char txt[MAX_STRSIZE];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
+
 		get_image_info( &buf, name );
 		set_glabel( filesel->info, "%s", vips_buf_firstline( &buf ) );
 	}
@@ -878,12 +876,12 @@ file_filter_from_file_type( FileselFileType *type )
 
 	if( type->suffixes[0] )
 		for( j = 0; type->suffixes[j]; j++ ) {
-			char buf[FILENAME_MAX];
-			VipsBuf patt;
+			char txt[FILENAME_MAX];
+			VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-			vips_buf_init_static( &patt, buf, FILENAME_MAX );
-			filesel_suffix_to_glob( type->suffixes[j], &patt );
-			gtk_file_filter_add_pattern( filter, vips_buf_all( &patt ) );
+			filesel_suffix_to_glob( type->suffixes[j], &buf );
+			gtk_file_filter_add_pattern( filter, 
+				vips_buf_all( &buf ) );
 		}
 	else
 		/* No suffix list means any suffix allowed.

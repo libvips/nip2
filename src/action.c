@@ -88,11 +88,11 @@ action_boperror( Reduce *rc, Compile *compile, const char *str,
 	const char *op_name = op >= 0 ? decode_BinOp( op ) : name;
 
 	char txt[MAX_ERROR_FRAG];
-	VipsBuf buf = VIPS_BUF_STATIC( txt )
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 	char txt2[MAX_ERROR_FRAG];
-	VipsBuf buf2 = VIPS_BUF_STATIC( txt2 )
+	VipsBuf buf2 = VIPS_BUF_STATIC( txt2 );
 	char txt3[MAX_ERROR_FRAG];
-	VipsBuf buf3 = VIPS_BUF_STATIC( txt3 )
+	VipsBuf buf3 = VIPS_BUF_STATIC( txt3 );
 
 	itext_value_ev( rc, &buf, a );
 	itext_value_ev( rc, &buf2, b );

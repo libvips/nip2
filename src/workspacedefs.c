@@ -63,8 +63,8 @@ workspacedefs_refresh( vObject *vobject )
 	Workspacedefs *workspacedefs = WORKSPACEDEFS( vobject );
 	Mainw *mainw = workspacedefs->mainw;
 	Workspace *ws = mainw->ws;
-	VipsBuf buf;
 	char txt[256];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 #ifdef DEBUG
 	printf( "workspacedefs_refresh:\n" );
@@ -90,7 +90,6 @@ workspacedefs_refresh( vObject *vobject )
 		}
 	}
 
-	vips_buf_init_static( &buf, txt, 512 );
 	if( workspacedefs->mainw->ws->local_kit ) {
 		int n = icontainer_get_n_children( ICONTAINER( 
 			workspacedefs->mainw->ws->local_kit ) );

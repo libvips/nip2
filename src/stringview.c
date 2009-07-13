@@ -87,9 +87,8 @@ stringview_refresh( vObject *vobject )
 
 	if( string->value ) {
 		char txt[MAX_STRSIZE];
-		VipsBuf buf;
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-		vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 		vips_buf_appendsc( &buf, FALSE, string->value );
 		editview_set_entry( EDITVIEW( stringview ), 
 			"%s", vips_buf_all( &buf ) );

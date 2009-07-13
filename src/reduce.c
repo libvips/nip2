@@ -109,12 +109,12 @@ void
 reduce_error_typecheck( Reduce *rc, 
 	PElement *e, const char *name, const char *type )
 {
-	VipsBuf buf;
 	char txt[1024];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	error_top( _( "Typecheck error." ) );
-	vips_buf_init_static( &buf, txt, 1024 );
-	vips_buf_appendf( &buf, _( "%s expected %s, instead saw:" ), name, type );
+	vips_buf_appendf( &buf, 
+		_( "%s expected %s, instead saw:" ), name, type );
 	vips_buf_appends( &buf, "\n  " );
 	itext_value_ev( rc, &buf, e );
 	error_sub( "%s", vips_buf_all( &buf ) );
@@ -773,13 +773,12 @@ reduce_is_class( Reduce *rc, PElement *klass )
 gboolean
 reduce_is_instanceof_exact( Reduce *rc, const char *name, PElement *instance )
 {
-        VipsBuf buf;
         char txt[256];
+        VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	if( !reduce_is_class( rc, instance ) )
 		return( FALSE );
 
-        vips_buf_init_static( &buf, txt, 256 );
         symbol_qualified_name( PEGETCLASSCOMPILE( instance )->sym, &buf );
         if( strcmp( name, vips_buf_all( &buf ) ) == 0 )
                 return( TRUE );
@@ -922,10 +921,9 @@ reduce_list_index( Reduce *rc, PElement *base, int n, PElement *out )
 static void
 argserror( Reduce *rc,  PElement *a )
 {
-	VipsBuf buf;
 	char txt[MAX_ERROR_FRAG];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, txt, MAX_ERROR_FRAG );
 	itext_value_ev( rc, &buf, a );
 
 	error_top( _( "No arguments allowed." ) );
@@ -1852,10 +1850,9 @@ reduce_start:
 	/* Should now be in WHNF ... test!
 	 */
 	if( !is_WHNF( out ) ) {
-		VipsBuf buf;
 		char txt[1000];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-		vips_buf_init_static( &buf, txt, 1000 );
 		graph_pelement( heap, &buf, out, TRUE );
 		printf( "*** internal error:\n" );
 		printf( "result of reduce_spine not in WHNF: " );
@@ -2002,10 +1999,9 @@ reduce_regenerate( Expr *expr, PElement *out )
 
 #ifdef DEBUG_REGEN
 {
-	VipsBuf buf;
 	char txt[1024];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, txt, 1024 );
 	graph_pelement( heap, &buf, out, TRUE );
 	printf( "reduce_regenerate: reducing " );
 	expr_name_print( expr );
@@ -2024,8 +2020,8 @@ reduce_regenerate( Expr *expr, PElement *out )
 
 #ifdef DEBUG_REGEN
 {
-	VipsBuf buf;
 	char txt[1024];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	/* Force immediate GC to pick up any stray pointers.
 	 */
@@ -2034,7 +2030,6 @@ reduce_regenerate( Expr *expr, PElement *out )
 		return( FALSE );
 	}
 
-	vips_buf_init_static( &buf, txt, 1024 );
 	graph_pelement( heap, &buf, out, TRUE );
 	printf( "reduce_regenerate: reduced " );
 	expr_name_print( expr );
@@ -2075,10 +2070,9 @@ reduce_regenerate_member( Expr *expr, PElement *ths, PElement *out )
 
 #ifdef DEBUG_REGEN_MEMBER
 {
-	VipsBuf buf;
 	char txt[1024];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, txt, 1024 );
 	graph_pelement( heap, &buf, out, TRUE );
 	printf( "reduce_regenerate_member: " );
 	expr_name_print( expr );

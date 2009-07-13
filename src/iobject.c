@@ -296,10 +296,9 @@ iobject_sink( iObject *iobject )
 void
 iobject_dump( iObject *iobject )
 {
-	VipsBuf buf;
-	char str[1000];
+	char txt[1000];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, str, 1000 );
 	iobject_info( iobject, &buf );
 	printf( "%s", vips_buf_all( &buf ) );
 }

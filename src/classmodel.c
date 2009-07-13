@@ -147,8 +147,8 @@ classmodel_graphic_save( Classmodel *classmodel, GtkWidget *parent )
 {
 	ClassmodelClass *class = CLASSMODEL_GET_CLASS( classmodel );
 	GtkWidget *filesel;
-	VipsBuf buf;
 	char txt[100];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	if( !class->graphic_save ) {
 		error_top( _( "Not implemented." ) );
@@ -159,7 +159,6 @@ classmodel_graphic_save( Classmodel *classmodel, GtkWidget *parent )
 	}
 
 	filesel = filesel_new();
-	vips_buf_init_static( &buf, txt, 100 );
 	row_qualified_name( HEAPMODEL( classmodel )->row, &buf );
 	iwindow_set_title( IWINDOW( filesel ), _( "Save %s \"%s\"" ), 
 		G_OBJECT_TYPE_NAME( classmodel ), vips_buf_all( &buf ) );
@@ -221,8 +220,8 @@ classmodel_graphic_replace( Classmodel *classmodel, GtkWidget *parent )
 {
 	ClassmodelClass *class = CLASSMODEL_GET_CLASS( classmodel );
 	GtkWidget *filesel;
-	VipsBuf buf;
 	char txt[100];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	if( !class->graphic_replace ) {
 		error_top( _( "Not implemented." ) );
@@ -233,7 +232,6 @@ classmodel_graphic_replace( Classmodel *classmodel, GtkWidget *parent )
 		return;
 	}
 
-	vips_buf_init_static( &buf, txt, 100 );
 	row_qualified_name( HEAPMODEL( classmodel )->row, &buf );
 	filesel = filesel_new();
 	iwindow_set_title( IWINDOW( filesel ), _( "Replace %s \"%s\"" ), 

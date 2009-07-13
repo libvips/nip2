@@ -1022,7 +1022,8 @@ jmp_buf parse_error_point;
 
 /* Text we've lexed.
  */
-VipsBuf lex_text;
+char lex_text_buffer[MAX_STRSIZE];
+VipsBuf lex_text = VIPS_BUF_STATIC( lex_text_buffer );
 
 /* State of input system.
  */
@@ -1042,7 +1043,6 @@ ParseNode *current_parsenode = NULL;
 Toolkit *current_kit;
 int tool_position;
 int last_top_lineno;
-char lex_text_buffer[MAX_STRSIZE];
 Symbol *scope_stack_symbol[MAX_SSTACK];
 Compile *scope_stack_compile[MAX_SSTACK];
 int scope_sp = 0;
@@ -1102,7 +1102,7 @@ attach_input_file( iOpenFile *of )
 
 	/* Init text gatherer.
 	 */
-	vips_buf_init_static( &lex_text, lex_text_buffer, MAX_STRSIZE );
+	vips_buf_rewind( &lex_text );
 }
 
 /* Attach yyinput to a string.
@@ -1132,7 +1132,7 @@ attach_input_string( const char *str )
 
 	/* Init text gatherer.
 	 */
-	vips_buf_init_static( &lex_text, lex_text_buffer, MAX_STRSIZE );
+	vips_buf_rewind( &lex_text );
 }
 
 /* Read a character from the input.
@@ -1307,7 +1307,7 @@ input_reset( void )
 	is->bwp = 0;
 	is->bspsp = 0;
 	is->bsp[0] = 0;
-	vips_buf_init_static( &lex_text, lex_text_buffer, MAX_STRSIZE );
+	vips_buf_rewind( &lex_text );
 }
 
 void

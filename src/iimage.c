@@ -349,9 +349,8 @@ iimage_replace( iImage *iimage, const char *filename )
 	Row *row = HEAPMODEL( iimage )->row;
 	iText *itext = ITEXT( HEAPMODEL( iimage )->rhs->itext );
 	char txt[MAX_STRSIZE];
-	VipsBuf buf;
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	vips_buf_init_static( &buf, txt, MAX_STRSIZE );
 	vips_buf_appends( &buf, "Image_file \"" );
 	vips_buf_appendsc( &buf, TRUE, filename );
 	vips_buf_appends( &buf, "\"" );

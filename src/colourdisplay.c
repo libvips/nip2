@@ -147,7 +147,7 @@ colourdisplay_drag_data_get( GtkWidget *widget, GdkDragContext *context,
 	double colours[3];
 	guint16 vals[4];
 	char vips_buf_text[256];
-	VipsBuf buf;
+	VipsBuf buf = VIPS_BUF_STATIC( vips_buf_text );
 
 	switch( info ) {
 	case TARGET_COLOUR:
@@ -169,12 +169,11 @@ colourdisplay_drag_data_get( GtkWidget *widget, GdkDragContext *context,
 		break;
 
 	case TARGET_TEXT:
-		vips_buf_init_static( &buf, vips_buf_text, 256 );
 		imageinfo_to_text( imageinfo, &buf );
-
 		gtk_selection_data_set( selection_data,
 			gdk_atom_intern( "text/plain", FALSE ), 8, 
-			(guchar *) vips_buf_all( &buf ), strlen( vips_buf_all( &buf ) ) );
+			(guchar *) vips_buf_all( &buf ), 
+			strlen( vips_buf_all( &buf ) ) );
 
 #ifdef DEBUG
 		printf( "colourdisplay_drag_data_get: sending text/plain\n" );

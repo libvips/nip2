@@ -173,8 +173,6 @@ plotstatus_refresh( Plotstatus *plotstatus )
 {
 	Plotmodel *plotmodel = plotstatus->plotmodel;
 	Plot *plot = plotmodel->plot;
-	char txt[MAX_LINELENGTH];
-	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 #ifdef DEBUG
 	printf( "plotstatus_refresh: %p\n", plotstatus );

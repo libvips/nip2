@@ -1,4 +1,4 @@
-- swap vips_buf_init_static() for VIPS_BUF_STATIC() ... reached classmodel.c
+- add an open raw to nip2? a wrapper around im_binfile()
 
 - right-click menu on row button should have items for "Jump to referrer / WC1
   / JC1 ..." and "Jump to referred / ..."

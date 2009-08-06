@@ -1,3 +1,5 @@
+- jpeg save should include a "don't tag with a profile" option? same for tiff
+
 - add an open raw to nip2? a wrapper around im_binfile()
 
 - right-click menu on row button should have items for "Jump to referrer / WC1

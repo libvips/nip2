@@ -5,6 +5,7 @@ started 7.19.0
 - join array didn't work on groups
 - fix memleak with IMAGEVEC args to VIPS
 - _check_all etc. no longer chain up, for a slight speed increase
+- fix crash with "" as LHS for various copy operations, eg. ("" ++ "a")
 
 started 7.18.0
 - bumped version numbers

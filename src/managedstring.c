@@ -176,6 +176,10 @@ managedstring_new( Heap *heap, const char *string )
 	printf( "managedstring_new: %p, %s\n", heap, string );
 #endif /*DEBUG*/
 
+	/* Disallow "" as string, we want to represent that as [].
+	 */
+	g_assert( strcmp( string, "" ) != 0 );
+
 	managedstring = g_object_new( TYPE_MANAGEDSTRING, NULL );
 	managed_link_heap( MANAGED( managedstring ), heap );
 	heap_register_element( heap, &managedstring->e );

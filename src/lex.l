@@ -348,8 +348,12 @@ FALSE {
 
 	read_string( buf );
 
-	yylval.yy_const.type = PARSE_CONST_STR;
-	yylval.yy_const.val.str = im_strdupn( buf );
+	if( strcmp( buf, "" ) == 0 ) 
+		yylval.yy_const.type = PARSE_CONST_ELIST;
+	else {
+		yylval.yy_const.type = PARSE_CONST_STR;
+		yylval.yy_const.val.str = im_strdupn( buf );
+	}
 
 	return( TK_CONST );
 }

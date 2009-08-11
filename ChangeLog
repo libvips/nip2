@@ -6,6 +6,7 @@ started 7.19.0
 - fix memleak with IMAGEVEC args to VIPS
 - _check_all etc. no longer chain up, for a slight speed increase
 - fix crash with "" as LHS for various copy operations, eg. ("" ++ "a")
+- add test_snip.def to test language features
 
 started 7.18.0
 - bumped version numbers

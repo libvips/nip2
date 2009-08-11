@@ -1,0 +1,14 @@
+tests = [
+	"" ++ "a" == "a",
+	hd [1, error "nope"] == 1
+];
+
+main 
+	= "all tests pass", fail == []
+	= "failed: " ++ join_sep ", " (map print fail_numbers)
+{
+	numbered = zip2 tests [1..];
+	fail = filter (not @ extract 0) numbered;
+	fail_numbers = map (extract 1) failed;
+}
+

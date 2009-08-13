@@ -1085,6 +1085,36 @@ regionview_rect_touching( Regionview *regionview, Rect *a, Rect *b )
 		return( NULL );
 }
 
+/* Does expose rect touch the mark positioned at mark_x/mark_y. Include a big
+ * grab handle in the centre of the crosshair.
+ */
+static gboolean 
+regionview_rect_touches_mark( Regionview *regionview, 
+	int mark_x, int mark_y, Rect *expose )
+{
+	Conversion *conv = regionview->ip->id->conv;
+
+	Rect tiny;
+	int x, y;
+
+	conversion_im_to_disp( conv, mark_x, mark_y, &x, &y ); 
+	if( regionview_crosshair_foreach( regionview, x, y, 
+		(regionview_rect_fn) regionview_rect_touching, expose ) )
+		return( TRUE );
+
+	/* ... and the centre of the crosshairs.
+	 */
+	tiny.left = x;
+	tiny.top = y;
+	tiny.width = 1;
+	tiny.height = 1;
+	im_rect_marginadjust( &tiny, regionview_crosshair_centre );
+	if( regionview_rect_touching( regionview, &tiny, expose ) ) 
+		return( TRUE );
+
+	return( FALSE );
+}
+
 /* Test for rect intersects some part of region.
  */
 static gboolean
@@ -1092,8 +1122,7 @@ regionview_rect_touches_region( Regionview *regionview, Rect *expose )
 {
 	Conversion *conv = regionview->ip->id->conv;
 
-	Rect canvas_area, tiny;
-	int x, y;
+	Rect canvas_area;
 
 	if( regionview->classmodel && regionview_rect_touching( regionview, 
 		&regionview->label, expose ) )
@@ -1114,54 +1143,35 @@ regionview_rect_touches_region( Regionview *regionview, Rect *expose )
 		break;
 
 	case REGIONVIEW_MARK:
-		conversion_im_to_disp( conv, 
-			regionview->area.left, regionview->area.top, &x, &y );
-		if( regionview_crosshair_foreach( regionview, x, y, 
-			(regionview_rect_fn) regionview_rect_touching, 
+		if( regionview_rect_touches_mark( regionview,
+			regionview->area.left, regionview->area.top, 
 			expose ) )
 			return( TRUE );
+
 		break;
 
 	case REGIONVIEW_ARROW:
-		conversion_im_to_disp_rect( conv, 
-			&regionview->area, &canvas_area );
-		if( regionview_crosshair_foreach( regionview, 
-			canvas_area.left, canvas_area.top,
-			(regionview_rect_fn) regionview_rect_touching, 
+		/* Test two marks first.
+		 */
+		if( regionview_rect_touches_mark( regionview,
+			regionview->area.left, regionview->area.top, 
 			expose ) )
 			return( TRUE );
-		if( regionview_crosshair_foreach( regionview, 
-			IM_RECT_RIGHT( &canvas_area ), 
-			IM_RECT_BOTTOM( &canvas_area ),
-			(regionview_rect_fn) regionview_rect_touching, 
+		if( regionview_rect_touches_mark( regionview,
+			IM_RECT_RIGHT( &regionview->area ), 
+			IM_RECT_BOTTOM( &regionview->area ),
 			expose ) )
 			return( TRUE );
 
 		/* Spot in main area too ... for the dotted line. Also avoid
 		 * zero-width/height areas for h and v lines.
 		 */
+		conversion_im_to_disp_rect( conv, 
+			&regionview->area, &canvas_area );
 		im_rect_normalise( &canvas_area );
 		im_rect_marginadjust( &canvas_area, 1 );
 		if( regionview_rect_touching( regionview, 
 			&canvas_area, expose ) )
-			return( TRUE );
-
-		/* ... and the centre of the crosshairs.
-		 */
-		tiny.left = canvas_area.left;
-		tiny.top = canvas_area.top;
-		tiny.width = 1;
-		tiny.height = 1;
-		im_rect_marginadjust( &tiny, regionview_crosshair_centre );
-		if( regionview_rect_touching( regionview, &tiny, expose ) )
-			return( TRUE );
-
-		tiny.left = IM_RECT_RIGHT( &canvas_area );
-		tiny.top = IM_RECT_BOTTOM( &canvas_area );
-		tiny.width = 1;
-		tiny.height = 1;
-		im_rect_marginadjust( &tiny, regionview_crosshair_centre );
-		if( regionview_rect_touching( regionview, &tiny, expose ) )
 			return( TRUE );
 
 		break;
@@ -1788,6 +1798,42 @@ regionview_motion_grab( Regionview *regionview, int x, int y )
 		imagepresent_scroll_stop( regionview->ip );
 }
 
+#ifdef EVENT
+static char *
+resize_to_str( RegionviewResize resize )
+{
+	switch( resize ) { 
+	case REGIONVIEW_RESIZE_NONE:	
+		return( "REGIONVIEW_RESIZE_NONE" );
+	case REGIONVIEW_RESIZE_MOVE:	
+		return( "REGIONVIEW_RESIZE_MOVE" ); 
+	case REGIONVIEW_RESIZE_EDIT:	
+		return( "REGIONVIEW_RESIZE_EDIT" ); 
+	case REGIONVIEW_RESIZE_TOPLEFT:	
+		return( "REGIONVIEW_RESIZE_TOPLEFT" ); 
+	case REGIONVIEW_RESIZE_TOP:	
+		return( "REGIONVIEW_RESIZE_TOP" ); 
+	case REGIONVIEW_RESIZE_TOPRIGHT:	
+		return( "REGIONVIEW_RESIZE_TOPRIGHT" ); 
+	case REGIONVIEW_RESIZE_RIGHT:	
+		return( "REGIONVIEW_RESIZE_RIGHT" ); 
+	case REGIONVIEW_RESIZE_BOTTOMRIGHT:	
+		return( "REGIONVIEW_RESIZE_BOTTOMRIGHT" ); 
+	case REGIONVIEW_RESIZE_BOTTOM:	
+		return( "REGIONVIEW_RESIZE_BOTTOM" ); 
+	case REGIONVIEW_RESIZE_BOTTOMLEFT:	
+		return( "REGIONVIEW_RESIZE_BOTTOMLEFT" ); 
+	case REGIONVIEW_RESIZE_LEFT:	
+		return( "REGIONVIEW_RESIZE_LEFT" ); 
+	case REGIONVIEW_RESIZE_LAST:	
+		return( "REGIONVIEW_RESIZE_LAST" );
+
+	default:
+		g_assert( 0 );
+	}
+}
+#endif /*EVENT*/
+
 /* Motion event.
  */
 static gint
@@ -1808,6 +1854,7 @@ regionview_motion( Regionview *regionview, GdkEvent *ev, int x, int y )
 	case REGIONVIEW_WAIT:
 		if( regionview_point_in_region( regionview, x, y ) ) {
 			resize = regionview_find_resize( regionview, x, y );
+
 			iwindow_cursor_context_set_cursor( regionview->cntxt, 
 				regionview_cursors[resize] );
 			regionview_set_paint_state( regionview, 

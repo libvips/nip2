@@ -658,7 +658,7 @@
           <Rhs vislevel="1" flags="1">
             <Option/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Option &quot;ICC profile&quot; [&quot;Use embedded profile, if available&quot;, &quot;Embed profile from file&quot;] 0"/>
+            <iText formula="Option &quot;ICC profile&quot; [&quot;Use image profile, if any&quot;, &quot;Embed profile from file&quot;, &quot;Don't attach a profile&quot;] 0"/>
           </Rhs>
         </Row>
         <Row popup="false" name="A8">

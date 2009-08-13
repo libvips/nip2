@@ -7,6 +7,8 @@ started 7.19.0
 - _check_all etc. no longer chain up, for a slight speed increase
 - fix crash with "" as LHS for various copy operations, eg. ("" ++ "a")
 - add test_snip.def to test language features
+- Arrow and Mark grab handles improved
+- "don't attach a profile" option for jpeg save
 
 started 7.18.0
 - bumped version numbers

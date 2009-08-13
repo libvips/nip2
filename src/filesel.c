@@ -352,6 +352,13 @@ filesel_jpeg_mode( char *out )
 
 		break;
 	}
+
+	case 2:
+		/* Don't attach a profile.
+		 */
+		im_snprintf( profile, FILENAME_MAX, ",none" );
+		break;
+
 	default:
 		/* Again, do nothing.
 		 */

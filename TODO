@@ -1,20 +1,7 @@
-- drag handles on regions are still poor :(
 
-  match-linear-search label handles are not tall enough --- they don't extend
-  to the bottom of the labelo
-
-  drag on arrow end fails at position 533, 1506, mag 4:1 ... seems OK at top
-  of image? an overflow problem?
-
-- nice if we could display the lavel background again
+- nice if we could display the label background again
 
 - double buffering for region draws argh
-
-- load workspace, replace from file, ws is not marked as modified
-
-  open image, scale, close, worksapce is not marked as modified
-
-  scale seems unreliable? eg. on gel images, argh
 
 - constant
 
@@ -22,8 +9,6 @@
 	class `VipsInterpolateBilinear' has no property named `blur'
 
   messages are very annoyingo
-
-- jpeg save should include a "don't tag with a profile" option? same for tiff
 
 - add an open raw to nip2? a wrapper around im_binfile()
 

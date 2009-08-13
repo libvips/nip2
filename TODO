@@ -3,6 +3,8 @@
 
   needs an im_convf wrapper? we don't seem to have one
 
+- nice if we could display the label background again
+
   needs a custom convol menu item which can loop over a group of matricies
   with a single image
 

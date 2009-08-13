@@ -2545,10 +2545,10 @@ findmaxmin( IMAGE *in,
 	im_free_dmask( msk );
 
 #ifdef DEBUG
+#endif /*DEBUG*/
 	printf( "findmaxmin: left = %d, top = %d, width = %d, height = %d\n",
 		left, top, width, height );
 	printf( "findmaxmin: max = %g, min = %g\n", *max, *min );
-#endif /*DEBUG*/
 
 	return( 0 );
 }

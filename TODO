@@ -1,4 +1,14 @@
 
+- outline text example
+
+  needs an im_convf wrapper? we don't seem to have one
+
+  needs a custom convol menu item which can loop over a group of matricies
+  with a single image
+
+  actually, we need to nail this down, otherwise when we pass in a list of
+  sample texts the loops don't nest
+
 - nice if we could display the label background again
 
 - double buffering for region draws argh

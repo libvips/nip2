@@ -108,7 +108,7 @@ iimage_info( iObject *iobject, VipsBuf *buf )
 	if( ii && (im = imageinfo_get( FALSE, ii )) ) {
 		char *filename;
 
-		if( im_header_get_type( im, ORIGINAL_FILENAME ) != 0 ) {
+		if( im_header_get_typeof( im, ORIGINAL_FILENAME ) != 0 ) {
 			if( !im_header_string( im, 
 				ORIGINAL_FILENAME, &filename ) ) {
 				vips_buf_appends( buf, _( "Original filename" ) );
@@ -260,7 +260,7 @@ iimage_class_get( Classmodel *classmodel, PElement *root )
 		char *filename;
 
 		if( (im = imageinfo_get( FALSE, ii )) &&
-			im_header_get_type( im, ORIGINAL_FILENAME ) != 0 ) {
+			im_header_get_typeof( im, ORIGINAL_FILENAME ) != 0 ) {
 			if( im_header_string( im, 
 				ORIGINAL_FILENAME, &filename ) )
 				return( FALSE );

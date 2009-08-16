@@ -10,6 +10,7 @@ started 7.19.0
 - replace-from-file marks a workspace as modified
 - Arrow and Mark grab handles improved
 - "don't attach a profile" option for jpeg save
+- fixes for gtkdoc merge
 
 started 7.18.0
 - bumped version numbers

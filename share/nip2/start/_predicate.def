@@ -419,7 +419,7 @@ get_header field x
 		= error (_ "image has no field " ++ field), type == 0
 		= error (_ "unknown type for field " ++ field)
 	{
-		type = im_header_get_type field im;
+		type = im_header_get_typeof field im;
 
 		itype = name2gtype "gint";
 		dtype = name2gtype "gdouble";
@@ -430,7 +430,7 @@ get_header field x
 
 get_header_type field x
 	= oo_unary_function get_header_type_op x, is_class x
-	= im_header_get_type field x, is_image x
+	= im_header_get_typeof field x, is_image x
 	= error (_ "bad arguments to " ++ "get_header_type")
 {
 	get_header_type_op = Operator "get_header_type" (get_header_type field)

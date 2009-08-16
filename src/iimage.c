@@ -111,7 +111,8 @@ iimage_info( iObject *iobject, VipsBuf *buf )
 		if( im_header_get_typeof( im, ORIGINAL_FILENAME ) != 0 ) {
 			if( !im_header_string( im, 
 				ORIGINAL_FILENAME, &filename ) ) {
-				vips_buf_appends( buf, _( "Original filename" ) );
+				vips_buf_appends( buf, 
+					_( "Original filename" ) );
 				vips_buf_appendf( buf, ": %s\n", filename );
 			}
 		}

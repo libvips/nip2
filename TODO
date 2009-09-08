@@ -1,3 +1,4 @@
+- set TMPDIR so im_system() uses nip2's temp area
 
 - outline text example
 

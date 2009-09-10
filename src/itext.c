@@ -237,13 +237,6 @@ itext_decompile_element( VipsBuf *buf, PElement *base, gboolean top )
 		if( !top )
 			vips_buf_appends( buf, ")" );
 	}
-#ifdef HAVE_VIPS8
-	else if( PEISVIPSOBJECT( base ) ) {
-		VipsObject *object = PEGETVIPSOBJECT( base );
-
-		vips_buf_appendf( buf, "<%s: %s>", object->name, object->caption );
-	}
-#endif /*HAVE_VIPS8*/
 	else if( PEISMANAGED( base ) ) {
 		Managed *managed = PEGETMANAGED( base );
 
@@ -383,15 +376,6 @@ itext_add_element( VipsBuf *buf, PElement *base,
 			return( FALSE );
 		vips_buf_appends( buf, "]" );
 	}
-#ifdef HAVE_VIPS8
-	else if( PEISVIPSOBJECT( base ) ) {
-		VipsObject *object = PEGETVIPSOBJECT( base );
-
-		vips_buf_appendf( buf, "<%s %s, %s>", 
-			G_OBJECT_TYPE_NAME( object ),
-			object->name, object->caption );
-	}
-#endif /*HAVE_VIPS8*/
 	else if( PEISIMAGE( base ) ) {
 		vips_buf_appendf( buf, "<" );
 		vips_buf_appendi( buf, imageinfo_get( FALSE, PEGETII( base ) ) );

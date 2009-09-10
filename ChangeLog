@@ -11,6 +11,7 @@ started 7.19.0
 - Arrow and Mark grab handles improved
 - "don't attach a profile" option for jpeg save
 - fixes for gtkdoc merge
+- set TMPDIR on startup to help im_system()
 
 started 7.18.0
 - bumped version numbers

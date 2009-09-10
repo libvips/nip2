@@ -350,9 +350,6 @@ main_quit( void )
 	managed_check_all_destroyed();
 	util_check_all_destroyed();
 	vips_check_all_destroyed();
-#ifdef HAVE_VIPS8
-	vips_object_print_all();
-#endif /*HAVE_VIPS8*/
 
 #ifdef PROFILE
 	g_mem_profile();
@@ -1046,11 +1043,6 @@ main( int argc, char *argv[] )
 	 */
 	setenvf( "SEP", "%s", G_DIR_SEPARATOR_S );
 
-#ifdef HAVE_VIPS8
-	if( !vips_init( &argc, &argv, &error ) ) 
-		vfatal( &error );
-#endif /*HAVE_VIPS8*/
-
 	/* Start up vips.
 	 */
 	if( im_init_world( main_argv0 ) )
@@ -1077,10 +1069,6 @@ main( int argc, char *argv[] )
 	/* Don't start X here! We may be in batch mode.
 	 */
 	g_option_context_add_group( context, gtk_get_option_group( FALSE ) );
-
-#ifdef HAVE_VIPS8
-	g_option_context_add_group( context, vips_get_option_group() );
-#endif /*HAVE_VIPS8*/
 	g_option_context_add_group( context, im_get_option_group() );
 
 	if( !g_option_context_parse( context, &argc, &argv, &error ) ) 
@@ -1341,6 +1329,12 @@ main( int argc, char *argv[] )
 	 * you might think we could just follow recomps.
 	 */
 	symbol_recalculate_all_force( TRUE );
+
+	/* Pass PATH_TMP down to vips via TMPDIR. See im_system(), for
+	 * example. We need to do this after the first recomp so that prefs
+	 * are loaded.
+	 */
+	setenvf( "TMPDIR", "%s", PATH_TMP );
 
 	/* Measure amount of stuff in temp area ... need this for checking
 	 * temps later. We pop a dialog if there are too many, so only useful

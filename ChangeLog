@@ -12,6 +12,7 @@ started 7.19.0
 - "don't attach a profile" option for jpeg save
 - fixes for gtkdoc merge
 - set TMPDIR on startup to help im_system()
+- add RAD as a coding type (thanks Roland)
 
 started 7.18.0
 - bumped version numbers

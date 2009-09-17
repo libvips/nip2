@@ -693,6 +693,7 @@ Image_coding = class {
 	NOCODING = 0;
 	COLQUANT = 1;
 	LABPACK = 2;
+	RAD = 6;
 }
 
 /* Values for BandFmt field in image.

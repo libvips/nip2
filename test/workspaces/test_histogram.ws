@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.18.0">
-  <Workspace filename="test_histogram.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1920" window_height="1165" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_histogram" caption="Default empty workspace">
-    <Column x="0" y="3" open="true" selected="false" sform="false" next="17" name="B" caption="Colour / Colourspace">
+  <Workspace filename="/home/john/SVN/vips/nip2/trunk/test/workspaces/test_histogram.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1920" window_height="1165" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_histogram" caption="Default empty workspace">
+    <Column x="0" y="0" open="true" selected="false" sform="false" next="17" name="B" caption="Colour / Colourspace">
       <Subcolumn vislevel="3">
         <Row popup="false" name="B1">
           <Rhs vislevel="1" flags="1">
@@ -12,7 +12,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="476" y="3" open="true" selected="true" sform="false" next="35" name="Z" caption="Histogram / Make, find, apply">
+    <Column x="476" y="0" open="true" selected="true" sform="false" next="35" name="Z" caption="Histogram / Make, find, apply">
       <Subcolumn vislevel="3">
         <Row popup="false" name="Z1">
           <Rhs vislevel="0" flags="4">
@@ -37,9 +37,9 @@
         </Row>
         <Row popup="false" name="Z21">
           <Rhs vislevel="1" flags="1">
-            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
             <iText formula="Hist_new_item.Hist_new_from_matrix.action Z19"/>
+            <Plot plot_left="0" plot_top="0" plot_mag="100" show_status="false"/>
           </Rhs>
         </Row>
         <Row popup="false" name="Z22">
@@ -173,7 +173,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1103" y="2" open="true" selected="false" sform="false" next="29" name="A" caption="Histogram / Maths">
+    <Column x="993" y="0" open="true" selected="false" sform="false" next="29" name="A" caption="Histogram / Maths">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
           <Rhs vislevel="0" flags="4">
@@ -286,7 +286,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1721" y="0" open="true" selected="false" sform="false" next="15" name="C" caption="Histogram / Profile and Projection">
+    <Column x="1529" y="0" open="true" selected="false" sform="false" next="15" name="C" caption="Histogram / Profile and Projection">
       <Subcolumn vislevel="3">
         <Row popup="false" name="C1">
           <Rhs vislevel="0" flags="4">
@@ -337,7 +337,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="2352" y="0" open="true" selected="false" sform="false" next="10" name="D" caption="Histogram / Extract, Plot">
+    <Column x="2136" y="0" open="true" selected="false" sform="false" next="10" name="D" caption="Histogram / Extract, Plot">
       <Subcolumn vislevel="3">
         <Row popup="false" name="D1">
           <Rhs vislevel="0" flags="4">

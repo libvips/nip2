@@ -1272,15 +1272,15 @@ Image_join_item = class
 			halign = Option "Horizontal alignment" valign_names 1;
 			valign = Option "Vertical alignment" halign_names 1;
 
+			// we can't use map_unary since chop-into-tiles returns a group of
+			// groups and we want to be able to reassemble that
+			// TODO: chop-into-tiles should return an array class which
+			// displays as group but does not have the looping behaviour?
 			_result 
-				= map_unary process x
-			{
-				process x
-					= (image_set_origin 0 0 @ 
-						foldl1 (join_tb vshim.value bg_colour.expr halign.value) @
-						map (foldl1 (join_lr hshim.value 
-							bg_colour.expr valign.value))) (to_list (to_list x));
-			}
+				= (image_set_origin 0 0 @ 
+					foldl1 (join_tb vshim.value bg_colour.expr halign.value) @
+					map (foldl1 (join_lr hshim.value 
+						bg_colour.expr valign.value))) (to_list (to_list x));
 		}
 	}
 }

@@ -1,4 +1,7 @@
-- set TMPDIR so im_system() uses nip2's temp area
+- im_blend now does bandalike/formatalike
+
+  where do we use our bandalike/formatalike stuff? push this doen into vips
+  and remove our stuff
 
 - outline text example
 

@@ -312,6 +312,20 @@ Filter_morphology_item = class
 			thinall x = foldr thin1 x masks;
 		}
 	}
+
+	sep3 = Menuseparator;
+
+	Segment_item = class
+		Menuaction "_Segment" "break image into disjoint regions" {
+		action x = class 
+			Image _image {
+			_vislevel = 3;
+
+			[_image, _segments] = im_segment x.value;
+
+			segments = Number "Number of disjoint regions" _segments;
+		}
+	}
 }
 
 Filter_fourier_item = class

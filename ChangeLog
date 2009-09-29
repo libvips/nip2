@@ -12,6 +12,7 @@ started 7.19.0
 - fixes for gtkdoc merge
 - set TMPDIR on startup to help im_system()
 - add RAD as a coding type (thanks Roland)
+- add Filter / Morphology / Segment menu item
 
 started 7.18.0
 - bumped version numbers

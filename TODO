@@ -1,7 +1,3 @@
-- "sum A1" where A1 is a 21x21 matrix dies with a C stack overflow
-
-  sum [[1,2],[3,4]]
-
 - im_blend now does bandalike/formatalike
 
   where do we use our bandalike/formatalike stuff? push this doen into vips

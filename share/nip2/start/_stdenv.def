@@ -203,10 +203,14 @@ meang x
 // zero-excluding mean
 meanze x
 	= oo_unary_function meanze_op x, is_class x
+	= meanze_image_hist x, is_image x && 
+		(fmt == Image_format.UCHAR || fmt == Image_format.USHORT)
 	= meanze_image x, is_image x
 	= meanze_list x, is_list x 
 	= error (_ "bad arguments (" ++ print x ++ ") to " ++ "meanze")
 {
+	fmt = get_format x;
+
 	meanze_op = Operator "meanze" meanze Operator_type.COMPOUND false;
 
 	meanze_list l = sum l / size l;
@@ -230,7 +234,7 @@ meanze x
 			= total + x;
 	}
 
-	// image mean
+	// image mean, for any image type
 	meanze_image i
 		= sum / N
 	{
@@ -246,6 +250,30 @@ meanze x
 
 		// number of non-zero pixels
 		N = b * (mean zp * w * h) / 255;
+	}
+
+	// image mean for 8 and 16-bit unsigned images
+	// we can use a histogram, yay, and save a pass through the image
+	meanze_image_hist i
+		= sum / N
+	{
+		// histogram, knock out zeros
+		hist = hist_find i;
+		black = image_new 1 1 (get_bands hist) 
+			(get_format hist) (get_coding hist) (get_type hist) 0 0 0;
+		histze = insert 0 0 black hist;
+
+		// matching identity
+		iden
+			= im_identity_ushort (get_bands hist) (get_width hist),
+				(get_width hist) > 256
+			= im_identity (get_bands hist);
+
+		// number of non-zero pixels
+		N = mean histze * 256;
+
+		// sum of pixels
+		sum = mean (hist * iden) * 256;
 	}
 }
 

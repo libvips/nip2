@@ -146,6 +146,12 @@ Kirk
 					matrix.width == 1 || matrix.height == 1
 				= false;
 			type = Option "Convolution type" ["Int", "Float"] 0;
+			rotate = Option "Rotate" [
+				"Don't rotate", 
+				"4 x 45 degrees", 
+				"8 x 45 degrees", 
+				"2 x 90 degrees"] 
+			0;
 
 			_result 
 				= map_unary process x
@@ -154,6 +160,9 @@ Kirk
 					= in.Image in'
 				{
 					conv_fn 
+						= im_lindetect, !separable && type == 0 && rotate == 1
+						= im_compass, !separable && type == 0 && rotate == 2
+						= im_gradient, !separable && type == 0 && rotate == 3
 						= im_conv, !separable && type == 0
 						= im_convsep, separable && type == 0
 						= im_convf, !separable && type == 1

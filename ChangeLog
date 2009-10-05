@@ -13,7 +13,8 @@ started 7.19.0
 - set TMPDIR on startup to help im_system()
 - add RAD as a coding type (thanks Roland)
 - add Filter / Morphology / Segment menu item
-- much faster meanze with histograms
+- much faster meanze for 8 & 16-bit unsigned images
+- added a "rotate" option to custom convolution
 
 started 7.18.0
 - bumped version numbers

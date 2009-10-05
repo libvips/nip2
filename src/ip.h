@@ -129,6 +129,7 @@ extern int statfs();
 #include <gdk/gdkkeysyms.h>
 
 #include <vips/vips.h>
+#include <vips/debug.h>
 
 #include <libxml/tree.h>
 #include <libxml/parser.h>

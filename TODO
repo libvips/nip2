@@ -1,3 +1,7 @@
+- try new gtksheet, will it work with G_SEAL()?
+
+  test old pre-gtksheet code, could we revert to that
+
 - im_blend now does bandalike/formatalike
 
   where do we use our bandalike/formatalike stuff? push this doen into vips

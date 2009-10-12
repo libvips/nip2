@@ -1,6 +1,17 @@
-- try new gtksheet, will it work with G_SEAL()?
+- Using nip2 7.18.2, when you try to save a Group of images as pyramidal 
+  tifs they seem to be just saved as normal tifs.  If the images are 
+  un-grouped and saved individually it seems to work fine.
 
-  test old pre-gtksheet code, could we revert to that
+- "sum A1" where A1 is a 21x21 matrix dies with a C stack overflow
+
+- try
+
+	sum [[1,2],[3,4]]
+
+  kind of makes sense, sum is just "foldr1 add", it's not like "mean", "max"
+  etc.
+
+  a problem with nip2's lack of namespaces?
 
 - im_blend now does bandalike/formatalike
 
@@ -256,6 +267,7 @@ WONTFIX for 7.14
 
 - use compile->last_sym to spot chains of defs
 
+  multiple definitions of the same function are allowed, provided they all
   multiple definitions of the same function are allowed, provided they all
   have the same number of arguments, and provided only one of them has no
   argument pattern matching

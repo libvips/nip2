@@ -346,10 +346,9 @@ conversion_make_display( Conversion *conv, IMAGE *in, IMAGE **mask_out )
 	else {
 		IMAGE *mask = im_open_local( out, "conv:1a", "p" );
 
-		if( im_render_fade( in, out, mask, 
+		if( im_render_priority( in, out, mask, 
 			conv->tile_size, conv->tile_size, 
 				conversion_get_default_tiles( conv ),
-			20, 0, 
 			conv->priority,
 			conversion_render_notify_cb, conv ) ) {
 			im_close( out );

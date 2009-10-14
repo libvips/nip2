@@ -1310,6 +1310,17 @@ hist_find_nD bins image
 		(hist_find_nD bins) Operator_type.COMPOUND_REWRAP false;
 }
 
+hist_find_indexed index value
+	= oo_binary_function hist_find_indexed_op index value, is_class index
+	= oo_binary'_function hist_find_indexed_op index value, is_class value
+	= im_hist_indexed index value, is_image index && is_image value
+	= error (_ "bad arguments to " ++ "hist_find_indexed")
+{
+	hist_find_indexed_op = Operator "hist_find_indexed" 
+		(compose (compose Plot_histogram) hist_find_indexed) 
+			Operator_type.COMPOUND false;
+}
+
 hist_map hist image
 	= oo_binary_function hist_map_op hist image, is_class hist
 	= oo_binary'_function hist_map_op hist image, is_class image

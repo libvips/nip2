@@ -16,6 +16,7 @@ started 7.19.0
 - much faster meanze for 8 & 16-bit unsigned images
 - added a "rotate" option to custom convolution
 - added Histogram / Find / Indexed
+- Cache defaults to 128x128 tiles
 
 started 7.18.0
 - bumped version numbers

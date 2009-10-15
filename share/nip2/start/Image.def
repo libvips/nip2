@@ -407,8 +407,8 @@ Image_cache_item = class
 		_result {
 		_vislevel = 3;
 
-		tile_width = Number "Tile width" 32;
-		tile_height = Number "Tile height" 32;
+		tile_width = Number "Tile width" 128;
+		tile_height = Number "Tile height" 128;
 		max_tiles = Number "Maximum number of tiles to cache" (-1);
 
 		_result

@@ -1,3 +1,9 @@
+- nicolas's workspace appears not to thread well, how odd, should be a x2
+  speedup you'd think
+
+  try his_indexed on a complex pipe and verify that im_iterate() is running
+  with two threads
+
 - Using nip2 7.18.2, when you try to save a Group of images as pyramidal 
   tifs they seem to be just saved as normal tifs.  If the images are 
   un-grouped and saved individually it seems to work fine.

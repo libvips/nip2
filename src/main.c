@@ -1334,7 +1334,13 @@ main( int argc, char *argv[] )
 	 * example. We need to do this after the first recomp so that prefs
 	 * are loaded.
 	 */
-	setenvf( "TMPDIR", "%s", PATH_TMP );
+{
+	char buf[FILENAME_MAX];
+
+	expand_variables( PATH_TMP, buf );
+	nativeize_path( buf );
+	setenvf( "TMPDIR", "%s", buf );
+}
 
 	/* Measure amount of stuff in temp area ... need this for checking
 	 * temps later. We pop a dialog if there are too many, so only useful

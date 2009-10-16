@@ -1,3 +1,7 @@
+- why doesn't Cache give us progress feedback?
+
+  eg. wtc.jpg, denoise, cache
+
 - Using nip2 7.18.2, when you try to save a Group of images as pyramidal 
   tifs they seem to be just saved as normal tifs.  If the images are 
   un-grouped and saved individually it seems to work fine.

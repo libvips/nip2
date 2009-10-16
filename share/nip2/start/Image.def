@@ -403,7 +403,22 @@ Image_header_item = class
 
 Image_cache_item = class
 	Menuaction "C_ache" "cache calculated image pixels" {
-	action x = map_unary cache x;
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		tile_width = Number "Tile width" 128;
+		tile_height = Number "Tile height" 128;
+		max_tiles = Number "Maximum number of tiles to cache" (-1);
+
+		_result
+			= map_unary process x
+		{
+			process image
+				= cache (to_real tile_width) (to_real tile_height) 
+					(to_real max_tiles) image;
+		}
+	}
 }
 
 #separator

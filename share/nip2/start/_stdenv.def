@@ -564,13 +564,15 @@ image_set_origin xoff yoff x
 		Operator_type.COMPOUND_REWRAP false;
 }
 
-cache x
+cache tile_width tile_height max_tiles x
 	= oo_unary_function cache_op x, is_class x
-	= im_copy_file x, is_image x
-	= x
+	= im_cache x (to_real tile_width) (to_real tile_height) 
+		(to_real max_tiles), is_image x
+	= error (_ "bad arguments to " ++ "cache")
 {
 	cache_op = Operator "cache" 
-		cache Operator_type.COMPOUND_REWRAP false;
+		(cache tile_width tile_height max_tiles) 
+		Operator_type.COMPOUND_REWRAP false;
 }
 
 tile across down x

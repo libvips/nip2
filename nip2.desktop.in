@@ -1,5 +1,4 @@
 [Desktop Entry]
-Encoding=UTF-8
 Name=@PACKAGE@
 Comment=Image manipulation program based on VIPS
 Comment[it]=Programma per la manipolazione di immagini basato su VIPS
@@ -11,4 +10,4 @@ Categories=Graphics;RasterGraphics;
 X-GNOME-Bugzilla-Bugzilla=GNOME
 X-GNOME-Bugzilla-Product=NIP2
 StartupNotify=true
-MimeType=image/x-vips
+MimeType=image/x-vips;

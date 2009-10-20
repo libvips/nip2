@@ -408,7 +408,7 @@ main_watchgroup_changed_cb( void )
 }
 
 /* Try to load a thing, anything at all. Actually, we don't load plugins
- * experimentally: win32 pops up an annoying error dialog if you try that.
+ * experimentally, win32 pops up an annoying error dialog if you try that.
  */
 gboolean
 main_load( Workspace *ws, const char *filename )
@@ -1398,10 +1398,6 @@ main( int argc, char *argv[] )
 				main_log_add( "%s\n", error_get_sub() );
 	}
 
-	/* Recalc to load any args.
-	 */
-	symbol_recalculate_all_force( TRUE );
-
 	/* Make sure our start ws doesn't have modified set. We may have
 	 * loaded some images or whatever into it.
 	 */
@@ -1427,7 +1423,7 @@ main( int argc, char *argv[] )
 
 		/* Process a few events ... we want the window to be mapped so
 		 * that log/welcome/clean? messages we pop appear in the right
-		 * place on the srceen.
+		 * place on the screen.
 		 */
 		while( g_main_context_iteration( NULL, FALSE ) )
 			;

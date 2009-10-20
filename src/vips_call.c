@@ -51,6 +51,10 @@
  */
 #define MAX_VIPS_ARGS (100)
 
+/* Maximum length of a vector we pass to INTVEC etc.
+ */
+#define MAX_VEC (10000)
+
 /* Stuff we hold about a call to a VIPS function.
  */
 typedef struct _VipsInfo {
@@ -538,7 +542,7 @@ vips_history_sanity( void )
 		g_assert( g_hash_table_lookup( vips_history_table, vi ) );
 
 		g_assert( vi->fn );
-		g_assert( vi->fn->argc > 0 && vi->fn->argc < 100 );
+		g_assert( vi->fn->argc > 0 && vi->fn->argc < MAX_VIPS_ARGS );
 		g_assert( vi->in_cache );
 	}
 
@@ -1399,10 +1403,10 @@ vips_fromip( Reduce *rc, PElement *arg,
 
 	case VIPS_DOUBLEVEC:
 	{
-		double buf[100];
+		double buf[MAX_VEC];
 		int n;
 
-		n = reduce_get_realvec( rc, arg, buf, 100 );
+		n = reduce_get_realvec( rc, arg, buf, MAX_VEC );
 		if( vips_make_doublevec( *obj, n, buf ) )
 			return( FALSE );
 
@@ -1411,10 +1415,10 @@ vips_fromip( Reduce *rc, PElement *arg,
 
 	case VIPS_INTVEC:
 	{
-		double buf[100];
+		double buf[MAX_VEC];
 		int n;
 
-		n = reduce_get_realvec( rc, arg, buf, 100 );
+		n = reduce_get_realvec( rc, arg, buf, MAX_VEC );
 		if( vips_make_intvec( *obj, n, buf ) )
 			return( FALSE );
 
@@ -1423,13 +1427,13 @@ vips_fromip( Reduce *rc, PElement *arg,
 
 	case VIPS_IMAGEVEC:
 	{
-		Imageinfo *buf[100];
+		Imageinfo *buf[MAX_VEC];
 		int n;
 
 		/* Put Imageinfo in for now ... a later pass changes this to
 		 * IMAGE* once we've checked all the LUTs.
 		 */
-		n = reduce_get_imagevec( rc, arg, buf, 100 );
+		n = reduce_get_imagevec( rc, arg, buf, MAX_VEC );
 		if( vips_make_imagevec( *obj, n, (IMAGE **) buf ) )
 			return( FALSE );
 

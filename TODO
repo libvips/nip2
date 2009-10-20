@@ -1,6 +1,8 @@
-- why doesn't Cache give us progress feedback?
+- why didn'y im_copy_file() work? mysterious
 
-  eg. wtc.jpg, denoise, cache
+- threading seems to always go back to 1 in batch mode, I wonder why
+
+  are prefs being loaded?
 
 - Using nip2 7.18.2, when you try to save a Group of images as pyramidal 
   tifs they seem to be just saved as normal tifs.  If the images are 

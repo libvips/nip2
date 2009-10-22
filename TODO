@@ -1,4 +1,14 @@
-- why didn'y im_copy_file() work? mysterious
+- try:
+
+	~(A1 < 100 & A1 > 50)
+
+  get:
+
+  	unknown binary operator: none
+
+  how odd
+
+- why didn't im_copy_file() work? mysterious
 
 - threading seems to always go back to 1 in batch mode, I wonder why
 

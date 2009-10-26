@@ -604,6 +604,7 @@ plot_new_gplot( Plot *plot )
 			NULL );
 		gog_series_set_dim( series, 1, data, &error );
 
+		/*
 		if( i < IM_NUMBER( default_colour ) ) {
 			GogStyle *style;
 
@@ -617,12 +618,12 @@ plot_new_gplot( Plot *plot )
 				default_colour[i] );
 			style->marker.auto_fill_color = FALSE;
 
-			/* Could match fill, but black everywhere looks nicer.
-			 */
+			// Could match fill, but black everywhere looks nicer.
 			go_marker_set_outline_color( style->marker.mark,
 				RGBA_BLACK );
 			style->marker.auto_outline_color = FALSE;
 		}
+		 */
 	}
 
 	return( gplot );

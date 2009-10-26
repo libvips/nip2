@@ -33,31 +33,7 @@
 
 #include "ip.h"
 
-/* We have gtkplot patched into the nip sources as a temp measure, so call 
- * directly.
- */
-#define HAVE_GTK_EXTRA
-#include "gtkplot.h"
-#include "gtkplotcanvas.h"
-#include "gtkplotcanvasplot.h"
-#include "gtkplotdata.h"
-#include "gtkplotbar.h"
-
 static FloatwindowClass *parent_class = NULL;
-
-/* All the magnification menus we have.
- */
-typedef struct _PlotwindowMagmenu {
-	const char *name;
-	int mag;
-} PlotwindowMagmenu;
-
-static const PlotwindowMagmenu plotwindow_mags[] = {
-	{ "Zoom100Mode", 100 },
-	{ "Zoom200Mode", 200 },
-	{ "Zoom400Mode", 400 },
-	{ "Zoom800Mode", 800 }
-};
 
 static void
 plotwindow_destroy( GtkObject *object )
@@ -81,33 +57,13 @@ plotwindow_destroy( GtkObject *object )
 }
 
 static void
-plotwindow_realize( GtkWidget *widget )
-{
-	Plotwindow *plotwindow = PLOTWINDOW( widget );
-	Plotmodel *plotmodel = plotwindow->plotmodel;
-	Plot *plot = plotmodel->plot;
-
-	GTK_WIDGET_CLASS( parent_class )->realize( widget );
-
-	/* Sadly this doesn't work :-( The adjustments still haven't been set
-	 * up when we come though here.
-	 */
-	if( CLASSMODEL( plot )->window_width != -1 ) 
-		plotpresent_set_mag_position( plotwindow->plotpresent,
-			plot->mag, plot->left, plot->top );
-}
-
-static void
 plotwindow_class_init( PlotwindowClass *class )
 {
 	GtkObjectClass *object_class = (GtkObjectClass *) class;
-	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
 
 	object_class->destroy = plotwindow_destroy;
-
-        widget_class->realize = plotwindow_realize;
 
 	/* Create signals.
 	 */
@@ -164,12 +120,11 @@ plotwindow_refresh_title( Plotwindow *plotwindow )
 	/* Can come here during ws destroy.
 	 */
 	if( ws ) {
+		VipsBuf buf;
 		char txt[512];
-		VipsBuf buf = VIPS_BUF_STATIC( txt );
 
+		vips_buf_init_static( &buf, txt, 512 );
 		row_qualified_name_relative( ws->sym, row, &buf );
-		vips_buf_appendf( &buf, " - %d%%", plotmodel->mag );
-
 		iwindow_set_title( IWINDOW( plotwindow ), "%s", 
 			vips_buf_all( &buf ) );
 	}
@@ -181,7 +136,6 @@ static void
 plotwindow_changed_cb( Plotmodel *plotmodel, Plotwindow *plotwindow )
 {
 	GtkAction *action;
-	int i;
 
 	plotwindow_refresh_title( plotwindow );
 
@@ -189,17 +143,6 @@ plotwindow_changed_cb( Plotmodel *plotmodel, Plotwindow *plotwindow )
 		"Status" );
 	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
 		plotmodel->show_status );
-
-	for( i = 0; i < IM_NUMBER( plotwindow_mags ); i++ )
-		if( plotmodel->mag == plotwindow_mags[i].mag ) {
-			action = gtk_action_group_get_action( 
-				plotwindow->action_group,
-				plotwindow_mags[i].name );
-			gtk_toggle_action_set_active( 
-				GTK_TOGGLE_ACTION( action ),
-				TRUE );
-			break;
-		}
 }
 
 static void
@@ -210,46 +153,11 @@ plotwindow_mouse_move_cb( Plotpresent *plotpresent,
 }
 
 static void
-plotwindow_zoom_in_action_cb( GtkAction *action, Plotwindow *plotwindow )
-{
-	Plotmodel *plotmodel = plotwindow->plotmodel;
-
-	plotmodel_set_mag( plotmodel, plotmodel->mag + 25 );
-}
-
-static void
-plotwindow_zoom_out_action_cb( GtkAction *action, Plotwindow *plotwindow )
-{
-	Plotmodel *plotmodel = plotwindow->plotmodel;
-
-	plotmodel_set_mag( plotmodel, plotmodel->mag - 25 );
-}
-
-static void
-plotwindow_zoom_100_action_cb( GtkAction *action, Plotwindow *plotwindow )
-{
-	plotmodel_set_mag( plotwindow->plotmodel, 100 );
-}
-
-static void
-plotwindow_zoom_fit_action_cb( GtkAction *action, Plotwindow *plotwindow )
-{
-}
-
-static void
 plotwindow_show_status_action_cb( GtkToggleAction *action, 
 	Plotwindow *plotwindow )
 {
 	plotmodel_set_status( plotwindow->plotmodel, 
 		gtk_toggle_action_get_active( action ) );
-}
-
-static void
-plotwindow_mag_action_cb( GtkRadioAction *action, GtkRadioAction *current, 
-	Plotwindow *plotwindow )
-{
-	plotmodel_set_mag( plotwindow->plotmodel, 
-		gtk_radio_action_get_current_value( action ) );
 }
 
 /* Our actions.
@@ -259,7 +167,6 @@ static GtkActionEntry plotwindow_actions[] = {
 	 */
 	{ "FileMenu", NULL, "_File" },
 	{ "ViewMenu", NULL, "_View" },
-	{ "ViewZoomMenu", NULL, "_Zoom" },
 	{ "HelpMenu", NULL, "_Help" },
 
 	/* Actions.
@@ -277,38 +184,7 @@ static GtkActionEntry plotwindow_actions[] = {
 	{ "About", 
 		NULL, N_( "_About" ), NULL,
 		N_( "About this program" ), 
-		G_CALLBACK( mainw_about_action_cb ) },
-
-	{ "ZoomIn",
-		GTK_STOCK_ZOOM_IN, N_( "Zoom _In" ), "<control>plus",
-		N_( "Zoom in on mouse cursor" ),
-		G_CALLBACK( plotwindow_zoom_in_action_cb ) },
-
-	{ "ZoomOut",
-		GTK_STOCK_ZOOM_OUT, N_( "Zoom _Out" ), "<control>minus",
-		N_( "Zoom out" ),
-		G_CALLBACK( plotwindow_zoom_out_action_cb ) },
-
-	{ "Zoom100",
-		GTK_STOCK_ZOOM_100, N_( "Zoom _100%" ), "<control>equal",
-		N_( "Zoom to 100%" ),
-		G_CALLBACK( plotwindow_zoom_100_action_cb ) },
-
-	{ "ZoomFit",
-		GTK_STOCK_ZOOM_FIT, N_( "Zoom to _Fit" ), NULL,
-		N_( "Zoom to fit plot to window" ),
-		G_CALLBACK( plotwindow_zoom_fit_action_cb ) },
-};
-
-static GtkRadioActionEntry plotwindow_zoom_radio_actions[] = {
-	{ "Zoom100Mode",
-		NULL, N_( "100%" ), NULL, N_( "Zoom to 100%" ), 100 },
-	{ "Zoom200Mode",
-		NULL, N_( "200%" ), NULL, N_( "Zoom to 200%" ), 200 },
-	{ "Zoom400Mode",
-		NULL, N_( "400%" ), NULL, N_( "Zoom to 400%" ), 400 },
-	{ "Zoom800Mode",
-		NULL, N_( "800%" ), NULL, N_( "Zoom to 800%" ), 800 }
+		G_CALLBACK( mainw_about_action_cb ) }
 };
 
 static GtkToggleActionEntry plotwindow_toggle_actions[] = {
@@ -326,16 +202,6 @@ static const char *plotwindow_menubar_ui_description =
 "    </menu>"
 "    <menu action='ViewMenu'>"
 "      <menuitem action='Status'/>"
-"      <separator/>"
-"      <menuitem action='ZoomIn'/>"
-"      <menuitem action='ZoomOut'/>"
-"      <menuitem action='Zoom100'/>"
-"      <menuitem action='ZoomFit'/>"
-"      <separator/>"
-"      <menuitem action='Zoom100Mode'/>"
-"      <menuitem action='Zoom200Mode'/>"
-"      <menuitem action='Zoom400Mode'/>"
-"      <menuitem action='Zoom800Mode'/>"
 "    </menu>"
 "    <menu action='HelpMenu'>"
 "      <menuitem action='Guide'/>"
@@ -375,12 +241,6 @@ plotwindow_build( Plotwindow *plotwindow, GtkWidget *vbox, Plot *plot )
 		plotwindow_toggle_actions, 
 			G_N_ELEMENTS( plotwindow_toggle_actions ), 
 		GTK_WINDOW( plotwindow ) );
-	gtk_action_group_add_radio_actions( plotwindow->action_group,
-		plotwindow_zoom_radio_actions, 
-			G_N_ELEMENTS( plotwindow_zoom_radio_actions ), 
-		1,
-		G_CALLBACK( plotwindow_mag_action_cb ),
-		GTK_WINDOW( plotwindow ) );
 
 	plotwindow->ui_manager = gtk_ui_manager_new();
 	gtk_ui_manager_insert_action_group( plotwindow->ui_manager, 
@@ -416,7 +276,9 @@ plotwindow_build( Plotwindow *plotwindow, GtkWidget *vbox, Plot *plot )
 	gtk_box_pack_start( GTK_BOX( vbox ), 
 		GTK_WIDGET( frame ), TRUE, TRUE, 0 );
 
+#ifdef HAVE_LIBGOFFICE
 	plotwindow->plotpresent = plotpresent_new( plotwindow->plotmodel );
+#endif /*HAVE_LIBGOFFICE*/
 	gtk_container_add( GTK_CONTAINER( frame ), 
 		GTK_WIDGET( plotwindow->plotpresent )  );
 	gtk_widget_show( GTK_WIDGET( plotwindow->plotpresent ) );
@@ -450,8 +312,6 @@ plotwindow_popdown( iWindow *iwnd, void *client,
 	/* We have to note position/size in popdown rather than destroy, since
 	 * the widgets have to all still be extant.
 	 */
-	plotpresent_get_mag_position( plotwindow->plotpresent,
-		&plot->mag, &plot->left, &plot->top );
 	plot->show_status = plotmodel->show_status;
 
 	nfn( sys, IWINDOW_YES );

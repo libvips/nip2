@@ -86,9 +86,7 @@ struct _Program {
 	gboolean csens;		/* Case sensitive */
 	gboolean regexp;	/* Interpret as regexp */
 	gboolean fromtop;	/* Start search from beginning again */
-#ifdef HAVE_REGEXEC
-	regex_t *comp;		/* Compiled pattern */
-#endif /*HAVE_REGEXEC*/
+	GRegex *comp;		/* Compiled pattern */
 
 	/* Current search position.
 	 */

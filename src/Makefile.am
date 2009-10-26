@@ -20,7 +20,31 @@ bin_PROGRAMS = nip2
 CLI_DIST = nip2-cli.c
 endif
 
+# the sources we have to copy-paste in here from gtksheet
+gtksheet_generated_h_sources = \
+	gtksheet-marshal.h \
+	gtksheettypebuiltins.h 
+
+gtksheet_generated_c_sources = \
+	gtksheet-marshal.c \
+	gtksheettypebuiltins.c 
+
+gtksheet_public_h_sources = \
+	gtksheet.h \
+	gtksheetfeatures.h \
+	gtksheetwidget.h \
+	gtkitementry.h 
+
+gtksheet_c_sources = \
+	gtksheet.c \
+	gtksheetwidget.c \
+	gtkitementry.c 
+
 nip2_SOURCES = \
+	$(gtksheet_public_h_sources) \
+	$(gtksheet_c_sources) \
+	$(gtksheet_generated_h_sources) \
+	$(gtksheet_generated_c_sources) \
 	vipsobject.c \
 	vipsobject.h \
 	plotmodel.c \
@@ -97,52 +121,6 @@ nip2_SOURCES = \
 	graphicview.h \
 	gtkutil.c \
 	gtkutil.h \
-	gtksheet.c \
-	gtksheet.h \
-	gtkitementry.c \
-	gtkitementry.h \
-	gtkextra-marshal.c \
-	gtkextra-marshal.h \
-	gtkextra.c \
-	gtkextrafeatures.h \
-	gtkplotbar.c \
-	gtkplotbar.h \
-	gtkplotarray.c \
-	gtkplotarray.h \
-	gtkplot.c \
-	gtkplot.h \
-	gtkplotpc.c \
-	gtkplotpc.h \
-	gtkpsfont.c \
-	gtkpsfont.h \
-	gtkplotdata.c \
-	gtkplotdata.h \
-	gtkplotgdk.c \
-	gtkplotgdk.h \
-	gtkplot3d.c \
-	gtkplot3d.h \
-	gtkplotcanvas.c \
-	gtkplotcanvasellipse.c \
-	gtkplotcanvasellipse.h \
-	gtkplotcanvas.h \
-	gtkplotcanvasline.c \
-	gtkplotcanvasline.h \
-	gtkplotcanvaspixmap.c \
-	gtkplotcanvaspixmap.h \
-	gtkplotcanvasplot.c \
-	gtkplotcanvasplot.h \
-	gtkplotcanvasrectangle.c \
-	gtkplotcanvasrectangle.h \
-	gtkplotcanvastext.c \
-	gtkplotcanvastext.h \
-	gtkplotpolar.c \
-	gtkplotpolar.h \
-	gtkplotsurface.c \
-	gtkplotsurface.h \
-	gtkplotdt.c \
-	gtkplotdt.h \
-	gtkplotps.c \
-	gtkplotps.h \
 	heap.c \
 	heap.h \
 	heapmodel.c \
@@ -323,8 +301,6 @@ nip2_SOURCES = \
 	vips_call.h \
 	watch.c \
 	watch.h \
-	wild.c \
-	wild.h \
 	workspace.c \
 	workspace.h \
 	workspacedefs.c \
@@ -344,15 +320,34 @@ nipmarshal.h:
 nipmarshal.c:
 	echo "#include \"nipmarshal.h\"" > nipmarshal.c 
 	glib-genmarshal --prefix=nip --body nipmarshal.list >> nipmarshal.c
-.PHONEY: gtkextra-marshal.h
-gtkextra-marshal.h:
-	glib-genmarshal --prefix=gtkextra --header gtkextra-marshal.list > \
-		gtkextra-marshal.h
-.PHONEY: gtkextra-marshal.c
-gtkextra-marshal.c:
-	echo "#include \"gtkextra-marshal.h\"" > gtkextra-marshal.c 
-	glib-genmarshal --prefix=gtkextra --body gtkextra-marshal.list >> \
-		gtkextra-marshal.c
+.PHONEY: gtksheet-marshal.h
+gtksheet-marshal.h:
+	glib-genmarshal --prefix=gtksheet --header gtksheet-marshal.list > \
+		gtksheet-marshal.h
+.PHONEY: gtksheet-marshal.c
+gtksheet-marshal.c:
+	echo "#include \"gtksheet-marshal.h\"" > gtksheet-marshal.c 
+	glib-genmarshal --prefix=gtksheet --body gtksheet-marshal.list >> \
+		gtksheet-marshal.c
+
+.PHONEY: gtksheettypebuiltins.h
+gtksheettypebuiltins.h: $(gtksheet_public_h_sources)
+	( glib-mkenums \
+		--fhead "#ifndef __GTKSHEET_TYPE_BUILTINS_H__\n#define __GTKSHEET_TYPE_BUILTINS_H__\n\n#include <glib-object.h>\n\nG_BEGIN_DECLS\n" \
+		--fprod "/* enumerations from \"@filename@\" */\n" \
+		--vhead "GType @enum_name@_get_type (void);\n#define GTK_TYPE_@ENUMSHORT@ (@enum_name@_get_type())\n" \
+		--ftail "G_END_DECLS\n\n#endif /* __GTKSHEET_TYPE_BUILTINS_H__ */" \
+		$(gtksheet_public_h_sources) ) > gtksheettypebuiltins.h
+
+.PHONEY: gtksheettypebuiltins.c
+gtksheettypebuiltins.c: $(gtksheet_public_h_sources)
+	( glib-mkenums \
+		--fhead "#define GTKSHEET_ENABLE_BROKEN\n#include \"gtksheet.h\"" \
+		--fprod "\n/* enumerations from \"@filename@\" */" \
+		--vhead "GType\n@enum_name@_get_type (void)\n{\n  static GType etype = 0;\n  if (etype == 0) {\n    static const G@Type@Value values[] = {" \
+		--vprod "      { @VALUENAME@, \"@VALUENAME@\", \"@valuenick@\" }," \
+		--vtail "      { 0, NULL, NULL }\n    };\n    etype = g_@type@_register_static (\"@EnumName@\", values);\n  }\n  return etype;\n}\n" \
+		$(gtksheet_public_h_sources) ) > gtksheettypebuiltins.c
 
 nip2-icon.rc:
 	echo 1 ICON \"nip2-icon.ico\" > nip2-icon.rc
@@ -382,5 +377,5 @@ CLEANFILES = parse.c parse.h lex.c tags
 
 EXTRA_DIST = makehelpindex.pl helpindex.h run-nip2.sh \
 	nipmarshal.h nipmarshal.c nipmarshal.list \
-	gtkextra-marshal.h gtkextra-marshal.c gtkextra-marshal.list \
+	gtksheet-marshal.h gtksheet-marshal.c gtksheet-marshal.list \
 	$(CLI_DIST)

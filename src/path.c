@@ -132,12 +132,12 @@ path_unparse( GSList *path )
  * function.
  */
 static void *
-path_match_pattern( Wild *wild, const char *dir_name, const char *name, 
+path_match_pattern( GPatternSpec *wild, const char *dir_name, const char *name, 
 	path_map_fn fn, void *a, void *b, void *c )
 {
 	/* Match.
 	 */
-	if( wild_match( wild, name ) ) {
+	if( g_pattern_match_string( wild, name ) ) {
 		char buf[FILENAME_MAX + 10];
 
 		/* Make up whole path name.
@@ -155,7 +155,7 @@ path_match_pattern( Wild *wild, const char *dir_name, const char *name,
  * function returns non-NULL.
  */
 static void *
-path_scan_dir( const char *dir_name, Wild *wild, 
+path_scan_dir( const char *dir_name, GPatternSpec *wild, 
 	path_map_fn fn, void *a, void *b, void *c )
 {	
 	GDir *dir;
@@ -219,11 +219,11 @@ path_next_item( const char *filename,
 void *
 path_map_exact( GSList *path, const char *patt, path_map_fn fn, void *a )
 {
-	Wild *wild;
+	GPatternSpec *wild;
 	GSList *previous;
 	void *ru;
 
-	if( !(wild = wild_new( patt )) )
+	if( !(wild = g_pattern_spec_new( patt )) )
 		return( NULL );
 	previous = NULL;
 
@@ -231,7 +231,7 @@ path_map_exact( GSList *path, const char *patt, path_map_fn fn, void *a )
 		wild, (void *) path_next_item, &previous, (void *) fn, a );
 
 	IM_FREEF( slist_free_all, previous );
-	IM_FREEF( wild_destroy, wild );
+	IM_FREEF( g_pattern_spec_free, wild );
 
 	return( ru );
 }
@@ -241,11 +241,11 @@ path_map_exact( GSList *path, const char *patt, path_map_fn fn, void *a )
 void *
 path_map( GSList *path, const char *patt, path_map_fn fn, void *a )
 {
-	Wild *wild;
+	GPatternSpec *wild;
 	GSList *previous;
 	void *ru;
 
-	if( !(wild = wild_new( patt )) )
+	if( !(wild = g_pattern_spec_new( patt )) )
 		return( NULL );
 	previous = NULL;
 
@@ -257,7 +257,7 @@ path_map( GSList *path, const char *patt, path_map_fn fn, void *a )
 			(void *) fn, a );
 
 	IM_FREEF( slist_free_all, previous );
-	IM_FREEF( wild_destroy, wild );
+	IM_FREEF( g_pattern_spec_free, wild );
 
 	return( ru );
 }
@@ -267,10 +267,10 @@ path_map( GSList *path, const char *patt, path_map_fn fn, void *a )
 void *
 path_map_dir( const char *dir, const char *patt, path_map_fn fn, void *a )
 {
-	Wild *wild;
+	GPatternSpec *wild;
 	void *ru;
 
-	if( !(wild = wild_new( patt )) )
+	if( !(wild = g_pattern_spec_new( patt )) )
 		return( NULL );
 	if( !(ru = path_scan_dir( dir, wild, fn, a, NULL, NULL )) ) {
 		/* Not found? Maybe - error message anyway.
@@ -278,7 +278,7 @@ path_map_dir( const char *dir, const char *patt, path_map_fn fn, void *a )
 		error_top( _( "Not found." ) );
 		error_sub( _( "File \"%s\" not found." ), patt );
 	}
-	IM_FREEF( wild_destroy, wild );
+	IM_FREEF( g_pattern_spec_free, wild );
 
 	return( ru );
 }

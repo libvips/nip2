@@ -1,3 +1,29 @@
+- need
+
+	GOG_GRID_LINE_TYPE
+	GOG_LEGEND_TYPE
+
+  where have they gone?
+
+  see: 
+
+  	plotpresent_add_grid()
+	plotpresent_build_plot() (legend stuff)
+
+- need to do:
+
+	gtk_sheet_set_selection_mode( sheet, GTK_SELECTION_MULTIPLE );
+
+  on sheet build
+
+- look for:
+
+	sheet->vadjustment->upper = SHEET_HEIGHT (sheet) + 80;
+
+  in gtksheetwidget.c, delete the +80? same for width
+
+- now need gtk >= 2.18, argh, can we fix this
+
 - try:
 
 	~(A1 < 100 & A1 > 50)

@@ -99,9 +99,6 @@
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif /*HAVE_UNISTD_H*/
-#ifdef HAVE_REGEX_H
-#include <regex.h>
-#endif /*HAVE_REGEX_H*/
 #ifdef HAVE_SYS_STATVFS_H
 #include <sys/statvfs.h>
 #endif /*HAVE_SYS_STATVFS_H*/
@@ -127,6 +124,30 @@ extern int statfs();
  */
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
+
+#ifdef HAVE_LIBGOFFICE
+#include <goffice/goffice.h>
+
+#include <goffice/app/go-plugin.h>
+#include <goffice/app/go-plugin-loader-module.h>
+
+#include <goffice/data/go-data-simple.h>
+
+#include <goffice/graph/gog-data-set.h>
+#include <goffice/graph/gog-label.h>
+#include <goffice/graph/gog-object.h>
+#include <goffice/graph/gog-plot.h>
+#include <goffice/graph/gog-series.h>
+#include <goffice/graph/gog-grid.h>
+#include <goffice/graph/gog-grid-line.h>
+#include <goffice/graph/gog-legend.h>
+#include <goffice/graph/gog-chart-map.h>
+
+#include <goffice/gtk/go-graph-widget.h>
+
+#include <goffice/utils/go-color.h>
+#include <goffice/utils/go-marker.h>
+#endif /*HAVE_LIBGOFFICE*/
 
 #include <vips/vips.h>
 #include <vips/debug.h>
@@ -316,7 +337,6 @@ typedef void *(*tool_map_fn)( Tool *, void *, void * );
  */
 #include "util.h"
 #include "gtkutil.h"
-#include "wild.h"
 #include "path.h"
 #include "iobject.h"
 #include "icontainer.h"

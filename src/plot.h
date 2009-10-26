@@ -102,3 +102,7 @@ GType plot_get_type( void );
 char *plot_f2c( PlotFormat format );
 char *plot_s2c( PlotStyle style );
 
+#ifdef HAVE_LIBGOFFICE
+GogPlot *plot_new_gplot( Plot *plot );
+#endif /*HAVE_LIBGOFFICE*/
+

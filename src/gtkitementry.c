@@ -24,10 +24,24 @@
  * GTK+ at ftp://ftp.gtk.org/pub/gtk/. 
  */
 
+/**
+ * SECTION: gtkitementry
+ * @short_description: An item entry widget.
+ *
+ * Originally GtkSheetEntry. This widget allows to change colors and justification and can be dinamically resized.
+ */
+
+/**
+ * GtkItemEntry:
+ *
+ * The GtkItemEntry struct contains only private data.
+ * It should only be accessed through the functions described below.
+ */
+
 #include <string.h>
 
 #include <pango/pango.h>
-
+#include <glib-object.h>
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 #include "gtkitementry.h"
@@ -49,8 +63,6 @@ typedef enum {
 
 /* GObject, GtkObject methods
  */
-static void   gtk_item_entry_class_init           (GtkItemEntryClass        *klass);
-static void   gtk_item_entry_init                 (GtkItemEntry         *entry);
 static void   gtk_item_entry_editable_init (GtkEditableClass *iface);
 
 /* GtkWidget methods
@@ -168,56 +180,21 @@ static void         get_widget_window_size             (GtkEntry       *entry,
 							gint           *width,
 							gint           *height);
 
-static GtkEntryClass *parent_class = NULL;
-
-GtkType
-gtk_item_entry_get_type (void)
-{
-  static GtkType item_entry_type = 0;
-
-  if (!item_entry_type)
-    {
-      static const GtkTypeInfo item_entry_info =
-      {
-	"GtkItemEntry",
-	sizeof (GtkItemEntry),
-	sizeof (GtkItemEntryClass),
-	(GtkClassInitFunc) gtk_item_entry_class_init,
-	(GtkObjectInitFunc) gtk_item_entry_init,
-	/* reserved_1 */ NULL,
-	/* reserved_2 */ NULL,
-        (GtkClassInitFunc) NULL,
-      };
-
-      static const GInterfaceInfo item_editable_info =
-      {
-        (GInterfaceInitFunc) gtk_item_entry_editable_init,    /* interface_init */
-        NULL,                                            /* interface_finalize */
-        NULL                                             /* interface_data */
-      };
-
-
-      item_entry_type = gtk_type_unique (GTK_TYPE_ENTRY, &item_entry_info);
-
-      g_type_add_interface_static (item_entry_type,
-                                   GTK_TYPE_EDITABLE,
-                                   &item_editable_info);
-
-    }
-
-  return item_entry_type;
-}
+/* Register our widget */
+G_DEFINE_TYPE_EXTENDED(GtkItemEntry,
+                       gtk_item_entry,
+                       GTK_TYPE_ENTRY,
+                       0,
+                       G_IMPLEMENT_INTERFACE(GTK_TYPE_EDITABLE,
+                                             gtk_item_entry_editable_init));
 
 static void
 gtk_item_entry_class_init (GtkItemEntryClass *class)
 {
-  GtkObjectClass *object_class;
   GtkWidgetClass *widget_class;
   GtkEntryClass *entry_class;
 
-  object_class = (GtkObjectClass*) class;
   widget_class = (GtkWidgetClass*) class;
-  parent_class = gtk_type_class (GTK_TYPE_ENTRY);
   entry_class = (GtkEntryClass *) class;
 
   widget_class->realize = gtk_entry_realize;
@@ -427,31 +404,31 @@ get_widget_window_size (GtkEntry *entry,
                         gint     *width,
                         gint     *height)
 {
-  GtkRequisition requisition;
-  GtkWidget *widget = GTK_WIDGET (entry);
-      
-  gtk_widget_get_child_requisition (widget, &requisition);
+    GtkRequisition requisition;
+    GtkWidget *widget = GTK_WIDGET (entry);
 
-  if (x)
-    *x = widget->allocation.x;
+    gtk_widget_get_child_requisition (widget, &requisition);
 
-  if (y)
+    if (x)
+        *x = widget->allocation.x;
+
+    if (y)
     {
-      if (entry->is_cell_renderer)
-	*y = widget->allocation.y;
-      else
-	*y = widget->allocation.y + (widget->allocation.height - requisition.height) / 2;
+        if (entry->is_cell_renderer)
+            *y = widget->allocation.y;
+        else
+            *y = widget->allocation.y + (widget->allocation.height - requisition.height) / 2;
     }
 
-  if (width)
-    *width = widget->allocation.width;
+    if (width)
+        *width = widget->allocation.width;
 
-  if (height)
+    if (height)
     {
-      if (entry->is_cell_renderer)
-	*height = widget->allocation.height;
-      else
-	*height = requisition.height;
+        if (entry->is_cell_renderer)
+            *height = widget->allocation.height;
+        else
+            *height = requisition.height;
     }
 }
 
@@ -503,26 +480,26 @@ gtk_entry_expose (GtkWidget      *widget,
   if (widget->window == event->window)
     gtk_entry_draw_frame (widget);
   else if (entry->text_area == event->window)
-    {
-      gint area_width, area_height;
+  {
+    gint area_width, area_height;
 
-      get_text_area_size (entry, NULL, NULL, &area_width, &area_height);
+    get_text_area_size (entry, NULL, NULL, &area_width, &area_height);
 
-      gdk_draw_rectangle (entry->text_area,
-                          widget->style->bg_gc[GTK_WIDGET_STATE(widget)],
-                          TRUE,
-                          0, 0, area_width, area_height);
+    gdk_draw_rectangle (entry->text_area,
+                        widget->style->bg_gc[GTK_WIDGET_STATE(widget)],
+                        TRUE,
+                        0, 0, area_width, area_height);
 
-      if ((entry->visible || entry->invisible_char != 0) &&
-	  GTK_WIDGET_HAS_FOCUS (widget) &&
-	  entry->selection_bound == entry->current_pos && entry->cursor_visible)
-	gtk_entry_draw_cursor (GTK_ENTRY (widget), CURSOR_STANDARD);
+    if ((entry->visible || entry->invisible_char != 0) &&
+        GTK_WIDGET_HAS_FOCUS (widget) &&
+        entry->selection_bound == entry->current_pos && entry->cursor_visible)
+      gtk_entry_draw_cursor (GTK_ENTRY (widget), CURSOR_STANDARD);
 
-      if (entry->dnd_position != -1)
-	gtk_entry_draw_cursor (GTK_ENTRY (widget), CURSOR_DND);
-      
-      gtk_entry_draw_text (GTK_ENTRY (widget));
-    }
+    if (entry->dnd_position != -1)
+      gtk_entry_draw_cursor (GTK_ENTRY (widget), CURSOR_DND);
+  
+    gtk_entry_draw_text (GTK_ENTRY (widget));
+  }
 
   return FALSE;
 }
@@ -533,12 +510,12 @@ gtk_entry_grab_focus (GtkWidget        *widget)
   GtkEntry *entry = GTK_ENTRY (widget);
   gboolean select_on_focus;
 
-  GTK_WIDGET_CLASS (parent_class)->grab_focus (widget);
+  GTK_WIDGET_CLASS (gtk_item_entry_parent_class)->grab_focus (widget);
 
   g_object_get (G_OBJECT (gtk_settings_get_default ()),
-		"gtk-entry-select-on-focus",
-		&select_on_focus,
-		NULL);
+                "gtk-entry-select-on-focus",
+                &select_on_focus,
+                NULL);
   
   if (select_on_focus && entry->editable && !entry->in_click)
     gtk_editable_select_region (GTK_EDITABLE (widget), 0, -1);
@@ -552,7 +529,7 @@ gtk_entry_direction_changed (GtkWidget        *widget,
 
   gtk_entry_recompute (entry);
       
-  GTK_WIDGET_CLASS (parent_class)->direction_changed (widget, previous_dir);
+  GTK_WIDGET_CLASS (gtk_item_entry_parent_class)->direction_changed (widget, previous_dir);
 }
 
 static void
@@ -672,73 +649,20 @@ gtk_entry_get_position (GtkEditable *editable)
 /* Default signal handlers
  */
 static void
-gtk_entry_real_insert_text (GtkEditable *editable,
-			    const gchar *new_text,
-			    gint         new_text_length,
-			    gint        *position)
+gtk_entry_real_insert_text (GtkEditable * editable,
+			    const gchar * new_text,
+			    gint new_text_length, gint * position)
 {
-  gint index;
-  gint n_chars;
-
   GtkEntry *entry = GTK_ENTRY (editable);
+  GtkEntryBuffer *buffer = gtk_entry_get_buffer (entry);
 
-  if (new_text_length < 0)
-    new_text_length = strlen (new_text);
+  guint length_inserted;
 
-  n_chars = g_utf8_strlen (new_text, new_text_length);
-  if (entry->text_max_length > 0 && n_chars + entry->text_length > entry->text_max_length)
-    {
-      gdk_beep ();
-      n_chars = entry->text_max_length - entry->text_length;
-      new_text_length = g_utf8_offset_to_pointer (new_text, n_chars) - new_text;
-    }
+  length_inserted = gtk_entry_buffer_insert_text (buffer,
+						  *position, new_text,
+						  new_text_length);
 
-  if (new_text_length + entry->n_bytes + 1 > entry->text_size)
-    {
-      while (new_text_length + entry->n_bytes + 1 > entry->text_size)
-	{
-	  if (entry->text_size == 0)
-	    entry->text_size = MIN_SIZE;
-	  else
-	    {
-	      if (2 * (guint)entry->text_size < MAX_SIZE &&
-		  2 * (guint)entry->text_size > entry->text_size)
-		entry->text_size *= 2;
-	      else
-		{
-		  entry->text_size = MAX_SIZE;
-		  if (new_text_length > (gint)entry->text_size - (gint)entry->n_bytes - 1)
-		    {
-		      new_text_length = (gint)entry->text_size - (gint)entry->n_bytes - 1;
-		      new_text_length = g_utf8_find_prev_char (new_text, new_text + new_text_length + 1) - new_text;
-		      n_chars = g_utf8_strlen (new_text, new_text_length);
-		    }
-		  break;
-		}
-	    }
-	}
-
-      entry->text = g_realloc (entry->text, entry->text_size);
-    }
-
-  index = g_utf8_offset_to_pointer (entry->text, *position) - entry->text;
-
-  g_memmove (entry->text + index + new_text_length, entry->text + index, entry->n_bytes - index);
-  memcpy (entry->text + index, new_text, new_text_length);
-
-  entry->n_bytes += new_text_length;
-  entry->text_length += n_chars;
-
-  /* NUL terminate for safety and convenience */
-  entry->text[entry->n_bytes] = '\0';
-  
-  if (entry->current_pos > *position)
-    entry->current_pos += n_chars;
-  
-  if (entry->selection_bound > *position)
-    entry->selection_bound += n_chars;
-
-  *position += n_chars;
+  *position += length_inserted;
 
   gtk_entry_recompute (entry);
 
@@ -747,37 +671,26 @@ gtk_entry_real_insert_text (GtkEditable *editable,
 }
 
 static void
-gtk_entry_real_delete_text (GtkEditable *editable,
-			    gint         start_pos,
-			    gint         end_pos)
+gtk_entry_real_delete_text (GtkEditable * editable,
+			    gint start_pos, gint end_pos)
 {
   GtkEntry *entry = GTK_ENTRY (editable);
+  GtkEntryBuffer *buffer = gtk_entry_get_buffer (entry);
 
-  if (start_pos < 0)
-    start_pos = 0;
-  if (end_pos < 0 || end_pos > entry->text_length)
-    end_pos = entry->text_length;
-  
-  if (start_pos < end_pos)
+  guint number_deleted;
+
+  number_deleted = gtk_entry_buffer_delete_text (buffer,
+						 start_pos,
+						 end_pos - start_pos);
+
+  if (number_deleted > 0)
     {
-      gint start_index = g_utf8_offset_to_pointer (entry->text, start_pos) - entry->text;
-      gint end_index = g_utf8_offset_to_pointer (entry->text, end_pos) - entry->text;
-
-      g_memmove (entry->text + start_index, entry->text + end_index, entry->n_bytes + 1 - end_index);
-      entry->text_length -= (end_pos - start_pos);
-      entry->n_bytes -= (end_index - start_index);
-      
-      if (entry->current_pos > start_pos)
-	entry->current_pos -= MIN (entry->current_pos, end_pos) - start_pos;
-
-      if (entry->selection_bound > start_pos)
-	entry->selection_bound -= MIN (entry->selection_bound, end_pos) - start_pos;
       /* We might have deleted the selection
        */
       gtk_entry_update_primary_selection (entry);
-      
+
       gtk_entry_recompute (entry);
-      
+
       g_signal_emit_by_name (editable, "changed");
       g_object_notify (G_OBJECT (editable), "text");
     }
@@ -804,8 +717,8 @@ get_better_cursor_x (GtkEntry *entry,
   PangoRectangle strong_pos, weak_pos;
   
   g_object_get (gtk_widget_get_settings (GTK_WIDGET (entry)),
-		"gtk-split-cursor", &split_cursor,
-		NULL);
+                "gtk-split-cursor", &split_cursor,
+                NULL);
 
   pango_layout_get_cursor_pos (layout, index, &strong_pos, &weak_pos);
 
@@ -826,79 +739,77 @@ gtk_entry_move_cursor (GtkEntry       *entry,
   gtk_entry_reset_im_context (entry);
 
   if (entry->current_pos != entry->selection_bound && !extend_selection)
+  {
+    /* If we have a current selection and aren't extending it, move to the
+     * start/or end of the selection as appropriate
+     */
+    switch (step)
     {
-      /* If we have a current selection and aren't extending it, move to the
-       * start/or end of the selection as appropriate
-       */
-      switch (step)
-	{
-	case GTK_MOVEMENT_VISUAL_POSITIONS:
-	  {
-	    gint current_x = get_better_cursor_x (entry, entry->current_pos);
-	    gint bound_x = get_better_cursor_x (entry, entry->selection_bound);
+      case GTK_MOVEMENT_VISUAL_POSITIONS:
+      {
+        gint current_x = get_better_cursor_x (entry, entry->current_pos);
+        gint bound_x = get_better_cursor_x (entry, entry->selection_bound);
 
-	    if (count < 0)
-	      new_pos = current_x < bound_x ? entry->current_pos : entry->selection_bound;
-	    else
-	      new_pos = current_x > bound_x ? entry->current_pos : entry->selection_bound;
+        if (count < 0)
+          new_pos = current_x < bound_x ? entry->current_pos : entry->selection_bound;
+        else
+          new_pos = current_x > bound_x ? entry->current_pos : entry->selection_bound;
 
-	    break;
-	  }
-	case GTK_MOVEMENT_LOGICAL_POSITIONS:
-	case GTK_MOVEMENT_WORDS:
-	  if (count < 0)
-	    new_pos = MIN (entry->current_pos, entry->selection_bound);
-	  else
-	    new_pos = MAX (entry->current_pos, entry->selection_bound);
-	  break;
-	case GTK_MOVEMENT_DISPLAY_LINE_ENDS:
-	case GTK_MOVEMENT_PARAGRAPH_ENDS:
-	case GTK_MOVEMENT_BUFFER_ENDS:
-	  new_pos = count < 0 ? 0 : entry->text_length;
-	  break;
-	case GTK_MOVEMENT_DISPLAY_LINES:
-	case GTK_MOVEMENT_PARAGRAPHS:
-	case GTK_MOVEMENT_PAGES:
-	  break;
-	default:
-	  break;
-	}
+        break;
+      }
+      case GTK_MOVEMENT_LOGICAL_POSITIONS:
+      case GTK_MOVEMENT_WORDS:
+        if (count < 0)
+          new_pos = MIN (entry->current_pos, entry->selection_bound);
+        else
+          new_pos = MAX (entry->current_pos, entry->selection_bound);
+        break;
+      case GTK_MOVEMENT_DISPLAY_LINE_ENDS:
+      case GTK_MOVEMENT_PARAGRAPH_ENDS:
+      case GTK_MOVEMENT_BUFFER_ENDS:
+        new_pos = count < 0 ? 0 : entry->text_length;
+        break;
+      case GTK_MOVEMENT_DISPLAY_LINES:
+      case GTK_MOVEMENT_PARAGRAPHS:
+      case GTK_MOVEMENT_PAGES:
+      case GTK_MOVEMENT_HORIZONTAL_PAGES:
+        break;
     }
+  }
   else
+  {
+    switch (step)
     {
-      switch (step)
-	{
-	case GTK_MOVEMENT_LOGICAL_POSITIONS:
-	  new_pos = gtk_entry_move_logically (entry, new_pos, count);
-	  break;
-	case GTK_MOVEMENT_VISUAL_POSITIONS:
-	  new_pos = gtk_entry_move_visually (entry, new_pos, count);
-	  break;
-	case GTK_MOVEMENT_WORDS:
-	  while (count > 0)
-	    {
-	      new_pos = gtk_entry_move_forward_word (entry, new_pos);
-	      count--;
-	    }
-	  while (count < 0)
-	    {
-	      new_pos = gtk_entry_move_backward_word (entry, new_pos);
-	      count++;
-	    }
-	  break;
-	case GTK_MOVEMENT_DISPLAY_LINE_ENDS:
-	case GTK_MOVEMENT_PARAGRAPH_ENDS:
-	case GTK_MOVEMENT_BUFFER_ENDS:
-	  new_pos = count < 0 ? 0 : entry->text_length;
-	  break;
-	case GTK_MOVEMENT_DISPLAY_LINES:
-	case GTK_MOVEMENT_PARAGRAPHS:
-	case GTK_MOVEMENT_PAGES:
-	  break;
-	default:
-	  break;
-	}
+      case GTK_MOVEMENT_LOGICAL_POSITIONS:
+        new_pos = gtk_entry_move_logically (entry, new_pos, count);
+        break;
+      case GTK_MOVEMENT_VISUAL_POSITIONS:
+        new_pos = gtk_entry_move_visually (entry, new_pos, count);
+        break;
+      case GTK_MOVEMENT_WORDS:
+        while (count > 0)
+        {
+          new_pos = gtk_entry_move_forward_word (entry, new_pos);
+          count--;
+        }
+        while (count < 0)
+        {
+          new_pos = gtk_entry_move_backward_word (entry, new_pos);
+          count++;
+        }
+        break;
+      case GTK_MOVEMENT_DISPLAY_LINE_ENDS:
+      case GTK_MOVEMENT_PARAGRAPH_ENDS:
+      case GTK_MOVEMENT_BUFFER_ENDS:
+        new_pos = count < 0 ? 0 : entry->text_length;
+        break;
+      case GTK_MOVEMENT_DISPLAY_LINES:
+      case GTK_MOVEMENT_PARAGRAPHS:
+      case GTK_MOVEMENT_PAGES:
+      case GTK_MOVEMENT_HORIZONTAL_PAGES:
+        break;
     }
+  }
 
   if (extend_selection)
     gtk_editable_select_region (GTK_EDITABLE (entry), entry->selection_bound, new_pos);
@@ -1030,9 +941,12 @@ static gboolean
 gtk_entry_retrieve_surrounding_cb (GtkIMContext *context,
                                GtkEntry     *entry)
 {
+  GtkEntryBuffer *buffer = gtk_entry_get_buffer (entry);
+  guint n_bytes = gtk_entry_buffer_get_bytes (buffer);
+
   gtk_im_context_set_surrounding (context,
                                   entry->text,
-                                  entry->n_bytes,
+                                  n_bytes,
                                   g_utf8_offset_to_pointer (entry->text, entry->current_pos) - entry->text);
 
   return TRUE;
@@ -1209,6 +1123,8 @@ static PangoLayout *
 gtk_entry_create_layout (GtkEntry *entry,
 			 gboolean  include_preedit)
 {
+  GtkEntryBuffer *buffer = gtk_entry_get_buffer (entry);
+  guint n_bytes = gtk_entry_buffer_get_bytes (buffer);
   PangoLayout *layout = gtk_widget_create_pango_layout (GTK_WIDGET (entry), NULL);
   PangoAttrList *tmp_attrs = pango_attr_list_new ();
   
@@ -1233,7 +1149,7 @@ gtk_entry_create_layout (GtkEntry *entry,
       
       if (entry->visible)
         {
-          g_string_prepend_len (tmp_string, entry->text, entry->n_bytes);
+          g_string_prepend_len (tmp_string, entry->text, n_bytes);
           g_string_insert (tmp_string, cursor_index, preedit_string);
         }
       else
@@ -1242,7 +1158,7 @@ gtk_entry_create_layout (GtkEntry *entry,
           gint preedit_len_chars;
           gunichar invisible_char;
           
-          ch_len = g_utf8_strlen (entry->text, entry->n_bytes);
+          ch_len = g_utf8_strlen (entry->text, n_bytes);
           preedit_len_chars = g_utf8_strlen (preedit_string, -1);
           ch_len += preedit_len_chars;
 
@@ -1276,7 +1192,7 @@ gtk_entry_create_layout (GtkEntry *entry,
     {
       if (entry->visible)
         {
-          pango_layout_set_text (layout, entry->text, entry->n_bytes);
+          pango_layout_set_text (layout, entry->text, n_bytes);
         }
       else
         {
@@ -1640,8 +1556,8 @@ gtk_entry_draw_cursor (GtkEntry  *entry,
       gint x2 = 0;
       GdkGC *gc;
 
-      gdk_window_get_size (entry->text_area, NULL, &text_area_height);
-      
+      gdk_drawable_get_size (GDK_DRAWABLE(entry->text_area), 
+                             NULL, &text_area_height);      
       gtk_entry_get_cursor_locations (entry, type, &strong_x, &weak_x);
 
       g_object_get (gtk_widget_get_settings (widget),
@@ -1757,7 +1673,7 @@ gtk_entry_adjust_scroll (GtkEntry *entry)
 
   item_entry = GTK_ITEM_ENTRY(entry);
   
-  gdk_window_get_size (entry->text_area, &text_area_width, NULL);
+  gdk_drawable_get_size(GDK_DRAWABLE(entry->text_area), &text_area_width, NULL);
   text_area_width -= 2 * INNER_BORDER;
 
   layout = gtk_entry_ensure_layout (entry, TRUE);
@@ -2142,21 +2058,40 @@ gtk_item_entry_new (void)
 {
   GtkWidget *widget;
 
-  widget = GTK_WIDGET (gtk_type_new (GTK_TYPE_ITEM_ENTRY));
+  //widget = GTK_WIDGET (gtk_type_new (GTK_TYPE_ITEM_ENTRY));
+  widget = GTK_WIDGET (g_object_new(GTK_TYPE_ITEM_ENTRY, NULL));
   return widget;
 }
 
+/**
+ * gtk_item_entry_new_with_max_length:
+ * @max: the maximum length of the entry, or 0 for no maximum. (other than the maximum length of entries.) 
+ * The value passed in will be clamped to the range 0-65536.
+ * 
+ * Creates a new #GtkItemEntry with the maximum allowed length of the contents of the widget. 
+ * If the current contents are longer than the given length, then they will be truncated to fit. 
+ *
+ * Return value: the newly-created #GtkItemEntry widget.
+ */
 GtkWidget*
 gtk_item_entry_new_with_max_length (gint max)
 {
-  GtkItemEntry *entry;
+  GtkWidget *widget;
 
-  entry = gtk_type_new (GTK_TYPE_ITEM_ENTRY);
-  gtk_entry_set_max_length(GTK_ENTRY(entry), max);
+  widget = GTK_WIDGET (g_object_new(GTK_TYPE_ITEM_ENTRY, NULL));
+  gtk_entry_set_max_length(GTK_ENTRY(widget), max);
 
-  return GTK_WIDGET (entry);
+  return widget;
 }
 
+/**
+ * gtk_item_entry_set_text:
+ * @entry: a #GtkItemEntry
+ * @text: the new text
+ * @justification: a #GtkJustification : GTK_JUSTIFY_LEFT,GTK_JUSTIFY_RIGHT,GTK_JUSTIFY_CENTER,GTK_JUSTIFY_FILL
+ * 
+ * Sets the text in the widget to the given value, replacing the current contents.
+ */
 void
 gtk_item_entry_set_text (GtkItemEntry    *entry,
 	      	         const gchar *text,
@@ -2217,7 +2152,7 @@ gtk_item_entry_set_text (GtkItemEntry    *entry,
  * gtk_entry_text_index_to_layout_index() are needed to convert byte
  * indices in the layout to byte indices in the entry contents.
  * 
- **/
+ */
 void
 gtk_item_entry_get_layout_offsets (GtkItemEntry *entry,
                                    gint     *x,
@@ -2240,6 +2175,13 @@ gtk_item_entry_get_layout_offsets (GtkItemEntry *entry,
     *y += text_area_y;
 }
 
+/**
+ * gtk_item_entry_set_justification:
+ * @entry: a #GtkItemEntry
+ * @just: a #GtkJustification : GTK_JUSTIFY_LEFT,GTK_JUSTIFY_RIGHT,GTK_JUSTIFY_CENTER,GTK_JUSTIFY_FILL
+ * 
+ * Sets justification of the widget to the given value, replacing the current one.
+ */
 void
 gtk_item_entry_set_justification(GtkItemEntry *entry, GtkJustification just)
 {
@@ -2387,6 +2329,13 @@ gtk_entry_pend_cursor_blink (GtkEntry *entry)
     }
 }
 
+/**
+ * gtk_item_set_cursor_visible:
+ * @entry: a #GtkItemEntry
+ * @visible: TRUE(visible) or FALSE (invisible)
+ * 
+ * Sets the cursor visibility in the widget.
+ */
 void
 gtk_item_entry_set_cursor_visible(GtkItemEntry *entry, gboolean visible)
 {
@@ -2395,6 +2344,13 @@ gtk_item_entry_set_cursor_visible(GtkItemEntry *entry, gboolean visible)
   GTK_ENTRY(entry)->cursor_visible = visible;
 }
 
+/**
+ * gtk_item_get_cursor_visible:
+ * @entry: a #GtkItemEntry
+ * Return value: TRUE(visible) or FALSE (invisible)
+ * 
+ * Gets the cursor visibility in the widget.
+ */
 gboolean
 gtk_item_entry_get_cursor_visible(GtkItemEntry *entry)
 {

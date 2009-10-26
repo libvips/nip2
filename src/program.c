@@ -456,20 +456,17 @@ program_find_note( Program *program, Symbol *sym, int start, int end )
 static gboolean
 program_find_pos( Program *program, const char *text, int *start, int *end )
 {
-#ifdef HAVE_REGEXEC
 	if( program->regexp ) {
-		regmatch_t matches[1];
+		GMatchInfo *match;
 
-		if( !regexec( program->comp, text, 1, matches, 0 ) ) {
-			*start = matches[0].rm_so;
-			*end = matches[0].rm_eo;
-
+		g_regex_match( program->comp, text, 0, &match );
+		if( g_match_info_fetch_pos( match, 0, start, end ) ) {
+			g_match_info_free( match );
 			return( TRUE );
 		}
+		g_match_info_free( match );
 	}
-	else 
-#endif /*HAVE_REGEXEC*/
-	if( program->csens ) {
+	else if( program->csens ) {
 		char *p;
 
 		if( (p = strstr( text, program->search )) ) {
@@ -574,9 +571,7 @@ program_destroy( GtkObject *object )
 	FREESID( program->kitgroup_destroy_sid, program->kitg );
 
 	IM_FREEF( g_free, program->search );
-#ifdef HAVE_REGEXEC
-	IM_FREEF( regfree, program->comp );
-#endif /*HAVE_REGEXEC*/
+	IM_FREEF( g_regex_unref, program->comp );
 
 	program_find_reset( program );
 
@@ -787,9 +782,7 @@ program_init( Program *program )
 	program->csens = FALSE;
 	program->regexp = FALSE;
 	program->fromtop = TRUE;
-#ifdef HAVE_REGEXEC
 	program->comp = NULL;
-#endif /*HAVE_REGEXEC*/
 }
 
 GtkType
@@ -1399,29 +1392,26 @@ program_find_done_cb( iWindow *iwnd, void *client,
 	program->search = 
 		gtk_editable_get_chars( GTK_EDITABLE( find->search ), 0, -1 );
 	program->csens = GTK_TOGGLE_BUTTON( find->csens )->active;
-#ifdef HAVE_REGEXEC
 	program->regexp = GTK_TOGGLE_BUTTON( find->regexp )->active;
-#endif /*HAVE_REGEXEC*/
 	program->fromtop = GTK_TOGGLE_BUTTON( find->fromtop )->active;
 
-#ifdef HAVE_REGEXEC
 	if( program->regexp ) {
-		int flags = 0;
-
-		if( !program->comp )
-			program->comp = INEW( NULL, regex_t );
+		GRegexCompileFlags cflags = 0;
+		GRegexMatchFlags mflags = 0;
 
 		if( !program->csens )
-			flags |= REG_ICASE;
+			cflags |= G_REGEX_CASELESS;
 
-		if( regcomp( program->comp, program->search, flags ) != 0 ) {
+		IM_FREEF( g_regex_unref, program->comp );
+
+		if( !(program->comp = g_regex_new( program->search, 
+			cflags, mflags, NULL )) ) {
 			error_top( _( "Parse error." ) );
 			error_sub( _( "Bad regular expression." ) );
 			nfn( sys, IWINDOW_ERROR );
 			return;
 		}
 	}
-#endif /*HAVE_REGEXEC*/
 
 	if( program->fromtop )
 		program_find_reset( program );
@@ -1461,10 +1451,8 @@ program_find_action_cb( GtkAction *action, Program *program )
 	set_tooltip( FIND( find )->search, _( "Enter search string here" ) );
         gtk_toggle_button_set_active( 
 		GTK_TOGGLE_BUTTON( FIND( find )->csens ), program->csens );
-#ifdef HAVE_REGEXEC
         gtk_toggle_button_set_active( 
 		GTK_TOGGLE_BUTTON( FIND( find )->regexp ), program->regexp );
-#endif /*HAVE_REGEXEC*/
         gtk_toggle_button_set_active( 
 		GTK_TOGGLE_BUTTON( FIND( find )->fromtop ), program->fromtop );
 

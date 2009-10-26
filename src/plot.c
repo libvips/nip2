@@ -250,21 +250,26 @@ plot_unpack( Plot *plot, DOUBLEMASK *mask )
 	return( TRUE );
 }
 
+#ifdef HAVE_LIBGOFFICE
 static View *
 plot_view_new( Model *model, View *parent )
 {
 	return( plotview_new() );
+	return( NULL );
 }
+#endif /*HAVE_LIBGOFFICE*/
 
 static void
 plot_edit( GtkWidget *parent, Model *model )
 {
+#ifdef HAVE_LIBGOFFICE
         Plot *plot = PLOT( model );
 	Plotwindow *plotwindow;
 
 	plotwindow = plotwindow_new( plot, parent );
 
 	gtk_widget_show( GTK_WIDGET( plotwindow ) );
+#endif /*HAVE_LIBGOFFICE*/
 }
 
 static xmlNode *
@@ -451,7 +456,9 @@ plot_class_init( PlotClass *class )
 
 	iobject_class->generate_caption = plot_generate_caption;
 
+#ifdef HAVE_LIBGOFFICE
 	model_class->view_new = plot_view_new;
+#endif /*HAVE_LIBGOFFICE*/
 	model_class->edit = plot_edit;
 	model_class->save = plot_save;
 	model_class->load = plot_load;
@@ -520,3 +527,105 @@ plot_get_type( void )
 
 	return( type );
 }
+
+#ifdef HAVE_LIBGOFFICE
+
+/* Choose line colours with this. RGB first, then mostly random.
+ */
+#define RGB(R, G, B) RGB_TO_RGBA( RGB_TO_UINT( R, G, B ), 0xff )
+static GOColor default_colour[] = {
+	RGB( 255, 0, 0 ),
+	RGB( 0, 255, 0 ),
+	RGB( 0, 0, 255 ),
+	RGB( 100, 0, 102 ),
+	RGB( 17, 0, 102 ),
+	RGB( 0, 0, 180 ),
+	RGB( 0, 53, 255 ),
+	RGB( 0, 104, 234 ),
+	RGB( 0, 150, 188 ),
+	RGB( 0, 205, 170 ),
+	RGB( 0, 255, 139 ),
+	RGB( 0, 255, 55 ),
+	RGB( 40, 255, 40 ),
+	RGB( 106, 255, 74 ),
+	RGB( 155, 255, 48 ),
+	RGB( 209, 255, 21 ),
+	RGB( 239, 255, 7 ),
+	RGB( 255, 176, 0 ),
+	RGB( 255, 110, 0 ),
+	RGB( 255, 50, 0 ),
+	RGB( 196, 0, 0 )
+};
+
+/* Build a GogPlot from a Plot.
+ */
+GogPlot *
+plot_new_gplot( Plot *plot )
+{
+	GogPlot *gplot;
+	int i;
+
+	if( plot->style == PLOT_STYLE_BAR )
+		gplot = gog_plot_new_by_name( "GogHistogramPlot" );
+	else
+		gplot = gog_plot_new_by_name( "GogXYPlot" );
+
+	switch( plot->style ) {
+	case PLOT_STYLE_POINT:
+		g_object_set( gplot, "default-style-has-lines", FALSE, NULL );
+		break;
+
+	case PLOT_STYLE_LINE:
+		g_object_set( gplot, "default-style-has-markers", FALSE, NULL );
+		break;
+
+	case PLOT_STYLE_SPLINE:
+		g_object_set( gplot, "default-style-has-markers", FALSE, NULL );
+		g_object_set( gplot, "use-splines", TRUE, NULL );
+		break;
+
+	case PLOT_STYLE_BAR:
+		break;
+
+	default:
+		g_assert( FALSE );
+	}
+
+	for( i = 0; i < plot->columns; i++ ) {
+		GogSeries *series;
+		GOData *data;
+		GError *error;
+
+                series = gog_plot_new_series( gplot );
+		data = go_data_vector_val_new( plot->xcolumn[i], plot->rows, 
+			NULL );
+		gog_series_set_dim( series, 0, data, &error );
+		data = go_data_vector_val_new( plot->ycolumn[i], plot->rows, 
+			NULL );
+		gog_series_set_dim( series, 1, data, &error );
+
+		if( i < IM_NUMBER( default_colour ) ) {
+			GogStyle *style;
+
+			style = gog_styled_object_get_style( 
+				GOG_STYLED_OBJECT( series ) );
+
+			style->line.color = default_colour[i];
+			style->line.auto_color = FALSE;
+
+			go_marker_set_fill_color( style->marker.mark,
+				default_colour[i] );
+			style->marker.auto_fill_color = FALSE;
+
+			/* Could match fill, but black everywhere looks nicer.
+			 */
+			go_marker_set_outline_color( style->marker.mark,
+				RGBA_BLACK );
+			style->marker.auto_outline_color = FALSE;
+		}
+	}
+
+	return( gplot );
+}
+
+#endif /*HAVE_LIBGOFFICE*/

@@ -29,11 +29,12 @@ extern "C" {
 
 
 #define GTK_TYPE_ITEM_ENTRY            (gtk_item_entry_get_type ())
-#define GTK_ITEM_ENTRY(obj)            (GTK_CHECK_CAST (obj, gtk_item_entry_get_type (), GtkItemEntry))
-#define GTK_ITEM_ENTRY_CLASS(klass)    (GTK_CHECK_CLASS_CAST (klass, gtk_item_entry_get_type (), GtkItemEntryClass))
-#define GTK_IS_ITEM_ENTRY(obj)         (GTK_CHECK_TYPE (obj, gtk_item_entry_get_type ()))
-#define GTK_IS_ITEM_ENTRY_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_ENTRY))
-
+#define GTK_ITEM_ENTRY(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), GTK_TYPE_ITEM_ENTRY, GtkItemEntry))
+#define GTK_ITEM_ENTRY_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), GTK_TYPE_ITEM_ENTRY, GtkItemEntryClass))
+#define GTK_IS_ITEM_ENTRY(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GTK_TYPE_ITEM_ENTRY))
+                                                                       /* Is this an error?*/
+#define GTK_IS_ITEM_ENTRY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GTK_TYPE_ENTRY))
+#define GTK_ITEM_ENTRY_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), GTK_TYPE_ITEM_ENTRY, GtkItemEntryClass))
 
 typedef struct _GtkItemEntry       GtkItemEntry;
 typedef struct _GtkItemEntryClass  GtkItemEntryClass;
@@ -52,15 +53,15 @@ struct _GtkItemEntryClass
   GtkEntryClass parent_class;
 };
 
-GtkType    gtk_item_entry_get_type       (void);
+GType    gtk_item_entry_get_type       (void);
 GtkWidget* gtk_item_entry_new            (void);
 GtkWidget* gtk_item_entry_new_with_max_length (gint   max);
-void       gtk_item_entry_set_text            (GtkItemEntry *item_entry, 
+void       gtk_item_entry_set_text            (GtkItemEntry *entry, 
                                                const gchar *text,
                                                GtkJustification justification);
 
-void       gtk_item_entry_set_justification (GtkItemEntry        *item_entry,
-					     GtkJustification   justification);
+void       gtk_item_entry_set_justification (GtkItemEntry        *entry,
+					     GtkJustification   just);
 
 void       gtk_item_entry_set_cursor_visible 	(GtkItemEntry *entry,
 					 	 gboolean visible);

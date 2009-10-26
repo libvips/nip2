@@ -48,6 +48,14 @@
 	} \
 } while( 0 )
 
+#define GOG_UNREF( X ) do { \
+	if( X ) { \
+		gog_object_clear_parent( GOG_OBJECT( X ) ); \
+		g_object_unref( G_OBJECT( X ) ); \
+		(X) = NULL; \
+	} \
+} while( 0 )
+
 #define FREESID( SID, OBJ ) do { \
 	if( (SID) && (OBJ) ) { \
 		g_signal_handler_disconnect( (OBJ), (SID) ); \

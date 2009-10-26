@@ -178,7 +178,7 @@ AC_CHECK_HEADER(libgen.h,
 AC_HEADER_DIRENT
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS(limits.h pwd.h fnmatch.h regex.h sys/statvfs.h sys/vfs.h sys/mount.h sys/resource.h sys/wait.h malloc.h sys/time.h sys/param.h unistd.h)
+AC_CHECK_HEADERS(limits.h pwd.h fnmatch.h sys/statvfs.h sys/vfs.h sys/mount.h sys/resource.h sys/wait.h malloc.h sys/time.h sys/param.h unistd.h)
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -189,7 +189,7 @@ AC_FUNC_ALLOCA
 AC_FUNC_FNMATCH
 AC_FUNC_MKDIR
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS(geteuid getcwd regexec getpwnam getrlimit getpwent getwd putenv regcomp strcspn strspn strstr)
+AC_CHECK_FUNCS(geteuid getcwd getpwnam getrlimit getpwent getwd putenv regcomp strcspn strspn strstr)
 
 # need fftw so we load and unload wisdom on startup/shutdown
 # no need to add to libs (pkg-config will do this for us when we ask for vips)
@@ -205,6 +205,24 @@ if test "x$with_fftw3" != "xno"; then
      with_fftw3=no
     ])
   IP_CFLAGS="$FFTW_INCLUDES $FFTW3_CFLAGS $IP_CFLAGS"
+fi
+
+# optional ... use libgoffice to draw plots
+# pretty basic functionality, really, but we need to be able to build without
+# it for testing
+# libgoffice 0.6.x is too buggy, build 0.7.x to get the 0.8 package
+AC_ARG_WITH([libgoffice], AS_HELP_STRING([--without-libgoffice], [build without libgoffice (default: test)]))
+
+if test "x$with_libgoffice" != "xno"; then
+  PKG_CHECK_MODULES(LIBGOFFICE, libgoffice-0.8,
+    [AC_DEFINE(HAVE_LIBGOFFICE,1,[define if you have libgoffice installed.])
+     with_libgoffice=yes
+    ],
+    [AC_MSG_WARN([libgoffice not found; disabling plot display])
+     with_libgoffice=no
+    ])
+  IP_CFLAGS="$LIBGOFFICE_CFLAGS $IP_CFLAGS"
+  IP_LIBS="$LIBGOFFICE_LIBS $IP_LIBS"
 fi
 
 # optional ... we add some gsl funcs as builtins if available
@@ -299,5 +317,6 @@ debug: 				$enable_debug
 * optional packages and modules
 use fftw3 for FFT: 		$with_fftw3
 use gsl for numeric functions:	$with_gsl
+use libgoffice to show plots:	$with_libgoffice
 display help files with xdg:	$XDG_OPEN
 ])

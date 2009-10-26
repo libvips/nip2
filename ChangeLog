@@ -17,6 +17,8 @@ started 7.19.0
 - added a "rotate" option to custom convolution
 - added Histogram / Find / Indexed
 - Cache defaults to 128x128 tiles
+- use libgoffice to display plots
+- use new gtksheet widget
 
 started 7.18.0
 - bumped version numbers

@@ -1,4 +1,4 @@
-/* a gtkplot widget, plus some navigation stuff
+/* a plot widget, plus some navigation stuff
  */
 
 /*
@@ -43,26 +43,19 @@ struct _Plotpresent {
 	 */
 	Plotmodel *plotmodel;		/* Keep model parts of widgets here */
 
-	/* Panning stuff.
-	 */
-	guint dx, dy;		/* Drag start position */
-
-	/* Last mouse position we saw: for in/out zooming. Also, mouse 
-	 * currently in window.
-	 */
-	double last_x;
-	double last_y;
-	gboolean inside;
-
 	/* Widgets.
 	 */
-	GtkWidget *swin;
 	GtkWidget *canvas;
-	struct _GtkPlotCanvasChild *child;
-	GtkWidget *plot;
-	GSList *data;		/* All the GtkPlotData we have added */
-	iWindowCursorContext *cntxt;
-	guint resize_timeout;
+
+#ifdef HAVE_LIBGOFFICE
+	GogRenderer *grend;
+	GogChart *gchart;
+	GogGraph *ggraph;
+        GogPlot *gplot;
+	GogLegend *glegend;
+	GogGridLine *x_ggl;
+	GogGridLine *y_ggl;
+#endif /*HAVE_LIBGOFFICE*/
 };
 
 typedef struct _PlotpresentClass {
@@ -77,10 +70,5 @@ typedef struct _PlotpresentClass {
 } PlotpresentClass;
 
 GtkType plotpresent_get_type( void );
-void plotpresent_get_mag_position( Plotpresent *plotpresent, 
-	int *mag, int *x, int *y );
-void plotpresent_set_mag_position( Plotpresent *plotpresent, 
-	int mag, int x, int y );
-GSList *plotpresent_build_data( Plot *plot, GtkWidget *widget );
 Plotpresent *plotpresent_new( Plotmodel *plotmodel );
 

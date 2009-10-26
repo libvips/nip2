@@ -10,6 +10,12 @@
   	plotpresent_add_grid()
 	plotpresent_build_plot() (legend stuff)
 
+  also:
+
+  	plot_new_gplot()
+
+  colouring lines
+
 - need to do:
 
 	gtk_sheet_set_selection_mode( sheet, GTK_SELECTION_MULTIPLE );
@@ -23,6 +29,8 @@
   in gtksheetwidget.c, delete the +80? same for width
 
 - now need gtk >= 2.18, argh, can we fix this
+
+  we'll certainly need at least 2.14
 
 - try:
 

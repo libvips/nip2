@@ -47,7 +47,8 @@
  */
 
 /* But some themes can trigger warnings, argh, so sometimes we need to
- * undef it. VipsObject sets can also trigger warnings.
+ * undef it. VipsObject sets can trigger warnings. libgoffice will warn about
+ * precision issues if run under valgrind.
  */
 #undef DEBUG_FATAL
 
@@ -335,6 +336,12 @@ main_quit( void )
 	 */
 	if( main_icon_factory )
 		gtk_icon_factory_remove_default( main_icon_factory );
+
+#ifdef HAVE_LIBGOFFICE
+	/* Not quite sure what this does.
+ 	 */
+	libgoffice_shutdown ();
+#endif /*HAVE_LIBGOFFICE*/
 
 	/* Should have freed everything now.
 	 */
@@ -767,6 +774,12 @@ main_x_init( int *argc, char ***argv )
 			PACKAGE G_DIR_SEPARATOR_S "rc" G_DIR_SEPARATOR_S 
 			"ipgtkrc", NULL, NULL, NULL );
 	gtk_init( argc, argv );
+
+#ifdef HAVE_LIBGOFFICE
+        libgoffice_init();
+	go_plugins_init( NULL, NULL, NULL, NULL, TRUE, 
+		GO_TYPE_PLUGIN_LOADER_MODULE );
+#endif /*HAVE_LIBGOFFICE*/
 
 	/* Set the default icon. 
 	 */

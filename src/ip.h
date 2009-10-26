@@ -440,7 +440,9 @@ typedef void *(*tool_map_fn)( Tool *, void *, void * );
 #include "matrix.h"
 #include "matrixview.h"
 #include "plot.h"
+#ifdef HAVE_LIBGOFFICE
 #include "plotview.h"
+#endif /*HAVE_LIBGOFFICE*/
 #include "plotmodel.h"
 #include "plotpresent.h"
 #include "plotwindow.h"

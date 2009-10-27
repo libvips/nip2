@@ -33,15 +33,12 @@
 
 #include "ip.h"
 
-#ifdef HAVE_GTK_EXTRA
-#include <gtkextra/gtksheet.h>
-#endif /*HAVE_GTK_EXTRA*/
-
 /* We have gtksheet patched into the nip sources as a temp measure, so call 
  * directly.
  */
-#define HAVE_GTK_EXTRA
+#ifdef USE_GTKSHEET
 #include "gtksheet.h"
+#endif /*USE_GTKSHEET*/
 
 /* Round N down to P boundary.
  */
@@ -61,14 +58,14 @@ static const int matrixview_max_height = 10;
  */
 static const int matrixview_max_cells = 100;
 
-/* A HAVE_GTK_EXTRA we can use in expressions.
+/* A USE_GTKSHEET we can use in expressions.
  */
-static const gboolean have_gtk_extra = 
-#ifdef HAVE_GTK_EXTRA
+static const gboolean use_gtksheet = 
+#ifdef USE_GTKSHEET
 	TRUE;
-#else /*!HAVE_GTK_EXTRA*/
+#else /*!USE_GTKSHEET*/
 	FALSE;
-#endif /*HAVE_GTK_EXTRA*/
+#endif /*USE_GTKSHEET*/
 
 static GraphicviewClass *parent_class = NULL;
 
@@ -94,7 +91,7 @@ matrixview_destroy( GtkObject *object )
     	GTK_OBJECT_CLASS( parent_class )->destroy( object );
 }
 
-#ifdef HAVE_GTK_EXTRA
+#ifdef USE_GTKSHEET
 static gboolean
 matrixview_scan_string( char *txt, double *out, gboolean *changed )
 {
@@ -113,7 +110,7 @@ matrixview_scan_string( char *txt, double *out, gboolean *changed )
 
     	return( TRUE );
 }
-#endif /*HAVE_GTK_EXTRA*/
+#endif /*USE_GTKSHEET*/
 
 static gboolean
 matrixview_scan_text( Matrixview *matrixview, GtkWidget *txt, 
@@ -203,7 +200,7 @@ matrixview_scan( View *view )
     				}
     			}
 
-#ifdef HAVE_GTK_EXTRA
+#ifdef USE_GTKSHEET
     	if( matrixview->sheet ) {
     		GtkSheet *sheet = GTK_SHEET( matrixview->sheet );
 
@@ -224,7 +221,7 @@ matrixview_scan( View *view )
     				}
     			}
     	}
-#endif /*HAVE_GTK_EXTRA*/
+#endif /*USE_GTKSHEET*/
 
     	if( changed ) 
     		classmodel_update( CLASSMODEL( matrix ) ) ;
@@ -442,7 +439,7 @@ matrixview_text_build_scale_offset( Matrixview *matrixview )
 	UNREF( group );
 }
 
-#ifndef HAVE_GTK_EXTRA
+#ifndef USE_GTKSHEET
 /* Build a set of text items for a matrix. 
  */
 static void
@@ -473,9 +470,9 @@ matrixview_text_build( Matrixview *matrixview )
     		 */
     		matrixview_text_build_scale_offset( matrixview );
 }
-#endif /*!HAVE_GTK_EXTRA*/
+#endif /*!USE_GTKSHEET*/
 
-#ifdef HAVE_GTK_EXTRA
+#ifdef USE_GTKSHEET
 static int 
 matrixview_text_traverse( GtkSheet *sheet,
     	int old_row, int old_col, int *new_row, int *new_col,
@@ -720,7 +717,7 @@ matrixview_text_build( Matrixview *matrixview )
     		matrixview_text_build_scale_offset( matrixview );
 }
 
-#endif /*HAVE_GTK_EXTRA*/
+#endif /*USE_GTKSHEET*/
 
 /* Set the label on a toggle button to reflect its value.
  */
@@ -800,7 +797,7 @@ matrixview_text_set( Matrixview *matrixview, GtkWidget *txt, double val )
     	}
 }
 
-#ifndef HAVE_GTK_EXTRA
+#ifndef USE_GTKSHEET
 /* Fill the widgets!
  */
 static void
@@ -823,9 +820,9 @@ matrixview_text_refresh( Matrixview *matrixview )
     	matrixview_text_set( matrixview, matrixview->scale, matrix->scale );
     	matrixview_text_set( matrixview, matrixview->offset, matrix->offset );
 }
-#endif /*!HAVE_GTK_EXTRA*/
+#endif /*!USE_GTKSHEET*/
 
-#ifdef HAVE_GTK_EXTRA
+#ifdef USE_GTKSHEET
 static void
 matrixview_text_refresh( Matrixview *matrixview )
 {
@@ -889,7 +886,7 @@ matrixview_text_refresh( Matrixview *matrixview )
     	matrixview_text_set( matrixview, matrixview->scale, matrix->scale );
     	matrixview_text_set( matrixview, matrixview->offset, matrix->offset );
 }
-#endif /*HAVE_GTK_EXTRA*/
+#endif /*USE_GTKSHEET*/
 
 static void
 matrixview_refresh( vObject *vobject )
@@ -906,7 +903,7 @@ matrixview_refresh( vObject *vobject )
 	/* Find required size ... limit non-gtk_sheet displays to avoid huge
 	 * slowness.
 	 */
-	if( have_gtk_extra && 
+	if( use_gtksheet && 
 		(matrix->display == MATRIX_DISPLAY_TEXT || 
 		matrix->display == MATRIX_DISPLAY_TEXT_SCALE_OFFSET) ) {
 		width = matrix->value.width;

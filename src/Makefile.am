@@ -40,11 +40,7 @@ gtksheet_c_sources = \
 	gtksheetwidget.c \
 	gtkitementry.c 
 
-nip2_SOURCES = \
-	$(gtksheet_public_h_sources) \
-	$(gtksheet_c_sources) \
-	$(gtksheet_generated_h_sources) \
-	$(gtksheet_generated_c_sources) \
+my_sources = \
 	vipsobject.c \
 	vipsobject.h \
 	plotmodel.c \
@@ -309,6 +305,20 @@ nip2_SOURCES = \
 	workspacegroup.h \
 	workspaceview.c \
 	workspaceview.h 
+
+# gtksheet needs GtkEntryBuffer, which is in gtk+-2.18 and later
+# on earlier gtks we fall back to a table plus a lot of entry widgets
+if USE_GTKSHEET
+nip2_SOURCES = \
+	$(gtksheet_public_h_sources) \
+	$(gtksheet_c_sources) \
+	$(gtksheet_generated_h_sources) \
+	$(gtksheet_generated_c_sources) \
+	$(my_sources)
+else
+nip2_SOURCES = \
+	$(my_sources)
+endif
 
 .PHONEY: helpindex.h
 helpindex.h: 

@@ -143,7 +143,7 @@ IP_CFLAGS="$REQUIRED_PACKAGES_CFLAGS $IP_CFLAGS"
 IP_LIBS="$REQUIRED_PACKAGES_LIBS $IP_LIBS"
 
 # gdk_window_set_opacity() was added in gtk 2.12
-PKG_CHECK_MODULES(SET_OPACITY, gtk+-2.0 >= 2.12,
+PKG_CHECK_EXISTS(gtk+-2.0 >= 2.12,
   [nip_set_opacity=yes],
   [nip_set_opacity=no]
 )
@@ -152,19 +152,18 @@ if test x"$nip_set_opacity" = x"yes"; then
   AC_DEFINE(HAVE_SET_OPACITY,1,[define if you have gdk_window_set_opacity()])
 fi
 
-# this is optional
-#
-#    commented out ... we have our own copy of gtksheet with some patches not
-#    yet in the main distribution
-#
-#    also, we should probably switch to treeview now it has gridlines and
-#    rectangular selects
-#
-#PKG_CHECK_MODULES(GTKEXTRA, gtkextra-2.0,
-#  [AC_DEFINE(HAVE_GTK_EXTRA,1,[define if you have gtkextra installed.])],
-#  [AC_MSG_WARN([gtkextra not found; matrix display will suck])])
-#IP_CFLAGS="$IP_CFLAGS $GTKEXTRA_CFLAGS"
-#IP_LIBS="$IP_LIBS $GTKEXTRA_LIBS"
+# GtkEntryBuffer was added in gtk 2.18
+PKG_CHECK_EXISTS(gtk+-2.0 >= 2.18,
+  [nip_use_gtksheet=yes],
+  [nip_use_gtksheet=no]
+)
+
+if test x"$nip_use_gtksheet" = x"yes"; then
+  AC_DEFINE(USE_GTKSHEET,1,[define if you have GtkEntryBuffer])
+  AM_CONDITIONAL(USE_GTKSHEET, true)
+else
+  AM_CONDITIONAL(USE_GTKSHEET, false)
+fi
 
 # Check for the function strccpy in libgen
 AC_CHECK_HEADER(libgen.h, 
@@ -318,5 +317,7 @@ debug: 				$enable_debug
 use fftw3 for FFT: 		$with_fftw3
 use gsl for numeric functions:	$with_gsl
 use libgoffice to show plots:	$with_libgoffice
+use gtksheet to show matrices:  $nip_use_gtksheet
+  (requires gtk+-2.0 >= 2.18)
 display help files with xdg:	$XDG_OPEN
 ])

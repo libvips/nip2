@@ -1,20 +1,12 @@
 - test regexp search in program window
 
-  also:
+- test build without gtksheet
+
+- test build without libgoffice
+
+- line colours are wrong, argh, very mysterious, see
 
   	plot_new_gplot()
-
-  colouring lines
-
-- look for:
-
-	sheet->vadjustment->upper = SHEET_HEIGHT (sheet) + 80;
-
-  in gtksheetwidget.c, delete the +80? same for width
-
-- now need gtk >= 2.18, argh, can we fix this
-
-  fall back to the non-gtksheet stuff if gtk < 2.18 I guess
 
 - try:
 

@@ -531,9 +531,11 @@ plot_get_type( void )
 
 #ifdef HAVE_LIBGOFFICE
 
-/* Choose line colours with this. RGB first, then mostly random.
+/* Choose line colours with this. RGB first, then mostly random. We can't use
+ * goffice's default colours because we really want the first three to be: red,
+ * green, blue.
  */
-#define RGB(R, G, B) RGB_TO_RGBA( RGB_TO_UINT( R, G, B ), 0xff )
+#define RGB( R, G, B ) RGB_TO_RGBA( RGB_TO_UINT( R, G, B ), 0xff )
 static GOColor default_colour[] = {
 	RGB( 255, 0, 0 ),
 	RGB( 0, 255, 0 ),
@@ -557,6 +559,9 @@ static GOColor default_colour[] = {
 	RGB( 255, 50, 0 ),
 	RGB( 196, 0, 0 )
 };
+
+static GOColor line_colour = RGB( 255, 0, 0 );
+
 
 /* Build a GogPlot from a Plot.
  */
@@ -596,6 +601,7 @@ plot_new_gplot( Plot *plot )
 		GogSeries *series;
 		GOData *data;
 		GError *error;
+		GOStyle *style;
 
                 series = gog_plot_new_series( gplot );
 		data = go_data_vector_val_new( plot->xcolumn[i], plot->rows, 
@@ -611,7 +617,7 @@ plot_new_gplot( Plot *plot )
 			style = go_styled_object_get_style( 
 				GO_STYLED_OBJECT( series ) );
 
-			style->line.color = default_colour[i];
+			style->line.color = default_colour[0];
 			style->line.auto_color = FALSE;
 
 			go_marker_set_fill_color( style->marker.mark,
@@ -624,8 +630,7 @@ plot_new_gplot( Plot *plot )
 				RGBA_BLACK );
 			style->marker.auto_outline_color = FALSE;
 
-			go_styled_object_style_changed( 
-				GO_STYLED_OBJECT( series ) );
+			gog_object_request_update( GOG_OBJECT( series ) );
 		}
 	}
 

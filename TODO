@@ -13,13 +13,6 @@
   actually, we need to nail this down, otherwise when we pass in a list of
   sample texts the loops don't nest
 
-- constant
-
-	(nip2:793): GLib-GObject-WARNING **: IA__g_object_set_property: object
-	class `VipsInterpolateBilinear' has no property named `blur'
-
-  messages are very annoyingo
-
 - add an open raw to nip2? a wrapper around im_binfile()
 
 - (if image then group else constant) doesn't work

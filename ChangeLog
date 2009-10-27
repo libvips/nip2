@@ -23,6 +23,7 @@ started 7.19.0
 - oop horrible tree_map() bug with uops caused a variety of strangeness
 - group image save now sets image save options (thanks Joe)
 - sum and product now work for any object
+- don't set non-existant properties in vips_object_new
 
 started 7.18.0
 - bumped version numbers

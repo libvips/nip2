@@ -172,9 +172,17 @@ vo_set_required_input( VipsObject *object, GParamSpec *pspec,
 }
 
 static void *
-vo_set_arg( const char *name, PElement *value, Vo *vo )
+vo_set_optional_arg( const char *name, PElement *value, Vo *vo )
 {
 	GValue gvalue = { 0 };
+
+	/* For optional args, we should ignore properties that don't exist. For
+	 * example, we might supply ($sharpening => 12) to all interpolators,
+	 * though only one interpolator uses this property.
+	 */
+	if( !g_object_class_find_property( G_OBJECT_GET_CLASS( vo->object ), 
+		name ) )
+		return( NULL );
 
 	if( !heap_ip_to_gvalue( value, &gvalue ) )
 		return( value );
@@ -191,7 +199,7 @@ static gboolean
 vo_set_optional( Vo *vo, PElement *list )
 {
 	if( heap_map_dict( list,
-		(heap_map_dict_fn) vo_set_arg, vo, NULL ) )
+		(heap_map_dict_fn) vo_set_optional_arg, vo, NULL ) )
 		return( FALSE );
 
 	return( TRUE );
@@ -270,7 +278,7 @@ vo_object_new( Reduce *rc, const char *name,
 		reduce_throw( rc );
 	}
 
-	/* Ask the operation to construct.
+	/* Ask the object to construct.
 	 */
 	if( vips_object_build( vo->object ) ) {
 		error_top( _( "VIPS library error." ) );

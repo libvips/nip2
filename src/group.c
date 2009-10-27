@@ -79,12 +79,17 @@ group_save_item( PElement *item, char *filename )
 	if( !heap_is_instanceof( CLASS_IMAGE, item, &result ) )
 		return( FALSE );
 	if( result ) {
+		char filename_image[MAX_STRSIZE];
 		PElement value;
+
+		strcpy( filename_image, filename );
+		filesel_add_mode( filename_image );
 
 		if( !class_get_member( item, MEMBER_VALUE, NULL, &value ) || 
 			!heap_get_image( &value, &ii ) ||
-			!imageinfo_write( ii, filename ) )
+			!imageinfo_write( ii, filename_image ) )
 			return( FALSE );
+
 		increment_filename( filename );
 	}
 
@@ -107,9 +112,15 @@ group_save_item( PElement *item, char *filename )
 	}
 
 	if( PEISIMAGE( item ) ) {
+		char filename_image[MAX_STRSIZE];
+
+		strcpy( filename_image, filename );
+		filesel_add_mode( filename_image );
+
 		if( !heap_get_image( item, &ii ) ||
-			!imageinfo_write( ii, filename ) )
+			!imageinfo_write( ii, filename_image ) )
 			return( FALSE );
+
 		increment_filename( filename );
 	}
 

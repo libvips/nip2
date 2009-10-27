@@ -21,6 +21,7 @@ started 7.19.0
 - use new gtksheet widget
 - better regexp searching in Program window (now full PCRE)
 - oop horrible tree_map() bug with uops caused a variety of strangeness
+- group image save now sets image save options (thanks Joe)
 
 started 7.18.0
 - bumped version numbers

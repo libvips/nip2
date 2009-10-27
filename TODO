@@ -1,12 +1,3 @@
-
-- threading seems to always go back to 1 in batch mode, I wonder why
-
-  are prefs being loaded?
-
-- Using nip2 7.18.2, when you try to save a Group of images as pyramidal 
-  tifs they seem to be just saved as normal tifs.  If the images are 
-  un-grouped and saved individually it seems to work fine.
-
 - "sum A1" where A1 is a 21x21 matrix dies with a C stack overflow
 
 - try

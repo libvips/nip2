@@ -54,6 +54,10 @@
 static const int matrixview_max_width = 7;
 static const int matrixview_max_height = 10;
 
+/* Show a matrix with fixed-width columns.
+ */
+static const int matrixview_column_width = 70;
+
 /* Limit non-gtksheet display size with these ... could be prefs?
  */
 static const int matrixview_max_cells = 100;
@@ -440,30 +444,175 @@ matrixview_text_build_scale_offset( Matrixview *matrixview )
 }
 
 #ifndef USE_GTKSHEET
+/* Make a GtkListStore from a MatrixValue.
+ */
+GtkListStore *
+matrixview_liststore_new( MatrixValue *matrixvalue )
+{
+	int width = matrixvalue->width;
+	int height = matrixvalue->height;
+
+	GType *types;
+	int i, y;
+	GtkListStore *store;
+	int *columns;
+	GValue *values;
+
+	types = g_new( GType, width );
+	for( i = 0; i < width; i++ )
+		types[i] = G_TYPE_DOUBLE;
+	store = gtk_list_store_newv( width, types );
+	g_free( types );
+
+	columns = g_new( int, width );
+	values = g_new0( GValue, width );
+
+	for( i = 0; i < width; i++ ) {
+		columns[i] = i;
+		g_value_init( &values[i], G_TYPE_DOUBLE );
+	}
+
+	for( y = 0; y < height; y++ ) {
+		GtkTreeIter iter;
+
+		for( i = 0; i < width; i++ ) 
+	                g_value_set_double( &values[i], 
+				matrixvalue->coeff[y * width + i] );
+
+		gtk_list_store_append( store, &iter );
+		gtk_list_store_set_valuesv( store, &iter, 
+			columns, values, width );
+	}
+
+	for( i = 0; i < width; i++ ) 
+		g_value_unset( &values[i] );
+
+	g_free( values );
+	g_free( columns );
+
+	return( store );
+}
+
 /* Build a set of text items for a matrix. 
  */
 static void
 matrixview_text_build( Matrixview *matrixview )
 {
-    	int x, y;
+    	Matrix *matrix = MATRIX( VOBJECT( matrixview )->iobject );
 
-    	matrixview->table = gtk_table_new( matrixview->height, 
-		matrixview->width, TRUE );
-    	gtk_box_pack_start( GTK_BOX( matrixview->box ), 
-    		matrixview->table, FALSE, FALSE, 0 );
+	GtkCellRenderer *renderer;
+	int i;
+	GtkTreeViewColumn *column;
+    	int cell_height;
+	GtkTreeSelection *selection;
 
-    	for( y = 0; y < matrixview->height; y++ )
-    		for( x = 0; x < matrixview->width; x++ ) {
-    			GtkWidget *txt;
+	matrixview->store = matrixview_liststore_new( &matrix->value );
+	matrixview->sheet = gtk_tree_view_new_with_model( 
+		GTK_TREE_MODEL( matrixview->store ) );
+	gtk_tree_view_set_headers_visible( GTK_TREE_VIEW( matrixview->sheet ),
+		FALSE );
 
-    			txt = build_entry( 8 );
-    			gtk_table_attach( GTK_TABLE( matrixview->table ), txt,
-    				x, x + 1, y, y + 1, GTK_FILL, GTK_FILL, 2, 2 );
-    			matrixview_text_connect( matrixview, txt );
+	renderer = gtk_cell_renderer_text_new();
+	g_object_set( renderer, "editable", TRUE, NULL );
 
-    			matrixview->items = 
-    				g_slist_append( matrixview->items, txt );
-    		}
+	for( i = 0; i < matrix->value.width; i++ ) {
+		char buf[256];
+
+		column = gtk_tree_view_column_new();
+		gtk_tree_view_column_set_sizing( column, 
+			GTK_TREE_VIEW_COLUMN_FIXED );
+		gtk_tree_view_column_set_fixed_width( column, 
+			matrixview_column_width );
+		im_snprintf( buf, 256, "%d", i );
+		gtk_tree_view_column_set_title( column, buf );
+		gtk_tree_view_column_pack_start( column, renderer, FALSE );
+		gtk_tree_view_column_set_attributes( column, renderer, 
+			"text", i, 
+			NULL );
+		gtk_tree_view_append_column( GTK_TREE_VIEW( matrixview->sheet ),
+			column );
+	}
+
+	gtk_tree_view_set_fixed_height_mode( GTK_TREE_VIEW( matrixview->sheet ),
+		TRUE );
+	gtk_tree_view_column_cell_get_size( column,
+		NULL, NULL, NULL, NULL, &cell_height );
+
+	selection = gtk_tree_view_get_selection( 
+		GTK_TREE_VIEW( matrixview->sheet ) );
+	gtk_tree_selection_set_mode( selection, GTK_SELECTION_MULTIPLE );
+	gtk_tree_view_set_rubber_banding( GTK_TREE_VIEW( matrixview->sheet ), 
+		TRUE );
+
+	gtk_tree_view_set_grid_lines( GTK_TREE_VIEW( matrixview->sheet ), 
+		GTK_TREE_VIEW_GRID_LINES_BOTH );
+
+	if( matrix->value.width > matrixview_max_width || 
+		matrix->value.height > matrixview_max_height ) {
+		GtkRequisition requisition;
+		gint spacing;
+		int border;
+		int width, height;
+
+		if( matrix->value.width > matrixview_max_width )
+			gtk_tree_view_set_headers_visible( 
+				GTK_TREE_VIEW( matrixview->sheet ),
+				TRUE );
+
+		matrixview->swin = gtk_scrolled_window_new( NULL, NULL );
+		gtk_scrolled_window_set_policy( 
+			GTK_SCROLLED_WINDOW( matrixview->swin ),
+			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
+		gtk_container_add( GTK_CONTAINER( matrixview->swin ), 
+			matrixview->sheet );
+
+		/* Calculate how big we should make the scrolled window. We
+		 * need to leave space for the scrollbars.
+		 */
+		gtk_widget_size_request( 
+			gtk_scrolled_window_get_hscrollbar( 
+				GTK_SCROLLED_WINDOW( matrixview->swin ) ),
+			&requisition );
+		gtk_widget_style_get( GTK_WIDGET( matrixview->swin ),
+			"scrollbar-spacing", &spacing,
+			NULL );
+		border = requisition.height + spacing;
+
+		/* Subarea of matrix we show, in cells.
+		 */
+		width = IM_MIN( matrix->value.width, matrixview_max_width );
+		height = IM_MIN( matrix->value.height, matrixview_max_height );
+
+		/* If we're showing row/column headers, need an extra
+		 * row/column.
+		if( matrixview->width > matrixview_max_width )
+			height += 1;
+		if( matrixview->height > matrixview_max_height )
+			width += 1;
+		 */
+
+		/* Convert to pixels.
+		 */
+		width *= matrixview_column_width;
+		height *= cell_height;
+
+		/* Will we be showing scrollbars? Need to add a bit.
+		 */
+		if( matrixview->width > matrixview_max_width )
+			height += border;
+		if( matrixview->height > matrixview_max_height )
+			width += border;
+
+		gtk_widget_set_size_request( GTK_WIDGET( matrixview->swin ), 
+			width + 5, height + 5 );
+
+		gtk_box_pack_start( GTK_BOX( matrixview->box ), 
+			matrixview->swin, FALSE, FALSE, 0 );
+	}
+	else {
+		gtk_box_pack_start( GTK_BOX( matrixview->box ), 
+			matrixview->sheet, FALSE, FALSE, 0 );
+	}
 
     	if( matrixview->display == MATRIX_DISPLAY_TEXT_SCALE_OFFSET )
     		/* Make the scale/offset widgets too.
@@ -716,7 +865,6 @@ matrixview_text_build( Matrixview *matrixview )
     	if( matrixview->display == MATRIX_DISPLAY_TEXT_SCALE_OFFSET )
     		matrixview_text_build_scale_offset( matrixview );
 }
-
 #endif /*USE_GTKSHEET*/
 
 /* Set the label on a toggle button to reflect its value.
@@ -805,18 +953,6 @@ matrixview_text_refresh( Matrixview *matrixview )
 {
     	Matrix *matrix = MATRIX( VOBJECT( matrixview )->iobject );
 
-    	int x, y;
-    	GSList *p;
-
-    	for( p = matrixview->items, y = 0; y < matrixview->height; y++ )
-    		for( x = 0; x < matrixview->width; x++, p = p->next ) {
-    			GtkWidget *item = GTK_WIDGET( p->data );
-    			int i = x + y * matrix->value.width;
-    			double coeff = matrix->value.coeff[i];
-
-    			matrixview_text_set( matrixview, item, coeff );
-    		}
-
     	matrixview_text_set( matrixview, matrixview->scale, matrix->scale );
     	matrixview_text_set( matrixview, matrixview->offset, matrix->offset );
 }
@@ -894,25 +1030,24 @@ matrixview_refresh( vObject *vobject )
     	Matrixview *matrixview = MATRIXVIEW( vobject );
     	Matrix *matrix = MATRIX( VOBJECT( matrixview )->iobject );
 
-    	gboolean built = FALSE;
-    	gboolean hclip = FALSE;
-    	gboolean vclip = FALSE;
+    	gboolean built;
+    	gboolean hclip;
+    	gboolean vclip;
 	int width, height;
 	int i;
 
-	/* Find required size ... limit non-gtk_sheet displays to avoid huge
-	 * slowness.
-	 */
-	if( use_gtksheet && 
-		(matrix->display == MATRIX_DISPLAY_TEXT || 
-		matrix->display == MATRIX_DISPLAY_TEXT_SCALE_OFFSET) ) {
-		width = matrix->value.width;
-		height = matrix->value.height;
-	}
-	else {
-		width = matrix->value.width;
-		height = matrix->value.height;
+    	built = FALSE;
+    	hclip = FALSE;
+    	vclip = FALSE;
 
+	/* Find required size ... limit displays which are tables of widgets 
+	 * to avoid huge slowness.
+	 */
+	width = matrix->value.width;
+	height = matrix->value.height;
+
+	if( matrix->display == MATRIX_DISPLAY_TOGGLE ||
+		matrix->display == MATRIX_DISPLAY_SLIDER ) {
 		if( width * height > matrixview_max_cells ) {
 			if( width > height ) {
 				width = IM_CLIP( 1, 
@@ -1095,6 +1230,7 @@ matrixview_init( Matrixview *matrixview )
 
     	/* Build on 1st refresh.
     	 */
+    	matrixview->store = NULL;
     	matrixview->sheet = NULL;
     	matrixview->swin = NULL;
     	matrixview->cell_text = NULL;

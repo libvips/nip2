@@ -163,6 +163,41 @@ bandjoin l
 	joined = im_gbandjoin (map get_image l);
 }
 
+sum x
+	= oo_unary_function sum_op x, is_class x
+	= im_avg x * (get_width x) * (get_height x) * (get_bands x), is_image x
+	= sum_list x, is_list x 
+	= error (_ "bad arguments (" ++ print x ++ ") to " ++ "sum")
+{
+	sum_op = Operator "sum" sum Operator_type.COMPOUND false;
+
+	// add elements in a nested-list thing
+	sum_list l
+		= foldr acc 0 l
+	{
+		acc x total
+			= total + sum x, is_list x
+			= total + x;
+	}
+}
+
+product x
+	= oo_unary_function product_op x, is_class x
+	= product_list x, is_list x 
+	// (product image) doesn't make much sense :(
+	= error (_ "bad arguments (" ++ print x ++ ") to " ++ "product")
+{
+	product_op = Operator "product" product Operator_type.COMPOUND false;
+
+	product_list l
+		= foldr prod 1 l
+	{
+		prod x total
+			= total * product x, is_list x
+			= total * x;
+	}
+}
+
 mean x
 	= oo_unary_function mean_op x, is_class x
 	= im_avg x, is_image x
@@ -180,15 +215,6 @@ mean x
 		acc x total
 			= total + size x, is_list x
 			= total + 1;
-	}
-
-	// add elements in a nested-list thing
-	sum l
-		= foldr acc 0 l
-	{
-		acc x total
-			= total + sum x, is_list x
-			= total + x;
 	}
 }
 

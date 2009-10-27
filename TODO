@@ -1,16 +1,3 @@
-- "sum A1" where A1 is a 21x21 matrix dies with a C stack overflow
-
-- try
-
-	sum [[1,2],[3,4]]
-
-  kind of makes sense, sum is just "foldr1 add", it's not like "mean", "max"
-  etc.
-
-  a problem with nip2's lack of namespaces?
-
-  maybe sum and product should be proper operators like min/max/mean/etc.
-
 - im_blend now does bandalike/formatalike
 
   where do we use our bandalike/formatalike stuff? push this doen into vips
@@ -19,10 +6,6 @@
 - outline text example
 
 - needs an im_convf wrapper? we don't seem to have one
-
-- nice if we could display the label background again
-
-- double buffering for region draws argh
 
 - needs a custom convol menu item which can loop over a group of matricies
   with a single image
@@ -46,6 +29,10 @@
 
 WONTFIX for 7.20
 ================
+
+- nice if we could display the label background again
+
+- double buffering for region draws argh
 
 - right-click menu on row button should have items for "Jump to referrer / WC1
   / JC1 ..." and "Jump to referred / ..."

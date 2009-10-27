@@ -117,11 +117,7 @@ foldr1 fn l
 	= [], l == []
 	= foldr fn (hd l) (tl l);
 
-sum = foldr1 add;
-
-product = foldr1 multiply;
-
-/* Search a list for an element, returning it's index (or -1)
+/* Search a list for an element, returning its index (or -1)
  *
  * index (equal 12) [13,12,11] == 1
  * index :: (* -> bool) -> [*] -> real

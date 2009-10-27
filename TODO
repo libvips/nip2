@@ -1,8 +1,3 @@
-- test regexp search in program window
-
-- line colours are wrong, argh, very mysterious, see
-
-  	plot_new_gplot()
 
 - try:
 
@@ -10,9 +5,37 @@
 
   get:
 
+  	Macro error.
+
   	unknown binary operator: none
 
   how odd
+
+- try:
+
+  	~(A1.value < 100 & A1.value > 50)
+  	!(A1.value < 100 & A1.value > 50)
+  	+(A1.value < 100 & A1.value > 50)
+  	-(A1.value < 100 & A1.value > 50)
+
+  get:
+
+  	Unimplemented.
+
+	Error in binary ">".
+	left = <1450x2048 8-bit unsigned integer, 3 bands, sRGB>
+	right = 50
+	Called from "A7" (A7)
+
+  but:
+
+  	!(A1.value < 100)
+
+  works fine
+
+- line colours are wrong, argh, very mysterious, see
+
+  	plot_new_gplot()
 
 - why didn't im_copy_file() work? mysterious
 

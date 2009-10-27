@@ -1591,6 +1591,7 @@ action_proc_uop( Reduce *rc, Compile *compile,
 	default:
 		action_uoperror( rc, compile, 
 			_( "Unimplemented." ), op, name, a );
+		break;
 	}
 }
 

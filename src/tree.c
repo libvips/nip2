@@ -406,7 +406,7 @@ tree_map( Compile *compile, tree_map_fn fn, ParseNode *node, void *a, void *b )
 		break;
 
 	case NODE_UOP:
-		if( (result = fn( compile, node->arg1, a, b )) )
+		if( (result = tree_map( compile, fn, node->arg1, a, b )) )
 			return( result );
 		break;
 

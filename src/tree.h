@@ -101,8 +101,8 @@ typedef enum {
 	UN_CCOMPLEX,		/* Convert to complex */
 	UN_CDCOMPLEX,		/* Convert to double complex */
 	UN_MINUS,		/* Unary minus */
-	UN_NEG,			/* Logical negation */
-	UN_COMPLEMENT,		/* 1s complement */
+	UN_NEG,			/* Logical negation, "!" */
+	UN_COMPLEMENT,		/* 1s complement, "~" */
 	UN_PLUS,		/* Unary plus */
 	UN_LAST			/* Sanity check with this */
 } UnOp;

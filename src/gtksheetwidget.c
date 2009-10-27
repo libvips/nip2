@@ -584,6 +584,7 @@ enum {
       SELECT_ROW, 
       SELECT_COLUMN, 
       SELECT_RANGE,
+      UNSELECT_RANGE,
       CLIP_RANGE,
       RESIZE_RANGE,
       MOVE_RANGE,
@@ -1166,7 +1167,24 @@ gtk_sheet_class_init (GtkSheetClass * klass)
             NULL, NULL,
             gtksheet_VOID__BOXED,
 	        G_TYPE_NONE, 1, GTK_TYPE_SHEET_RANGE);
- 
+
+  /**
+   * GtkSheet::unselect-range:
+   * @sheet: the sheet widget that emitted the signal
+   * @range: the range of cells that have been marked to be copied to the clipboard
+   *
+   * Emitted when a block of cells has been unselected. The @range parameter
+   * indicates the cells which are no longer selected.
+   */
+  sheet_signals[UNSELECT_RANGE] =
+    g_signal_new ("unselect_range",
+            G_TYPE_FROM_CLASS(object_class),
+		    G_SIGNAL_RUN_LAST,		    
+		    G_STRUCT_OFFSET (GtkSheetClass, unselect_range),
+            NULL, NULL,
+            gtksheet_VOID__BOXED,
+	        G_TYPE_NONE, 1, GTK_TYPE_SHEET_RANGE);
+
   /**
    * GtkSheet::clip-range:
    * @sheet: the sheet widget that emitted the signal
@@ -6251,6 +6269,8 @@ gtk_sheet_real_unselect_range (GtkSheet * sheet,
   }
 
   gtk_sheet_position_children(sheet);
+
+  gtk_signal_emit(GTK_OBJECT(sheet), sheet_signals[UNSELECT_RANGE], range);
 }
 
 

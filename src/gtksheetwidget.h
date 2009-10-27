@@ -434,6 +434,8 @@ struct _GtkSheetClass
 
  void (*select_range) 		(GtkSheet *sheet, GtkSheetRange *range);
 
+ void (*unselect_range) 	(GtkSheet *sheet, GtkSheetRange *range);
+
  void (*clip_range) 		(GtkSheet *sheet, GtkSheetRange *clip_range);
 
  void (*resize_range)		(GtkSheet *sheet,

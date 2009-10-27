@@ -108,7 +108,8 @@ plot_generate_caption( iObject *iobject )
 
 	vips_buf_rewind( buf );
 	image_value_caption( &plot->value, buf );
-	vips_buf_appendf( buf, ", %d series, %d points", plot->columns, plot->rows );
+	vips_buf_appendf( buf, ", %d series, %d points", 
+			plot->columns, plot->rows );
 	vips_buf_appendf( buf, ", xrange [%g, %g]", plot->xmin, plot->xmax );
 	vips_buf_appendf( buf, ", yrange [%g, %g]", plot->ymin, plot->ymax );
 
@@ -604,12 +605,11 @@ plot_new_gplot( Plot *plot )
 			NULL );
 		gog_series_set_dim( series, 1, data, &error );
 
-		/*
 		if( i < IM_NUMBER( default_colour ) ) {
-			GogStyle *style;
+			GOStyle *style;
 
-			style = gog_styled_object_get_style( 
-				GOG_STYLED_OBJECT( series ) );
+			style = go_styled_object_get_style( 
+				GO_STYLED_OBJECT( series ) );
 
 			style->line.color = default_colour[i];
 			style->line.auto_color = FALSE;
@@ -618,12 +618,15 @@ plot_new_gplot( Plot *plot )
 				default_colour[i] );
 			style->marker.auto_fill_color = FALSE;
 
-			// Could match fill, but black everywhere looks nicer.
+			/* Could match fill, but black everywhere looks nicer.
+			 */
 			go_marker_set_outline_color( style->marker.mark,
 				RGBA_BLACK );
 			style->marker.auto_outline_color = FALSE;
+
+			go_styled_object_style_changed( 
+				GO_STYLED_OBJECT( series ) );
 		}
-		 */
 	}
 
 	return( gplot );

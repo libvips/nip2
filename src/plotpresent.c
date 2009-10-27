@@ -244,14 +244,12 @@ plotpresent_add_grid( GogAxis *axis )
 {
 	GogGridLine *ggl;
 
-	/*
-	ggl = g_object_new( GOG_GRID_LINE_TYPE, "is-minor", FALSE, NULL );
+	ggl = g_object_new( GOG_TYPE_GRID_LINE, "is-minor", FALSE, NULL );
 	gog_object_add_by_name( GOG_OBJECT( axis ), 
 		"MajorGrid", GOG_OBJECT( ggl ) );
-	ggl = g_object_new( GOG_GRID_LINE_TYPE, "is-minor", TRUE, NULL );
+	ggl = g_object_new( GOG_TYPE_GRID_LINE, "is-minor", TRUE, NULL );
 	gog_object_add_by_name( GOG_OBJECT( axis ), 
 		"MinorGrid", GOG_OBJECT( ggl ) );
-	 */
 
 	return( ggl );
 }
@@ -276,13 +274,11 @@ plotpresent_build_plot( Plotpresent *plotpresent )
 	gog_object_add_by_name( GOG_OBJECT( plotpresent->gchart ), 
 		"Plot", GOG_OBJECT( plotpresent->gplot ) );
 
-	/*
 	if( plot->columns > 1 ) {
-		plotpresent->glegend = g_object_new( GOG_LEGEND_TYPE, NULL );
+		plotpresent->glegend = g_object_new( GOG_TYPE_LEGEND, NULL );
 		gog_object_add_by_name( GOG_OBJECT( plotpresent->gchart ), 
 			"Legend", GOG_OBJECT( plotpresent->glegend ) );
 	}
-	 */
 
 	axes = gog_chart_get_axes( plotpresent->gchart, GOG_AXIS_X );
 	axis = GOG_AXIS( axes->data );

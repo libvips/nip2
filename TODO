@@ -1,44 +1,4 @@
 
-- try:
-
-	~(A1 < 100 & A1 > 50)
-
-  get:
-
-  	Macro error.
-
-  	unknown binary operator: none
-
-  how odd
-
-- try:
-
-  	~(A1.value < 100 & A1.value > 50)
-  	!(A1.value < 100 & A1.value > 50)
-  	+(A1.value < 100 & A1.value > 50)
-  	-(A1.value < 100 & A1.value > 50)
-
-  get:
-
-  	Unimplemented.
-
-	Error in binary ">".
-	left = <1450x2048 8-bit unsigned integer, 3 bands, sRGB>
-	right = 50
-	Called from "A7" (A7)
-
-  but:
-
-  	!(A1.value < 100)
-
-  works fine
-
-- line colours are wrong, argh, very mysterious, see
-
-  	plot_new_gplot()
-
-- why didn't im_copy_file() work? mysterious
-
 - threading seems to always go back to 1 in batch mode, I wonder why
 
   are prefs being loaded?
@@ -71,15 +31,13 @@
 
 - nice if we could display the label background again
 
+- double buffering for region draws argh
+
 - needs a custom convol menu item which can loop over a group of matricies
   with a single image
 
   actually, we need to nail this down, otherwise when we pass in a list of
   sample texts the loops don't nest
-
-- nice if we could display the label background again
-
-- double buffering for region draws argh
 
 - constant
 
@@ -90,13 +48,22 @@
 
 - add an open raw to nip2? a wrapper around im_binfile()
 
-- right-click menu on row button should have items for "Jump to referrer / WC1
-  / JC1 ..." and "Jump to referred / ..."
-
 - (if image then group else constant) doesn't work
 
 - why does Filter / Blend / Alpha not give the same result if the args are
   swapped?
+
+WONTFIX for 7.20
+================
+
+- right-click menu on row button should have items for "Jump to referrer / WC1
+  / JC1 ..." and "Jump to referred / ..."
+
+- why didn't im_copy_file() work? mysterious
+
+- line colours are wrong, argh, very mysterious, see
+
+  	plot_new_gplot()
 
 - gtk3.0 tests:
 
@@ -123,12 +90,6 @@
 	GTK_CHECK_TYPE
 	GtkSignalFunc
 
-  argh, in gtkplot as well! maybe this is a good time to move to another 
-  graph lib?
-
-WONTFIX for 7.18
-================
-
 - add Set menu to Math with mkset/union/intersection/difference ?
 
   could do bit operations on images?
@@ -140,11 +101,10 @@ WONTFIX for 7.18
   the 'x' gets copied inside the lcomp, leaving a zombie 'x' attached to argh,
   which Program / View / Errors then reports
 
-  turn the 'x' we copy into a 'generated'? when we copy the expr, how do we
-  know what zombies it made? we don't want to make all syms referenced by x
-  into zombies
+  fix: don't resolve names as we parse and junk the ugly patch list thing
 
-  what about nested lcomps? make sure they still work
+  instead, have a separate resolve stage that runs after we've moved scraps
+  of graph to their final home
 
 - if we want full VipsObject introspection we will need a lot more
 

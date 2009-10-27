@@ -560,9 +560,6 @@ static GOColor default_colour[] = {
 	RGB( 196, 0, 0 )
 };
 
-static GOColor line_colour = RGB( 255, 0, 0 );
-
-
 /* Build a GogPlot from a Plot.
  */
 GogPlot *
@@ -601,7 +598,6 @@ plot_new_gplot( Plot *plot )
 		GogSeries *series;
 		GOData *data;
 		GError *error;
-		GOStyle *style;
 
                 series = gog_plot_new_series( gplot );
 		data = go_data_vector_val_new( plot->xcolumn[i], plot->rows, 
@@ -617,7 +613,7 @@ plot_new_gplot( Plot *plot )
 			style = go_styled_object_get_style( 
 				GO_STYLED_OBJECT( series ) );
 
-			style->line.color = default_colour[0];
+			style->line.color = default_colour[i];
 			style->line.auto_color = FALSE;
 
 			go_marker_set_fill_color( style->marker.mark,

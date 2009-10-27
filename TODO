@@ -1,9 +1,5 @@
 - test regexp search in program window
 
-- test build without gtksheet
-
-- test build without libgoffice
-
 - line colours are wrong, argh, very mysterious, see
 
   	plot_new_gplot()

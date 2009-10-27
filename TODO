@@ -1,7 +1,7 @@
-- im_blend now does bandalike/formatalike
+- im_blend(), im_ifthenelse(), im_add() etc. now do bandalike/formatalike
 
-  where do we use our bandalike/formatalike stuff? push this doen into vips
-  and remove our stuff
+  where do we use our bandalike/formatalike stuff? remove our stuff, though
+  make sure we have equivalents in vips now
 
 - outline text example
 

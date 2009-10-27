@@ -338,9 +338,10 @@ main_quit( void )
 		gtk_icon_factory_remove_default( main_icon_factory );
 
 #ifdef HAVE_LIBGOFFICE
-	/* Not quite sure what this does.
+	/* Not quite sure what this does, but don't do it in batch mode.
  	 */
-	libgoffice_shutdown ();
+	if( !main_option_batch )
+		libgoffice_shutdown ();
 #endif /*HAVE_LIBGOFFICE*/
 
 	/* Should have freed everything now.

@@ -7,7 +7,6 @@ make_xy x y = im_make_xy (to_real x) (to_real y);
  * Vector [0, 0, 0], or 12. If coding == labq, we ignore bands, format and
  * type, generate a 3 band float image, and lab2labq it before handing it
  * back.
- */
 image_new w h b fmt coding type pixel xoff yoff
 	= im''''
 {
@@ -22,6 +21,37 @@ image_new w h b fmt coding type pixel xoff yoff
 		= type;
 
 	im = im_black (to_real w) (to_real h) (to_real b') + pixel;
+
+	im' = clip2fmt fmt' im;
+
+	im'' 
+		= im_Lab2LabQ im', coding == Image_coding.LABPACK;
+		= im';
+
+	im''' = image_set_type type' im'';
+	im'''' = image_set_origin xoff yoff im''';
+}
+ */
+
+/* make an image with the specified properties ... pixel is (eg.) 
+ * Vector [0, 0, 0], or 12. If coding == labq, we ignore bands, format and
+ * type, generate a 3 band float image, and lab2labq it before handing it
+ * back.
+ */
+image_new w h b fmt coding type pixel xoff yoff
+	= embed 1 0 0 w h im''''
+{
+	b'
+		= 3, coding == Image_coding.LABPACK
+		= b;
+	fmt'
+		= Image_format.FLOAT, coding == Image_coding.LABPACK
+		= fmt;
+	type'
+		= Image_type.LAB, coding == Image_coding.LABPACK
+		= type;
+
+	im = im_black 1 1 (to_real b') + pixel;
 
 	im' = clip2fmt fmt' im;
 

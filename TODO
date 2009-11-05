@@ -1,3 +1,19 @@
+
+- constant images:
+
+	we make them with im_black(), then m_lintra(), then im_clip(). How
+	about instead making a 1x1 pixel image and expanding with im_embed()
+	would this be quicker?
+
+	test wth nip2
+
+	might be rather similar, nip2 will use im_black() + im_maplut() I
+	guess
+
+	maybe optimise the expand-one-pixel mode of im_embed()?
+
+- Joe's new defs
+
 - im_blend(), im_ifthenelse(), im_add() etc. now do bandalike/formatalike
 
   where do we use our bandalike/formatalike stuff? remove our stuff, though

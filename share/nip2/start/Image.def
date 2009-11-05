@@ -1283,6 +1283,32 @@ Image_join_item = class
 						bg_colour.expr valign.value))) (to_list (to_list x));
 		}
 	}
+
+	ArrayFL_item = class
+		Menuaction "_Array from List"
+			"join a list of images into a single image" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			ncol = Number "Max. Number of Columns" 1;
+			hshim = Scale "Horizontal spacing" (-100) (100) 0;
+			vshim = Scale "Vertical spacing" (-100) (100) 0;
+			bg_colour = Expression "Background colour" 0;
+			halign = Option "Horizontal alignment" valign_names 1;
+			valign = Option "Vertical alignment" halign_names 1;
+
+			_l 
+				= split_lines ncol.value x.value, is_Group x
+				= split_lines ncol.value x;
+
+			_result
+				= (image_set_origin 0 0 @
+					foldl1 (join_tb vshim.value bg_colour.expr halign.value) @
+					map (foldl1 (join_lr hshim.value
+						bg_colour.expr valign.value))) (to_list (to_list _l));
+		}
+	}
 }
 
 Image_tile_item = class 

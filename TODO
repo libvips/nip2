@@ -1,5 +1,7 @@
+- do we make constant images with im_black() anywhere else?
 
-- Joe's new defs
+- test Joe's layout thing, compare to the thing we do in study2 to make the
+  diagnostic image
 
 - im_blend(), im_ifthenelse(), im_add() etc. now do bandalike/formatalike
 

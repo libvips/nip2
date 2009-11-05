@@ -25,6 +25,7 @@ started 7.19.0
 - sum and product now work for any object
 - don't set non-existant properties in vips_object_new
 - faster constant image maker with im_embed()
+- added "join image array from list", thanks Joe
 
 started 7.18.0
 - bumped version numbers

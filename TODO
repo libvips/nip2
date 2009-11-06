@@ -1,4 +1,14 @@
-- do we make constant images with im_black() anywhere else?
+- try
+
+  	if A1 < 128 then 42 else 53
+
+  get  
+
+	Macro error.
+
+	bad arguments to to_real
+
+- can we benchmark the new ifthenelse stuff again?
 
 - test Joe's layout thing, compare to the thing we do in study2 to make the
   diagnostic image

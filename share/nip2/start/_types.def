@@ -970,14 +970,7 @@ Image value = class
 				has_member_list has_format x
 			= [];
 
-		to_image x
-			= x, is_image x
-			= x.value, is_Image x
-			= clip2fmt target_format im, target_format != []
-			= im
-		{
-			im = im_black width height target_bands + x;
-		}
+		to_image x = to_image_size width height target_bands target_format x;
 
 		[if_size, then_size, else_size] = 
 			size_alike (value : formats_alike (map to_image x));

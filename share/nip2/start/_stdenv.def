@@ -960,16 +960,11 @@ blend cond in1 in2
 		target_format = get_member_list has_format get_format objects;
 		target_type = get_member_list has_type get_type objects;
 
-		to_image x
-			= x, is_image x
-			= x.value, is_Image x
-			= black + x
-		{
-			black = im_black target_width target_height target_bands;
-		}
+		to_image x 
+			= to_image_size target_width target_height 
+				target_bands target_format x;
 
-		[then_image, else_image] = 
-			map (clip2fmt target_format @ to_image) [then_part, else_part];
+		[then_image, else_image] = map to_image [then_part, else_part];
 		[c, t, e] = size_alike [cond, then_image, else_image];
 
 		blend_result_image = image_set_type target_type (im_blend c t e);

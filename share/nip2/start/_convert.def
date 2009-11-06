@@ -61,6 +61,24 @@ to_image x
 	}
 }
 
+// like to_image, but we do 1x1 pixel + x, then embed it up
+// always make an unwrapped image for speed ... this gets used by ifthenelse
+// and stuff like that
+// format can be NULL, meaning set format from x
+to_image_size width height bands format x
+	= x, is_image x
+	= x.value, is_Image x
+	= im''
+{
+	// we want x to set the target format if we don't have one, so we
+	// can't use image_new
+	im = im_black 1 1 bands + x;
+	im'
+		= clip2fmt format im, format != NULL
+		= im;
+	im'' = embed 1 0 0 width height im';
+}
+
 /* Try to make a Colour.
  */
 to_colour x

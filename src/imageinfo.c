@@ -2332,7 +2332,7 @@ imageinfo_from_rgb( Imageinfo *imageinfo, double *rgb )
 		case IM_TYPE_RGB:
 		case IM_TYPE_sRGB:
 		default:
-			if( im_clip2f( in->im, out->im ) )
+			if( im_clip2fmt( in->im, out->im, IM_BANDFMT_FLOAT ) )
 				return;
 			break;
 		}

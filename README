@@ -8,37 +8,35 @@ nip2 is a user interface for the VIPS image processing library.
 Getting nip2 from SVN
 =====================
 
-Enter:
-
 	svn co https://vips.svn.sourceforge.net/svnroot/vips/nip2
 
 Building nip2 from source
 =========================
 
-In the nip2 directory, you should just be able to do:
+If you downloaded from SVN you need:
 
-	user% ./configure
-	user% make
+	$ ./bootstrap.sh
 
-then as root: 
+Then the usual:
 
-	root% make install
+	$ ./configure ...
+	$ make
 
-By default this will install files to /usr/local/bin, /usr/local/share/vips,
-/usr/local/include, /usr/local/lib and /usr/local/man. 
+then finally:
+
+	$ sudo make install
+
+By default this will install files to /usr/local. Use the --prefix argument to
+./configure to change this.
 
 If you have problems, read on.
 
 Building nip2 on win32
 ----------------------
 
-Probably the easiest route is to use mingw/msys. This provides a GNU-style
-build environment for win32. 
+I cross-compile from Linux, usually. See:
 
 	http://www.vips.ecs.soton.ac.uk/index.php?title=Build_on_windows
-
-Alternatively, vips-7.x/win32 contains sample build systems using the
-Microsoft toolchain. See the README in there for details.
 
 Building nip2 on OS X
 ---------------------
@@ -57,14 +55,11 @@ libxml2
 
 flex/bison
 	needed at compiletime
-	
+
 fftw3
 gsl
+goffice
 	optional, but useful
-
-vips8
-	not required: internal development only, but you may see warning
-	messages
 
 Tips 
 ----

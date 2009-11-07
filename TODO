@@ -1,13 +1,3 @@
-- try
-
-  	if A1 < 128 then 42 else 53
-
-  get  
-
-	Macro error.
-
-	bad arguments to to_real
-
 - can we benchmark the new ifthenelse stuff again?
 
 - test Joe's layout thing, compare to the thing we do in study2 to make the
@@ -35,12 +25,12 @@
 - why does Filter / Blend / Alpha not give the same result if the args are
   swapped?
 
-WONTFIX for 7.20
-================
-
 - nice if we could display the label background again
 
 - double buffering for region draws argh
+
+WONTFIX for 7.20
+================
 
 - right-click menu on row button should have items for "Jump to referrer / WC1
   / JC1 ..." and "Jump to referred / ..."

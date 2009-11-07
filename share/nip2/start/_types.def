@@ -968,7 +968,7 @@ Image value = class
 		target_format 
 			= get_member_list has_format get_format x, 
 				has_member_list has_format x
-			= [];
+			= NULL;
 
 		to_image x = to_image_size width height target_bands target_format x;
 

@@ -27,7 +27,7 @@ started 7.19.0
 - faster constant image maker with im_embed()
 - added "join image array from list", thanks Joe
 - phew, label backgrounds are back
-- added raw import
+- added raw import (thanks Jim)
 
 started 7.18.0
 - bumped version numbers

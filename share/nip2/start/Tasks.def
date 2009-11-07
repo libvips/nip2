@@ -40,6 +40,30 @@ Tasks_capture_item = class
 		}
 	}
 
+	Raw_import_item = class
+		Menuaction "_Raw Import" "read a file of binary values" {
+		action = class 
+			_result {
+			_vislevel = 3;
+
+			path = Pathname "File to load" "empty";
+			across = Expression "Pixels across" 100;
+			down = Expression "Pixels down" 100;
+			bytes = Expression "Bytes per pixel" 3;
+			skip = Expression "Skip over initial bytes" 0;
+
+			_result
+				= Image blank, path.value == "empty"
+				= Image (im_binfile path.value 
+					across.expr down.expr bytes.expr skip.expr)
+			{
+				blank = image_new 1 1 1 
+					Image_format.DOUBLE Image_coding.NOCODING Image_type.B_W 
+					0 0 0;
+			}
+		}
+	}
+
 	// interpret Analyze header for layout and calibration
 	Analyze7_header_item = class
 		Menuaction "_Interpret Analyze 7 Header" 

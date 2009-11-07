@@ -1,20 +1,3 @@
-- add an open raw to nip2? a wrapper around im_binfile()
-
-Usage:
-VIPS operator "im_binfile"
-open a headerless binary file, from package "iofuncs"
-"im_binfile" takes 5 arguments:
-   filename  - string
-   width  - integer
-   height  - integer
-   bands  - integer
-   offset  - integer
-And produces 1 result:
-   out  - image
-Flags:
-   (WIO function) (no coordinate transformation) 
-     (area operation) (operation can be cached)
-
 
 - can we benchmark the new ifthenelse stuff again?
 

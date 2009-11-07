@@ -83,7 +83,7 @@ Group value = class
 		groups = filter is_Group args;
 	
 		shortest = foldr1 min_pair (map (len @ get_value) groups);
-	
+
 		process n
 			= NULL, any (map (is_noval n) args)
 			= map_nary fn (map (extract n) args)

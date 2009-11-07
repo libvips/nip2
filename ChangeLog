@@ -26,6 +26,7 @@ started 7.19.0
 - don't set non-existant properties in vips_object_new
 - faster constant image maker with im_embed()
 - added "join image array from list", thanks Joe
+- phew, label backgrounds are back
 
 started 7.18.0
 - bumped version numbers

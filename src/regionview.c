@@ -247,15 +247,17 @@ regionview_paint_label( Regionview *regionview, GdkDrawable *draw,
 	grect.y = r->top;
 	grect.width = r->width;
 	grect.height = r->height;
-	gtk_paint_box( widget->style, draw,
-		regionview->paint_state, GTK_SHADOW_OUT,
+	gtk_paint_flat_box( widget->style, draw, regionview->paint_state, 
+		GTK_SHADOW_OUT,
 		&grect, widget, "buttondefault",
 		grect.x, grect.y, grect.width, grect.height );
 
 	/* Paint text over the top.
 	 */
 	layout = gtk_widget_create_pango_layout( widget, txt );
-	gdk_draw_layout( draw, widget->style->fg_gc[regionview->paint_state], 
+	gtk_paint_layout( widget->style, draw, regionview->paint_state,
+		FALSE,
+		&grect, widget, NULL,
 		r->left + n, r->top + n + ascent, layout );
 	g_object_unref( layout );
 }

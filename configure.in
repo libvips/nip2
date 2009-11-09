@@ -9,7 +9,7 @@ dnl of them.
 dnl
 
 m4_define([nip_major_version], [7])
-m4_define([nip_minor_version], [19])
+m4_define([nip_minor_version], [20])
 m4_define([nip_micro_version], [0])
 m4_define([nip_version],
           [nip_major_version.nip_minor_version.nip_micro_version])
@@ -138,7 +138,7 @@ fi
 # get packages we need
 # gtk before 2.4.9 crashes with the way we use combobox :-(
 PKG_CHECK_MODULES(REQUIRED_PACKAGES, 
-  gthread-2.0 gtk+-2.0 >= 2.4.9 libxml-2.0 vips-7.19)
+  gthread-2.0 gtk+-2.0 >= 2.4.9 libxml-2.0 vips-7.20)
 IP_CFLAGS="$REQUIRED_PACKAGES_CFLAGS $IP_CFLAGS"
 IP_LIBS="$REQUIRED_PACKAGES_LIBS $IP_LIBS"
 
@@ -153,6 +153,8 @@ if test x"$nip_set_opacity" = x"yes"; then
 fi
 
 # GtkEntryBuffer was added in gtk 2.18
+# we need it for our hacked-about gtksheet widget ... fall back to a treeview
+# matrix widget if we have to
 PKG_CHECK_EXISTS(gtk+-2.0 >= 2.18,
   [nip_use_gtksheet=yes],
   [nip_use_gtksheet=no]

@@ -1206,6 +1206,16 @@ conv mask image
 		(conv mask) Operator_type.COMPOUND_REWRAP false;
 }
 
+convf mask image
+	= oo_unary_function convf_op image, is_class image
+	= im_convf image (to_matrix mask), is_image image
+	= error (_ "bad arguments to " ++ "convf" ++ ": " ++ 
+		"convf (" ++ print mask ++ ") (" ++ print image ++ ")")
+{
+	convf_op = Operator "convf" 
+		(convf mask) Operator_type.COMPOUND_REWRAP false;
+}
+
 convsep mask image
 	= oo_unary_function convsep_op image, is_class image
 	= im_convsep image (to_matrix mask), is_image image

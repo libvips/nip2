@@ -1,6 +1,7 @@
 started 7.20.0, 9/11/09
 - version bump
 - "make dist" fixes
+- add "convf" operator
 
 started 7.19.0
 - remove deprecated use of GtkList in option edit ... needs replacing

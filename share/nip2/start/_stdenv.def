@@ -1208,7 +1208,7 @@ conv mask image
 
 convf mask image
 	= oo_unary_function convf_op image, is_class image
-	= im_convf image (to_matrix mask), is_image image
+	= im_conv_f image (to_matrix mask), is_image image
 	= error (_ "bad arguments to " ++ "convf" ++ ": " ++ 
 		"convf (" ++ print mask ++ ") (" ++ print image ++ ")")
 {
@@ -1227,7 +1227,7 @@ convsep mask image
 
 convsepf mask image
 	= oo_unary_function convsepf_op image, is_class image
-	= im_convsepf image (to_matrix mask), is_image image
+	= im_convsep_f image (to_matrix mask), is_image image
 	= error (_ "bad arguments to " ++ "convsepf")
 {
 	convsepf_op = Operator "convsepf" 

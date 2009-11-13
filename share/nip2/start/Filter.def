@@ -165,8 +165,8 @@ Kirk
 						= im_gradient, !separable && type == 0 && rotate == 3
 						= im_conv, !separable && type == 0
 						= im_convsep, separable && type == 0
-						= im_convf, !separable && type == 1
-						= im_convsepf, separable && type == 1
+						= im_conv_f, !separable && type == 1
+						= im_convsep_f, separable && type == 1
 						= error "boink!";
 					in' = conv_fn in.value matrix;
 				}

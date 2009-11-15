@@ -531,11 +531,20 @@ plot_get_type( void )
 
 #ifdef HAVE_LIBGOFFICE
 
+/* Make a GOColor from an RGB triple. Different versions of goffice have
+ * different ways of doing this :(
+ */
+#ifdef GO_COLOR_FROM_RGB
+  #define RGB( R, G, B ) GO_COLOR_FROM_RGB( R, G, B )
+#else
+  #define RGB( R, G, B ) RGB_TO_RGBA( RGB_TO_UINT( R, G, B ), 0xff )
+#endif
+
 /* Choose line colours with this. RGB first, then mostly random. We can't use
  * goffice's default colours because we really want the first three to be: red,
  * green, blue.
  */
-#define RGB( R, G, B ) RGB_TO_RGBA( RGB_TO_UINT( R, G, B ), 0xff )
+
 static GOColor default_colour[] = {
 	RGB( 255, 0, 0 ),
 	RGB( 0, 255, 0 ),
@@ -623,7 +632,7 @@ plot_new_gplot( Plot *plot )
 			/* Could match fill, but black everywhere looks nicer.
 			 */
 			go_marker_set_outline_color( style->marker.mark,
-				RGBA_BLACK );
+				RGB( 0, 0, 0 ) );
 			style->marker.auto_outline_color = FALSE;
 
 			gog_object_request_update( GOG_OBJECT( series ) );

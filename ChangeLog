@@ -1,6 +1,7 @@
 started 7.20.1, 11/11/09
 - add "convf" operator
 - default number of CPUs bumped to 4
+- plot.c can work with goffice-0.7.15
 
 started 7.20.0, 9/11/09
 - version bump

@@ -595,7 +595,9 @@ find_build( GtkWidget *widget )
 
 	find->search = build_glabeltext4( idlg->work, NULL, _( "Search for" ) );
 	find->csens = build_gtoggle( idlg->work, _( "Case sensitive" ) );
+#ifdef HAVE_GREGEX
 	find->regexp = build_gtoggle( idlg->work, _( "Regular expression" ) );
+#endif /*HAVE_GREGEX*/
 	find->fromtop = build_gtoggle( idlg->work, _( "Search from start" ) );
 	idialog_set_default_entry( idlg, GTK_ENTRY( find->search ) );
 	gtk_widget_show_all( idlg->work );

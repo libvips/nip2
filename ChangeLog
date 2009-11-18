@@ -1,3 +1,7 @@
+started 7.20.2, 11/11/09
+- make GRegex optional so we can work with older glibs
+- fix a crash with "-p" and Managedstring
+
 started 7.20.1, 11/11/09
 - add "convf" operator
 - default number of CPUs bumped to 4

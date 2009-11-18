@@ -10,7 +10,7 @@ dnl
 
 m4_define([nip_major_version], [7])
 m4_define([nip_minor_version], [20])
-m4_define([nip_micro_version], [1])
+m4_define([nip_micro_version], [2])
 m4_define([nip_version],
           [nip_major_version.nip_minor_version.nip_micro_version])
 
@@ -118,7 +118,6 @@ AC_CHECK_TOOL(LD, ld)
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 
-
 # dmalloc option
 AM_WITH_DMALLOC
 
@@ -165,6 +164,17 @@ if test x"$nip_use_gtksheet" = x"yes"; then
   AM_CONDITIONAL(USE_GTKSHEET, true)
 else
   AM_CONDITIONAL(USE_GTKSHEET, false)
+fi
+
+# GRegex was added in glib-2.14
+# we need it for regex searching in the program window
+PKG_CHECK_EXISTS(glib-2.0 >= 2.14,
+  [nip_use_gregex=yes],
+  [nip_use_gregex=no]
+)
+
+if test x"$nip_use_gregex" = x"yes"; then
+  AC_DEFINE(HAVE_GREGEX,1,[define if you have GRegex])
 fi
 
 # Check for the function strccpy in libgen
@@ -321,5 +331,7 @@ use gsl for numeric functions:	$with_gsl
 use libgoffice to show plots:	$with_libgoffice
 use gtksheet to show matrices:  $nip_use_gtksheet
   (requires gtk+-2.0 >= 2.18)
+allow regex searches: 		$nip_use_gregex
+  (requires glib-2.0 >= 2.14)
 display help files with xdg:	$XDG_OPEN
 ])

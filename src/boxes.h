@@ -105,7 +105,9 @@ typedef struct _Find {
 	/* My instance vars.
 	 */
 	GtkWidget *search;
+#ifdef HAVE_GREGEX
 	GtkWidget *regexp;
+#endif /*HAVE_GREGEX*/
 	GtkWidget *csens;
 	GtkWidget *fromtop;
 } Find;

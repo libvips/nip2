@@ -212,7 +212,7 @@ expr_new_value( Expr *expr )
 	printf( "expr_new_value: " );
 	symbol_name_print( expr->sym );
 	printf( ": " );
-	pgraph( root );
+	graph_pointer( root );
 }
 #endif /*DEBUG*/
 

@@ -975,7 +975,11 @@ symbol_recalculate_check( Symbol *sym )
 {
 #ifdef DEBUG_RECALC
 	printf( "symbol_recalculate_check: %s\n", symbol_name_scope( sym ) );
-	g_assert( symbol_is_leafable( sym ) );
+
+	/* We can symbol_recalculate_check() syms which are not dirty.
+	 */
+	g_assert( !sym->dirty || symbol_is_leafable( sym ) );
+
 	g_assert( symbol_ndirty( sym ) == 0 );
 #endif /*DEBUG_RECALC*/
 
@@ -1025,7 +1029,8 @@ symbol_recalculate_check( Symbol *sym )
 		expr_new_value( sym->expr );
 
 #ifdef DEBUG_RECALC
-		printf( "\t(success)\n" ); 
+		printf( "\tsuccess: " ); 
+		graph_pointer( &sym->expr->root );
 #endif /*DEBUG_RECALC*/
 	}
 #ifdef DEBUG_RECALC

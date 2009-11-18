@@ -230,13 +230,13 @@ reduce_map_dict( Reduce *rc, PElement *base,
 }
 
 static void *
-reduce_clone_list_sub( Reduce *rc, PElement *data, PElement *out )
+reduce_clone_list_sub( Reduce *rc, PElement *head, PElement *out )
 {
 	PElement lhs;
 
 	if( !heap_list_add( rc->heap, out, &lhs ) )
 		reduce_throw( rc );
-	PEPUTPE( &lhs, data );
+	PEPUTPE( &lhs, head );
 
 	heap_list_next( out );
 

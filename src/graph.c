@@ -116,12 +116,17 @@ lisp_list( VipsBuf *buf, PElement *base,
 		else
 			lisp_pelement( buf, base, back, fn, indent );
 	}
+	else if( PEISMANAGEDSTRING( base ) ) {
+		vips_buf_appends( buf, ", Managedstring <" );
+		vips_buf_appends( buf, PEGETMANAGEDSTRING( base )->string );
+		vips_buf_appends( buf, ">" );
+	}
 	else if( !PEISELIST( base ) ) 
 		lisp_pelement( buf, base, back, fn, indent );
 }
 
 /* Print a [char] ... fall back to lisp_list() if we hit a non-char
- * element.
+ * element. base is the RHS of a cons, so it can be a managedstring too.
  */
 static void
 lisp_string( VipsBuf *buf, PElement *base, 
@@ -158,6 +163,8 @@ lisp_string( VipsBuf *buf, PElement *base,
 		else
 			error = TRUE;
 	}
+	else if( PEISMANAGEDSTRING( base ) ) 
+		vips_buf_appends( buf, PEGETMANAGEDSTRING( base )->string );
 	else if( !PEISELIST( base ) ) 
 		error = TRUE;
 }
@@ -263,7 +270,8 @@ lisp_node( VipsBuf *buf, HeapNode *hn, GSList **back, gboolean fn, int indent )
 
 			PEPOINTLEFT( hn, &p2 );
 			if( *p1.type != *p2.type || *p1.ele != *p2.ele ) { 
-				vips_buf_appendf( buf, "\n%s", spc( indent + TAB ) );
+				vips_buf_appendf( buf, "\n%s", 
+					spc( indent + TAB ) );
 				vips_buf_appendf( buf, _( "secret" ) );
 				vips_buf_appendf( buf, " = { " );
 				lisp_symval( buf, &p2, 
@@ -395,7 +403,8 @@ lisp_pelement( VipsBuf *buf, PElement *base,
 		break;
 
 	case ELEMENT_COMB:
-		vips_buf_appends( buf, decode_CombinatorType( PEGETCOMB( base ) ) );
+		vips_buf_appends( buf, 
+			decode_CombinatorType( PEGETCOMB( base ) ) );
 		break;
 
 	default:
@@ -518,7 +527,13 @@ shell_node( HeapNode *hn )
 				shell_pelement( &p1 );
 
 			PEPOINTRIGHT( hn, &p2 );
-			if( PEISELIST( &p2 ) ) 
+			if( PEISMANAGEDSTRING( &p2 ) ) {
+				printf( "%s\n", 
+					PEGETMANAGEDSTRING( &p2 )->string );
+				break;
+
+			}
+			else if( PEISELIST( &p2 ) ) 
 				break;
 
 			if( !string_mode )
@@ -585,6 +600,8 @@ shell_pelement( PElement *base )
 	case ELEMENT_MANAGED:
 		if( PEISIMAGE( base ) )
 			printf( "%s", PEGETIMAGE( base )->filename );
+		else if( PEISMANAGEDSTRING( base ) ) 
+			printf( "%s", PEGETMANAGEDSTRING( base )->string );
 		break;
 
 	default:
@@ -608,5 +625,3 @@ graph_value( PElement *root )
 	shell_pelement( root );
 	printf( "\n" );
 }
-
-

@@ -1412,6 +1412,8 @@ main( int argc, char *argv[] )
 				main_log_add( "%s\n", error_get_sub() );
 	}
 
+	symbol_recalculate_all_force( TRUE );
+
 	/* Make sure our start ws doesn't have modified set. We may have
 	 * loaded some images or whatever into it.
 	 */

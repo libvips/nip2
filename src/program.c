@@ -456,6 +456,7 @@ program_find_note( Program *program, Symbol *sym, int start, int end )
 static gboolean
 program_find_pos( Program *program, const char *text, int *start, int *end )
 {
+#ifdef HAVE_GREGEX
 	if( program->regexp ) {
 		GMatchInfo *match;
 
@@ -466,7 +467,9 @@ program_find_pos( Program *program, const char *text, int *start, int *end )
 		}
 		g_match_info_free( match );
 	}
-	else if( program->csens ) {
+	else 
+#endif /*HAVE_GREGEX*/
+	if( program->csens ) {
 		char *p;
 
 		if( (p = strstr( text, program->search )) ) {
@@ -571,7 +574,9 @@ program_destroy( GtkObject *object )
 	FREESID( program->kitgroup_destroy_sid, program->kitg );
 
 	IM_FREEF( g_free, program->search );
+#ifdef HAVE_GREGEX
 	IM_FREEF( g_regex_unref, program->comp );
+#endif /*HAVE_GREGEX*/
 
 	program_find_reset( program );
 
@@ -780,9 +785,11 @@ program_init( Program *program )
 
 	program->search = NULL;
 	program->csens = FALSE;
-	program->regexp = FALSE;
 	program->fromtop = TRUE;
+#ifdef HAVE_GREGEX
+	program->regexp = FALSE;
 	program->comp = NULL;
+#endif /*HAVE_GREGEX*/
 }
 
 GtkType
@@ -1392,8 +1399,10 @@ program_find_done_cb( iWindow *iwnd, void *client,
 	program->search = 
 		gtk_editable_get_chars( GTK_EDITABLE( find->search ), 0, -1 );
 	program->csens = GTK_TOGGLE_BUTTON( find->csens )->active;
-	program->regexp = GTK_TOGGLE_BUTTON( find->regexp )->active;
 	program->fromtop = GTK_TOGGLE_BUTTON( find->fromtop )->active;
+
+#ifdef HAVE_GREGEX
+	program->regexp = GTK_TOGGLE_BUTTON( find->regexp )->active;
 
 	if( program->regexp ) {
 		GRegexCompileFlags cflags = 0;
@@ -1412,6 +1421,7 @@ program_find_done_cb( iWindow *iwnd, void *client,
 			return;
 		}
 	}
+#endif /*HAVE_GREGEX*/
 
 	if( program->fromtop )
 		program_find_reset( program );
@@ -1451,8 +1461,10 @@ program_find_action_cb( GtkAction *action, Program *program )
 	set_tooltip( FIND( find )->search, _( "Enter search string here" ) );
         gtk_toggle_button_set_active( 
 		GTK_TOGGLE_BUTTON( FIND( find )->csens ), program->csens );
+#ifdef HAVE_GREGEX
         gtk_toggle_button_set_active( 
 		GTK_TOGGLE_BUTTON( FIND( find )->regexp ), program->regexp );
+#endif /*HAVE_GREGEX*/
         gtk_toggle_button_set_active( 
 		GTK_TOGGLE_BUTTON( FIND( find )->fromtop ), program->fromtop );
 

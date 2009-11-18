@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nip2 7.11.11\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-11-10 13:50+0000\n"
+"POT-Creation-Date: 2009-11-18 21:15+0000\n"
 "PO-Revision-Date: 2006-09-06 12:30+0000\n"
 "Last-Translator: john <jcupitt@gmail.com>\n"
 "Language-Team: dk <LL@li.org>\n"
@@ -169,49 +169,49 @@ msgstr "Malkovich"
 msgid "Case sensitive"
 msgstr "Malkovich"
 
-#: src/boxes.c:598
+#: src/boxes.c:599
 msgid "Regular expression"
 msgstr "Malkovich"
 
-#: src/boxes.c:599
+#: src/boxes.c:601
 msgid "Search from start"
 msgstr "Malkovich"
 
-#: src/boxes.c:799
+#: src/boxes.c:801
 msgid "Image header fields"
 msgstr "Malkovich"
 
-#: src/boxes.c:815
+#: src/boxes.c:817
 msgid "Image history"
 msgstr "Malkovich"
 
-#: src/boxes.c:931 src/boxes.c:942 src/boxes.c:969
+#: src/boxes.c:933 src/boxes.c:944 src/boxes.c:971
 #, fuzzy
 msgid "Unable to view help file."
 msgstr "Malkovich"
 
-#: src/boxes.c:932
+#: src/boxes.c:934
 #, fuzzy, c-format
 msgid "Unable to open URL \"%s\", windows error code = %d."
 msgstr "Malkovich"
 
-#: src/boxes.c:943
+#: src/boxes.c:945
 #, c-format
 msgid ""
 "Attempt to view URL with xdg-open failed\n"
 "%s"
 msgstr ""
 
-#: src/boxes.c:948 src/boxes.c:979
+#: src/boxes.c:950 src/boxes.c:981
 msgid "Browser window opened."
 msgstr "Malkovich"
 
-#: src/boxes.c:949 src/boxes.c:980
+#: src/boxes.c:951 src/boxes.c:982
 #, fuzzy
 msgid "You may need to switch desktops to see the new window."
 msgstr "Malkovich"
 
-#: src/boxes.c:971
+#: src/boxes.c:973
 #, fuzzy, c-format
 msgid ""
 "Attempted to launch browser with command:\n"
@@ -219,42 +219,42 @@ msgid ""
 "You can change this command in Preferences."
 msgstr "Malkovich"
 
-#: src/boxes.c:1070
+#: src/boxes.c:1072
 #, fuzzy, c-format
 msgid "Version %s"
 msgstr "Malkovich"
 
-#: src/boxes.c:1083
+#: src/boxes.c:1085
 #, fuzzy
 msgid "Starting ..."
 msgstr "Malkovich"
 
-#: src/boxes.c:1091
+#: src/boxes.c:1093
 msgid "Display this splash screen during startup"
 msgstr "Malkovich"
 
-#: src/boxes.c:1160
+#: src/boxes.c:1162
 msgid "Select Font"
 msgstr "Malkovich"
 
-#: src/boxes.c:1218
+#: src/boxes.c:1220
 msgid "Font not found."
 msgstr "Malkovich"
 
-#: src/boxes.c:1219
+#: src/boxes.c:1221
 #, fuzzy, c-format
 msgid "Font \"%s\" not found on system."
 msgstr "Malkovich"
 
-#: src/boxes.c:1299
+#: src/boxes.c:1301
 msgid "Pick a font"
 msgstr "Malkovich"
 
-#: src/boxes.c:1304
+#: src/boxes.c:1306
 msgid "Set Font"
 msgstr "Malkovich"
 
-#: src/boxes.c:1350
+#: src/boxes.c:1352
 msgid "Click to select font"
 msgstr "Malkovich"
 
@@ -548,9 +548,9 @@ msgid "Save Column \"%s\""
 msgstr "Malkovich"
 
 #: src/columnview.c:180 src/columnview.c:241 src/mainw.c:1331 src/mainw.c:1369
-#: src/program.c:591 src/program.c:620 src/program.c:1043 src/program.c:1084
-#: src/program.c:1130 src/program.c:1162 src/program.c:1485 src/program.c:1526
-#: src/program.c:2199 src/row.c:479 src/workspacegroup.c:177
+#: src/program.c:596 src/program.c:625 src/program.c:1050 src/program.c:1091
+#: src/program.c:1137 src/program.c:1169 src/program.c:1497 src/program.c:1538
+#: src/program.c:2211 src/row.c:479 src/workspacegroup.c:177
 #: src/workspacegroup.c:213
 msgid "Name"
 msgstr "Malkovich"
@@ -560,7 +560,7 @@ msgid "Toolkit"
 msgstr "Malkovich"
 
 #: src/columnview.c:182 src/columnview.c:245 src/matrix.c:269
-#: src/program.c:592 src/program.c:622 src/program.c:1131 src/program.c:1164
+#: src/program.c:597 src/program.c:627 src/program.c:1138 src/program.c:1171
 msgid "Filename"
 msgstr "Malkovich"
 
@@ -613,7 +613,7 @@ msgstr "Malkovich"
 msgid "_Edit Caption"
 msgstr "Malkovich"
 
-#: src/columnview.c:896 src/mainw.c:1663 src/program.c:1708
+#: src/columnview.c:896 src/mainw.c:1663 src/program.c:1720
 msgid "Select _All"
 msgstr "Malkovich"
 
@@ -784,7 +784,7 @@ msgid "Search for all unresolved references"
 msgstr ""
 
 #: src/error.c:138 src/imageview.c:499 src/mainw.c:1653 src/plotwindow.c:175
-#: src/program.c:1683 src/trace.c:243
+#: src/program.c:1695 src/trace.c:243
 msgid "_Close"
 msgstr "Malkovich"
 
@@ -794,22 +794,22 @@ msgid "Close ierror window"
 msgstr "Malkovich"
 
 #: src/error.c:143 src/imageview.c:529 src/mainw.c:1723 src/plotwindow.c:180
-#: src/program.c:1763 src/trace.c:248
+#: src/program.c:1775 src/trace.c:248
 msgid "_Contents"
 msgstr "Malkovich"
 
 #: src/error.c:144 src/imageview.c:530 src/mainw.c:1724 src/plotwindow.c:181
-#: src/program.c:1764 src/trace.c:249
+#: src/program.c:1776 src/trace.c:249
 msgid "Open the users guide"
 msgstr "Malkovich"
 
 #: src/error.c:148 src/imageview.c:534 src/mainw.c:1718 src/plotwindow.c:185
-#: src/program.c:1758 src/trace.c:253
+#: src/program.c:1770 src/trace.c:253
 msgid "_About"
 msgstr "Malkovich"
 
 #: src/error.c:149 src/imageview.c:535 src/mainw.c:1719 src/plotwindow.c:186
-#: src/program.c:1759 src/trace.c:254
+#: src/program.c:1771 src/trace.c:254
 msgid "About this program"
 msgstr "Malkovich"
 
@@ -1033,7 +1033,7 @@ msgid "File \"%s\" exists. OK to overwrite?"
 msgstr "Malkovich"
 
 #: src/fontname.c:58 src/mainw.c:1332 src/mainw.c:1371 src/number.c:65
-#: src/option.c:65 src/pathname.c:81 src/program.c:1044 src/program.c:1086
+#: src/option.c:65 src/pathname.c:81 src/program.c:1051 src/program.c:1093
 #: src/slider.c:48 src/string.c:67 src/toggle.c:48 src/workspacegroup.c:178
 #: src/workspacegroup.c:215
 msgid "Caption"
@@ -1044,68 +1044,68 @@ msgid ""
 "Press Escape to cancel edit, press Return to accept edit and recalculate"
 msgstr "Malkovich"
 
-#: src/graph.c:179
+#: src/graph.c:186
 msgid "circular"
 msgstr "Malkovich"
 
-#: src/graph.c:184
+#: src/graph.c:191
 #, fuzzy, c-format
 msgid "circular to label %d"
 msgstr "Malkovich"
 
-#: src/graph.c:194
+#: src/graph.c:201
 #, fuzzy, c-format
 msgid "label %d"
 msgstr "Malkovich"
 
-#: src/graph.c:211
+#: src/graph.c:218
 msgid "unevaluated"
 msgstr "Malkovich"
 
-#: src/graph.c:246
+#: src/graph.c:253
 #, fuzzy, c-format
 msgid "class (%p)"
 msgstr "Malkovich"
 
-#: src/graph.c:257
+#: src/graph.c:264
 msgid "members"
 msgstr "Malkovich"
 
-#: src/graph.c:267
+#: src/graph.c:275
 msgid "secret"
 msgstr "Malkovich"
 
-#: src/graph.c:320
+#: src/graph.c:328
 #, fuzzy, c-format
 msgid "no value (type %d)"
 msgstr "Malkovich"
 
-#: src/graph.c:328
+#: src/graph.c:336
 msgid "NULL pointer"
 msgstr "Malkovich"
 
-#: src/graph.c:337
+#: src/graph.c:345
 msgid "symbol"
 msgstr "Malkovich"
 
-#: src/graph.c:345
+#: src/graph.c:353
 msgid "constructor"
 msgstr "Malkovich"
 
-#: src/graph.c:353
+#: src/graph.c:361
 msgid "symref"
 msgstr "Malkovich"
 
-#: src/graph.c:361
+#: src/graph.c:369
 msgid "compileref"
 msgstr "Malkovich"
 
-#: src/graph.c:389
+#: src/graph.c:397
 #, fuzzy, c-format
 msgid "tag \"%s\""
 msgstr "Malkovich"
 
-#: src/graph.c:403
+#: src/graph.c:412
 #, fuzzy, c-format
 msgid "unknown element tag %d"
 msgstr "Malkovich"
@@ -1387,7 +1387,7 @@ msgstr "Malkovich"
 msgid "Recalculate image"
 msgstr "Malkovich"
 
-#: src/imageview.c:500 src/plotwindow.c:176 src/program.c:1684
+#: src/imageview.c:500 src/plotwindow.c:176 src/program.c:1696
 msgid "Close"
 msgstr "Malkovich"
 
@@ -1870,23 +1870,23 @@ msgstr "Malkovich"
 msgid "unable to read max file descriptors"
 msgstr "Malkovich"
 
-#: src/main.c:1401 src/main.c:1452
+#: src/main.c:1401 src/main.c:1454
 #, fuzzy, c-format
 msgid ""
 "Startup error log:\n"
 "%s"
 msgstr "Malkovich"
 
-#: src/main.c:1451
+#: src/main.c:1453
 msgid "Startup error."
 msgstr "Malkovich"
 
-#: src/main.c:1462
+#: src/main.c:1464
 #, fuzzy, c-format
 msgid "Welcome to %s-%s!"
 msgstr "Malkovich"
 
-#: src/main.c:1467
+#: src/main.c:1469
 #, fuzzy, c-format
 msgid ""
 "A new directory has been created in your home directory to hold startup, "
@@ -2078,7 +2078,7 @@ msgstr "Malkovich"
 msgid "Open _Recent"
 msgstr "Malkovich"
 
-#: src/mainw.c:1589 src/mainw.c:1713 src/program.c:720 src/regionview.c:996
+#: src/mainw.c:1589 src/mainw.c:1713 src/program.c:725 src/regionview.c:996
 #: src/rowview.c:585
 msgid "_Edit"
 msgstr "Malkovich"
@@ -2117,7 +2117,7 @@ msgstr "Malkovich"
 msgid "Create a new column with a specified name"
 msgstr "Malkovich"
 
-#: src/mainw.c:1613 src/program.c:1653
+#: src/mainw.c:1613 src/program.c:1665
 msgid "New _Workspace"
 msgstr "Malkovich"
 
@@ -2186,7 +2186,7 @@ msgstr "Malkovich"
 msgid "Close workspace"
 msgstr "Malkovich"
 
-#: src/mainw.c:1658 src/program.c:1703
+#: src/mainw.c:1658 src/program.c:1715
 msgid "_Delete"
 msgstr "Malkovich"
 
@@ -2222,7 +2222,7 @@ msgstr "Malkovich"
 msgid "Align columns to grid"
 msgstr "Malkovich"
 
-#: src/mainw.c:1683 src/program.c:1728
+#: src/mainw.c:1683 src/program.c:1740
 msgid "_Find"
 msgstr "Malkovich"
 
@@ -2230,7 +2230,7 @@ msgstr "Malkovich"
 msgid "Find in workspace"
 msgstr "Malkovich"
 
-#: src/mainw.c:1688 src/program.c:1733
+#: src/mainw.c:1688 src/program.c:1745
 msgid "Find _Next"
 msgstr "Malkovich"
 
@@ -2627,7 +2627,7 @@ msgstr "Malkovich"
 msgid "left-hand-side pattern contains no identifiers"
 msgstr ""
 
-#: parse.y:1064 src/program.c:1409
+#: parse.y:1064 src/program.c:1418
 msgid "Parse error."
 msgstr "Malkovich"
 
@@ -2674,8 +2674,8 @@ msgstr ""
 
 #. Not found? Maybe - error message anyway.
 #.
-#: src/path.c:278 src/path.c:305 src/program.c:1427 src/program.c:1475
-#: src/program.c:1496 src/program.c:1504 src/symbol.c:486
+#: src/path.c:278 src/path.c:305 src/program.c:1437 src/program.c:1487
+#: src/program.c:1508 src/program.c:1516 src/symbol.c:486
 msgid "Not found."
 msgstr "Malkovich"
 
@@ -2803,32 +2803,32 @@ msgstr "Malkovich"
 msgid "modified"
 msgstr "Malkovich"
 
-#: src/program.c:620
+#: src/program.c:625
 msgid "Menu item text"
 msgstr "Malkovich"
 
-#: src/program.c:623
+#: src/program.c:628
 msgid "Load column from this file"
 msgstr "Malkovich"
 
-#: src/program.c:625
+#: src/program.c:630
 #, fuzzy, c-format
 msgid "Edit Column Item \"%s\""
 msgstr "Malkovich"
 
-#: src/program.c:630
+#: src/program.c:635
 msgid "Set column item"
 msgstr "Malkovich"
 
-#: src/program.c:651 src/program.c:657
+#: src/program.c:656 src/program.c:662
 msgid "Unable to save."
 msgstr "Malkovich"
 
-#: src/program.c:652
+#: src/program.c:657
 msgid "You can only save toolkits, not tools."
 msgstr "Malkovich"
 
-#: src/program.c:658
+#: src/program.c:663
 msgid "You can't save auto-generated toolkits."
 msgstr "Malkovich"
 
@@ -2836,316 +2836,316 @@ msgstr "Malkovich"
 #.
 #. Init methods.
 #.
-#: src/program.c:719
+#: src/program.c:724
 msgid "Toolkit menu"
 msgstr "Malkovich"
 
-#: src/program.c:1084
+#: src/program.c:1091
 msgid "Set toolkit name here"
 msgstr "Malkovich"
 
-#: src/program.c:1086
+#: src/program.c:1093
 msgid "Set toolkit caption here"
 msgstr "Malkovich"
 
-#: src/program.c:1087
+#: src/program.c:1094
 msgid "New Toolkit"
 msgstr "Malkovich"
 
-#: src/program.c:1091 src/program.c:1169
+#: src/program.c:1098 src/program.c:1176
 msgid "Create"
 msgstr "Malkovich"
 
-#: src/program.c:1103
+#: src/program.c:1110
 msgid "Nothing selected."
 msgstr "Malkovich"
 
-#: src/program.c:1104
+#: src/program.c:1111
 msgid "No toolkit selected."
 msgstr "Malkovich"
 
-#: src/program.c:1162
+#: src/program.c:1169
 msgid "Display this name"
 msgstr "Malkovich"
 
-#: src/program.c:1164
+#: src/program.c:1171
 msgid "Load this file"
 msgstr "Malkovich"
 
-#: src/program.c:1232
+#: src/program.c:1239
 msgid "Load Definition"
 msgstr "Malkovich"
 
-#: src/program.c:1286
+#: src/program.c:1293
 msgid "Reload"
 msgstr "Malkovich"
 
-#: src/program.c:1287
+#: src/program.c:1294
 msgid "Reload startup objects?"
 msgstr "Malkovich"
 
-#: src/program.c:1288
+#: src/program.c:1295
 msgid ""
 "Would you like to reload all startup menus, workspaces and plugins now? This "
 "may take a few seconds."
 msgstr "Malkovich"
 
-#: src/program.c:1371
+#: src/program.c:1378
 msgid "No tool selected"
 msgstr "Malkovich"
 
-#: src/program.c:1410
+#: src/program.c:1419
 msgid "Bad regular expression."
 msgstr "Malkovich"
 
-#: src/program.c:1428
+#: src/program.c:1438
 #, fuzzy, c-format
 msgid "No match found for \"%s\"."
 msgstr "Malkovich"
 
-#: src/program.c:1441
+#: src/program.c:1451
 msgid "Find in all Toolkits"
 msgstr "Malkovich"
 
-#: src/program.c:1451
+#: src/program.c:1461
 msgid "Enter search string here"
 msgstr "Malkovich"
 
-#: src/program.c:1476
+#: src/program.c:1488
 msgid "No match found."
 msgstr "Malkovich"
 
-#: src/program.c:1497
+#: src/program.c:1509
 #, fuzzy, c-format
 msgid "No top-level symbol called \"%s\"."
 msgstr "Malkovich"
 
-#: src/program.c:1505
+#: src/program.c:1517
 #, fuzzy, c-format
 msgid "Symbol \"%s\" has no tool inforation."
 msgstr "Malkovich"
 
-#: src/program.c:1526
+#: src/program.c:1538
 msgid "Go to definition of this symbol"
 msgstr "Malkovich"
 
-#: src/program.c:1528
+#: src/program.c:1540
 msgid "Go to Definition"
 msgstr "Malkovich"
 
-#: src/program.c:1558
+#: src/program.c:1570
 msgid "Object information."
 msgstr "Malkovich"
 
-#: src/program.c:1609
+#: src/program.c:1621
 msgid "No documentation available."
 msgstr "Malkovich"
 
-#: src/program.c:1610
+#: src/program.c:1622
 msgid ""
 "On-line documentation is only currently available for VIPS functions and nip "
 "builtins."
 msgstr "Malkovich"
 
-#: src/program.c:1628
+#: src/program.c:1640
 msgid "New _Tool"
 msgstr "Malkovich"
 
-#: src/program.c:1629
+#: src/program.c:1641
 msgid "Make a new tool"
 msgstr "Malkovich"
 
-#: src/program.c:1633
+#: src/program.c:1645
 msgid "New Tool_kit"
 msgstr "Malkovich"
 
-#: src/program.c:1634
+#: src/program.c:1646
 msgid "Make a new toolkit"
 msgstr "Malkovich"
 
-#: src/program.c:1638
+#: src/program.c:1650
 msgid "New _Separator"
 msgstr "Malkovich"
 
-#: src/program.c:1639
+#: src/program.c:1651
 msgid "Make a new separator"
 msgstr "Malkovich"
 
-#: src/program.c:1643
+#: src/program.c:1655
 msgid "New _Column Item"
 msgstr "Malkovich"
 
-#: src/program.c:1644
+#: src/program.c:1656
 msgid "Make a new column item"
 msgstr "Malkovich"
 
-#: src/program.c:1648
+#: src/program.c:1660
 msgid "New _Program Window"
 msgstr "Malkovich"
 
-#: src/program.c:1649
+#: src/program.c:1661
 msgid "Make a new program window"
 msgstr "Malkovich"
 
-#: src/program.c:1654
+#: src/program.c:1666
 msgid "Make a new workspace"
 msgstr "Malkovich"
 
-#: src/program.c:1658
+#: src/program.c:1670
 msgid "_Open Toolkit"
 msgstr "Malkovich"
 
-#: src/program.c:1659
+#: src/program.c:1671
 msgid "_Open toolkit"
 msgstr "Malkovich"
 
-#: src/program.c:1663
+#: src/program.c:1675
 msgid "Save Toolkit"
 msgstr "Malkovich"
 
-#: src/program.c:1664
+#: src/program.c:1676
 msgid "_Save toolkit"
 msgstr "Malkovich"
 
-#: src/program.c:1668
+#: src/program.c:1680
 msgid "Save Toolkit _As"
 msgstr "Malkovich"
 
-#: src/program.c:1669
+#: src/program.c:1681
 msgid "Save toolkit as"
 msgstr "Malkovich"
 
-#: src/program.c:1673
+#: src/program.c:1685
 msgid "_Process"
 msgstr "Malkovich"
 
-#: src/program.c:1674
+#: src/program.c:1686
 msgid "Process text"
 msgstr "Malkovich"
 
-#: src/program.c:1678
+#: src/program.c:1690
 msgid "_Reload Start Stuff"
 msgstr "Malkovich"
 
-#: src/program.c:1679
+#: src/program.c:1691
 msgid "Remove and reload all startup data"
 msgstr "Malkovich"
 
-#: src/program.c:1688
+#: src/program.c:1700
 msgid "C_ut"
 msgstr "Malkovich"
 
-#: src/program.c:1689
+#: src/program.c:1701
 msgid "Cut selected text"
 msgstr "Malkovich"
 
-#: src/program.c:1693
+#: src/program.c:1705
 msgid "_Copy"
 msgstr "Malkovich"
 
-#: src/program.c:1694
+#: src/program.c:1706
 msgid "Copy selected text"
 msgstr "Malkovich"
 
-#: src/program.c:1698
+#: src/program.c:1710
 msgid "_Paste"
 msgstr "Malkovich"
 
-#: src/program.c:1699
+#: src/program.c:1711
 msgid "Paste selected text"
 msgstr "Malkovich"
 
-#: src/program.c:1704
+#: src/program.c:1716
 msgid "Delete selected text"
 msgstr "Malkovich"
 
-#: src/program.c:1709
+#: src/program.c:1721
 msgid "Select all text"
 msgstr "Malkovich"
 
-#: src/program.c:1713
+#: src/program.c:1725
 msgid "Dese_lect All"
 msgstr "Malkovich"
 
-#: src/program.c:1714
+#: src/program.c:1726
 msgid "Deselect all text"
 msgstr "Malkovich"
 
-#: src/program.c:1718
+#: src/program.c:1730
 msgid "Delete _Tool"
 msgstr "Malkovich"
 
-#: src/program.c:1719
+#: src/program.c:1731
 msgid "Delete current tool"
 msgstr "Malkovich"
 
-#: src/program.c:1723
+#: src/program.c:1735
 msgid "Delete Tool_kit"
 msgstr "Malkovich"
 
-#: src/program.c:1724
+#: src/program.c:1736
 msgid "Delete current toolkit"
 msgstr "Malkovich"
 
-#: src/program.c:1729
+#: src/program.c:1741
 msgid "Find text in toolkits"
 msgstr "Malkovich"
 
-#: src/program.c:1734
+#: src/program.c:1746
 msgid "Find text again"
 msgstr "Malkovich"
 
-#: src/program.c:1738
+#: src/program.c:1750
 msgid "_Jump To Definition"
 msgstr "Malkovich"
 
-#: src/program.c:1739
+#: src/program.c:1751
 msgid "Jump to definition"
 msgstr "Malkovich"
 
-#: src/program.c:1743
+#: src/program.c:1755
 msgid "_Info"
 msgstr "Malkovich"
 
-#: src/program.c:1744
+#: src/program.c:1756
 msgid "Info on selected object"
 msgstr "Malkovich"
 
-#: src/program.c:1748
+#: src/program.c:1760
 msgid "_Trace"
 msgstr "Malkovich"
 
-#: src/program.c:1749
+#: src/program.c:1761
 msgid "Make a new trace window"
 msgstr "Malkovich"
 
-#: src/program.c:1753
+#: src/program.c:1765
 msgid "_Errors"
 msgstr "Malkovich"
 
-#: src/program.c:1754
+#: src/program.c:1766
 msgid "Show all errors"
 msgstr "Malkovich"
 
-#: src/program.c:1768
+#: src/program.c:1780
 msgid "Help on _Tool"
 msgstr "Malkovich"
 
-#: src/program.c:1769
+#: src/program.c:1781
 msgid "View docs for this tool"
 msgstr "Malkovich"
 
-#: src/program.c:2012
+#: src/program.c:2024
 msgid "Bad drag."
 msgstr "Malkovich"
 
-#: src/program.c:2013
+#: src/program.c:2025
 msgid ""
 "Sorry, you can only drag tools between toolkits. You can't reorder toolkits, "
 "you can't nest toolkits and you can't drag tools to the top level."
 msgstr "Malkovich"
 
-#: src/program.c:2194
+#: src/program.c:2206
 msgid "Tool"
 msgstr "Malkovich"
 

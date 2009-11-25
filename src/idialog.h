@@ -58,8 +58,10 @@ struct _iDialog {
 	GtkWidget *hb;			
 	GtkWidget *bb;
 
-	GSList *ok_l;			/* List of OK buttons */
-	GSList *ok_txt_l;		/* List of text of OK buttons */
+	GSList *ok_l;			/* List of OKbutton as set by user */
+	GSList *ok_disp_l;		/* List of OKbutton as displayed */
+	GSList *ok_but_l;		/* List of OK GtkButton as displayed */
+
 	GtkWidget *but_cancel;
 	GtkWidget *but_help;
 	GtkWidget *tog_pin;		/* Optional pinup widget */
@@ -91,7 +93,6 @@ struct _iDialog {
 
 	/* Our callbacks.
 	 */
-	GSList *ok_cb_l;		/* List of OK callbacks */
 	iWindowFn cancel_cb;
 	iWindowFn popdown_cb;
 	iDialogFreeFn destroy_cb;	/* Called from _destroy() */

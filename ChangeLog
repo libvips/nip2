@@ -1,3 +1,8 @@
+started 7.20.3, 25/11/09
+- argh, button order error in dialogs on win32
+- updated help index
+- initial window size was too large
+
 started 7.20.2, 11/11/09
 - make GRegex optional so we can work with older glibs
 - fix a crash with "-p" and Managedstring

@@ -360,7 +360,7 @@
         </Row>
         <Row popup="false" name="MAINW_WINDOW_HEIGHT">
           <Rhs vislevel="1" flags="4">
-            <iText formula="1010"/>
+            <iText formula="500"/>
           </Rhs>
         </Row>
         <Row popup="false" name="BROWSER">

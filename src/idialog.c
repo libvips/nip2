@@ -35,6 +35,35 @@
 
 static iWindowClass *parent_class = NULL;
 
+/* An OK button: label (can be a stock) plus a callback.
+ */
+typedef struct {
+	char *label;
+	iWindowFn done_cb;
+} OKButton;
+
+static void *
+okbutton_free( OKButton *ok )
+{
+	IM_FREE( ok->label );
+	ok->done_cb = NULL;
+	IM_FREE( ok );
+
+	return( NULL );
+}
+
+static OKButton *
+okbutton_new( char *label, iWindowFn done_cb )
+{
+	OKButton *ok;
+
+	ok = g_new( OKButton, 1 );
+	ok->label = g_strdup( label );
+	ok->done_cb = done_cb;
+
+	return( ok );
+}
+
 /* Handy destroy callback ... just free client.
  */
 void
@@ -69,7 +98,7 @@ idialog_set_sensitive( GtkWidget *w, gboolean state )
 void
 idialog_set_ok_button_state( iDialog *idlg, gboolean state )
 {
-	slist_map( idlg->ok_l, 
+	slist_map( idlg->ok_but_l, 
 		(SListMapFn) idialog_set_sensitive, GINT_TO_POINTER( state ) );
 }
 
@@ -168,7 +197,7 @@ idialog_done_notify( void *sys, iWindowResult result )
 void
 idialog_done_trigger( iDialog *idlg, int pos )
 {
-	iWindowFn fn = (iWindowFn) g_slist_nth_data( idlg->ok_cb_l, pos );
+	OKButton *ok = (OKButton *) g_slist_nth_data( idlg->ok_disp_l, pos );
 
 #ifdef DEBUG
 	printf( "idialog_done_trigger: %s, %d\n", 
@@ -177,10 +206,11 @@ idialog_done_trigger( iDialog *idlg, int pos )
 
 	/* Trigger user done callback.
 	 */
-	g_assert( fn );
+	g_assert( pos >= 0 );
+	g_assert( ok->done_cb );
 	idialog_set_button_state( idlg, FALSE );
 	iwindow_notify_send( IWINDOW( idlg ), 
-		fn, idlg->client, idialog_done_notify, idlg );
+		ok->done_cb, idlg->client, idialog_done_notify, idlg );
 }
 
 /* Sub-fn of below.
@@ -232,7 +262,7 @@ idialog_cancel_trigger( iDialog *idlg )
 static void
 idialog_done_cb( GtkWidget *w, iDialog *idlg )
 {
-	int pos = g_slist_index( idlg->ok_l, w );
+	int pos = g_slist_index( idlg->ok_but_l, w );
 
 	g_assert( pos != -1 );
 
@@ -279,10 +309,10 @@ idialog_destroy( GtkObject *object )
 	}
 
 	FREESID( idlg->destroy_sid, idlg->iobject );
-	slist_map( idlg->ok_txt_l, (SListMapFn) im_free, NULL );
-	IM_FREEF( g_slist_free, idlg->ok_cb_l );
-	IM_FREEF( g_slist_free, idlg->ok_txt_l );
+	slist_map( idlg->ok_l, (SListMapFn) okbutton_free, NULL );
 	IM_FREEF( g_slist_free, idlg->ok_l );
+	IM_FREEF( g_slist_free, idlg->ok_disp_l );
+	IM_FREEF( g_slist_free, idlg->ok_but_l );
 
 	GTK_OBJECT_CLASS( parent_class )->destroy( object );
 }
@@ -319,12 +349,14 @@ idialog_iobject_destroy( iObject *iobject, iDialog *idlg )
 }
 
 static void *
-idialog_build_ok( const char *txt, iDialog *idlg )
+idialog_build_ok( OKButton *ok, iDialog *idlg )
 {
 	GtkWidget *but;
 
-	but = build_button( txt, GTK_SIGNAL_FUNC( idialog_done_cb ), idlg );
-	idlg->ok_l = g_slist_prepend( idlg->ok_l, but );
+	but = build_button( ok->label, 
+		GTK_SIGNAL_FUNC( idialog_done_cb ), idlg );
+	idlg->ok_disp_l = g_slist_prepend( idlg->ok_disp_l, ok );
+	idlg->ok_but_l = g_slist_prepend( idlg->ok_but_l, but );
 	gtk_box_pack_start( GTK_BOX( idlg->bb ), but, TRUE, TRUE, 0 );
 	gtk_widget_show( but );
 
@@ -435,16 +467,16 @@ idialog_build( GtkWidget *widget )
 
 	/* Make OK1
 	 */
-	if( idlg->ok_txt_l ) {
-		const char *ok1_txt = (const char *) (idlg->ok_txt_l->data);
+	if( idlg->ok_l ) {
+		OKButton *ok1 = (OKButton *) idlg->ok_l->data;
 
-		idialog_build_ok( ok1_txt, idlg );
+		idialog_build_ok( ok1, idlg );
 	}
 
 	/* Add OK2, 3, etc., but backwards.
 	 */
-	if( idlg->ok_txt_l && idlg->ok_txt_l->next )
-		slist_map_rev( idlg->ok_txt_l->next,
+	if( idlg->ok_l && idlg->ok_l->next )
+		slist_map_rev( idlg->ok_l->next,
 			(SListMapFn) idialog_build_ok, idlg );
 
         if( idlg->cancel_cb ) {
@@ -461,8 +493,8 @@ idialog_build( GtkWidget *widget )
 
 	/* Add OK2, 3, etc.
 	 */
-	if( idlg->ok_txt_l && idlg->ok_txt_l->next )
-		slist_map_rev( idlg->ok_txt_l->next,
+	if( idlg->ok_l && idlg->ok_l->next )
+		slist_map_rev( idlg->ok_l->next,
 			(SListMapFn) idialog_build_ok, idlg );
 
         if( idlg->cancel_cb ) {
@@ -477,18 +509,18 @@ idialog_build( GtkWidget *widget )
 
 	/* Make OK1
 	 */
-	if( idlg->ok_txt_l ) {
-		const char *ok1_txt = (const char *) (idlg->ok_txt_l->data);
+	if( idlg->ok_l ) {
+		OKButton *ok1 = (OKButton *) idlg->ok_l->data;
 
-		idialog_build_ok( ok1_txt, idlg );
+		idialog_build_ok( ok1, idlg );
 	}
 
 #endif /*lots*/
 
 	/* OK1 grabs the default.
 	 */
-	if( idlg->ok_l ) 
-		idialog_set_default( idlg, idlg->ok_l->data );
+	if( idlg->ok_but_l ) 
+		idialog_set_default( idlg, idlg->ok_but_l->data );
 
 	/* Escape triggers cancel, if there is a cancel.
 	 */
@@ -498,9 +530,9 @@ idialog_build( GtkWidget *widget )
 	else {
 		/* If there's just 1 OK, that gets Esc too.
 		 */
-		if( g_slist_length( idlg->ok_l ) == 1 )
+		if( g_slist_length( idlg->ok_but_l ) == 1 )
 			gtk_widget_add_accelerator( 
-				GTK_WIDGET( idlg->ok_l->data ), "clicked", 
+				GTK_WIDGET( idlg->ok_but_l->data ), "clicked", 
 				iwnd->accel_group, GDK_Escape, 0, 0 );
 	}
 
@@ -569,7 +601,9 @@ idialog_init( iDialog *idlg )
 	idlg->work = NULL;
 
 	idlg->ok_l = NULL;
-	idlg->ok_txt_l = NULL;
+	idlg->ok_disp_l = NULL;
+	idlg->ok_but_l = NULL;
+
 	idlg->but_cancel = NULL;
 	idlg->but_help = NULL;
 	idlg->tog_pin = NULL;
@@ -585,7 +619,6 @@ idialog_init( iDialog *idlg )
 
 	idlg->cancel_text = GTK_STOCK_CANCEL;
 
-	idlg->ok_cb_l = NULL;
 	idlg->cancel_cb = NULL;
 	idlg->popdown_cb = NULL;
 	idlg->destroy_cb = NULL;
@@ -700,9 +733,8 @@ idialog_add_ok( iDialog *idlg, iWindowFn done_cb, const char *fmt, ... )
 	/* So the last OK button added is the default one (and at the head of
 	 * the list). [OK1, OK2, OK3, OK4]
 	 */
-	idlg->ok_cb_l = g_slist_prepend( idlg->ok_cb_l, (void *) done_cb );
-	idlg->ok_txt_l = 
-		g_slist_prepend( idlg->ok_txt_l, im_strdup( NULL, buf ) );
+	idlg->ok_l = g_slist_prepend( idlg->ok_l, 
+		okbutton_new( buf, done_cb ) );
 }
 
 void 

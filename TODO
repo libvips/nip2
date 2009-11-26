@@ -1,3 +1,7 @@
+- use infobar widget instead of box_error and friends
+
+- add a file preview pane to "Open"
+
 - test Joe's layout thing, compare to the thing we do in study2 to make the
   diagnostic image
 

@@ -63,7 +63,6 @@ browse_destroy( GtkObject *object )
 	/* My instance destroy stuff.
 	 */
 	browse_refresh_stop( browse );
-	browse->filesel->browse = NULL;
 	IM_FREE( browse->dirname );
 
 	GTK_OBJECT_CLASS( parent_class )->destroy( object );

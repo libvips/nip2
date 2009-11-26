@@ -94,7 +94,6 @@ typedef struct _Filesel {
 	gboolean save;			/* True if this is a save dialog */
 	gboolean multi;			/* Multiple-select */
 	gboolean start_name;		/* True if we have a suggested name */
-	struct _Browse *browse;		/* Browse window */
 
 	FileselFileType **type;		/* Allowable types for this filesel */
 	int ntypes;

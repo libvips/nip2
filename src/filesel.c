@@ -586,8 +586,6 @@ filesel_dir_enter( Filesel *filesel )
 
 	if( !filesel->current_dir || 
 		(dir && strcmp( filesel->current_dir, dir ) != 0) ) {
-		if( filesel->browse )
-			browse_refresh( filesel->browse, dir );
 		filesel_space_update( filesel, dir );
 		if( !filesel->start_name )
 			IM_SETSTR( filesel_last_dir, dir );
@@ -849,29 +847,6 @@ filesel_auto_incr_cb( GtkWidget *tog, Filesel *filesel )
 		idialog_set_pinup( IDIALOG( filesel ), TRUE );
 }
 
-/* Popup a new browse window.
- */
-/*ARGSUSED*/
-static void
-browse_cb( GtkWidget *wid, Filesel *filesel )
-{
-        if( !filesel->browse ) {
-		char *dir;
-
-                filesel->browse = BROWSE( browse_new() );
-		browse_set_filesel( filesel->browse, filesel );
-		iwindow_build( IWINDOW( filesel->browse ) );
-		gtk_widget_show( GTK_WIDGET( filesel->browse ) );
-
-		if( (dir = filesel_get_dir( filesel )) ) {
-			browse_refresh( filesel->browse, dir );
-			g_free( dir );
-		}
-		else
-			box_alert( GTK_WIDGET( filesel ) );
-	}
-}
-
 static GtkFileFilter *
 file_filter_from_file_type( FileselFileType *type )
 {
@@ -1008,24 +983,6 @@ filesel_build( GtkWidget *widget )
 			"file name" ) );
 	}
 
-        /* Browse thumbnails.
-         */
-        if( !filesel->save && filesel->imls ) {
-		GtkWidget *hb;
-
-		hb = gtk_hbox_new( FALSE, 3 );
-		gtk_box_pack_start( GTK_BOX( vb ), hb, FALSE, FALSE, 0 );
-		gtk_widget_show( hb );
-
-                but = gtk_button_new_with_label( _( "Show thumbnails" ) );
-                gtk_box_pack_end( GTK_BOX( hb ), but, FALSE, FALSE, 0 );
-                gtk_widget_show( but );
-                gtk_signal_connect( GTK_OBJECT( but ), "clicked",
-                        GTK_SIGNAL_FUNC( browse_cb ), filesel );
-		set_tooltip( but, 
-			_( "Show thumbnails for files in this directory" ) );
-        }
-
 	if( filesel_last_dir ) 
 		gtk_file_chooser_set_current_folder(
 			GTK_FILE_CHOOSER( filesel->chooser ), 
@@ -1109,7 +1066,6 @@ filesel_init( Filesel *filesel )
 	filesel->save = FALSE;
 	filesel->multi = FALSE;
 	filesel->start_name = FALSE;
-	filesel->browse = NULL;
 	filesel->type = NULL;
 	filesel->default_type = 0;
 	filesel->type_pref = NULL;

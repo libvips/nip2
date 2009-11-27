@@ -751,7 +751,7 @@ workspace_auto_recover_load( iWindow *iwnd,
  * retain_files[] set.
  */
 void
-workspace_auto_recover( GtkWidget *parent )
+workspace_auto_recover( Mainw *mainw )
 {
 	char *p;
 	char *name;
@@ -761,7 +761,7 @@ workspace_auto_recover( GtkWidget *parent )
 	/* Find the dir we are saving temp files to.
 	 */
 	if( !temp_name( buf, "ws" ) ) {
-		box_alert( parent );
+		mainw_error( mainw );
 		return;
 	}
 
@@ -773,13 +773,13 @@ workspace_auto_recover( GtkWidget *parent )
 		(path_map_fn) workspace_test_file, buf2 );
 	if( date_sofar == -1 ) {
 		if( !AUTO_WS_SAVE )
-			box_info( parent, 
+			mainw_info( mainw, 
 				_( "No backup workspaces found." ),
 				_( "You need to enable \"Auto workspace "
 				"save\" in Preferences "
 				"before automatic recovery works." ) );
 		else
-			box_info( parent, 
+			mainw_info( mainw, 
 				_( "No backup workspaces found." ),
 				_( "No suitable workspace save files found "
 				"in \"%s\"" ), buf );
@@ -791,7 +791,7 @@ workspace_auto_recover( GtkWidget *parent )
 	 */
 	name = im_strdupn( buf2 );
 
-	box_yesno( parent, 
+	box_yesno( GTK_WIDGET( mainw ), 
 		workspace_auto_recover_load, iwindow_true_cb, name, 
 		(iWindowNotifyFn) im_free, name,
 		GTK_STOCK_OPEN, 
@@ -1214,7 +1214,7 @@ workspace_top_load( Filemodel *filemodel,
 		 */
 		if( state->major != filemodel->major ||
 			state->minor != filemodel->minor ) {
-			box_info( NULL,
+			mainw_info( MAINW( ws->iwnd ),
 				_( "Version mismatch." ),
 				_( "File \"%s\" was saved from %s-%d.%d.%d. "
 				"You may see compatibility problems." ),

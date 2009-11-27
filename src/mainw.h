@@ -104,6 +104,8 @@ struct _Mainw {
 	GtkWidget *progress_box;
 	GtkWidget *progress;
 
+	GtkWidget *infobar;
+
 	/* Left and right panes ... program window and toolkit browser.
 	 */
 	Pane *lpane;
@@ -142,3 +144,6 @@ Mainw *mainw_new( Workspace *ws );
 void busy_progress( int percent, int eta );
 void busy_begin( void );
 void busy_end( void );
+
+void mainw_info( Mainw *mainw, const char *top, const char *sub, ... );
+void mainw_error( Mainw *mainw );

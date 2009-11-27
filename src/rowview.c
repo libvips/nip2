@@ -299,7 +299,7 @@ rowview_clone_cb( GtkWidget *menu, GtkWidget *button, Rowview *rview )
 	/* Only allow clone of top level rows.
 	 */
 	if( row->top_row != row ) {
-		box_info( button, 
+		mainw_info( MAINW( ws->iwnd ), 
 			_( "Can't duplicate." ),
 			_( "You can only duplicate top level rows." ) );
 		return;
@@ -308,7 +308,7 @@ rowview_clone_cb( GtkWidget *menu, GtkWidget *button, Rowview *rview )
         workspace_deselect_all( ws );
         row_select( row );
         if( !workspace_clone_selected( ws ) )
-                box_alert( GTK_WIDGET( rview ) );
+                mainw_error( MAINW( ws->iwnd ) );
         workspace_deselect_all( ws );
 
         symbol_recalculate_all();
@@ -324,7 +324,7 @@ rowview_ungroup_cb( GtkWidget *menu, GtkWidget *button, Rowview *rview )
         workspace_deselect_all( row->ws );
         row_select( row );
         if( !workspace_selected_ungroup( row->ws ) )
-                box_alert( button );
+                mainw_error( MAINW( row->ws->iwnd ) );
         symbol_recalculate_all();
 }
 
@@ -370,13 +370,13 @@ rowview_recalc_cb( GtkWidget *menu, GtkWidget *button, Rowview *rview )
         workspace_deselect_all( ws );
         row_select( row );
         if( !workspace_selected_recalc( ws ) )
-                box_alert( button );
+                mainw_error( MAINW( ws->iwnd ) );
         workspace_deselect_all( ws );
 
 	/* Now ... pick up any errors.
 	 */
 	if( symbol_recalculate_check( row->sym ) )
-                box_alert( button );
+                mainw_error( MAINW( ws->iwnd ) );
 }
 
 /* Reset the current item.

@@ -176,7 +176,7 @@ gboolean workspace_selected_save( Workspace *ws, const char *filename );
 gboolean workspace_clone_selected( Workspace *ws );
 
 void workspace_retain_clean( void );
-void workspace_auto_recover( GtkWidget *parent );
+void workspace_auto_recover( Mainw *mainw );
 
 GType workspace_get_type( void );
 Workspace *workspace_new( Workspacegroup *wsg, const char *name );

@@ -127,7 +127,7 @@ box_vmarkup( char *out, const char *top, const char *sub, va_list ap )
 		int len = strlen( out );
 
 		(void) im_snprintf( out + len, MAX_DIALOG_TEXT - len, 
-			"\n\n%s", buf3 );
+			"\n%s", buf3 );
 	}
 }
 
@@ -163,15 +163,12 @@ box_alert( GtkWidget *par )
 /* Make an information dialog.
  */
 void
-box_info( GtkWidget *par, const char *top, const char *sub, ... )
+box_vinfo( GtkWidget *par, const char *top, const char *sub, va_list ap )
 {
-	va_list ap;
 	char buf[MAX_DIALOG_TEXT];
 	GtkWidget *idlg;
 
-        va_start( ap, sub );
 	box_vmarkup( buf, top, sub, ap );
-        va_end( ap );
 
 	idlg = idialog_new();
 	idialog_set_build( IDIALOG( idlg ), 
@@ -183,6 +180,18 @@ box_info( GtkWidget *par, const char *top, const char *sub, ... )
 	iwindow_build( IWINDOW( idlg ) );
 
 	gtk_widget_show( GTK_WIDGET( idlg ) );
+}
+
+/* Make an information dialog.
+ */
+void
+box_info( GtkWidget *par, const char *top, const char *sub, ... )
+{
+	va_list ap;
+
+        va_start( ap, sub );
+	box_vinfo( par, top, sub, ap );
+        va_end( ap );
 }
 
 /* Pop up an 'Are you sure?' window. 
@@ -1418,4 +1427,71 @@ const char *
 fontbutton_get_font_name( Fontbutton *fontbutton )
 {
 	return( fontbutton->font_name );
+}
+
+/* Make an infobar ... return NULL if our GTK doesn't have this thing.
+ */
+GtkWidget *
+infobar_new( void )
+{
+#ifdef USE_INFOBAR
+	GtkWidget *info;
+	GtkWidget *label;
+	GtkWidget *content_area;
+
+	info = gtk_info_bar_new();
+	label = gtk_label_new("");
+        gtk_label_set_justify( GTK_LABEL( label ), GTK_JUSTIFY_LEFT );
+        gtk_label_set_selectable( GTK_LABEL( label ), TRUE );
+	gtk_label_set_line_wrap( GTK_LABEL( label ), TRUE );
+	content_area = gtk_info_bar_get_content_area( GTK_INFO_BAR( info ) );
+	gtk_container_add( GTK_CONTAINER( content_area ), label );
+	gtk_widget_show( label );
+	gtk_info_bar_add_button( GTK_INFO_BAR( info ),
+		 GTK_STOCK_OK, GTK_RESPONSE_OK );
+	g_signal_connect( info, "response",
+		G_CALLBACK( gtk_widget_hide ), NULL );
+
+	return( info );
+#else /*!USE_INFOBAR*/
+	return( NULL );
+#endif /*USE_INFOBAR*/
+}
+
+/* Set the label on an infobar to some marked-up text.
+ */
+void
+infobar_vset( GtkWidget *info, GtkMessageType type, 
+	const char *top, const char *sub, va_list ap )
+{
+	char buf[MAX_DIALOG_TEXT];
+	GtkWidget *label;
+	GtkWidget *content_area;
+	GList *children;
+
+	box_vmarkup( buf, top, sub, ap );
+
+	content_area = gtk_info_bar_get_content_area( GTK_INFO_BAR( info ) );
+	children = gtk_container_get_children( GTK_CONTAINER( content_area ) );
+	g_assert( g_list_length( children ) == 1 );
+	label = GTK_WIDGET( g_list_nth_data( children, 0 ) );
+	g_list_free( children );
+
+	gtk_label_set_markup( GTK_LABEL( label ), buf );
+	gtk_info_bar_set_message_type( GTK_INFO_BAR( info ), type );
+
+	gtk_widget_show( info );
+}
+
+/* Set the label on an infobar to some marked-up text.
+ */
+void
+infobar_set( GtkWidget *info, GtkMessageType type, 
+	const char *top, const char *sub, ... )
+{
+	va_list ap;
+
+        va_start( ap, sub );
+	infobar_vset( info, type, top, sub, ap );
+        va_end( ap );
 }

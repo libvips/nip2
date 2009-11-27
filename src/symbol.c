@@ -486,8 +486,8 @@ symbol_not_defined( Symbol *sym )
 	error_top( _( "Not found." ) );
 	vips_buf_appendf( &buf, _( "Symbol %s is not defined." ), 
 		symbol_name( sym ) );
-	vips_buf_appends( &buf, "\n" );
 	if( sym->topparents ) {
+		vips_buf_appends( &buf, "\n" );
 		vips_buf_appendf( &buf, _( "%s is referred to by" ),
 			symbol_name( sym ) );
 		vips_buf_appends( &buf, ": " );

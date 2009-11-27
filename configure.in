@@ -151,6 +151,16 @@ if test x"$nip_set_opacity" = x"yes"; then
   AC_DEFINE(HAVE_SET_OPACITY,1,[define if you have gdk_window_set_opacity()])
 fi
 
+# GtkInfoBar was added in gtk 2.18
+PKG_CHECK_EXISTS(gtk+-2.0 >= 2.18,
+  [nip_use_infobar=yes],
+  [nip_use_infobar=no]
+)
+
+if test x"$nip_use_infobar" = x"yes"; then
+  AC_DEFINE(USE_INFOBAR,1,[define if you have GtkInfoBar])
+fi
+
 # GtkEntryBuffer was added in gtk 2.18
 # we need it for our hacked-about gtksheet widget ... fall back to a treeview
 # matrix widget if we have to
@@ -320,18 +330,20 @@ chmod +x test/test_all.sh
 
 AC_MSG_RESULT([
 * general build options
-native win32:			$nip_os_win32
-native os x:			$nip_os_darwin
-update desktop after install: 	$nip_desktop_update
-debug: 				$enable_debug
+native win32:				$nip_os_win32
+native os x:				$nip_os_darwin
+update desktop after install: 		$nip_desktop_update
+debug: 					$enable_debug
 
 * optional packages and modules
-use fftw3 for FFT: 		$with_fftw3
-use gsl for numeric functions:	$with_gsl
-use libgoffice to show plots:	$with_libgoffice
-use gtksheet to show matrices:  $nip_use_gtksheet
+use fftw3 for FFT: 			$with_fftw3
+use gsl for numeric functions:		$with_gsl
+use libgoffice to show plots:		$with_libgoffice
+use gtksheet to show matrices:  	$nip_use_gtksheet
   (requires gtk+-2.0 >= 2.18)
-allow regex searches: 		$nip_use_gregex
+use gtkinfobar to show messages: 	$nip_use_infobar
+  (requires gtk+-2.0 >= 2.18)
+allow regex searches: 			$nip_use_gregex
   (requires glib-2.0 >= 2.14)
 display help files with xdg:	$XDG_OPEN
 ])

@@ -166,7 +166,7 @@ mainw_compat_timeout( Mainw *mainw )
 {
 	mainw->compat_timeout = 0;
 
-	box_info( GTK_WIDGET( mainw ),
+	mainw_info( mainw,
 		_( "Compatibility mode." ),
 		_( "This workspace was created by version %d.%d.%d. "
 		"A set of compatibility menus have been loaded "
@@ -282,6 +282,8 @@ mainw_init( Mainw *mainw )
 	mainw->space_free_eb = NULL;
 	mainw->progress_box = NULL;
 	mainw->progress = NULL;
+
+	mainw->infobar = NULL;
 
 	mainw->lpane = NULL;
 	mainw->rpane = NULL;
@@ -649,7 +651,7 @@ mainw_clone( Mainw *mainw )
 		Row *row = workspace_get_bottom( ws );
 
 		if( !row ) {
-			box_alert( GTK_WIDGET( mainw ) );
+			mainw_error( mainw );
 			return;
 		}
 		row_select( row );
@@ -659,7 +661,7 @@ mainw_clone( Mainw *mainw )
 	 */
 	progress_begin();
 	if( !workspace_clone_selected( ws ) ) { 
-		box_alert( GTK_WIDGET( mainw ) );
+		mainw_error( mainw );
 		progress_end();
 		return;
 	}
@@ -683,7 +685,7 @@ mainw_ungroup_action_cb( GtkAction *action, Mainw *mainw )
 {
 	progress_begin();
 	if( !workspace_selected_ungroup( mainw->ws ) )
-		box_alert( GTK_WIDGET( mainw ) );
+		mainw_error( mainw );
 	progress_end();
 }
 
@@ -702,7 +704,7 @@ mainw_group_action_cb( GtkAction *action, Mainw *mainw )
 		Row *row = workspace_get_bottom( ws );
 
 		if( !row ) {
-			box_alert( GTK_WIDGET( mainw ) );
+			mainw_error( mainw );
 			return;
 		}
 		row_select( row );
@@ -712,7 +714,7 @@ mainw_group_action_cb( GtkAction *action, Mainw *mainw )
 	workspace_selected_names( ws, &buf, "," );
 	vips_buf_appends( &buf, "]" );
 	if( !workspace_add_def( ws, vips_buf_all( &buf ) ) ) {
-		box_alert( GTK_WIDGET( mainw ) );
+		mainw_error( mainw );
 		return;
 	}
 	workspace_deselect_all( ws );
@@ -737,7 +739,7 @@ mainw_find_action_cb( GtkAction *action, Mainw *mainw )
 {
 	error_top( _( "Not implemented." ) );
 	error_sub( _( "Find in workspace not implemented yet." ) );
-	box_alert( GTK_WIDGET( mainw ) );
+	mainw_error( mainw );
 }
 
 static void
@@ -745,7 +747,7 @@ mainw_find_again_action_cb( GtkAction *action, Mainw *mainw )
 {
 	error_top( _( "Not implemented." ) );
 	error_sub( _( "Find again in workspace not implemented yet." ) );
-	box_alert( GTK_WIDGET( mainw ) );
+	mainw_error( mainw );
 }
 
 static Row *
@@ -779,7 +781,7 @@ mainw_next_error_action_cb( GtkAction *action, Mainw *mainw )
 	int found;
 
 	if( !mainw->ws->errors ) {
-		box_info( GTK_WIDGET( mainw ), _( "No errors." ), 
+		mainw_info( mainw, _( "No errors." ), 
 			_( "There are no errors (that I can see) "
 			"in this workspace." ) );
 		return;
@@ -990,7 +992,8 @@ mainw_open_done_cb( iWindow *iwnd, void *client,
 		mainw->ws &&
 		!workspace_add_def( mainw->ws, vips_buf_all( &buf ) ) ) {
 		error_top( _( "Load failed." ) );
-		error_sub( _( "Unable to execute:\n   %s" ), vips_buf_all( &buf ) );
+		error_sub( _( "Unable to execute:\n   %s" ), 
+			vips_buf_all( &buf ) );
 		nfn( sys, IWINDOW_ERROR );
 		return;
 	}
@@ -1090,7 +1093,7 @@ mainw_recent_open_cb( GtkWidget *widget, const char *filename )
 
 	progress_begin();
 	if( !mainw_recent_open( mainw, filename ) ) {
-		box_alert( widget );
+		mainw_error( mainw );
 		progress_end();
 		return;
 	}
@@ -1265,7 +1268,7 @@ mainw_workspace_duplicate_action_cb( GtkAction *action, Mainw *mainw )
         progress_begin();
 	if( !(new_ws = workspace_clone( mainw->ws )) ) {
 		progress_end();
-		box_alert( GTK_WIDGET( mainw ) );
+		mainw_error( mainw );
 		return;
 	}
 	symbol_recalculate_all();
@@ -1293,7 +1296,7 @@ mainw_workspace_merge_action_cb2( GtkWidget *wid, GtkWidget *host,
 static void
 mainw_recover_action_cb( GtkAction *action, Mainw *mainw )
 {
-	workspace_auto_recover( GTK_WIDGET( mainw ) );
+	workspace_auto_recover( mainw );
 }
 
 /* Callback from make new column.
@@ -1306,7 +1309,7 @@ mainw_column_new_action_cb( GtkAction *action, Mainw *mainw )
 
 	name = workspace_column_name_new( mainw->ws, NULL );
 	if( !(col = column_new( mainw->ws, name )) ) 
-		box_alert( GTK_WIDGET( mainw ) );
+		mainw_error( mainw );
 	else
 		workspace_column_select( mainw->ws, col );
 	IM_FREE( name );
@@ -1522,7 +1525,7 @@ mainw_preferences_action_cb( GtkAction *action, Mainw *mainw )
 	/* Can fail if there's no prefs ws, or an error on load.
 	 */
 	if( !(prefs = prefs_new( NULL )) ) {
-		box_alert( GTK_WIDGET( mainw ) );
+		mainw_error( mainw );
 		return;
 	}
 
@@ -1558,11 +1561,11 @@ mainw_magic_cb( gpointer callback_data, guint callback_action,
 	Row *row = workspace_selected_one( ws );
 
 	if( !row )
-		box_info( GTK_WIDGET( mainw ),
+		mainw_info( mainw,
 			"Select a single object with left-click, "
 			"select Magic Definition." );
 	else if( !magic_sym( row->sym ) )
-		box_alert( GTK_WIDGET( mainw ) );
+		mainw_error( mainw );
 	else
 		workspace_deselect_all( ws );
 }
@@ -1966,6 +1969,12 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	gtk_box_pack_start( GTK_BOX( vbox ), mainw->toolbar, FALSE, FALSE, 0 );
         widget_visible( mainw->toolbar, MAINW_TOOLBAR );
 
+	/* This will set to NULL if we don't have infobar support.
+	 */
+	if( (mainw->infobar = infobar_new()) ) 
+		gtk_box_pack_start( GTK_BOX( vbox ), 
+			mainw->infobar, FALSE, FALSE, 0 );
+
 	/* hbox for status bar etc.
 	 */
         mainw->statusbar_main = gtk_hbox_new( FALSE, 2 );
@@ -2192,4 +2201,27 @@ mainw_new( Workspace *ws )
 	mainw_link( mainw, ws );
 
 	return( mainw );
+}
+
+void
+mainw_info( Mainw *mainw, const char *top, const char *sub, ... )
+{
+	va_list ap;
+
+        va_start( ap, sub );
+	if( mainw->infobar )
+		infobar_vset( mainw->infobar, GTK_MESSAGE_INFO, top, sub, ap );
+	else
+		box_vinfo( GTK_WIDGET( mainw ), top, sub, ap );
+        va_end( ap );
+}
+
+void
+mainw_error( Mainw *mainw )
+{
+	if( mainw->infobar )
+		infobar_set( mainw->infobar, GTK_MESSAGE_ERROR, 
+			error_get_top(), "%s", error_get_sub() );
+	else
+		box_alert( GTK_WIDGET( mainw ) );
 }

@@ -668,7 +668,7 @@ columnview_text_enter_cb( GtkWidget *wid, Columnview *cview )
 		return;
 
 	if( !(sym = workspace_add_def( ws, text )) ) {
-		box_alert( wid );
+		mainw_error( MAINW( ws->iwnd ) );
 		symbol_recalculate_all();
 		return;
 	}

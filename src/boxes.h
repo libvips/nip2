@@ -28,6 +28,7 @@
  */
 
 void box_alert( GtkWidget *par );
+void box_vinfo( GtkWidget *par, const char *top, const char *sub, va_list ap );
 void box_info( GtkWidget *par, const char *top, const char *sub, ... )
 	__attribute__((format(printf, 3, 4)));
 iDialog *box_yesno( GtkWidget *par, 
@@ -246,3 +247,9 @@ GtkType fontbutton_get_type( void );
 Fontbutton *fontbutton_new( void );
 void fontbutton_set_font_name( Fontbutton *fontbutton, const char *font_name );
 const char *fontbutton_get_font_name( Fontbutton * );
+
+GtkWidget *infobar_new( void );
+void infobar_vset( GtkWidget *info, GtkMessageType type, 
+	const char *top, const char *sub, va_list ap );
+void infobar_set( GtkWidget *info, GtkMessageType type, 
+	const char *top, const char *sub, ... );

@@ -85,6 +85,7 @@ typedef struct _Filesel {
         GtkWidget *chooser;             /* Filechooser widget */
         GtkWidget *space;               /* Space available */
         GtkWidget *info;                /* File info */
+        Preview *preview;		/* Selected file preview */
 	GtkFileFilter *filter[FILESEL_MAX_FILTERS];	
 
 	/* State. 

@@ -61,8 +61,8 @@ my_sources = \
 	action.h \
 	boxes.c \
 	boxes.h \
-	browse.c \
-	browse.h \
+	preview.c \
+	preview.h \
 	builtin.c \
 	builtin.h \
 	icontainer.c \

@@ -847,6 +847,21 @@ filesel_auto_incr_cb( GtkWidget *tog, Filesel *filesel )
 		idialog_set_pinup( IDIALOG( filesel ), TRUE );
 }
 
+static void
+filesel_update_preview_cb( GtkFileChooser *chooser, Filesel *filesel )
+{
+        char *filename;
+
+	if( (filename = gtk_file_chooser_get_preview_filename(
+		GTK_FILE_CHOOSER( filesel->chooser ) )) ) {
+		gtk_file_chooser_set_preview_widget_active(
+			GTK_FILE_CHOOSER( filesel->chooser ),
+			preview_set_filename( filesel->preview, filename ) );
+
+		g_free( filename );
+	}
+}
+
 static GtkFileFilter *
 file_filter_from_file_type( FileselFileType *type )
 {
@@ -898,7 +913,6 @@ filesel_build( GtkWidget *widget )
 	int i;
 	FileselFileType *type;
 	GtkWidget *vb;
-	GtkWidget *but;
 	GtkWidget *tog;
 
 #ifdef DEBUG
@@ -983,6 +997,17 @@ filesel_build( GtkWidget *widget )
 			"file name" ) );
 	}
 
+        if( filesel->imls ) {
+		filesel->preview = preview_new();
+		gtk_file_chooser_set_preview_widget(
+			GTK_FILE_CHOOSER( filesel->chooser ), 
+			GTK_WIDGET( filesel->preview ) );
+		gtk_signal_connect( GTK_OBJECT( filesel->chooser ), 
+			"update-preview",
+			GTK_SIGNAL_FUNC( filesel_update_preview_cb ), filesel );
+		gtk_widget_show( GTK_WIDGET( filesel->preview ) );
+	}
+
 	if( filesel_last_dir ) 
 		gtk_file_chooser_set_current_folder(
 			GTK_FILE_CHOOSER( filesel->chooser ), 
@@ -1059,6 +1084,7 @@ filesel_init( Filesel *filesel )
 	filesel->chooser = NULL;
 	filesel->space = NULL;
 	filesel->info = NULL;
+	filesel->preview = NULL;
 	for( i = 0; i < FILESEL_MAX_FILTERS; i++ )
 		filesel->filter[i] = NULL;
 	filesel->incr = FALSE;

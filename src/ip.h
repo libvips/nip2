@@ -307,6 +307,7 @@ typedef struct _Toolkitgroupview Toolkitgroupview;
 typedef struct _Toolkitview Toolkitview;
 typedef struct _Toolview Toolview;
 typedef struct _Trace Trace;
+typedef struct _Preview Preview;
 typedef struct _iError iError;
 typedef struct _Log Log;
 typedef struct _vObject vObject;
@@ -415,7 +416,7 @@ typedef void *(*tool_map_fn)( Tool *, void *, void * );
 #include "statusview.h"
 #include "plotstatus.h"
 #include "mainw.h"
-#include "browse.h"
+#include "preview.h"
 #include "builtin.h"
 #include "compile.h"
 #include "dump.h"

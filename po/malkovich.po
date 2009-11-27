@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nip2 7.11.11\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-11-25 17:39+0000\n"
+"POT-Creation-Date: 2009-11-27 14:58+0000\n"
 "PO-Revision-Date: 2006-09-06 12:30+0000\n"
 "Last-Translator: john <jcupitt@gmail.com>\n"
 "Language-Team: dk <LL@li.org>\n"
@@ -13,1035 +13,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
-#: src/action.c:87
-msgid "Bad arguments."
-msgstr "Malkovich"
-
-#. Expands to eg. 'bad args to "+", called from "fred"'
+#. Create signals.
 #.
-#: src/action.c:102 src/action.c:186
-msgid "Called from"
-msgstr "Malkovich"
-
-#: src/action.c:108
-#, fuzzy, c-format
-msgid ""
-"Error in binary \"%s\".\n"
-"left = %s\n"
-"right = %s\n"
-"%s"
-msgstr "Malkovich"
-
-#: src/action.c:142 src/class.c:190
-#, fuzzy, c-format
-msgid "Member \"%s\" not found in class \"%s\"."
-msgstr "Malkovich"
-
-#: src/action.c:149
-#, fuzzy, c-format
-msgid "object = %s"
-msgstr "Malkovich"
-
-#: src/action.c:153
-#, fuzzy, c-format
-msgid "tag = %s"
-msgstr "Malkovich"
-
-#: src/action.c:158
-#, fuzzy, c-format
-msgid "Reference attempted in \"%s\"."
-msgstr "Malkovich"
-
-#: src/action.c:162 src/class.c:189
-msgid "Member not found."
-msgstr "Malkovich"
-
-#: src/action.c:173 src/builtin.c:990 src/class.c:49 src/class.c:1019
-#: src/reduce.c:872 src/reduce.c:885 src/vips_call.c:1085
-msgid "Bad argument."
-msgstr "Malkovich"
-
-#: src/action.c:192
-#, fuzzy, c-format
-msgid ""
-"Error in unary \"%s\".\n"
-"argument = %s\n"
-"%s"
-msgstr "Malkovich"
-
-#: src/action.c:359 src/action.c:377 src/action.c:407
-#, fuzzy
-msgid "Bad right hand side of '.'."
-msgstr "Malkovich"
-
-#: src/action.c:369
-msgid "Symbol on left hand side of '.' is not scope"
-msgstr "Malkovich"
-
-#: src/action.c:411
-#, fuzzy
-msgid "Property not found."
-msgstr "Malkovich"
-
-#: src/action.c:425
-msgid "Bad left hand side of '.'."
-msgstr "Malkovich"
-
-#: src/action.c:937
-msgid "Division by zero."
-msgstr "Malkovich"
-
-#: src/action.c:1313 src/action.c:1593
-msgid "Unimplemented."
-msgstr "Malkovich"
-
-#: src/action.c:1677 src/action.c:1713 src/action.c:1971
-msgid "invoking method:"
-msgstr "Malkovich"
-
-#: src/boxes.c:243
-msgid "Close _without Saving"
-msgstr "Malkovich"
-
-#. Translators: translate this to a credit for you, and it'll appear in
-#. * the About box.
+#. Init methods.
 #.
-#: src/boxes.c:262
-msgid "translator_credits"
+#: src/plotstatus.c:99 src/statusview.c:108
+msgid "Status bar menu"
 msgstr "Malkovich"
 
-#: src/boxes.c:271
-#, fuzzy, c-format
-msgid "About %s."
-msgstr "Malkovich"
-
-#: src/boxes.c:274
-#, fuzzy, c-format
-msgid "%s is an image processing package."
-msgstr "Malkovich"
-
-#: src/boxes.c:278
-#, fuzzy, c-format
-msgid ""
-"%s comes with ABSOLUTELY NO WARRANTY. This is free software and you are "
-"welcome to redistribute it under certain conditions, see http://www.gnu.org."
-msgstr "Malkovich"
-
-#: src/boxes.c:297
-#, fuzzy
-msgid "Personal start folder"
-msgstr "Malkovich"
-
-#: src/boxes.c:301
-#, fuzzy
-msgid "Homepage"
-msgstr "Malkovich"
-
-#: src/boxes.c:304
-#, fuzzy
-msgid "Linked to VIPS"
-msgstr "Malkovich"
-
-#: src/boxes.c:307
-#, fuzzy
-msgid "Built against VIPS"
-msgstr "Malkovich"
-
-#: src/boxes.c:320
-#, fuzzy
-msgid "Temp files in"
-msgstr "Malkovich"
-
-#: src/boxes.c:386
-msgid "Help page not found."
-msgstr "Malkovich"
-
-#: src/boxes.c:387
-#, fuzzy, c-format
-msgid "No indexed help page found for tag \"%s\""
-msgstr "Malkovich"
-
-#: src/boxes.c:596
-msgid "Search for"
-msgstr "Malkovich"
-
-#: src/boxes.c:597
-msgid "Case sensitive"
-msgstr "Malkovich"
-
-#: src/boxes.c:599
-msgid "Regular expression"
-msgstr "Malkovich"
-
-#: src/boxes.c:601
-msgid "Search from start"
-msgstr "Malkovich"
-
-#: src/boxes.c:801
-msgid "Image header fields"
-msgstr "Malkovich"
-
-#: src/boxes.c:817
-msgid "Image history"
-msgstr "Malkovich"
-
-#: src/boxes.c:933 src/boxes.c:944 src/boxes.c:971
-#, fuzzy
-msgid "Unable to view help file."
-msgstr "Malkovich"
-
-#: src/boxes.c:934
-#, fuzzy, c-format
-msgid "Unable to open URL \"%s\", windows error code = %d."
-msgstr "Malkovich"
-
-#: src/boxes.c:945
-#, c-format
-msgid ""
-"Attempt to view URL with xdg-open failed\n"
-"%s"
-msgstr ""
-
-#: src/boxes.c:950 src/boxes.c:981
-msgid "Browser window opened."
-msgstr "Malkovich"
-
-#: src/boxes.c:951 src/boxes.c:982
-#, fuzzy
-msgid "You may need to switch desktops to see the new window."
-msgstr "Malkovich"
-
-#: src/boxes.c:973
-#, fuzzy, c-format
-msgid ""
-"Attempted to launch browser with command:\n"
-"  %s\n"
-"You can change this command in Preferences."
-msgstr "Malkovich"
-
-#: src/boxes.c:1072
-#, fuzzy, c-format
-msgid "Version %s"
-msgstr "Malkovich"
-
-#: src/boxes.c:1085
-#, fuzzy
-msgid "Starting ..."
-msgstr "Malkovich"
-
-#: src/boxes.c:1093
-msgid "Display this splash screen during startup"
-msgstr "Malkovich"
-
-#: src/boxes.c:1162
-msgid "Select Font"
-msgstr "Malkovich"
-
-#: src/boxes.c:1220
-msgid "Font not found."
-msgstr "Malkovich"
-
-#: src/boxes.c:1221
-#, fuzzy, c-format
-msgid "Font \"%s\" not found on system."
-msgstr "Malkovich"
-
-#: src/boxes.c:1301
-msgid "Pick a font"
-msgstr "Malkovich"
-
-#: src/boxes.c:1306
-msgid "Set Font"
-msgstr "Malkovich"
-
-#: src/boxes.c:1352
-msgid "Click to select font"
-msgstr "Malkovich"
-
-#: src/browse.c:83
-msgid "Thumbnails"
-msgstr "Malkovich"
-
-#: src/browse.c:301
-#, fuzzy, c-format
-msgid "Image files found in: \"%s\""
-msgstr "Malkovich"
-
-#: src/browse.c:303
-msgid "Searching ..."
-msgstr "Malkovich"
-
-#: src/browse.c:305
-msgid "Search incomplete!"
-msgstr "Malkovich"
-
-#: src/builtin.c:257
-msgid "Out of range."
-msgstr "Malkovich"
-
-#: src/builtin.c:258
-msgid "gammq arguments must be a > 0, x >= 0."
-msgstr "Malkovich"
-
-#: src/builtin.c:265
-msgid "Not available."
-msgstr "Malkovich"
-
-#: src/builtin.c:266
-msgid "No GSL library available for gammq."
-msgstr "Malkovich"
-
-#: src/builtin.c:410 src/classmodel.c:154 src/classmodel.c:227
-#: src/filemodel.c:100 src/filemodel.c:130 src/filemodel.c:342
-#: src/filemodel.c:566 src/filemodel.c:607 src/mainw.c:738 src/mainw.c:746
-#: src/model.c:313 src/model.c:368 src/rowview.c:455 src/view.c:820
-msgid "Not implemented."
-msgstr "Malkovich"
-
-#: src/builtin.c:411
-msgid "Complex math ops not implemented."
-msgstr "Malkovich"
-
-#: src/builtin.c:486
-msgid "Macro error."
-msgstr "Malkovich"
-
-#: src/builtin.c:669
-#, fuzzy
-msgid "No such type"
-msgstr "Malkovich"
-
-#: src/builtin.c:670
-#, fuzzy, c-format
-msgid "GType %u not found."
-msgstr "Malkovich"
-
-#: src/builtin.c:887
-msgid "GSL library error."
-msgstr "Malkovich"
-
-#: src/builtin.c:936
-#, fuzzy, c-format
-msgid "Builtin \"%s\" takes %d argument."
-msgid_plural "Builtin \"%s\" takes %d arguments."
-msgstr[0] "Malkovich"
-msgstr[1] "Malkovich"
-
-#: src/builtin.c:991
-#, fuzzy, c-format
-msgid ""
-"Argument %d to builtin \"%s\" should be \"%s\", you passed:\n"
-"  %s"
-msgstr "Malkovich"
-
-#: src/class.c:50
-#, fuzzy, c-format
-msgid "Object %s is not a class."
-msgstr "Malkovich"
-
-#: src/class.c:333
-msgid "No such secret."
-msgstr "Malkovich"
-
-#: src/class.c:334
-msgid ""
-"Editing local classes which reference non-local objects is a bit broken at "
-"the moment :-("
-msgstr "Malkovich"
-
-#: src/class.c:657 src/class.c:881 src/class.c:978 src/compile.c:1767
-#: src/vipsobject.c:125
-msgid "Too many arguments."
-msgstr "Malkovich"
-
-#: src/class.c:658
-#, fuzzy, c-format
-msgid "You can't have more than %d arguments to a superclass constructor."
-msgstr "Malkovich"
-
-#: src/class.c:787 src/class.c:846
-msgid "Bad superclass."
-msgstr "Malkovich"
-
-#: src/class.c:788
-#, fuzzy, c-format
-msgid "Superclass constructor \"%s\" should have no secret arguments."
-msgstr "Malkovich"
-
-#: src/class.c:795 src/workspace.c:1582
-msgid "Wrong number of arguments."
-msgstr "Malkovich"
-
-#: src/class.c:796
-#, fuzzy, c-format
-msgid "Superclass constructor \"%s\" expects %d arguments, not %d."
-msgstr "Malkovich"
-
-#: src/class.c:850
-#, fuzzy, c-format
-msgid "First element in superclass of \"%s\" must be class or constructor."
-msgstr "Malkovich"
-
-#: src/class.c:854 src/vips_call.c:955 src/vips_call.c:975
-msgid "You passed:"
-msgstr "Malkovich"
-
-#: src/class.c:882 src/class.c:979
-#, fuzzy, c-format
-msgid ""
-"Too many arguments to class constructor \"%s\". No more than %d arguments "
-"are supported."
-msgstr "Malkovich"
-
-#: src/class.c:972
-msgid "Class not found."
-msgstr "Malkovich"
-
-#: src/class.c:973
-#, fuzzy, c-format
-msgid "Class \"%s\" not found."
-msgstr "Malkovich"
-
-#: src/class.c:1010
-#, fuzzy, c-format
-msgid "Member \"%s\" of class \"%s\" should be of type \"%s\", instead it's:"
-msgstr "Malkovich"
-
-#: src/classmodel.c:155 src/classmodel.c:228
-#, fuzzy, c-format
-msgid "_%s() method not implemented for %s."
-msgstr "Malkovich"
-
-#: src/classmodel.c:163
-#, fuzzy, c-format
-msgid "Save %s \"%s\""
-msgstr "Malkovich"
-
-#: src/classmodel.c:237
-#, fuzzy, c-format
-msgid "Replace %s \"%s\""
-msgstr "Malkovich"
-
-#: src/classmodel.c:695
-msgid "Set boolean value here"
-msgstr "Malkovich"
-
-#: src/classmodel.c:701
-msgid "Enter a floating point number here"
-msgstr "Malkovich"
-
-#: src/classmodel.c:708
-msgid "Enter a string here"
-msgstr "Malkovich"
-
-#. Expands to "Edit Toggle A1".
-#.
-#: src/classmodel.c:762
-#, fuzzy, c-format
-msgid "Edit %s %s"
-msgstr "Malkovich"
-
-#: src/classmodel.c:773
-#, fuzzy, c-format
-msgid "Set %s"
-msgstr "Malkovich"
-
-#: src/classmodel.c:1086
-#, fuzzy
-msgid "Unknown option."
-msgstr "Malkovich"
-
-#: src/classmodel.c:1087
-#, fuzzy, c-format
-msgid "Option \"%s\" not known."
-msgstr "Malkovich"
-
-#: src/classmodel.c:1161 src/matrixview.c:198 src/matrixview.c:219
-#: src/plot.c:140 src/plot.c:150 src/plot.c:360 src/plot.c:379 src/plot.c:392
-msgid "Bad value."
-msgstr "Malkovich"
-
-#: src/classmodel.c:1162
-#, fuzzy, c-format
-msgid "%d band value only"
-msgstr "Malkovich"
-
-#: src/clock.c:59 src/clock.c:93 src/clock.c:190
-msgid "Interval"
-msgstr "Malkovich"
-
-#: src/clock.c:60 src/clock.c:96
-msgid "Elapsed time"
-msgstr "Malkovich"
-
-#: src/clock.c:93
-msgid "Interval between ticks (seconds)"
-msgstr "Malkovich"
-
-#: src/clock.c:96
-msgid "Elapsed time (seconds)"
-msgstr "Malkovich"
-
-#: src/clock.c:100
-#, fuzzy, c-format
-msgid "Edit Clock \"%s\""
-msgstr "Malkovich"
-
-#: src/clock.c:104
-msgid "Set Clock"
-msgstr "Malkovich"
-
-#: src/clock.c:193 src/colour.c:302 src/fontname.c:61 src/matrix.c:260
-#: src/number.c:68 src/option.c:71 src/pathname.c:84 src/plot.c:340
-#: src/slider.c:57 src/string.c:70 src/toggle.c:51
-msgid "Value"
-msgstr "Malkovich"
-
-#: src/colour.c:261
-#, fuzzy, c-format
-msgid "Edit Color \"%s\""
-msgstr "Malkovich"
-
-#: src/colour.c:267
-msgid "Set Color"
-msgstr "Malkovich"
-
-#: src/colour.c:299
-#, fuzzy
-msgid "Color Space"
-msgstr "Malkovich"
-
-#: src/colourdisplay.c:259
-msgid "Double-click to edit this color, or drag-and-drop between colors"
-msgstr "Malkovich"
-
-#: src/column.c:327 src/tool.c:869 src/workspace.c:1418
-#: src/workspacegroup.c:145
-msgid "Name clash."
-msgstr "Malkovich"
-
-#: src/column.c:328
-#, fuzzy, c-format
-msgid "Can't create column \"%s\". A column with that name already exists."
-msgstr "Malkovich"
-
-#: src/column.c:365
-msgid "Empty column."
-msgstr "Malkovich"
-
-#: src/column.c:366
-msgid "There are no objects in the current column."
-msgstr "Malkovich"
-
-#: src/column.c:385
-msgid "Too few items."
-msgstr "Malkovich"
-
-#: src/column.c:386
-#, fuzzy, c-format
-msgid "This column only has %d items, but %s needs %d items."
-msgstr "Malkovich"
-
-#: src/columnview.c:133
-#, fuzzy, c-format
-msgid "Save Column \"%s\""
-msgstr "Malkovich"
-
-#: src/columnview.c:180 src/columnview.c:241 src/mainw.c:1331 src/mainw.c:1369
-#: src/program.c:596 src/program.c:625 src/program.c:1050 src/program.c:1091
-#: src/program.c:1137 src/program.c:1169 src/program.c:1497 src/program.c:1538
-#: src/program.c:2211 src/row.c:479 src/workspacegroup.c:177
-#: src/workspacegroup.c:213
-msgid "Name"
-msgstr "Malkovich"
-
-#: src/columnview.c:181 src/columnview.c:243
-msgid "Toolkit"
-msgstr "Malkovich"
-
-#: src/columnview.c:182 src/columnview.c:245 src/matrix.c:269
-#: src/program.c:597 src/program.c:627 src/program.c:1138 src/program.c:1171
-msgid "Filename"
-msgstr "Malkovich"
-
-#: src/columnview.c:241
-msgid "Set menu item text here"
-msgstr "Malkovich"
-
-#: src/columnview.c:243
-msgid "Add to this toolkit"
-msgstr "Malkovich"
-
-#: src/columnview.c:245
-msgid "Store column in this file"
-msgstr "Malkovich"
-
-#: src/columnview.c:248
-#, fuzzy, c-format
-msgid "New Menu Item from Column \"%s\""
-msgstr "Malkovich"
-
-#: src/columnview.c:253
-msgid "Menuize"
-msgstr "Malkovich"
-
-#: src/columnview.c:648
-msgid "Edit caption, press enter to accept changes, press escape to cancel"
-msgstr "Malkovich"
-
-#: src/columnview.c:701
-msgid "Enter expressions here"
-msgstr "Malkovich"
-
-#: src/columnview.c:755
-msgid "doubleclick to set title"
-msgstr ""
-
-#: src/columnview.c:764
-msgid "Fold the column away"
-msgstr "Malkovich"
-
-#: src/columnview.c:769
-msgid "Open the column"
-msgstr "Malkovich"
-
-#: src/columnview.c:893
-msgid "Column menu"
-msgstr "Malkovich"
-
-#: src/columnview.c:894
-msgid "_Edit Caption"
-msgstr "Malkovich"
-
-#: src/columnview.c:896 src/mainw.c:1663 src/program.c:1720
-msgid "Select _All"
-msgstr "Malkovich"
-
-#: src/columnview.c:903
-msgid "Make Column Into _Menu Item"
-msgstr "Malkovich"
-
-#: src/columnview.c:940
-msgid "Left-drag to move, left-double-click to set title, right-click for menu"
-msgstr "Malkovich"
-
-#: src/columnview.c:973
-msgid "Delete the column"
-msgstr "Malkovich"
-
-#: src/compile.c:1449
-msgid "Too many shared nodes in graph."
-msgstr "Malkovich"
-
-#: src/compile.c:1451
-msgid "Raise MAX_RELOC"
-msgstr "Malkovich"
-
-#: src/compile.c:1768
-#, fuzzy, c-format
-msgid "Member \"%s\" of class \"%s\" should have no arguments."
-msgstr "Malkovich"
-
-#: src/compile.c:2645
-#, fuzzy
-msgid "pattern match failed"
-msgstr "Malkovich"
-
-#: src/conversion.c:464
-msgid "not uncoded"
-msgstr "Malkovich"
-
-#: src/conversion.c:1400
-#, fuzzy, c-format
-msgid "Header for \"%s\""
-msgstr "Malkovich"
-
-#: src/conversion.c:1402
-msgid "OK"
-msgstr "Malkovich"
-
-#: src/conversionview.c:66
-msgid "Unable to find image range."
-msgstr "Malkovich"
-
-#: src/conversionview.c:67
-msgid "Find image range failed."
-msgstr "Malkovich"
-
-#: src/conversionview.c:90
-msgid "Unable to scale image."
-msgstr "Malkovich"
-
-#: src/conversionview.c:91
-msgid "Maximum and minimum pixel values are equal."
-msgstr "Malkovich"
-
-#. Build menu. One for each window, as we need to track falsecolour
-#. * etc. toggles. Could just have one, and modify pre-popup, but this
-#. * is easier.
-#.
-#: src/conversionview.c:229
-msgid "Convert menu"
-msgstr "Malkovich"
-
-#: src/conversionview.c:230
-msgid "_Scale"
-msgstr "Malkovich"
-
-#: src/conversionview.c:232
-msgid "_False Color"
-msgstr "Malkovich"
-
-#: src/conversionview.c:234
-msgid "_Interpret"
-msgstr "Malkovich"
-
-#: src/conversionview.c:236 src/regionview.c:1000
-msgid "_Reset"
-msgstr "Malkovich"
-
-#: src/conversionview.c:238
-msgid "Set As Workspace _Default"
-msgstr "Malkovich"
-
-#: src/dump.c:186 src/expr.c:613
-msgid "value"
-msgstr "Malkovich"
-
-#: src/dump.c:187
-msgid "parameter"
-msgstr "Malkovich"
-
-#: src/dump.c:188
-msgid "zombie"
-msgstr "Malkovich"
-
-#: src/dump.c:189 src/util.c:1349
-msgid "workspace"
-msgstr "Malkovich"
-
-#: src/dump.c:190
-msgid "workspace group"
-msgstr "Malkovich"
-
-#: src/dump.c:191
-msgid "root symbol"
-msgstr "Malkovich"
-
-#: src/dump.c:192
-msgid "external symbol"
-msgstr "Malkovich"
-
-#: src/dump.c:193
-msgid "built-in symbol"
-msgstr "Malkovich"
-
-#: src/editview.c:79 src/fontnameview.c:80 src/formula.c:198 src/gtkutil.c:747
-#: src/gtkutil.c:782 src/gtkutil.c:836 src/optionview.c:172
-#: src/pathnameview.c:80 src/sliderview.c:74
-#, fuzzy, c-format
-msgid "%s:"
-msgstr "Malkovich"
-
-#: src/editview.c:158
-msgid "Escape to cancel edit, press Return to accept edit and recalculate"
-msgstr "Malkovich"
-
-#: src/error.c:60
-#, fuzzy
-msgid "No ierrors found."
-msgstr "Malkovich"
-
-#: src/error.c:100
-msgid "No unresolved symbols found."
-msgstr "Malkovich"
-
-#: src/error.c:123 src/trace.c:238
-msgid "_Clear"
-msgstr "Malkovich"
-
-#: src/error.c:124
-#, fuzzy
-msgid "Clear ierror window"
-msgstr "Malkovich"
-
-#: src/error.c:128
-#, fuzzy
-msgid "List _iErrors"
-msgstr "Malkovich"
-
-#: src/error.c:129
-#, fuzzy
-msgid "Search for all ierrors"
-msgstr "Malkovich"
-
-#: src/error.c:133
-msgid "List _Unresolved"
-msgstr ""
-
-#: src/error.c:134
-msgid "Search for all unresolved references"
-msgstr ""
-
-#: src/error.c:138 src/imageview.c:499 src/mainw.c:1653 src/plotwindow.c:175
-#: src/program.c:1695 src/trace.c:243
-msgid "_Close"
-msgstr "Malkovich"
-
-#: src/error.c:139
-#, fuzzy
-msgid "Close ierror window"
-msgstr "Malkovich"
-
-#: src/error.c:143 src/imageview.c:529 src/mainw.c:1723 src/plotwindow.c:180
-#: src/program.c:1775 src/trace.c:248
-msgid "_Contents"
-msgstr "Malkovich"
-
-#: src/error.c:144 src/imageview.c:530 src/mainw.c:1724 src/plotwindow.c:181
-#: src/program.c:1776 src/trace.c:249
-msgid "Open the users guide"
-msgstr "Malkovich"
-
-#: src/error.c:148 src/imageview.c:534 src/mainw.c:1718 src/plotwindow.c:185
-#: src/program.c:1770 src/trace.c:253
-msgid "_About"
-msgstr "Malkovich"
-
-#: src/error.c:149 src/imageview.c:535 src/mainw.c:1719 src/plotwindow.c:186
-#: src/program.c:1771 src/trace.c:254
-msgid "About this program"
-msgstr "Malkovich"
-
-#: src/error.c:222
-#, fuzzy, c-format
-msgid "iError - %s"
-msgstr "Malkovich"
-
-#: src/expr.c:64
-#, fuzzy, c-format
-msgid "error in \"%s\""
-msgstr "Malkovich"
-
-#: src/expr.c:326
-msgid "Error"
-msgstr "Malkovich"
-
-#: src/expr.c:585
-msgid "top level"
-msgstr "Malkovich"
-
-#: src/expr.c:590
-msgid "class"
-msgstr "Malkovich"
-
-#: src/expr.c:593
-msgid "instance"
-msgstr "Malkovich"
-
-#: src/expr.c:597
-msgid "definition"
-msgstr "Malkovich"
-
-#: src/expr.c:604
-#, fuzzy, c-format
-msgid "parameter \"%s\""
-msgstr "Malkovich"
-
-#: src/expr.c:608
-msgid "member"
-msgstr "Malkovich"
-
-#: src/expr.c:617 src/itext.c:446
-msgid "function"
-msgstr "Malkovich"
-
-#: src/expr.c:626
-msgid "of"
-msgstr "Malkovich"
-
-#: src/filemodel.c:101 src/filemodel.c:131 src/filemodel.c:567
-#: src/filemodel.c:608 src/model.c:314 src/model.c:369 src/model.c:388
-#, fuzzy, c-format
-msgid "_%s() not implemented for class \"%s\"."
-msgstr "Malkovich"
-
-#: src/filemodel.c:255 src/filemodel.c:270 src/model.c:419
-msgid "XML library error."
-msgstr "Malkovich"
-
-#: src/filemodel.c:256
-msgid "model_save_filename: xmlNewDoc() failed"
-msgstr "Malkovich"
-
-#: src/filemodel.c:271
-msgid "model_save_filename: xmlNewDocNode() failed"
-msgstr "Malkovich"
-
-#: src/filemodel.c:287
-msgid "Save failed."
-msgstr "Malkovich"
-
-#: src/filemodel.c:288
-#, fuzzy, c-format
-msgid ""
-"Save of %s \"%s\" to file \"%s\" failed.\n"
-"%s"
-msgstr "Malkovich"
-
-#: src/filemodel.c:343
-msgid "filemodel_real_save_all: no save method"
-msgstr "Malkovich"
-
-#: src/filemodel.c:452 src/filemodel.c:461 src/filemodel.c:474 src/mainw.c:992
-#: src/model.c:130
-msgid "Load failed."
-msgstr "Malkovich"
-
-#: src/filemodel.c:453
-#, fuzzy, c-format
-msgid "Can't load XML file \"%s\", it's not a %s save file."
-msgstr "Malkovich"
-
-#: src/filemodel.c:462
-#, fuzzy, c-format
-msgid ""
-"Can't load XML file \"%s\", unable to extract version information from "
-"namespace."
-msgstr "Malkovich"
-
-#: src/filemodel.c:475
-#, fuzzy, c-format
-msgid "Can't load XML file \"%s\", the file does not contain a %s."
-msgstr "Malkovich"
-
-#. Expands to (eg.) "Save Column A2".
-#.
-#: src/filemodel.c:660
-#, fuzzy, c-format
-msgid "Save %s %s"
-msgstr "Malkovich"
-
-#: src/filemodel.c:735 src/filemodel.c:747
-msgid "Object has been modified."
-msgstr "Malkovich"
-
-#: src/filemodel.c:736
-#, fuzzy, c-format
-msgid ""
-"%s \"%s\" has been modified since you loaded it from file \"%s\".\n"
-"\n"
-"Do you want to save your changes?"
-msgstr "Malkovich"
-
-#: src/filemodel.c:748
-#, fuzzy, c-format
-msgid "%s \"%s\" has been modified. Do you want to save your changes?"
-msgstr "Malkovich"
-
-#: src/filesel.c:86
-msgid "Workspace files (*.ws)"
-msgstr "Malkovich"
-
-#: src/filesel.c:88
-msgid "Recombination matrix files (*.rec)"
-msgstr "Malkovich"
-
-#: src/filesel.c:90
-msgid "Morphology matrix files (*.mor)"
-msgstr "Malkovich"
-
-#: src/filesel.c:92
-msgid "Convolution matrix files (*.con)"
-msgstr "Malkovich"
-
-#: src/filesel.c:94
-msgid "Matrix files (*.mat)"
-msgstr "Malkovich"
-
-#: src/filesel.c:96
-msgid "Definition files (*.def)"
-msgstr "Malkovich"
-
-#: src/filesel.c:98
-msgid "ICC profiles (*.icc, *.icm)"
-msgstr "Malkovich"
-
-#: src/filesel.c:100
-msgid "All files (*)"
-msgstr "Malkovich"
-
-#. Used as eg. "VIPS image files (*.v)"
-#.
-#: src/filesel.c:133
-#, fuzzy
-msgid "image files"
-msgstr "Malkovich"
-
-#: src/filesel.c:500
-#, fuzzy, c-format
-msgid "Unable to determine space free in \"%s\"."
-msgstr "Malkovich"
-
-#. Expands to (eg.) '6GB free in "/pics/tmp"'
-#.
-#: src/filesel.c:511
-#, fuzzy, c-format
-msgid "free in \"%s\""
-msgstr "Malkovich"
-
-#: src/filesel.c:761 src/util.c:1932 src/util.c:1938
-msgid "Bad filename."
-msgstr "Malkovich"
-
-#: src/filesel.c:762
-msgid "No file selected."
-msgstr "Malkovich"
-
-#: src/filesel.c:1001
-msgid "Increment filename"
-msgstr "Malkovich"
-
-#: src/filesel.c:1007
-msgid "After Save, add 1 to the last number in the file name"
-msgstr "Malkovich"
-
-#: src/filesel.c:1020
-msgid "Show thumbnails"
-msgstr "Malkovich"
-
-#: src/filesel.c:1026
-msgid "Show thumbnails for files in this directory"
-msgstr "Malkovich"
-
-#: src/filesel.c:1253
-#, fuzzy, c-format
-msgid "%s Save Preferences"
-msgstr "Malkovich"
-
-#: src/filesel.c:1314
-msgid "Overwrite"
-msgstr "Malkovich"
-
-#: src/filesel.c:1315
-msgid "Overwrite file?"
-msgstr "Malkovich"
-
-#: src/filesel.c:1316
-#, fuzzy, c-format
-msgid "File \"%s\" exists. OK to overwrite?"
-msgstr "Malkovich"
-
-#: src/fontname.c:58 src/mainw.c:1332 src/mainw.c:1371 src/number.c:65
-#: src/option.c:65 src/pathname.c:81 src/program.c:1051 src/program.c:1093
-#: src/slider.c:48 src/string.c:67 src/toggle.c:48 src/workspacegroup.c:178
-#: src/workspacegroup.c:215
-msgid "Caption"
-msgstr "Malkovich"
-
-#: src/formula.c:143
-msgid ""
-"Press Escape to cancel edit, press Return to accept edit and recalculate"
+#: src/plotstatus.c:190 src/statusview.c:223 src/statusview.c:226
+msgid "Magnification"
 msgstr "Malkovich"
 
 #: src/graph.c:186
@@ -1110,6 +91,328 @@ msgstr "Malkovich"
 msgid "unknown element tag %d"
 msgstr "Malkovich"
 
+#: src/pathnameview.c:80 src/gtkutil.c:747 src/gtkutil.c:782 src/gtkutil.c:836
+#: src/editview.c:79 src/formula.c:198 src/fontnameview.c:80
+#: src/optionview.c:172 src/sliderview.c:74
+#, fuzzy, c-format
+msgid "%s:"
+msgstr "Malkovich"
+
+#: src/pathnameview.c:173
+msgid "Select a new file name"
+msgstr "Malkovich"
+
+#: src/pathname.c:81 src/slider.c:48 src/option.c:65 src/string.c:67
+#: src/toggle.c:48 src/number.c:65 src/fontname.c:58 src/mainw.c:1335
+#: src/mainw.c:1374 src/program.c:1051 src/program.c:1093
+#: src/workspacegroup.c:178 src/workspacegroup.c:215
+msgid "Caption"
+msgstr "Malkovich"
+
+#: src/pathname.c:84 src/slider.c:57 src/option.c:71 src/string.c:70
+#: src/toggle.c:51 src/clock.c:193 src/number.c:68 src/fontname.c:61
+#: src/colour.c:302 src/matrix.c:260 src/plot.c:340
+msgid "Value"
+msgstr "Malkovich"
+
+#: src/iarrow.c:117
+msgid "No image"
+msgstr "Malkovich"
+
+#. Used in (eg.) "Mark at (10, 10) on [A1, A2]"
+#.
+#. Expands to (eg.) "Region on A1 at (10, 10), size (50, 50)"
+#.
+#: src/iarrow.c:130 src/iregion.c:156
+msgid "on"
+msgstr "Malkovich"
+
+#: src/iarrow.c:148 src/iarrow.c:153
+#, fuzzy, c-format
+msgid "at %d"
+msgstr "Malkovich"
+
+#: src/iarrow.c:158
+#, fuzzy, c-format
+msgid "at (%d, %d)"
+msgstr "Malkovich"
+
+#: src/iarrow.c:165
+#, fuzzy, c-format
+msgid "at (%d, %d), offset (%d, %d)"
+msgstr "Malkovich"
+
+#: src/vips_call.c:174 src/vips_call.c:1106 src/vipsobject.c:284
+#: src/util.c:191
+msgid "VIPS library error."
+msgstr "Malkovich"
+
+#: src/vips_call.c:175 src/vips_call.c:1109
+#, fuzzy, c-format
+msgid "Error calling library function \"%s\" (%s)."
+msgstr "Malkovich"
+
+#: src/vips_call.c:190
+msgid "Unknown type."
+msgstr "Malkovich"
+
+#: src/vips_call.c:191
+#, fuzzy, c-format
+msgid "VIPS type \"%s\" not supported"
+msgstr "Malkovich"
+
+#: src/vips_call.c:955 src/vips_call.c:975 src/class.c:854
+msgid "You passed:"
+msgstr "Malkovich"
+
+#: src/vips_call.c:1028
+msgid "Usage:"
+msgstr "Malkovich"
+
+#: src/vips_call.c:1030
+#, fuzzy, c-format
+msgid "VIPS operator \"%s\""
+msgstr "Malkovich"
+
+#: src/vips_call.c:1032
+#, fuzzy, c-format
+msgid "%s, from package \"%s\""
+msgstr "Malkovich"
+
+#: src/vips_call.c:1037
+#, fuzzy, c-format
+msgid "\"%s\" takes %d argument:"
+msgid_plural "\"%s\" takes %d arguments:"
+msgstr[0] "Malkovich"
+msgstr[1] "Malkovich"
+
+#: src/vips_call.c:1044
+#, fuzzy, c-format
+msgid "And produces %d result:"
+msgid_plural "And produces %d results:"
+msgstr[0] "Malkovich"
+msgstr[1] "Malkovich"
+
+#. Print any flags this function has.
+#.
+#: src/vips_call.c:1052
+msgid "Flags:"
+msgstr "Malkovich"
+
+#: src/vips_call.c:1056
+msgid "PIO function"
+msgstr "Malkovich"
+
+#: src/vips_call.c:1058
+msgid "WIO function"
+msgstr "Malkovich"
+
+#: src/vips_call.c:1061
+msgid "coordinate transformer"
+msgstr "Malkovich"
+
+#: src/vips_call.c:1063
+msgid "no coordinate transformation"
+msgstr "Malkovich"
+
+#: src/vips_call.c:1066
+msgid "point-to-point operation"
+msgstr "Malkovich"
+
+#: src/vips_call.c:1068
+msgid "area operation"
+msgstr "Malkovich"
+
+#: src/vips_call.c:1071
+msgid "uncacheable operation"
+msgstr "Malkovich"
+
+#: src/vips_call.c:1073
+msgid "operation can be cached"
+msgstr "Malkovich"
+
+#: src/vips_call.c:1085 src/action.c:173 src/reduce.c:872 src/reduce.c:885
+#: src/builtin.c:990 src/class.c:49 src/class.c:1019
+msgid "Bad argument."
+msgstr "Malkovich"
+
+#: src/vips_call.c:1088
+#, fuzzy, c-format
+msgid "Argument %d (%s) to \"%s\" is the wrong type."
+msgstr "Malkovich"
+
+#: src/vips_call.c:1112
+#, fuzzy, c-format
+msgid "VIPS library: %s"
+msgstr "Malkovich"
+
+#: src/vips_call.c:2154 src/vips_call.c:2203
+#, fuzzy, c-format
+msgid "image \"%s\""
+msgstr "Malkovich"
+
+#: src/vips_call.c:2161
+msgid "no image"
+msgstr "Malkovich"
+
+#: src/vips_call.c:2177
+msgid "doublevec"
+msgstr "Malkovich"
+
+#: src/vips_call.c:2200
+msgid "imagevec"
+msgstr "Malkovich"
+
+#: src/matrixview.c:105 src/gtkutil.c:654 src/gtkutil.c:662
+msgid "Bad floating point number."
+msgstr "Malkovich"
+
+#: src/matrixview.c:106 src/gtkutil.c:655
+#, fuzzy, c-format
+msgid "\"%s\" is not a floating point number."
+msgstr "Malkovich"
+
+#: src/matrixview.c:198 src/matrixview.c:219 src/classmodel.c:1161
+#: src/plot.c:140 src/plot.c:150 src/plot.c:360 src/plot.c:379 src/plot.c:392
+msgid "Bad value."
+msgstr "Malkovich"
+
+#: src/matrixview.c:199 src/matrixview.c:220
+#, fuzzy, c-format
+msgid ""
+"Cell (%d, %d):\n"
+"%s"
+msgstr "Malkovich"
+
+#: src/matrixview.c:434 src/matrix.c:263
+msgid "Scale"
+msgstr "Malkovich"
+
+#: src/matrixview.c:439 src/matrix.c:266
+msgid "Offset"
+msgstr "Malkovich"
+
+#. Expands to (eg) "A2: cell (1,2): 45" ... status line display during
+#. * matrix traverse.
+#.
+#: src/matrixview.c:649
+#, fuzzy, c-format
+msgid ": cell (%d, %d): %s"
+msgstr "Malkovich"
+
+#: src/slider.c:51
+msgid "From"
+msgstr "Malkovich"
+
+#: src/slider.c:54
+msgid "To"
+msgstr "Malkovich"
+
+#. Need one menu per image window (could have a single menu for all
+#. * windows, but then we'd have to set the state of the toggle buttons
+#. * before mapping)
+#.
+#: src/imagepresent.c:1548
+msgid "Ruler menu"
+msgstr "Malkovich"
+
+#: src/imagepresent.c:1549
+msgid "Rulers In _mm"
+msgstr "Malkovich"
+
+#: src/imagepresent.c:1551
+msgid "Show _Offset"
+msgstr "Malkovich"
+
+#: src/option.c:68
+msgid "Labels"
+msgstr "Malkovich"
+
+#: src/filesel.c:86
+msgid "Workspace files (*.ws)"
+msgstr "Malkovich"
+
+#: src/filesel.c:88
+msgid "Recombination matrix files (*.rec)"
+msgstr "Malkovich"
+
+#: src/filesel.c:90
+msgid "Morphology matrix files (*.mor)"
+msgstr "Malkovich"
+
+#: src/filesel.c:92
+msgid "Convolution matrix files (*.con)"
+msgstr "Malkovich"
+
+#: src/filesel.c:94
+msgid "Matrix files (*.mat)"
+msgstr "Malkovich"
+
+#: src/filesel.c:96
+msgid "Definition files (*.def)"
+msgstr "Malkovich"
+
+#: src/filesel.c:98
+msgid "ICC profiles (*.icc, *.icm)"
+msgstr "Malkovich"
+
+#: src/filesel.c:100
+msgid "All files (*)"
+msgstr "Malkovich"
+
+#. Used as eg. "VIPS image files (*.v)"
+#.
+#: src/filesel.c:133
+#, fuzzy
+msgid "image files"
+msgstr "Malkovich"
+
+#: src/filesel.c:500
+#, fuzzy, c-format
+msgid "Unable to determine space free in \"%s\"."
+msgstr "Malkovich"
+
+#. Expands to (eg.) '6GB free in "/pics/tmp"'
+#.
+#: src/filesel.c:511
+#, fuzzy, c-format
+msgid "free in \"%s\""
+msgstr "Malkovich"
+
+#: src/filesel.c:759 src/util.c:1932 src/util.c:1938
+msgid "Bad filename."
+msgstr "Malkovich"
+
+#: src/filesel.c:760
+msgid "No file selected."
+msgstr "Malkovich"
+
+#: src/filesel.c:990
+msgid "Increment filename"
+msgstr "Malkovich"
+
+#: src/filesel.c:996
+msgid "After Save, add 1 to the last number in the file name"
+msgstr "Malkovich"
+
+#: src/filesel.c:1235
+#, fuzzy, c-format
+msgid "%s Save Preferences"
+msgstr "Malkovich"
+
+#: src/filesel.c:1296
+msgid "Overwrite"
+msgstr "Malkovich"
+
+#: src/filesel.c:1297
+msgid "Overwrite file?"
+msgstr "Malkovich"
+
+#: src/filesel.c:1298
+#, fuzzy, c-format
+msgid "File \"%s\" exists. OK to overwrite?"
+msgstr "Malkovich"
+
 #: src/gtkutil.c:599
 msgid "Bad identifier."
 msgstr "Malkovich"
@@ -1118,15 +421,6 @@ msgstr "Malkovich"
 msgid ""
 "Enter an identifier. Identifiers start with a letter, and then contain only "
 "letters, numbers, apostrophy and underscore."
-msgstr "Malkovich"
-
-#: src/gtkutil.c:654 src/gtkutil.c:662 src/matrixview.c:105
-msgid "Bad floating point number."
-msgstr "Malkovich"
-
-#: src/gtkutil.c:655 src/matrixview.c:106
-#, fuzzy, c-format
-msgid "\"%s\" is not a floating point number."
 msgstr "Malkovich"
 
 #: src/gtkutil.c:663
@@ -1153,6 +447,478 @@ msgstr "Malkovich"
 
 #: src/gtkutil.c:844 src/toggleview.c:106
 msgid "Left-click to change value"
+msgstr "Malkovich"
+
+#: src/vipsobject.c:94
+#, fuzzy
+msgid "No such type."
+msgstr "Malkovich"
+
+#: src/vipsobject.c:95
+#, fuzzy, c-format
+msgid "Type \"%s\" not found as a subclass of VipsObject."
+msgstr "Malkovich"
+
+#: src/vipsobject.c:125 src/compile.c:1767 src/class.c:657 src/class.c:881
+#: src/class.c:978
+msgid "Too many arguments."
+msgstr "Malkovich"
+
+#: src/vipsobject.c:126
+#, fuzzy, c-format
+msgid "No more than %d arguments allowed."
+msgstr "Malkovich"
+
+#: src/vipsobject.c:253
+msgid "Wrong number of required arguments."
+msgstr "Malkovich"
+
+#: src/vipsobject.c:254
+#, fuzzy, c-format
+msgid "Operation \"%s\" has %d required arguments, you supplied %d."
+msgstr "Malkovich"
+
+#: src/vipsobject.c:285
+#, fuzzy
+msgid "Unable to build object."
+msgstr "Malkovich"
+
+#: src/util.c:211
+msgid "Unable to set XML property."
+msgstr "Malkovich"
+
+#: src/util.c:212
+#, fuzzy, c-format
+msgid "Unable to set property \"%s\" to value \"%s\"."
+msgstr "Malkovich"
+
+#: src/util.c:830
+msgid "(no image)"
+msgstr "Malkovich"
+
+#: src/util.c:844
+#, fuzzy, c-format
+msgid "%dx%d %s, %d band, %s"
+msgid_plural "%dx%d %s, %d bands, %s"
+msgstr[0] "Malkovich"
+msgstr[1] "Malkovich"
+
+#: src/util.c:1257
+msgid "8-bit unsigned integer"
+msgstr "Malkovich"
+
+#. IM_BANDFMT_UCHAR
+#: src/util.c:1258
+msgid "8-bit signed integer"
+msgstr "Malkovich"
+
+#. IM_BANDFMT_CHAR
+#: src/util.c:1259
+msgid "16-bit unsigned integer"
+msgstr "Malkovich"
+
+#. IM_BANDFMT_USHORT
+#: src/util.c:1260
+msgid "16-bit signed integer"
+msgstr "Malkovich"
+
+#. IM_BANDFMT_SHORT
+#: src/util.c:1261
+msgid "32-bit unsigned integer"
+msgstr "Malkovich"
+
+#. IM_BANDFMT_UINT
+#: src/util.c:1262
+msgid "32-bit signed integer"
+msgstr "Malkovich"
+
+#. IM_BANDFMT_INT
+#: src/util.c:1263
+msgid "32-bit float"
+msgstr "Malkovich"
+
+#. IM_BANDFMT_FLOAT
+#: src/util.c:1264
+msgid "64-bit complex"
+msgstr "Malkovich"
+
+#. IM_BANDFMT_COMPLEX
+#: src/util.c:1265
+msgid "64-bit float"
+msgstr "Malkovich"
+
+#. IM_BANDFMT_DOUBLE
+#: src/util.c:1266
+msgid "128-bit complex"
+msgstr "Malkovich"
+
+#: src/util.c:1274
+msgid "<unknown format>"
+msgstr "Malkovich"
+
+#: src/util.c:1316
+msgid "<unknown type>"
+msgstr "Malkovich"
+
+#: src/util.c:1340
+msgid "directory"
+msgstr "Malkovich"
+
+#: src/util.c:1349 src/dump.c:189
+msgid "workspace"
+msgstr "Malkovich"
+
+#: src/util.c:1599
+msgid "Unable to find install area."
+msgstr "Malkovich"
+
+#: src/util.c:1775
+msgid "<charset conversion error>"
+msgstr "Malkovich"
+
+#: src/util.c:1933
+msgid "Filename is too long."
+msgstr "Malkovich"
+
+#: src/util.c:1939
+msgid "Filename contains only blank characters."
+msgstr "Malkovich"
+
+#: src/util.c:2002 src/util.c:2011 src/util.c:2066
+msgid "Unable to open."
+msgstr "Malkovich"
+
+#: src/util.c:2003 src/util.c:2012
+#, fuzzy, c-format
+msgid ""
+"Unable to open file \"%s\" for reading.\n"
+"%s."
+msgstr "Malkovich"
+
+#: src/util.c:2067
+#, fuzzy, c-format
+msgid ""
+"Unable to open file \"%s\" for writing.\n"
+"%s."
+msgstr "Malkovich"
+
+#: src/util.c:2088
+msgid "Unable to write."
+msgstr "Malkovich"
+
+#: src/util.c:2089
+#, fuzzy, c-format
+msgid ""
+"Unable to write to file \"%s\".\n"
+"%s."
+msgstr "Malkovich"
+
+#: src/util.c:2124 src/util.c:2137 src/util.c:2162
+msgid "Unable to read."
+msgstr "Malkovich"
+
+#: src/util.c:2125
+#, fuzzy, c-format
+msgid "File \"%s\" too large."
+msgstr "Malkovich"
+
+#: src/util.c:2138 src/util.c:2163
+#, fuzzy, c-format
+msgid ""
+"Unable to read from file \"%s\".\n"
+"%s."
+msgstr "Malkovich"
+
+#. File length unit.
+#.
+#: src/util.c:2454
+msgid "bytes"
+msgstr "Malkovich"
+
+#. Kilo byte unit.
+#.
+#: src/util.c:2458
+msgid "KB"
+msgstr "Malkovich"
+
+#. Mega byte unit.
+#.
+#: src/util.c:2462
+msgid "MB"
+msgstr "Malkovich"
+
+#. Giga byte unit.
+#.
+#: src/util.c:2466
+msgid "GB"
+msgstr "Malkovich"
+
+#. Tera byte unit.
+#.
+#: src/util.c:2470
+msgid "TB"
+msgstr "Malkovich"
+
+#: src/util.c:2513
+msgid "Unable to create temporary file."
+msgstr "Malkovich"
+
+#: src/util.c:2514
+#, fuzzy, c-format
+msgid ""
+"Unable to make file \"%s\"\n"
+"%s"
+msgstr "Malkovich"
+
+#: src/util.c:2721
+msgid "Out of memory."
+msgstr "Malkovich"
+
+#: src/util.c:2722
+#, fuzzy, c-format
+msgid "Request for %s of RAM triggered memory allocation failure."
+msgstr "Malkovich"
+
+#: src/view.c:820 src/classmodel.c:154 src/classmodel.c:227 src/builtin.c:410
+#: src/mainw.c:740 src/mainw.c:748 src/model.c:313 src/model.c:368
+#: src/filemodel.c:100 src/filemodel.c:130 src/filemodel.c:342
+#: src/filemodel.c:566 src/filemodel.c:607 src/rowview.c:455
+msgid "Not implemented."
+msgstr "Malkovich"
+
+#: src/trace.c:126 src/reduce.c:128 src/reduce.c:1030 src/workspace.c:1593
+msgid "Overflow error."
+msgstr "Malkovich"
+
+#: src/trace.c:127
+msgid "Trace buffer stack overflow."
+msgstr "Malkovich"
+
+#: src/trace.c:238 src/error.c:123
+msgid "_Clear"
+msgstr "Malkovich"
+
+#: src/trace.c:239
+msgid "Clear trace window"
+msgstr "Malkovich"
+
+#: src/trace.c:243 src/imageview.c:499 src/mainw.c:1656 src/program.c:1695
+#: src/plotwindow.c:175 src/error.c:138
+msgid "_Close"
+msgstr "Malkovich"
+
+#: src/trace.c:244
+msgid "Close trace window"
+msgstr "Malkovich"
+
+#: src/trace.c:248 src/imageview.c:529 src/mainw.c:1726 src/program.c:1775
+#: src/plotwindow.c:180 src/error.c:143
+msgid "_Contents"
+msgstr "Malkovich"
+
+#: src/trace.c:249 src/imageview.c:530 src/mainw.c:1727 src/program.c:1776
+#: src/plotwindow.c:181 src/error.c:144
+msgid "Open the users guide"
+msgstr "Malkovich"
+
+#: src/trace.c:253 src/imageview.c:534 src/mainw.c:1721 src/program.c:1770
+#: src/plotwindow.c:185 src/error.c:148
+msgid "_About"
+msgstr "Malkovich"
+
+#: src/trace.c:254 src/imageview.c:535 src/mainw.c:1722 src/program.c:1771
+#: src/plotwindow.c:186 src/error.c:149
+msgid "About this program"
+msgstr "Malkovich"
+
+#: src/trace.c:260
+msgid "_Operators"
+msgstr "Malkovich"
+
+#: src/trace.c:261
+msgid "trace operators"
+msgstr "Malkovich"
+
+#: src/trace.c:265
+msgid "_Builtin Functions"
+msgstr "Malkovich"
+
+#: src/trace.c:266
+msgid "trace calls to built in functions"
+msgstr "Malkovich"
+
+#: src/trace.c:270
+msgid "_Class Construction"
+msgstr "Malkovich"
+
+#: src/trace.c:271
+msgid "trace class constructors"
+msgstr "Malkovich"
+
+#: src/trace.c:275
+msgid "_VIPS Operations"
+msgstr "Malkovich"
+
+#: src/trace.c:276
+msgid "trace calls to VIPS"
+msgstr "Malkovich"
+
+#: src/trace.c:352
+msgid "Trace"
+msgstr "Malkovich"
+
+#. Not found? Maybe - error message anyway.
+#.
+#: src/symbol.c:486 src/program.c:1437 src/program.c:1487 src/program.c:1508
+#: src/program.c:1516 src/path.c:278 src/path.c:305
+msgid "Not found."
+msgstr "Malkovich"
+
+#: src/symbol.c:487
+#, fuzzy, c-format
+msgid "Symbol %s is not defined."
+msgstr "Malkovich"
+
+#: src/symbol.c:491
+#, fuzzy, c-format
+msgid "%s is referred to by"
+msgstr "Malkovich"
+
+#: src/symbol.c:707
+#, fuzzy, c-format
+msgid "Redefinition of \"%s\"."
+msgstr "Malkovich"
+
+#: src/symbol.c:711
+#, fuzzy, c-format
+msgid "Previously defined at line %d."
+msgstr "Malkovich"
+
+#: src/symbol.c:734
+#, fuzzy, c-format
+msgid "Attempt to redefine root symbol \"%s\"."
+msgstr "Malkovich"
+
+#. Parameter, workspace, etc.
+#.
+#: src/symbol.c:759
+#, fuzzy, c-format
+msgid "Can't redefine %s \"%s\"."
+msgstr "Malkovich"
+
+#: parse.y:244 parse.y:255
+msgid "not top level"
+msgstr "Malkovich"
+
+#: parse.y:260
+msgid "not strings"
+msgstr "Malkovich"
+
+#: parse.y:318
+msgid "left-hand-side pattern contains no identifiers"
+msgstr ""
+
+#: parse.y:1064 src/program.c:1418
+msgid "Parse error."
+msgstr "Malkovich"
+
+#: parse.y:1067
+#, fuzzy, c-format
+msgid "Error in %s: %s"
+msgstr "Malkovich"
+
+#: parse.y:1070
+#, fuzzy, c-format
+msgid "Error: %s"
+msgstr "Malkovich"
+
+#: parse.y:1183
+msgid "definition is too long!"
+msgstr "Malkovich"
+
+#: parse.y:1607
+#, fuzzy
+msgid "no leading identifier"
+msgstr "Malkovich"
+
+#: parse.y:1613
+msgid "'=' missing"
+msgstr ""
+
+#: parse.y:1643
+msgid "identifier expected"
+msgstr ""
+
+#: parse.y:1653
+#, c-format
+msgid "'%s' does not exist"
+msgstr ""
+
+#: parse.y:1655
+#, c-format
+msgid "'%s' has no members"
+msgstr ""
+
+#: parse.y:1670
+msgid "'.' or '=' expected"
+msgstr ""
+
+#: src/editview.c:158
+msgid "Escape to cancel edit, press Return to accept edit and recalculate"
+msgstr "Malkovich"
+
+#: src/classmodel.c:155 src/classmodel.c:228
+#, fuzzy, c-format
+msgid "_%s() method not implemented for %s."
+msgstr "Malkovich"
+
+#: src/classmodel.c:163
+#, fuzzy, c-format
+msgid "Save %s \"%s\""
+msgstr "Malkovich"
+
+#: src/classmodel.c:237
+#, fuzzy, c-format
+msgid "Replace %s \"%s\""
+msgstr "Malkovich"
+
+#: src/classmodel.c:695
+msgid "Set boolean value here"
+msgstr "Malkovich"
+
+#: src/classmodel.c:701
+msgid "Enter a floating point number here"
+msgstr "Malkovich"
+
+#: src/classmodel.c:708
+msgid "Enter a string here"
+msgstr "Malkovich"
+
+#. Expands to "Edit Toggle A1".
+#.
+#: src/classmodel.c:762
+#, fuzzy, c-format
+msgid "Edit %s %s"
+msgstr "Malkovich"
+
+#: src/classmodel.c:773
+#, fuzzy, c-format
+msgid "Set %s"
+msgstr "Malkovich"
+
+#: src/classmodel.c:1086
+#, fuzzy
+msgid "Unknown option."
+msgstr "Malkovich"
+
+#: src/classmodel.c:1087
+#, fuzzy, c-format
+msgid "Option \"%s\" not known."
+msgstr "Malkovich"
+
+#: src/classmodel.c:1162
+#, fuzzy, c-format
+msgid "%d band value only"
 msgstr "Malkovich"
 
 #: src/heap.c:812
@@ -1184,119 +950,866 @@ msgstr "Malkovich"
 msgid "Unable to convert %s to a nip type."
 msgstr "Malkovich"
 
-#: src/iarrow.c:117
-msgid "No image"
+#: src/action.c:87
+msgid "Bad arguments."
 msgstr "Malkovich"
 
-#. Used in (eg.) "Mark at (10, 10) on [A1, A2]"
+#. Expands to eg. 'bad args to "+", called from "fred"'
 #.
-#. Expands to (eg.) "Region on A1 at (10, 10), size (50, 50)"
-#.
-#: src/iarrow.c:130 src/iregion.c:156
-msgid "on"
+#: src/action.c:102 src/action.c:186
+msgid "Called from"
 msgstr "Malkovich"
 
-#: src/iarrow.c:148 src/iarrow.c:153
+#: src/action.c:108
 #, fuzzy, c-format
-msgid "at %d"
+msgid ""
+"Error in binary \"%s\".\n"
+"left = %s\n"
+"right = %s\n"
+"%s"
 msgstr "Malkovich"
 
-#: src/iarrow.c:158
+#: src/action.c:142 src/class.c:190
 #, fuzzy, c-format
-msgid "at (%d, %d)"
+msgid "Member \"%s\" not found in class \"%s\"."
 msgstr "Malkovich"
 
-#: src/iarrow.c:165
+#: src/action.c:149
 #, fuzzy, c-format
-msgid "at (%d, %d), offset (%d, %d)"
+msgid "object = %s"
 msgstr "Malkovich"
 
-#: src/idialog.c:432
-msgid "Pin up"
-msgstr "Malkovich"
-
-#: src/idialog.c:434
-msgid "Check this to pin the dialog up"
-msgstr "Malkovich"
-
-#: src/iimage.c:115
-msgid "Original filename"
-msgstr "Malkovich"
-
-#: src/iimage.c:338
-msgid "Save timer."
-msgstr "Malkovich"
-
-#: src/iimage.c:339
+#: src/action.c:153
 #, fuzzy, c-format
-msgid "Image save took %g seconds."
+msgid "tag = %s"
 msgstr "Malkovich"
 
-#: src/imageinfo.c:679
+#: src/action.c:158
+#, fuzzy, c-format
+msgid "Reference attempted in \"%s\"."
+msgstr "Malkovich"
+
+#: src/action.c:162 src/class.c:189
+msgid "Member not found."
+msgstr "Malkovich"
+
+#: src/action.c:192
+#, fuzzy, c-format
+msgid ""
+"Error in unary \"%s\".\n"
+"argument = %s\n"
+"%s"
+msgstr "Malkovich"
+
+#: src/action.c:359 src/action.c:377 src/action.c:407
 #, fuzzy
-msgid "User cancelled operation"
+msgid "Bad right hand side of '.'."
 msgstr "Malkovich"
 
-#: src/imageinfo.c:979
-msgid "Unable to open image."
+#: src/action.c:369
+msgid "Symbol on left hand side of '.' is not scope"
 msgstr "Malkovich"
 
-#: src/imageinfo.c:980
+#: src/action.c:411
+#, fuzzy
+msgid "Property not found."
+msgstr "Malkovich"
+
+#: src/action.c:425
+msgid "Bad left hand side of '.'."
+msgstr "Malkovich"
+
+#: src/action.c:937
+msgid "Division by zero."
+msgstr "Malkovich"
+
+#: src/action.c:1313 src/action.c:1593
+msgid "Unimplemented."
+msgstr "Malkovich"
+
+#: src/action.c:1677 src/action.c:1713 src/action.c:1971
+msgid "invoking method:"
+msgstr "Malkovich"
+
+#. Create signals.
+#.
+#. Init methods.
+#.
+#: src/paintboxview.c:109
+msgid "Paintbox bar menu"
+msgstr "Malkovich"
+
+#: src/paintboxview.c:202
+msgid "Clear undo history?"
+msgstr "Malkovich"
+
+#: src/paintboxview.c:203
+msgid ""
+"Are you sure you want to clear all undo and redo? This will free up memory, "
+"but you will no longer be able to undo or redo any of the painting you have "
+"done so far."
+msgstr "Malkovich"
+
+#: src/paintboxview.c:238
+msgid "1 round"
+msgstr "Malkovich"
+
+#. PAINTBOX_1ROUND
+#: src/paintboxview.c:239
+msgid "2 round"
+msgstr "Malkovich"
+
+#. PAINTBOX_2ROUND
+#: src/paintboxview.c:240
+msgid "3 round"
+msgstr "Malkovich"
+
+#. PAINTBOX_3ROUND
+#: src/paintboxview.c:241
+msgid "4 round"
+msgstr "Malkovich"
+
+#. PAINTBOX_4ROUND
+#: src/paintboxview.c:242
+msgid "5 round"
+msgstr "Malkovich"
+
+#. PAINTBOX_5ROUND
+#: src/paintboxview.c:243
+msgid "6 round"
+msgstr "Malkovich"
+
+#. PAINTBOX_6ROUND
+#: src/paintboxview.c:244
+msgid "10 round"
+msgstr "Malkovich"
+
+#. PAINTBOX_10ROUND
+#: src/paintboxview.c:245
+msgid "2 italic"
+msgstr "Malkovich"
+
+#. PAINTBOX_2ITALIC
+#: src/paintboxview.c:246
+msgid "3 italic"
+msgstr "Malkovich"
+
+#. PAINTBOX_3ITALIC
+#: src/paintboxview.c:247
+msgid "4 italic"
+msgstr "Malkovich"
+
+#. PAINTBOX_4ITALIC
+#: src/paintboxview.c:248
+msgid "5 italic"
+msgstr "Malkovich"
+
+#. PAINTBOX_5ITALIC
+#: src/paintboxview.c:249
+msgid "6 italic"
+msgstr "Malkovich"
+
+#. PAINTBOX_6ITALIC
+#: src/paintboxview.c:250
+msgid "10 italic"
+msgstr "Malkovich"
+
+#: src/paintboxview.c:254
+msgid "Manipulate regions"
+msgstr "Malkovich"
+
+#. IMAGEMODEL_SELECT
+#: src/paintboxview.c:255
+msgid "Pan window"
+msgstr "Malkovich"
+
+#. IMAGEMODEL_PAN
+#: src/paintboxview.c:256
+msgid "Zoom in on mouse"
+msgstr "Malkovich"
+
+#. IMAGEMODEL_MAGIN
+#: src/paintboxview.c:257 src/imageview.c:515 src/imageview.c:579
+msgid "Zoom out"
+msgstr "Malkovich"
+
+#. IMAGEMODEL_MAGOUT
+#: src/paintboxview.c:258
+msgid "Read pixel into inkwell"
+msgstr "Malkovich"
+
+#. IMAGEMODEL_DROPPER
+#: src/paintboxview.c:259
+msgid "Freehand draw "
+msgstr "Malkovich"
+
+#. IMAGEMODEL_PEN
+#: src/paintboxview.c:260
+msgid "Draw straight lines"
+msgstr "Malkovich"
+
+#. IMAGEMODEL_LINE
+#: src/paintboxview.c:261
+msgid "Fill rectangles"
+msgstr "Malkovich"
+
+#. IMAGEMODEL_RECT
+#: src/paintboxview.c:262
+msgid "Flood while pixel not equal to ink"
+msgstr "Malkovich"
+
+#. IMAGEMODEL_FLOOD
+#: src/paintboxview.c:264
+msgid "Flood while pixel equal to click"
+msgstr "Malkovich"
+
+#. IMAGEMODEL_BLOB
+#: src/paintboxview.c:266
+msgid "Draw text"
+msgstr "Malkovich"
+
+#. IMAGEMODEL_TEXT
+#: src/paintboxview.c:267 src/main.c:682
+msgid "Smudge"
+msgstr "Malkovich"
+
+#: src/paintboxview.c:317
+msgid "Undo last paint action"
+msgstr "Malkovich"
+
+#: src/paintboxview.c:326
+msgid "Redo last paint action"
+msgstr "Malkovich"
+
+#: src/paintboxview.c:335
+msgid "Clear all undo and redo buffers"
+msgstr "Malkovich"
+
+#: src/paintboxview.c:355
+msgid "Nib"
+msgstr "Malkovich"
+
+#: src/paintboxview.c:376
+msgid "Enter text for text tool"
+msgstr "Malkovich"
+
+#: src/clock.c:59 src/clock.c:93 src/clock.c:190
+msgid "Interval"
+msgstr "Malkovich"
+
+#: src/clock.c:60 src/clock.c:96
+msgid "Elapsed time"
+msgstr "Malkovich"
+
+#: src/clock.c:93
+msgid "Interval between ticks (seconds)"
+msgstr "Malkovich"
+
+#: src/clock.c:96
+msgid "Elapsed time (seconds)"
+msgstr "Malkovich"
+
+#: src/clock.c:100
 #, fuzzy, c-format
-msgid "Unable to open file \"%s\" as image."
+msgid "Edit Clock \"%s\""
 msgstr "Malkovich"
 
-#: src/imageinfo.c:1110 src/imageinfo.c:1118
-msgid "Unable to write to file."
+#: src/clock.c:104
+msgid "Set Clock"
 msgstr "Malkovich"
 
-#: src/imageinfo.c:1111
+#: src/workspacedefs.c:97
 #, fuzzy, c-format
-msgid "File \"%s\" is already open for read."
+msgid "%d definition"
+msgid_plural "%d definitions"
+msgstr[0] "Malkovich"
+msgstr[1] "Malkovich"
+
+#: src/workspacedefs.c:103
+#, fuzzy
+msgid "errors"
 msgstr "Malkovich"
 
-#: src/imageinfo.c:1119
+#: src/workspacedefs.c:108 src/program.c:263
+msgid "modified"
+msgstr "Malkovich"
+
+#: src/workspacedefs.c:181
+#, fuzzy
+msgid "Replace Definition From File"
+msgstr "Malkovich"
+
+#: src/workspacedefs.c:261
+#, fuzzy
+msgid "Workspace definitions"
+msgstr "Malkovich"
+
+#: src/workspacedefs.c:262 src/rowview.c:593
+msgid "Replace From _File"
+msgstr "Malkovich"
+
+#: src/workspacedefs.c:282
+#, fuzzy
+msgid "Process"
+msgstr "Malkovich"
+
+#: lex.l:91 lex.l:101
+msgid "line too long"
+msgstr "Malkovich"
+
+#: lex.l:109
+msgid "end of line inside string"
+msgstr "Malkovich"
+
+#: lex.l:111
+msgid "no end of string"
+msgstr "Malkovich"
+
+#: lex.l:132 lex.l:142 lex.l:150
+msgid "bad char constant"
+msgstr "Malkovich"
+
+#: lex.l:175
+msgid "nested comment!"
+msgstr "Malkovich"
+
+#: lex.l:181
+msgid "no end of comment!"
+msgstr "Malkovich"
+
+#: lex.l:311
 #, fuzzy, c-format
-msgid "Error writing image to file \"%s\"."
+msgid "bad number %s"
 msgstr "Malkovich"
 
-#: src/imageinfo.c:1176
-msgid "Unable to paint on image."
+#: lex.l:364
+#, fuzzy, c-format
+msgid "illegal character \"%c\""
 msgstr "Malkovich"
 
-#: src/imageinfo.c:1177
+#: src/formula.c:143
+msgid ""
+"Press Escape to cancel edit, press Return to accept edit and recalculate"
+msgstr "Malkovich"
+
+#: src/toolkitbrowser.c:241
+msgid "Search:"
+msgstr "Malkovich"
+
+#: src/toolkitbrowser.c:266
+msgid "Action"
+msgstr "Malkovich"
+
+#: src/toolkitbrowser.c:274
+msgid "Parameters"
+msgstr "Malkovich"
+
+#: src/toolkitbrowser.c:282
+msgid "Menu Item"
+msgstr "Malkovich"
+
+#: src/main.c:112
+msgid "evaluate and print EXPRESSION"
+msgstr "Malkovich"
+
+#: src/main.c:115
+msgid "load FILE as a set of definitions"
+msgstr "Malkovich"
+
+#: src/main.c:118
+msgid "write value of 'main' to FILE"
+msgstr "Malkovich"
+
+#: src/main.c:120
+msgid "run in batch mode"
+msgstr "Malkovich"
+
+#: src/main.c:122
+#, fuzzy
+msgid "set values"
+msgstr "Malkovich"
+
+#: src/main.c:124
+msgid "verbose error output"
+msgstr ""
+
+#: src/main.c:127
+msgid "don't load menu definitions"
+msgstr "Malkovich"
+
+#: src/main.c:129
+#, fuzzy
+msgid "don't try to load command-line arguments"
+msgstr "Malkovich"
+
+#: src/main.c:131
+msgid "load stdin as a workspace"
+msgstr "Malkovich"
+
+#: src/main.c:133
+msgid "load stdin as a set of definitions"
+msgstr "Malkovich"
+
+#: src/main.c:135
+msgid "print value of 'main' to stdout"
+msgstr "Malkovich"
+
+#: src/main.c:138
+msgid "start up and shut down"
+msgstr "Malkovich"
+
+#: src/main.c:141
+msgid "time image save operations"
+msgstr "Malkovich"
+
+#: src/main.c:144
+msgid "start as if installed to PREFIX"
+msgstr ""
+
+#: src/main.c:146
+msgid "output strings for internationalisation"
+msgstr "Malkovich"
+
+#: src/main.c:149
+msgid "print version number"
+msgstr "Malkovich"
+
+#: src/main.c:152
+msgid "test for errors and quit"
+msgstr ""
+
+#: src/main.c:231
+#, fuzzy, c-format
+msgid "error calculating \"%s\""
+msgstr "Malkovich"
+
+#: src/main.c:239
+#, fuzzy, c-format
+msgid "error saving \"%s\""
+msgstr "Malkovich"
+
+#: src/main.c:293
+#, fuzzy
+msgid "no \"main\" found"
+msgstr "Malkovich"
+
+#: src/main.c:455
+msgid "Unknown file type."
+msgstr "Malkovich"
+
+#: src/main.c:456
+#, fuzzy, c-format
+msgid "Unable to load \"%s\"."
+msgstr "Malkovich"
+
+#: src/main.c:467
+msgid "Unable to load."
+msgstr "Malkovich"
+
+#: src/main.c:468
+#, fuzzy, c-format
+msgid "Error loading plug-in \"%s\"."
+msgstr "Malkovich"
+
+#: src/main.c:676
+msgid "Next _Error"
+msgstr "Malkovich"
+
+#: src/main.c:677
+msgid "Ink dropper"
+msgstr "Malkovich"
+
+#: src/main.c:678
+msgid "D_uplicate"
+msgstr "Malkovich"
+
+#: src/main.c:679
+msgid "Pen"
+msgstr "Malkovich"
+
+#: src/main.c:680 src/plot.c:94
+msgid "Line"
+msgstr "Malkovich"
+
+#: src/main.c:681 src/matrix.c:147
+msgid "Text"
+msgstr "Malkovich"
+
+#: src/main.c:683
+msgid "Flood"
+msgstr "Malkovich"
+
+#: src/main.c:684
+msgid "Flood Blob"
+msgstr "Malkovich"
+
+#: src/main.c:685
+msgid "Fill Rectangle"
+msgstr "Malkovich"
+
+#: src/main.c:686
+msgid "Pan"
+msgstr "Malkovich"
+
+#: src/main.c:687
+msgid "Select"
+msgstr "Malkovich"
+
+#. And the LEDs we use.
+#.
+#: src/main.c:691
+msgid "Red LED"
+msgstr "Malkovich"
+
+#: src/main.c:692
+msgid "Green LED"
+msgstr "Malkovich"
+
+#: src/main.c:693
+msgid "Blue LED"
+msgstr "Malkovich"
+
+#: src/main.c:694
+msgid "Yellow LED"
+msgstr "Malkovich"
+
+#: src/main.c:695
+msgid "Cyan LED"
+msgstr "Malkovich"
+
+#: src/main.c:696
+msgid "Off LED"
+msgstr "Malkovich"
+
+#: src/main.c:883
+msgid "Empty temp area"
+msgstr "Malkovich"
+
+#: src/main.c:884
+msgid "Many files in temp area."
+msgstr "Malkovich"
+
+#: src/main.c:885
 #, fuzzy, c-format
 msgid ""
-"Unable to get write permission for file \"%s\".\n"
-"Check permission settings."
+"The temp area \"%s\" contains %s of files. Would you like to empty the temp "
+"area? This will delete any workspace backups and cannot be undone."
 msgstr "Malkovich"
 
-#: src/imageinfo.c:1220
-msgid "Modify"
+#: src/main.c:901
+#, fuzzy, c-format
+msgid "unable to make %s %s: %s"
 msgstr "Malkovich"
 
-#: src/imageinfo.c:1221
-msgid "Modify disc file?"
+#: src/main.c:1079
+msgid "- image processing spreadsheet"
 msgstr "Malkovich"
 
-#: src/imageinfo.c:1222
+#: src/main.c:1111
+#, fuzzy, c-format
+msgid "linked to vips-%s"
+msgstr "Malkovich"
+
+#. -1 means can't-be-set, at least on os x, so don't
+#. * warn.
+#.
+#: src/main.c:1171
 #, fuzzy, c-format
 msgid ""
-"This image is being shown directly from the disc file:\n"
-"\n"
-"   %s\n"
-"\n"
-"If you paint on this file, it will be permanently changed. If something goes "
-"wrong, you may lose work. Are you sure you want to modify this file?"
+"unable to change max file descriptors\n"
+"max file descriptors still set to %d"
 msgstr "Malkovich"
 
-#: src/imageinfo.c:1926
-msgid "Unable to paint text."
+#: src/main.c:1177
+msgid "unable to read max file descriptors"
 msgstr "Malkovich"
 
-#: src/imageinfo.c:1927
+#: src/main.c:1401 src/main.c:1454
 #, fuzzy, c-format
-msgid "Unable to paint text \"%s\" in font \"%s\"."
+msgid ""
+"Startup error log:\n"
+"%s"
+msgstr "Malkovich"
+
+#: src/main.c:1453
+msgid "Startup error."
+msgstr "Malkovich"
+
+#: src/main.c:1464
+#, fuzzy, c-format
+msgid "Welcome to %s-%s!"
+msgstr "Malkovich"
+
+#: src/main.c:1469
+#, fuzzy, c-format
+msgid ""
+"A new directory has been created in your home directory to hold startup, "
+"data and temporary files:\n"
+"\n"
+"     %s\n"
+"\n"
+"If you've used previous versions of %s, you will probably want to move any "
+"files over from your old work area and remove any old temps."
+msgstr "Malkovich"
+
+#: src/conversion.c:464
+msgid "not uncoded"
+msgstr "Malkovich"
+
+#: src/conversion.c:1400
+#, fuzzy, c-format
+msgid "Header for \"%s\""
+msgstr "Malkovich"
+
+#: src/conversion.c:1402
+msgid "OK"
+msgstr "Malkovich"
+
+#: src/reduce.c:115
+msgid "Typecheck error."
+msgstr "Malkovich"
+
+#: src/reduce.c:117
+#, fuzzy, c-format
+msgid "%s expected %s, instead saw:"
+msgstr "Malkovich"
+
+#: src/reduce.c:129
+#, fuzzy, c-format
+msgid "%s too long."
+msgstr "Malkovich"
+
+#: src/reduce.c:512 src/reduce.c:571
+msgid "Not rectangular."
+msgstr "Malkovich"
+
+#: src/reduce.c:513 src/reduce.c:572
+#, fuzzy, c-format
+msgid ""
+"Matrix of real is not rectangular. Found row of length %d, should be %d."
+msgstr "Malkovich"
+
+#: src/reduce.c:824
+msgid "List length"
+msgstr "Malkovich"
+
+#: src/reduce.c:873
+#, fuzzy, c-format
+msgid "List index must be positive, not %d"
+msgstr "Malkovich"
+
+#: src/reduce.c:881
+msgid "List index"
+msgstr "Malkovich"
+
+#: src/reduce.c:886
+#, fuzzy, c-format
+msgid "List only has %d elements, unable to get element %d."
+msgstr "Malkovich"
+
+#: src/reduce.c:929
+msgid "No arguments allowed."
+msgstr "Malkovich"
+
+#: src/reduce.c:930
+#, fuzzy, c-format
+msgid "Object \"%s\" should have no arguments."
+msgstr "Malkovich"
+
+#: src/reduce.c:1031
+msgid "C stack overflow. Expression too complex."
+msgstr "Malkovich"
+
+#: src/reduce.c:1047
+#, fuzzy
+msgid "Cancelled."
+msgstr "Malkovich"
+
+#: src/reduce.c:1048
+msgid "Evaluation cancelled."
+msgstr ""
+
+#: src/reduce.c:1133
+msgid "No value."
+msgstr "Malkovich"
+
+#: src/reduce.c:1134
+#, fuzzy, c-format
+msgid "Symbol \"%s\" has no value."
+msgstr "Malkovich"
+
+#: src/reduce.c:1606 src/reduce.c:1611 src/reduce.c:1617
+msgid "List generator"
+msgstr "Malkovich"
+
+#: src/builtin.c:257
+msgid "Out of range."
+msgstr "Malkovich"
+
+#: src/builtin.c:258
+msgid "gammq arguments must be a > 0, x >= 0."
+msgstr "Malkovich"
+
+#: src/builtin.c:265
+msgid "Not available."
+msgstr "Malkovich"
+
+#: src/builtin.c:266
+msgid "No GSL library available for gammq."
+msgstr "Malkovich"
+
+#: src/builtin.c:411
+msgid "Complex math ops not implemented."
+msgstr "Malkovich"
+
+#: src/builtin.c:486
+msgid "Macro error."
+msgstr "Malkovich"
+
+#: src/builtin.c:669
+#, fuzzy
+msgid "No such type"
+msgstr "Malkovich"
+
+#: src/builtin.c:670
+#, fuzzy, c-format
+msgid "GType %u not found."
+msgstr "Malkovich"
+
+#: src/builtin.c:887
+msgid "GSL library error."
+msgstr "Malkovich"
+
+#: src/builtin.c:936
+#, fuzzy, c-format
+msgid "Builtin \"%s\" takes %d argument."
+msgid_plural "Builtin \"%s\" takes %d arguments."
+msgstr[0] "Malkovich"
+msgstr[1] "Malkovich"
+
+#: src/builtin.c:991
+#, fuzzy, c-format
+msgid ""
+"Argument %d to builtin \"%s\" should be \"%s\", you passed:\n"
+"  %s"
+msgstr "Malkovich"
+
+#: src/conversionview.c:66
+msgid "Unable to find image range."
+msgstr "Malkovich"
+
+#: src/conversionview.c:67
+msgid "Find image range failed."
+msgstr "Malkovich"
+
+#: src/conversionview.c:90
+msgid "Unable to scale image."
+msgstr "Malkovich"
+
+#: src/conversionview.c:91
+msgid "Maximum and minimum pixel values are equal."
+msgstr "Malkovich"
+
+#. Build menu. One for each window, as we need to track falsecolour
+#. * etc. toggles. Could just have one, and modify pre-popup, but this
+#. * is easier.
+#.
+#: src/conversionview.c:229
+msgid "Convert menu"
+msgstr "Malkovich"
+
+#: src/conversionview.c:230
+msgid "_Scale"
+msgstr "Malkovich"
+
+#: src/conversionview.c:232
+msgid "_False Color"
+msgstr "Malkovich"
+
+#: src/conversionview.c:234
+msgid "_Interpret"
+msgstr "Malkovich"
+
+#: src/conversionview.c:236 src/regionview.c:1000
+msgid "_Reset"
+msgstr "Malkovich"
+
+#: src/conversionview.c:238
+msgid "Set As Workspace _Default"
+msgstr "Malkovich"
+
+#: src/progress.c:105
+#, fuzzy
+msgid "Cancelling"
+msgstr "Malkovich"
+
+#: src/progress.c:136
+#, fuzzy, c-format
+msgid "%d minute left"
+msgid_plural "%d minutes left"
+msgstr[0] "Malkovich"
+msgstr[1] "Malkovich"
+
+#: src/progress.c:141
+#, fuzzy, c-format
+msgid "%d second left"
+msgid_plural "%d seconds left"
+msgstr[0] "Malkovich"
+msgstr[1] "Malkovich"
+
+#: src/progress.c:156
+msgid "Calculating"
+msgstr "Malkovich"
+
+#: src/progress.c:175
+#, fuzzy
+msgid "Loading"
+msgstr "Malkovich"
+
+#: src/expr.c:64
+#, fuzzy, c-format
+msgid "error in \"%s\""
+msgstr "Malkovich"
+
+#: src/expr.c:326
+msgid "Error"
+msgstr "Malkovich"
+
+#: src/expr.c:585
+msgid "top level"
+msgstr "Malkovich"
+
+#: src/expr.c:590
+msgid "class"
+msgstr "Malkovich"
+
+#: src/expr.c:593
+msgid "instance"
+msgstr "Malkovich"
+
+#: src/expr.c:597
+msgid "definition"
+msgstr "Malkovich"
+
+#: src/expr.c:604
+#, fuzzy, c-format
+msgid "parameter \"%s\""
+msgstr "Malkovich"
+
+#: src/expr.c:608
+msgid "member"
+msgstr "Malkovich"
+
+#: src/expr.c:613 src/dump.c:186
+msgid "value"
+msgstr "Malkovich"
+
+#: src/expr.c:617 src/itext.c:446
+msgid "function"
+msgstr "Malkovich"
+
+#: src/expr.c:626
+msgid "of"
 msgstr "Malkovich"
 
 #: src/imagemodel.c:505
@@ -1305,22 +1818,6 @@ msgstr "Malkovich"
 
 #: src/imagemodel.c:506
 msgid "Enter some text to paint in the entry widget at the top of the window."
-msgstr "Malkovich"
-
-#. Need one menu per image window (could have a single menu for all
-#. * windows, but then we'd have to set the state of the toggle buttons
-#. * before mapping)
-#.
-#: src/imagepresent.c:1548
-msgid "Ruler menu"
-msgstr "Malkovich"
-
-#: src/imagepresent.c:1549
-msgid "Rulers In _mm"
-msgstr "Malkovich"
-
-#: src/imagepresent.c:1551
-msgid "Show _Offset"
 msgstr "Malkovich"
 
 #: src/imageview.c:459
@@ -1379,7 +1876,7 @@ msgstr "Malkovich"
 msgid "Save image to file"
 msgstr "Malkovich"
 
-#: src/imageview.c:494 src/mainw.c:851
+#: src/imageview.c:494 src/mainw.c:853
 msgid "Recalculate"
 msgstr "Malkovich"
 
@@ -1387,7 +1884,7 @@ msgstr "Malkovich"
 msgid "Recalculate image"
 msgstr "Malkovich"
 
-#: src/imageview.c:500 src/plotwindow.c:176 src/program.c:1696
+#: src/imageview.c:500 src/program.c:1696 src/plotwindow.c:176
 msgid "Close"
 msgstr "Malkovich"
 
@@ -1409,11 +1906,6 @@ msgstr "Malkovich"
 
 #: src/imageview.c:514 src/imageview.c:578
 msgid "Zoom _Out"
-msgstr "Malkovich"
-
-#. IMAGEMODEL_MAGIN
-#: src/imageview.c:515 src/imageview.c:579 src/paintboxview.c:257
-msgid "Zoom out"
 msgstr "Malkovich"
 
 #: src/imageview.c:519
@@ -1548,354 +2040,18 @@ msgstr "Malkovich"
 msgid "Zoom to 1600%"
 msgstr "Malkovich"
 
-#: src/iregion.c:166
+#: src/colour.c:261
 #, fuzzy, c-format
-msgid "at (%d, %d), size (%d, %d)"
+msgid "Edit Color \"%s\""
 msgstr "Malkovich"
 
-#: src/iregion.c:181 src/iregion.c:223
-msgid "Left"
+#: src/colour.c:267
+msgid "Set Color"
 msgstr "Malkovich"
 
-#: src/iregion.c:182 src/iregion.c:226
-msgid "Top"
-msgstr "Malkovich"
-
-#: src/iregion.c:183 src/iregion.c:229
-msgid "Width"
-msgstr "Malkovich"
-
-#: src/iregion.c:184 src/iregion.c:232
-msgid "Height"
-msgstr "Malkovich"
-
-#: src/iregion.c:223
-msgid "Left edge of region"
-msgstr "Malkovich"
-
-#: src/iregion.c:226
-msgid "Top edge of region"
-msgstr "Malkovich"
-
-#: src/iregion.c:229
-msgid "Width of region"
-msgstr "Malkovich"
-
-#: src/iregion.c:232
-msgid "Height of region"
-msgstr "Malkovich"
-
-#: src/iregion.c:237
-#, fuzzy, c-format
-msgid "Edit \"%s\""
-msgstr "Malkovich"
-
-#: src/iregion.c:241
-msgid "Set Region"
-msgstr "Malkovich"
-
-#: src/itext.c:67
-msgid "Formula"
-msgstr "Malkovich"
-
-#: src/itext.c:184 src/itext.c:325
-msgid "no value"
-msgstr "Malkovich"
-
-#: src/itext.c:503 src/itext.c:536
-msgid "Dirty value"
-msgstr "Malkovich"
-
-#: lex.l:91 lex.l:101
-msgid "line too long"
-msgstr "Malkovich"
-
-#: lex.l:109
-msgid "end of line inside string"
-msgstr "Malkovich"
-
-#: lex.l:111
-msgid "no end of string"
-msgstr "Malkovich"
-
-#: lex.l:132 lex.l:142 lex.l:150
-msgid "bad char constant"
-msgstr "Malkovich"
-
-#: lex.l:175
-msgid "nested comment!"
-msgstr "Malkovich"
-
-#: lex.l:181
-msgid "no end of comment!"
-msgstr "Malkovich"
-
-#: lex.l:311
-#, fuzzy, c-format
-msgid "bad number %s"
-msgstr "Malkovich"
-
-#: lex.l:364
-#, fuzzy, c-format
-msgid "illegal character \"%c\""
-msgstr "Malkovich"
-
-#: src/link.c:578
-msgid "Circular dependency."
-msgstr "Malkovich"
-
-#: src/link.c:579
-#, fuzzy, c-format
-msgid "Circular dependency detected near symbol \"%s\"."
-msgstr "Malkovich"
-
-#: src/main.c:112
-msgid "evaluate and print EXPRESSION"
-msgstr "Malkovich"
-
-#: src/main.c:115
-msgid "load FILE as a set of definitions"
-msgstr "Malkovich"
-
-#: src/main.c:118
-msgid "write value of 'main' to FILE"
-msgstr "Malkovich"
-
-#: src/main.c:120
-msgid "run in batch mode"
-msgstr "Malkovich"
-
-#: src/main.c:122
+#: src/colour.c:299
 #, fuzzy
-msgid "set values"
-msgstr "Malkovich"
-
-#: src/main.c:124
-msgid "verbose error output"
-msgstr ""
-
-#: src/main.c:127
-msgid "don't load menu definitions"
-msgstr "Malkovich"
-
-#: src/main.c:129
-#, fuzzy
-msgid "don't try to load command-line arguments"
-msgstr "Malkovich"
-
-#: src/main.c:131
-msgid "load stdin as a workspace"
-msgstr "Malkovich"
-
-#: src/main.c:133
-msgid "load stdin as a set of definitions"
-msgstr "Malkovich"
-
-#: src/main.c:135
-msgid "print value of 'main' to stdout"
-msgstr "Malkovich"
-
-#: src/main.c:138
-msgid "start up and shut down"
-msgstr "Malkovich"
-
-#: src/main.c:141
-msgid "time image save operations"
-msgstr "Malkovich"
-
-#: src/main.c:144
-msgid "start as if installed to PREFIX"
-msgstr ""
-
-#: src/main.c:146
-msgid "output strings for internationalisation"
-msgstr "Malkovich"
-
-#: src/main.c:149
-msgid "print version number"
-msgstr "Malkovich"
-
-#: src/main.c:152
-msgid "test for errors and quit"
-msgstr ""
-
-#: src/main.c:231
-#, fuzzy, c-format
-msgid "error calculating \"%s\""
-msgstr "Malkovich"
-
-#: src/main.c:239
-#, fuzzy, c-format
-msgid "error saving \"%s\""
-msgstr "Malkovich"
-
-#: src/main.c:293
-#, fuzzy
-msgid "no \"main\" found"
-msgstr "Malkovich"
-
-#: src/main.c:455
-msgid "Unknown file type."
-msgstr "Malkovich"
-
-#: src/main.c:456
-#, fuzzy, c-format
-msgid "Unable to load \"%s\"."
-msgstr "Malkovich"
-
-#: src/main.c:467
-msgid "Unable to load."
-msgstr "Malkovich"
-
-#: src/main.c:468
-#, fuzzy, c-format
-msgid "Error loading plug-in \"%s\"."
-msgstr "Malkovich"
-
-#: src/main.c:676
-msgid "Next _Error"
-msgstr "Malkovich"
-
-#: src/main.c:677
-msgid "Ink dropper"
-msgstr "Malkovich"
-
-#: src/main.c:678
-msgid "D_uplicate"
-msgstr "Malkovich"
-
-#: src/main.c:679
-msgid "Pen"
-msgstr "Malkovich"
-
-#: src/main.c:680 src/plot.c:94
-msgid "Line"
-msgstr "Malkovich"
-
-#: src/main.c:681 src/matrix.c:147
-msgid "Text"
-msgstr "Malkovich"
-
-#. IMAGEMODEL_TEXT
-#: src/main.c:682 src/paintboxview.c:267
-msgid "Smudge"
-msgstr "Malkovich"
-
-#: src/main.c:683
-msgid "Flood"
-msgstr "Malkovich"
-
-#: src/main.c:684
-msgid "Flood Blob"
-msgstr "Malkovich"
-
-#: src/main.c:685
-msgid "Fill Rectangle"
-msgstr "Malkovich"
-
-#: src/main.c:686
-msgid "Pan"
-msgstr "Malkovich"
-
-#: src/main.c:687
-msgid "Select"
-msgstr "Malkovich"
-
-#. And the LEDs we use.
-#.
-#: src/main.c:691
-msgid "Red LED"
-msgstr "Malkovich"
-
-#: src/main.c:692
-msgid "Green LED"
-msgstr "Malkovich"
-
-#: src/main.c:693
-msgid "Blue LED"
-msgstr "Malkovich"
-
-#: src/main.c:694
-msgid "Yellow LED"
-msgstr "Malkovich"
-
-#: src/main.c:695
-msgid "Cyan LED"
-msgstr "Malkovich"
-
-#: src/main.c:696
-msgid "Off LED"
-msgstr "Malkovich"
-
-#: src/main.c:883
-msgid "Empty temp area"
-msgstr "Malkovich"
-
-#: src/main.c:884
-msgid "Many files in temp area."
-msgstr "Malkovich"
-
-#: src/main.c:885
-#, fuzzy, c-format
-msgid ""
-"The temp area \"%s\" contains %s of files. Would you like to empty the temp "
-"area? This will delete any workspace backups and cannot be undone."
-msgstr "Malkovich"
-
-#: src/main.c:901
-#, fuzzy, c-format
-msgid "unable to make %s %s: %s"
-msgstr "Malkovich"
-
-#: src/main.c:1079
-msgid "- image processing spreadsheet"
-msgstr "Malkovich"
-
-#: src/main.c:1111
-#, fuzzy, c-format
-msgid "linked to vips-%s"
-msgstr "Malkovich"
-
-#. -1 means can't-be-set, at least on os x, so don't
-#. * warn.
-#.
-#: src/main.c:1171
-#, fuzzy, c-format
-msgid ""
-"unable to change max file descriptors\n"
-"max file descriptors still set to %d"
-msgstr "Malkovich"
-
-#: src/main.c:1177
-msgid "unable to read max file descriptors"
-msgstr "Malkovich"
-
-#: src/main.c:1401 src/main.c:1454
-#, fuzzy, c-format
-msgid ""
-"Startup error log:\n"
-"%s"
-msgstr "Malkovich"
-
-#: src/main.c:1453
-msgid "Startup error."
-msgstr "Malkovich"
-
-#: src/main.c:1464
-#, fuzzy, c-format
-msgid "Welcome to %s-%s!"
-msgstr "Malkovich"
-
-#: src/main.c:1469
-#, fuzzy, c-format
-msgid ""
-"A new directory has been created in your home directory to hold startup, "
-"data and temporary files:\n"
-"\n"
-"     %s\n"
-"\n"
-"If you've used previous versions of %s, you will probably want to move any "
-"files over from your old work area and remove any old temps."
+msgid "Color Space"
 msgstr "Malkovich"
 
 #: src/mainw.c:170
@@ -1909,877 +2065,485 @@ msgid ""
 "have been loaded for this window."
 msgstr "Malkovich"
 
-#: src/mainw.c:339
+#: src/mainw.c:341
 msgid "No temp area"
 msgstr "Malkovich"
 
-#: src/mainw.c:345
+#: src/mainw.c:347
 #, fuzzy, c-format
 msgid "%s free"
 msgstr "Malkovich"
 
-#: src/mainw.c:358
+#: src/mainw.c:360
 #, fuzzy, c-format
 msgid "%d cells free"
 msgstr "Malkovich"
 
 #. Display select message instead.
 #.
-#: src/mainw.c:373
+#: src/mainw.c:375
 msgid "Selected:"
 msgstr "Malkovich"
 
-#: src/mainw.c:403
+#: src/mainw.c:405
 msgid "compatibility mode"
 msgstr "Malkovich"
 
-#: src/mainw.c:412
+#: src/mainw.c:414
 #, fuzzy
 msgid "unsaved workspace"
 msgstr "Malkovich"
 
-#: src/mainw.c:429
+#: src/mainw.c:431
 #, c-format
 msgid "%s: &#0169;2009 Imperial College, London"
 msgstr ""
 
 #. Expands to (eg.) "14GB free in /pics/tmp"
-#: src/mainw.c:595
+#: src/mainw.c:597
 #, fuzzy, c-format
 msgid " in \"%s\""
 msgstr "Malkovich"
 
-#: src/mainw.c:599
+#: src/mainw.c:601
 #, fuzzy, c-format
 msgid "%d cells in heap, %d cells free, %d cells maximum"
 msgstr "Malkovich"
 
-#: src/mainw.c:603
+#: src/mainw.c:605
 #, fuzzy, c-format
 msgid "%d objects in workspace"
 msgstr "Malkovich"
 
-#: src/mainw.c:607
+#: src/mainw.c:609
 #, fuzzy, c-format
 msgid "%d vips calls cached"
 msgstr "Malkovich"
 
-#: src/mainw.c:739
+#: src/mainw.c:741
 msgid "Find in workspace not implemented yet."
 msgstr "Malkovich"
 
-#: src/mainw.c:747
+#: src/mainw.c:749
 msgid "Find again in workspace not implemented yet."
 msgstr "Malkovich"
 
-#: src/mainw.c:782
+#: src/mainw.c:784
 msgid "No errors."
 msgstr "Malkovich"
 
-#: src/mainw.c:783
+#: src/mainw.c:785
 msgid "There are no errors (that I can see) in this workspace."
 msgstr "Malkovich"
 
-#: src/mainw.c:852
+#: src/mainw.c:854
 msgid "Completely recalculate?"
 msgstr "Malkovich"
 
-#: src/mainw.c:993
+#: src/mainw.c:994 src/model.c:130 src/filemodel.c:452 src/filemodel.c:461
+#: src/filemodel.c:474
+msgid "Load failed."
+msgstr "Malkovich"
+
+#: src/mainw.c:995
 #, fuzzy, c-format
 msgid ""
 "Unable to execute:\n"
 "   %s"
 msgstr "Malkovich"
 
-#: src/mainw.c:1009 src/mainw.c:1042
+#: src/mainw.c:1012 src/mainw.c:1045
 msgid "Open File"
 msgstr "Malkovich"
 
-#: src/mainw.c:1156
+#: src/mainw.c:1159
 msgid "Recent Images"
 msgstr "Malkovich"
 
-#: src/mainw.c:1164
+#: src/mainw.c:1167
 msgid "Recent Workspaces"
 msgstr "Malkovich"
 
-#: src/mainw.c:1172
+#: src/mainw.c:1175
 msgid "Recent Matricies"
 msgstr "Malkovich"
 
-#: src/mainw.c:1181
+#: src/mainw.c:1184
 msgid "No recent items"
 msgstr "Malkovich"
 
-#: src/mainw.c:1187
+#: src/mainw.c:1190
 msgid "Clear Recent Menu"
 msgstr "Malkovich"
 
-#: src/mainw.c:1247
+#: src/mainw.c:1250
 #, fuzzy
 msgid "Merge Workspace from File"
 msgstr "Malkovich"
 
-#: src/mainw.c:1369
+#: src/mainw.c:1334 src/mainw.c:1372 src/program.c:596 src/program.c:625
+#: src/program.c:1050 src/program.c:1091 src/program.c:1137 src/program.c:1169
+#: src/program.c:1497 src/program.c:1538 src/program.c:2211 src/row.c:479
+#: src/workspacegroup.c:177 src/workspacegroup.c:213 src/columnview.c:180
+#: src/columnview.c:241
+msgid "Name"
+msgstr "Malkovich"
+
+#: src/mainw.c:1372
 #, fuzzy
 msgid "Set column name here"
 msgstr "Malkovich"
 
-#: src/mainw.c:1371
+#: src/mainw.c:1374
 #, fuzzy
 msgid "Set column caption here"
 msgstr "Malkovich"
 
-#: src/mainw.c:1373
+#: src/mainw.c:1376
 #, fuzzy
 msgid "New Column"
 msgstr "Malkovich"
 
-#: src/mainw.c:1377
+#: src/mainw.c:1380
 #, fuzzy
 msgid "Create Column"
 msgstr "Malkovich"
 
-#: src/mainw.c:1510
+#: src/mainw.c:1513
 msgid "Revert to Defaults"
 msgstr "Malkovich"
 
-#: src/mainw.c:1511
+#: src/mainw.c:1514
 msgid "Revert to installation defaults?"
 msgstr "Malkovich"
 
-#: src/mainw.c:1512
+#: src/mainw.c:1515
 msgid ""
 "Would you like to reset all preferences to their factory settings? This will "
 "delete any changes you have ever made to your preferences and may take a few "
 "seconds."
 msgstr "Malkovich"
 
-#: src/mainw.c:1529
+#: src/mainw.c:1532
 msgid "Preferences"
 msgstr "Malkovich"
 
-#: src/mainw.c:1534
+#: src/mainw.c:1537
 #, fuzzy
 msgid "Revert to Defaults ..."
 msgstr "Malkovich"
 
 #. Menu items.
 #.
-#: src/mainw.c:1586
+#: src/mainw.c:1589
 msgid "_File"
 msgstr "Malkovich"
 
-#: src/mainw.c:1587
+#: src/mainw.c:1590
 msgid "_New"
 msgstr "Malkovich"
 
-#: src/mainw.c:1588
+#: src/mainw.c:1591
 msgid "Open _Recent"
 msgstr "Malkovich"
 
-#: src/mainw.c:1589 src/mainw.c:1713 src/program.c:725 src/regionview.c:996
+#: src/mainw.c:1592 src/mainw.c:1716 src/regionview.c:996 src/program.c:725
 #: src/rowview.c:585
 msgid "_Edit"
 msgstr "Malkovich"
 
-#: src/mainw.c:1590 src/mainw.c:2067
+#: src/mainw.c:1593 src/mainw.c:2076
 msgid "Jump to _Column"
 msgstr "Malkovich"
 
-#: src/mainw.c:1591
+#: src/mainw.c:1594
 msgid "_View"
 msgstr "Malkovich"
 
-#: src/mainw.c:1592
+#: src/mainw.c:1595
 msgid "_Toolkits"
 msgstr "Malkovich"
 
-#: src/mainw.c:1593
+#: src/mainw.c:1596
 msgid "_Help"
 msgstr "Malkovich"
 
-#: src/mainw.c:1603 src/mainw.c:2064
+#: src/mainw.c:1606 src/mainw.c:2073
 msgid "New C_olumn"
 msgstr "Malkovich"
 
-#: src/mainw.c:1604
+#: src/mainw.c:1607
 msgid "Create a new column"
 msgstr "Malkovich"
 
-#: src/mainw.c:1608
+#: src/mainw.c:1611
 #, fuzzy
 msgid "New Named C_olumn"
 msgstr "Malkovich"
 
-#: src/mainw.c:1609
+#: src/mainw.c:1612
 #, fuzzy
 msgid "Create a new column with a specified name"
 msgstr "Malkovich"
 
-#: src/mainw.c:1613 src/program.c:1665
+#: src/mainw.c:1616 src/program.c:1665
 msgid "New _Workspace"
 msgstr "Malkovich"
 
-#: src/mainw.c:1614
+#: src/mainw.c:1617
 msgid "Create a new workspace"
 msgstr "Malkovich"
 
-#: src/mainw.c:1618
+#: src/mainw.c:1621
 msgid "_Open"
 msgstr "Malkovich"
 
-#: src/mainw.c:1619
+#: src/mainw.c:1622
 msgid "Open a file"
 msgstr "Malkovich"
 
-#: src/mainw.c:1623
+#: src/mainw.c:1626
 msgid "Open _Examples"
 msgstr "Malkovich"
 
-#: src/mainw.c:1624
+#: src/mainw.c:1627
 msgid "Open example workspaces"
 msgstr "Malkovich"
 
-#: src/mainw.c:1628
+#: src/mainw.c:1631
 msgid "_Duplicate Workspace"
 msgstr "Malkovich"
 
-#: src/mainw.c:1629
+#: src/mainw.c:1632
 msgid "Duplicate workspace"
 msgstr "Malkovich"
 
-#: src/mainw.c:1633
+#: src/mainw.c:1636
 msgid "_Merge Workspace"
 msgstr "Malkovich"
 
-#: src/mainw.c:1634
+#: src/mainw.c:1637
 msgid "Merge workspace into this workspace"
 msgstr "Malkovich"
 
-#: src/mainw.c:1638
+#: src/mainw.c:1641
 msgid "_Save Workspace"
 msgstr "Malkovich"
 
-#: src/mainw.c:1639
+#: src/mainw.c:1642
 msgid "Save workspace"
 msgstr "Malkovich"
 
-#: src/mainw.c:1643
+#: src/mainw.c:1646
 msgid "_Save Workspace As"
 msgstr "Malkovich"
 
-#: src/mainw.c:1644
+#: src/mainw.c:1647
 msgid "Save workspace as"
 msgstr "Malkovich"
 
-#: src/mainw.c:1648
+#: src/mainw.c:1651
 #, fuzzy
 msgid "Search for Workspace _Backups"
 msgstr "Malkovich"
 
-#: src/mainw.c:1649
+#: src/mainw.c:1652
 msgid "Load last automatically backed-up workspace"
 msgstr "Malkovich"
 
-#: src/mainw.c:1654
+#: src/mainw.c:1657
 msgid "Close workspace"
 msgstr "Malkovich"
 
-#: src/mainw.c:1658 src/program.c:1715
+#: src/mainw.c:1661 src/program.c:1715
 msgid "_Delete"
 msgstr "Malkovich"
 
-#: src/mainw.c:1659
+#: src/mainw.c:1662
 msgid "Delete selected items"
 msgstr "Malkovich"
 
-#: src/mainw.c:1664
+#: src/mainw.c:1666 src/program.c:1720 src/columnview.c:896
+msgid "Select _All"
+msgstr "Malkovich"
+
+#: src/mainw.c:1667
 msgid "Select all items"
 msgstr "Malkovich"
 
-#: src/mainw.c:1668
+#: src/mainw.c:1671
 msgid "D_uplicate Selected"
 msgstr "Malkovich"
 
-#: src/mainw.c:1669
+#: src/mainw.c:1672
 msgid "Duplicate selected items"
 msgstr "Malkovich"
 
-#: src/mainw.c:1673 src/rowview.c:595
+#: src/mainw.c:1676 src/rowview.c:595
 msgid "_Recalculate"
 msgstr "Malkovich"
 
-#: src/mainw.c:1674
+#: src/mainw.c:1677
 msgid "Recalculate selected items"
 msgstr "Malkovich"
 
-#: src/mainw.c:1678 src/mainw.c:2068
+#: src/mainw.c:1681 src/mainw.c:2077
 msgid "Align _Columns"
 msgstr "Malkovich"
 
-#: src/mainw.c:1679
+#: src/mainw.c:1682
 msgid "Align columns to grid"
 msgstr "Malkovich"
 
-#: src/mainw.c:1683 src/program.c:1740
+#: src/mainw.c:1686 src/program.c:1740
 msgid "_Find"
 msgstr "Malkovich"
 
-#: src/mainw.c:1684
+#: src/mainw.c:1687
 msgid "Find in workspace"
 msgstr "Malkovich"
 
-#: src/mainw.c:1688 src/program.c:1745
+#: src/mainw.c:1691 src/program.c:1745
 msgid "Find _Next"
 msgstr "Malkovich"
 
-#: src/mainw.c:1689
+#: src/mainw.c:1692
 msgid "Find again in workspace"
 msgstr "Malkovich"
 
-#: src/mainw.c:1694
+#: src/mainw.c:1697
 msgid "Jump to next error"
 msgstr "Malkovich"
 
-#: src/mainw.c:1698
+#: src/mainw.c:1701
 msgid "_Group"
 msgstr "Malkovich"
 
-#: src/mainw.c:1699
+#: src/mainw.c:1702
 msgid "Group selected items"
 msgstr "Malkovich"
 
-#: src/mainw.c:1703 src/rowview.c:589
+#: src/mainw.c:1706 src/rowview.c:589
 msgid "U_ngroup"
 msgstr "Malkovich"
 
-#: src/mainw.c:1704
+#: src/mainw.c:1707
 msgid "Ungroup selected items"
 msgstr "Malkovich"
 
-#: src/mainw.c:1708
+#: src/mainw.c:1711
 msgid "_Preferences"
 msgstr "Malkovich"
 
-#: src/mainw.c:1709
+#: src/mainw.c:1712
 msgid "Edit preferences"
 msgstr "Malkovich"
 
-#: src/mainw.c:1714
+#: src/mainw.c:1717
 msgid "Edit toolkits"
 msgstr "Malkovich"
 
-#: src/mainw.c:1728
+#: src/mainw.c:1731
 msgid "_Website"
 msgstr "Malkovich"
 
-#: src/mainw.c:1729
+#: src/mainw.c:1732
 msgid "Open the VIPS Homepage"
 msgstr "Malkovich"
 
-#: src/mainw.c:1735
+#: src/mainw.c:1738
 msgid "Au_to Recalculate"
 msgstr "Malkovich"
 
-#: src/mainw.c:1736
+#: src/mainw.c:1739
 msgid "Recalculate automatically on change"
 msgstr "Malkovich"
 
-#: src/mainw.c:1740
+#: src/mainw.c:1743
 msgid "_Toolbar"
 msgstr "Malkovich"
 
-#: src/mainw.c:1741
+#: src/mainw.c:1744
 msgid "Show window toolbar"
 msgstr "Malkovich"
 
-#: src/mainw.c:1745
+#: src/mainw.c:1748
 msgid "_Statusbar"
 msgstr "Malkovich"
 
-#: src/mainw.c:1746
+#: src/mainw.c:1749
 msgid "Show window statusbar"
 msgstr "Malkovich"
 
-#: src/mainw.c:1750
+#: src/mainw.c:1753
 msgid "Toolkit _Browser"
 msgstr "Malkovich"
 
-#: src/mainw.c:1751
+#: src/mainw.c:1754
 msgid "Show toolkit browser"
 msgstr "Malkovich"
 
-#: src/mainw.c:1755
+#: src/mainw.c:1758
 #, fuzzy
 msgid "Workspace _Definitions"
 msgstr "Malkovich"
 
-#: src/mainw.c:1756
+#: src/mainw.c:1759
 #, fuzzy
 msgid "Show workspace definitions"
 msgstr "Malkovich"
 
-#: src/mainw.c:1762
+#: src/mainw.c:1765
 msgid "_Normal"
 msgstr "Malkovich"
 
-#: src/mainw.c:1763
+#: src/mainw.c:1766
 msgid "Normal view mode"
 msgstr "Malkovich"
 
-#: src/mainw.c:1767
+#: src/mainw.c:1770
 msgid "Show _Formula"
 msgstr "Malkovich"
 
-#: src/mainw.c:1768
+#: src/mainw.c:1771
 msgid "Show formula view mode"
 msgstr "Malkovich"
 
-#: src/mainw.c:1772
+#: src/mainw.c:1775
 msgid "No _Edits"
 msgstr "Malkovich"
 
-#: src/mainw.c:1773
+#: src/mainw.c:1776
 msgid "No edits view mode"
 msgstr "Malkovich"
 
-#: src/mainw.c:2063
+#: src/mainw.c:2072
 #, fuzzy
 msgid "Workspace menu"
 msgstr "Malkovich"
 
-#: src/mainw.c:2073
+#: src/mainw.c:2082
 #, fuzzy
 msgid "_Merge Workspace from File"
 msgstr "Malkovich"
 
-#: src/mainw.c:2076
+#: src/mainw.c:2085
 #, fuzzy
 msgid "_Group Selected"
 msgstr "Malkovich"
 
 #. Toolkit Browser pane.
 #.
-#: src/mainw.c:2085
+#: src/mainw.c:2094
 #, fuzzy
 msgid "Toolkit Browser"
 msgstr "Malkovich"
 
 #. Workspace-local defs pane.
 #.
-#: src/mainw.c:2107
+#: src/mainw.c:2116
 #, fuzzy
 msgid "Workspace Definitions"
-msgstr "Malkovich"
-
-#: src/matrix.c:148
-msgid "Sliders"
-msgstr "Malkovich"
-
-#: src/matrix.c:149
-msgid "Toggle buttons"
-msgstr "Malkovich"
-
-#: src/matrix.c:150
-msgid "Text, plus scale and offset"
-msgstr "Malkovich"
-
-#: src/matrix.c:161
-msgid "Display as"
-msgstr "Malkovich"
-
-#: src/matrix.c:192
-#, fuzzy, c-format
-msgid "Edit Matrix \"%s\""
-msgstr "Malkovich"
-
-#: src/matrix.c:197
-msgid "Set Matrix"
-msgstr "Malkovich"
-
-#: src/matrix.c:263 src/matrixview.c:434
-msgid "Scale"
-msgstr "Malkovich"
-
-#: src/matrix.c:266 src/matrixview.c:439
-msgid "Offset"
-msgstr "Malkovich"
-
-#: src/matrix.c:272
-msgid "Display"
-msgstr "Malkovich"
-
-#: src/matrixview.c:199 src/matrixview.c:220
-#, fuzzy, c-format
-msgid ""
-"Cell (%d, %d):\n"
-"%s"
-msgstr "Malkovich"
-
-#. Expands to (eg) "A2: cell (1,2): 45" ... status line display during
-#. * matrix traverse.
-#.
-#: src/matrixview.c:649
-#, fuzzy, c-format
-msgid ": cell (%d, %d): %s"
-msgstr "Malkovich"
-
-#: src/model.c:131
-#, fuzzy, c-format
-msgid ""
-"Unable to load from file \"%s\". Error log is:\n"
-"%s"
-msgstr "Malkovich"
-
-#: src/model.c:420
-msgid "model_save: xmlNewChild() failed"
-msgstr "Malkovich"
-
-#: src/model.c:477
-msgid "XML load error."
-msgstr "Malkovich"
-
-#: src/model.c:478
-#, fuzzy, c-format
-msgid "Can't load node of type \"%s\" into object of type \"%s\""
-msgstr "Malkovich"
-
-#: src/model.c:693
-msgid "Delete?"
-msgstr "Malkovich"
-
-#: src/model.c:694
-#, fuzzy, c-format
-msgid "Are you sure you want to delete %s \"%s\"?"
-msgstr "Malkovich"
-
-#: src/option.c:68
-msgid "Labels"
-msgstr "Malkovich"
-
-#. Create signals.
-#.
-#. Init methods.
-#.
-#: src/paintboxview.c:109
-msgid "Paintbox bar menu"
-msgstr "Malkovich"
-
-#: src/paintboxview.c:202
-msgid "Clear undo history?"
-msgstr "Malkovich"
-
-#: src/paintboxview.c:203
-msgid ""
-"Are you sure you want to clear all undo and redo? This will free up memory, "
-"but you will no longer be able to undo or redo any of the painting you have "
-"done so far."
-msgstr "Malkovich"
-
-#: src/paintboxview.c:238
-msgid "1 round"
-msgstr "Malkovich"
-
-#. PAINTBOX_1ROUND
-#: src/paintboxview.c:239
-msgid "2 round"
-msgstr "Malkovich"
-
-#. PAINTBOX_2ROUND
-#: src/paintboxview.c:240
-msgid "3 round"
-msgstr "Malkovich"
-
-#. PAINTBOX_3ROUND
-#: src/paintboxview.c:241
-msgid "4 round"
-msgstr "Malkovich"
-
-#. PAINTBOX_4ROUND
-#: src/paintboxview.c:242
-msgid "5 round"
-msgstr "Malkovich"
-
-#. PAINTBOX_5ROUND
-#: src/paintboxview.c:243
-msgid "6 round"
-msgstr "Malkovich"
-
-#. PAINTBOX_6ROUND
-#: src/paintboxview.c:244
-msgid "10 round"
-msgstr "Malkovich"
-
-#. PAINTBOX_10ROUND
-#: src/paintboxview.c:245
-msgid "2 italic"
-msgstr "Malkovich"
-
-#. PAINTBOX_2ITALIC
-#: src/paintboxview.c:246
-msgid "3 italic"
-msgstr "Malkovich"
-
-#. PAINTBOX_3ITALIC
-#: src/paintboxview.c:247
-msgid "4 italic"
-msgstr "Malkovich"
-
-#. PAINTBOX_4ITALIC
-#: src/paintboxview.c:248
-msgid "5 italic"
-msgstr "Malkovich"
-
-#. PAINTBOX_5ITALIC
-#: src/paintboxview.c:249
-msgid "6 italic"
-msgstr "Malkovich"
-
-#. PAINTBOX_6ITALIC
-#: src/paintboxview.c:250
-msgid "10 italic"
-msgstr "Malkovich"
-
-#: src/paintboxview.c:254
-msgid "Manipulate regions"
-msgstr "Malkovich"
-
-#. IMAGEMODEL_SELECT
-#: src/paintboxview.c:255
-msgid "Pan window"
-msgstr "Malkovich"
-
-#. IMAGEMODEL_PAN
-#: src/paintboxview.c:256
-msgid "Zoom in on mouse"
-msgstr "Malkovich"
-
-#. IMAGEMODEL_MAGOUT
-#: src/paintboxview.c:258
-msgid "Read pixel into inkwell"
-msgstr "Malkovich"
-
-#. IMAGEMODEL_DROPPER
-#: src/paintboxview.c:259
-msgid "Freehand draw "
-msgstr "Malkovich"
-
-#. IMAGEMODEL_PEN
-#: src/paintboxview.c:260
-msgid "Draw straight lines"
-msgstr "Malkovich"
-
-#. IMAGEMODEL_LINE
-#: src/paintboxview.c:261
-msgid "Fill rectangles"
-msgstr "Malkovich"
-
-#. IMAGEMODEL_RECT
-#: src/paintboxview.c:262
-msgid "Flood while pixel not equal to ink"
-msgstr "Malkovich"
-
-#. IMAGEMODEL_FLOOD
-#: src/paintboxview.c:264
-msgid "Flood while pixel equal to click"
-msgstr "Malkovich"
-
-#. IMAGEMODEL_BLOB
-#: src/paintboxview.c:266
-msgid "Draw text"
-msgstr "Malkovich"
-
-#: src/paintboxview.c:317
-msgid "Undo last paint action"
-msgstr "Malkovich"
-
-#: src/paintboxview.c:326
-msgid "Redo last paint action"
-msgstr "Malkovich"
-
-#: src/paintboxview.c:335
-msgid "Clear all undo and redo buffers"
-msgstr "Malkovich"
-
-#: src/paintboxview.c:355
-msgid "Nib"
-msgstr "Malkovich"
-
-#: src/paintboxview.c:376
-msgid "Enter text for text tool"
-msgstr "Malkovich"
-
-#: src/panechild.c:108
-#, fuzzy
-msgid "Close the pane"
-msgstr "Malkovich"
-
-#: parse.y:244 parse.y:255
-msgid "not top level"
-msgstr "Malkovich"
-
-#: parse.y:260
-msgid "not strings"
-msgstr "Malkovich"
-
-#: parse.y:318
-msgid "left-hand-side pattern contains no identifiers"
-msgstr ""
-
-#: parse.y:1064 src/program.c:1418
-msgid "Parse error."
-msgstr "Malkovich"
-
-#: parse.y:1067
-#, fuzzy, c-format
-msgid "Error in %s: %s"
-msgstr "Malkovich"
-
-#: parse.y:1070
-#, fuzzy, c-format
-msgid "Error: %s"
-msgstr "Malkovich"
-
-#: parse.y:1183
-msgid "definition is too long!"
-msgstr "Malkovich"
-
-#: parse.y:1607
-#, fuzzy
-msgid "no leading identifier"
-msgstr "Malkovich"
-
-#: parse.y:1613
-msgid "'=' missing"
-msgstr ""
-
-#: parse.y:1643
-msgid "identifier expected"
-msgstr ""
-
-#: parse.y:1653
-#, c-format
-msgid "'%s' does not exist"
-msgstr ""
-
-#: parse.y:1655
-#, c-format
-msgid "'%s' has no members"
-msgstr ""
-
-#: parse.y:1670
-msgid "'.' or '=' expected"
-msgstr ""
-
-#. Not found? Maybe - error message anyway.
-#.
-#: src/path.c:278 src/path.c:305 src/program.c:1437 src/program.c:1487
-#: src/program.c:1508 src/program.c:1516 src/symbol.c:486
-msgid "Not found."
-msgstr "Malkovich"
-
-#: src/path.c:279
-#, fuzzy, c-format
-msgid "File \"%s\" not found."
-msgstr "Malkovich"
-
-#: src/path.c:306
-#, fuzzy, c-format
-msgid "File \"%s\" not found on path"
-msgstr "Malkovich"
-
-#: src/pathnameview.c:173
-msgid "Select a new file name"
-msgstr "Malkovich"
-
-#: src/plot.c:80
-msgid "YYYY"
-msgstr ""
-
-#: src/plot.c:81
-msgid "XYYY"
-msgstr ""
-
-#: src/plot.c:82
-msgid "XYXY"
-msgstr ""
-
-#: src/plot.c:93
-#, fuzzy
-msgid "Point"
-msgstr "Malkovich"
-
-#: src/plot.c:95
-#, fuzzy
-msgid "Spline"
-msgstr "Malkovich"
-
-#: src/plot.c:96
-msgid "Bar"
-msgstr ""
-
-#: src/plot.c:141
-msgid "More than one column needed or XY plots"
-msgstr ""
-
-#: src/plot.c:151
-msgid "Even number of columns only for XY format plots"
-msgstr ""
-
-#: src/plot.c:316
-#, fuzzy
-msgid "Format"
-msgstr "Malkovich"
-
-#: src/plot.c:319
-#, fuzzy
-msgid "Style"
-msgstr "Malkovich"
-
-#: src/plot.c:322
-msgid "Xmin"
-msgstr ""
-
-#: src/plot.c:325
-msgid "Xmax"
-msgstr ""
-
-#: src/plot.c:328
-msgid "Ymin"
-msgstr ""
-
-#: src/plot.c:331
-msgid "Ymax"
-msgstr ""
-
-#: src/plot.c:337
-msgid "Options"
-msgstr "Malkovich"
-
-#: src/plot.c:361
-msgid "1xn or nx1 images only for Plot"
-msgstr ""
-
-#: src/plot.c:380
-#, fuzzy
-msgid "Unable to prepare image."
-msgstr "Malkovich"
-
-#: src/plot.c:393
-msgid "1xn or nx1 images only"
-msgstr ""
-
-#. Create signals.
-#.
-#. Init methods.
-#.
-#: src/plotstatus.c:99 src/statusview.c:108
-msgid "Status bar menu"
-msgstr "Malkovich"
-
-#: src/plotstatus.c:190 src/statusview.c:223 src/statusview.c:226
-msgid "Magnification"
 msgstr "Malkovich"
 
 #. Probably failed to load prefs on startup for some reason.
@@ -2795,12 +2559,44 @@ msgid ""
 "%s started."
 msgstr "Malkovich"
 
+#: src/regionview.c:917 src/rowview.c:303
+msgid "Can't duplicate."
+msgstr "Malkovich"
+
+#: src/regionview.c:918
+msgid "You can only duplicate top level regions."
+msgstr "Malkovich"
+
+#: src/regionview.c:960
+msgid "Can't delete."
+msgstr "Malkovich"
+
+#: src/regionview.c:961
+msgid "You can only delete top level regions."
+msgstr "Malkovich"
+
+#: src/regionview.c:969
+msgid "Delete Region?"
+msgstr "Malkovich"
+
+#: src/regionview.c:970
+#, fuzzy, c-format
+msgid "Are you sure you want to delete Region \"%s\"?"
+msgstr "Malkovich"
+
+#. Other init.
+#.
+#: src/regionview.c:995
+msgid "Region menu"
+msgstr "Malkovich"
+
 #: src/program.c:73
 msgid "Edit window"
 msgstr "Malkovich"
 
-#: src/program.c:263 src/workspacedefs.c:108
-msgid "modified"
+#: src/program.c:597 src/program.c:627 src/program.c:1138 src/program.c:1171
+#: src/matrix.c:269 src/columnview.c:182 src/columnview.c:245
+msgid "Filename"
 msgstr "Malkovich"
 
 #: src/program.c:625
@@ -3149,144 +2945,127 @@ msgstr "Malkovich"
 msgid "Tool"
 msgstr "Malkovich"
 
-#: src/progress.c:105
-#, fuzzy
-msgid "Cancelling"
+#: src/itext.c:67
+msgid "Formula"
 msgstr "Malkovich"
 
-#: src/progress.c:136
-#, fuzzy, c-format
-msgid "%d minute left"
-msgid_plural "%d minutes left"
-msgstr[0] "Malkovich"
-msgstr[1] "Malkovich"
-
-#: src/progress.c:141
-#, fuzzy, c-format
-msgid "%d second left"
-msgid_plural "%d seconds left"
-msgstr[0] "Malkovich"
-msgstr[1] "Malkovich"
-
-#: src/progress.c:156
-msgid "Calculating"
+#: src/itext.c:184 src/itext.c:325
+msgid "no value"
 msgstr "Malkovich"
 
-#: src/progress.c:175
-#, fuzzy
-msgid "Loading"
+#: src/itext.c:503 src/itext.c:536
+msgid "Dirty value"
 msgstr "Malkovich"
 
-#: src/reduce.c:115
-msgid "Typecheck error."
-msgstr "Malkovich"
-
-#: src/reduce.c:117
-#, fuzzy, c-format
-msgid "%s expected %s, instead saw:"
-msgstr "Malkovich"
-
-#: src/reduce.c:128 src/reduce.c:1030 src/trace.c:126 src/workspace.c:1593
-msgid "Overflow error."
-msgstr "Malkovich"
-
-#: src/reduce.c:129
-#, fuzzy, c-format
-msgid "%s too long."
-msgstr "Malkovich"
-
-#: src/reduce.c:512 src/reduce.c:571
-msgid "Not rectangular."
-msgstr "Malkovich"
-
-#: src/reduce.c:513 src/reduce.c:572
+#: src/model.c:131
 #, fuzzy, c-format
 msgid ""
-"Matrix of real is not rectangular. Found row of length %d, should be %d."
+"Unable to load from file \"%s\". Error log is:\n"
+"%s"
 msgstr "Malkovich"
 
-#: src/reduce.c:824
-msgid "List length"
-msgstr "Malkovich"
-
-#: src/reduce.c:873
+#: src/model.c:314 src/model.c:369 src/model.c:388 src/filemodel.c:101
+#: src/filemodel.c:131 src/filemodel.c:567 src/filemodel.c:608
 #, fuzzy, c-format
-msgid "List index must be positive, not %d"
+msgid "_%s() not implemented for class \"%s\"."
 msgstr "Malkovich"
 
-#: src/reduce.c:881
-msgid "List index"
+#: src/model.c:419 src/filemodel.c:255 src/filemodel.c:270
+msgid "XML library error."
 msgstr "Malkovich"
 
-#: src/reduce.c:886
+#: src/model.c:420
+msgid "model_save: xmlNewChild() failed"
+msgstr "Malkovich"
+
+#: src/model.c:477
+msgid "XML load error."
+msgstr "Malkovich"
+
+#: src/model.c:478
 #, fuzzy, c-format
-msgid "List only has %d elements, unable to get element %d."
+msgid "Can't load node of type \"%s\" into object of type \"%s\""
 msgstr "Malkovich"
 
-#: src/reduce.c:929
-msgid "No arguments allowed."
+#: src/model.c:693
+msgid "Delete?"
 msgstr "Malkovich"
 
-#: src/reduce.c:930
+#: src/model.c:694
 #, fuzzy, c-format
-msgid "Object \"%s\" should have no arguments."
+msgid "Are you sure you want to delete %s \"%s\"?"
 msgstr "Malkovich"
 
-#: src/reduce.c:1031
-msgid "C stack overflow. Expression too complex."
-msgstr "Malkovich"
-
-#: src/reduce.c:1047
+#: src/panechild.c:108
 #, fuzzy
-msgid "Cancelled."
+msgid "Close the pane"
 msgstr "Malkovich"
 
-#: src/reduce.c:1048
-msgid "Evaluation cancelled."
-msgstr ""
-
-#: src/reduce.c:1133
-msgid "No value."
+#: src/imageinfo.c:679
+#, fuzzy
+msgid "User cancelled operation"
 msgstr "Malkovich"
 
-#: src/reduce.c:1134
+#: src/imageinfo.c:979
+msgid "Unable to open image."
+msgstr "Malkovich"
+
+#: src/imageinfo.c:980
 #, fuzzy, c-format
-msgid "Symbol \"%s\" has no value."
+msgid "Unable to open file \"%s\" as image."
 msgstr "Malkovich"
 
-#: src/reduce.c:1606 src/reduce.c:1611 src/reduce.c:1617
-msgid "List generator"
+#: src/imageinfo.c:1110 src/imageinfo.c:1118
+msgid "Unable to write to file."
 msgstr "Malkovich"
 
-#: src/regionview.c:917 src/rowview.c:303
-msgid "Can't duplicate."
-msgstr "Malkovich"
-
-#: src/regionview.c:918
-msgid "You can only duplicate top level regions."
-msgstr "Malkovich"
-
-#: src/regionview.c:960
-msgid "Can't delete."
-msgstr "Malkovich"
-
-#: src/regionview.c:961
-msgid "You can only delete top level regions."
-msgstr "Malkovich"
-
-#: src/regionview.c:969
-msgid "Delete Region?"
-msgstr "Malkovich"
-
-#: src/regionview.c:970
+#: src/imageinfo.c:1111
 #, fuzzy, c-format
-msgid "Are you sure you want to delete Region \"%s\"?"
+msgid "File \"%s\" is already open for read."
 msgstr "Malkovich"
 
-#. Other init.
-#.
-#: src/regionview.c:995
-msgid "Region menu"
+#: src/imageinfo.c:1119
+#, fuzzy, c-format
+msgid "Error writing image to file \"%s\"."
+msgstr "Malkovich"
+
+#: src/imageinfo.c:1176
+msgid "Unable to paint on image."
+msgstr "Malkovich"
+
+#: src/imageinfo.c:1177
+#, fuzzy, c-format
+msgid ""
+"Unable to get write permission for file \"%s\".\n"
+"Check permission settings."
+msgstr "Malkovich"
+
+#: src/imageinfo.c:1220
+msgid "Modify"
+msgstr "Malkovich"
+
+#: src/imageinfo.c:1221
+msgid "Modify disc file?"
+msgstr "Malkovich"
+
+#: src/imageinfo.c:1222
+#, fuzzy, c-format
+msgid ""
+"This image is being shown directly from the disc file:\n"
+"\n"
+"   %s\n"
+"\n"
+"If you paint on this file, it will be permanently changed. If something goes "
+"wrong, you may lose work. Are you sure you want to modify this file?"
+msgstr "Malkovich"
+
+#: src/imageinfo.c:1926
+msgid "Unable to paint text."
+msgstr "Malkovich"
+
+#: src/imageinfo.c:1927
+#, fuzzy, c-format
+msgid "Unable to paint text \"%s\" in font \"%s\"."
 msgstr "Malkovich"
 
 #: src/row.c:185
@@ -3319,497 +3098,46 @@ msgstr "Malkovich"
 msgid "is blocked on"
 msgstr "Malkovich"
 
-#: src/rowview.c:304
-msgid "You can only duplicate top level rows."
-msgstr "Malkovich"
-
-#: src/rowview.c:456
-msgid "Drag between columns not yet implemented."
-msgstr "Malkovich"
-
-#. Other init.
-#.
-#: src/rowview.c:584
-msgid "Row menu"
-msgstr "Malkovich"
-
-#: src/rowview.c:593 src/workspacedefs.c:262
-msgid "Replace From _File"
-msgstr "Malkovich"
-
-#: src/rowview.c:597
-msgid "Re_set"
-msgstr "Malkovich"
-
-#: src/rowview.c:663
-msgid "Click to open or close class"
-msgstr "Malkovich"
-
-#: src/slider.c:51
-msgid "From"
-msgstr "Malkovich"
-
-#: src/slider.c:54
-msgid "To"
-msgstr "Malkovich"
-
-#: src/spin.c:223
-msgid "Expand or collapse row"
-msgstr "Malkovich"
-
-#: src/symbol.c:487
-#, fuzzy, c-format
-msgid "Symbol %s is not defined."
-msgstr "Malkovich"
-
-#: src/symbol.c:491
-#, fuzzy, c-format
-msgid "%s is referred to by"
-msgstr "Malkovich"
-
-#: src/symbol.c:707
-#, fuzzy, c-format
-msgid "Redefinition of \"%s\"."
-msgstr "Malkovich"
-
-#: src/symbol.c:711
-#, fuzzy, c-format
-msgid "Previously defined at line %d."
-msgstr "Malkovich"
-
-#: src/symbol.c:734
-#, fuzzy, c-format
-msgid "Attempt to redefine root symbol \"%s\"."
-msgstr "Malkovich"
-
-#. Parameter, workspace, etc.
-#.
-#: src/symbol.c:759
-#, fuzzy, c-format
-msgid "Can't redefine %s \"%s\"."
-msgstr "Malkovich"
-
-#. used as in "fred refers to undefined symbol jim"
-#.
-#: src/tool.c:77
-msgid "refers to undefined symbol"
-msgstr "Malkovich"
-
-#: src/tool.c:870
-#, fuzzy, c-format
-msgid ""
-"Can't create dialog with name \"%s\", an object with that name already "
-"exists in kit \"%s\"."
-msgstr "Malkovich"
-
-#: src/toolkitbrowser.c:241
-msgid "Search:"
-msgstr "Malkovich"
-
-#: src/toolkitbrowser.c:266
-msgid "Action"
-msgstr "Malkovich"
-
-#: src/toolkitbrowser.c:274
-msgid "Parameters"
-msgstr "Malkovich"
-
-#: src/toolkitbrowser.c:282
-msgid "Menu Item"
-msgstr "Malkovich"
-
-#: src/toolkitgroup.c:139
-#, fuzzy, c-format
-msgid "Toolkits for %s"
-msgstr "Malkovich"
-
-#: src/trace.c:127
-msgid "Trace buffer stack overflow."
-msgstr "Malkovich"
-
-#: src/trace.c:239
-msgid "Clear trace window"
-msgstr "Malkovich"
-
-#: src/trace.c:244
-msgid "Close trace window"
-msgstr "Malkovich"
-
-#: src/trace.c:260
-msgid "_Operators"
-msgstr "Malkovich"
-
-#: src/trace.c:261
-msgid "trace operators"
-msgstr "Malkovich"
-
-#: src/trace.c:265
-msgid "_Builtin Functions"
-msgstr "Malkovich"
-
-#: src/trace.c:266
-msgid "trace calls to built in functions"
-msgstr "Malkovich"
-
-#: src/trace.c:270
-msgid "_Class Construction"
-msgstr "Malkovich"
-
-#: src/trace.c:271
-msgid "trace class constructors"
-msgstr "Malkovich"
-
-#: src/trace.c:275
-msgid "_VIPS Operations"
-msgstr "Malkovich"
-
-#: src/trace.c:276
-msgid "trace calls to VIPS"
-msgstr "Malkovich"
-
-#: src/trace.c:352
-msgid "Trace"
-msgstr "Malkovich"
-
-#: src/tslider.c:369
-msgid "Slider value ... edit!"
-msgstr "Malkovich"
-
-#: src/tslider.c:390
-msgid "Left-drag to set number"
-msgstr "Malkovich"
-
-#: src/util.c:191 src/vips_call.c:174 src/vips_call.c:1106
-#: src/vipsobject.c:284
-msgid "VIPS library error."
-msgstr "Malkovich"
-
-#: src/util.c:211
-msgid "Unable to set XML property."
-msgstr "Malkovich"
-
-#: src/util.c:212
-#, fuzzy, c-format
-msgid "Unable to set property \"%s\" to value \"%s\"."
-msgstr "Malkovich"
-
-#: src/util.c:830
-msgid "(no image)"
-msgstr "Malkovich"
-
-#: src/util.c:844
-#, fuzzy, c-format
-msgid "%dx%d %s, %d band, %s"
-msgid_plural "%dx%d %s, %d bands, %s"
-msgstr[0] "Malkovich"
-msgstr[1] "Malkovich"
-
-#: src/util.c:1257
-msgid "8-bit unsigned integer"
-msgstr "Malkovich"
-
-#. IM_BANDFMT_UCHAR
-#: src/util.c:1258
-msgid "8-bit signed integer"
-msgstr "Malkovich"
-
-#. IM_BANDFMT_CHAR
-#: src/util.c:1259
-msgid "16-bit unsigned integer"
-msgstr "Malkovich"
-
-#. IM_BANDFMT_USHORT
-#: src/util.c:1260
-msgid "16-bit signed integer"
-msgstr "Malkovich"
-
-#. IM_BANDFMT_SHORT
-#: src/util.c:1261
-msgid "32-bit unsigned integer"
-msgstr "Malkovich"
-
-#. IM_BANDFMT_UINT
-#: src/util.c:1262
-msgid "32-bit signed integer"
-msgstr "Malkovich"
-
-#. IM_BANDFMT_INT
-#: src/util.c:1263
-msgid "32-bit float"
-msgstr "Malkovich"
-
-#. IM_BANDFMT_FLOAT
-#: src/util.c:1264
-msgid "64-bit complex"
-msgstr "Malkovich"
-
-#. IM_BANDFMT_COMPLEX
-#: src/util.c:1265
-msgid "64-bit float"
-msgstr "Malkovich"
-
-#. IM_BANDFMT_DOUBLE
-#: src/util.c:1266
-msgid "128-bit complex"
-msgstr "Malkovich"
-
-#: src/util.c:1274
-msgid "<unknown format>"
-msgstr "Malkovich"
-
-#: src/util.c:1316
-msgid "<unknown type>"
-msgstr "Malkovich"
-
-#: src/util.c:1340
-msgid "directory"
-msgstr "Malkovich"
-
-#: src/util.c:1599
-msgid "Unable to find install area."
-msgstr "Malkovich"
-
-#: src/util.c:1775
-msgid "<charset conversion error>"
-msgstr "Malkovich"
-
-#: src/util.c:1933
-msgid "Filename is too long."
-msgstr "Malkovich"
-
-#: src/util.c:1939
-msgid "Filename contains only blank characters."
-msgstr "Malkovich"
-
-#: src/util.c:2002 src/util.c:2011 src/util.c:2066
-msgid "Unable to open."
-msgstr "Malkovich"
-
-#: src/util.c:2003 src/util.c:2012
-#, fuzzy, c-format
-msgid ""
-"Unable to open file \"%s\" for reading.\n"
-"%s."
-msgstr "Malkovich"
-
-#: src/util.c:2067
-#, fuzzy, c-format
-msgid ""
-"Unable to open file \"%s\" for writing.\n"
-"%s."
-msgstr "Malkovich"
-
-#: src/util.c:2088
-msgid "Unable to write."
-msgstr "Malkovich"
-
-#: src/util.c:2089
-#, fuzzy, c-format
-msgid ""
-"Unable to write to file \"%s\".\n"
-"%s."
-msgstr "Malkovich"
-
-#: src/util.c:2124 src/util.c:2137 src/util.c:2162
-msgid "Unable to read."
-msgstr "Malkovich"
-
-#: src/util.c:2125
-#, fuzzy, c-format
-msgid "File \"%s\" too large."
-msgstr "Malkovich"
-
-#: src/util.c:2138 src/util.c:2163
-#, fuzzy, c-format
-msgid ""
-"Unable to read from file \"%s\".\n"
-"%s."
-msgstr "Malkovich"
-
-#. File length unit.
-#.
-#: src/util.c:2454
-msgid "bytes"
-msgstr "Malkovich"
-
-#. Kilo byte unit.
-#.
-#: src/util.c:2458
-msgid "KB"
-msgstr "Malkovich"
-
-#. Mega byte unit.
-#.
-#: src/util.c:2462
-msgid "MB"
-msgstr "Malkovich"
-
-#. Giga byte unit.
-#.
-#: src/util.c:2466
-msgid "GB"
-msgstr "Malkovich"
-
-#. Tera byte unit.
-#.
-#: src/util.c:2470
-msgid "TB"
-msgstr "Malkovich"
-
-#: src/util.c:2513
-msgid "Unable to create temporary file."
-msgstr "Malkovich"
-
-#: src/util.c:2514
-#, fuzzy, c-format
-msgid ""
-"Unable to make file \"%s\"\n"
-"%s"
-msgstr "Malkovich"
-
-#: src/util.c:2721
-msgid "Out of memory."
-msgstr "Malkovich"
-
-#: src/util.c:2722
-#, fuzzy, c-format
-msgid "Request for %s of RAM triggered memory allocation failure."
-msgstr "Malkovich"
-
-#: src/vips_call.c:175 src/vips_call.c:1109
-#, fuzzy, c-format
-msgid "Error calling library function \"%s\" (%s)."
-msgstr "Malkovich"
-
-#: src/vips_call.c:190
-msgid "Unknown type."
-msgstr "Malkovich"
-
-#: src/vips_call.c:191
-#, fuzzy, c-format
-msgid "VIPS type \"%s\" not supported"
-msgstr "Malkovich"
-
-#: src/vips_call.c:1028
-msgid "Usage:"
-msgstr "Malkovich"
-
-#: src/vips_call.c:1030
-#, fuzzy, c-format
-msgid "VIPS operator \"%s\""
-msgstr "Malkovich"
-
-#: src/vips_call.c:1032
-#, fuzzy, c-format
-msgid "%s, from package \"%s\""
-msgstr "Malkovich"
-
-#: src/vips_call.c:1037
-#, fuzzy, c-format
-msgid "\"%s\" takes %d argument:"
-msgid_plural "\"%s\" takes %d arguments:"
-msgstr[0] "Malkovich"
-msgstr[1] "Malkovich"
-
-#: src/vips_call.c:1044
-#, fuzzy, c-format
-msgid "And produces %d result:"
-msgid_plural "And produces %d results:"
-msgstr[0] "Malkovich"
-msgstr[1] "Malkovich"
-
-#. Print any flags this function has.
-#.
-#: src/vips_call.c:1052
-msgid "Flags:"
-msgstr "Malkovich"
-
-#: src/vips_call.c:1056
-msgid "PIO function"
-msgstr "Malkovich"
-
-#: src/vips_call.c:1058
-msgid "WIO function"
-msgstr "Malkovich"
-
-#: src/vips_call.c:1061
-msgid "coordinate transformer"
-msgstr "Malkovich"
-
-#: src/vips_call.c:1063
-msgid "no coordinate transformation"
-msgstr "Malkovich"
-
-#: src/vips_call.c:1066
-msgid "point-to-point operation"
-msgstr "Malkovich"
-
-#: src/vips_call.c:1068
-msgid "area operation"
-msgstr "Malkovich"
-
-#: src/vips_call.c:1071
-msgid "uncacheable operation"
-msgstr "Malkovich"
-
-#: src/vips_call.c:1073
-msgid "operation can be cached"
-msgstr "Malkovich"
-
-#: src/vips_call.c:1088
-#, fuzzy, c-format
-msgid "Argument %d (%s) to \"%s\" is the wrong type."
-msgstr "Malkovich"
-
-#: src/vips_call.c:1112
-#, fuzzy, c-format
-msgid "VIPS library: %s"
-msgstr "Malkovich"
-
-#: src/vips_call.c:2154 src/vips_call.c:2203
-#, fuzzy, c-format
-msgid "image \"%s\""
-msgstr "Malkovich"
-
-#: src/vips_call.c:2161
-msgid "no image"
-msgstr "Malkovich"
-
-#: src/vips_call.c:2177
-msgid "doublevec"
-msgstr "Malkovich"
-
-#: src/vips_call.c:2200
-msgid "imagevec"
-msgstr "Malkovich"
-
-#: src/vipsobject.c:94
+#: src/error.c:60
 #, fuzzy
-msgid "No such type."
+msgid "No ierrors found."
 msgstr "Malkovich"
 
-#: src/vipsobject.c:95
-#, fuzzy, c-format
-msgid "Type \"%s\" not found as a subclass of VipsObject."
+#: src/error.c:100
+msgid "No unresolved symbols found."
 msgstr "Malkovich"
 
-#: src/vipsobject.c:126
-#, fuzzy, c-format
-msgid "No more than %d arguments allowed."
-msgstr "Malkovich"
-
-#: src/vipsobject.c:253
-msgid "Wrong number of required arguments."
-msgstr "Malkovich"
-
-#: src/vipsobject.c:254
-#, fuzzy, c-format
-msgid "Operation \"%s\" has %d required arguments, you supplied %d."
-msgstr "Malkovich"
-
-#: src/vipsobject.c:285
+#: src/error.c:124
 #, fuzzy
-msgid "Unable to build object."
+msgid "Clear ierror window"
+msgstr "Malkovich"
+
+#: src/error.c:128
+#, fuzzy
+msgid "List _iErrors"
+msgstr "Malkovich"
+
+#: src/error.c:129
+#, fuzzy
+msgid "Search for all ierrors"
+msgstr "Malkovich"
+
+#: src/error.c:133
+msgid "List _Unresolved"
+msgstr ""
+
+#: src/error.c:134
+msgid "Search for all unresolved references"
+msgstr ""
+
+#: src/error.c:139
+#, fuzzy
+msgid "Close ierror window"
+msgstr "Malkovich"
+
+#: src/error.c:222
+#, fuzzy, c-format
+msgid "iError - %s"
 msgstr "Malkovich"
 
 #: src/workspace.c:156
@@ -3874,6 +3202,11 @@ msgstr "Malkovich"
 msgid "// private definitions for this workspace\n"
 msgstr "Malkovich"
 
+#: src/workspace.c:1418 src/workspacegroup.c:145 src/tool.c:869
+#: src/column.c:327
+msgid "Name clash."
+msgstr "Malkovich"
+
 #: src/workspace.c:1419
 #, fuzzy, c-format
 msgid "Can't create workspace \"%s\". A symbol with that name already exists."
@@ -3881,6 +3214,10 @@ msgstr "Malkovich"
 
 #: src/workspace.c:1510
 msgid "Default empty workspace"
+msgstr "Malkovich"
+
+#: src/workspace.c:1582 src/class.c:795
+msgid "Wrong number of arguments."
 msgstr "Malkovich"
 
 #: src/workspace.c:1583
@@ -3918,31 +3255,262 @@ msgstr "Malkovich"
 msgid "Row \"%s\" is not a Group or a list."
 msgstr "Malkovich"
 
-#: src/workspacedefs.c:97
+#: src/iimage.c:115
+msgid "Original filename"
+msgstr "Malkovich"
+
+#: src/iimage.c:338
+msgid "Save timer."
+msgstr "Malkovich"
+
+#: src/iimage.c:339
 #, fuzzy, c-format
-msgid "%d definition"
-msgid_plural "%d definitions"
-msgstr[0] "Malkovich"
-msgstr[1] "Malkovich"
-
-#: src/workspacedefs.c:103
-#, fuzzy
-msgid "errors"
+msgid "Image save took %g seconds."
 msgstr "Malkovich"
 
-#: src/workspacedefs.c:181
-#, fuzzy
-msgid "Replace Definition From File"
+#: src/tslider.c:369
+msgid "Slider value ... edit!"
 msgstr "Malkovich"
 
-#: src/workspacedefs.c:261
-#, fuzzy
-msgid "Workspace definitions"
+#: src/tslider.c:390
+msgid "Left-drag to set number"
 msgstr "Malkovich"
 
-#: src/workspacedefs.c:282
+#: src/path.c:279
+#, fuzzy, c-format
+msgid "File \"%s\" not found."
+msgstr "Malkovich"
+
+#: src/path.c:306
+#, fuzzy, c-format
+msgid "File \"%s\" not found on path"
+msgstr "Malkovich"
+
+#: src/boxes.c:252
+msgid "Close _without Saving"
+msgstr "Malkovich"
+
+#. Translators: translate this to a credit for you, and it'll appear in
+#. * the About box.
+#.
+#: src/boxes.c:271
+msgid "translator_credits"
+msgstr "Malkovich"
+
+#: src/boxes.c:280
+#, fuzzy, c-format
+msgid "About %s."
+msgstr "Malkovich"
+
+#: src/boxes.c:283
+#, fuzzy, c-format
+msgid "%s is an image processing package."
+msgstr "Malkovich"
+
+#: src/boxes.c:287
+#, fuzzy, c-format
+msgid ""
+"%s comes with ABSOLUTELY NO WARRANTY. This is free software and you are "
+"welcome to redistribute it under certain conditions, see http://www.gnu.org."
+msgstr "Malkovich"
+
+#: src/boxes.c:306
 #, fuzzy
-msgid "Process"
+msgid "Personal start folder"
+msgstr "Malkovich"
+
+#: src/boxes.c:310
+#, fuzzy
+msgid "Homepage"
+msgstr "Malkovich"
+
+#: src/boxes.c:313
+#, fuzzy
+msgid "Linked to VIPS"
+msgstr "Malkovich"
+
+#: src/boxes.c:316
+#, fuzzy
+msgid "Built against VIPS"
+msgstr "Malkovich"
+
+#: src/boxes.c:329
+#, fuzzy
+msgid "Temp files in"
+msgstr "Malkovich"
+
+#: src/boxes.c:395
+msgid "Help page not found."
+msgstr "Malkovich"
+
+#: src/boxes.c:396
+#, fuzzy, c-format
+msgid "No indexed help page found for tag \"%s\""
+msgstr "Malkovich"
+
+#: src/boxes.c:605
+msgid "Search for"
+msgstr "Malkovich"
+
+#: src/boxes.c:606
+msgid "Case sensitive"
+msgstr "Malkovich"
+
+#: src/boxes.c:608
+msgid "Regular expression"
+msgstr "Malkovich"
+
+#: src/boxes.c:610
+msgid "Search from start"
+msgstr "Malkovich"
+
+#: src/boxes.c:810
+msgid "Image header fields"
+msgstr "Malkovich"
+
+#: src/boxes.c:826
+msgid "Image history"
+msgstr "Malkovich"
+
+#: src/boxes.c:942 src/boxes.c:953 src/boxes.c:980
+#, fuzzy
+msgid "Unable to view help file."
+msgstr "Malkovich"
+
+#: src/boxes.c:943
+#, fuzzy, c-format
+msgid "Unable to open URL \"%s\", windows error code = %d."
+msgstr "Malkovich"
+
+#: src/boxes.c:954
+#, c-format
+msgid ""
+"Attempt to view URL with xdg-open failed\n"
+"%s"
+msgstr ""
+
+#: src/boxes.c:959 src/boxes.c:990
+msgid "Browser window opened."
+msgstr "Malkovich"
+
+#: src/boxes.c:960 src/boxes.c:991
+#, fuzzy
+msgid "You may need to switch desktops to see the new window."
+msgstr "Malkovich"
+
+#: src/boxes.c:982
+#, fuzzy, c-format
+msgid ""
+"Attempted to launch browser with command:\n"
+"  %s\n"
+"You can change this command in Preferences."
+msgstr "Malkovich"
+
+#: src/boxes.c:1081
+#, fuzzy, c-format
+msgid "Version %s"
+msgstr "Malkovich"
+
+#: src/boxes.c:1094
+#, fuzzy
+msgid "Starting ..."
+msgstr "Malkovich"
+
+#: src/boxes.c:1102
+msgid "Display this splash screen during startup"
+msgstr "Malkovich"
+
+#: src/boxes.c:1171
+msgid "Select Font"
+msgstr "Malkovich"
+
+#: src/boxes.c:1229
+msgid "Font not found."
+msgstr "Malkovich"
+
+#: src/boxes.c:1230
+#, fuzzy, c-format
+msgid "Font \"%s\" not found on system."
+msgstr "Malkovich"
+
+#: src/boxes.c:1310
+msgid "Pick a font"
+msgstr "Malkovich"
+
+#: src/boxes.c:1315
+msgid "Set Font"
+msgstr "Malkovich"
+
+#: src/boxes.c:1361
+msgid "Click to select font"
+msgstr "Malkovich"
+
+#: src/spin.c:223
+msgid "Expand or collapse row"
+msgstr "Malkovich"
+
+#: src/filemodel.c:256
+msgid "model_save_filename: xmlNewDoc() failed"
+msgstr "Malkovich"
+
+#: src/filemodel.c:271
+msgid "model_save_filename: xmlNewDocNode() failed"
+msgstr "Malkovich"
+
+#: src/filemodel.c:287
+msgid "Save failed."
+msgstr "Malkovich"
+
+#: src/filemodel.c:288
+#, fuzzy, c-format
+msgid ""
+"Save of %s \"%s\" to file \"%s\" failed.\n"
+"%s"
+msgstr "Malkovich"
+
+#: src/filemodel.c:343
+msgid "filemodel_real_save_all: no save method"
+msgstr "Malkovich"
+
+#: src/filemodel.c:453
+#, fuzzy, c-format
+msgid "Can't load XML file \"%s\", it's not a %s save file."
+msgstr "Malkovich"
+
+#: src/filemodel.c:462
+#, fuzzy, c-format
+msgid ""
+"Can't load XML file \"%s\", unable to extract version information from "
+"namespace."
+msgstr "Malkovich"
+
+#: src/filemodel.c:475
+#, fuzzy, c-format
+msgid "Can't load XML file \"%s\", the file does not contain a %s."
+msgstr "Malkovich"
+
+#. Expands to (eg.) "Save Column A2".
+#.
+#: src/filemodel.c:660
+#, fuzzy, c-format
+msgid "Save %s %s"
+msgstr "Malkovich"
+
+#: src/filemodel.c:735 src/filemodel.c:747
+msgid "Object has been modified."
+msgstr "Malkovich"
+
+#: src/filemodel.c:736
+#, fuzzy, c-format
+msgid ""
+"%s \"%s\" has been modified since you loaded it from file \"%s\".\n"
+"\n"
+"Do you want to save your changes?"
+msgstr "Malkovich"
+
+#: src/filemodel.c:748
+#, fuzzy, c-format
+msgid "%s \"%s\" has been modified. Do you want to save your changes?"
 msgstr "Malkovich"
 
 #: src/workspacegroup.c:146
@@ -3967,29 +3535,449 @@ msgstr "Malkovich"
 msgid "Create Workspace"
 msgstr "Malkovich"
 
-#: src/reduce.h:75 src/reduce.h:105
-msgid "Stack overflow."
+#: src/matrix.c:148
+msgid "Sliders"
 msgstr "Malkovich"
 
-#: src/reduce.h:76
-msgid "Spine stack overflow, runaway recursion?"
+#: src/matrix.c:149
+msgid "Toggle buttons"
 msgstr "Malkovich"
 
-#: src/reduce.h:106
-msgid "Frame stack overflow, expression too complex."
+#: src/matrix.c:150
+msgid "Text, plus scale and offset"
 msgstr "Malkovich"
 
-#: src/reduce.h:119 src/reduce.h:131
-msgid "Stack underflow."
+#: src/matrix.c:161
+msgid "Display as"
 msgstr "Malkovich"
 
-#: src/reduce.h:120
-msgid "Frame stack underflow, you've found a bug!"
+#: src/matrix.c:192
+#, fuzzy, c-format
+msgid "Edit Matrix \"%s\""
 msgstr "Malkovich"
 
-#: src/reduce.h:132
-msgid "Spine stack underflow, you've found a bug!"
+#: src/matrix.c:197
+msgid "Set Matrix"
 msgstr "Malkovich"
+
+#: src/matrix.c:272
+msgid "Display"
+msgstr "Malkovich"
+
+#: src/columnview.c:133
+#, fuzzy, c-format
+msgid "Save Column \"%s\""
+msgstr "Malkovich"
+
+#: src/columnview.c:181 src/columnview.c:243
+msgid "Toolkit"
+msgstr "Malkovich"
+
+#: src/columnview.c:241
+msgid "Set menu item text here"
+msgstr "Malkovich"
+
+#: src/columnview.c:243
+msgid "Add to this toolkit"
+msgstr "Malkovich"
+
+#: src/columnview.c:245
+msgid "Store column in this file"
+msgstr "Malkovich"
+
+#: src/columnview.c:248
+#, fuzzy, c-format
+msgid "New Menu Item from Column \"%s\""
+msgstr "Malkovich"
+
+#: src/columnview.c:253
+msgid "Menuize"
+msgstr "Malkovich"
+
+#: src/columnview.c:648
+msgid "Edit caption, press enter to accept changes, press escape to cancel"
+msgstr "Malkovich"
+
+#: src/columnview.c:701
+msgid "Enter expressions here"
+msgstr "Malkovich"
+
+#: src/columnview.c:755
+msgid "doubleclick to set title"
+msgstr ""
+
+#: src/columnview.c:764
+msgid "Fold the column away"
+msgstr "Malkovich"
+
+#: src/columnview.c:769
+msgid "Open the column"
+msgstr "Malkovich"
+
+#: src/columnview.c:893
+msgid "Column menu"
+msgstr "Malkovich"
+
+#: src/columnview.c:894
+msgid "_Edit Caption"
+msgstr "Malkovich"
+
+#: src/columnview.c:903
+msgid "Make Column Into _Menu Item"
+msgstr "Malkovich"
+
+#: src/columnview.c:940
+msgid "Left-drag to move, left-double-click to set title, right-click for menu"
+msgstr "Malkovich"
+
+#: src/columnview.c:973
+msgid "Delete the column"
+msgstr "Malkovich"
+
+#. used as in "fred refers to undefined symbol jim"
+#.
+#: src/tool.c:77
+msgid "refers to undefined symbol"
+msgstr "Malkovich"
+
+#: src/tool.c:870
+#, fuzzy, c-format
+msgid ""
+"Can't create dialog with name \"%s\", an object with that name already "
+"exists in kit \"%s\"."
+msgstr "Malkovich"
+
+#: src/compile.c:1449
+msgid "Too many shared nodes in graph."
+msgstr "Malkovich"
+
+#: src/compile.c:1451
+msgid "Raise MAX_RELOC"
+msgstr "Malkovich"
+
+#: src/compile.c:1768
+#, fuzzy, c-format
+msgid "Member \"%s\" of class \"%s\" should have no arguments."
+msgstr "Malkovich"
+
+#: src/compile.c:2645
+#, fuzzy
+msgid "pattern match failed"
+msgstr "Malkovich"
+
+#: src/idialog.c:432
+msgid "Pin up"
+msgstr "Malkovich"
+
+#: src/idialog.c:434
+msgid "Check this to pin the dialog up"
+msgstr "Malkovich"
+
+#: src/link.c:578
+msgid "Circular dependency."
+msgstr "Malkovich"
+
+#: src/link.c:579
+#, fuzzy, c-format
+msgid "Circular dependency detected near symbol \"%s\"."
+msgstr "Malkovich"
+
+#: src/colourdisplay.c:259
+msgid "Double-click to edit this color, or drag-and-drop between colors"
+msgstr "Malkovich"
+
+#: src/toolkitgroup.c:139
+#, fuzzy, c-format
+msgid "Toolkits for %s"
+msgstr "Malkovich"
+
+#: src/dump.c:187
+msgid "parameter"
+msgstr "Malkovich"
+
+#: src/dump.c:188
+msgid "zombie"
+msgstr "Malkovich"
+
+#: src/dump.c:190
+msgid "workspace group"
+msgstr "Malkovich"
+
+#: src/dump.c:191
+msgid "root symbol"
+msgstr "Malkovich"
+
+#: src/dump.c:192
+msgid "external symbol"
+msgstr "Malkovich"
+
+#: src/dump.c:193
+msgid "built-in symbol"
+msgstr "Malkovich"
+
+#: src/column.c:328
+#, fuzzy, c-format
+msgid "Can't create column \"%s\". A column with that name already exists."
+msgstr "Malkovich"
+
+#: src/column.c:365
+msgid "Empty column."
+msgstr "Malkovich"
+
+#: src/column.c:366
+msgid "There are no objects in the current column."
+msgstr "Malkovich"
+
+#: src/column.c:385
+msgid "Too few items."
+msgstr "Malkovich"
+
+#: src/column.c:386
+#, fuzzy, c-format
+msgid "This column only has %d items, but %s needs %d items."
+msgstr "Malkovich"
+
+#: src/class.c:50
+#, fuzzy, c-format
+msgid "Object %s is not a class."
+msgstr "Malkovich"
+
+#: src/class.c:333
+msgid "No such secret."
+msgstr "Malkovich"
+
+#: src/class.c:334
+msgid ""
+"Editing local classes which reference non-local objects is a bit broken at "
+"the moment :-("
+msgstr "Malkovich"
+
+#: src/class.c:658
+#, fuzzy, c-format
+msgid "You can't have more than %d arguments to a superclass constructor."
+msgstr "Malkovich"
+
+#: src/class.c:787 src/class.c:846
+msgid "Bad superclass."
+msgstr "Malkovich"
+
+#: src/class.c:788
+#, fuzzy, c-format
+msgid "Superclass constructor \"%s\" should have no secret arguments."
+msgstr "Malkovich"
+
+#: src/class.c:796
+#, fuzzy, c-format
+msgid "Superclass constructor \"%s\" expects %d arguments, not %d."
+msgstr "Malkovich"
+
+#: src/class.c:850
+#, fuzzy, c-format
+msgid "First element in superclass of \"%s\" must be class or constructor."
+msgstr "Malkovich"
+
+#: src/class.c:882 src/class.c:979
+#, fuzzy, c-format
+msgid ""
+"Too many arguments to class constructor \"%s\". No more than %d arguments "
+"are supported."
+msgstr "Malkovich"
+
+#: src/class.c:972
+msgid "Class not found."
+msgstr "Malkovich"
+
+#: src/class.c:973
+#, fuzzy, c-format
+msgid "Class \"%s\" not found."
+msgstr "Malkovich"
+
+#: src/class.c:1010
+#, fuzzy, c-format
+msgid "Member \"%s\" of class \"%s\" should be of type \"%s\", instead it's:"
+msgstr "Malkovich"
+
+#: src/plot.c:80
+msgid "YYYY"
+msgstr ""
+
+#: src/plot.c:81
+msgid "XYYY"
+msgstr ""
+
+#: src/plot.c:82
+msgid "XYXY"
+msgstr ""
+
+#: src/plot.c:93
+#, fuzzy
+msgid "Point"
+msgstr "Malkovich"
+
+#: src/plot.c:95
+#, fuzzy
+msgid "Spline"
+msgstr "Malkovich"
+
+#: src/plot.c:96
+msgid "Bar"
+msgstr ""
+
+#: src/plot.c:141
+msgid "More than one column needed or XY plots"
+msgstr ""
+
+#: src/plot.c:151
+msgid "Even number of columns only for XY format plots"
+msgstr ""
+
+#: src/plot.c:316
+#, fuzzy
+msgid "Format"
+msgstr "Malkovich"
+
+#: src/plot.c:319
+#, fuzzy
+msgid "Style"
+msgstr "Malkovich"
+
+#: src/plot.c:322
+msgid "Xmin"
+msgstr ""
+
+#: src/plot.c:325
+msgid "Xmax"
+msgstr ""
+
+#: src/plot.c:328
+msgid "Ymin"
+msgstr ""
+
+#: src/plot.c:331
+msgid "Ymax"
+msgstr ""
+
+#: src/plot.c:337
+msgid "Options"
+msgstr "Malkovich"
+
+#: src/plot.c:361
+msgid "1xn or nx1 images only for Plot"
+msgstr ""
+
+#: src/plot.c:380
+#, fuzzy
+msgid "Unable to prepare image."
+msgstr "Malkovich"
+
+#: src/plot.c:393
+msgid "1xn or nx1 images only"
+msgstr ""
+
+#: src/rowview.c:304
+msgid "You can only duplicate top level rows."
+msgstr "Malkovich"
+
+#: src/rowview.c:456
+msgid "Drag between columns not yet implemented."
+msgstr "Malkovich"
+
+#. Other init.
+#.
+#: src/rowview.c:584
+msgid "Row menu"
+msgstr "Malkovich"
+
+#: src/rowview.c:597
+msgid "Re_set"
+msgstr "Malkovich"
+
+#: src/rowview.c:663
+msgid "Click to open or close class"
+msgstr "Malkovich"
+
+#: src/iregion.c:166
+#, fuzzy, c-format
+msgid "at (%d, %d), size (%d, %d)"
+msgstr "Malkovich"
+
+#: src/iregion.c:181 src/iregion.c:223
+msgid "Left"
+msgstr "Malkovich"
+
+#: src/iregion.c:182 src/iregion.c:226
+msgid "Top"
+msgstr "Malkovich"
+
+#: src/iregion.c:183 src/iregion.c:229
+msgid "Width"
+msgstr "Malkovich"
+
+#: src/iregion.c:184 src/iregion.c:232
+msgid "Height"
+msgstr "Malkovich"
+
+#: src/iregion.c:223
+msgid "Left edge of region"
+msgstr "Malkovich"
+
+#: src/iregion.c:226
+msgid "Top edge of region"
+msgstr "Malkovich"
+
+#: src/iregion.c:229
+msgid "Width of region"
+msgstr "Malkovich"
+
+#: src/iregion.c:232
+msgid "Height of region"
+msgstr "Malkovich"
+
+#: src/iregion.c:237
+#, fuzzy, c-format
+msgid "Edit \"%s\""
+msgstr "Malkovich"
+
+#: src/iregion.c:241
+msgid "Set Region"
+msgstr "Malkovich"
+
+#~ msgid "Thumbnails"
+#~ msgstr "Malkovich"
+
+#, fuzzy
+#~ msgid "Image files found in: \"%s\""
+#~ msgstr "Malkovich"
+
+#~ msgid "Searching ..."
+#~ msgstr "Malkovich"
+
+#~ msgid "Search incomplete!"
+#~ msgstr "Malkovich"
+
+#~ msgid "Show thumbnails"
+#~ msgstr "Malkovich"
+
+#~ msgid "Show thumbnails for files in this directory"
+#~ msgstr "Malkovich"
+
+#~ msgid "Stack overflow."
+#~ msgstr "Malkovich"
+
+#~ msgid "Spine stack overflow, runaway recursion?"
+#~ msgstr "Malkovich"
+
+#~ msgid "Frame stack overflow, expression too complex."
+#~ msgstr "Malkovich"
+
+#~ msgid "Stack underflow."
+#~ msgstr "Malkovich"
+
+#~ msgid "Frame stack underflow, you've found a bug!"
+#~ msgstr "Malkovich"
+
+#~ msgid "Spine stack underflow, you've found a bug!"
+#~ msgstr "Malkovich"
 
 #~ msgid "No options."
 #~ msgstr "Malkovich"

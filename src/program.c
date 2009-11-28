@@ -677,7 +677,8 @@ program_save_object_cb( GtkWidget *menu, Program *program )
 			filemodel_inter_save( IWINDOW( program ), 
 				FILEMODEL( model ) );
 		else 
-			box_alert( GTK_WIDGET( program ) );
+			iwindow_alert( GTK_WIDGET( program ), 
+				GTK_MESSAGE_ERROR );
 	}
 }
 
@@ -691,7 +692,8 @@ program_saveas_object_cb( GtkWidget *menu, Program *program )
 			filemodel_inter_saveas( IWINDOW( program ), 
 				FILEMODEL( model ) );
 		else
-			box_alert( GTK_WIDGET( program ) );
+			iwindow_alert( GTK_WIDGET( program ), 
+				GTK_MESSAGE_ERROR );
 	}
 }
 
@@ -1035,7 +1037,7 @@ program_tool_new_action_cb( GtkAction *action, Program *program )
 	/* Existing text changed? Parse it.
 	 */
 	if( program->dirty && !program_parse( program ) ) {
-		box_alert( GTK_WIDGET( program ) );
+		iwindow_alert( GTK_WIDGET( program ), GTK_MESSAGE_ERROR );
 		return;
 	}
 
@@ -1106,9 +1108,9 @@ static gboolean
 program_check_kit( Program *program )
 {
 	if( !program->kit ) {
-		box_info( GTK_WIDGET( program ), 
-			_( "Nothing selected." ),
-			_( "No toolkit selected." ) );
+		error_top( _( "Nothing selected." ) );
+		error_sub( "%s", _( "No toolkit selected." ) );
+		iwindow_alert( GTK_WIDGET( program ), GTK_MESSAGE_INFO );
 		return( FALSE );
 	}
 
@@ -1269,7 +1271,7 @@ static void
 program_process_action_cb( GtkAction *action, Program *program )
 {
 	if( !program_parse( program ) )
-		box_alert( GTK_WIDGET( program ) );
+		iwindow_alert( GTK_WIDGET( program ), GTK_MESSAGE_ERROR );
 }
 
 static void
@@ -1373,9 +1375,10 @@ program_remove_tool_action_cb( GtkAction *action, Program *program )
 
 	if( model && IS_TOOL( model ) )
 		model_check_destroy( GTK_WIDGET( program ), model );
-	else 
-		box_info( GTK_WIDGET( program ), 
-			_( "No tool selected" ), "%s", "" );
+	else {
+		error_top( _( "No tool selected" ) );
+		iwindow_alert( GTK_WIDGET( program ), GTK_MESSAGE_INFO );
+	}
 }
 
 static void
@@ -1482,10 +1485,10 @@ program_find_again_action_cb( GtkAction *action, Program *program )
 		text_view_select_text( GTK_TEXT_VIEW( program->text ), 
 			program->find_start, program->find_end );
 	}
-	else
-		box_info( GTK_WIDGET( program ), 
-			_( "Not found." ),
-			_( "No match found." ) );
+	else {
+		error_top( _( "Not found." ) );
+		iwindow_alert( GTK_WIDGET( program ), GTK_MESSAGE_INFO );
+	}
 }
 
 static void
@@ -1567,8 +1570,9 @@ program_info_action_cb( GtkAction *action, Program *program )
 	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	program_info( program, &buf );
-	box_info( GTK_WIDGET( program ), _( "Object information." ), 
-		"%s", vips_buf_all( &buf ) );
+	error_top( _( "Object information." ) );
+	error_sub( "%s", vips_buf_all( &buf ) );
+	iwindow_alert( GTK_WIDGET( program ), GTK_MESSAGE_INFO );
 }
 
 static void
@@ -1616,11 +1620,12 @@ program_tool_help_action_cb( GtkAction *action, Program *program )
 			break;
 		}
 	}
-	else
-		box_info( GTK_WIDGET( program ), 
-			_( "No documentation available." ),
-			_( "On-line documentation is only currently "
+	else {
+		error_top( _( "No documentation available." ) );
+		error_sub( "%s", _( "On-line documentation is only currently "
 			"available for VIPS functions and nip builtins." ) );
+		iwindow_alert( GTK_WIDGET( program ), GTK_MESSAGE_INFO );
+	}
 }
 
 /* Our actions.
@@ -1880,7 +1885,7 @@ program_select_row( Program *program, GtkTreeIter *iter )
 		model = MODEL( kit );
 
 	if( !program_select( program, model ) ) 
-		box_alert( GTK_WIDGET( program ) );
+		iwindow_alert( GTK_WIDGET( program ), GTK_MESSAGE_ERROR );
 }
 
 static void
@@ -2020,11 +2025,12 @@ program_row_deleted_cb( GtkTreeModel *treemodel,
 #endif /*DEBUG*/
 
 	if( !program->to_kit || !program->tool ) {
-		box_info( GTK_WIDGET( program ), 
-			_( "Bad drag." ),
+		error_top( _( "Bad drag." ) );
+		error_sub( "%s", 
 			_( "Sorry, you can only drag tools between toolkits. "
 			"You can't reorder toolkits, you can't nest toolkits "
 			"and you can't drag tools to the top level." ) );
+		iwindow_alert( GTK_WIDGET( program ), GTK_MESSAGE_INFO );
 		return;
 	}
 
@@ -2174,6 +2180,13 @@ program_build( Program *program, GtkWidget *vbox )
 	item = gtk_widget_get_parent( GTK_WIDGET( item ) );
         gtk_signal_connect( GTK_OBJECT( item ), "map",
                 GTK_SIGNAL_FUNC( program_edit_map_cb ), program );
+
+	/* This will set to NULL if we don't have infobar support.
+	 */
+	if( (IWINDOW( program )->infobar = infobar_new()) ) 
+		gtk_box_pack_start( GTK_BOX( vbox ), 
+			GTK_WIDGET( IWINDOW( program )->infobar ), 
+			FALSE, FALSE, 0 );
 
 	program->pane = gtk_hpaned_new();
 	gtk_paned_set_position( GTK_PANED( program->pane ), 

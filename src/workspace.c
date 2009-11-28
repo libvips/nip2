@@ -761,7 +761,7 @@ workspace_auto_recover( Mainw *mainw )
 	/* Find the dir we are saving temp files to.
 	 */
 	if( !temp_name( buf, "ws" ) ) {
-		mainw_error( mainw );
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
 		return;
 	}
 
@@ -772,17 +772,20 @@ workspace_auto_recover( Mainw *mainw )
 	(void) path_map_dir( buf, "*.ws", 
 		(path_map_fn) workspace_test_file, buf2 );
 	if( date_sofar == -1 ) {
-		if( !AUTO_WS_SAVE )
-			mainw_info( mainw, 
-				_( "No backup workspaces found." ),
+		if( !AUTO_WS_SAVE ) {
+			error_top( _( "No backup workspaces found." ) );
+			error_sub( "%s", 
 				_( "You need to enable \"Auto workspace "
 				"save\" in Preferences "
 				"before automatic recovery works." ) );
-		else
-			mainw_info( mainw, 
-				_( "No backup workspaces found." ),
-				_( "No suitable workspace save files found "
+			iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
+		}
+		else {
+			error_top( _( "No backup workspaces found." ) );
+			error_sub( _( "No suitable workspace save files found "
 				"in \"%s\"" ), buf );
+			iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
+		}
 
 		return;
 	}
@@ -1095,7 +1098,7 @@ static void *
 workspace_load_toolkit( const char *filename, Toolkitgroup *toolkitgroup )
 {
 	if( !toolkit_new_from_file( toolkitgroup, filename ) ) 
-		box_alert( NULL );
+		iwindow_alert( NULL, GTK_MESSAGE_ERROR );
 
 	return( NULL );
 }
@@ -1214,12 +1217,13 @@ workspace_top_load( Filemodel *filemodel,
 		 */
 		if( state->major != filemodel->major ||
 			state->minor != filemodel->minor ) {
-			mainw_info( MAINW( ws->iwnd ),
-				_( "Version mismatch." ),
-				_( "File \"%s\" was saved from %s-%d.%d.%d. "
+			error_top( _( "Version mismatch." ) );
+			error_sub( _( "File \"%s\" was saved from %s-%d.%d.%d. "
 				"You may see compatibility problems." ),
 				state->filename, PACKAGE,
 				state->major, state->minor, state->micro );
+			iwindow_alert( GTK_WIDGET( ws->iwnd ), 
+				GTK_MESSAGE_INFO );
 		}
 
 		break;

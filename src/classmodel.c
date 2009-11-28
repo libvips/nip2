@@ -154,7 +154,7 @@ classmodel_graphic_save( Classmodel *classmodel, GtkWidget *parent )
 		error_top( _( "Not implemented." ) );
 		error_sub( _( "_%s() method not implemented for %s." ), 
 			"graphic_save", G_OBJECT_TYPE_NAME( classmodel ) );
-		box_alert( parent );
+		iwindow_alert( parent, GTK_MESSAGE_ERROR );
 		return;
 	}
 
@@ -228,7 +228,7 @@ classmodel_graphic_replace( Classmodel *classmodel, GtkWidget *parent )
 		error_sub( _( "_%s() method not implemented for %s." ), 
 			"graphic_replace",
 			G_OBJECT_TYPE_NAME( classmodel ) );
-		box_alert( parent );
+		iwindow_alert( parent, GTK_MESSAGE_ERROR );
 		return;
 	}
 

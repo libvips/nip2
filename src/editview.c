@@ -135,7 +135,7 @@ editview_activate_cb( GtkWidget *wid, Editview *editview )
 
 	if( expr->err ) {
 		expr_error_get( expr );
-		box_alert( wid );
+		iwindow_alert( wid, GTK_MESSAGE_ERROR );
 	}
 }
 

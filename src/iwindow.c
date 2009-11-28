@@ -561,7 +561,7 @@ iwindow_popdown_notify( iWindow *iwnd, iWindowResult result )
 #endif /*DEBUG*/
 
 	if( result == IWINDOW_ERROR )
-		box_alert( GTK_WIDGET( iwnd ) );
+		iwindow_alert( GTK_WIDGET( iwnd ), GTK_MESSAGE_ERROR );
 	else if( result == IWINDOW_YES )
 		iwindow_kill( iwnd );
 
@@ -764,6 +764,7 @@ iwindow_init( iWindow *iwnd )
 	iwnd->accel_group = gtk_accel_group_new();
 	gtk_window_add_accel_group( GTK_WINDOW( iwnd ), iwnd->accel_group );
 	g_object_unref( iwnd->accel_group );
+	iwnd->infobar = NULL;
 
 	iwnd->title = NULL;
 
@@ -956,5 +957,35 @@ iwindow_get_root_noparent( GtkWidget *widget )
 		return( iwindow_get_root( IWINDOW( toplevel )->parent ) );
 	else
 		return( toplevel );
+}
+
+void
+iwindow_alert( GtkWidget *parent, GtkMessageType type )
+{
+	GtkWidget *toplevel;
+
+	if( !parent )
+		parent = GTK_WIDGET( mainw_pick_one() );
+
+	if( parent && 
+		(toplevel = iwindow_get_root( parent )) &&
+		IS_IWINDOW( toplevel ) &&
+		IWINDOW( toplevel )->infobar ) 
+		infobar_set( IWINDOW( toplevel )->infobar, type, 
+			error_get_top(), "%s", error_get_sub() );
+	else 
+		switch( type ) {
+		case GTK_MESSAGE_INFO:
+			box_info( parent, 
+				error_get_top(), "%s", error_get_sub() );
+			break;
+
+		case GTK_MESSAGE_ERROR:
+			box_alert( parent );
+			break;
+
+		default:
+			break;
+		}
 }
 

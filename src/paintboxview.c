@@ -169,7 +169,7 @@ static void
 paintboxview_undo_cb( GtkWidget *widget, Paintboxview *pbv )
 {
 	if( !imageinfo_undo( pbv->ii ) )
-		box_alert( widget );
+		iwindow_alert( widget, GTK_MESSAGE_ERROR );
 	imagemodel_paint_recalc( pbv->imagemodel );
 }
 
@@ -177,7 +177,7 @@ static void
 paintboxview_redo_cb( GtkWidget *widget, Paintboxview *pbv )
 {
 	if( !imageinfo_redo( pbv->ii ) )
-		box_alert( widget );
+		iwindow_alert( widget, GTK_MESSAGE_ERROR );
 	imagemodel_paint_recalc( pbv->imagemodel );
 }
 

@@ -152,6 +152,7 @@ struct _iWindow {
 
 	GtkWidget *work;
 	GtkAccelGroup *accel_group;
+	Infobar *infobar;
 
 	char *title;
 
@@ -236,6 +237,7 @@ void iwindow_kill_action_cb( GtkAction *action, iWindow *iwnd );
 
 GtkWidget *iwindow_get_root( GtkWidget *widget );
 GtkWidget *iwindow_get_root_noparent( GtkWidget *widget );
+void iwindow_alert( GtkWidget *parent, GtkMessageType type );
 
 #ifdef __cplusplus
 }

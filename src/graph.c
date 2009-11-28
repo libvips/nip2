@@ -617,7 +617,7 @@ graph_value( PElement *root )
 	Reduce *rc = reduce_context;
 
 	if( !reduce_pelement( rc, reduce_spine_strict, root ) ) {
-		box_alert( NULL );
+		iwindow_alert( NULL, GTK_MESSAGE_ERROR );
 		return;
 	}
 

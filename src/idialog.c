@@ -184,7 +184,7 @@ idialog_done_notify( void *sys, iWindowResult result )
 	/* Alert on failure.
 	 */
 	if( result == IWINDOW_ERROR )
-		box_alert( GTK_WIDGET( idlg ) );
+		iwindow_alert( GTK_WIDGET( idlg ), GTK_MESSAGE_ERROR );
 
 	/* Clean up.
 	 */
@@ -236,7 +236,7 @@ idialog_cancel_notify( void *sys, iWindowResult result )
 	/* Alert on error.
 	 */
 	if( result == IWINDOW_ERROR )
-		box_alert( GTK_WIDGET( idlg ) );
+		iwindow_alert( GTK_WIDGET( idlg ), GTK_MESSAGE_ERROR );
 
 	/* Clean up.
 	 */

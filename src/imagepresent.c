@@ -882,7 +882,7 @@ imagepresent_left_press( Imagepresent *ip, GdkEvent *ev, int x, int y )
 		ip->paint_last_y = iy;
 
 		if( !imagemodel_refresh_text( imagemodel ) ) {
-			box_alert( GTK_WIDGET( ip ) );
+			iwindow_alert( GTK_WIDGET( ip ), GTK_MESSAGE_ERROR );
 			break;
 		}
 
@@ -922,7 +922,8 @@ imagepresent_paint_stop( Imagepresent *ip, int x, int y )
 		if( im_rect_includespoint( &conv->underlay, ix, iy ) ) 
 			if( !imageinfo_paint_dropper( imageinfo, 
 				imagemodel->ink, ix, iy ) )
-				box_alert( GTK_WIDGET( ip ) );
+				iwindow_alert( GTK_WIDGET( ip ), 
+					GTK_MESSAGE_ERROR );
 
 		break;
 
@@ -930,7 +931,7 @@ imagepresent_paint_stop( Imagepresent *ip, int x, int y )
 		if( !imageinfo_paint_line( imageinfo, 
 			imagemodel->ink, imagemodel->nib, 
 			ip->paint_last_x, ip->paint_last_y, ix, iy ) )
-			box_alert( GTK_WIDGET( ip ) );
+			iwindow_alert( GTK_WIDGET( ip ), GTK_MESSAGE_ERROR );
 
 		break;
 
@@ -943,7 +944,8 @@ imagepresent_paint_stop( Imagepresent *ip, int x, int y )
 				ip->floating.left, ip->floating.top,
 				IM_RECT_RIGHT( &ip->floating ),
 				IM_RECT_BOTTOM( &ip->floating ) ) )
-				box_alert( GTK_WIDGET( ip ) );
+				iwindow_alert( GTK_WIDGET( ip ), 
+					GTK_MESSAGE_ERROR );
 		}
 
 		break;
@@ -956,7 +958,8 @@ imagepresent_paint_stop( Imagepresent *ip, int x, int y )
 
 			if( !imageinfo_paint_rect( imageinfo, 
 				imagemodel->ink, &ip->floating ) )
-				box_alert( GTK_WIDGET( ip ) );
+				iwindow_alert( GTK_WIDGET( ip ), 
+					GTK_MESSAGE_ERROR );
 		}
 
 		break;
@@ -964,14 +967,14 @@ imagepresent_paint_stop( Imagepresent *ip, int x, int y )
 	case IMAGEMODEL_FLOOD:
 		if( !imageinfo_paint_flood( imageinfo, 
 			imagemodel->ink, ix, iy, FALSE ) )
-			box_alert( GTK_WIDGET( ip ) );
+			iwindow_alert( GTK_WIDGET( ip ), GTK_MESSAGE_ERROR );
 
 		break;
 
 	case IMAGEMODEL_BLOB:
 		if( !imageinfo_paint_flood( imageinfo, 
 			imagemodel->ink, ix, iy, TRUE ) )
-			box_alert( GTK_WIDGET( ip ) );
+			iwindow_alert( GTK_WIDGET( ip ), GTK_MESSAGE_ERROR );
 
 		break;
 
@@ -982,7 +985,8 @@ imagepresent_paint_stop( Imagepresent *ip, int x, int y )
 			if( !imageinfo_paint_mask( imageinfo, 
 				imagemodel->ink, imagemodel->text_mask, 
 				ip->floating.left, ip->floating.top ) )
-				box_alert( GTK_WIDGET( ip ) );
+				iwindow_alert( GTK_WIDGET( ip ), 
+					GTK_MESSAGE_ERROR );
 		}
 
 		break;
@@ -1001,7 +1005,7 @@ imagepresent_paint_stop( Imagepresent *ip, int x, int y )
 
 		if( !imageinfo_paint_smudge( imageinfo,
 			&oper, ip->paint_last_x, ip->paint_last_y, ix, iy ) )
-			box_alert( GTK_WIDGET( ip ) );
+			iwindow_alert( GTK_WIDGET( ip ), GTK_MESSAGE_ERROR );
 
 		break;
 
@@ -1095,7 +1099,8 @@ imagepresent_left_release( Imagepresent *ip, GdkEvent *ev, int x, int y )
 
 			if( !(sym = workspace_add_def( row->ws, 
 				vips_buf_all( &buf ) )) ) 
-				box_alert( GTK_WIDGET( ip ) );
+				iwindow_alert( GTK_WIDGET( ip ), 
+					GTK_MESSAGE_ERROR );
 
 			workspace_deselect_all( row->ws );
 		}
@@ -1152,14 +1157,15 @@ imagepresent_button_motion( Imagepresent *ip, GdkEvent *ev )
 		if( im_rect_includespoint( &conv->underlay, ix, iy ) ) 
 			if( !imageinfo_paint_dropper( imageinfo, 
 				imagemodel->ink, ix, iy ) )
-				box_alert( GTK_WIDGET( ip ) );
+				iwindow_alert( GTK_WIDGET( ip ), 
+					GTK_MESSAGE_ERROR );
 		break;
 
 	case IMAGEMODEL_PEN:
 		if( !imageinfo_paint_line( imageinfo, 
 			imagemodel->ink, imagemodel->nib, 
 			ip->paint_last_x, ip->paint_last_y, ix, iy ) )
-			box_alert( GTK_WIDGET( ip ) );
+			iwindow_alert( GTK_WIDGET( ip ), GTK_MESSAGE_ERROR );
 		ip->paint_last_x = ix;
 		ip->paint_last_y = iy;
 		break;
@@ -1184,7 +1190,7 @@ imagepresent_button_motion( Imagepresent *ip, GdkEvent *ev )
 		if( !imageinfo_paint_smudge( imageinfo, &oper, 
 			ip->paint_last_x, ip->paint_last_y, 
 			ix, iy ) )
-			box_alert( GTK_WIDGET( ip ) );
+			iwindow_alert( GTK_WIDGET( ip ), GTK_MESSAGE_ERROR );
 		ip->paint_last_x = ix;
 		ip->paint_last_y = iy;
 		break;

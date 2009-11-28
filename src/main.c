@@ -467,7 +467,7 @@ main_load_plug( char *name )
 		error_top( _( "Unable to load." ) );
 		error_sub( _( "Error loading plug-in \"%s\"." ), name );
 		error_vips();
-		box_alert( NULL );
+		iwindow_alert( NULL, GTK_MESSAGE_ERROR );
 	}
 
 	return( NULL );
@@ -484,7 +484,7 @@ main_load_def( const char *filename )
 
 		if( !(kit = toolkit_new_from_file( main_toolkitgroup, 
 			filename )) )
-			box_alert( NULL );
+			iwindow_alert( NULL, GTK_MESSAGE_ERROR );
 		else 
 			filemodel_set_auto_load( FILEMODEL( kit ) );
 	}
@@ -504,7 +504,7 @@ main_load_ws( const char *filename )
 	progress_update_loading( 0, im_skip_dir( filename ) );
 
 	if( !(ws = workspace_new_from_file( main_workspacegroup, filename )) ) 
-		box_alert( NULL );
+		iwindow_alert( NULL, GTK_MESSAGE_ERROR );
 	else {
 		filemodel_set_auto_load( FILEMODEL( ws ) );
 	}
@@ -1453,7 +1453,7 @@ main( int argc, char *argv[] )
 			error_top( _( "Startup error." ) );
 			error_sub( _( "Startup error log:\n%s" ), 
 				main_log_get() );
-			box_alert( NULL );
+			iwindow_alert( NULL, GTK_MESSAGE_ERROR );
 		}
 
 		if( welcome_message ) {
@@ -1464,14 +1464,15 @@ main( int argc, char *argv[] )
 				_( "Welcome to %s-%s!" ), PACKAGE, VERSION );
 			expand_variables( get_savedir(), save_dir );
 			nativeize_path( save_dir );
-			box_info( NULL, 
-				buf,
+			error_top( "%s", buf );
+			error_sub( 
 _( "A new directory has been created in your home directory to hold startup, "
 "data and temporary files:\n\n"
 "     %s\n\n"
 "If you've used previous versions of %s, you will probably want "
 "to move any files over from your old work area and remove any old temps." ),
 				save_dir, PACKAGE );
+			iwindow_alert( NULL, GTK_MESSAGE_INFO );
 		}
 
 		/* Offer to junk temps.

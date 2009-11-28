@@ -166,14 +166,14 @@ mainw_compat_timeout( Mainw *mainw )
 {
 	mainw->compat_timeout = 0;
 
-	mainw_info( mainw,
-		_( "Compatibility mode." ),
-		_( "This workspace was created by version %d.%d.%d. "
+	error_top( _( "Compatibility mode." ) );
+	error_sub( _( "This workspace was created by version %d.%d.%d. "
 		"A set of compatibility menus have been loaded "
 		"for this window." ),
 		FILEMODEL( mainw->ws )->major,
 		FILEMODEL( mainw->ws )->minor,
 		FILEMODEL( mainw->ws )->micro );
+	iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
 
 	return( FALSE );
 }
@@ -185,6 +185,9 @@ mainw_map( GtkWidget *widget )
 
 	g_assert( !mainw->compat_timeout );
 
+	/* Popping up the info dialog immediately gives us stacking problems
+	 * :(
+	 */
 	if( mainw->ws->compat_major )
 		mainw->compat_timeout = g_timeout_add( 500, 
 			(GSourceFunc) mainw_compat_timeout, mainw );
@@ -282,8 +285,6 @@ mainw_init( Mainw *mainw )
 	mainw->space_free_eb = NULL;
 	mainw->progress_box = NULL;
 	mainw->progress = NULL;
-
-	mainw->infobar = NULL;
 
 	mainw->lpane = NULL;
 	mainw->rpane = NULL;
@@ -651,7 +652,7 @@ mainw_clone( Mainw *mainw )
 		Row *row = workspace_get_bottom( ws );
 
 		if( !row ) {
-			mainw_error( mainw );
+			iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
 			return;
 		}
 		row_select( row );
@@ -661,7 +662,7 @@ mainw_clone( Mainw *mainw )
 	 */
 	progress_begin();
 	if( !workspace_clone_selected( ws ) ) { 
-		mainw_error( mainw );
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
 		progress_end();
 		return;
 	}
@@ -685,7 +686,7 @@ mainw_ungroup_action_cb( GtkAction *action, Mainw *mainw )
 {
 	progress_begin();
 	if( !workspace_selected_ungroup( mainw->ws ) )
-		mainw_error( mainw );
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
 	progress_end();
 }
 
@@ -704,7 +705,7 @@ mainw_group_action_cb( GtkAction *action, Mainw *mainw )
 		Row *row = workspace_get_bottom( ws );
 
 		if( !row ) {
-			mainw_error( mainw );
+			iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
 			return;
 		}
 		row_select( row );
@@ -714,7 +715,7 @@ mainw_group_action_cb( GtkAction *action, Mainw *mainw )
 	workspace_selected_names( ws, &buf, "," );
 	vips_buf_appends( &buf, "]" );
 	if( !workspace_add_def( ws, vips_buf_all( &buf ) ) ) {
-		mainw_error( mainw );
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
 		return;
 	}
 	workspace_deselect_all( ws );
@@ -739,7 +740,7 @@ mainw_find_action_cb( GtkAction *action, Mainw *mainw )
 {
 	error_top( _( "Not implemented." ) );
 	error_sub( _( "Find in workspace not implemented yet." ) );
-	mainw_error( mainw );
+	iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
 }
 
 static void
@@ -747,7 +748,7 @@ mainw_find_again_action_cb( GtkAction *action, Mainw *mainw )
 {
 	error_top( _( "Not implemented." ) );
 	error_sub( _( "Find again in workspace not implemented yet." ) );
-	mainw_error( mainw );
+	iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
 }
 
 static Row *
@@ -781,9 +782,10 @@ mainw_next_error_action_cb( GtkAction *action, Mainw *mainw )
 	int found;
 
 	if( !mainw->ws->errors ) {
-		mainw_info( mainw, _( "No errors." ), 
-			_( "There are no errors (that I can see) "
+		error_top( _( "No errors." ) );
+		error_sub( "%s", _( "There are no errors (that I can see) "
 			"in this workspace." ) );
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
 		return;
 	}
 
@@ -1093,7 +1095,7 @@ mainw_recent_open_cb( GtkWidget *widget, const char *filename )
 
 	progress_begin();
 	if( !mainw_recent_open( mainw, filename ) ) {
-		mainw_error( mainw );
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
 		progress_end();
 		return;
 	}
@@ -1268,7 +1270,7 @@ mainw_workspace_duplicate_action_cb( GtkAction *action, Mainw *mainw )
         progress_begin();
 	if( !(new_ws = workspace_clone( mainw->ws )) ) {
 		progress_end();
-		mainw_error( mainw );
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
 		return;
 	}
 	symbol_recalculate_all();
@@ -1309,7 +1311,7 @@ mainw_column_new_action_cb( GtkAction *action, Mainw *mainw )
 
 	name = workspace_column_name_new( mainw->ws, NULL );
 	if( !(col = column_new( mainw->ws, name )) ) 
-		mainw_error( mainw );
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
 	else
 		workspace_column_select( mainw->ws, col );
 	IM_FREE( name );
@@ -1525,7 +1527,7 @@ mainw_preferences_action_cb( GtkAction *action, Mainw *mainw )
 	/* Can fail if there's no prefs ws, or an error on load.
 	 */
 	if( !(prefs = prefs_new( NULL )) ) {
-		mainw_error( mainw );
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
 		return;
 	}
 
@@ -1561,11 +1563,11 @@ mainw_magic_cb( gpointer callback_data, guint callback_action,
 	Row *row = workspace_selected_one( ws );
 
 	if( !row )
-		mainw_info( mainw,
+		box_alert( mainw,
 			"Select a single object with left-click, "
 			"select Magic Definition." );
 	else if( !magic_sym( row->sym ) )
-		mainw_error( mainw );
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
 	else
 		workspace_deselect_all( ws );
 }
@@ -1971,9 +1973,10 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 
 	/* This will set to NULL if we don't have infobar support.
 	 */
-	if( (mainw->infobar = infobar_new()) ) 
+	if( (IWINDOW( mainw )->infobar = infobar_new()) ) 
 		gtk_box_pack_start( GTK_BOX( vbox ), 
-			mainw->infobar, FALSE, FALSE, 0 );
+			GTK_WIDGET( IWINDOW( mainw )->infobar ), 
+			FALSE, FALSE, 0 );
 
 	/* hbox for status bar etc.
 	 */
@@ -2201,27 +2204,4 @@ mainw_new( Workspace *ws )
 	mainw_link( mainw, ws );
 
 	return( mainw );
-}
-
-void
-mainw_info( Mainw *mainw, const char *top, const char *sub, ... )
-{
-	va_list ap;
-
-        va_start( ap, sub );
-	if( mainw->infobar )
-		infobar_vset( mainw->infobar, GTK_MESSAGE_INFO, top, sub, ap );
-	else
-		box_vinfo( GTK_WIDGET( mainw ), top, sub, ap );
-        va_end( ap );
-}
-
-void
-mainw_error( Mainw *mainw )
-{
-	if( mainw->infobar )
-		infobar_set( mainw->infobar, GTK_MESSAGE_ERROR, 
-			error_get_top(), "%s", error_get_sub() );
-	else
-		box_alert( GTK_WIDGET( mainw ) );
 }

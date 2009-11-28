@@ -276,7 +276,7 @@ static void
 rowview_double_cb( GtkWidget *button, Rowview *rview )
 {
 	if( !rowview_edit( rview ) ) 
-		box_alert( button );
+		iwindow_alert( button, GTK_MESSAGE_ERROR );
 }
 
 /* Edit in menu.
@@ -285,7 +285,7 @@ static void
 rowview_edit_cb( GtkWidget *menu, GtkWidget *button, Rowview *rview )
 {
 	if( !rowview_edit( rview ) ) 
-		box_alert( button );
+		iwindow_alert( button, GTK_MESSAGE_ERROR );
 }
 
 /* Clone the current item.
@@ -299,16 +299,17 @@ rowview_clone_cb( GtkWidget *menu, GtkWidget *button, Rowview *rview )
 	/* Only allow clone of top level rows.
 	 */
 	if( row->top_row != row ) {
-		mainw_info( MAINW( ws->iwnd ), 
-			_( "Can't duplicate." ),
+		error_top( _( "Can't duplicate." ) );
+		error_sub( "%s", 
 			_( "You can only duplicate top level rows." ) );
+		iwindow_alert( button, GTK_MESSAGE_INFO );
 		return;
 	}
 
         workspace_deselect_all( ws );
         row_select( row );
         if( !workspace_clone_selected( ws ) )
-                mainw_error( MAINW( ws->iwnd ) );
+		iwindow_alert( button, GTK_MESSAGE_ERROR );
         workspace_deselect_all( ws );
 
         symbol_recalculate_all();
@@ -324,7 +325,7 @@ rowview_ungroup_cb( GtkWidget *menu, GtkWidget *button, Rowview *rview )
         workspace_deselect_all( row->ws );
         row_select( row );
         if( !workspace_selected_ungroup( row->ws ) )
-                mainw_error( MAINW( row->ws->iwnd ) );
+		iwindow_alert( button, GTK_MESSAGE_ERROR );
         symbol_recalculate_all();
 }
 
@@ -370,13 +371,13 @@ rowview_recalc_cb( GtkWidget *menu, GtkWidget *button, Rowview *rview )
         workspace_deselect_all( ws );
         row_select( row );
         if( !workspace_selected_recalc( ws ) )
-                mainw_error( MAINW( ws->iwnd ) );
+		iwindow_alert( button, GTK_MESSAGE_ERROR );
         workspace_deselect_all( ws );
 
 	/* Now ... pick up any errors.
 	 */
 	if( symbol_recalculate_check( row->sym ) )
-                mainw_error( MAINW( ws->iwnd ) );
+		iwindow_alert( button, GTK_MESSAGE_ERROR );
 }
 
 /* Reset the current item.
@@ -454,7 +455,7 @@ rowview_drag( Rowview *rview_from, Rowview *rview_to )
 	if( row_from->top_col != row_to->top_col ) {
 		error_top( _( "Not implemented." ) );
 		error_sub( _( "Drag between columns not yet implemented." ) );
-		box_alert( GTK_WIDGET( rview_from ) ); 
+		iwindow_alert( GTK_WIDGET( rview_from ), GTK_MESSAGE_ERROR );
 		return;
 	}
 

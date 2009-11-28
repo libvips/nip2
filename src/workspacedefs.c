@@ -236,7 +236,7 @@ workspacedefs_process_cb( GtkWidget *wid, Workspacedefs *workspacedefs )
 
 	txt = text_view_get_text( GTK_TEXT_VIEW( workspacedefs->text ) );
 	if( !workspacedefs_set_text( workspacedefs, txt ) )
-		mainw_error( workspacedefs->mainw );
+		iwindow_alert( wid, GTK_MESSAGE_ERROR );
 	g_free( txt );
 }
 

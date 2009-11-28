@@ -84,7 +84,7 @@ columnview_clone_cb( GtkWidget *wid, GtkWidget *host, Columnview *cview )
         column_select_symbols( col );
 	workspace_column_select( ws, newcol );
         if( !workspace_clone_selected( ws ) )
-                box_alert( GTK_WIDGET( cview ) );
+		iwindow_alert( GTK_WIDGET( cview ), GTK_MESSAGE_ERROR );
 	workspace_deselect_all( ws );
 
         symbol_recalculate_all();
@@ -668,7 +668,7 @@ columnview_text_enter_cb( GtkWidget *wid, Columnview *cview )
 		return;
 
 	if( !(sym = workspace_add_def( ws, text )) ) {
-		mainw_error( MAINW( ws->iwnd ) );
+		iwindow_alert( wid, GTK_MESSAGE_ERROR );
 		symbol_recalculate_all();
 		return;
 	}

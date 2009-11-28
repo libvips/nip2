@@ -468,7 +468,7 @@ workspaceview_drag_data_received( GtkWidget *widget, GdkDragContext *context,
 
 		name = workspace_column_name_new( ws, NULL );
 		if( !(col = column_new( ws, name )) )
-			box_alert( widget );
+			iwindow_alert( widget, GTK_MESSAGE_ERROR );
 		IM_FREE( name );
 
 		if( col ) {
@@ -488,7 +488,7 @@ workspaceview_drag_data_received( GtkWidget *widget, GdkDragContext *context,
 
 			if( !(sym = workspace_add_def( ws, 
 				vips_buf_all( &buf ) )) ) 
-				box_alert( widget );
+				iwindow_alert( widget, GTK_MESSAGE_ERROR );
 
 			symbol_recalculate_all();
 

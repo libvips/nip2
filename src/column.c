@@ -40,7 +40,6 @@ static FilemodelClass *parent_class = NULL;
 static int column_left_offset = 0;
 static int column_top_offset = 0;
 
-static const int column_open_ms = 20;		/* Ms delay between frames */
 static const int column_open_max_frames = 10;	/* Max frames we animate */
 
 /* Map down a column.
@@ -490,7 +489,7 @@ column_set_open( Column *col, gboolean open )
 
 		if( !col->open_timeout ) {
 			col->open_frames = 0;
-			col->open_timeout = g_timeout_add( column_open_ms, 
+			col->open_timeout = g_timeout_add( 20, 
 				(GSourceFunc) column_open_timeout_cb, col );
 		}
 	}

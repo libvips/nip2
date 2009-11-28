@@ -220,7 +220,8 @@ toolkitbrowser_row_activated_cb( GtkTreeView *treeview,
 	Toolkitbrowser *toolkitbrowser )
 {
 	if( !toolkitbrowser_activate_selected( toolkitbrowser ) )
-		box_alert( GTK_WIDGET( toolkitbrowser ) );
+		iwindow_alert( GTK_WIDGET( toolkitbrowser ), 
+			GTK_MESSAGE_ERROR );
 }
 
 static void

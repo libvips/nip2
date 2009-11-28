@@ -913,16 +913,17 @@ regionview_clone_cb( GtkWidget *menu, Regionview *regionview, Imagepresent *ip )
 	Workspace *ws = row->top_col->ws;
 
 	if( row->top_row != row ) {
-		box_info( GTK_WIDGET( regionview->ip ),
-			_( "Can't duplicate." ),
+		error_top( _( "Can't duplicate." ) );
+		error_sub( "%s", 
 			_( "You can only duplicate top level regions." ) );
+		iwindow_alert( GTK_WIDGET( regionview->ip ), GTK_MESSAGE_INFO );
 		return;
 	}
 
         workspace_deselect_all( ws );
         row_select( row );
         if( !workspace_clone_selected( ws ) )
-                box_alert( GTK_WIDGET( regionview ) );
+		iwindow_alert( GTK_WIDGET( regionview ), GTK_MESSAGE_ERROR );
         workspace_deselect_all( ws );
 
         symbol_recalculate_all();
@@ -956,9 +957,9 @@ regionview_remove_cb( GtkWidget *menu,
 	Row *row = HEAPMODEL( regionview->classmodel )->row;
 
 	if( row->top_row != row ) {
-		box_info( GTK_WIDGET( regionview->ip ),
-			_( "Can't delete." ),
-			_( "You can only delete top level regions." ) );
+		error_top( _( "Can't delete." ) );
+		error_sub( _( "You can only delete top level regions." ) );
+		iwindow_alert( GTK_WIDGET( regionview->ip ), GTK_MESSAGE_INFO );
 		return;
 	}
 

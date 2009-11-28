@@ -899,7 +899,7 @@ filedrop_drag_data_received( GtkWidget *widget,
 		g_free( sPath );
 
 		if( !result )
-			box_alert( fdi->widget );
+			iwindow_alert( fdi->widget, GTK_MESSAGE_ERROR );
 
 		pFrom = strstr( pTo, "file:" );
         } 

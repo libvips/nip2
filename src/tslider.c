@@ -287,7 +287,7 @@ tslider_value_activate_cb( GtkWidget *entry, Tslider *tslider )
 	double value;
 
 	if( !get_geditable_double( entry, &value ) ) {
-		box_alert( entry );
+		iwindow_alert( entry, GTK_MESSAGE_ERROR );
 		return;
 	}
 

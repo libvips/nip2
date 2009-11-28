@@ -78,7 +78,7 @@ toolview_activate_cb( GtkWidget *widget, Toolitem *toolitem )
 	case TOOL_DIA:
 		if( !workspace_merge_file( ws, 
 			FILEMODEL( toolitem->tool )->filename ) )
-			mainw_error( MAINW( ws->iwnd ) );
+			iwindow_alert( widget, GTK_MESSAGE_ERROR );
 		symbol_recalculate_all();
 		break;
 
@@ -86,7 +86,7 @@ toolview_activate_cb( GtkWidget *widget, Toolitem *toolitem )
 		if( !workspace_add_action( ws, 
 			toolitem->name, toolitem->action, 
 			toolitem->action_sym->expr->compile->nparam ) )
-			mainw_error( MAINW( ws->iwnd ) );
+			iwindow_alert( widget, GTK_MESSAGE_ERROR );
 		break;
 
 	default:

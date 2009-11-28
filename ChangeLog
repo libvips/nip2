@@ -1,7 +1,7 @@
 started 7.20.4, 26/11/09
 - removed 'browse thumbnails' button from filesel
 - added 'preview' widget to file open
-- added some basic GtkInfoBar support
+- GtkInfoBar support
 
 started 7.20.3, 25/11/09
 - argh, button order error in dialogs on win32

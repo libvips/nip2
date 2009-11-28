@@ -272,7 +272,7 @@ imageview_new_arrow2_action_cb( GtkAction *action, Imageview *iv )
 	}
 
 	if( !(sym = workspace_add_def( ws, vips_buf_all( &buf ) )) ) {
-		box_alert( GTK_WIDGET( iv ) );
+		iwindow_alert( GTK_WIDGET( iv ), GTK_MESSAGE_ERROR );
 		return;
 	}
 
@@ -307,7 +307,7 @@ imageview_new_arrow4_action_cb( GtkAction *action, Imageview *iv )
 		ir.left, ir.top, ir.width, ir.height );
 
 	if( !(sym = workspace_add_def( ws, vips_buf_all( &buf ) )) ) {
-		box_alert( GTK_WIDGET( iv ) );
+		iwindow_alert( GTK_WIDGET( iv ), GTK_MESSAGE_ERROR );
 		return;
 	}
 
@@ -343,7 +343,7 @@ imageview_recalc_action_cb( GtkAction *action, Imageview *iv )
         workspace_deselect_all( row->ws );
         row_select( row );
         if( !workspace_selected_recalc( row->ws ) )
-                box_alert( GTK_WIDGET( iv ) );
+		iwindow_alert( GTK_WIDGET( iv ), GTK_MESSAGE_ERROR );
         workspace_deselect_all( row->ws );
 }
 
@@ -755,6 +755,12 @@ imageview_build( Imageview *iv, GtkWidget *vbox, iImage *iimage )
 		"/ImageviewMenubar" );
 	gtk_box_pack_start( GTK_BOX( vbox ), mbar, FALSE, FALSE, 0 );
         gtk_widget_show( mbar );
+
+	/* This will set to NULL if we don't have infobar support.
+	 */
+	if( (IWINDOW( iv )->infobar = infobar_new()) ) 
+		gtk_box_pack_start( GTK_BOX( vbox ), 
+			GTK_WIDGET( IWINDOW( iv )->infobar ), FALSE, FALSE, 0 );
 
 	/* Status bar.
 	 */

@@ -81,7 +81,7 @@ conversionview_scale_cb( GtkWidget *wid, Conversionview *cv )
 	progress_begin();
 	if( !conversionview_findmaxmin( imagemodel, &min, &max ) ) {
 		progress_end();
-		box_alert( wid );
+		iwindow_alert( wid, GTK_MESSAGE_ERROR );
 		return;
 	}
 	progress_end();
@@ -89,7 +89,7 @@ conversionview_scale_cb( GtkWidget *wid, Conversionview *cv )
         if( max - min < 1e-20 ) {
                 error_top( _( "Unable to scale image." ) );
                 error_sub( _( "Maximum and minimum pixel values are equal." ) );
-                box_alert( wid );
+		iwindow_alert( wid, GTK_MESSAGE_ERROR );
                 return;
         }
 

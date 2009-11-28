@@ -686,7 +686,8 @@ filemodel_inter_save( iWindow *parent, Filemodel *filemodel )
 {
 	if( filemodel->filename ) {
 		if( !filemodel_save_all( filemodel, filemodel->filename ) ) 
-			box_alert( GTK_WIDGET( parent ) );
+			iwindow_alert( GTK_WIDGET( parent ), 
+				GTK_MESSAGE_ERROR );
 		else 
 			filemodel_set_modified( filemodel, FALSE );
 	}

@@ -108,7 +108,7 @@ box_error( GtkWidget *par, const char *fmt, ... )
 	gtk_widget_show( GTK_WIDGET( idlg ) );
 }
 
-/* Mark up a top/sub pair.
+/* Mark up a top/sub pair for a dialog box.
  */
 static void
 box_vmarkup( char *out, const char *top, const char *sub, va_list ap )
@@ -127,7 +127,7 @@ box_vmarkup( char *out, const char *top, const char *sub, va_list ap )
 		int len = strlen( out );
 
 		(void) im_snprintf( out + len, MAX_DIALOG_TEXT - len, 
-			"\n%s", buf3 );
+			"\n\n%s", buf3 );
 	}
 }
 
@@ -394,7 +394,7 @@ box_help( GtkWidget *par, const char *name )
 
 	error_top( _( "Help page not found." ) );
 	error_sub( _( "No indexed help page found for tag \"%s\"" ), name );
-	box_alert( par );
+	iwindow_alert( par, GTK_MESSAGE_ERROR );
 }
 
 /* Name + caption dialog ... for new workspace / new column.
@@ -942,7 +942,7 @@ box_url( GtkWidget *par, const char *url )
 		error_top( _( "Unable to view help file." ) );
 		error_sub( _( "Unable to open URL \"%s\", "
 			"windows error code = %d." ), url, v );
-		box_alert( par );
+		iwindow_alert( par, GTK_MESSAGE_ERROR );
 	}
 #elif defined OS_DARWIN
 	(void) systemf( "open %s", url );
@@ -953,12 +953,14 @@ box_url( GtkWidget *par, const char *url )
 		error_top( _( "Unable to view help file." ) );
 		error_sub( _( "Attempt to view URL with xdg-open failed\n%s" ),
 			url );
-		box_alert( par );
+		iwindow_alert( par, GTK_MESSAGE_ERROR );
 	}
 	else if( !shown ) {
-		box_info( par, _( "Browser window opened." ),
+		error_top( _( "Browser window opened." ) );
+		error_sub( "%s", 
 			_( "You may need to switch desktops to see the "
 			"new window." ) );
+		iwindow_alert( par, GTK_MESSAGE_INFO );
 		shown = TRUE;
 	}
 #else /*default unix-y*/
@@ -983,13 +985,14 @@ box_url( GtkWidget *par, const char *url )
 			"  %s\n"
 			"You can change this command in Preferences." ),
 			vips_buf_all( &buf2 ) );
-		box_alert( par );
+		iwindow_alert( par, GTK_MESSAGE_ERROR );
 	}
 	else if( !shown ) {
-		box_info( par, 
-			_( "Browser window opened." ),
+		error_top( _( "Browser window opened." ) );
+		error_sub( "%s",
 			_( "You may need to switch desktops to see the "
 			"new window." ) );
+		iwindow_alert( par, GTK_MESSAGE_INFO );
 		shown = TRUE;
 	}
 #endif /*lots*/
@@ -1429,69 +1432,216 @@ fontbutton_get_font_name( Fontbutton *fontbutton )
 	return( fontbutton->font_name );
 }
 
+/* Infobar.
+ */
+
+static GtkInfoBarClass *infobar_parent_class = NULL;
+
+static void
+infobar_destroy( GtkObject *object )
+{
+	Infobar *infobar;
+
+	g_return_if_fail( object != NULL );
+	g_return_if_fail( IS_INFOBAR( object ) );
+
+	infobar = INFOBAR( object );
+
+	IM_FREEF( g_source_remove, infobar->close_timeout );
+	IM_FREEF( g_source_remove, infobar->close_animation_timeout );
+
+	GTK_OBJECT_CLASS( infobar_parent_class )->destroy( object );
+}
+
+static void
+infobar_class_init( InfobarClass *class )
+{
+	GtkObjectClass *object_class = (GtkObjectClass *) class;
+
+	infobar_parent_class = g_type_class_peek_parent( class );
+
+	object_class->destroy = infobar_destroy;
+}
+
+static void
+infobar_init( Infobar *infobar )
+{
+	infobar->label = NULL;
+	infobar->close_timeout = 0;
+	infobar->close_animation_timeout = 0;
+	infobar->height = 0;
+}
+
+GType
+infobar_get_type( void )
+{
+	static GType type = 0;
+
+	if( !type ) {
+		static const GTypeInfo info = {
+			sizeof( InfobarClass ),
+			NULL,           /* base_init */
+			NULL,           /* base_finalize */
+			(GClassInitFunc) infobar_class_init,
+			NULL,           /* class_finalize */
+			NULL,           /* class_data */
+			sizeof( Infobar ),
+			32,             /* n_preallocs */
+			(GInstanceInitFunc) infobar_init,
+		};
+
+		type = g_type_register_static( GTK_TYPE_INFO_BAR, 
+			"Infobar", &info, 0 );
+	}
+
+	return( type );
+}
+
+static void
+infobar_hide( Infobar *infobar )
+{
+	IM_FREEF( g_source_remove, infobar->close_animation_timeout );
+	IM_FREEF( g_source_remove, infobar->close_timeout );
+
+	gtk_widget_hide( GTK_WIDGET( infobar ) );
+	gtk_widget_set_size_request( GTK_WIDGET( infobar ), -1, -1 );
+}
+
+static gboolean
+infobar_close_animation_timeout( Infobar *infobar )
+{
+	infobar->height -= 20;
+	if( infobar->height <= 0 ) {
+		infobar_hide( infobar );
+		return( FALSE );
+	}
+	gtk_widget_set_size_request( GTK_WIDGET( infobar ), 
+		-1, infobar->height );
+
+	return( TRUE );
+}
+
+static void
+infobar_start_close( Infobar *infobar )
+{
+	IM_FREEF( g_source_remove, infobar->close_timeout );
+	IM_FREEF( g_source_remove, infobar->close_animation_timeout );
+	gtk_widget_set_size_request( GTK_WIDGET( infobar ), -1, -1 );
+
+	infobar->height = GTK_WIDGET( infobar )->allocation.height;
+	infobar->close_animation_timeout = g_timeout_add( 50, 
+		(GSourceFunc) infobar_close_animation_timeout, infobar );
+}
+
+static gboolean
+infobar_close_timeout( Infobar *infobar )
+{
+	infobar_start_close( infobar );
+
+	return( FALSE );
+}
+
+static void
+infobar_show( Infobar *infobar )
+{
+	IM_FREEF( g_source_remove, infobar->close_timeout );
+	IM_FREEF( g_source_remove, infobar->close_animation_timeout );
+
+	gtk_widget_set_size_request( GTK_WIDGET( infobar ), -1, -1 );
+	infobar->close_timeout = g_timeout_add( 5000, 
+		(GSourceFunc) infobar_close_timeout, infobar );
+
+	gtk_widget_show( GTK_WIDGET( infobar ) );
+}
+
+static void                
+infobar_response_cb( GtkInfoBar *info_bar, 
+	gint response_id, gpointer user_data )  
+{
+	infobar_start_close( INFOBAR( info_bar ) );
+}
+
 /* Make an infobar ... return NULL if our GTK doesn't have this thing.
  */
-GtkWidget *
+Infobar *
 infobar_new( void )
 {
 #ifdef USE_INFOBAR
-	GtkWidget *info;
-	GtkWidget *label;
+	Infobar *infobar;
 	GtkWidget *content_area;
 
-	info = gtk_info_bar_new();
-	label = gtk_label_new("");
-        gtk_label_set_justify( GTK_LABEL( label ), GTK_JUSTIFY_LEFT );
-        gtk_label_set_selectable( GTK_LABEL( label ), TRUE );
-	gtk_label_set_line_wrap( GTK_LABEL( label ), TRUE );
-	content_area = gtk_info_bar_get_content_area( GTK_INFO_BAR( info ) );
-	gtk_container_add( GTK_CONTAINER( content_area ), label );
-	gtk_widget_show( label );
-	gtk_info_bar_add_button( GTK_INFO_BAR( info ),
+	infobar = g_object_new( TYPE_INFOBAR, NULL );
+	infobar->label = gtk_label_new( "" );
+        gtk_label_set_justify( GTK_LABEL( infobar->label ), GTK_JUSTIFY_LEFT );
+        gtk_label_set_selectable( GTK_LABEL( infobar->label ), TRUE );
+	gtk_label_set_line_wrap( GTK_LABEL( infobar->label ), TRUE );
+	content_area = gtk_info_bar_get_content_area( GTK_INFO_BAR( infobar ) );
+	gtk_container_add( GTK_CONTAINER( content_area ), infobar->label );
+	gtk_widget_show( infobar->label );
+	gtk_info_bar_add_button( GTK_INFO_BAR( infobar ),
 		 GTK_STOCK_OK, GTK_RESPONSE_OK );
-	g_signal_connect( info, "response",
-		G_CALLBACK( gtk_widget_hide ), NULL );
+	g_signal_connect( infobar, "response",
+		G_CALLBACK( infobar_response_cb ), NULL );
 
-	return( info );
+	return( infobar );
 #else /*!USE_INFOBAR*/
 	return( NULL );
 #endif /*USE_INFOBAR*/
 }
 
-/* Set the label on an infobar to some marked-up text.
+/* Mark up a top/sub pair for an infobar.
  */
-void
-infobar_vset( GtkWidget *info, GtkMessageType type, 
-	const char *top, const char *sub, va_list ap )
+static void
+box_vmarkup_infobar( char *out, const char *top, const char *sub, va_list ap )
 {
-	char buf[MAX_DIALOG_TEXT];
-	GtkWidget *label;
-	GtkWidget *content_area;
-	GList *children;
+	char buf1[MAX_DIALOG_TEXT];
+	char buf2[MAX_DIALOG_TEXT];
+	char buf3[MAX_DIALOG_TEXT];
+	char *p;
 
-	box_vmarkup( buf, top, sub, ap );
+	escape_markup( top, buf1, MAX_DIALOG_TEXT );
+	(void) im_vsnprintf( buf2, MAX_DIALOG_TEXT, sub, ap );
+	escape_markup( buf2, buf3, MAX_DIALOG_TEXT );
 
-	content_area = gtk_info_bar_get_content_area( GTK_INFO_BAR( info ) );
-	children = gtk_container_get_children( GTK_CONTAINER( content_area ) );
-	g_assert( g_list_length( children ) == 1 );
-	label = GTK_WIDGET( g_list_nth_data( children, 0 ) );
-	g_list_free( children );
+	(void) im_snprintf( out, MAX_DIALOG_TEXT, 
+		"<b>%s</b>", buf1 );
+	if( strcmp( buf3, "" ) != 0 ) {
+		int len = strlen( out );
 
-	gtk_label_set_markup( GTK_LABEL( label ), buf );
-	gtk_info_bar_set_message_type( GTK_INFO_BAR( info ), type );
+		(void) im_snprintf( out + len, MAX_DIALOG_TEXT - len, 
+			"\n%s", buf3 );
+	}
 
-	gtk_widget_show( info );
+	/* Remove any trailing newlines, they make infobars rather large.
+	 */
+	while( (p = out + strlen( out )) > out && p[-1] == '\n' )
+		p[-1] = '\0';
 }
 
 /* Set the label on an infobar to some marked-up text.
  */
 void
-infobar_set( GtkWidget *info, GtkMessageType type, 
+infobar_vset( Infobar *infobar, GtkMessageType type, 
+	const char *top, const char *sub, va_list ap )
+{
+	char buf[MAX_DIALOG_TEXT];
+
+	box_vmarkup_infobar( buf, top, sub, ap );
+	gtk_label_set_markup( GTK_LABEL( infobar->label ), buf );
+	gtk_info_bar_set_message_type( GTK_INFO_BAR( infobar ), type );
+
+	infobar_show( infobar );
+}
+
+/* Set the label on an infobar to some marked-up text.
+ */
+void
+infobar_set( Infobar *infobar, GtkMessageType type, 
 	const char *top, const char *sub, ... )
 {
 	va_list ap;
 
         va_start( ap, sub );
-	infobar_vset( info, type, top, sub, ap );
+	infobar_vset( infobar, type, top, sub, ap );
         va_end( ap );
 }

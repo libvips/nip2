@@ -239,7 +239,7 @@ colourdisplay_drag_data_received( GtkWidget *widget, GdkDragContext *context,
 
 		if( !imageinfo_from_text( imageinfo, 
 			(char *) selection_data->data ) )
-			box_alert( widget );
+			iwindow_alert( widget, GTK_MESSAGE_ERROR );
 		break;
 
 	default:

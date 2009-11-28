@@ -248,8 +248,34 @@ Fontbutton *fontbutton_new( void );
 void fontbutton_set_font_name( Fontbutton *fontbutton, const char *font_name );
 const char *fontbutton_get_font_name( Fontbutton * );
 
-GtkWidget *infobar_new( void );
-void infobar_vset( GtkWidget *info, GtkMessageType type, 
+/* Infobar subclass, with a close animation and a label.
+ */
+#define TYPE_INFOBAR (infobar_get_type())
+#define INFOBAR( obj ) \
+	(GTK_CHECK_CAST( (obj), TYPE_INFOBAR, Infobar ))
+#define INFOBAR_CLASS( klass ) \
+	(GTK_CHECK_CLASS_CAST( (klass), TYPE_INFOBAR, InfobarClass ))
+#define IS_INFOBAR( obj ) (GTK_CHECK_TYPE( (obj), TYPE_INFOBAR ))
+#define IS_INFOBAR_CLASS( klass ) \
+	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_INFOBAR ))
+
+struct _Infobar {
+	GtkButton parent_object;
+
+	GtkWidget *label;
+	guint close_timeout;
+	guint close_animation_timeout;
+	int height;
+};
+
+typedef struct _InfobarClass {
+	GtkButtonClass parent_class;
+
+} InfobarClass;
+
+GtkType infobar_get_type( void );
+Infobar *infobar_new( void );
+void infobar_vset( Infobar *infobar, GtkMessageType type, 
 	const char *top, const char *sub, va_list ap );
-void infobar_set( GtkWidget *info, GtkMessageType type, 
+void infobar_set( Infobar *infobar, GtkMessageType type, 
 	const char *top, const char *sub, ... );

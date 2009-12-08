@@ -1,3 +1,6 @@
+- load businesscard.ws, open a viewer on the text object, change the font,
+  image does not update?
+
 - test Joe's layout thing, compare to the thing we do in study2 to make the
   diagnostic image
 

@@ -29,6 +29,7 @@
 
 /*
 #define DEBUG
+#define DEBUG_MEMUSE
  */
 
 #include "ip.h"
@@ -70,6 +71,11 @@ progress_begin( void )
 	if( progress->count == 1 ) {
 		g_timer_start( progress->busy_timer );
 		g_timer_start( progress->update_timer );
+
+#ifdef DEBUG_MEMUSE
+		printf( "progress_begin:\n" );
+		im__print_all();
+#endif /*DEBUG_MEMUSE*/
 	}
 }
 
@@ -120,6 +126,11 @@ progress_update( Progress *progress )
 		   can loop during startup. Just do a single iteration.
 		 */
 		g_main_context_iteration( NULL, FALSE );
+
+#ifdef DEBUG_MEMUSE
+		printf( "progress_update:\n" );
+		im__print_all();
+#endif /*DEBUG_MEMUSE*/
 	}
 }
 
@@ -211,6 +222,11 @@ progress_end( void )
 
 		progress->cancel = FALSE;
 		progress->busy = FALSE;
+
+#ifdef DEBUG_MEMUSE
+		printf( "progress_end:\n" );
+		im__print_all();
+#endif /*DEBUG_MEMUSE*/
 	}
 }
 

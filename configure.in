@@ -341,9 +341,9 @@ use gsl for numeric functions:		$with_gsl
 use libgoffice to show plots:		$with_libgoffice
 use gtksheet to show matrices:  	$nip_use_gtksheet
   (requires gtk+-2.0 >= 2.18)
-use gtkinfobar to show messages: 	$nip_use_infobar
+use gtkinfobar to show messages:	$nip_use_infobar
   (requires gtk+-2.0 >= 2.18)
 allow regex searches: 			$nip_use_gregex
   (requires glib-2.0 >= 2.14)
-display help files with xdg:	$XDG_OPEN
+display help files with xdg:		$XDG_OPEN
 ])

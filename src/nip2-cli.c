@@ -1,5 +1,9 @@
 /* nip2-cli.c ... run the nip2 executable, connecting stdin and stdout to the
  * console
+ *
+ * 11/12/09
+ * 	- use SetHandleInformation() to stop the child inheriting the read
+ * 	  handle (thanks Leo)
  */
 
 /*
@@ -138,6 +142,16 @@ main (int argc, char **argv)
   if (!CreatePipe (&hChildStdoutRd, &hChildStdoutWr, &saAttr, 0))
     {
       fprintf (stderr, "CreatePipe failed: ");
+      print_last_error ();
+      fprintf (stderr, "\n");
+      exit (1);
+    }
+
+  /* Ensure the read handle to the pipe for STDOUT is not inherited.
+   */
+  if (!SetHandleInformation(hChildStdoutRd, HANDLE_FLAG_INHERIT, 0))
+    {
+      fprintf (stderr, "SetHandleInformation failed: ");
       print_last_error ();
       fprintf (stderr, "\n");
       exit (1);

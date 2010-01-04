@@ -86,6 +86,7 @@ void popup_detach( GtkWidget *host, guint sid );
 
 void set_tooltip( GtkWidget *wid, const char *fmt, ... )
 	__attribute__((format(printf, 2, 3)));
+void junk_tooltips( void );
 
 typedef void (*TooltipGenerateFn)( GtkWidget *, VipsBuf *, void *a, void *b );
 void set_tooltip_generate( GtkWidget *widget, 

@@ -494,6 +494,14 @@ set_tooltip_generate( GtkWidget *widget,
 		tooltip_generate_attach( widget, gen );
 }
 
+/* Junk all tooltips, helps trim valgrind noise.
+ */
+void
+junk_tooltips( void )
+{
+	g_object_ref_sink( GTK_OBJECT( our_tooltips ) );
+}
+
 /* Set a GtkEditable.
  */
 void

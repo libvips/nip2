@@ -1,14 +1,4 @@
-- how about
-
-	[1..10, 10..1]
-
-  no reason we couldn't allow that, is there?
-
-  hmm
-
-	[1, 2, 3, 7 .. 12, 13]
-
-  so is that 7, 8, 9, 10 11, 12 ... or should it look at the previous 3?
+- doubleclick does not work on the macbook, argh
 
 - test Joe's layout thing, compare to the thing we do in study2 to make the
   diagnostic image

@@ -86,9 +86,15 @@ export G_SLICE=always-malloc
 	This completely disables the magazine and slab allocator in Glib, 
 	and makes it use plain malloc()/free() instead.
 
-valgrind --suppressions=/home/john/nip2.supp --leak-check=yes nip2 ...
+valgrind --suppressions=/home/john/nip2.supp \
+  --leak-check=yes \
+  nip2 ... > nip2-vg.log 2>&1
 
-valgrind --suppressions=/home/john/nip2.supp --leak-check=no --db-attach=yes nip2 ...
+memory access check
+
+valgrind --suppressions=/home/john/nip2.supp \
+  --leak-check=no --db-attach=yes \
+  nip2 ... > nip2-vg.log 2>&1
 
 or put "--suppressions=/home/john/nip2.supp" into ~/.valgrindrc 
 

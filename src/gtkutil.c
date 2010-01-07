@@ -499,7 +499,8 @@ set_tooltip_generate( GtkWidget *widget,
 void
 junk_tooltips( void )
 {
-	g_object_ref_sink( GTK_OBJECT( our_tooltips ) );
+	if( our_tooltips )
+		g_object_ref_sink( GTK_OBJECT( our_tooltips ) );
 }
 
 /* Set a GtkEditable.

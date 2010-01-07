@@ -44,13 +44,6 @@
 
 #include "doubleclick.h"
 
-/* 
-
-	FIXME .. yuk! must be an easy way to get this from gdk/wherever
-
- */
-#define DOUBLE_CLICK_TIME      (100)
-
 #define FREEFI( F, S ) { if( S ) { (void) F( S ); (S) = 0; } }
 
 /* For debugging.
@@ -161,8 +154,12 @@ doubleclick_trigger_cb( GtkWidget *wid, GdkEvent *ev, Doubleclick *click )
 #endif /*DEBUG*/
 		/* No previous click. This may be either. Start a timeout to
 		 * help us decide.
+		 *
+		 * We aren't supposed to look at double_click_time, but
+		 * there's no access method, I think.
 		 */
-		click->click = g_timeout_add( 200, 
+		click->click = g_timeout_add( 
+			gtk_widget_get_display( wid )->double_click_time, 
 			(GSourceFunc) doubleclick_time_cb, click );
 
 		/* If do-single-on-double is set, we can trigger a

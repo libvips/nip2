@@ -3,6 +3,7 @@ started 7.21.0, 8/12/09
 - "make check" tests the example workspaces too
 - nip2-cli.c improvements (thanks Leo)
 - leak test improvements
+- set double-click time from the system
 
 started 7.20.5, 27/11/09
 - fixed up GtkInfoBar support

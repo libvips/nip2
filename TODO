@@ -6,6 +6,12 @@
   where do we use our bandalike/formatalike stuff? remove our stuff, though
   make sure we have equivalents in vips now
 
+- look at NSIS
+
+	http://nsis.sourceforge.net/Simple_tutorials
+
+  can we make a win installer from linux with this?
+
 WONTFIX for 7.20
 ================
 

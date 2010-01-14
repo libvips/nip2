@@ -1,3 +1,5 @@
+im_system_image A2 "%s.jpg" "%s.jpg" "convert %s -swirl 45 %s"
+
 - test Joe's layout thing, compare to the thing we do in study2 to make the
   diagnostic image
 

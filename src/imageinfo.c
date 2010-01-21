@@ -83,10 +83,10 @@ most of the jobs above are pushed down into vips8 now ... except for
 
 /*
 #define DEBUG
-#define DEBUG_CHECK
 #define DEBUG_MAKE
 #define DEBUG_OPEN
 #define DEBUG_RGB
+#define DEBUG_CHECK
  */
 
 static iContainerClass *imageinfogroup_parent_class = NULL;
@@ -1126,52 +1126,9 @@ imageinfo_write( Imageinfo *imageinfo, const char *name )
 	return( TRUE );
 }
 
-/* Change an imageinfo to be a file, rather than a memory object. 
- */
-static gboolean
-imageinfo_file( Imageinfo *imageinfo )
-{
-	IMAGE *im;
-	char filename[FILENAME_MAX];
-
-	/* Check image type.
-	 */
-	if( !imageinfo_get( FALSE, imageinfo ) )
-		return( FALSE );
-	if( im_isfile( imageinfo_get( FALSE, imageinfo ) ) )
-		return( TRUE );
-
-	/* Save it.
-	 */
-	if( !temp_name( filename, "v" ) )
-		return( FALSE );
-	if( !imageinfo_write( imageinfo, filename ) )
-		return( FALSE );
-	if( !(im = im_open( filename, "r" )) ) {
-		error_vips_all();
-		return( FALSE );
-	}
-
-	IM_FREEF( im_close, imageinfo->im );
-	IM_FREEF( im_close, imageinfo->mapped_im );
-	MANAGED_UNREF( imageinfo->underlying );
-
-	imageinfo->im = im;
-
-	/* It's now a temp file.
-	 */
-	imageinfo->dfile = TRUE;
-
-	iobject_changed( IOBJECT( imageinfo ) );
-
-	return( TRUE );
-}
-
 static gboolean
 imageinfo_make_paintable( Imageinfo *imageinfo )
 {
-	if( !imageinfo_file( imageinfo ) ) 
-		return( FALSE );
 	if( im_rwcheck( imageinfo->im ) ) {
 		error_top( _( "Unable to paint on image." ) );
 		error_sub( _( "Unable to get write permission for "
@@ -1744,9 +1701,6 @@ imageinfo_redo( Imageinfo *imageinfo )
 	return( TRUE );
 }
 
-/* Try to add to the undo buffer. If undo is disabled, junk everything since
- * this new paint action will invalidate all saved undo/redo stuff.
- */
 void
 imageinfo_undo_clear( Imageinfo *imageinfo )
 {

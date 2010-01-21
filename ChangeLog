@@ -4,6 +4,8 @@ started 7.21.0, 8/12/09
 - nip2-cli.c improvements (thanks Leo)
 - leak test improvements
 - set double-click time from the system
+- don't copy to file for paintbox, it makes dangling pointers if you use it in
+  complex workspaces
 
 started 7.20.5, 27/11/09
 - fixed up GtkInfoBar support

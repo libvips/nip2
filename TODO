@@ -1,3 +1,18 @@
+- paint rect rubberbanding is broken
+
+- we're getting a leak report if we use the paintbox
+
+- imageinfo_make_paintable() no longer copies to a file, since this used to
+  cause problems with dangling pointers because of the im_close()s we had to
+  do
+
+  however, this means we now do all painting in memory :-( do we need to add
+  API to change a memory image (eg. a "p") into a file?
+
+- image thumbnails don't update on paint
+
+  add something to the thing that makes the thumbnail to watch invalidate
+
 - test Joe's layout thing, compare to the thing we do in study2 to make the
   diagnostic image
 
@@ -5,12 +20,6 @@
 
   where do we use our bandalike/formatalike stuff? remove our stuff, though
   make sure we have equivalents in vips now
-
-- look at NSIS
-
-	http://nsis.sourceforge.net/Simple_tutorials
-
-  can we make a win installer from linux with this?
 
 WONTFIX for 7.20
 ================

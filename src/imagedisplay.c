@@ -142,9 +142,10 @@ imagedisplay_paint_image( Imagedisplay *id, GdkRectangle *expose )
 
 	if( im_prepare( conv->ireg, &vclip ) ) {
 #ifdef DEBUG_PAINT
-#endif /*DEBUG_PAINT*/
 		printf( "imagedisplay_paint_image: paint error\n" );
-		im_error_buffer();
+		printf( "\t%s\n", im_error_buffer() );
+#endif /*DEBUG_PAINT*/
+
 		im_error_clear();
 
 		return;
@@ -481,7 +482,7 @@ imagedisplay_get_type( void )
 	return( type );
 }
 
-/* Conversion has changed ... resize and repaint.
+/* Conversion has changed ... repaint everything.
  */
 static void
 imagedisplay_conversion_changed_cb( Conversion *conv, Imagedisplay *id )

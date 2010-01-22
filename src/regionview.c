@@ -309,6 +309,32 @@ regionview_paint_arrow( GdkDrawable *draw, GdkGC *fg, int off, Rect *r )
 		GDK_LINE_SOLID, GDK_CAP_BUTT, GDK_JOIN_MITER );
 }
 
+/* Paint the dotted box for a text preview, or rectangle paint preview.
+ */
+static void
+regionview_paint_box( GdkDrawable *draw, GdkGC *fg, int off, Rect *r )
+{
+        static gint8 dash_list[] = { 10, 10 };
+
+        gdk_gc_set_dashes( fg, off, dash_list, 2 );
+	gdk_gc_set_line_attributes( fg, 2, 
+		GDK_LINE_DOUBLE_DASH, GDK_CAP_BUTT, GDK_JOIN_MITER );
+	gdk_draw_line( draw, fg, 
+		r->left, r->top, 
+		IM_RECT_RIGHT( r ), r->top );
+	gdk_draw_line( draw, fg, 
+		IM_RECT_RIGHT( r ), r->top, 
+		IM_RECT_RIGHT( r ), IM_RECT_BOTTOM( r ) );
+	gdk_draw_line( draw, fg, 
+		IM_RECT_RIGHT( r ), IM_RECT_BOTTOM( r ),
+		r->left, IM_RECT_BOTTOM( r ) );
+	gdk_draw_line( draw, fg, 
+		r->left, IM_RECT_BOTTOM( r ),
+		r->left, r->top );
+	gdk_gc_set_line_attributes( fg, 0, 
+		GDK_LINE_SOLID, GDK_CAP_BUTT, GDK_JOIN_MITER );
+}
+
 /* Apply a function to every rect in a crosshair positioned at (x, y).
  */
 static void *
@@ -520,7 +546,7 @@ regionview_paint( Regionview *regionview )
 
 	case REGIONVIEW_BOX:
 		im_rect_normalise( &dr );
-		regionview_paint_arrow( draw, 
+		regionview_paint_box( draw, 
 			tl, regionview->dash_offset, &dr );
 		break;
 

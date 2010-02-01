@@ -1106,10 +1106,12 @@ Interpolate_type = class {
 	BICUBIC = 2;
 	YAFRSMOOTH = 3;
 	NOHALO = 4;
+	SNOHALO = 5;
+	NOHALO2 = 6;
 
 	// should introspect to get the list of interpolators :-( we can "dir" on
 	// VipsInterpolate to get a list of them, but we can't get i18n'd
-	// descriptions until we have more introspection stuff
+	// descriptions until we have more introspection stuff in nip2
 
 	/* Table to map interpol numbers to descriptive strings
 	 */
@@ -1119,7 +1121,8 @@ Interpolate_type = class {
 		_ "Bicubic",
 		_ "Bicubic plus edge enhance (yafr-smooth)",
 		_ "Bilinear plus edge enhance (nohalo-sharp-1)",
-		_ "Bilinear minus edge enhance (nohalo-smooth-1)"
+		_ "Bilinear minus edge enhance (nohalo-smooth-1)",
+		_ "Two-way bilinear (nohalo-2)"
 	];
 
 	/* And to vips type names.
@@ -1130,7 +1133,8 @@ Interpolate_type = class {
 		"VipsInterpolateBicubic",
 		"VipsInterpolateYafrsmooth",
 		"VipsInterpolateNohalo1",
-		"VipsInterpolateSnohalo1"
+		"VipsInterpolateSnohalo1",
+		"VipsInterpolateNohalo2"
 	];
 }
 

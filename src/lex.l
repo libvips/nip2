@@ -58,7 +58,7 @@
 
 /* See parse.y for input and unput.
  */
-#define output(A) (error( "output called by lex!!" ))
+#define output(A) (error( "output called by lex" ))
 
 #define YYLMAX MAX_STRSIZE
 
@@ -172,13 +172,13 @@ read_char( void )
 		}
 		else if( ch == '/' ) {
 			if( (ch = input()) == '*' ) 
-				yyerror( _( "nested comment!" ) );
+				yyerror( _( "nested comment" ) );
 			else
 				unput( ch );
 		}
 
 	if( ch == EOF )
-		yyerror( _( "no end of comment!" ) );
+		yyerror( _( "no end of comment" ) );
 }
 # |
 (\/\/) { 

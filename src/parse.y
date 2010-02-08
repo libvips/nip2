@@ -1180,7 +1180,7 @@ ip_input( void )
 	 * definition.
 	 */
 	if( is->bwp >= MAX_STRSIZE )
-		yyerror( _( "definition is too long!" ) );
+		yyerror( _( "definition is too long" ) );
 	if( is->bwp >= 0 )
 		is->buf[is->bwp] = ch;
 	is->bwp++;

@@ -713,7 +713,7 @@ conversion_make_repaint( Conversion *conv, IMAGE *in )
 
 		/* im_msb() only works for the int formats.
 		 */
-		if( im_isint( in ) ) {
+		if( vips_bandfmt_isint( in->BandFmt ) ) {
 			if( im_msb( in, t[0] ) ) {
 				im_close( out );
 				return( NULL );
@@ -734,7 +734,7 @@ conversion_make_repaint( Conversion *conv, IMAGE *in )
 	if( in->BandFmt != IM_BANDFMT_UCHAR ) {
 		IMAGE *t = im_open_local( out, "conv:1", "p" );
 
-		if( !t || im_clip( in, t ) ) {
+		if( !t || im_clip2fmt( in, t, IM_BANDFMT_UCHAR ) ) {
 			im_close( out );
 			return( NULL );
 		}

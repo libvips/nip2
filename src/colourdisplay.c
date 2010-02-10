@@ -77,7 +77,7 @@ colourdisplay_set_drag_type( Colourdisplay *colourdisplay )
 	if( !GTK_WIDGET_REALIZED( GTK_WIDGET( colourdisplay ) ) || !im ) 
 		return;
 
-	if( im->Bands == 3 && !im_iscomplex( im ) )
+	if( im->Bands == 3 && !vips_bandfmt_iscomplex( im->BandFmt ) )
 		targets = colour_targets;
 	else if( im->Coding == IM_CODING_LABQ )
 		targets = colour_targets;

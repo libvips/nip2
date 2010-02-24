@@ -1,3 +1,9 @@
+- OS X bundler:
+
+   http://sourceforge.net/apps/trac/gtk-osx/wiki/Bundle
+
+  test?
+
 - we're getting a leak report if we use the paintbox
 
 - imageinfo_make_paintable() no longer copies to a file, since this used to

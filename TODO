@@ -1,3 +1,19 @@
+- try:
+
+	make A1, a 2 x 10 matrix
+	A2 = [x :: [x, y] <- A1.value]
+
+	change something in A1, A2 does not update, argh
+
+- try:
+
+	start nip2
+	dir untitled
+	create A2, A3, etc.
+	A1 does not update
+
+  when we add/remove a def to workspace, should we mark the ws dirty?
+
 - OS X bundler:
 
    http://sourceforge.net/apps/trac/gtk-osx/wiki/Bundle

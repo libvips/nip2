@@ -1,5 +1,11 @@
 - try:
 
+	 nip2 Workspaces.uniformshapes2.A1.start_line=21 uniformshapes2.ws 
+
+  --set does not work for non-toplevels
+
+- try:
+
 	make A1, a 2 x 10 matrix
 	A2 = [x :: [x, y] <- A1.value]
 

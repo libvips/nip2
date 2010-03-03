@@ -6,10 +6,19 @@
 
 - try:
 
-	make A1, a 2 x 10 matrix
-	A2 = [x :: [x, y] <- A1.value]
+	A1 = [1]
+	A2 = [x :: x <- A1]
 
-	change something in A1, A2 does not update, argh
+	change A1, A2 does not update, argh
+
+  this in parse.y:723
+
+		/* Link unresolved names outwards.
+		 */
+		compile_resolve_names( current_compile, 
+			compile_get_parent( current_compile ) );
+
+  isn't making links correctly
 
 - try:
 
@@ -19,6 +28,10 @@
 	A1 does not update
 
   when we add/remove a def to workspace, should we mark the ws dirty?
+
+- lambdas should allow patterns? eg.:
+
+	map (\[x, y] x + y) [[1, 2], [3, 4]] == [3, 7]
 
 - OS X bundler:
 

@@ -202,6 +202,27 @@ expr_get_root_dynamic( Expr *expr )
 		return( NULL ); 
 }
 
+/* Is an expr part of a row, including enclosing exprs. 
+ *
+ * For example, row A1 could be "[x::x<-A2]", that would be expanded to 
+ * something like 
+ * "$lcomp0 {$lcomp0 = foldr $f0 [] A2 {$f0 x $sofar = x : $sofar}}"
+ * Now, row A1 depends on A2, but expr A1 will not ... it's $lcomp0, the local
+ * expr of A1, that will get called for expr_dirty.
+ *
+ * Return NULL for expr is not a row and has no enclosing rows.
+ */
+static Row *
+expr_get_row( Expr *expr )
+{
+	if( expr->row )
+		return( expr->row );
+	else if( is_top( expr->sym ) )
+		return( NULL );
+	else
+		return( expr_get_row( expr_get_parent( expr ) ) );
+}
+
 void 
 expr_new_value( Expr *expr )
 {
@@ -538,7 +559,7 @@ expr_error_clear( Expr *expr )
 
 /* Mark an expr dirty.
  *
- * Two cases: if expr->row, this is part of a display. Use the row
+ * Two cases: if expr has a row, this is part of a display. Use the row
  * stuff to mark this expr dirty. Then use symbol_dirty() to mark on from the
  * root of this row.
  *
@@ -551,10 +572,18 @@ expr_error_clear( Expr *expr )
 void *
 expr_dirty( Expr *expr, int serial )
 {
-	if( expr->row ) {
-		Symbol *top_sym = expr->row->top_row->sym;
+	Row *row;
 
-		row_dirty( expr->row, TRUE );
+#ifdef DEBUG
+	printf( "expr_dirty: " );
+	symbol_name_print( expr->sym );
+	printf( "\n" );
+#endif /*DEBUG*/
+
+	if( (row = expr_get_row( expr )) ) {
+		Symbol *top_sym = row->top_row->sym;
+
+		row_dirty( row, TRUE );
 		symbol_dirty( top_sym, serial );
 	}
 	else

@@ -1,3 +1,5 @@
+- paint, undo, paint again, segv
+
 - try:
 
 	 nip2 Workspaces.uniformshapes2.A1.start_line=21 uniformshapes2.ws 
@@ -11,14 +13,49 @@
 
 	change A1, A2 does not update, argh
 
-  this in parse.y:723
+  we get:
 
-		/* Link unresolved names outwards.
-		 */
-		compile_resolve_names( current_compile, 
-			compile_get_parent( current_compile ) );
+	link_expr_new: expr A2.$$lcomp0 references link->child = A1
 
-  isn't making links correctly
+  so perhaps we are updating the local of A2, but not A2?
+
+  A2 is certainly being marked dirty ... on change of A1 we get:
+
+	row_dirty_set_single: A1  clear_error = true
+	symbol_dirty_set: A1 (0x1a59480)
+	symbol_dirty_set: A2 (0x1a595a0)
+	symbol_recalculate_check: untitled.A1
+	row_dirty_clear: A1 
+	row_recomp_all: done row A1  - 0.000143873s
+	row_dirty_set_single: A1  clear_error = false
+	row_dirty_clear: A1 
+	symbol_dirty_clear: A1 (0x1a59480)
+		success: [2]
+	symbol_recalculate_check: untitled.A2
+	symbol_dirty_clear: A2 (0x1a595a0)
+		success: [1]
+
+  so maybe A2.something is being updated, but the row is not
+
+  we now mark a row dirty if a sub-expr is dirty. but in row_renerate(), we
+  don't build subexprs 
+
+  should we mark the subexpr dirty? (or maybe we do?)
+
+  or should we always copy all subexprs when we copy an expr
+
+  or only subexprs with no row?
+
+  do we calc rows outside-in or inside-out? does this affect copying subrows?
+
+  when do we copy now, the first time a row is made?
+
+ 
+
+- we destroy and rebuild all links during recomp (eg. turn on DEBUG in
+  link.c), why is this? can't we only rebuild on a change of source text?
+
+- fix the FIXME in itext_clear_edited() or wherever it is
 
 - try:
 

@@ -100,7 +100,6 @@ GType row_get_type( void );
 void row_link_symbol( Row *row, Symbol *sym, PElement *root );
 Row *row_new( Subcolumn *scol, Symbol *sym, PElement *root );
 
-void *row_dirty_set( Row *row, gboolean clear_dirty );
 void *row_dirty( Row *row, gboolean clear_dirty );
 void *row_dirty_intrans( Row *row, gboolean clear_dirty );
 

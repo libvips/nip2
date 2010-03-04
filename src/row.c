@@ -40,8 +40,8 @@
  */
 
 /* Time row recomp.
-#define DEBUG_TIME_SORT
 #define DEBUG_TIME
+#define DEBUG_TIME_SORT
  */
 
 /* Trace create/destroy.
@@ -147,98 +147,6 @@ row_name_print( Row *row )
 	return( NULL );
 }
 
-/* Mark a row as containing an error ... called from expr_error_set()
- * ... don't call this directly.
- */
-void
-row_error_set( Row *row )
-{
-	if( !row->err ) {
-		Workspace *ws = row->ws;
-		gboolean was_clear = ws->errors == NULL;
-
-		ws->errors = g_slist_prepend( ws->errors, row );
-		row->err = TRUE;
-
-#ifdef DEBUG_ERROR
-		printf( "row_error_set: " );
-		row_name_print( row );
-		printf( "\n" );
-#endif /*DEBUG_ERROR*/
-
-		iobject_changed( IOBJECT( row ) );
-
-		/* First error? State change on workspace.
-		 */
-		if( was_clear )
-			iobject_changed( IOBJECT( ws ) );
-
-		/* If this is a local row, mark the top row in error too to end
-		 * recomp on this tree.
-		 */
-		if( row != row->top_row ) {
-			char txt[100];
-			VipsBuf buf = VIPS_BUF_STATIC( txt );
-
-			row_qualified_name( row, &buf );
-
-			error_top( _( "Error in row." ) );
-			/* Elements are name of row, principal error,
-			 * secondary error.
-			 */
-			error_sub( _( "Error in row %s: %s\n%s" ),	
-				vips_buf_all( &buf ),
-				row->expr->error_top,
-				row->expr->error_sub );
-
-			expr_error_set( row->top_row->expr );
-		}
-	}
-}
-
-/* Clear error state ... called from expr_error_clear() ... don't call this
- * directly.
- */
-void
-row_error_clear( Row *row )
-{
-	if( row->err ) {
-		Workspace *ws = row->ws;
-
-		ws->errors = g_slist_remove( ws->errors, row );
-		row->err = FALSE;
-
-		iobject_changed( IOBJECT( row ) );
-
-#ifdef DEBUG_ERROR
-		printf( "row_error_clear: " );
-		row_name_print( row );
-		printf( "\n" );
-#endif /*DEBUG_ERROR*/
-
-		/* Mark our text modified to make sure we reparse and compile.
-		 * The code may contain pointers to dead symbols if we were in
-		 * error because they were undefined.
-		 */
-		if( row->child_rhs && row->child_rhs->itext )
-			heapmodel_set_modified( 
-				HEAPMODEL( row->child_rhs->itext ), TRUE );
-
-		/* All errors gone? Ws changed too.
-		 */
-		if( !ws->errors )
-			iobject_changed( IOBJECT( ws ) );
-
-		/* Is this a local row? Clear the top row error as well, in
-		 * case it's in error because of us.
-		 */
-		if( row != row->top_row && row->top_row->expr ) {
-			expr_error_clear( row->top_row->expr );
-			row_dirty_set( row->top_row, TRUE );
-		}
-	}
-}
-
 static void *
 row_dirty_clear( Row *row )
 {
@@ -331,7 +239,7 @@ row_dirty_set_sub( Model *model, gboolean clear_error )
  * values dirty too so that they will get a chance to reapply their edits over
  * the top of the new value we will make for this row.
  */
-void *
+static void *
 row_dirty_set( Row *row, gboolean clear_error )
 {
 	row_dirty_set_single( row, clear_error );
@@ -339,6 +247,98 @@ row_dirty_set( Row *row, gboolean clear_error )
 	return( icontainer_map_all( ICONTAINER( row ),
 		(icontainer_map_fn) row_dirty_set_sub, 
 			GINT_TO_POINTER( clear_error ) ) );
+}
+
+/* Mark a row as containing an error ... called from expr_error_set()
+ * ... don't call this directly.
+ */
+void
+row_error_set( Row *row )
+{
+	if( !row->err ) {
+		Workspace *ws = row->ws;
+		gboolean was_clear = ws->errors == NULL;
+
+		ws->errors = g_slist_prepend( ws->errors, row );
+		row->err = TRUE;
+
+#ifdef DEBUG_ERROR
+		printf( "row_error_set: " );
+		row_name_print( row );
+		printf( "\n" );
+#endif /*DEBUG_ERROR*/
+
+		iobject_changed( IOBJECT( row ) );
+
+		/* First error? State change on workspace.
+		 */
+		if( was_clear )
+			iobject_changed( IOBJECT( ws ) );
+
+		/* If this is a local row, mark the top row in error too to end
+		 * recomp on this tree.
+		 */
+		if( row != row->top_row ) {
+			char txt[100];
+			VipsBuf buf = VIPS_BUF_STATIC( txt );
+
+			row_qualified_name( row, &buf );
+
+			error_top( _( "Error in row." ) );
+			/* Elements are name of row, principal error,
+			 * secondary error.
+			 */
+			error_sub( _( "Error in row %s: %s\n%s" ),	
+				vips_buf_all( &buf ),
+				row->expr->error_top,
+				row->expr->error_sub );
+
+			expr_error_set( row->top_row->expr );
+		}
+	}
+}
+
+/* Clear error state ... called from expr_error_clear() ... don't call this
+ * directly.
+ */
+void
+row_error_clear( Row *row )
+{
+	if( row->err ) {
+		Workspace *ws = row->ws;
+
+		ws->errors = g_slist_remove( ws->errors, row );
+		row->err = FALSE;
+
+		iobject_changed( IOBJECT( row ) );
+
+#ifdef DEBUG_ERROR
+		printf( "row_error_clear: " );
+		row_name_print( row );
+		printf( "\n" );
+#endif /*DEBUG_ERROR*/
+
+		/* Mark our text modified to make sure we reparse and compile.
+		 * The code may contain pointers to dead symbols if we were in
+		 * error because they were undefined.
+		 */
+		if( row->child_rhs && row->child_rhs->itext )
+			heapmodel_set_modified( 
+				HEAPMODEL( row->child_rhs->itext ), TRUE );
+
+		/* All errors gone? Ws changed too.
+		 */
+		if( !ws->errors )
+			iobject_changed( IOBJECT( ws ) );
+
+		/* Is this a local row? Clear the top row error as well, in
+		 * case it's in error because of us.
+		 */
+		if( row != row->top_row && row->top_row->expr ) {
+			expr_error_clear( row->top_row->expr );
+			row_dirty_set( row->top_row, TRUE );
+		}
+	}
 }
 
 /* Break a dependency.

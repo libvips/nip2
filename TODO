@@ -1,4 +1,25 @@
-- paint, undo, paint again, segv
+- paint, paint again, segv
+
+  we are doing im_invalidate() in im_plotmask() and (way down the line) it is
+  invalidating regions being used by im_render() to update the thumbnail
+
+  so we get a terrible race condition where one thread is trying to
+  invalidate regions the other thread is using :( specifically:
+
+  static void *
+  im_invalidate_region( REGION *reg )
+  {
+          if( reg->buffer )
+		  reg->buffer->invalid = TRUE;
+
+	  return( NULL );
+  }
+
+  we get reg->buffer being nulled between the test and the set
+
+  plotmask should not invalidate ... it means when we use fastlineuser we
+  invalidate on every pixel (argh) rather than on the whole line (no wonder
+  the paintbox has seemed a little slow recently)
 
 - try:
 

@@ -17,6 +17,10 @@
 
   we get reg->buffer being nulled between the test and the set
 
+  fix: move invalid and the get/set cache logic to REGION
+
+  make sure we lock the region list before traversing it in invalidate
+
   plotmask should not invalidate ... it means when we use fastlineuser we
   invalidate on every pixel (argh) rather than on the whole line (no wonder
   the paintbox has seemed a little slow recently)

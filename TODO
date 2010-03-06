@@ -1,29 +1,15 @@
-- paint, paint again, segv
+- paint on an image, thumbnail flickers horribly due to constant invalidate
+  calls
 
-  we are doing im_invalidate() in im_plotmask() and (way down the line) it is
-  invalidating regions being used by im_render() to update the thumbnail
+  why do we clear to black before update? unclear
 
-  so we get a terrible race condition where one thread is trying to
-  invalidate regions the other thread is using :( specifically:
+  maybe don't invalidate in imageinfo_area_painted()?
 
-  static void *
-  im_invalidate_region( REGION *reg )
-  {
-          if( reg->buffer )
-		  reg->buffer->invalid = TRUE;
+- managed to get 
 
-	  return( NULL );
-  }
+	ERROR:buffer.c:234:im_buffer_undone: assertion failed: (cache->thread == g_thread_self())
 
-  we get reg->buffer being nulled between the test and the set
-
-  fix: move invalid and the get/set cache logic to REGION
-
-  make sure we lock the region list before traversing it in invalidate
-
-  plotmask should not invalidate ... it means when we use fastlineuser we
-  invalidate on every pixel (argh) rather than on the whole line (no wonder
-  the paintbox has seemed a little slow recently)
+  after some smudging, painting in one window, another window open
 
 - try:
 
@@ -74,8 +60,6 @@
   do we calc rows outside-in or inside-out? does this affect copying subrows?
 
   when do we copy now, the first time a row is made?
-
- 
 
 - we destroy and rebuild all links during recomp (eg. turn on DEBUG in
   link.c), why is this? can't we only rebuild on a change of source text?

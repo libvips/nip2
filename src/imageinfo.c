@@ -294,7 +294,6 @@ imageinfo_area_painted( Imageinfo *imageinfo, Rect *dirty )
 		dirty->left, dirty->top, dirty->width, dirty->height );
 #endif /*DEBUG*/
 
-	im_invalidate( imageinfo_get( FALSE, imageinfo ) );
 	g_signal_emit( G_OBJECT( imageinfo ), 
 		imageinfo_signals[SIG_AREA_PAINTED], 0, dirty );
 

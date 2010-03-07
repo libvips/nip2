@@ -1015,6 +1015,11 @@ imagepresent_paint_stop( Imagepresent *ip, int x, int y )
 
 	imagemodel_paint_recalc( imagemodel );
 	imageinfo_undo_mark( imageinfo );
+
+	/* End of a paint action, ask downstream images to drop cache and
+	 * recalculate.
+	 */
+	im_invalidate( imageinfo_get( FALSE, imageinfo ) );
 }
 
 /* Left button release event.

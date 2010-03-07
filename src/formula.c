@@ -207,9 +207,10 @@ formula_refresh( Formula *formula )
 		set_glabel1( formula->right_label, "%s", formula->value );
 
 	if( formula->edit && formula->needs_focus ) {
-		gtk_editable_select_region( 
-			GTK_EDITABLE( formula->entry ),
-			0, strlen( formula->expr ) );
+		if( formula->expr )
+			gtk_editable_select_region( 
+				GTK_EDITABLE( formula->entry ),
+				0, strlen( formula->expr ) );
 		gtk_widget_grab_focus( formula->entry );
 		formula->needs_focus = FALSE;
 	}
@@ -345,8 +346,7 @@ formula_scan( Formula *formula )
 		 */
 		expr = gtk_entry_get_text( GTK_ENTRY( formula->entry ) );
 		if( expr && 
-			strspn( expr, WHITESPACE ) != strlen( expr ) &&
-			strcmp( expr, formula->expr ) != 0 ) {
+			strspn( expr, WHITESPACE ) != strlen( expr ) ) {
 			IM_SETSTR( formula->expr, expr );
 			changed = TRUE;
 		}

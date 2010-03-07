@@ -8,6 +8,8 @@ started 7.21.0, 8/12/09
   complex workspaces
 - thumbnail updates on paint actions, woo
 - rect and text tools have a working preview box
+- safer handling of missing exprs in formula
+- handle im_invalidate() in paintbox ourselves
 
 started 7.20.5, 27/11/09
 - fixed up GtkInfoBar support

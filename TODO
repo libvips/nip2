@@ -1,3 +1,8 @@
+- open image, zoom out, paint
+
+  display is only updated at end of drawing (I guess on im_invalidate()) ...
+  why not on the imagedisplay update signal?
+
 - paint on an image, thumbnail flickers horribly due to constant invalidate
   calls
 

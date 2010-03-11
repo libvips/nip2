@@ -1,20 +1,29 @@
-- open image, zoom out, paint
+- open image, paintbox, zoom out, paint a line, display only updates on button
+  release
 
-  display is only updated at end of drawing (I guess on im_invalidate()) ...
-  why not on the imagedisplay update signal?
+  explanation: we only invalidate at the end of paint, zoomed-out images
+  display through im_subsample() and therefore have a region with some
+  calculated pixels
 
-- paint on an image, thumbnail flickers horribly due to constant invalidate
-  calls
+  solutions:
 
-  why do we clear to black before update? unclear
+  * invalidate more often
 
-  maybe don't invalidate in imageinfo_area_painted()?
+	invalidate is too slow for this, since it has to make regions to stop 
+	images being freed during callbacks
 
-- managed to get 
+	get rid of invalidate callbacks, does im_render() really need them?
+	I'm not sure why they are necessary
 
-	ERROR:buffer.c:234:im_buffer_undone: assertion failed: (cache->thread == g_thread_self())
+	make invalidate callbacks faster by adding a way to keep images alive
+	(a ref count I guess)
 
-  after some smudging, painting in one window, another window open
+  * invalidate ourselves
+
+  	we could drop the cache in nip2 I guess, somehow, and do it more
+	quickly
+ 
+
 
 - try:
 

@@ -272,8 +272,8 @@ imageinfo_area_changed( Imageinfo *imageinfo, Rect *dirty )
 	g_assert( IS_IMAGEINFO( imageinfo ) );
 
 #ifdef DEBUG
-	printf( "imageinfo_area_changed: left = %d, top = %d, "
-		"width = %d, height = %d\n",
+	printf( "imageinfo_area_changed: "
+		"left = %d, top = %d, width = %d, height = %d\n",
 		dirty->left, dirty->top, dirty->width, dirty->height );
 #endif /*DEBUG*/
 

@@ -1357,6 +1357,11 @@ void
 conversion_set_synchronous( Conversion *conv, gboolean synchronous )
 {
 	if( conv->synchronous != synchronous ) {
+#ifdef DEBUG
+		printf( "conversion_set_synchronous: %d", synchronous );
+		iobject_print( IOBJECT( conv ) );
+#endif /*DEBUG*/
+
 		conv->synchronous = synchronous;
 		if( conv->ii )
 			iobject_changed( IOBJECT( conv->ii ) );

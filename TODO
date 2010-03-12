@@ -13,7 +13,7 @@
 	images being freed during callbacks
 
 	get rid of invalidate callbacks, does im_render() really need them?
-	I'm not sure why they are necessary
+	I'm not sure why they are necessary ... oh, vips_call needs them
 
 	make invalidate callbacks faster by adding a way to keep images alive
 	(a ref count I guess)
@@ -22,6 +22,14 @@
 
   	we could drop the cache in nip2 I guess, somehow, and do it more
 	quickly
+
+	yes, much betterer
+
+	argh, difficult! the display transform can mean we have many, many
+	images between the one we paint and the one we display
+
+	maybe split invalidate into something that quickly drops cache, and
+	something that drops cache and triggers callbacks?
  
 
 

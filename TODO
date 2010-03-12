@@ -1,3 +1,48 @@
+- image scrolling with cursor keys seems OK
+
+  with middle-drag get whole-image repaints, argh
+
+
+
+- argh, try this:
+
+  open paintbox, plot a single pixel, get a colossal number of repaint
+  actions, including repainting the entire image several times
+
+  fixing this!
+
+  when we invalidate, should we reset the valid area too? eg. consider
+
+  	render full thumbnail, a 48x64 buffer is made
+
+	invalidate, region is tagged as invalid
+
+	paint 1 px 
+
+	im_prepare() that pixel
+
+	old buffer found and reused
+
+	region is invalid, so buffer is marked undone, but the old 48x64 size
+	remains
+
+	buffer is recalculated (the whole thumbnail, not just the image)
+
+	as each tile in the im_render() is calculated, we get a render
+	callback :( and that bit of the screen is painted
+
+	so a 1px paint triggers a repaint of the whole thumbnail
+
+  fix: im_region_buffer() should not use unref_ref if the region is invalid,
+  it should do im_buffer_new() with exactly the size we want
+
+
+
+
+
+
+
+
 - open image, paintbox, zoom out, paint a line, display only updates on button
   release
 
@@ -17,6 +62,8 @@
 
 	make invalidate callbacks faster by adding a way to keep images alive
 	(a ref count I guess)
+
+	don't repaint on invalidate, do this ourselves
 
   * invalidate ourselves
 

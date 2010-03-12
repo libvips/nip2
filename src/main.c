@@ -34,8 +34,8 @@
  */
 
 /* Show all paint actions with flashing stuff.
-#define DEBUG_UPDATES
  */
+#define DEBUG_UPDATES
 
 /* Stop startup creation of externs for all VIPS functions etc.
 #define DEBUG_NOAUTO

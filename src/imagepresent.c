@@ -1016,7 +1016,7 @@ imagepresent_paint_stop( Imagepresent *ip, int x, int y )
 	imagemodel_paint_recalc( imagemodel );
 	imageinfo_undo_mark( imageinfo );
 
-	/* End of a paint action, ask downstream images to drop cache.
+	/* Ask everyone to drop cache, the image has changed.
 	 */
 	im_invalidate( imageinfo_get( FALSE, imageinfo ) );
 }
@@ -1202,6 +1202,10 @@ imagepresent_button_motion( Imagepresent *ip, GdkEvent *ev )
 	default:
 		break;
 	}
+
+	/* Ask everyone to drop cache, the image has changed.
+	 */
+	im_invalidate( imageinfo_get( FALSE, imageinfo ) );
 }
 
 /* Main event loop.

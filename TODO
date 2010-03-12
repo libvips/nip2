@@ -1,6 +1,4 @@
-- image scrolling with cursor keys seems OK
-
-  with middle-drag get whole-image repaints, argh
+- ctrl-z in paintbox does not signal invalidate?
 
 
 

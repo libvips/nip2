@@ -31,6 +31,18 @@
 	maybe split invalidate into something that quickly drops cache, and
 	something that drops cache and triggers callbacks?
  
+  * have something on an image that prevents caching
+
+  	after doing im_rwcheck(), an image is tagged as uncacheable?
+
+	could be bad for performance once painting has stopped
+
+  * make an uncacheable im_render()
+
+  	we want synchronous rendering and no cache (0 tiles?)
+	
+	would that prevent the large regions being held by intermediates?
+
 
 
 - try:

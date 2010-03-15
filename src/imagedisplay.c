@@ -101,48 +101,22 @@ imagedisplay_needs_painting( Imagedisplay *id, Rect *area )
 /* Repaint an area of the image.
  */
 static void
-imagedisplay_paint_image( Imagedisplay *id, GdkRectangle *expose )
+imagedisplay_paint_image( Imagedisplay *id, Rect *area )
 {
 	Conversion *conv = id->conv;
 
-	GdkRectangle clip;
-	GdkRectangle canvas;
-	Rect vclip;
 	guchar *buf;
 	int lsk;
 
-	if( !GTK_WIDGET( id )->window )
-		return;
-	if( !GTK_WIDGET_VISIBLE( id ) )
-		return;
-	if( !conv->ireg )
-		return;
-
-	/* Clip as much as we can.
-	 */
-	canvas.x = 0;
-	canvas.y = 0;
-	canvas.width = conv->canvas.width;
-	canvas.height = conv->canvas.height;
-	if( !gdk_rectangle_intersect( expose, &canvas, &clip ) )
-		return;
-
-	/* Pixels we need.
-	 */
-	vclip.left = clip.x;
-	vclip.top = clip.y;
-	vclip.width = clip.width;
-	vclip.height = clip.height;
-
 #ifdef DEBUG_PAINT
 	g_print( "imagedisplay_paint_image: at %d x %d, size %d x %d ",
-		clip.x, clip.y, clip.width, clip.height );
+		area->left, area->top, area->width, area->height );
 	gobject_print( G_OBJECT( id ) );
 #endif /*DEBUG_PAINT*/
 
 	/* Request pixels.
 	 */
-	if( im_prepare( conv->ireg, &vclip ) ) {
+	if( im_prepare( conv->ireg, area ) ) {
 #ifdef DEBUG_PAINT
 		printf( "imagedisplay_paint_image: paint error\n" );
 		printf( "\t%s\n", im_error_buffer() );
@@ -153,12 +127,17 @@ imagedisplay_paint_image( Imagedisplay *id, GdkRectangle *expose )
 		return;
 	}
 
-	/* No pixels available? Skip the paint.
+	/* No pixels available? Skip the paint. 
 	 */
-	if( !imagedisplay_needs_painting( id, &vclip ) )
-		return;
+	if( !imagedisplay_needs_painting( id, area ) ) {
+#ifdef DEBUG_PAINT
+		printf( "imagedisplay_paint_image: no pixels, skipping\n" );
+#endif /*DEBUG_PAINT*/
 
-	buf = (guchar *) IM_REGION_ADDR( conv->ireg, vclip.left, vclip.top );
+		return;
+	}
+
+	buf = (guchar *) IM_REGION_ADDR( conv->ireg, area->left, area->top );
 	lsk = IM_REGION_LSKIP( conv->ireg );
 
 	/* Paint into window.
@@ -166,13 +145,13 @@ imagedisplay_paint_image( Imagedisplay *id, GdkRectangle *expose )
 	if( conv->ireg->im->Bands == 3 )
 		gdk_draw_rgb_image( GTK_WIDGET( id )->window,
 			GTK_WIDGET( id )->style->white_gc,
-			clip.x, clip.y, clip.width, clip.height,
+			area->left, area->top, area->width, area->height,
 			GDK_RGB_DITHER_MAX,
 			buf, lsk );
 	else if( conv->ireg->im->Bands == 1 )
 		gdk_draw_gray_image( GTK_WIDGET( id )->window,
 			GTK_WIDGET( id )->style->white_gc,
-			clip.x, clip.y, clip.width, clip.height,
+			area->left, area->top, area->width, area->height,
 			GDK_RGB_DITHER_MAX,
 			buf, lsk );
 }
@@ -180,25 +159,25 @@ imagedisplay_paint_image( Imagedisplay *id, GdkRectangle *expose )
 /* Paint an area with the background pattern.
  */
 static void
-imagedisplay_paint_background( Imagedisplay *id, GdkRectangle *expose )
+imagedisplay_paint_background( Imagedisplay *id, Rect *expose )
 {
 #ifdef DEBUG_PAINT
 	g_print( "imagedisplay_paint_background: at %d x %d, size %d x %d\n",
-		expose->x, expose->y, expose->width, expose->height );
+		expose->left, expose->top, expose->width, expose->height );
 #endif /*DEBUG_PAINT*/
 
 	gdk_draw_rectangle( GTK_WIDGET( id )->window, 
 		id->back_gc, TRUE,
-		expose->x, expose->y, expose->width, expose->height );
+		expose->left, expose->top, expose->width, expose->height );
 }
 
 /* Paint areas outside the image.
  */
 static void
-imagedisplay_paint_background_clipped( Imagedisplay *id, GdkRectangle *expose )
+imagedisplay_paint_background_clipped( Imagedisplay *id, Rect *expose )
 {
 	Conversion *conv = id->conv;
-	GdkRectangle image, clip, area;
+	Rect clip;
 
 #ifdef DEBUG_PAINT
 	g_print( "imagedisplay_paint_background_clipped: canvas %d x %d\n",
@@ -209,19 +188,18 @@ imagedisplay_paint_background_clipped( Imagedisplay *id, GdkRectangle *expose )
 	 * everything to the right of the image, and everything strictly
 	 * below.
 	 */
-	image.x = 0;
-	image.y = 0;
-	image.width = conv->canvas.width;
-	image.height = conv->canvas.height;
-	if( gdk_rectangle_intersect( expose, &image, &clip ) ) {
+	im_rect_intersectrect( expose, &conv->canvas, &clip );
+	if( !im_rect_isempty( &clip ) ) {
+		Rect area;
+
 		area = *expose;
-		area.x = conv->canvas.width;
+		area.left = conv->canvas.width;
 		area.width -= clip.width;
 		if( area.width > 0 )
 			imagedisplay_paint_background( id, &area );
 
 		area = *expose;
-		area.y = conv->canvas.height;
+		area.top = conv->canvas.height;
 		area.width = clip.width;
 		area.height -= clip.height;
 		if( area.height > 0 )
@@ -232,21 +210,46 @@ imagedisplay_paint_background_clipped( Imagedisplay *id, GdkRectangle *expose )
 }
 
 static void
-imagedisplay_paint( Imagedisplay *id, GdkRectangle *area )
+imagedisplay_paint( Imagedisplay *id, Rect *area )
 {
+	Conversion *conv = id->conv;
+	const int tsize = conv->tile_size;
+
+	Rect clip;
+	int xs, ys;
+	int x, y;
+
+	/* Clip non-image parts of the expose.
+	 */
+	im_rect_intersectrect( area, &conv->canvas, &clip );
+	if( im_rect_isempty( &clip ) )
+		return;
+
 #ifdef DEBUG_PAINT
 	g_print( "imagedisplay_paint: at %d x %d, size %d x %d\n",
-		area->x, area->y, area->width, area->height );
+		clip.left, clip.top, clip.width, clip.height );
 #endif /*DEBUG_PAINT*/
 
-	/* Clear to background. Always do this, to make sure we paint 
-	 * outside the image area.
+	/* Round left/top down to the start tile.
 	 */
-	imagedisplay_paint_background_clipped( id, area );
+	xs = (clip.left / tsize) * tsize;
+	ys = (clip.top / tsize) * tsize;
 
-	/* Paint image.
+	/* Now loop painting image tiles.
 	 */
-	imagedisplay_paint_image( id, area );
+	for( y = ys; y < IM_RECT_BOTTOM( &clip ); y += tsize )
+		for( x = xs; x < IM_RECT_RIGHT( &clip ); x += tsize ) {
+			Rect tile;
+			Rect tile2;
+
+			tile.left = x;
+			tile.top = y;
+			tile.width = conv->tile_size;
+			tile.height = conv->tile_size;
+			im_rect_intersectrect( &tile, &clip, &tile2 );
+
+			imagedisplay_paint_image( id, &tile2 );
+		}
 }
 
 /* Expose signal handler.
@@ -255,19 +258,40 @@ static gint
 imagedisplay_expose( GtkWidget *widget, GdkEventExpose *event )
 {
 	Imagedisplay *id = IMAGEDISPLAY( widget );
+	Conversion *conv = id->conv;
+
 	GdkRectangle *rect;
 	int i, n;
 
 	if( !GTK_WIDGET_DRAWABLE( id ) ||
-		event->area.width == 0 || event->area.height == 0 )
+		event->area.width == 0 || 
+		event->area.height == 0 ||
+		!GTK_WIDGET( id )->window ||
+		!GTK_WIDGET_VISIBLE( id ) ||
+		!conv->ireg )
 		return( FALSE );
 
 	gdk_region_get_rectangles( event->region, &rect, &n );
 #ifdef DEBUG_PAINT
 	g_print( "imagedisplay_expose: %d rectangles\n", n ); 
 #endif /*DEBUG_PAINT*/
-	for( i = 0; i < n; i++ ) 
-		imagedisplay_paint( id, &rect[i] );
+	for( i = 0; i < n; i++ ) {
+		Rect area;
+
+		area.left = rect[i].x;
+		area.top = rect[i].y;
+		area.width = rect[i].width;
+		area.height = rect[i].height;
+
+		/* Clear to background. Always do this, to make sure we paint 
+		 * outside the image area.
+		 */
+		imagedisplay_paint_background_clipped( id, &area );
+
+		/* And paint pixels.
+		 */
+		imagedisplay_paint( id, &area );
+	}
 	g_free( rect );
 
         return( FALSE );

@@ -170,6 +170,11 @@ paintboxview_undo_cb( GtkWidget *widget, Paintboxview *pbv )
 {
 	if( !imageinfo_undo( pbv->ii ) )
 		iwindow_alert( widget, GTK_MESSAGE_ERROR );
+
+	/* Ask everyone to drop cache, the image has changed.
+	 */
+	im_invalidate( imageinfo_get( FALSE, pbv->ii ) );
+
 	imagemodel_paint_recalc( pbv->imagemodel );
 }
 
@@ -178,6 +183,11 @@ paintboxview_redo_cb( GtkWidget *widget, Paintboxview *pbv )
 {
 	if( !imageinfo_redo( pbv->ii ) )
 		iwindow_alert( widget, GTK_MESSAGE_ERROR );
+
+	/* Ask everyone to drop cache, the image has changed.
+	 */
+	im_invalidate( imageinfo_get( FALSE, pbv->ii ) );
+
 	imagemodel_paint_recalc( pbv->imagemodel );
 }
 

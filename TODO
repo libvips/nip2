@@ -1,4 +1,61 @@
+- open paintbox, draw a small line with the pen
+
+  get some very large paint actions, eg.:
+
+imagedisplay_paint_image: at 30 x 4, size 1 x 1 Imagedisplay (0x67be0b0)
+imagedisplay_paint_image: at 632 x 90, size 10 x 11 Imagedisplay (0x6865480)
+conversion_update_dispatch: left = 16, top = 0, width = 16, height = 16
+imagedisplay_conversion_area_changed_cb: left = 16, top = 0, width = 16, height = 16, Imagedisplay (0x67be0b0)
+imagedisplay_conversion_area_changed_cb: left = 336, top = 0, width = 336, height = 336, Imagedisplay (0x6865480)
+imagedisplay_paint_image: at 16 x 0, size 16 x 16 Imagedisplay (0x67be0b0)
+imagedisplay_paint_image: at 336 x 0, size 336 x 336 Imagedisplay (0x6865480)
+
+the final imagedisplay_paint_image is much too large ... the huge patch being
+painted somes from imagedisplay_conversion_area_changed_cb
+
+what triggers this?
+
+conversion_ii_area_changed_cb: left = 336, top = 0, width = 336, height = 336
+
+area_changed on ii
+
+imageinfo_area_changed: left = 336, top = 0, width = 336, height = 336
+
+conversion_render_idle_cb()
+
+argh! it's the 16x16 tile from the thumbnail scaled up to image size
+
+
+
+
+
+
+so .. we have a single imageinfo with several conversions for display
+(thumbnail, paintbox, image view window)
+
+each conversion (except the paintbox) uses an im_render() to display the image
+
+each im_render() has a notify callback to signal when pixels are ready for
+painting ... these are added to the queue for conversion_render_idle_cb()
+
+and conversion_render_idle_cb() marks area_changed on the underlying
+imageinfo, not on the display image, argh
+
+
+todo .. conversion_render_idle_cb() should signal area_changed on the 
+conversion, not the underlying image
+
+make a conversion_area_changed() out of conversion_ii_area_changed_cb()
+
+
+
+
+
 - ctrl-z in paintbox does not signal invalidate?
+
+- conversion_render_idle_cb() still has the +1 margin commented out
+
+
 
 
 

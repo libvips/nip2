@@ -64,6 +64,13 @@ conversion_imageinfo_changed( Conversion *conv )
 }
 
 static void
+conversion_area_changed( Conversion *conv, Rect *dirty )
+{
+	g_signal_emit( G_OBJECT( conv ), 
+		conversion_signals[SIG_AREA_CHANGED], 0, dirty );
+}
+
+static void
 conversion_dispose( GObject *gobject )
 {
 	Conversion *conv;
@@ -216,7 +223,6 @@ conversion_render_idle_cb( gpointer data )
 {
 	ConversionUpdate *update = (ConversionUpdate *) data;
 	Conversion *conv = update->conv;
-	Rect image;
 
 	/* Must be a valid conversion, must be for the image that that 
 	 * conversion is still using for display.
@@ -232,28 +238,22 @@ conversion_render_idle_cb( gpointer data )
 	}
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	g_print( "conversion_update_dispatch: left = %d, top = %d, "
 		"width = %d, height = %d\n",
 		update->area.left, update->area.top, 
 		update->area.width, update->area.height );
-
-	conversion_disp_to_im_rect( conv, &update->area, &image );
-
-	/* If we're zoomed out, expand the margins to allow for rounding.
-	if( update->conv->mag < 0 ) {
-		image.width += 1;
-		image.height += 1;
-	}
-	 */
+#endif /*DEBUG*/
 
 	/* We need to invalid the main image too, since those regions will
 	 * have black in from the failed first calc.
+	 *
+	 * im_render() can't do this invalidate for us, it needs to be done
+	 * from the main loop.
 	 */
 	im_invalidate( conv->mask );
 	im_invalidate( imageinfo_get( FALSE, conv->display_ii ) );
 
-	imageinfo_area_changed( conv->ii, &image );
+	conversion_area_changed( conv, &update->area );
 
 	g_free( update );
 
@@ -1120,6 +1120,8 @@ conversion_ii_changed_cb( Imageinfo *ii, Conversion *conv )
 	iobject_changed( IOBJECT( conv ) );
 }
 
+/* Something like a paint action on the ii.
+ */
 static void
 conversion_ii_area_changed_cb( Imageinfo *imageinfo, 
 	Rect *dirty, Conversion *conv )
@@ -1127,8 +1129,7 @@ conversion_ii_area_changed_cb( Imageinfo *imageinfo,
 	Rect repaint;
 
 	conversion_im_to_disp_rect( conv, dirty, &repaint );
-	g_signal_emit( G_OBJECT( conv ), 
-		conversion_signals[SIG_AREA_CHANGED], 0, &repaint );
+	conversion_area_changed( conv, &repaint );
 }
 
 /* Install a new image. 

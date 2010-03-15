@@ -6,6 +6,8 @@
 - nasty black squares during a repaint ... I thought we didn't paint all-black
   tiles?
 
+  perhaps we should cut repaints into tile-sized chunks?
+
 - try:
 
 	 nip2 Workspaces.uniformshapes2.A1.start_line=21 uniformshapes2.ws 

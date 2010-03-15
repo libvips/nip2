@@ -134,17 +134,14 @@ imagedisplay_paint_image( Imagedisplay *id, GdkRectangle *expose )
 	vclip.width = clip.width;
 	vclip.height = clip.height;
 
-	/* Test for paintability.
-	 */
-	if( !imagedisplay_needs_painting( id, &vclip ) )
-		return;
-
 #ifdef DEBUG_PAINT
 	g_print( "imagedisplay_paint_image: at %d x %d, size %d x %d ",
 		clip.x, clip.y, clip.width, clip.height );
 	gobject_print( G_OBJECT( id ) );
 #endif /*DEBUG_PAINT*/
 
+	/* Request pixels.
+	 */
 	if( im_prepare( conv->ireg, &vclip ) ) {
 #ifdef DEBUG_PAINT
 		printf( "imagedisplay_paint_image: paint error\n" );
@@ -155,6 +152,12 @@ imagedisplay_paint_image( Imagedisplay *id, GdkRectangle *expose )
 
 		return;
 	}
+
+	/* No pixels available? Skip the paint.
+	 */
+	if( !imagedisplay_needs_painting( id, &vclip ) )
+		return;
+
 	buf = (guchar *) IM_REGION_ADDR( conv->ireg, vclip.left, vclip.top );
 	lsk = IM_REGION_LSKIP( conv->ireg );
 

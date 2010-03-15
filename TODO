@@ -1,12 +1,8 @@
-- open a large image, scroll slowly, after a while we get chunks left behind
-  and see:
+- open a large image, scroll slowly, after a while we see:
 
   ERROR:buffer.c:234:im_buffer_undone: assertion failed: (cache->thread == g_thread_self())
 
-- nasty black squares during a repaint ... I thought we didn't paint all-black
-  tiles?
-
-  perhaps we should cut repaints into tile-sized chunks?
+- #CPUs should default to -1 or 0 in prefs now that we have autodetect
 
 - try:
 

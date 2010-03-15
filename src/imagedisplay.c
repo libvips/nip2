@@ -65,39 +65,6 @@ imagedisplay_queue_draw_area( Imagedisplay *id, Rect *area )
 		area->left, area->top, area->width, area->height ); 
 }
 
-/* Does an area need painting? Test the mask for non-zero pixels.
- */
-static gboolean
-imagedisplay_needs_painting( Imagedisplay *id, Rect *area )
-{
-	Conversion *conv = id->conv;
-	guchar *buf;
-	int lsk;
-	int x, y;
-
-	/* No mask? Always paint.
-	 */
-	if( !conv->mreg )
-		return( TRUE );
-
-	/* If the mask is all zero, don't paint. This can leave old pixels on
-	 * the screen, but it does stop a lot of flicker and makes updates
-	 * look cleaner.
-	 */
-	if( im_prepare( conv->mreg, area ) )
-		return( TRUE );
-        buf = (guchar *) IM_REGION_ADDR( conv->mreg, area->left, area->top );
-        lsk = IM_REGION_LSKIP( conv->mreg );
-	for( y = 0; y < area->height; y++ ) {
-		for( x = 0; x < area->width; x++ )
-			if( buf[x] )
-				return( TRUE );
-		buf += lsk;
-	}
-
-	return( FALSE );
-}
-
 /* Repaint an area of the image.
  */
 static void
@@ -114,8 +81,20 @@ imagedisplay_paint_image( Imagedisplay *id, Rect *area )
 	gobject_print( G_OBJECT( id ) );
 #endif /*DEBUG_PAINT*/
 
-	/* Request pixels.
+	/* Request pixels. We ask the mask first, to get an idea of what's
+	 * currently in cache, then request tiles of pixels. We must always
+	 * request pixels, even if the mask is blank, because the request
+	 * will trigger a notify later which will reinvoke us.
 	 */
+	if( conv->mreg &&
+		im_prepare( conv->mreg, area ) ) {
+#ifdef DEBUG_PAINT
+		printf( "imagedisplay_paint_image: mask paint error\n" );
+		printf( "\t%s\n", im_error_buffer() );
+#endif /*DEBUG_PAINT*/
+
+		return;
+	}
 	if( im_prepare( conv->ireg, area ) ) {
 #ifdef DEBUG_PAINT
 		printf( "imagedisplay_paint_image: paint error\n" );
@@ -127,21 +106,45 @@ imagedisplay_paint_image( Imagedisplay *id, Rect *area )
 		return;
 	}
 
-	/* No pixels available? Skip the paint. 
+	/* Is the mask all zero? Skip the paint.
 	 */
-	if( !imagedisplay_needs_painting( id, area ) ) {
+	if( conv->mreg ) {
+		gboolean found;
+		int x, y;
+
+		buf = (guchar *) 
+			IM_REGION_ADDR( conv->mreg, area->left, area->top );
+		lsk = IM_REGION_LSKIP( conv->mreg );
+		found = FALSE;
+
+		for( y = 0; y < area->height; y++ ) {
+			for( x = 0; x < area->width; x++ )
+				if( buf[x] ) {
+					found = TRUE;
+					break;
+				}
+
+			if( found )
+				break;
+
+			buf += lsk;
+		}
+
+		if( !found ) {
 #ifdef DEBUG_PAINT
-		printf( "imagedisplay_paint_image: no pixels, skipping\n" );
+			printf( "imagedisplay_paint_image: zero mask\n" );
 #endif /*DEBUG_PAINT*/
 
-		return;
+			return;
+		}
 	}
+
+	/* Paint into window.
+	 */
 
 	buf = (guchar *) IM_REGION_ADDR( conv->ireg, area->left, area->top );
 	lsk = IM_REGION_LSKIP( conv->ireg );
 
-	/* Paint into window.
-	 */
 	if( conv->ireg->im->Bands == 3 )
 		gdk_draw_rgb_image( GTK_WIDGET( id )->window,
 			GTK_WIDGET( id )->style->white_gc,

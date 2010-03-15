@@ -673,7 +673,7 @@ imageinfo_proxy_eval( Imageinfoproxy *proxy )
 {
 	Imageinfo *imageinfo = proxy->imageinfo;
 
-	if( imageinfo ) 
+	if( imageinfo && imageinfo->im->time ) 
 		if( progress_update_percent( imageinfo->im->time->percent,
 			imageinfo->im->time->eta ) ) {
 			im_error( "nip2", _( "User cancelled operation" ) );

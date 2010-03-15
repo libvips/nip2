@@ -1,5 +1,4 @@
-/* Imagedisplay widget code ... display entire image, place this widget in a
- * scrolledwindow to get clipping/scrolling behaviour.
+/* Imagedisplay widget code ... display entire image, place this widget in a * scrolledwindow to get clipping/scrolling behaviour.
  */
 
 /*
@@ -56,6 +55,12 @@ static guint imagedisplay_signals[SIG_LAST] = { 0 };
 void
 imagedisplay_queue_draw_area( Imagedisplay *id, Rect *area )
 {
+#ifdef DEBUG_PAINT
+	printf( "imagedisplay_queue_draw_area: "
+		"left = %d, top = %d, width = %d, height = %d\n",
+		area->left, area->top, area->width, area->height );
+#endif /*DEBUG_PAINT*/
+
 	gtk_widget_queue_draw_area( GTK_WIDGET( id ),
 		area->left, area->top, area->width, area->height ); 
 }
@@ -359,12 +364,6 @@ imagedisplay_real_conversion_changed( Imagedisplay *id )
 static void
 imagedisplay_real_area_changed( Imagedisplay *id, Rect *dirty )
 {
-#ifdef DEBUG_PAINT
-	g_print( "imagedisplay_real_area_changed: left = %d, top = %d, "
-		"width = %d, height = %d\n",
-		dirty->left, dirty->top, dirty->width, dirty->height );
-#endif /*DEBUG_PAINT*/
-
 	imagedisplay_queue_draw_area( id, dirty );
 }
 
@@ -487,7 +486,13 @@ imagedisplay_get_type( void )
 static void
 imagedisplay_conversion_changed_cb( Conversion *conv, Imagedisplay *id )
 {
+#ifdef DEBUG
+	printf( "imagedisplay_conversion_changed_cb: " );
+	gobject_print( G_OBJECT( id ) );
+#endif /*DEBUG*/
+
 	IMAGEDISPLAY_GET_CLASS( id )->conversion_changed( id );
+
 	g_signal_emit( G_OBJECT( id ), 
 		imagedisplay_signals[SIG_AREA_CHANGED], 0, &conv->canvas );
 }
@@ -498,6 +503,13 @@ static void
 imagedisplay_conversion_area_changed_cb( Conversion *conv, 
 	Rect *dirty, Imagedisplay *id )
 {
+#ifdef DEBUG
+	printf( "imagedisplay_conversion_area_changed_cb: " 
+		"left = %d, top = %d, width = %d, height = %d, ",
+		dirty->left, dirty->top, dirty->width, dirty->height );
+	gobject_print( G_OBJECT( id ) );
+#endif /*DEBUG*/
+
 	g_signal_emit( G_OBJECT( id ), 
 		imagedisplay_signals[SIG_AREA_CHANGED], 0, dirty );
 }

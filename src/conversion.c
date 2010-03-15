@@ -232,20 +232,20 @@ conversion_render_idle_cb( gpointer data )
 	}
 
 #ifdef DEBUG
+#endif /*DEBUG*/
 	g_print( "conversion_update_dispatch: left = %d, top = %d, "
 		"width = %d, height = %d\n",
 		update->area.left, update->area.top, 
 		update->area.width, update->area.height );
-#endif /*DEBUG*/
 
 	conversion_disp_to_im_rect( conv, &update->area, &image );
 
 	/* If we're zoomed out, expand the margins to allow for rounding.
-	 */
 	if( update->conv->mag < 0 ) {
 		image.width += 1;
 		image.height += 1;
 	}
+	 */
 
 	/* We need to invalid the main image too, since those regions will
 	 * have black in from the failed first calc.

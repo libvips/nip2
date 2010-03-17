@@ -1,9 +1,3 @@
-- open a large image, scroll slowly, after a while we see:
-
-  ERROR:buffer.c:234:im_buffer_undone: assertion failed: (cache->thread == g_thread_self())
-
-- #CPUs should default to -1 or 0 in prefs now that we have autodetect
-
 - try:
 
 	 nip2 Workspaces.uniformshapes2.A1.start_line=21 uniformshapes2.ws 

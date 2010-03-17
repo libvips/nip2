@@ -871,7 +871,7 @@
           <Rhs vislevel="1" flags="1">
             <Number/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Number &quot;Number of CPUs to use&quot; 4"/>
+            <iText formula="Number &quot;Number of CPUs to use (0 for autodetect)&quot; 0"/>
           </Rhs>
         </Row>
       </Subcolumn>

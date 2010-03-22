@@ -428,9 +428,7 @@ mainw_status_update( Mainw *mainw )
 	else {
 		char txt[256];
 
-		im_snprintf( txt, 256, 
-			_( "%s: &#0169;2009 Imperial College, London" ), 
-			PACKAGE );
+		im_snprintf( txt, 256, _( NIP_COPYRIGHT ), PACKAGE );
 		gtk_label_set_markup( GTK_LABEL( mainw->statusbar ), txt );
 	}
 }

@@ -533,6 +533,12 @@ reduce_get_matrix_size( Reduce *rc,
 	(void) reduce_map_list( rc, base, 
 		(reduce_map_list_fn) reduce_get_line_size, &w, &h );
 
+	if( w == 0 || h == 0 ) {
+		error_top( _( "Zero dimension." ) );
+		error_sub( _( "Matrix has width %d, height %d." ), w, h ); 
+		reduce_throw( rc );
+	}
+
 	*xsize = w;
 	*ysize = h;
 }

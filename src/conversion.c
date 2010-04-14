@@ -1048,7 +1048,7 @@ conversion_init( Conversion *conv )
 	/* Default tile size ... OK for image display, too big for
 	 * thumbnails.
 	 */
-	conv->tile_size = 128;
+	conv->tile_size = 64;
 
 	conv->underlay = emptyrect;
 	conv->image = emptyrect;

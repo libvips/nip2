@@ -306,7 +306,7 @@ conversion_make_display( Conversion *conv, IMAGE *in, IMAGE **mask_out )
 			FIXME ... look for pyramid TIFFs here
 
 		 */
-		IMAGE *t = im_open_local( out, "conv:1", "p" );
+		IMAGE *t = im_open_local( out, "conv:s", "p" );
 
 		/* Don't shrink by more than the image size (ie. to less than
 		 * 1 pixel).
@@ -325,7 +325,7 @@ conversion_make_display( Conversion *conv, IMAGE *in, IMAGE **mask_out )
 	/* Zoom, if necessary. 
 	 */
 	if( conv->mag > 1 ) {
-		IMAGE *t = im_open_local( out, "conv:1", "p" );
+		IMAGE *t = im_open_local( out, "conv:z", "p" );
 
 		if( !t || im_zoom( in, t, conv->mag, conv->mag ) ) {
 			im_close( out );
@@ -344,7 +344,9 @@ conversion_make_display( Conversion *conv, IMAGE *in, IMAGE **mask_out )
 		}
 	}
 	else {
-		IMAGE *mask = im_open_local( out, "conv:1a", "p" );
+		IMAGE *mask = im_open_local( out, "conv:r", "p" );
+
+		printf( "conversion_make_display: conv = %p\n", conv );
 
 		if( im_render_priority( in, out, mask, 
 			conv->tile_size, conv->tile_size, 

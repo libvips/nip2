@@ -4,6 +4,9 @@ http://www.eggheadcafe.com/software/aspnet/35467981/programmatic-console-appl.as
 
   possibly better than nip2-cli.exe
 
+- turning a column from Many Stats into a vector for doing arithmetic is very
+  
+
 - try:
 
 	 nip2 Workspaces.uniformshapes2.A1.start_line=21 uniformshapes2.ws 

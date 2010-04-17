@@ -346,8 +346,6 @@ conversion_make_display( Conversion *conv, IMAGE *in, IMAGE **mask_out )
 	else {
 		IMAGE *mask = im_open_local( out, "conv:r", "p" );
 
-		printf( "conversion_make_display: conv = %p\n", conv );
-
 		if( im_render_priority( in, out, mask, 
 			conv->tile_size, conv->tile_size, 
 				conversion_get_default_tiles( conv ),

@@ -4,8 +4,6 @@ http://www.eggheadcafe.com/software/aspnet/35467981/programmatic-console-appl.as
 
   possibly better than nip2-cli.exe
 
-- test for building agsint gtks without infobar, km is complaining
-
 
 - turning a column from Many Stats into a vector for doing arithmetic is very
   tricky argh

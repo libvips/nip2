@@ -13,6 +13,7 @@ started 7.21.0, 8/12/09
 - much faster and smarter image window repaints, especially with the paintbox 
   active
 - #CPUs in prefs defaults to zero, meaning autodetect
+- works without GtkInfoBar 
 
 started 7.20.5, 27/11/09
 - fixed up GtkInfoBar support

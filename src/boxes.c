@@ -1432,8 +1432,9 @@ fontbutton_get_font_name( Fontbutton *fontbutton )
 	return( fontbutton->font_name );
 }
 
-/* Infobar.
+/* Infobar. Optional: it's only in quite recent gtk.
  */
+#ifdef USE_INFOBAR
 
 static GtkInfoBarClass *infobar_parent_class = NULL;
 
@@ -1561,12 +1562,9 @@ infobar_response_cb( GtkInfoBar *info_bar,
 	infobar_start_close( INFOBAR( info_bar ) );
 }
 
-/* Make an infobar ... return NULL if our GTK doesn't have this thing.
- */
 Infobar *
 infobar_new( void )
 {
-#ifdef USE_INFOBAR
 	Infobar *infobar;
 	GtkWidget *content_area;
 
@@ -1584,10 +1582,17 @@ infobar_new( void )
 		G_CALLBACK( infobar_response_cb ), NULL );
 
 	return( infobar );
-#else /*!USE_INFOBAR*/
-	return( NULL );
-#endif /*USE_INFOBAR*/
 }
+
+#else /*!USE_INFOBAR*/
+
+Infobar *
+infobar_new( void )
+{
+	return( NULL );
+}
+
+#endif /*USE_INFOBAR*/
 
 /* Mark up a top/sub pair for an infobar.
  */
@@ -1624,6 +1629,7 @@ void
 infobar_vset( Infobar *infobar, GtkMessageType type, 
 	const char *top, const char *sub, va_list ap )
 {
+#ifdef USE_INFOBAR
 	char buf[MAX_DIALOG_TEXT];
 
 	box_vmarkup_infobar( buf, top, sub, ap );
@@ -1631,6 +1637,7 @@ infobar_vset( Infobar *infobar, GtkMessageType type,
 	gtk_info_bar_set_message_type( GTK_INFO_BAR( infobar ), type );
 
 	infobar_show( infobar );
+#endif /*USE_INFOBAR*/
 }
 
 /* Set the label on an infobar to some marked-up text.

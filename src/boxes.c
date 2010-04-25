@@ -1622,7 +1622,9 @@ box_vmarkup_infobar( char *out, const char *top, const char *sub, va_list ap )
 	while( (p = out + strlen( out )) > out && p[-1] == '\n' )
 		p[-1] = '\0';
 }
+#endif /*USE_INFOBAR*/
 
+#ifdef USE_INFOBAR
 /* Set the label on an infobar to some marked-up text.
  */
 void

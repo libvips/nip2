@@ -37,14 +37,14 @@
 #define IS_PANECHILD_CLASS( klass ) \
 	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_PANECHILD ))
 
-typedef struct _Panechild {
+struct _Panechild {
 	vObject parent_object;
 
 	Pane *pane;			/* The pane we are part of */
 
 	const char *title;		/* Title we display */
 	GtkWidget *label;		/* Titlebar label */
-} Panechild;
+};
 
 typedef struct _PanechildClass {
 	vObjectClass parent_class;

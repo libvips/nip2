@@ -44,13 +44,26 @@ static GtkHPanedClass *parent_class = NULL;
 
 static guint pane_signals[SIG_LAST] = { 0 };
 
+#ifdef DEBUG
+static char *
+pane_handedness2char( PaneHandedness handedness )
+{
+	switch( handedness ) {
+	case PANE_HIDE_LEFT:	return( "PANE_HIDE_LEFT" );
+	case PANE_HIDE_RIGHT:	return( "PANE_HIDE_RIGHT" );
+	default:		g_assert( 0 );
+	}
+}
+#endif /*DEBUG*/
+
 static void
 pane_changed( Pane *pane )
 {
 	g_assert( IS_PANE( pane ) );
 
 #ifdef DEBUG
-	printf( "pane_changed:\n" );
+	printf( "pane_changed: %p %s\n", 
+		pane, pane_handedness2char( pane->handedness ) );
 #endif /*DEBUG*/
 
 	g_signal_emit( G_OBJECT( pane ), pane_signals[SIG_CHANGED], 0 );
@@ -62,7 +75,7 @@ pane_closed_position( Pane *pane )
 	/* Can't use max/min since we need to be able to work before our
 	 * window has been built.
 	 */
-	return( pane->handedness == PANE_HIDE_RIGHT ?  10000 : 0 ); 
+	return( pane->handedness == PANE_HIDE_RIGHT ? 10000 : 0 ); 
 }
 
 /* An open position ... used in case we are asked to open, but the position is
@@ -94,7 +107,8 @@ pane_destroy( GtkObject *object )
 	pane = PANE( object );
 
 #ifdef DEBUG
-	printf( "pane_destroy:\n" );
+	printf( "pane_destroy: %p %s\n",
+		pane, pane_handedness2char( pane->handedness ) );
 #endif /*DEBUG*/
 
 	/* My instance destroy stuff.
@@ -137,7 +151,7 @@ pane_notify_position_cb( Pane *pane )
 	gboolean changed;
 
 	/* Can get here even though we block notify during position set in
-	 * animate, becauseof delays in window setup.
+	 * animate, because of delays in window setup.
 	 */
 	if( pane->animate_timeout )
 		return;
@@ -147,32 +161,32 @@ pane_notify_position_cb( Pane *pane )
 		"min_position", &min_position, 
 		NULL );
 
-	/* We can have 10,000 in as position (meaning way to the
+	/* We can have 10,000 as position (meaning way to the
 	 * right), take account of any clipping there may be.
 	 */
-	pane->position = 
-		IM_CLIP( min_position, pane->position, max_position );
+	pane->position = IM_CLIP( min_position, pane->position, max_position );
 
 	/* And the new value.
 	 */
 	position = gtk_paned_get_position( GTK_PANED( pane ) );
 
 #ifdef DEBUG
-	printf( "pane_notify_position_cb: %d\n", position );
+	printf( "pane_notify_position_cb: %p %s %d\n", 
+		pane, pane_handedness2char( pane->handedness ), position );
 #endif /*DEBUG*/
 
 	changed = FALSE;
 
-	if( (pane->handedness == PANE_HIDE_LEFT &&
-		position == min_position) ||
+	if( (pane->handedness == PANE_HIDE_LEFT && position == min_position) ||
 		(pane->handedness == PANE_HIDE_RIGHT &&
-		position == max_position) ) {
+			position == max_position) ) {
 		/* Position changed to closed. 
 		 */
 		if( pane->open ) {
 			pane->open = FALSE;
 			pane->position = position;
 			changed = TRUE;
+			gtk_widget_hide( GTK_WIDGET( pane->panechild ) );
 		}
 	}
 	else if( pane->position != position ) {
@@ -181,6 +195,7 @@ pane_notify_position_cb( Pane *pane )
 		pane->open = TRUE;
 		pane->position = position;
 		changed = TRUE;
+		gtk_widget_show( GTK_WIDGET( pane->panechild ) );
 	}
 
 	if( changed )
@@ -227,6 +242,12 @@ pane_get_type( void )
 static void
 pane_set_widget_position( Pane *pane, int position )
 {
+#ifdef DEBUG
+	printf( "pane_set_widget_position: %p %s %d\n",
+		pane, pane_handedness2char( pane->handedness ),
+		position );
+#endif /*DEBUG*/
+
 	g_signal_handlers_block_by_func( pane, 
 		pane_notify_position_cb, NULL );
 	gtk_paned_set_position( GTK_PANED( pane ), position );
@@ -243,7 +264,8 @@ pane_animate_timeout_cb( Pane *pane )
 	gboolean more;
 
 #ifdef DEBUG
-	printf( "pane_animate_timeout_cb:\n", );
+	printf( "pane_animate_timeout_cb: %p %s\n",
+		pane, pane_handedness2char( pane->handedness ) );
 #endif /*DEBUG*/
 
 	new = now + (target - now) / 2;
@@ -289,7 +311,8 @@ pane_animate( Pane *pane, int target_position )
 	pane->target_position = target_position;
 
 #ifdef DEBUG
-	printf( "pane_animate: max = %d, min = %d, target = %d\n", 
+	printf( "pane_animate: %p %s max = %d, min = %d, target = %d\n", 
+		pane, pane_handedness2char( pane->handedness ),
 		max_position, min_position, pane->target_position );
 #endif /*DEBUG*/
 
@@ -305,6 +328,11 @@ pane_animate( Pane *pane, int target_position )
 static void
 pane_link( Pane *pane, PaneHandedness handedness )
 {
+#ifdef DEBUG
+	printf( "pane_link: %p %s\n",
+		pane, pane_handedness2char( handedness ) );
+#endif /*DEBUG*/
+
 	pane->handedness = handedness;
 	pane_set_widget_position( pane, pane_closed_position( pane ) );
 }
@@ -313,10 +341,6 @@ Pane *
 pane_new( PaneHandedness handedness )
 {
 	Pane *pane;
-
-#ifdef DEBUG
-	printf( "pane_new:\n" );
-#endif /*DEBUG*/
 
 	pane = PANE( g_object_new( TYPE_PANE, NULL ) );
 	pane_link( pane, handedness );
@@ -330,7 +354,8 @@ void
 pane_set_open_position( Pane *pane, gboolean open, int position )
 {
 #ifdef DEBUG
-	printf( "pane_set_open_position: %s %d\n", 
+	printf( "pane_set_open_position: %p %s %s %d\n", 
+		pane, pane_handedness2char( pane->handedness ),
 		bool_to_char( open ), position );
 #endif /*DEBUG*/
 
@@ -360,6 +385,9 @@ pane_set_open_position( Pane *pane, gboolean open, int position )
 		if( position == pane_closed_position( pane ) )
 			position = pane_open_position( pane );
 
+		if( open )
+			gtk_widget_show( GTK_WIDGET( pane->panechild ) );
+
 		pane->position = position;
 		pane->open = open;
 		pane_animate( pane, position );
@@ -372,4 +400,17 @@ void
 pane_set_open( Pane *pane, gboolean open )
 {
 	pane_set_open_position( pane, open, pane->position );
+}
+
+void
+pane_set_child( Pane *pane, Panechild *panechild )
+{
+	pane->panechild = panechild;
+
+	if( pane->handedness == PANE_HIDE_LEFT )
+		gtk_paned_pack1( GTK_PANED( pane ), 
+			GTK_WIDGET( panechild ), TRUE, TRUE );
+	else
+		gtk_paned_pack2( GTK_PANED( pane ), 
+			GTK_WIDGET( panechild ), TRUE, TRUE );
 }

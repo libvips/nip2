@@ -323,6 +323,7 @@ typedef struct _iText iText;
 typedef struct _Expression Expression;
 typedef struct _Mainw Mainw;
 typedef struct _Toolviewitemgroup Toolviewitemgroup;
+typedef struct _Panechild Panechild;
 
 /* container map function typedefs.
  */

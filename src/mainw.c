@@ -2093,9 +2093,6 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	/* Toolkit Browser pane.
 	 */
 	panechild = panechild_new( mainw->rpane, _( "Toolkit Browser" ) );
-	gtk_paned_pack2( GTK_PANED( mainw->rpane ), 
-		GTK_WIDGET( panechild ), TRUE, TRUE );
-	gtk_widget_show( GTK_WIDGET( panechild ) );
 
 	/* Have to put toolkitbrowser in an ebox so the search entry gets
 	 * clipped to the pane size.
@@ -2115,9 +2112,6 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	/* Workspace-local defs pane.
 	 */
 	panechild = panechild_new( mainw->lpane, _( "Workspace Definitions" ) );
-	gtk_paned_pack1( GTK_PANED( mainw->lpane ), 
-		GTK_WIDGET( panechild ), TRUE, TRUE );
-	gtk_widget_show( GTK_WIDGET( panechild ) );
 
 	mainw->workspacedefs = workspacedefs_new( mainw );
 	vobject_link( VOBJECT( mainw->workspacedefs ), IOBJECT( mainw->ws ) );

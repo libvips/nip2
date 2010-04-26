@@ -1594,6 +1594,7 @@ infobar_new( void )
 
 #endif /*USE_INFOBAR*/
 
+#ifdef USE_INFOBAR
 /* Mark up a top/sub pair for an infobar.
  */
 static void
@@ -1624,7 +1625,6 @@ box_vmarkup_infobar( char *out, const char *top, const char *sub, va_list ap )
 }
 #endif /*USE_INFOBAR*/
 
-#ifdef USE_INFOBAR
 /* Set the label on an infobar to some marked-up text.
  */
 void

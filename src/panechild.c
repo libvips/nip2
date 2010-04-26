@@ -148,8 +148,10 @@ panechild_new( Pane *pane, const char *title )
 {
 	Panechild *panechild = gtk_type_new( TYPE_PANECHILD );
 
-	panechild->pane = pane;
 	IM_SETSTR( panechild->title, title );
+
+	panechild->pane = pane;
+	pane_set_child( pane, panechild );
 
 	return( panechild );
 }

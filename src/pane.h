@@ -47,14 +47,29 @@ typedef struct _Pane {
 
 	PaneHandedness handedness;	/* Hide on left or right */
 
-	/* Current state. Four states: open, close, opening, closing. Use open
-	 * and animate_timeout NULL/not-NULL to encode the four states.
+	/* The child pane we show on left or right.
+	 */
+	Panechild *panechild;
+
+	/* Are we visible or not.
 	 */
 	gboolean open;
+
+	/* The 'open' position of the divider.
+	 */
 	int position;		
-	int target_position;		/* Animating towards this pos */
-	int last_set_position;		/* The last one we set ... for sanity */
-	guint animate_timeout;		/* With this timeout */
+
+	/* Animating towards this position.
+	 */
+	int target_position;
+
+	/* Set animation speed with this.
+	 */
+	int last_set_position;		
+
+	/* Timeout for animation.
+	 */
+	guint animate_timeout;
 } Pane;
 
 typedef struct _PaneClass {

@@ -1454,7 +1454,10 @@ mainw_statusbar_action_cb( GtkToggleAction *action, Mainw *mainw )
 static void
 mainw_toolkitbrowser_action_cb( GtkToggleAction *action, Mainw *mainw )
 {
-	pane_set_open( mainw->rpane, gtk_toggle_action_get_active( action ) );
+	if( gtk_toggle_action_get_active( action ) )
+		pane_animate_open( mainw->rpane );
+	else
+		pane_animate_closed( mainw->rpane );
 }
 
 /* Expose/hide the workspace defs.
@@ -1462,7 +1465,10 @@ mainw_toolkitbrowser_action_cb( GtkToggleAction *action, Mainw *mainw )
 static void
 mainw_workspacedefs_action_cb( GtkToggleAction *action, Mainw *mainw )
 {
-	pane_set_open( mainw->lpane, gtk_toggle_action_get_active( action ) );
+	if( gtk_toggle_action_get_active( action ) )
+		pane_animate_open( mainw->lpane );
+	else
+		pane_animate_closed( mainw->lpane );
 }
 
 /* Layout columns.
@@ -1861,7 +1867,7 @@ static void
 mainw_lpane_changed_cb( Pane *pane, Mainw *mainw )
 {
 	mainw->ws->lpane_open = pane->open;
-	mainw->ws->lpane_position = pane->position;
+	mainw->ws->lpane_position = pane->user_position;
 
 	/* Give menus an update.
 	 */
@@ -1872,7 +1878,7 @@ static void
 mainw_rpane_changed_cb( Pane *pane, Mainw *mainw )
 {
 	mainw->ws->rpane_open = pane->open;
-	mainw->ws->rpane_position = pane->position;
+	mainw->ws->rpane_position = pane->user_position;
 
 	/* Give menus an update.
 	 */
@@ -2177,10 +2183,12 @@ mainw_link( Mainw *mainw, Workspace *ws )
 				gdk_screen_get_height( screen ) ) );
 	}
 
-	pane_set_open_position( mainw->lpane, 
-		ws->lpane_open, ws->lpane_position );
-	pane_set_open_position( mainw->rpane, 
-		ws->rpane_open, ws->rpane_position );
+	pane_set_position( mainw->lpane, ws->lpane_position );
+	pane_set_user_position( mainw->lpane, ws->lpane_position );
+	pane_set_open( mainw->lpane, ws->lpane_open );
+	pane_set_position( mainw->rpane, ws->rpane_position );
+	pane_set_user_position( mainw->rpane, ws->rpane_position );
+	pane_set_open( mainw->rpane, ws->rpane_open );
 }
 
 Mainw *

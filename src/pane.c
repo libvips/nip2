@@ -93,7 +93,7 @@ pane_open_position( Pane *pane )
 		NULL );
 
 	return( pane->handedness == PANE_HIDE_RIGHT ? 
-		max_position - 100: min_position + 100 ); 
+		max_position - 200: min_position + 200 ); 
 }
 
 static void
@@ -148,7 +148,6 @@ pane_notify_position_cb( Pane *pane )
 	int max_position;
 	int min_position;
 	int position;
-	gboolean changed;
 
 	/* Can get here even though we block notify during position set in
 	 * animate, because of delays in window setup.
@@ -175,39 +174,34 @@ pane_notify_position_cb( Pane *pane )
 		pane, pane_handedness2char( pane->handedness ), position );
 #endif /*DEBUG*/
 
-	changed = FALSE;
+	pane_set_position( pane, position );
+	pane_set_user_position( pane, position );
 
-	if( (pane->handedness == PANE_HIDE_LEFT && position == min_position) ||
-		(pane->handedness == PANE_HIDE_RIGHT &&
-			position == max_position) ) {
-		/* Position changed to closed. 
-		 */
-		if( pane->open ) {
-			pane->open = FALSE;
-			pane->position = position;
-			changed = TRUE;
-			gtk_widget_hide( GTK_WIDGET( pane->panechild ) );
-		}
-	}
-	else if( pane->position != position ) {
-		/* Either dragged open, or drag while open.
-		 */
-		pane->open = TRUE;
-		pane->position = position;
-		changed = TRUE;
-		gtk_widget_show( GTK_WIDGET( pane->panechild ) );
-	}
-
-	if( changed )
-		pane_changed( pane );
+	/* Look for dragged close.
+	 */
+	if( pane->open &&
+		pane->handedness == PANE_HIDE_LEFT && 
+		position == min_position ) 
+		pane_set_open( pane, FALSE );
+	if( pane->open &&
+		pane->handedness == PANE_HIDE_RIGHT &&
+		position == max_position )
+		pane_set_open( pane, FALSE );
 }
 
 static void
 pane_init( Pane *pane )
 {
-	pane->position = 400; 		/* overwritten on _link() */
-	pane->animate_timeout = 0;
+	pane->handedness = PANE_HIDE_LEFT;
+	pane->panechild = NULL;
 	pane->open = FALSE;
+	pane->position = 0; 		
+	pane->user_position = 400; 		/* overwritten on _link() */
+	pane->target_position = 0;
+	pane->close_on_end = FALSE;
+	pane->last_set_position = 0;
+	pane->animate_timeout = 0;
+
 	g_signal_connect( pane, "notify::position", 
 		G_CALLBACK( pane_notify_position_cb ), NULL );
 }
@@ -237,29 +231,79 @@ pane_get_type( void )
 	return( type );
 }
 
-/* Set the position without triggering notify.
+/* Operations on the model.
  */
-static void
-pane_set_widget_position( Pane *pane, int position )
+
+void
+pane_set_position( Pane *pane, int position )
 {
+	if( pane->position != position ) {
 #ifdef DEBUG
-	printf( "pane_set_widget_position: %p %s %d\n",
-		pane, pane_handedness2char( pane->handedness ),
-		position );
+		printf( "pane_set_position: %p %s %d\n",
+			pane, pane_handedness2char( pane->handedness ),
+			position );
 #endif /*DEBUG*/
 
-	g_signal_handlers_block_by_func( pane, 
-		pane_notify_position_cb, NULL );
-	gtk_paned_set_position( GTK_PANED( pane ), position );
-	g_signal_handlers_unblock_by_func( pane, 
-		pane_notify_position_cb, NULL );
+		g_signal_handlers_block_by_func( pane, 
+			pane_notify_position_cb, NULL );
+		gtk_paned_set_position( GTK_PANED( pane ), position );
+		g_signal_handlers_unblock_by_func( pane, 
+			pane_notify_position_cb, NULL );
+
+		pane->position = position;
+		pane_changed( pane );
+	}
 }
+
+void
+pane_set_user_position( Pane *pane, int user_position )
+{
+	if( pane->user_position != user_position ) {
+		pane->user_position = user_position;
+		pane_changed( pane );
+	}
+}
+
+void
+pane_set_open( Pane *pane, gboolean open )
+{
+	if( pane->open != open ) {
+#ifdef DEBUG
+		printf( "pane_set_open: %p %s %d\n",
+			pane, pane_handedness2char( pane->handedness ),
+			open );
+#endif /*DEBUG*/
+
+		widget_visible( GTK_WIDGET( pane->panechild ), open );
+		pane->open = open;
+		pane_changed( pane );
+	}
+}
+
+void
+pane_set_child( Pane *pane, Panechild *panechild )
+{
+	g_assert( !pane->panechild );
+
+	pane->panechild = panechild;
+
+	if( pane->handedness == PANE_HIDE_LEFT )
+		gtk_paned_pack1( GTK_PANED( pane ), 
+			GTK_WIDGET( panechild ), TRUE, TRUE );
+	else
+		gtk_paned_pack2( GTK_PANED( pane ), 
+			GTK_WIDGET( panechild ), TRUE, TRUE );
+}
+
+/* Control.
+ */
 
 static gboolean
 pane_animate_timeout_cb( Pane *pane )
 {
-	int now = gtk_paned_get_position( GTK_PANED( pane ) );
+	int position = pane->position;
 	int target = pane->target_position;
+
 	int new;
 	gboolean more;
 
@@ -268,61 +312,98 @@ pane_animate_timeout_cb( Pane *pane )
 		pane, pane_handedness2char( pane->handedness ) );
 #endif /*DEBUG*/
 
-	new = now + (target - now) / 2;
-
-	if( ABS( new - target ) < 5 || new == pane->last_set_position ) {
-		/* Close enough: set exactly the target and stop animating. Or
-		 * the new position we set last hasn't taken .. in which case 
-		 * we must have hit a stop.
+	more = TRUE;
+	new = position + (target - position) / 2;
+	if( ABS( position - target ) < 5 || 
+		new == pane->last_set_position ) {
+		/* At our target!
 		 */
 		new = target;
 		more = FALSE;
+		pane->animate_timeout = 0;
 	}
-	else 
-		/* Keep moving.
-		 */
-		more = TRUE;
 
+	pane_set_position( pane, new );
 	pane->last_set_position = new;
-	pane_set_widget_position( pane, new );
-	pane->animate_timeout = 0;
+
+	if( !more &&
+		pane->close_on_end )
+		pane_set_open( pane, FALSE );
 
 	return( more );
 }
 
-/* Animate the pane to a new position.
+/* Close the pane with an animation.
  */
-static void
-pane_animate( Pane *pane, int target_position )
+void
+pane_animate_closed( Pane *pane )
 {
-	int max_position;
-	int min_position;
+	if( !pane->animate_timeout && 
+		pane->open ) {
+		int max_position;
+		int min_position;
+		int target_position;
 
-	g_object_get( pane, 
-		"max_position", &max_position, 
-		"min_position", &min_position, 
-		NULL );
+		target_position = pane_closed_position( pane );
+		g_object_get( pane, 
+			"max_position", &max_position, 
+			"min_position", &min_position, 
+			NULL );
 
-	/* Can be zero if we're here very early.
-	 */
-	if( max_position > 0 ) 
-		target_position = 
-			IM_CLIP( min_position, target_position, max_position );
-	pane->target_position = target_position;
+		/* Can be zero if we're here very early.
+		 */
+		if( max_position > 0 ) 
+			target_position = 
+				IM_CLIP( min_position, 
+					target_position, max_position );
+		pane->target_position = target_position;
+		pane->close_on_end = TRUE;
+		pane->last_set_position = -1;
 
-#ifdef DEBUG
-	printf( "pane_animate: %p %s max = %d, min = %d, target = %d\n", 
-		pane, pane_handedness2char( pane->handedness ),
-		max_position, min_position, pane->target_position );
-#endif /*DEBUG*/
-
-	/* Invalidate the last set pos.
-	 */
-	pane->last_set_position = -1;
-
-	if( !pane->animate_timeout ) 
 		pane->animate_timeout = g_timeout_add( 50, 
 			(GSourceFunc) pane_animate_timeout_cb, pane );
+	}
+}
+
+/* Open the pane with an animation.
+ */
+void
+pane_animate_open( Pane *pane )
+{
+	if( !pane->animate_timeout && 
+		!pane->open ) {
+		int max_position;
+		int min_position;
+		int target_position;
+
+		target_position = pane->user_position;
+		g_object_get( pane, 
+			"max_position", &max_position, 
+			"min_position", &min_position, 
+			NULL );
+
+		/* Can be zero if we're here very early.
+		 */
+		if( max_position > 0 ) 
+			target_position = 
+				IM_CLIP( min_position, 
+					target_position, max_position );
+
+		/* user_position can be max or min if the pane was dragged
+		 * closed.
+		 */
+		if( target_position == max_position ||
+			target_position == min_position )
+			target_position = pane_open_position( pane );
+
+		pane->target_position = target_position;
+		pane->close_on_end = FALSE;
+		pane->last_set_position = -1;
+		pane_set_open( pane, TRUE );
+
+		pane->animate_timeout = g_timeout_add( 50, 
+			(GSourceFunc) pane_animate_timeout_cb, pane );
+	}
 }
 
 static void
@@ -334,7 +415,7 @@ pane_link( Pane *pane, PaneHandedness handedness )
 #endif /*DEBUG*/
 
 	pane->handedness = handedness;
-	pane_set_widget_position( pane, pane_closed_position( pane ) );
+	pane_set_open( pane, FALSE );
 }
 
 Pane *
@@ -346,71 +427,4 @@ pane_new( PaneHandedness handedness )
 	pane_link( pane, handedness );
 
 	return( pane );
-}
-
-/* Change state, with an animation.
- */
-void
-pane_set_open_position( Pane *pane, gboolean open, int position )
-{
-#ifdef DEBUG
-	printf( "pane_set_open_position: %p %s %s %d\n", 
-		pane, pane_handedness2char( pane->handedness ),
-		bool_to_char( open ), position );
-#endif /*DEBUG*/
-
-	if( pane->animate_timeout ) 
-		return;
-
-	if( pane->open == open && pane->position == position ) 
-		return;
-
-	if( !pane->open && !open ) {
-		/* Change the position while closed. No animation.
-		 */
-		pane->position = position;
-	}
-	else if( !open ) {
-		/* Closing ... need an animation.
-		 */
-		pane->position = position;
-		pane->open = FALSE;
-		pane_animate( pane, pane_closed_position( pane ) );
-	}
-	else {
-		/* Opening, or move while open. We may have previously been
-		 * dragged closed, in which case position could be
-		 * closed_position. 
-		 */
-		if( position == pane_closed_position( pane ) )
-			position = pane_open_position( pane );
-
-		if( open )
-			gtk_widget_show( GTK_WIDGET( pane->panechild ) );
-
-		pane->position = position;
-		pane->open = open;
-		pane_animate( pane, position );
-	}
-
-	pane_changed( pane );
-}
-
-void
-pane_set_open( Pane *pane, gboolean open )
-{
-	pane_set_open_position( pane, open, pane->position );
-}
-
-void
-pane_set_child( Pane *pane, Panechild *panechild )
-{
-	pane->panechild = panechild;
-
-	if( pane->handedness == PANE_HIDE_LEFT )
-		gtk_paned_pack1( GTK_PANED( pane ), 
-			GTK_WIDGET( panechild ), TRUE, TRUE );
-	else
-		gtk_paned_pack2( GTK_PANED( pane ), 
-			GTK_WIDGET( panechild ), TRUE, TRUE );
 }

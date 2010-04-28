@@ -55,13 +55,21 @@ typedef struct _Pane {
 	 */
 	gboolean open;
 
-	/* The 'open' position of the divider.
+	/* The position of the divider. This changes as the pane is animated
+	 * open and closed and does not reflect the position the user has
+	 * selected by dragging.
 	 */
 	int position;		
 
-	/* Animating towards this position.
+	/* The position the user wants the pane to sit at.
+	 */
+	int user_position;
+
+	/* Animating towards this position. If close_on_end is true, close the
+	 * pane at the end of animation.
 	 */
 	int target_position;
+	gboolean close_on_end;
 
 	/* Set animation speed with this.
 	 */
@@ -81,7 +89,14 @@ typedef struct _PaneClass {
 } PaneClass;
 
 GType pane_get_type( void );
+
 Pane *pane_new( PaneHandedness handedness );
-void pane_set_open_position( Pane *pane, gboolean open, int position );
+
+void pane_set_position( Pane *pane, int position );
+void pane_set_user_position( Pane *pane, int user_position );
 void pane_set_open( Pane *pane, gboolean open );
+void pane_set_child( Pane *pane, Panechild *panechild );
+
+void pane_animate_closed( Pane *pane );
+void pane_animate_open( Pane *pane );
 

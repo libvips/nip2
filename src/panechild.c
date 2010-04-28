@@ -81,7 +81,7 @@ panechild_class_init( PanechildClass *class )
 static void
 panechild_hide_cb( GtkWidget *wid, Panechild *panechild )
 {
-	pane_set_open( panechild->pane, FALSE );
+	pane_animate_closed( panechild->pane );
 }
 
 static void

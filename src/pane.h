@@ -95,6 +95,7 @@ Pane *pane_new( PaneHandedness handedness );
 void pane_set_position( Pane *pane, int position );
 void pane_set_user_position( Pane *pane, int user_position );
 void pane_set_open( Pane *pane, gboolean open );
+void pane_set_state( Pane *pane, gboolean open, int user_position );
 void pane_set_child( Pane *pane, Panechild *panechild );
 
 void pane_animate_closed( Pane *pane );

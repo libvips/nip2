@@ -1866,23 +1866,25 @@ static const char *mainw_toolbar_ui_description =
 static void
 mainw_lpane_changed_cb( Pane *pane, Mainw *mainw )
 {
-	mainw->ws->lpane_open = pane->open;
-	mainw->ws->lpane_position = pane->user_position;
+	if( mainw->ws->lpane_open != pane->open ||
+		mainw->ws->lpane_position != pane->user_position ) {
+		mainw->ws->lpane_open = pane->open;
+		mainw->ws->lpane_position = pane->user_position;
 
-	/* Give menus an update.
-	 */
-	mainw_refresh( mainw );
+		mainw_refresh( mainw );
+	}
 }
 
 static void
 mainw_rpane_changed_cb( Pane *pane, Mainw *mainw )
 {
-	mainw->ws->rpane_open = pane->open;
-	mainw->ws->rpane_position = pane->user_position;
+	if( mainw->ws->rpane_open != pane->open ||
+		mainw->ws->rpane_position != pane->user_position ) {
+		mainw->ws->rpane_open = pane->open;
+		mainw->ws->rpane_position = pane->user_position;
 
-	/* Give menus an update.
-	 */
-	mainw_refresh( mainw );
+		mainw_refresh( mainw );
+	}
 }
 
 static void
@@ -2183,12 +2185,8 @@ mainw_link( Mainw *mainw, Workspace *ws )
 				gdk_screen_get_height( screen ) ) );
 	}
 
-	pane_set_position( mainw->lpane, ws->lpane_position );
-	pane_set_user_position( mainw->lpane, ws->lpane_position );
-	pane_set_open( mainw->lpane, ws->lpane_open );
-	pane_set_position( mainw->rpane, ws->rpane_position );
-	pane_set_user_position( mainw->rpane, ws->rpane_position );
-	pane_set_open( mainw->rpane, ws->rpane_open );
+	pane_set_state( mainw->lpane, ws->lpane_open, ws->lpane_position );
+	pane_set_state( mainw->rpane, ws->rpane_open, ws->rpane_position );
 }
 
 Mainw *

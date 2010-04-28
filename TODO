@@ -1,6 +1,6 @@
-- not saving pane positions correctly?
+- when generating to a mem buffer, we don't see progress feedback atm 
 
-
+  eg. denoise wtc.jpg, open paintbox, click on nib ... no feedback
 
 - look at:
 
@@ -90,16 +90,12 @@ http://www.eggheadcafe.com/software/aspnet/35467981/programmatic-console-appl.as
 
   test?
 
-- we're getting a leak report if we use the paintbox
-
 - imageinfo_make_paintable() no longer copies to a file, since this used to
   cause problems with dangling pointers because of the im_close()s we had to
   do
 
   however, this means we now do all painting in memory :-( do we need to add
   API to change a memory image (eg. a "p") into a file?
-
-  also, when generating to a mem buffer, we don't see progress feedback atm 
 
 - test Joe's layout thing, compare to the thing we do in study2 to make the
   diagnostic image

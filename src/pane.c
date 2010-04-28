@@ -196,7 +196,7 @@ pane_init( Pane *pane )
 	pane->panechild = NULL;
 	pane->open = FALSE;
 	pane->position = 0; 		
-	pane->user_position = 400; 		/* overwritten on _link() */
+	pane->user_position = 0; 		/* overwritten on _link() */
 	pane->target_position = 0;
 	pane->close_on_end = FALSE;
 	pane->last_set_position = 0;
@@ -259,6 +259,12 @@ void
 pane_set_user_position( Pane *pane, int user_position )
 {
 	if( pane->user_position != user_position ) {
+#ifdef DEBUG
+		printf( "pane_set_user_position: %p %s %d\n",
+			pane, pane_handedness2char( pane->handedness ),
+			user_position );
+#endif /*DEBUG*/
+
 		pane->user_position = user_position;
 		pane_changed( pane );
 	}
@@ -276,6 +282,29 @@ pane_set_open( Pane *pane, gboolean open )
 
 		widget_visible( GTK_WIDGET( pane->panechild ), open );
 		pane->open = open;
+		pane_changed( pane );
+	}
+}
+
+/* Set everything all at once on startup.
+ */
+void
+pane_set_state( Pane *pane, gboolean open, int user_position )
+{
+	if( pane->open != open ||
+		pane->user_position != user_position ) {
+		g_signal_handlers_block_by_func( pane, 
+			pane_notify_position_cb, NULL );
+		gtk_paned_set_position( GTK_PANED( pane ), user_position );
+		g_signal_handlers_unblock_by_func( pane, 
+			pane_notify_position_cb, NULL );
+
+		widget_visible( GTK_WIDGET( pane->panechild ), open );
+
+		pane->open = open;
+		pane->user_position = user_position;
+		pane->position = user_position;
+
 		pane_changed( pane );
 	}
 }
@@ -395,6 +424,12 @@ pane_animate_open( Pane *pane )
 		if( target_position == max_position ||
 			target_position == min_position )
 			target_position = pane_open_position( pane );
+
+#ifdef DEBUG
+		printf( "pane_animate_open: %p %s %d\n", 
+			pane, pane_handedness2char( pane->handedness ), 
+			target_position );
+#endif /*DEBUG*/
 
 		pane->target_position = target_position;
 		pane->close_on_end = FALSE;

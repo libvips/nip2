@@ -2,14 +2,6 @@
 
   eg. denoise wtc.jpg, open paintbox, click on nib ... no feedback
 
-  oh, denoise and save wtc.jpg as .v and we don't get feedback either
-
-  ah ha! we do, but only for each 9372x16 block
-
-  is 16 pixels not high enough? should this be smalltile?
-
-  need feedback more often than this .. per tile? would that be too slow?
-
 - look at:
 
 http://www.eggheadcafe.com/software/aspnet/35467981/programmatic-console-appl.aspx

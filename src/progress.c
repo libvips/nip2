@@ -118,14 +118,11 @@ progress_update( Progress *progress )
 		if( cancel )
 			progress->cancel = TRUE;
 
-		/* Mysteriously:
-
-			while( g_main_context_iteration( NULL, FALSE ) )
-				;
-
-		   can loop during startup. Just do a single iteration.
+		/* Mysteriously this has looped during startup in the past. It
+		 * seems to be OK now though.
 		 */
-		g_main_context_iteration( NULL, FALSE );
+		while( g_main_context_iteration( NULL, FALSE ) )
+			;
 
 #ifdef DEBUG_MEMUSE
 		printf( "progress_update:\n" );
@@ -147,10 +144,11 @@ progress_update_percent( int percent, int eta )
 			"%d minute left", "%d minutes left", 
 			minutes ), minutes );
 	}
-	else
+	else if( eta > 5 ) 
 		vips_buf_appendf( &progress->feedback, ngettext( 
 			"%d second left", "%d seconds left", 
 			eta ), eta );
+
 	progress->percent = percent;
 
 	progress_update( progress );

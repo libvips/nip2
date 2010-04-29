@@ -1128,8 +1128,10 @@ imageinfo_write( Imageinfo *imageinfo, const char *name )
 
 static gboolean
 imageinfo_make_paintable( Imageinfo *imageinfo )
-{
+{	
+	progress_begin();
 	if( im_rwcheck( imageinfo->im ) ) {
+		progress_end();
 		error_top( _( "Unable to paint on image." ) );
 		error_sub( _( "Unable to get write permission for "
 			"file \"%s\".\nCheck permission settings." ), 
@@ -1137,6 +1139,7 @@ imageinfo_make_paintable( Imageinfo *imageinfo )
 		error_vips();
 		return( FALSE );
 	}
+	progress_end();
 
 	imageinfo->ok_to_paint = TRUE;
 

@@ -1,6 +1,3 @@
-- when generating to a mem buffer, we don't see progress feedback atm 
-
-  eg. denoise wtc.jpg, open paintbox, click on nib ... no feedback
 
 - look at:
 

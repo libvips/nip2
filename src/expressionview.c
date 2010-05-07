@@ -74,7 +74,8 @@ expressionview_scan( View *view )
 }
 #endif /*DEBUG*/
 
-	if( formula_scan( expressionview->formula ) &&
+	if( itext &&
+		formula_scan( expressionview->formula ) &&
 		itext_set_formula( itext, expressionview->formula->expr ) ) {
 		itext_set_edited( itext, TRUE );
 

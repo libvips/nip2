@@ -148,6 +148,11 @@ progress_update_percent( int percent, int eta )
 		vips_buf_appendf( &progress->feedback, ngettext( 
 			"%d second left", "%d seconds left", 
 			eta ), eta );
+	else
+		/* The empty string changes the height of the prgress bar
+		 * argh.
+		 */
+		vips_buf_appendf( &progress->feedback, " " );
 
 	progress->percent = percent;
 

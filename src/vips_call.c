@@ -1275,10 +1275,14 @@ vips_make_doublevec( im_doublevec_object *dv, int n, double *vec )
 	int i;
 
 	dv->n = n;
-	if( !(dv->vec = IARRAY( NULL, n, double )) )
-		return( -1 );
-	for( i = 0; i < n; i++ )
-		dv->vec[i] = vec[i];
+	dv->vec = NULL;
+
+	if( n > 0 ) {
+		if( !(dv->vec = IARRAY( NULL, n, double )) )
+			return( -1 );
+		for( i = 0; i < n; i++ )
+			dv->vec[i] = vec[i];
+	}
 
 	return( 0 );
 }
@@ -1292,10 +1296,14 @@ vips_make_intvec( im_intvec_object *dv, int n, double *vec )
 	int i;
 
 	dv->n = n;
-	if( !(dv->vec = IARRAY( NULL, n, int )) )
-		return( -1 );
-	for( i = 0; i < n; i++ )
-		dv->vec[i] = vec[i];
+	dv->vec = NULL;
+
+	if( n > 0 ) {
+		if( !(dv->vec = IARRAY( NULL, n, int )) )
+			return( -1 );
+		for( i = 0; i < n; i++ )
+			dv->vec[i] = vec[i];
+	}
 
 	return( 0 );
 }
@@ -1308,10 +1316,14 @@ vips_make_imagevec( im_imagevec_object *iv, int n, IMAGE **vec )
 	int i;
 
 	iv->n = n;
-	if( !(iv->vec = IARRAY( NULL, n, IMAGE * )) )
-		return( -1 );
-	for( i = 0; i < n; i++ )
-		iv->vec[i] = vec[i];
+	iv->vec = NULL;
+
+	if( n > 0 ) {
+		if( !(iv->vec = IARRAY( NULL, n, IMAGE * )) )
+			return( -1 );
+		for( i = 0; i < n; i++ )
+			iv->vec[i] = vec[i];
+	}
 
 	return( 0 );
 }

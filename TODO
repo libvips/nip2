@@ -1,6 +1,16 @@
 
 - nip2 trunk breaks on Nicolas's disc workspace :-( argh
 
+  we get rare tiles with painted = 0, dirty = 0, sigh, so those parts of the
+  image just sit there
+
+  sometimes we get serious breaks in computation as well, perhaps the same
+  sort of problem in sinkmemory when it renders chunks of identity ramps and
+  stuff for maplut?
+
+  in which case I guess it's a race in threadpool
+
+
 
 - look at:
 

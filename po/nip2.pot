@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-15 10:06+0000\n"
+"POT-Creation-Date: 2010-05-12 21:42+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -107,8 +107,8 @@ msgid "Select a new file name"
 msgstr ""
 
 #: src/pathname.c:81 src/slider.c:48 src/option.c:65 src/string.c:67
-#: src/toggle.c:48 src/number.c:65 src/fontname.c:58 src/mainw.c:1337
-#: src/mainw.c:1376 src/program.c:1053 src/program.c:1095
+#: src/toggle.c:48 src/number.c:65 src/fontname.c:58 src/mainw.c:1335
+#: src/mainw.c:1374 src/program.c:1053 src/program.c:1095
 #: src/workspacegroup.c:178 src/workspacegroup.c:215
 msgid "Caption"
 msgstr ""
@@ -235,7 +235,7 @@ msgstr ""
 msgid "operation can be cached"
 msgstr ""
 
-#: src/vips_call.c:1085 src/action.c:173 src/reduce.c:872 src/reduce.c:885
+#: src/vips_call.c:1085 src/action.c:173 src/reduce.c:878 src/reduce.c:891
 #: src/builtin.c:990 src/class.c:49 src/class.c:1019
 msgid "Bad argument."
 msgstr ""
@@ -250,20 +250,20 @@ msgstr ""
 msgid "VIPS library: %s"
 msgstr ""
 
-#: src/vips_call.c:2154 src/vips_call.c:2203
+#: src/vips_call.c:2166 src/vips_call.c:2215
 #, c-format
 msgid "image \"%s\""
 msgstr ""
 
-#: src/vips_call.c:2161
+#: src/vips_call.c:2173
 msgid "no image"
 msgstr ""
 
-#: src/vips_call.c:2177
+#: src/vips_call.c:2189
 msgid "doublevec"
 msgstr ""
 
-#: src/vips_call.c:2200
+#: src/vips_call.c:2212
 msgid "imagevec"
 msgstr ""
 
@@ -316,15 +316,15 @@ msgstr ""
 #. * windows, but then we'd have to set the state of the toggle buttons
 #. * before mapping)
 #.
-#: src/imagepresent.c:1554
+#: src/imagepresent.c:1562
 msgid "Ruler menu"
 msgstr ""
 
-#: src/imagepresent.c:1555
+#: src/imagepresent.c:1563
 msgid "Rulers In _mm"
 msgstr ""
 
-#: src/imagepresent.c:1557
+#: src/imagepresent.c:1565
 msgid "Show _Offset"
 msgstr ""
 
@@ -681,13 +681,13 @@ msgid "Request for %s of RAM triggered memory allocation failure."
 msgstr ""
 
 #: src/view.c:820 src/classmodel.c:154 src/classmodel.c:227 src/builtin.c:410
-#: src/mainw.c:741 src/mainw.c:749 src/model.c:313 src/model.c:368
+#: src/mainw.c:739 src/mainw.c:747 src/model.c:313 src/model.c:368
 #: src/filemodel.c:100 src/filemodel.c:130 src/filemodel.c:342
 #: src/filemodel.c:566 src/filemodel.c:607 src/rowview.c:456
 msgid "Not implemented."
 msgstr ""
 
-#: src/trace.c:126 src/reduce.c:128 src/reduce.c:1030 src/workspace.c:1597
+#: src/trace.c:126 src/reduce.c:128 src/reduce.c:1036 src/workspace.c:1597
 msgid "Overflow error."
 msgstr ""
 
@@ -703,7 +703,7 @@ msgstr ""
 msgid "Clear trace window"
 msgstr ""
 
-#: src/trace.c:243 src/imageview.c:499 src/mainw.c:1658 src/program.c:1700
+#: src/trace.c:243 src/imageview.c:499 src/mainw.c:1662 src/program.c:1700
 #: src/plotwindow.c:175 src/error.c:138
 msgid "_Close"
 msgstr ""
@@ -712,22 +712,22 @@ msgstr ""
 msgid "Close trace window"
 msgstr ""
 
-#: src/trace.c:248 src/imageview.c:529 src/mainw.c:1728 src/program.c:1780
+#: src/trace.c:248 src/imageview.c:529 src/mainw.c:1732 src/program.c:1780
 #: src/plotwindow.c:180 src/error.c:143
 msgid "_Contents"
 msgstr ""
 
-#: src/trace.c:249 src/imageview.c:530 src/mainw.c:1729 src/program.c:1781
+#: src/trace.c:249 src/imageview.c:530 src/mainw.c:1733 src/program.c:1781
 #: src/plotwindow.c:181 src/error.c:144
 msgid "Open the users guide"
 msgstr ""
 
-#: src/trace.c:253 src/imageview.c:534 src/mainw.c:1723 src/program.c:1775
+#: src/trace.c:253 src/imageview.c:534 src/mainw.c:1727 src/program.c:1775
 #: src/plotwindow.c:185 src/error.c:148
 msgid "_About"
 msgstr ""
 
-#: src/trace.c:254 src/imageview.c:535 src/mainw.c:1724 src/program.c:1776
+#: src/trace.c:254 src/imageview.c:535 src/mainw.c:1728 src/program.c:1776
 #: src/plotwindow.c:186 src/error.c:149
 msgid "About this program"
 msgstr ""
@@ -834,7 +834,7 @@ msgid "Error: %s"
 msgstr ""
 
 #: parse.y:1183
-msgid "definition is too long!"
+msgid "definition is too long"
 msgstr ""
 
 #: parse.y:1607
@@ -1036,157 +1036,157 @@ msgstr ""
 msgid "Paintbox bar menu"
 msgstr ""
 
-#: src/paintboxview.c:202
+#: src/paintboxview.c:212
 msgid "Clear undo history?"
 msgstr ""
 
-#: src/paintboxview.c:203
+#: src/paintboxview.c:213
 msgid ""
 "Are you sure you want to clear all undo and redo? This will free up memory, "
 "but you will no longer be able to undo or redo any of the painting you have "
 "done so far."
 msgstr ""
 
-#: src/paintboxview.c:238
+#: src/paintboxview.c:248
 msgid "1 round"
 msgstr ""
 
 #. PAINTBOX_1ROUND
-#: src/paintboxview.c:239
+#: src/paintboxview.c:249
 msgid "2 round"
 msgstr ""
 
 #. PAINTBOX_2ROUND
-#: src/paintboxview.c:240
+#: src/paintboxview.c:250
 msgid "3 round"
 msgstr ""
 
 #. PAINTBOX_3ROUND
-#: src/paintboxview.c:241
+#: src/paintboxview.c:251
 msgid "4 round"
 msgstr ""
 
 #. PAINTBOX_4ROUND
-#: src/paintboxview.c:242
+#: src/paintboxview.c:252
 msgid "5 round"
 msgstr ""
 
 #. PAINTBOX_5ROUND
-#: src/paintboxview.c:243
+#: src/paintboxview.c:253
 msgid "6 round"
 msgstr ""
 
 #. PAINTBOX_6ROUND
-#: src/paintboxview.c:244
+#: src/paintboxview.c:254
 msgid "10 round"
 msgstr ""
 
 #. PAINTBOX_10ROUND
-#: src/paintboxview.c:245
+#: src/paintboxview.c:255
 msgid "2 italic"
 msgstr ""
 
 #. PAINTBOX_2ITALIC
-#: src/paintboxview.c:246
+#: src/paintboxview.c:256
 msgid "3 italic"
 msgstr ""
 
 #. PAINTBOX_3ITALIC
-#: src/paintboxview.c:247
+#: src/paintboxview.c:257
 msgid "4 italic"
 msgstr ""
 
 #. PAINTBOX_4ITALIC
-#: src/paintboxview.c:248
+#: src/paintboxview.c:258
 msgid "5 italic"
 msgstr ""
 
 #. PAINTBOX_5ITALIC
-#: src/paintboxview.c:249
+#: src/paintboxview.c:259
 msgid "6 italic"
 msgstr ""
 
 #. PAINTBOX_6ITALIC
-#: src/paintboxview.c:250
+#: src/paintboxview.c:260
 msgid "10 italic"
 msgstr ""
 
-#: src/paintboxview.c:254
+#: src/paintboxview.c:264
 msgid "Manipulate regions"
 msgstr ""
 
 #. IMAGEMODEL_SELECT
-#: src/paintboxview.c:255
+#: src/paintboxview.c:265
 msgid "Pan window"
 msgstr ""
 
 #. IMAGEMODEL_PAN
-#: src/paintboxview.c:256
+#: src/paintboxview.c:266
 msgid "Zoom in on mouse"
 msgstr ""
 
 #. IMAGEMODEL_MAGIN
-#: src/paintboxview.c:257 src/imageview.c:515 src/imageview.c:579
+#: src/paintboxview.c:267 src/imageview.c:515 src/imageview.c:579
 msgid "Zoom out"
 msgstr ""
 
 #. IMAGEMODEL_MAGOUT
-#: src/paintboxview.c:258
+#: src/paintboxview.c:268
 msgid "Read pixel into inkwell"
 msgstr ""
 
 #. IMAGEMODEL_DROPPER
-#: src/paintboxview.c:259
+#: src/paintboxview.c:269
 msgid "Freehand draw "
 msgstr ""
 
 #. IMAGEMODEL_PEN
-#: src/paintboxview.c:260
+#: src/paintboxview.c:270
 msgid "Draw straight lines"
 msgstr ""
 
 #. IMAGEMODEL_LINE
-#: src/paintboxview.c:261
+#: src/paintboxview.c:271
 msgid "Fill rectangles"
 msgstr ""
 
 #. IMAGEMODEL_RECT
-#: src/paintboxview.c:262
+#: src/paintboxview.c:272
 msgid "Flood while pixel not equal to ink"
 msgstr ""
 
 #. IMAGEMODEL_FLOOD
-#: src/paintboxview.c:264
+#: src/paintboxview.c:274
 msgid "Flood while pixel equal to click"
 msgstr ""
 
 #. IMAGEMODEL_BLOB
-#: src/paintboxview.c:266
+#: src/paintboxview.c:276
 msgid "Draw text"
 msgstr ""
 
 #. IMAGEMODEL_TEXT
-#: src/paintboxview.c:267 src/main.c:683
+#: src/paintboxview.c:277 src/main.c:683
 msgid "Smudge"
 msgstr ""
 
-#: src/paintboxview.c:317
+#: src/paintboxview.c:327
 msgid "Undo last paint action"
 msgstr ""
 
-#: src/paintboxview.c:326
+#: src/paintboxview.c:336
 msgid "Redo last paint action"
 msgstr ""
 
-#: src/paintboxview.c:335
+#: src/paintboxview.c:345
 msgid "Clear all undo and redo buffers"
 msgstr ""
 
-#: src/paintboxview.c:355
+#: src/paintboxview.c:365
 msgid "Nib"
 msgstr ""
 
-#: src/paintboxview.c:376
+#: src/paintboxview.c:386
 msgid "Enter text for text tool"
 msgstr ""
 
@@ -1263,11 +1263,11 @@ msgid "bad char constant"
 msgstr ""
 
 #: lex.l:175
-msgid "nested comment!"
+msgid "nested comment"
 msgstr ""
 
 #: lex.l:181
-msgid "no end of comment!"
+msgid "no end of comment"
 msgstr ""
 
 #: lex.l:311
@@ -1546,12 +1546,12 @@ msgstr ""
 msgid "not uncoded"
 msgstr ""
 
-#: src/conversion.c:1400
+#: src/conversion.c:1406
 #, c-format
 msgid "Header for \"%s\""
 msgstr ""
 
-#: src/conversion.c:1402
+#: src/conversion.c:1408
 msgid "OK"
 msgstr ""
 
@@ -1569,65 +1569,74 @@ msgstr ""
 msgid "%s too long."
 msgstr ""
 
-#: src/reduce.c:512 src/reduce.c:571
+#: src/reduce.c:512 src/reduce.c:577
 msgid "Not rectangular."
 msgstr ""
 
-#: src/reduce.c:513 src/reduce.c:572
+#: src/reduce.c:513 src/reduce.c:578
 #, c-format
 msgid ""
 "Matrix of real is not rectangular. Found row of length %d, should be %d."
 msgstr ""
 
-#: src/reduce.c:824
+#: src/reduce.c:537
+msgid "Zero dimension."
+msgstr ""
+
+#: src/reduce.c:538
+#, c-format
+msgid "Matrix has width %d, height %d."
+msgstr ""
+
+#: src/reduce.c:830
 msgid "List length"
 msgstr ""
 
-#: src/reduce.c:873
+#: src/reduce.c:879
 #, c-format
 msgid "List index must be positive, not %d"
 msgstr ""
 
-#: src/reduce.c:881
+#: src/reduce.c:887
 msgid "List index"
 msgstr ""
 
-#: src/reduce.c:886
+#: src/reduce.c:892
 #, c-format
 msgid "List only has %d elements, unable to get element %d."
 msgstr ""
 
-#: src/reduce.c:929
+#: src/reduce.c:935
 msgid "No arguments allowed."
 msgstr ""
 
-#: src/reduce.c:930
+#: src/reduce.c:936
 #, c-format
 msgid "Object \"%s\" should have no arguments."
 msgstr ""
 
-#: src/reduce.c:1031
+#: src/reduce.c:1037
 msgid "C stack overflow. Expression too complex."
 msgstr ""
 
-#: src/reduce.c:1047
+#: src/reduce.c:1053
 msgid "Cancelled."
 msgstr ""
 
-#: src/reduce.c:1048
+#: src/reduce.c:1054
 msgid "Evaluation cancelled."
 msgstr ""
 
-#: src/reduce.c:1133
+#: src/reduce.c:1139
 msgid "No value."
 msgstr ""
 
-#: src/reduce.c:1134
+#: src/reduce.c:1140
 #, c-format
 msgid "Symbol \"%s\" has no value."
 msgstr ""
 
-#: src/reduce.c:1606 src/reduce.c:1611 src/reduce.c:1617
+#: src/reduce.c:1612 src/reduce.c:1617 src/reduce.c:1623
 msgid "List generator"
 msgstr ""
 
@@ -1718,7 +1727,7 @@ msgstr ""
 msgid "_Interpret"
 msgstr ""
 
-#: src/conversionview.c:236 src/regionview.c:1001
+#: src/conversionview.c:236 src/regionview.c:1027
 msgid "_Reset"
 msgstr ""
 
@@ -1730,25 +1739,25 @@ msgstr ""
 msgid "Cancelling"
 msgstr ""
 
-#: src/progress.c:147
+#: src/progress.c:144
 #, c-format
 msgid "%d minute left"
 msgid_plural "%d minutes left"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/progress.c:152
+#: src/progress.c:149
 #, c-format
 msgid "%d second left"
 msgid_plural "%d seconds left"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/progress.c:167
+#: src/progress.c:170
 msgid "Calculating"
 msgstr ""
 
-#: src/progress.c:186
+#: src/progress.c:189
 msgid "Loading"
 msgstr ""
 
@@ -1757,44 +1766,44 @@ msgstr ""
 msgid "error in \"%s\""
 msgstr ""
 
-#: src/expr.c:326
+#: src/expr.c:347
 msgid "Error"
 msgstr ""
 
-#: src/expr.c:585
+#: src/expr.c:614
 msgid "top level"
 msgstr ""
 
-#: src/expr.c:590
+#: src/expr.c:619
 msgid "class"
 msgstr ""
 
-#: src/expr.c:593
+#: src/expr.c:622
 msgid "instance"
 msgstr ""
 
-#: src/expr.c:597
+#: src/expr.c:626
 msgid "definition"
 msgstr ""
 
-#: src/expr.c:604
+#: src/expr.c:633
 #, c-format
 msgid "parameter \"%s\""
 msgstr ""
 
-#: src/expr.c:608
+#: src/expr.c:637
 msgid "member"
 msgstr ""
 
-#: src/expr.c:613 src/dump.c:186
+#: src/expr.c:642 src/dump.c:186
 msgid "value"
 msgstr ""
 
-#: src/expr.c:617 src/itext.c:446
+#: src/expr.c:646 src/itext.c:446
 msgid "function"
 msgstr ""
 
-#: src/expr.c:626
+#: src/expr.c:655
 msgid "of"
 msgstr ""
 
@@ -1862,7 +1871,7 @@ msgstr ""
 msgid "Save image to file"
 msgstr ""
 
-#: src/imageview.c:494 src/mainw.c:855
+#: src/imageview.c:494 src/mainw.c:853
 msgid "Recalculate"
 msgstr ""
 
@@ -2078,93 +2087,88 @@ msgstr ""
 msgid "unsaved workspace"
 msgstr ""
 
-#: src/mainw.c:432
-#, c-format
-msgid "%s: &#0169;2009 Imperial College, London"
-msgstr ""
-
 #. Expands to (eg.) "14GB free in /pics/tmp"
-#: src/mainw.c:598
+#: src/mainw.c:596
 #, c-format
 msgid " in \"%s\""
 msgstr ""
 
-#: src/mainw.c:602
+#: src/mainw.c:600
 #, c-format
 msgid "%d cells in heap, %d cells free, %d cells maximum"
 msgstr ""
 
-#: src/mainw.c:606
+#: src/mainw.c:604
 #, c-format
 msgid "%d objects in workspace"
 msgstr ""
 
-#: src/mainw.c:610
+#: src/mainw.c:608
 #, c-format
 msgid "%d vips calls cached"
 msgstr ""
 
-#: src/mainw.c:742
+#: src/mainw.c:740
 msgid "Find in workspace not implemented yet."
 msgstr ""
 
-#: src/mainw.c:750
+#: src/mainw.c:748
 msgid "Find again in workspace not implemented yet."
 msgstr ""
 
-#: src/mainw.c:785
+#: src/mainw.c:783
 msgid "No errors."
 msgstr ""
 
-#: src/mainw.c:786
+#: src/mainw.c:784
 msgid "There are no errors (that I can see) in this workspace."
 msgstr ""
 
-#: src/mainw.c:856
+#: src/mainw.c:854
 msgid "Completely recalculate?"
 msgstr ""
 
-#: src/mainw.c:996 src/model.c:130 src/filemodel.c:452 src/filemodel.c:461
+#: src/mainw.c:994 src/model.c:130 src/filemodel.c:452 src/filemodel.c:461
 #: src/filemodel.c:474
 msgid "Load failed."
 msgstr ""
 
-#: src/mainw.c:997
+#: src/mainw.c:995
 #, c-format
 msgid ""
 "Unable to execute:\n"
 "   %s"
 msgstr ""
 
-#: src/mainw.c:1014 src/mainw.c:1047
+#: src/mainw.c:1012 src/mainw.c:1045
 msgid "Open File"
 msgstr ""
 
-#: src/mainw.c:1161
+#: src/mainw.c:1159
 msgid "Recent Images"
 msgstr ""
 
-#: src/mainw.c:1169
+#: src/mainw.c:1167
 msgid "Recent Workspaces"
 msgstr ""
 
-#: src/mainw.c:1177
+#: src/mainw.c:1175
 msgid "Recent Matricies"
 msgstr ""
 
-#: src/mainw.c:1186
+#: src/mainw.c:1184
 msgid "No recent items"
 msgstr ""
 
-#: src/mainw.c:1192
+#: src/mainw.c:1190
 msgid "Clear Recent Menu"
 msgstr ""
 
-#: src/mainw.c:1252
+#: src/mainw.c:1250
 msgid "Merge Workspace from File"
 msgstr ""
 
-#: src/mainw.c:1336 src/mainw.c:1374 src/program.c:596 src/program.c:625
+#: src/mainw.c:1334 src/mainw.c:1372 src/program.c:596 src/program.c:625
 #: src/program.c:1052 src/program.c:1093 src/program.c:1139 src/program.c:1171
 #: src/program.c:1500 src/program.c:1541 src/program.c:2224 src/row.c:479
 #: src/workspacegroup.c:177 src/workspacegroup.c:213 src/columnview.c:180
@@ -2172,345 +2176,345 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: src/mainw.c:1374
+#: src/mainw.c:1372
 msgid "Set column name here"
 msgstr ""
 
-#: src/mainw.c:1376
+#: src/mainw.c:1374
 msgid "Set column caption here"
 msgstr ""
 
-#: src/mainw.c:1378
+#: src/mainw.c:1376
 msgid "New Column"
 msgstr ""
 
-#: src/mainw.c:1382
+#: src/mainw.c:1380
 msgid "Create Column"
 msgstr ""
 
-#: src/mainw.c:1515
+#: src/mainw.c:1519
 msgid "Revert to Defaults"
 msgstr ""
 
-#: src/mainw.c:1516
+#: src/mainw.c:1520
 msgid "Revert to installation defaults?"
 msgstr ""
 
-#: src/mainw.c:1517
+#: src/mainw.c:1521
 msgid ""
 "Would you like to reset all preferences to their factory settings? This will "
 "delete any changes you have ever made to your preferences and may take a few "
 "seconds."
 msgstr ""
 
-#: src/mainw.c:1534
+#: src/mainw.c:1538
 msgid "Preferences"
 msgstr ""
 
-#: src/mainw.c:1539
+#: src/mainw.c:1543
 msgid "Revert to Defaults ..."
 msgstr ""
 
 #. Menu items.
 #.
-#: src/mainw.c:1591
+#: src/mainw.c:1595
 msgid "_File"
 msgstr ""
 
-#: src/mainw.c:1592
+#: src/mainw.c:1596
 msgid "_New"
 msgstr ""
 
-#: src/mainw.c:1593
+#: src/mainw.c:1597
 msgid "Open _Recent"
 msgstr ""
 
-#: src/mainw.c:1594 src/mainw.c:1718 src/regionview.c:997 src/program.c:727
+#: src/mainw.c:1598 src/mainw.c:1722 src/regionview.c:1023 src/program.c:727
 #: src/rowview.c:586
 msgid "_Edit"
 msgstr ""
 
-#: src/mainw.c:1595 src/mainw.c:2079
+#: src/mainw.c:1599 src/mainw.c:2085
 msgid "Jump to _Column"
 msgstr ""
 
-#: src/mainw.c:1596
+#: src/mainw.c:1600
 msgid "_View"
 msgstr ""
 
-#: src/mainw.c:1597
+#: src/mainw.c:1601
 msgid "_Toolkits"
 msgstr ""
 
-#: src/mainw.c:1598
+#: src/mainw.c:1602
 msgid "_Help"
 msgstr ""
 
-#: src/mainw.c:1608 src/mainw.c:2076
+#: src/mainw.c:1612 src/mainw.c:2082
 msgid "New C_olumn"
 msgstr ""
 
-#: src/mainw.c:1609
+#: src/mainw.c:1613
 msgid "Create a new column"
 msgstr ""
 
-#: src/mainw.c:1613
+#: src/mainw.c:1617
 msgid "New Named C_olumn"
 msgstr ""
 
-#: src/mainw.c:1614
+#: src/mainw.c:1618
 msgid "Create a new column with a specified name"
 msgstr ""
 
-#: src/mainw.c:1618 src/program.c:1670
+#: src/mainw.c:1622 src/program.c:1670
 msgid "New _Workspace"
 msgstr ""
 
-#: src/mainw.c:1619
+#: src/mainw.c:1623
 msgid "Create a new workspace"
 msgstr ""
 
-#: src/mainw.c:1623
+#: src/mainw.c:1627
 msgid "_Open"
 msgstr ""
 
-#: src/mainw.c:1624
+#: src/mainw.c:1628
 msgid "Open a file"
 msgstr ""
 
-#: src/mainw.c:1628
+#: src/mainw.c:1632
 msgid "Open _Examples"
 msgstr ""
 
-#: src/mainw.c:1629
+#: src/mainw.c:1633
 msgid "Open example workspaces"
 msgstr ""
 
-#: src/mainw.c:1633
+#: src/mainw.c:1637
 msgid "_Duplicate Workspace"
 msgstr ""
 
-#: src/mainw.c:1634
+#: src/mainw.c:1638
 msgid "Duplicate workspace"
 msgstr ""
 
-#: src/mainw.c:1638
+#: src/mainw.c:1642
 msgid "_Merge Workspace"
 msgstr ""
 
-#: src/mainw.c:1639
+#: src/mainw.c:1643
 msgid "Merge workspace into this workspace"
 msgstr ""
 
-#: src/mainw.c:1643
+#: src/mainw.c:1647
 msgid "_Save Workspace"
 msgstr ""
 
-#: src/mainw.c:1644
+#: src/mainw.c:1648
 msgid "Save workspace"
 msgstr ""
 
-#: src/mainw.c:1648
+#: src/mainw.c:1652
 msgid "_Save Workspace As"
 msgstr ""
 
-#: src/mainw.c:1649
+#: src/mainw.c:1653
 msgid "Save workspace as"
 msgstr ""
 
-#: src/mainw.c:1653
+#: src/mainw.c:1657
 msgid "Search for Workspace _Backups"
 msgstr ""
 
-#: src/mainw.c:1654
+#: src/mainw.c:1658
 msgid "Load last automatically backed-up workspace"
 msgstr ""
 
-#: src/mainw.c:1659
+#: src/mainw.c:1663
 msgid "Close workspace"
 msgstr ""
 
-#: src/mainw.c:1663 src/program.c:1720
+#: src/mainw.c:1667 src/program.c:1720
 msgid "_Delete"
 msgstr ""
 
-#: src/mainw.c:1664
+#: src/mainw.c:1668
 msgid "Delete selected items"
 msgstr ""
 
-#: src/mainw.c:1668 src/program.c:1725 src/columnview.c:896
+#: src/mainw.c:1672 src/program.c:1725 src/columnview.c:896
 msgid "Select _All"
 msgstr ""
 
-#: src/mainw.c:1669
+#: src/mainw.c:1673
 msgid "Select all items"
 msgstr ""
 
-#: src/mainw.c:1673
+#: src/mainw.c:1677
 msgid "D_uplicate Selected"
 msgstr ""
 
-#: src/mainw.c:1674
+#: src/mainw.c:1678
 msgid "Duplicate selected items"
 msgstr ""
 
-#: src/mainw.c:1678 src/rowview.c:596
+#: src/mainw.c:1682 src/rowview.c:596
 msgid "_Recalculate"
 msgstr ""
 
-#: src/mainw.c:1679
+#: src/mainw.c:1683
 msgid "Recalculate selected items"
 msgstr ""
 
-#: src/mainw.c:1683 src/mainw.c:2080
+#: src/mainw.c:1687 src/mainw.c:2086
 msgid "Align _Columns"
 msgstr ""
 
-#: src/mainw.c:1684
+#: src/mainw.c:1688
 msgid "Align columns to grid"
 msgstr ""
 
-#: src/mainw.c:1688 src/program.c:1745
+#: src/mainw.c:1692 src/program.c:1745
 msgid "_Find"
 msgstr ""
 
-#: src/mainw.c:1689
+#: src/mainw.c:1693
 msgid "Find in workspace"
 msgstr ""
 
-#: src/mainw.c:1693 src/program.c:1750
+#: src/mainw.c:1697 src/program.c:1750
 msgid "Find _Next"
 msgstr ""
 
-#: src/mainw.c:1694
+#: src/mainw.c:1698
 msgid "Find again in workspace"
 msgstr ""
 
-#: src/mainw.c:1699
+#: src/mainw.c:1703
 msgid "Jump to next error"
 msgstr ""
 
-#: src/mainw.c:1703
+#: src/mainw.c:1707
 msgid "_Group"
 msgstr ""
 
-#: src/mainw.c:1704
+#: src/mainw.c:1708
 msgid "Group selected items"
 msgstr ""
 
-#: src/mainw.c:1708 src/rowview.c:590
+#: src/mainw.c:1712 src/rowview.c:590
 msgid "U_ngroup"
 msgstr ""
 
-#: src/mainw.c:1709
+#: src/mainw.c:1713
 msgid "Ungroup selected items"
 msgstr ""
 
-#: src/mainw.c:1713
+#: src/mainw.c:1717
 msgid "_Preferences"
 msgstr ""
 
-#: src/mainw.c:1714
+#: src/mainw.c:1718
 msgid "Edit preferences"
 msgstr ""
 
-#: src/mainw.c:1719
+#: src/mainw.c:1723
 msgid "Edit toolkits"
 msgstr ""
 
-#: src/mainw.c:1733
+#: src/mainw.c:1737
 msgid "_Website"
 msgstr ""
 
-#: src/mainw.c:1734
+#: src/mainw.c:1738
 msgid "Open the VIPS Homepage"
 msgstr ""
 
-#: src/mainw.c:1740
+#: src/mainw.c:1744
 msgid "Au_to Recalculate"
 msgstr ""
 
-#: src/mainw.c:1741
+#: src/mainw.c:1745
 msgid "Recalculate automatically on change"
 msgstr ""
 
-#: src/mainw.c:1745
+#: src/mainw.c:1749
 msgid "_Toolbar"
 msgstr ""
 
-#: src/mainw.c:1746
+#: src/mainw.c:1750
 msgid "Show window toolbar"
 msgstr ""
 
-#: src/mainw.c:1750
+#: src/mainw.c:1754
 msgid "_Statusbar"
 msgstr ""
 
-#: src/mainw.c:1751
+#: src/mainw.c:1755
 msgid "Show window statusbar"
 msgstr ""
 
-#: src/mainw.c:1755
+#: src/mainw.c:1759
 msgid "Toolkit _Browser"
 msgstr ""
 
-#: src/mainw.c:1756
+#: src/mainw.c:1760
 msgid "Show toolkit browser"
 msgstr ""
 
-#: src/mainw.c:1760
+#: src/mainw.c:1764
 msgid "Workspace _Definitions"
 msgstr ""
 
-#: src/mainw.c:1761
+#: src/mainw.c:1765
 msgid "Show workspace definitions"
 msgstr ""
 
-#: src/mainw.c:1767
+#: src/mainw.c:1771
 msgid "_Normal"
 msgstr ""
 
-#: src/mainw.c:1768
+#: src/mainw.c:1772
 msgid "Normal view mode"
 msgstr ""
 
-#: src/mainw.c:1772
+#: src/mainw.c:1776
 msgid "Show _Formula"
 msgstr ""
 
-#: src/mainw.c:1773
+#: src/mainw.c:1777
 msgid "Show formula view mode"
 msgstr ""
 
-#: src/mainw.c:1777
+#: src/mainw.c:1781
 msgid "No _Edits"
 msgstr ""
 
-#: src/mainw.c:1778
+#: src/mainw.c:1782
 msgid "No edits view mode"
 msgstr ""
 
-#: src/mainw.c:2075
+#: src/mainw.c:2081
 msgid "Workspace menu"
 msgstr ""
 
-#: src/mainw.c:2085
+#: src/mainw.c:2091
 msgid "_Merge Workspace from File"
 msgstr ""
 
-#: src/mainw.c:2088
+#: src/mainw.c:2094
 msgid "_Group Selected"
 msgstr ""
 
 #. Toolkit Browser pane.
 #.
-#: src/mainw.c:2097
+#: src/mainw.c:2103
 msgid "Toolkit Browser"
 msgstr ""
 
 #. Workspace-local defs pane.
 #.
-#: src/mainw.c:2119
+#: src/mainw.c:2122
 msgid "Workspace Definitions"
 msgstr ""
 
@@ -2527,34 +2531,34 @@ msgid ""
 "%s started."
 msgstr ""
 
-#: src/regionview.c:916 src/rowview.c:302
+#: src/regionview.c:942 src/rowview.c:302
 msgid "Can't duplicate."
 msgstr ""
 
-#: src/regionview.c:918
+#: src/regionview.c:944
 msgid "You can only duplicate top level regions."
 msgstr ""
 
-#: src/regionview.c:960
+#: src/regionview.c:986
 msgid "Can't delete."
 msgstr ""
 
-#: src/regionview.c:961
+#: src/regionview.c:987
 msgid "You can only delete top level regions."
 msgstr ""
 
-#: src/regionview.c:970
+#: src/regionview.c:996
 msgid "Delete Region?"
 msgstr ""
 
-#: src/regionview.c:971
+#: src/regionview.c:997
 #, c-format
 msgid "Are you sure you want to delete Region \"%s\"?"
 msgstr ""
 
 #. Other init.
 #.
-#: src/regionview.c:996
+#: src/regionview.c:1022
 msgid "Region menu"
 msgstr ""
 
@@ -2991,26 +2995,26 @@ msgstr ""
 msgid "Error writing image to file \"%s\"."
 msgstr ""
 
-#: src/imageinfo.c:1176
+#: src/imageinfo.c:1135
 msgid "Unable to paint on image."
 msgstr ""
 
-#: src/imageinfo.c:1177
+#: src/imageinfo.c:1136
 #, c-format
 msgid ""
 "Unable to get write permission for file \"%s\".\n"
 "Check permission settings."
 msgstr ""
 
-#: src/imageinfo.c:1220
+#: src/imageinfo.c:1180
 msgid "Modify"
 msgstr ""
 
-#: src/imageinfo.c:1221
+#: src/imageinfo.c:1181
 msgid "Modify disc file?"
 msgstr ""
 
-#: src/imageinfo.c:1222
+#: src/imageinfo.c:1182
 #, c-format
 msgid ""
 "This image is being shown directly from the disc file:\n"
@@ -3021,23 +3025,23 @@ msgid ""
 "wrong, you may lose work. Are you sure you want to modify this file?"
 msgstr ""
 
-#: src/imageinfo.c:1926
+#: src/imageinfo.c:1883
 msgid "Unable to paint text."
 msgstr ""
 
-#: src/imageinfo.c:1927
+#: src/imageinfo.c:1884
 #, c-format
 msgid "Unable to paint text \"%s\" in font \"%s\"."
 msgstr ""
 
-#: src/row.c:185
+#: src/row.c:287
 msgid "Error in row."
 msgstr ""
 
 #. Elements are name of row, principal error,
 #. * secondary error.
 #.
-#: src/row.c:189
+#: src/row.c:291
 #, c-format
 msgid ""
 "Error in row %s: %s\n"

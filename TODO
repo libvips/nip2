@@ -1,4 +1,10 @@
+- win installer should make a menu item called "nip2 7.22", and a registry key
+  called 7.22
 
+  that way we can have multiple versions installed, with multiple uninstallers
+
+WONTFIX for 7.20
+================
 
 
 - look at:
@@ -103,9 +109,6 @@ http://www.eggheadcafe.com/software/aspnet/35467981/programmatic-console-appl.as
 
   where do we use our bandalike/formatalike stuff? remove our stuff, though
   make sure we have equivalents in vips now
-
-WONTFIX for 7.20
-================
 
 - outline text example
 

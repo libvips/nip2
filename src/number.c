@@ -1,4 +1,4 @@
-/* an editable number number
+/* an editable number
  */
 
 /*

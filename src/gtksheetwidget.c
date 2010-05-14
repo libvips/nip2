@@ -5699,8 +5699,8 @@ gtk_sheet_make_backing_pixmap (GtkSheet *sheet, guint width, guint height)
     if(!GTK_WIDGET_REALIZED(GTK_WIDGET(sheet))) return;
 
     if(width == 0 && height == 0){
-        width=sheet->sheet_window_width+80;
-        height=sheet->sheet_window_height+80;
+        width=sheet->sheet_window_width;
+        height=sheet->sheet_window_height;
     }
 
     if (!sheet->pixmap)
@@ -8201,7 +8201,7 @@ adjust_scrollbars (GtkSheet * sheet)
   sheet->vadjustment->page_increment = sheet->sheet_window_height / 2;
   sheet->vadjustment->step_increment = DEFAULT_ROW_HEIGHT(GTK_WIDGET(sheet));
   sheet->vadjustment->lower = 0;
-  sheet->vadjustment->upper = SHEET_HEIGHT (sheet) + 80;
+  sheet->vadjustment->upper = SHEET_HEIGHT (sheet);
 /*
   if (sheet->sheet_window_height - sheet->voffset > SHEET_HEIGHT (sheet))
     {
@@ -8220,7 +8220,7 @@ adjust_scrollbars (GtkSheet * sheet)
   sheet->hadjustment->page_increment = sheet->sheet_window_width / 2;
   sheet->hadjustment->step_increment = DEFAULT_COLUMN_WIDTH;
   sheet->hadjustment->lower = 0;
-  sheet->hadjustment->upper = SHEET_WIDTH (sheet)+ 80;
+  sheet->hadjustment->upper = SHEET_WIDTH (sheet);
 /*
   if (sheet->sheet_window_width - sheet->hoffset > SHEET_WIDTH (sheet))
     {

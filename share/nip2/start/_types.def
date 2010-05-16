@@ -1104,10 +1104,9 @@ Interpolate_type = class {
 	NEAREST_NEIGHBOUR = 0;
 	BILINEAR = 1;
 	BICUBIC = 2;
-	YAFRSMOOTH = 3;
+        LBB = 3;
 	NOHALO = 4;
 	SNOHALO = 5;
-	NOHALO2 = 6;
 
 	// should introspect to get the list of interpolators :-( we can "dir" on
 	// VipsInterpolate to get a list of them, but we can't get i18n'd
@@ -1118,11 +1117,10 @@ Interpolate_type = class {
 	descriptions = [
 		_ "Nearest neighbour",
 		_ "Bilinear",
-		_ "Bicubic",
-		_ "Bicubic plus edge enhance (yafr-smooth)",
-		_ "Bilinear plus edge enhance (nohalo-sharp-1)",
-		_ "Bilinear minus edge enhance (nohalo-smooth-1)",
-		_ "Two-way bilinear (nohalo-2)"
+                _ "Bicubic",
+		_ "Reduced halo bicubic (lbb)",
+		_ "Reduced halo bicubic with edge sharpening (nohalo)",
+		_ "Diagonal-preserving reduced halo sampler (snohalo)"
 	];
 
 	/* And to vips type names.
@@ -1131,10 +1129,9 @@ Interpolate_type = class {
 		"VipsInterpolateNearest",
 		"VipsInterpolateBilinear",
 		"VipsInterpolateBicubic",
-		"VipsInterpolateYafrsmooth",
-		"VipsInterpolateNohalo1",
-		"VipsInterpolateSnohalo1",
-		"VipsInterpolateNohalo2"
+		"VipsInterpolateLbb",
+		"VipsInterpolateNohalo",
+		"VipsInterpolateSnohalo"
 	];
 }
 
@@ -1145,12 +1142,11 @@ Interpolate type options = class {
 Interpolate_bilinear = Interpolate Interpolate_type.BILINEAR [];
 
 Interpolate_picker default = class 
-	Interpolate interp.value [$sharpening => sharp.value, $blur => blur.value] {
+	Interpolate interp.value [$blur => blur.value] {
 	_vislevel = 2;
 
 	interp = Option "Interpolation" Interpolate_type.descriptions default;
-	sharp = Scale "Yafrsmooth sharpening" 0 4 1;
-	blur = Scale "Snohalo1 blur" 0 1 1;
+	blur = Scale "Snohalo blur" 0 1 1;
 }
 
 Render_intent = class {

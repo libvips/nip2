@@ -1118,9 +1118,9 @@ Interpolate_type = class {
 		_ "Nearest neighbour",
 		_ "Bilinear",
                 _ "Bicubic",
-		_ "Reduced halo bicubic (lbb)",
-		_ "Reduced halo bicubic with edge sharpening (nohalo)",
-		_ "Diagonal-preserving reduced halo sampler (snohalo)"
+		_ "Reduced halo bicubic (LBB)",
+		_ "Edge sharpening reduced halo bicubic (nohalo)",
+		_ "Edge smoothing reduced halo method (prototype)"
 	];
 
 	/* And to vips type names.

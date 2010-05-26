@@ -1001,10 +1001,6 @@ main( int argc, char *argv[] )
  	 */
 	gtk_disable_setlocale();
 
-	/* Set localised application name.
-	 */
-	g_set_application_name( _( PACKAGE ) );
-
 #ifdef DEBUG
 	printf( "main: sizeof( HeapNode ) == %zd\n", sizeof( HeapNode ) );
 
@@ -1076,6 +1072,10 @@ main( int argc, char *argv[] )
 	textdomain( GETTEXT_PACKAGE );
 	bindtextdomain( GETTEXT_PACKAGE, name );
 	bind_textdomain_codeset( GETTEXT_PACKAGE, "UTF-8" );
+
+	/* Set localised application name.
+	 */
+	g_set_application_name( _( PACKAGE ) );
 
 	context = g_option_context_new( _( "- image processing spreadsheet" ) );
 	g_option_context_add_main_entries( context, 

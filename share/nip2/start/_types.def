@@ -1108,9 +1108,10 @@ Interpolate_type = class {
 	NOHALO = 4;
 	VSQBS = 5;
 
-	// should introspect to get the list of interpolators :-( we can "dir" on
-	// VipsInterpolate to get a list of them, but we can't get i18n'd
-	// descriptions until we have more introspection stuff in nip2
+	// Should introspect to get the list of interpolators :-(
+        // We can "dir" on VipsInterpolate to get a list of them, but we
+        // can't get i18n'd descriptions until we have more
+        // introspection stuff in nip2.
 
 	/* Table to map interpol numbers to descriptive strings
 	 */
@@ -1119,8 +1120,8 @@ Interpolate_type = class {
 		_ "Bilinear",
                 _ "Bicubic",
 		_ "Upsize: reduced halo bicubic (LBB)",
-		_ "Upsharp: edge sharpening reduced halo bicubic (Nohalo)",
-		_ "Upsmooth: B-splines with jaggy reduction (VSQBS)"
+		_ "Upsharp: reduced halo bicubic with edge sharpening (Nohalo)",
+		_ "Upsmooth: quadratic B-splines with jaggy reduction (VSQBS)"
 	];
 
 	/* And to vips type names.

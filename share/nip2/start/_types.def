@@ -1106,7 +1106,7 @@ Interpolate_type = class {
 	BICUBIC = 2;
         LBB = 3;
 	NOHALO = 4;
-	SNOHALO = 5;
+	VSQBS = 5;
 
 	// should introspect to get the list of interpolators :-( we can "dir" on
 	// VipsInterpolate to get a list of them, but we can't get i18n'd
@@ -1120,7 +1120,7 @@ Interpolate_type = class {
                 _ "Bicubic",
 		_ "Upsize: reduced halo bicubic (LBB)",
 		_ "Upsharp: edge sharpening reduced halo bicubic (Nohalo)",
-		_ "Upsmooth: edge smoothing reduced halo prototype (Snohalo)"
+		_ "Upsmooth: B-splines with jaggy reduction (VSQBS)"
 	];
 
 	/* And to vips type names.
@@ -1131,7 +1131,7 @@ Interpolate_type = class {
 		"VipsInterpolateBicubic",
 		"VipsInterpolateLbb",
 		"VipsInterpolateNohalo",
-		"VipsInterpolateSnohalo"
+		"VipsInterpolateVsqbs"
 	];
 }
 
@@ -1142,11 +1142,10 @@ Interpolate type options = class {
 Interpolate_bilinear = Interpolate Interpolate_type.BILINEAR [];
 
 Interpolate_picker default = class 
-	Interpolate interp.value [$blur => blur.value] {
+	Interpolate interp.value [] {
 	_vislevel = 2;
 
 	interp = Option "Interpolation" Interpolate_type.descriptions default;
-	blur = Scale "Snohalo blur" 0 1 1;
 }
 
 Render_intent = class {

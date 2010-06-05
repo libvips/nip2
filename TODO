@@ -3,7 +3,8 @@
 
   that way we can have multiple versions installed, with multiple uninstallers
 
-- fix i18n startup, test for German VIPS
+
+
 
 WONTFIX for 7.20
 ================

@@ -1,4 +1,4 @@
-/* a gtkplot in a floating window
+/* a plotpresent / plotmodel in a floating window
  */
 
 /*

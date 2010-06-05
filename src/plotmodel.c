@@ -28,12 +28,35 @@
  */
 
 /*
-#define DEBUG
  */
+#define DEBUG
 
 #include "ip.h"
 
 static iObjectClass *parent_class = NULL;
+
+static void
+plotmodel_dispose( GObject *gobject )
+{
+	Plotmodel *plotmodel;
+
+	g_return_if_fail( gobject != NULL );
+	g_return_if_fail( IS_PLOTMODEL( gobject ) );
+
+	plotmodel = PLOTMODEL( gobject );
+
+#ifdef DEBUG
+	printf( "plotmodel_dispose %p: ", plotmodel );
+	iobject_print( IOBJECT( plotmodel ) );
+#endif /*DEBUG*/
+
+	/* My instance destroy stuff.
+	 */
+	FREESID( plotmodel->changed_sid, plotmodel->plot );
+	FREESID( plotmodel->destroy_sid, plotmodel->plot );
+
+	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+}
 
 static void
 plotmodel_finalize( GObject *gobject )
@@ -43,10 +66,6 @@ plotmodel_finalize( GObject *gobject )
 #ifdef DEBUG
 	printf( "plotmodel_finalize: %p\n", plotmodel );
 #endif /*DEBUG*/
-
-	/* My instance destroy stuff.
-	 */
-	FREESID( plotmodel->changed_sid, plotmodel->plot );
 
 	G_OBJECT_CLASS( parent_class )->finalize( gobject );
 }
@@ -74,6 +93,7 @@ plotmodel_class_init( PlotmodelClass *class )
 
 	parent_class = g_type_class_peek_parent( class );
 
+	gobject_class->dispose = plotmodel_dispose;
 	gobject_class->finalize = plotmodel_finalize;
 
 	iobject_class->changed = plotmodel_changed;
@@ -93,6 +113,7 @@ plotmodel_init( Plotmodel *plotmodel )
 #endif /*DEBUG*/
 
 	plotmodel->changed_sid = 0;
+	plotmodel->destroy_sid = 0;
 	plotmodel->width = -1;
 	plotmodel->height = -1;
 	plotmodel->mag = 100;
@@ -125,6 +146,14 @@ plotmodel_get_type( void )
 }
 
 static void
+plotmodel_plot_destroy_cb( Plot *plot, Plotmodel *plotmodel )
+{
+	plotmodel->plot = NULL;
+	plotmodel->destroy_sid = 0;
+	plotmodel->changed_sid = 0;
+}
+
+static void
 plotmodel_plot_changed_cb( Plot *plot, Plotmodel *plotmodel )
 {
 	iobject_changed( IOBJECT( plotmodel ) );
@@ -137,6 +166,9 @@ plotmodel_link( Plotmodel *plotmodel, Plot *plot )
 	 * that.
 	 */
 	plotmodel->plot = plot;
+	plotmodel->destroy_sid = g_signal_connect( 
+		G_OBJECT( plot ), "destroy", 
+		G_CALLBACK( plotmodel_plot_destroy_cb ), plotmodel );
 	plotmodel->changed_sid = g_signal_connect( 
 		G_OBJECT( plot ), "changed", 
 		G_CALLBACK( plotmodel_plot_changed_cb ), plotmodel );

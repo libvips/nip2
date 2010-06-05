@@ -1,6 +1,7 @@
 started 7.22.0, 12/5/10
 - version bump
 - gtksheet sizing changes, again
+- plot window destroy cleanup
 
 started 7.21.0, 8/12/09
 - 7.16 ws load could fail (thanks Jim)

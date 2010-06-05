@@ -43,6 +43,7 @@ struct _Plotmodel {
 	 */
 	Plot *plot;
 	guint changed_sid;
+	guint destroy_sid;
 
 	/* The last canvas size we set ... stop resize loops with these.
 	 */

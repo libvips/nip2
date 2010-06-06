@@ -28,8 +28,8 @@
  */
 
 /*
- */
 #define DEBUG
+ */
 
 #include "ip.h"
 
@@ -61,9 +61,9 @@ plotmodel_dispose( GObject *gobject )
 static void
 plotmodel_finalize( GObject *gobject )
 {
+#ifdef DEBUG
 	Plotmodel *plotmodel = PLOTMODEL( gobject );
 
-#ifdef DEBUG
 	printf( "plotmodel_finalize: %p\n", plotmodel );
 #endif /*DEBUG*/
 

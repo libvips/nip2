@@ -29,8 +29,8 @@
 
 /*
 #define DEBUG_GEO
- */
 #define DEBUG
+ */
 
 #include "ip.h"
 

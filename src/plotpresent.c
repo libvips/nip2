@@ -29,8 +29,8 @@
 
 /*
 #define DEBUG_EVENT
- */
 #define DEBUG
+ */
 
 #include "ip.h"
 

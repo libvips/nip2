@@ -1673,8 +1673,8 @@ gtk_sheet_init (GtkSheet *sheet)
   sheet->state=GTK_SHEET_NORMAL;
 
   sheet->sheet_window = NULL;
-  sheet->sheet_window_width = 0;
-  sheet->sheet_window_height = 0;
+  sheet->sheet_window_width = 1;
+  sheet->sheet_window_height = 1;
   sheet->sheet_entry = NULL;
   sheet->button = NULL;
 

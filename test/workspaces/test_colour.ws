@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.18.0">
-  <Workspace filename="test_colour.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1920" window_height="1165" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_colour" caption="Default empty workspace">
+  <Workspace filename="workspaces/test_colour.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1280" window_height="771" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_colour" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="10" name="A" caption="Colour / New">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
@@ -36,7 +36,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="386" y="366" open="true" selected="false" sform="false" next="21" name="B" caption="Colour / Colourspace">
+    <Column x="386" y="366" open="true" selected="true" sform="false" next="22" name="B" caption="Colour / Colourspace">
       <Subcolumn vislevel="3">
         <Row popup="false" name="B1">
           <Rhs vislevel="0" flags="4">
@@ -111,7 +111,32 @@
         <Row popup="false" name="B7">
           <Rhs vislevel="3" flags="7">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
-            <Subcolumn vislevel="1"/>
+            <Subcolumn vislevel="1">
+              <Row name="dest">
+                <Rhs vislevel="0" flags="4">
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="x">
+                <Rhs vislevel="3" flags="4">
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="super">
+                <Rhs vislevel="0" flags="4">
+                  <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="to">
+                <Rhs vislevel="1" flags="1">
+                  <Option caption="Convert to" labelsn="11" labels0="Mono" labels1="sRGB" labels2="RGB16" labels3="GREY16" labels4="Lab" labels5="LabQ" labels6="LabS" labels7="LCh" labels8="XYZ" labels9="Yxy" labels10="UCS" value="9"/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+            </Subcolumn>
             <iText formula="Colour_convert_item.Yxy_item.action B6"/>
           </Rhs>
         </Row>
@@ -124,7 +149,7 @@
         </Row>
         <Row popup="false" name="B15">
           <Rhs vislevel="1" flags="4">
-            <iText formula="&quot;test max difference &lt; 1&quot;"/>
+            <iText formula="&quot;test max difference &lt; 2&quot;"/>
           </Rhs>
         </Row>
         <Row popup="false" name="B12">
@@ -141,7 +166,7 @@
         </Row>
         <Row popup="false" name="B14">
           <Rhs vislevel="1" flags="4">
-            <iText formula="if B13 &gt; 1 then error &quot;fail&quot; else &quot;ok!&quot;"/>
+            <iText formula="if B13 &gt; 2 then error &quot;fail&quot; else &quot;ok!&quot;"/>
           </Rhs>
         </Row>
         <Row popup="false" name="B10">
@@ -158,7 +183,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1042" y="0" open="true" selected="true" sform="false" next="15" name="C" caption="Colour / Tag As">
+    <Column x="1042" y="0" open="true" selected="false" sform="false" next="15" name="C" caption="Colour / Tag As">
       <Subcolumn vislevel="3">
         <Row popup="false" name="C1">
           <Rhs vislevel="1" flags="1">

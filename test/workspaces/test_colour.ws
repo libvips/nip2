@@ -36,7 +36,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="386" y="366" open="true" selected="true" sform="false" next="22" name="B" caption="Colour / Colourspace">
+    <Column x="386" y="366" open="true" selected="false" sform="false" next="22" name="B" caption="Colour / Colourspace">
       <Subcolumn vislevel="3">
         <Row popup="false" name="B1">
           <Rhs vislevel="0" flags="4">
@@ -419,7 +419,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="2486" y="0" open="true" selected="false" sform="false" next="8" name="F" caption="Colour / ICC">
+    <Column x="2486" y="0" open="true" selected="true" sform="false" next="9" name="F" caption="Colour / ICC">
       <Subcolumn vislevel="3">
         <Row popup="false" name="F1">
           <Rhs vislevel="1" flags="1">
@@ -558,9 +558,14 @@
             <iText formula="Colour_dE_item.CIEdE76_item.action F3 F4"/>
           </Rhs>
         </Row>
+        <Row popup="false" name="F8">
+          <Rhs vislevel="1" flags="4">
+            <iText formula="max F5"/>
+          </Rhs>
+        </Row>
         <Row popup="false" name="F6">
           <Rhs vislevel="1" flags="4">
-            <iText formula="if max F5 &gt; 2 then error &quot;fail&quot; else &quot;ok!&quot;"/>
+            <iText formula="if F8 &gt; 2 then error &quot;fail&quot; else &quot;ok!&quot;"/>
           </Rhs>
         </Row>
       </Subcolumn>

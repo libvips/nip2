@@ -1170,6 +1170,8 @@ imagepresent_button_motion( Imagepresent *ip, GdkEvent *ev )
 			imagemodel->ink, imagemodel->nib, 
 			ip->paint_last_x, ip->paint_last_y, ix, iy ) )
 			iwindow_alert( GTK_WIDGET( ip ), GTK_MESSAGE_ERROR );
+		im_invalidate( imageinfo_get( FALSE, imageinfo ) );
+
 		ip->paint_last_x = ix;
 		ip->paint_last_y = iy;
 		break;
@@ -1195,17 +1197,17 @@ imagepresent_button_motion( Imagepresent *ip, GdkEvent *ev )
 			ip->paint_last_x, ip->paint_last_y, 
 			ix, iy ) )
 			iwindow_alert( GTK_WIDGET( ip ), GTK_MESSAGE_ERROR );
+		im_invalidate( imageinfo_get( FALSE, imageinfo ) );
+
 		ip->paint_last_x = ix;
 		ip->paint_last_y = iy;
+
 		break;
 
 	default:
 		break;
 	}
 
-	/* Ask everyone to drop cache, the image has changed.
-	 */
-	im_invalidate( imageinfo_get( FALSE, imageinfo ) );
 }
 
 /* Main event loop.

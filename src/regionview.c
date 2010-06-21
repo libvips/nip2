@@ -859,20 +859,14 @@ regionview_model_update( Regionview *regionview )
 	if( classmodel ) {
 		classmodel_update( classmodel );
 
-		if( CALC_RECOMP_REGION ) {
+		if( CALC_RECOMP_REGION ) 
 			symbol_recalculate_all();
-
-			/* We need to update during drags to avoid leaving
-			 * unpainted trails behind regions.
-			 */
-			gdk_window_process_updates( 
-				GTK_WIDGET( ip->id )->window, FALSE );
-		}
 	}
 
 	/* Refresh immediately .. gives faster feedback during drag.
 	 */
 	vobject_refresh( VOBJECT( regionview ) );
+	gdk_window_process_updates( GTK_WIDGET( ip->id )->window, FALSE );
 
 #ifdef DEBUG
 	printf( "regionview_model_update: set model to %dx%d size %dx%d\n",

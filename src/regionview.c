@@ -866,7 +866,6 @@ regionview_model_update( Regionview *regionview )
 	/* Refresh immediately .. gives faster feedback during drag.
 	 */
 	vobject_refresh( VOBJECT( regionview ) );
-	gdk_window_process_updates( GTK_WIDGET( ip->id )->window, FALSE );
 
 #ifdef DEBUG
 	printf( "regionview_model_update: set model to %dx%d size %dx%d\n",

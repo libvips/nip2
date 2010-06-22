@@ -1,8 +1,9 @@
+- make a tiff pyram, try "nip2 fred.tif:1", it can't load it, how odd
+
 - win installer should make a menu item called "nip2 7.22", and a registry key
   called 7.22
 
   that way we can have multiple versions installed, with multiple uninstallers
-
 
 WONTFIX for 7.20
 ================

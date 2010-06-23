@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.18.0">
-  <Workspace filename="workspaces/test_math.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1920" window_height="1165" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_math" caption="Default empty workspace">
+  <Workspace filename="test_math.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1280" window_height="771" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_math" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="17" name="B" caption="Colour / Colourspace">
       <Subcolumn vislevel="3">
         <Row popup="false" name="B1">
@@ -377,67 +377,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="2710" y="0" open="true" selected="false" sform="false" next="9" name="NB" caption="Math / Relational">
-      <Subcolumn vislevel="3">
-        <Row popup="false" name="NB1">
-          <Rhs vislevel="1" flags="1">
-            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
-            <Subcolumn vislevel="0"/>
-            <iText formula="B1"/>
-          </Rhs>
-        </Row>
-        <Row popup="false" name="NB2">
-          <Rhs vislevel="1" flags="1">
-            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
-            <Subcolumn vislevel="0"/>
-            <iText formula="B1"/>
-          </Rhs>
-        </Row>
-        <Row popup="false" name="NB3">
-          <Rhs vislevel="1" flags="1">
-            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
-            <Subcolumn vislevel="0"/>
-            <iText formula="Math_relational_item.Equal_item.action NB1 NB2"/>
-          </Rhs>
-        </Row>
-        <Row popup="false" name="NB4">
-          <Rhs vislevel="1" flags="1">
-            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
-            <Subcolumn vislevel="0"/>
-            <iText formula="Math_relational_item.Not_equal_item.action NB2 NB3"/>
-          </Rhs>
-        </Row>
-        <Row popup="false" name="NB5">
-          <Rhs vislevel="1" flags="1">
-            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
-            <Subcolumn vislevel="0"/>
-            <iText formula="Math_relational_item.More_item.action NB3 NB4"/>
-          </Rhs>
-        </Row>
-        <Row popup="false" name="NB6">
-          <Rhs vislevel="1" flags="1">
-            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
-            <Subcolumn vislevel="0"/>
-            <iText formula="Math_relational_item.Less_item.action NB4 NB5"/>
-          </Rhs>
-        </Row>
-        <Row popup="false" name="NB7">
-          <Rhs vislevel="1" flags="1">
-            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
-            <Subcolumn vislevel="0"/>
-            <iText formula="Math_relational_item.Less_equal_item.action NB5 NB6"/>
-          </Rhs>
-        </Row>
-        <Row popup="false" name="NB8">
-          <Rhs vislevel="1" flags="1">
-            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
-            <Subcolumn vislevel="0"/>
-            <iText formula="Math_relational_item.More_equal_item.action NB6 NB7"/>
-          </Rhs>
-        </Row>
-      </Subcolumn>
-    </Column>
-    <Column x="3196" y="0" open="true" selected="false" sform="false" next="23" name="OB" caption="Math / List ">
+    <Column x="3898" y="0" open="true" selected="false" sform="false" next="23" name="OB" caption="Math / List ">
       <Subcolumn vislevel="3">
         <Row popup="false" name="OB1">
           <Rhs vislevel="1" flags="4">
@@ -541,7 +481,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3545" y="0" open="true" selected="false" sform="false" next="5" name="PB" caption="Math / Round">
+    <Column x="4247" y="0" open="true" selected="false" sform="false" next="5" name="PB" caption="Math / Round">
       <Subcolumn vislevel="3">
         <Row popup="false" name="PB1">
           <Rhs vislevel="1" flags="1">
@@ -573,7 +513,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3868" y="0" open="true" selected="false" sform="false" next="6" name="QB" caption="Math / Fourier">
+    <Column x="4570" y="0" open="true" selected="false" sform="false" next="6" name="QB" caption="Math / Fourier">
       <Subcolumn vislevel="3">
         <Row popup="false" name="QB1">
           <Rhs vislevel="1" flags="1">
@@ -614,7 +554,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="4354" y="0" open="true" selected="false" sform="false" next="33" name="RB" caption="Math / Statistics">
+    <Column x="5056" y="0" open="true" selected="false" sform="false" next="33" name="RB" caption="Math / Statistics">
       <Subcolumn vislevel="3">
         <Row popup="false" name="RB1">
           <Rhs vislevel="1" flags="1">
@@ -740,7 +680,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="4921" y="0" open="true" selected="false" sform="false" next="8" name="SB" caption="Math / Base">
+    <Column x="5623" y="0" open="true" selected="false" sform="false" next="8" name="SB" caption="Math / Base">
       <Subcolumn vislevel="3">
         <Row popup="false" name="SB1">
           <Rhs vislevel="1" flags="4">
@@ -764,7 +704,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="5107" y="0" open="true" selected="true" sform="false" next="5" name="C" caption="Math / Cluster">
+    <Column x="5809" y="0" open="true" selected="false" sform="false" next="5" name="C" caption="Math / Cluster">
       <Subcolumn vislevel="3">
         <Row popup="false" name="C1">
           <Rhs vislevel="1" flags="4">
@@ -775,6 +715,169 @@
           <Rhs vislevel="2" flags="6">
             <Subcolumn vislevel="1"/>
             <iText formula="Math_stats_item.Cluster_item.action C1"/>
+          </Rhs>
+        </Row>
+      </Subcolumn>
+    </Column>
+    <Column x="2710" y="909" open="true" selected="false" sform="false" next="7" name="A" caption="test results of relational">
+      <Subcolumn vislevel="3">
+        <Row popup="false" name="A4">
+          <Rhs vislevel="2" flags="4">
+            <iText formula="[D4,D5,D6,D7,D8,D9]"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="A2">
+          <Rhs vislevel="1" flags="4">
+            <iText formula="map max A4"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="A5">
+          <Rhs vislevel="1" flags="4">
+            <iText formula="if A2 != [255, 255, 0, 0, 255, 0] then error &quot;relational argh&quot; else &quot;ok!&quot;"/>
+          </Rhs>
+        </Row>
+      </Subcolumn>
+    </Column>
+    <Column x="2710" y="0" open="true" selected="false" sform="false" next="10" name="D" caption="Math / Relational">
+      <Subcolumn vislevel="3">
+        <Row popup="false" name="D1">
+          <Rhs vislevel="0" flags="4">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+            <iText formula="B1"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="D2">
+          <Rhs vislevel="2" flags="5">
+            <iImage window_x="768" window_y="40" window_width="510" window_height="727" image_left="240" image_top="316" image_mag="1" show_status="true" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+            <iText formula="if D1 == 255 then 0 else D1"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="D3">
+          <Rhs vislevel="0" flags="4">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+            <iText formula="D2"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="D4">
+          <Rhs vislevel="2" flags="5">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+            <iText formula="Math_relational_item.Equal_item.action D2 D3"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="D5">
+          <Rhs vislevel="2" flags="5">
+            <iImage window_x="768" window_y="40" window_width="510" window_height="727" image_left="240" image_top="316" image_mag="1" show_status="true" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+            <iText formula="Math_relational_item.Not_equal_item.action D3 D4"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="D6">
+          <Rhs vislevel="2" flags="5">
+            <iImage window_x="768" window_y="40" window_width="510" window_height="727" image_left="240" image_top="316" image_mag="1" show_status="true" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+            <iText formula="Math_relational_item.More_item.action D4 D5"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="D7">
+          <Rhs vislevel="2" flags="5">
+            <iImage window_x="768" window_y="40" window_width="510" window_height="727" image_left="240" image_top="316" image_mag="1" show_status="true" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+            <iText formula="Math_relational_item.Less_item.action D5 D6"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="D8">
+          <Rhs vislevel="2" flags="5">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+            <iText formula="Math_relational_item.Less_equal_item.action D6 D7"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="D9">
+          <Rhs vislevel="2" flags="5">
+            <iImage window_x="768" window_y="40" window_width="510" window_height="727" image_left="240" image_top="316" image_mag="1" show_status="true" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+            <iText formula="Math_relational_item.More_equal_item.action D7 D8"/>
+          </Rhs>
+        </Row>
+      </Subcolumn>
+    </Column>
+    <Column x="3305" y="0" open="true" selected="false" sform="false" next="11" name="E" caption="Math / Relational constant">
+      <Subcolumn vislevel="3">
+        <Row popup="false" name="E1">
+          <Rhs vislevel="0" flags="4">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+            <iText formula="D2"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="E2">
+          <Rhs vislevel="2" flags="4">
+            <iText formula="255"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="E4">
+          <Rhs vislevel="2" flags="5">
+            <iText formula="Math_relational_item.Equal_item.action E2 E1"/>
+            <iImage window_x="768" window_y="40" window_width="510" window_height="727" image_left="240" image_top="316" image_mag="1" show_status="true" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="E5">
+          <Rhs vislevel="2" flags="5">
+            <iText formula="Math_relational_item.Not_equal_item.action E2 E1"/>
+            <iImage window_x="768" window_y="40" window_width="510" window_height="727" image_left="256" image_top="316" image_mag="1" show_status="true" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="E6">
+          <Rhs vislevel="2" flags="5">
+            <iImage window_x="768" window_y="40" window_width="510" window_height="727" image_left="240" image_top="316" image_mag="1" show_status="true" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+            <iText formula="Math_relational_item.More_item.action E2 E1"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="E7">
+          <Rhs vislevel="2" flags="5">
+            <iImage window_x="768" window_y="40" window_width="510" window_height="727" image_left="240" image_top="316" image_mag="1" show_status="true" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+            <iText formula="Math_relational_item.Less_item.action E2 E1"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="E8">
+          <Rhs vislevel="2" flags="5">
+            <iImage window_x="768" window_y="40" window_width="510" window_height="727" image_left="240" image_top="316" image_mag="1" show_status="true" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+            <iText formula="Math_relational_item.Less_equal_item.action E2 E1"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="E9">
+          <Rhs vislevel="2" flags="5">
+            <iImage window_x="768" window_y="40" window_width="510" window_height="727" image_left="240" image_top="316" image_mag="1" show_status="true" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+            <iText formula="Math_relational_item.More_equal_item.action E2 E1"/>
+          </Rhs>
+        </Row>
+      </Subcolumn>
+    </Column>
+    <Column x="3305" y="798" open="true" selected="true" sform="false" next="5" name="F" caption="test results of relational constant">
+      <Subcolumn vislevel="3">
+        <Row popup="false" name="F4">
+          <Rhs vislevel="2" flags="4">
+            <iText formula="[E4,E5,E6,E7,E8,E9]"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="F2">
+          <Rhs vislevel="1" flags="4">
+            <iText formula="map max F4"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="F3">
+          <Rhs vislevel="1" flags="4">
+            <iText formula="if F2 != [0, 255, 255, 0, 0, 255] then error &quot;relational argh&quot; else &quot;ok!&quot;"/>
           </Rhs>
         </Row>
       </Subcolumn>

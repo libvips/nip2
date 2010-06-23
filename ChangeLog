@@ -1,6 +1,7 @@
 started 7.22.1, 13/6/10
 - relax tolerances in test_colour.ws, thanks Peter
 - improve region repaint during drag, thanks Ruven
+- test relational constants
 
 started 7.22.0, 12/5/10
 - version bump

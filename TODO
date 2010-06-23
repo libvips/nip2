@@ -1,3 +1,5 @@
+- add stuff to "make check" to look for bugs found recently
+
 - make a tiff pyram, try "nip2 fred.tif:1", it can't load it, how odd
 
 - win installer should make a menu item called "nip2 7.22", and a registry key

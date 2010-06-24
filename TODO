@@ -1,4 +1,9 @@
-- add stuff to "make check" to look for bugs found recently
+- copy new test stuff to 7.22
+
+  add a script to test vips operations with large numbers of threads and small
+  tiles
+
+- add quit, CTRL-Q, menu item? gedit has both
 
 - make a tiff pyram, try "nip2 fred.tif:1", it can't load it, how odd
 

@@ -3,6 +3,7 @@ started 7.22.1, 13/6/10
 - improve region repaint during drag, thanks Ruven
 - test relational constants
 - test load / save in various file formats
+- test threading system
 
 started 7.22.0, 12/5/10
 - version bump

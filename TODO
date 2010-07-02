@@ -21,6 +21,53 @@
 
 - make a tiff pyram, try "nip2 fred.tif:1", it can't load it, how odd
 
+- Ackermann
+
+        http://shootout.alioth.debian.org/great/benchmark.php?test=ackermann&lang=all&sort=cpu
+
+        A x y
+                = y + 1, x == 0
+                = A (x - 1) 1, y == 0
+                = A (x - 1) (A x (y - 1));
+
+        correct test result: A 3 4 == 125
+
+  A 3 10 is benchmark test ... we fail with a "C stack overflow" error
+
+  A 3 9 == 4093 works OK
+
+  we could make this a lot quicker with some arithmetic streamlining
+
+  could we do tail-recursion elimination?
+
+  strictness analysis would help too
+
+- Fib
+
+        http://shootout.alioth.debian.org/great/benchmark.php?test=fibo&lang=all&sort=cpu
+
+        F x
+                = 1, x == 0
+                = 1, x == 1
+                = F (x - 2) + F (x - 1);
+
+  correct output F 32 == 3524578
+
+  cima is ~370s for this (!!)
+
+- turn on DEBUG in heap.c, run the fibonacci benchmark
+
+  we heap_copy F every time it recurses! because when we heap_copy we don't
+  link recursive references
+
+  try fixing this ... but remember the problems we had with shared classes
+  when we did link-to-value rather than link-to-copy
+
+  we also have a huge amount of stuff in the heap, could we trim this down?
+  how does it all get pulled in? is it preferences?
+
+  in nip1, F is about 4x faster
+
 WONTFIX for 7.20
 ================
 

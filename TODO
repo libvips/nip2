@@ -1,3 +1,7 @@
+- File / Duplicate Workspace is broken?
+
+- mac binary has a broken im_text()
+
 - do we allow
 
 	[r, g, b] = Image_file "babe.jpg"

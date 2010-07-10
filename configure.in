@@ -10,7 +10,7 @@ dnl
 
 m4_define([nip_major_version], [7])
 m4_define([nip_minor_version], [22])
-m4_define([nip_micro_version], [0])
+m4_define([nip_micro_version], [2])
 m4_define([nip_version],
           [nip_major_version.nip_minor_version.nip_micro_version])
 
@@ -126,7 +126,8 @@ GETTEXT_PACKAGE=nip2
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
 	[The prefix for our gettext translation domains.])
-ALL_LINGUAS="en_GB malkovich"
+# ALL_LINGUAS="en_GB malkovich"
+ALL_LINGUAS="en_GB"
 AM_GLIB_GNU_GETTEXT
 
 # check for flex ... nip needs to adjust itself a bit

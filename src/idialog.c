@@ -450,34 +450,15 @@ idialog_build( GtkWidget *widget )
 	 *
 	 * win32 button order:
 	 *
-	 * Help        OK1 OK3 OK2 Cancel 
+	 * OK1 OK2 OK3 Cancel Help
 	 */
-
-        if( idlg->help_tag ) {
-                idlg->but_help = build_button( GTK_STOCK_HELP,
-			GTK_SIGNAL_FUNC( idialog_help_cb ), idlg );
-                gtk_box_pack_end( GTK_BOX( idlg->bb ),
-                        idlg->but_help, TRUE, TRUE, 0 );
-		gtk_button_box_set_child_secondary( GTK_BUTTON_BOX( idlg->bb ),
-			idlg->but_help, TRUE );
-                gtk_widget_show( idlg->but_help );
-        }
 
 #ifdef OS_WIN32
 
-	/* Make OK1
+	/* OK buttons.
 	 */
-	if( idlg->ok_l ) {
-		OKButton *ok1 = (OKButton *) idlg->ok_l->data;
-
-		idialog_build_ok( ok1, idlg );
-	}
-
-	/* Add OK2, 3, etc., but backwards.
-	 */
-	if( idlg->ok_l && idlg->ok_l->next )
-		slist_map_rev( idlg->ok_l->next,
-			(SListMapFn) idialog_build_ok, idlg );
+	slist_map( idlg->ok_l,
+		(SListMapFn) idialog_build_ok, idlg );
 
         if( idlg->cancel_cb ) {
 		idialog_build_cancel( idlg );
@@ -489,7 +470,23 @@ idialog_build( GtkWidget *widget )
 			idialog_set_default( idlg, idlg->but_cancel );
 	}
 
+        if( idlg->help_tag ) {
+                idlg->but_help = build_button( GTK_STOCK_HELP,
+			GTK_SIGNAL_FUNC( idialog_help_cb ), idlg );
+                gtk_widget_show( idlg->but_help );
+        }
+
 #else /*!OS_WIN32*/
+
+        if( idlg->help_tag ) {
+                idlg->but_help = build_button( GTK_STOCK_HELP,
+			GTK_SIGNAL_FUNC( idialog_help_cb ), idlg );
+                gtk_box_pack_end( GTK_BOX( idlg->bb ),
+                        idlg->but_help, TRUE, TRUE, 0 );
+		gtk_button_box_set_child_secondary( GTK_BUTTON_BOX( idlg->bb ),
+			idlg->but_help, TRUE );
+                gtk_widget_show( idlg->but_help );
+        }
 
 	/* Add OK2, 3, etc.
 	 */

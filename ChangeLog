@@ -1,6 +1,8 @@
 started 7.22.2, 5/7/10
 - show nthreads in space free tooltip
 - fix win32 button order, again
+- fix duplicate workspace
+- added ^Q for quit nip2
 
 started 7.22.1, 13/6/10
 - relax tolerances in test_colour.ws, thanks Peter

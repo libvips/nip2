@@ -614,8 +614,10 @@ mainw_space_free_tooltip_generate( GtkWidget *widget, VipsBuf *buf,
 static void
 mainw_free_changed_cb( gpointer *dummy, Mainw *mainw )
 {
-	mainw_free_update( mainw );
-	mainw_status_update( mainw );
+	if( mainw->ws ) {
+		mainw_free_update( mainw );
+		mainw_status_update( mainw );
+	}
 }
 
 /* Go to home page.
@@ -902,7 +904,7 @@ mainw_open_file_into_workspace( Mainw *mainw, const char *filename )
 		have compatibility menus.
 
 		Could open filename and get version info, then decide whether
-		we need a new window of whether we load into this window.
+		we need a new window or whether we load into this window.
 
 	*/
 	if( workspace_is_empty( mainw->ws ) ) {
@@ -1269,16 +1271,22 @@ mainw_workspace_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 	Mainw *new_mainw;
 
         progress_begin();
+
 	if( !(new_ws = workspace_clone( mainw->ws )) ) {
 		progress_end();
 		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
 		return;
 	}
-	symbol_recalculate_all();
-	progress_end();
 
 	new_mainw = mainw_new( new_ws );
 	gtk_widget_show( GTK_WIDGET( new_mainw ) );
+
+	/* We have to show before recalculate or the window never appears, not
+	 * sure why.
+	 */
+	symbol_recalculate_all();
+
+	progress_end();
 }
 
 static void
@@ -1666,6 +1674,11 @@ static GtkActionEntry mainw_actions[] = {
 		N_( "Close workspace" ), 
 		G_CALLBACK( iwindow_kill_action_cb ) },
 
+	{ "Quit", 
+		GTK_STOCK_QUIT, N_( "_Quit" ), "<control>q",
+		N_( "Quit nip2" ), 
+		G_CALLBACK( main_quit_test ) },
+
 	{ "Delete", 
 		GTK_STOCK_DELETE, N_( "_Delete" ), "<Shift>BackSpace",
 		N_( "Delete selected items" ), 
@@ -1808,6 +1821,7 @@ static const char *mainw_menubar_ui_description =
 "      <menuitem action='Recover'/>"
 "      <separator/>"
 "      <menuitem action='Close'/>"
+"      <menuitem action='Quit'/>"
 "    </menu>"
 "    <menu action='EditMenu'>"
 "      <menuitem action='Delete'/>"
@@ -1893,10 +1907,13 @@ mainw_rpane_changed_cb( Pane *pane, Mainw *mainw )
 static void
 mainw_watch_changed_cb( Watchgroup *watchgroup, Watch *watch, Mainw *mainw )
 {
-	if( strcmp( IOBJECT( watch )->name, "MAINW_TOOLBAR_STYLE" ) == 0 )
-		mainw->toolbar_visible = MAINW_TOOLBAR;
+	if( mainw->ws ) {
+		if( strcmp( IOBJECT( watch )->name, 
+			"MAINW_TOOLBAR_STYLE" ) == 0 )
+			mainw->toolbar_visible = MAINW_TOOLBAR;
 
-	mainw_refresh( mainw );
+		mainw_refresh( mainw );
+	}
 }
 
 /* Make the insides of the panel.
@@ -2148,8 +2165,9 @@ mainw_popdown( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys )
 
 	IM_FREEF( g_source_remove, mainw->compat_timeout );
 
-	filemodel_inter_savenclose_cb( IWINDOW( mainw ), 
-		FILEMODEL( mainw->ws ), nfn, sys );
+	if( mainw->ws )
+		filemodel_inter_savenclose_cb( IWINDOW( mainw ), 
+			FILEMODEL( mainw->ws ), nfn, sys );
 }
 
 static void

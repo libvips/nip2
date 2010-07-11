@@ -1023,7 +1023,7 @@ workspace_save( Model *model, xmlNode *xnode )
 	return( xthis );
 }
 
-void
+static void
 workspace_empty( Model *model )
 {
 	Workspace *ws = WORKSPACE( model );

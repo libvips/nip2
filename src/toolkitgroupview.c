@@ -148,7 +148,7 @@ toolkitgroupview_set_mainw( Toolkitgroupview *kitgview, Mainw *mainw )
 
 	/* Fetch the menu we add toolkit menus to.
 	 */
-        item = gtk_ui_manager_get_widget( mainw->ui_manager,
+        item = gtk_ui_manager_get_widget( IWINDOW( mainw )->ui_manager,
 		"/MainwMenubar/ToolkitsMenu/Stub" );
         kitgview->menu = gtk_widget_get_parent( GTK_WIDGET( item ) );
 

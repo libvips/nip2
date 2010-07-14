@@ -326,6 +326,10 @@ mainw_cancel_cb( GtkWidget *wid, Mainw *mainw )
 static void
 mainw_workspace_destroy_cb( Workspace *ws, Mainw *mainw )
 {
+#ifdef DEBUG
+	printf( "mainw_workspace_destroy_cb: %p\n", mainw );
+#endif /*DEBUG*/
+
 	mainw->destroy_sid = 0;
 	mainw->changed_sid = 0;
 	mainw->ws = NULL;
@@ -511,8 +515,10 @@ mainw_refresh( Mainw *mainw )
 		"NoEdit"
 	};
 
+	iWindow *iwnd = IWINDOW( mainw );
 	Workspace *ws = mainw->ws;
 	int pref = IM_CLIP( 0, MAINW_TOOLBAR_STYLE, IM_NUMBER( styles ) - 1 );
+
         GtkAction *action;
 
 #ifdef DEBUG
@@ -529,34 +535,34 @@ mainw_refresh( Mainw *mainw )
 
 	gtk_toolbar_set_style( GTK_TOOLBAR( mainw->toolbar ), styles[pref] );
 
-	action = gtk_action_group_get_action( mainw->action_group, 
+	action = gtk_action_group_get_action( iwnd->action_group, 
 		"AutoRecalculate" );
 	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
 		mainw_auto_recalc );
 
-	action = gtk_action_group_get_action( mainw->action_group, 
+	action = gtk_action_group_get_action( iwnd->action_group, 
 		"Toolbar" );
 	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
 		mainw->toolbar_visible );
         widget_visible( mainw->toolbar, mainw->toolbar_visible );
 
-	action = gtk_action_group_get_action( mainw->action_group, 
+	action = gtk_action_group_get_action( iwnd->action_group, 
 		"Statusbar" );
 	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
 		mainw->statusbar_visible );
         widget_visible( mainw->statusbar_main, mainw->statusbar_visible );
 
-	action = gtk_action_group_get_action( mainw->action_group, 
+	action = gtk_action_group_get_action( iwnd->action_group, 
 		"WorkspaceDefs" );
 	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
 		mainw->lpane->open );
 
-	action = gtk_action_group_get_action( mainw->action_group, 
+	action = gtk_action_group_get_action( iwnd->action_group, 
 		"ToolkitBrowser" );
 	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
 		mainw->rpane->open );
 
-	action = gtk_action_group_get_action( mainw->action_group, 
+	action = gtk_action_group_get_action( iwnd->action_group, 
 		view_mode[ws->mode] );
 	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
 		TRUE );
@@ -614,18 +620,16 @@ mainw_space_free_tooltip_generate( GtkWidget *widget, VipsBuf *buf,
 static void
 mainw_free_changed_cb( gpointer *dummy, Mainw *mainw )
 {
-	if( mainw->ws ) {
-		mainw_free_update( mainw );
-		mainw_status_update( mainw );
-	}
+	mainw_free_update( mainw );
+	mainw_status_update( mainw );
 }
 
 /* Go to home page.
  */
-static void
-mainw_homepage_action_cb( GtkAction *action, Mainw *mainw )
+void
+mainw_homepage_action_cb( GtkAction *action, iWindow *iwnd )
 {
-	box_url( GTK_WIDGET( mainw ), VIPS_HOMEPAGE );
+	box_url( GTK_WIDGET( iwnd ), VIPS_HOMEPAGE );
 }
 
 /* About... box.
@@ -1603,14 +1607,9 @@ mainw_mode_action_cb( GtkRadioAction *action, GtkRadioAction *current,
 static GtkActionEntry mainw_actions[] = {
 	/* Menu items.
 	 */
-	{ "FileMenu", NULL, N_( "_File" ) },
-	{ "NewMenu", NULL, N_( "_New" ) },
 	{ "RecentMenu", NULL, N_( "Open _Recent" ) },
-	{ "EditMenu", NULL, N_( "_Edit" ) },
 	{ "JumpToColumnMenu", NULL, N_( "Jump to _Column" ) },
-	{ "ViewMenu", NULL, N_( "_View" ) },
 	{ "ToolkitsMenu", NULL, N_( "_Toolkits" ) },
-	{ "HelpMenu", NULL, N_( "_Help" ) },
 
 	/* Dummy action ... replaced at runtime.
 	 */
@@ -1668,16 +1667,6 @@ static GtkActionEntry mainw_actions[] = {
 		NULL, N_( "Search for Workspace _Backups" ), NULL,
 		N_( "Load last automatically backed-up workspace" ), 
 		G_CALLBACK( mainw_recover_action_cb ) },
-
-	{ "Close", 
-		GTK_STOCK_CLOSE, N_( "_Close" ), "<control>w",
-		N_( "Close workspace" ), 
-		G_CALLBACK( iwindow_kill_action_cb ) },
-
-	{ "Quit", 
-		GTK_STOCK_QUIT, N_( "_Quit" ), "<control>q",
-		N_( "Quit nip2" ), 
-		G_CALLBACK( main_quit_test ) },
 
 	{ "Delete", 
 		GTK_STOCK_DELETE, N_( "_Delete" ), "<Shift>BackSpace",
@@ -1737,22 +1726,7 @@ static GtkActionEntry mainw_actions[] = {
 	{ "EditToolkits", 
 		NULL, N_( "_Edit" ), NULL,
 		N_( "Edit toolkits" ), 
-		G_CALLBACK( mainw_program_new_action_cb ) },
-
-	{ "About", 
-		NULL, N_( "_About" ), NULL,
-		N_( "About this program" ), 
-		G_CALLBACK( mainw_about_action_cb ) },
-
-	{ "Guide", 
-		GTK_STOCK_HELP, N_( "_Contents" ), "F1",
-		N_( "Open the users guide" ), 
-		G_CALLBACK( mainw_guide_action_cb ) },
-
-	{ "Homepage", 
-		NULL, N_( "_Website" ), NULL,
-		N_( "Open the VIPS Homepage" ), 
-		G_CALLBACK( mainw_homepage_action_cb ) },
+		G_CALLBACK( mainw_program_new_action_cb ) }
 };
 
 static GtkToggleActionEntry mainw_toggle_actions[] = {
@@ -1907,13 +1881,10 @@ mainw_rpane_changed_cb( Pane *pane, Mainw *mainw )
 static void
 mainw_watch_changed_cb( Watchgroup *watchgroup, Watch *watch, Mainw *mainw )
 {
-	if( mainw->ws ) {
-		if( strcmp( IOBJECT( watch )->name, 
-			"MAINW_TOOLBAR_STYLE" ) == 0 )
-			mainw->toolbar_visible = MAINW_TOOLBAR;
+	if( strcmp( IOBJECT( watch )->name, "MAINW_TOOLBAR_STYLE" ) == 0 )
+		mainw->toolbar_visible = MAINW_TOOLBAR;
 
-		mainw_refresh( mainw );
-	}
+	mainw_refresh( mainw );
 }
 
 /* Make the insides of the panel.
@@ -1926,7 +1897,6 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
         GtkWidget *mbar;
 	GtkWidget *frame;
 	GtkWidget *ebox;
-	GtkAccelGroup *accel_group;
 	GError *error;
 	GtkWidget *cancel;
 	GtkWidget *item;
@@ -1938,46 +1908,36 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 
         /* Make main menu bar
          */
-	mainw->action_group = gtk_action_group_new( "MainwActions" );
-	gtk_action_group_set_translation_domain( mainw->action_group, 
-		GETTEXT_PACKAGE );
-	gtk_action_group_add_actions( mainw->action_group, 
+	gtk_action_group_add_actions( iwnd->action_group, 
 		mainw_actions, G_N_ELEMENTS( mainw_actions ), 
 		GTK_WINDOW( mainw ) );
-	gtk_action_group_add_toggle_actions( mainw->action_group, 
+	gtk_action_group_add_toggle_actions( iwnd->action_group, 
 		mainw_toggle_actions, G_N_ELEMENTS( mainw_toggle_actions ), 
 		GTK_WINDOW( mainw ) );
-	gtk_action_group_add_radio_actions( mainw->action_group,
+	gtk_action_group_add_radio_actions( iwnd->action_group,
 		mainw_radio_actions, G_N_ELEMENTS( mainw_radio_actions ), 
 		WORKSPACE_MODE_REGULAR,
 		G_CALLBACK( mainw_mode_action_cb ),
 		GTK_WINDOW( mainw ) );
 
-	mainw->ui_manager = gtk_ui_manager_new();
-	gtk_ui_manager_insert_action_group( mainw->ui_manager, 
-		mainw->action_group, 0 );
-
-	accel_group = gtk_ui_manager_get_accel_group( mainw->ui_manager );
-	gtk_window_add_accel_group( GTK_WINDOW( mainw ), accel_group );
-
 	error = NULL;
-	if( !gtk_ui_manager_add_ui_from_string( mainw->ui_manager,
+	if( !gtk_ui_manager_add_ui_from_string( iwnd->ui_manager,
 			mainw_menubar_ui_description, -1, &error ) ||
-		!gtk_ui_manager_add_ui_from_string( mainw->ui_manager,
+		!gtk_ui_manager_add_ui_from_string( iwnd->ui_manager,
 			mainw_toolbar_ui_description, -1, &error ) ) {
 		g_message( "building menus failed: %s", error->message );
 		g_error_free( error );
 		exit( EXIT_FAILURE );
 	}
 
-	mbar = gtk_ui_manager_get_widget( mainw->ui_manager, "/MainwMenubar" );
+	mbar = gtk_ui_manager_get_widget( iwnd->ui_manager, "/MainwMenubar" );
 	gtk_box_pack_start( GTK_BOX( vbox ), mbar, FALSE, FALSE, 0 );
         gtk_widget_show( mbar );
 
 	/* Get the dummy item on the recent menu, then get the enclosing menu
 	 * for that dummy item.
 	 */
-        item = gtk_ui_manager_get_widget( mainw->ui_manager,
+        item = gtk_ui_manager_get_widget( iwnd->ui_manager,
 		"/MainwMenubar/FileMenu/RecentMenu/Stub" );
 	mainw->recent_menu = gtk_widget_get_parent( GTK_WIDGET( item ) );
         gtk_signal_connect( GTK_OBJECT( mainw->recent_menu ), "map",
@@ -1985,7 +1945,7 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 
 	/* Same for the column jump menu.
 	 */
-        item = gtk_ui_manager_get_widget( mainw->ui_manager,
+        item = gtk_ui_manager_get_widget( iwnd->ui_manager,
 		"/MainwMenubar/EditMenu/JumpToColumnMenu/Stub" );
 	mainw->jump_to_column_menu = 
 		gtk_widget_get_parent( GTK_WIDGET( item ) );
@@ -1993,7 +1953,7 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	/* Attach toolbar.
   	 */
 	mainw->toolbar = gtk_ui_manager_get_widget( 
-		mainw->ui_manager, "/MainwToolbar" );
+		iwnd->ui_manager, "/MainwToolbar" );
 	gtk_box_pack_start( GTK_BOX( vbox ), mainw->toolbar, FALSE, FALSE, 0 );
         widget_visible( mainw->toolbar, MAINW_TOOLBAR );
 
@@ -2163,11 +2123,22 @@ mainw_popdown( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys )
 {
 	Mainw *mainw = MAINW( iwnd );
 
-	IM_FREEF( g_source_remove, mainw->compat_timeout );
+	/* We can be destroyed in two ways: either our iwnd tells us to go, or
+	 * our model is destroyed under us. If the model has gone, we just go.
+	 * If the model is still there, we need to ask about saving and
+	 * quitting.
+	 */
+	if( mainw->ws ) {
+		/* Argh, cancel this immediately, in case we close before
+		 * we're up properly.
+		 */
+		IM_FREEF( g_source_remove, mainw->compat_timeout );
 
-	if( mainw->ws )
 		filemodel_inter_savenclose_cb( IWINDOW( mainw ), 
 			FILEMODEL( mainw->ws ), nfn, sys );
+	}
+	else
+		nfn( sys, IWINDOW_YES );
 }
 
 static void

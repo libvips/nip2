@@ -42,8 +42,6 @@ struct _Program {
 	 */
 	Toolkitgroup *kitg;
 
-	GtkActionGroup *action_group;
-	GtkUIManager *ui_manager;
 	GtkWidget *text;
 	gboolean dirty;		/* Has the text changed since we set it */
 	guint text_hash;	/* Hash of the last text we set */

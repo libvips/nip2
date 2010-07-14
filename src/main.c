@@ -374,20 +374,44 @@ main_quit( void )
 	exit( 0 );
 }
 
+/* We mustn't quit recursively!
+ */
+static gboolean main_quit_running = FALSE;
+
 static void
 main_quit_test_cb( void *sys, iWindowResult result )
 {
+#ifdef DEBUG
+	printf( "main_quit_test_cb:\n" );
+#endif/*DEBUG*/
+
 	if( result == IWINDOW_YES )
 		/* No return from this.
 		 */
 		main_quit();
+	else
+		/* Quit has been cancelled.
+		 */
+		main_quit_running = FALSE;
 }
 
-/* Check before quitting.
+/* Check before quitting. 
  */
 void
 main_quit_test( void )
 {
+	if( main_quit_running ) {
+#ifdef DEBUG
+		printf( "main_quit_test: recursive quit blocked\n" );
+#endif/*DEBUG*/
+		return;
+	}
+	main_quit_running = TRUE;
+
+#ifdef DEBUG
+	printf( "main_quit_test:\n" );
+#endif/*DEBUG*/
+
 	/* Flush any pending preference saves before we look for dirty
 	 * objects.
 	 */

@@ -226,33 +226,10 @@ trace_view_action_cb( GtkToggleAction *action, Trace *trace )
 /* Our actions.
  */
 static GtkActionEntry trace_actions[] = {
-	/* Menu items.
-	 */
-	{ "FileMenu", NULL, "_File" },
-	{ "ViewMenu", NULL, "_View" },
-	{ "HelpMenu", NULL, "_Help" },
-
-	/* Actions.
-	 */
 	{ "Clear", 
 		NULL, N_( "_Clear" ), NULL, 
 		N_( "Clear trace window" ), 
-		G_CALLBACK( log_clear_action_cb ) },
-
-	{ "Close", 
-		GTK_STOCK_CLOSE, N_( "_Close" ), NULL, 
-		N_( "Close trace window" ), 
-		G_CALLBACK( iwindow_kill_action_cb ) },
-
-	{ "Guide", 
-		GTK_STOCK_HELP, N_( "_Contents" ), "F1",
-		N_( "Open the users guide" ), 
-		G_CALLBACK( mainw_guide_action_cb ) },
-
-	{ "About", 
-		NULL, N_( "_About" ), NULL,
-		N_( "About this program" ), 
-		G_CALLBACK( mainw_about_action_cb ) }
+		G_CALLBACK( log_clear_action_cb ) }
 };
 
 static GtkToggleActionEntry trace_toggle_actions[] = {
@@ -294,6 +271,8 @@ static const char *trace_menubar_ui_description =
 "    <menu action='HelpMenu'>"
 "      <menuitem action='Guide'/>"
 "      <menuitem action='About'/>"
+"      <separator/>"
+"      <menuitem action='Homepage'/>"
 "    </menu>"
 "  </menubar>"
 "</ui>";

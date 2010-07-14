@@ -160,33 +160,6 @@ plotwindow_show_status_action_cb( GtkToggleAction *action,
 		gtk_toggle_action_get_active( action ) );
 }
 
-/* Our actions.
- */
-static GtkActionEntry plotwindow_actions[] = {
-	/* Menu items.
-	 */
-	{ "FileMenu", NULL, "_File" },
-	{ "ViewMenu", NULL, "_View" },
-	{ "HelpMenu", NULL, "_Help" },
-
-	/* Actions.
-	 */
-	{ "Close", 
-		GTK_STOCK_CLOSE, N_( "_Close" ), NULL,
-		N_( "Close" ), 
-		G_CALLBACK( iwindow_kill_action_cb ) },
-
-	{ "Guide", 
-		GTK_STOCK_HELP, N_( "_Contents" ), "F1",
-		N_( "Open the users guide" ), 
-		G_CALLBACK( mainw_guide_action_cb ) },
-
-	{ "About", 
-		NULL, N_( "_About" ), NULL,
-		N_( "About this program" ), 
-		G_CALLBACK( mainw_about_action_cb ) }
-};
-
 static GtkToggleActionEntry plotwindow_toggle_actions[] = {
 	{ "Status",
 		NULL, N_( "_Status" ), NULL,
@@ -206,6 +179,8 @@ static const char *plotwindow_menubar_ui_description =
 "    <menu action='HelpMenu'>"
 "      <menuitem action='Guide'/>"
 "      <menuitem action='About'/>"
+"      <separator/>"
+"      <menuitem action='Homepage'/>"
 "    </menu>"
 "  </menubar>"
 "</ui>";
@@ -213,7 +188,8 @@ static const char *plotwindow_menubar_ui_description =
 static void
 plotwindow_build( Plotwindow *plotwindow, GtkWidget *vbox, Plot *plot )
 {
-	GtkAccelGroup *accel_group;
+	iWindow *iwnd = IWINDOW( plotwindow );
+
 	GError *error;
 	GtkWidget *mbar;
 	GtkWidget *frame;
@@ -231,33 +207,20 @@ plotwindow_build( Plotwindow *plotwindow, GtkWidget *vbox, Plot *plot )
 
         /* Make main menu bar
          */
-	plotwindow->action_group = gtk_action_group_new( "PlotwindowActions" );
-	gtk_action_group_set_translation_domain( plotwindow->action_group, 
-		GETTEXT_PACKAGE );
-	gtk_action_group_add_actions( plotwindow->action_group, 
-		plotwindow_actions, G_N_ELEMENTS( plotwindow_actions ), 
-		GTK_WINDOW( plotwindow ) );
-	gtk_action_group_add_toggle_actions( plotwindow->action_group,
+	gtk_action_group_add_toggle_actions( iwnd->action_group,
 		plotwindow_toggle_actions, 
 			G_N_ELEMENTS( plotwindow_toggle_actions ), 
 		GTK_WINDOW( plotwindow ) );
 
-	plotwindow->ui_manager = gtk_ui_manager_new();
-	gtk_ui_manager_insert_action_group( plotwindow->ui_manager, 
-		plotwindow->action_group, 0 );
-
-	accel_group = gtk_ui_manager_get_accel_group( plotwindow->ui_manager );
-	gtk_window_add_accel_group( GTK_WINDOW( plotwindow ), accel_group );
-
 	error = NULL;
-	if( !gtk_ui_manager_add_ui_from_string( plotwindow->ui_manager,
+	if( !gtk_ui_manager_add_ui_from_string( iwnd->ui_manager,
 			plotwindow_menubar_ui_description, -1, &error ) ) {
 		g_message( "building menus failed: %s", error->message );
 		g_error_free( error );
 		exit( EXIT_FAILURE );
 	}
 
-	mbar = gtk_ui_manager_get_widget( plotwindow->ui_manager, 
+	mbar = gtk_ui_manager_get_widget( iwnd->ui_manager, 
 		"/PlotwindowMenubar" );
 	gtk_box_pack_start( GTK_BOX( vbox ), mbar, FALSE, FALSE, 0 );
         gtk_widget_show( mbar );

@@ -156,6 +156,12 @@ struct _iWindow {
 
 	char *title;
 
+	/* Action stuff. We init this and add a few common actions to help out
+	 * subclasses.
+	 */
+	GtkActionGroup *action_group;
+	GtkUIManager *ui_manager;
+
 	/* Per instance build function.
 	 */
 	iWindowBuildFn build;

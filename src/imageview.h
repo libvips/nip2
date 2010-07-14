@@ -47,9 +47,6 @@ typedef struct _Imageview {
 	Conversionview *cv;
 	Statusview *sv;
 	Paintboxview *pbv;
-
-	GtkActionGroup *action_group;
-	GtkUIManager *ui_manager;
 } Imageview;
 
 typedef struct _ImageviewClass {

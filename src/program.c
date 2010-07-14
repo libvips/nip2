@@ -1633,11 +1633,7 @@ program_tool_help_action_cb( GtkAction *action, Program *program )
 static GtkActionEntry program_actions[] = {
 	/* Menu items.
 	 */
-	{ "FileMenu", NULL, "_File" },
-	{ "FileNewMenu", NULL, "_New" },
-	{ "EditMenu", NULL, "_Edit" },
 	{ "DebugMenu", NULL, "_Debug" },
-	{ "HelpMenu", NULL, "_Help" },
 
 	/* Actions.
 	 */
@@ -1695,11 +1691,6 @@ static GtkActionEntry program_actions[] = {
 		NULL, N_( "_Reload Start Stuff" ), NULL,
 		N_( "Remove and reload all startup data" ), 
 		G_CALLBACK( program_reload_action_cb ) },
-
-	{ "Close", 
-		GTK_STOCK_CLOSE, N_( "_Close" ), NULL,
-		N_( "Close" ), 
-		G_CALLBACK( iwindow_kill_action_cb ) },
 
 	{ "Cut", 
 		GTK_STOCK_CUT, N_( "C_ut" ), NULL,
@@ -1771,16 +1762,6 @@ static GtkActionEntry program_actions[] = {
 		N_( "Show all errors" ), 
 		G_CALLBACK( program_errorreport_action_cb ) },
 
-	{ "About", 
-		NULL, N_( "_About" ), NULL,
-		N_( "About this program" ), 
-		G_CALLBACK( mainw_about_action_cb ) },
-
-	{ "Guide", 
-		GTK_STOCK_HELP, N_( "_Contents" ), "F1",
-		N_( "Open the users guide" ), 
-		G_CALLBACK( mainw_guide_action_cb ) },
-
 	{ "HelpTool", 
 		NULL, N_( "Help on _Tool" ), NULL,
 		N_( "View docs for this tool" ), 
@@ -1791,7 +1772,7 @@ static const char *program_menubar_ui_description =
 "<ui>"
 "  <menubar name='ProgramMenubar'>"
 "    <menu action='FileMenu'>"
-"      <menu action='FileNewMenu'>"
+"      <menu action='NewMenu'>"
 "        <menuitem action='NewTool'/>"
 "        <menuitem action='NewToolkit'/>"
 "        <menuitem action='NewSeparator'/>"
@@ -1835,6 +1816,8 @@ static const char *program_menubar_ui_description =
 "      <menuitem action='Guide'/>"
 "      <menuitem action='About'/>"
 "      <menuitem action='HelpTool'/>"
+"      <separator/>"
+"      <menuitem action='Homepage'/>"
 "    </menu>"
 "  </menubar>"
 "</ui>";
@@ -2056,41 +2039,40 @@ program_row_deleted_cb( GtkTreeModel *treemodel,
 static void
 program_edit_map_cb( GtkWidget *widget, Program *program )
 {
+	iWindow *iwnd = IWINDOW( program );
 	GtkClipboard *clipboard = gtk_widget_get_clipboard( 
 		GTK_WIDGET( program ), GDK_SELECTION_CLIPBOARD );
 	GtkTextView *text_view = GTK_TEXT_VIEW( program->text );
 	GtkTextBuffer *text_buffer = gtk_text_view_get_buffer( text_view );
+
 	gboolean editable = !program->kit || !program->kit->pseudo;
 	gboolean available = gtk_clipboard_wait_is_text_available( clipboard );
 	gboolean selected = gtk_text_buffer_get_selection_bounds( text_buffer,
 		NULL, NULL );
+
 	GtkAction *action;
 
-	action = gtk_action_group_get_action( program->action_group, 
-		"Paste" );
+	action = gtk_action_group_get_action( iwnd->action_group, "Paste" );
 	g_object_set( G_OBJECT( action ), 
 		"sensitive", available && editable,
 		NULL );
 
-	action = gtk_action_group_get_action( program->action_group, 
-		"Copy" );
+	action = gtk_action_group_get_action( iwnd->action_group, "Copy" );
 	g_object_set( G_OBJECT( action ), 
 		"sensitive", selected,
 		NULL );
 
-	action = gtk_action_group_get_action( program->action_group, 
-		"Cut" );
+	action = gtk_action_group_get_action( iwnd->action_group, "Cut" );
 	g_object_set( G_OBJECT( action ), 
 		"sensitive", selected && editable,
 		NULL );
 
-	action = gtk_action_group_get_action( program->action_group, 
-		"Delete" );
+	action = gtk_action_group_get_action( iwnd->action_group, "Delete" );
 	g_object_set( G_OBJECT( action ), 
 		"sensitive", selected && editable,
 		NULL );
 
-	action = gtk_action_group_get_action( program->action_group, 
+	action = gtk_action_group_get_action( iwnd->action_group, 
 		"DeselectAll" );
 	g_object_set( G_OBJECT( action ), 
 		"sensitive", selected,
@@ -2134,7 +2116,8 @@ program_text_new( void )
 static void
 program_build( Program *program, GtkWidget *vbox )
 {
-	GtkAccelGroup *accel_group;
+	iWindow *iwnd = IWINDOW( program );
+
 	GError *error;
 
 	GtkWidget *mbar;
@@ -2146,36 +2129,26 @@ program_build( Program *program, GtkWidget *vbox )
 
         /* Make main menu bar
          */
-	program->action_group = gtk_action_group_new( "ProgramActions" );
-	gtk_action_group_set_translation_domain( program->action_group, 
-		GETTEXT_PACKAGE );
-	gtk_action_group_add_actions( program->action_group, 
+	gtk_action_group_add_actions( iwnd->action_group, 
 		program_actions, G_N_ELEMENTS( program_actions ), 
 		GTK_WINDOW( program ) );
 
-	program->ui_manager = gtk_ui_manager_new();
-	gtk_ui_manager_insert_action_group( program->ui_manager, 
-		program->action_group, 0 );
-
-	accel_group = gtk_ui_manager_get_accel_group( program->ui_manager );
-	gtk_window_add_accel_group( GTK_WINDOW( program ), accel_group );
-
 	error = NULL;
-	if( !gtk_ui_manager_add_ui_from_string( program->ui_manager,
+	if( !gtk_ui_manager_add_ui_from_string( iwnd->ui_manager,
 			program_menubar_ui_description, -1, &error ) ) {
 		g_message( "building menus failed: %s", error->message );
 		g_error_free( error );
 		exit( EXIT_FAILURE );
 	}
 
-	mbar = gtk_ui_manager_get_widget( program->ui_manager, 
+	mbar = gtk_ui_manager_get_widget( iwnd->ui_manager, 
 		"/ProgramMenubar" );
 	gtk_box_pack_start( GTK_BOX( vbox ), mbar, FALSE, FALSE, 0 );
         gtk_widget_show( mbar );
 
 	/* On map of the edit menu, rethink cut/copy/paste sensitivity.
 	 */
-        item = gtk_ui_manager_get_widget( program->ui_manager,
+        item = gtk_ui_manager_get_widget( iwnd->ui_manager,
 		"/ProgramMenubar/EditMenu/Cut" );
 	item = gtk_widget_get_parent( GTK_WIDGET( item ) );
         gtk_signal_connect( GTK_OBJECT( item ), "map",

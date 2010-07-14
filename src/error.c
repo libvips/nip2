@@ -111,14 +111,6 @@ unresolved_show_all_action_cb( GtkAction *action, iError *ierror )
 /* Our actions.
  */
 static GtkActionEntry ierror_actions[] = {
-	/* Menu items.
-	 */
-	{ "FileMenu", NULL, "_File" },
-	{ "ViewMenu", NULL, "_View" },
-	{ "HelpMenu", NULL, "_Help" },
-
-	/* Actions.
-	 */
 	{ "Clear", 
 		NULL, N_( "_Clear" ), NULL, 
 		N_( "Clear ierror window" ), 
@@ -132,22 +124,7 @@ static GtkActionEntry ierror_actions[] = {
 	{ "Unresolved", 
 		NULL, N_( "List _Unresolved" ), NULL, 
 		N_( "Search for all unresolved references" ), 
-		G_CALLBACK( unresolved_show_all_action_cb ) },
-
-	{ "Close", 
-		GTK_STOCK_CLOSE, N_( "_Close" ), NULL, 
-		N_( "Close ierror window" ), 
-		G_CALLBACK( iwindow_kill_action_cb ) },
-
-	{ "Guide", 
-		GTK_STOCK_HELP, N_( "_Contents" ), "F1",
-		N_( "Open the users guide" ), 
-		G_CALLBACK( mainw_guide_action_cb ) },
-
-	{ "About", 
-		NULL, N_( "_About" ), NULL,
-		N_( "About this program" ), 
-		G_CALLBACK( mainw_about_action_cb ) }
+		G_CALLBACK( unresolved_show_all_action_cb ) }
 };
 
 static const char *ierror_menubar_ui_description =
@@ -157,6 +134,7 @@ static const char *ierror_menubar_ui_description =
 "      <menuitem action='Clear'/>"
 "      <separator/>"
 "      <menuitem action='Close'/>"
+"      <menuitem action='Quit'/>"
 "    </menu>"
 "    <menu action='ViewMenu'>"
 "      <menuitem action='iErrors'/>"
@@ -165,6 +143,8 @@ static const char *ierror_menubar_ui_description =
 "    <menu action='HelpMenu'>"
 "      <menuitem action='Guide'/>"
 "      <menuitem action='About'/>"
+"      <separator/>"
+"      <menuitem action='Homepage'/>"
 "    </menu>"
 "  </menubar>"
 "</ui>";

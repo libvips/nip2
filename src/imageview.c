@@ -158,34 +158,36 @@ imageview_refresh_title( Imageview *iv )
 static void
 imageview_imagemodel_changed_cb( Imagemodel *imagemodel, Imageview *iv )
 {
+	iWindow *iwnd = IWINDOW( iv );
 	Conversion *conv = imagemodel->conv;
 
 	GtkAction *action;
 	int i;
 
-	action = gtk_action_group_get_action( iv->action_group, 
+	action = gtk_action_group_get_action( iwnd->action_group, 
 		"Status" );
 	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
 		imagemodel->show_status );
 
-	action = gtk_action_group_get_action( iv->action_group, 
+	action = gtk_action_group_get_action( iwnd->action_group, 
 		"Control" );
 	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
 		imagemodel->show_convert );
 
-	action = gtk_action_group_get_action( iv->action_group, 
+	action = gtk_action_group_get_action( iwnd->action_group, 
 		"Paint" );
 	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
 		imagemodel->show_paintbox );
 
-	action = gtk_action_group_get_action( iv->action_group, 
+	action = gtk_action_group_get_action( iwnd->action_group, 
 		"Rulers" );
 	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
 		imagemodel->show_rulers );
 
 	for( i = 0; i < IM_NUMBER( imageview_mags ); i++ )
 		if( conv->mag == imageview_mags[i].mag ) {
-			action = gtk_action_group_get_action( iv->action_group,
+			action = gtk_action_group_get_action( 
+				iwnd->action_group,
 				imageview_mags[i].name );
 			gtk_toggle_action_set_active( 
 				GTK_TOGGLE_ACTION( action ),
@@ -445,13 +447,9 @@ imageview_mag_action_cb( GtkRadioAction *action, GtkRadioAction *current,
 static GtkActionEntry imageview_actions[] = {
 	/* Menu items.
 	 */
-	{ "FileMenu", NULL, "_File" },
-	{ "FileNewMenu", NULL, "_New" },
-	{ "ViewMenu", NULL, "_View" },
 	{ "ViewToolbarMenu", NULL, "_Toolbar" },
 	{ "ViewModeMenu", NULL, "M_ode" },
 	{ "ViewZoomMenu", NULL, "_Zoom" },
-	{ "HelpMenu", NULL, "_Help" },
 
 	/* Actions.
 	 */
@@ -495,11 +493,6 @@ static GtkActionEntry imageview_actions[] = {
 		N_( "Recalculate image" ), 
 		G_CALLBACK( imageview_recalc_action_cb ) },
 
-	{ "Close", 
-		GTK_STOCK_CLOSE, N_( "_Close" ), NULL,
-		N_( "Close" ), 
-		G_CALLBACK( iwindow_kill_action_cb ) },
-
 	{ "Header", 
 		NULL, N_( "Image _Header" ), NULL,
 		N_( "View image header" ), 
@@ -523,17 +516,7 @@ static GtkActionEntry imageview_actions[] = {
 	{ "ZoomFit",
 		GTK_STOCK_ZOOM_FIT, N_( "Zoom to _Fit" ), NULL,
 		N_( "Zoom to fit image to window" ),
-		G_CALLBACK( imageview_zoom_fit_action_cb ) },
-
-	{ "Guide", 
-		GTK_STOCK_HELP, N_( "_Contents" ), "F1",
-		N_( "Open the users guide" ), 
-		G_CALLBACK( mainw_guide_action_cb ) },
-
-	{ "About", 
-		NULL, N_( "_About" ), NULL,
-		N_( "About this program" ), 
-		G_CALLBACK( mainw_about_action_cb ) }
+		G_CALLBACK( imageview_zoom_fit_action_cb ) }
 };
 
 static GtkToggleActionEntry imageview_toggle_actions[] = {
@@ -605,7 +588,7 @@ static const char *imageview_menubar_ui_description =
 "<ui>"
 "  <menubar name='ImageviewMenubar'>"
 "    <menu action='FileMenu'>"
-"      <menu action='FileNewMenu'>"
+"      <menu action='NewMenu'>"
 "        <menuitem action='NewMark'/>"
 "        <menuitem action='NewHGuide'/>"
 "        <menuitem action='NewVGuide'/>"
@@ -619,6 +602,7 @@ static const char *imageview_menubar_ui_description =
 "      <menuitem action='Recalculate'/>"
 "      <separator/>"
 "      <menuitem action='Close'/>"
+"      <menuitem action='Quit'/>"
 "    </menu>"
 "    <menu action='ViewMenu'>"
 "      <menu action='ViewToolbarMenu'>"
@@ -654,6 +638,8 @@ static const char *imageview_menubar_ui_description =
 "    <menu action='HelpMenu'>"
 "      <menuitem action='Guide'/>"
 "      <menuitem action='About'/>"
+"      <separator/>"
+"      <menuitem action='Homepage'/>"
 "    </menu>"
 "  </menubar>"
 "</ui>";
@@ -696,7 +682,8 @@ imageview_filedrop( Imageview *iv, const char *file )
 static void
 imageview_build( Imageview *iv, GtkWidget *vbox, iImage *iimage )
 {
-	GtkAccelGroup *accel_group;
+	iWindow *iwnd = IWINDOW( iv );
+
 	GError *error;
 	GtkWidget *mbar;
 	GtkWidget *frame;
@@ -713,45 +700,35 @@ imageview_build( Imageview *iv, GtkWidget *vbox, iImage *iimage )
 
         /* Make main menu bar
          */
-	iv->action_group = gtk_action_group_new( "ImageviewActions" );
-	gtk_action_group_set_translation_domain( iv->action_group, 
-		GETTEXT_PACKAGE );
-	gtk_action_group_add_actions( iv->action_group, 
+	gtk_action_group_add_actions( iwnd->action_group, 
 		imageview_actions, G_N_ELEMENTS( imageview_actions ), 
 		GTK_WINDOW( iv ) );
-	gtk_action_group_add_toggle_actions( iv->action_group, 
+	gtk_action_group_add_toggle_actions( iwnd->action_group, 
 		imageview_toggle_actions, 
 			G_N_ELEMENTS( imageview_toggle_actions ), 
 		GTK_WINDOW( iv ) );
-	gtk_action_group_add_radio_actions( iv->action_group,
+	gtk_action_group_add_radio_actions( iwnd->action_group,
 		imageview_mode_radio_actions, 
 			G_N_ELEMENTS( imageview_mode_radio_actions ), 
 		IMAGEMODEL_SELECT,
 		G_CALLBACK( imageview_mode_action_cb ),
 		GTK_WINDOW( iv ) );
-	gtk_action_group_add_radio_actions( iv->action_group,
+	gtk_action_group_add_radio_actions( iwnd->action_group,
 		imageview_zoom_radio_actions, 
 			G_N_ELEMENTS( imageview_zoom_radio_actions ), 
 		1,
 		G_CALLBACK( imageview_mag_action_cb ),
 		GTK_WINDOW( iv ) );
 
-	iv->ui_manager = gtk_ui_manager_new();
-	gtk_ui_manager_insert_action_group( iv->ui_manager, 
-		iv->action_group, 0 );
-
-	accel_group = gtk_ui_manager_get_accel_group( iv->ui_manager );
-	gtk_window_add_accel_group( GTK_WINDOW( iv ), accel_group );
-
 	error = NULL;
-	if( !gtk_ui_manager_add_ui_from_string( iv->ui_manager,
-			imageview_menubar_ui_description, -1, &error ) ) {
+	if( !gtk_ui_manager_add_ui_from_string( iwnd->ui_manager,
+		imageview_menubar_ui_description, -1, &error ) ) {
 		g_message( "building menus failed: %s", error->message );
 		g_error_free( error );
 		exit( EXIT_FAILURE );
 	}
 
-	mbar = gtk_ui_manager_get_widget( iv->ui_manager, 
+	mbar = gtk_ui_manager_get_widget( iwnd->ui_manager, 
 		"/ImageviewMenubar" );
 	gtk_box_pack_start( GTK_BOX( vbox ), mbar, FALSE, FALSE, 0 );
         gtk_widget_show( mbar );

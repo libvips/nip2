@@ -88,8 +88,6 @@ struct _Mainw {
 	Toolkitbrowser *toolkitbrowser;
 	Workspacedefs *workspacedefs;
 	Workspaceview *wsview;
-	GtkActionGroup *action_group;
-	GtkUIManager *ui_manager;
 	GtkWidget *toolbar;
 	GtkWidget *recent_menu;
 	GtkWidget *jump_to_column_menu;
@@ -134,6 +132,7 @@ void mainw_recent_add( GSList **recent, const char *filename );
 int mainw_number( void );
 Mainw *mainw_pick_one( void );
 GType mainw_get_type( void );
+void mainw_homepage_action_cb( GtkAction *action, iWindow *iwnd );
 void mainw_about_action_cb( GtkAction *action, iWindow *iwnd );
 void mainw_guide_action_cb( GtkAction *action, iWindow *iwnd );
 Workspace *mainw_open_file_into_workspace( Mainw *mainw, const char *filename );

@@ -557,7 +557,7 @@ static void
 iwindow_popdown_notify( iWindow *iwnd, iWindowResult result )
 {
 #ifdef DEBUG
-	printf( "iwindow_popdown_notify: %s\n", iwnd->title );
+	printf( "iwindow_popdown_notify: %p %s\n", iwnd, iwnd->title );
 #endif /*DEBUG*/
 
 	if( result == IWINDOW_ERROR )
@@ -648,11 +648,49 @@ iwindow_parent_unmap_cb( GtkWidget *par, iWindow *iwnd )
 	iwindow_kill( iwnd );
 }
 
+static GtkActionEntry iwnd_actions[] = {
+	/* Common menus.
+	 */
+	{ "FileMenu", NULL, N_( "_File" ) },
+	{ "NewMenu", NULL, N_( "_New" ) },
+	{ "EditMenu", NULL, N_( "_Edit" ) },
+	{ "ViewMenu", NULL, N_( "_View" ) },
+	{ "HelpMenu", NULL, N_( "_Help" ) },
+
+	/* Common items.
+	 */
+	{ "Close", 
+		GTK_STOCK_CLOSE, N_( "_Close" ), NULL,
+		N_( "Close" ), 
+		G_CALLBACK( iwindow_kill_action_cb ) },
+
+	{ "Quit", 
+		GTK_STOCK_QUIT, N_( "_Quit" ), "<control>q",
+		N_( "Quit nip2" ), 
+		G_CALLBACK( main_quit_test ) },
+	{ "Guide", 
+		GTK_STOCK_HELP, N_( "_Contents" ), "F1",
+		N_( "Open the users guide" ), 
+		G_CALLBACK( mainw_guide_action_cb ) },
+
+	{ "About", 
+		NULL, N_( "_About" ), NULL,
+		N_( "About this program" ), 
+		G_CALLBACK( mainw_about_action_cb ) },
+
+	{ "Homepage", 
+		NULL, N_( "_Website" ), NULL,
+		N_( "Open the VIPS Homepage" ), 
+		G_CALLBACK( mainw_homepage_action_cb ) }
+};
+
 static void 
 iwindow_real_build( GtkWidget *widget )
 {
 	iWindow *iwnd = IWINDOW( widget );
 	GdkScreen *screen = gtk_widget_get_screen( GTK_WIDGET( iwnd ) );
+
+	GtkAccelGroup *accel_group;
 
 #ifdef DEBUG
 	printf( "iwindow_real_build: %s\n", iwnd->title );
@@ -662,6 +700,23 @@ iwindow_real_build( GtkWidget *widget )
 
         iwnd->work = gtk_vbox_new( FALSE, 0 );
         gtk_container_add( GTK_CONTAINER( iwnd ), iwnd->work );
+
+	/* Use the type name (eg. "Imageview") for the name of the
+	 * actiongroup.
+	 */
+	iwnd->action_group = gtk_action_group_new( G_OBJECT_TYPE_NAME( iwnd ) );
+	gtk_action_group_set_translation_domain( iwnd->action_group, 
+		GETTEXT_PACKAGE );
+	gtk_action_group_add_actions( iwnd->action_group, 
+		iwnd_actions, G_N_ELEMENTS( iwnd_actions ), 
+		GTK_WINDOW( iwnd ) );
+
+	iwnd->ui_manager = gtk_ui_manager_new();
+	gtk_ui_manager_insert_action_group( iwnd->ui_manager, 
+		iwnd->action_group, 0 );
+
+	accel_group = gtk_ui_manager_get_accel_group( iwnd->ui_manager );
+	gtk_window_add_accel_group( GTK_WINDOW( iwnd ), accel_group );
 
 	/* Call per-instance build.
 	 */
@@ -887,7 +942,7 @@ void *
 iwindow_kill( iWindow *iwnd )
 {
 #ifdef DEBUG
-	printf( "iwindow_kill: %s\n", iwnd->title );
+	printf( "iwindow_kill: %p %s\n", iwnd, iwnd->title );
 #endif /*DEBUG*/
 
 	if( !iwnd->destroy ) {

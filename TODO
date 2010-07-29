@@ -1,4 +1,6 @@
-- mac binary has a broken im_text() argh
+- fix gtkentry problem, see Adam's mail
+
+- mac/win binary has a broken im_text() argh
 
 - do we allow
 

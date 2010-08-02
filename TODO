@@ -1,8 +1,3 @@
-- ^O, click on wtc.jpg, press OK before the thumbnail appears, segv
-
-  we should load thumbnails in the background and have some decoupled thing to
-  update the preview, if it's still valid
-
 - mac/win binary has a broken im_text() argh
 
 - do we allow
@@ -23,8 +18,6 @@
   	reverse image
 
   to swap the bands over? heh need to be able to override hd and tl
-
-- add quit, CTRL-Q, menu item? gedit has both
 
 - make a tiff pyram, try "nip2 fred.tif:1", it can't load it, how odd
 
@@ -61,6 +54,8 @@
   correct output F 32 == 3524578
 
   cima is ~370s for this (!!)
+
+  work machine is about 50s
 
 - turn on DEBUG in heap.c, run the fibonacci benchmark
 

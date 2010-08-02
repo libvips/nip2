@@ -52,4 +52,4 @@ typedef struct _PreviewClass {
 
 GtkType preview_get_type( void );
 Preview *preview_new( void );
-gboolean preview_set_filename( Preview *preview, char *filename );
+void preview_set_filename( Preview *preview, char *filename );

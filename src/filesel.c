@@ -854,10 +854,7 @@ filesel_update_preview_cb( GtkFileChooser *chooser, Filesel *filesel )
 
 	if( (filename = gtk_file_chooser_get_preview_filename(
 		GTK_FILE_CHOOSER( filesel->chooser ) )) ) {
-		gtk_file_chooser_set_preview_widget_active(
-			GTK_FILE_CHOOSER( filesel->chooser ),
-			preview_set_filename( filesel->preview, filename ) );
-
+		preview_set_filename( filesel->preview, filename );
 		g_free( filename );
 	}
 }
@@ -1006,6 +1003,8 @@ filesel_build( GtkWidget *widget )
 			"update-preview",
 			GTK_SIGNAL_FUNC( filesel_update_preview_cb ), filesel );
 		gtk_widget_show( GTK_WIDGET( filesel->preview ) );
+		gtk_file_chooser_set_preview_widget_active(
+			GTK_FILE_CHOOSER( filesel->chooser ), TRUE );
 	}
 
 	if( filesel_last_dir ) 

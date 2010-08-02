@@ -49,8 +49,7 @@ preview_destroy( GtkObject *object )
 
 	preview = PREVIEW( object );
 
-	/* My instance destroy stuff.
-	 */
+	UNREF( preview->conv );
 	IM_FREE( preview->filename );
 
 	GTK_OBJECT_CLASS( parent_class )->destroy( object );
@@ -83,6 +82,7 @@ preview_init( Preview *preview )
 	gtk_widget_set_size_request( GTK_WIDGET( preview ), 128, 128 );
 	imagedisplay_set_conversion( IMAGEDISPLAY( preview ), preview->conv );
 	imagedisplay_set_shrink_to_fit( IMAGEDISPLAY( preview ), TRUE );
+	g_object_ref( G_OBJECT( preview->conv ) );
 }
 
 GtkType
@@ -116,29 +116,81 @@ preview_new( void )
 	return( preview );
 }
 
-/* Return FALSE for unable to preview file.
- */
-gboolean
-preview_set_filename( Preview *preview, char *filename )
+static void
+preview_set_filename_idle( Preview *preview, char *filename )
 {
 	Imageinfo *ii;
-        char txt[MAX_LINELENGTH];
-	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	if( !(ii = imageinfo_new_input( main_imageinfogroup, 
-		GTK_WIDGET( preview ), NULL, filename )) )
-		return( FALSE );
-	conversion_set_image( preview->conv, ii );
-	MANAGED_UNREF( ii );
-
-	IM_SETSTR( preview->filename, filename );
-
-	/* How strange, we need this to get the background to clear fully.
+	/* Make sure our enclosing preview wasn't been killed before this idle
+	 * starts.
 	 */
-	gtk_widget_queue_draw( GTK_WIDGET( preview ) );
+	if( !preview->conv )
+		return;
 
-	get_image_info( &buf, IOBJECT( preview->conv->ii )->name );
-	set_tooltip( GTK_WIDGET( preview ), "%s", vips_buf_all( &buf ) );
+	/* This is the call that can take ages and kill everything.
+	 */
+	if( !(ii = imageinfo_new_input( main_imageinfogroup, 
+		GTK_WIDGET( preview ), NULL, filename )) ) 
+		return;
 
-	return( TRUE );
+	/* So test for alive-ness again.
+	 */
+	if( preview->conv ) {
+		char txt[MAX_LINELENGTH];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
+
+		conversion_set_image( preview->conv, ii );
+		IM_SETSTR( preview->filename, filename );
+
+		/* How strange, we need this to get the 
+		 * background to clear fully.
+		 */
+		gtk_widget_queue_draw( GTK_WIDGET( preview ) );
+
+		get_image_info( &buf, IOBJECT( preview->conv->ii )->name );
+		set_tooltip( GTK_WIDGET( preview ), 
+			"%s", vips_buf_all( &buf ) );
+	}
+
+	MANAGED_UNREF( ii );
+}
+
+typedef struct _UpdateProxy {
+	Preview *preview;
+	char *filename;
+} UpdateProxy;
+
+static gboolean
+preview_set_filename_idle_cb( UpdateProxy *proxy )
+{
+	preview_set_filename_idle( proxy->preview, proxy->filename );
+
+	UNREF( proxy->preview );
+	g_free( proxy );
+
+	/* Don't run again.
+	 */
+	return( FALSE );
+}
+
+/* We can't load in-line, it can take ages and trigger progress callbacks,
+ * which in turn, could kill our enclosing widget.
+ *
+ * Instead, we do the load in a idle callback and update the preview at the
+ * end, if it's still valid.
+ */
+void
+preview_set_filename( Preview *preview, char *filename )
+{
+	UpdateProxy *proxy = g_new( UpdateProxy, 1 );
+
+	/* We are going to put the preview into the idle queue. It must remain
+	 * valid until the idle handler is handled, so we ref.
+	 */
+	g_object_ref( preview );
+
+	proxy->preview = preview;
+	proxy->filename = g_strdup( filename );
+
+	g_idle_add( (GSourceFunc) preview_set_filename_idle_cb, proxy );
 }

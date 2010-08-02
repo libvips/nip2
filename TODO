@@ -1,4 +1,7 @@
-- fix gtkentry problem, see Adam's mail
+- ^O, click on wtc.jpg, press OK before the thumbnail appears, segv
+
+  we should load thumbnails in the background and have some decoupled thing to
+  update the preview, if it's still valid
 
 - mac/win binary has a broken im_text() argh
 

@@ -193,6 +193,41 @@ vips_lookup_type( im_arg_type type )
 	return( VIPS_NONE );
 }
 
+/* Does an argument type require an argument from nip2?
+ */
+static gboolean
+vips_type_needs_input( im_type_desc *ty )
+{
+	/* We supply these.
+	 */
+	if( strcmp( ty->type, IM_TYPE_DISPLAY ) == 0 ) 
+		return( FALSE );
+
+	if( !(ty->flags & IM_TYPE_OUTPUT) )
+		return( TRUE );
+
+	if( ty->flags & IM_TYPE_RW ) 
+		return( TRUE );
+
+	return( FALSE );
+}
+
+/* Will an argument type generate a result for nip2?
+ */
+static gboolean
+vips_type_makes_output( im_type_desc *ty )
+{
+	/* We ignore these.
+	 */
+	if( strcmp( ty->type, IM_TYPE_DISPLAY ) == 0 ) 
+		return( FALSE );
+
+	if( ty->flags & (IM_TYPE_OUTPUT | IM_TYPE_RW) ) 
+		return( TRUE );
+
+	return( FALSE );
+}
+
 /* Hash from a vargv ... just look at input args and the function name.
  */
 static unsigned int
@@ -223,10 +258,10 @@ vips_hash( VipsInfo *vi )
 	HASH_P( vi->fn );
 
         for( i = 0; i < vi->fn->argc; i++ ) {
-                im_type_desc *vips = vi->fn->argv[i].desc;
-		VipsArgumentType vt = vips_lookup_type( vips->type );
+                im_type_desc *ty = vi->fn->argv[i].desc;
+		VipsArgumentType vt = vips_lookup_type( ty->type );
 
-                if( !(vips->flags & IM_TYPE_OUTPUT) ) {
+                if( vips_type_needs_input( ty ) ) {
 			switch( vt ) {
 			case VIPS_DOUBLE:
 				HASH_D( *((double *) vi->vargv[i]) );
@@ -359,10 +394,10 @@ vips_equal( VipsInfo *vi1, VipsInfo *vi2 )
 		return( FALSE );
 
         for( i = 0; i < fn->argc; i++ ) {
-                im_type_desc *vips = fn->argv[i].desc;
-		VipsArgumentType vt = vips_lookup_type( vips->type );
+                im_type_desc *ty = fn->argv[i].desc;
+		VipsArgumentType vt = vips_lookup_type( ty->type );
 
-                if( !(vips->flags & IM_TYPE_OUTPUT) ) {
+                if( vips_type_needs_input( ty ) ) {
 			switch( vt ) {
 			case VIPS_DOUBLE:
 				if( *((double *) vi1->vargv[i]) != 
@@ -748,7 +783,7 @@ vips_destroy( VipsInfo *vi )
 			/* Input images are from the heap; do nothing.
 			 * Output image we made ... close if there.
 			 */
-			if( ty->flags & IM_TYPE_OUTPUT ) {
+			if( vips_type_makes_output( ty ) ) {
 				IMAGE **im = (IMAGE **) &obj;
 
 				IM_FREEF( im_close, *im );
@@ -759,7 +794,7 @@ vips_destroy( VipsInfo *vi )
 			/* We only allow input IMAGEVEC, so we just need to
 			 * free the spine.
 			 */
-			g_assert( !(ty->flags & IM_TYPE_OUTPUT) );
+			g_assert( vips_type_needs_input( ty ) );
 			IM_FREE( ((im_imagevec_object *) obj)->vec );
 			break;
 
@@ -880,8 +915,8 @@ static void
 vips_tochar( VipsInfo *vi, int i, VipsBuf *buf )
 {
 	im_object obj = vi->vargv[i];
-	im_type_desc *vips = vi->fn->argv[i].desc;
-	VipsArgumentType vt = vips_lookup_type( vips->type );
+	im_type_desc *ty = vi->fn->argv[i].desc;
+	VipsArgumentType vt = vips_lookup_type( ty->type );
 
 	switch( vt ) {
 	case VIPS_DOUBLE:
@@ -975,11 +1010,10 @@ vips_args_vips( VipsInfo *vi, VipsBuf *buf )
 	vips_buf_appendf( buf, _( "You passed:" ) );
 	vips_buf_appendf( buf, "\n" );
         for( i = 0; i < vi->fn->argc; i++ ) {
-                im_type_desc *type = vi->fn->argv[i].desc;
+                im_type_desc *ty = vi->fn->argv[i].desc;
                 char *name = vi->fn->argv[i].name;
 
-                if( !(type->flags & IM_TYPE_OUTPUT)  &&
-                        strcmp( type->type, IM_TYPE_DISPLAY ) != 0 ) {
+                if( vips_type_needs_input( ty ) ) {
                         vips_buf_appendf( buf, "   %s - ", name );
                         vips_tochar( vi, i, buf );
                         vips_buf_appendf( buf, "\n" );
@@ -1011,15 +1045,12 @@ vips_usage( VipsBuf *buf, im_function *fn )
 		im_snprintf( line, 256, 
 			"   %s  - %s\n", arg->name, arg->desc->type );
 
-		if( strcmp( arg->desc->type, IM_TYPE_DISPLAY ) == 0 ) {
-			/* Special secret display argument. 
-			 */
-		}
-		else if( arg->desc->flags & IM_TYPE_OUTPUT ) {
+		if( vips_type_makes_output( arg->desc ) ) {
 			strcat( output, line );
 			nout++;
 		}
-		else {
+
+		if( vips_type_needs_input( arg->desc ) ) {
 			strcat( input, line );
 			nin++;
 		}
@@ -1150,9 +1181,7 @@ vips_new( Reduce *rc, im_function *fn )
 	for( i = 0; i < vi->fn->argc; i++ ) {
 		im_type_desc *ty = vi->fn->argv[i].desc;
 
-		if( ty->flags & IM_TYPE_OUTPUT ) {
-			/* Found an output object.
-			 */
+		if( vips_type_makes_output( ty ) ) {
 			vi->outpos[vi->nres] = i;
 			vi->nres += 1; 
 
@@ -1161,9 +1190,8 @@ vips_new( Reduce *rc, im_function *fn )
 			if( strcmp( ty->type, IM_TYPE_IMAGE ) == 0 ) 
 				vi->nires += 1;
 		}
-		else if( strcmp( ty->type, IM_TYPE_DISPLAY ) != 0 ) {
-			/* Found an input object.
-			 */
+
+		if( vips_type_needs_input( ty ) ) {
 			vi->inpos[vi->nargs] = i;
 			vi->nargs += 1; 
 		}
@@ -1191,7 +1219,7 @@ vips_new( Reduce *rc, im_function *fn )
 	return( vi );
 }
 
-/* Is this the sort of VIPS funtion we can call?
+/* Is this the sort of VIPS function we can call?
  */
 gboolean
 vips_is_callable( im_function *fn )
@@ -1219,14 +1247,19 @@ vips_is_callable( im_function *fn )
                 }
         }
 
+        nin = nout = 0;
+        for( i = 0; i < fn->argc; i++ ) {
+		im_type_desc *ty = fn->argv[i].desc;
+
+		if( vips_type_makes_output( ty ) ) 
+			nout += 1;
+
+		if( vips_type_needs_input( ty ) ) 
+			nin += 1;
+	}
+
         /* Must be at least one output argument.
          */
-        nin = nout = 0;
-        for( i = 0; i < fn->argc; i++ )
-                if( fn->argv[i].desc->flags & IM_TYPE_OUTPUT )
-                        nout++;
-		else
-                        nin++;
         if( nout == 0 ) 
                 return( FALSE );
 
@@ -1248,19 +1281,9 @@ vips_n_args( im_function *fn )
 	int nin;
 
         for( nin = 0, i = 0; i < fn->argc; i++ ) {
-                im_arg_desc *arg = &fn->argv[i];
-                im_arg_type vt = arg->desc->type;
-                VipsArgumentType t = vips_lookup_type( vt );
+		im_type_desc *ty = fn->argv[i].desc;
 
-                if( t == VIPS_NONE ) {
-                        /* Unknown type .. if DISPLAY it's OK.
-                         */
-                        if( strcmp( vt, IM_TYPE_DISPLAY ) != 0 )
-                                return( -1 );
-                }
-                else if( !(arg->desc->flags & IM_TYPE_OUTPUT) )
-                        /* Found an input arg.
-                         */
+		if( vips_type_needs_input( ty ) ) 
                         nin += 1;
         }
 
@@ -1332,13 +1355,13 @@ vips_make_imagevec( im_imagevec_object *iv, int n, IMAGE **vec )
  */
 static gboolean
 vips_fromip( Reduce *rc, PElement *arg, 
-	im_type_desc *vips, im_object *obj )
+	im_type_desc *ty, im_object *obj )
 {
-	VipsArgumentType vt = vips_lookup_type( vips->type );
+	VipsArgumentType vt = vips_lookup_type( ty->type );
 
 	/* If vips_lookup_type failed, is it the special DISPLAY type?
 	 */
-	if( vt == VIPS_NONE && strcmp( vips->type, IM_TYPE_DISPLAY ) != 0 ) 
+	if( vt == VIPS_NONE && strcmp( ty->type, IM_TYPE_DISPLAY ) != 0 ) 
 		/* Unknown type, and it's not DISPLAY. Flag an error.
 		 */
 		return( FALSE );
@@ -1508,11 +1531,11 @@ static void
 vips_toip( VipsInfo *vi, int i, int *outiiindex, PElement *arg )
 {
 	im_object obj = vi->vargv[i];
-	im_type_desc *vips = vi->fn->argv[i].desc;
-	VipsArgumentType vt = vips_lookup_type( vips->type );
+	im_type_desc *ty = vi->fn->argv[i].desc;
+	VipsArgumentType vt = vips_lookup_type( ty->type );
 
 #ifdef DEBUG
-	printf( "vips_toip: arg[%d] (%s) = ", i, vips->type );
+	printf( "vips_toip: arg[%d] (%s) = ", i, ty->type );
 #endif /*DEBUG*/
 
 	switch( vt ) {
@@ -1611,8 +1634,8 @@ static void
 vips_tobuf( VipsInfo *vi, int i, VipsBuf *buf )
 {
 	im_object obj = vi->vargv[i];
-	im_type_desc *vips = vi->fn->argv[i].desc;
-	VipsArgumentType vt = vips_lookup_type( vips->type );
+	im_type_desc *ty = vi->fn->argv[i].desc;
+	VipsArgumentType vt = vips_lookup_type( ty->type );
 
 	switch( vt ) {
 	case VIPS_DOUBLE:
@@ -1698,7 +1721,7 @@ vips_tobuf( VipsInfo *vi, int i, VipsBuf *buf )
 		break;
 
 	case VIPS_NONE:
-		if( strcmp( vips->type, IM_TYPE_DISPLAY ) == 0 ) 
+		if( strcmp( ty->type, IM_TYPE_DISPLAY ) == 0 ) 
 			/* Just assume sRGB.
 			 */
 			vips_buf_appendf( buf, "sRGB" );
@@ -1721,14 +1744,15 @@ vips_gather( VipsInfo *vi )
 	for( i = 0; i < vi->fn->argc; i++ ) {
 		im_type_desc *ty = vi->fn->argv[i].desc;
 
-		if( strcmp( ty->type, IM_TYPE_IMAGE ) == 0 && 
-			!(ty->flags & IM_TYPE_OUTPUT) ) {
+		if( !vips_type_needs_input( ty ) ) 
+			continue;
+
+		if( strcmp( ty->type, IM_TYPE_IMAGE ) == 0 ) {
 			vi->inii[vi->ninii] = vi->vargv[i];
 			vi->ninii += 1;
 		}
 
-		if( strcmp( ty->type, IM_TYPE_IMAGEVEC ) == 0 && 
-			!(ty->flags & IM_TYPE_OUTPUT) ) {
+		if( strcmp( ty->type, IM_TYPE_IMAGEVEC ) == 0 ) {
 			im_imagevec_object *iv = 
 				(im_imagevec_object *) vi->vargv[i];
 
@@ -1760,15 +1784,16 @@ vips_gather( VipsInfo *vi )
 	for( i = 0; i < vi->fn->argc; i++ ) {
 		im_type_desc *ty = vi->fn->argv[i].desc;
 
-		if( strcmp( ty->type, IM_TYPE_IMAGE ) == 0 && 
-			!(ty->flags & IM_TYPE_OUTPUT) ) {
+		if( !vips_type_needs_input( ty ) ) 
+			continue;
+
+		if( strcmp( ty->type, IM_TYPE_IMAGE ) == 0 ) { 
 			if( !(vi->vargv[i] = 
 				imageinfo_get( vi->use_lut, vi->vargv[i] )) )
 				reduce_throw( vi->rc );
 		}
 
-		if( strcmp( ty->type, IM_TYPE_IMAGEVEC ) == 0 && 
-			!(ty->flags & IM_TYPE_OUTPUT) ) {
+		if( strcmp( ty->type, IM_TYPE_IMAGEVEC ) == 0 ) {
 			im_imagevec_object *iv = 
 				(im_imagevec_object *) vi->vargv[i];
 
@@ -1870,30 +1895,31 @@ vips_fill_spine( VipsInfo *vi, HeapNode **arg )
 	}
 
 	for( j = 0, i = 0; i < vi->fn->argc; i++ ) {
-		im_arg_desc *varg = &vi->fn->argv[i];
+		im_type_desc *ty = vi->fn->argv[i].desc;
 
-		if( varg->desc->flags & IM_TYPE_OUTPUT ) 
+		if( vips_type_makes_output( ty ) ) 
 			vips_build_output( vi, i ); 
-		else if( strcmp( varg->desc->type, IM_TYPE_DISPLAY ) == 0 ) {
+
+		if( strcmp( ty->type, IM_TYPE_DISPLAY ) == 0 ) {
 			/* Special DISPLAY argument - don't fetch another ip
 			 * argument for it.
 			 */
-			(void) vips_fromip( vi->rc, 
-				NULL, varg->desc, &vi->vargv[i] );
+			(void) vips_fromip( vi->rc, NULL, ty, &vi->vargv[i] );
 		}
-		else {
+
+		if( vips_type_needs_input( ty ) ) {
 			PElement rhs;
 
 #ifdef DEBUG
 			printf( "vips_fill_spine: arg[%d] (%s) = ", 
-				i, varg->desc->type );
+				i, ty->type );
 #endif /*DEBUG*/
 
 			/* Convert ip type to VIPS type.
 			 */
 			PEPOINTRIGHT( arg[vi->nargs - j - 1], &rhs );
 			if( !vips_fromip( vi->rc, 
-				&rhs, varg->desc, &vi->vargv[i] ) ) {
+				&rhs, ty, &vi->vargv[i] ) ) {
 				vips_error_arg( vi, arg, j );
 				reduce_throw( vi->rc );
 			}
@@ -2051,8 +2077,8 @@ vips_wrap_output( VipsInfo *vi )
 	for( i = 0; i < vi->nres; i++ ) {
 		int j = vi->outpos[i];
 		IMAGE *im = (IMAGE *) vi->vargv[j];
-		im_type_desc *vips = vi->fn->argv[j].desc;
-		VipsArgumentType vt = vips_lookup_type( vips->type );
+		im_type_desc *ty = vi->fn->argv[j].desc;
+		VipsArgumentType vt = vips_lookup_type( ty->type );
 		Imageinfo *outii;
 
 		if( vt != VIPS_IMAGE )
@@ -2101,9 +2127,10 @@ vips_fillva( VipsInfo *vi, va_list ap )
 		printf( "vips_fillva: arg[%d] (%s) = ", i, ty->type );
 #endif /*DEBUG*/
 
-		if( ty->flags & IM_TYPE_OUTPUT ) 
+		if( vips_type_makes_output( ty ) ) 
 			vips_build_output( vi, i );
-		else if( strcmp( ty->type, IM_TYPE_DISPLAY ) == 0 ) {
+
+		if( strcmp( ty->type, IM_TYPE_DISPLAY ) == 0 ) {
 			/* DISPLAY argument ... just IM_TYPE_sRGB.
 			 */
 			vi->vargv[i] = im_col_displays( 7 );

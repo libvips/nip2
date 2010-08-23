@@ -1,5 +1,6 @@
 started 7.23.0, 2/8/10
 - fix a crash in thumbnail preview with large images
+- start adding IM_TYPE_RW support to vips_call.c
 
 started 7.22.2, 5/7/10
 - show nthreads in space free tooltip

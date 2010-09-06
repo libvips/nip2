@@ -824,12 +824,12 @@ workspaceview_class_init( WorkspaceviewClass *class )
 }
 
 static gboolean
-workspaceview_filedrop( Workspaceview *wview, const char *file )
+workspaceview_filedrop( Workspaceview *wview, const char *filename )
 {
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
 	gboolean result;
 
-	result = main_load( ws, file );
+	result = main_load( ws, filename );
 	if( result )
 		symbol_recalculate_all();
 

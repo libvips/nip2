@@ -118,11 +118,15 @@ progress_update( Progress *progress )
 		if( cancel )
 			progress->cancel = TRUE;
 
-		/* Mysteriously this has looped during startup in the past. It
-		 * seems to be OK now though.
+		/* Mysteriously this can sometimes get stuck, eg. if you drag
+		 * multiple workspaces to the main window.
+
+			while( g_main_context_iteration( NULL, FALSE ) )
+				;
+
+		 * Just run once.
 		 */
-		while( g_main_context_iteration( NULL, FALSE ) )
-			;
+		g_main_context_iteration( NULL, FALSE );
 
 #ifdef DEBUG_MEMUSE
 		printf( "progress_update:\n" );

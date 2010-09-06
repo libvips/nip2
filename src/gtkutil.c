@@ -899,7 +899,8 @@ filedrop_drag_data_received( GtkWidget *widget,
 #if !GLIB_CHECK_VERSION (2,0,0)
 		result = fdi->fn( fdi->client, sPath );
 #else
-		/* format changed with Gtk+1.3, use conversion */
+		/* format changed with Gtk+1.3, use conversion 
+		 */
 		pFrom = g_filename_from_uri( sPath, NULL, &error );
 		result = fdi->fn( fdi->client, pFrom );
 		g_free( pFrom );

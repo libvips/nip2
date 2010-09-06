@@ -1957,7 +1957,8 @@ regionview_event_cb( GtkWidget *widget, GdkEvent *ev, Regionview *regionview )
 		switch( ev->button.button ) {
 		case 1:
 			if( regionview->state == REGIONVIEW_MOVE &&
-				regionview->resize == REGIONVIEW_RESIZE_EDIT ) {
+				regionview->resize == REGIONVIEW_RESIZE_EDIT &&
+				regionview->classmodel ) {
 				model_edit( GTK_WIDGET( ip ), 
 					MODEL( regionview->classmodel ) );
 				handled = TRUE;

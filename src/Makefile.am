@@ -295,6 +295,8 @@ my_sources = \
 	view.h \
 	vips_call.c \
 	vips_call.h \
+	vips_cache.c \
+	vips_cache.h \
 	watch.c \
 	watch.h \
 	workspace.c \

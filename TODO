@@ -1,3 +1,18 @@
+
+- vips_call should work for RW image args
+
+  as part of nip->vips, make a "t" image and copy to that
+
+  can just return that image for output
+
+  but! how do we spot RW images? there's no clue in the type
+
+  need a new flag value I think meaning INPUT and OUTPUT
+ 
+  or maybe make INPUT explicit? but we'd break compat
+
+
+
 - redo name resolution in parser ... scrap the patch thing, instead have a
   separate 'resolve' step that runs after parsing a top-level
 

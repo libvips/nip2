@@ -472,6 +472,7 @@ typedef void *(*tool_map_fn)( Tool *, void *, void * );
 #include "toggle.h"
 #include "toggleview.h"
 #include "vips_call.h"
+#include "vips_cache.h"
 #include "parser.h"
 
 #ifdef WITH_DMALLOC

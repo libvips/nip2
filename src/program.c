@@ -1477,6 +1477,9 @@ program_find_action_cb( GtkAction *action, Program *program )
 static void
 program_find_again_action_cb( GtkAction *action, Program *program )
 {
+	if( !program->search )
+		return;
+
 	if( program->find_sym ) 
 		program->find_start += 1;
 

@@ -82,8 +82,22 @@ reduce_throw( Reduce *rc )
 		longjmp( rc->error[--rc->running], -1 );
 }
 
+
+static gboolean
+reduce_safe_pointer_wrap( Reduce *rc, 
+	PElement *out, reduce_safe_pointer_fn fn, 
+	void *a, void *b, void *c, void *d,
+	void **result )
+{
+	REDUCE_CATCH_START( FALSE );
+	*result = fn( rc, out, a, b, c, d );
+	REDUCE_CATCH_STOP; 
+
+	return( TRUE );
+}
+
 /* Call a function, passing in a "safe" PElement ... ie. the PElement points
- * at a fresh element which will be safe from the GC.
+ * at a fresh element which will be safe from the GC. 
  */
 void *
 reduce_safe_pointer( Reduce *rc, reduce_safe_pointer_fn fn, 
@@ -98,8 +112,10 @@ reduce_safe_pointer( Reduce *rc, reduce_safe_pointer_fn fn,
 	PEPOINTE( &pe, &e );
 	heap_register_element( rc->heap, &e );
 
-	result = fn( rc, &pe, a, b, c, d );
-
+	if( !reduce_safe_pointer_wrap( rc, &pe, fn, a, b, c, d, &result ) ) {
+		heap_unregister_element( rc->heap, &e );
+		reduce_throw( rc );
+	}
 	heap_unregister_element( rc->heap, &e );
 
 	return( result );

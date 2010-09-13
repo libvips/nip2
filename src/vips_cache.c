@@ -519,6 +519,7 @@ vips_history_insert( VipsInfo *vi )
 
 	queue_add( vips_history_lru, vi );
 	vi->in_cache = TRUE;
+	g_object_ref( vi );
 
 #ifdef DEBUG_HISTORY_SANITY
 	vips_history_sanity();
@@ -528,7 +529,7 @@ vips_history_insert( VipsInfo *vi )
 #endif /*DEBUG_HISTORY*/
 }
 
-/* Are we in the history? Remove us.
+/* Are we in the history? Remove us. Called from vips_info_dispose().
  */
 void
 vips_history_remove( VipsInfo *vi )
@@ -560,7 +561,7 @@ vips_history_remove_lru( void )
 	printf( "vips_history_remove_lru: flushing \"%s\"\n", vi->name );
 #endif /*DEBUG_HISTORY*/
 
-	vips_destroy( vi );
+	g_object_unref( vi );
 
 #ifdef DEBUG_HISTORY_SANITY
 	vips_history_sanity();
@@ -575,7 +576,7 @@ vips_history_destroy_cb( Imageinfo *ii, VipsInfo *vi )
 		vi->name );
 #endif /*DEBUG_HISTORY*/
 
-	vips_destroy( vi );
+	g_object_unref( vi );
 }
 
 static void
@@ -586,7 +587,7 @@ vips_history_invalidate_cb( Imageinfo *ii, VipsInfo *vi )
 		"on invalidate of ii, uncaching \"%s\"\n", vi->name );
 #endif /*DEBUG_HISTORY*/
 
-	vips_destroy( vi );
+	g_object_unref( vi );
 }
 
 /* Add a function call to the history. 
@@ -630,7 +631,7 @@ vips_history_add( VipsInfo *vi )
 
 /* Sort out the input images. 
  */
-static void
+static gboolean
 vips_gather( VipsInfo *vi ) 
 {
 	int i, j;
@@ -662,7 +663,7 @@ vips_gather( VipsInfo *vi )
 	/* No input images.
 	 */
 	if( vi->ninii == 0 )
-		return;
+		return( TRUE );
 
 	/* Can we LUT? Function needs to be LUTable, all input images
 	 * have to be the same underlying image, and image must be uncoded
@@ -686,7 +687,7 @@ vips_gather( VipsInfo *vi )
 		if( strcmp( ty->type, IM_TYPE_IMAGE ) == 0 ) { 
 			if( !(vi->vargv[i] = 
 				imageinfo_get( vi->use_lut, vi->vargv[i] )) )
-				reduce_throw( vi->rc );
+				return( FALSE );
 		}
 
 		if( strcmp( ty->type, IM_TYPE_IMAGEVEC ) == 0 ) {
@@ -701,15 +702,17 @@ vips_gather( VipsInfo *vi )
 
 				if( !(iv->vec[j] = imageinfo_get( 
 					vi->use_lut, ii )) )
-					reduce_throw( vi->rc );
+					return( FALSE );
 			}
 		}
 	}
+
+	return( TRUE );
 }
 
 /* Loop over the output IMAGEs, transforming them into Imageinfo.
  */
-static void
+static gboolean
 vips_wrap_output( VipsInfo *vi )
 {
 	int i;
@@ -725,7 +728,7 @@ vips_wrap_output( VipsInfo *vi )
 
 		if( !(outii = imageinfo_new( main_imageinfogroup, 
 			vi->rc->heap, im, NULL )) )
-			reduce_throw( vi->rc );
+			return( FALSE );
 		if( vi->use_lut ) 
 			imageinfo_set_underlying( outii, vi->inii[0] );
 
@@ -742,12 +745,84 @@ vips_wrap_output( VipsInfo *vi )
 		 */
 		if( im_pincheck( im ) ) {
 			vips_error( vi );
-			reduce_throw( vi->rc );
+			return( FALSE );
 		}
 
 		/* Record on output ii table.
 		 */
 		vi->outii[vi->noutii++] = outii;
+	}
+
+	return( TRUE );
+}
+
+/* VIPS types -> a buffer. For tracing calls.
+ */
+static void
+vips_tochar( VipsInfo *vi, int i, VipsBuf *buf )
+{
+	im_object obj = vi->vargv[i];
+	im_type_desc *ty = vi->fn->argv[i].desc;
+
+	switch( vips_lookup_type( ty->type ) ) {
+	case VIPS_DOUBLE:
+		vips_buf_appendf( buf, "%g", *((double*)obj) );
+		break;
+
+	case VIPS_INT:
+		vips_buf_appendf( buf, "%d", *((int*)obj) );
+		break;
+
+	case VIPS_COMPLEX:
+		vips_buf_appendf( buf, "(%g, %g)", 
+			((double*)obj)[0], ((double*)obj)[1] );
+		break;
+
+	case VIPS_STRING:
+		vips_buf_appendf( buf, "\"%s\"", (char*) obj );
+		break;
+
+	case VIPS_IMAGE:
+		vips_buf_appendi( buf, (IMAGE *) obj );
+		break;
+
+	case VIPS_DMASK:
+		vips_buf_appendf( buf, "dmask" );
+		break;
+
+	case VIPS_IMASK:
+		vips_buf_appendf( buf, "imask" );
+		break;
+
+	case VIPS_DOUBLEVEC:
+		vips_buf_appendf( buf, "doublevec" );
+		break;
+
+	case VIPS_INTVEC:
+		vips_buf_appendf( buf, "intvec" );
+		break;
+
+	case VIPS_IMAGEVEC:
+		vips_buf_appendf( buf, "imagevec" );
+		break;
+
+	case VIPS_GVALUE:
+	{
+		GValue *value = (GValue *) obj;
+
+		vips_buf_appends( buf, "(gvalue" );
+		vips_buf_appendgv( buf, value );
+		vips_buf_appendf( buf, ")" );
+
+		break;
+	}
+
+	case VIPS_INTERPOLATE:
+		vips_object_to_string( VIPS_OBJECT( obj ), buf );
+		break;
+
+	default:
+		g_assert( FALSE );
 	}
 }
 
@@ -794,6 +869,110 @@ vips_error_fn_vips( VipsInfo *vi )
 	vips_buf_appendf( &buf, "\n" );
 	vips_usage( &buf, vi->fn );
 	error_sub( "%s", vips_buf_all( &buf ) );
+}
+
+/* VIPS types -> a string buffer. Used to update image history. Yuk! Should be
+ * a method on object type.
+ */
+static void
+vips_tobuf( VipsInfo *vi, int i, VipsBuf *buf )
+{
+	im_object obj = vi->vargv[i];
+	im_type_desc *ty = vi->fn->argv[i].desc;
+
+	switch( vips_lookup_type( ty->type ) ) {
+	case VIPS_DOUBLE:
+		vips_buf_appendf( buf, "%g", *((double*)obj) );
+		break;
+
+	case VIPS_INT:
+		vips_buf_appendf( buf, "%d", *((int*)obj) );
+		break;
+
+	case VIPS_COMPLEX:
+		vips_buf_appendf( buf, "(%g, %g)", 
+			((double*)obj)[0], ((double*)obj)[1] );
+		break;
+
+	case VIPS_STRING:
+		vips_buf_appendf( buf, "\"%s\"", (char*)obj );
+		break;
+
+	case VIPS_IMAGE:
+		vips_buf_appendf( buf, "%s", NN( ((IMAGE*)obj)->filename ) );
+		break;
+
+	case VIPS_DMASK:
+	case VIPS_IMASK:
+	{
+		im_mask_object *mo = obj;
+
+		vips_buf_appendf( buf, "%s", NN( mo->name ) );
+		break;
+	}
+
+	case VIPS_DOUBLEVEC:
+	{
+		im_doublevec_object *v = (im_doublevec_object *) obj;
+		int j;
+
+		vips_buf_appendf( buf, "\"" );
+		for( j = 0; j < v->n; j++ )
+			vips_buf_appendf( buf, "%g ", v->vec[j] );
+		vips_buf_appendf( buf, "\"" );
+
+		break;
+	}
+
+	case VIPS_INTVEC:
+	{
+		im_intvec_object *v = (im_intvec_object *) obj;
+		int j;
+
+		vips_buf_appendf( buf, "\"" );
+		for( j = 0; j < v->n; j++ )
+			vips_buf_appendf( buf, "%d ", v->vec[j] );
+		vips_buf_appendf( buf, "\"" );
+
+		break;
+	}
+
+	case VIPS_IMAGEVEC:
+	{
+		im_imagevec_object *v = (im_imagevec_object *) obj;
+		int j;
+
+		vips_buf_appendf( buf, "\"" );
+		for( j = 0; j < v->n; j++ )
+			vips_buf_appendf( buf, "%s ", v->vec[j]->filename );
+		vips_buf_appendf( buf, "\"" );
+
+		break;
+	}
+
+	case VIPS_GVALUE:
+	{
+		GValue *value = (GValue *) obj;
+
+		vips_buf_appendgv( buf, value );
+
+		break;
+	}
+
+	case VIPS_INTERPOLATE:
+		vips_object_to_string( VIPS_OBJECT( obj ), buf );
+		break;
+
+	case VIPS_NONE:
+		if( strcmp( ty->type, IM_TYPE_DISPLAY ) == 0 ) 
+			/* Just assume sRGB.
+			 */
+			vips_buf_appendf( buf, "sRGB" );
+		break;
+
+	default:
+		g_assert( FALSE );
+	}
 }
 
 static gboolean
@@ -881,31 +1060,45 @@ vips_update_hist( VipsInfo *vi )
 /* Call a vips operation. 
  *
  * The cache takes ownership of the VipsInfo passed in, and returns a ref to a
- * VipsInfo (might be a different one) that should be unreffed when you're 
- * done with it.
+ * VipsInfo (might be a different one) that contains the result. Should be 
+ * unreffed when you're done with it.
+ *
+ * On error, return NULL.
  */
 VipsInfo *
 vips_dispatch( VipsInfo *vi, PElement *out )
 {
-	Reduce *rc = vi->rc;
 	VipsInfo *old_vi;
+
+#ifdef DEBUG_HISTORY_SANITY
+	vips_history_sanity();
+#endif /*DEBUG_HISTORY_SANITY*/
 
 	/* Calculate the hash for this vi after building it, but before we do
 	 * vips_gather();
+	 *
+	 * We want the hash to reflect the args as supplied by nip2, not the
+	 * args as transformed by vips_gather() for this specific call.
 	 */
 	(void) vips_hash( vi );
 
 	/* Look over the images we have ... turn input Imageinfo to IMAGE.
 	 * If we can do this with a lut, set all that up.
 	 */
-	vips_gather( vi );
+	if( !vips_gather( vi ) ) {
+		g_object_unref( vi );
+		return( NULL );
+	}
 
 	/* Is this function call in the history?
 	 */
 	if( (old_vi = vips_history_lookup( vi )) ) {
-		/* Yes: reuse!
+		/* Yes: reuse! unref our arg to junk it, adda ref to the
+		 * cached call for our caller.
 		 */
+		g_object_unref( vi );
 		vi = old_vi;
+		g_object_ref( vi );
 
 		if( trace_flags & TRACE_VIPS ) 
 			vips_buf_appendf( trace_current(), "(from cache) " );
@@ -943,13 +1136,17 @@ vips_dispatch( VipsInfo *vi, PElement *out )
 
 		if( result ) {
 			vips_error_fn_vips( vi );
+			g_object_unref( vi );
 			return( NULL );
 		}
 		vips_update_hist( vi );
 
 		/* Transform output IMAGE back into Imageinfo.
 		 */
-		vips_wrap_output( vi );
+		if( !vips_wrap_output( vi ) ) {
+			g_object_unref( vi );
+			return( NULL );
+		}
 	}
 
 	/* Add to our operation cache, if necessary.
@@ -969,6 +1166,10 @@ vips_dispatch( VipsInfo *vi, PElement *out )
 		else
 			vips_history_add( vi );
 	}
+
+#ifdef DEBUG_HISTORY_SANITY
+	vips_history_sanity();
+#endif /*DEBUG_HISTORY_SANITY*/
 
 	return( vi );
 }

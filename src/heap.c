@@ -1457,6 +1457,21 @@ heap_get_realvec( PElement *base, double *buf, int n )
 	return( l );
 }
 
+/* Get an element as a realvec. Return -1 on error, or length of vector.
+ */
+int
+heap_get_imagevec( PElement *base, Imageinfo **buf, int n )
+{
+	Reduce *rc = reduce_context;
+	int l;
+
+	REDUCE_CATCH_START( -1 );
+	l = reduce_get_imagevec( reduce_context, base, buf, n );
+	REDUCE_CATCH_STOP; 
+
+	return( l );
+}
+
 /* Get an element as a matrix. Return -1 on error, or length of buffer used. 
  * Write xsize/ysize to args.
  */

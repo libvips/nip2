@@ -414,6 +414,7 @@ gboolean heap_get_real( PElement *base, double *out );
 gboolean heap_get_class( PElement *base, PElement *out );
 gboolean heap_get_image( PElement *base, Imageinfo **out );
 int heap_get_realvec( PElement *base, double *buf, int n );
+int heap_get_imagevec( PElement *base, Imageinfo **buf, int n );
 gboolean heap_get_matrix_size( PElement *base, int *xsize, int *ysize );
 gboolean heap_get_matrix( PElement *base, 
 	double *buf, int n, int *xsize, int *ysize );

@@ -35,23 +35,6 @@
  */
 #define MAX_VEC (10000)
 
-/* VIPS argument types we support. Keep order in sync with VipsArgumentType.
- */
-static im_arg_type vips_supported[] = {
-	IM_TYPE_DOUBLE,		
-	IM_TYPE_INT,	
-	IM_TYPE_COMPLEX,
-	IM_TYPE_STRING,
-	IM_TYPE_IMAGE,
-	IM_TYPE_DOUBLEVEC,
-	IM_TYPE_DMASK,
-	IM_TYPE_IMASK,
-	IM_TYPE_IMAGEVEC,
-	IM_TYPE_INTVEC,
-	IM_TYPE_GVALUE,
-	IM_TYPE_INTERPOLATE
-};
-
 typedef enum _VipsArgumentType {
 	VIPS_NONE = -1,
 	VIPS_DOUBLE = 0,
@@ -138,6 +121,11 @@ typedef struct _VipsInfoClass {
 	iObjectClass parent_class;
 
 } VipsInfoClass;
+
+extern GSList *vips_info_all;
+
+VipsArgumentType vips_lookup_type( im_arg_type type );
+void vips_error( VipsInfo *vi );
 
 GType vips_info_get_type( void );
 

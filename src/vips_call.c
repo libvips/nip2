@@ -757,7 +757,7 @@ vips_info_dispose( GObject *gobject )
 
 #ifdef DEBUG
 	printf( "vips_info_dispose: (%p) %s \"%s\"\n",
-		vi, G_OBJECT_TYPE_NAME( vi ), NN( IOBJECT( vi )->name ) );
+		vi, G_OBJECT_TYPE_NAME( vi ), vi->name );
 #endif /*DEBUG*/
 
 	/* Are we in the history? Remove us.
@@ -1340,6 +1340,16 @@ vips_fill_spine( VipsInfo *vi, HeapNode **arg )
 				vips_error_arg( vi, arg, j );
 				return( FALSE );
 			}
+
+#ifdef DEBUG
+{
+			char txt[512];
+			VipsBuf buf = VIPS_BUF_STATIC( txt );
+
+			vips_tobuf( vi, i, &buf );
+			printf( "%s\n", vips_buf_all( &buf ) );
+}
+#endif /*DEBUG*/
 
 			j += 1;
 		}

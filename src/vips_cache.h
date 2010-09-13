@@ -29,5 +29,6 @@
 
 extern int vips_history_size;
 
+void vips_tobuf( VipsInfo *vi, int i, VipsBuf *buf );
 void vips_history_remove( VipsInfo *vi );
 VipsInfo *vips_dispatch( VipsInfo *vi, PElement *out );

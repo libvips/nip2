@@ -756,125 +756,9 @@ vips_wrap_output( VipsInfo *vi )
 	return( TRUE );
 }
 
-/* VIPS types -> a buffer. For tracing calls.
+/* VIPS types -> a string buffer. Yuk! Should be a method on object type.
  */
-static void
-vips_tochar( VipsInfo *vi, int i, VipsBuf *buf )
-{
-	im_object obj = vi->vargv[i];
-	im_type_desc *ty = vi->fn->argv[i].desc;
-
-	switch( vips_lookup_type( ty->type ) ) {
-	case VIPS_DOUBLE:
-		vips_buf_appendf( buf, "%g", *((double*)obj) );
-		break;
-
-	case VIPS_INT:
-		vips_buf_appendf( buf, "%d", *((int*)obj) );
-		break;
-
-	case VIPS_COMPLEX:
-		vips_buf_appendf( buf, "(%g, %g)", 
-			((double*)obj)[0], ((double*)obj)[1] );
-		break;
-
-	case VIPS_STRING:
-		vips_buf_appendf( buf, "\"%s\"", (char*) obj );
-		break;
-
-	case VIPS_IMAGE:
-		vips_buf_appendi( buf, (IMAGE *) obj );
-		break;
-
-	case VIPS_DMASK:
-		vips_buf_appendf( buf, "dmask" );
-		break;
-
-	case VIPS_IMASK:
-		vips_buf_appendf( buf, "imask" );
-		break;
-
-	case VIPS_DOUBLEVEC:
-		vips_buf_appendf( buf, "doublevec" );
-		break;
-
-	case VIPS_INTVEC:
-		vips_buf_appendf( buf, "intvec" );
-		break;
-
-	case VIPS_IMAGEVEC:
-		vips_buf_appendf( buf, "imagevec" );
-		break;
-
-	case VIPS_GVALUE:
-	{
-		GValue *value = (GValue *) obj;
-
-		vips_buf_appends( buf, "(gvalue" );
-		vips_buf_appendgv( buf, value );
-		vips_buf_appendf( buf, ")" );
-
-		break;
-	}
-
-	case VIPS_INTERPOLATE:
-		vips_object_to_string( VIPS_OBJECT( obj ), buf );
-		break;
-
-	default:
-		g_assert( FALSE );
-	}
-}
-
-/* Get the args from the VIPS call buffer.
- */
-static void
-vips_args_vips( VipsInfo *vi, VipsBuf *buf )
-{
-	int i;
-
-	vips_buf_appendf( buf, _( "You passed:" ) );
-	vips_buf_appendf( buf, "\n" );
-        for( i = 0; i < vi->fn->argc; i++ ) {
-                im_type_desc *ty = vi->fn->argv[i].desc;
-                char *name = vi->fn->argv[i].name;
-
-                if( vips_type_needs_input( ty ) ) {
-                        vips_buf_appendf( buf, "   %s - ", name );
-                        vips_tochar( vi, i, buf );
-                        vips_buf_appendf( buf, "\n" );
-                }
-        }
-}
-
-/* There's a problem calling the function. Show args from the vips call
- * struct.
- */
-static void
-vips_error_fn_vips( VipsInfo *vi )
-{
-	char txt[1000];
-	VipsBuf buf = VIPS_BUF_STATIC( txt );
-
-	error_top( _( "VIPS library error." ) );
-
-	vips_buf_appendf( &buf, 
-		_( "Error calling library function \"%s\" (%s)." ),
-		vi->name, vi->fn->desc );
-	vips_buf_appendf( &buf, "\n" );
-	vips_buf_appendf( &buf, _( "VIPS library: %s" ), im_error_buffer() );
-	im_error_clear();
-	vips_buf_appendf( &buf, "\n" );
-	vips_args_vips( vi, &buf );
-	vips_buf_appendf( &buf, "\n" );
-	vips_usage( &buf, vi->fn );
-	error_sub( "%s", vips_buf_all( &buf ) );
-}
-
-/* VIPS types -> a string buffer. Used to update image history. Yuk! Should be
- * a method on object type.
- */
-static void
+void
 vips_tobuf( VipsInfo *vi, int i, VipsBuf *buf )
 {
 	im_object obj = vi->vargv[i];
@@ -899,7 +783,15 @@ vips_tobuf( VipsInfo *vi, int i, VipsBuf *buf )
 		break;
 
 	case VIPS_IMAGE:
-		vips_buf_appendf( buf, "%s", NN( ((IMAGE*)obj)->filename ) );
+		/* Before vips_gather(), this pointer will be an Imageinfo.
+		 * Yuk!!
+		 */
+		if( IS_IMAGEINFO( (Imageinfo *) obj ) )
+			vips_buf_appendf( buf, "%s", 
+				IOBJECT( obj )->name );
+		else
+			vips_buf_appendf( buf, "%s", 
+				NN( ((IMAGE *) obj)->filename ) );
 		break;
 
 	case VIPS_DMASK:
@@ -973,6 +865,51 @@ vips_tobuf( VipsInfo *vi, int i, VipsBuf *buf )
 	default:
 		g_assert( FALSE );
 	}
+}
+
+/* Get the args from the VIPS call buffer.
+ */
+static void
+vips_args_vips( VipsInfo *vi, VipsBuf *buf )
+{
+	int i;
+
+	vips_buf_appendf( buf, _( "You passed:" ) );
+	vips_buf_appendf( buf, "\n" );
+        for( i = 0; i < vi->fn->argc; i++ ) {
+                im_type_desc *ty = vi->fn->argv[i].desc;
+                char *name = vi->fn->argv[i].name;
+
+                if( vips_type_needs_input( ty ) ) {
+                        vips_buf_appendf( buf, "   %s - ", name );
+                        vips_tobuf( vi, i, buf );
+                        vips_buf_appendf( buf, "\n" );
+                }
+        }
+}
+
+/* There's a problem calling the function. Show args from the vips call
+ * struct.
+ */
+static void
+vips_error_fn_vips( VipsInfo *vi )
+{
+	char txt[1000];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
+
+	error_top( _( "VIPS library error." ) );
+
+	vips_buf_appendf( &buf, 
+		_( "Error calling library function \"%s\" (%s)." ),
+		vi->name, vi->fn->desc );
+	vips_buf_appendf( &buf, "\n" );
+	vips_buf_appendf( &buf, _( "VIPS library: %s" ), im_error_buffer() );
+	im_error_clear();
+	vips_buf_appendf( &buf, "\n" );
+	vips_args_vips( vi, &buf );
+	vips_buf_appendf( &buf, "\n" );
+	vips_usage( &buf, vi->fn );
+	error_sub( "%s", vips_buf_all( &buf ) );
 }
 
 static gboolean
@@ -1130,7 +1067,7 @@ vips_dispatch( VipsInfo *vi, PElement *out )
 		result = vi->fn->disp( vi->vargv );
 
 #ifdef DEBUG_TIME
-		printf( "vips_dispatch: %s - %g\n", 
+		printf( "vips_dispatch: %s - %g seconds\n", 
 			vi->name, g_timer_elapsed( timer, NULL ) );
 #endif /*DEBUG_TIME*/
 

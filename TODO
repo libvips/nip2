@@ -1,3 +1,6 @@
+- grep for _throw() in vips_*.c
+
+
 - ^Q, when a 'save?' dialog pops up, ^W the window, now continue in the ^Q
   dialog, crash
 

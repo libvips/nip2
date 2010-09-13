@@ -783,7 +783,7 @@ vips_tobuf( VipsInfo *vi, int i, VipsBuf *buf )
 		break;
 
 	case VIPS_IMAGE:
-		/* Before vips_gather(), this pointer will be an Imageinfo.
+		/* This pointer can be an IMAGE or an Imageinfo.
 		 * Yuk!!
 		 */
 		if( IS_IMAGEINFO( (Imageinfo *) obj ) )

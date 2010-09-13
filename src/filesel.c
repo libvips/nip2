@@ -768,20 +768,6 @@ filesel_get_filename( Filesel *filesel )
 	return( name );
 }
 
-/* How many selected filenames.
- */
-int
-filesel_nselected( Filesel *filesel )
-{
-	GSList *names = gtk_file_chooser_get_filenames( 
-		GTK_FILE_CHOOSER( filesel->chooser ) );
-	int n = g_slist_length( names );
-
-	IM_FREEF( slist_free_all, names );
-
-	return( n );
-}
-
 /* Get filename multi ... map over the selected filenames.
  */
 void *

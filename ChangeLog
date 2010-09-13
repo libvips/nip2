@@ -5,6 +5,7 @@ started 7.23.0, 2/8/10
   M.v.Gulik)
 - drag multiple workspaces to the mainw could get stuck (thanks M.v.Gulik)
 - find-again before find would crash (thanks M.v.Gulik)
+- open multiple ws in file browser would crash
 
 started 7.22.2, 5/7/10
 - show nthreads in space free tooltip

@@ -130,7 +130,6 @@ GtkWidget *filesel_new( void );
 
 gboolean filesel_set_filename( Filesel *filesel, const char *name );
 char *filesel_get_filename( Filesel *filesel );
-int filesel_nselected( Filesel *filesel );
 void *filesel_map_filename_multi( Filesel *filesel,
 	FileselMapFn fn, void *a, void *b );
 

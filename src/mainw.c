@@ -886,44 +886,18 @@ mainw_workspace_save_as_action_cb( GtkAction *action, Mainw *mainw )
 	filemodel_inter_saveas( IWINDOW( mainw ), FILEMODEL( mainw->ws ) );
 }
 
-Workspace *
-mainw_open_file_into_workspace( Mainw *mainw, const char *filename )
+static Workspace *
+mainw_open_workspace( Workspacegroup *wsg, const char *filename )
 {
-	Workspacegroup *wsg = WORKSPACEGROUP( ICONTAINER( mainw->ws )->parent );
-	Workspace *new_ws;
-	Mainw *new_mainw;
+	Workspace *ws;
+	Mainw *mainw;
 
-	if( !(new_ws = workspace_new_from_file( wsg, filename )) ) 
+	if( !(ws = workspace_new_from_file( wsg, filename )) ) 
 		return( NULL );
 
-	new_mainw = mainw_new( new_ws );
-	gtk_widget_show( GTK_WIDGET( new_mainw ) );
-
-	/*
-
-		FIXME ... if the ws we are loading into is blank, we could
-		call workspace_merge_file() instead of
-		workspace_new_from_file() and avoid the uglyliness. But this
-		will fail if there's a version mismatch and filename needs to
-		have compatibility menus.
-
-		Could open filename and get version info, then decide whether
-		we need a new window or whether we load into this window.
-
-	*/
-	if( workspace_is_empty( mainw->ws ) ) {
-		/* Make sure modified isn't set ... otherwise we'll get a
-		 * "save before close" dialog.
-		 */
-		filemodel_set_modified( FILEMODEL( mainw->ws ), FALSE );
-		iwindow_kill( IWINDOW( mainw ) );
-	}
-
-	/* Can't rely on filename still being around ... read filename
-	 * from new ws instead.
-	 */
-	mainw_recent_add( &mainw_recent_workspace, 
-		FILEMODEL( new_ws )->filename );
+	mainw = mainw_new( ws );
+	gtk_widget_show( GTK_WIDGET( mainw ) );
+	mainw_recent_add( &mainw_recent_workspace, filename );
 
 	/* Process some events to make sure we rethink the layout and
 	 * are able to get the append-at-RHS offsets.
@@ -933,13 +907,42 @@ mainw_open_file_into_workspace( Mainw *mainw, const char *filename )
 
 	symbol_recalculate_all();
 
+	return( ws );
+}
+
+/* Open a new workspace, close the current one if it's empty. 
+ *
+ * The idea is that if you have a blank workspace and do file-open, you want
+ * to load into the blank. However, we can't actually do this, since the new
+ * workspace might need a different set of menus. 
+ *
+ * We could sniff the file and then call workspace_merge_file() if the
+ * workspace was compatible with the current one, but why bother.
+ */
+Workspace *
+mainw_open_file_into_workspace( Mainw *mainw, const char *filename )
+{
+	Workspacegroup *wsg = WORKSPACEGROUP( ICONTAINER( mainw->ws )->parent );
+	Workspace *new_ws;
+
+	if( !(new_ws = mainw_open_workspace( wsg, filename )) ) 
+		return( NULL );
+
+	if( workspace_is_empty( mainw->ws ) ) {
+		/* Make sure modified isn't set ... otherwise we'll get a
+		 * "save before close" dialog.
+		 */
+		filemodel_set_modified( FILEMODEL( mainw->ws ), FALSE );
+		iwindow_kill( IWINDOW( mainw ) );
+	}
+
 	return( new_ws );
 }
 
 /* Track these during a load.
  */
 typedef struct {
-	Mainw *mainw;
+	Workspacegroup *wsg;
 	VipsBuf *buf;
 	int nitems;
 } MainwLoad;
@@ -951,7 +954,7 @@ static void *
 mainw_open_fn( Filesel *filesel, const char *filename, MainwLoad *load )
 {
 	if( is_file_type( &filesel_wfile_type, filename ) ) {
-		if( !mainw_open_file_into_workspace( load->mainw, filename ) )
+		if( !mainw_open_workspace( load->wsg, filename ) )
 			return( filesel );
 	}
 	else {
@@ -974,37 +977,51 @@ mainw_open_done_cb( iWindow *iwnd, void *client,
 {
 	Mainw *mainw = MAINW( client );
 	Filesel *filesel = FILESEL( iwnd );
-	int nselected = filesel_nselected( filesel );
 	char txt[MAX_STRSIZE];
 	VipsBuf buf = VIPS_BUF_STATIC( txt );
 	MainwLoad load;
 
-	load.mainw = mainw;
+	load.wsg = WORKSPACEGROUP( ICONTAINER( mainw->ws )->parent );
 	load.buf = &buf;
 	load.nitems = 0;
 
-	if( nselected > 1 )
-		vips_buf_appends( &buf, "Group [" );
 	if( filesel_map_filename_multi( filesel,
 		(FileselMapFn) mainw_open_fn, &load, NULL ) ) {
 		nfn( sys, IWINDOW_ERROR );
 		return;
 	}
-	if( nselected > 1 )
-		vips_buf_appends( &buf, "]" );
 
-	/* We may have loaded a workspace and caused this workspace to
-	 * vanish, argh. mainw may no longer be valid, but check ->ws anyway.
-	 * We'll probably see a NULL if this ws has been junked.
+	/* If we have just loaded one or more workspaces, and the current
+	 * workspace is smpty, we can junk it.
 	 */
-	if( load.nitems && 
-		mainw->ws &&
-		!workspace_add_def( mainw->ws, vips_buf_all( &buf ) ) ) {
-		error_top( _( "Load failed." ) );
-		error_sub( _( "Unable to execute:\n   %s" ), 
-			vips_buf_all( &buf ) );
-		nfn( sys, IWINDOW_ERROR );
-		return;
+	if( !load.nitems && 
+		workspace_is_empty( mainw->ws ) ) {
+		/* Make sure modified isn't set ... otherwise we'll get a
+		 * "save before close" dialog.
+		 */
+		filemodel_set_modified( FILEMODEL( mainw->ws ), FALSE );
+		iwindow_kill( IWINDOW( mainw ) );
+	}
+	else {
+		char txt2[MAX_STRSIZE];
+		VipsBuf buf2 = VIPS_BUF_STATIC( txt2 );
+
+		if( load.nitems > 1 )
+			vips_buf_appendf( &buf2, "Group [%s]", 
+				vips_buf_all( &buf ) );
+		else
+			vips_buf_appends( &buf2, vips_buf_all( &buf ) );
+
+		/* Some actual files (image, matrix) were selected. Load into
+		 * the current workspace.
+		 */
+		if( !workspace_add_def( mainw->ws, vips_buf_all( &buf2 ) ) ) {
+			error_top( _( "Load failed." ) );
+			error_sub( _( "Unable to execute:\n   %s" ), 
+				vips_buf_all( &buf2 ) );
+			nfn( sys, IWINDOW_ERROR );
+			return;
+		}
 	}
 
 	nfn( sys, IWINDOW_YES );

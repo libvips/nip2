@@ -1,11 +1,14 @@
 started 7.23.0, 2/8/10
 - fix a crash in thumbnail preview with large images
-- start adding IM_TYPE_RW support to vips_call.c
 - doublelick while painting with a rect (eg. text) would crash (thanks
   M.v.Gulik)
 - drag multiple workspaces to the mainw could get stuck (thanks M.v.Gulik)
 - find-again before find would crash (thanks M.v.Gulik)
 - open multiple ws in file browser would crash
+- added filemodel_set_window_hint() and filemodel_get_window_hint() to help ^Q
+  display popups on the right window
+- split vips_call.c to vips_call / vips_cache
+- start adding IM_TYPE_RW support to vips_call.c
 
 started 7.22.2, 5/7/10
 - show nthreads in space free tooltip

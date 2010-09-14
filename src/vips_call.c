@@ -30,9 +30,9 @@
 #include "ip.h"
 
 /*
- */
 #define DEBUG_TIME
 #define DEBUG
+ */
 
 /* This is usually turned on from a -D in cflags.
 #define DEBUG_LEAK
@@ -1328,11 +1328,6 @@ vips_fill_spine( VipsInfo *vi, HeapNode **arg )
 		if( vips_type_needs_input( ty ) ) {
 			PElement rhs;
 
-#ifdef DEBUG
-			printf( "vips_fill_spine: arg[%d] (%s) = ", 
-				i, ty->type );
-#endif /*DEBUG*/
-
 			/* Convert ip type to VIPS type.
 			 */
 			PEPOINTRIGHT( arg[vi->nargs - j - 1], &rhs );
@@ -1340,16 +1335,6 @@ vips_fill_spine( VipsInfo *vi, HeapNode **arg )
 				vips_error_arg( vi, arg, j );
 				return( FALSE );
 			}
-
-#ifdef DEBUG
-{
-			char txt[512];
-			VipsBuf buf = VIPS_BUF_STATIC( txt );
-
-			vips_tobuf( vi, i, &buf );
-			printf( "%s\n", vips_buf_all( &buf ) );
-}
-#endif /*DEBUG*/
 
 			j += 1;
 		}

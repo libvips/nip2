@@ -143,10 +143,14 @@ mainw_destroy( GtkObject *object )
 
 	/* My instance destroy stuff.
 	 */
-	if( mainw->ws )
+	if( mainw->ws ) {
 		mainw->ws->iwnd = NULL;
-	FREESID( mainw->destroy_sid, mainw->ws );
-	FREESID( mainw->changed_sid, mainw->ws );
+
+		filemodel_set_window_hint( FILEMODEL( mainw->ws ), NULL );
+		FREESID( mainw->destroy_sid, mainw->ws );
+		FREESID( mainw->changed_sid, mainw->ws );
+	}
+
 	FREESID( mainw->imageinfo_changed_sid, main_imageinfogroup );
 	FREESID( mainw->heap_changed_sid, reduce_context->heap );
 	FREESID( mainw->watch_changed_sid, main_watchgroup );
@@ -413,7 +417,8 @@ mainw_title_update( Mainw *mainw )
 			mainw->ws->compat_minor ); 
 	}
 	if( FILEMODEL( mainw->ws )->filename )
-		vips_buf_appendf( &buf, " - %s", FILEMODEL( mainw->ws )->filename );
+		vips_buf_appendf( &buf, " - %s", 
+			FILEMODEL( mainw->ws )->filename );
 	else {
 		vips_buf_appends( &buf, " - " );
 		vips_buf_appends( &buf, _( "unsaved workspace" ) );
@@ -2172,6 +2177,7 @@ mainw_link( Mainw *mainw, Workspace *ws )
 	iwindow_set_build( IWINDOW( mainw ), 
 		(iWindowBuildFn) mainw_build, ws, NULL, NULL );
 	iwindow_set_popdown( IWINDOW( mainw ), mainw_popdown, NULL );
+	filemodel_set_window_hint( FILEMODEL( ws ), IWINDOW( mainw ) );
 
 	/* If we have a saved size for this workspoace, set that. Otherwise,
 	 * default to the default.

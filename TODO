@@ -1,12 +1,6 @@
-- grep for _throw() in vips_*.c
+- when we display a popup, uniconise and pop the parent window to the front,
+  eg. ^Q dialogs
 
-
-- ^Q, when a 'save?' dialog pops up, ^W the window, now continue in the ^Q
-  dialog, crash
-
-	  GLib-GObject-WARNING **: invalid uninstantiatable type 
-	  	`<invalid>' in cast to `Filemodel'
-	  aborting...
 
 - vips_call should work for RW image args
 

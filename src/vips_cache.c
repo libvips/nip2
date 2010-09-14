@@ -30,12 +30,12 @@
 #include "ip.h"
 
 /*
- */
 #define DEBUG_TIME
 #define DEBUG_HISTORY_SANITY
 #define DEBUG_HISTORY_MISS
 #define DEBUG
 #define DEBUG_HISTORY
+ */
 
 /* This is usually turned on from a -D in cflags.
 #define DEBUG_LEAK
@@ -431,7 +431,7 @@ vips_history_sanity( void )
 			g_assert( !vi->in_cache );
 	}
 
-	/* Every image argument on every in-cache call should be sane.
+	/* Every input image argument on every in-cache call should be sane.
 	 */
 	for( p = vips_info_all; p; p = p->next ) {
 		VipsInfo *vi = (VipsInfo *) p->data;
@@ -442,6 +442,9 @@ vips_history_sanity( void )
 
 		for( i = 0; i < vi->fn->argc; i++ ) {
 			im_type_desc *ty = vi->fn->argv[i].desc;
+
+			if( !vips_type_needs_input( ty ) )
+				continue;
 
 			if( strcmp( ty->type, IM_TYPE_IMAGE ) == 0 ) {
 				IMAGE *im = (IMAGE *) vi->vargv[i];
@@ -457,6 +460,23 @@ vips_history_sanity( void )
 					g_assert( !im_image_sanity( 
 						iv->vec[j] ) );
 			}
+		}
+	}
+
+	/* All the output images should be sane.
+	 */
+	for( p = vips_info_all; p; p = p->next ) {
+		VipsInfo *vi = (VipsInfo *) p->data;
+		int i;
+
+		if( !vi->in_cache )
+			continue;
+
+		for( i = 0; i < vi->noutii; i++ ) {
+			IMAGE *im;
+
+			if( (im = imageinfo_get( FALSE, vi->outii[i] )) )
+				g_assert( !im_image_sanity( im ) );
 		}
 	}
 }
@@ -756,10 +776,11 @@ vips_wrap_output( VipsInfo *vi )
 	return( TRUE );
 }
 
-/* VIPS types -> a string buffer. Yuk! Should be a method on object type.
+/* VIPS types -> a string buffer. Yuk! Should be a method on object type. This
+ * is used to generate vips history, so it has to be in sh format.
  */
 void
-vips_tobuf( VipsInfo *vi, int i, VipsBuf *buf )
+vips_tochar_shell( VipsInfo *vi, int i, VipsBuf *buf )
 {
 	im_object obj = vi->vargv[i];
 	im_type_desc *ty = vi->fn->argv[i].desc;
@@ -783,15 +804,7 @@ vips_tobuf( VipsInfo *vi, int i, VipsBuf *buf )
 		break;
 
 	case VIPS_IMAGE:
-		/* This pointer can be an IMAGE or an Imageinfo.
-		 * Yuk!!
-		 */
-		if( IS_IMAGEINFO( (Imageinfo *) obj ) )
-			vips_buf_appendf( buf, "%s", 
-				IOBJECT( obj )->name );
-		else
-			vips_buf_appendf( buf, "%s", 
-				NN( ((IMAGE *) obj)->filename ) );
+		vips_buf_appendf( buf, "%s", NN( ((IMAGE *) obj)->filename ) );
 		break;
 
 	case VIPS_DMASK:
@@ -867,6 +880,76 @@ vips_tobuf( VipsInfo *vi, int i, VipsBuf *buf )
 	}
 }
 
+/* VIPS types -> a buffer. For tracing calls and debug.
+ */
+void
+vips_tochar_trace( VipsInfo *vi, int i, VipsBuf *buf )
+{
+	im_object obj = vi->vargv[i];
+	im_type_desc *vips = vi->fn->argv[i].desc;
+
+	switch( vips_lookup_type( vips->type ) ) {
+	case VIPS_DOUBLE:
+		vips_buf_appendf( buf, "%g", *((double*)obj) );
+		break;
+
+	case VIPS_INT:
+		vips_buf_appendf( buf, "%d", *((int*)obj) );
+		break;
+
+	case VIPS_COMPLEX:
+		vips_buf_appendf( buf, "(%g, %g)", 
+			((double*)obj)[0], ((double*)obj)[1] );
+		break;
+
+	case VIPS_STRING:
+		vips_buf_appendf( buf, "\"%s\"", (char*) obj );
+		break;
+
+	case VIPS_IMAGE:
+		vips_buf_appendi( buf, (IMAGE *) obj );
+		break;
+
+	case VIPS_DMASK:
+		vips_buf_appendf( buf, "dmask" );
+		break;
+
+	case VIPS_IMASK:
+		vips_buf_appendf( buf, "imask" );
+		break;
+
+	case VIPS_DOUBLEVEC:
+		vips_buf_appendf( buf, "doublevec" );
+		break;
+
+	case VIPS_INTVEC:
+		vips_buf_appendf( buf, "intvec" );
+		break;
+
+	case VIPS_IMAGEVEC:
+		vips_buf_appendf( buf, "imagevec" );
+		break;
+
+	case VIPS_GVALUE:
+	{
+		GValue *value = (GValue *) obj;
+
+		vips_buf_appends( buf, "(gvalue" );
+		vips_buf_appendgv( buf, value );
+		vips_buf_appendf( buf, ")" );
+
+		break;
+	}
+
+	case VIPS_INTERPOLATE:
+		vips_object_to_string( VIPS_OBJECT( obj ), buf );
+		break;
+
+	default:
+		g_assert( FALSE );
+	}
+}
+
 /* Get the args from the VIPS call buffer.
  */
 static void
@@ -882,7 +965,7 @@ vips_args_vips( VipsInfo *vi, VipsBuf *buf )
 
                 if( vips_type_needs_input( ty ) ) {
                         vips_buf_appendf( buf, "   %s - ", name );
-                        vips_tobuf( vi, i, buf );
+                        vips_tochar_trace( vi, i, buf );
                         vips_buf_appendf( buf, "\n" );
                 }
         }
@@ -921,7 +1004,7 @@ vips_build_argv( VipsInfo *vi, char **argv )
 		char txt[512];
 		VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-		vips_tobuf( vi, i, &buf );
+		vips_tochar_shell( vi, i, &buf );
 		if( !(argv[i] = im_strdup( NULL, vips_buf_all( &buf ) )) )
 			return( FALSE );
 	}
@@ -1026,6 +1109,26 @@ vips_dispatch( VipsInfo *vi, PElement *out )
 		g_object_unref( vi );
 		return( NULL );
 	}
+
+	/* We have to show args after gather, since the tracer wants IMAGE not
+	 * Imageinfo.
+	 */
+#ifdef DEBUG
+{
+	int i;
+
+	for( i = 0; i < vi->fn->argc; i++ ) {
+		im_type_desc *ty = vi->fn->argv[i].desc;
+
+		char txt[512];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
+
+		printf( "vips_fill_spine: arg[%d] (%s) = ", i, ty->type );
+		vips_tochar_trace( vi, i, &buf );
+		printf( "%s\n", vips_buf_all( &buf ) );
+	}
+}
+#endif /*DEBUG*/
 
 	/* Is this function call in the history?
 	 */

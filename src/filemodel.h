@@ -58,6 +58,8 @@ struct _Filemodel {
 	int major;
 	int minor;
 	int micro;
+
+	iWindow *window_hint;	/* Our views set this as a hint */
 };
 
 typedef struct _FilemodelClass {
@@ -92,6 +94,8 @@ void *filemodel_top_load( Filemodel *filemodel,
 
 void filemodel_set_filename( Filemodel *filemodel, const char *filename );
 void filemodel_set_modified( Filemodel *filemodel, gboolean state );
+void filemodel_set_window_hint( Filemodel *filemodel, iWindow *iwnd );
+iWindow *filemodel_get_window_hint( Filemodel *filemodel );
 
 GType filemodel_get_type( void );
 

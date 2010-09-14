@@ -259,7 +259,7 @@ main_print_ws( Workspace *ws, gboolean *found )
 }
 
 /* Clean up our application and quit. Not interactive! Do any "has been
- * modified, OK to quit?" stuff before this.
+ * modified, OK to quit?" stuff before this, see main_quit_test().
  */
 static void
 main_quit( void )

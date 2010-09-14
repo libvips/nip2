@@ -119,6 +119,21 @@ filemodel_set_modified( Filemodel *filemodel, gboolean modified )
 		filemodel_class->set_modified( filemodel, modified );
 }
 
+void 
+filemodel_set_window_hint( Filemodel *filemodel, iWindow *iwnd )
+{
+	filemodel->window_hint = iwnd;
+}
+
+iWindow * 
+filemodel_get_window_hint( Filemodel *filemodel )
+{
+	if( filemodel->window_hint )
+		return( filemodel->window_hint );
+	else
+		return( IWINDOW( main_window_top ) );
+}
+
 gboolean
 filemodel_save_all( Filemodel *filemodel, const char *filename )
 {
@@ -394,6 +409,8 @@ filemodel_init( Filemodel *filemodel )
 	filemodel->major = MAJOR_VERSION;
 	filemodel->minor = MINOR_VERSION;
 	filemodel->micro = MICRO_VERSION;
+
+	filemodel->window_hint = NULL;
 }
 
 GtkType
@@ -885,7 +902,8 @@ filemodel_inter_close_registered_cb( iWindow *iwnd, void *client,
 			filemodel_inter_close_registered_cb, 
 			iwnd, client, nfn, sys );
 
-		filemodel_inter_savenclose_cb( iwnd, filemodel, 
+		filemodel_inter_savenclose_cb( 
+			filemodel_get_window_hint( filemodel ), filemodel, 
 			iwindow_susp_comp, susp );
 	}
 	else

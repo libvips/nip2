@@ -1,6 +1,8 @@
 - when we display a popup, uniconise and pop the parent window to the front,
   eg. ^Q dialogs
 
+- do we check the return value of vips_spine(), vips_run(), vipsva()
+  everywhere? they no longer throw errors
 
 - vips_call should work for RW image args
 

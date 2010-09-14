@@ -136,9 +136,9 @@ gboolean vips_type_makes_output( im_type_desc *ty );
 gboolean vips_is_callable( im_function *fn );
 int vips_n_args( im_function *fn );
 void vips_usage( VipsBuf *buf, im_function *fn );
-gboolean vips_spine( Reduce *rc, 
+void vips_spine( Reduce *rc, 
 	const char *name, HeapNode **arg, PElement *out );
-gboolean vips_run( Reduce *rc, Compile *compile,
+void vips_run( Reduce *rc, Compile *compile,
 	int op, const char *name, HeapNode **arg, PElement *out,
 	im_function *function );
-gboolean vipsva( Reduce *rc, PElement *out, const char *name, ... );
+void vipsva( Reduce *rc, PElement *out, const char *name, ... );

@@ -1258,7 +1258,7 @@ vipsva_sub( VipsInfo *vi, PElement *out, va_list ap )
 
 /* Call a VIPS function picking up args from the function call.
  */
-gboolean
+void
 vipsva( Reduce *rc, PElement *out, const char *name, ... )
 {
 	va_list ap;
@@ -1266,7 +1266,7 @@ vipsva( Reduce *rc, PElement *out, const char *name, ... )
 	gboolean res;
 
 	if( !(vi = vips_new( rc, im_find_function( name ) )) )
-		return( FALSE );
+		reduce_throw( rc );
 
 	if( trace_flags & TRACE_VIPS ) 
 		trace_push();
@@ -1288,7 +1288,8 @@ vipsva( Reduce *rc, PElement *out, const char *name, ... )
 	printf( "vipsva: success\n" );
 #endif /*DEBUG*/
 
-	return( res );
+	if( !res )
+		reduce_throw( rc );
 }
 
 /* Fill an argument vector from our stack frame. Number of args already
@@ -1362,7 +1363,7 @@ vips_spine_sub( VipsInfo *vi, PElement *out, HeapNode **arg )
 
 /* Call a VIPS function, pick up args from the graph. 
  */
-gboolean
+void
 vips_spine( Reduce *rc, const char *name, HeapNode **arg, PElement *out )
 {
 	VipsInfo *vi;
@@ -1372,7 +1373,7 @@ vips_spine( Reduce *rc, const char *name, HeapNode **arg, PElement *out )
 #endif /*DEBUG*/
 
 	if( !(vi = vips_new( rc, im_find_function( name ) )) )
-		return( FALSE );
+		reduce_throw( rc );
 
 	if( trace_flags & TRACE_VIPS ) {
 		VipsBuf *buf = trace_push();
@@ -1382,7 +1383,7 @@ vips_spine( Reduce *rc, const char *name, HeapNode **arg, PElement *out )
 	}
 
 	if( !vips_spine_sub( vi, out, arg ) )
-		return( FALSE );
+		reduce_throw( rc );
 
 	if( trace_flags & TRACE_VIPS ) {
 		trace_result( TRACE_VIPS, out );
@@ -1392,13 +1393,11 @@ vips_spine( Reduce *rc, const char *name, HeapNode **arg, PElement *out )
 #ifdef DEBUG
 	printf( "vips_spine: success\n" );
 #endif /*DEBUG*/
-
-	return( TRUE );
 }
 
 /* As an ActionFn.
  */
-gboolean
+void
 vips_run( Reduce *rc, Compile *compile,
 	int op, const char *name, HeapNode **arg, PElement *out,
 	im_function *function )
@@ -1410,7 +1409,7 @@ vips_run( Reduce *rc, Compile *compile,
 #endif /*DEBUG*/
 
 	if( !(vi = vips_new( rc, function )) )
-		return( FALSE );
+		reduce_throw( rc );
 
 	if( trace_flags & TRACE_VIPS ) {
 		VipsBuf *buf = trace_push();
@@ -1420,12 +1419,10 @@ vips_run( Reduce *rc, Compile *compile,
 	}
 
 	if( !vips_spine_sub( vi, out, arg ) )
-		return( FALSE );
+		reduce_throw( rc );
 
 	if( trace_flags & TRACE_VIPS ) {
 		trace_result( TRACE_VIPS, out );
 		trace_pop();
 	}
-
-	return( TRUE );
 }

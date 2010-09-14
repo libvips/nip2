@@ -753,6 +753,12 @@ iwindow_real_build( GtkWidget *widget )
 			GTK_OBJECT( iwnd->parent_window ), 
 			"unmap",
 			GTK_SIGNAL_FUNC( iwindow_parent_unmap_cb ), iwnd );
+
+		/* Show the parent. For example, if this is the ^Q
+		 * save-or-quit dialog and the parent is a mainw, we want to
+		 * pop the mainw up.
+		 */
+		gtk_window_present( GTK_WINDOW( iwnd->parent_window ) );
 	}
 
         gtk_widget_show( iwnd->work );

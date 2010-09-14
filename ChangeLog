@@ -9,6 +9,7 @@ started 7.23.0, 2/8/10
   display popups on the right window
 - split vips_call.c to vips_call / vips_cache
 - start adding IM_TYPE_RW support to vips_call.c
+- gtk_window_present() parents when we show children in iwindow.c
 
 started 7.22.2, 5/7/10
 - show nthreads in space free tooltip

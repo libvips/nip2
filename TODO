@@ -1,8 +1,27 @@
+- currently, vips_fill_spine() and friends do:
 
-- do we check the return value of vips_spine(), vips_run(), vipsva()
-  everywhere? they no longer throw errors
+	for each arg:
+		arg makes output?
+			vips_build_output()
+		arg needs input?
+			vips_fromip():
+				copy the ii into vargv
 
+  and vips_fillva() does the same, but calls
+  vips_build_inputva() not vips_fromip()
 
+  vips_build_output() will init the vargv slot with a "p" image, vips_fromip()
+  will overwrite that with the imageinfo from nip2
+
+  instead of overwriting, we need to im_copy() the imageinfo to the image
+
+  this will cause problems for vips_gather(), reexamine that
+
+  can we be certain the imageinfo will stay alive long enough?
+
+  the "p" image will need to have an eval progress thing attached, when does
+  this happen? when we wrap the result back in an imageinfo again? too late
+  for im_draw_circle() and friends
 
 
 - vips_call should work for RW image args
@@ -10,12 +29,6 @@
   as part of nip->vips, make a "t" image and copy to that
 
   can just return that image for output
-
-  but! how do we spot RW images? there's no clue in the type
-
-  need a new flag value I think meaning INPUT and OUTPUT
- 
-  or maybe make INPUT explicit? but we'd break compat
 
 
 

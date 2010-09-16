@@ -126,6 +126,7 @@ extern GSList *vips_info_all;
 
 VipsArgumentType vips_lookup_type( im_arg_type type );
 void vips_error( VipsInfo *vi );
+void vips_error_toomany( VipsInfo *vi );
 
 GType vips_info_get_type( void );
 

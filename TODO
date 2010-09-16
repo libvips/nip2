@@ -1,3 +1,19 @@
+- perhaps we shouldn't store imageinfo pointers in vargv :-( it's pretty poor
+  style
+
+  like outii, have a separate array of input images? then _gather() fills
+  vargv from that with extra im_copy magic as required
+
+  oh haha we have inii[], perhaps we should just use that
+
+  currently we save the ii in vargv during fill_spine etc., then vips_gather
+  walks vargv and fills inii[]
+
+  actually, I think it's OK as it is, it's hard to record the ii otherwise
+
+  
+
+
 - currently, vips_fill_spine() and friends do:
 
 	for each arg:
@@ -22,6 +38,29 @@
   the "p" image will need to have an eval progress thing attached, when does
   this happen? when we wrap the result back in an imageinfo again? too late
   for im_draw_circle() and friends
+
+
+
+
+  vips_build_output() has
+
+	case VIPS_IMAGE:
+		if( !temp_name( tname, "v" ) || 
+			!(vi->vargv[i] = im_open( tname, "p" )) ) {
+			vips_error( vi );
+			return( FALSE );
+		}
+		break;
+
+  instead, make a temp ii and put that pointer in there
+
+  unref when we free the spine ... saves the annoying NULL-ing out of the
+  pointer when we copy the IMAGE* outo
+
+  argh, this really would be better with a separate array for all the iis
+
+
+
 
 
 - vips_call should work for RW image args

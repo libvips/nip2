@@ -678,6 +678,11 @@ vips_gather( VipsInfo *vi )
 				vi->ninii += 1;
 			}
 		}
+
+		if( vi->ninii > MAX_VIPS_ARGS - 1 ) {
+			vips_error_toomany( vi );
+			return( FALSE );
+		}
 	}
 
 	/* No input images.
@@ -771,6 +776,10 @@ vips_wrap_output( VipsInfo *vi )
 		/* Record on output ii table.
 		 */
 		vi->outii[vi->noutii++] = outii;
+		if( vi->noutii > MAX_VIPS_ARGS - 1 ) {
+			vips_error_toomany( vi );
+			return( FALSE );
+		}
 	}
 
 	return( TRUE );

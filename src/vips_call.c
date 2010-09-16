@@ -89,33 +89,6 @@ vips_check_all_destroyed( void )
 #endif /*DEBUG_LEAK*/
 }
 
-/* Error early on .. we can't print args yet.
- */
-void
-vips_error( VipsInfo *vi )
-{
-	error_top( _( "VIPS library error." ) );
-	error_sub( _( "Error calling library function \"%s\" (%s)." ), 
-		vi->name, vi->fn->desc );
-}
-
-/* Look up a VIPS type. 
- */
-VipsArgumentType
-vips_lookup_type( im_arg_type type )
-{
-	int i;
-
-	for( i = 0; i < IM_NUMBER( vips_supported ); i++ )
-		if( strcmp( type, vips_supported[i] ) == 0 )
-			return( (VipsArgumentType) i );
-
-	error_top( _( "Unknown type." ) );
-	error_sub( _( "VIPS type \"%s\" not supported" ), type );
-
-	return( VIPS_NONE );
-}
-
 /* Does a vips argument type require an argument from nip2?
  */
 gboolean
@@ -149,6 +122,16 @@ vips_type_makes_output( im_type_desc *ty )
 		return( TRUE );
 
 	return( FALSE );
+}
+
+/* Error early on .. we can't print args yet.
+ */
+void
+vips_error( VipsInfo *vi )
+{
+	error_top( _( "VIPS library error." ) );
+	error_sub( _( "Error calling library function \"%s\" (%s)." ), 
+		vi->name, vi->fn->desc );
 }
 
 /* Get the args from the heap.
@@ -273,6 +256,41 @@ vips_error_arg( VipsInfo *vi, HeapNode **arg, int argi )
 	vips_buf_appendf( &buf, "\n" );
 	vips_usage( &buf, vi->fn );
 	error_sub( "%s", vips_buf_all( &buf ) );
+}
+
+/* Too many args.
+ */
+void
+vips_error_toomany( VipsInfo *vi )
+{
+	char txt[1000];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
+
+	error_top( _( "Too many arguments." ) );
+
+	vips_buf_appendf( &buf,
+		_( "Too many arguments to \"%s\"." ),
+		vi->name );
+	vips_buf_appendf( &buf, "\n" );
+	vips_usage( &buf, vi->fn );
+	error_sub( "%s", vips_buf_all( &buf ) );
+}
+
+/* Look up a VIPS type. 
+ */
+VipsArgumentType
+vips_lookup_type( im_arg_type type )
+{
+	int i;
+
+	for( i = 0; i < IM_NUMBER( vips_supported ); i++ )
+		if( strcmp( type, vips_supported[i] ) == 0 )
+			return( (VipsArgumentType) i );
+
+	error_top( _( "Unknown type." ) );
+	error_sub( _( "VIPS type \"%s\" not supported" ), type );
+
+	return( VIPS_NONE );
 }
 
 /* Is this the sort of VIPS function we can call?

@@ -410,7 +410,7 @@ vips_make_intvec( im_intvec_object *dv, int n, double *vec )
 /* Make an im_imagevec_object.
  */
 static int
-vips_make_imagevec( im_imagevec_object *iv, int n, IMAGE **vec )
+vips_make_imagevec( im_imagevec_object *iv, int n )
 {
 	int i;
 
@@ -421,7 +421,7 @@ vips_make_imagevec( im_imagevec_object *iv, int n, IMAGE **vec )
 		if( !(iv->vec = IARRAY( NULL, n, IMAGE * )) )
 			return( -1 );
 		for( i = 0; i < n; i++ )
-			iv->vec[i] = vec[i];
+			iv->vec[i] = NULL;
 	}
 
 	return( 0 );
@@ -439,11 +439,12 @@ vips_add_input_ii( VipsInfo *vi, Imageinfo *ii )
 
 	vi->inii[vi->ninii] = ii;
 	vi->ninii += 1;
-	managed_dup_nonheap( MANAGED( ii ) );
 
-	// need to managed_destroy_nonheap() when we junk a VipsInfo
-	// also, should we attach signals here? what do we do in
-	// vips_gather()?
+	/* We don't ref the iis, they can't go away while we build vargv
+	 * (we've already reduced all the arguments) and in any case we want
+	 * weakrefs: we want to remove this VipsInfo from history if any of
+	 * the iis we use are junked.
+	 */
 
 	return( TRUE );
 }
@@ -520,20 +521,13 @@ vips_fromip( VipsInfo *vi, int i, PElement *arg )
 	}
 
 	case VIPS_IMAGE:
-	{
-		/* Put Imageinfo in for now ... a later pass changes this to
-		 * IMAGE* once we've checked all the LUTs.
+		/* Just note the Imageinfo for now ... a later pass sets vargv 
+		 * once we've checked all the LUTs.
 		 */
-		Imageinfo **im = (Imageinfo **) obj;
-
-		if( !PEISIMAGE( arg ) )
+		if( !PEISIMAGE( arg ) ||
+			!vips_add_input_ii( vi, IMAGEINFO( PEGETII( arg ) ) ) )
 			return( FALSE );
-
-		/* Do an IMAGEINFO() as well as GETII to validate the pointer.
-		 */
-		*im = IMAGEINFO( PEGETII( arg ) );
 		break;
-	}
 
 	case VIPS_DOUBLEVEC:
 	{
@@ -563,13 +557,18 @@ vips_fromip( VipsInfo *vi, int i, PElement *arg )
 	{
 		Imageinfo *buf[MAX_VEC];
 		int n;
+		int i;
 
 		/* Put Imageinfo in for now ... a later pass changes this to
 		 * IMAGE* once we've checked all the LUTs.
 		 */
 		if( (n = heap_get_imagevec( arg, buf, MAX_VEC )) < 0 ||
-			vips_make_imagevec( *obj, n, (IMAGE **) buf ) )
+			vips_make_imagevec( *obj, n ) )
 			return( FALSE );
+
+		for( i = 0; i < n; i++ )
+			if( !vips_add_input_ii( vi, buf[i] ) )
+				return( FALSE );
 
 		break;
 	}
@@ -789,7 +788,6 @@ static void
 vips_info_dispose( GObject *gobject )
 {
 	VipsInfo *vi;
-	int i;
 
 	g_return_if_fail( gobject != NULL );
 	g_return_if_fail( IS_VIPS_INFO( gobject ) );
@@ -804,15 +802,6 @@ vips_info_dispose( GObject *gobject )
 	/* Are we in the history? Remove us.
 	 */
 	vips_history_remove( vi ); 
-
-	/* Remove signals.
-	 */
-	for( i = 0; i < vi->noutii; i++ ) 
-		FREESID( vi->outii_destroy_sid[i], vi->outii[i] ); 
-	for( i = 0; i < vi->ninii; i++ ) {
-		FREESID( vi->inii_destroy_sid[i], vi->inii[i] ); 
-		FREESID( vi->inii_invalidate_sid[i], vi->inii[i] ); 
-	}
 
 	G_OBJECT_CLASS( parent_class )->dispose( gobject );
 }
@@ -1116,26 +1105,34 @@ static gboolean
 vips_build_inputva( VipsInfo *vi, int i, va_list ap )
 {
 	im_type_desc *ty = vi->fn->argv[i].desc;
-	VipsArgumentType vt = vips_lookup_type( ty->type );
 
-	if( vt == VIPS_DOUBLE ) {
+	switch( vips_lookup_type( ty->type ) ) {
+	case VIPS_DOUBLE:
+	{
 		double v = va_arg( ap, double );
 
 		*((double*)vi->vargv[i]) = v;
 
 		if( trace_flags & TRACE_VIPS ) 
 			vips_buf_appendf( trace_current(), "%g ", v );
+
+		break;
 	}
-	else if( vt == VIPS_INT ) {
+
+	case VIPS_INT:
+	{
 		int v = va_arg( ap, int );
 
 		*((int*)vi->vargv[i]) = v;
 
 		if( trace_flags & TRACE_VIPS ) 
 			vips_buf_appendf( trace_current(), "%d ", v );
+
+		break;
 	}
 
-	else if( vt == VIPS_GVALUE ) {
+	case VIPS_GVALUE:
+	{
 		GValue *value = va_arg( ap, GValue * );
 
 		vi->vargv[i] = value;
@@ -1144,9 +1141,12 @@ vips_build_inputva( VipsInfo *vi, int i, va_list ap )
 			vips_buf_appendgv( trace_current(), value );
 			vips_buf_appends( trace_current(), " " );
 		}
+
+		break;
 	}
 
-	else if( vt == VIPS_INTERPOLATE ) {
+	case VIPS_INTERPOLATE:
+	{
 		VipsInterpolate *value = 
 			va_arg( ap, VipsInterpolate * );
 
@@ -1157,12 +1157,16 @@ vips_build_inputva( VipsInfo *vi, int i, va_list ap )
 				trace_current() );
 			vips_buf_appends( trace_current(), " " );
 		}
+
+		break;
 	}
 
-	else if( vt == VIPS_IMAGE ) {
+	case VIPS_IMAGE:
+	{
 		Imageinfo *ii = va_arg( ap, Imageinfo * );
 
-		vi->vargv[i] = ii;
+		if( !vips_add_input_ii( vi, ii ) )
+			return( FALSE );
 
 		if( trace_flags & TRACE_VIPS ) {
 			VipsBuf *buf = trace_current();
@@ -1181,13 +1185,18 @@ vips_build_inputva( VipsInfo *vi, int i, va_list ap )
 				vips_buf_appends( buf, "> " );
 			}
 		}
+
+		break;
 	}
-	else if( vt == VIPS_DOUBLEVEC ) {
+
+	case VIPS_DOUBLEVEC:
+	{
 		int n = va_arg( ap, int );
 		double *vec = va_arg( ap, double * );
 
 		if( vips_make_doublevec( vi->vargv[i], n, vec ) )
 			return( FALSE );
+
 		if( trace_flags & TRACE_VIPS ) {
 			VipsBuf *buf = trace_current();
 			int i;
@@ -1198,19 +1207,28 @@ vips_build_inputva( VipsInfo *vi, int i, va_list ap )
 				vips_buf_appendf( buf, " %g", vec[i] );
 			vips_buf_appends( buf, "> " );
 		}
+
+		break;
 	}
+
 	/* 
 
 		FIXME ... add intvec perhaps
 
 	 */
-	else if( vt == VIPS_IMAGEVEC ) {
+
+	case VIPS_IMAGEVEC:
+	{
 		int n = va_arg( ap, int );
 		Imageinfo **vec = va_arg( ap, Imageinfo ** );
 
-		if( vips_make_imagevec( vi->vargv[i], 
-			n, (IMAGE **) vec ) )
+		if( vips_make_imagevec( vi->vargv[i], n ) )
 			return( FALSE );
+
+		for( i = 0; i < n; i++ )
+			if( !vips_add_input_ii( vi, vec[i] ) )
+				return( FALSE );
+
 		if( trace_flags & TRACE_VIPS ) {
 			VipsBuf *buf = trace_current();
 			int i;
@@ -1226,10 +1244,13 @@ vips_build_inputva( VipsInfo *vi, int i, va_list ap )
 			}
 			vips_buf_appends( buf, "> " );
 		}
+
+		break;
 	}
 
-	else
+	default:
 		g_assert( FALSE );
+	}
 
 	return( TRUE );
 }

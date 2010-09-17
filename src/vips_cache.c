@@ -106,8 +106,6 @@ vips_hash( VipsInfo *vi )
 
 			case VIPS_GVALUE:
 			case VIPS_INTERPOLATE:
-			case VIPS_IMAGE:
-				HASH_P( vi->vargv[i] );
 				break;
 
 			case VIPS_DOUBLEVEC:
@@ -178,24 +176,17 @@ vips_hash( VipsInfo *vi )
 				break;
 			}
 
-			case VIPS_IMAGEVEC:
-			{
-				im_imagevec_object *v = 
-					(im_imagevec_object *) vi->vargv[i];
-				int j;
-
-				for( j = 0; j < v->n; j++ )
-					HASH_P( v->vec[j] );
-
-				break;
-			}
-
 			default:
 			case VIPS_NONE:
 				break;
 			}
 		}
         }
+
+	/* And the input images.
+	 */
+	for( i = 0; i < vi->ninii; i++ )
+		HASH_P( vi->inii[i] );
 
 	vi->found_hash = TRUE;
 	vi->hash = hash;
@@ -246,11 +237,6 @@ vips_equal( VipsInfo *vi1, VipsInfo *vi2 )
 			case VIPS_STRING:
 				if( strcmp( (char *) vi1->vargv[i],
 					(char *) vi2->vargv[i] ) != 0 )
-					return( FALSE );
-				break;
-
-			case VIPS_IMAGE:
-				if( vi1->vargv[i] != vi2->vargv[i] )
 					return( FALSE );
 				break;
 
@@ -344,11 +330,9 @@ vips_equal( VipsInfo *vi1, VipsInfo *vi2 )
 					(im_imagevec_object *) vi1->vargv[i];
 				im_imagevec_object *v2 = 
 					(im_imagevec_object *) vi2->vargv[i];
-				int j;
 
-				for( j = 0; j < v1->n; j++ )
-					if( v1->vec[j] != v2->vec[j] )
-						return( FALSE );
+				if( v1->n != v2->n )
+					return( FALSE );
 
 				break;
 			}
@@ -373,6 +357,14 @@ vips_equal( VipsInfo *vi1, VipsInfo *vi2 )
 			}
 		}
         }
+
+	/* And the input images.
+	 */
+	if( vi1->ninii != vi2->ninii )
+		return( FALSE );
+	for( i = 0; i < vi1->ninii; i++ )
+		if( vi1->inii[i] != vi2->inii[i] )
+			return( FALSE );
 
 	return( TRUE );
 }
@@ -526,34 +518,14 @@ vips_history_touch( VipsInfo *vi )
 #endif /*DEBUG_HISTORY*/
 }
 
-static void
-vips_history_insert( VipsInfo *vi )
-{
-	g_assert( !g_hash_table_lookup( vips_history_table, vi ) );
-	g_assert( !vi->in_cache );
-
-	g_hash_table_insert( vips_history_table, vi, vi );
-	vips_history_size += 1;
-
-	g_assert( g_hash_table_lookup( vips_history_table, vi ) );
-
-	queue_add( vips_history_lru, vi );
-	vi->in_cache = TRUE;
-	g_object_ref( vi );
-
-#ifdef DEBUG_HISTORY_SANITY
-	vips_history_sanity();
-#endif /*DEBUG_HISTORY_SANITY*/
-#ifdef DEBUG_HISTORY
-	printf( "vips_history_insert: adding \"%s\"\n", vi->name );
-#endif /*DEBUG_HISTORY*/
-}
-
-/* Are we in the history? Remove us. Called from vips_info_dispose().
+/* Are we in the history? Remove us. Called from vips_info_dispose() on unref, 
+ * don't call this directly.
  */
 void
 vips_history_remove( VipsInfo *vi )
 {
+	int i;
+
 	if( vi->in_cache ) {
 		queue_remove( vips_history_lru, vi );
 		g_hash_table_remove( vips_history_table, vi );
@@ -563,6 +535,15 @@ vips_history_remove( VipsInfo *vi )
 #ifdef DEBUG_HISTORY
 		printf( "vips_history_remove: removing \"%s\"\n", vi->name );
 #endif /*DEBUG_HISTORY*/
+	}
+
+	/* Disconnect signals.
+	 */
+	for( i = 0; i < vi->noutii; i++ ) 
+		FREESID( vi->outii_destroy_sid[i], vi->outii[i] ); 
+	for( i = 0; i < vi->ninii; i++ ) {
+		FREESID( vi->inii_destroy_sid[i], vi->inii[i] ); 
+		FREESID( vi->inii_invalidate_sid[i], vi->inii[i] ); 
 	}
 
 #ifdef DEBUG_HISTORY_SANITY
@@ -617,12 +598,26 @@ vips_history_add( VipsInfo *vi )
 {
 	int i;
 
+#ifdef DEBUG_HISTORY_SANITY
+	vips_history_sanity();
+#endif /*DEBUG_HISTORY_SANITY*/
+
 #ifdef DEBUG_HISTORY
 	printf( "vips_history_add: adding \"%s\" (%p), hash = %u\n", 
 		vi->name, vi, vi->hash );
 #endif /*DEBUG_HISTORY*/
 
-	vips_history_insert( vi );
+	g_assert( !g_hash_table_lookup( vips_history_table, vi ) );
+	g_assert( !vi->in_cache );
+
+	g_hash_table_insert( vips_history_table, vi, vi );
+	vips_history_size += 1;
+
+	g_assert( g_hash_table_lookup( vips_history_table, vi ) );
+
+	queue_add( vips_history_lru, vi );
+	vi->in_cache = TRUE;
+	g_object_ref( vi );
 
 	/* If any of our ii are destroyed, we must go too.
 	 */
@@ -647,6 +642,10 @@ vips_history_add( VipsInfo *vi )
 	 */
 	if( queue_length( vips_history_lru ) > VIPS_HISTORY_MAX ) 
 		vips_history_remove_lru();
+
+#ifdef DEBUG_HISTORY_SANITY
+	vips_history_sanity();
+#endif /*DEBUG_HISTORY_SANITY*/
 }
 
 /* Sort out the input images. 
@@ -655,35 +654,7 @@ static gboolean
 vips_gather( VipsInfo *vi ) 
 {
 	int i, j;
-
-	/* Find all the input images.
-	 */
-	for( i = 0; i < vi->fn->argc; i++ ) {
-		im_type_desc *ty = vi->fn->argv[i].desc;
-
-		if( !vips_type_needs_input( ty ) ) 
-			continue;
-
-		if( strcmp( ty->type, IM_TYPE_IMAGE ) == 0 ) {
-			vi->inii[vi->ninii] = vi->vargv[i];
-			vi->ninii += 1;
-		}
-
-		if( strcmp( ty->type, IM_TYPE_IMAGEVEC ) == 0 ) {
-			im_imagevec_object *iv = 
-				(im_imagevec_object *) vi->vargv[i];
-
-			for( j = 0; j < iv->n; j++ ) {
-				vi->inii[vi->ninii] = IMAGEINFO( iv->vec[j] );
-				vi->ninii += 1;
-			}
-		}
-
-		if( vi->ninii > MAX_VIPS_ARGS - 1 ) {
-			vips_error_toomany( vi );
-			return( FALSE );
-		}
-	}
+	int ni;
 
 	/* No input images.
 	 */
@@ -703,6 +674,7 @@ vips_gather( VipsInfo *vi )
 
 	/* Now zap the vargv vector with the correct IMAGE pointers.
 	 */
+	ni = 0;
 	for( i = 0; i < vi->fn->argc; i++ ) {
 		im_type_desc *ty = vi->fn->argv[i].desc;
 
@@ -711,7 +683,7 @@ vips_gather( VipsInfo *vi )
 
 		if( strcmp( ty->type, IM_TYPE_IMAGE ) == 0 ) { 
 			if( !(vi->vargv[i] = 
-				imageinfo_get( vi->use_lut, vi->vargv[i] )) )
+				imageinfo_get( vi->use_lut, vi->inii[ni++] )) )
 				return( FALSE );
 		}
 
@@ -722,15 +694,16 @@ vips_gather( VipsInfo *vi )
 			/* Found an input image vector. Add all the imageinfo
 			 * in the vector.
 			 */
-			for( j = 0; j < iv->n; j++ ) {
-				Imageinfo *ii = IMAGEINFO( iv->vec[j] );
-
+			for( j = 0; j < iv->n; j++ ) 
 				if( !(iv->vec[j] = imageinfo_get( 
-					vi->use_lut, ii )) )
+					vi->use_lut, vi->inii[ni++] )) )
 					return( FALSE );
-			}
 		}
 	}
+
+	/* We should have used up all the images exactly.
+	 */
+	g_assert( ni == vi->ninii );
 
 	return( TRUE );
 }
@@ -1111,7 +1084,7 @@ vips_dispatch( VipsInfo *vi, PElement *out )
 	 */
 	(void) vips_hash( vi );
 
-	/* Look over the images we have ... turn input Imageinfo to IMAGE.
+	/* Look over the images we have and turn input Imageinfos to IMAGEs.
 	 * If we can do this with a lut, set all that up.
 	 */
 	if( !vips_gather( vi ) ) {

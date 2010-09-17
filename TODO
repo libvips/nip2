@@ -9,7 +9,10 @@
   currently we save the ii in vargv during fill_spine etc., then vips_gather
   walks vargv and fills inii[]
 
-  actually, I think it's OK as it is, it's hard to record the ii otherwise
+
+
+
+
 
   
 

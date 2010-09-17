@@ -427,12 +427,35 @@ vips_make_imagevec( im_imagevec_object *iv, int n, IMAGE **vec )
 	return( 0 );
 }
 
+/* Add another ii to inii.
+ */
+static gboolean
+vips_add_input_ii( VipsInfo *vi, Imageinfo *ii )
+{
+	if( vi->ninii > MAX_VIPS_ARGS ) {
+		vips_error_toomany( vi );
+		return( FALSE );
+	}
+
+	vi->inii[vi->ninii] = ii;
+	vi->ninii += 1;
+	managed_dup_nonheap( MANAGED( ii ) );
+
+	// need to managed_destroy_nonheap() when we junk a VipsInfo
+	// also, should we attach signals here? what do we do in
+	// vips_gather()?
+
+	return( TRUE );
+}
+
 /* ip types -> VIPS types. Write to obj. FALSE for no conversion possible.
  */
 static gboolean
-vips_fromip( PElement *arg, im_type_desc *ty, im_object *obj )
+vips_fromip( VipsInfo *vi, int i, PElement *arg )
 {
+	im_type_desc *ty = vi->fn->argv[i].desc;
 	VipsArgumentType vt = vips_lookup_type( ty->type );
+	im_object *obj = &vi->vargv[i];
 
 	/* If vips_lookup_type failed, is it the special DISPLAY type?
 	 */
@@ -1341,7 +1364,7 @@ vips_fill_spine( VipsInfo *vi, HeapNode **arg )
 			/* Special DISPLAY argument - don't fetch another ip
 			 * argument for it.
 			 */
-			(void) vips_fromip( NULL, ty, &vi->vargv[i] );
+			(void) vips_fromip( vi, i, NULL );
 		}
 
 		if( vips_type_needs_input( ty ) ) {
@@ -1350,7 +1373,7 @@ vips_fill_spine( VipsInfo *vi, HeapNode **arg )
 			/* Convert ip type to VIPS type.
 			 */
 			PEPOINTRIGHT( arg[vi->nargs - j - 1], &rhs );
-			if( !vips_fromip( &rhs, ty, &vi->vargv[i] ) ) {
+			if( !vips_fromip( vi, i, &rhs ) ) {
 				vips_error_arg( vi, arg, j );
 				return( FALSE );
 			}

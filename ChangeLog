@@ -8,7 +8,8 @@ started 7.23.0, 2/8/10
 - added filemodel_set_window_hint() and filemodel_get_window_hint() to help ^Q
   display popups on the right window
 - split vips_call.c to vips_call / vips_cache
-- start adding IM_TYPE_RW support to vips_call.c
+- added IM_TYPE_RW support to vips_call.c: you can call paintbox operations
+  directly now
 - gtk_window_present() parents when we show children in iwindow.c
 
 started 7.22.2, 5/7/10

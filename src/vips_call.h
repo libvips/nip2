@@ -115,6 +115,10 @@ typedef struct _VipsInfo {
 	/* Set if we're in the history cache.
 	 */
 	gboolean in_cache;
+
+	/* Sanity check ref drops.
+	 */
+	gboolean must_drop;
 } VipsInfo;
 
 typedef struct _VipsInfoClass {

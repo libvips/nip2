@@ -672,7 +672,11 @@ vips_gather( VipsInfo *vi )
 		imageinfo_get_underlying( vi->inii[0] )->BandFmt == 
 			IM_BANDFMT_UCHAR;
 
-	/* Now zap the vargv vector with the correct IMAGE pointers.
+	if( vi->use_lut ) 
+		for( i = 0; i < vi->noutii; i++ )
+			imageinfo_set_underlying( vi->outii[i], vi->inii[0] );
+
+	/* Now fill the vargv vector with the IMAGE pointers.
 	 */
 	ni = 0;
 	for( i = 0; i < vi->fn->argc; i++ ) {
@@ -682,9 +686,21 @@ vips_gather( VipsInfo *vi )
 			continue;
 
 		if( strcmp( ty->type, IM_TYPE_IMAGE ) == 0 ) { 
-			if( !(vi->vargv[i] = 
-				imageinfo_get( vi->use_lut, vi->inii[ni++] )) )
+			Imageinfo *inii = vi->inii[ni++];
+			IMAGE *im;
+
+			if( !(im = imageinfo_get( vi->use_lut, inii )) )
 				return( FALSE );
+
+			/* RW operations need an extra copy. Tyhe vargv will
+			 * already have been created by vips_build_output().
+			 */
+			if( ty->flags & IM_TYPE_RW ) {
+				if( im_copy( im, vi->vargv[i] ) )
+					return( FALSE );
+			}
+			else
+				vi->vargv[i] = im; 
 		}
 
 		if( strcmp( ty->type, IM_TYPE_IMAGEVEC ) == 0 ) {
@@ -694,66 +710,21 @@ vips_gather( VipsInfo *vi )
 			/* Found an input image vector. Add all the imageinfo
 			 * in the vector.
 			 */
-			for( j = 0; j < iv->n; j++ ) 
-				if( !(iv->vec[j] = imageinfo_get( 
-					vi->use_lut, vi->inii[ni++] )) )
+			for( j = 0; j < iv->n; j++ ) {
+				Imageinfo *inii = vi->inii[ni++];
+				IMAGE *im;
+
+				if( !(im = imageinfo_get( vi->use_lut, inii )) )
 					return( FALSE );
+
+				iv->vec[j] = im;
+			}
 		}
 	}
 
 	/* We should have used up all the images exactly.
 	 */
 	g_assert( ni == vi->ninii );
-
-	return( TRUE );
-}
-
-/* Loop over the output IMAGEs, transforming them into Imageinfo.
- */
-static gboolean
-vips_wrap_output( VipsInfo *vi )
-{
-	int i;
-
-	for( i = 0; i < vi->nres; i++ ) {
-		int j = vi->outpos[i];
-		IMAGE *im = (IMAGE *) vi->vargv[j];
-		im_type_desc *ty = vi->fn->argv[j].desc;
-		Imageinfo *outii;
-
-		if( vips_lookup_type( ty->type ) != VIPS_IMAGE )
-			continue;
-
-		if( !(outii = imageinfo_new( main_imageinfogroup, 
-			vi->rc->heap, im, NULL )) )
-			return( FALSE );
-		if( vi->use_lut ) 
-			imageinfo_set_underlying( outii, vi->inii[0] );
-
-		/* This output ii depends upon all of the input images.
-		 */
-		managed_sub_add_all( MANAGED( outii ), 
-			vi->ninii, (Managed **) vi->inii );
-
-		/* Junk the pointer in vargv to stop im_close() on vips end.
-		 */
-		vi->vargv[j] = NULL;
-
-		/* Rewind the image.
-		 */
-		if( im_pincheck( im ) ) {
-			vips_error( vi );
-			return( FALSE );
-		}
-
-		/* Record on output ii table.
-		 */
-		vi->outii[vi->noutii++] = outii;
-		if( vi->noutii > MAX_VIPS_ARGS - 1 ) {
-			vips_error_toomany( vi );
-			return( FALSE );
-		}
-	}
 
 	return( TRUE );
 }
@@ -786,8 +757,17 @@ vips_tochar_shell( VipsInfo *vi, int i, VipsBuf *buf )
 		break;
 
 	case VIPS_IMAGE:
-		vips_buf_appendf( buf, "%s", NN( ((IMAGE *) obj)->filename ) );
+{
+		IMAGE *im = (IMAGE *) obj;
+
+		/* In quotes, in case there are spaces in the
+		 * filename. We also need to test im, as we might be called
+		 * before the im has been generated.
+		 */
+		vips_buf_appendf( buf, "\"%s\"", im ? im->filename : "null" );
+
 		break;
+}
 
 	case VIPS_DMASK:
 	case VIPS_IMASK:
@@ -795,6 +775,7 @@ vips_tochar_shell( VipsInfo *vi, int i, VipsBuf *buf )
 		im_mask_object *mo = obj;
 
 		vips_buf_appendf( buf, "%s", NN( mo->name ) );
+
 		break;
 	}
 
@@ -1162,13 +1143,6 @@ vips_dispatch( VipsInfo *vi, PElement *out )
 			return( NULL );
 		}
 		vips_update_hist( vi );
-
-		/* Transform output IMAGE back into Imageinfo.
-		 */
-		if( !vips_wrap_output( vi ) ) {
-			g_object_unref( vi );
-			return( NULL );
-		}
 	}
 
 	/* Add to our operation cache, if necessary.

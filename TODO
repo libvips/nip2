@@ -1,76 +1,23 @@
-- perhaps we shouldn't store imageinfo pointers in vargv :-( it's pretty poor
-  style
+- test new vips_call stuff
 
-  like outii, have a separate array of input images? then _gather() fills
-  vargv from that with extra im_copy magic as required
+  maybe reread too
 
-  oh haha we have inii[], perhaps we should just use that
+- do we have eval progress for the setup phase of IM_TYPE_RW images? should
+  do, I hope
 
-  currently we save the ii in vargv during fill_spine etc., then vips_gather
-  walks vargv and fills inii[]
+- how about something that does:
 
+	  im' = operation_list [a, b, c, d] im
 
+  it does a fold:
 
+	  im' = d (c (b (a im)))
 
+  but the intermediate images are reused, so you can do in-place stuff with it
 
-
-  
-
-
-- currently, vips_fill_spine() and friends do:
-
-	for each arg:
-		arg makes output?
-			vips_build_output()
-		arg needs input?
-			vips_fromip():
-				copy the ii into vargv
-
-  and vips_fillva() does the same, but calls
-  vips_build_inputva() not vips_fromip()
-
-  vips_build_output() will init the vargv slot with a "p" image, vips_fromip()
-  will overwrite that with the imageinfo from nip2
-
-  instead of overwriting, we need to im_copy() the imageinfo to the image
-
-  this will cause problems for vips_gather(), reexamine that
-
-  can we be certain the imageinfo will stay alive long enough?
-
-  the "p" image will need to have an eval progress thing attached, when does
-  this happen? when we wrap the result back in an imageinfo again? too late
-  for im_draw_circle() and friends
+- move the old wrapped-for-nip2 inplace paintbox operations to deprecated
 
 
-
-
-  vips_build_output() has
-
-	case VIPS_IMAGE:
-		if( !temp_name( tname, "v" ) || 
-			!(vi->vargv[i] = im_open( tname, "p" )) ) {
-			vips_error( vi );
-			return( FALSE );
-		}
-		break;
-
-  instead, make a temp ii and put that pointer in there
-
-  unref when we free the spine ... saves the annoying NULL-ing out of the
-  pointer when we copy the IMAGE* outo
-
-  argh, this really would be better with a separate array for all the iis
-
-
-
-
-
-- vips_call should work for RW image args
-
-  as part of nip->vips, make a "t" image and copy to that
-
-  can just return that image for output
 
 
 

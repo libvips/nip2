@@ -811,8 +811,12 @@ vips_tochar_shell( VipsInfo *vi, int i, VipsBuf *buf )
 		int j;
 
 		vips_buf_appendf( buf, "\"" );
-		for( j = 0; j < v->n; j++ )
-			vips_buf_appendf( buf, "%s ", v->vec[j]->filename );
+		for( j = 0; j < v->n; j++ ) {
+			IMAGE *im = v->vec[j];
+
+			if( im )
+				vips_buf_appendf( buf, "%s ", im->filename );
+		}
 		vips_buf_appendf( buf, "\"" );
 
 		break;
@@ -870,7 +874,8 @@ vips_tochar_trace( VipsInfo *vi, int i, VipsBuf *buf )
 		break;
 
 	case VIPS_IMAGE:
-		vips_buf_appendi( buf, (IMAGE *) obj );
+		if( obj )
+			vips_buf_appendi( buf, (IMAGE *) obj );
 		break;
 
 	case VIPS_DMASK:

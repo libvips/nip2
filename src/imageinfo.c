@@ -1862,7 +1862,7 @@ imageinfo_paint_rect( Imageinfo *imageinfo, Imageinfo *ink, Rect *area )
 		return( FALSE );
 
 	if( im_draw_rect( im, 
-		area->left. area->top, area->width, area->height, 1, data ) ) {
+		area->left, area->top, area->width, area->height, 1, data ) ) {
 		error_vips_all();
 		return( FALSE );
 	}

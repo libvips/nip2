@@ -1799,7 +1799,7 @@ imageinfo_paint_flood( Imageinfo *imageinfo, Imageinfo *ink,
 	Rect dirty;
 	int result;
 
-	/* Save undo area. We have to save the entire image, as we don't know
+	/* Save undo area. We have to save the entire image since we don't know
 	 * how much the flood will change :(
 	 */
 	dirty.left = 0;
@@ -1861,7 +1861,8 @@ imageinfo_paint_rect( Imageinfo *imageinfo, Imageinfo *ink, Rect *area )
 	if( !imageinfo_undo_add( imageinfo, area ) )
 		return( FALSE );
 
-	if( im_paintrect( im, area, data ) ) {
+	if( im_draw_rect( im, 
+		area->left. area->top, area->width, area->height, 1, data ) ) {
 		error_vips_all();
 		return( FALSE );
 	}

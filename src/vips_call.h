@@ -116,7 +116,7 @@ typedef struct _VipsInfo {
 	 */
 	gboolean in_cache;
 
-	/* Sanity check ref drops.
+	/* Set if we hold refs in inii/outii that must be dropped.
 	 */
 	gboolean must_drop;
 } VipsInfo;

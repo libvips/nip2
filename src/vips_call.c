@@ -800,6 +800,33 @@ vips_write_result( VipsInfo *vi, PElement *out )
 	return( TRUE );
 }
 
+/* Junk all the refs we were holding during the call. See vips_add_input_ii() 
+ * and vips_add_output_ii().
+ *
+ * This gets called explicitly after we have handed the ii refs back to nip2
+ * during normal processing, or from _dispose() if we bomb out early and
+ * unref.
+ */
+static void
+vips_drop_refs( VipsInfo *vi )
+{
+	if( vi->must_drop ) {
+		int i;
+
+#ifdef DEBUG
+		printf( "vips_drop_refs: dropping %d in refs\n", vi->ninii );
+		printf( "vips_drop_refs: dropping %d out refs\n", vi->noutii );
+#endif /*DEBUG*/
+
+		for( i = 0; i < vi->ninii; i++ )
+			managed_destroy_nonheap( MANAGED( vi->inii[i] ) );
+		for( i = 0; i < vi->noutii; i++ )
+			managed_destroy_nonheap( MANAGED( vi->outii[i] ) );
+
+		vi->must_drop = FALSE;
+	}
+}
+
 static void
 vips_info_dispose( GObject *gobject )
 {
@@ -819,7 +846,9 @@ vips_info_dispose( GObject *gobject )
 	 */
 	vips_history_remove( vi ); 
 
-	g_assert( !vi->must_drop );
+	/* Drop any refs we may have left dangling.
+	 */
+	vips_drop_refs( vi );
 
 	G_OBJECT_CLASS( parent_class )->dispose( gobject );
 }
@@ -1292,9 +1321,12 @@ vips_build_inputva( VipsInfo *vi, int i, va_list ap )
 static gboolean
 vips_fillva( VipsInfo *vi, va_list ap )
 {
-	int i, j;
+	int i;
 
-	for( j = 0, i = 0; i < vi->fn->argc; i++ ) {
+	g_assert( vi->ninii == 0 );
+	g_assert( vi->noutii == 0 );
+
+	for( i = 0; i < vi->fn->argc; i++ ) {
 		im_type_desc *ty = vi->fn->argv[i].desc;
 
 #ifdef DEBUG
@@ -1327,29 +1359,12 @@ vips_fillva( VipsInfo *vi, va_list ap )
 		managed_sub_add_all( MANAGED( vi->outii[i] ), 
 			vi->ninii, (Managed **) vi->inii );
 
+#ifdef DEBUG
+	printf( "vips_fill_spine: reffed %d in\n", vi->ninii );
+	printf( "vips_fill_spine: created %d out\n", vi->noutii );
+#endif /*DEBUG*/
+
 	return( TRUE );
-}
-
-/* Junk all the refs we were holding during the call. See vips_add_input_ii() 
- * and vips_add_output_ii().
- */
-static void
-vips_drop_refs( VipsInfo *vi )
-{
-	int i;
-
-	/* We absoluely must *not* call this more than once (we'd drop refs
-	 * twice), and we must call this (or we'll leave dangling refs). It
-	 * needs to happen after the call, but can't happen in dispose.
-	 */
-	g_assert( vi->must_drop );
-
-	for( i = 0; i < vi->ninii; i++ )
-		managed_destroy_nonheap( MANAGED( vi->inii[i] ) );
-	for( i = 0; i < vi->noutii; i++ )
-		managed_destroy_nonheap( MANAGED( vi->outii[i] ) );
-
-	vi->must_drop = FALSE;
 }
 
 static gboolean
@@ -1386,7 +1401,11 @@ vipsva_sub( Reduce *rc, const char *name, PElement *out, va_list ap )
 	}
 
 	if( vi ) {
+		/* We must drop refs explicitly, since this unref might not
+		 * dispose the vi.
+		 */
 		vips_drop_refs( vi );
+
 		g_object_unref( vi );
 	}
 
@@ -1402,7 +1421,7 @@ vipsva( Reduce *rc, PElement *out, const char *name, ... )
 	gboolean result;
 
 #ifdef DEBUG
-	printf( "vipsva: starting for %s\n", name );
+	printf( "** vipsva: starting for %s\n", name );
 #endif /*DEBUG*/
 
         va_start( ap, name );
@@ -1424,6 +1443,9 @@ static gboolean
 vips_fill_spine( VipsInfo *vi, HeapNode **arg )
 {
 	int i, j;
+
+	g_assert( vi->ninii == 0 );
+	g_assert( vi->noutii == 0 );
 
 	/* Fully reduce all arguments. Once we've done this, we can be sure
 	 * there will not be a GC while we gather, and therefore that no
@@ -1472,6 +1494,11 @@ vips_fill_spine( VipsInfo *vi, HeapNode **arg )
 		managed_sub_add_all( MANAGED( vi->outii[i] ), 
 			vi->ninii, (Managed **) vi->inii );
 
+#ifdef DEBUG
+	printf( "vips_fill_spine: reffed %d inii\n", vi->ninii );
+	printf( "vips_fill_spine: created %d outii\n", vi->noutii );
+#endif /*DEBUG*/
+
 	return( TRUE );
 }
 
@@ -1483,7 +1510,7 @@ vips_spine_sub( Reduce *rc, const char *name, im_function *fn,
 	gboolean result;
 
 #ifdef DEBUG
-	printf( "vips_spine: starting for %s\n", name );
+	printf( "** vips_spine: starting for %s\n", name );
 #endif /*DEBUG*/
 
 	if( !(vi = vips_new( rc, fn )) )
@@ -1509,7 +1536,11 @@ vips_spine_sub( Reduce *rc, const char *name, im_function *fn,
 	}
 
 	if( vi ) {
+		/* We must drop refs explicitly, since this unref might not
+		 * dispose the vi.
+		 */
 		vips_drop_refs( vi );
+
 		g_object_unref( vi );
 	}
 

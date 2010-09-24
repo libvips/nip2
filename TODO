@@ -1,7 +1,4 @@
 
-- do we have eval progress for the setup phase of IM_TYPE_RW images? should
-  do, I hope
-
 - how about something that does:
 
 	  im' = operation_list [a, b, c, d] im
@@ -12,7 +9,13 @@
 
   but the intermediate images are reused, so you can do in-place stuff with it
 
-- move the old wrapped-for-nip2 inplace paintbox operations to deprecated
+  we could get rid of lineset!
+
+
+
+
+- in 7.22.2, 3x upscale of a bright image, bilinear, we get tile boundaries! 
+  argh
 
 
 

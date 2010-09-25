@@ -1,3 +1,10 @@
+- "nip2 ~/pics/babe.jpg", open image view window, ^Q in that window, segv
+
+Program received signal SIGSEGV, Segmentation fault.
+0x00000000004b2ab9 in imageview_popdown (iwnd=0xa5e1f0, client=0x0, 
+    nfn=0x4b8e9b <iwindow_popdown_notify>, sys=0xa5e1f0) at imageview.c:858
+858		iImage *iimage = imagemodel->iimage;
+    
 
 - how about something that does:
 

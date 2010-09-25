@@ -449,6 +449,8 @@ imagepresent_floating_new( Imagepresent *ip,
 	gboolean frozen, RegionviewType type, RegionviewResize resize,
 	int x, int y )
 {
+	g_assert( !ip->regionview );
+
 	ip->floating.left = left;
 	ip->floating.top = top;
 	ip->floating.width = width;
@@ -801,9 +803,16 @@ imagepresent_left_press( Imagepresent *ip, GdkEvent *ev, int x, int y )
 	IMAGE *im, *im2;
 	int ix, iy;
 
+	/* If there's a regionview grabbed already, block other actions. This
+	 * can happen with, for example, the win32 backend where we don't
+	 * always see a RELEASE for every PRESS.
+	 */
+	if( ip->regionview )
+		return( FALSE );
+
 	switch( imagemodel->state ) {
 	case IMAGEMODEL_SELECT:
-		if( !ip->regionview && ev->button.state & GDK_CONTROL_MASK ) {
+		if( ev->button.state & GDK_CONTROL_MASK ) {
 			im = imageinfo_get( FALSE, conv->ii );
 
 			imagepresent_snap_point( ip, x, y, &x, &y );

@@ -1,3 +1,5 @@
+- start nip2, Colour / New, duplicate ... segv!
+
 - "nip2 ~/pics/babe.jpg", open image view window, ^Q in that window, segv
 
 Program received signal SIGSEGV, Segmentation fault.

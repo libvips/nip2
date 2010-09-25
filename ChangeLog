@@ -13,6 +13,7 @@ started 7.23.0, 2/8/10
 - gtk_window_present() parents when we show children in iwindow.c
 - fix a crash with win32 and two PRESS on a window while in rect mode 
   (thanks M.v.Gulik)
+- fix a crash with duplicate Colour (thanks M.v.Gulik)
 
 started 7.22.2, 5/7/10
 - show nthreads in space free tooltip

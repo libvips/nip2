@@ -91,7 +91,10 @@ colour_get_vips_type( Colour *colour )
 	int type;
 	int i;
 
-	type = -1;
+	/* Default to something harmless.
+	 */
+	type = IM_TYPE_MULTIBAND;
+
 	if( colour->colour_space ) 
 		for( i = 0; i < IM_NUMBER( colour_colour_space ); i++ )
 			if( strcasecmp( colour->colour_space, 

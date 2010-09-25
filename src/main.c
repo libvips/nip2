@@ -293,14 +293,18 @@ main_quit( void )
 			main_error_exit( "%s", _( "no \"main\" found" ) );
 	}
 
-	/* Force all windows down. 
+	/* Force all our windows down.
 
-		FIXME 
+	iwindow_map_all( (iWindowMapFn) iwindow_kill, NULL );
 
-		this can cause a recursive call to us from mainw_destroy()
+		Actually, we don't do this now, it triggers problems with 
+		model/view shutdown: we can end up trying to popdown windows 
+		whose models have already gone
 
 	 */
-	iwindow_map_all( (iWindowMapFn) iwindow_kill, NULL );
+
+	/* Saves recent and stuff like that.
+	 */
 	mainw_shutdown();
 
 	/* Dump wisdom back again.

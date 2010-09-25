@@ -1,12 +1,37 @@
-- start nip2, Colour / New, duplicate ... segv!
-
 - "nip2 ~/pics/babe.jpg", open image view window, ^Q in that window, segv
+
+  ^Q in mainw is OK
+  File / Quit in image window is OK how odd
+  ^Q in image window is segv
+
+main_quit_test:
+imageview_destroy
+imagemodel_dispose 0xb3ee60: Imagemodel "A1" (0xb3ee60)
+imagemodel_finalize: Imagemodel "A1" (0xb3ee60)
+main_quit_test_cb:
+main_quit: cleaning up ...
 
 Program received signal SIGSEGV, Segmentation fault.
 0x00000000004b2ab9 in imageview_popdown (iwnd=0xa5e1f0, client=0x0, 
     nfn=0x4b8e9b <iwindow_popdown_notify>, sys=0xa5e1f0) at imageview.c:858
 858		iImage *iimage = imagemodel->iimage;
-    
+
+main_quit_test:
+imageview_destroy
+imagemodel_dispose 0xb38e60: Imagemodel "A1" (0xb38e60)
+imagemodel_finalize: Imagemodel "A1" (0xb38e60)
+imageview_destroy
+main_quit_test: recursive quit blocked
+main_quit_test_cb:
+main_quit: cleaning up ...
+DEBUG_LEAK: testing for leaks ...
+0 dirty renders
+main_quit: exit( 0 )
+[Thread 0x7fffe6f62710 (LWP 29737) exited]
+
+  
+
+
 
 - how about something that does:
 

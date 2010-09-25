@@ -61,6 +61,10 @@ floatwindow_popdown( GtkWidget *widget )
 	Floatwindow *floatwindow = FLOATWINDOW( widget );
 	Classmodel *classmodel = floatwindow->classmodel;
 
+#ifdef DEBUG
+	printf( "floatwindow_popdown\n" );
+#endif /*DEBUG*/
+
 	/* We have to note position/size in popdown rather than destroy, since
 	 * the widgets have to all still be extant.
 	 */

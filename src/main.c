@@ -294,14 +294,8 @@ main_quit( void )
 	}
 
 	/* Force all our windows down.
-
-	iwindow_map_all( (iWindowMapFn) iwindow_kill, NULL );
-
-		Actually, we don't do this now, it triggers problems with 
-		model/view shutdown: we can end up trying to popdown windows 
-		whose models have already gone
-
 	 */
+	iwindow_map_all( (iWindowMapFn) iwindow_kill, NULL );
 
 	/* Saves recent and stuff like that.
 	 */

@@ -550,6 +550,11 @@ iwindow_destroy( GtkObject *gobject )
 	 */
 	FREESID( iwnd->parent_unmap_sid, iwnd->parent_window );
 
+	/* Now we've destroyed, we must stop popdown from being called, since 
+	 * the view will have junked a lot of stuff.
+	 */
+	iwnd->destroy = TRUE;
+
 	GTK_OBJECT_CLASS( parent_class )->destroy( gobject );
 }
 

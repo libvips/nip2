@@ -4,6 +4,10 @@
   File / Quit in image window is OK how odd
   ^Q in image window is segv
 
+  why do we call window popdown after window destroy? if destroy drops the
+  model, popdown has nowhere to save stuff, and has no chance to cancel the
+  popdown anyway
+
 main_quit_test:
 imageview_destroy
 imagemodel_dispose 0xb3ee60: Imagemodel "A1" (0xb3ee60)

@@ -6,6 +6,13 @@
 
 - new inplace stuff needs a test suite
 
+- try experimental high-quality thumbnails pref
+
+- 'don't show this dialog again' on delete row dialog, also in prefs
+
+- show toolkit browser on startup?
+
+
 
 
 - how about something that does:

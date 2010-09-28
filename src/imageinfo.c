@@ -1742,7 +1742,8 @@ imageinfo_paint_line( Imageinfo *imageinfo, Imageinfo *ink,
 	if( !imageinfo_undo_add( imageinfo, &clipped ) ) 
 		return( FALSE );
 
-	if( im_fastlineuser( im, x1, y1, x2, y2, im_plotmask, data, 
+	if( im_draw_line_user( im, x1, y1, x2, y2, 
+		(VipsPlotFn) im_plotmask, data, 
 		imageinfo_brush_masks[nib], &imageinfo_brush_shapes[nib] ) ) {
 		error_vips_all();
 		return( FALSE );
@@ -1776,8 +1777,8 @@ imageinfo_paint_smudge( Imageinfo *imageinfo,
 
 	/* Smudge line connecting old and new points. 
 	 */
-	if( im_fastlineuser( im, x1, y1, x2, y2, im_smudge, 
-		oper, NULL, NULL ) ) {
+	if( im_draw_line_user( im, x1, y1, x2, y2, 
+		(VipsPlotFn) im_smudge, oper, NULL, NULL ) ) {
 		error_vips_all();
 		return( FALSE );
 	}

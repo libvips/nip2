@@ -10,12 +10,16 @@
 
 - 'don't show this dialog again' on delete row dialog, also in prefs
 
-- show toolkit browser on startup?
+  box_yesno() could take a string which is the name of a pref to check for
+  ask-or-not
 
 - show dependancy graph for workspace, see
 
 	http://www.graphviz.org/Gallery/directed/cluster.html
 
+  looks like we'd need to render to a file and display that, argh
+
+  but it seems graphviz should work on Windows
 
 
 

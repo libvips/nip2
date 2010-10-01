@@ -306,6 +306,11 @@ const char *watch_string_get( Watchgroup *,
 #define DISPLAY_THUMBNAIL \
 	(watch_int_get( main_watchgroup, "DISPLAY_THUMBNAIL", 64 ))
 
+/* High-quality thumbnails.
+ */
+#define DISPLAY_THUMBNAIL_HQ \
+	(watch_bool_get( main_watchgroup, "DISPLAY_THUMBNAIL_HQ", FALSE ))
+
 /* File stuff.
  */
 #define PIN_FILESEL \

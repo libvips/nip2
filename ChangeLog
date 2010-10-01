@@ -15,6 +15,7 @@ started 7.23.0, 2/8/10
   (thanks M.v.Gulik)
 - fix a crash with duplicate Colour (thanks M.v.Gulik)
 - fix an occasional crash with ^Q in imageview
+- added high-quality thumbnail option (thanks Martin)
 
 started 7.22.2, 5/7/10
 - show nthreads in space free tooltip

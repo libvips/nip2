@@ -4,13 +4,17 @@
 - instead of the fixed brushes we have now, let people dial up a brush
   diameter, with anti-aliasing
 
-- new inplace stuff needs a test suite
+- maybe another slider for brush fuzz?
 
-- try experimental high-quality thumbnails pref
+- new inplace stuff needs a test suite
 
 - 'don't show this dialog again' on delete row dialog, also in prefs
 
 - show toolkit browser on startup?
+
+- show dependancy graph for workspace, see
+
+	http://www.graphviz.org/Gallery/directed/cluster.html
 
 
 

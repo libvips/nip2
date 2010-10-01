@@ -314,9 +314,17 @@ conversion_make_display( Conversion *conv, IMAGE *in, IMAGE **mask_out )
 		int xshrink = IM_MIN( -conv->mag, in->Xsize );
 		int yshrink = IM_MIN( -conv->mag, in->Ysize );
 
-		if( !t || im_subsample( in, t, xshrink, yshrink ) ) {
-			im_close( out );
-			return( NULL );
+		if( DISPLAY_THUMBNAIL_HQ ) {
+			if( !t || im_shrink( in, t, xshrink, yshrink ) ) {
+				im_close( out );
+				return( NULL );
+			}
+		}
+		else {
+			if( !t || im_subsample( in, t, xshrink, yshrink ) ) {
+				im_close( out );
+				return( NULL );
+			}
 		}
 
 		in = t;

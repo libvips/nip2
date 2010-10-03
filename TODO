@@ -17,7 +17,8 @@
 
 	http://www.graphviz.org/Gallery/directed/cluster.html
 
-  looks like we'd need to render to a file and display that, argh
+  looks like we'd need to render to a file and display that, argh, or write an
+  entire render -> cairo engine thing
 
   but it seems graphviz should work on Windows
 

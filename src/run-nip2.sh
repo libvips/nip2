@@ -9,6 +9,20 @@ shopt -s extglob
 # name we were invoked as
 bname=`basename $0`
 
+# prepend a path component to an environment variable
+# be careful to avoid trailing : characters if the var is not defined, they
+# can cause security problems
+function prepend_var () {
+	# we have to use eval to do double indirection, I think
+	eval value=x"\$$1"
+	if [ $value = x ]; then
+		export $1=$2
+	else 
+		eval value="\$$1"
+		export $1=$2:$value
+	fi
+}
+
 # try to extract the prefix from a path to an executable
 # eg. "/home/john/vips/bin/fred" -> "/home/john/vips"
 function find_prefix () {
@@ -85,17 +99,18 @@ export VIPSHOME=$prefix
 # add the VIPS lib area to the library path
 case `uname` in
 HPUX)
-	export SHLIB_PATH=$VIPSHOME/lib:$SHLIB_PATH
+	libvar=SHLIB_PATH 
 	;;
 
 Darwin)
-	export DYLD_LIBRARY_PATH=$VIPSHOME/lib:$DYLD_LIBRARY_PATH
+	libvar=DYLD_LIBRARY_PATH
 	;;
- 
+
 *)
-	export LD_LIBRARY_PATH=$VIPSHOME/lib:$LD_LIBRARY_PATH
+	libvar=LD_LIBRARY_PATH
 	;;
 esac
+prepend_var $libvar $VIPSHOME/lib
 
 # stop LD_PRELOAD messing up our libraries
 unset LD_PRELOAD
@@ -103,7 +118,7 @@ unset LD_PRELOAD
 # ask for xft font rendering from pango
 export GDK_USE_XFT=1
 
-# how odd, need to say where font.conf is
+# how odd, need to say where fonts.conf is
 export FONTCONFIG_FILE=/etc/fonts/fonts.conf
 
 # run, passing in args we were passed

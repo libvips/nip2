@@ -228,7 +228,6 @@ box_yesno( GtkWidget *par,
 
 /* Pop up a `save'/`don't save'/`cancel' dialog.
  */
-/*VARARGS3*/
 void
 box_savenosave( GtkWidget *par, 
 	iWindowFn save, iWindowFn nosave, void *client,   /* Call client */

@@ -1,4 +1,4 @@
-/* Util functions for heaps.
+/* display workspaces with graphviz
  */
 
 /*
@@ -27,15 +27,4 @@
 
 */
 
-void graph_node( Heap *heap, VipsBuf *buf, HeapNode *root, gboolean fn );
-void graph_pelement( Heap *heap, VipsBuf *buf, PElement *root, gboolean fn );
-void graph_element( Heap *heap, VipsBuf *buf, Element *root, gboolean fn );
-void graph_pointer( PElement *root );
-
-/* Reduce and print, csh-style output.
- */
-void graph_value( PElement *root );
-
-/* Make sure all images are written to disc, and won't be deleted on exit.
- */
-void *save_objects( PElement *base, char *filename );
+void graph_write( Workspace *ws );

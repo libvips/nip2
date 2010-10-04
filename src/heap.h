@@ -438,3 +438,12 @@ gboolean heap_copy( Heap *heap, Compile *compile, PElement *out );
 
 gboolean heap_ip_to_gvalue( PElement *in, GValue *out );
 gboolean heap_gvalue_to_ip( GValue *in, PElement *out );
+
+void graph_node( Heap *heap, VipsBuf *buf, HeapNode *root, gboolean fn );
+void graph_pelement( Heap *heap, VipsBuf *buf, PElement *root, gboolean fn );
+void graph_element( Heap *heap, VipsBuf *buf, Element *root, gboolean fn );
+void graph_pointer( PElement *root );
+
+/* Reduce and print, csh-style output.
+ */
+void graph_value( PElement *root );

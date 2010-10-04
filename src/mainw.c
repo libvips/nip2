@@ -1614,6 +1614,12 @@ mainw_magic_cb( gpointer callback_data, guint callback_action,
 }
  */
 
+static void
+mainw_graph_action_cb( GtkAction *action, Mainw *mainw )
+{
+	graph_write( mainw->ws );
+}
+
 /* Set display mode.
  */
 static void
@@ -1745,6 +1751,11 @@ static GtkActionEntry mainw_actions[] = {
 		N_( "Edit preferences" ), 
 		G_CALLBACK( mainw_preferences_action_cb ) },
 
+	{ "Graph", 
+		NULL, N_( "Grap_h" ), NULL,
+		N_( "Show Workspace as Graph" ), 
+		G_CALLBACK( mainw_graph_action_cb ) },
+
 	{ "EditToolkits", 
 		NULL, N_( "_Edit" ), NULL,
 		N_( "Edit toolkits" ), 
@@ -1844,6 +1855,8 @@ static const char *mainw_menubar_ui_description =
 "      <menuitem action='Statusbar'/>"
 "      <menuitem action='ToolkitBrowser'/>"
 "      <menuitem action='WorkspaceDefs'/>"
+"      <separator/>"
+"      <menuitem action='Graph'/>"
 "      <separator/>"
 "      <menuitem action='Normal'/>"
 "      <menuitem action='ShowFormula'/>"

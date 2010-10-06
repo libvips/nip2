@@ -104,12 +104,6 @@ struct _Classmodel {
 	 * and matrix). Used to set the filename for the "save" dialog.
 	 */
 	char *filename;
-
-	/* For things that have a pop-up window (eg. iimage, plot), the
-	 * position and size of the window.
-	 */
-	int window_x, window_y;
-	int window_width, window_height;
 };
 
 typedef struct _ClassmodelClass {

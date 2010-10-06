@@ -772,7 +772,7 @@ imageview_build( Imageview *iv, GtkWidget *vbox, iImage *iimage )
 
 	/* Position and size to restore?
 	 */
-	if( CLASSMODEL( iimage )->window_width != -1 ) {
+	if( MODEL( iimage )->window_width != -1 ) {
 		/* Floatwindow will set pos/size.
 		 */
 		iv->imagemodel->show_status = iimage->show_status;
@@ -900,7 +900,7 @@ imageview_link( Imageview *iv, iImage *iimage, GtkWidget *parent )
 		(iWindowBuildFn) imageview_build, iimage, NULL, NULL );
 	iwindow_set_popdown( IWINDOW( iv ), imageview_popdown, NULL );
 	iwindow_set_parent( IWINDOW( iv ), parent );
-	floatwindow_link( FLOATWINDOW( iv ), CLASSMODEL( iimage ) );
+	floatwindow_link( FLOATWINDOW( iv ), MODEL( iimage ) );
 	iwindow_build( IWINDOW( iv ) );
 	slist_map( iimage->classmodels,
 		(SListMapFn) imageview_add_region, iv );
@@ -923,7 +923,7 @@ imageview_new( iImage *iimage, GtkWidget *parent )
 	 */
 	gtk_widget_show( GTK_WIDGET( iv ) );
 
-	if( CLASSMODEL( iimage )->window_width != -1 ) 
+	if( MODEL( iimage )->window_width != -1 ) 
 		imagepresent_set_mag_pos( iv->ip, 
 			iimage->image_mag,
 			iimage->image_left, iimage->image_top );

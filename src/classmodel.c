@@ -882,18 +882,6 @@ classmodel_save( Model *model, xmlNode *xnode )
 	if( !(xthis = MODEL_CLASS( parent_class )->save( model, xnode )) )
 		return( NULL );
 
-	if( classmodel->window_width != -1 ) {
-		if( !set_prop( xthis, "window_x", "%d", 
-				classmodel->window_x ) ||
-			!set_prop( xthis, "window_y", "%d", 
-				classmodel->window_y ) ||
-			!set_prop( xthis, "window_width", "%d", 
-				classmodel->window_width ) ||
-			!set_prop( xthis, "window_height", "%d", 
-				classmodel->window_height ) )
-			return( NULL );
-	}
-
 	if( classmodel->edited ) 
 		for( i = 0; i < class->n_members; i++ ) 
 			if( !classmodel_save_member( classmodel, 
@@ -1038,11 +1026,6 @@ classmodel_load( Model *model,
 	row_name_print( HEAPMODEL( classmodel )->row );
 	printf( "\n" );
 #endif /*DEBUG*/
-
-	(void) get_iprop( xthis, "window_x", &classmodel->window_x );
-	(void) get_iprop( xthis, "window_y", &classmodel->window_y );
-	(void) get_iprop( xthis, "window_width", &classmodel->window_width );
-	(void) get_iprop( xthis, "window_height", &classmodel->window_height );
 
 	/* Only for classes with member automation.
 	 */
@@ -1386,14 +1369,6 @@ classmodel_init( Classmodel *classmodel )
         classmodel->views = NULL;
 
         classmodel->filename = NULL;
-
-	/* Magic: -1 means none of these saved settings are valid. It'd be
-	 * nice to do something better, but we'd break old workspaces.
-	 */
-	classmodel->window_x = 0;
-	classmodel->window_y = 0;
-	classmodel->window_width = -1;	
-	classmodel->window_height = 0;
 }
 
 GType

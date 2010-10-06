@@ -258,7 +258,7 @@ iimageview_refresh( vObject *vobject )
 	/* If the image_width has been set, a viewer must have popped down and
 	 * set it, so the recorded settings must be valid.
 	 */
-	if( CLASSMODEL( iimage )->window_width != -1 ) {
+	if( MODEL( iimage )->window_width != -1 ) {
 		enabled = iimage->show_convert;
 		scale = iimage->scale;
 		offset = iimage->offset;

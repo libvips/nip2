@@ -252,7 +252,7 @@ plotwindow_build( Plotwindow *plotwindow, GtkWidget *vbox, Plot *plot )
 
 	/* Initial window size.
 	 */
-	if( CLASSMODEL( plot )->window_width == -1 ) {
+	if( MODEL( plot )->window_width == -1 ) {
 		w = IM_MIN( IMAGE_WINDOW_WIDTH, 500 );
 		h = IM_MIN( IMAGE_WINDOW_HEIGHT, 500 );
 		gtk_window_set_default_size( GTK_WINDOW( plotwindow ), w, h );
@@ -289,7 +289,7 @@ plotwindow_link( Plotwindow *plotwindow, Plot *plot, GtkWidget *parent )
 		(iWindowBuildFn) plotwindow_build, plot, NULL, NULL );
 	iwindow_set_parent( IWINDOW( plotwindow ), parent );
 	iwindow_set_popdown( IWINDOW( plotwindow ), plotwindow_popdown, NULL );
-	floatwindow_link( FLOATWINDOW( plotwindow ), CLASSMODEL( plot ) );
+	floatwindow_link( FLOATWINDOW( plotwindow ), MODEL( plot ) );
 	iwindow_build( IWINDOW( plotwindow ) );
 
 	/* Initial "changed" on the model to get all views to init.

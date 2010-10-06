@@ -39,14 +39,19 @@
 struct _Graphwindow {
 	Floatwindow parent_class;
 
-	/* The model we watch.
+	/* The last dot graph we generated.
 	 */
-	Workspace *ws;
+	VipsBuf dot_buf;
+	char dot_buf_txt[MAX_STRSIZE];
+
+	/* Regenerate the graph on a timeout to avoid regen on many small 
+	 * changes.
+	 */
+	guint layout_timeout;
 
 	/* The imagedisplay we make.
 	 */
 	Imagemodel *imagemodel;
-	guint imagemodel_changed_sid;
 	Imagepresent *ip;
 };
 

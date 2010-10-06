@@ -59,7 +59,7 @@ static void
 floatwindow_popdown( GtkWidget *widget )
 {
 	Floatwindow *floatwindow = FLOATWINDOW( widget );
-	Classmodel *classmodel = floatwindow->classmodel;
+	Model *model = floatwindow->model;
 
 #ifdef DEBUG
 	printf( "floatwindow_popdown\n" );
@@ -71,13 +71,13 @@ floatwindow_popdown( GtkWidget *widget )
 
 	/* Note position/size for later reuse.
 	 */
-	classmodel->window_width = 
+	model->window_width = 
 		GTK_WIDGET( floatwindow )->allocation.width;
-	classmodel->window_height = 
+	model->window_height = 
 		GTK_WIDGET( floatwindow )->allocation.height;
 	gdk_window_get_root_origin( 
 		gtk_widget_get_toplevel( GTK_WIDGET( floatwindow ) )->window, 
-		&classmodel->window_x, &classmodel->window_y );
+		&model->window_x, &model->window_y );
 
 	IWINDOW_CLASS( parent_class )->popdown( widget );
 }
@@ -86,18 +86,18 @@ static void
 floatwindow_build( GtkWidget *widget )
 {
 	Floatwindow *floatwindow = FLOATWINDOW( widget );
-	Classmodel *classmodel = floatwindow->classmodel;
+	Model *model = floatwindow->model;
 
 	IWINDOW_CLASS( parent_class )->build( widget );
 
 	/* Must be set with floatmodel_link before build.
 	 */
-	g_assert( floatwindow->classmodel );
+	g_assert( floatwindow->model );
 
 	/* Position and size to restore? Come here after parent build, so we
 	 * can override any default settings from there.
 	 */
-	if( classmodel->window_width != -1 ) {
+	if( model->window_width != -1 ) {
 		GdkScreen *screen = 
 			gtk_widget_get_screen( GTK_WIDGET( floatwindow ) );
 		int screen_width = gdk_screen_get_width( screen );
@@ -113,13 +113,13 @@ floatwindow_build( GtkWidget *widget )
 
 		 */
 
-		int window_x = IM_CLIP( 0, classmodel->window_x,
-			screen_width - classmodel->window_width );
-		int window_y = IM_CLIP( 0, classmodel->window_y,
-			screen_height - classmodel->window_height );
-		int window_width = IM_MIN( classmodel->window_width,
+		int window_x = IM_CLIP( 0, model->window_x,
+			screen_width - model->window_width );
+		int window_y = IM_CLIP( 0, model->window_y,
+			screen_height - model->window_height );
+		int window_width = IM_MIN( model->window_width,
 			screen_width );
-		int window_height = IM_MIN( classmodel->window_height,
+		int window_height = IM_MIN( model->window_height,
 			screen_height );
 
 		gtk_widget_set_uposition( GTK_WIDGET( floatwindow ), 
@@ -160,36 +160,38 @@ floatwindow_class_init( FloatwindowClass *class )
 static void
 floatwindow_init( Floatwindow *floatwindow )
 {
-	floatwindow->classmodel = NULL;
+	floatwindow->model = NULL;
 }
 
-GtkType
+GType
 floatwindow_get_type( void )
 {
-	static GtkType type = 0;
+	static GType type = 0;
 
 	if( !type ) {
-		static const GtkTypeInfo info = {
-			"Floatwindow",
-			sizeof( Floatwindow ),
+		static const GTypeInfo info = {
 			sizeof( FloatwindowClass ),
-			(GtkClassInitFunc) floatwindow_class_init,
-			(GtkObjectInitFunc) floatwindow_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
+			NULL,           /* base_init */
+			NULL,           /* base_finalize */
+			(GClassInitFunc) floatwindow_class_init,
+			NULL,           /* class_finalize */
+			NULL,           /* class_data */
+			sizeof( Floatwindow ),
+			32,             /* n_preallocs */
+			(GInstanceInitFunc) floatwindow_init,
 		};
 
-		type = gtk_type_unique( TYPE_IWINDOW, &info );
+		type = g_type_register_static( TYPE_IWINDOW, 
+			"Floatwindow", &info, 0 );
 	}
 
 	return( type );
 }
 
 void
-floatwindow_link( Floatwindow *floatwindow, Classmodel *classmodel )
+floatwindow_link( Floatwindow *floatwindow, Model *model )
 {
-	floatwindow->classmodel = classmodel;
+	floatwindow->model = model;
 	destroy_if_destroyed( G_OBJECT( floatwindow ), 
-		G_OBJECT( classmodel ), (DestroyFn) gtk_widget_destroy );
+		G_OBJECT( model ), (DestroyFn) gtk_widget_destroy );
 }

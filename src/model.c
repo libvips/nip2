@@ -425,6 +425,16 @@ model_real_save( Model *model, xmlNode *xnode )
 		(icontainer_map_fn) model_save, xthis, NULL ) )
 		return( NULL );
 
+	if( model->window_width != -1 ) {
+		if( !set_prop( xthis, "window_x", "%d", model->window_x ) ||
+			!set_prop( xthis, "window_y", "%d", model->window_y ) ||
+			!set_prop( xthis, "window_width", "%d", 
+				model->window_width ) ||
+			!set_prop( xthis, "window_height", "%d", 
+				model->window_height ) )
+			return( NULL );
+	}
+
 	return( xthis );
 }
 
@@ -479,6 +489,11 @@ model_real_load( Model *model,
 			"object of type \"%s\"" ), xnode->name, tname );
 		return( FALSE );
 	}
+
+	(void) get_iprop( xnode, "window_x", &model->window_x );
+	(void) get_iprop( xnode, "window_y", &model->window_y );
+	(void) get_iprop( xnode, "window_width", &model->window_width );
+	(void) get_iprop( xnode, "window_height", &model->window_height );
 
 	if( !ICONTAINER( model )->parent )
 		icontainer_child_add( ICONTAINER( parent ), 
@@ -553,6 +568,14 @@ static void
 model_init( Model *model )
 {
 	model->display = TRUE;
+
+	/* Magic: -1 means none of these saved settings are valid. It'd be
+	 * nice to do something better, but we'd break old workspaces.
+	 */
+	model->window_x = 0;
+	model->window_y = 0;
+	model->window_width = -1;	
+	model->window_height = 0;
 }
 
 GType

@@ -1617,7 +1617,10 @@ mainw_magic_cb( gpointer callback_data, guint callback_action,
 static void
 mainw_graph_action_cb( GtkAction *action, Mainw *mainw )
 {
-	graph_write( mainw->ws );
+	Graphwindow *graphwindow;
+
+	graphwindow = graphwindow_new( mainw->ws, GTK_WIDGET( mainw ) );
+	gtk_widget_show( GTK_WIDGET( graphwindow ) );
 }
 
 /* Set display mode.

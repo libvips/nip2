@@ -90,6 +90,12 @@ struct _Model {
 	/* My instance vars.
 	 */
 	gboolean display;	/* This model should have a view */
+
+	/* For things that have a pop-up window (eg. iimage, plot), the
+	 * position and size of the window.
+	 */
+	int window_x, window_y;
+	int window_width, window_height;
 };
 
 typedef struct _ModelClass {

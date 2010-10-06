@@ -1,3 +1,13 @@
+- should floatwindow watch "changed" on the model? 
+
+  how many of float's subclasses need this functionality?
+
+- should floatwindow handle window default size? we seem to repeat this a lot
+  too
+
+- we have ws->window_width, can we use the one on Model now instead?
+
+
   
 - use im_draw_mask() instead of im_plotmask()
 

@@ -41,7 +41,7 @@ typedef struct _Floatwindow {
 
 	/* Model stuff here.
 	 */
-	Classmodel *classmodel;
+	Model *model;
 } Floatwindow;
 
 typedef struct _FloatwindowClass {
@@ -52,4 +52,4 @@ typedef struct _FloatwindowClass {
 } FloatwindowClass;
 
 GtkType floatwindow_get_type( void );
-void floatwindow_link( Floatwindow *floatwindow, Classmodel *classmodel );
+void floatwindow_link( Floatwindow *floatwindow, Model *model );

@@ -111,8 +111,8 @@ my_sources = \
 	fontnameview.h \
 	filesel.c \
 	filesel.h \
-	graph.c \
-	graph.h \
+	graphwindow.c \
+	graphwindow.h \
 	graphicview.c \
 	graphicview.h \
 	gtkutil.c \

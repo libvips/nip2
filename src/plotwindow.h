@@ -46,9 +46,6 @@ struct _Plotwindow {
 	 */
 	Plotstatus *plotstatus;
 	Plotpresent *plotpresent;
-
-	GtkActionGroup *action_group;
-	GtkUIManager *ui_manager;
 };
 
 typedef struct _PlotwindowClass {

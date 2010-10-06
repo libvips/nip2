@@ -135,11 +135,13 @@ plotwindow_refresh_title( Plotwindow *plotwindow )
 static void
 plotwindow_changed_cb( Plotmodel *plotmodel, Plotwindow *plotwindow )
 {
+	iWindow *iwnd = IWINDOW( plotwindow );
+
 	GtkAction *action;
 
 	plotwindow_refresh_title( plotwindow );
 
-	action = gtk_action_group_get_action( plotwindow->action_group, 
+	action = gtk_action_group_get_action( iwnd->action_group, 
 		"Status" );
 	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
 		plotmodel->show_status );

@@ -297,6 +297,7 @@ typedef struct _Plot Plot;
 typedef struct _Plotwindow Plotwindow;
 typedef struct _Plotpresent Plotpresent;
 typedef struct _Plotmodel Plotmodel;
+typedef struct _Graphwindow Graphwindow;
 typedef struct _Subcolumn Subcolumn;
 typedef struct _Subcolumnview Subcolumnview;
 typedef struct _Symbol Symbol;
@@ -422,7 +423,6 @@ typedef void *(*tool_map_fn)( Tool *, void *, void * );
 #include "builtin.h"
 #include "compile.h"
 #include "dump.h"
-#include "graph.h"
 #include "main.h"
 #include "predicate.h"
 #include "slider.h"
@@ -449,6 +449,7 @@ typedef void *(*tool_map_fn)( Tool *, void *, void * );
 #include "plotmodel.h"
 #include "plotpresent.h"
 #include "plotwindow.h"
+#include "graphwindow.h"
 #include "option.h"
 #include "optionview.h"
 #include "iimage.h"

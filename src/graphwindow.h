@@ -27,4 +27,38 @@
 
 */
 
+#define TYPE_GRAPHWINDOW (graphwindow_get_type())
+#define GRAPHWINDOW( obj ) \
+	(GTK_CHECK_CAST( (obj), TYPE_GRAPHWINDOW, Graphwindow ))
+#define GRAPHWINDOW_CLASS( klass ) \
+	(GTK_CHECK_CLASS_CAST( (klass), TYPE_GRAPHWINDOW, GraphwindowClass ))
+#define IS_GRAPHWINDOW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_GRAPHWINDOW ))
+#define IS_GRAPHWINDOW_CLASS( klass ) \
+	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_GRAPHWINDOW ))
+
+struct _Graphwindow {
+	Floatwindow parent_class;
+
+	/* The model we watch.
+	 */
+	Workspace *ws;
+
+	/* The imagedisplay we make.
+	 */
+	Imagemodel *imagemodel;
+	guint imagemodel_changed_sid;
+	Imagepresent *ip;
+};
+
+typedef struct _GraphwindowClass {
+	FloatwindowClass parent_class;
+
+	/* My methods.
+	 */
+} GraphwindowClass;
+
 void graph_write( Workspace *ws );
+
+GtkType graphwindow_get_type( void );
+Graphwindow *graphwindow_new( Workspace *ws, GtkWidget *parent );
+

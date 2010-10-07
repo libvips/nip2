@@ -17,8 +17,8 @@ started 7.23.0, 2/8/10
 - fix an occasional crash with ^Q in imageview
 - added high-quality thumbnail option (thanks Martin)
 - set lib env var more carefully (thanks Jay)
-- added "Workspace as graph" view option
 - configure tests for libgvc, the graphviz library
+- added "Workspace as graph" view option
 
 started 7.22.2, 5/7/10
 - show nthreads in space free tooltip

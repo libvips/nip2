@@ -264,7 +264,7 @@ graphwindow_update_image( Graphwindow *graphwindow )
 
 	MANAGED_UNREF( ii );
 
-	/* We can unlink now: the png will have been copnverted to vips
+	/* We can unlink now: the png will have been converted to vips
 	 * format.
 	 */
 	unlinkf( "%s", tname );

@@ -251,7 +251,8 @@ imagemodel_refresh_ink( Imagemodel *imagemodel, Imageinfo *ii )
 static void
 imagemodel_conv_changed_cb( Conversion *conv, Imagemodel *imagemodel )
 {
-	imagemodel_refresh_ink( imagemodel, conv->ii );
+	if( conv->ii )
+		imagemodel_refresh_ink( imagemodel, conv->ii );
 
 	iobject_changed( IOBJECT( imagemodel ) );
 }
@@ -373,7 +374,9 @@ imagemodel_new( iImage *iimage )
 	Imagemodel *imagemodel;
 
 	imagemodel = g_object_new( TYPE_IMAGEMODEL, NULL );
-	imagemodel_link( imagemodel, iimage );
+
+	if( iimage )
+		imagemodel_link( imagemodel, iimage );
 
 #ifdef DEBUG
 	printf( "imagemodel_new: " );

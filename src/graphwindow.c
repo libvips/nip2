@@ -28,12 +28,16 @@
  */
 
 /*
- */
 #define DEBUG
+ */
 
 #include "ip.h"
 
+#ifdef HAVE_LIBGVC
+
 static FloatwindowClass *parent_class = NULL;
+
+static int graph_write_cluster_index = 0;
 
 static void *
 graph_write_row_child( Link *link, VipsBuf *buf )
@@ -59,9 +63,8 @@ graph_write_row( Row *row, VipsBuf *buf )
 static void *
 graph_write_column( Column *col, VipsBuf *buf )
 {
-	static int n = 0;
-
-	vips_buf_appendf( buf, "\tsubgraph cluster_%d {\n", n++ );
+	vips_buf_appendf( buf, "\tsubgraph cluster_%d {\n", 
+		graph_write_cluster_index++ );
 	vips_buf_appendf( buf, "\t\tlabel = \"%s", IOBJECT( col )->name );
 	if( IOBJECT( col )->caption )
 		vips_buf_appendf( buf, " - %s", IOBJECT( col )->caption );
@@ -83,6 +86,7 @@ graph_write_column( Column *col, VipsBuf *buf )
 static void
 graph_write_dot( Workspace *ws, VipsBuf *buf )
 {
+	graph_write_cluster_index = 0;
 	vips_buf_appends( buf, "digraph G {\n" );
 	workspace_map_column( ws, 
 		(column_map_fn) graph_write_column, buf );
@@ -119,7 +123,16 @@ graphwindow_destroy( GtkObject *object )
 
 	/* My instance destroy stuff.
 	 */
+	IM_FREE( graphwindow->dot );
 	IM_FREEF( g_source_remove, graphwindow->layout_timeout );
+
+	UNREF( graphwindow->imagemodel );
+
+	IM_FREEF( agclose, graphwindow->graph );
+	IM_FREEF( gvFreeContext, graphwindow->gvc );
+
+	FREESID( graphwindow->workspace_changed_sid, 
+		FLOATWINDOW( graphwindow )->model );
 
 	GTK_OBJECT_CLASS( parent_class )->destroy( object );
 }
@@ -147,13 +160,10 @@ graphwindow_init( Graphwindow *graphwindow )
 	printf( "graphwindow_init: %p\n", graphwindow );
 #endif /*DEBUG*/
 
-	vips_buf_init_static( &graphwindow->dot_buf, 
-		graphwindow->dot_buf_txt, MAX_STRSIZE );
-
+	graphwindow->dot = NULL;
 	graphwindow->layout_timeout = 0;
 
-	graphwindow->imagemodel = NULL;
-	graphwindow->ip = NULL;
+	graphwindow->gvc = gvContext();
 }
 
 GType
@@ -199,19 +209,105 @@ graphwindow_refresh_title( Graphwindow *graphwindow )
 }
 
 static gboolean
+graphwindow_build_graph( Graphwindow *graphwindow )
+{
+	char tname[FILENAME_MAX];
+	iOpenFile *of;
+
+	if( !temp_name( tname, "dot" ) ||
+		!(of = file_open_write( "%s", tname )) )
+		return( FALSE );
+	if( !file_write( of, "%s", graphwindow->dot ) ) {
+		file_close( of );
+		unlinkf( "%s", tname );
+		return( FALSE );
+	}
+	file_close( of );
+
+	if( !(of = file_open_read( "%s", tname )) ) {
+		unlinkf( "%s", tname );
+		return( FALSE );
+	}
+
+	IM_FREEF( agclose, graphwindow->graph );
+
+	graphwindow->graph = agread( of->fp );
+
+	file_close( of );
+	unlinkf( "%s", tname );
+
+	return( TRUE );
+}
+
+static gboolean
+graphwindow_update_image( Graphwindow *graphwindow )
+{
+	char tname[FILENAME_MAX];
+	iOpenFile *of;
+	Imageinfo *ii;
+
+	if( !temp_name( tname, "png" ) ||
+		!(of = file_open_write( "%s", tname )) )
+		return( FALSE );
+
+	gvRender( graphwindow->gvc, graphwindow->graph, "png:cairo", of->fp );
+
+	file_close( of );
+
+	if( !(ii = imageinfo_new_input( main_imageinfogroup, 
+		GTK_WIDGET( graphwindow ), NULL, tname )) ) {
+		unlinkf( "%s", tname );
+		return( FALSE );
+	}
+
+	conversion_set_image( graphwindow->imagemodel->conv, ii );
+
+	MANAGED_UNREF( ii );
+
+	/* We can unlink now: the png will have been copnverted to vips
+	 * format.
+	 */
+	unlinkf( "%s", tname );
+
+	return( TRUE );
+}
+
+static gboolean
+graphwindow_layout( Graphwindow *graphwindow )
+{
+	if( !graphwindow_build_graph( graphwindow ) )
+		return( FALSE );
+	gvLayout( graphwindow->gvc, graphwindow->graph, "dot" );
+	if( !graphwindow_update_image( graphwindow ) )
+		return( FALSE );
+
+	return( TRUE );
+}
+
+static gboolean
 graphwindow_layout_cb( Graphwindow *graphwindow )
 {
 	Workspace *ws = WORKSPACE( FLOATWINDOW( graphwindow )->model );
 
+	char txt[MAX_STRSIZE];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
+
 	graphwindow->layout_timeout = 0;
 
-	vips_buf_rewind( &graphwindow->dot_buf );
-	graph_write_dot( ws, &graphwindow->dot_buf );
+	graph_write_dot( ws, &buf );
+	if( !graphwindow->dot ||
+		strcmp( vips_buf_all( &buf ), graphwindow->dot ) != 0 ) {
+		IM_FREE( graphwindow->dot );
+		graphwindow->dot = im_strdup( NULL, vips_buf_all( &buf ) );
 
 #ifdef DEBUG
-	printf( "graphwindow_changed_cb:\n%s\n", 
-		vips_buf_all( &graphwindow->dot_buf ) );
+		printf( "graphwindow_changed_cb:\n%s\n", graphwindow->dot );
 #endif /*DEBUG*/
+
+		if( !graphwindow_layout( graphwindow ) )
+			iwindow_alert( GTK_WIDGET( graphwindow ), 
+				GTK_MESSAGE_ERROR );
+	}
 
 	/* Clear the timeout.
 	 */
@@ -263,11 +359,13 @@ graphwindow_build( Graphwindow *graphwindow, GtkWidget *vbox, Workspace *ws )
 	GtkWidget *mbar;
 	GtkWidget *frame;
 
-	int w, h; 
-
 	/* Make our model.
 	 */
-	g_signal_connect( G_OBJECT( ws ), "changed", 
+	graphwindow->imagemodel = imagemodel_new( NULL );
+	g_object_ref( G_OBJECT( graphwindow->imagemodel ) );
+	iobject_sink( IOBJECT( graphwindow->imagemodel ) );
+	graphwindow->workspace_changed_sid = g_signal_connect( 
+		G_OBJECT( ws ), "changed", 
 		G_CALLBACK( graphwindow_changed_cb ), graphwindow );
 
         /* Make main menu bar
@@ -285,6 +383,12 @@ graphwindow_build( Graphwindow *graphwindow, GtkWidget *vbox, Workspace *ws )
 	gtk_box_pack_start( GTK_BOX( vbox ), mbar, FALSE, FALSE, 0 );
         gtk_widget_show( mbar );
 
+	/* This will set to NULL if we don't have infobar support.
+	 */
+	if( (iwnd->infobar = infobar_new()) ) 
+		gtk_box_pack_start( GTK_BOX( vbox ), 
+			GTK_WIDGET( iwnd->infobar ), FALSE, FALSE, 0 );
+
 	/* Graph area. 
 	 */
 	frame = gtk_frame_new( NULL );
@@ -292,14 +396,10 @@ graphwindow_build( Graphwindow *graphwindow, GtkWidget *vbox, Workspace *ws )
 	gtk_widget_show( frame );
 	gtk_box_pack_start( GTK_BOX( vbox ), 
 		GTK_WIDGET( frame ), TRUE, TRUE, 0 );
-
-	/* Initial window size.
-	 */
-	if( MODEL( ws )->window_width == -1 ) {
-		w = IM_MIN( IMAGE_WINDOW_WIDTH, 500 );
-		h = IM_MIN( IMAGE_WINDOW_HEIGHT, 500 );
-		gtk_window_set_default_size( GTK_WINDOW( graphwindow ), w, h );
-	}
+	graphwindow->ip = imagepresent_new( graphwindow->imagemodel );
+	gtk_container_add( GTK_CONTAINER( frame ), 
+		GTK_WIDGET( graphwindow->ip ) );
+	gtk_widget_show( GTK_WIDGET( graphwindow->ip ) );
 }
 
 static void
@@ -309,6 +409,8 @@ graphwindow_link( Graphwindow *graphwindow, Workspace *ws, GtkWidget *parent )
 		(iWindowBuildFn) graphwindow_build, ws, NULL, NULL );
 	iwindow_set_parent( IWINDOW( graphwindow ), parent );
 	floatwindow_link( FLOATWINDOW( graphwindow ), MODEL( ws ) );
+	iwindow_set_size_prefs( IWINDOW( graphwindow ), 
+		"GRAPH_WINDOW_WIDTH", "GRAPH_WINDOW_HEIGHT" );
 	iwindow_build( IWINDOW( graphwindow ) );
 
 	/* Initial "changed" on the model to get all views to init.
@@ -326,3 +428,4 @@ graphwindow_new( Workspace *ws, GtkWidget *parent )
 	return( graphwindow );
 }
 
+#endif /*HAVE_LIBGVC*/

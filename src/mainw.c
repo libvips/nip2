@@ -1614,6 +1614,7 @@ mainw_magic_cb( gpointer callback_data, guint callback_action,
 }
  */
 
+#ifdef HAVE_LIBGVC
 static void
 mainw_graph_action_cb( GtkAction *action, Mainw *mainw )
 {
@@ -1622,6 +1623,7 @@ mainw_graph_action_cb( GtkAction *action, Mainw *mainw )
 	graphwindow = graphwindow_new( mainw->ws, GTK_WIDGET( mainw ) );
 	gtk_widget_show( GTK_WIDGET( graphwindow ) );
 }
+#endif /*HAVE_LIBGVC*/
 
 /* Set display mode.
  */
@@ -1754,10 +1756,12 @@ static GtkActionEntry mainw_actions[] = {
 		N_( "Edit preferences" ), 
 		G_CALLBACK( mainw_preferences_action_cb ) },
 
+#ifdef HAVE_LIBGVC
 	{ "Graph", 
-		NULL, N_( "Grap_h" ), NULL,
-		N_( "Show Workspace as Graph" ), 
+		NULL, N_( "Workspace as Grap_h" ), NULL,
+		N_( "Show a graph of workspace dependencies" ), 
 		G_CALLBACK( mainw_graph_action_cb ) },
+#endif /*HAVE_LIBGVC*/
 
 	{ "EditToolkits", 
 		NULL, N_( "_Edit" ), NULL,
@@ -1859,8 +1863,10 @@ static const char *mainw_menubar_ui_description =
 "      <menuitem action='ToolkitBrowser'/>"
 "      <menuitem action='WorkspaceDefs'/>"
 "      <separator/>"
+#ifdef HAVE_LIBGVC
 "      <menuitem action='Graph'/>"
 "      <separator/>"
+#endif /*HAVE_LIBGVC*/
 "      <menuitem action='Normal'/>"
 "      <menuitem action='ShowFormula'/>"
 "      <menuitem action='NoEdit'/>"
@@ -2195,7 +2201,7 @@ mainw_link( Mainw *mainw, Workspace *ws )
 	iwindow_set_popdown( IWINDOW( mainw ), mainw_popdown, NULL );
 	filemodel_set_window_hint( FILEMODEL( ws ), IWINDOW( mainw ) );
 
-	/* If we have a saved size for this workspoace, set that. Otherwise,
+	/* If we have a saved size for this workspace, set that. Otherwise,
 	 * default to the default.
 	 */
 	if( !ws->window_width ) {

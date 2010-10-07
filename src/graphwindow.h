@@ -41,8 +41,7 @@ struct _Graphwindow {
 
 	/* The last dot graph we generated.
 	 */
-	VipsBuf dot_buf;
-	char dot_buf_txt[MAX_STRSIZE];
+	char *dot;
 
 	/* Regenerate the graph on a timeout to avoid regen on many small 
 	 * changes.
@@ -53,6 +52,15 @@ struct _Graphwindow {
 	 */
 	Imagemodel *imagemodel;
 	Imagepresent *ip;
+
+	/* Watch the ws with this.
+	 */
+	guint workspace_changed_sid;
+
+#ifdef HAVE_LIBGVC
+	GVC_t *gvc;
+	graph_t *graph;
+#endif /*HAVE_LIBGVC*/
 };
 
 typedef struct _GraphwindowClass {

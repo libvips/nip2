@@ -919,7 +919,7 @@ imagepresent_paint_stop( Imagepresent *ip, int x, int y )
 {
 	Imagemodel *imagemodel = ip->imagemodel;
 	Conversion *conv = imagemodel->conv;
-	Imageinfo *imageinfo = imagemodel->iimage->value.ii;
+	Imageinfo *imageinfo = conv->ii;
         Rect oper;
         int ix, iy;
 
@@ -1036,7 +1036,8 @@ static void
 imagepresent_left_release( Imagepresent *ip, GdkEvent *ev, int x, int y )
 {
 	Imagemodel *imagemodel = ip->imagemodel;
-	Row *row = HEAPMODEL( imagemodel->iimage )->row;
+	Row *row = imagemodel->iimage ? 
+		HEAPMODEL( imagemodel->iimage )->row : NULL;
 
 	switch( imagemodel->state ) {
 	case IMAGEMODEL_SELECT:
@@ -1142,7 +1143,7 @@ imagepresent_button_motion( Imagepresent *ip, GdkEvent *ev )
 {
 	Imagemodel *imagemodel = ip->imagemodel;
 	Conversion *conv = imagemodel->conv;
-	Imageinfo *imageinfo = imagemodel->iimage->value.ii;
+	Imageinfo *imageinfo = conv->ii;
 	Rect oper;
 	int x, y;
 	int ix, iy;
@@ -1692,8 +1693,10 @@ imagepresent_link( Imagepresent *ip, Imagemodel *imagemodel )
 		G_CALLBACK( imagepresent_imagemodel_imageinfo_changed_cb ), 
 		ip );
 	imagedisplay_set_conversion( ip->id, imagemodel->conv );
-	imagemodel->iimage->views = 
-		g_slist_prepend( imagemodel->iimage->views, ip );
+
+	if( imagemodel->iimage )
+		imagemodel->iimage->views = 
+			g_slist_prepend( imagemodel->iimage->views, ip );
 }
 
 /* Make a new Imagepresent. 

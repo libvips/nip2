@@ -28,6 +28,29 @@
  */
 
 /*
+
+   	TODO
+
+	Don't generate DOT in a file, build the graph ourselves. We'd need 
+	some sort of graph hash thing to avoid relayouts. Or perhaps a 
+	workspace hash?
+
+	After layout, don't render to a file, instead draw directly to the 
+	output window with cairo. Copy/paste code from the png:cairo render.
+	Have some simple culling stuff to only render visible parts of the 
+	graph.
+
+	As well as "view workspace as graph", have a "view column as graph" 
+	item.
+ 
+	Don't show nodes which are not inside this workspace.
+
+	Possibly add graph editing, or at least edge highlighting as you 
+	mouse.
+
+ */
+
+/*
 #define DEBUG
  */
 

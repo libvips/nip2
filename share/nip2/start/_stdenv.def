@@ -2152,3 +2152,15 @@ float2rad image
 	float2rad_op = Operator "float2rad" 
 		float2rad Operator_type.COMPOUND_REWRAP false;
 }
+
+segment x
+	= oo_unary_function segment_op x, is_class x
+	= image', is_image x 
+	= error (_ "bad arguments to " ++ "segment")
+{
+	segment_op = Operator "segment" 
+		segment Operator_type.COMPOUND_REWRAP false;
+
+	[image, nsegs] = im_segment x;
+	image' = im_copy_set_meta image "n-segments" nsegs;
+}

@@ -33,7 +33,7 @@
 
 	Don't generate DOT in a file, build the graph ourselves. We'd need 
 	some sort of graph hash thing to avoid relayouts. Or perhaps a 
-	workspace hash?
+	workspace hash? A hash by column?
 
 	After layout, don't render to a file, instead draw directly to the 
 	output window with cairo. Copy/paste code from the png:cairo render.
@@ -47,6 +47,12 @@
 
 	Possibly add graph editing, or at least edge highlighting as you 
 	mouse.
+
+	Let columns be collapsed / expanded, and start the view with columns 
+	collapsed if there's more than 1. This might be easier if columns were 
+	separate scopes, I suppose.
+
+	Do we should dynamic dependencies? How about (A2 = untitled."A1") ?
 
  */
 

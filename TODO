@@ -1,3 +1,7 @@
+- wrap im_read_point()
+
+  should get cells from matrix / list / vector as well
+
 - should floatwindow watch "changed" on the model? 
 
   how many of float's subclasses need this functionality?

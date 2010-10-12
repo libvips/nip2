@@ -2164,3 +2164,21 @@ segment x
 	[image, nsegs] = im_segment x;
 	image' = im_copy_set_meta image "n-segments" nsegs;
 }
+
+point a b
+	= oo_binary_function point_op a b, is_class a
+	= oo_binary'_function point_op a b, is_class b
+	= im_read_point b x y, is_image b
+	= [b?x?y], is_matrix b
+	= [b?x], is_real_list b && y == 0
+	= [b?y], is_real_list b && x == 0
+	= error (_ "bad arguments to " ++ "point")
+{
+	point_op = Operator "point" 
+		(\a\b Vector (point a b)) Operator_type.COMPOUND false;
+
+	(x, y) 
+		= a, is_complex a;
+		= (a?0, a?1), is_real_list a && is_list_len 2 a
+		= error "bad position format";
+}

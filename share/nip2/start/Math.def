@@ -426,6 +426,17 @@ Math_fourier_item = class
 
 Math_stats_item = class 
 	Menupullright "_Statistics" "measure various statistics of objects" {
+	Value_item = class 
+		Menuaction "_Value" "value of point in object" {
+		action a = class _result {
+			_vislevel = 3;
+	
+			position = Expression "Coordinate" (0, 0);
+	
+			_result = map_binary point position.expr a;
+		}
+	}
+
 	Mean_item = class 
 		Menuaction "_Mean" "arithmetic mean value" {
 		action a = map_unary mean a;
@@ -542,7 +553,7 @@ Math_stats_item = class
 	Cluster_item = class 
 		Menuaction "_Cluster" "cluster a list of numbers" {
 		action l = class {
-			_vislevel = 2;
+			_vislevel = 3;
 	
 			thresh = Expression "Threshold" 10;
 	

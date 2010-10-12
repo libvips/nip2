@@ -1691,7 +1691,7 @@ static GtkActionEntry program_actions[] = {
 		G_CALLBACK( program_process_action_cb ) },
 
 	{ "Reload", 
-		NULL, N_( "_Reload Start Stuff" ), NULL,
+		NULL, N_( "_Reload All Toolkits" ), NULL,
 		N_( "Remove and reload all startup data" ), 
 		G_CALLBACK( program_reload_action_cb ) },
 

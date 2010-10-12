@@ -362,9 +362,12 @@ Matrix_base value = class
 			op.type == Operator_type.ARITHMETIC],
 
 		// compound ... don't do iteration
-		[this.Matrix_base (op.fn this.value x.value),
-			(is_Matrix x || is_Real x || is_Vector x) &&
-			op.type == Operator_type.COMPOUND_REWRAP]
+		[this.Matrix_base (op.fn this.value x),
+			op.type == Operator_type.COMPOUND_REWRAP],
+
+		[op.fn this.value x,
+			op.type == Operator_type.COMPOUND]
+
 	] ++ super.oo_binary_table op x
 	{
 		mul = im_matmul this x;
@@ -934,8 +937,8 @@ Image value = class
 	] ++ super.oo_binary_table op x
 	{
 		// wrap the result with this 
-		// x can be a non-image, eg. compare "Image v == []" vs. "Image v ==
-		// 12"
+		// x can be a non-image, eg. compare "Image v == []" vs. 
+		// "Image v == 12"
 		wrap x
 			= x, op.type == Operator_type.COMPOUND ||
 				!is_image x

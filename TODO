@@ -1,13 +1,74 @@
-- wrap im_read_point()
+- try
 
-  should get cells from matrix / list / vector as well
+	point re
+		= x
+	{
+		(x, y) = re;
+	}
 
-- should floatwindow watch "changed" on the model? 
+  it's the 'im' param, it stops (im pos) being bound to the
+  get-real-part-of-complex builtin
 
-  how many of float's subclasses need this functionality?
+  expands to
 
-- should floatwindow handle window default size? we seem to repeat this a lot
-  too
+	point re
+		= x
+	{
+		$$x = re;
+		x
+			= re $$x, is_complex $$x
+			= error "bad match";
+	}
+
+  add secrets
+
+	point point.re
+		= x point.re
+	{
+		$$1 $$1.re = point.re;
+		x x.re
+			= x.re ($$x point.re), is_complex ($$x point.re)
+			= error "bad match";
+	}
+
+
+x compiles to
+
+if_then_else (<symbol "point.x.is_complex"> (<symbol "point.$$pattern_lhs78"> <symbol "point.re">))
+ <symbol "point.x.re"> (<symbol "point.$$pattern_lhs78"> <symbol "point.re">)
+ <symbol "point.x.error"> <Managed* 0x37c5a80>
+
+abstracting point.re
+
+after var abstract
+
+((S ((Sr (if_then_else <compileref "point.x">)) ((Sl ((Sr (&& <compileref "point.x">)) ((Sr <symbol "point.x.is_complex">) <symbol "point.$$pattern_lhs78">))) true))) ((Sl ((Sr SHARE0[(: <compileref "point.x">)]) ((Sr <symbol "point.x.re">) <symbol "point.$$pattern_lhs78">))) ((REF0 (<symbol "point.x.error"> <Managed* 0x3a55980>)) [ ])))
+
+reduce and get 
+
+reduce_spine: (<symbol "point.x.re"> (<symbol "point.$$pattern_lhs0"> (I (1,2))))
+reduce_spine: (<symbol "point.re"> (<symbol "point.$$pattern_lhs0"> (I (1,2))))
+sym-param found, argh: point.re
+
+
+  maybe fix this when we revise the parser
+
+  would be a good time to add multiple definitions as well
+
+- redo name resolution in parser ... scrap the patch thing, instead have a
+  separate 'resolve' step that runs after parsing a top-level
+
+  don't create ZOMBIE symbols, instead make REF nodes in the tree
+
+  this binds local references, but leaves external refs dangling
+
+  we do a final link at load time when we copy into the heap
+
+  do we need zombies at all now?
+
+  make a fork for this
+
+
 
 - we have ws->window_width, can we use the one on Model now instead?
 
@@ -59,19 +120,6 @@
 
 
 
-
-- redo name resolution in parser ... scrap the patch thing, instead have a
-  separate 'resolve' step that runs after parsing a top-level
-
-  don't create ZOMBIE symbols, instead make REF nodes in the tree
-
-  this binds local references, but leaves external refs dangling
-
-  we do a final link at load time when we copy into the heap
-
-  do we need zombies at all now?
-
-  make a fork for this
 
 
 

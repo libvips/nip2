@@ -1750,7 +1750,7 @@ compile_check_more( Compile *compile, ParseNode *pn )
 	return( NULL );
 }
 
-/* Do end-of-parse checks. Called after every 'A=...' style definition (not 
+/* Do end-of-parse checks. Called after every 'A = ...' style definition (not 
  * just top-level syms). Used to do lots of checks, not much left now.
  */
 gboolean

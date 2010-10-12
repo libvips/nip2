@@ -33,6 +33,10 @@
 #define DEBUG_REGEN
  */
 
+/* trace each reduction
+#define DEBUG_TRACE
+ */
+
 /* trace copies of code from compile heap to main heap.
 #define DEBUG_COPY
  */
@@ -1072,6 +1076,16 @@ reduce_start:
 		}
 	}
 
+#ifdef DEBUG_TRACE
+{
+	char txt[1024];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
+
+	graph_pelement( rc->heap, &buf, out, TRUE );
+	printf( "reduce_spine: %s\n", vips_buf_all( &buf ) );
+}
+#endif /*DEBUG_TRACE*/
+
 	switch( PEGETTYPE( &np ) ) {
 	case ELEMENT_CHAR:
 	case ELEMENT_BOOL:
@@ -1196,6 +1210,9 @@ reduce_start:
 		case SYM_PARAM:
 			/* All params should be taken out by var abstract.
 			 */
+			printf( "sym-param found, argh: " ); 
+			symbol_name_print( sym );
+			printf( "\n" );
 			g_assert( FALSE );
 			break;
 

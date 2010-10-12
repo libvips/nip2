@@ -20,6 +20,7 @@ started 7.23.0, 2/8/10
 - configure tests for libgvc, the graphviz library
 - added "Workspace as graph" view option
 - better "segment" menu item
+- "value" menu item
 
 started 7.22.2, 5/7/10
 - show nthreads in space free tooltip

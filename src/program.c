@@ -1792,6 +1792,7 @@ static const char *program_menubar_ui_description =
 "      <menuitem action='Reload'/>"
 "      <separator/>"
 "      <menuitem action='Close'/>"
+"      <menuitem action='Quit'/>"
 "    </menu>"
 "    <menu action='EditMenu'>"
 "      <menuitem action='Cut'/>"

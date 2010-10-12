@@ -369,6 +369,7 @@ static const char *graphwindow_menubar_ui_description =
 "  <menubar name='GraphwindowMenubar'>"
 "    <menu action='FileMenu'>"
 "      <menuitem action='Close'/>"
+"      <menuitem action='Quit'/>"
 "    </menu>"
 "    <menu action='HelpMenu'>"
 "      <menuitem action='Guide'/>"

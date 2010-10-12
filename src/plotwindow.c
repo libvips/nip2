@@ -174,6 +174,7 @@ static const char *plotwindow_menubar_ui_description =
 "  <menubar name='PlotwindowMenubar'>"
 "    <menu action='FileMenu'>"
 "      <menuitem action='Close'/>"
+"      <menuitem action='Quit'/>"
 "    </menu>"
 "    <menu action='ViewMenu'>"
 "      <menuitem action='Status'/>"

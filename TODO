@@ -72,6 +72,11 @@ sym-param found, argh: point.re
 
 - we have ws->window_width, can we use the one on Model now instead?
 
+- wrap im_read_point()
+
+  should get cells from matrix / list / vector as well
+
+- should floatwindow watch "changed" on the model? 
 
   
 - use im_draw_mask() instead of im_plotmask()

@@ -184,7 +184,7 @@ model_loadstate_new_openfile( iOpenFile *of )
 
 	xmlSetGenericErrorFunc( state, 
 		(xmlGenericErrorFunc) model_loadstate_error );
-	if( !file_read_buffer( of, load_buffer, MAX_STRSIZE ) ) {
+	if( !ifile_read_buffer( of, load_buffer, MAX_STRSIZE ) ) {
 		model_loadstate_destroy( state );
 		return( NULL );
 	}

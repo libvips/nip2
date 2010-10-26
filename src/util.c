@@ -1950,7 +1950,7 @@ char *im_strdupn( const char *txt ) { return( im_strdup( NULL, txt ) ); }
 /* Free an iOpenFile.
  */
 void
-file_close( iOpenFile *of )
+ifile_close( iOpenFile *of )
 {
 	IM_FREEF( fclose, of->fp );
 	IM_FREE( of->fname );
@@ -1961,7 +1961,7 @@ file_close( iOpenFile *of )
 /* Make an iOpenFile*.
  */
 static iOpenFile *
-file_build( const char *fname )
+ifile_build( const char *fname )
 {
 	iOpenFile *of;
 
@@ -1975,7 +1975,7 @@ file_build( const char *fname )
 
 	IM_SETSTR( of->fname, fname );
 	if( !of->fname ) {
-		file_close( of );
+		ifile_close( of );
 		return( NULL );
 	}
 
@@ -1985,7 +1985,7 @@ file_build( const char *fname )
 /* Find and open for read.
  */
 iOpenFile *
-file_open_read( const char *name, ... )
+ifile_open_read( const char *name, ... )
 {
 	va_list ap;
 	char buf[FILENAME_MAX];
@@ -1994,7 +1994,7 @@ file_open_read( const char *name, ... )
         va_start( ap, name );
         (void) im_vsnprintf( buf, FILENAME_MAX, name, ap );
         va_end( ap );
-        of = file_build( buf );
+        of = ifile_build( buf );
 
 	if( !of )
 		return( NULL );
@@ -2002,7 +2002,7 @@ file_open_read( const char *name, ... )
 		error_top( _( "Unable to open." ) );
 		error_sub( _( "Unable to open file \"%s\" for reading.\n%s." ),
 			of->fname, g_strerror( errno ) );
-		file_close( of );
+		ifile_close( of );
 		return( NULL );
 	}
 
@@ -2011,7 +2011,7 @@ file_open_read( const char *name, ... )
 		error_top( _( "Unable to open." ) );
 		error_sub( _( "Unable to open file \"%s\" for reading.\n%s." ),
 			of->fname_real, g_strerror( errno ) );
-		file_close( of );
+		ifile_close( of );
 		return( NULL );
 	}
 
@@ -2023,15 +2023,15 @@ file_open_read( const char *name, ... )
 /* Open stdin for read.
  */
 iOpenFile *
-file_open_read_stdin()
+ifile_open_read_stdin()
 {
 	iOpenFile *of;
 
-	if( !(of = file_build( "stdin" )) )
+	if( !(of = ifile_build( "stdin" )) )
 		return( NULL );
 	IM_SETSTR( of->fname_real, of->fname );
 	if( !of->fname_real ) {
-		file_close( of );
+		ifile_close( of );
 		return( NULL );
 	}
 	of->fp = stdin;
@@ -2043,7 +2043,7 @@ file_open_read_stdin()
 /* Find and open for write.
  */
 iOpenFile *
-file_open_write( const char *name, ... )
+ifile_open_write( const char *name, ... )
 {
 	va_list ap;
 	char buf[FILENAME_MAX];
@@ -2052,13 +2052,13 @@ file_open_write( const char *name, ... )
         va_start( ap, name );
         (void) im_vsnprintf( buf, FILENAME_MAX, name, ap );
         va_end( ap );
-        of = file_build( buf );
+        of = ifile_build( buf );
 
 	if( !of )
 		return( NULL );
 	IM_SETSTR( of->fname_real, of->fname );
 	if( !of->fname_real ) {
-		file_close( of );
+		ifile_close( of );
 		return( NULL );
 	}
 	if( !(of->fp = (FILE *) callv_string_filename( (callv_string_fn) fopen,
@@ -2066,7 +2066,7 @@ file_open_write( const char *name, ... )
 		error_top( _( "Unable to open." ) );
 		error_sub( _( "Unable to open file \"%s\" for writing.\n%s." ),
 			of->fname_real, g_strerror( errno ) );
-		file_close( of );
+		ifile_close( of );
 		return( NULL );
 	}
 
@@ -2078,7 +2078,7 @@ file_open_write( const char *name, ... )
 /* fprintf() to a file, checking result.
  */
 gboolean
-file_write( iOpenFile *of, const char *fmt, ... )
+ifile_write( iOpenFile *of, const char *fmt, ... )
 {
 	va_list ap;
 
@@ -2099,10 +2099,10 @@ file_write( iOpenFile *of, const char *fmt, ... )
  *	fred="boink!"
  */
 gboolean
-file_write_var( iOpenFile *of, const char *name, const char *value )
+ifile_write_var( iOpenFile *of, const char *name, const char *value )
 {
 	if( value )
-		return( file_write( of, " %s=\"%s\"", name, value ) );
+		return( ifile_write( of, " %s=\"%s\"", name, value ) );
 	
 	return( TRUE );
 }
@@ -2110,7 +2110,7 @@ file_write_var( iOpenFile *of, const char *name, const char *value )
 /* Load up a file as a string.
  */
 char *
-file_read( iOpenFile *of )
+ifile_read( iOpenFile *of )
 {
 	long len;
 	char *str;
@@ -2148,7 +2148,7 @@ file_read( iOpenFile *of )
  * stdin. 
  */
 char *
-file_read_buffer( iOpenFile *of, char *buffer, size_t max )
+ifile_read_buffer( iOpenFile *of, char *buffer, size_t max )
 {
 	size_t len;
 
@@ -2172,7 +2172,7 @@ file_read_buffer( iOpenFile *of, char *buffer, size_t max )
 /* Return '\0' for EOF, -1 for error.
  */
 int
-file_getc( iOpenFile *of )
+ifile_getc( iOpenFile *of )
 {
 	int ch;
 
@@ -2779,7 +2779,7 @@ recent_load( const char *filename )
 
 	recent = NULL;
 
-	if( (of = file_open_read( "%s" G_DIR_SEPARATOR_S "%s", 
+	if( (of = ifile_open_read( "%s" G_DIR_SEPARATOR_S "%s", 
 		get_savedir(), filename )) ) {
 		char buf[256];
 
@@ -2793,7 +2793,7 @@ recent_load( const char *filename )
 			}
 		}
 
-		file_close( of );
+		ifile_close( of );
 	}
 
 	return( recent );
@@ -2843,11 +2843,11 @@ recent_save( GSList *recent, const char *filename )
 	slist_map_rev( recent, 
 		(SListMapFn) recent_save_sub, &old_recent );
 
-	if( (of = file_open_write( "%s" G_DIR_SEPARATOR_S "%s", 
+	if( (of = ifile_open_write( "%s" G_DIR_SEPARATOR_S "%s", 
 		get_savedir(), filename )) ) {
 		slist_map_rev( old_recent,
 			(SListMapFn) recent_save_sub2, of );
-		file_close( of );
+		ifile_close( of );
 	}
 
 	recent_free( old_recent );

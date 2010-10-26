@@ -304,10 +304,10 @@ main_quit( void )
 	/* Dump wisdom back again.
 	 */
 #if HAVE_FFTW || HAVE_FFTW3
-	if( (of = file_open_write( "%s" G_DIR_SEPARATOR_S "wisdom", 
+	if( (of = ifile_open_write( "%s" G_DIR_SEPARATOR_S "wisdom", 
 		get_savedir() )) ) {
 		fftw_export_wisdom_to_file( of->fp );
-		file_close( of );
+		ifile_close( of );
 	}
 #endif /*HAVE_FFTW*/
 
@@ -1171,7 +1171,7 @@ main( int argc, char *argv[] )
 #endif /*OS_WIN32*/ 
 #endif /*DEBUG_FATAL*/
 
-	main_stdin = file_open_read_stdin();
+	main_stdin = ifile_open_read_stdin();
 
 #ifdef HAVE_GETRLIMIT
 	/* Make sure we have lots of file descriptors. Some platforms have cur
@@ -1227,10 +1227,10 @@ main( int argc, char *argv[] )
 	fftw_import_system_wisdom();
 #endif /*HAVE_FFTW3*/
 #if HAVE_FFTW || HAVE_FFTW3
-	if( (of = file_open_read( "%s" G_DIR_SEPARATOR_S "wisdom", 
+	if( (of = ifile_open_read( "%s" G_DIR_SEPARATOR_S "wisdom", 
 		get_savedir() )) ) {
 		fftw_import_wisdom_from_file( of->fp );
-		file_close( of );
+		ifile_close( of );
 	}
 #endif /*HAVE_FFTW*/
 

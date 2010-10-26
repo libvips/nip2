@@ -320,15 +320,15 @@ filemodel_save_all_text( Filemodel *filemodel, const char *filename )
 {
 	iOpenFile *of;
 
-	if( !(of = file_open_write( "%s", filename )) ) 
+	if( !(of = ifile_open_write( "%s", filename )) ) 
 		return( FALSE );
 
 	column_set_offset( filemodel->x_off, filemodel->y_off );
 	if( model_save_text( MODEL( filemodel ), of ) ) {
-		file_close( of );
+		ifile_close( of );
 		return( FALSE );
 	}
-	file_close( of );
+	ifile_close( of );
 
 	return( TRUE );
 }
@@ -543,14 +543,14 @@ filemodel_load_all_text( Filemodel *filemodel,
 {
 	iOpenFile *of;
 
-	if( !(of = file_open_read( "%s", filename )) ) 
+	if( !(of = ifile_open_read( "%s", filename )) ) 
 		return( FALSE );
 
 	if( model_load_text( MODEL( filemodel ), parent, of ) ) {
-		file_close( of );
+		ifile_close( of );
 		return( FALSE );
 	}
-	file_close( of );
+	ifile_close( of );
 
 	return( TRUE );
 }

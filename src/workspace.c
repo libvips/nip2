@@ -1944,22 +1944,22 @@ workspace_local_set_from_file( Workspace *ws, const char *fname )
 	iOpenFile *of;
 	char *txt;
 
-	if( !(of = file_open_read( "%s", fname )) ) 
+	if( !(of = ifile_open_read( "%s", fname )) ) 
 		return( FALSE );
-	if( !(txt = file_read( of )) ) {
-		file_close( of );
+	if( !(txt = ifile_read( of )) ) {
+		ifile_close( of );
 		return( FALSE );
 	}
 	if( !workspace_local_set( ws, txt ) ) {
 		g_free( txt );
-		file_close( of );
+		ifile_close( of );
 		return( FALSE );
 	}
 
 	filemodel_set_filename( FILEMODEL( ws->local_kit ), fname );
 
 	g_free( txt );
-	file_close( of );
+	ifile_close( of );
 
 	return( TRUE );
 }

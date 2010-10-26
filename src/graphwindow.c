@@ -244,16 +244,16 @@ graphwindow_build_graph( Graphwindow *graphwindow )
 	iOpenFile *of;
 
 	if( !temp_name( tname, "dot" ) ||
-		!(of = file_open_write( "%s", tname )) )
+		!(of = ifile_open_write( "%s", tname )) )
 		return( FALSE );
-	if( !file_write( of, "%s", graphwindow->dot ) ) {
-		file_close( of );
+	if( !ifile_write( of, "%s", graphwindow->dot ) ) {
+		ifile_close( of );
 		unlinkf( "%s", tname );
 		return( FALSE );
 	}
-	file_close( of );
+	ifile_close( of );
 
-	if( !(of = file_open_read( "%s", tname )) ) {
+	if( !(of = ifile_open_read( "%s", tname )) ) {
 		unlinkf( "%s", tname );
 		return( FALSE );
 	}
@@ -262,7 +262,7 @@ graphwindow_build_graph( Graphwindow *graphwindow )
 
 	graphwindow->graph = agread( of->fp );
 
-	file_close( of );
+	ifile_close( of );
 	unlinkf( "%s", tname );
 
 	return( TRUE );
@@ -276,12 +276,12 @@ graphwindow_update_image( Graphwindow *graphwindow )
 	Imageinfo *ii;
 
 	if( !temp_name( tname, "png" ) ||
-		!(of = file_open_write( "%s", tname )) )
+		!(of = ifile_open_write( "%s", tname )) )
 		return( FALSE );
 
 	gvRender( graphwindow->gvc, graphwindow->graph, "png:cairo", of->fp );
 
-	file_close( of );
+	ifile_close( of );
 
 	if( !(ii = imageinfo_new_input( main_imageinfogroup, 
 		GTK_WIDGET( graphwindow ), NULL, tname )) ) {

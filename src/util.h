@@ -261,18 +261,18 @@ typedef struct _iOpenFile {
 	gboolean read;		/* True for open read, false for open write */
 } iOpenFile;
 
-void file_close( iOpenFile *of );
-iOpenFile *file_open_read( const char *name, ... )
+void ifile_close( iOpenFile *of );
+iOpenFile *ifile_open_read( const char *name, ... )
 	__attribute__((format(printf, 1, 2)));
-iOpenFile *file_open_read_stdin();
-iOpenFile *file_open_write( const char *name, ... )
+iOpenFile *ifile_open_read_stdin();
+iOpenFile *ifile_open_write( const char *name, ... )
 	__attribute__((format(printf, 1, 2)));
-gboolean file_write( iOpenFile *of, const char *fmt, ... )
+gboolean ifile_write( iOpenFile *of, const char *fmt, ... )
 	__attribute__((format(printf, 2, 3)));
-gboolean file_write_var( iOpenFile *of, const char *name, const char *value );
-char *file_read( iOpenFile *of );
-char *file_read_buffer( iOpenFile *of, char *buffer, size_t len );
-int file_getc( iOpenFile *of );
+gboolean ifile_write_var( iOpenFile *of, const char *name, const char *value );
+char *ifile_read( iOpenFile *of );
+char *ifile_read_buffer( iOpenFile *of, char *buffer, size_t len );
+int ifile_getc( iOpenFile *of );
 
 double directory_size( const char *dirname );
 

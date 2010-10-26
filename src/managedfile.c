@@ -45,7 +45,7 @@ managedfile_dispose( GObject *gobject )
 	iobject_print( IOBJECT( managedfile ) );
 #endif /*DEBUG*/
 
-	IM_FREEF( file_close, managedfile->file );
+	IM_FREEF( ifile_close, managedfile->file );
 
 	G_OBJECT_CLASS( parent_class )->dispose( gobject );
 }
@@ -122,7 +122,7 @@ managedfile_new( Heap *heap, const char *filename )
 	printf( "managedfile_new: %p: %s\n", managedfile, filename );
 #endif /*DEBUG*/
 
-	if( !(file = file_open_read( "%s", filename )) )
+	if( !(file = ifile_open_read( "%s", filename )) )
 		return( NULL );
 
 	managedfile = g_object_new( TYPE_MANAGEDFILE, NULL );
@@ -135,7 +135,7 @@ managedfile_new( Heap *heap, const char *filename )
 int
 managedfile_getc( Managedfile *managedfile )
 {
-	int ch = file_getc( managedfile->file );
+	int ch = ifile_getc( managedfile->file );
 
 #ifdef DEBUG
 {

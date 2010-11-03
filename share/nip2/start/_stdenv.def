@@ -1143,7 +1143,8 @@ embed type x y w h im
 _morph_2_masks fn m1 m2
 	= m''
 {
-	image = (unsigned char) im_mask2vips (Matrix m2);
+	// The [[real]] can contain 128 values ... squeeze them out!
+	image = im_mask2vips (Matrix m2) == 255;
 	m2_width = get_width image;
 	m2_height = get_height image;
 

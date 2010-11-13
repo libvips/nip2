@@ -8,5 +8,6 @@ EXTRA_DIST = \
 	test_transform.ws \
 	test.ws
 
-TESTS = test_all.sh
+TESTS = \
+	test_all.sh 
 

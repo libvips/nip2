@@ -1,3 +1,18 @@
+- test_matrix.ws fails
+
+	it's Matrix / Insert / Rows and Matrix / Insert / Columns
+
+  test_tasks.ws fails 
+
+  	Capture / Image rank
+
+  test_filter.ws fails with IM_NOVECTOR on
+
+
+
+- add tests to exactly check im_conv(), add tests for various masks sizes too
+
+
 - try
 
 	point re
@@ -88,15 +103,6 @@ sym-param found, argh: point.re
   box_yesno() could take a string which is the name of a pref to check for
   ask-or-not
 
-- show dependancy graph for workspace, see
-
-	http://www.graphviz.org/Gallery/directed/cluster.html
-
-  looks like we'd need to render to a file and display that, argh, or write an
-  entire render -> cairo engine thing
-
-  but it seems graphviz should work on Windows
-
 
 
 - how about something that does:
@@ -110,14 +116,6 @@ sym-param found, argh: point.re
   but the intermediate images are reused, so you can do in-place stuff with it
 
   we could get rid of lineset!
-
-
-
-
-- in 7.22.2, 3x upscale of a bright image, bilinear, we get tile boundaries! 
-  argh
-
-
 
 
 

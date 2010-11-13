@@ -1,45 +1,67 @@
 #!/bin/sh
 
-# run the test workspaces
-for i in @TOP_SRCDIR@/test/workspaces/*; do
-	echo -n "testing `basename $i` ... "
-	if ! @TOP_SRCDIR@/src/nip2 --prefix=@TOP_SRCDIR@ --test $i ; then
-		echo failed
-	else
+result=0
+
+test_result() {
+	if [ $? = 0 ]; then
 		echo ok
+	else
+		echo failed
+		result=1
 	fi
-done
+}
+
+# run the test workspaces
+test_workspaces() {
+	for i in @TOP_SRCDIR@/test/workspaces/*; do
+		echo -n "testing `basename $i` ... "
+		@TOP_SRCDIR@/src/nip2 --prefix=@TOP_SRCDIR@ --test $i
+		test_result
+	done
+}
 
 # load all the example workspaces too
-for i in @TOP_SRCDIR@/share/nip2/data/examples/*/*.ws; do
-	# have to skip these two, they use a non-free plugin
-	if test x"`basename $i`" = x"framing.ws" ; then
-		continue
-	fi
-	if test x"`basename $i`" = x"registering.ws" ; then
-		continue
-	fi
+test_examples() {
+	for i in @TOP_SRCDIR@/share/nip2/data/examples/*/*.ws; do
+		# have to skip these two, they use a non-free plugin
+		if test x"`basename $i`" = x"framing.ws" ; then
+			continue
+		fi
+		if test x"`basename $i`" = x"registering.ws" ; then
+			continue
+		fi
 
-	echo -n "testing `basename $i` ... "
-
-	if ! @TOP_SRCDIR@/src/nip2 --prefix=@TOP_SRCDIR@ --test $i ; then
-		echo failed
-	else
-		echo ok
-	fi
-done
+		echo -n "testing `basename $i` ... "
+		@TOP_SRCDIR@/src/nip2 --prefix=@TOP_SRCDIR@ --test $i 
+		test_result
+	done
+}
 
 # run all the test scripts in scripts/, passing in @TOP_SRCDIR@ so they can
 # find stuff
 
 # these scripts put temp files here, we remove the dir on exit
-mkdir -p tmp
+test_scripts() {
+	mkdir -p tmp
 
-for i in @TOP_SRCDIR@/test/scripts/*.sh; do
-	echo "running `basename $i`:"
-	if ! $i @TOP_SRCDIR@ ; then
-		echo "++ `basename $i` failed"
-	fi
-done
+	for i in @TOP_SRCDIR@/test/scripts/*.sh; do
+		echo "running `basename $i`:"
+		$i @TOP_SRCDIR@ 
+		test_result
+	done
 
-rm -rf tmp
+	rm -rf tmp
+}
+
+test_workspaces
+test_examples
+test_scripts
+
+echo "repeating tests with the vectorising system disabled"
+
+export NO_VECTOR=1
+test_workspaces
+test_examples
+test_scripts
+
+exit $result

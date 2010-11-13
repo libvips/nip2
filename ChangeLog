@@ -22,6 +22,7 @@ started 7.23.0, 2/8/10
 - better "segment" menu item
 - "value" menu item
 - rename stuff to avoid name clashes with cfitsio
+- "make check" runs twice, with and without vector stuff
 
 started 7.22.2, 5/7/10
 - show nthreads in space free tooltip

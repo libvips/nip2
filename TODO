@@ -1,3 +1,21 @@
+- try
+
+	join_tb A1 A1
+
+  with two Matrx ... loops?
+
+
+
+- error popup: just show the top line and a 'details' button
+
+  autoclose normally, if 'details' is clicked, expand and stop auto-close
+
+
+
+
+
+
+
 - test_matrix.ws fails
 
 	it's Matrix / Insert / Rows and Matrix / Insert / Columns
@@ -7,6 +25,11 @@
   	Capture / Image rank
 
   test_filter.ws fails with IM_NOVECTOR on
+
+
+
+
+- 
 
 
 

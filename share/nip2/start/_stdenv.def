@@ -1074,16 +1074,12 @@ matrix_binary fn a b
 join_lr a b
 	= oo_binary_function join_lr_op a b, is_class a
 	= oo_binary'_function join_lr_op a b, is_class b
-	= join a b
+	= join_im a b, is_image a && is_image b 
+	= matrix_binary join_im a b, is_matrix a && is_matrix b 
+	= error (_ "bad arguments to " ++ "join_lr")
 {
 	join_lr_op = Operator "join_lr" 
-		join Operator_type.COMPOUND_REWRAP false;
-
-	join a b
-		= join_im a b, is_image a && is_image b 
-		= matrix_binary join_im a b,
-			is_matrix a && is_matrix b 
-		= error (_ "bad arguments to " ++ "join_lr");
+		join_lr Operator_type.COMPOUND_REWRAP false;
 
 	join_im a b	= insert (get_width a) 0 b a;
 }
@@ -1091,16 +1087,12 @@ join_lr a b
 join_tb a b
 	= oo_binary_function join_tb_op a b, is_class a
 	= oo_binary'_function join_tb_op a b, is_class b
-	= join a b
+	= join_im a b, is_image a && is_image b 
+	= matrix_binary join_im a b, is_matrix a && is_matrix b 
+	= error (_ "bad arguments to " ++ "join_tb")
 {
 	join_tb_op = Operator "join_tb" 
-		join Operator_type.COMPOUND_REWRAP false;
-
-	join a b
-		= join_im a b, is_image a && is_image b 
-		= matrix_binary join_im a b,
-			is_matrix a && is_matrix b 
-		= error (_ "bad arguments to " ++ "join_tb");
+		join_tb Operator_type.COMPOUND_REWRAP false;
 
 	join_im a b	= insert 0 (get_height a) b a;
 }

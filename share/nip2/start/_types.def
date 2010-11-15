@@ -362,7 +362,8 @@ Matrix_base value = class
 			op.type == Operator_type.ARITHMETIC],
 
 		// compound ... don't do iteration
-		[this.Matrix_base (op.fn this.value x),
+		[this.Matrix_base (op.fn this.value x.value),
+			(is_Matrix x || is_Real x || is_Vector x) &&
 			op.type == Operator_type.COMPOUND_REWRAP],
 
 		[op.fn this.value x,

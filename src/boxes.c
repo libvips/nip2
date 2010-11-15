@@ -1466,7 +1466,8 @@ infobar_class_init( InfobarClass *class )
 static void
 infobar_init( Infobar *infobar )
 {
-	infobar->label = NULL;
+	infobar->top = NULL;
+	infobar->sub = NULL;
 	infobar->close_timeout = 0;
 	infobar->close_animation_timeout = 0;
 	infobar->height = 0;
@@ -1498,13 +1499,18 @@ infobar_get_type( void )
 }
 
 static void
+infobar_cancel_close( Infobar *infobar )
+{
+	IM_FREEF( g_source_remove, infobar->close_timeout );
+	IM_FREEF( g_source_remove, infobar->close_animation_timeout );
+	gtk_widget_set_size_request( GTK_WIDGET( infobar ), -1, -1 );
+}
+
+static void
 infobar_hide( Infobar *infobar )
 {
-	IM_FREEF( g_source_remove, infobar->close_animation_timeout );
-	IM_FREEF( g_source_remove, infobar->close_timeout );
-
+	infobar_cancel_close( infobar );
 	gtk_widget_hide( GTK_WIDGET( infobar ) );
-	gtk_widget_set_size_request( GTK_WIDGET( infobar ), -1, -1 );
 }
 
 static gboolean
@@ -1524,9 +1530,7 @@ infobar_close_animation_timeout( Infobar *infobar )
 static void
 infobar_start_close( Infobar *infobar )
 {
-	IM_FREEF( g_source_remove, infobar->close_timeout );
-	IM_FREEF( g_source_remove, infobar->close_animation_timeout );
-	gtk_widget_set_size_request( GTK_WIDGET( infobar ), -1, -1 );
+	infobar_cancel_close( infobar );
 
 	infobar->height = GTK_WIDGET( infobar )->allocation.height;
 	infobar->close_animation_timeout = g_timeout_add( 50, 
@@ -1544,10 +1548,8 @@ infobar_close_timeout( Infobar *infobar )
 static void
 infobar_show( Infobar *infobar )
 {
-	IM_FREEF( g_source_remove, infobar->close_timeout );
-	IM_FREEF( g_source_remove, infobar->close_animation_timeout );
+	infobar_cancel_close( infobar );
 
-	gtk_widget_set_size_request( GTK_WIDGET( infobar ), -1, -1 );
 	infobar->close_timeout = g_timeout_add( 5000, 
 		(GSourceFunc) infobar_close_timeout, infobar );
 
@@ -1558,7 +1560,11 @@ static void
 infobar_response_cb( GtkInfoBar *info_bar, 
 	gint response_id, gpointer user_data )  
 {
-	infobar_start_close( INFOBAR( info_bar ) );
+	Infobar *infobar = INFOBAR( info_bar );
+
+	infobar_cancel_close( infobar );
+	gtk_widget_show( GTK_WIDGET( infobar->sub ) );
+	gtk_button_set_label( GTK_BUTTON( infobar->button ), GTK_STOCK_CLOSE );
 }
 
 Infobar *
@@ -1566,17 +1572,30 @@ infobar_new( void )
 {
 	Infobar *infobar;
 	GtkWidget *content_area;
+	GtkWidget *vbox;
 
 	infobar = g_object_new( TYPE_INFOBAR, NULL );
-	infobar->label = gtk_label_new( "" );
-        gtk_label_set_justify( GTK_LABEL( infobar->label ), GTK_JUSTIFY_LEFT );
-        gtk_label_set_selectable( GTK_LABEL( infobar->label ), TRUE );
-	gtk_label_set_line_wrap( GTK_LABEL( infobar->label ), TRUE );
+
+	vbox = gtk_vbox_new( FALSE, 2 );
 	content_area = gtk_info_bar_get_content_area( GTK_INFO_BAR( infobar ) );
-	gtk_container_add( GTK_CONTAINER( content_area ), infobar->label );
-	gtk_widget_show( infobar->label );
-	gtk_info_bar_add_button( GTK_INFO_BAR( infobar ),
-		 GTK_STOCK_OK, GTK_RESPONSE_OK );
+	gtk_container_add( GTK_CONTAINER( content_area ), vbox );
+	gtk_widget_show( vbox );
+
+	infobar->top = gtk_label_new( "" );
+        gtk_label_set_justify( GTK_LABEL( infobar->top ), GTK_JUSTIFY_LEFT );
+        gtk_label_set_selectable( GTK_LABEL( infobar->top ), TRUE );
+	gtk_label_set_line_wrap( GTK_LABEL( infobar->top ), TRUE );
+	gtk_container_add( GTK_CONTAINER( vbox ), infobar->top );
+	gtk_widget_show( infobar->top );
+
+	infobar->sub = gtk_label_new( "" );
+        gtk_label_set_justify( GTK_LABEL( infobar->sub ), GTK_JUSTIFY_LEFT );
+        gtk_label_set_selectable( GTK_LABEL( infobar->sub ), TRUE );
+	gtk_label_set_line_wrap( GTK_LABEL( infobar->sub ), TRUE );
+	gtk_container_add( GTK_CONTAINER( vbox ), infobar->sub );
+
+	infobar->button = gtk_info_bar_add_button( GTK_INFO_BAR( infobar ),
+		 GTK_STOCK_INFO, GTK_RESPONSE_OK );
 	g_signal_connect( infobar, "response",
 		G_CALLBACK( infobar_response_cb ), NULL );
 
@@ -1593,37 +1612,6 @@ infobar_new( void )
 
 #endif /*USE_INFOBAR*/
 
-#ifdef USE_INFOBAR
-/* Mark up a top/sub pair for an infobar.
- */
-static void
-box_vmarkup_infobar( char *out, const char *top, const char *sub, va_list ap )
-{
-	char buf1[MAX_DIALOG_TEXT];
-	char buf2[MAX_DIALOG_TEXT];
-	char buf3[MAX_DIALOG_TEXT];
-	char *p;
-
-	escape_markup( top, buf1, MAX_DIALOG_TEXT );
-	(void) im_vsnprintf( buf2, MAX_DIALOG_TEXT, sub, ap );
-	escape_markup( buf2, buf3, MAX_DIALOG_TEXT );
-
-	(void) im_snprintf( out, MAX_DIALOG_TEXT, 
-		"<b>%s</b>", buf1 );
-	if( strcmp( buf3, "" ) != 0 ) {
-		int len = strlen( out );
-
-		(void) im_snprintf( out + len, MAX_DIALOG_TEXT - len, 
-			"\n%s", buf3 );
-	}
-
-	/* Remove any trailing newlines, they make infobars rather large.
-	 */
-	while( (p = out + strlen( out )) > out && p[-1] == '\n' )
-		p[-1] = '\0';
-}
-#endif /*USE_INFOBAR*/
-
 /* Set the label on an infobar to some marked-up text.
  */
 void
@@ -1631,10 +1619,24 @@ infobar_vset( Infobar *infobar, GtkMessageType type,
 	const char *top, const char *sub, va_list ap )
 {
 #ifdef USE_INFOBAR
-	char buf[MAX_DIALOG_TEXT];
+	char buf1[MAX_DIALOG_TEXT];
+	char buf2[MAX_DIALOG_TEXT];
+	char *p;
 
-	box_vmarkup_infobar( buf, top, sub, ap );
-	gtk_label_set_markup( GTK_LABEL( infobar->label ), buf );
+	escape_markup( top, buf1, MAX_DIALOG_TEXT );
+	im_snprintf( buf2, MAX_DIALOG_TEXT, "<b>%s</b>", buf1 );
+	gtk_label_set_markup( GTK_LABEL( infobar->top ), buf2 );
+
+	(void) im_vsnprintf( buf1, MAX_DIALOG_TEXT, sub, ap );
+	escape_markup( buf1, buf2, MAX_DIALOG_TEXT );
+
+	/* Remove any trailing newlines, they make infobars rather large.
+	 */
+	while( (p = buf2 + strlen( buf2 )) > buf2 && p[-1] == '\n' )
+		p[-1] = '\0';
+
+	gtk_label_set_markup( GTK_LABEL( infobar->sub ), buf2 );
+
 	gtk_info_bar_set_message_type( GTK_INFO_BAR( infobar ), type );
 
 	infobar_show( infobar );

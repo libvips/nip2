@@ -1,4 +1,10 @@
+- infobar button action needs changing on 'information'
+
+
+
 - oo_binary etc. needs revising, we don't search down branches as we should
+
+
 
   for example, Matrix does:
 
@@ -22,15 +28,6 @@
   Have a base class for operators that does most of the standard stuff
 
   get rid of the operator types rewrap / arithmetic / relational etc. etc. 
-
-
-
-
-
-- error popup: just show the top line and a 'details' button
-
-  autoclose normally, if 'details' is clicked, expand and stop auto-close
-
 
 
 

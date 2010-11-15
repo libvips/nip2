@@ -172,18 +172,18 @@ tool_save_text( Model *model, iOpenFile *of )
 	switch( tool->type ) {
 	case TOOL_SYM:
 		if( sym->expr )
-			if( !file_write( of, 
+			if( !ifile_write( of, 
 				"%s;\n\n", sym->expr->compile->text ) )
 				return( FALSE );
 		break;
 
 	case TOOL_SEP:
-		if( !file_write( of, "#separator\n\n" ) )
+		if( !ifile_write( of, "#separator\n\n" ) )
 			return( FALSE );
 		break;
 
 	case TOOL_DIA:
-		if( !file_write( of, "#dialog \"%s\" \"%s\"\n\n",
+		if( !ifile_write( of, "#dialog \"%s\" \"%s\"\n\n",
 			IOBJECT( tool )->name, FILEMODEL( tool )->filename ) )
 			return( FALSE );
 		break;

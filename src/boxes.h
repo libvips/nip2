@@ -260,16 +260,22 @@ const char *fontbutton_get_font_name( Fontbutton * );
 	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_INFOBAR ))
 
 struct _Infobar {
-	GtkButton parent_object;
+#ifdef USE_INFOBAR
+	GtkInfoBar parent_object;
+#endif /*USE_INFOBAR*/
 
-	GtkWidget *label;
+	GtkWidget *top;
+	GtkWidget *sub;
+	GtkWidget *button;
 	guint close_timeout;
 	guint close_animation_timeout;
 	int height;
 };
 
 typedef struct _InfobarClass {
-	GtkButtonClass parent_class;
+#ifdef USE_INFOBAR
+	GtkInfoBarClass parent_class;
+#endif /*USE_INFOBAR*/
 
 } InfobarClass;
 

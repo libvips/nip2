@@ -1235,6 +1235,7 @@ main( int argc, char *argv[] )
 #endif /*HAVE_FFTW*/
 
 	mainw_startup();
+	imageinfo_startup();
 	reduce_context = reduce_new();
 	main_symbol_root = symbol_root_init();
 	g_object_ref( G_OBJECT( main_symbol_root ) );

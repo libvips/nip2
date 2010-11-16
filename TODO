@@ -1,10 +1,29 @@
-- infobar button action needs changing on 'information'
+
+- imageinfo_paint_line() now takes an Imageinfo for a brush
+  
+- use im_draw_mask() instead of im_plotmask()
+
+- instead of the fixed brushes we have now, let people dial up a brush
+  diameter, with anti-aliasing
+
+- maybe another slider for brush fuzz?
+
+
+
+
+
+- try
+
+	cd test/workspaces
+	nip2 test_conv.ws
+	^O
+	load test_filter.ws
+	strange error box?
+
 
 
 
 - oo_binary etc. needs revising, we don't search down branches as we should
-
-
 
   for example, Matrix does:
 
@@ -34,24 +53,6 @@
 
 
 
-- test_matrix.ws fails
-
-	it's Matrix / Insert / Rows and Matrix / Insert / Columns
-
-  test_tasks.ws fails 
-
-  	Capture / Image rank
-
-  test_filter.ws fails with IM_NOVECTOR on
-
-
-
-
-- 
-
-
-
-- add tests to exactly check im_conv(), add tests for various masks sizes too
 
 
 - try
@@ -106,7 +107,6 @@ reduce_spine: (<symbol "point.x.re"> (<symbol "point.$$pattern_lhs0"> (I (1,2)))
 reduce_spine: (<symbol "point.re"> (<symbol "point.$$pattern_lhs0"> (I (1,2))))
 sym-param found, argh: point.re
 
-
   maybe fix this when we revise the parser
 
   would be a good time to add multiple definitions as well
@@ -128,14 +128,6 @@ sym-param found, argh: point.re
 
 - we have ws->window_width, can we use the one on Model now instead?
 
-
-  
-- use im_draw_mask() instead of im_plotmask()
-
-- instead of the fixed brushes we have now, let people dial up a brush
-  diameter, with anti-aliasing
-
-- maybe another slider for brush fuzz?
 
 - new inplace stuff needs a test suite
 

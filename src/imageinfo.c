@@ -1329,6 +1329,31 @@ static Rect imageinfo_brush_shapes[] = {
 	{ -5, -5, 10, 10 }		/* PAINTBOX_10ITALIC */
 };
 
+IMAGE *imageinfo_brushes[IM_NUMBER( imageinfo_brush_masks )] = { NULL };
+
+int
+imageinfo_startup( void )
+{
+	int i;
+
+	if( imageinfo_brushes[0] )
+		return( 0 );
+
+	for( i = 0; i < IM_NUMBER( imageinfo_brush_masks ); i++ ) {
+		imageinfo_brushes[i] = im_image( 
+			imageinfo_brush_masks[i],
+			imageinfo_brush_shapes[i].width, 
+			imageinfo_brush_shapes[i].height, 
+	                1, IM_BANDFMT_UCHAR );
+		if( !imageinfo_brushes[i] ) {
+			error_vips_all();
+			return( -1 );
+		}
+	}
+
+	return( 0 );
+}
+
 static Undofragment *
 imageinfo_undofragment_new( Undobuffer *undo )
 {
@@ -1711,23 +1736,37 @@ imageinfo_undo_clear( Imageinfo *imageinfo )
 	imageinfo_undo_changed( imageinfo );
 }
 
+static int
+imageinfo_draw_point_cb( IMAGE *im, int x, int y, void *a, void *b, void *c )
+{
+	IMAGE *mask = (IMAGE *) a;
+	PEL *ink = (PEL *) b;
+
+	return( im_draw_mask( im, mask, 
+		x - mask->Xsize / 2, y - mask->Ysize - 2, ink ) );
+}
+
 /* Draw a line.
  */
 gboolean
-imageinfo_paint_line( Imageinfo *imageinfo, Imageinfo *ink, 
-	int nib, int x1, int y1, int x2, int y2 )
+imageinfo_paint_line( Imageinfo *imageinfo, 
+	Imageinfo *ink, Imageinfo *mask,
+	int x1, int y1, int x2, int y2 )
 {
 	IMAGE *im = imageinfo_get( FALSE, imageinfo ); 
 	IMAGE *ink_im = imageinfo_get( FALSE, ink );
+	IMAGE *mask_im = imageinfo_get( FALSE, mask );
 	PEL *data = (PEL *) ink_im->data;
 	Rect dirty, p1, p2, image, clipped;
 
-	p1 = imageinfo_brush_shapes[nib];
-	p1.left += x1;
-	p1.top += y1;
-	p2 = imageinfo_brush_shapes[nib];
-	p2.left += x2;
-	p2.top += y2;
+	p1.width = mask_im->Xsize;
+	p1.height = mask_im->Ysize;
+	p1.left += x1 - mask_im->Xsize / 2;
+	p1.top += y1 - mask_im->Ysize / 2;
+	p2.width = mask_im->Xsize;
+	p2.height = mask_im->Ysize;
+	p2.left += x2 - mask_im->Xsize / 2;
+	p2.top += y2 - mask_im->Ysize / 2;
 	im_rect_unionrect( &p1, &p2, &dirty );
 
 	image.left = 0;
@@ -1743,8 +1782,7 @@ imageinfo_paint_line( Imageinfo *imageinfo, Imageinfo *ink,
 		return( FALSE );
 
 	if( im_draw_line_user( im, x1, y1, x2, y2, 
-		(VipsPlotFn) im_plotmask, data, 
-		imageinfo_brush_masks[nib], &imageinfo_brush_shapes[nib] ) ) {
+		(VipsPlotFn) imageinfo_draw_point_cb, mask_im, data, NULL ) ) {
 		error_vips_all();
 		return( FALSE );
 	}

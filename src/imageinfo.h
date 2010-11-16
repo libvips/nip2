@@ -221,8 +221,12 @@ gboolean imageinfo_undo( Imageinfo *imageinfo );
 gboolean imageinfo_redo( Imageinfo *imageinfo );
 void imageinfo_undo_clear( Imageinfo *imageinfo );
 
-gboolean imageinfo_paint_line( Imageinfo *imageinfo, Imageinfo *ink, 
-	int nib, int x1, int y1, int x2, int y2 );
+extern IMAGE *imageinfo_brushes[];
+int imageinfo_startup( void );
+
+gboolean imageinfo_paint_line( Imageinfo *imageinfo, 
+	Imageinfo *ink, Imageinfo *mask, 
+	int x1, int y1, int x2, int y2 );
 gboolean imageinfo_paint_flood( Imageinfo *imageinfo, Imageinfo *ink,  
 	int x, int y, gboolean blob );
 gboolean imageinfo_paint_smudge( Imageinfo *imageinfo, 

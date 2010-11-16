@@ -266,7 +266,6 @@ struct _Infobar {
 
 	GtkWidget *top;
 	GtkWidget *sub;
-	GtkWidget *button;
 	guint close_timeout;
 	guint close_animation_timeout;
 	int height;

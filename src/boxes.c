@@ -1511,6 +1511,7 @@ infobar_hide( Infobar *infobar )
 {
 	infobar_cancel_close( infobar );
 	gtk_widget_hide( GTK_WIDGET( infobar ) );
+	gtk_widget_hide( GTK_WIDGET( infobar->sub ) );
 }
 
 static gboolean
@@ -1562,9 +1563,19 @@ infobar_response_cb( GtkInfoBar *info_bar,
 {
 	Infobar *infobar = INFOBAR( info_bar );
 
-	infobar_cancel_close( infobar );
-	gtk_widget_show( GTK_WIDGET( infobar->sub ) );
-	gtk_button_set_label( GTK_BUTTON( infobar->button ), GTK_STOCK_CLOSE );
+	switch( response_id ) {
+	case GTK_RESPONSE_OK:
+		infobar_cancel_close( infobar );
+		gtk_widget_show( GTK_WIDGET( infobar->sub ) );
+		break;
+
+	case GTK_RESPONSE_CANCEL:
+		infobar_start_close( infobar );
+		break;
+	
+	default:
+		break;
+	}
 }
 
 Infobar *
@@ -1594,8 +1605,13 @@ infobar_new( void )
 	gtk_label_set_line_wrap( GTK_LABEL( infobar->sub ), TRUE );
 	gtk_container_add( GTK_CONTAINER( vbox ), infobar->sub );
 
-	infobar->button = gtk_info_bar_add_button( GTK_INFO_BAR( infobar ),
+	gtk_info_bar_add_button( GTK_INFO_BAR( infobar ),
 		 GTK_STOCK_INFO, GTK_RESPONSE_OK );
+	g_signal_connect( infobar, "response",
+		G_CALLBACK( infobar_response_cb ), NULL );
+
+	gtk_info_bar_add_button( GTK_INFO_BAR( infobar ),
+		 GTK_STOCK_CLOSE, GTK_RESPONSE_CANCEL );
 	g_signal_connect( infobar, "response",
 		G_CALLBACK( infobar_response_cb ), NULL );
 

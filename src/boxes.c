@@ -1512,6 +1512,7 @@ infobar_hide( Infobar *infobar )
 	infobar_cancel_close( infobar );
 	gtk_widget_hide( GTK_WIDGET( infobar ) );
 	gtk_widget_hide( GTK_WIDGET( infobar->sub ) );
+	gtk_widget_set_sensitive( GTK_WIDGET( infobar->info ), TRUE );
 }
 
 static gboolean
@@ -1558,36 +1559,32 @@ infobar_show( Infobar *infobar )
 }
 
 static void                
-infobar_response_cb( GtkInfoBar *info_bar, 
-	gint response_id, gpointer user_data )  
+infobar_info_cb( GtkWidget *button, Infobar *infobar )
 {
-	Infobar *infobar = INFOBAR( info_bar );
+	infobar_cancel_close( infobar );
+	gtk_widget_show( GTK_WIDGET( infobar->sub ) );
+	gtk_widget_set_sensitive( GTK_WIDGET( infobar->info ), FALSE );
+}
 
-	switch( response_id ) {
-	case GTK_RESPONSE_OK:
-		infobar_cancel_close( infobar );
-		gtk_widget_show( GTK_WIDGET( infobar->sub ) );
-		break;
-
-	case GTK_RESPONSE_CANCEL:
-		infobar_start_close( infobar );
-		break;
-	
-	default:
-		break;
-	}
+static void                
+infobar_close_cb( GtkWidget *button, Infobar *infobar )
+{
+	infobar_start_close( infobar );
 }
 
 Infobar *
 infobar_new( void )
 {
 	Infobar *infobar;
-	GtkWidget *content_area;
 	GtkWidget *vbox;
+	GtkWidget *content_area;
+	GtkWidget *hbox;
+	GtkWidget *action_area;
+	GtkWidget *button;
 
 	infobar = g_object_new( TYPE_INFOBAR, NULL );
 
-	vbox = gtk_vbox_new( FALSE, 2 );
+	vbox = gtk_vbox_new( FALSE, 10 );
 	content_area = gtk_info_bar_get_content_area( GTK_INFO_BAR( infobar ) );
 	gtk_container_add( GTK_CONTAINER( content_area ), vbox );
 	gtk_widget_show( vbox );
@@ -1605,15 +1602,26 @@ infobar_new( void )
 	gtk_label_set_line_wrap( GTK_LABEL( infobar->sub ), TRUE );
 	gtk_container_add( GTK_CONTAINER( vbox ), infobar->sub );
 
-	gtk_info_bar_add_button( GTK_INFO_BAR( infobar ),
-		 GTK_STOCK_INFO, GTK_RESPONSE_OK );
-	g_signal_connect( infobar, "response",
-		G_CALLBACK( infobar_response_cb ), NULL );
+	/* We can't use gtk_info_bar_add_button(), we need the buttons
+	 * horizontally.
+	 */
 
-	gtk_info_bar_add_button( GTK_INFO_BAR( infobar ),
-		 GTK_STOCK_CLOSE, GTK_RESPONSE_CANCEL );
-	g_signal_connect( infobar, "response",
-		G_CALLBACK( infobar_response_cb ), NULL );
+	hbox = gtk_hbox_new( FALSE, 2 );
+	action_area = gtk_info_bar_get_action_area( GTK_INFO_BAR( infobar ) );
+	gtk_container_add( GTK_CONTAINER( action_area ), hbox );
+	gtk_widget_show( hbox );
+
+	button = gtk_button_new_from_stock( GTK_STOCK_CLOSE );
+        gtk_box_pack_end( GTK_BOX( hbox ), button, TRUE, TRUE, 2 );
+	g_signal_connect( button, "clicked",
+		G_CALLBACK( infobar_close_cb ), infobar );
+	gtk_widget_show( button );
+
+	infobar->info = gtk_button_new_from_stock( GTK_STOCK_INFO );
+        gtk_box_pack_end( GTK_BOX( hbox ), infobar->info, TRUE, TRUE, 2 );
+	g_signal_connect( infobar->info, "clicked",
+		G_CALLBACK( infobar_info_cb ), infobar );
+	gtk_widget_show( infobar->info );
 
 	return( infobar );
 }

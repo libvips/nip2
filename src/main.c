@@ -1489,11 +1489,11 @@ main( int argc, char *argv[] )
 			nativeize_path( save_dir );
 			error_top( "%s", buf );
 			error_sub( 
-_( "A new directory has been created in your home directory to hold startup, "
+_( "A new directory has been created to hold startup, "
 "data and temporary files:\n\n"
 "     %s\n\n"
-"If you've used previous versions of %s, you will probably want "
-"to move any files over from your old work area and remove any old temps." ),
+"If you've used previous versions of %s, you might want "
+"to copy files over from your old work area." ),
 				save_dir, PACKAGE );
 			iwindow_alert( NULL, GTK_MESSAGE_INFO );
 		}

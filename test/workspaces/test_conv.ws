@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.23.0">
-  <Workspace window_x="0" window_y="0" window_width="1920" window_height="1171" filename="test_conv.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="100" lpane_open="false" rpane_position="400" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_conv" caption="Default empty workspace">
+  <Workspace window_x="0" window_y="0" window_width="788" window_height="541" filename="/home/john/SVN/vips/nip2/trunk/test/workspaces/test_conv.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="100" lpane_open="false" rpane_position="400" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_conv" caption="Default empty workspace">
     <Column x="0" y="657" open="true" selected="false" sform="false" next="5" name="A" caption="medium test matrix">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">

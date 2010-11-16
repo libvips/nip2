@@ -996,8 +996,9 @@ mainw_open_done_cb( iWindow *iwnd, void *client,
 		return;
 	}
 
-	/* If we have just loaded one or more workspaces, and the current
-	 * workspace is smpty, we can junk it.
+	/* If there's nothing left to load (we only had workspaes to load and
+	 * we've loaded them all) and the current workspace is smpty, we can 
+	 * junk it.
 	 */
 	if( !load.nitems && 
 		workspace_is_empty( mainw->ws ) ) {
@@ -1007,7 +1008,11 @@ mainw_open_done_cb( iWindow *iwnd, void *client,
 		filemodel_set_modified( FILEMODEL( mainw->ws ), FALSE );
 		iwindow_kill( IWINDOW( mainw ) );
 	}
-	else {
+
+	/* Some actual files (image, matrix) were selected. Load into
+	 * the current workspace.
+	 */
+	if( load.nitems ) {
 		char txt2[MAX_STRSIZE];
 		VipsBuf buf2 = VIPS_BUF_STATIC( txt2 );
 
@@ -1017,9 +1022,6 @@ mainw_open_done_cb( iWindow *iwnd, void *client,
 		else
 			vips_buf_appends( &buf2, vips_buf_all( &buf ) );
 
-		/* Some actual files (image, matrix) were selected. Load into
-		 * the current workspace.
-		 */
 		if( !workspace_add_def( mainw->ws, vips_buf_all( &buf2 ) ) ) {
 			error_top( _( "Load failed." ) );
 			error_sub( _( "Unable to execute:\n   %s" ), 

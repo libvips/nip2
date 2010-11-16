@@ -1280,8 +1280,8 @@ workspace_save_all( Filemodel *filemodel, const char *filename )
 		NN( IOBJECT( filemodel )->name ), filename );
 #endif /*DEBUG*/
 
-	if( (result = FILEMODEL_CLASS( parent_class )->save_all( filemodel,
-		filename )) )
+	if( (result = FILEMODEL_CLASS( parent_class )->
+		save_all( filemodel, filename )) )
 		/* This will add save-as files to recent too. Don't note
 		 * auto_load on recent, since it won't have been loaded by the
 		 * user.

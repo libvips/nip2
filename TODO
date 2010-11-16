@@ -1,24 +1,14 @@
 
-- imageinfo_paint_line() now takes an Imageinfo for a brush
-  
-- use im_draw_mask() instead of im_plotmask()
-
 - instead of the fixed brushes we have now, let people dial up a brush
   diameter, with anti-aliasing
+
+  get rid of 'nib' in imagemodel, have a brush imageinfo instead
+
+  have a value for brush radius set from a slider
 
 - maybe another slider for brush fuzz?
 
 
-
-
-
-- try
-
-	cd test/workspaces
-	nip2 test_conv.ws
-	^O
-	load test_filter.ws
-	strange error box?
 
 
 

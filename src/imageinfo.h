@@ -221,7 +221,7 @@ gboolean imageinfo_undo( Imageinfo *imageinfo );
 gboolean imageinfo_redo( Imageinfo *imageinfo );
 void imageinfo_undo_clear( Imageinfo *imageinfo );
 
-extern IMAGE *imageinfo_brushes[];
+extern Imageinfo *imageinfo_brushes[];
 int imageinfo_startup( void );
 
 gboolean imageinfo_paint_line( Imageinfo *imageinfo, 

@@ -938,7 +938,8 @@ imagepresent_paint_stop( Imagepresent *ip, int x, int y )
 
 	case IMAGEMODEL_PEN:
 		if( !imageinfo_paint_line( imageinfo, 
-			imagemodel->ink, imagemodel->nib, 
+			imagemodel->ink, 
+			imageinfo_brushes[imagemodel->nib], 
 			ip->paint_last_x, ip->paint_last_y, ix, iy ) )
 			iwindow_alert( GTK_WIDGET( ip ), GTK_MESSAGE_ERROR );
 
@@ -949,7 +950,8 @@ imagepresent_paint_stop( Imagepresent *ip, int x, int y )
 			DESTROY_GTK( ip->regionview );
 
 			if( !imageinfo_paint_line( imageinfo, 
-				imagemodel->ink, imagemodel->nib, 
+				imagemodel->ink, 
+				imageinfo_brushes[imagemodel->nib], 
 				ip->floating.left, ip->floating.top,
 				IM_RECT_RIGHT( &ip->floating ),
 				IM_RECT_BOTTOM( &ip->floating ) ) )
@@ -1177,7 +1179,8 @@ imagepresent_button_motion( Imagepresent *ip, GdkEvent *ev )
 
 	case IMAGEMODEL_PEN:
 		if( !imageinfo_paint_line( imageinfo, 
-			imagemodel->ink, imagemodel->nib, 
+			imagemodel->ink, 
+			imageinfo_brushes[imagemodel->nib], 
 			ip->paint_last_x, ip->paint_last_y, ix, iy ) )
 			iwindow_alert( GTK_WIDGET( ip ), GTK_MESSAGE_ERROR );
 		im_invalidate( imageinfo_get( FALSE, imageinfo ) );

@@ -1329,7 +1329,7 @@ static Rect imageinfo_brush_shapes[] = {
 	{ -5, -5, 10, 10 }		/* PAINTBOX_10ITALIC */
 };
 
-IMAGE *imageinfo_brushes[IM_NUMBER( imageinfo_brush_masks )] = { NULL };
+Imageinfo *imageinfo_brushes[IM_NUMBER( imageinfo_brush_masks )] = { NULL };
 
 int
 imageinfo_startup( void )
@@ -1340,15 +1340,24 @@ imageinfo_startup( void )
 		return( 0 );
 
 	for( i = 0; i < IM_NUMBER( imageinfo_brush_masks ); i++ ) {
-		imageinfo_brushes[i] = im_image( 
+		IMAGE *im;
+		Imageinfo *ii;
+
+		if( !(im = im_image( 
 			imageinfo_brush_masks[i],
 			imageinfo_brush_shapes[i].width, 
 			imageinfo_brush_shapes[i].height, 
-	                1, IM_BANDFMT_UCHAR );
-		if( !imageinfo_brushes[i] ) {
+	                1, IM_BANDFMT_UCHAR )) ) {
 			error_vips_all();
 			return( -1 );
 		}
+		if( !(ii = imageinfo_new( 
+			main_imageinfogroup, NULL, im, NULL )) ) {
+			im_close( im );
+			error_vips_all();
+			return( -1 );
+		}
+		imageinfo_brushes[i] = ii;
 	}
 
 	return( 0 );
@@ -1743,7 +1752,7 @@ imageinfo_draw_point_cb( IMAGE *im, int x, int y, void *a, void *b, void *c )
 	PEL *ink = (PEL *) b;
 
 	return( im_draw_mask( im, mask, 
-		x - mask->Xsize / 2, y - mask->Ysize - 2, ink ) );
+		x - mask->Xsize / 2, y - mask->Ysize / 2, ink ) );
 }
 
 /* Draw a line.
@@ -1761,12 +1770,12 @@ imageinfo_paint_line( Imageinfo *imageinfo,
 
 	p1.width = mask_im->Xsize;
 	p1.height = mask_im->Ysize;
-	p1.left += x1 - mask_im->Xsize / 2;
-	p1.top += y1 - mask_im->Ysize / 2;
+	p1.left = x1 - mask_im->Xsize / 2;
+	p1.top = y1 - mask_im->Ysize / 2;
 	p2.width = mask_im->Xsize;
 	p2.height = mask_im->Ysize;
-	p2.left += x2 - mask_im->Xsize / 2;
-	p2.top += y2 - mask_im->Ysize / 2;
+	p2.left = x2 - mask_im->Xsize / 2;
+	p2.top = y2 - mask_im->Ysize / 2;
 	im_rect_unionrect( &p1, &p2, &dirty );
 
 	image.left = 0;

@@ -1235,7 +1235,6 @@ main( int argc, char *argv[] )
 #endif /*HAVE_FFTW*/
 
 	mainw_startup();
-	imageinfo_startup();
 	reduce_context = reduce_new();
 	main_symbol_root = symbol_root_init();
 	g_object_ref( G_OBJECT( main_symbol_root ) );
@@ -1253,6 +1252,7 @@ main( int argc, char *argv[] )
 	main_imageinfogroup = imageinfogroup_new();
 	g_object_ref( G_OBJECT( main_imageinfogroup ) );
 	iobject_sink( IOBJECT( main_imageinfogroup ) );
+	imageinfo_startup();
 
 	/* First pass at command-line options. Just look at the flags that
 	 * imply other flags, don't do any processing yet.

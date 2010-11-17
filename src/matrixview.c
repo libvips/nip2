@@ -455,8 +455,6 @@ matrixview_liststore_new( MatrixValue *matrixvalue )
 	GType *types;
 	int i, y;
 	GtkListStore *store;
-	int *columns;
-	GValue *values;
 
 	types = g_new( GType, width );
 	for( i = 0; i < width; i++ )
@@ -464,31 +462,15 @@ matrixview_liststore_new( MatrixValue *matrixvalue )
 	store = gtk_list_store_newv( width, types );
 	g_free( types );
 
-	columns = g_new( int, width );
-	values = g_new0( GValue, width );
-
-	for( i = 0; i < width; i++ ) {
-		columns[i] = i;
-		g_value_init( &values[i], G_TYPE_DOUBLE );
-	}
-
 	for( y = 0; y < height; y++ ) {
 		GtkTreeIter iter;
 
-		for( i = 0; i < width; i++ ) 
-	                g_value_set_double( &values[i], 
-				matrixvalue->coeff[y * width + i] );
-
 		gtk_list_store_append( store, &iter );
-		gtk_list_store_set_valuesv( store, &iter, 
-			columns, values, width );
+
+		for( i = 0; i < width; i++ ) 
+			gtk_list_store_set( store, &iter, 
+				i, matrixvalue->coeff[y * width + i], -1 );
 	}
-
-	for( i = 0; i < width; i++ ) 
-		g_value_unset( &values[i] );
-
-	g_free( values );
-	g_free( columns );
 
 	return( store );
 }

@@ -132,14 +132,12 @@ paintboxview_tool_toggled_cb( GtkWidget *wid, Paintboxview *pbv )
 /* New nib selected.
  */
 static void
-paintboxview_new_nib_cb( GtkWidget *wid, Paintboxview *pbv )
+paintboxview_scale_change_cb( Tslider *tslider, Paintboxview *pbv )
 {
 	Imagemodel *imagemodel = pbv->imagemodel;
-	const PaintboxNib nib = (PaintboxNib) 
-		gtk_combo_box_get_active( GTK_COMBO_BOX( pbv->nib ) );
 
-	if( imagemodel->nib != nib ) {
-		imagemodel->nib = nib;
+	if( imagemodel->nib_radius != tslider->value ) {
+		imagemodel->nib_radius = tslider->value; 
 		iobject_changed( IOBJECT( imagemodel ) );
 	}
 }
@@ -244,22 +242,6 @@ paintboxview_init( Paintboxview *pbv )
 		STOCK_SMUDGE 		/* IMAGEMODEL_SMUDGE */
 	};
 
-	static const char *nib_names[] = {
-		N_( "1 round" ),	/* PAINTBOX_1ROUND */
-		N_( "2 round" ),	/* PAINTBOX_2ROUND */
-		N_( "3 round" ),	/* PAINTBOX_3ROUND */
-		N_( "4 round" ),	/* PAINTBOX_4ROUND */
-		N_( "5 round" ),	/* PAINTBOX_5ROUND */
-		N_( "6 round" ),	/* PAINTBOX_6ROUND */
-		N_( "10 round" ),	/* PAINTBOX_10ROUND */
-		N_( "2 italic" ),	/* PAINTBOX_2ITALIC */
-		N_( "3 italic" ),	/* PAINTBOX_3ITALIC */
-		N_( "4 italic" ),	/* PAINTBOX_4ITALIC */
-		N_( "5 italic" ),	/* PAINTBOX_5ITALIC */
-		N_( "6 italic" ),	/* PAINTBOX_6ITALIC */
-		N_( "10 italic" )	/* PAINTBOX_10ITALIC */
-	};
-
 	static const char *tool_tooltips[] = {
 		N_( "Manipulate regions" ), 		/* IMAGEMODEL_SELECT */
 		N_( "Pan window" ),	 		/* IMAGEMODEL_PAN */
@@ -362,9 +344,17 @@ paintboxview_init( Paintboxview *pbv )
 	}
 	gtk_box_pack_start( GTK_BOX( hb ), hb2, FALSE, FALSE, 0 );
 
-	pbv->nib = build_goption( hb, NULL, _( "Nib" ), 
-		nib_names, IM_NUMBER( nib_names ),
-		GTK_SIGNAL_FUNC( paintboxview_new_nib_cb ), pbv );
+	pbv->nib = tslider_new();
+	pbv->nib->from = 0;
+	pbv->nib->to = 64;
+	pbv->nib->value = 0;
+	pbv->nib->svalue = 1;
+	pbv->nib->digits = 2;
+	tslider_changed( pbv->nib );
+        gtk_box_pack_start( GTK_BOX( hb ), 
+		GTK_WIDGET( pbv->nib ), FALSE, TRUE, 0 );
+        gtk_signal_connect( GTK_OBJECT( pbv->nib ), "changed", 
+		GTK_SIGNAL_FUNC( paintboxview_scale_change_cb ), pbv );
 
 	pbv->ink = (GtkWidget *) colourdisplay_new( NULL );
         doubleclick_add( GTK_WIDGET( pbv->ink ), FALSE,
@@ -438,8 +428,6 @@ paintboxview_changed_cb( Imagemodel *imagemodel, Paintboxview *pbv )
 {
 	Conversion *conv = imagemodel->conv;
 	Colourdisplay *ink = COLOURDISPLAY( pbv->ink );
-	const PaintboxNib paintbox_nib = (PaintboxNib) 
-		gtk_combo_box_get_active( GTK_COMBO_BOX( pbv->nib ) ); 
 	int i;
 
 #ifdef DEBUG
@@ -480,12 +468,6 @@ paintboxview_changed_cb( Imagemodel *imagemodel, Paintboxview *pbv )
 		gtk_toggle_button_set_active( 
 			GTK_TOGGLE_BUTTON( pbv->tool[i] ), 
 			i == (int) imagemodel->state );
-
-	/* Has the tool changed? Update.
-	 */
-	if( paintbox_nib != imagemodel->nib ) 
-		gtk_combo_box_set_active( GTK_COMBO_BOX( pbv->nib ),
-			imagemodel->nib );
 
 	fontbutton_set_font_name( FONTBUTTON( pbv->font ),
 		pbv->imagemodel->font_name );

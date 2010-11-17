@@ -132,6 +132,7 @@ imagemodel_dispose( GObject *gobject )
 	IM_FREE( imagemodel->font_name );
 	IM_FREE( imagemodel->text );
 	MANAGED_UNREF( imagemodel->text_mask );
+	MANAGED_UNREF( imagemodel->nib );
 
 	G_OBJECT_CLASS( parent_class )->dispose( gobject );
 }
@@ -291,7 +292,8 @@ imagemodel_init( Imagemodel *imagemodel )
 	imagemodel->show_status = DISPLAY_STATUS;
 
 	imagemodel->show_paintbox = FALSE;
-	imagemodel->nib = PAINTBOX_1ROUND;
+	imagemodel->nib_radius = 0;
+	imagemodel->nib = NULL;
 	imagemodel->ink = NULL;
 	imagemodel->font_name = im_strdup( NULL, PAINTBOX_FONT );
 	imagemodel->text = NULL;
@@ -522,6 +524,23 @@ imagemodel_refresh_text( Imagemodel *imagemodel )
 	if( !imageinfo_paint_text( imagemodel->text_mask, 
 		imagemodel->font_name, imagemodel->text, 
 		&imagemodel->text_area ) )
+		return( FALSE );
+
+	return( TRUE );
+}
+
+gboolean
+imagemodel_refresh_nib( Imagemodel *imagemodel )
+{
+	MANAGED_UNREF( imagemodel->nib );
+
+	if( !(imagemodel->nib = imageinfo_new_temp( main_imageinfogroup, 
+			reduce_context->heap, NULL, "t" )) ) 
+		return( FALSE );
+
+	MANAGED_REF( imagemodel->nib );
+
+	if( !imageinfo_paint_nib( imagemodel->nib, imagemodel->nib_radius ) )
 		return( FALSE );
 
 	return( TRUE );

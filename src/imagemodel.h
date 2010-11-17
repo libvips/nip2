@@ -57,24 +57,6 @@ typedef enum _ImagemodelState {
 	IMAGEMODEL_LAST	
 } ImagemodelState;
 
-/* Paint nibs.
- */
-typedef enum _PaintboxNib {
-	PAINTBOX_1ROUND = 0,
-	PAINTBOX_2ROUND,
-	PAINTBOX_3ROUND,
-	PAINTBOX_4ROUND,
-	PAINTBOX_5ROUND,
-	PAINTBOX_6ROUND,
-	PAINTBOX_10ROUND,
-	PAINTBOX_2ITALIC,
-	PAINTBOX_3ITALIC,
-	PAINTBOX_4ITALIC,
-	PAINTBOX_5ITALIC,
-	PAINTBOX_6ITALIC,
-	PAINTBOX_10ITALIC
-} PaintboxNib;
-
 struct _Imagemodel {
 	iObject parent_class;
 
@@ -110,7 +92,8 @@ struct _Imagemodel {
 	/* Paintbox.
 	 */
 	gboolean show_paintbox;		/* Visible/not */
-	PaintboxNib nib;		/* Current nib */
+	int nib_radius;			/* Selected radius */
+	Imageinfo *nib;			/* Generated nib mask */
 	Imageinfo *ink;			/* 1x1 pixel ink image */
 	char *font_name;		/* Selected font name */
 	char *text; 			/* Text to render */
@@ -149,5 +132,6 @@ void imagemodel_set_status( Imagemodel *imagemodel, gboolean show_status );
 void imagemodel_set_convert( Imagemodel *imagemodel, gboolean show_convert );
 
 gboolean imagemodel_refresh_text( Imagemodel *imagemodel );
+gboolean imagemodel_refresh_nib( Imagemodel *imagemodel );
 
 void imagemodel_paint_recalc( Imagemodel *imagemodel );

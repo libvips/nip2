@@ -49,8 +49,8 @@
 /* But some themes can trigger warnings, argh, so sometimes we need to
  * undef it. VipsObject sets can trigger warnings. libgoffice will warn about
  * precision issues if run under valgrind.
-#undef DEBUG_FATAL
  */
+#undef DEBUG_FATAL
 
 /* Time startup.
 #define DEBUG_TIME
@@ -1252,7 +1252,6 @@ main( int argc, char *argv[] )
 	main_imageinfogroup = imageinfogroup_new();
 	g_object_ref( G_OBJECT( main_imageinfogroup ) );
 	iobject_sink( IOBJECT( main_imageinfogroup ) );
-	imageinfo_startup();
 
 	/* First pass at command-line options. Just look at the flags that
 	 * imply other flags, don't do any processing yet.

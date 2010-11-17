@@ -221,9 +221,6 @@ gboolean imageinfo_undo( Imageinfo *imageinfo );
 gboolean imageinfo_redo( Imageinfo *imageinfo );
 void imageinfo_undo_clear( Imageinfo *imageinfo );
 
-extern Imageinfo *imageinfo_brushes[];
-int imageinfo_startup( void );
-
 gboolean imageinfo_paint_line( Imageinfo *imageinfo, 
 	Imageinfo *ink, Imageinfo *mask, 
 	int x1, int y1, int x2, int y2 );
@@ -237,6 +234,7 @@ gboolean imageinfo_paint_rect( Imageinfo *imageinfo, Imageinfo *ink,
 	Rect *area );
 gboolean imageinfo_paint_text( Imageinfo *imageinfo, 
 	const char *font_name, const char *text, Rect *tarea );
+gboolean imageinfo_paint_nib( Imageinfo *imageinfo, int nib_radius );
 gboolean imageinfo_paint_mask( Imageinfo *imageinfo, 
 	Imageinfo *ink, Imageinfo *mask, int x, int y );
 

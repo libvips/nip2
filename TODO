@@ -1,17 +1,4 @@
 
-- instead of the fixed brushes we have now, let people dial up a brush
-  diameter, with anti-aliasing
-
-  get rid of 'nib' in imagemodel, have a brush imageinfo instead
-
-  have a value for brush radius set from a slider
-
-- maybe another slider for brush fuzz?
-
-
-
-
-
 
 - oo_binary etc. needs revising, we don't search down branches as we should
 

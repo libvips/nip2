@@ -852,6 +852,7 @@ imagepresent_left_press( Imagepresent *ip, GdkEvent *ev, int x, int y )
 
 	case IMAGEMODEL_PEN:
 	case IMAGEMODEL_SMUDGE:
+		imagemodel_refresh_nib( imagemodel );
 		imagepresent_snap_point( ip, x, y, &x, &y );
 		conversion_disp_to_im( conv, x, y, &ix, &iy );
 		ip->paint_last_x = ix;
@@ -860,6 +861,7 @@ imagepresent_left_press( Imagepresent *ip, GdkEvent *ev, int x, int y )
 		break;
 
 	case IMAGEMODEL_LINE:
+		imagemodel_refresh_nib( imagemodel );
 		imagepresent_snap_point( ip, x, y, &x, &y );
 		conversion_disp_to_im( conv, x, y, &ix, &iy );
 		ip->paint_last_x = ix;
@@ -939,7 +941,7 @@ imagepresent_paint_stop( Imagepresent *ip, int x, int y )
 	case IMAGEMODEL_PEN:
 		if( !imageinfo_paint_line( imageinfo, 
 			imagemodel->ink, 
-			imageinfo_brushes[imagemodel->nib], 
+			imagemodel->nib, 
 			ip->paint_last_x, ip->paint_last_y, ix, iy ) )
 			iwindow_alert( GTK_WIDGET( ip ), GTK_MESSAGE_ERROR );
 
@@ -951,7 +953,7 @@ imagepresent_paint_stop( Imagepresent *ip, int x, int y )
 
 			if( !imageinfo_paint_line( imageinfo, 
 				imagemodel->ink, 
-				imageinfo_brushes[imagemodel->nib], 
+				imagemodel->nib, 
 				ip->floating.left, ip->floating.top,
 				IM_RECT_RIGHT( &ip->floating ),
 				IM_RECT_BOTTOM( &ip->floating ) ) )
@@ -1180,7 +1182,7 @@ imagepresent_button_motion( Imagepresent *ip, GdkEvent *ev )
 	case IMAGEMODEL_PEN:
 		if( !imageinfo_paint_line( imageinfo, 
 			imagemodel->ink, 
-			imageinfo_brushes[imagemodel->nib], 
+			imagemodel->nib, 
 			ip->paint_last_x, ip->paint_last_y, ix, iy ) )
 			iwindow_alert( GTK_WIDGET( ip ), GTK_MESSAGE_ERROR );
 		im_invalidate( imageinfo_get( FALSE, imageinfo ) );

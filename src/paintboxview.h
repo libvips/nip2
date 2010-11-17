@@ -53,7 +53,7 @@ struct _Paintboxview {
 	GtkWidget *redo;
 	GtkWidget *clear;
 	GtkWidget *tool[IMAGEMODEL_LAST];
-	GtkWidget *nib;
+	Tslider *nib;
 	GtkWidget *ink;
 	GtkWidget *font;
 	GtkWidget *text;

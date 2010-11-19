@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.23.0">
-  <Workspace window_x="0" window_y="0" window_width="788" window_height="541" filename="/home/john/SVN/vips/nip2/trunk/test/workspaces/test_conv.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="100" lpane_open="false" rpane_position="400" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_conv" caption="Default empty workspace">
-    <Column x="0" y="657" open="true" selected="false" sform="false" next="5" name="A" caption="medium test matrix">
+  <Workspace window_x="0" window_y="0" window_width="788" window_height="1166" filename="test_conv.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="100" lpane_open="false" rpane_position="400" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_conv" caption="Default empty workspace">
+    <Column x="0" y="345" open="true" selected="false" sform="false" next="5" name="A" caption="medium test matrix">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
           <Rhs vislevel="3" flags="7">
@@ -71,13 +71,13 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="840" y="0" open="true" selected="false" sform="false" next="4" name="C" caption="convolve with vips">
+    <Column x="843" y="0" open="true" selected="false" sform="false" next="4" name="C" caption="convolve with vips">
       <Subcolumn vislevel="3">
         <Row popup="false" name="C1">
           <Rhs vislevel="2" flags="5">
             <iImage window_x="0" window_y="1" window_width="510" window_height="727" image_left="240" image_top="318" image_mag="1" show_status="true" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="conv G4 B1"/>
+            <iText formula="conv G5 B1"/>
           </Rhs>
         </Row>
         <Row popup="false" name="C2">
@@ -96,7 +96,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1219" y="603" open="true" selected="false" sform="false" next="20" name="D" caption="convolve by hand">
+    <Column x="1222" y="603" open="true" selected="false" sform="false" next="20" name="D" caption="convolve by hand">
       <Subcolumn vislevel="3">
         <Row popup="false" name="D19">
           <Rhs vislevel="0" flags="4">
@@ -147,7 +147,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1931" y="0" open="true" selected="false" sform="false" next="20" name="E" caption="check result">
+    <Column x="1937" y="0" open="true" selected="false" sform="false" next="20" name="E" caption="check result">
       <Subcolumn vislevel="3">
         <Row popup="false" name="E16">
           <Rhs vislevel="0" flags="4">
@@ -225,7 +225,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="1287" open="true" selected="false" sform="false" next="5" name="F" caption="large test matrix">
+    <Column x="0" y="975" open="true" selected="false" sform="false" next="5" name="F" caption="large test matrix">
       <Subcolumn vislevel="3">
         <Row popup="false" name="F1">
           <Rhs vislevel="3" flags="7">
@@ -284,72 +284,29 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="144" open="true" selected="false" sform="false" next="5" name="G" caption="small test matrix">
+    <Column x="0" y="144" open="true" selected="true" sform="false" next="7" name="G" caption="small test matrix">
       <Subcolumn vislevel="3">
-        <Row popup="false" name="G1">
-          <Rhs vislevel="3" flags="7">
-            <Matrix/>
-            <Subcolumn vislevel="1">
-              <Row name="super">
-                <Rhs vislevel="0" flags="4">
-                  <Matrix/>
-                  <Subcolumn vislevel="0"/>
-                  <iText/>
-                </Rhs>
-              </Row>
-              <Row name="s">
-                <Rhs vislevel="1" flags="1">
-                  <Slider caption="Sigma" from="0.001" to="10" value="1.1716146341463416"/>
-                  <Subcolumn vislevel="0"/>
-                  <iText/>
-                </Rhs>
-              </Row>
-              <Row name="ma">
-                <Rhs vislevel="1" flags="1">
-                  <Slider caption="Minimum amplitude" from="0" to="1" value="0.7219512195121951"/>
-                  <Subcolumn vislevel="0"/>
-                  <iText/>
-                </Rhs>
-              </Row>
-              <Row name="integer">
-                <Rhs vislevel="1" flags="1">
-                  <Toggle caption="Integer" value="true"/>
-                  <Subcolumn vislevel="0"/>
-                  <iText/>
-                </Rhs>
-              </Row>
-            </Subcolumn>
-            <iText formula="Matrix_build_item.Matrix_gaussian_item.action"/>
-          </Rhs>
-        </Row>
-        <Row popup="false" name="G2">
-          <Rhs vislevel="2" flags="5">
-            <Matrix/>
-            <Subcolumn vislevel="0"/>
-            <iText formula="(int) (G1/10)"/>
-          </Rhs>
-        </Row>
-        <Row popup="false" name="G3">
+        <Row popup="false" name="G6">
           <Rhs vislevel="1" flags="4">
-            <iText formula="sum G2"/>
+            <iText formula="&quot;some -ve coeffs in this one&quot;"/>
           </Rhs>
         </Row>
-        <Row popup="false" name="G4">
-          <Rhs vislevel="2" flags="5">
-            <Matrix/>
+        <Row popup="false" name="G5">
+          <Rhs vislevel="1" flags="1">
+            <Matrix valuen="9" value0="-1" value1="-1" value2="-1" value3="-1" value4="16" value5="-1" value6="-1" value7="-1" value8="-1" width="3" height="3" scale="8" offset="0" filename="" display="3"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Matrix_con G3 0 G2.value"/>
+            <iText formula="Matrix_build_item.Convolution_item.action"/>
           </Rhs>
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1219" y="0" open="true" selected="false" sform="false" next="8" name="H" caption="convolve by hand">
+    <Column x="1222" y="0" open="true" selected="false" sform="false" next="8" name="H" caption="convolve by hand">
       <Subcolumn vislevel="3">
         <Row popup="false" name="H1">
           <Rhs vislevel="0" flags="4">
             <Matrix/>
             <Subcolumn vislevel="0"/>
-            <iText formula="G4"/>
+            <iText formula="G5"/>
           </Rhs>
         </Row>
         <Row popup="false" name="H2">
@@ -394,7 +351,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1219" y="1306" open="true" selected="false" sform="false" next="8" name="I" caption="convolve by hand">
+    <Column x="1222" y="1306" open="true" selected="false" sform="false" next="8" name="I" caption="convolve by hand">
       <Subcolumn vislevel="3">
         <Row popup="false" name="I1">
           <Rhs vislevel="0" flags="4">
@@ -445,7 +402,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1931" y="537" open="true" selected="false" sform="false" next="13" name="N" caption="check result">
+    <Column x="1937" y="537" open="true" selected="false" sform="false" next="13" name="N" caption="check result">
       <Subcolumn vislevel="3">
         <Row popup="false" name="N1">
           <Rhs vislevel="0" flags="4">
@@ -523,7 +480,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1931" y="1124" open="true" selected="true" sform="false" next="13" name="O" caption="check result">
+    <Column x="1937" y="1124" open="true" selected="false" sform="false" next="13" name="O" caption="check result">
       <Subcolumn vislevel="3">
         <Row popup="false" name="O1">
           <Rhs vislevel="0" flags="4">

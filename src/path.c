@@ -149,6 +149,10 @@ path_match_pattern( GPatternSpec *wild, const char *dir_name, const char *name,
 		im_snprintf( buf, FILENAME_MAX, 
 			"%s" G_DIR_SEPARATOR_S "%s", dir_name, name );
 
+#ifdef DEBUG_SEARCH
+		printf( "path_match_pattern: matched \"%s\"\n", buf );
+#endif /*DEBUG_SEARCH*/
+
 		return( fn( buf, a, b, c ) );
 	}
 
@@ -167,7 +171,7 @@ path_scan_dir( const char *dir_name, GPatternSpec *wild,
 	void *ru;
 
 #ifdef DEBUG_SEARCH
-	printf( "path_scan_dir: searching \"%s\"\n", dir_name );
+	printf( "path_scan_dir: scanning \"%s\"\n", dir_name );
 #endif /*DEBUG_SEARCH*/
 
 	if( !(dir = (GDir *) callv_string_filename( 
@@ -177,9 +181,6 @@ path_scan_dir( const char *dir_name, GPatternSpec *wild,
 	while( (name = g_dir_read_name( dir )) ) 
 		if( (ru = path_match_pattern( wild, dir_name, name, 
 			fn, a, b, c )) ) {
-#ifdef DEBUG_SEARCH
-			printf( "path_scan_dir: found \"%s\"\n", name );
-#endif /*DEBUG_SEARCH*/
 			g_dir_close( dir );
 			return( ru );
 		}
@@ -376,14 +377,14 @@ path_init( void )
 	im_snprintf( buf, FILENAME_MAX,
 		"%s" G_DIR_SEPARATOR_S "start" G_SEARCHPATH_SEPARATOR_S
 		"$VIPSHOME" G_DIR_SEPARATOR_S "share" G_DIR_SEPARATOR_S
-			PACKAGE G_DIR_SEPARATOR_S "start",
+		"$PACKAGE" G_DIR_SEPARATOR_S "start",
 		get_savedir() );
 	path_start_default = path_parse( buf );
 
 	im_snprintf( buf, FILENAME_MAX,
 		"%s" G_DIR_SEPARATOR_S "data" G_SEARCHPATH_SEPARATOR_S
 		"$VIPSHOME" G_DIR_SEPARATOR_S "share" G_DIR_SEPARATOR_S 
-		PACKAGE G_DIR_SEPARATOR_S "data" G_SEARCHPATH_SEPARATOR_S 
+		"$PACKAGE" G_DIR_SEPARATOR_S "data" G_SEARCHPATH_SEPARATOR_S 
 		".",
 		get_savedir() );
 	path_search_default = path_parse( buf );

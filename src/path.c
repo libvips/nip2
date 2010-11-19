@@ -31,6 +31,10 @@
 #define DEBUG
  */
 
+/* show path searches
+ */
+#define DEBUG_SEARCH
+
 #include "ip.h"
 
 /* List of directories we have visited this session. Added to by fsb stuff.
@@ -162,6 +166,10 @@ path_scan_dir( const char *dir_name, GPatternSpec *wild,
 	const char *name;
 	void *ru;
 
+#ifdef DEBUG_SEARCH
+	printf( "path_scan_dir: searching \"%s\"\n", dir_name );
+#endif /*DEBUG_SEARCH*/
+
 	if( !(dir = (GDir *) callv_string_filename( 
 		(callv_string_fn) g_dir_open, dir_name, NULL, NULL, NULL )) ) 
 		return( NULL );
@@ -169,6 +177,9 @@ path_scan_dir( const char *dir_name, GPatternSpec *wild,
 	while( (name = g_dir_read_name( dir )) ) 
 		if( (ru = path_match_pattern( wild, dir_name, name, 
 			fn, a, b, c )) ) {
+#ifdef DEBUG_SEARCH
+			printf( "path_scan_dir: found \"%s\"\n", name );
+#endif /*DEBUG_SEARCH*/
 			g_dir_close( dir );
 			return( ru );
 		}
@@ -223,6 +234,10 @@ path_map_exact( GSList *path, const char *patt, path_map_fn fn, void *a )
 	GSList *previous;
 	void *ru;
 
+#ifdef DEBUG_SEARCH
+	printf( "path_map_exact: searching for \"%s\"\n", patt );
+#endif /*DEBUG_SEARCH*/
+
 	if( !(wild = g_pattern_spec_new( patt )) )
 		return( NULL );
 	previous = NULL;
@@ -244,6 +259,10 @@ path_map( GSList *path, const char *patt, path_map_fn fn, void *a )
 	GPatternSpec *wild;
 	GSList *previous;
 	void *ru;
+
+#ifdef DEBUG_SEARCH
+	printf( "path_map: searching for \"%s\"\n", patt );
+#endif /*DEBUG_SEARCH*/
 
 	if( !(wild = g_pattern_spec_new( patt )) )
 		return( NULL );
@@ -269,6 +288,10 @@ path_map_dir( const char *dir, const char *patt, path_map_fn fn, void *a )
 {
 	GPatternSpec *wild;
 	void *ru;
+
+#ifdef DEBUG_SEARCH
+	printf( "path_map_dir: searching for \"%s\"\n", patt );
+#endif /*DEBUG_SEARCH*/
 
 	if( !(wild = g_pattern_spec_new( patt )) )
 		return( NULL );
@@ -317,9 +340,13 @@ void
 path_add_dir( const char *dir )
 {
         if( !slist_map( path_session, 
-		(SListMapFn) path_str_eq, (gpointer) dir ) ) 
+		(SListMapFn) path_str_eq, (gpointer) dir ) ) {
+#ifdef DEBUG_SEARCH
+		printf( "path_add_dir: adding \"%s\"\n", dir );
+#endif /*DEBUG_SEARCH*/
                 path_session = g_slist_prepend( path_session, 
 			im_strdup( NULL, dir ) );
+	}
 }
 
 void

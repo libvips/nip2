@@ -1,3 +1,15 @@
+- try using a smaller norm factor in nip2 for sep conv gen there?
+
+- nip2-7.22.3 on Windows is not adding the path you load from to the set of
+  paths to search, breaking demo2 for Hamish
+
+  DEBUG_SEARCH is showing some strange behaviour on startup, we are adding too
+  much to the session path ... "/dev"??
+
+  why isn't it showing finding all the .def files on startup? what mechanism
+  does that use?
+
+
 
 
 - oo_binary etc. needs revising, we don't search down branches as we should

@@ -4,10 +4,10 @@
     <Column x="0" y="0" open="true" selected="false" sform="false" next="9" name="J" caption="input image">
       <Subcolumn vislevel="3">
         <Row popup="false" name="J3">
-          <Rhs vislevel="3" flags="7">
+          <Rhs vislevel="2" flags="5">
             <iImage window_x="0" window_y="0" window_width="1674" window_height="999" image_left="1807" image_top="543" image_mag="1" show_status="false" show_paintbox="false" show_convert="false" show_rulers="true" scale="1" offset="0" falsecolour="false" type="true"/>
-            <Subcolumn vislevel="1"/>
-            <iText formula="Image_file &quot;/home/john/SVN/vips/nip2/trunk/test/workspaces/gold_sample.v&quot;"/>
+            <Subcolumn vislevel="0"/>
+            <iText formula="Image_file &quot;gold_sample.v&quot;"/>
           </Rhs>
         </Row>
         <Row popup="false" name="J6">

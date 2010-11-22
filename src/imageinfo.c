@@ -84,10 +84,10 @@ most of the jobs above are pushed down into vips8 now ... except for
 /*
 #define DEBUG
 #define DEBUG_MAKE
-#define DEBUG_OPEN
 #define DEBUG_RGB
 #define DEBUG_CHECK
  */
+#define DEBUG_OPEN
 
 static iContainerClass *imageinfogroup_parent_class = NULL;
 
@@ -393,7 +393,7 @@ imageinfo_get_underlying( Imageinfo *imageinfo )
 	if( imageinfo->underlying )
 		return( imageinfo_get_underlying( imageinfo->underlying ) );
 	else
-		return(  imageinfo->im );
+		return( imageinfo->im );
 }
 
 /* Free up an undo fragment. 
@@ -470,8 +470,7 @@ static void
 imageinfo_finalize( GObject *gobject )
 {
 	Imageinfo *imageinfo = IMAGEINFO( gobject );
-	IMAGE *im = imageinfo_get_underlying( imageinfo );
-	gboolean isfile = im ? im_isfile( im ) : FALSE;
+	gboolean isfile = imageinfo->im ? im_isfile( imageinfo->im ) : FALSE;
 	char name[FILENAME_MAX];
 
 #ifdef DEBUG_MAKE
@@ -479,23 +478,21 @@ imageinfo_finalize( GObject *gobject )
 	imageinfo_print( imageinfo );
 #endif /*DEBUG_MAKE*/
 
-	if( imageinfo->dfile && isfile ) 
-		/* We must close before we delete to make sure we
-		 * get the desc file too ... save the filename.
+	if( imageinfo->dfile && isfile ) {
+		/* We must close before we delete ... save the filename.
 		 */
-		im_strncpy( name, im->filename, FILENAME_MAX - 5 );
+		im_strncpy( name, imageinfo->im->filename, FILENAME_MAX - 5 );
+
+#ifdef DEBUG_OPEN
+		printf( "imageinfo_destroy: unlinking \"%s\"\n", name );
+#endif /*DEBUG_OPEN*/
+	}
 
 	IM_FREEF( im_close, imageinfo->im );
 	IM_FREEF( im_close, imageinfo->mapped_im );
 	IM_FREEF( im_close, imageinfo->identity_lut );
 
 	if( imageinfo->dfile && isfile ) {
-#ifdef DEBUG_OPEN
-		printf( "imageinfo_destroy: unlinking \"%s\"\n", name );
-#endif /*DEBUG_OPEN*/
-
-		unlinkf( "%s", name );
-		strcpy( name + strlen( name ) - 1, "desc" );
 		unlinkf( "%s", name );
 		iobject_changed( IOBJECT( main_imageinfogroup ) );
 	}
@@ -876,8 +873,8 @@ imageinfo_open_image_input( const char *filename, ImageinfoOpen *open )
 		}
 
 #ifdef DEBUG_OPEN
-		printf( "imageinfo_open_image_input: "
-			"opened %s \"%s\"\n", format->name, filename );
+		printf( "imageinfo_open_image_input: opened %s \"%s\"\n", 
+			VIPS_OBJECT_CLASS( format )->nickname, filename );
 #endif /*DEBUG_OPEN*/
 	}
 

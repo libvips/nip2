@@ -28,6 +28,7 @@ started 7.23.0, 2/8/10
 - nib radius slider replaces the old 1-10 dropdown, nibs above radius 0 are
   anti-aliased
 - changes to help rhel5
+- oop, could delete vips files accidentally
 
 started 7.22.2, 5/7/10
 - show nthreads in space free tooltip

@@ -132,62 +132,57 @@ path_unparse( GSList *path )
 	return( buf );
 }
 
-/* Test for string matches pattern. If the match is successful, call a user 
- * function.
+/* Track this stuff during a file search.
  */
-static void *
-path_match_pattern( GPatternSpec *wild, const char *dir_name, const char *name, 
-	path_map_fn fn, void *a, void *b, void *c )
-{
-	/* Match.
+typedef struct _Search {
+	/* Pattern we search for, and it's compiled form. This does not
+	 * include any directory components. 
 	 */
-	if( g_pattern_match_string( wild, name ) ) {
-		char buf[FILENAME_MAX + 10];
+	const char *basename;
+	GPatternSpec *wild;
 
-		/* Make up whole path name.
-		 */
-		im_snprintf( buf, FILENAME_MAX, 
-			"%s" G_DIR_SEPARATOR_S "%s", dir_name, name );
+	/* Directory offset. If the original pattern is a relative path, eg.
+	 * "poop/x*.v", we search every directory on path for a subdirectory
+	 * called "poop" and then search all files within that.
+	 */
+	char *dirname; 
 
-#ifdef DEBUG_SEARCH
-		printf( "path_match_pattern: matched \"%s\"\n", buf );
-#endif /*DEBUG_SEARCH*/
+	/* User function to call for every matching file.
+	 */
+	path_map_fn fn;
+	void *a;
 
-		return( fn( buf, a, b, c ) );
-	}
+	/* Files we've previously offered to the user function: we remove
+	 * duplicates. So "path1/wombat.def" hides "path2/wombat.def".
+	 */
+	GSList *previous;
+} Search;
 
-	return( NULL );
+static void
+path_search_free( Search *search )
+{
+	IM_FREE( search->basename );
+	IM_FREE( search->dirname );
+	IM_FREEF( slist_free_all, search->previous );
+	IM_FREEF( g_pattern_spec_free, search->wild );
 }
 
-/* Scan a directory, calling a function for every entry. Abort scan if 
- * function returns non-NULL.
- */
-static void *
-path_scan_dir( const char *dir_name, GPatternSpec *wild, 
-	path_map_fn fn, void *a, void *b, void *c )
-{	
-	GDir *dir;
-	const char *name;
-	void *ru;
+static gboolean
+path_search_init( Search *search, const char *patt, path_map_fn fn, void *a )
+{
+	search->basename = g_path_get_basename( patt );
+	search->dirname = g_path_get_dirname( patt );
+	search->wild = NULL;
+	search->fn = fn;
+	search->a = a;
+	search->previous = NULL;
 
-#ifdef DEBUG_SEARCH
-	printf( "path_scan_dir: scanning \"%s\"\n", dir_name );
-#endif /*DEBUG_SEARCH*/
+	if( !(search->wild = g_pattern_spec_new( search->basename )) ) {
+		path_search_free( search );
+		return( FALSE );
+	}
 
-	if( !(dir = (GDir *) callv_string_filename( 
-		(callv_string_fn) g_dir_open, dir_name, NULL, NULL, NULL )) ) 
-		return( NULL );
-
-	while( (name = g_dir_read_name( dir )) ) 
-		if( (ru = path_match_pattern( wild, dir_name, name, 
-			fn, a, b, c )) ) {
-			g_dir_close( dir );
-			return( ru );
-		}
-
-	g_dir_close( dir );
-
-	return( NULL );
+	return( TRUE );
 }
 
 static void *
@@ -199,20 +194,63 @@ path_str_eq( const char *s1, const char *s2 )
                 return( NULL );
 }
 
+/* Test for string matches pattern. If the match is successful, call a user 
+ * function.
+ */
 static void *
-path_next_item( const char *filename, 
-	GSList **previous, path_map_fn fn, void *a )
+path_search_match( Search *search, const char *dir_name, const char *name )
 {
-	const char *name = im_skip_dir( filename );
-	void *ru;
+	if( g_pattern_match_string( search->wild, name ) &&
+		!slist_map( search->previous, 
+			(SListMapFn) path_str_eq, (gpointer) name ) ) {
+		char buf[FILENAME_MAX + 10];
+		void *result;
 
-	g_assert( name );
-	if( !slist_map( *previous, 
-		(SListMapFn) path_str_eq, (gpointer) name ) ) {
-		*previous = g_slist_prepend( *previous, g_strdup( name ) );
-		if( (ru = fn( filename, a, NULL, NULL )) )
-			return( ru );
+		/* Add to exclusion list.
+		 */
+		search->previous = 
+			g_slist_prepend( search->previous, g_strdup( name ) );
+
+		im_snprintf( buf, FILENAME_MAX, 
+			"%s" G_DIR_SEPARATOR_S "%s", dir_name, name );
+#ifdef DEBUG_SEARCH
+		printf( "path_search_match: matched \"%s\"\n", buf );
+#endif /*DEBUG_SEARCH*/
+
+		if( (result = search->fn( buf, search->a, NULL, NULL )) )
+			return( result );
 	}
+
+	return( NULL );
+}
+
+/* Scan a directory, calling a function for every entry. Abort scan if 
+ * function returns non-NULL.
+ */
+static void *
+path_scan_dir( const char *dir_name, Search *search )
+{
+	char buf[FILENAME_MAX];
+	GDir *dir;
+	const char *name;
+	void *result;
+
+	/* Add the pattern offset, if any. It's '.' for no offset.
+	 */
+	im_snprintf( buf, FILENAME_MAX, 
+		"%s" G_DIR_SEPARATOR_S "%s", dir_name, search->dirname );
+
+	if( !(dir = (GDir *) callv_string_filename( 
+		(callv_string_fn) g_dir_open, buf, NULL, NULL, NULL )) ) 
+		return( NULL );
+
+	while( (name = g_dir_read_name( dir )) ) 
+		if( (result = path_search_match( search, buf, name )) ) {
+			g_dir_close( dir );
+			return( result );
+		}
+
+	g_dir_close( dir );
 
 	return( NULL );
 }
@@ -231,25 +269,21 @@ path_next_item( const char *filename,
 void *
 path_map_exact( GSList *path, const char *patt, path_map_fn fn, void *a )
 {
-	GPatternSpec *wild;
-	GSList *previous;
-	void *ru;
+	Search search;
+	void *result;
 
 #ifdef DEBUG_SEARCH
 	printf( "path_map_exact: searching for \"%s\"\n", patt );
 #endif /*DEBUG_SEARCH*/
 
-	if( !(wild = g_pattern_spec_new( patt )) )
+	if( !path_search_init( &search, patt, fn, a ) )
 		return( NULL );
-	previous = NULL;
 
-	ru = slist_map5( path, (SListMap5Fn) path_scan_dir, 
-		wild, (void *) path_next_item, &previous, (void *) fn, a );
+	result = slist_map( path, (SListMapFn) path_scan_dir, &search );
 
-	IM_FREEF( slist_free_all, previous );
-	IM_FREEF( g_pattern_spec_free, wild );
+	path_search_free( &search );
 
-	return( ru );
+	return( result );
 }
 
 /* As above, but walk the session path too.
@@ -257,29 +291,24 @@ path_map_exact( GSList *path, const char *patt, path_map_fn fn, void *a )
 void *
 path_map( GSList *path, const char *patt, path_map_fn fn, void *a )
 {
-	GPatternSpec *wild;
-	GSList *previous;
-	void *ru;
+	Search search;
+	void *result;
 
 #ifdef DEBUG_SEARCH
 	printf( "path_map: searching for \"%s\"\n", patt );
 #endif /*DEBUG_SEARCH*/
 
-	if( !(wild = g_pattern_spec_new( patt )) )
+	if( !path_search_init( &search, patt, fn, a ) )
 		return( NULL );
-	previous = NULL;
 
-	ru = slist_map5( path, (SListMap5Fn) path_scan_dir, 
-		wild, (void *) path_next_item, &previous, (void *) fn, a );
-	if( !ru )
-		ru = slist_map5( path_session, (SListMap5Fn) path_scan_dir, 
-			wild, (void *) path_next_item, &previous, 
-			(void *) fn, a );
+	result = slist_map( path, (SListMapFn) path_scan_dir, &search );
+	if( !result )
+		result = slist_map( path_session, 
+			(SListMapFn) path_scan_dir, &search );
 
-	IM_FREEF( slist_free_all, previous );
-	IM_FREEF( g_pattern_spec_free, wild );
+	path_search_free( &search );
 
-	return( ru );
+	return( result );
 }
 
 /* As above, but scan a single directory.
@@ -287,33 +316,34 @@ path_map( GSList *path, const char *patt, path_map_fn fn, void *a )
 void *
 path_map_dir( const char *dir, const char *patt, path_map_fn fn, void *a )
 {
-	GPatternSpec *wild;
-	void *ru;
+	Search search;
+	void *result;
 
 #ifdef DEBUG_SEARCH
 	printf( "path_map_dir: searching for \"%s\"\n", patt );
 #endif /*DEBUG_SEARCH*/
 
-	if( !(wild = g_pattern_spec_new( patt )) )
+	if( !path_search_init( &search, patt, fn, a ) )
 		return( NULL );
-	if( !(ru = path_scan_dir( dir, wild, fn, a, NULL, NULL )) ) {
+
+	if( !(result = path_scan_dir( dir, &search )) ) {
 		/* Not found? Maybe - error message anyway.
 		 */
 		error_top( _( "Not found." ) );
 		error_sub( _( "File \"%s\" not found." ), patt );
 	}
-	IM_FREEF( g_pattern_spec_free, wild );
 
-	return( ru );
+	path_search_free( &search );
+
+	return( result );
 }
 
-/* Search for a file, and return it's path. NULL for not found. Return a new
+/* Search for a file and return it's path. NULL for not found. Return a new
  * string.
  */
 char *
 path_find_file( GSList *path, const char *filename )
 {
-	char buf[FILENAME_MAX];
 	char *fname;
 
 	/* Try file name exactly.
@@ -321,18 +351,16 @@ path_find_file( GSList *path, const char *filename )
 	if( existsf( "%s", filename ) )
 		return( im_strdupn( filename ) );
 
-	/* Drop directory and search path for filename.
+	/* Search everywhere.
 	 */
-	expand_variables( filename, buf );
-	if( !(fname = path_map( path, im_skip_dir( buf ), 
-		(path_map_fn) im_strdupn, NULL ) )) {
-		error_top( _( "Not found." ) );
-		error_sub( _( "File \"%s\" not found on path" ), 
-			im_skip_dir( buf ) );
-		return( NULL );
-	}
+	if( (fname = path_map( path, filename,
+		(path_map_fn) im_strdupn, NULL )) )
+		return( fname );
+	
+	error_top( _( "Not found." ) );
+	error_sub( _( "File \"%s\" not found on path" ), filename );
 
-	return( fname );
+	return( NULL );
 }
 
 /* Add a directory to the session path, if it's not there already.

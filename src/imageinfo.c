@@ -86,8 +86,8 @@ most of the jobs above are pushed down into vips8 now ... except for
 #define DEBUG_MAKE
 #define DEBUG_RGB
 #define DEBUG_CHECK
- */
 #define DEBUG_OPEN
+ */
 
 static iContainerClass *imageinfogroup_parent_class = NULL;
 

@@ -29,6 +29,7 @@ started 7.23.0, 2/8/10
   anti-aliased
 - changes to help rhel5
 - oop, could delete vips files accidentally
+- better file search 
 
 started 7.22.2, 5/7/10
 - show nthreads in space free tooltip

@@ -682,7 +682,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="7268" y="0" open="true" selected="false" sform="false" next="29" name="G" caption="(SMALL) draw squares at centroid locations">
+    <Column x="7268" y="0" open="true" selected="false" sform="false" next="29" name="G" caption="(SMALL) draw red crosses at centroid locations">
       <Subcolumn vislevel="3">
         <Row popup="false" name="G1">
           <Rhs vislevel="0" flags="4">
@@ -955,7 +955,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="7750" y="0" open="true" selected="false" sform="false" next="10" name="I" caption="(SMALL) plot 3x3 green squares on image with blue disks at big disk locations">
+    <Column x="7750" y="0" open="true" selected="false" sform="false" next="10" name="I" caption="(SMALL) plot 3x3 crosses on original image">
       <Subcolumn vislevel="3">
         <Row popup="false" name="I1">
           <Rhs vislevel="0" flags="4">
@@ -985,7 +985,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="774" y="66" open="true" selected="true" sform="false" next="7" name="E" caption="FINAL IMAGE RESULT with small nanoparticles tagged with a 3x3 green cross and big disks tagged with a blue cross">
+    <Column x="774" y="66" open="true" selected="false" sform="false" next="7" name="E" caption="FINAL IMAGE RESULT with small nanoparticles tagged with a 3x3 green cross and big disks tagged with a blue cross">
       <Subcolumn vislevel="3">
         <Row popup="false" name="E1">
           <Rhs vislevel="1" flags="1">
@@ -1233,7 +1233,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="11782" y="0" open="true" selected="false" sform="false" next="59" name="W" caption="(BIG) disk average minus the ranked wedge average">
+    <Column x="11555" y="0" open="true" selected="false" sform="false" next="59" name="W" caption="(BIG) disk average minus the ranked wedge average">
       <Subcolumn vislevel="3">
         <Row popup="false" name="W1">
           <Rhs vislevel="1" flags="4">
@@ -1302,7 +1302,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="10617" y="0" open="true" selected="false" sform="false" next="20" name="X" caption="(BIG) ring octants masks">
+    <Column x="10390" y="0" open="true" selected="false" sform="false" next="20" name="X" caption="(BIG) ring octants masks">
       <Subcolumn vislevel="3">
         <Row popup="false" name="X1">
           <Rhs vislevel="0" flags="4">
@@ -1342,7 +1342,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="11180" y="0" open="true" selected="false" sform="false" next="15" name="Y" caption="(BIG) ring wedge averages">
+    <Column x="10953" y="0" open="true" selected="false" sform="false" next="15" name="Y" caption="(BIG) ring wedge averages">
       <Subcolumn vislevel="3">
         <Row popup="false" name="Y1">
           <Rhs vislevel="2" flags="5">
@@ -1363,7 +1363,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="9339" y="0" open="true" selected="false" sform="false" next="15" name="Z" caption="(BIG) octant masks">
+    <Column x="9112" y="0" open="true" selected="false" sform="false" next="15" name="Z" caption="(BIG) octant masks">
       <Subcolumn vislevel="3">
         <Row popup="false" name="Z13">
           <Rhs vislevel="1" flags="4">
@@ -1574,7 +1574,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="12444" y="0" open="true" selected="false" sform="false" next="13" name="AB" caption="(BIG) region centroids (computed with indexed histogram)">
+    <Column x="12217" y="0" open="true" selected="false" sform="false" next="13" name="AB" caption="(BIG) region centroids (computed with indexed histogram)">
       <Subcolumn vislevel="3">
         <Row popup="false" name="AB1">
           <Rhs vislevel="0" flags="4">
@@ -1746,7 +1746,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="13083" y="0" open="true" selected="false" sform="false" next="29" name="BB" caption="(BIG) put small crosses centered at centroids">
+    <Column x="12856" y="0" open="true" selected="false" sform="false" next="29" name="BB" caption="(BIG) put 3x3 crosses centered at centroids">
       <Subcolumn vislevel="3">
         <Row popup="false" name="BB1">
           <Rhs vislevel="0" flags="4">
@@ -2019,7 +2019,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="13705" y="0" open="true" selected="false" sform="false" next="10" name="CB" caption="(BIG) plot small crosses on original">
+    <Column x="13478" y="0" open="true" selected="true" sform="false" next="10" name="CB" caption="(BIG) plot crosses on original">
       <Subcolumn vislevel="3">
         <Row popup="false" name="CB1">
           <Rhs vislevel="0" flags="4">
@@ -2067,7 +2067,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="8354" y="0" open="true" selected="false" sform="false" next="3" name="GB" caption="(BIG) &quot;dark enough&quot; test">
+    <Column x="8127" y="0" open="true" selected="false" sform="false" next="3" name="GB" caption="(BIG) &quot;dark enough&quot; test">
       <Subcolumn vislevel="3">
         <Row popup="false" name="GB1">
           <Rhs vislevel="3" flags="7">
@@ -2217,14 +2217,14 @@
     </Column>
     <Column x="0" y="835" open="true" selected="false" sform="false" next="5" name="JB" caption="(BIG) NUMBER of directions to ignore in the &quot;darker in all but n directions&quot; test (useable range: 0-7)">
       <Subcolumn vislevel="3">
-        <Row popup="false" name="JB1">
-          <Rhs vislevel="1" flags="4">
-            <iText formula="2"/>
-          </Rhs>
-        </Row>
         <Row popup="false" name="JB4">
           <Rhs vislevel="1" flags="4">
             <iText formula="&quot;There are 8 ranked directions because we symmetrized the octants themselves&quot;"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="JB1">
+          <Rhs vislevel="1" flags="4">
+            <iText formula="2"/>
           </Rhs>
         </Row>
       </Subcolumn>
@@ -2656,7 +2656,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="8768" y="0" open="true" selected="false" sform="false" next="13" name="K" caption="(BIG) disk mask">
+    <Column x="8541" y="0" open="true" selected="false" sform="false" next="13" name="K" caption="(BIG) disk mask">
       <Subcolumn vislevel="3">
         <Row popup="false" name="K1">
           <Rhs vislevel="1" flags="4">
@@ -2817,7 +2817,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="9762" y="0" open="true" selected="false" sform="false" next="6" name="RB" caption="(BIG) outer radius of ring">
+    <Column x="9535" y="0" open="true" selected="false" sform="false" next="6" name="RB" caption="(BIG) outer radius of ring">
       <Subcolumn vislevel="3">
         <Row popup="false" name="RB1">
           <Rhs vislevel="1" flags="4">
@@ -2908,7 +2908,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="10186" y="0" open="true" selected="false" sform="false" next="13" name="SB" caption="(BIG) inner radius of ring">
+    <Column x="9959" y="0" open="true" selected="false" sform="false" next="13" name="SB" caption="(BIG) inner radius of ring">
       <Subcolumn vislevel="3">
         <Row popup="false" name="SB1">
           <Rhs vislevel="1" flags="4">
@@ -3039,7 +3039,7 @@
     <Column x="1628" y="0" open="true" selected="false" sform="false" next="1" name="XXXX" caption="THE MAIN COMPUTATION STEPS ARE FOUND TO THE RIGHT">
       <Subcolumn vislevel="3"/>
     </Column>
-    <Column x="774" y="267" open="true" selected="false" sform="false" next="10" name="WWWW" caption="NANOPARTICLE COORDINATES">
+    <Column x="774" y="240" open="true" selected="false" sform="false" next="10" name="WWWW" caption="NANOPARTICLE COORDINATES">
       <Subcolumn vislevel="3">
         <Row popup="false" name="WWWW2">
           <Rhs vislevel="1" flags="4">

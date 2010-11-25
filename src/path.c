@@ -32,8 +32,8 @@
  */
 
 /* show path searches
- */
 #define DEBUG_SEARCH
+ */
 
 #include "ip.h"
 

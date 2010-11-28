@@ -466,8 +466,8 @@ statusview_mouse( Statusview *sv, int x, int y )
 	}
 
 	if( imagemodel->rulers_mm ) {
-		dx *= im->Xres;
-		dy *= im->Yres;
+		dx /= im->Xres;
+		dy /= im->Yres;
 	}
 
 	set_glabel( sv->pos, "(%5g, %5g)", dx, dy ); 

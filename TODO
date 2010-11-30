@@ -1,4 +1,5 @@
-- try using a smaller norm factor in nip2 for sep conv gen there?
+- matrix_gaussian_blur could have an 'accuracy' or 'max error' param? expose
+  in custom blur etc.
 
 
 

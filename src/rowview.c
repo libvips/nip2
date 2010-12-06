@@ -608,7 +608,7 @@ rowview_enter_cb( GtkWidget *widget, Rowview *rview )
 	Row *row = ROW( VOBJECT( rview )->iobject );
 
 	row_set_status( row );
-	row_show_dependants( row );
+	row_show_dependents( row );
 }
 
 static void
@@ -616,7 +616,7 @@ rowview_leave_cb( GtkWidget *widget, Rowview *rview )
 {
 	Row *row = ROW( VOBJECT( rview )->iobject );
 
-	row_hide_dependants( row );
+	row_hide_dependents( row );
 }
 
 static gboolean

@@ -113,8 +113,8 @@ void *row_select_extend( Row *row );
 void *row_select_toggle( Row *row );
 void row_select_modifier( Row *row, guint state );
 
-void row_show_dependants( Row *row );
-void row_hide_dependants( Row *row );
+void row_show_dependents( Row *row );
+void row_hide_dependents( Row *row );
 void row_set_status( Row *row );
 
 Row *row_parse_name( Symbol *context, const char *path );

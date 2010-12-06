@@ -230,7 +230,7 @@ itextview_enter_cb( Formula *formula, iTextview *itextview )
 	Row *row = HEAPMODEL( itext )->row;
 
 	row_set_status( row );
-	row_show_dependants( row );
+	row_show_dependents( row );
 }
 
 static void
@@ -239,7 +239,7 @@ itextview_leave_cb( Formula *formula, iTextview *itextview )
 	iText *itext = ITEXT( VOBJECT( itextview )->iobject );
 	Row *row = HEAPMODEL( itext )->row;
 
-	row_hide_dependants( row );
+	row_hide_dependents( row );
 }
 
 static void

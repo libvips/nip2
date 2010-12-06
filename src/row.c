@@ -387,7 +387,7 @@ row_dispose( GObject *gobject )
 
 	/* Reset state. Also see row_parent_remove().
 	 */
-	row_hide_dependants( row );
+	row_hide_dependents( row );
 	if( row->expr )
 		expr_error_clear( row->expr );
 	if( row->top_col && row->top_col->last_select == row )
@@ -1252,7 +1252,7 @@ row_dependant_mark( Row *row, row_map_fn fn, void *a )
 	return( row_dependant_map_sub( row, fn, a ) );
 }
 
-/* Apply to all dependants of row.
+/* Apply to all dependents of row.
  */
 static void *
 row_dependant_map_sub( Row *row, row_map_fn fn, void *a )
@@ -1280,6 +1280,7 @@ row_dependant_map_sub( Row *row, row_map_fn fn, void *a )
 
 	 	FIXME ... could use dynamic dependency stuff to find things
 		that refer to this.us?
+
 	 */
 
 	return( NULL );
@@ -1306,7 +1307,7 @@ row_dependant_map( Row *row, row_map_fn fn, void *a )
 	return( row_dependant_map_sub( row, fn, a ) );
 }
 
-/* This row has changed ... mark all dependants (direct and indirect) 
+/* This row has changed ... mark all dependents (direct and indirect) 
  * dirty.
  */
 void *
@@ -1319,7 +1320,7 @@ row_dirty( Row *row, gboolean clear_error )
 	return( NULL );
 }
 
-/* This tally has changed ... mark all dependants (but not this one!)
+/* This tally has changed ... mark all dependents (but not this one!)
  * dirty.
  */
 void *
@@ -1954,12 +1955,12 @@ row_show_child( Link *link, RowShowState show )
 }
 
 void
-row_show_dependants( Row *row )
+row_show_dependents( Row *row )
 {
 	Symbol *topsym = row->top_row->sym;
 
 #ifdef DEBUG
-	printf( "row_show_dependants: " );
+	printf( "row_show_dependents: " );
 	row_name_print( row );
 	printf( "\n" );
 #endif /*DEBUG*/
@@ -1975,12 +1976,12 @@ row_show_dependants( Row *row )
 }
 
 void
-row_hide_dependants( Row *row )
+row_hide_dependents( Row *row )
 {
 	Symbol *topsym;
 
 #ifdef DEBUG
-	printf( "row_hide_dependants: " );
+	printf( "row_hide_dependents: " );
 	row_name_print( row );
 	printf( "\n" );
 #endif /*DEBUG*/

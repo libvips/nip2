@@ -1231,12 +1231,12 @@ row_link_destroy( Row *row )
 	return( NULL );
 }
 
-static void *row_dependant_map_sub( Row *row, row_map_fn fn, void *a );
+static void *row_dependent_map_sub( Row *row, row_map_fn fn, void *a );
 
 /* Do this row, and any that depend on it.
  */
 static void *
-row_dependant_mark( Row *row, row_map_fn fn, void *a )
+row_dependent_mark( Row *row, row_map_fn fn, void *a )
 {
 	void *res;
 
@@ -1249,13 +1249,13 @@ row_dependant_mark( Row *row, row_map_fn fn, void *a )
 	if( (res = fn( row, a, NULL, NULL )) )
 		return( res );
 
-	return( row_dependant_map_sub( row, fn, a ) );
+	return( row_dependent_map_sub( row, fn, a ) );
 }
 
 /* Apply to all dependents of row.
  */
 static void *
-row_dependant_map_sub( Row *row, row_map_fn fn, void *a )
+row_dependent_map_sub( Row *row, row_map_fn fn, void *a )
 {
 	Row *i;
 	void *res;
@@ -1263,7 +1263,7 @@ row_dependant_map_sub( Row *row, row_map_fn fn, void *a )
 	/* Things that refer to us.
 	 */
 	if( (res = slist_map2( row->parents, 
-		(SListMap2Fn) row_dependant_mark, (void *) fn, a )) )
+		(SListMap2Fn) row_dependent_mark, (void *) fn, a )) )
 		return( res );
 
 	/* Things that refer to our enclosing syms ... eg. if A1.fred.x 
@@ -1271,7 +1271,7 @@ row_dependant_map_sub( Row *row, row_map_fn fn, void *a )
 	 * anything that refers to A1.fred.
 	 */
 	for( i = row; (i = HEAPMODEL( i )->row); ) 
-		if( (res = row_dependant_map_sub( i, fn, a )) )
+		if( (res = row_dependent_map_sub( i, fn, a )) )
 			return( res );
 
 	/* We are not going to spot things that refer to this.us :-( we could
@@ -1287,7 +1287,7 @@ row_dependant_map_sub( Row *row, row_map_fn fn, void *a )
 }
 
 static void *
-row_dependant_clear( Row *row )
+row_dependent_clear( Row *row )
 {
 	row->depend = FALSE;
 
@@ -1297,14 +1297,14 @@ row_dependant_clear( Row *row )
 /* Apply a function to all rows in this tree which depend on this row.
  */
 void *
-row_dependant_map( Row *row, row_map_fn fn, void *a )
+row_dependent_map( Row *row, row_map_fn fn, void *a )
 {
 	/* Clear the flags we use to spot loops.
 	 */
 	row_map_all( row->top_row,
-		(row_map_fn) row_dependant_clear, NULL, NULL, NULL );
+		(row_map_fn) row_dependent_clear, NULL, NULL, NULL );
 
-	return( row_dependant_map_sub( row, fn, a ) );
+	return( row_dependent_map_sub( row, fn, a ) );
 }
 
 /* This row has changed ... mark all dependents (direct and indirect) 
@@ -1314,7 +1314,7 @@ void *
 row_dirty( Row *row, gboolean clear_error )
 {
 	(void) row_dirty_set( row, clear_error );
-	(void) row_dependant_map( row, 
+	(void) row_dependent_map( row, 
 		(row_map_fn) row_dirty_set, GINT_TO_POINTER( clear_error ) );
 
 	return( NULL );
@@ -1326,7 +1326,7 @@ row_dirty( Row *row, gboolean clear_error )
 void *
 row_dirty_intrans( Row *row, gboolean clear_error )
 {
-	(void) row_dependant_map( row, 
+	(void) row_dependent_map( row, 
 		(row_map_fn) row_dirty_set, GINT_TO_POINTER( clear_error ) );
 
 	return( NULL );
@@ -1364,7 +1364,7 @@ row_recomp_sort_func( Row *a, Row *b )
 
 	/* If b depends on a, want a first.
 	 */
-	if( row_dependant_map( a, (row_map_fn) map_equal, b ) ) {
+	if( row_dependent_map( a, (row_map_fn) map_equal, b ) ) {
 #ifdef DEBUG_SORT_VERBOSE
 		row_name_print( a );
 		printf( "before " );
@@ -1374,7 +1374,7 @@ row_recomp_sort_func( Row *a, Row *b )
 
 		order = -1;
 	}
-	else if( row_dependant_map( b, (row_map_fn) map_equal, a ) ) {
+	else if( row_dependent_map( b, (row_map_fn) map_equal, a ) ) {
 #ifdef DEBUG_SORT_VERBOSE
 		row_name_print( b );
 		printf( "before " );

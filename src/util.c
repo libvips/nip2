@@ -880,7 +880,7 @@ is_postfix( const char *a, const char *b )
 	return( !strcmp( a, b + m - n ) );
 }
 
-/* Test for string a ends string b, case independant.
+/* Test for string a ends string b, case independent.
  */
 gboolean
 is_casepostfix( const char *a, const char *b )

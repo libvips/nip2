@@ -1896,32 +1896,38 @@ Test_images_item = class
 		}
 	}
 
-    Colour_atlas_item = class
-        Menuaction "_Colour Atlas"
-            "make a grid of patches grouped around a colour" {
-        action = class 
-            _result {   
-            _vislevel = 3;
+	Colour_atlas_item = class
+	Menuaction "_Colour Atlas"
+		"make a grid of patches grouped around a colour" {
+		action = class 
+			_result {   
+			_vislevel = 3;
        
-            start = Colour_picker "Lab" [50,0,0];
-            nstep = Expression "Number of steps" 2;
-            ssize = Expression "Step size" 2; 
+			start = Colour_picker "Lab" [50,0,0];
+			nstep = Expression "Number of steps" 9;
+			ssize = Expression "Step size" 10; 
+			psize = Expression "Patch size" 32;
+			sepsize = Expression "Separator size" 4;
+	
+			_result
+				= colour_transform_to (get_type start) blocks'''
+			{
+				size = (to_real nstep * 2 + 1) * to_real psize - 
+					to_real sepsize;
+				xy = make_xy size size; 
 
-            _result
-                = Image (colour_transform_to (get_type start) im)
-            {
-                base = colour_transform_to Image_type.LAB start;
-                step = to_real ssize;
-                offset = to_real nstep * step;
-                range c = [c - offset, c - offset + step ... c + offset]; 
-                                
-                mk_patch b a = image_new 8 8 3
-                    Image_format.FLOAT Image_coding.NOCODING 
-                    Image_type.LAB (Vector [base?0, a, b]) 0 0;
+				xy_grid = (xy % to_real psize) < 
+					(to_real psize - to_real sepsize);
+				grid = xy_grid?0 & xy_grid?1;
 
-                mk_strip b = map (mk_patch b) (range base?1);
-                mk_grid = map mk_strip (range base?2);
-                im = imagearray_assemble 1 1 mk_grid;
+				blocks = (int) (to_real ssize * ((int) (xy / to_real psize)));
+				lab_start = colour_transform_to Image_type.LAB start;
+				blocks' = blocks - to_real nstep * to_real ssize + 
+					Vector (tl lab_start.value);
+				blocks'' = hd lab_start.value ++ Image blocks';
+				blocks''' 
+					= image_set_type Image_type.LAB blocks'', Image grid
+					= 0;
             }    
         }
     }

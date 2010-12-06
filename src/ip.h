@@ -149,9 +149,9 @@ extern int statfs();
 #include <goffice/utils/go-marker.h>
 #endif /*HAVE_LIBGOFFICE*/
 
-#ifdef HAVE_LIBGOFFICE
+#ifdef HAVE_LIBGVC
 #include <gvc.h>
-#endif /*HAVE_GRAPHVIZ*/
+#endif /*HAVE_LIBGVC*/
 
 #include <vips/vips.h>
 #include <vips/debug.h>

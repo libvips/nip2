@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.19.0">
-  <Workspace window_x="0" window_y="0" window_width="1280" window_height="974" filename="big_and_small_disks.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="0" lpane_open="false" rpane_position="1274" rpane_open="false" local_defs="// private definitions for this workspace&#10;summit in mask = class Image value {&#10;value = im_compass in mask;&#10;}&#10;&#10;main = A2;" name="big_and_small_disks" caption="Default empty workspace">
+  <Workspace window_x="0" window_y="0" window_width="1280" window_height="770" filename="workspaces/big_and_small_disks.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="359" lpane_open="true" rpane_position="1274" rpane_open="false" local_defs="// private definitions for this workspace&#10;summit in mask = class Image value {&#10;&#9;value = im_compass in mask;&#10;}&#10;&#10;main = WWWW7;" name="big_and_small_disks" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="true" sform="false" next="9" name="J" caption="input image">
       <Subcolumn vislevel="3">
         <Row popup="false" name="J3">

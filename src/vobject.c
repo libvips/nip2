@@ -172,7 +172,7 @@ vobject_iobject_changed( iObject *iobject, vObject *vobject )
 #ifdef DEBUG
 	printf( "vobject_iobject_changed: %s %s \"%s\"\n", 
 		G_OBJECT_TYPE_NAME( vobject ), 
-		G_OBJECT_TYPE_NAME( model ), 
+		G_OBJECT_TYPE_NAME( iobject ), 
 		NN( iobject->name ) );
 #endif /*DEBUG*/
 

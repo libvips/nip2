@@ -28,7 +28,7 @@
  */
 
 /* just load .defs/.wses from "."
-#define DEBUG
+#define DEBUG_LOCAL
  */
 
 /* show path searches
@@ -394,12 +394,12 @@ path_add_file( const char *filename )
 void
 path_init( void )
 {
-#ifdef DEBUG
+#ifdef DEBUG_LOCAL
 	printf( "path_init: loading start from \".\" only\n" );
 	path_start_default = path_parse( "." );
 	path_search_default = path_parse( "." );
 	path_tmp_default = im_strdup( NULL, "." );
-#else /*!DEBUG*/
+#else /*!DEBUG_LOCAL*/
 	char buf[FILENAME_MAX];
 
 	im_snprintf( buf, FILENAME_MAX,
@@ -420,5 +420,5 @@ path_init( void )
 	im_snprintf( buf, FILENAME_MAX, 
 		"%s" G_DIR_SEPARATOR_S "tmp", get_savedir() );
 	path_tmp_default = im_strdup( NULL, buf );
-#endif /*DEBUG*/
+#endif /*DEBUG_LOCAL*/
 }

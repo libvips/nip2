@@ -958,7 +958,7 @@ builtin_trace_args( Heap *heap, const char *name, int n, HeapNode **arg )
 
 		PEPOINTRIGHT( arg[n - i - 1], &t );
 		vips_buf_appends( &buf, "(" );
-		graph_pelement( hi, &buf, &t, FALSE );
+		graph_pelement( heap, &buf, &t, FALSE );
 		vips_buf_appends( &buf, ") " );
 	}
 

@@ -73,7 +73,7 @@ static void
 preview_init( Preview *preview )
 {
 #ifdef DEBUG
-	printf( "preview_init: %s\n", IWINDOW( preview )->title );
+	printf( "preview_init: %p\n", preview );
 #endif /*DEBUG*/
 
 	preview->filename = NULL;

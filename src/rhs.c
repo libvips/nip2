@@ -446,7 +446,9 @@ rhs_new( Row *row )
 	icontainer_child_add( ICONTAINER( row ), ICONTAINER( rhs ), -1 );
 
 #ifdef DEBUG
-	printf( "rhs_new: %s (%p)\n", MODEL( row )->name, rhs );
+	printf( "rhs_new: " );
+	row_name_print( HEAPMODEL( rhs )->row );
+	printf( " (%p)\n", rhs );
 #endif /*DEBUG*/
 
 	return( rhs );

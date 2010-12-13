@@ -126,7 +126,8 @@ row_qualified_name_relative( Symbol *context, Row *row, VipsBuf *buf )
 void
 row_qualified_name( Row *row, VipsBuf *buf )
 {
-	row_qualified_name_relative( row->ws->sym, row, buf );
+	if( row->ws )
+		row_qualified_name_relative( row->ws->sym, row, buf );
 }
 
 /* Convenience ... print a row name out, identifying by tally heirarchy.
@@ -387,7 +388,7 @@ row_dispose( GObject *gobject )
 
 	/* Reset state. Also see row_parent_remove().
 	 */
-	row_hide_dependents( row );
+	row_hide_dependants( row );
 	if( row->expr )
 		expr_error_clear( row->expr );
 	if( row->top_col && row->top_col->last_select == row )
@@ -1231,12 +1232,12 @@ row_link_destroy( Row *row )
 	return( NULL );
 }
 
-static void *row_dependent_map_sub( Row *row, row_map_fn fn, void *a );
+static void *row_dependant_map_sub( Row *row, row_map_fn fn, void *a );
 
 /* Do this row, and any that depend on it.
  */
 static void *
-row_dependent_mark( Row *row, row_map_fn fn, void *a )
+row_dependant_mark( Row *row, row_map_fn fn, void *a )
 {
 	void *res;
 
@@ -1249,13 +1250,13 @@ row_dependent_mark( Row *row, row_map_fn fn, void *a )
 	if( (res = fn( row, a, NULL, NULL )) )
 		return( res );
 
-	return( row_dependent_map_sub( row, fn, a ) );
+	return( row_dependant_map_sub( row, fn, a ) );
 }
 
-/* Apply to all dependents of row.
+/* Apply to all dependants of row.
  */
 static void *
-row_dependent_map_sub( Row *row, row_map_fn fn, void *a )
+row_dependant_map_sub( Row *row, row_map_fn fn, void *a )
 {
 	Row *i;
 	void *res;
@@ -1263,7 +1264,7 @@ row_dependent_map_sub( Row *row, row_map_fn fn, void *a )
 	/* Things that refer to us.
 	 */
 	if( (res = slist_map2( row->parents, 
-		(SListMap2Fn) row_dependent_mark, (void *) fn, a )) )
+		(SListMap2Fn) row_dependant_mark, (void *) fn, a )) )
 		return( res );
 
 	/* Things that refer to our enclosing syms ... eg. if A1.fred.x 
@@ -1271,7 +1272,7 @@ row_dependent_map_sub( Row *row, row_map_fn fn, void *a )
 	 * anything that refers to A1.fred.
 	 */
 	for( i = row; (i = HEAPMODEL( i )->row); ) 
-		if( (res = row_dependent_map_sub( i, fn, a )) )
+		if( (res = row_dependant_map_sub( i, fn, a )) )
 			return( res );
 
 	/* We are not going to spot things that refer to this.us :-( we could
@@ -1280,14 +1281,13 @@ row_dependent_map_sub( Row *row, row_map_fn fn, void *a )
 
 	 	FIXME ... could use dynamic dependency stuff to find things
 		that refer to this.us?
-
 	 */
 
 	return( NULL );
 }
 
 static void *
-row_dependent_clear( Row *row )
+row_dependant_clear( Row *row )
 {
 	row->depend = FALSE;
 
@@ -1297,36 +1297,36 @@ row_dependent_clear( Row *row )
 /* Apply a function to all rows in this tree which depend on this row.
  */
 void *
-row_dependent_map( Row *row, row_map_fn fn, void *a )
+row_dependant_map( Row *row, row_map_fn fn, void *a )
 {
 	/* Clear the flags we use to spot loops.
 	 */
 	row_map_all( row->top_row,
-		(row_map_fn) row_dependent_clear, NULL, NULL, NULL );
+		(row_map_fn) row_dependant_clear, NULL, NULL, NULL );
 
-	return( row_dependent_map_sub( row, fn, a ) );
+	return( row_dependant_map_sub( row, fn, a ) );
 }
 
-/* This row has changed ... mark all dependents (direct and indirect) 
+/* This row has changed ... mark all dependants (direct and indirect) 
  * dirty.
  */
 void *
 row_dirty( Row *row, gboolean clear_error )
 {
 	(void) row_dirty_set( row, clear_error );
-	(void) row_dependent_map( row, 
+	(void) row_dependant_map( row, 
 		(row_map_fn) row_dirty_set, GINT_TO_POINTER( clear_error ) );
 
 	return( NULL );
 }
 
-/* This tally has changed ... mark all dependents (but not this one!)
+/* This tally has changed ... mark all dependants (but not this one!)
  * dirty.
  */
 void *
 row_dirty_intrans( Row *row, gboolean clear_error )
 {
-	(void) row_dependent_map( row, 
+	(void) row_dependant_map( row, 
 		(row_map_fn) row_dirty_set, GINT_TO_POINTER( clear_error ) );
 
 	return( NULL );
@@ -1364,7 +1364,7 @@ row_recomp_sort_func( Row *a, Row *b )
 
 	/* If b depends on a, want a first.
 	 */
-	if( row_dependent_map( a, (row_map_fn) map_equal, b ) ) {
+	if( row_dependant_map( a, (row_map_fn) map_equal, b ) ) {
 #ifdef DEBUG_SORT_VERBOSE
 		row_name_print( a );
 		printf( "before " );
@@ -1374,7 +1374,7 @@ row_recomp_sort_func( Row *a, Row *b )
 
 		order = -1;
 	}
-	else if( row_dependent_map( b, (row_map_fn) map_equal, a ) ) {
+	else if( row_dependant_map( b, (row_map_fn) map_equal, a ) ) {
 #ifdef DEBUG_SORT_VERBOSE
 		row_name_print( b );
 		printf( "before " );
@@ -1955,12 +1955,12 @@ row_show_child( Link *link, RowShowState show )
 }
 
 void
-row_show_dependents( Row *row )
+row_show_dependants( Row *row )
 {
 	Symbol *topsym = row->top_row->sym;
 
 #ifdef DEBUG
-	printf( "row_show_dependents: " );
+	printf( "row_show_dependants: " );
 	row_name_print( row );
 	printf( "\n" );
 #endif /*DEBUG*/
@@ -1976,12 +1976,12 @@ row_show_dependents( Row *row )
 }
 
 void
-row_hide_dependents( Row *row )
+row_hide_dependants( Row *row )
 {
 	Symbol *topsym;
 
 #ifdef DEBUG
-	printf( "row_hide_dependents: " );
+	printf( "row_hide_dependants: " );
 	row_name_print( row );
 	printf( "\n" );
 #endif /*DEBUG*/

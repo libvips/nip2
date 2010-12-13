@@ -82,7 +82,7 @@ stringview_refresh( vObject *vobject )
 
 	printf( "stringview_refresh: " );
 	row_name_print( row );
-	printf( " (%p)\n", view );
+	printf( " (%p)\n", vobject );
 #endif /*DEBUG*/
 
 	if( string->value ) {

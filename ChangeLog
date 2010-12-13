@@ -3,6 +3,7 @@ started 7.24.0, 30/11/10
 - fix build without graphviz
 - much faster colour atlas menu item
 - fix make check, again
+- fix debug everywhere
 
 started 7.23.0, 2/8/10
 - fix a crash in thumbnail preview with large images

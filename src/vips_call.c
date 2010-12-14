@@ -1163,14 +1163,18 @@ vips_build_output( VipsInfo *vi, int i )
 }
 
 static gboolean
-vips_build_inputva( VipsInfo *vi, int i, va_list ap )
+vips_build_inputva( VipsInfo *vi, int i, va_list *ap )
 {
 	im_type_desc *ty = vi->fn->argv[i].desc;
 
 	switch( vips_lookup_type( ty->type ) ) {
 	case VIPS_DOUBLE:
 	{
-		double v = va_arg( ap, double );
+		double v = va_arg( *ap, double );
+
+#ifdef DEBUG
+		printf( "%g\n", v );
+#endif /*DEBUG*/
 
 		*((double*)vi->vargv[i]) = v;
 
@@ -1182,7 +1186,11 @@ vips_build_inputva( VipsInfo *vi, int i, va_list ap )
 
 	case VIPS_INT:
 	{
-		int v = va_arg( ap, int );
+		int v = va_arg( *ap, int );
+
+#ifdef DEBUG
+		printf( "%d\n", v );
+#endif /*DEBUG*/
 
 		*((int*)vi->vargv[i]) = v;
 
@@ -1194,7 +1202,11 @@ vips_build_inputva( VipsInfo *vi, int i, va_list ap )
 
 	case VIPS_GVALUE:
 	{
-		GValue *value = va_arg( ap, GValue * );
+		GValue *value = va_arg( *ap, GValue * );
+
+#ifdef DEBUG
+		printf( "gvalue %p\n", value );
+#endif /*DEBUG*/
 
 		vi->vargv[i] = value;
 
@@ -1209,7 +1221,11 @@ vips_build_inputva( VipsInfo *vi, int i, va_list ap )
 	case VIPS_INTERPOLATE:
 	{
 		VipsInterpolate *value = 
-			va_arg( ap, VipsInterpolate * );
+			va_arg( *ap, VipsInterpolate * );
+
+#ifdef DEBUG
+		printf( "interpolate %p\n", value );
+#endif /*DEBUG*/
 
 		vi->vargv[i] = value;
 
@@ -1224,10 +1240,18 @@ vips_build_inputva( VipsInfo *vi, int i, va_list ap )
 
 	case VIPS_IMAGE:
 	{
-		Imageinfo *ii = va_arg( ap, Imageinfo * );
+		Imageinfo *ii = va_arg( *ap, Imageinfo * );
+
+#ifdef DEBUG
+		printf( "imageinfo %p\n", ii );
+#endif /*DEBUG*/
 
 		if( !vips_add_input_ii( vi, ii ) )
 			return( FALSE );
+
+		/* Filled in later.
+		 */
+		vi->vargv[i] = NULL;
 
 		if( trace_flags & TRACE_VIPS ) {
 			VipsBuf *buf = trace_current();
@@ -1252,8 +1276,18 @@ vips_build_inputva( VipsInfo *vi, int i, va_list ap )
 
 	case VIPS_DOUBLEVEC:
 	{
-		int n = va_arg( ap, int );
-		double *vec = va_arg( ap, double * );
+		int n = va_arg( *ap, int );
+		double *vec = va_arg( *ap, double * );
+
+#ifdef DEBUG
+{
+		int i;
+
+		for( i = 0; i < n; i++ )
+			printf( "%g, ", vec[i] );
+		printf( "\n" );
+}
+#endif /*DEBUG*/
 
 		if( vips_make_doublevec( vi->vargv[i], n, vec ) )
 			return( FALSE );
@@ -1280,8 +1314,18 @@ vips_build_inputva( VipsInfo *vi, int i, va_list ap )
 
 	case VIPS_IMAGEVEC:
 	{
-		int n = va_arg( ap, int );
-		Imageinfo **vec = va_arg( ap, Imageinfo ** );
+		int n = va_arg( *ap, int );
+		Imageinfo **vec = va_arg( *ap, Imageinfo ** );
+
+#ifdef DEBUG
+{
+		int i;
+
+		for( i = 0; i < n; i++ )
+			printf( "%p, ", vec[i] );
+		printf( "\n" );
+}
+#endif /*DEBUG*/
 
 		if( vips_make_imagevec( vi->vargv[i], n ) )
 			return( FALSE );
@@ -1319,7 +1363,7 @@ vips_build_inputva( VipsInfo *vi, int i, va_list ap )
 /* Fill an argument vector from the C stack.
  */
 static gboolean
-vips_fillva( VipsInfo *vi, va_list ap )
+vips_fillva( VipsInfo *vi, va_list *ap )
 {
 	int i;
 
@@ -1336,14 +1380,18 @@ vips_fillva( VipsInfo *vi, va_list ap )
 		if( vips_type_makes_output( ty ) ) {
 			if( !vips_build_output( vi, i ) )
 				return( FALSE );
+#ifdef DEBUG
+			printf( " output\n" );
+#endif /*DEBUG*/
 		}
 
 		if( strcmp( ty->type, IM_TYPE_DISPLAY ) == 0 ) {
 			/* DISPLAY argument ... just IM_TYPE_sRGB.
 			 */
 			vi->vargv[i] = im_col_displays( 7 );
+
 #ifdef DEBUG
-			printf( "ip-display-calib\n" );
+			printf( " display\n" );
 #endif /*DEBUG*/
 		}
 
@@ -1368,7 +1416,7 @@ vips_fillva( VipsInfo *vi, va_list ap )
 }
 
 static gboolean
-vipsva_sub( Reduce *rc, const char *name, PElement *out, va_list ap )
+vipsva_sub( Reduce *rc, const char *name, PElement *out, va_list *ap )
 {
 	VipsInfo *vi;
 	gboolean result;
@@ -1425,7 +1473,7 @@ vipsva( Reduce *rc, PElement *out, const char *name, ... )
 #endif /*DEBUG*/
 
         va_start( ap, name );
-	result = vipsva_sub( rc, name, out, ap );
+	result = vipsva_sub( rc, name, out, &ap );
         va_end( ap );
 
 #ifdef DEBUG

@@ -1166,7 +1166,7 @@ action_proc_add( Reduce *rc, Compile *compile,
 	else if( PEISIMAGE( a ) && PEISIMAGE( b ) ) 
 		vipsva( rc, out, "im_add", 
 			PEGETII( a ), PEGETII( b ) );
-	else if( PEISIMAGE( a ) && PEISREAL( b ) ) 
+	else if( PEISIMAGE( a ) && PEISREAL( b ) )  
 		vipsva( rc, out, "im_lintra", 
 			1.0, PEGETII( a ), PEGETREAL( b ) );
 	else if( PEISREAL( a ) && PEISIMAGE( b ) ) 

@@ -4,6 +4,7 @@ started 7.24.0, 30/11/10
 - much faster colour atlas menu item
 - fix make check, again
 - fix debug everywhere
+- fix a va_args problem on Windows
 
 started 7.23.0, 2/8/10
 - fix a crash in thumbnail preview with large images

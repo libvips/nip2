@@ -33,8 +33,8 @@
 #define IP_H
 
 /* DEBUG everywhere.
- */
 #define DEBUG
+ */
 
 /* Turn off VIPS's old and broken defines, we don't need them.
  */

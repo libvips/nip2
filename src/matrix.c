@@ -113,8 +113,10 @@ matrix_done_cb( iWindow *iwnd, void *client,
 
 	int width, height;
 
-	/* Parse values.
+	/* Parse values. We have to scan before we resize in case we are
+	 * sizing smaller and we have unscanned changes at the edges.
 	 */
+	view_scan_all();
 	eds->matrix->display = (MatrixDisplayType)
 		gtk_combo_box_get_active( GTK_COMBO_BOX( eds->display ) );
 	if( !get_geditable_pint( eds->width, &width ) ||

@@ -1,14 +1,3 @@
-- new matrix
-
-  type a value into the right-most column, but don't press 'enter'
-
-  doubleclick on the label, set the size to 2x2, enter
-
-  segv!, or a segv when you close the program (double free())
-
-
-
-
 
 - load an image in A1, then type
 

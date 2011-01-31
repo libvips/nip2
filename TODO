@@ -1,39 +1,4 @@
 
-- load an image in A1, then type
-
-	im_affinei_all A1.value 2 1 0 0 1 0 0 
-
-  error msg is wrong, it says:
-
-  	Argument 2 (out) to "im_affinei_all" is the wrong type.
-	You passed:
-	  in - <10000x10000 32-bit float, 3 bands, sRGB>
-	  interpolate - 2
-	  a - 1
-	  b - 0
-	  c - 0
-	  d - 1
-	  dx - 0
-	  dy - 0
-	
-	Usage:
-	VIPS operator "im_affinei_all"
-	affine transform of whole image, from package "resample"
-	"im_affinei_all" takes 8 arguments:
-	   in  - image
-	   interpolate  - interpolate
-	   a  - double
-	   b  - double
-	   c  - double
-	   d  - double
-	   dx  - double
-	   dy  - double
-	And produces 1 result:
-	   out  - image
-
-
-
-
 
 - matrix_gaussian_blur could have an 'accuracy' or 'max error' param? expose
   in custom blur etc.

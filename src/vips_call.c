@@ -250,7 +250,7 @@ vips_error_arg( VipsInfo *vi, HeapNode **arg, int argi )
 
 	vips_buf_appendf( &buf,
 		_( "Argument %d (%s) to \"%s\" is the wrong type." ),
-		argi + 1, vi->fn->argv[argi].name, vi->name );
+		argi + 1, vi->fn->argv[vi->inpos[argi]].name, vi->name );
 	vips_buf_appendf( &buf, "\n" );
 	vips_args_heap( vi, arg, &buf );
 	vips_buf_appendf( &buf, "\n" );

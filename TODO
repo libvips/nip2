@@ -1,3 +1,8 @@
+- save a 1-bit 100,000 x 100,000 tif, we get the animated stopwatch but no
+  progress bar :(
+
+
+
 - new matrix
 
   type a value into the right-most column, but don't press 'enter'

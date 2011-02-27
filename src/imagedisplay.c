@@ -1,4 +1,5 @@
-/* Imagedisplay widget code ... display entire image, place this widget in a * scrolledwindow to get clipping/scrolling behaviour.
+/* Imagedisplay widget code ... display entire image, place this widget in a 
+ * scrolledwindow to get clipping/scrolling behaviour.
  */
 
 /*

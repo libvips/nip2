@@ -1,3 +1,14 @@
+- in 7.24.1, make xy image, then try A1?0 + A1?1, nonsense image argh
+
+  make xy image, then try
+
+  	polar (A1?0, A1?!)
+
+  assert failure in ri2c.c
+
+  	VIPS:ERROR:im_ri2c.c:88:join_buffer: assertion failed: (0)
+
+
 - save a 1-bit 100,000 x 100,000 tif, we get the animated stopwatch but no
   progress bar :(
 

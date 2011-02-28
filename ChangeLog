@@ -3,6 +3,7 @@ started 7.25.0, 7/1/11
 - oop spelling 
 - fix a crash with resizing dirty matrices
 - minor fix to vips_call error messages
+- more tests in "make check"
 
 started 7.24.0, 30/11/10
 - bump for 7.24

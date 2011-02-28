@@ -1,4 +1,5 @@
 *.o
+TAGS
 Makefile
 Makefile.in
 config.*

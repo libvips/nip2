@@ -1,4 +1,5 @@
 *.o
+.*.swp
 TAGS
 Makefile
 Makefile.in

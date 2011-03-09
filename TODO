@@ -1,5 +1,10 @@
 - im_system_image with tiff format seems to not remove temp files?
 
+- ban parameters which are built-ins, eg. "im", "re" etc., you get nasty
+  crashes
+
+  see also notes below: a new parser could fix this
+
 
 - save a 1-bit 100,000 x 100,000 tif, we get the animated stopwatch but no
   progress bar :(

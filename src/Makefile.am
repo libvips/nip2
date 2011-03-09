@@ -293,10 +293,10 @@ my_sources = \
 	util.h \
 	view.c \
 	view.h \
-	vips_call.c \
-	vips_call.h \
-	vips_cache.c \
-	vips_cache.h \
+	call.c \
+	call.h \
+	cache.c \
+	cache.h \
 	watch.c \
 	watch.h \
 	workspace.c \

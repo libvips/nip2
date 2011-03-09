@@ -243,13 +243,13 @@ action_proc_eor( Reduce *rc, Compile *compile,
 				op, name, a, b );
 	}
 	else if( PEISIMAGE( a ) && PEISIMAGE( b ) ) 
-		vipsva( rc, out, 
+		callva( rc, out, 
 			"im_eorimage", PEGETII( a ), PEGETII( b ) ); 
 	else if( PEISIMAGE( a ) && PEISREAL( b ) ) 
-		vipsva( rc, out, "im_eorimageconst", 
+		callva( rc, out, "im_eorimageconst", 
 			PEGETII( a ), (int) PEGETREAL( b ) ); 
 	else if( PEISREAL( a ) && PEISIMAGE( b ) ) 
-		vipsva( rc, out, "im_eorimageconst", 
+		callva( rc, out, "im_eorimageconst", 
 			PEGETII( b ), (int) PEGETREAL( a ) ); 
 	else
 		action_boperror( rc, compile, NULL, op, name, a, b );
@@ -272,13 +272,13 @@ action_proc_bor( Reduce *rc, Compile *compile,
 				op, name, a, b );
 	}
 	else if( PEISIMAGE( a ) && PEISIMAGE( b ) ) 
-		vipsva( rc, out, "im_orimage", 
+		callva( rc, out, "im_orimage", 
 			PEGETII( a ), PEGETII( b ) ); 
 	else if( PEISIMAGE( a ) && PEISREAL( b ) ) 
-		vipsva( rc, out, "im_orimageconst", 
+		callva( rc, out, "im_orimageconst", 
 			PEGETII( a ), (int) PEGETREAL( b ) ); 
 	else if( PEISREAL( a ) && PEISIMAGE( b ) ) 
-		vipsva( rc, out, "im_orimageconst", 
+		callva( rc, out, "im_orimageconst", 
 			PEGETII( b ), (int) PEGETREAL( a ) ); 
 	else
 		action_boperror( rc, compile, NULL, op, name, a, b );
@@ -293,7 +293,7 @@ action_proc_band( Reduce *rc, Compile *compile,
 	Heap *heap = rc->heap;
 
 	if( PEISIMAGE( a ) && PEISIMAGE( b ) ) 
-		vipsva( rc, out, 
+		callva( rc, out, 
 			"im_andimage", PEGETII( a ), PEGETII( b ) ); 
 	else if( PEISREAL( a ) && PEISREAL( b ) ) {
 		int v1 = PEGETREAL( a );
@@ -304,10 +304,10 @@ action_proc_band( Reduce *rc, Compile *compile,
 				op, name, a, b );
 	}
 	else if( PEISIMAGE( a ) && PEISREAL( b ) ) 
-		vipsva( rc, out, "im_andimageconst", 
+		callva( rc, out, "im_andimageconst", 
 			PEGETII( a ), (int) PEGETREAL( b ) ); 
 	else if( PEISREAL( a ) && PEISIMAGE( b ) ) 
-		vipsva( rc, out, "im_andimageconst", 
+		callva( rc, out, "im_andimageconst", 
 			PEGETII( b ), (int) PEGETREAL( a ) ); 
 	else
 		action_boperror( rc, compile, NULL, op, name, a, b );
@@ -449,13 +449,13 @@ action_proc_lesseq( Reduce *rc, Compile *compile,
 		PEPUTP( out, ELEMENT_BOOL, strcmp( a_string, b_string ) <= 0 );
 	}
 	else if( PEISIMAGE( a ) && PEISREAL( b ) ) 
-		vipsva( rc, out, "im_lesseqconst",
+		callva( rc, out, "im_lesseqconst",
 			PEGETII( a ), PEGETREAL( b ) ); 
 	else if( PEISREAL( a ) && PEISIMAGE( b ) ) 
-		vipsva( rc, out, "im_moreeqconst",
+		callva( rc, out, "im_moreeqconst",
 			PEGETII( b ), PEGETREAL( a ) ); 
 	else if( PEISIMAGE( a ) && PEISIMAGE( b ) ) 
-		vipsva( rc, out, "im_lesseq", PEGETII( a ), PEGETII( b ) ); 
+		callva( rc, out, "im_lesseq", PEGETII( a ), PEGETII( b ) ); 
 	else
 		action_boperror( rc, compile, NULL, op, name, a, b );
 }
@@ -483,13 +483,13 @@ action_proc_less( Reduce *rc, Compile *compile,
 		PEPUTP( out, ELEMENT_BOOL, strcmp( a_string, b_string ) < 0 );
 	}
 	else if( PEISIMAGE( a ) && PEISREAL( b ) ) 
-		vipsva( rc, out, "im_lessconst",
+		callva( rc, out, "im_lessconst",
 			PEGETII( a ), PEGETREAL( b ) ); 
 	else if( PEISREAL( a ) && PEISIMAGE( b ) ) 
-		vipsva( rc, out, "im_moreconst",
+		callva( rc, out, "im_moreconst",
 			PEGETII( b ), PEGETREAL( a ) ); 
 	else if( PEISIMAGE( a ) && PEISIMAGE( b ) ) 
-		vipsva( rc, out, "im_less", PEGETII( a ), PEGETII( b ) ); 
+		callva( rc, out, "im_less", PEGETII( a ), PEGETII( b ) ); 
 	else
 		action_boperror( rc, compile, NULL, op, name, a, b );
 }
@@ -729,13 +729,13 @@ action_proc_equal( Reduce *rc, Compile *compile,
 		reduce_spine_strict( rc, b );
 
 		if( PEISIMAGE( a ) && PEISREAL( b ) ) 
-			vipsva( rc, out, "im_equalconst", 
+			callva( rc, out, "im_equalconst", 
 				PEGETII( a ), PEGETREAL( b ) );
 		else if( PEISREAL( a ) && PEISIMAGE( b ) ) 
-			vipsva( rc, out, "im_equalconst", 
+			callva( rc, out, "im_equalconst", 
 				PEGETII( b ), PEGETREAL( a ) );
 		else if( PEISIMAGE( a ) && PEISIMAGE( b ) ) 
-			vipsva( rc, out, "im_equal", 
+			callva( rc, out, "im_equal", 
 				PEGETII( a ), PEGETII( b ) ); 
 		else
 			PEPUTP( out, ELEMENT_BOOL, FALSE ); 
@@ -769,13 +769,13 @@ action_proc_notequal( Reduce *rc, Compile *compile,
 		reduce_spine_strict( rc, b );
 
 		if( PEISIMAGE( a ) && PEISREAL( b ) ) 
-			vipsva( rc, out, "im_notequalconst", 
+			callva( rc, out, "im_notequalconst", 
 				PEGETII( a ), PEGETREAL( b ) );
 		else if( PEISREAL( a ) && PEISIMAGE( b ) ) 
-			vipsva( rc, out, "im_notequalconst", 
+			callva( rc, out, "im_notequalconst", 
 				PEGETII( b ), PEGETREAL( a ) );
 		else if( PEISIMAGE( a ) && PEISIMAGE( b ) ) 
-			vipsva( rc, out, "im_notequal", 
+			callva( rc, out, "im_notequal", 
 				PEGETII( a ), PEGETII( b ) ); 
 		else
 			PEPUTP( out, ELEMENT_BOOL, TRUE ); 
@@ -810,7 +810,7 @@ action_proc_join( Reduce *rc, Compile *compile,
 	PEPOINTRIGHT( arg[0], &right );
 
 	if( PEISIMAGE( a ) && PEISIMAGE( b ) ) 
-		vipsva( rc, out, "im_bandjoin", PEGETII( a ), PEGETII( b ) ); 
+		callva( rc, out, "im_bandjoin", PEGETII( a ), PEGETII( b ) ); 
 	else if( PEISLIST( a ) && PEISLIST( b ) ) {
 		if( reduce_safe_pointer( rc, 
 			(reduce_safe_pointer_fn) action_proc_join_sub,
@@ -846,7 +846,7 @@ action_proc_index( Reduce *rc, Compile *compile,
 		PEPUTPE( out, &result );
 	}
 	else if( PEISIMAGE( a ) && PEISREAL( b ) ) {
-		vipsva( rc, out, "im_extract_band", 
+		callva( rc, out, "im_extract_band", 
 			PEGETII( a ), (int) PEGETREAL( b ) );
 	}
 	else
@@ -868,9 +868,9 @@ action_proc_exp( Reduce *rc, Compile *compile,
 				op, name, a, b );
 	}
 	else if( PEISIMAGE( a ) && PEISREAL( b ) ) 
-		vipsva( rc, out, "im_powtra", PEGETII( a ), PEGETREAL( b ) );
+		callva( rc, out, "im_powtra", PEGETII( a ), PEGETREAL( b ) );
 	else if( PEISREAL( a ) && PEISIMAGE( b ) ) 
-		vipsva( rc, out, "im_expntra", PEGETII( b ), PEGETREAL( a ) );
+		callva( rc, out, "im_expntra", PEGETII( b ), PEGETREAL( a ) );
 	else
 		action_boperror( rc, compile, NULL, op, name, a, b );
 }
@@ -892,7 +892,7 @@ action_proc_lshift( Reduce *rc, Compile *compile,
 				op, name, a, b );
 	}
 	else if( PEISIMAGE( a ) && PEISREAL( b ) ) 
-		vipsva( rc, out, "im_shiftleft", 
+		callva( rc, out, "im_shiftleft", 
 			PEGETII( a ), (int) PEGETREAL( b ) );
 	else
 		action_boperror( rc, compile, NULL, op, name, a, b );
@@ -915,7 +915,7 @@ action_proc_rshift( Reduce *rc, Compile *compile,
 				op, name, a, b );
 	}
 	else if( PEISIMAGE( a ) && PEISREAL( b ) ) 
-		vipsva( rc, out, "im_shiftright", 
+		callva( rc, out, "im_shiftright", 
 			PEGETII( a ), (int) PEGETREAL( b ) );
 	else
 		action_boperror( rc, compile, NULL, op, name, a, b );
@@ -942,10 +942,10 @@ action_proc_rem( Reduce *rc, Compile *compile,
 				op, name, a, b );
 	}
 	else if( PEISIMAGE( a ) && PEISIMAGE( b ) ) 
-		vipsva( rc, out, "im_remainder", 
+		callva( rc, out, "im_remainder", 
 			PEGETII( a ), PEGETII( b ) );
 	else if( PEISIMAGE( a ) && PEISREAL( b ) ) 
-		vipsva( rc, out, "im_remainderconst", 
+		callva( rc, out, "im_remainderconst", 
 			PEGETII( a ), PEGETREAL( b ) );
 	else
 		action_boperror( rc, compile, NULL, op, name, a, b );
@@ -1000,10 +1000,10 @@ action_proc_div( Reduce *rc, Compile *compile,
 				op, name, a, b );
 	}
 	else if( PEISIMAGE( a ) && PEISIMAGE( b ) ) 
-		vipsva( rc, out, "im_divide", 
+		callva( rc, out, "im_divide", 
 			PEGETII( a ), PEGETII( b ) );
 	else if( PEISIMAGE( a ) && PEISREAL( b ) ) 
-		vipsva( rc, out, "im_lintra", 
+		callva( rc, out, "im_lintra", 
 			1.0 / PEGETREAL( b ), PEGETII( a ), 0.0 );
 	else if( PEISREAL( a ) && PEISIMAGE( b ) ) {
 		HeapNode hn;
@@ -1015,11 +1015,11 @@ action_proc_div( Reduce *rc, Compile *compile,
 
 		/* Take recip.
 		 */
-		vipsva( rc, &rhs, "im_powtra", PEGETII( b ), -1.0 );
+		callva( rc, &rhs, "im_powtra", PEGETII( b ), -1.0 );
 
 		/* Now multiply by const.
 		 */
-		vipsva( rc, out, "im_lintra",
+		callva( rc, out, "im_lintra",
 			PEGETREAL( a ), PEGETII( &rhs ), 0.0 );
 	}
 	else
@@ -1066,13 +1066,13 @@ action_proc_mul( Reduce *rc, Compile *compile,
 				op, name, a, b );
 	}
 	else if( PEISIMAGE( a ) && PEISIMAGE( b ) ) 
-		vipsva( rc, out, "im_multiply", 
+		callva( rc, out, "im_multiply", 
 			PEGETII( a ), PEGETII( b ) );
 	else if( PEISIMAGE( a ) && PEISREAL( b ) ) 
-		vipsva( rc, out, "im_lintra", 
+		callva( rc, out, "im_lintra", 
 			PEGETREAL( b ), PEGETII( a ), 0.0 );
 	else if( PEISREAL( a ) && PEISIMAGE( b ) ) 
-		vipsva( rc, out, "im_lintra", 
+		callva( rc, out, "im_lintra", 
 			PEGETREAL( a ), PEGETII( b ), 0.0 );
 	else
 		action_boperror( rc, compile, NULL, op, name, a, b );
@@ -1115,13 +1115,13 @@ action_proc_sub( Reduce *rc, Compile *compile,
 				op, name, a, b );
 	}
 	else if( PEISIMAGE( a ) && PEISIMAGE( b ) ) 
-		vipsva( rc, out, "im_subtract", 
+		callva( rc, out, "im_subtract", 
 			PEGETII( a ), PEGETII( b ) );
 	else if( PEISIMAGE( a ) && PEISREAL( b ) ) 
-		vipsva( rc, out, "im_lintra", 
+		callva( rc, out, "im_lintra", 
 			1.0, PEGETII( a ), -PEGETREAL( b ) );
 	else if( PEISREAL( a ) && PEISIMAGE( b ) ) 
-		vipsva( rc, out, "im_lintra", 
+		callva( rc, out, "im_lintra", 
 			-1.0, PEGETII( b ), PEGETREAL( a ) );
 	else
 		action_boperror( rc, compile, NULL, op, name, a, b );
@@ -1164,13 +1164,13 @@ action_proc_add( Reduce *rc, Compile *compile,
 				op, name, a, b );
 	}
 	else if( PEISIMAGE( a ) && PEISIMAGE( b ) ) 
-		vipsva( rc, out, "im_add", 
+		callva( rc, out, "im_add", 
 			PEGETII( a ), PEGETII( b ) );
 	else if( PEISIMAGE( a ) && PEISREAL( b ) )  
-		vipsva( rc, out, "im_lintra", 
+		callva( rc, out, "im_lintra", 
 			1.0, PEGETII( a ), PEGETREAL( b ) );
 	else if( PEISREAL( a ) && PEISIMAGE( b ) ) 
-		vipsva( rc, out, "im_lintra", 
+		callva( rc, out, "im_lintra", 
 			1.0, PEGETII( b ), PEGETREAL( a ) );
 	else
 		action_boperror( rc, compile, NULL, op, name, a, b );
@@ -1287,7 +1287,7 @@ action_proc_bop_strict( Reduce *rc, Compile *compile,
 			PEPUTP( out, ELEMENT_NODE, hn );
 		}
 		else if( PEISIMAGE( a ) && PEISIMAGE( b ) ) {
-			vipsva( rc, out, "im_ri2c", 
+			callva( rc, out, "im_ri2c", 
 				PEGETII( a ), PEGETII( b ) ); 
 		}
 		else
@@ -1343,7 +1343,7 @@ action_proc_uop( Reduce *rc, Compile *compile,
 			PEPUTP( out, ELEMENT_BOOL, !PEGETBOOL( a ) );
 		}
 		else if( PEISIMAGE( a ) ) 
-			vipsva( rc, out, "im_equalconst", PEGETII( a ), 0.0 );
+			callva( rc, out, "im_equalconst", PEGETII( a ), 0.0 );
 		else
 			action_uoperror( rc, compile, NULL, op, name, a ); 
 
@@ -1360,7 +1360,7 @@ action_proc_uop( Reduce *rc, Compile *compile,
 				reduce_throw( rc );
 		}
 		else if( PEISIMAGE( a ) ) 
-			vipsva( rc, out, "im_lintra", 
+			callva( rc, out, "im_lintra", 
 				-1.0, PEGETII( a ), 0.0 );
 		else
 			action_uoperror( rc, compile, NULL, op, name, a ); 
@@ -1375,7 +1375,7 @@ action_proc_uop( Reduce *rc, Compile *compile,
 				reduce_throw( rc );
 		}
 		else if( PEISIMAGE( a ) ) 
-			vipsva( rc, out, "im_eorimageconst", 
+			callva( rc, out, "im_eorimageconst", 
 				PEGETII( a ), -1 );
 		else
 			action_uoperror( rc, compile, NULL, op, name, a ); 
@@ -1397,7 +1397,7 @@ action_proc_uop( Reduce *rc, Compile *compile,
 				reduce_throw( rc );
 		}
 		else if( PEISIMAGE( a ) ) 
-			vipsva( rc, out, "im_clip2c", PEGETII( a ) );
+			callva( rc, out, "im_clip2c", PEGETII( a ) );
 		else
 			action_uoperror( rc, compile, NULL, op, name, a ); 
 
@@ -1424,7 +1424,7 @@ action_proc_uop( Reduce *rc, Compile *compile,
 			PEPUTPE( out, a );
 		}
 		else if( PEISIMAGE( a ) ) 
-			vipsva( rc, out, "im_clip", PEGETII( a ) );
+			callva( rc, out, "im_clip", PEGETII( a ) );
 		else
 			action_uoperror( rc, compile, NULL, op, name, a ); 
 
@@ -1441,7 +1441,7 @@ action_proc_uop( Reduce *rc, Compile *compile,
 				reduce_throw( rc );
 		}
 		else if( PEISIMAGE( a ) ) 
-			vipsva( rc, out, "im_clip2i", PEGETII( a ) );
+			callva( rc, out, "im_clip2i", PEGETII( a ) );
 		else
 			action_uoperror( rc, compile, NULL, op, name, a ); 
 
@@ -1457,7 +1457,7 @@ action_proc_uop( Reduce *rc, Compile *compile,
 				reduce_throw( rc );
 		}
 		else if( PEISIMAGE( a ) ) 
-			vipsva( rc, out, "im_clip2ui", PEGETII( a ) );
+			callva( rc, out, "im_clip2ui", PEGETII( a ) );
 		else
 			action_uoperror( rc, compile, NULL, op, name, a ); 
 
@@ -1474,7 +1474,7 @@ action_proc_uop( Reduce *rc, Compile *compile,
 				reduce_throw( rc );
 		}
 		else if( PEISIMAGE( a ) ) 
-			vipsva( rc, out, "im_clip2s", PEGETII( a ) );
+			callva( rc, out, "im_clip2s", PEGETII( a ) );
 		else
 			action_uoperror( rc, compile, NULL, op, name, a ); 
 
@@ -1490,7 +1490,7 @@ action_proc_uop( Reduce *rc, Compile *compile,
 				reduce_throw( rc );
 		}
 		else if( PEISIMAGE( a ) ) 
-			vipsva( rc, out, "im_clip2us", PEGETII( a ) );
+			callva( rc, out, "im_clip2us", PEGETII( a ) );
 		else
 			action_uoperror( rc, compile, NULL, op, name, a ); 
 
@@ -1512,7 +1512,7 @@ action_proc_uop( Reduce *rc, Compile *compile,
 				reduce_throw( rc );
 		}
 		else if( PEISIMAGE( a ) ) 
-			vipsva( rc, out, "im_clip2f", PEGETII( a ) );
+			callva( rc, out, "im_clip2f", PEGETII( a ) );
 		else
 			action_uoperror( rc, compile, NULL, op, name, a ); 
 
@@ -1534,7 +1534,7 @@ action_proc_uop( Reduce *rc, Compile *compile,
 				reduce_throw( rc );
 		}
 		else if( PEISIMAGE( a ) ) 
-			vipsva( rc, out, "im_clip2d", PEGETII( a ) );
+			callva( rc, out, "im_clip2d", PEGETII( a ) );
 		else
 			action_uoperror( rc, compile, NULL, op, name, a ); 
 
@@ -1576,10 +1576,10 @@ action_proc_uop( Reduce *rc, Compile *compile,
 		}
 		else if( PEISIMAGE( a ) ) {
 			if( op == UN_CCOMPLEX )
-				vipsva( rc, out, 
+				callva( rc, out, 
 					"im_clip2cm", PEGETII( a ) );
 			else
-				vipsva( rc, out, 
+				callva( rc, out, 
 					"im_clip2dcm", PEGETII( a ) );
 		}
 		else
@@ -1868,7 +1868,7 @@ action_if( Reduce *rc, Compile *compile,
 				action_boperror( rc, compile, NULL, 
 					op, name, a, b );
 
-			vipsva( rc, out, "im_ifthenelse", 
+			callva( rc, out, "im_ifthenelse", 
 				PEGETII( a ), PEGETII( &t ), PEGETII( &e ) ); 
 		}
 		else 

@@ -49,14 +49,14 @@
 
 /* The previous function calls we are caching, plus an LRU queue for flushing.
  */
-static GHashTable *vips_history_table = NULL;
-static Queue *vips_history_lru = NULL;
-int vips_history_size = 0;
+static GHashTable *cache_history_table = NULL;
+static Queue *cache_history_lru = NULL;
+int cache_history_size = 0;
 
 /* Hash from a vargv ... just look at input args and the function name.
  */
 static unsigned int
-vips_hash( VipsInfo *vi )
+cache_hash( CallInfo *vi )
 {
 	int i;
 	unsigned int hash;
@@ -85,30 +85,30 @@ vips_hash( VipsInfo *vi )
         for( i = 0; i < vi->fn->argc; i++ ) {
                 im_type_desc *ty = vi->fn->argv[i].desc;
 
-                if( vips_type_needs_input( ty ) ) {
-			switch( vips_lookup_type( ty->type ) ) {
-			case VIPS_DOUBLE:
+                if( call_type_needs_input( ty ) ) {
+			switch( call_lookup_type( ty->type ) ) {
+			case CALL_DOUBLE:
 				HASH_D( *((double *) vi->vargv[i]) );
 				break;
 
-			case VIPS_INT:
+			case CALL_INT:
 				HASH_I( *((int *) vi->vargv[i]) );
 				break;
 
-			case VIPS_COMPLEX:
+			case CALL_COMPLEX:
 				HASH_D( ((double *) vi->vargv[i])[0] );
 				HASH_D( ((double *) vi->vargv[i])[1] );
 				break;
 
-			case VIPS_STRING:
+			case CALL_STRING:
 				HASH_S( (char *) vi->vargv[i] );
 				break;
 
-			case VIPS_GVALUE:
-			case VIPS_INTERPOLATE:
+			case CALL_GVALUE:
+			case CALL_INTERPOLATE:
 				break;
 
-			case VIPS_DOUBLEVEC:
+			case CALL_DOUBLEVEC:
 			{
 				im_doublevec_object *v = 
 					(im_doublevec_object *) vi->vargv[i];
@@ -120,7 +120,7 @@ vips_hash( VipsInfo *vi )
 				break;
 			}
 
-			case VIPS_INTVEC:
+			case CALL_INTVEC:
 			{
 				im_intvec_object *v = 
 					(im_intvec_object *) vi->vargv[i];
@@ -132,13 +132,13 @@ vips_hash( VipsInfo *vi )
 				break;
 			}
 
-			case VIPS_DMASK:
+			case CALL_DMASK:
 			{
 				im_mask_object *mo = vi->vargv[i];
 				DOUBLEMASK *mask = mo->mask;
 
 				/* mask can be NULL if we are called after 
-				 * vips_new() but before we've built the arg
+				 * call_new() but before we've built the arg
 				 * list.
 				 */
 				if( mask ) {
@@ -154,13 +154,13 @@ vips_hash( VipsInfo *vi )
 				break;
 			}
 
-			case VIPS_IMASK:
+			case CALL_IMASK:
 			{
 				im_mask_object *mo = vi->vargv[i];
 				INTMASK *mask = mo->mask;
 
 				/* mask can be NULL if we are called after 
-				 * vips_new() but before we've built the arg
+				 * call_new() but before we've built the arg
 				 * list.
 				 */
 				if( mask ) {
@@ -177,7 +177,7 @@ vips_hash( VipsInfo *vi )
 			}
 
 			default:
-			case VIPS_NONE:
+			case CALL_NONE:
 				break;
 			}
 		}
@@ -197,7 +197,7 @@ vips_hash( VipsInfo *vi )
 /* Are two function calls equal. Check the func and the input args.
  */
 static gboolean
-vips_equal( VipsInfo *vi1, VipsInfo *vi2 ) 
+cache_equal( CallInfo *vi1, CallInfo *vi2 ) 
 {
 	int i;
 	im_function *fn = vi1->fn;
@@ -211,21 +211,21 @@ vips_equal( VipsInfo *vi1, VipsInfo *vi2 )
         for( i = 0; i < fn->argc; i++ ) {
                 im_type_desc *ty = fn->argv[i].desc;
 
-                if( vips_type_needs_input( ty ) ) {
-			switch( vips_lookup_type( ty->type ) ) {
-			case VIPS_DOUBLE:
+                if( call_type_needs_input( ty ) ) {
+			switch( call_lookup_type( ty->type ) ) {
+			case CALL_DOUBLE:
 				if( *((double *) vi1->vargv[i]) != 
 					*((double *) vi2->vargv[i]) )
 					return( FALSE );
 				break;
 
-			case VIPS_INT:
+			case CALL_INT:
 				if( *((int *) vi1->vargv[i]) != 
 					*((int *) vi2->vargv[i]) )
 					return( FALSE );
 				break;
 
-			case VIPS_COMPLEX:
+			case CALL_COMPLEX:
 				if( ((double *) vi1->vargv[i])[0] != 
 					((double *) vi2->vargv[i])[0] )
 					return( FALSE );
@@ -234,13 +234,13 @@ vips_equal( VipsInfo *vi1, VipsInfo *vi2 )
 					return( FALSE );
 				break;
 
-			case VIPS_STRING:
+			case CALL_STRING:
 				if( strcmp( (char *) vi1->vargv[i],
 					(char *) vi2->vargv[i] ) != 0 )
 					return( FALSE );
 				break;
 
-			case VIPS_DOUBLEVEC:
+			case CALL_DOUBLEVEC:
 			{
 				im_doublevec_object *v1 = 
 					(im_doublevec_object *) vi1->vargv[i];
@@ -255,7 +255,7 @@ vips_equal( VipsInfo *vi1, VipsInfo *vi2 )
 				break;
 			}
 
-			case VIPS_INTVEC:
+			case CALL_INTVEC:
 			{
 				im_intvec_object *v1 = 
 					(im_intvec_object *) vi1->vargv[i];
@@ -270,7 +270,7 @@ vips_equal( VipsInfo *vi1, VipsInfo *vi2 )
 				break;
 			}
 
-			case VIPS_DMASK:
+			case CALL_DMASK:
 			{
 				im_mask_object *mo1 = 
 					(im_mask_object *) vi1->vargv[i];
@@ -297,7 +297,7 @@ vips_equal( VipsInfo *vi1, VipsInfo *vi2 )
 				break;
 			}
 
-			case VIPS_IMASK:
+			case CALL_IMASK:
 			{
 				im_mask_object *mo1 = 
 					(im_mask_object *) vi1->vargv[i];
@@ -324,7 +324,7 @@ vips_equal( VipsInfo *vi1, VipsInfo *vi2 )
 				break;
 			}
 
-			case VIPS_IMAGEVEC:
+			case CALL_IMAGEVEC:
 			{
 				im_imagevec_object *v1 = 
 					(im_imagevec_object *) vi1->vargv[i];
@@ -341,18 +341,18 @@ vips_equal( VipsInfo *vi1, VipsInfo *vi2 )
 			 * to have a pspec for each argument type and then use 
 			 * g_param_values_cmp() to test equality.
 			 */
-			case VIPS_GVALUE:
+			case CALL_GVALUE:
 				if( vi1->vargv[i] != vi2->vargv[i] )
 					return( FALSE );
 				break;
 
-			case VIPS_INTERPOLATE:
+			case CALL_INTERPOLATE:
 				if( vi1->vargv[i] != vi2->vargv[i] )
 					return( FALSE );
 				break;
 
 			default:
-			case VIPS_NONE:
+			case CALL_NONE:
 				break;
 			}
 		}
@@ -371,62 +371,62 @@ vips_equal( VipsInfo *vi1, VipsInfo *vi2 )
 
 #ifdef DEBUG_HISTORY_SANITY
 static void
-vips_history_sanity_sub( VipsInfo *vi )
+cache_history_sanity_sub( CallInfo *vi )
 {
-	g_assert( g_slist_find( vips_history_lru->list, vi ) );
+	g_assert( g_slist_find( cache_history_lru->list, vi ) );
 }
 
 static void
-vips_history_sanity( void )
+cache_history_sanity( void )
 {
 	GSList *p;
 
-	if( !vips_history_lru || !vips_history_table )
+	if( !cache_history_lru || !cache_history_table )
 		return;
 
 	/* Everything that's on the LRU should be in the history table.
 	 */
-	for( p = vips_history_lru->list; p; p = p->next ) {
-		VipsInfo *vi = (VipsInfo *) p->data;
+	for( p = cache_history_lru->list; p; p = p->next ) {
+		CallInfo *vi = (CallInfo *) p->data;
 
-		g_assert( g_hash_table_lookup( vips_history_table, vi ) );
+		g_assert( g_hash_table_lookup( cache_history_table, vi ) );
 
 		g_assert( vi->fn );
-		g_assert( vi->fn->argc > 0 && vi->fn->argc < MAX_VIPS_ARGS );
+		g_assert( vi->fn->argc > 0 && vi->fn->argc < MAX_CALL_ARGS );
 		g_assert( vi->in_cache );
 	}
 
 	/* Everything that's on the history table should be in the LRU.
 	 */
-	g_hash_table_foreach( vips_history_table,
-		(GHFunc) vips_history_sanity_sub, NULL );
+	g_hash_table_foreach( cache_history_table,
+		(GHFunc) cache_history_sanity_sub, NULL );
 
-	/* Everything that's on the LRU should be in the global vips_info
+	/* Everything that's on the LRU should be in the global cache_info
 	 * list.
 	 */
-	for( p = vips_history_lru->list; p; p = p->next ) {
-		VipsInfo *vi = (VipsInfo *) p->data;
+	for( p = cache_history_lru->list; p; p = p->next ) {
+		CallInfo *vi = (CallInfo *) p->data;
 
-		/* Need to build with DEBUG on before vips_info_all is
+		/* Need to build with DEBUG on before cache_info_all is
 		 * maintained.
 		 */
-		g_assert( g_slist_find( vips_info_all, vi ) );
+		g_assert( g_slist_find( cache_info_all, vi ) );
 	}
 
-	/* Everything on vips_info_all that's not in vips_history_table should
+	/* Everything on cache_info_all that's not in cache_history_table should
 	 * have in_cache FALSE.
 	 */
-	for( p = vips_info_all; p; p = p->next ) {
-		VipsInfo *vi = (VipsInfo *) p->data;
+	for( p = cache_info_all; p; p = p->next ) {
+		CallInfo *vi = (CallInfo *) p->data;
 
-		if( !g_hash_table_lookup( vips_history_table, vi ) )
+		if( !g_hash_table_lookup( cache_history_table, vi ) )
 			g_assert( !vi->in_cache );
 	}
 
 	/* Every input image argument on every in-cache call should be sane.
 	 */
-	for( p = vips_info_all; p; p = p->next ) {
-		VipsInfo *vi = (VipsInfo *) p->data;
+	for( p = cache_info_all; p; p = p->next ) {
+		CallInfo *vi = (CallInfo *) p->data;
 		int i;
 
 		if( !vi->in_cache )
@@ -435,7 +435,7 @@ vips_history_sanity( void )
 		for( i = 0; i < vi->fn->argc; i++ ) {
 			im_type_desc *ty = vi->fn->argv[i].desc;
 
-			if( !vips_type_needs_input( ty ) )
+			if( !call_type_needs_input( ty ) )
 				continue;
 
 			if( strcmp( ty->type, IM_TYPE_IMAGE ) == 0 ) {
@@ -457,8 +457,8 @@ vips_history_sanity( void )
 
 	/* All the output images should be sane.
 	 */
-	for( p = vips_info_all; p; p = p->next ) {
-		VipsInfo *vi = (VipsInfo *) p->data;
+	for( p = cache_info_all; p; p = p->next ) {
+		CallInfo *vi = (CallInfo *) p->data;
 		int i;
 
 		if( !vi->in_cache )
@@ -476,25 +476,25 @@ vips_history_sanity( void )
 
 /* Is a function call in our history? Return the old one. 
  */
-static VipsInfo *
-vips_history_lookup( VipsInfo *vi )
+static CallInfo *
+cache_history_lookup( CallInfo *vi )
 {
-	VipsInfo *old_vi;
+	CallInfo *old_vi;
 
-	if( !vips_history_table ) {
-		vips_history_table = g_hash_table_new( 
-			(GHashFunc) vips_hash, (GEqualFunc) vips_equal );
-		vips_history_lru = queue_new();
+	if( !cache_history_table ) {
+		cache_history_table = g_hash_table_new( 
+			(GHashFunc) cache_hash, (GEqualFunc) cache_equal );
+		cache_history_lru = queue_new();
 	}
 
-	old_vi = (VipsInfo *) g_hash_table_lookup( vips_history_table, vi );
+	old_vi = (CallInfo *) g_hash_table_lookup( cache_history_table, vi );
 
 #ifdef DEBUG_HISTORY
 	if( old_vi ) 
-		printf( "vips_history_lookup: found \"%s\"\n", old_vi->name );
+		printf( "cache_history_lookup: found \"%s\"\n", old_vi->name );
 #endif /*DEBUG_HISTORY*/
 #ifdef DEBUG_HISTORY_SANITY
-	vips_history_sanity();
+	cache_history_sanity();
 #endif /*DEBUG_HISTORY_SANITY*/
 
 	return( old_vi );
@@ -503,37 +503,37 @@ vips_history_lookup( VipsInfo *vi )
 /* Bump to end of LRU.
  */
 static void
-vips_history_touch( VipsInfo *vi )
+cache_history_touch( CallInfo *vi )
 {
 	g_assert( vi->in_cache );
 
-	queue_remove( vips_history_lru, vi );
-	queue_add( vips_history_lru, vi );
+	queue_remove( cache_history_lru, vi );
+	queue_add( cache_history_lru, vi );
 
 #ifdef DEBUG_HISTORY_SANITY
-	vips_history_sanity();
+	cache_history_sanity();
 #endif /*DEBUG_HISTORY_SANITY*/
 #ifdef DEBUG_HISTORY
-	printf( "vips_history_touch: bumping \"%s\"\n", vi->name );
+	printf( "cache_history_touch: bumping \"%s\"\n", vi->name );
 #endif /*DEBUG_HISTORY*/
 }
 
-/* Are we in the history? Remove us. Called from vips_info_dispose() on unref, 
+/* Are we in the history? Remove us. Called from cache_info_dispose() on unref, 
  * don't call this directly.
  */
 void
-vips_history_remove( VipsInfo *vi )
+cache_history_remove( CallInfo *vi )
 {
 	int i;
 
 	if( vi->in_cache ) {
-		queue_remove( vips_history_lru, vi );
-		g_hash_table_remove( vips_history_table, vi );
-		vips_history_size -= 1;
+		queue_remove( cache_history_lru, vi );
+		g_hash_table_remove( cache_history_table, vi );
+		cache_history_size -= 1;
 		vi->in_cache = FALSE;
 
 #ifdef DEBUG_HISTORY
-		printf( "vips_history_remove: removing \"%s\"\n", vi->name );
+		printf( "cache_history_remove: removing \"%s\"\n", vi->name );
 #endif /*DEBUG_HISTORY*/
 	}
 
@@ -547,33 +547,33 @@ vips_history_remove( VipsInfo *vi )
 	}
 
 #ifdef DEBUG_HISTORY_SANITY
-	vips_history_sanity();
+	cache_history_sanity();
 #endif /*DEBUG_HISTORY_SANITY*/
 }
 
 static void
-vips_history_remove_lru( void )
+cache_history_remove_lru( void )
 {
-	VipsInfo *vi;
+	CallInfo *vi;
 
-	vi = (VipsInfo *) queue_head( vips_history_lru );
+	vi = (CallInfo *) queue_head( cache_history_lru );
 
 #ifdef DEBUG_HISTORY
-	printf( "vips_history_remove_lru: flushing \"%s\"\n", vi->name );
+	printf( "cache_history_remove_lru: flushing \"%s\"\n", vi->name );
 #endif /*DEBUG_HISTORY*/
 
 	g_object_unref( vi );
 
 #ifdef DEBUG_HISTORY_SANITY
-	vips_history_sanity();
+	cache_history_sanity();
 #endif /*DEBUG_HISTORY_SANITY*/
 }
 
 static void
-vips_history_destroy_cb( Imageinfo *ii, VipsInfo *vi )
+cache_history_destroy_cb( Imageinfo *ii, CallInfo *vi )
 {
 #ifdef DEBUG_HISTORY
-	printf( "vips_history_destroy_cb: on death of ii, uncaching \"%s\"\n", 
+	printf( "cache_history_destroy_cb: on death of ii, uncaching \"%s\"\n", 
 		vi->name );
 #endif /*DEBUG_HISTORY*/
 
@@ -581,10 +581,10 @@ vips_history_destroy_cb( Imageinfo *ii, VipsInfo *vi )
 }
 
 static void
-vips_history_invalidate_cb( Imageinfo *ii, VipsInfo *vi )
+cache_history_invalidate_cb( Imageinfo *ii, CallInfo *vi )
 {
 #ifdef DEBUG_HISTORY
-	printf( "vips_history_invalidate_cb: "
+	printf( "cache_history_invalidate_cb: "
 		"on invalidate of ii, uncaching \"%s\"\n", vi->name );
 #endif /*DEBUG_HISTORY*/
 
@@ -594,28 +594,28 @@ vips_history_invalidate_cb( Imageinfo *ii, VipsInfo *vi )
 /* Add a function call to the history. 
  */
 static void
-vips_history_add( VipsInfo *vi )
+cache_history_add( CallInfo *vi )
 {
 	int i;
 
 #ifdef DEBUG_HISTORY_SANITY
-	vips_history_sanity();
+	cache_history_sanity();
 #endif /*DEBUG_HISTORY_SANITY*/
 
 #ifdef DEBUG_HISTORY
-	printf( "vips_history_add: adding \"%s\" (%p), hash = %u\n", 
+	printf( "cache_history_add: adding \"%s\" (%p), hash = %u\n", 
 		vi->name, vi, vi->hash );
 #endif /*DEBUG_HISTORY*/
 
-	g_assert( !g_hash_table_lookup( vips_history_table, vi ) );
+	g_assert( !g_hash_table_lookup( cache_history_table, vi ) );
 	g_assert( !vi->in_cache );
 
-	g_hash_table_insert( vips_history_table, vi, vi );
-	vips_history_size += 1;
+	g_hash_table_insert( cache_history_table, vi, vi );
+	cache_history_size += 1;
 
-	g_assert( g_hash_table_lookup( vips_history_table, vi ) );
+	g_assert( g_hash_table_lookup( cache_history_table, vi ) );
 
-	queue_add( vips_history_lru, vi );
+	queue_add( cache_history_lru, vi );
 	vi->in_cache = TRUE;
 	g_object_ref( vi );
 
@@ -624,7 +624,7 @@ vips_history_add( VipsInfo *vi )
 	for( i = 0; i < vi->noutii; i++ )
 		vi->outii_destroy_sid[i] = g_signal_connect( vi->outii[i], 
 			"destroy", 
-			G_CALLBACK( vips_history_destroy_cb ), vi );
+			G_CALLBACK( cache_history_destroy_cb ), vi );
 
 	/* If any of our input ii are destroyed or painted on, we must also 
 	 * uncache.
@@ -632,26 +632,26 @@ vips_history_add( VipsInfo *vi )
 	for( i = 0; i < vi->ninii; i++ ) {
 		vi->inii_destroy_sid[i] = g_signal_connect( vi->inii[i], 
 			"destroy", 
-			G_CALLBACK( vips_history_destroy_cb ), vi );
+			G_CALLBACK( cache_history_destroy_cb ), vi );
 		vi->inii_invalidate_sid[i] = g_signal_connect( vi->inii[i], 
 			"invalidate", 
-			G_CALLBACK( vips_history_invalidate_cb ), vi );
+			G_CALLBACK( cache_history_invalidate_cb ), vi );
 	}
 
 	/* History too big? Flush!
 	 */
-	if( queue_length( vips_history_lru ) > VIPS_HISTORY_MAX ) 
-		vips_history_remove_lru();
+	if( queue_length( cache_history_lru ) > CALL_HISTORY_MAX ) 
+		cache_history_remove_lru();
 
 #ifdef DEBUG_HISTORY_SANITY
-	vips_history_sanity();
+	cache_history_sanity();
 #endif /*DEBUG_HISTORY_SANITY*/
 }
 
 /* Sort out the input images. 
  */
 static gboolean
-vips_gather( VipsInfo *vi ) 
+cache_gather( CallInfo *vi ) 
 {
 	int i, j;
 	int ni;
@@ -682,7 +682,7 @@ vips_gather( VipsInfo *vi )
 	for( i = 0; i < vi->fn->argc; i++ ) {
 		im_type_desc *ty = vi->fn->argv[i].desc;
 
-		if( !vips_type_needs_input( ty ) ) 
+		if( !call_type_needs_input( ty ) ) 
 			continue;
 
 		if( strcmp( ty->type, IM_TYPE_IMAGE ) == 0 ) { 
@@ -693,7 +693,7 @@ vips_gather( VipsInfo *vi )
 				return( FALSE );
 
 			/* RW operations need an extra copy. Tyhe vargv will
-			 * already have been created by vips_build_output().
+			 * already have been created by cache_build_output().
 			 */
 			if( ty->flags & IM_TYPE_RW ) {
 				if( im_copy( im, vi->vargv[i] ) )
@@ -733,30 +733,30 @@ vips_gather( VipsInfo *vi )
  * is used to generate vips history, so it has to be in sh format.
  */
 void
-vips_tochar_shell( VipsInfo *vi, int i, VipsBuf *buf )
+cache_tochar_shell( CallInfo *vi, int i, VipsBuf *buf )
 {
 	im_object obj = vi->vargv[i];
 	im_type_desc *ty = vi->fn->argv[i].desc;
 
-	switch( vips_lookup_type( ty->type ) ) {
-	case VIPS_DOUBLE:
+	switch( call_lookup_type( ty->type ) ) {
+	case CALL_DOUBLE:
 		vips_buf_appendf( buf, "%g", *((double*)obj) );
 		break;
 
-	case VIPS_INT:
+	case CALL_INT:
 		vips_buf_appendf( buf, "%d", *((int*)obj) );
 		break;
 
-	case VIPS_COMPLEX:
+	case CALL_COMPLEX:
 		vips_buf_appendf( buf, "(%g, %g)", 
 			((double*)obj)[0], ((double*)obj)[1] );
 		break;
 
-	case VIPS_STRING:
+	case CALL_STRING:
 		vips_buf_appendf( buf, "\"%s\"", (char*)obj );
 		break;
 
-	case VIPS_IMAGE:
+	case CALL_IMAGE:
 {
 		IMAGE *im = (IMAGE *) obj;
 
@@ -769,8 +769,8 @@ vips_tochar_shell( VipsInfo *vi, int i, VipsBuf *buf )
 		break;
 }
 
-	case VIPS_DMASK:
-	case VIPS_IMASK:
+	case CALL_DMASK:
+	case CALL_IMASK:
 	{
 		im_mask_object *mo = obj;
 
@@ -779,7 +779,7 @@ vips_tochar_shell( VipsInfo *vi, int i, VipsBuf *buf )
 		break;
 	}
 
-	case VIPS_DOUBLEVEC:
+	case CALL_DOUBLEVEC:
 	{
 		im_doublevec_object *v = (im_doublevec_object *) obj;
 		int j;
@@ -792,7 +792,7 @@ vips_tochar_shell( VipsInfo *vi, int i, VipsBuf *buf )
 		break;
 	}
 
-	case VIPS_INTVEC:
+	case CALL_INTVEC:
 	{
 		im_intvec_object *v = (im_intvec_object *) obj;
 		int j;
@@ -805,7 +805,7 @@ vips_tochar_shell( VipsInfo *vi, int i, VipsBuf *buf )
 		break;
 	}
 
-	case VIPS_IMAGEVEC:
+	case CALL_IMAGEVEC:
 	{
 		im_imagevec_object *v = (im_imagevec_object *) obj;
 		int j;
@@ -818,7 +818,7 @@ vips_tochar_shell( VipsInfo *vi, int i, VipsBuf *buf )
 		break;
 	}
 
-	case VIPS_GVALUE:
+	case CALL_GVALUE:
 	{
 		GValue *value = (GValue *) obj;
 
@@ -827,11 +827,11 @@ vips_tochar_shell( VipsInfo *vi, int i, VipsBuf *buf )
 		break;
 	}
 
-	case VIPS_INTERPOLATE:
+	case CALL_INTERPOLATE:
 		vips_object_to_string( VIPS_OBJECT( obj ), buf );
 		break;
 
-	case VIPS_NONE:
+	case CALL_NONE:
 		if( strcmp( ty->type, IM_TYPE_DISPLAY ) == 0 ) 
 			/* Just assume sRGB.
 			 */
@@ -846,54 +846,54 @@ vips_tochar_shell( VipsInfo *vi, int i, VipsBuf *buf )
 /* VIPS types -> a buffer. For tracing calls and debug.
  */
 void
-vips_tochar_trace( VipsInfo *vi, int i, VipsBuf *buf )
+cache_tochar_trace( CallInfo *vi, int i, VipsBuf *buf )
 {
 	im_object obj = vi->vargv[i];
 	im_type_desc *vips = vi->fn->argv[i].desc;
 
-	switch( vips_lookup_type( vips->type ) ) {
-	case VIPS_DOUBLE:
+	switch( call_lookup_type( vips->type ) ) {
+	case CALL_DOUBLE:
 		vips_buf_appendf( buf, "%g", *((double*)obj) );
 		break;
 
-	case VIPS_INT:
+	case CALL_INT:
 		vips_buf_appendf( buf, "%d", *((int*)obj) );
 		break;
 
-	case VIPS_COMPLEX:
+	case CALL_COMPLEX:
 		vips_buf_appendf( buf, "(%g, %g)", 
 			((double*)obj)[0], ((double*)obj)[1] );
 		break;
 
-	case VIPS_STRING:
+	case CALL_STRING:
 		vips_buf_appendf( buf, "\"%s\"", (char*) obj );
 		break;
 
-	case VIPS_IMAGE:
+	case CALL_IMAGE:
 		vips_buf_appendi( buf, (IMAGE *) obj );
 		break;
 
-	case VIPS_DMASK:
+	case CALL_DMASK:
 		vips_buf_appendf( buf, "dmask" );
 		break;
 
-	case VIPS_IMASK:
+	case CALL_IMASK:
 		vips_buf_appendf( buf, "imask" );
 		break;
 
-	case VIPS_DOUBLEVEC:
+	case CALL_DOUBLEVEC:
 		vips_buf_appendf( buf, "doublevec" );
 		break;
 
-	case VIPS_INTVEC:
+	case CALL_INTVEC:
 		vips_buf_appendf( buf, "intvec" );
 		break;
 
-	case VIPS_IMAGEVEC:
+	case CALL_IMAGEVEC:
 		vips_buf_appendf( buf, "imagevec" );
 		break;
 
-	case VIPS_GVALUE:
+	case CALL_GVALUE:
 	{
 		GValue *value = (GValue *) obj;
 
@@ -904,7 +904,7 @@ vips_tochar_trace( VipsInfo *vi, int i, VipsBuf *buf )
 		break;
 	}
 
-	case VIPS_INTERPOLATE:
+	case CALL_INTERPOLATE:
 		vips_object_to_string( VIPS_OBJECT( obj ), buf );
 		break;
 
@@ -916,7 +916,7 @@ vips_tochar_trace( VipsInfo *vi, int i, VipsBuf *buf )
 /* Get the args from the VIPS call buffer.
  */
 static void
-vips_args_vips( VipsInfo *vi, VipsBuf *buf )
+cache_args_vips( CallInfo *vi, VipsBuf *buf )
 {
 	int i;
 
@@ -926,9 +926,9 @@ vips_args_vips( VipsInfo *vi, VipsBuf *buf )
                 im_type_desc *ty = vi->fn->argv[i].desc;
                 char *name = vi->fn->argv[i].name;
 
-                if( vips_type_needs_input( ty ) ) {
+                if( call_type_needs_input( ty ) ) {
                         vips_buf_appendf( buf, "   %s - ", name );
-                        vips_tochar_trace( vi, i, buf );
+                        cache_tochar_trace( vi, i, buf );
                         vips_buf_appendf( buf, "\n" );
                 }
         }
@@ -938,7 +938,7 @@ vips_args_vips( VipsInfo *vi, VipsBuf *buf )
  * struct.
  */
 static void
-vips_error_fn_vips( VipsInfo *vi )
+cache_error_fn_vips( CallInfo *vi )
 {
 	char txt[1000];
 	VipsBuf buf = VIPS_BUF_STATIC( txt );
@@ -952,14 +952,14 @@ vips_error_fn_vips( VipsInfo *vi )
 	vips_buf_appendf( &buf, _( "VIPS library: %s" ), im_error_buffer() );
 	im_error_clear();
 	vips_buf_appendf( &buf, "\n" );
-	vips_args_vips( vi, &buf );
+	cache_args_vips( vi, &buf );
 	vips_buf_appendf( &buf, "\n" );
-	vips_usage( &buf, vi->fn );
+	call_usage( &buf, vi->fn );
 	error_sub( "%s", vips_buf_all( &buf ) );
 }
 
 static gboolean
-vips_build_argv( VipsInfo *vi, char **argv )
+cache_build_argv( CallInfo *vi, char **argv )
 {
 	int i;
 
@@ -967,13 +967,13 @@ vips_build_argv( VipsInfo *vi, char **argv )
 		char txt[512];
 		VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-		vips_tochar_shell( vi, i, &buf );
+		cache_tochar_shell( vi, i, &buf );
 		if( !(argv[i] = im_strdup( NULL, vips_buf_all( &buf ) )) )
 			return( FALSE );
 	}
 
 #ifdef DEBUG
-	printf( "vips_build_argv: argv for %s is:\n  ", vi->fn->name );
+	printf( "cache_build_argv: argv for %s is:\n  ", vi->fn->name );
 	for( i = 0; i < vi->fn->argc; i++ )
 		printf( "%s ", NN( argv[i] ) );
 	printf( "\n" );
@@ -983,7 +983,7 @@ vips_build_argv( VipsInfo *vi, char **argv )
 }
 
 static void
-vips_free_argv( int argc, char **argv )
+cache_free_argv( int argc, char **argv )
 {
 	int i;
 
@@ -996,14 +996,14 @@ vips_free_argv( int argc, char **argv )
 /* Update the VIPS hist for all output images.
  */
 static void
-vips_update_hist( VipsInfo *vi )
+cache_update_hist( CallInfo *vi )
 {
 	int argc = vi->fn->argc;
 	char **argv;
 	int i;
 
 #ifdef DEBUG
-	printf( "vips_update_hist: %s\n", vi->name );
+	printf( "cache_update_hist: %s\n", vi->name );
 #endif /*DEBUG*/
 
 	/* No output images? Nothing to do.
@@ -1017,8 +1017,8 @@ vips_update_hist( VipsInfo *vi )
 		return;
 	for( i = 0; i < argc + 1; i++ )
 		argv[i] = NULL;
-	if( !vips_build_argv( vi, argv ) ) {
-		vips_free_argv( argc, argv );
+	if( !cache_build_argv( vi, argv ) ) {
+		cache_free_argv( argc, argv );
 		return;
 	}
 
@@ -1028,47 +1028,47 @@ vips_update_hist( VipsInfo *vi )
 
 		/* Image output.
 		 */
-		if( vips_lookup_type( ty->type ) == VIPS_IMAGE ) {
+		if( call_lookup_type( ty->type ) == CALL_IMAGE ) {
 #ifdef DEBUG
-			printf( "vips_update_hist: adding to arg %d\n", j );
+			printf( "cache_update_hist: adding to arg %d\n", j );
 #endif /*DEBUG*/
 
 			im_updatehist( vi->vargv[j], vi->fn->name, argc, argv );
 		}
 	}
 
-	vips_free_argv( argc, argv );
+	cache_free_argv( argc, argv );
 }
 
 /* Call a vips operation. 
  *
- * The cache takes ownership of the VipsInfo passed in, and returns a ref to a
- * VipsInfo (might be a different one) that contains the result. Should be 
+ * The cache takes ownership of the CallInfo passed in, and returns a ref to a
+ * CallInfo (might be a different one) that contains the result. Should be 
  * unreffed when you're done with it.
  *
  * On error, return NULL.
  */
-VipsInfo *
-vips_dispatch( VipsInfo *vi, PElement *out )
+CallInfo *
+cache_dispatch( CallInfo *vi, PElement *out )
 {
-	VipsInfo *old_vi;
+	CallInfo *old_vi;
 
 #ifdef DEBUG_HISTORY_SANITY
-	vips_history_sanity();
+	cache_history_sanity();
 #endif /*DEBUG_HISTORY_SANITY*/
 
 	/* Calculate the hash for this vi after building it, but before we do
-	 * vips_gather();
+	 * cache_gather();
 	 *
 	 * We want the hash to reflect the args as supplied by nip2, not the
-	 * args as transformed by vips_gather() for this specific call.
+	 * args as transformed by cache_gather() for this specific call.
 	 */
-	(void) vips_hash( vi );
+	(void) cache_hash( vi );
 
 	/* Look over the images we have and turn input Imageinfos to IMAGEs.
 	 * If we can do this with a lut, set all that up.
 	 */
-	if( !vips_gather( vi ) ) {
+	if( !cache_gather( vi ) ) {
 		g_object_unref( vi );
 		return( NULL );
 	}
@@ -1086,8 +1086,8 @@ vips_dispatch( VipsInfo *vi, PElement *out )
 		char txt[512];
 		VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-		printf( "vips_fill_spine: arg[%d] (%s) = ", i, ty->type );
-		vips_tochar_trace( vi, i, &buf );
+		printf( "cache_fill_spine: arg[%d] (%s) = ", i, ty->type );
+		cache_tochar_trace( vi, i, &buf );
 		printf( "%s\n", vips_buf_all( &buf ) );
 	}
 }
@@ -1095,7 +1095,7 @@ vips_dispatch( VipsInfo *vi, PElement *out )
 
 	/* Is this function call in the history?
 	 */
-	if( (old_vi = vips_history_lookup( vi )) ) {
+	if( (old_vi = cache_history_lookup( vi )) ) {
 		/* Yes: reuse! unref our arg to junk it, adda ref to the
 		 * cached call for our caller.
 		 */
@@ -1107,7 +1107,7 @@ vips_dispatch( VipsInfo *vi, PElement *out )
 			vips_buf_appendf( trace_current(), "(from cache) " );
 
 #ifdef DEBUG_HISTORY
-		printf( "vips_dispatch: found %s in history\n", vi->name );
+		printf( "cache_dispatch: found %s in history\n", vi->name );
 #endif /*DEBUG_HISTORY*/
 	}
 	else {
@@ -1124,25 +1124,25 @@ vips_dispatch( VipsInfo *vi, PElement *out )
 #endif /*DEBUG_TIME*/
 
 #ifdef DEBUG_HISTORY_MISS
-		printf( "vips_dispatch: calling %s\n", vi->name );
+		printf( "cache_dispatch: calling %s\n", vi->name );
 #endif /*DEBUG_HISTORY_MISS*/
 
 		/* Be careful. Eval callbacks from this may do anything,
-		 * including call vips_dispatch().
+		 * including call cache_dispatch().
 		 */
 		result = vi->fn->disp( vi->vargv );
 
 #ifdef DEBUG_TIME
-		printf( "vips_dispatch: %s - %g seconds\n", 
+		printf( "cache_dispatch: %s - %g seconds\n", 
 			vi->name, g_timer_elapsed( timer, NULL ) );
 #endif /*DEBUG_TIME*/
 
 		if( result ) {
-			vips_error_fn_vips( vi );
+			cache_error_fn_vips( vi );
 			g_object_unref( vi );
 			return( NULL );
 		}
-		vips_update_hist( vi );
+		cache_update_hist( vi );
 	}
 
 	/* Add to our operation cache, if necessary.
@@ -1151,20 +1151,20 @@ vips_dispatch( VipsInfo *vi, PElement *out )
 		if( vi->in_cache ) 
 			/* Already in the history. Just touch the time.
 			 */
-			vips_history_touch( vi );
-		else if( (old_vi = vips_history_lookup( vi )) ) {
+			cache_history_touch( vi );
+		else if( (old_vi = cache_history_lookup( vi )) ) {
 			/* We have an equal but older item there? This can 
 			 * happen with nested calls. Touch the old one.
 			 */
-			vips_history_touch( old_vi );
+			cache_history_touch( old_vi );
 			vi = old_vi;
 		}
 		else
-			vips_history_add( vi );
+			cache_history_add( vi );
 	}
 
 #ifdef DEBUG_HISTORY_SANITY
-	vips_history_sanity();
+	cache_history_sanity();
 #endif /*DEBUG_HISTORY_SANITY*/
 
 	return( vi );

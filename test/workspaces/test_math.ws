@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.18.0">
-  <Workspace filename="test_math.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1280" window_height="771" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_math" caption="Default empty workspace">
+  <Workspace window_x="0" window_y="0" window_width="1280" window_height="1168" filename="test_math.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_math" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="17" name="B" caption="Colour / Colourspace">
       <Subcolumn vislevel="3">
         <Row popup="false" name="B1">
@@ -12,38 +12,38 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="476" y="0" open="true" selected="false" sform="false" next="15" name="Y" caption="Math / Arithmetic">
+    <Column x="462" y="0" open="true" selected="true" sform="false" next="17" name="Y" caption="Math / Arithmetic">
       <Subcolumn vislevel="3">
         <Row popup="false" name="Y1">
-          <Rhs vislevel="1" flags="1">
+          <Rhs vislevel="2" flags="5">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
             <iText formula="B1"/>
           </Rhs>
         </Row>
         <Row popup="false" name="Y3">
-          <Rhs vislevel="1" flags="1">
+          <Rhs vislevel="2" flags="5">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
             <iText formula="B1"/>
           </Rhs>
         </Row>
         <Row popup="false" name="Y4">
-          <Rhs vislevel="1" flags="1">
+          <Rhs vislevel="2" flags="5">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
             <iText formula="Math_arithmetic_item.Add_item.action Y1 Y3"/>
           </Rhs>
         </Row>
         <Row popup="false" name="Y5">
-          <Rhs vislevel="1" flags="1">
+          <Rhs vislevel="2" flags="5">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
             <iText formula="Math_arithmetic_item.Subtract_item.action Y4 Y3"/>
           </Rhs>
         </Row>
         <Row popup="false" name="Y6">
-          <Rhs vislevel="1" flags="1">
+          <Rhs vislevel="2" flags="5">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
             <iText formula="Math_arithmetic_item.Multiply_item.action Y4 Y5"/>
@@ -55,50 +55,60 @@
           </Rhs>
         </Row>
         <Row popup="false" name="Y8">
-          <Rhs vislevel="1" flags="1">
+          <Rhs vislevel="2" flags="5">
             <iImage window_x="0" window_y="30" window_width="512" window_height="729" image_left="229" image_top="289" image_mag="1" show_status="true" show_paintbox="false" show_convert="true" show_rulers="true" scale="1" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
             <iText formula="Math_arithmetic_item.Divide_item.action Y6 Y7"/>
           </Rhs>
         </Row>
         <Row popup="false" name="Y10">
-          <Rhs vislevel="1" flags="1">
+          <Rhs vislevel="2" flags="5">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
             <iText formula="Math_arithmetic_item.Remainder_item.action Y4 Y7"/>
           </Rhs>
         </Row>
         <Row popup="false" name="Y12">
-          <Rhs vislevel="1" flags="1">
+          <Rhs vislevel="2" flags="5">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
             <iText formula="Math_arithmetic_item.Absolute_value_item.action Y10"/>
           </Rhs>
         </Row>
         <Row popup="false" name="Y11">
-          <Rhs vislevel="1" flags="1">
+          <Rhs vislevel="2" flags="5">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
             <iText formula="Math_arithmetic_item.Absolute_value_vector_item.action Y10"/>
           </Rhs>
         </Row>
         <Row popup="false" name="Y13">
-          <Rhs vislevel="1" flags="1">
+          <Rhs vislevel="2" flags="5">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
             <iText formula="Math_arithmetic_item.Sign_item.action Y11"/>
           </Rhs>
         </Row>
         <Row popup="false" name="Y14">
-          <Rhs vislevel="1" flags="1">
+          <Rhs vislevel="2" flags="5">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
             <iText formula="Math_arithmetic_item.Negate_item.action Y13"/>
           </Rhs>
         </Row>
+        <Row popup="false" name="Y15">
+          <Rhs vislevel="2" flags="4">
+            <iText formula="max (abs (Y1 - (250 * Y8)**0.5))"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="Y16">
+          <Rhs vislevel="1" flags="4">
+            <iText formula="if Y15 &gt; 0.0001 then error &quot;argh&quot; else &quot;ok!&quot;"/>
+          </Rhs>
+        </Row>
       </Subcolumn>
     </Column>
-    <Column x="958" y="0" open="true" selected="false" sform="false" next="15" name="JB" caption="Math / Trig">
+    <Column x="978" y="0" open="true" selected="false" sform="false" next="15" name="JB" caption="Math / Trig">
       <Subcolumn vislevel="3">
         <Row popup="false" name="JB1">
           <Rhs vislevel="1" flags="1">
@@ -189,7 +199,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1445" y="0" open="true" selected="false" sform="false" next="10" name="KB" caption="Math / Log">
+    <Column x="1457" y="0" open="true" selected="false" sform="false" next="10" name="KB" caption="Math / Log">
       <Subcolumn vislevel="3">
         <Row popup="false" name="KB1">
           <Rhs vislevel="1" flags="1">
@@ -279,7 +289,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="2215" y="0" open="true" selected="false" sform="false" next="19" name="MB" caption="Math / Boolean">
+    <Column x="2772" y="0" open="true" selected="false" sform="false" next="19" name="MB" caption="Math / Boolean">
       <Subcolumn vislevel="3">
         <Row popup="false" name="MB1">
           <Rhs vislevel="1" flags="1">
@@ -377,7 +387,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3898" y="0" open="true" selected="false" sform="false" next="23" name="OB" caption="Math / List ">
+    <Column x="4521" y="0" open="true" selected="false" sform="false" next="23" name="OB" caption="Math / List ">
       <Subcolumn vislevel="3">
         <Row popup="false" name="OB1">
           <Rhs vislevel="1" flags="4">
@@ -481,7 +491,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="4247" y="0" open="true" selected="false" sform="false" next="5" name="PB" caption="Math / Round">
+    <Column x="4886" y="0" open="true" selected="false" sform="false" next="5" name="PB" caption="Math / Round">
       <Subcolumn vislevel="3">
         <Row popup="false" name="PB1">
           <Rhs vislevel="1" flags="1">
@@ -513,7 +523,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="4570" y="0" open="true" selected="false" sform="false" next="6" name="QB" caption="Math / Fourier">
+    <Column x="5205" y="0" open="true" selected="false" sform="false" next="6" name="QB" caption="Math / Fourier">
       <Subcolumn vislevel="3">
         <Row popup="false" name="QB1">
           <Rhs vislevel="1" flags="1">
@@ -554,7 +564,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="5056" y="0" open="true" selected="false" sform="false" next="33" name="RB" caption="Math / Statistics">
+    <Column x="5679" y="0" open="true" selected="false" sform="false" next="33" name="RB" caption="Math / Statistics">
       <Subcolumn vislevel="3">
         <Row popup="false" name="RB1">
           <Rhs vislevel="1" flags="1">
@@ -680,7 +690,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="5623" y="0" open="true" selected="false" sform="false" next="8" name="SB" caption="Math / Base">
+    <Column x="6295" y="0" open="true" selected="false" sform="false" next="8" name="SB" caption="Math / Base">
       <Subcolumn vislevel="3">
         <Row popup="false" name="SB1">
           <Rhs vislevel="1" flags="4">
@@ -704,7 +714,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="5809" y="0" open="true" selected="false" sform="false" next="5" name="C" caption="Math / Cluster">
+    <Column x="6490" y="0" open="true" selected="false" sform="false" next="5" name="C" caption="Math / Cluster">
       <Subcolumn vislevel="3">
         <Row popup="false" name="C1">
           <Rhs vislevel="1" flags="4">
@@ -719,7 +729,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="2710" y="909" open="true" selected="false" sform="false" next="7" name="A" caption="test results of relational">
+    <Column x="3256" y="916" open="true" selected="false" sform="false" next="7" name="A" caption="test results of relational">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A4">
           <Rhs vislevel="2" flags="4">
@@ -738,7 +748,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="2710" y="0" open="true" selected="false" sform="false" next="10" name="D" caption="Math / Relational">
+    <Column x="3256" y="0" open="true" selected="false" sform="false" next="10" name="D" caption="Math / Relational">
       <Subcolumn vislevel="3">
         <Row popup="false" name="D1">
           <Rhs vislevel="0" flags="4">
@@ -805,7 +815,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3305" y="0" open="true" selected="false" sform="false" next="11" name="E" caption="Math / Relational constant">
+    <Column x="3889" y="0" open="true" selected="false" sform="false" next="11" name="E" caption="Math / Relational constant">
       <Subcolumn vislevel="3">
         <Row popup="false" name="E1">
           <Rhs vislevel="0" flags="4">
@@ -863,7 +873,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3305" y="798" open="true" selected="true" sform="false" next="5" name="F" caption="test results of relational constant">
+    <Column x="3889" y="804" open="true" selected="false" sform="false" next="5" name="F" caption="test results of relational constant">
       <Subcolumn vislevel="3">
         <Row popup="false" name="F4">
           <Rhs vislevel="2" flags="4">
@@ -878,6 +888,76 @@
         <Row popup="false" name="F3">
           <Rhs vislevel="1" flags="4">
             <iText formula="if F2 != [0, 255, 255, 0, 0, 255] then error &quot;relational argh&quot; else &quot;ok!&quot;"/>
+          </Rhs>
+        </Row>
+      </Subcolumn>
+    </Column>
+    <Column x="2242" y="0" open="true" selected="false" sform="false" next="12" name="G" caption="Math / Complex">
+      <Subcolumn vislevel="3">
+        <Row popup="false" name="G1">
+          <Rhs vislevel="1" flags="1">
+            <iText formula="(B1,B1)"/>
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="G2">
+          <Rhs vislevel="2" flags="5">
+            <iText formula="Math_complex_item.Complex_extract.Real_item.action G1"/>
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="G3">
+          <Rhs vislevel="2" flags="5">
+            <iText formula="Math_complex_item.Complex_extract.Imaginary_item.action G1"/>
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="G4">
+          <Rhs vislevel="2" flags="5">
+            <iText formula="Math_complex_item.Complex_build_item.action G2 G3"/>
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="G5">
+          <Rhs vislevel="2" flags="5">
+            <iText formula="Math_complex_item.Polar_item.action G4"/>
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="G6">
+          <Rhs vislevel="2" flags="5">
+            <iText formula="Math_complex_item.Rectangular_item.action G5"/>
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="G7">
+          <Rhs vislevel="2" flags="5">
+            <iText formula="Math_complex_item.Conjugate_item.action G6"/>
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="G8">
+          <Rhs vislevel="2" flags="5">
+            <iText formula="Math_complex_item.Conjugate_item.action G7"/>
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="G10">
+          <Rhs vislevel="1" flags="4">
+            <iText formula="max (abs (re (G8 - G1)))"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="G11">
+          <Rhs vislevel="1" flags="4">
+            <iText formula="if G10 &gt; 0.0001 then error &quot;argh&quot; else &quot;ok!&quot;"/>
           </Rhs>
         </Row>
       </Subcolumn>

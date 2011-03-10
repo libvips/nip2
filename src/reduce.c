@@ -1238,7 +1238,7 @@ reduce_start:
 
 			action_dispatch( rc, NULL, reduce_spine,
 				-1, sym->function->name, FALSE,
-				(ActionFn) vips_run, na, arg, 
+				(ActionFn) call_run, na, arg, 
 				sym->function );
 
 			/* Find output element.

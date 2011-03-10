@@ -416,7 +416,7 @@ const char *watch_string_get( Watchgroup *,
 
 /* Number of vips calls to memoise.
  */
-#define VIPS_HISTORY_MAX \
+#define CALL_HISTORY_MAX \
 	(watch_int_get( main_watchgroup, "VIPS_HISTORY_MAX", 200 ))
 
 /* Auto save wses.

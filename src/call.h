@@ -23,49 +23,49 @@
 
 /*
 
-    These files are distributed with VIPS - http://www.vips.ecs.soton.ac.uk
+    These files are distributed with CALL - http://www.vips.ecs.soton.ac.uk
 
 */
 
-/* Maxiumum number of args to a VIPS function.
+/* Maxiumum number of args to a CALL function.
  */
-#define MAX_VIPS_ARGS (100)
+#define MAX_CALL_ARGS (100)
 
 /* Maximum length of a vector we pass to INTVEC etc.
  */
 #define MAX_VEC (10000)
 
-typedef enum _VipsArgumentType {
-	VIPS_NONE = -1,
-	VIPS_DOUBLE = 0,
-	VIPS_INT,
-	VIPS_COMPLEX,
-	VIPS_STRING,
-	VIPS_IMAGE,
-	VIPS_DOUBLEVEC,
-	VIPS_DMASK,
-	VIPS_IMASK,
-	VIPS_IMAGEVEC,
-	VIPS_INTVEC,
-	VIPS_GVALUE,
-	VIPS_INTERPOLATE
-} VipsArgumentType;
+typedef enum _CallArgumentType {
+	CALL_NONE = -1,
+	CALL_DOUBLE = 0,
+	CALL_INT,
+	CALL_COMPLEX,
+	CALL_STRING,
+	CALL_IMAGE,
+	CALL_DOUBLEVEC,
+	CALL_DMASK,
+	CALL_IMASK,
+	CALL_IMAGEVEC,
+	CALL_INTVEC,
+	CALL_GVALUE,
+	CALL_INTERPOLATE
+} CallArgumentType;
 
-#define TYPE_VIPS_INFO (vips_info_get_type())
-#define VIPS_INFO( obj ) \
-	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_VIPS_INFO, VipsInfo ))
-#define VIPS_INFO_CLASS( klass ) \
-	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_VIPS_INFO, VipsInfoClass))
-#define IS_VIPS_INFO( obj ) \
-	(G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_VIPS_INFO ))
-#define IS_VIPS_INFO_CLASS( klass ) \
-	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_VIPS_INFO ))
-#define VIPS_INFO_GET_CLASS( obj ) \
-	(G_TYPE_INSTANCE_GET_CLASS( (obj), TYPE_VIPS_INFO, VipsInfoClass ))
+#define TYPE_CALL_INFO (call_info_get_type())
+#define CALL_INFO( obj ) \
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_CALL_INFO, CallInfo ))
+#define CALL_INFO_CLASS( klass ) \
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_CALL_INFO, CallInfoClass))
+#define IS_CALL_INFO( obj ) \
+	(G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_CALL_INFO ))
+#define IS_CALL_INFO_CLASS( klass ) \
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_CALL_INFO ))
+#define CALL_INFO_GET_CLASS( obj ) \
+	(G_TYPE_INSTANCE_GET_CLASS( (obj), TYPE_CALL_INFO, CallInfoClass ))
 
-/* Stuff we hold about a call to a VIPS function.
+/* Stuff we hold about a call to a CALL function.
  */
-typedef struct _VipsInfo {
+typedef struct _CallInfo {
 	iObject parent_object;
 
 	/* Environment.
@@ -76,12 +76,12 @@ typedef struct _VipsInfo {
 
 	/* Args we build. Images in vargv are IMAGE* pointers.
 	 */
-	im_object *vargv;		/* vargv we build for VIPS */
+	im_object *vargv;		/* vargv we build for CALL */
 	int nargs;			/* Number of args needed from ip */
 	int nres;			/* Number of objects we write back */
 	int nires;			/* Number of images we write back */
-	int inpos[MAX_VIPS_ARGS];	/* Positions of inputs */
-	int outpos[MAX_VIPS_ARGS];	/* Positions of outputs */
+	int inpos[MAX_CALL_ARGS];	/* Positions of inputs */
+	int outpos[MAX_CALL_ARGS];	/* Positions of outputs */
 
 	/* Input images. Need to track "destroy" on each one (and kill us
 	 * in turn). 
@@ -95,15 +95,15 @@ typedef struct _VipsInfo {
 	 * destroy for it.
 	 */
 	int ninii;			
-	Imageinfo *inii[MAX_VIPS_ARGS];	
-	unsigned int inii_destroy_sid[MAX_VIPS_ARGS];
-	unsigned int inii_invalidate_sid[MAX_VIPS_ARGS];
+	Imageinfo *inii[MAX_CALL_ARGS];	
+	unsigned int inii_destroy_sid[MAX_CALL_ARGS];
+	unsigned int inii_invalidate_sid[MAX_CALL_ARGS];
 
 	/* Output images. 
 	 */
 	int noutii;
-	Imageinfo *outii[MAX_VIPS_ARGS];
-	unsigned int outii_destroy_sid[MAX_VIPS_ARGS];
+	Imageinfo *outii[MAX_CALL_ARGS];
+	unsigned int outii_destroy_sid[MAX_CALL_ARGS];
 
 	gboolean use_lut;		/* TRUE for using a lut */
 
@@ -119,31 +119,31 @@ typedef struct _VipsInfo {
 	/* Set if we hold refs in inii/outii that must be dropped.
 	 */
 	gboolean must_drop;
-} VipsInfo;
+} CallInfo;
 
-typedef struct _VipsInfoClass {
+typedef struct _CallInfoClass {
 	iObjectClass parent_class;
 
-} VipsInfoClass;
+} CallInfoClass;
 
-extern GSList *vips_info_all;
+extern GSList *call_info_all;
 
-VipsArgumentType vips_lookup_type( im_arg_type type );
-void vips_error( VipsInfo *vi );
-void vips_error_toomany( VipsInfo *vi );
+CallArgumentType call_lookup_type( im_arg_type type );
+void call_error( CallInfo *vi );
+void call_error_toomany( CallInfo *vi );
 
-GType vips_info_get_type( void );
+GType call_info_get_type( void );
 
-void vips_check_all_destroyed( void );
-gboolean vips_type_needs_input( im_type_desc *ty );
-gboolean vips_type_makes_output( im_type_desc *ty );
+void call_check_all_destroyed( void );
+gboolean call_type_needs_input( im_type_desc *ty );
+gboolean call_type_makes_output( im_type_desc *ty );
 
-gboolean vips_is_callable( im_function *fn );
-int vips_n_args( im_function *fn );
-void vips_usage( VipsBuf *buf, im_function *fn );
-void vips_spine( Reduce *rc, 
+gboolean call_is_callable( im_function *fn );
+int call_n_args( im_function *fn );
+void call_usage( VipsBuf *buf, im_function *fn );
+void call_spine( Reduce *rc, 
 	const char *name, HeapNode **arg, PElement *out );
-void vips_run( Reduce *rc, Compile *compile,
+void call_run( Reduce *rc, Compile *compile,
 	int op, const char *name, HeapNode **arg, PElement *out,
 	im_function *function );
-void vipsva( Reduce *rc, PElement *out, const char *name, ... );
+void callva( Reduce *rc, PElement *out, const char *name, ... );

@@ -356,7 +356,7 @@ main_quit( void )
 	im__print_all();
 	managed_check_all_destroyed();
 	util_check_all_destroyed();
-	vips_check_all_destroyed();
+	call_check_all_destroyed();
 
 #ifdef PROFILE
 	g_mem_profile();
@@ -549,7 +549,7 @@ main_link_package( im_package *pack)
 	kit = toolkit_new( main_toolkitgroup, name );
 
         for( i = 0; i < pack->nfuncs; i++ ) 
-		if( vips_is_callable( pack->table[i] ) ) {
+		if( call_is_callable( pack->table[i] ) ) {
 			Symbol *sym;
 
 			sym = symbol_new( symbol_root->expr->compile,
@@ -557,7 +557,7 @@ main_link_package( im_package *pack)
 			g_assert( sym->type == SYM_ZOMBIE );
 			sym->type = SYM_EXTERNAL;
 			sym->function = pack->table[i];
-			sym->fn_nargs = vips_n_args( pack->table[i] );
+			sym->fn_nargs = call_n_args( pack->table[i] );
 			(void) tool_new_sym( kit, -1, sym );
 			symbol_made( sym );
 		}

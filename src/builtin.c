@@ -184,9 +184,9 @@ apply_complex_call( Reduce *rc,
 
 	if( PEISIMAGE( &rhs ) ) {
 		if( strcmp( name, "re" ) == 0 ) 
-			vips_spine( rc, "im_c2real", arg, out );
+			call_spine( rc, "im_c2real", arg, out );
 		else if( strcmp( name, "im" ) == 0 ) 
-			vips_spine( rc, "im_c2imag", arg, out );
+			call_spine( rc, "im_c2imag", arg, out );
 	}
 	else if( PEISCOMPLEX( &rhs ) ) {
 		if( strcmp( name, "re" ) == 0 ) {
@@ -397,7 +397,7 @@ apply_math_call( Reduce *rc,
 	if( PEISIMAGE( &rhs ) ) {
 		/* Easy ... pass to VIPS.
 		 */
-		vips_spine( rc, math_fn[i].ifn, arg, out );
+		call_spine( rc, math_fn[i].ifn, arg, out );
 	}
 	else if( PEISREAL( &rhs ) ) {
 		double a = PEGETREAL( &rhs );

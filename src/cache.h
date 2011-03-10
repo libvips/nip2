@@ -27,8 +27,8 @@
 
 */
 
-extern int vips_history_size;
+extern int cache_history_size;
 
-void vips_tochar_trace( VipsInfo *vi, int i, VipsBuf *buf );
-void vips_history_remove( VipsInfo *vi );
-VipsInfo *vips_dispatch( VipsInfo *vi, PElement *out );
+void cache_tochar_trace( CallInfo *vi, int i, VipsBuf *buf );
+void cache_history_remove( CallInfo *vi );
+CallInfo *cache_dispatch( CallInfo *vi, PElement *out );

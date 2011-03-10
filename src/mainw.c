@@ -616,7 +616,8 @@ mainw_space_free_tooltip_generate( GtkWidget *widget, VipsBuf *buf,
 		g_slist_length( ICONTAINER( sym->expr->compile )->children ) );
         vips_buf_appends( buf, ", " );
 
-        vips_buf_appendf( buf, _( "%d vips calls cached" ), vips_history_size );
+        vips_buf_appendf( buf, _( "%d vips calls cached" ), 
+		cache_history_size );
         vips_buf_appends( buf, ", " );
 
         vips_buf_appendf( buf, _( "using %d threads" ), im_concurrency_get() );

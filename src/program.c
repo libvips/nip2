@@ -863,7 +863,7 @@ program_set_text_tool( Program *program, Tool *tool )
 	case TOOL_SYM:
 		switch( tool->sym->type ) {
 		case SYM_EXTERNAL:
-			vips_usage( &buf, tool->sym->function );
+			call_usage( &buf, tool->sym->function );
 			program_set_text( program, 
 				vips_buf_all( &buf ), FALSE );
 			break;

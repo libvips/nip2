@@ -3,6 +3,22 @@
 
   see also notes below: a new parser could fix this
 
+- add a PLATFORM env var so defs can do things like adding a ".exe" suffix
+
+- add a Image / Draw menu with flood / line / rect / circle
+
+- add a Filter / Magick menu
+
+- get rid of the splash screen
+
+- try this:
+
+	Workspaces.untitled
+	has_member "A1" A1
+
+  doesn't seem to work?
+
+- im_system_image() does not remove temps?
 
 
 - save a 1-bit 100,000 x 100,000 tif, we get the animated stopwatch but no

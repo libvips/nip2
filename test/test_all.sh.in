@@ -59,7 +59,7 @@ test_scripts
 
 echo "repeating tests with the vectorising system disabled"
 
-export NO_VECTOR=1
+export IM_NOVECTOR=1
 test_workspaces
 test_examples
 test_scripts

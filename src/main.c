@@ -63,6 +63,11 @@
 #define PROFILE
  */
 
+/* Sometimes we need to be able to disable these at build time.
+ */
+#undef DEBUG_FATAL
+#undef DEBUG_LEAK
+
 /* Need im__print_all() for leak testing.
  */
 #ifdef DEBUG_LEAK

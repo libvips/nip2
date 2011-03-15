@@ -62,15 +62,6 @@ static const int matrixview_column_width = 70;
  */
 static const int matrixview_max_cells = 100;
 
-/* A USE_GTKSHEET we can use in expressions.
- */
-static const gboolean use_gtksheet = 
-#ifdef USE_GTKSHEET
-	TRUE;
-#else /*!USE_GTKSHEET*/
-	FALSE;
-#endif /*USE_GTKSHEET*/
-
 static GraphicviewClass *parent_class = NULL;
 
 static void

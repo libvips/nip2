@@ -49,11 +49,11 @@ static guint progress_signals[SIG_LAST] = { 0 };
 
 /* Delay before we start showing busy feedback.
  */
-static const double progress_busy_delay = 2.0;
+static const double progress_busy_delay = 1.0;
 
 /* Delay between busy updates.
  */
-static const double progress_update_interval = 0.2;
+static const double progress_update_interval = 0.1;
 
 void
 progress_begin( void )
@@ -82,7 +82,7 @@ progress_begin( void )
 static void
 progress_update( Progress *progress )
 {
-	/* Handle delayed emission of "begin".
+	/* Don't show the process and cancel button for a bit.
 	 */
 	if( progress->count ) {
 		if( !progress->busy && 

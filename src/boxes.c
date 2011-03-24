@@ -741,6 +741,11 @@ imageheader_row_map_fn( IMAGE *im,
 {
 	GtkWidget *hbox;
 
+	/* This is just there for back compt, hide it.
+	 */
+	if( strcmp( field, "Bbits" ) == 0 )
+		return( NULL );
+
 	hbox = imageheader_row_new( imageheader->group, field, value );
 	gtk_box_pack_start( GTK_BOX( imageheader->fields ), 
 		hbox, FALSE, FALSE, 0 );

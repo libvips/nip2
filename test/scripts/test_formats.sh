@@ -42,7 +42,7 @@ test_format() {
 	save_load $in $format $mode
 
 	vips im_subtract $in $tmp/back.v $tmp/difference.v
-	vips im_abs $tmp/difference.v $tmp/abs.v
+	vips im_abs $tmp/difference.v $tmp/abs.v 
 	dif=`vips im_max $tmp/abs.v`
 
 	if (( $dif > $threshold )) ; then

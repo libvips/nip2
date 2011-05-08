@@ -1,4 +1,9 @@
-- im_system_image with tiff format seems to not remove temp files?
+
+- find a 1D hist, set element zero to zero
+
+  this is harder than it should be ... insert a 1x1 image removes the Plot
+  wrapper, change to matrix works, edit element zero to 0 works, change back
+  to Plot (or hist?) is not possible, you have to do 'plot object'
 
 - ban parameters which are built-ins, eg. "im", "re" etc., you get nasty
   crashes

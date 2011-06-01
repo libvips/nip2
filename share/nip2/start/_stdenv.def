@@ -1218,6 +1218,15 @@ convsep mask image
 		(convsep mask) Operator_type.COMPOUND_REWRAP false;
 }
 
+aconv layers mask image 
+	= oo_unary_function aconv_op image, is_class image
+	= im_aconv image (to_matrix mask) (to_real layers), is_image image
+	= error (_ "bad arguments to " ++ "aconv")
+{
+	aconv_op = Operator "aconv" 
+		(aconv layers mask) Operator_type.COMPOUND_REWRAP false;
+}
+
 convsepf mask image
 	= oo_unary_function convsepf_op image, is_class image
 	= im_convsep_f image (to_matrix mask), is_image image

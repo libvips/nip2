@@ -109,11 +109,12 @@ Kirk
 			type = Option "Type" ["Blur", "Sharpen"] 0;
 			r = Scale "Radius" 1 100 1;
 			fac = Scale "Amount" 0 1 1;
+			layers = Scale "Layers" 1 100 10;
 			shape = Option "Mask shape" [
 				"Square",
 				"Gaussian"
 			] 0;
-			prec = Option "Precision" ["Int", "Float"] 0;
+			prec = Option "Precision" ["Int", "Float", "Approximate"] 0;
 
 			_result 
 				= map_unary process x
@@ -124,7 +125,7 @@ Kirk
 					mask
 						= matrix_blur r.value, shape.value == 0
 						= matrix_gaussian_blur r.value;
-					blur = [convsep, convsepf]?prec mask in;
+					blur = [convsep, convsepf, aconv layers]?prec mask in;
 					proc
 						= in + fac * (in - blur), type == 1
 						= blur * fac + in * (1 - fac);

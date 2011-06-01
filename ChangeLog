@@ -5,6 +5,7 @@ started 7.25.0, 7/1/11
 - minor fix to vips_call error messages
 - more tests in "make check"
 - moved vips_cache and vips_call out of the vips_ namespace
+- added approx. option to blur/sharpen
 
 started 7.24.0, 30/11/10
 - bump for 7.24

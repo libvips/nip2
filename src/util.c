@@ -831,6 +831,8 @@ vips_buf_appendi( VipsBuf *buf, IMAGE *im )
 		return;
 	}
 
+	vips_buf_appendf( buf, "%p ", im );
+
 	/* Coded? Special warning.
 	 */
 	if( im->Coding != IM_CODING_NONE )

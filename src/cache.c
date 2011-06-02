@@ -33,8 +33,8 @@
 #define DEBUG_TIME
 #define DEBUG_HISTORY_SANITY
 #define DEBUG_HISTORY_MISS
-#define DEBUG
 #define DEBUG_HISTORY
+#define DEBUG
  */
 
 /* This is usually turned on from a -D in cflags.

@@ -1,3 +1,9 @@
+- start, open image, close, segv
+
+	the close callback from the output image that's suppose to unref the
+	render crashes, since the render has already been freed ... I think
+
+- make a laplacian, pull out the centre horizontal, click plot object, argh
 
 - find a 1D hist, set element zero to zero
 

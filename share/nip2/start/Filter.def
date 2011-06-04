@@ -125,7 +125,7 @@ Kirk
 					mask
 						= matrix_blur r.value, shape.value == 0
 						= matrix_gaussian_blur r.value;
-					blur = [convsep, convsepf, aconv layers]?prec mask in;
+					blur = [convsep, convsepf, aconvsep layers]?prec mask in;
 					proc
 						= in + fac * (in - blur), type == 1
 						= blur * fac + in * (1 - fac);

@@ -1,3 +1,11 @@
+- try:
+
+	make xy image
+	form complexs image
+	A1 - (10, 10)
+
+	bad args error
+
 - start, open image, close, segv
 
 	the close callback from the output image that's suppose to unref the

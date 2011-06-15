@@ -92,7 +92,6 @@ gboolean main_starting = TRUE;			/* In startup */
 static const char *main_argv0 = NULL;		/* argv[0] */
 static iOpenFile *main_stdin = NULL;		/* stdin as an iOpenFile */
 static GtkIconFactory *main_icon_factory = NULL;/* Add stocks to this */
-static Splash *main_splash = NULL;
 
 static char *main_option_script = NULL;
 static char *main_option_expression = NULL;
@@ -424,13 +423,6 @@ main_quit_test( void )
 	 */
 	filemodel_inter_close_registered_cb( IWINDOW( main_window_top ), NULL,
 		main_quit_test_cb, NULL );
-}
-
-gboolean
-main_splash_enabled( void )
-{
-	return( !existsf( "%s" G_DIR_SEPARATOR_S "%s", 
-		get_savedir(), NO_SPLASH ) );
 }
 
 static void
@@ -817,8 +809,7 @@ main_x_init( int *argc, char ***argv )
 	gtk_window_set_default_icon_from_file( buf, NULL );
 
 	/* Turn off startup notification. Startup is done when we pop our
-	 * first window, not when we make this secret window or display the
-	 * splash screen.
+	 * first window, not when we make this secret window.
 	 */
 	gtk_window_set_auto_startup_notification( FALSE );
 
@@ -835,17 +826,6 @@ main_x_init( int *argc, char ***argv )
 #endif /*DEBUG_UPDATES*/
 
 	main_register_icons();
-
-	if( main_splash_enabled() ) {
-		main_splash = splash_new();
-		gtk_widget_show( GTK_WIDGET( main_splash ) );
-
-		/* Wait for the splashscreen to pop up. We want this to appear
-		 * as quickly as possible.
-		 */
-		while( g_main_context_iteration( NULL, FALSE ) )
-			;
-	}
 
 	/* Next window we make is end of startup.
 	 */
@@ -1471,11 +1451,6 @@ main( int argc, char *argv[] )
 		 */
 		while( g_main_context_iteration( NULL, FALSE ) )
 			;
-
-		if( main_splash ) {
-			gtk_widget_destroy( GTK_WIDGET( main_splash ) );
-			main_splash = NULL;
-		}
 
 		if( !main_log_is_empty() ) {
 			error_top( _( "Startup error." ) );

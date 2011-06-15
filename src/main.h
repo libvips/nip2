@@ -56,7 +56,5 @@ extern GtkStyle *dirty_style;
 
 void main_quit_test( void );
 void main_reload( void );
-void main_splash_update( const char *fmt, ... )
-	__attribute__((format(printf, 1, 2)));
 gboolean main_load( Workspace *ws, const char *filename );
 

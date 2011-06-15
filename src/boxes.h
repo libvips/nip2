@@ -156,38 +156,6 @@ GtkWidget *imageheader_new( Conversion *conv );
 
 void box_url( GtkWidget *par, const char *url );
 
-/* Splash window.
- */
-#define TYPE_SPLASH (splash_get_type())
-#define SPLASH( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_SPLASH, Splash ))
-#define SPLASH_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_SPLASH, SplashClass ))
-#define IS_SPLASH( obj ) (GTK_CHECK_TYPE( (obj), TYPE_SPLASH ))
-#define IS_SPLASH_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_SPLASH ))
-
-/* The file we make to suppress the splash screen.
- */
-#define NO_SPLASH "no_splash"
-
-typedef struct _Splash {
-	GtkWindow parent_object;
-
-	GtkWidget *progress;		/* Display progress here */
-	guint update_sid;		/* Link to update messages */
-} Splash;
-
-typedef struct _SplashClass {
-	GtkWindowClass parent_class;
-
-	/* My methods.
-	 */
-} SplashClass;
-
-GtkType splash_get_type( void );
-Splash *splash_new( void );
-
 /* Font chooser window.
  */
 #define TYPE_FONTCHOOSER (fontchooser_get_type())

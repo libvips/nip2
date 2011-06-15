@@ -1,7 +1,5 @@
 - image + complex constant would be nice
 
-- Matrix / New / Circular would be useful, also square?
-
 - make a laplacian, pull out the centre horizontal, click plot object, argh
 
 - find a 1D hist, set element zero to zero
@@ -10,18 +8,17 @@
   wrapper, change to matrix works, edit element zero to 0 works, change back
   to Plot (or hist?) is not possible, you have to do 'plot object'
 
+  Histogram menu needs a "convert to hist" item to match the one in matrix /
+  image
+
 - ban parameters which are built-ins, eg. "im", "re" etc., you get nasty
   crashes
 
   see also notes below: a new parser could fix this
 
-- add a PLATFORM env var so defs can do things like adding a ".exe" suffix
-
 - add a Image / Draw menu with flood / line / rect / circle
 
 - add a Filter / Magick menu
-
-- get rid of the splash screen
 
 - try this:
 
@@ -509,8 +506,6 @@ http://www.eggheadcafe.com/software/aspnet/35467981/programmatic-console-appl.as
 	make our own binary format, don't use XML ... we want speed
 
   3. 	try loading and benchmarking
-
-  	can we junk the splash screen?
 
   4.	if the benchmarks look promising, harden and polish
 

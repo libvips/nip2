@@ -8,6 +8,7 @@ started 7.25.0, 7/1/11
 - added approx. option to blur/sharpen
 - added Matrix / New Circular / Square / Identity
 - removed the splash screen, all machines are fast enough now
+- added EXEEXT env var
 
 started 7.24.0, 30/11/10
 - bump for 7.24

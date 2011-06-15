@@ -1061,6 +1061,10 @@ main( int argc, char *argv[] )
 	 */
 	setenvf( "SEP", "%s", G_DIR_SEPARATOR_S );
 
+	/* Executable file extension (eg. ".exe" on Windows).
+	 */
+	setenvf( "EXEEXT", "%s", VIPS_EXEEXT );
+
 	/* Start up vips.
 	 */
 	if( im_init_world( main_argv0 ) )

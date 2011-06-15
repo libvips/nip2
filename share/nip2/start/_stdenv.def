@@ -2185,13 +2185,38 @@ point a b
 		= error "bad position format";
 }
 
+/* Generate an ImageMagick (or GraphicsMagick) command suitable for 
+ * im_system_image.
+ */
+magick_cmd switch 
+	= join_sep " " [convert, "%s", switch, "%s"]
+{
+	prefs = Workspaces.Preferences;
+	use_gm = prefs.USE_GRAPHICSMAGICK;
+	convert	
+		= join_sep " " [concat ["gm", expand "$EXEEXT"], "convert"],
+			use_gm
+		= concat ["convert", expand "$EXEEXT"];
+}
+
+// im_system_image A1.value "%.tif" "%s.tif" "convert %s -swirl 24 %s"
+
 /* Run an ImageMagick (or GraphicsMagick) command on an image. A command is
  * something like "-swirl 45".
  */
-magick cmd im
-	= image_out
+magick switch x
+	= oo_unary_function magick_op x, is_class x
+	= madge x, is_image x
+	= error (_ "bad arguments to " ++ "magick")
 {
-	[image_out, log] = im_system_image (get_image im) "%s.tif" "%s.tif" command;
-	exe = concat ["convert", expand "$EXEEXT"];
-	command = join_sep " " [exe, "%s", cmd, "%s"]; 
+	magick_op = Operator "magick" 
+		(magick switch) Operator_type.COMPOUND_REWRAP false;
+
+	madge im
+		= image_out
+	{
+		[image_out, log] = 
+			im_system_image (get_image im) "%s.tif" "%s.tif" 
+				(magick_cmd switch);
+	}
 }

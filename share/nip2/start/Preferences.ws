@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.24.0">
-  <Workspace filename="../share/nip2/start/Preferences.ws" view="WORKSPACE_MODE_NOEDIT" scale="1" offset="0" window_width="680" window_height="1159" lpane_position="100" lpane_open="false" rpane_position="400" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="Preferences1">
-    <Column x="0" y="3067" open="false" selected="true" sform="false" next="99" name="B" caption="Interface column -- don't touch this!">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.25.0">
+  <Workspace window_x="0" window_y="0" window_width="680" window_height="800" filename="/home/john/vips/share/nip2/start/Preferences.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="100" lpane_open="false" rpane_position="400" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="Preferences1">
+    <Column x="0" y="3067" open="false" selected="false" sform="false" next="99" name="B" caption="Interface column -- don't touch this!">
       <Subcolumn vislevel="2">
         <Row popup="false" name="CSV_SEPARATOR">
           <Rhs vislevel="1" flags="4">
@@ -11,6 +11,11 @@
         <Row popup="false" name="CALC_PRINT_CARTIESIAN">
           <Rhs vislevel="1" flags="4">
             <iText formula="F10.value"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="USE_GRAPHICSMAGICK">
+          <Rhs vislevel="1" flags="4">
+            <iText formula="D45.value"/>
           </Rhs>
         </Row>
         <Row popup="false" name="PROGRAM_PANE_POSITION">
@@ -807,7 +812,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="0" open="true" selected="false" sform="false" next="45" name="D" caption="Calculation">
+    <Column x="0" y="0" open="true" selected="true" sform="false" next="46" name="D" caption="Calculation">
       <Subcolumn vislevel="2">
         <Row popup="false" name="D2">
           <Rhs vislevel="1" flags="1">
@@ -884,6 +889,13 @@
             <Number/>
             <Subcolumn vislevel="0"/>
             <iText formula="Number &quot;Number of CPUs to use (0 for autodetect)&quot; 0"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="D45">
+          <Rhs vislevel="1" flags="1">
+            <Toggle/>
+            <Subcolumn vislevel="0"/>
+            <iText formula="Toggle &quot;Use GraphicsMagick for Magick menu&quot; false"/>
           </Rhs>
         </Row>
       </Subcolumn>

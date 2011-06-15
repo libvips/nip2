@@ -2184,3 +2184,14 @@ point a b
 		= (a?0, a?1), is_real_list a && is_list_len 2 a
 		= error "bad position format";
 }
+
+/* Run an ImageMagick (or GraphicsMagick) command on an image. A command is
+ * something like "-swirl 45".
+ */
+magick cmd im
+	= image_out
+{
+	[image_out, log] = im_system_image (get_image im) "%s.tif" "%s.tif" command;
+	exe = concat ["convert", expand "$EXEEXT"];
+	command = join_sep " " [exe, "%s", cmd, "%s"]; 
+}

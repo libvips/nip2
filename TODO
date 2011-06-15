@@ -1,15 +1,6 @@
-- try:
+- image + complex constant would be nice
 
-	make xy image
-	form complexs image
-	A1 - (10, 10)
-
-	bad args error
-
-- start, open image, close, segv
-
-	the close callback from the output image that's suppose to unref the
-	render crashes, since the render has already been freed ... I think
+- Matrix / New / Circular would be useful, also square?
 
 - make a laplacian, pull out the centre horizontal, click plot object, argh
 

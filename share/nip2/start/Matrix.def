@@ -25,6 +25,59 @@ Matrix_build_item = class
 
 	sep1 = Menuseparator;
 
+	Matrix_identity_item = class 
+		Menuaction "_Identity" "make an identity matrix" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			s = Expression "Size" 5;
+
+			_result = Matrix (identity_matrix s.expr);
+		}
+	}
+
+	Matrix_square_item = class 
+		Menuaction "_Square" "make a square matrix" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			s = Expression "Size" 5;
+
+			_result 
+				= Matrix_con (s.expr ** 2) 0 square
+			{
+				line = take s.expr [1, 1 ..];
+				square = replicate s.expr line;
+			}
+		}
+	}
+
+	Matrix_circular_item = class 
+		Menuaction "_Circular" "make a circular matrix" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			r = Expression "Radius" 5;
+
+			_result 
+				= Matrix_con (sum circle) 0 circle
+			{
+				line = [-r.expr .. r.expr];
+				xes = replicate (2 * r.expr + 1) line;
+				yes = transpose xes;
+				circle = map2 (map2 pyth) xes yes
+				{
+					pyth a b 
+						= 1, (a**2 + b**2) ** 0.5 <= r.expr
+						= 0;
+				}
+			}
+		}
+	}
+
 	Matrix_gaussian_item = class 
 		Menuaction "_Gaussian" "make a gaussian matrix" {
 		action = class
@@ -64,6 +117,7 @@ Matrix_build_item = class
 			}
 		}
 	}
+
 }
 
 Matrix_to_matrix_item = class

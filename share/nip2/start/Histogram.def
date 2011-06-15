@@ -114,14 +114,14 @@ Hist_eq_item = Filter_enhance_item.Hist_equal_item;
 #separator
 
 Hist_cum_item = class 
-	Menuaction "_Cumulativise" 
+	Menuaction "_Integrate" 
 		"form cumulative histogram" {
 	action x = map_unary hist_cum x;
 }
 
 Hist_diff_item = class 
 	Menuaction "_Differentiate" 
-		"find point-to-point differences (inverse of Cumulativise)" {
+		"find point-to-point differences (inverse of Integrate)" {
 	action x = map_unary hist_diff x;
 }
 

@@ -746,6 +746,24 @@ Filter_greyc_item = class
 Filter_magick_item = class
 	Menupullright "Magic_k" "various Image/Graphics Magick filters" {
 	system command x = map_unary (system_image command) x;
+	radius_widget = Scale "Radius" 1 100 10;
+	sigma_widget = Scale "Sigma" 0.1 10 1;
+	angle_widget = Scale "Angle" (-360) 360 0;
+
+	Adaptive_blur_item = class
+		Menuaction "_Adaptive Blur" "blur less near edges" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			radius = radius_widget; 
+			sigma = sigma_widget;
+			command = magick_command (concat ["-adaptive-blur ",
+				print radius.value, "x", print sigma.value]);
+
+			_result = system command x; 
+		}
+	}
 
 	Swirl_item = class
 		Menuaction "_Swirl" "swirl around the centre" {
@@ -759,6 +777,7 @@ Filter_magick_item = class
 			_result = system command x; 
 		}
 	}
+
 }
 
 #separator

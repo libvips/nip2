@@ -851,12 +851,16 @@ static void
 main_toobig_done( iWindow *iwnd, 
 	void *client, iWindowNotifyFn nfn, void *sys )
 {
-	/* Don't "rm *", too dangerous. There can (I think?) only be ws and
-	 * VIPS files.
+	/* Don't "rm *", too dangerous. 
 	 */
 	path_map_dir( PATH_TMP, "*.v",
 		(path_map_fn) main_toobig_done_sub, NULL );
 	path_map_dir( PATH_TMP, "*.ws",
+		(path_map_fn) main_toobig_done_sub, NULL );
+
+	/* _stdenv.def:magick can generate .tif files.
+	 */
+	path_map_dir( PATH_TMP, "*.tif",
 		(path_map_fn) main_toobig_done_sub, NULL );
 
 	/* Tell space-free indicators to update.

@@ -749,6 +749,116 @@ Filter_magick_item = class
 	radius_widget = Scale "Radius" 1 100 10;
 	sigma_widget = Scale "Sigma" 0.1 10 1;
 	angle_widget = Scale "Angle" (-360) 360 0;
+	foreground_widget = Colour "sRGB" [0, 0, 0];
+	background_widget = Colour "sRGB" [255, 255, 255];
+
+	print_colour triple
+		= concat ["\"#", concat (map fmt triple), "\""]
+	{
+		fmt x = reverse (take 2 (reverse (print_base 16 (x + 256))));
+	}
+
+	Option_list caption labels item = class
+		Option caption labels (index (equal item) labels) {
+		Option_edit caption labels value 
+			= this.Option_list caption labels (labels?value);
+	}
+
+	Geometry_widget = class {
+		_vislevel = 3;
+
+		x = Expression "Y" 0;
+		y = Expression "X" 0;
+		hoffset = Expression "Horizontal offset" 10;
+		voffset = Expression "Vertical offset" 10;
+
+		value 
+			= concat [print x.expr, "x", print y.expr, 
+				format hoffset, format voffset]
+		{
+			// print an offset ... we want '+' in front of +ve strings
+			format offset 
+				= concat ["+", print offset.expr], offset.expr >= 0
+				= print offset.expr;
+		}
+	};
+
+	gravity_widget = Option_list "Gravity" [
+		"None",
+		"Center",
+		"East",
+		"Forget",
+		"NorthEast",
+		"North",
+		"NorthWest",
+		"SouthEast",
+		"South",
+		"SouthWest",
+		"West",
+		"Static"
+	] "None";
+
+	Font_widget = class {
+		_vislevel = 3;
+
+		family = Option_list "Family" [
+			"Arial",
+			"ArialBlack",
+			"AvantGarde",
+			"BitstreamCharter",
+			"Bookman",
+			"CenturySchoolbook",
+			"ComicSansMS",
+			"Courier",
+			"CourierNew",
+			"DejaVuSans",
+			"DejaVuSansMono",
+			"DejaVuSerif",
+			"Dingbats",
+			"FreeMono",
+			"FreeSans",
+			"FreeSerif",
+			"Garuda",
+			"Georgia",
+			"Helvetica",
+			"HelveticaNarrow",
+			"Impact",
+			"LiberationMono",
+			"LiberationSans",
+			"LiberationSerif",
+			"NewCenturySchlbk",
+			"Palatino",
+			"Purisa",
+			"Symbol",
+			"Times",
+			"TimesNewRoman",
+			"Ubuntu",
+			"Verdana",
+			"Webdings"
+		] "Arial";
+		style = Option_list "Style" [
+			"Any", "Italic", "Normal", "Oblique"
+		] "Normal";
+		weight = Scale "Weight" 1 800 400;
+		size = Scale "Point size" 1 100 12;
+		stretch = Option_list "Stretch" [
+			"Any", "Condensed", "Expanded", "ExtraCondensed", "ExtraExpanded", 
+			"Normal", "SemiCondensed", "SemiExpanded", "UltraCondensed", 
+			"UltraExpanded"
+		] "Normal";
+
+		value = join_sep " " [
+				"-family", family.item,
+				"-weight", print weight.value,
+				"-pointsize", print size.value,
+				"-style", style.item,
+				"-stretch", stretch.item];
+	}
+
+	alpha_widget = Option_list "Alpha" [
+		"On", "Off", "Set", "Opaque", "Transparent", 
+		"Extract", "Copy", "Shape", "Background"
+	] "On";
 
 	Adaptive_blur_item = class
 		Menuaction "_Adaptive Blur" "blur less near edges" {
@@ -760,6 +870,56 @@ Filter_magick_item = class
 			sigma = sigma_widget;
 			command = magick_command (concat ["-adaptive-blur ",
 				print radius.value, "x", print sigma.value]);
+
+			_result = system command x; 
+		}
+	}
+
+	Adaptive_sharpen_item = class
+		Menuaction "_Adaptive Sharpen" "sharpen more near edges" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			radius = radius_widget; 
+			sigma = sigma_widget;
+			command = magick_command (concat ["-adaptive-sharpen ",
+				print radius.value, "x", print sigma.value]);
+
+			_result = system command x; 
+		}
+	}
+
+	Alpha_item = class
+		Menuaction "_Alpha" "add/remove alpha channel" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			alpha = alpha_widget; 
+			command = magick_command (concat ["-alpha ", alpha.item]); 
+
+			_result = system command x; 
+		}
+	}
+
+	Annotate_item = class
+		Menuaction "_Annotate" "add text annotation" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			text = String "Text to draw" "AaBbCcDdEe";
+			gravity = gravity_widget; 
+			geometry = Geometry_widget; 
+			font = Font_widget;
+			foreground = foreground_widget;
+
+			command = magick_command (join_sep " " [
+				font.value,
+				"-gravity", gravity.item,
+				"-fill", print_colour foreground.value,
+				"-annotate", geometry.value, "\"" ++ text.value ++ "\""]);
 
 			_result = system command x; 
 		}
@@ -1157,7 +1317,7 @@ Filter_blend_item = class
 		FREEZE = 14;
 		OR = 15;
 		AND = 16;
-	
+
 		// names we show the user for blend types
 		names = Enum [
 			[_ "Normal", NORMAL],
@@ -1178,7 +1338,7 @@ Filter_blend_item = class
 			[_ "Bitwise OR", OR],
 			[_ "Bitwise AND", AND]
 		];
-	
+
 		// functions we call for each blend type
 		actions = Table [
 			[NORMAL, blend_normal],

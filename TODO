@@ -1,3 +1,7 @@
+
+- turn on GM in prefs, have to restart before _stdenv.def:magick sees the 
+  change
+
 - image + complex constant would be nice
 
 - make a laplacian, pull out the centre horizontal, click plot object, argh
@@ -18,16 +22,12 @@
 
 - add a Image / Draw menu with flood / line / rect / circle
 
-- add a Filter / Magick menu
-
 - try this:
 
 	Workspaces.untitled
 	has_member "A1" A1
 
   doesn't seem to work?
-
-- im_system_image() does not remove temps?
 
 - save a 1-bit 100,000 x 100,000 tif, we get the animated stopwatch but no
   progress bar :(

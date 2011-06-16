@@ -2188,7 +2188,7 @@ point a b
 /* Generate an ImageMagick (or GraphicsMagick) command suitable for 
  * im_system_image.
  */
-magick_cmd switch 
+magick_command switch 
 	= join_sep " " [convert, "%s", switch, "%s"]
 {
 	prefs = Workspaces.Preferences;
@@ -2199,24 +2199,20 @@ magick_cmd switch
 		= concat ["convert", expand "$EXEEXT"];
 }
 
-// im_system_image A1.value "%.tif" "%s.tif" "convert %s -swirl 24 %s"
-
-/* Run an ImageMagick (or GraphicsMagick) command on an image. A command is
- * something like "-swirl 45".
+/* Run a command on an image. See magick_command, for example.
  */
-magick switch x
-	= oo_unary_function magick_op x, is_class x
-	= madge x, is_image x
-	= error (_ "bad arguments to " ++ "magick")
+system_image command x
+	= oo_unary_function system_image_op x, is_class x
+	= system x, is_image x
+	= error (_ "bad arguments to " ++ "system_image")
 {
-	magick_op = Operator "magick" 
-		(magick switch) Operator_type.COMPOUND_REWRAP false;
+	system_image_op = Operator "system_image" 
+		(system_image command) Operator_type.COMPOUND_REWRAP false;
 
-	madge im
+	system im
 		= image_out
 	{
 		[image_out, log] = 
-			im_system_image (get_image im) "%s.tif" "%s.tif" 
-				(magick_cmd switch);
+			im_system_image (get_image im) "%s.tif" "%s.tif" command;
 	}
 }

@@ -749,8 +749,7 @@ Filter_magick_item = class
 	radius_widget = Scale "Radius" 1 100 10;
 	sigma_widget = Scale "Sigma" 0.1 10 1;
 	angle_widget = Scale "Angle" (-360) 360 0;
-	foreground_widget = Colour "sRGB" [0, 0, 0];
-	background_widget = Colour "sRGB" [255, 255, 255];
+	text_widget = String "Text to draw" "AaBbCcDdEe";
 
 	print_colour triple
 		= concat ["\"#", concat (map fmt triple), "\""]
@@ -758,11 +757,81 @@ Filter_magick_item = class
 		fmt x = reverse (take 2 (reverse (print_base 16 (x + 256))));
 	}
 
+	Foreground triple = class
+		Colour "sRGB" triple {
+
+		_flag = "-fill " ++ print_colour triple;
+
+		Colour_edit space triple = this.Foreground triple;
+	}
+	foreground_widget = Foreground [0, 0, 0];
+
+	Background triple = class
+		Colour "sRGB" triple {
+
+		_flag = "-background " ++ print_colour triple;
+
+		Colour_edit space triple = this.Background triple;
+	}
+	background_widget = Background [255, 255, 255];
+
+	Antialias value = class
+		Toggle "Antialias" value {
+
+		_flag
+			= "-antialias", value
+			= "+antialias";
+
+		Toggle_edit caption value = this.Antialias value;
+	}
+	antialias_widget = Antialias true;
+
 	Option_list caption labels item = class
 		Option caption labels (index (equal item) labels) {
 		Option_edit caption labels value 
 			= this.Option_list caption labels (labels?value);
 	}
+
+	Gravity gravity = class
+		Option_list "Gravity" [
+			"None",
+			"Center",
+			"East",
+			"Forget",
+			"NorthEast",
+			"North",
+			"NorthWest",
+			"SouthEast",
+			"South",
+			"SouthWest",
+			"West",
+			"Static"
+		] gravity {
+
+		_flag = "-gravity " ++ gravity;
+
+		Option_edit caption labels value = this.Gravity labels?value;
+	}
+	gravity_widget = Gravity "Center";
+
+	Alpha alpha = class
+		Option_list "Alpha" [
+			"On", 
+			"Off", 
+			"Set", 
+			"Opaque", 
+			"Transparent", 
+			"Extract", 
+			"Copy", 
+			"Shape", 
+			"Background"
+		] alpha {
+
+		_flag = "-alpha " ++ alpha;
+
+		Option_edit caption labels value = this.Alpha labels?value;
+	}
+	alpha_widget = Alpha "On";
 
 	Geometry_widget = class {
 		_vislevel = 3;
@@ -772,7 +841,7 @@ Filter_magick_item = class
 		hoffset = Expression "Horizontal offset" 10;
 		voffset = Expression "Vertical offset" 10;
 
-		value 
+		_flag 
 			= concat [print x.expr, "x", print y.expr, 
 				format hoffset, format voffset]
 		{
@@ -782,21 +851,6 @@ Filter_magick_item = class
 				= print offset.expr;
 		}
 	};
-
-	gravity_widget = Option_list "Gravity" [
-		"None",
-		"Center",
-		"East",
-		"Forget",
-		"NorthEast",
-		"North",
-		"NorthWest",
-		"SouthEast",
-		"South",
-		"SouthWest",
-		"West",
-		"Static"
-	] "None";
 
 	Font_widget = class {
 		_vislevel = 3;
@@ -847,18 +901,13 @@ Filter_magick_item = class
 			"UltraExpanded"
 		] "Normal";
 
-		value = join_sep " " [
+		_flag = join_sep " " [
 				"-family", family.item,
 				"-weight", print weight.value,
 				"-pointsize", print size.value,
 				"-style", style.item,
 				"-stretch", stretch.item];
 	}
-
-	alpha_widget = Option_list "Alpha" [
-		"On", "Off", "Set", "Opaque", "Transparent", 
-		"Extract", "Copy", "Shape", "Background"
-	] "On";
 
 	Adaptive_blur_item = class
 		Menuaction "_Adaptive Blur" "blur less near edges" {
@@ -897,7 +946,7 @@ Filter_magick_item = class
 			_vislevel = 3;
 
 			alpha = alpha_widget; 
-			command = magick_command (concat ["-alpha ", alpha.item]); 
+			command = magick_command alpha._flag; 
 
 			_result = system command x; 
 		}
@@ -909,17 +958,18 @@ Filter_magick_item = class
 			_result {
 			_vislevel = 3;
 
-			text = String "Text to draw" "AaBbCcDdEe";
-			gravity = gravity_widget; 
+			text = text_widget;
+			//gravity = gravity_widget; 
 			geometry = Geometry_widget; 
 			font = Font_widget;
-			foreground = foreground_widget;
-
+			//foreground = foreground_widget;
+			antialias = antialias_widget;
 			command = magick_command (join_sep " " [
-				font.value,
-				"-gravity", gravity.item,
-				"-fill", print_colour foreground.value,
-				"-annotate", geometry.value, "\"" ++ text.value ++ "\""]);
+				font._flag,
+				antialias._flag,
+				//gravity._flag,
+				//foreground._flag,
+				"-annotate", geometry._flag, "\"" ++ text.value ++ "\""]);
 
 			_result = system command x; 
 		}
@@ -931,7 +981,7 @@ Filter_magick_item = class
 			_result {
 			_vislevel = 3;
 
-			angle = Scale "Angle" (-360) 360 0;
+			angle = angle_widget;
 			command = magick_command ("-swirl " ++ print angle.value);
 
 			_result = system command x; 

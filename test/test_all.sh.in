@@ -13,7 +13,16 @@ test_result() {
 
 # run the test workspaces
 test_workspaces() {
-	for i in @TOP_SRCDIR@/test/workspaces/*; do
+	for i in @TOP_SRCDIR@/test/workspaces/*.ws; do
+		echo -n "testing `basename $i` ... "
+		@TOP_SRCDIR@/src/nip2 --prefix=@TOP_SRCDIR@ --test $i
+		test_result
+	done
+}
+
+# run the test defs
+test_defs() {
+	for i in @TOP_SRCDIR@/test/workspaces/*.def; do
 		echo -n "testing `basename $i` ... "
 		@TOP_SRCDIR@/src/nip2 --prefix=@TOP_SRCDIR@ --test $i
 		test_result
@@ -54,6 +63,7 @@ test_scripts() {
 }
 
 test_workspaces
+test_defs
 test_examples
 test_scripts
 
@@ -61,6 +71,7 @@ echo "repeating tests with the vectorising system disabled"
 
 export IM_NOVECTOR=1
 test_workspaces
+test_defs
 test_examples
 test_scripts
 

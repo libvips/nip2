@@ -1600,7 +1600,7 @@ action_proc_construct_sub( Reduce *rc, PElement *pe,
 	Compile *compile, HeapNode **arg, PElement *out )
 {
 	if( !class_new( rc->heap, compile, arg, pe ) ) 
-		return( out );
+		reduce_throw( rc );
 
 	PEPUTPE( out, pe );
 

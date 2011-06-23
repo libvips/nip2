@@ -953,9 +953,9 @@ Filter_magick_item = class
 			_vislevel = 3;
 
 			text = text_widget;
-			gravity = gravity_widget; 
-			geometry = Geometry_widget; 
 			font = Font_widget;
+			geometry = Geometry_widget; 
+			gravity = gravity_widget; 
 			foreground = foreground_widget;
 			antialias = antialias_widget;
 			command = magick_command (join_sep " " [

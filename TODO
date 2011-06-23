@@ -19,18 +19,7 @@
   don't automatically give all members 'this' as a secret, check that they
   make references to other class members that do need secrets first 
   
-
-	   
-		
-
-
-
-
-  make the superclass error more verbose ... what secrets are being generated?
-
-  the superclass error is being triggered a LOT ... does this matter? very odd
-
-  add something to log the secrets missing for each one
+- need a compat dir for 7.24 now we've changed stuff in _types
 
 - turn on GM in prefs, have to restart before _stdenv.def:magick sees the 
   change

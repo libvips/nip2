@@ -815,13 +815,13 @@ dump_link( Link *link )
 	printf( "link->parent = " );
 	symbol_name_print( link->parent );
 	if( link->parent->dirty )
-		printf( " (dirty)" );
+		printf( "(dirty)" );
 	printf( "\n" );
 
 	printf( "link->child = " );
 	symbol_name_print( link->child );
 	if( link->child->dirty )
-		printf( " (dirty)" );
+		printf( "(dirty)" );
 	printf( "\n" );
 
 	printf( "link->serial = %d\n", link->serial );
@@ -853,7 +853,7 @@ dump_symbol_heap( Symbol *sym )
 {
 	printf( "symbol " );
 	symbol_name_print( sym );
-	printf( " has graph:\n" );
+	printf( "has graph:\n" );
 	if( sym->expr ) 
 		pgraph( &sym->expr->root );
 	printf( "\n" );

@@ -786,14 +786,16 @@ Filter_magick_item = class
 	}
 	antialias_widget = Antialias true;
 
-	Option_list caption labels item = class
-		Option caption labels (index (equal item) labels) {
-		Option_edit caption labels value 
-			= this.Option_list caption labels (labels?value);
-	}
+/* An option whose value is a string rather than a number.
+ */
+Option_string caption labels item = class
+	Option caption labels (index (equal item) labels) {
+	Option_edit caption labels value 
+		= this.Option_string caption labels (labels?value);
+}
 
 	Gravity gravity = class
-		Option_list "Gravity" [
+		Option_string "Gravity" [
 			"None",
 			"Center",
 			"East",
@@ -815,7 +817,7 @@ Filter_magick_item = class
 	gravity_widget = Gravity "Center";
 
 	Alpha alpha = class
-		Option_list "Alpha" [
+		Option_string "Alpha" [
 			"On", 
 			"Off", 
 			"Set", 
@@ -855,7 +857,7 @@ Filter_magick_item = class
 	Font_widget = class {
 		_vislevel = 3;
 
-		family = Option_list "Family" [
+		family = Option_string "Family" [
 			"Arial",
 			"ArialBlack",
 			"AvantGarde",
@@ -890,12 +892,12 @@ Filter_magick_item = class
 			"Verdana",
 			"Webdings"
 		] "Arial";
-		style = Option_list "Style" [
+		style = Option_string "Style" [
 			"Any", "Italic", "Normal", "Oblique"
 		] "Normal";
 		weight = Scale "Weight" 1 800 400;
 		size = Scale "Point size" 1 100 12;
-		stretch = Option_list "Stretch" [
+		stretch = Option_string "Stretch" [
 			"Any", "Condensed", "Expanded", "ExtraCondensed", "ExtraExpanded", 
 			"Normal", "SemiCondensed", "SemiExpanded", "UltraCondensed", 
 			"UltraExpanded"
@@ -1448,7 +1450,7 @@ Filter_blend_item = class
 			_value {
 			_vislevel = 3;
 	
-			method = Option_enum names "Blend mode" "Normal";
+			method = Option_enum "Blend mode" names "Normal";
 			opacity = Scale "Opacity" 0 255 255;
 			hmove = Scale "Horizontal move by" (-bg.width) (bg.width) 0; 
 			vmove = Scale "Vertical move by" (-bg.height) (bg.height) 0; 		

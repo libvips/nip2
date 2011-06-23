@@ -66,10 +66,8 @@ tool_linkreport_sym_sym( Symbol *child,
 	if( child->type == SYM_ZOMBIE && 
 		!child->generated && !parent->generated &&
 		!compile_resolve_top( child ) ) {
-		Tool *tool = symbol_get_tool( parent );
 
-		symbol_qualified_name( parent, buf );
-		tool_error( tool, buf );
+		symbol_name_error( parent, buf );
 
 		vips_buf_appendf( buf, " " );
 		/* used as in "fred refers to undefined symbol jim"
@@ -124,7 +122,7 @@ tool_dispose( GObject *gobject )
 		symbol_name_print( tool->sym );
 	else
 		printf( "anonymous-tool" );
-	printf( " at addr %p\n", tool );
+	printf( "at addr %p\n", tool );
 #endif /*DEBUG*/
 
 	FREESID( tool->new_value_sid, tool->link_sym );
@@ -820,7 +818,7 @@ tool_new_sym( Toolkit *kit, int pos, Symbol *sym )
 #ifdef DEBUG
 	printf( "tool_new_sym: new tool for " );
 	symbol_name_print( sym );
-	printf( " at %p\n", tool );
+	printf( "at %p\n", tool );
 #endif /*DEBUG*/
 
 	return( tool );

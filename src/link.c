@@ -45,7 +45,7 @@ link_expr_destroy( LinkExpr *le )
 #ifdef DEBUG
 	printf( "link_expr_destroy: removing expr " );
 	symbol_name_print( le->expr->sym );
-	printf( " referencing link->child = " );
+	printf( "referencing link->child = " );
 	symbol_name_print( le->link->child );
 	printf( "\n" );
 #endif /*DEBUG*/
@@ -70,7 +70,7 @@ link_expr_new( Link *link, Expr *expr, gboolean dynamic )
 #ifdef DEBUG
 	printf( "link_expr_new: expr " );
 	symbol_name_print( expr->sym );
-	printf( " references link->child = " );
+	printf( "references link->child = " );
 	symbol_name_print( link->child );
 	printf( "\n" );
 #endif /*DEBUG*/
@@ -156,7 +156,7 @@ link_destroy( Link *link )
 #ifdef DEBUG
 	printf( "link_destroy: destroying link from " );
 	symbol_name_print( link->parent );
-	printf( " to " );
+	printf( "to " );
 	symbol_name_print( link->child );
 	printf( "\n" );
 #endif /*DEBUG*/
@@ -191,7 +191,7 @@ link_new( Symbol *child, Symbol *parent )
 #ifdef DEBUG
 	printf( "link_new: making link from " );
 	symbol_name_print( parent );
-	printf( " to " );
+	printf( "to " );
 	symbol_name_print( child );
 	printf( "\n" );
 #endif /*DEBUG*/
@@ -535,7 +535,7 @@ symbol_dirty_set( Symbol *sym )
 #ifdef DEBUG_DIRTY
 		printf( "symbol_dirty_set: " );
 		symbol_name_print( sym );
-		printf( " (%p)\n", sym );
+		printf( "(%p)\n", sym );
 #endif /*DEBUG_DIRTY*/
 
 		/* Change of state.
@@ -635,7 +635,7 @@ symbol_dirty_clear( Symbol *sym )
 #ifdef DEBUG_DIRTY
 		printf( "symbol_dirty_clear: " );
 		symbol_name_print( sym );
-		printf( " (%p)\n", sym );
+		printf( "(%p)\n", sym );
 #endif /*DEBUG_DIRTY*/
 
 		/* Change of state.

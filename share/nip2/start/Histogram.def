@@ -255,8 +255,8 @@ Hist_plot_item = class
 		_result {
 		_vislevel = 3;
 
-		format = Option_enum Plot_format.names "Format" "YYYY";
-		style = Option_enum Plot_style.names "Style" "Line";
+		format = Option_enum "Format" Plot_format.names "YYYY";
+		style = Option_enum "Style" Plot_style.names "Line";
 
 		auto = Toggle "Auto Range" true;
 		xmin = Expression "X range minimum" 0;

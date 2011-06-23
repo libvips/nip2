@@ -379,7 +379,7 @@ Tasks_capture_item = class
 			_result {
 			_vislevel = 3;
 
-			style = Option_enum Plot_style.names "Style" "Line";
+			style = Option_enum "Style" Plot_style.names "Line";
 
 			auto = Toggle "Auto Range" true;
 			ymin = Expression "Y range minimum" 0;

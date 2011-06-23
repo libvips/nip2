@@ -481,10 +481,10 @@ Colour colour_space value = class
 
 // a subclass with widgets for picking a space and value
 Colour_picker default_colour default_value = class 
-	Colour space.value_name colour.expr {
+	Colour space.item colour.expr {
 	_vislevel = 3;
 
-	space = Option_enum Image_type.colour_spaces "Colour space" default_colour;
+	space = Option_enum "Colour space" Image_type.colour_spaces default_colour;
 	colour = Expression "Colour value" default_value;
 
 	Colour_edit colour_space value = 
@@ -542,13 +542,23 @@ Option caption labels value = class
 	];
 }
 
-Option_enum enum caption value_name = class
-	Option caption enum.names (index (equal value_name) enum.names) {
+/* An option whose value is a string rather than a number.
+ */
+Option_string caption labels item = class
+	Option caption labels (index (equal item) labels) {
+	Option_edit caption labels value 
+		= this.Option_string caption labels (labels?value);
+}
+
+/* Make an option from an enum.
+ */
+Option_enum caption enum item = class
+	Option_string caption enum.names item {
 	// corresponding thing
-	value_thing = enum.get_thing value_name;
+	value_thing = enum.get_thing item;
 
 	Option_edit caption labels value 
-		= this.Option_enum enum caption (enum.names ? value);
+		= this.Option_enum caption enum (enum.names?value);
 }
 
 /* A rectangle. width and height can be -ve.

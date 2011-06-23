@@ -120,7 +120,6 @@ expr_name_print( Expr *expr )
 {
 	printf( "expr(%p) ", expr );
 	symbol_name_print( expr->sym );
-	printf( " " );
 
 	if( expr->row ) {
 		printf( "(row " );

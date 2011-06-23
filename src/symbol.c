@@ -184,6 +184,23 @@ symbol_qualified_name_relative( Symbol *context, Symbol *sym, VipsBuf *buf )
 	vips_buf_appends( buf, NN( IOBJECT( sym )->name ) );
 }
 
+/* As above, but include stuff about where the symbol is defined, handy for
+ * building error messages.
+ */
+void *
+symbol_name_error( Symbol *sym, VipsBuf *buf )
+{
+	Tool *tool;
+
+	symbol_qualified_name( sym, buf );
+	if( (tool = symbol_get_tool( sym )) )
+		tool_error( tool, buf );
+
+	vips_buf_appends( buf, " " );
+
+	return( NULL );
+}
+
 /* Handy for error messages ... but nowt else. Return string overwritten on
  * next call.
  */
@@ -201,10 +218,12 @@ symbol_name( Symbol *sym )
 
 /* Convenience ... print a qual name to stdout.
  */
-void
+void *
 symbol_name_print( Symbol *sym )
 {
-	printf( "%s", symbol_name( sym ) );
+	printf( "%s ", symbol_name( sym ) );
+
+	return( NULL );
 }
 
 /* Print a symbol's name, including the enclosing static scope. Return value
@@ -466,10 +485,7 @@ symbol_made( Symbol *sym )
 static void *
 symbol_not_defined_sub( Link *link, VipsBuf *buf )
 {
-	symbol_qualified_name( link->parent, buf );
-
-	if( link->parent->tool ) 
-		tool_error( link->parent->tool, buf );
+	symbol_name_error( link->parent, buf );
 
 	return( NULL );
 }
@@ -525,7 +541,7 @@ symbol_dispose( GObject *gobject )
 #ifdef DEBUG_MAKE
 	printf( "symbol_dispose: " );
 	symbol_name_print( sym );
-	printf( " (%p)\n", sym );
+	printf( "(%p)\n", sym );
 #endif /*DEBUG_MAKE*/
 
 	/* Make sure we're not leaving last_sym dangling.
@@ -678,7 +694,7 @@ symbol_new( Compile *compile, const char *name )
 #ifdef DEBUG_MAKE
 		printf( "symbol_new: redefining " );
 		symbol_name_print( sym );
-		printf( " (%p)\n", sym );
+		printf( "(%p)\n", sym );
 #endif /*DEBUG_MAKE*/
 	}
 	else {
@@ -690,7 +706,7 @@ symbol_new( Compile *compile, const char *name )
 #ifdef DEBUG_MAKE
 		printf( "symbol_new: creating " );
 		symbol_name_print( sym );
-		printf( " (%p)\n", sym );
+		printf( "(%p)\n", sym );
 #endif /*DEBUG_MAKE*/
 	}
 

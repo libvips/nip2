@@ -207,7 +207,7 @@ class_get_symbol( PElement *instance, Symbol *sym, PElement *out )
 #ifdef DEBUG_MEMBER
 	printf( "class_get_symbol: looking up " );
 	symbol_name_print( sym );
-	printf( " in class " );
+	printf( "in class " );
 	pgraph( instance );
 #endif /*DEBUG_MEMBER*/
 
@@ -351,11 +351,11 @@ class_member_secret( ClassBuildInfo *pbi,
 
 	PEPOINTRIGHT( apl, &p1 );
 	graph_pelement( pbi->heap, &buf, &p1, TRUE );
-	printf( "class_member_secret: secret arg \"" );
+	printf( "class_member_secret: secret arg " );
 	symbol_name_print( ssym );
-	printf( "\" to member \"" );
+	printf( "to member " );
 	symbol_name_print( sym );
-	printf( "\" = %s\n", vips_buf_all( &buf ) );
+	printf( "= %s\n", vips_buf_all( &buf ) );
 }
 #endif /*DEBUG_VERBOSE*/
 
@@ -517,9 +517,9 @@ class_new_single( Heap *heap,
 {
 	int i;
 
-	printf( "class_new_single: starting for \"" );
+	printf( "class_new_single: starting for " );
 	symbol_name_print( sym );
-	printf( "\"; %d secrets, %d params\n", 
+	printf( "%d secrets, %d params\n", 
 		compile->nsecret, compile->nparam );
 
 	for( i = 0; i < compile->nsecret; i++ ) {
@@ -604,9 +604,9 @@ class_new_single( Heap *heap,
 	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	graph_pelement( heap, &buf, out, TRUE );
-	printf( "class_new_single: built instance of \"" );
+	printf( "class_new_single: built instance of " );
 	symbol_name_print( sym );
-	printf( "\":\n%s\n", vips_buf_all( &buf ) );
+	printf( ":\n%s\n", vips_buf_all( &buf ) );
 }
 #endif /*DEBUG*/
 
@@ -784,10 +784,18 @@ class_new_super( Heap *heap,
 			/* Check total arg count.
 			 */
 			if( super_compile->nsecret != 0 ) {
+				char txt[1024];
+				VipsBuf buf = VIPS_BUF_STATIC( txt );
+
+				slist_map2( super_compile->secret, 
+					(SListMap2Fn) symbol_name_error, 
+					&buf, NULL );
+
 				error_top( _( "Bad superclass." ) );
 				error_sub( _( "Superclass constructor \"%s\" "
-					"should have no secret arguments." ),
-					symbol_name( super_compile->sym ) );
+					"refers to non-local symbols %s" ),
+					symbol_name( super_compile->sym ),
+					vips_buf_all( &buf ) );
 
 				return( FALSE );
 			}

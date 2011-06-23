@@ -1,4 +1,30 @@
-- Alpha class (and others) in magick seem broken, get a bad superclass error
+- we can't define local superclasses at the moment
+
+  eg. consider:
+
+  	Fred = class {
+	  Jim a = class {
+	    value = a + 12;
+	  }
+
+	  Jennie x = class Jim x {
+	    value = 99;
+	  }
+	}
+
+  you can't do (Fred.Jennie 12) since Jim will have a secret 'this' param
+  (because it is a class member) and superclass constructors can't have
+  secrets.
+
+  don't automatically give all members 'this' as a secret, check that they
+  make references to other class members that do need secrets first 
+  
+
+	   
+		
+
+
+
 
   make the superclass error more verbose ... what secrets are being generated?
 

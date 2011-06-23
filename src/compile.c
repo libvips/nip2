@@ -74,7 +74,6 @@ compile_name_print( Compile *compile )
 {
 	printf( "compile(%p) ", compile );
 	symbol_name_print( compile->sym );
-	printf( " " );
 
 	return( NULL );
 }
@@ -517,7 +516,7 @@ compile_reference( Compile *compile, Symbol *sym, PElement *out )
 #ifdef DEBUG
 	printf( "generate_reference: ref to " );
 	symbol_name_print( sym );
-	printf( " inside " );
+	printf( "inside " );
 	compile_name_print( compile );
 	printf( "\n" );
 #endif /*DEBUG*/
@@ -1500,7 +1499,7 @@ compile_remove_subexpr( Compile *compile, PElement *root )
 		compile_node_total += compile_node_sum;
 		printf( "compile_remove_subexpr: " );
 		symbol_name_print( compile->sym );
-		printf( ": saved %d nodes (total %d)\n", 
+		printf( "saved %d nodes (total %d)\n", 
 			compile_node_sum, compile_node_total );
 	}
 #endif /*DEBUG_COMMON*/
@@ -1592,9 +1591,9 @@ compile_heap( Compile *compile )
 	char txt[1024];
 	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	printf( "compiled \"" );
+	printf( "compiled " );
 	symbol_name_print( compile->sym );
-	printf( "\" to: " );
+	printf( "to: " );
 	graph_pelement( compile->heap, &buf, &base, TRUE );
 	printf( "%s\n", vips_buf_all( &buf ) );
 }
@@ -1850,7 +1849,7 @@ compile_resolve( Symbol *sym, Symbol *zombie )
 #ifdef DEBUG_RESOLVE
 	printf( "compile_resolve: resolving zombie " );
 	symbol_name_print( zombie );
-	printf( " to symbol " );
+	printf( "to symbol " );
 	symbol_name_print( sym );
 	printf( "\n" );
 #endif /*DEBUG_RESOLVE*/
@@ -2065,7 +2064,7 @@ compile_copy_sym( Symbol *sym, Compile *dest )
 #ifdef DEBUG
 	printf( "compile_copy_sym: copying " );
 	symbol_name_print( sym );
-	printf( " to scope of " );
+	printf( "to scope of " );
 	compile_name_print( dest );
 	printf( "\n" );
 #endif /*DEBUG*/

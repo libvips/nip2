@@ -9,6 +9,10 @@ started 7.25.0, 7/1/11
 - added Matrix / New Circular / Square / Identity
 - removed the splash screen, all machines are fast enough now
 - added EXEEXT env var
+- better "bad superclass" error
+- changed order of args for Option_enum
+- added Option_list
+- added a simple Magick menu
 
 started 7.24.0, 30/11/10
 - bump for 7.24

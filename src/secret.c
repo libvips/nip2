@@ -115,7 +115,7 @@ secret_add( Symbol *secret, Compile *compile, gboolean *changed )
 #ifdef DEBUG
 	printf( "secret_add: considering secret " );
 	symbol_name_print( secret );
-	printf( " for " );
+	printf( "for " );
 	compile_name_print( compile );
 	printf( " ...\n" );
 #endif /*DEBUG*/
@@ -155,7 +155,7 @@ secret_add( Symbol *secret, Compile *compile, gboolean *changed )
 #ifdef DEBUG_ADD
 	printf( "secret_add: adding secret " );
 	symbol_name_print( secret );
-	printf( " to " );
+	printf( "to " );
 	compile_name_print( compile );
 	printf( "\n" );
 #endif /*DEBUG_ADD*/

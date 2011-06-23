@@ -51,7 +51,7 @@ Colour_convert_item = class
 		_result {
 		_vislevel = 3;
 
-		to = Option_enum spaces (_ "Convert to") (spaces.get_name dest);
+		to = Option_enum (_ "Convert to") spaces (spaces.get_name dest);
 
 		_result = map_unary (colour_transform_to to.value_thing) x;
 	}
@@ -123,7 +123,7 @@ Colour_tag_item = class
 		_result {
 		_vislevel = 3;
 
-		to = Option_enum spaces (_ "Tag as") (spaces.get_name dest);
+		to = Option_enum (_ "Tag as") spaces (spaces.get_name dest);
 
 		_result = map_unary (image_set_type to.value_thing) x;
 	}
@@ -196,8 +196,8 @@ Colour_temperature_item = class
 			_result {
 			_vislevel = 3;
 
-			old_white = Option_enum Whitepoints (_ "Old whitepoint") "D65";
-			new_white = Option_enum Whitepoints (_ "New whitepoint") "D50";
+			old_white = Option_enum (_ "Old whitepoint") Whitepoints "D65";
+			new_white = Option_enum (_ "New whitepoint") Whitepoints "D50";
 
 			_result
 				= map_unary process x
@@ -304,7 +304,7 @@ Colour_icc_item = class
 	guess_profile image
 		= monitor_profile, has_bands image && get_bands image == 3
 		= print_profile;
-	render_intents = Option_enum Render_intent.names (_ "Render intent") 
+	render_intents = Option_enum (_ "Render intent") Render_intent.names
 		(_ "Absolute");
 
 	Export_item = class

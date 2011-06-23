@@ -23,8 +23,8 @@ Image_new_item = class
 			nheight = Expression "Image height (pixels)" 64;
 			nbands = Expression "Image bands" 1;
 			format_option = Option "Image format" format_names 0;
-			type_option = Option_enum 
-				Image_type.type_names "Image type" "B_W";
+			type_option = Option_enum "Image type"
+				Image_type.type_names "B_W";
 			pixel = Expression "Pixel value" 0;
 
 			_result
@@ -211,7 +211,7 @@ Image_header_item = class
 				$coding => coding
 			];
 
-			field_option name = Option_enum field_names (_ "Field") name;
+			field_option name = Option_enum (_ "Field") field_names name;
 
 			field_funcs = Table [
 				[type, get_type],
@@ -381,7 +381,7 @@ Image_header_item = class
 			nyoff = Expression "Yoffset" (get_prop has_yoffset get_yoffset 0 x);
 
 			type_option 
-				= Option_enum Image_type.type_names "Image type"
+				= Option_enum "Image type" Image_type.type_names 
 					(Image_type.type_names.get_name type)
 			{
 				type 

@@ -786,14 +786,6 @@ Filter_magick_item = class
 	}
 	antialias_widget = Antialias true;
 
-/* An option whose value is a string rather than a number.
- */
-Option_string caption labels item = class
-	Option caption labels (index (equal item) labels) {
-	Option_edit caption labels value 
-		= this.Option_string caption labels (labels?value);
-}
-
 	Gravity gravity = class
 		Option_string "Gravity" [
 			"None",
@@ -961,16 +953,16 @@ Option_string caption labels item = class
 			_vislevel = 3;
 
 			text = text_widget;
-			//gravity = gravity_widget; 
+			gravity = gravity_widget; 
 			geometry = Geometry_widget; 
 			font = Font_widget;
-			//foreground = foreground_widget;
+			foreground = foreground_widget;
 			antialias = antialias_widget;
 			command = magick_command (join_sep " " [
 				font._flag,
 				antialias._flag,
-				//gravity._flag,
-				//foreground._flag,
+				gravity._flag,
+				foreground._flag,
 				"-annotate", geometry._flag, "\"" ++ text.value ++ "\""]);
 
 			_result = system command x; 
@@ -989,7 +981,6 @@ Option_string caption labels item = class
 			_result = system command x; 
 		}
 	}
-
 }
 
 #separator

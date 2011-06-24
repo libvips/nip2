@@ -1,0 +1,404 @@
+
+Matrix_build_item = class 
+	Menupullright "_New" "make a new matrix of some sort" {
+
+	Plain_item = class 
+		Menuaction "_Plain" "make a new plain matrix widget" {
+		action = Matrix (identity_matrix 3);
+	}
+
+	Convolution_item = class 
+		Menuaction "_Convolution" "make a new convolution matrix widget" {
+		action = Matrix_con 1 0 [[0, 0, 0], [0, 1, 0], [0, 0, 0]];
+	}
+
+	Recombination_item = class 
+		Menuaction "_Recombination" 
+			"make a new recombination matrix widget" {
+		action = Matrix_rec (identity_matrix 3);
+	}
+
+	Morphology_item = class 
+		Menuaction "_Morphology" "make a new morphology matrix widget" {
+		action = Matrix_mor [[0, 0, 0], [0, 255, 0], [0, 0, 0]];
+	}
+
+	sep1 = Menuseparator;
+
+	Matrix_gaussian_item = class 
+		Menuaction "_Gaussian" "make a gaussian matrix" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			s = Scale "Sigma" 0.001 10 1;
+			ma = Scale "Minimum amplitude" 0 1 0.2;
+			integer = Toggle "Integer" false;
+
+			_result 
+				= fn s.value ma.value
+			{
+				fn
+					= im_gauss_imask, integer
+					= im_gauss_dmask;
+			}
+		}
+	}
+
+	Matrix_laplacian_item = class 
+		Menuaction "_Laplacian" "make the Laplacian of a Gaussian matrix" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			s = Scale "Sigma" 0.001 10 1.5;
+			ma = Scale "Minimum amplitude" 0 1 0.1;
+			integer = Toggle "Integer" false;
+
+			_result 
+				= fn s.value ma.value
+			{
+				fn
+					= im_log_imask, integer
+					= im_log_dmask;
+			}
+		}
+	}
+}
+
+Matrix_to_matrix_item = class
+	Menuaction "Con_vert to Matrix" "convert anything to a matrix" {
+	action x = to_matrix x;
+}
+
+#separator
+
+Matrix_extract_item = class
+	Menupullright "_Extract" "extract rows or columns from a matrix" {
+	Rows_item = class
+		Menuaction "_Rows" "extract rows" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			first = Expression "Extract from row" 0;
+			number = Expression "Extract this many rows" 1;
+
+			_result 
+				= map_unary process x
+			{
+				process x
+					= extract_area 0 first (get_width x) number x;
+			}
+		}
+	}
+
+	Columns_item = class
+		Menuaction "_Columns" "extract columns" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			first = Expression "Extract from column" 0;
+			number = Expression "Extract this many columns" 1;
+
+			_result 
+				= map_unary process x
+			{
+				process mat
+					= extract_area first 0 number (get_height x) x;
+			}
+		}
+	}
+
+	Area_item = class
+		Menuaction "_Area" "extract area" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			left = Expression "First column" 0;
+			top = Expression "First row" 0;
+			width = Expression "Number of columns" 1;
+			height = Expression "Number of rows" 1;
+
+			_result 
+				= map_unary process x
+			{
+				process mat
+					= extract_area left top width height x;
+			}
+		}
+	}
+
+	Diagonal_item = class
+		Menuaction "_Diagonal" "extract diagonal" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			which = Option "Extract" [
+				"Leading Diagonal",
+				"Trailing Diagonal"
+			] 0;
+
+			_result 
+				= map_unary process x
+			{
+				process mat
+					= mat.Matrix_base (map2 extr [0..] mat.value),
+						which == 0
+					= mat.Matrix_base (map2 extr 
+						[mat.width - 1, mat.width - 2 .. 0] mat.value);
+				extr n l = [l?n];
+			}
+		}
+	}
+}
+
+Matrix_insert_item = class
+	Menupullright "_Insert" "insert rows or columns into a matrix" {
+	// make a new 8-bit uchar image of wxh with pixels set to p
+	// use to generate new cells
+	newim w h p
+		= image_new w h 1 
+			Image_format.UCHAR Image_coding.NOCODING Image_type.B_W p 0 0;
+
+	Rows_item = class
+		Menuaction "_Rows" "insert rows" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			first = Expression "Insert at row" 0;
+			number = Expression "Insert this many rows" 1;
+			item = Expression "Set new cells to" 0;
+
+			_result 
+				= map_unary process x
+			{
+				process x
+					= foldl1 join_tb (concat [top, new, bottom])
+				{
+					top 
+						= [extract_area 0 0 w f x], f > 0
+						= [];
+					new = [(if is_Matrix x then to_matrix else id) 
+						(newim w number item.expr)];
+					bottom 
+						= [extract_area 0 f w (h - f) x], f < h
+						= [];
+
+					f = to_real first;
+					w = get_width x;
+					h = get_height x;
+				}
+			}
+		}
+	}
+
+	Columns_item = class
+		Menuaction "_Columns" "insert columns" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			first = Expression "Insert at column" 0;
+			number = Expression "Insert this many columns" 1;
+			item = Expression "Set new cells to" 0;
+
+			_result 
+				= map_unary process x
+			{
+				process x
+					= foldl1 join_lr (concat [left, new, right])
+				{
+					left 
+						= [extract_area 0 0 f h x], f > 0
+						= [];
+					new = [(if is_Matrix x then to_matrix else id) 
+						(newim number h item.expr)];
+					right 
+						= [extract_area f 0 (w - f) h x], f < w
+						= [];
+
+					f = to_real first;
+					w = get_width x;
+					h = get_height x;
+				}
+			}
+		}
+	}
+}
+
+Matrix_delete_item = class
+	Menupullright "_Delete" "delete rows or columns from a matrix" {
+	// remove number of items, starting at first
+	delete first number l = take (to_real first) l ++ 
+		drop (to_real first + to_real number) l;
+
+	Rows_item = class
+		Menuaction "_Rows" "delete rows" {
+
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			first = Expression "Delete from row" 0;
+			number = Expression "Delete this many rows" 1;
+
+			_result 
+				= map_unary process x
+			{
+				process x
+					= foldl1 join_tb (concat [top, bottom])
+				{
+					top 
+						= [extract_area 0 0 w f x], f > 0
+						= [];
+					bottom 
+						= [extract_area 0 b w (h - b) x], b < h
+						= [];
+
+					f = to_real first;
+					n = to_real number;
+					b = f + n;
+					w = get_width x;
+					h = get_height x;
+				}
+			}
+		}
+	}
+
+	Columns_item = class
+		Menuaction "_Columns" "delete columns" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			first = Expression "Delete from column" 0;
+			number = Expression "Delete this many columns" 1;
+
+			_result 
+				= map_unary process x
+			{
+				process x
+					= foldl1 join_lr (concat [left, right])
+				{
+					left 
+						= [extract_area 0 0 f h x], f > 0
+						= [];
+					right 
+						= [extract_area r 0 (w - r) h x], r < w
+						= [];
+
+					f = to_real first;
+					n = to_real number;
+					r = f + n;
+					w = get_width x;
+					h = get_height x;
+				}
+			}
+		}
+	}
+}
+
+Matrix_join = class
+	Menupullright "_Join" "join two matricies" {
+	Left_right_item = class
+		Menuaction "_Left to Right" "join two matricies left-right" {
+		action a b = map_binary join_lr a b;
+	}
+
+	Top_bottom_item = class
+		Menuaction "_Top to Bottom" "joiin two matricies top-bottom" {
+		action a b = map_binary join_tb a b;
+	}
+}
+
+Matrix_rotate_item = class
+	Menupullright "_Rotate" "clockwise rotation by fixed angles" {
+
+	rot90 = Image_transform_item.Rotate_item.Fixed_item.Rot90_item;
+
+	rot180 = Image_transform_item.Rotate_item.Fixed_item.Rot180_item;
+
+	rot270 = Image_transform_item.Rotate_item.Fixed_item.Rot270_item;
+
+	Matrix_rot45_item = class
+		Menuaction "_45 Degrees" 
+			"45 degree rotate (square, odd-length-sides only)" {
+		action x = map_unary rot45 x;
+	}
+}
+
+Matrix_flip_item = Image_transform_item.Flip_item;
+
+#separator
+
+Matrix_invert_item = class
+	Menuaction "In_vert" "calculate inverse matrix" {
+	action x = map_unary (converse power (-1)) x;
+}
+
+Matrix_transpose_item = class
+	Menuaction "_Transpose" "swap rows and columns" {
+	action x = map_unary transpose x;
+}
+
+#separator
+
+Matrix_plot_scatter_item = class 
+	Menuaction "_Plot Scatter" 
+		"plot a scatter graph of a matrix of [x,y1,y2,..] coordinates" {
+	action x = class
+		_result {
+		_check_args = [
+			[x, "x", check_Matrix]
+		];
+		_vislevel = 3;
+
+		auto = Toggle "Auto Range" true;
+		xmin = Expression "X range minimum" 0;
+		xmax = Expression "X range maximum" 1;
+		ymin = Expression "Y range minimum" 0;
+		ymax = Expression "Y range maximum" 1;
+
+		_result
+			= Plot options ((x2b @ get_image @ to_image) x)
+		{
+			options
+				= [$style => Plot_style.POINT, $format => Plot_format.XYYY] ++ 
+					range;
+			range
+				= [], auto
+				= [$xmin => xmin.expr, $xmax => xmax.expr, 
+					$ymin => ymin.expr, $ymax => ymax.expr]; 
+
+			// matrix to image makes a 1-band mxn image
+			// we need to put columns into bands
+			x2b im
+				= bandjoin (map extract_col [0 .. w - 1])
+			{
+				w = get_width im;
+				h = get_height im;
+				b = get_bands im;
+				extract_col x = extract_area x 0 1 h im;
+			}
+		}
+	}
+}
+
+Matrix_plot_item = Hist_plot_item;
+
+Matrix_buildlut_item = class 
+	Menuaction "_Build LUT From Scatter" 
+		"make a lookup table from a matrix of [x,y1,y2..] coordinates" {
+	action x = class
+		_result {
+		_check_args = [
+			[x, "x", check_Matrix]
+		];
+		_result = buildlut x;
+	}
+}

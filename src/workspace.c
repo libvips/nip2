@@ -1103,16 +1103,113 @@ workspace_load_toolkit( const char *filename, Toolkitgroup *toolkitgroup )
 	return( NULL );
 }
 
+/* The compat modes this version of nip2 has. Search the compar dir and make a
+ * list of these things.
+ */
+#define MAX_COMPAT (100)
+static int compat_major[MAX_COMPAT];
+static int compat_minor[MAX_COMPAT];
+static int n_compat = 0;
+
+static void *
+workspace_build_compat_fn( const char *filename )
+{
+	char *basename;
+	int major;
+	int minor;
+
+	basename = g_path_get_basename( filename );
+
+	if( sscanf( basename, "%d.%d", &major, &minor ) != 2 ) {
+		g_free( basename );
+		return( NULL );
+	}
+	g_free( basename );
+
+	compat_major[n_compat] = major;
+	compat_minor[n_compat] = minor;
+	n_compat += 1;
+
+#ifdef DEBUG
+	printf( "workspace_build_compat_fn: found major = %d, minor = %d\n", 
+		major, minor ); 
+#endif /*DEBUG*/
+
+	return( NULL );
+}
+
+/* Build the list of ws compatibility defs we have.
+ */
+static void
+workspace_build_compat( void )
+{
+	if( n_compat > 0 )
+		return;
+
+	path_map_dir( "$VIPSHOME/share/" PACKAGE "/compat", "*.*", 
+		(path_map_fn) workspace_build_compat_fn, NULL );
+}
+
+/* Given a major/minor (eg. read from a ws header), return non-zero if we have 
+ * a set of compat defs.
+ */
+static int
+workspace_have_compat( int major, int minor, 
+	int *best_major, int *best_minor )
+{
+	int i;
+	int best;
+
+#ifdef DEBUG
+	printf( "workspace_have_compat: searching for %d.%d\n", major, minor );
+#endif /*DEBUG*/
+
+	/* Sets of ws compatibility defs cover themselves and any earlier
+	 * releases, as far back as the next set of compat defs. We need to
+	 * search for the smallest compat version that's greater than the
+	 * version number in the file.
+	 */
+	workspace_build_compat();
+	best = -1;
+	for( i = 0; i < n_compat; i++ ) 
+		if( major <= compat_major[i] && minor <= compat_minor[i] ) 
+			/* Found a possible compat set, is it better than the
+			 * best we've seen so far?
+			 */
+			if( best == -1 ||
+				compat_major[i] < compat_major[best] ||
+				compat_minor[i] < compat_minor[best] )
+				best = i;
+	if( best == -1 )
+		return( 0 );
+
+#ifdef DEBUG
+	printf( "\tfound %d.%d\n", compat_major[best], compat_minor[best] );
+#endif /*DEBUG*/
+
+	if( best_major )
+		*best_major = compat_major[best];
+	if( best_minor )
+		*best_minor = compat_minor[best];
+
+	return( 1 );
+}
+
 static gboolean
 workspace_load_compat( Workspace *ws, int major, int minor )
 {
 	char pathname[FILENAME_MAX];
 	GSList *path;
+	int best_major;
+	int best_minor;
 
-#ifdef DEBUG
-	printf( "workspace_load_compat: loading compat for %d.%d\n", 
-		major, minor );
-#endif /*DEBUG*/
+	if( !workspace_have_compat( major, minor, &best_major, &best_minor ) )
+		return( TRUE );
+
+	/* Do we need broken region handling?
+	 */
+	if( major == 7 && minor == 8 ) 
+		ws->compat_78 = TRUE;
 
 	/* Make a private toolkitgroup local to this workspace to hold the
 	 * compatibility defs we are planning to load.
@@ -1123,7 +1220,8 @@ workspace_load_compat( Workspace *ws, int major, int minor )
 	iobject_sink( IOBJECT( ws->kitg ) );
 
 	im_snprintf( pathname, FILENAME_MAX, 
-		"$VIPSHOME/share/" PACKAGE "/compat/%d.%d", major, minor );
+		"$VIPSHOME/share/" PACKAGE "/compat/%d.%d", 
+		best_major, best_minor );
 	path = path_parse( pathname );
 	if( path_map_exact( path, "*.def", 
 		(path_map_fn) workspace_load_toolkit, ws->kitg ) ) {
@@ -1132,8 +1230,8 @@ workspace_load_compat( Workspace *ws, int major, int minor )
 	}
 	path_free2( path );
 
-	ws->compat_major = major;
-	ws->compat_minor = minor;
+	ws->compat_major = best_major;
+	ws->compat_minor = best_minor;
 
 	return( TRUE );
 }
@@ -1147,6 +1245,8 @@ workspace_top_load( Filemodel *filemodel,
 	Column *current_col;
 	xmlNode *i, *j, *k;
 	char name[FILENAME_MAX];
+	int best_major;
+	int best_minor;
 
 #ifdef DEBUG
 	printf( "workspace_top_load: from %s\n", state->filename );
@@ -1173,19 +1273,9 @@ workspace_top_load( Filemodel *filemodel,
 
 		/* If necessary, load up compatibility definitions.
 		 */
-		if( filemodel->major != MAJOR_VERSION || 
-			filemodel->minor != MINOR_VERSION ) {
-			if( existsf( "$VIPSHOME/share/" PACKAGE "/compat/%d.%d",
-				filemodel->major, filemodel->minor ) ) 
-				if( !workspace_load_compat( ws, 
-					filemodel->major, filemodel->minor ) ) 
-					return( FALSE );
-
-			/* Do we need broken region handling?
-			 */
-			if( filemodel->major == 7 && filemodel->minor == 8 ) 
-				ws->compat_78 = TRUE;
-		}
+		if( !workspace_load_compat( ws, 
+			filemodel->major, filemodel->minor ) ) 
+			return( FALSE );
 
 		if( model_load( MODEL( ws ), state, parent, xnode ) )
 			return( FALSE );
@@ -1215,8 +1305,10 @@ workspace_top_load( Filemodel *filemodel,
 
 		/* Is there a version mismatch? Issue a warning.
 		 */
-		if( state->major != filemodel->major ||
-			state->minor != filemodel->minor ) {
+		if( workspace_have_compat( state->major, state->minor, 
+			&best_major, &best_minor ) &&
+			(best_major != filemodel->major ||
+			best_minor != filemodel->minor) ) {
 			error_top( _( "Version mismatch." ) );
 			error_sub( _( "File \"%s\" was saved from %s-%d.%d.%d. "
 				"You may see compatibility problems." ),

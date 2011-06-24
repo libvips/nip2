@@ -13,6 +13,8 @@ started 7.25.0, 7/1/11
 - changed order of args for Option_enum
 - added Option_list
 - added a simple Magick menu
+- better compat handling
+- added a 7.24 compat dir
 
 started 7.24.0, 30/11/10
 - bump for 7.24

@@ -19,8 +19,6 @@
   don't automatically give all members 'this' as a secret, check that they
   make references to other class members that do need secrets first 
   
-- need a compat dir for 7.24 now we've changed stuff in _types
-
 - turn on GM in prefs, have to restart before _stdenv.def:magick sees the 
   change
 

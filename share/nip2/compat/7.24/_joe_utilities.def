@@ -1,0 +1,705 @@
+/*  ******Functions included in start/_NG_utilities.def:******
+ *
+ *  so_balance ref_meanmax im1 im2 mask blur gauss *
+ *  nonzero_mean im = no_out *
+ *  so_meanmax im = result *
+ *  so_calculate ref_meanmax im mask = result *
+ *  simple_frame frame im_w im_h ov cs ms bf option = result *
+ *  corner_frame frame im_w im_h ov cs ms bf = result *
+ *  build_frame r_tl r_tr r_bl r_br r_mt r_mb r_ml r_mr im_w im_h ov bf = result *
+ *  complex_frame frame im_w im_h ov cs es ms bf option= result *
+ *  complex_edge ra rb t bl d = rc *
+ *  frame_lr_min r_l r_r target bw = result *
+ *  frame_tb_min r_t r_b target bw = result *
+ *  frame_position_image im ref os colour= result *
+ *  merge_array bw arr = result *
+ *  merge_to_scale im target blend dir = result *
+ *  select_ellipse line width = mask *
+ *  select_tetragon p1 p2 p3 p4 = mask *
+ *  select_polygon pt_list = mask *
+ *  perspective_transform to from = trans'' *
+ *  sort_pts_clockwise l = l'' *
+ */
+
+/* Called from:
+* _NG_Extra.def Clone_area_item
+*/
+so_balance ref_meanmax im1 im2 mask gauss
+   = result
+   {
+   //ref_meanmax = so_meanmax im1;
+   so_values = so_calculate ref_meanmax im2 mask;
+   im2_cor_a = clip2fmt im2.format im2'', has_member "format" im2
+             = im2''
+           {im2'' = im2 * (so_values?0) + (so_values?1);}
+         // Option to convert replacement image to scaled gaussian noise
+         im2_cor = im2_cor_a, gauss == false
+           = clip2fmt im2_cor_a.format gauss_im
+       {gauss_im =
+           im_gaussnoise im2_cor_a.width im2_cor_a.height ref_meanmax?0
+(deviation im2_cor_a);}
+                           result = im_blend (get_image mask) (get_image
+im2_cor) (get_image im1);
+   };
+
+////////////////////////////////////////////////////////////////////////////////	
+/* Calculates the mean of the non zero pixels.
+ * 
+ * Called from:
+ * _NG_utilities so_meanmax
+ */
+nonzero_mean im = no_out
+	{
+	zero_im = (im == 0);
+	zero_mean = mean zero_im;              
+	no_mean = mean im;
+	no_out = no_mean/(1 - (zero_mean/255));
+	};
+
+////////////////////////////////////////////////////////////////////////////////
+/* Calculates the max and nonzero mean of an image
+ * 
+ * Called from:
+ * _NG_utilities so_balance
+ * _NG_utilities so_calculate
+ * _NG_Extra.def Clone_area_item
+ * _NG_Extra.def Balance_item.Balance_find_item
+ */
+so_meanmax im = result
+	{
+	mean_of_im = nonzero_mean im;
+	adjusted_im = im - mean_of_im;
+	max_of_im = max adjusted_im;
+		
+	result = [mean_of_im, max_of_im];
+	};
+
+////////////////////////////////////////////////////////////////////////////////
+/* Calculates the scale and offset required to match a reference mean and max 
+ * 
+ * Called from:
+ * _NG_utilities so_balance
+ * _NG_Extra.def Balance_item.Balance_find_item
+ */	
+so_calculate ref_meanmax im mask = result
+	{
+	im' = if mask then im else 0;
+	im_values = so_meanmax im';
+
+	mean_of_ref = ref_meanmax?0; 
+	mean_of_im  = im_values?0;
+		
+	max_of_ref = ref_meanmax?1; 
+	max_of_im  = im_values?1;
+		
+	scale = (max_of_ref)/(max_of_im);
+	offset = mean_of_ref - (mean_of_im * scale);
+	result = [ scale, offset ];
+	};
+
+////////////////////////////////////////////////////////////////////////////////
+/* Extends or shortens the central sections of a simple frame to fit round a given image.
+ * 
+ * Called from:
+ * _NG_Extra.def Frame_item.Simple_frame_item
+ */
+simple_frame frame im_w im_h ov cs ms bf option = result
+		{
+		cs' = (1 - cs);
+		ms' = (0.5 - (ms/2));
+		ms'' = (1 - cs);
+
+		//Regions
+		r_tl = Region_relative frame 0 0 cs cs;
+		r_tr = fliplr r_tl, option == true
+			  = Region_relative frame cs' 0 cs cs;
+		r_bl = Region_relative frame 0 cs' cs cs;
+		r_br = fliplr r_bl, option == true
+		       = Region_relative frame cs' cs' cs cs;
+
+		r_mt = Region_relative frame ms' 0 ms cs;
+		r_mb = Region_relative frame ms' ms'' ms cs;
+		r_ml = Region_relative frame 0 ms' cs ms;
+		r_mr = fliplr r_ml, option == true
+		       = Region_relative frame ms'' ms' cs ms;
+
+		result = build_frame r_tl r_tr r_bl r_br r_mt r_mb r_ml r_mr im_w im_h ov bf;
+		};
+
+////////////////////////////////////////////////////////////////////////////////
+/* Copies and extends a simple frame corner to produce a complete frame to fit round a given image.
+ * 
+ * Called from:
+ * _NG_Extra.def Frame_item.Frame_corner_item
+ */
+corner_frame frame im_w im_h ov cs ms bf = result
+	{
+	cs' = (1 - cs);
+	ms' = (0.5 - (ms/2));
+
+	//Regions
+	r_tl = Region_relative frame 0 0 cs cs;
+	r_tr = fliplr r_tl;
+	r_bl = fliptb r_tl;
+	r_br = fliplr r_bl;
+	r_mt = Region_relative frame ms' 0 ms cs;
+	r_mb = fliptb r_mt;
+	r_ml = Region_relative frame 0 ms' cs ms;;
+	r_mr = fliplr r_ml;
+	result = build_frame r_tl r_tr r_bl r_br r_mt r_mb r_ml r_mr im_w im_h ov bf;
+	};
+
+////////////////////////////////////////////////////////////////////////////////
+/* Completes the frame building process for simple_frame and corner_frame.
+ *
+ * _NG_utilities simple_frame
+ * _NG_utilities corner_frame
+ */
+build_frame r_tl r_tr r_bl r_br r_mt r_mb r_ml r_mr im_w im_h ov bf = result
+	{
+	//Find pixel thickness of frames section
+	s_width = r_ml.width - mean (im_profile (map_unary fliplr (r_ml.value)?0) 1);
+	s_height = r_mt.height - mean (im_profile (map_unary fliptb (r_mt.value)?0) 0);
+
+	w_target = im_w + (2 * (s_width - ov));
+	h_target = im_h + (2 * (s_height - ov));
+
+	blend = bf * r_tl.width;
+
+	cw_target = w_target - (2 * r_tl.width) + (2 * blend), w_target > (2 * r_tl.width)
+			  = w_target;
+	ch_target = h_target - (2 * r_tl.height) + (2 * blend), h_target > (2 * r_tl.height)
+			  = h_target;
+
+	//Use regions to produce sections
+	top 	= merge_to_scale r_mt cw_target blend 0;
+	bottom 	= merge_to_scale r_mb cw_target blend 0;
+	left 	= merge_to_scale r_ml ch_target blend 1;
+	right 	= merge_to_scale r_mr ch_target blend 1;
+	middle  = Image 
+		(image_new cw_target ch_target left.bands left.format left.coding left.type 0 0 0);
+
+	//Build sections into full frame.
+	row_1 = frame_lr_min r_tl r_tr w_target blend, ( w_target < (r_tl.width * 2))
+		  = merge_array blend [[r_tl, top, r_tr]];
+	row_2 = frame_lr_min left right w_target blend, ( w_target < (r_tl.width * 2))
+		  = merge_array blend [[left, middle, right]];
+	row_3 = frame_lr_min r_bl r_br w_target blend, ( w_target < (r_tl.width * 2))
+		  = merge_array blend [[r_bl, bottom, r_br]];
+
+	result = frame_tb_min row_1 row_3 h_target blend, (h_target < (r_tl.height * 2))
+	 	   = merge_array blend [[row_1], [row_2], [row_3]];
+	};
+
+////////////////////////////////////////////////////////////////////////////////
+/* Extends or shortens the central sections of a frame, preserving any central details on each
+ * edge, to fit round a given image.
+ * 
+ * Called from:
+ * _NG_Extra.def Frame_item.Complex_frame_item
+ */
+complex_frame frame im_w im_h ov cs es ms bf option= result
+	{
+	cs' = (1 - cs);
+	ms' = (0.5 - (ms/2));
+	es' = (0.25 - (es/2));
+
+	r_tl = Region_relative frame 0 0 cs cs;
+	r_tr = fliplr r_tl, option == true
+	   	 = Region_relative frame cs' 0 cs cs;
+	r_bl = Region_relative frame 0 cs' cs cs;
+	r_br = fliplr r_bl, option == true
+		 = Region_relative frame cs' cs' cs cs;
+
+	r_mt = Region_relative frame ms' 0 ms cs;
+	r_mb = Region_relative frame ms' cs' ms cs;
+	r_ml = Region_relative frame 0 ms' cs ms;
+	r_mr = fliplr r_ml, option == true
+	     = Region_relative frame cs' ms' cs ms;
+
+	r_et = Region_relative frame es' 0 es cs;
+	r_eb = Region_relative frame es' cs' es cs;
+	r_el = Region_relative frame 0 es' cs es;
+	r_er = fliplr r_el, option == true
+	     = Region_relative frame cs' es' cs es;
+
+	//Find pixel thickness of frames section
+	s_width = r_el.width - mean (im_profile (map_unary fliplr (r_el.value)?0) 1);
+	s_height = r_et.height - mean (im_profile (map_unary fliptb (r_et.value)?0) 0);
+
+	w_target = im_w + (2 * (s_width - ov));
+	h_target = im_h + (2 * (s_height - ov));
+	min_size = foldr1 min_pair [r_tl.width, r_tl.height,
+								r_mt.width, r_mt.height,
+								r_et.width, r_et.height];
+	blend = bf * min_size;
+
+	cw_target = w_target - (2 * r_tl.width) + (2 * blend);
+	ch_target = h_target - (2 * r_tl.height) + (2 * blend);
+
+	top 	= complex_edge r_mt r_et cw_target blend 0;
+	bottom 	= complex_edge r_mb r_eb cw_target blend 0;
+	left	= complex_edge r_ml r_el ch_target blend 1;
+	right	= complex_edge r_mr r_er ch_target blend 1;
+	middle  = Image 
+		(image_new top.width left.height left.bands left.format left.coding left.type 0 0 0);
+
+	//Build regions into full frame.
+	row_1 = frame_lr_min r_tl r_tr w_target blend, ( w_target < (r_tl.width * 2))
+		  = merge_array blend [[r_tl, top, r_tr]];
+	row_2 = frame_lr_min left right w_target blend, ( w_target < (r_tl.width * 2))
+		  = merge_array blend [[left, middle, right]];
+	row_3 = frame_lr_min r_bl r_br w_target blend, ( w_target < (r_tl.width * 2))
+		  = merge_array blend [[r_bl, bottom, r_br]];
+	result = frame_tb_min row_1 row_3 h_target blend, (h_target < (r_tl.height * 2))
+		   = merge_array blend [[row_1], [row_2], [row_3]];
+	};
+
+////////////////////////////////////////////////////////////////////////////////	
+/*  Function called by complex frame, used to produce section
+ * 
+ * Called from:
+ * _NG_utilities.def complex_frame
+ */
+complex_edge ra rb t bl d = rc
+	{
+	e1 = ceil (ra.width - t)/2, d == 0
+	   = 0;
+	e2 = 0, d == 0
+	   = ceil (ra.height - t)/2;
+	e3 = t, d == 0
+       = ra.width;
+	e4 = ra.height, d == 0
+	   = t;
+	
+	check = ra.width, d == 0;
+    	  = ra.height;
+		
+	rai = get_image ra;
+
+	t2 = (t - ra.width + (2 * bl))/2, d == 0
+	   = (t - ra.height + (2 * bl))/2;
+
+	rc = ra , t <= 0
+	   = Image (im_extract_area rai e1 e2 e3 e4), t <= check
+	   = merge_array bl [[rb',ra,rb']], d == 0
+	   = merge_array bl [[rb'],[ra],[rb']]
+	   	{rb' = merge_to_scale rb t2 bl d;}
+	};
+
+//////////////////////////////////////////////////////////////////////////////
+/* Blends two images left/right to produce an image a specific width.
+ *
+ * _NG_utilities build_frame
+ * _NG_utilities complex_frame
+ */
+frame_lr_min r_l r_r target bw = result
+	{
+	//Calculating the new widh required for each image.
+	no = (target/2 + bw);
+	n_w = no, (r_l.width > no)
+		= r_l.width;
+	
+	//Removing excess from what will be the middle of the final image.
+	n_l = im_extract_area r_l.value 0 0 n_w r_l.height;
+	n_r = im_extract_area r_r.value (r_r.width - n_w) 0 n_w r_l.height;
+
+	//Merge the two image together with a bw*2 pixel overlap.
+	result = Image (im_lrmerge n_l n_r ((bw*2) - n_w) 0 bw);
+	};
+
+//////////////////////////////////////////////////////////////////////////////
+/* Blends two images top/bottom to produce an image a specific width.
+ *
+ * _NG_utilities build_frame
+ * _NG_utilities complex_frame
+ */
+frame_tb_min r_t r_b target bw = result
+	{
+	//Calculating the new height required for each image.
+	no = (target/2 + bw);
+	n_h = no, (r_t.height > no)
+		= r_t.height;
+		
+	//Removing excess from what will be the middle of the final image.
+	n_t = im_extract_area r_t.value 0 0 r_t.width n_h;
+	n_b = im_extract_area r_b.value 0 (r_b.height - n_h) r_b.width n_h;
+
+	//Merge the two image together with a 50 pixel overlap.
+	result = Image (im_tbmerge n_t n_b 0 ((bw*2) -n_h) bw);
+	};
+
+//////////////////////////////////////////////////////////////////////////////
+/* Resixe canvas of an image to accomodate a frame and possible mount 
+ *
+ * Called from:
+ * _NG_Extra.def Frame_item.Frame_corner_item
+ * _NG_Extra.def Frame_item.Simple_frame_item
+ * _NG_Extra.def Frame_item.Complex_frame_item
+ */
+frame_position_image im ref os colour= result
+	{
+	background = image_new ref.width ref.height
+					im.bands im.format im.coding im.type colour 0 0;
+
+	result = insert_noexpand xp yp im background
+		{
+		xp = (ref.width - im.width)/2;
+		yp = (ref.height - im.height - os)/2;
+		}
+	};
+
+//////////////////////////////////////////////////////////////////////////////
+/* Merges an array of images together according to blend width bw 
+ *
+ * Called from:
+ * _NG_Utilites.def build_frame
+ * _NG_Utilites.def complex_frame
+ * _NG_Utilites.def complex_edge
+ */	
+merge_array bw arr = result
+	{
+	merge_lr bw im1 im2 = im3
+		{
+		bw' = get_header "Xsize" (get_image im1);
+		bw'' = -(bw' - bw);
+		im3 = im_lrmerge (get_image im1) (get_image im2) bw'' 0 bw;
+		}
+	merge_tb bw im1 im2 = im3
+		{
+		bw' = get_header "Ysize" (get_image im1);
+		bw'' = -(bw' - bw);
+		im3 = im_tbmerge (get_image im1) (get_image im2) 0 bw'' bw;
+		}
+
+	im_out 	= (image_set_origin 0 0 @ 
+			foldl1 (merge_tb bw) @
+			map (foldl1 (merge_lr bw))) arr;
+	result = Image im_out;
+	};
+
+//////////////////////////////////////////////////////////////////////////////
+/* Repeatably top/bottom add clones of im, with a defined overlap, until final height > target
+ *
+ * Called from:
+ * _NG_Utilites.def build_frame
+ * _NG_Utilites.def complex_edge
+ */
+merge_to_scale im target blend dir = result
+	{
+	blend' = floor blend;
+	
+	//allow fir lr or tb process
+	var_a = im.width, dir == 0
+		  = im.height;
+	
+	var_w = im.width, dir == 1
+	      = target, target > blend'
+		  = blend';
+	var_h = im.height, dir == 0
+	      = target, target > blend'
+		  = blend';
+
+	//total numner of copies of im requires, taking overlap into account.
+	no_loops = ceil ((log ((target - blend')/(var_a - blend')))/(log 2));
+	
+	process im no = result
+		{
+		pr_a = get_header "Xsize" (get_image im), dir == 0
+	    	 = get_header "Ysize" (get_image im);
+		pr_b = -(pr_a - blend' + 1);
+	
+		im' = im_lrmerge (get_image im) (get_image im) pr_b 0 blend', dir == 0
+	    	= im_tbmerge (get_image im) (get_image im) 0 pr_b blend';
+		no' = no - 1;
+		
+		result = im', no' < 1
+		       = process im' no';
+		}
+		
+	im_tmp 	= im.value, var_a > target
+		    = process im no_loops;
+
+	result = Image (im_extract_area (get_image im_tmp) 0 0 var_w var_h);
+	};
+
+//////////////////////////////////////////////////////////////////////////////
+/* Selects an elispe based on a line and a width
+ *
+ * Called from:
+ * _NG_Extra.def Select_item.Elipse
+ */  
+select_ellipse line width = mask
+	{
+	im = Image (get_image line);
+	
+	//Make a 2 band image whose value equals its coordinates.
+	im_coor = Image (make_xy im.width im.height);	
+
+	//Adjust the values to center tham on (line.left, line.top)
+	im_cent = im_coor - Vector [line.left,line.top];
+		
+	w = line.width;
+	h = line.height;
+		
+	angle	= 270, w == 0 && h < 0
+			= 90, w == 0 && h >= 0
+			= 360 + atan (h/w), w > 0 && h < 0
+	 		= atan (h/w), w > 0 && h >= 0
+	 		= 180 + atan (h/w);
+
+	a = ( (h ** 2) + (w ** 2) )**0.5;
+	b = a * width;
+
+	x' = ( (cos angle) * im_cent?0) + ( (sin angle) * im_cent?1);
+	y' = ( (cos angle) * im_cent?1) - ( (sin angle) * im_cent?0);
+	
+	mask =  ( (b**2) * (x'**2) ) +  ( (a**2) * (y'**2) ) <= (a * b)**2;
+	};
+
+//////////////////////////////////////////////////////////////////////////////
+/* Selects a tetragon based on four points.
+ *
+ * Called from:
+ * _NG_Extra.def Select_item.Tetragon
+ * _NG_Extra.def Perspective_item
+ */  
+select_tetragon p1 p2 p3 p4 = mask
+	{
+	//Put points in clockwise order starting at the top left.
+	pt_list = sort_pts_clockwise [p1, p2, p3, p4];
+				
+	pair_list = [
+    	[ pt_list?0, pt_list?1 ],
+    	[ pt_list?1, pt_list?2 ],
+    	[ pt_list?2, pt_list?3 ],
+    	[ pt_list?3, pt_list?0 ] ];
+
+	//Make xy image the same size as p1.image;
+   	im_xy = Image (make_xy p1.image.width p1.image.height);
+	white = Image (image_new p1.image.width p1.image.height 1 0 Image_coding.NOCODING 1 255 0 0);
+	
+	mask = foldl process white pair_list;
+	
+	/* Treat each pair of point as a vector going from p1 to p2,
+	 * then select all to right of line. This is done for each pair,
+	 * the results are all combined to select the area defined by
+	 * the four points.
+	 */
+	process im_in pair = im_out
+		{
+		x = (pair?0).left;
+		y = (pair?0).top;
+		x'= (pair?1).left;
+		y'= (pair?1).top;
+
+		w = x' - x;
+		h = y' - y;
+		
+		m = 0, x == x'
+		  = (y-y')/(x-x');
+		c = 0, x == x'
+		  = ((y*x') - (y'*x))/(x' - x);
+
+		mask=  im_xy?1 - (im_xy?0 * m)  >= c, w > 0
+			=  im_xy?1 - (im_xy?0 * m)  <= c, w < 0
+			=  im_xy?0 <= x, w == 0 && h > 0
+			=  im_xy?0 >= x;
+	
+		im_out = im_in & mask;
+		}
+	};
+
+//////////////////////////////////////////////////////////////////////////////
+/* Selects a tetragon based on four points.
+ *
+ * Called from:
+ * _NG_Extra.def Select_item.Polygon
+ */ 	
+select_polygon pt_list = mask
+	{
+	group_check = is_Group pt_list;
+	pt_l = pt_list.value, group_check
+		 = pt_list;
+			 
+	im = Image (get_image (pt_l?0));
+	im_xy = Image (make_xy im.width im.height);
+	black = Image (image_new im_xy.width im_xy.height 1 0 Image_coding.NOCODING 1 0 0 0);
+
+	x = im_xy?0;
+	y = im_xy?1;
+
+	pt_l' = grp_trip pt_l;
+	
+	mask = foldl process black pt_l';
+				
+	/*Takes a group adds the first two the end and then creates a lists of 
+	 *lists [[a, b, c], [b, c, d] .... [x, a, b]]
+ 	 */
+	grp_trip l = l''
+		{
+		px = take 2 l;
+		l' = join l px;
+		start = [(take 3 l')];
+		rest = drop 3 l';
+
+		process a b = c
+			{
+			x = (last a)?1;
+			x'= (last a)?2;
+			x'' = [[x, x', b]];
+			c = join a x'';
+			}
+				
+		l'' = foldl process start rest;
+		};
+					
+	process im_in triplet = im_out
+		{
+		p1 = triplet?0;
+		p2 = triplet?1;
+		p3 = triplet?2;	
+					
+		//check for change in x direction between p1-p2 and p2 -p3
+		dir_1 = sign (p2.left - p1.left);
+		dir_2 = sign (p3.left - p2.left);
+		dir = dir_1 + dir_2;
+
+		//define min x limit.
+		min_x = p1.left, p1.left < p2.left
+			  = p2.left + 1, dir != 0
+			  = p2.left;
+		
+		//define max x limit.
+		max_x = p1.left, p1.left > p2.left
+	       	  = p2.left - 1, dir != 0
+			  = p2.left; 
+
+		//equation of line defined by p1 and p2
+		m = line_m p1 p2;
+		c = line_c p1 p2;
+		
+		//Every thing below the line
+		im_test = ((y >= (m * x) + c) & (x >= min_x) & (x <= max_x));		
+
+		im_out = im_in ^ im_test;
+		}
+		
+	line_c p1 p2 = c
+		{m = line_m p1 p2;
+		 c = p1.top - (m * p1.left);};
+
+	line_m p1 p2 = (p2.top - p1.top)/(p2.left - p1.left), p2.left != p1.left
+	    		 = 0;
+	};
+
+//////////////////////////////////////////////////////////////////////////////
+/* Selects a tetragon based on four points.
+ *
+ * Called from:
+ * _NG_Extra.def Perspective_match_item
+ * _NG_Extra.def Perspective_item
+ */ 	
+perspective_transform to from = trans''
+	{
+	/*
+	 *  Tramsformation matrix is calculated on the bases of the following functions:
+	 *		x' = c0x + c1y + c2xy + c3
+	 *		y' = c4x + c5y + c6xy + c7
+	 *
+	 *  The functions used in vips im_transform works based on the functions:
+	 *		x = x' + b0 + b2x' + b4y' + b6x'y'
+	 *		y = y' + b1 + b3x' + b5y' + b7x'y'
+	 *
+	 *  and is applied in the form of the matrix:
+	 *
+	 *  	[[b0, b1],
+	 *   	 [b2, b3],
+	 *   	 [b4, b5],
+	 *   	 [b6, b7]]
+	 *
+	 * Therefore our required calculated matrix will be
+	 *
+	 *  	[[ c3		, c7],
+	 *   	 [(c0 - 1)	, c4],
+	 *   	 [ c1		, (c5 - 1)],
+	 *   	 [ c2		, c6]]
+	 *
+	 * to = [x1, y1, x2, y2, x3, y3, x4, y4]
+	 * from = [x1', y1', x2', y2', x3', y3', x4', y4']
+	 * trans = [[c0], [c1], [c2], [c3], [c4], [c5], [c6], [c7]]
+	 *
+	 */
+
+	to' = Matrix
+	   [[to?0, to?1, ((to?0)*(to?1)), 1, 0, 0, 0, 0],
+		[0, 0, 0, 0, to?0, to?1, ((to?0)*(to?1)), 1],
+		[to?2, to?3, ((to?2)*(to?3)), 1, 0, 0, 0, 0],
+		[0, 0, 0, 0, to?2, to?3, ((to?2)*(to?3)), 1],
+		[to?4, to?5, ((to?4)*(to?5)), 1, 0, 0, 0, 0],
+		[0, 0, 0, 0, to?4, to?5, ((to?4)*(to?5)), 1],
+		[to?6, to?7, ((to?6)*(to?7)), 1, 0, 0, 0, 0],
+		[0, 0, 0, 0, to?6, to?7, ((to?6)*(to?7)), 1]];
+
+	from' = Matrix (transpose [from]);
+
+	to'' = to' ** (-1);
+
+	trans = to'' * from';
+	trans' = trans.value;
+	trans''= Matrix [[(trans'?3)?0, 	  (trans'?7)?0		],
+					 [((trans'?0)?0 - 1), (trans'?4)?0		],
+					 [(trans'?1)?0, 	  ((trans'?5)?0 - 1)],
+					 [(trans'?2)?0, 	  (trans'?6)?0		]];
+	};
+
+//////////////////////////////////////////////////////////////////////////////
+/* Sort a list of points into clockwise order.
+ *
+ * Called from:
+ * _NG_utilities.def select_tetragon
+ * _NG_Extra.def Perspective_match_item
+ * _NG_Extra.def Perspective_item
+ */ 	
+sort_pts_clockwise l = l''
+		{
+		// sort functions:
+		f_top a b = a.top < b.top;
+		f_left a b = a.left < b.left;
+		f_right a b = a.left > b.left;
+
+		l' = sortc f_top l;
+		l'_a = take 2 l';
+		l'_b = drop 2 l';
+
+		l''_a = sortc f_left l'_a;
+		l''_b = sortc f_right l'_b;
+		l'' = join l''_a l''_b;
+		};
+
+Mount_options _ctype _ppcm = class 
+  {
+  _vislevel = 3;
+  apply = Toggle "Apply mount options" false;
+  ls = Expression "Lower mount section bigger by (cm)" 0;
+  mount_colour = Colour _ctype [0, 0, 0];
+  _los = ls.expr * _ppcm;
+  };
+
+Frame_variables comp = class
+  {
+  _vislevel = 3;
+
+  scale_factor = Expression "scale the size of the frame by" 1;
+
+  /* These sliders define the fraction of the frames width or height is extracted
+   * to produce each of the particular regions.
+   */
+  corner_section = Scale "Corner section" 0.1 1 0.5;
+  edge_section = Scale "Edge section" 0.1 1 0.2, comp > 0
+				  = "Only required for complex frames";
+  middle_section = Scale "Middle section" 0.1 1 0.2;
+  blend_fraction = Scale "Blend fraction" 0.1 0.9 0.1;
+  option = Toggle "Use mirror of left-side to make right" true;
+  };
+

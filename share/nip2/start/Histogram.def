@@ -45,6 +45,11 @@ Hist_new_item = class
 	}
 }
 
+Hist_convert_to_hist_item = class 
+	Menuaction "Con_vert to Histogram" "convert anything to a histogram" {
+	action x = hist_tag (to_image x);
+}
+
 Hist_find_item = class 
 	Menupullright "_Find" "find a histogram" {
 	Oned_item = class 

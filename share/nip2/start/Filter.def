@@ -151,8 +151,8 @@ Kirk
 				"Don't rotate", 
 				"4 x 45 degrees", 
 				"8 x 45 degrees", 
-				"2 x 90 degrees"] 
-			0;
+				"2 x 90 degrees"
+			] 0;
 
 			_result 
 				= map_unary process x
@@ -1363,23 +1363,23 @@ Filter_blend_item = class
 
 		// names we show the user for blend types
 		names = Enum [
-			[_ "Normal", NORMAL],
-			[_ "If Lighter", IFLIGHTER],
-			[_ "If Darker", IFDARKER],
-			[_ "Multiply", MULTIPLY],
-			[_ "Add", ADD],
-			[_ "Subtract", SUBTRACT],
-			[_ "Screen", SCREEN],
-			[_ "Burn", BURN],
-			[_ "Soft Light", SOFTLIGHT],
-			[_ "Hard Light", HARDLIGHT],
-			[_ "Lighten", LIGHTEN],
-			[_ "Darken", DARKEN],
-			[_ "Dodge", DODGE],
-			[_ "Reflect", REFLECT],
-			[_ "Freeze", FREEZE],
-			[_ "Bitwise OR", OR],
-			[_ "Bitwise AND", AND]
+			_ "Normal" => NORMAL,
+			_ "If Lighter" => IFLIGHTER,
+			_ "If Darker" => IFDARKER,
+			_ "Multiply" => MULTIPLY,
+			_ "Add" => ADD,
+			_ "Subtract" => SUBTRACT,
+			_ "Screen" => SCREEN,
+			_ "Burn" => BURN,
+			_ "Soft Light" => SOFTLIGHT,
+			_ "Hard Light" => HARDLIGHT,
+			_ "Lighten" => LIGHTEN,
+			_ "Darken" => DARKEN,
+			_ "Dodge" => DODGE,
+			_ "Reflect" => REFLECT,
+			_ "Freeze" => FREEZE,
+			_ "Bitwise OR" => OR,
+			_ "Bitwise AND" => AND
 		];
 
 		// functions we call for each blend type
@@ -1540,15 +1540,15 @@ Filter_browse_multiband_item = class
 
         	band = Scale "Band" 0 (image.bands - 1) 0;
        		display = Option "Display as" [
-				_ "Grey",
-				_ "Green over Red",
-				_ "Blue over Red",
-				_ "Red over Green",
-				_ "Red over Blue",
-				_ "Blue over Green",
-				_ "Green over Blue"
-			] 0;
-	
+			_ "Grey",
+			_ "Green over Red",
+			_ "Blue over Red",
+			_ "Red over Green",
+			_ "Red over Blue",
+			_ "Blue over Green",
+			_ "Green over Blue"
+		] 0;
+
         	_result 
 				= output
 			{

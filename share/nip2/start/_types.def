@@ -920,22 +920,8 @@ Image value = class
 		[wrap join_result_image,
 			(has_real x || is_Vector x) &&
 			(op.op_name == "join" || op.op_name == "join'")],
-		// image ++ image is slightly different ... we want to
-		// sizealike, but we must not bandalike
-		[wrap 
-			(op.fn (get_image resized?0) (get_image resized?1)),
-			has_image x &&
-			(op.op_name == "join" || op.op_name == "join'")],
 		[wrap ite_result_image,
 			op.op_name == "if_then_else"],
-		// arithmetic and reational binops between image resize
-		// and band_alike images to match
-		[wrap 
-			(op.fn (get_image rebanded?0) (get_image rebanded?1)),
-			has_image x &&
-			(op.type == Operator_type.ARITHMETIC ||
-				op.type == Operator_type.RELATIONAL)],
-		// other op types don't resize
 		[wrap (op.fn this.value (get_image x)),
 			has_image x],
 		[wrap (op.fn this.value (get_number x)),
@@ -986,14 +972,10 @@ Image value = class
 
 		to_image x = to_image_size width height target_bands target_format x;
 
-		[if_size, then_size, else_size] = 
-			size_alike (value : formats_alike (map to_image x));
+		[then', else'] = map to_image x;
 
 		ite_result_image = image_set_type target_type
-			(if if_size then then_size else else_size);
-
-		resized = size_alike [this, x];
-		rebanded = bands_alike resized;
+			(if value then then' else else');
 	}
 
 	// FIXME ... yuk ... don't use operator hints, just always rewrap if

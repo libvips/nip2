@@ -1098,18 +1098,6 @@ imageinfo_write( Imageinfo *imageinfo, const char *name )
 	Imageinfogroup *imageinfogroup = 
 		IMAGEINFOGROUP( ICONTAINER( imageinfo )->parent );
 	IMAGE *im = imageinfo_get( FALSE, imageinfo );
-	char filename[FILENAME_MAX];
-	char filemode[FILENAME_MAX];
-
-	im_filename_split( name, filename, filemode );
-
-	if( (imageinfo = imageinfogroup_lookup( imageinfogroup, filename )) ) {
-                error_top( _( "Unable to write to file." ) );
-		error_sub( _( "File \"%s\" is already open for read." ), 
-			filename );
-
-                return( FALSE );
-	}
 
 	if( vips_format_write( im, name ) ) {
 		error_top( _( "Unable to write to file." ) );

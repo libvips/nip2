@@ -1,3 +1,10 @@
+- can't load odd pages of multipage tiffs
+
+  $ header test1.tif:1
+  ... works fine
+  $ nip2 test1.tif:1
+  ... unable to open
+
 - we can't define local superclasses at the moment
 
   eg. consider:

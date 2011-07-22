@@ -949,7 +949,7 @@ imageinfo_attach_check( Imageinfo *imageinfo )
 		IM_FREEF( g_source_remove, imageinfo->check_tid );
 }
 
-/* Open a filename for input.
+/* Open a filename for input. The filenmae can have an embedded mode. 
  */
 Imageinfo *
 imageinfo_new_input( Imageinfogroup *imageinfogroup, GtkWidget *parent,
@@ -957,24 +957,17 @@ imageinfo_new_input( Imageinfogroup *imageinfogroup, GtkWidget *parent,
 {
 	Imageinfo *imageinfo;
 	ImageinfoOpen open;
-	char filename[FILENAME_MAX];
-	char mode[FILENAME_MAX];
 
-	im_filename_split( name, filename, mode );
-	if( (imageinfo = imageinfogroup_lookup( imageinfogroup, filename )) ) {
+	if( (imageinfo = imageinfogroup_lookup( imageinfogroup, name )) ) {
 		/* We always make a new non-heap pointer.
 		 */
 		MANAGED_REF( imageinfo );
 		return( imageinfo );
 	}
 
-
-	where do we pop filename and name?
-
-
 	open.imageinfogroup = imageinfogroup;
 	open.heap = heap;
-	open.filename = filename;
+	open.filename = name;
 	open.parent = parent;
 
         if( !(imageinfo = (Imageinfo *) callv_string_filename( 
@@ -982,7 +975,7 @@ imageinfo_new_input( Imageinfogroup *imageinfogroup, GtkWidget *parent,
 		name, &open, NULL, NULL )) ) {
 		error_top( _( "Unable to open image." ) );
 		error_sub( _( "Unable to open file \"%s\" as image." ), 
-			filename );
+			name );
 		error_vips();
                 return( NULL );
         }

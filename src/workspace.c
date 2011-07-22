@@ -489,13 +489,6 @@ workspace_add_def( Workspace *ws, const char *str )
 gboolean
 workspace_load_file_buf( VipsBuf *buf, const char *filename )
 {
-	if( !existsf( "%s", filename ) ) {
-		error_top( _( "File does not exist." ) );
-		error_sub( _( "File \"%s\" cannot be read." ), filename );
-
-		return( FALSE );
-	}
-
 	if( vips_format_for_file( filename ) ) 
 		vips_buf_appends( buf, "Image_file" );
 	else

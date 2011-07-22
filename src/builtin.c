@@ -284,8 +284,11 @@ apply_image_call( Reduce *rc,
 	const char *name, HeapNode **arg, PElement *out )
 {
 	Heap *heap = rc->heap;
+
 	PElement rhs;
 	char buf[FILENAME_MAX];
+	char filename[FILENAME_MAX];
+	char mode[FILENAME_MAX];
 	char *fn;
 	Imageinfo *ii;
 
@@ -294,12 +297,21 @@ apply_image_call( Reduce *rc,
 	PEPOINTRIGHT( arg[0], &rhs );
 	(void) reduce_get_string( rc, &rhs, buf, FILENAME_MAX );
 
+	/* The buf might be something like n3862.pyr.tif:1, ie. contain some
+	 * load options. Split and search just for the filename component.
+	 */
+	im_filename_split( buf, filename, mode );
+
 	/* Try to load image from given string.
 	 */
-	if( !(fn = path_find_file( PATH_SEARCH, buf )) )
+	if( !(fn = path_find_file( PATH_SEARCH, filename )) )
 		reduce_throw( rc );
+
+	/* Reattach the mode and load.
+	 */
+	im_snprintf( buf, FILENAME_MAX, "%s:%s", fn, mode );
 	if( !(ii = imageinfo_new_input( 
-		main_imageinfogroup, NULL, heap, fn )) ) {
+		main_imageinfogroup, NULL, heap, buf )) ) {
 		IM_FREE( fn );
 		reduce_throw( rc );
 	}

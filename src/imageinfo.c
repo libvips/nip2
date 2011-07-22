@@ -953,17 +953,24 @@ imageinfo_attach_check( Imageinfo *imageinfo )
  */
 Imageinfo *
 imageinfo_new_input( Imageinfogroup *imageinfogroup, GtkWidget *parent,
-	Heap *heap, const char *filename )
+	Heap *heap, const char *name )
 {
 	Imageinfo *imageinfo;
 	ImageinfoOpen open;
+	char filename[FILENAME_MAX];
+	char mode[FILENAME_MAX];
 
+	im_filename_split( name, filename, mode );
 	if( (imageinfo = imageinfogroup_lookup( imageinfogroup, filename )) ) {
 		/* We always make a new non-heap pointer.
 		 */
 		MANAGED_REF( imageinfo );
 		return( imageinfo );
 	}
+
+
+	where do we pop filename and name?
+
 
 	open.imageinfogroup = imageinfogroup;
 	open.heap = heap;
@@ -972,7 +979,7 @@ imageinfo_new_input( Imageinfogroup *imageinfogroup, GtkWidget *parent,
 
         if( !(imageinfo = (Imageinfo *) callv_string_filename( 
 		(callv_string_fn) imageinfo_open_image_input, 
-		filename, &open, NULL, NULL )) ) {
+		name, &open, NULL, NULL )) ) {
 		error_top( _( "Unable to open image." ) );
 		error_sub( _( "Unable to open file \"%s\" as image." ), 
 			filename );
@@ -1095,11 +1102,13 @@ imageinfo_same_underlying( Imageinfo *imageinfo[], int n )
 gboolean
 imageinfo_write( Imageinfo *imageinfo, const char *name )
 {
-	Imageinfogroup *imageinfogroup = 
-		IMAGEINFOGROUP( ICONTAINER( imageinfo )->parent );
 	IMAGE *im = imageinfo_get( FALSE, imageinfo );
 
 	if( vips_format_write( im, name ) ) {
+		char filename[FILENAME_MAX];
+		char mode[FILENAME_MAX];
+
+		im_filename_split( name, filename, mode );
 		error_top( _( "Unable to write to file." ) );
 		error_sub( _( "Error writing image to file \"%s\"." ), 
 			filename );

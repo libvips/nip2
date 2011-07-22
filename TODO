@@ -39,9 +39,6 @@
   wrapper, change to matrix works, edit element zero to 0 works, change back
   to Plot (or hist?) is not possible, you have to do 'plot object'
 
-  Histogram menu needs a "convert to hist" item to match the one in matrix /
-  image
-
 - ban parameters which are built-ins, eg. "im", "re" etc., you get nasty
   crashes
 

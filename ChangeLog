@@ -17,6 +17,8 @@ started 7.25.0, 7/1/11
 - added a 7.24 compat dir
 - removed the "already open for read" error on save, too annoying for the
   small amount of safety it gave you
+- test pfm load/save
+- also test cmyk jpeg/tif load/save
 
 started 7.24.0, 30/11/10
 - bump for 7.24

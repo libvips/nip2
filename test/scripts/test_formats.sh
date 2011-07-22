@@ -12,6 +12,11 @@ mono=$tmp/mono.v
 vips im_float2rad $image $tmp/rad.v 
 rad=$tmp/rad.v
 
+# make a cmyk image
+vips im_bandjoin $image $tmp/mono.v $tmp/t1.v
+vips im_copy_set $tmp/t1.v $tmp/cmyk.v 15 1 1 0 0 
+cmyk=$tmp/cmyk.v
+
 # save to t1.format, load as back.v
 save_load() {
 	in=$1
@@ -30,14 +35,14 @@ save_load() {
 }
 
 # save to the named file in tmp, convert back to vips again, subtract, look
-# for max differernce less than a threshold
+# for max difference less than a threshold
 test_format() {
 	in=$1
 	format=$2
 	threshold=$3
 	mode=$4
 
-	echo -n "testing $format$mode ... "
+	echo -n "testing $in $format$mode ... "
 
 	save_load $in $format $mode
 
@@ -59,7 +64,7 @@ test_format() {
 test_rad() {
 	in=$1
 
-	echo -n "testing hdr ... "
+	echo -n "testing $in hdr ... "
 
 	save_load $in hdr
 
@@ -87,8 +92,18 @@ test_format $image tif 10 :jpeg,tile,pyramid
 test_format $image png 0
 test_format $image png 0 :9,1
 test_format $image jpg 10
-test_format $mono csv 0
 test_format $image ppm 0
+test_format $image pfm 0
+
+# csv can only do mono
+test_format $mono csv 0
+
+# cmyk jpg is a special path
+test_format $cmyk jpg 10
+test_format $cmyk tif 0
+test_format $cmyk tif 10 :jpeg
+test_format $cmyk tif 10 :jpeg,tile
+test_format $cmyk tif 10 :jpeg,tile,pyramid
 
 test_rad $rad 
 

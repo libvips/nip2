@@ -578,61 +578,6 @@ colour_transform from to in
  */
 colour_transform_to to in = colour_transform (get_type in) to in;
 
-/* Given a list of things, try to make them all the same size. Don't change
- * the format. Don't touch non-image things.
- */
-size_alike l
-	= map enlarge l
-{
-	max_width = foldr (test_prop has_width get_width) 0 l;
-	max_height = foldr (test_prop has_height get_height) 0 l;
-
-	test_prop has get x best
-		= best, !has x
-		= max_pair best (get x);
-
-	enlarge x
-		= embed 0 0 0 max_width max_height x, has_width x
-		= x;
-}
-
-/* Given a list of things, look for 1 band objects and bump them to to n -
- * band objects, where n is the maximum number of bands. Don't change the 
- * format. Don't touch non-image things.
- */
-bands_alike l
-	= map upband l
-{
-	max_bands = foldr (test_prop has_bands get_bands) 0 l;
-
-	test_prop has get x best
-		= best, !has x
-		= max_pair best (get x);
-
-	upband x
-		= bandjoin (replicate max_bands x),
-			has_bands x && get_bands x == 1
-		= x;
-}
-
-/* Given a list of things, try to match the formats. Don't touch non-image
- * objects.
- */
-formats_alike l
-	= map upformat l
-{
-	max_format = foldr (test_prop has_format get_format) Image_format.UCHAR l;
-
-	test_prop has get x best
-		= best, !has x
-		= max_pair best (get x);
-
-	upformat x
-		= clip2fmt max_format x,
-			has_format x 
-		= x;
-}
-
 /* String for path separator on this platform.
  */
 path_separator = expand "$SEP";

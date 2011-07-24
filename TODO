@@ -1,3 +1,19 @@
+- could remove the old histplot thing from conversion.c, no longer needed
+
+- ban parameters which are built-ins, eg. "im", "re" etc., you get nasty
+  crashes
+
+  see also notes below: a new parser could fix this
+
+- add a Image / Draw menu with flood / line / rect / circle
+
+- save a 1-bit 100,000 x 100,000 tif, we get the animated stopwatch but no
+  progress bar :(
+
+
+
+
+- image + complex constant would be nice
 
 - we can't define local superclasses at the moment
 
@@ -23,32 +39,12 @@
 - turn on GM in prefs, have to restart before _stdenv.def:magick sees the 
   change
 
-- image + complex constant would be nice
-
-- make a laplacian, pull out the centre horizontal, click plot object, argh
-
-- find a 1D hist, set element zero to zero
-
-  this is harder than it should be ... insert a 1x1 image removes the Plot
-  wrapper, change to matrix works, edit element zero to 0 works, change back
-  to Plot (or hist?) is not possible, you have to do 'plot object'
-
-- ban parameters which are built-ins, eg. "im", "re" etc., you get nasty
-  crashes
-
-  see also notes below: a new parser could fix this
-
-- add a Image / Draw menu with flood / line / rect / circle
-
 - try this:
 
 	Workspaces.untitled
 	has_member "A1" A1
 
   doesn't seem to work?
-
-- save a 1-bit 100,000 x 100,000 tif, we get the animated stopwatch but no
-  progress bar :(
 
 
 
@@ -163,6 +159,7 @@ sym-param found, argh: point.re
 - we have ws->window_width, can we use the one on Model now instead?
 
 
+
 - new inplace stuff needs a test suite
 
 - 'don't show this dialog again' on delete row dialog, also in prefs
@@ -209,8 +206,6 @@ sym-param found, argh: point.re
   	reverse image
 
   to swap the bands over? heh need to be able to override hd and tl
-
-- make a tiff pyram, try "nip2 fred.tif:1", it can't load it, how odd
 
 - Ackermann
 

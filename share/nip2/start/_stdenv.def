@@ -971,9 +971,11 @@ blend cond in1 in2
 	}
 }
 
+// do big first: we want to keep big's class, if possible
+// eg. big is a Plot, small is a 1x1 Image
 insert x y small big
-	= oo_binary_function insert_op small big, is_class small
 	= oo_binary'_function insert_op small big, is_class big
+	= oo_binary_function insert_op small big, is_class small
 	= im_insert big small (to_real x) (to_real y), 
 		is_image small && is_image big
 	= error (_ "bad arguments to " ++ "insert")

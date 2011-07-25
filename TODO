@@ -1,19 +1,36 @@
-- could remove the old histplot thing from conversion.c, no longer needed
+
+- try
+
+	nip2 wtc.jpg
+
+  can we get the main window to pop up earlier? when does the load happen in
+  the startup process?
+
+- add a Image / Draw menu with flood / line / rect / circle
+
+- save a 1-bit 100,000 x 100,000 tif, we get the animated stopwatch but no
+  progress bar :( very mysterious
+
+
+
+
+
+
+- image + complex constant would be nice
 
 - ban parameters which are built-ins, eg. "im", "re" etc., you get nasty
   crashes
 
   see also notes below: a new parser could fix this
 
-- add a Image / Draw menu with flood / line / rect / circle
+  can only ban for new code? do we have duff code in compat?
 
-- save a 1-bit 100,000 x 100,000 tif, we get the animated stopwatch but no
-  progress bar :(
+  argh yes there are at least 15 like this, fix them or fix the parser? also
+  need to disable this check for compat defs
 
+  better to fix the parser, it can't be that hard
 
-
-
-- image + complex constant would be nice
+  need to fix up the list comp compiler too, sigh
 
 - we can't define local superclasses at the moment
 
@@ -93,7 +110,7 @@
 		(x, y) = re;
 	}
 
-  it's the 'im' param, it stops (im pos) being bound to the
+  it's the 're' param, it stops x being bound to the
   get-real-part-of-complex builtin
 
   expands to

@@ -129,7 +129,8 @@ conversion_make_visualise( Conversion *conv, IMAGE *in )
 	IMAGE *out = im_open( "conversion_make_visualise", "p" );
 	int tconv = !(conv && conv->enabled && !conv->type);
 
-        /* Histogram type ... plot the histogram
+        /* Histogram type ... plot the histogram. Keep this old hist display
+	 * method in case the goffice plotter is not available.
          */
         if( tconv && in->Type == IM_TYPE_HISTOGRAM && 
 		(in->Xsize == 1 || in->Ysize == 1) ) {

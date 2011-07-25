@@ -22,6 +22,8 @@ started 7.25.0, 7/1/11
 - allow file modes in filenames, so "nip2 wtc_pyr.tif:2" works
 - show main window much sooner during workspace load and startup
 - better progress feedback
+- added Image / Select / Rectangle
+- added Image / Draw menu
 
 started 7.24.0, 30/11/10
 - bump for 7.24

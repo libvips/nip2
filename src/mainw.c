@@ -228,8 +228,6 @@ mainw_class_init( MainwClass *class )
 static void
 mainw_progress_begin( Progress *progress, Mainw *mainw )
 {
-	printf( "mainw_progress_begin: displaying progress box\n" );
-
 	mainw->cancel = FALSE;
         gtk_widget_show( mainw->progress_box );
 }
@@ -1296,7 +1294,7 @@ mainw_workspace_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 	Workspace *new_ws;
 	Mainw *new_mainw;
 
-        progress_begin();
+	progress_begin();
 
 	if( !(new_ws = workspace_clone( mainw->ws )) ) {
 		progress_end();

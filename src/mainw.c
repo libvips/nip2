@@ -228,6 +228,8 @@ mainw_class_init( MainwClass *class )
 static void
 mainw_progress_begin( Progress *progress, Mainw *mainw )
 {
+	printf( "mainw_progress_begin: displaying progress box\n" );
+
 	mainw->cancel = FALSE;
         gtk_widget_show( mainw->progress_box );
 }
@@ -904,12 +906,6 @@ mainw_open_workspace( Workspacegroup *wsg, const char *filename )
 	mainw = mainw_new( ws );
 	gtk_widget_show( GTK_WIDGET( mainw ) );
 	mainw_recent_add( &mainw_recent_workspace, filename );
-
-	/* Process some events to make sure we rethink the layout and
-	 * are able to get the append-at-RHS offsets.
-	 */
-	while( g_main_context_iteration( NULL, FALSE ) )
-		;
 
 	symbol_recalculate_all();
 

@@ -1,16 +1,5 @@
 
-- close mainw during initial recomp can trigger a crash
-
-
-
-- save a 1-bit 100,000 x 100,000 tif, we get the animated stopwatch but no
-  progress bar :( very mysterious
-
 - add a Image / Draw menu with flood / line / rect / circle
-
-
-
-
 
 
 - image + complex constant would be nice

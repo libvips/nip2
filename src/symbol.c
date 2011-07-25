@@ -549,17 +549,15 @@ symbol_dispose( GObject *gobject )
 	if( compile && compile->last_sym == sym )
 		compile->last_sym = NULL;
 
-	/* Note the impending destruction of this symbol. It's a state
-	 * change, take off the leaf set if it's there.
-	 */
-	symbol_state_change( sym );
-
 	/* Clear state.
 	 */
 	if( is_top( sym ) ) {
 		/* All stuff that depends on this sym is now dirty.
 		 */
 		symbol_dirty_intrans( sym, link_serial_new() );
+
+		/* This will knock this sym off the leaf set as well.
+		 */
 		symbol_dirty_clear( sym );
 	}
 

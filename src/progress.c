@@ -28,8 +28,8 @@
  */
 
 /*
-#define DEBUG
 #define DEBUG_MEMUSE
+#define DEBUG
  */
 
 #include "ip.h"
@@ -85,9 +85,14 @@ progress_update( Progress *progress )
 	/* Don't show the process and cancel button for a bit.
 	 */
 	if( progress->count ) {
+		double elapsed = g_timer_elapsed( progress->busy_timer, NULL );
+
 		if( !progress->busy && 
-			g_timer_elapsed( progress->busy_timer, NULL ) > 
-			progress_busy_delay ) {
+			elapsed > progress_busy_delay ) {
+#ifdef DEBUG
+			printf( "progress_update: displaying progress bar\n" );
+#endif /*DEBUG*/
+
 			g_signal_emit( G_OBJECT( progress ), 
 				progress_signals[SIG_BEGIN], 0 );
 			progress->busy = TRUE;
@@ -100,6 +105,10 @@ progress_update( Progress *progress )
 	if( g_timer_elapsed( progress->update_timer, NULL ) > 
 		progress_update_interval ) {
 		gboolean cancel;
+
+#ifdef DEBUG
+		printf( "progress_update:\n" );
+#endif /*DEBUG*/
 
 		g_timer_start( progress->update_timer );
 
@@ -118,15 +127,11 @@ progress_update( Progress *progress )
 		if( cancel )
 			progress->cancel = TRUE;
 
-		/* Mysteriously this can sometimes get stuck, eg. if you drag
-		 * multiple workspaces to the main window.
-
-			while( g_main_context_iteration( NULL, FALSE ) )
-				;
-
-		 * Just run once.
+		/* Rather dangerous, but we need this to give nice updates
+		 * for the feedback thing.
 		 */
-		g_main_context_iteration( NULL, FALSE );
+		while( g_main_context_iteration( NULL, FALSE ) )
+			;
 
 #ifdef DEBUG_MEMUSE
 		printf( "progress_update:\n" );

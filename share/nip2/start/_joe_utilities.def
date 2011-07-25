@@ -438,7 +438,7 @@ select_ellipse line width = mask
 
 	//Adjust the values to center tham on (line.left, line.top)
 	im_cent = im_coor - Vector [line.left,line.top];
-		
+
 	w = line.width;
 	h = line.height;
 		

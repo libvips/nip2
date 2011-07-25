@@ -1181,6 +1181,118 @@ Image_insert_item = class
 
 Image_select_item = Select_item;
 
+Image_draw_item = class 
+	Menupullright "_Draw" "draw lines, circles, rectangles, floods" {
+	Line_item = class Menuaction "_Line" "draw line on image" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			x1 = Expression "Start x" 0;
+			y1 = Expression "Start y" 0;
+			x2 = Expression "End x" 100;
+			y2 = Expression "End y" 100;
+
+			ink = Expression "Ink" [0];
+
+			_result 
+				= map_unary line x
+			{
+				line im 
+					= draw_line x1.expr y1.expr x2.expr y2.expr ink.expr im;
+			}
+		}
+	}
+
+	Rect_item = class Menuaction "_Rectangle" "draw rectangle on image" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			left = Expression "Left" 50;
+			top = Expression "Top" 50;
+			width = Expression "Width" 100;
+			height = Expression "Height" 100;
+
+			fill = Toggle "Fill" true;
+
+			ink = Expression "Ink" [0];
+
+			_result 
+				= map_unary rect x
+			{
+				rect im 
+					= draw_rect left.expr top.expr width.expr height.expr
+							fill.value ink.expr im;
+			}
+		}
+	}
+
+	Circle_item = class Menuaction "_Circle" "draw circle on image" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			cx = Expression "Centre x" 100;
+			cy = Expression "Centre y" 100;
+			r = Expression "Radius" 50;
+
+			fill = Toggle "Fill" true;
+
+			ink = Expression "Ink" [0];
+
+			_result 
+				= map_unary circle x
+			{
+				circle im 
+					= draw_circle cx.expr cy.expr r.expr 
+						fill.value ink.expr im;
+			}
+		}
+	}
+
+	Flood_item = class Menuaction "_Flood" 
+		"flood bounded area of image" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			startx = Expression "Start x" 100;
+			starty = Expression "Start y" 100;
+
+			edge = Option "Flood while" [
+				"Not equal to ink",
+				"Equal to start point"
+			] 0;
+
+			// pick a default ink that won't flood, if we can
+			ink 
+				= Expression "Ink" default_ink
+			{
+				default_ink
+					= [0], ! has_image x
+					= pixel;
+				pixel = map mean (bandsplit (extract_area left top 1 1 im));
+				left = startx.expr;
+				top = starty.expr;
+				im = get_image x;
+			}
+
+			_result 
+				= map_unary flood x
+			{
+				flood im 
+					= draw_flood left top ink.expr im, edge == 0
+					= draw_flood_blob left top ink.expr im
+				{
+					left = startx.expr;
+					top = starty.expr;
+				}
+			}
+		}
+	}
+}
+
 Image_join_item = class 
 	Menupullright "_Join" "join two or more images together" {
 	Bandwise_item = class

@@ -1674,13 +1674,52 @@ icc_ac2rc profile in
 		Operator_type.COMPOUND_REWRAP false;
 }
 
-flood_blob x y v image
-	= oo_unary_function flood_blob_op image, is_class image
-	= im_flood_blob_copy image (to_real x) (to_real y) v, is_image image
-	= error (_ "bad arguments to " ++ "flood_blob")
+draw_flood_blob x y ink image
+	= oo_unary_function draw_flood_blob_op image, is_class image
+	= im_draw_flood_blob image (to_real x) (to_real y) ink, is_image image
+	= error (_ "bad arguments to " ++ "draw_flood_blob")
 {
-	flood_blob_op = Operator "flood_blob" 
-		(flood_blob x y v) Operator_type.COMPOUND_REWRAP false;
+	draw_flood_blob_op = Operator "draw_flood_blob" 
+		(draw_flood_blob x y ink) Operator_type.COMPOUND_REWRAP false;
+}
+
+draw_flood x y ink image
+	= oo_unary_function draw_flood_op image, is_class image
+	= im_draw_flood image (to_real x) (to_real y) ink, is_image image
+	= error (_ "bad arguments to " ++ "draw_flood")
+{
+	draw_flood_op = Operator "draw_flood" 
+		(draw_flood x y ink) Operator_type.COMPOUND_REWRAP false;
+}
+
+draw_rect x y w h f ink image
+	= oo_unary_function draw_rect_op image, is_class image
+	= im_draw_rect image (to_real x) (to_real y) 
+		(to_real w) (to_real h) (to_real f) ink, is_image image
+	= error (_ "bad arguments to " ++ "draw_rect")
+{
+	draw_rect_op = Operator "draw_rect" 
+		(draw_rect x y w h f ink) Operator_type.COMPOUND_REWRAP false;
+}
+
+draw_circle x y r f ink image
+	= oo_unary_function draw_circle_op image, is_class image
+	= im_draw_circle image (to_real x) (to_real y) 
+		(to_real r) (to_real f) ink, is_image image
+	= error (_ "bad arguments to " ++ "draw_circle")
+{
+	draw_circle_op = Operator "draw_circle" 
+		(draw_circle x y r f ink) Operator_type.COMPOUND_REWRAP false;
+}
+
+draw_line x1 y1 x2 y2 ink image
+	= oo_unary_function draw_line_op image, is_class image
+	= im_draw_line image (to_real x1) (to_real y1) 
+		(to_real x2) (to_real y2) ink, is_image image
+	= error (_ "bad arguments to " ++ "draw_line")
+{
+	draw_line_op = Operator "draw_line" 
+		(draw_line x1 y1 x2 y2 ink) Operator_type.COMPOUND_REWRAP false;
 }
 
 print_base base in

@@ -217,17 +217,47 @@ Select_item = class
 	 	"Selection White",
 	 	"Background Black",
 	 	"Background White",
-		"Mask" ] 4;
-
+		"Mask" 
+	] 4;
 
 	control_selection mask im no
-		= (if mask then im * 1.2 else im * 1), no == 0
-		= (if mask then im * 0.8 else im * 1), no == 1
-		= (if mask then 0 else im), no == 2
-		= (if mask then 255 else im), no == 3
-		= (if mask then im else 0), no == 4
-		= (if mask then im else 255), no == 5
-		= mask;
+		= [
+			if mask then im * 1.2 else im * 1,
+			if mask then im * 0.8 else im * 1,
+			if mask then 0 else im,
+			if mask then 255 else im,
+			if mask then im else 0,
+			if mask then im else 255,
+			mask
+		]?no;
+
+	Rectangle = class
+		Menuaction "_Rectangle"
+			"use line/arrow/rect x to define a rectangle"
+		{
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			control = _control;
+
+			_result = control_selection mask im control
+  				{
+				mask = select_rect x;
+				im = get_image x;
+				select_rect x
+					= Image mask
+				{
+					im = Image (get_image x);
+					imc = make_xy im.width im.height;	
+					mask = imc?0 >= x.nleft & 
+							imc?0 < x.nright & 
+							imc?1 >= x.ntop & 
+							imc?1 < x.nbottom;
+				}
+				}
+			}
+		}
 
 	Elipse = class
 		Menuaction "_Ellipse"

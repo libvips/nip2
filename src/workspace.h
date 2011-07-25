@@ -169,6 +169,7 @@ Column *workspace_column_pick( Workspace *ws );
 void workspace_column_select( Workspace *ws, Column *col );
 
 Symbol *workspace_add_def( Workspace *ws, const char *str );
+Symbol *workspace_add_def_recalc( Workspace *ws, const char *str );
 gboolean workspace_load_file_buf( VipsBuf *buf, const char *filename );
 Symbol *workspace_load_file( Workspace *ws, const char *filename );
 

@@ -467,7 +467,7 @@ main_load( Workspace *ws, const char *filename )
 
 	/* Try as matrix or image. Have to do these via definitions.
 	 */
-	if( workspace_load_file( ws, filename ) )
+	if( workspace_load_file( ws, filename ) ) 
 		return( TRUE );
 
 	error_clear();
@@ -1428,8 +1428,6 @@ main( int argc, char *argv[] )
 				main_log_add( "%s\n", error_get_sub() );
 	}
 
-	symbol_recalculate_all_force( TRUE );
-
 	/* Make sure our start ws doesn't have modified set. We may have
 	 * loaded some images or whatever into it.
 	 */
@@ -1497,6 +1495,10 @@ _( "A new directory has been created to hold startup, "
 		/* Through startup.
 		 */
 		main_starting = FALSE;
+
+		/* Make sure we have a recalc queued.
+		 */
+		symbol_recalculate_all_force( FALSE );
 
 		gtk_main();
 	}

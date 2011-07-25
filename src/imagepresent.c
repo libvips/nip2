@@ -1115,7 +1115,7 @@ imagepresent_left_release( Imagepresent *ip, GdkEvent *ev, int x, int y )
 
 			DESTROY_GTK( ip->regionview );
 
-			if( !(sym = workspace_add_def( row->ws, 
+			if( !(sym = workspace_add_def_recalc( row->ws, 
 				vips_buf_all( &buf ) )) ) 
 				iwindow_alert( GTK_WIDGET( ip ), 
 					GTK_MESSAGE_ERROR );

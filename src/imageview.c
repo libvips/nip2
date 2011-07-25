@@ -273,7 +273,7 @@ imageview_new_arrow2_action_cb( GtkAction *action, Imageview *iv )
 		g_assert( FALSE );
 	}
 
-	if( !(sym = workspace_add_def( ws, vips_buf_all( &buf ) )) ) {
+	if( !(sym = workspace_add_def_recalc( ws, vips_buf_all( &buf ) )) ) {
 		iwindow_alert( GTK_WIDGET( iv ), GTK_MESSAGE_ERROR );
 		return;
 	}
@@ -308,7 +308,7 @@ imageview_new_arrow4_action_cb( GtkAction *action, Imageview *iv )
 	vips_buf_appendf( &buf, " (%d) (%d) %d %d", 
 		ir.left, ir.top, ir.width, ir.height );
 
-	if( !(sym = workspace_add_def( ws, vips_buf_all( &buf ) )) ) {
+	if( !(sym = workspace_add_def_recalc( ws, vips_buf_all( &buf ) )) ) {
 		iwindow_alert( GTK_WIDGET( iv ), GTK_MESSAGE_ERROR );
 		return;
 	}

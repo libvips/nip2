@@ -468,6 +468,25 @@ workspace_add_def( Workspace *ws, const char *str )
 	symbol_made( sym );
 	filemodel_set_modified( FILEMODEL( ws ), TRUE );
 
+	return( sym );
+}
+
+/* Make up a new definition, recalc and scroll to make it visible. 
+ */
+Symbol *
+workspace_add_def_recalc( Workspace *ws, const char *str )
+{
+	Column *col = workspace_column_pick( ws );
+
+	Symbol *sym;
+
+#ifdef DEBUG
+	printf( "workspace_add_def_recalc: %s\n", str );
+#endif /*DEBUG*/
+
+	if( !(sym = workspace_add_def( ws, str )) )
+		return( NULL );
+
 	if( symbol_recalculate_check( sym ) ) {
 		/* Eval error.
 		 */
@@ -501,6 +520,9 @@ workspace_load_file_buf( VipsBuf *buf, const char *filename )
 	return( TRUE );
 }
 
+/* Load a matrix or image. Don't recalc: you need to recalc later to test for
+ * success/fail. See eg. workspace_add_def_recalc()
+ */
 Symbol *
 workspace_load_file( Workspace *ws, const char *filename )
 {
@@ -1684,7 +1706,7 @@ workspace_add_action( Workspace *ws,
 			return( FALSE );
 		}
 
-		if( !workspace_add_def( ws, vips_buf_all( &buf ) ) ) 
+		if( !workspace_add_def_recalc( ws, vips_buf_all( &buf ) ) ) 
 			return( FALSE );
 		workspace_deselect_all( ws );
 	}
@@ -1693,7 +1715,7 @@ workspace_add_action( Workspace *ws,
 		 * arguments. 
 		 */
 		if( !column_add_n_names( col, name, &buf, nparam ) || 
-			!workspace_add_def( ws, vips_buf_all( &buf ) ) ) 
+			!workspace_add_def_recalc( ws, vips_buf_all( &buf ) ) ) 
 			return( FALSE );
 	}
 
@@ -1886,7 +1908,7 @@ workspace_ungroup_add_index( Row *row, const char *fmt, int i )
 	vips_buf_rewind( &buf );
 	row_qualified_name( row, &buf );
 	vips_buf_appendf( &buf, fmt, i );
-	if( !workspace_add_def( row->ws, vips_buf_all( &buf ) ) )
+	if( !workspace_add_def_recalc( row->ws, vips_buf_all( &buf ) ) )
 		return( FALSE );
 
 	return( TRUE );

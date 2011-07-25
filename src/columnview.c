@@ -667,7 +667,7 @@ columnview_text_enter_cb( GtkWidget *wid, Columnview *cview )
         if( !text || strspn( text, WHITESPACE ) == strlen( text ) )
 		return;
 
-	if( !(sym = workspace_add_def( ws, text )) ) {
+	if( !(sym = workspace_add_def_recalc( ws, text )) ) {
 		iwindow_alert( wid, GTK_MESSAGE_ERROR );
 		symbol_recalculate_all();
 		return;

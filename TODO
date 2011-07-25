@@ -1,15 +1,12 @@
 
-- try
+- close mainw during initial recomp can trigger a crash
 
-	nip2 wtc.jpg
 
-  can we get the main window to pop up earlier? when does the load happen in
-  the startup process?
-
-- add a Image / Draw menu with flood / line / rect / circle
 
 - save a 1-bit 100,000 x 100,000 tif, we get the animated stopwatch but no
   progress bar :( very mysterious
+
+- add a Image / Draw menu with flood / line / rect / circle
 
 
 

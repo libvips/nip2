@@ -727,7 +727,7 @@ mainw_group_action_cb( GtkAction *action, Mainw *mainw )
 	vips_buf_appends( &buf, "Group [" );
 	workspace_selected_names( ws, &buf, "," );
 	vips_buf_appends( &buf, "]" );
-	if( !workspace_add_def( ws, vips_buf_all( &buf ) ) ) {
+	if( !workspace_add_def_recalc( ws, vips_buf_all( &buf ) ) ) {
 		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
 		return;
 	}
@@ -1023,7 +1023,8 @@ mainw_open_done_cb( iWindow *iwnd, void *client,
 		else
 			vips_buf_appends( &buf2, vips_buf_all( &buf ) );
 
-		if( !workspace_add_def( mainw->ws, vips_buf_all( &buf2 ) ) ) {
+		if( !workspace_add_def_recalc( mainw->ws, 
+			vips_buf_all( &buf2 ) ) ) {
 			error_top( _( "Load failed." ) );
 			error_sub( _( "Unable to execute:\n   %s" ), 
 				vips_buf_all( &buf2 ) );
@@ -2234,9 +2235,7 @@ mainw_new( Workspace *ws )
 {
 	Mainw *mainw;
 
-	/* We must have calced before we build the view so we get menus etc.
-	 */
-	symbol_recalculate_all_force( TRUE );
+	symbol_recalculate_all_force( FALSE );
 
 	mainw = MAINW( g_object_new( TYPE_MAINW, NULL ) );
 	mainw_link( mainw, ws );

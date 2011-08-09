@@ -1,7 +1,23 @@
+- the windows setup .exe install a bazillion .png icons we will never use,
+  then installs them all again as .svg, which we will certainly never use
+
+- many of the examples open in compat mode
+
+
+
+- add extract_volume, cf. "grid"
+
+  record tile_size in meta somewhere? grid could set it, save a parameter off
+  extract_volume
+
+  also extract_sequence to get volume over time
 
 
 
 - image + complex constant would be nice
+
+
+
 
 - ban parameters which are built-ins, eg. "im", "re" etc., you get nasty
   crashes
@@ -16,6 +32,11 @@
   better to fix the parser, it can't be that hard
 
   need to fix up the list comp compiler too, sigh
+
+
+
+
+
 
 - we can't define local superclasses at the moment
 
@@ -33,7 +54,7 @@
 
   you can't do (Fred.Jennie 12) since Jim will have a secret 'this' param
   (because it is a class member) and superclass constructors can't have
-  secrets.
+  secrets
 
   don't automatically give all members 'this' as a secret, check that they
   make references to other class members that do need secrets first 

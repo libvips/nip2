@@ -1,8 +1,6 @@
 - the windows setup .exe install a bazillion .png icons we will never use,
   then installs them all again as .svg, which we will certainly never use
 
-- many of the examples open in compat mode
-
 
 
 - add extract_volume, cf. "grid"

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.18.0">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.26.0">
   <Workspace filename="clone/clone.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1019" window_height="625" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="clone" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="4" name="A" caption="Images">
       <Subcolumn vislevel="3">

@@ -15,15 +15,17 @@ for tile in 10 64 128 512; do
 	vips --vips-concurrency=1 \
 		--vips-tile-width=$tile --vips-tile-height=$tile \
 		im_benchmarkn $tmp/t3.v $tmp/t4.v $chain
+	vips im_LabQ2Lab $tmp/t4.v $tmp/t5.v 
 
 	for cpus in 2 3 4 5 6 7 8 99 1024; do
-		echo trying cpus = $cpus, tile = $tile ..
+		echo trying cpus = $cpus, tile = $tile ...
 		vips --vips-concurrency=$cpus \
 			--vips-tile-width=$tile --vips-tile-height=$tile \
-			im_benchmarkn $tmp/t3.v $tmp/t5.v $chain
-		vips im_subtract $tmp/t4.v $tmp/t5.v $tmp/t6.v
-		vips im_abs $tmp/t6.v $tmp/t7.v
-		max=`vips im_max $tmp/t7.v`
+			im_benchmarkn $tmp/t3.v $tmp/t6.v $chain
+		vips im_LabQ2Lab $tmp/t6.v $tmp/t7.v 
+		vips im_subtract $tmp/t5.v $tmp/t7.v $tmp/t8.v
+		vips im_abs $tmp/t8.v $tmp/t9.v
+		max=`vips im_max $tmp/t9.v`
 		if [[ $max > 0 ]]; then
 			break
 		fi

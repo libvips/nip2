@@ -31,5 +31,5 @@ src/parse.h
 stamp-h1
 test/test_all.sh
 ylwrap
-
-
+doc/html
+doc/pdf

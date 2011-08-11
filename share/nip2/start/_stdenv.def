@@ -2225,17 +2225,23 @@ point a b
 }
 
 /* Generate an ImageMagick (or GraphicsMagick) command suitable for 
- * im_system_image.
+ * im_system_image. Use convert.exe in $VIPSHOME/bin, if it exists, otherwise
+ * assume it's on the path somewhere.
  */
 magick_command switch 
-	= join_sep " " [convert, "%s", switch, "%s"]
+	= join_sep " " [convert, "\"%s\"", switch, "\"%s\""]
 {
 	prefs = Workspaces.Preferences;
 	use_gm = prefs.USE_GRAPHICSMAGICK;
+	name = if use_gm then "gm" else "convert";
+	exe = concat [name, expand "$EXEEXT"];
+	vipsexe = path_absolute [expand "$VIPSHOME", "bin", exe];
+	final_exe 
+		= vipsexe, search vipsexe != []
+		= exe;
 	convert	
-		= join_sep " " [concat ["gm", expand "$EXEEXT"], "convert"],
-			use_gm
-		= concat ["convert", expand "$EXEEXT"];
+		= join_sep " " [final_exe, "convert"], use_gm
+		= final_exe;
 }
 
 /* Run a command on an image. See magick_command, for example.

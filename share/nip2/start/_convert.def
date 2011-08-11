@@ -595,7 +595,7 @@ path_relative l = join_sep path_separator l;
  */
 path_absolute l
 	= path_relative l,
-		len l?0 == 2 && is_letter l?0?0 && l?0?1 == ':'
+		len l?0 > 1 && is_letter l?0?0 && l?0?1 == ':'
 	= path_separator ++ path_relative l;
 
 /* Parse a pathname.

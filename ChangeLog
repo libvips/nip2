@@ -1,6 +1,10 @@
 started 7.26.2, 10/8/11
 - update threading test for fixed benchmark
 - fix blocking in progress update (thanks M. v. Gulik)
+- search returns empty list for file not found rather than throwing an
+  exception
+- magick_command tries to use $VIPSHOME/bin/convert.exe, if it exists
+- magick_command tries quotes filenames
 
 started 7.26.1, 28/7/11
 - much better threading test, based on im_benchmarkn()

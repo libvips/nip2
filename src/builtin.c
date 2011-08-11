@@ -521,7 +521,9 @@ apply_search_call( Reduce *rc, const char *name, HeapNode **arg, PElement *out )
 	(void) reduce_get_string( rc, &rhs, buf, MAX_STRSIZE );
 
 	if( !(fn = path_find_file( PATH_SEARCH, buf )) )
-		reduce_throw( rc );
+		/* If not found, return [].
+		 */
+		fn = im_strdup( NULL, "" );
 
 	if( !heap_managedstring_new( rc->heap, fn, out ) ) {
 		IM_FREE( fn );

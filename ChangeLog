@@ -1,5 +1,6 @@
-started 7.26.1, 10/8/11
+started 7.26.2, 10/8/11
 - update threading test for fixed benchmark
+- fix blocking in progress update (thanks M. v. Gulik)
 
 started 7.26.1, 28/7/11
 - much better threading test, based on im_benchmarkn()

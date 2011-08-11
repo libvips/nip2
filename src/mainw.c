@@ -1238,8 +1238,7 @@ mainw_workspace_merge_fn( Filesel *filesel,
 	/* Process some events to make sure we rethink the layout and
 	 * are able to get the append-at-RHS offsets.
 	 */
-	while( g_main_context_iteration( NULL, FALSE ) )
-		;
+	process_events();
 
 	symbol_recalculate_all();
 	mainw_recent_add( &mainw_recent_workspace, filename );

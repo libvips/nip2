@@ -155,3 +155,5 @@ void text_view_select_text( GtkTextView *text_view, int start, int end );
 typedef void (*DestroyFn)( GObject * );
 void destroy_if_destroyed( GObject *child, GObject *parent, 
 	DestroyFn destroy_fn );
+
+void process_events( void );

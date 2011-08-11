@@ -130,8 +130,7 @@ progress_update( Progress *progress )
 		/* Rather dangerous, but we need this to give nice updates
 		 * for the feedback thing.
 		 */
-		while( g_main_context_iteration( NULL, FALSE ) )
-			;
+		process_events();
 
 #ifdef DEBUG_MEMUSE
 		printf( "progress_update:\n" );

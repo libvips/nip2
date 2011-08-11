@@ -1248,3 +1248,35 @@ destroy_if_destroyed( GObject *child, GObject *parent, DestroyFn destroy_fn )
 	g_object_weak_ref( child, 
 		(GWeakNotify) destroy_if_destroyed_child_cb, difd );
 }
+
+/* A 'safe' way to run a few events.
+ */
+void
+process_events( void )
+{
+	/* Max events we process before signalling a timeout. Without this we
+	 * can get stuck in event loops in some circumstances.
+	 */
+	static const int max_events = 100;
+
+	/* Block too much recursion. 0 is from the top-level, 1 is from a
+	 * callback, we don't want any more than that.
+	 */
+	if( g_main_depth() < 2 ) {
+		int n;
+
+#ifdef DEBUG
+		printf( "progress_update: starting event dispatch\n" );
+#endif /*DEBUG*/
+
+		for( n = 0; n < max_events && 
+			g_main_context_iteration( NULL, FALSE ); n++ )
+			;
+
+#ifdef DEBUG
+		printf( "progress_update: event dispatch done\n" );
+		if( n == max_events )
+			printf( "progress_update: event dispatch timeout\n" );
+#endif /*DEBUG*/
+	}
+}

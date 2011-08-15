@@ -1,5 +1,6 @@
 started 7.26.3, 15/8/11
 - tidier cancel messages
+- disable dump.c debug
 
 started 7.26.2, 10/8/11
 - update threading test for fixed benchmark

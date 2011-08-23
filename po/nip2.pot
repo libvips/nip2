@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-08-11 17:10+0100\n"
+"POT-Creation-Date: 2011-08-19 17:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1270,48 +1270,44 @@ msgstr ""
 msgid "Image save took %g seconds."
 msgstr ""
 
-#: src/imageinfo.c:676
-msgid "User cancelled operation"
-msgstr ""
-
-#: src/imageinfo.c:976
+#: src/imageinfo.c:974
 msgid "Unable to open image."
 msgstr ""
 
-#: src/imageinfo.c:977
+#: src/imageinfo.c:975
 #, c-format
 msgid "Unable to open file \"%s\" as image."
 msgstr ""
 
-#: src/imageinfo.c:1105
+#: src/imageinfo.c:1103
 msgid "Unable to write to file."
 msgstr ""
 
-#: src/imageinfo.c:1106
+#: src/imageinfo.c:1104
 #, c-format
 msgid "Error writing image to file \"%s\"."
 msgstr ""
 
-#: src/imageinfo.c:1122
+#: src/imageinfo.c:1120
 msgid "Unable to paint on image."
 msgstr ""
 
-#: src/imageinfo.c:1123
+#: src/imageinfo.c:1121
 #, c-format
 msgid ""
 "Unable to get write permission for file \"%s\".\n"
 "Check permission settings."
 msgstr ""
 
-#: src/imageinfo.c:1167
+#: src/imageinfo.c:1165
 msgid "Modify"
 msgstr ""
 
-#: src/imageinfo.c:1168
+#: src/imageinfo.c:1166
 msgid "Modify disc file?"
 msgstr ""
 
-#: src/imageinfo.c:1169
+#: src/imageinfo.c:1167
 #, c-format
 msgid ""
 "This image is being shown directly from the disc file:\n"
@@ -1322,11 +1318,11 @@ msgid ""
 "wrong, you may lose work. Are you sure you want to modify this file?"
 msgstr ""
 
-#: src/imageinfo.c:1771
+#: src/imageinfo.c:1769
 msgid "Unable to paint text."
 msgstr ""
 
-#: src/imageinfo.c:1772
+#: src/imageinfo.c:1770
 #, c-format
 msgid "Unable to paint text \"%s\" in font \"%s\"."
 msgstr ""

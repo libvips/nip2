@@ -230,10 +230,10 @@ main_print_main( Symbol *sym )
 	PElement *root;
 
 	root = &sym->expr->root;
-	if( symbol_recalculate_check( sym ) || 
+	if( symbol_recalculate_check( sym ) ||
 		!reduce_pelement( reduce_context, reduce_spine_strict, root ) ) 
 		main_error_exit( _( "error calculating \"%s\"" ), 
-			symbol_name( sym ) );
+			symbol_name_scope( sym ) );
 
 	if( main_option_output ) {
 		char filename[FILENAME_MAX];
@@ -241,7 +241,7 @@ main_print_main( Symbol *sym )
 		im_strncpy( filename, main_option_output, FILENAME_MAX );
 		if( !group_save_item( root, filename ) )
 			main_error_exit( _( "error saving \"%s\"" ), 
-				symbol_name( sym ) );
+				symbol_name_scope( sym ) );
 	}
 
 	if( main_option_print_main )

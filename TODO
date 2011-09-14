@@ -1,5 +1,24 @@
+- add matrix sort by row / col
+
+- insert row/col should have an option to add a value or a series
+
+- Draw / Rectangle has fields called with/height ... messes up any downstream
+  stuff which tried to get these fields out of an image, argh
+
+- why is Segment in Morphology? wouldn't Select be a better place?
+
+- find hist should work on a uint image (eg. result of segment)
+
+- "save as bitmap" would be handy in chart view, see gnumeric
+
+- to_matrix does not work on Group
+
 - the windows setup .exe install a bazillion .png icons we will never use,
   then installs them all again as .svg, which we will certainly never use
+
+- toolkit browser for program window would be nice
+
+  or maybe add an option to the tk browser to let it show all symbols?
 
 
 

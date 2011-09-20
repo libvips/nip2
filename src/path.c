@@ -138,7 +138,7 @@ typedef struct _Search {
 	/* Pattern we search for, and it's compiled form. This does not
 	 * include any directory components. 
 	 */
-	const char *basename;
+	char *basename;
 	GPatternSpec *wild;
 
 	/* Directory offset. If the original pattern is a relative path, eg.
@@ -161,8 +161,8 @@ typedef struct _Search {
 static void
 path_search_free( Search *search )
 {
-	IM_FREE( search->basename );
-	IM_FREE( search->dirname );
+	IM_FREEF( g_free, search->basename );
+	IM_FREEF( g_free, search->dirname );
 	IM_FREEF( slist_free_all, search->previous );
 	IM_FREEF( g_pattern_spec_free, search->wild );
 }

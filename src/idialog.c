@@ -45,9 +45,9 @@ typedef struct {
 static void *
 okbutton_free( OKButton *ok )
 {
-	IM_FREE( ok->label );
+	IM_FREEF( g_free, ok->label );
 	ok->done_cb = NULL;
-	IM_FREE( ok );
+	IM_FREEF( g_free, ok );
 
 	return( NULL );
 }

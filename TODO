@@ -1,3 +1,5 @@
+- call_vargv_free() seems to have a im_free()/g_free() mixup for CALL_STRING
+
 - add matrix sort by row / col
 
 - insert row/col should have an option to add a value or a series

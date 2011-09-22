@@ -324,12 +324,49 @@ about_build( iDialog *idlg, GtkWidget *work )
 	escape_markup( NN( g_getenv( "SAVEDIR" ) ), txt2, MAX_DIALOG_TEXT );
 	vips_buf_appendf( &buf, "<b>$SAVEDIR:</b> %s\n", txt2 );
 	escape_markup( PATH_TMP, txt2, MAX_DIALOG_TEXT );
-	vips_buf_appendf( &buf, "<b>%s:</b> %s", 
+	vips_buf_appendf( &buf, "<b>%s:</b> %s\n", 
 		_( "Temp files in" ), txt2 );
 	if( strcmp( translator_credits, "translator_credits" ) != 0 ) {
 		vips_buf_appendf( &buf, "\n" ); 
 		vips_buf_appends( &buf, translator_credits );
 	}
+
+	vips_buf_appendf( &buf, "\n" ); 
+
+	mainw_find_disc( &buf );
+	/* Expands to (eg.) "14GB free in /pics/tmp" */
+        vips_buf_appendf( &buf, _( " in \"%s\"" ), PATH_TMP );
+        vips_buf_appends( &buf, "\n" );
+
+        vips_buf_appendf( &buf, 
+		_( "%d cells in heap, %d cells free, %d cells maximum" ),
+                reduce_context->heap->ncells, 
+		reduce_context->heap->nfree, 
+		reduce_context->heap->max_fn( reduce_context->heap ) );
+        vips_buf_appends( &buf, "\n" );
+
+        vips_buf_appendf( &buf, _( "%d vips calls cached by nip2" ), 
+		cache_history_size );
+        vips_buf_appends( &buf, "\n" );
+
+        vips_buf_appendf( &buf, _( "%d vips operations cached by libvips" ), 
+		vips_cache_get_size() );
+        vips_buf_appends( &buf, "\n" );
+
+        vips_buf_appendf( &buf, _( "using %d threads" ), im_concurrency_get() );
+        vips_buf_appends( &buf, "\n" );
+
+        vips_buf_appendf( &buf, _( "%d pixel buffers in vips" ), 
+		vips_tracked_get_allocs() );
+        vips_buf_appends( &buf, "\n" );
+
+	to_size( &buf, vips_tracked_get_mem() );
+        vips_buf_appendf( &buf, _( " of ram in pixel buffers" ) ); 
+        vips_buf_appends( &buf, "\n" );
+
+	to_size( &buf, vips_tracked_get_mem_highwater() );
+        vips_buf_appendf( &buf, _( " of ram highwater mark" ) ); 
+        vips_buf_appends( &buf, "\n" );
 
 	hb = gtk_hbox_new( FALSE, 0 );
 	gtk_container_border_width( GTK_CONTAINER( hb ), 10 );

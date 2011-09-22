@@ -132,12 +132,13 @@ void mainw_recent_add( GSList **recent, const char *filename );
 int mainw_number( void );
 Mainw *mainw_pick_one( void );
 GType mainw_get_type( void );
+
+void mainw_find_disc( VipsBuf *buf );
+void mainw_find_heap( VipsBuf *buf, Heap *heap );
+
 void mainw_homepage_action_cb( GtkAction *action, iWindow *iwnd );
 void mainw_about_action_cb( GtkAction *action, iWindow *iwnd );
 void mainw_guide_action_cb( GtkAction *action, iWindow *iwnd );
 Workspace *mainw_open_file_into_workspace( Mainw *mainw, const char *filename );
 Mainw *mainw_new( Workspace *ws );
 
-void busy_progress( int percent, int eta );
-void busy_begin( void );
-void busy_end( void );

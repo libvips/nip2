@@ -341,7 +341,7 @@ mainw_workspace_destroy_cb( Workspace *ws, Mainw *mainw )
 	iwindow_kill( IWINDOW( mainw ) );
 }
 
-static void
+void
 mainw_find_disc( VipsBuf *buf )
 {
 	double sz = find_space( PATH_TMP );
@@ -357,7 +357,7 @@ mainw_find_disc( VipsBuf *buf )
 	}
 }
 
-static void
+void
 mainw_find_heap( VipsBuf *buf, Heap *heap )
 {
 	/* How much we can still expand the heap by ... this 

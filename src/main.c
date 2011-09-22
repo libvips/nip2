@@ -357,6 +357,7 @@ main_quit( void )
 	 */
 	UNREF( main_imageinfogroup );
 	heap_check_all_destroyed();
+	vips_cache_drop_all();
 	im__print_all();
 	managed_check_all_destroyed();
 	util_check_all_destroyed();

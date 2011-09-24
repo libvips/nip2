@@ -56,23 +56,14 @@
 #define DEBUG_TIME
  */
 
-/* On quit, make sure we free stuff we can free. Define PROFILE too to get
- * glib's mem use profiler. But it's broken on windows and will cause strange
- * problems, careful.
+/* On quit, make sure we free stuff we can free. 
 #define DEBUG_LEAK
-#define PROFILE
  */
 
 /* Sometimes we need to be able to disable these at build time.
 #undef DEBUG_FATAL
 #undef DEBUG_LEAK
  */
-
-/* Need im__print_all() for leak testing.
- */
-#ifdef DEBUG_LEAK
-extern void im__print_all( void );
-#endif /*DEBUG_LEAK*/
 
 /* General stuff. 
  */
@@ -332,8 +323,6 @@ main_quit( void )
 	reduce_destroy( reduce_context );
 
 #ifdef DEBUG_LEAK
-	fprintf( stderr, "DEBUG_LEAK: testing for leaks ...\n" );
-
 	/* Free other GTK stuff.
 	 */
 	if( main_icon_factory )
@@ -357,15 +346,10 @@ main_quit( void )
 	 */
 	UNREF( main_imageinfogroup );
 	heap_check_all_destroyed();
-	vips_cache_drop_all();
-	im__print_all();
+	vips_shutdown();
 	managed_check_all_destroyed();
 	util_check_all_destroyed();
 	call_check_all_destroyed();
-
-#ifdef PROFILE
-	g_mem_profile();
-#endif /*PROFILE*/
 #endif /*DEBUG_LEAK*/
 
 #ifdef DEBUG
@@ -988,12 +972,6 @@ main( int argc, char *argv[] )
 	char txt[MAX_STRSIZE];
 	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-#ifdef DEBUG_LEAK
-#ifdef PROFILE
-	g_mem_set_vtable( glib_mem_profiler_table );
-#endif /*PROFILE*/
-#endif /*DEBUG_LEAK*/
-
 #ifdef DEBUG_TIME
 	GTimer *startup_timer = g_timer_new();
 	printf( "DEBUG_TIME: startup timer zeroed ...\n" );
@@ -1131,11 +1109,6 @@ main( int argc, char *argv[] )
 		exit( 0 );
 	}
 
-#ifdef DEBUG_LEAK
-	fprintf( stderr, 
-		"*** DEBUG_LEAK is on ... will leaktest on exit\n" );
-#endif /*DEBUG_LEAK*/
-
 #ifdef DEBUG_FATAL
 	/* Set masks for debugging ... stop on any problem. 
 	 */
@@ -1145,9 +1118,6 @@ main( int argc, char *argv[] )
 		G_LOG_LEVEL_ERROR |
 		G_LOG_LEVEL_CRITICAL |
 		G_LOG_LEVEL_WARNING );
-
-	fprintf( stderr, 
-		"*** DEBUG_FATAL is on ... will abort() on first warning\n" );
 #else /*!DEBUG_FATAL*/
 #ifdef OS_WIN32 
 	/* No logging output ... on win32, log output pops up a very annoying

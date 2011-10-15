@@ -36,23 +36,6 @@
 static GraphicviewClass *parent_class = NULL;
 
 static void
-pathnameview_destroy( GtkObject *object )
-{
-	Pathnameview *pathnameview;
-
-#ifdef DEBUG
-	printf( "pathnameview_destroy\n" );
-#endif /*DEBUG*/
-
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_PATHNAMEVIEW( object ) );
-
-	pathnameview = PATHNAMEVIEW( object );
-
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
-}
-
-static void
 pathnameview_link( View *view, Model *model, View *parent )
 {
 	Pathnameview *pathnameview = PATHNAMEVIEW( view );
@@ -89,13 +72,10 @@ pathnameview_refresh( vObject *vobject )
 static void
 pathnameview_class_init( PathnameviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
-
-	object_class->destroy = pathnameview_destroy;
 
 	/* Create signals.
 	 */

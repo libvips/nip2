@@ -97,11 +97,8 @@ tool_linkreport_sym( Symbol *sym, VipsBuf *buf, gboolean *found )
 void *
 tool_linkreport_tool( Tool *tool, VipsBuf *buf, gboolean *found )
 {
-	Symbol *sym;
-
 	if( tool->type != TOOL_SYM )
 		return( NULL );
-	sym = tool->sym;
 
 	return( symbol_map_all( tool->sym, 
 		(symbol_map_fn) tool_linkreport_sym, buf, found ) );

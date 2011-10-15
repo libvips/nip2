@@ -35,22 +35,6 @@
 
 static GtkEventBoxClass *parent_class = NULL;
 
-static void
-conversionview_destroy( GtkObject *object )
-{
-	Conversionview *cv;
-
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_CONVERSIONVIEW( object ) );
-
-	cv = CONVERSIONVIEW( object );
-
-	/* My instance destroy stuff.
-	 */
-
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
-}
-
 /* Find max and min of visible area of image.
  */
 static gboolean
@@ -163,11 +147,7 @@ conversionview_hide_cb( GtkWidget *wid, Conversionview *cv )
 static void
 conversionview_class_init( ConversionviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
-
 	parent_class = g_type_class_peek_parent( class );
-
-	object_class->destroy = conversionview_destroy;
 
 	/* Create signals.
 	 */

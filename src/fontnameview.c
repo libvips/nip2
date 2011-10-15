@@ -36,23 +36,6 @@
 static GraphicviewClass *parent_class = NULL;
 
 static void
-fontnameview_destroy( GtkObject *object )
-{
-	Fontnameview *fontnameview;
-
-#ifdef DEBUG
-	printf( "fontnameview_destroy\n" );
-#endif /*DEBUG*/
-
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_FONTNAMEVIEW( object ) );
-
-	fontnameview = FONTNAMEVIEW( object );
-
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
-}
-
-static void
 fontnameview_link( View *view, Model *model, View *parent )
 {
 	Fontnameview *fontnameview = FONTNAMEVIEW( view );
@@ -89,13 +72,10 @@ fontnameview_refresh( vObject *vobject )
 static void
 fontnameview_class_init( FontnameviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
-
-	object_class->destroy = fontnameview_destroy;
 
 	/* Create signals.
 	 */

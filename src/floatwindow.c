@@ -36,26 +36,6 @@
 static iWindowClass *parent_class = NULL;
 
 static void
-floatwindow_destroy( GtkObject *object )
-{
-	Floatwindow *floatwindow;
-
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_FLOATWINDOW( object ) );
-
-	floatwindow = FLOATWINDOW( object );
-
-#ifdef DEBUG
-	printf( "floatwindow_destroy\n" );
-#endif /*DEBUG*/
-
-	/* My instance destroy stuff.
-	 */
-
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
-}
-
-static void
 floatwindow_popdown( GtkWidget *widget )
 {
 	Floatwindow *floatwindow = FLOATWINDOW( widget );
@@ -132,12 +112,9 @@ floatwindow_build( GtkWidget *widget )
 static void
 floatwindow_class_init( FloatwindowClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	iWindowClass *iwindow_class = (iWindowClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
-
-	object_class->destroy = floatwindow_destroy;
 
 	iwindow_class->build = floatwindow_build;
 	iwindow_class->popdown = floatwindow_popdown;

@@ -36,26 +36,6 @@
 static ViewClass *parent_class = NULL;
 
 static void
-toolkitgroupview_destroy( GtkObject *object )
-{
-	Toolkitgroupview *kitgview;
-
-#ifdef DEBUG
-	printf( "toolkitgroupview_destroy\n" );
-#endif /*DEBUG*/
-
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_TOOLKITGROUPVIEW( object ) );
-
-	kitgview = TOOLKITGROUPVIEW( object );
-
-	/* Instance destroy.
-	 */
-
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
-}
-
-static void
 toolkitgroupview_finalize( GObject *gobject )
 {
 #ifdef DEBUG
@@ -87,13 +67,11 @@ static void
 toolkitgroupview_class_init( ToolkitgroupviewClass *class )
 {
 	GObjectClass *gobject_class = (GObjectClass *) class;
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
 
 	gobject_class->finalize = toolkitgroupview_finalize;
-	object_class->destroy = toolkitgroupview_destroy;
 
 	/* Create signals.
 	 */

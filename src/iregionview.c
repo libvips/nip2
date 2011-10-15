@@ -36,30 +36,9 @@
 static iImageviewClass *parent_class = NULL;
 
 static void
-iregionview_destroy( GtkObject *object )
-{
-	iRegionview *iregionview;
-
-#ifdef DEBUG
-	printf( "iregionview_destroy\n" );
-#endif /*DEBUG*/
-
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_IREGIONVIEW( object ) );
-
-	iregionview = IREGIONVIEW( object );
-
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
-}
-
-static void
 iregionview_class_init( iRegionviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
-
 	parent_class = g_type_class_peek_parent( class );
-
-	object_class->destroy = iregionview_destroy;
 
 	/* Create signals.
 	 */

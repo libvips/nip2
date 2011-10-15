@@ -36,28 +36,6 @@
 
 static HeapmodelClass *parent_class = NULL;
 
-static void
-rhs_finalize( GObject *gobject )
-{
-	Rhs *rhs;
-
-	g_return_if_fail( gobject != NULL );
-	g_return_if_fail( IS_RHS( gobject ) );
-
-	rhs = RHS( gobject );
-
-	/* My instance destroy stuff.
-	 */
-
-#ifdef DEBUG
-	printf( "rhs_destroy: " );
-	row_name_print( HEAPMODEL( rhs )->row );
-	printf( " (%p)\n", rhs );
-#endif /*DEBUG*/
-
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
-}
-
 /* child is about to be added ... update our graphic/scol/text shortcuts.
  */
 static void
@@ -366,7 +344,6 @@ rhs_update_model( Heapmodel *heapmodel )
 static void
 rhs_class_init( RhsClass *class )
 {
-	GObjectClass *gobject_class = (GObjectClass *) class;
 	iContainerClass *icontainer_class = (iContainerClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 	HeapmodelClass *heapmodel_class = (HeapmodelClass *) class;
@@ -378,8 +355,6 @@ rhs_class_init( RhsClass *class )
 
 	/* Init methods.
 	 */
-	gobject_class->finalize = rhs_finalize;
-
 	icontainer_class->child_add = rhs_child_add;
 	icontainer_class->child_remove = rhs_child_remove;
 	icontainer_class->parent_add = rhs_parent_add;

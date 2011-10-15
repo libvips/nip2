@@ -35,22 +35,6 @@
 
 static GraphicviewClass *parent_class = NULL;
 
-static void
-toggleview_destroy( GtkObject *object )
-{
-	Toggleview *togview;
-
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_TOGGLEVIEW( object ) );
-
-	togview = TOGGLEVIEW( object );
-
-	/* My instance destroy stuff.
-	 */
-
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
-}
-
 /* Toggleview callback.
  */
 static void
@@ -84,12 +68,9 @@ toggleview_refresh( vObject *vobject )
 static void
 toggleview_class_init( ToggleviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
-
-	object_class->destroy = toggleview_destroy;
 
 	/* Create signals.
 	 */

@@ -36,19 +36,6 @@
 static GraphicviewClass *parent_class = NULL;
 
 static void
-colourview_destroy( GtkObject *object )
-{
-	Colourview *colourview;
-
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_COLOURVIEW( object ) );
-
-	colourview = COLOURVIEW( object );
-
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
-}
-
-static void
 colourview_link( View *view, Model *model, View *parent )
 {
 	Colourview *colourview = COLOURVIEW( view );
@@ -78,13 +65,10 @@ colourview_refresh( vObject *vobject )
 static void
 colourview_class_init( ColourviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
-
-	object_class->destroy = colourview_destroy;
 
 	/* Create signals.
 	 */

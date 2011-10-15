@@ -36,37 +36,12 @@
 static ValueClass *parent_class = NULL;
 
 static void
-vector_finalize( GObject *gobject )
-{
-	Vector *vector;
-
-#ifdef DEBUG
-	printf( "vector_finalize\n" );
-#endif /*DEBUG*/
-
-	g_return_if_fail( gobject != NULL );
-	g_return_if_fail( IS_VECTOR( gobject ) );
-
-	vector = VECTOR( gobject );
-
-	/* My instance finalize stuff.
-	 */
-
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
-}
-
-static void
 vector_class_init( VectorClass *class )
 {
-	GObjectClass *gobject_class = (GObjectClass *) class;
-
 	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
-
-	gobject_class->finalize = vector_finalize;
-
 	model_register_loadable( MODEL_CLASS( class ) );
 }
 

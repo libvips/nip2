@@ -35,23 +35,6 @@
 
 static ClassmodelClass *parent_class = NULL;
 
-static void
-expression_finalize( GObject *gobject )
-{
-	Expression *expression;
-
-#ifdef DEBUG
-	printf( "expression_finalize\n" );
-#endif /*DEBUG*/
-
-	g_return_if_fail( gobject != NULL );
-	g_return_if_fail( IS_EXPRESSION( gobject ) );
-
-	expression = EXPRESSION( gobject );
-
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
-}
-
 /* Sub fn. of below.
  */
 static void *
@@ -157,13 +140,10 @@ expression_class_get( Classmodel *classmodel, PElement *root )
 static void
 expression_class_init( ExpressionClass *class )
 {
-	GObjectClass *gobject_class = (GObjectClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 	ClassmodelClass *classmodel_class = (ClassmodelClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
-
-	gobject_class->finalize = expression_finalize;
 
 	/* Create signals.
 	 */

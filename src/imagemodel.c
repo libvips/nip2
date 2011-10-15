@@ -138,24 +138,6 @@ imagemodel_dispose( GObject *gobject )
 }
 
 static void
-imagemodel_finalize( GObject *gobject )
-{
-	Imagemodel *imagemodel;
-
-	g_return_if_fail( gobject != NULL );
-	g_return_if_fail( IS_IMAGEMODEL( gobject ) );
-
-	imagemodel = IMAGEMODEL( gobject );
-
-#ifdef DEBUG
-	printf( "imagemodel_finalize: " );
-	iobject_print( IOBJECT( imagemodel ) );
-#endif /*DEBUG*/
-
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
-}
-
-static void
 imagemodel_changed( iObject *iobject )
 {
 	Imagemodel *imagemodel = IMAGEMODEL( iobject );
@@ -199,7 +181,6 @@ imagemodel_class_init( ImagemodelClass *class )
 	parent_class = g_type_class_peek_parent( class );
 
 	gobject_class->dispose = imagemodel_dispose;
-	gobject_class->finalize = imagemodel_finalize;
 
 	iobject_class->changed = imagemodel_changed;
 

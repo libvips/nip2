@@ -101,19 +101,6 @@ heapmodel_clear_edited( Heapmodel *heapmodel )
 	return( NULL );
 }
 
-static void
-heapmodel_finalize( GObject *gobject )
-{
-	Heapmodel *heapmodel;
-
-	g_return_if_fail( gobject != NULL );
-	g_return_if_fail( IS_HEAPMODEL( gobject ) );
-
-	heapmodel = HEAPMODEL( gobject );
-
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
-}
-
 static Rhs *
 heapmodel_get_rhs( Heapmodel *heapmodel )
 {
@@ -193,7 +180,6 @@ heapmodel_real_clear_edited( Heapmodel *heapmodel )
 static void
 heapmodel_class_init( HeapmodelClass *class )
 {
-	GObjectClass *gobject_class = (GObjectClass *) class;
 	HeapmodelClass *heapmodel_class = (HeapmodelClass *) class;
 	iContainerClass *icontainer_class = (iContainerClass *) class;
 
@@ -201,8 +187,6 @@ heapmodel_class_init( HeapmodelClass *class )
 
 	/* Init methods.
 	 */
-	gobject_class->finalize = heapmodel_finalize;
-
 	icontainer_class->parent_add = heapmodel_parent_add;
 
 	heapmodel_class->new_heap = heapmodel_real_new_heap;

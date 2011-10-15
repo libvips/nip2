@@ -59,10 +59,8 @@ static void
 preview_class_init( PreviewClass *class )
 {
 	GtkObjectClass *object_class;
-	iWindowClass *iwindow_class;
 
 	object_class = (GtkObjectClass *) class;
-	iwindow_class = (iWindowClass *) class;
 
 	object_class->destroy = preview_destroy;
 

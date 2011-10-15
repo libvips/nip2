@@ -36,25 +36,6 @@
 static GraphicviewClass *parent_class = NULL;
 
 static void
-editview_destroy( GtkObject *object )
-{
-	Editview *editview;
-
-#ifdef DEBUG
-	printf( "editview_destroy\n" );
-#endif /*DEBUG*/
-
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_EDITVIEW( object ) );
-
-	/* My instance destroy stuff.
-	 */
-	editview = EDITVIEW( object );
-
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
-}
-
-static void
 editview_link( View *view, Model *model, View *parent )
 {
 	Editview *editview = EDITVIEW( view );
@@ -85,13 +66,10 @@ editview_refresh( vObject *vobject )
 static void
 editview_class_init( EditviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
-
-	object_class->destroy = editview_destroy;
 
 	/* Create signals.
 	 */

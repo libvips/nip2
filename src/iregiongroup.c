@@ -35,26 +35,6 @@
 
 static ClassmodelClass *parent_class = NULL;
 
-static void
-iregiongroup_dispose( GObject *gobject )
-{
-	iRegiongroup *iregiongroup;
-
-#ifdef DEBUG
-	printf( "iregiongroup_dispose\n" );
-#endif /*DEBUG*/
-
-	g_return_if_fail( gobject != NULL );
-	g_return_if_fail( IS_IREGIONGROUP( gobject ) );
-
-	iregiongroup = IREGIONGROUP( gobject );
-
-	/* My instance destroy stuff.
-	 */
-
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
-}
-
 static void *
 iregiongroup_update_model( Heapmodel *heapmodel )
 {
@@ -86,7 +66,6 @@ iregiongroup_view_new( Model *model, View *parent )
 static void
 iregiongroup_class_init( iRegiongroupClass *class )
 {
-	GObjectClass *gobject_class = (GObjectClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 	HeapmodelClass *heapmodel_class = (HeapmodelClass *) class;
 
@@ -97,8 +76,6 @@ iregiongroup_class_init( iRegiongroupClass *class )
 
 	/* Init methods.
 	 */
-	gobject_class->dispose = iregiongroup_dispose;
-
 	heapmodel_class->update_model = iregiongroup_update_model;
 
 	model_class->view_new = iregiongroup_view_new;

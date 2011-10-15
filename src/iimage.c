@@ -130,11 +130,8 @@ iimage_edit( GtkWidget *parent, Model *model )
 {
         iImage *iimage = IIMAGE( model );
 
-	if( iimage->value.ii ) {
-		Imageview *iv;
-
-		iv = imageview_new( iimage, parent );
-	}
+	if( iimage->value.ii ) 
+		(void) imageview_new( iimage, parent );
 }
 
 static xmlNode *

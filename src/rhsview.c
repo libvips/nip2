@@ -36,26 +36,6 @@
 
 static ViewClass *parent_class = NULL;
 
-static void
-rhsview_destroy( GtkObject *object )
-{
-	Rhsview *rhsview;
-
-#ifdef DEBUG
-	printf( "rhsview_destroy\n" );
-#endif /*DEBUG*/
-
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_RHSVIEW( object ) );
-
-	rhsview = RHSVIEW( object );
-
-	/* My instance destroy stuff.
-	 */
-
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
-}
-
 /* Get this if ws->mode changes.
  */
 static void
@@ -188,13 +168,10 @@ rhsview_child_remove( View *parent, View *child )
 static void
 rhsview_class_init( RhsviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass*) class;
 	vObjectClass *vobject_class = (vObjectClass*) class;
 	ViewClass *view_class = (ViewClass*) class;
 
 	parent_class = g_type_class_peek_parent( class );
-
-	object_class->destroy = rhsview_destroy;
 
 	/* Create signals.
 	 */

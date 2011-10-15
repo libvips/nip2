@@ -35,22 +35,6 @@
 
 static GraphicviewClass *parent_class = NULL;
 
-static void
-sliderview_destroy( GtkObject *object )
-{
-	Sliderview *sliderview;
-
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_SLIDERVIEW( object ) );
-
-	sliderview = SLIDERVIEW( object );
-
-	/* My instance destroy stuff.
-	 */
-
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
-}
-
 static void 
 sliderview_refresh( vObject *vobject )
 {
@@ -139,13 +123,10 @@ sliderview_link( View *view, Model *model, View *parent )
 static void
 sliderview_class_init( SliderviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
-
-	object_class->destroy = sliderview_destroy;
 
 	/* Create signals.
 	 */

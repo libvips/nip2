@@ -36,19 +36,6 @@
 static GraphicviewClass *parent_class = NULL;
 
 static void
-iimageview_destroy( GtkObject *object )
-{
-	iImageview *iimageview;
-
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_IIMAGEVIEW( object ) );
-
-	iimageview = IIMAGEVIEW( object );
-
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
-}
-
-static void
 iimageview_realize( GtkWidget *widget )
 {
 	GTK_WIDGET_CLASS( parent_class )->realize( widget );
@@ -275,7 +262,6 @@ iimageview_refresh( vObject *vobject )
 static void
 iimageview_class_init( iImageviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
@@ -287,8 +273,6 @@ iimageview_class_init( iImageviewClass *class )
 
 	/* Init methods.
 	 */
-	object_class->destroy = iimageview_destroy;
-
 	widget_class->realize = iimageview_realize;
 	widget_class->drag_begin = iimageview_drag_begin;
 	widget_class->drag_end = iimageview_drag_end;

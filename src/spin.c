@@ -50,22 +50,6 @@ enum {
 
 static guint spin_signals[LAST_SIGNAL] = { 0 };
 
-static void
-spin_destroy( GtkObject *object )
-{
-	Spin *spin;
-
-	g_return_if_fail( object != NULL);
-	g_return_if_fail( IS_SPIN( object ) );
-
-	spin = SPIN( object );
-
-	/* My instance destroy stuff.
-	 */
-
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
-}
-
 /* Default up and down signal handlers.
  */
 static void
@@ -87,19 +71,9 @@ spin_real_down_click( Spin *spin )
 static void
 spin_class_init( SpinClass *class )
 {
-	GObjectClass *gobject_class;
-	GtkObjectClass *object_class;
-	GtkWidgetClass *widget_class;
-	ViewClass *view_class;
-
-	gobject_class = G_OBJECT_CLASS( class );
-	object_class = (GtkObjectClass *) class;
-	widget_class = (GtkWidgetClass *) class;
-	view_class = (ViewClass *) class;
+	GObjectClass *gobject_class = (GObjectClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
-
-	object_class->destroy = spin_destroy;
 
 	/* Create signals.
          */

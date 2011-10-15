@@ -607,23 +607,6 @@ stringset_child_get( Stringset *ss, const char *label )
 static iDialogClass *find_parent_class = NULL;
 
 static void
-find_destroy( GtkObject *object )
-{
-	Find *find;
-
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_FIND( object ) );
-
-	find = FIND( object );
-
-	/* My instance destroy stuff.
-	 */
-
-	if( GTK_OBJECT_CLASS( find_parent_class )->destroy )
-		(*GTK_OBJECT_CLASS( find_parent_class )->destroy)( object );
-}
-
-static void
 find_build( GtkWidget *widget )
 {
 	Find *find = FIND( widget );
@@ -651,13 +634,8 @@ find_build( GtkWidget *widget )
 static void
 find_class_init( FindClass *class )
 {
-	GtkObjectClass *object_class;
-	iWindowClass *iwindow_class;
+	iWindowClass *iwindow_class = (iWindowClass *) class;
 
-	object_class = (GtkObjectClass *) class;
-	iwindow_class = (iWindowClass *) class;
-
-	object_class->destroy = find_destroy;
 	iwindow_class->build = find_build;
 
 	find_parent_class = g_type_class_peek_parent( class );

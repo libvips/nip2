@@ -505,12 +505,11 @@ regionview_paint( Regionview *regionview )
 	GdkDrawable *draw = GTK_WIDGET( id )->window;
 	int state = regionview->last_paint_state;
 
-	GdkGC *tl, *br, *fg, *bg;
+	GdkGC *tl, *br, *bg;
 	Rect dr;
 
 	tl = style->light_gc[state];
 	br = style->dark_gc[state];
-	fg = style->fg_gc[state];
 	bg = style->bg_gc[state];
 
 	conversion_im_to_disp_rect( conv, &regionview->area, &dr );

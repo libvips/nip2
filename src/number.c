@@ -35,23 +35,6 @@
 
 static ClassmodelClass *parent_class = NULL;
 
-static void
-number_finalize( GObject *gobject )
-{
-	Number *number;
-
-#ifdef DEBUG
-	printf( "number_finalize\n" );
-#endif /*DEBUG*/
-
-	g_return_if_fail( gobject != NULL );
-	g_return_if_fail( IS_NUMBER( gobject ) );
-
-	number = NUMBER( gobject );
-
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
-}
-
 static View *
 number_view_new( Model *model, View *parent )
 {
@@ -72,7 +55,6 @@ static ClassmodelMember number_members[] = {
 static void
 number_class_init( NumberClass *class )
 {
-	GObjectClass *gobject_class = (GObjectClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 	ClassmodelClass *classmodel_class = (ClassmodelClass *) class;
 
@@ -81,8 +63,6 @@ number_class_init( NumberClass *class )
 
 	/* Init methods.
 	 */
-	gobject_class->finalize = number_finalize;
-
 	model_class->view_new = number_view_new;
 
 	/* Static init.

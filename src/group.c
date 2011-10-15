@@ -35,26 +35,6 @@
 
 static ValueClass *parent_class = NULL;
 
-static void
-group_finalize( GObject *gobject )
-{
-	Group *group;
-
-#ifdef DEBUG
-	printf( "group_finalize\n" );
-#endif /*DEBUG*/
-
-	g_return_if_fail( gobject != NULL );
-	g_return_if_fail( IS_GROUP( gobject ) );
-
-	group = GROUP( gobject );
-
-	/* My instance finalize stuff.
-	 */
-
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
-}
-
 static gboolean
 group_save_list( PElement *list, char *filename );
 
@@ -175,15 +155,12 @@ group_graphic_save( Classmodel *classmodel,
 static void
 group_class_init( GroupClass *class )
 {
-	GObjectClass *gobject_class = (GObjectClass *) class;
 	ClassmodelClass *classmodel_class = (ClassmodelClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
-
-	gobject_class->finalize = group_finalize;
 
 	classmodel_class->graphic_save = group_graphic_save;
 

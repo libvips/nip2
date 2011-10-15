@@ -42,19 +42,6 @@ enum {
 
 static ImagedisplayClass *parent_class = NULL;
 
-static void
-colourdisplay_destroy( GtkObject *object )
-{
-	Colourdisplay *colourdisplay;
-
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_COLOURDISPLAY( object ) );
-
-	colourdisplay = COLOURDISPLAY( object );
-
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
-}
-
 /* Prefer x-color drags for 3 band non-complex imageinfos, and for LABQ
  */
 static void
@@ -277,14 +264,11 @@ colourdisplay_conversion_changed( Imagedisplay *id )
 static void
 colourdisplay_class_init( ColourdisplayClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	ImagedisplayClass *imagedisplay_class = (ImagedisplayClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
 
-	object_class->destroy = colourdisplay_destroy;
-	
 	widget_class->realize = colourdisplay_realize;
 	widget_class->drag_begin = colourdisplay_drag_begin;
 	widget_class->drag_end = colourdisplay_drag_end;

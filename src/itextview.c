@@ -35,25 +35,6 @@
 
 static ViewClass *parent_class = NULL;
 
-static void
-itextview_destroy( GtkObject *object )
-{
-	iTextview *itextview;
-
-#ifdef DEBUG
-	printf( "itextview_destroy\n" );
-#endif /*DEBUG*/
-
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_ITEXTVIEW( object ) );
-
-	/* My instance destroy stuff.
-	 */
-	itextview = ITEXTVIEW( object );
-
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
-}
-
 static void 
 itextview_refresh( vObject *vobject )
 {
@@ -176,13 +157,10 @@ itextview_scan( View *view )
 static void
 itextview_class_init( iTextviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
-
-	object_class->destroy = itextview_destroy;
 
 	/* Create signals.
 	 */

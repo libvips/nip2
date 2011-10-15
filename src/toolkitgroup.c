@@ -43,23 +43,6 @@ toolkitgroup_map( Toolkitgroup *kitg, toolkit_map_fn fn, void *a, void *b )
 }
 
 static void
-toolkitgroup_finalize( GObject *gobject )
-{
-	Toolkitgroup *kitg;
-
-#ifdef DEBUG
-	printf( "toolkitgroup_finalize\n" );
-#endif /*DEBUG*/
-
-	g_return_if_fail( gobject != NULL );
-	g_return_if_fail( IS_TOOLKITGROUP( gobject ) );
-
-	kitg = TOOLKITGROUP( gobject );
-
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
-}
-
-static void
 toolkitgroup_changed( iObject *iobject )
 {
 #ifdef DEBUG
@@ -79,7 +62,6 @@ toolkitgroup_view_new( Model *model, View *parent )
 static void
 toolkitgroup_class_init( ToolkitgroupClass *class )
 {
-	GObjectClass *gobject_class = (GObjectClass *) class;
 	iObjectClass *iobject_class = (iObjectClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 
@@ -90,7 +72,6 @@ toolkitgroup_class_init( ToolkitgroupClass *class )
 
 	/* Init methods.
 	 */
-	gobject_class->finalize = toolkitgroup_finalize;
 
 	iobject_class->changed = toolkitgroup_changed;
 

@@ -35,25 +35,6 @@
 
 static GraphicviewClass *parent_class = NULL;
 
-static void
-expressionview_destroy( GtkObject *object )
-{
-	Expressionview *expressionview;
-
-#ifdef DEBUG
-	printf( "expressionview_destroy\n" );
-#endif /*DEBUG*/
-
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_EXPRESSIONVIEW( object ) );
-
-	/* My instance destroy stuff.
-	 */
-	expressionview = EXPRESSIONVIEW( object );
-
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
-}
-
 /* Re-read the text in a tally entry. 
  */
 static void *
@@ -187,13 +168,10 @@ expressionview_reset( View *view )
 static void
 expressionview_class_init( ExpressionviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
-
-	object_class->destroy = expressionview_destroy;
 
 	/* Create signals.
 	 */

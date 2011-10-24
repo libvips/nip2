@@ -1,3 +1,10 @@
+- make check is failing
+
+running test_formats.sh:
+VipsEmbed: bad dimensions
+
+
+
 - extract a line from an image, convert to matrix, get nonsense
 
 - replace flex/bison with

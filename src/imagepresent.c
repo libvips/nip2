@@ -813,6 +813,9 @@ imagepresent_left_press( Imagepresent *ip, GdkEvent *ev, int x, int y )
 	switch( imagemodel->state ) {
 	case IMAGEMODEL_SELECT:
 		if( ev->button.state & GDK_CONTROL_MASK ) {
+			/* Do we need this call? Tets.
+			 * FIXME
+			 */
 			im = imageinfo_get( FALSE, conv->ii );
 
 			imagepresent_snap_point( ip, x, y, &x, &y );

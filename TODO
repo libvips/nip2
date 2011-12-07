@@ -1,3 +1,6 @@
+- paint out peaks on FFT to remove scan artefacts is broken?
+
+
 - extract a line from an image, convert to matrix, get nonsense
 
 - replace flex/bison with

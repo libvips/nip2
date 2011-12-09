@@ -1,5 +1,6 @@
 - paint out peaks on FFT to remove scan artefacts is broken?
 
+- util.c:to_size() can be replaced with vips_buf_append_size()
 
 - extract a line from an image, convert to matrix, get nonsense
 

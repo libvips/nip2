@@ -118,6 +118,7 @@ test_format $image png 0 :9,1
 test_format $image jpg 10
 test_format $image ppm 0
 test_format $image pfm 0
+test_format $image fits 0
 
 # csv can only do mono
 test_format $mono csv 0

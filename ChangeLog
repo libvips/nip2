@@ -1,6 +1,7 @@
 started 7.27.0, 23/8/11
 - bump for new cycle
 - add raw load/save test
+- test fits load/save
 
 started 7.26.3, 15/8/11
 - tidier cancel messages

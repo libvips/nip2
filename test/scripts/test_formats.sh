@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#set -x
+
 top_srcdir=$1
 tmp=$top_srcdir/test/tmp
 image=$top_srcdir/share/nip2/data/examples/businesscard/slanted_oval_vase2.jpg
@@ -34,6 +36,22 @@ save_load() {
 	fi
 }
 
+# subtract, look for max difference less than a threshold
+test_difference() {
+	before=$1
+	after=$2
+	threshold=$3
+
+	vips im_subtract $before $after $tmp/difference.v
+	vips im_abs $tmp/difference.v $tmp/abs.v 
+	dif=`vips im_max $tmp/abs.v`
+
+	if (( $dif > $threshold )) ; then
+		echo "save / load difference is $dif"
+		exit 1
+	fi
+}
+
 # save to the named file in tmp, convert back to vips again, subtract, look
 # for max difference less than a threshold
 test_format() {
@@ -45,15 +63,7 @@ test_format() {
 	echo -n "testing $in $format$mode ... "
 
 	save_load $in $format $mode
-
-	vips im_subtract $in $tmp/back.v $tmp/difference.v
-	vips im_abs $tmp/difference.v $tmp/abs.v 
-	dif=`vips im_max $tmp/abs.v`
-
-	if (( $dif > $threshold )) ; then
-		echo "save / load difference is $dif"
-		exit 1
-	fi
+	test_difference $in $tmp/back.v $threshold
 
 	echo "ok"
 }
@@ -70,14 +80,28 @@ test_rad() {
 
 	vips im_rad2float $in $tmp/before.v
 	vips im_rad2float $tmp/back.v $tmp/after.v
-	vips im_subtract $tmp/before.v $tmp/after.v $tmp/difference.v
-	vips im_abs $tmp/difference.v $tmp/abs.v
-	dif=`vips im_max $tmp/abs.v`
 
-	if (( $dif > 0 )) ; then
-		echo "save / load difference is $dif"
-		exit 1
-	fi
+	test_difference $tmp/before.v $tmp/after.v 0
+
+	echo "ok"
+}
+
+# as above, but raw format
+# we can't use suffix stuff to pick the load/save
+test_raw() {
+	in=$1
+
+	echo -n "testing $in raw ... "
+
+	vips copy $in $tmp/before.v
+	width=`vips im_header_int Xsize $tmp/before.v`
+	height=`vips im_header_int Ysize $tmp/before.v`
+	bands=`vips im_header_int Bands $tmp/before.v`
+
+	vips rawsave $tmp/before.v $tmp/raw
+	vips rawload $tmp/raw $tmp/after.v $width $height $bands
+
+	test_difference $tmp/before.v $tmp/after.v 0
 
 	echo "ok"
 }
@@ -106,6 +130,9 @@ test_format $cmyk tif 10 :jpeg,tile
 test_format $cmyk tif 10 :jpeg,tile,pyramid
 
 test_rad $rad 
+
+test_raw $mono 
+test_raw $image 
 
 # we have loaders but not savers for other formats, eg. mat and of course all
 # the libMagick formats -- add these when we get the savers done

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#set -x
+
 top_srcdir=$1
 tmp=$top_srcdir/test/tmp
 image=$top_srcdir/share/nip2/data/examples/businesscard/slanted_oval_vase2.jpg
@@ -35,6 +37,7 @@ done
 
 if [[ $max > 0 ]]; then
 	echo error, max == $max
+	exit 1
 else
 	echo all threading tests passed
 fi

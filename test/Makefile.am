@@ -4,6 +4,7 @@ EXTRA_DIST = \
 	README \
 	workspaces \
 	scripts \
+	images \
 	test-5x5.v \
 	test_transform.ws \
 	test.ws

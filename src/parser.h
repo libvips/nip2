@@ -52,8 +52,9 @@ extern InputState input_state;
 
 /* Function declarations for parse.y.
  */
-void yyerror( const char *sub, ... )
+void nip2yyerror( const char *sub, ... )
 	__attribute__((format(printf, 1, 2)));
+void yyerror( const char *msg ); 
 extern int yyleng;			/* lex stuff */
 
 /* Lex gathers tokens here for workspace.c

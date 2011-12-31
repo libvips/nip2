@@ -726,7 +726,7 @@ symbol_error_redefine( Symbol *sym )
 			sym->tool->lineno );
 	}
 
-	yyerror( "%s", vips_buf_all( &buf ) );
+	yyerror( vips_buf_all( &buf ) );
 }
 
 /* Name in defining occurence. If this is a top-level definition, clean the
@@ -745,7 +745,8 @@ symbol_new_defining( Compile *compile, const char *name )
 	/* Block definition of "root" anywhere ... too confusing.
 	 */
 	if( strcmp( name, IOBJECT( symbol_root )->name ) == 0 )
-		yyerror( _( "Attempt to redefine root symbol \"%s\"." ), name );
+		nip2yyerror( _( "Attempt to redefine root symbol \"%s\"." ), 
+			name );
 
 	/* Is this a redefinition of an existing symbol?
 	 */
@@ -770,7 +771,7 @@ symbol_new_defining( Compile *compile, const char *name )
 		default:
 			/* Parameter, workspace, etc.
 			 */
-			yyerror( _( "Can't redefine %s \"%s\"." ), 
+			nip2yyerror( _( "Can't redefine %s \"%s\"." ), 
 				decode_SymbolType_user( sym->type ), name );
 			/*NOTREACHED*/
 		}

@@ -33,7 +33,6 @@
 
 
 
-
 - add extract_volume, cf. "grid"
 
   record tile_size in meta somewhere? grid could set it, save a parameter off

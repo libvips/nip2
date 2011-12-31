@@ -264,7 +264,7 @@ directive:
 		tool = tool_new_dia( current_kit, tool_position, 
 			$2.val.str, $3.val.str );
 		if( !tool )
-			yyerror( "%s", error_get_sub() );
+			yyerror( error_get_sub() );
 		tool->lineno = input_state.lineno;
 
 		/* Cast away const here.
@@ -646,7 +646,7 @@ lambda:
 		current_compile->tree = $4;
 
 		if( !compile_check( current_compile ) )
-			yyerror( "%s", error_get_sub() );
+			yyerror( error_get_sub() );
 
 		/* Link unresolved names in to the outer scope.
 		 */
@@ -1048,11 +1048,13 @@ Compile *scope_stack_compile[MAX_SSTACK];
 int scope_sp = 0;
 int parse_object_id = 0;
 
-/* Here for errors in parse. Can be called by some of the tree builders.
+/* Here for errors in parse. 
+ *
+ * Bison calls yyerror with only a char* arg. This printf() version is called
+ * from nip2 in a few places during parse.
  */
-/*VARARGS1*/
 void
-yyerror( const char *sub, ... )
+nip2yyerror( const char *sub, ... )
 {
 	va_list ap;
  	char buf[4096];
@@ -1070,6 +1072,14 @@ yyerror( const char *sub, ... )
 		error_sub( _( "Error: %s" ), buf );
 
 	longjmp( parse_error_point, -1 );
+}
+
+/* Bison calls this.
+ */
+void
+yyerror( const char *msg )
+{
+	nip2yyerror( "%s", msg );
 }
 
 /* Attach yyinput to a file.
@@ -1650,9 +1660,11 @@ parse_set_symbol( void )
 			 * come. Look up this one and move to that context.
 			 */
 			if( !(sym = compile_lookup( compile, ident )) ) 
-				yyerror( _( "'%s' does not exist" ), ident );
+				nip2yyerror( _( "'%s' does not exist" ), 
+					ident );
 			if( !sym->expr || !sym->expr->compile )
-				yyerror( _( "'%s' has no members" ), ident );
+				nip2yyerror( _( "'%s' has no members" ), 
+					ident );
 			compile = sym->expr->compile;
 			IM_FREE( ident );
 			break;

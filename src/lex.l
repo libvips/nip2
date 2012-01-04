@@ -64,7 +64,6 @@
 
 #define unput ip_unput
 #define input ip_input
-
 #endif /*HAVE_FLEX*/
 
 /* Stuff from bison.
@@ -308,7 +307,7 @@ FALSE {
 	BEGIN BINARY;
 
 	if( sscanf( yytext, "0x%x", &i ) != 1 )
-		yyerror( _( "bad number %s" ), yytext );
+		nip2yyerror( _( "bad number %s" ), yytext );
 
 	yylval.yy_const.type = PARSE_CONST_NUM;
 	yylval.yy_const.val.num = i;
@@ -361,5 +360,5 @@ FALSE {
 [ \t\n\r\m\01] ;
 
 . {
-	yyerror( _( "illegal character \"%c\"" ), *yytext );
+	nip2yyerror( _( "illegal character \"%c\"" ), *yytext );
 }

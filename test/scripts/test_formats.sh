@@ -4,7 +4,12 @@
 
 top_srcdir=$1
 tmp=$top_srcdir/test/tmp
-image=$top_srcdir/share/nip2/data/examples/businesscard/slanted_oval_vase2.jpg
+test_images=$top_srcdir/test/images
+image=$test_images/slanted_oval_vase2.jpg
+
+# the matlab image and reference image
+matlab=$test_images/test/images/lena.mat
+matlab_ref=$test_images/test/images/lena.tif
 
 # make a mono image
 vips im_extract_band $image $tmp/mono.v 1
@@ -45,6 +50,11 @@ test_difference() {
 	vips im_subtract $before $after $tmp/difference.v
 	vips im_abs $tmp/difference.v $tmp/abs.v 
 	dif=`vips im_max $tmp/abs.v`
+
+	# vips8 max will display "0.000" not zero, which will confuse the
+	# int-only bash
+	#
+	# make something with bc to do this comparison instead?
 
 	if (( $dif > $threshold )) ; then
 		echo "save / load difference is $dif"
@@ -106,6 +116,22 @@ test_raw() {
 	echo "ok"
 }
 
+# a format for which we only have a load (eg. matlab)
+# pass in a reference file as well and compare to that
+test_loader() {
+	ref=$1
+	in=$2
+
+	echo -n "testing $in loader ... "
+
+	vips copy $ref $tmp/before.v
+	vips copy $in $tmp/after.v
+
+	test_difference $tmp/before.v $tmp/after.v 0
+
+	echo "ok"
+}
+
 test_format $image v 0
 test_format $image tif 0
 test_format $image tif 10 :jpeg
@@ -135,6 +161,7 @@ test_rad $rad
 test_raw $mono 
 test_raw $image 
 
-# we have loaders but not savers for other formats, eg. mat and of course all
-# the libMagick formats -- add these when we get the savers done
+test_loader $matlab_ref $matlab
+
+# we have loaders but not savers for other formats, add tests here
 

@@ -44,9 +44,8 @@ typedef struct _Vo {
 
 	/* Operation we are building.
 	 */
+	VipsOperation *operation;
 	char *name;
-	GType type;
-	VipsObject *object;
 
 	/* Required args supplied to us from nip.
 	 */
@@ -60,26 +59,12 @@ typedef struct _Vo {
 	/* Number of ouput args the operation has.
 	 */
 	int nargs_output;
-
-	/* Output objects we have built and should unref.
-	 */
-	GSList *unref;
 } Vo;
 
 static void
 vo_free( Vo *vo )
 {
-	IM_FREE( vo->name );
-
-	while( vo->unref ) {
-		GObject *object = G_OBJECT( vo->unref->data );
-
-		g_object_unref( object );
-
-		vo->unref = g_slist_remove( vo->unref, object );
-	}
-
-	IM_FREEF( g_object_unref, vo->object );
+	IM_UNREF( vo->operation );
 
 	im_free( vo );
 }
@@ -87,33 +72,22 @@ vo_free( Vo *vo )
 static Vo *
 vo_new( Reduce *rc, const char *name )
 {
-	GType type;
+	VipsOperation *operation;
 	Vo *vo;
 
-	if( !(type = vips_type_find( "VipsObject", name )) ) {
-		error_top( _( "No such type." ) );
-		error_sub( _( "Type \"%s\" not found as a subclass "
-			"of VipsObject." ), name );
+	if( !(operation = vips_operation_new( name )) )
+		return( NULL );
+
+	if( !(vo = INEW( NULL, Vo )) ) {
+		g_object_unref( operation );
 		return( NULL );
 	}
-
-	if( !(vo = INEW( NULL, Vo )) )
-		return( NULL );
 	vo->rc = rc;
-	vo->name = NULL;
-	vo->type = type;
-	vo->object = NULL;
+	vo->operation = operation;
+	vo->name = VIPS_OBJECT_GET_CLASS( operation )->nickname;
 	vo->nargs_supplied = 0;
 	vo->nargs_required = 0;
 	vo->nargs_output = 0;
-	vo->unref = NULL;
-
-	if( !(vo->name = im_strdupn( name )) ) {
-		vo_free( vo );
-		return( NULL );
-	}
-
-	vo->object = VIPS_OBJECT( g_object_new( type, NULL ) );
 
 	return( vo );
 }
@@ -141,29 +115,24 @@ vo_set_required_input( VipsObject *object, GParamSpec *pspec,
 	VipsArgumentInstance *argument_instance, Vo *vo )
 {
 	VipsArgument *argument = (VipsArgument *) argument_class;
-	const char *name = argument->pspec->name;
 
 	/* Looking for required input args ... these are the ones we can set
 	 * from the supplied required list. 
 	 */
 	if( (argument_class->flags & VIPS_ARGUMENT_REQUIRED) &&
-		!(argument_class->flags & VIPS_ARGUMENT_CONSTRUCT) &&
+		(argument_class->flags & VIPS_ARGUMENT_CONSTRUCT) &&
+		(argument_class->flags & VIPS_ARGUMENT_INPUT) &&
 		!argument_instance->assigned &&
 		vo->nargs_required < vo->nargs_supplied ) {
-		/* Also insist we are under the nargs
-		 * limit ... our caller checks the numbers match and makes the
-		 * error message.
-		 */
-		if( vo->nargs_required < vo->nargs_supplied ) {
-			int i = vo->nargs_required;
-			GValue value = { 0 };
+		const char *name = g_param_spec_get_name( pspec );
+		int i = vo->nargs_required;
 
-			if( !heap_ip_to_gvalue( &vo->args[i], &value ) )
-				return( object );
-			g_object_set_property( G_OBJECT( object ), 
-				name, &value );
-			g_value_unset( &value );
-		}
+		GValue value = { 0 };
+
+		if( !heap_ip_to_gvalue( &vo->args[i], &value ) )
+			return( object );
+		g_object_set_property( G_OBJECT( object ), name, &value );
+		g_value_unset( &value );
 
 		vo->nargs_required += 1;
 	}
@@ -208,10 +177,6 @@ vo_set_optional( Vo *vo, PElement *list )
 static gboolean
 vo_build_result( Vo *vo, PElement *out )
 {
-	/* We don't have it yet, but we should loop over args looking for
-	 * outputs and building a list. Paste this code back in at some
-	 * point.
-	 */
 	Managedgobject *managedgobject;
 
 	if( !(managedgobject = managedgobject_new( vo->rc->heap, 
@@ -244,7 +209,7 @@ vo_object_new( Reduce *rc, const char *name,
 
 	/* Set required input arguments.
 	 */
-	if( vips_argument_map( VIPS_OBJECT( vo->object ),
+	if( vips_argument_map( VIPS_OBJECT( vo->operation ),
 		(VipsArgumentMapFn) vo_set_required_input, vo, NULL ) ) {
 		vo_free( vo );
 		reduce_throw( rc );
@@ -257,19 +222,8 @@ vo_object_new( Reduce *rc, const char *name,
 			vo->nargs_required,
 			vo->nargs_supplied );
 		vo_free( vo );
-	}
-
-	/* Init required output arguments.
-
-	   	we don't have any output args yet: paste this stuff back in 
-		once we have a VipsOperation subclass
-
-	if( vips__argument_map( VIPS_OBJECT( vo->operation ),
-		(VipsArgumentMapFn) vo_set_required_output, vo, NULL ) ) {
-		vo_free( vo );
 		reduce_throw( rc );
 	}
-	 */
 
 	/* Set all optional input args.
 	 */

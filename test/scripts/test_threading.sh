@@ -4,7 +4,8 @@
 
 top_srcdir=$1
 tmp=$top_srcdir/test/tmp
-image=$top_srcdir/share/nip2/data/examples/businesscard/slanted_oval_vase2.jpg
+test_images=$top_srcdir/test/images
+image=$test_images/slanted_oval_vase2.jpg
 chain=1
 
 # im_benchmark needs a labq

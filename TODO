@@ -1,3 +1,4 @@
+
 - fix vipsobject.c now we have a more complete vips8 API
 
   need to only set optional inputs ... eg. "xmin" of "min" isn't a bool we
@@ -7,6 +8,8 @@
   need to gather outputs
 
   rename ... vips_object_new is not a good name
+
+  remember this is used to create Interpolate objects, see _types.def
 
 
 

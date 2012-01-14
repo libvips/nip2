@@ -1,3 +1,16 @@
+- fix vipsobject.c now we have a more complete vips8 API
+
+  need to only set optional inputs ... eg. "xmin" of "min" isn't a bool we
+  set, it's an output int, ie. seeing it in the optional arg list means we 
+  should read "xmin" after build
+
+  need to gather outputs
+
+  rename ... vips_object_new is not a good name
+
+
+
+
 - paint out peaks on FFT to remove scan artefacts is broken?
 
 - util.c:to_size() can be replaced with vips_buf_append_size()

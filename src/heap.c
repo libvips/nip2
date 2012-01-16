@@ -1830,6 +1830,13 @@ heap_ip_to_gvalue( PElement *in, GValue *out )
 		printf( "ip_to_gvalue: no complex gtype!\n" );
 		return( FALSE );
 	}
+	else if( PEISIMAGE( in ) ) {
+		Imageinfo *ii = PEGETII( in );
+		VipsImage *im = imageinfo_get( FALSE, ii );
+
+		g_value_init( out, VIPS_TYPE_IMAGE );
+		g_value_set_object( out, im );
+	}
 	else if( PEISLIST( in ) ) {
 		gboolean result;
 

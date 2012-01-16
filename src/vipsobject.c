@@ -42,21 +42,21 @@
 typedef struct _Vo {
 	 Reduce *rc;
 
-	/* Operation we are building.
+	/* Object we are building.
 	 */
-	VipsOperation *operation;
-	char *name;
+	VipsObject *object;
+	const char *name;
 
 	/* Required args supplied to us from nip.
 	 */
 	PElement args[MAX_VIPS_ARGS];
 	int nargs_supplied;
 
-	/* Number of required input args the operation actually has.
+	/* Number of required input args the object has.
 	 */
 	int nargs_required;
 
-	/* Number of ouput args the operation has.
+	/* Number of output args the object has.
 	 */
 	int nargs_output;
 } Vo;
@@ -64,7 +64,7 @@ typedef struct _Vo {
 static void
 vo_free( Vo *vo )
 {
-	IM_UNREF( vo->operation );
+	VIPS_UNREF( vo->object );
 
 	im_free( vo );
 }
@@ -72,19 +72,17 @@ vo_free( Vo *vo )
 static Vo *
 vo_new( Reduce *rc, const char *name )
 {
-	VipsOperation *operation;
+	VipsObjectClass *class;
 	Vo *vo;
 
-	if( !(operation = vips_operation_new( name )) )
+	if( !(class = vips_class_find( "VipsObject", name )) )
 		return( NULL );
 
-	if( !(vo = INEW( NULL, Vo )) ) {
-		g_object_unref( operation );
+	if( !(vo = INEW( NULL, Vo )) ) 
 		return( NULL );
-	}
 	vo->rc = rc;
-	vo->operation = operation;
-	vo->name = VIPS_OBJECT_GET_CLASS( operation )->nickname;
+	vo->object = g_object_new( G_OBJECT_CLASS_TYPE( class ), NULL );
+	vo->name = class->nickname;
 	vo->nargs_supplied = 0;
 	vo->nargs_required = 0;
 	vo->nargs_output = 0;
@@ -114,8 +112,6 @@ vo_set_required_input( VipsObject *object, GParamSpec *pspec,
         VipsArgumentClass *argument_class, 
 	VipsArgumentInstance *argument_instance, Vo *vo )
 {
-	VipsArgument *argument = (VipsArgument *) argument_class;
-
 	/* Looking for required input args ... these are the ones we can set
 	 * from the supplied required list. 
 	 */
@@ -209,7 +205,7 @@ vo_object_new( Reduce *rc, const char *name,
 
 	/* Set required input arguments.
 	 */
-	if( vips_argument_map( VIPS_OBJECT( vo->operation ),
+	if( vips_argument_map( VIPS_OBJECT( vo->object ),
 		(VipsArgumentMapFn) vo_set_required_input, vo, NULL ) ) {
 		vo_free( vo );
 		reduce_throw( rc );

@@ -240,7 +240,7 @@ itext_decompile_element( VipsBuf *buf, PElement *base, gboolean top )
 	else if( PEISMANAGED( base ) ) {
 		Managed *managed = PEGETMANAGED( base );
 
-		vips_buf_appends( buf, "<" );
+		vips_buf_appendf( buf, "<%s ", G_OBJECT_TYPE_NAME( managed ) );
 		iobject_info( IOBJECT( managed ), buf );
 		vips_buf_appends( buf, ">" );
 	}
@@ -384,7 +384,7 @@ itext_add_element( VipsBuf *buf, PElement *base,
 	else if( PEISMANAGED( base ) ) {
 		Managed *managed = PEGETMANAGED( base );
 
-		vips_buf_appends( buf, "<" );
+		vips_buf_append( buf, "<" );
 		iobject_info( IOBJECT( managed ), buf );
 		vips_buf_appends( buf, ">" );
 	}

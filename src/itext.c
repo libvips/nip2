@@ -384,7 +384,7 @@ itext_add_element( VipsBuf *buf, PElement *base,
 	else if( PEISMANAGED( base ) ) {
 		Managed *managed = PEGETMANAGED( base );
 
-		vips_buf_append( buf, "<" );
+		vips_buf_appends( buf, "<" );
 		iobject_info( IOBJECT( managed ), buf );
 		vips_buf_appends( buf, ">" );
 	}

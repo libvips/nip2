@@ -1,9 +1,7 @@
-
 - fix vipsobject.c now we have a more complete vips8 API
 
-  make a vipsoperation.c as well which does output gathering
-
-  remember this is used to create Interpolate objects, see _types.def
+  make a vipsoperation.c as well which does output gathering and uses the
+  operation cache
 
 
 

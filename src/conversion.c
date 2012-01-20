@@ -1403,20 +1403,3 @@ conversion_set_params( Conversion *conv, gboolean enabled,
 		iobject_changed( IOBJECT( conv ) );
 	}
 }
-
-void
-conversion_header_dialog( Conversion *conv, 
-	const char *name, GtkWidget *parent )
-{
-	GtkWidget *imageheader;
-
-	imageheader = imageheader_new( conv );
-	iwindow_set_title( IWINDOW( imageheader ), 
-		_( "Header for \"%s\"" ), name );
-	idialog_set_callbacks( IDIALOG( imageheader ), NULL, NULL, NULL, NULL );
-	idialog_add_ok( IDIALOG( imageheader ), iwindow_true_cb, _( "OK" ) );
-	iwindow_set_parent( IWINDOW( imageheader ), parent );
-	iwindow_build( IWINDOW( imageheader ) );
-
-	gtk_widget_show( imageheader );
-}

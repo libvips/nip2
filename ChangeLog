@@ -2,6 +2,7 @@ started 7.27.0, 23/8/11
 - bump for new cycle
 - add raw load/save test
 - test fits load/save
+- better image header display, now on right-click rowview menu
 
 started 7.26.5, 31/12/11
 - fix possible security thing in yyerror(), thanks Jay

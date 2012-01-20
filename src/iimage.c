@@ -134,6 +134,29 @@ iimage_edit( GtkWidget *parent, Model *model )
 		(void) imageview_new( iimage, parent );
 }
 
+void
+iimage_header_dialog( GtkWidget *parent, Model *model )
+{
+        iImage *iimage = IIMAGE( model );
+	Row *row = HEAPMODEL( iimage )->row;
+	Workspace *ws = row_get_workspace( row );
+
+	GtkWidget *imageheader;
+	char txt[512];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
+
+	imageheader = imageheader_new( iimage );
+	row_qualified_name_relative( ws->sym, row, &buf );
+	iwindow_set_title( IWINDOW( imageheader ), 
+		_( "Header for \"%s\"" ), vips_buf_all( &buf ) );
+	idialog_set_callbacks( IDIALOG( imageheader ), NULL, NULL, NULL, NULL );
+	idialog_add_ok( IDIALOG( imageheader ), iwindow_true_cb, _( "OK" ) );
+	iwindow_set_parent( IWINDOW( imageheader ), parent );
+	iwindow_build( IWINDOW( imageheader ) );
+
+	gtk_widget_show( imageheader );
+}
+
 static xmlNode *
 iimage_save( Model *model, xmlNode *xnode )
 {
@@ -395,6 +418,7 @@ iimage_class_init( iImageClass *class )
 
 	model_class->view_new = iimage_view_new;
 	model_class->edit = iimage_edit;
+	model_class->info = iimage_header_dialog;
 	model_class->save = iimage_save;
 	model_class->load = iimage_load;
 

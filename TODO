@@ -1,8 +1,18 @@
+
+- add a right-click menu to image area of iamge view windows
+
+  add a filter thing
+
+  column sorting?
+
+  have model::info and iobject::info argh
+
+
+
 - fix vipsobject.c now we have a more complete vips8 API
 
   make a vipsoperation.c as well which does output gathering and uses the
   operation cache
-
 
 
 

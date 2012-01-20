@@ -61,6 +61,8 @@ my_sources = \
 	action.h \
 	boxes.c \
 	boxes.h \
+	imageheader.c \
+	imageheader.h \
 	preview.c \
 	preview.h \
 	builtin.c \

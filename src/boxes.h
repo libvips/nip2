@@ -137,7 +137,7 @@ GtkWidget *find_new( void );
 typedef struct _Imageheader {
 	iDialog parent;
 
-	Conversion *conv;
+	iImage *iimage;
 	GtkWidget *swin_fields;
 	GtkWidget *fields;
 	GtkSizeGroup *group;
@@ -152,7 +152,7 @@ typedef struct _ImageheaderClass {
 } ImageheaderClass;
 
 GtkType imageheader_get_type( void );
-GtkWidget *imageheader_new( Conversion *conv );
+GtkWidget *imageheader_new( iImage *iimage );
 
 void box_url( GtkWidget *par, const char *url );
 

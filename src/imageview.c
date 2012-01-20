@@ -354,14 +354,8 @@ imageview_header_action_cb( GtkAction *action, Imageview *iv )
 {
 	Imagemodel *imagemodel = iv->imagemodel;
 	iImage *iimage = imagemodel->iimage;
-	Row *row = HEAPMODEL( iimage )->row;
-	Workspace *ws = row_get_workspace( row );
-	char txt[512];
-	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	row_qualified_name_relative( ws->sym, row, &buf );
-	conversion_header_dialog( imagemodel->conv, 
-		vips_buf_all( &buf ), GTK_WIDGET( iv ) );
+	iimage_header_dialog( GTK_WIDGET( iv ), MODEL( iimage ) );
 }
 
 static void

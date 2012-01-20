@@ -699,7 +699,7 @@ imageheader_destroy( GtkObject *object )
 
 	/* My instance destroy stuff.
 	 */
-	UNREF( imageheader->conv );
+	UNREF( imageheader->iimage );
 
 	if( GTK_OBJECT_CLASS( imageheader_parent_class )->destroy )
 		GTK_OBJECT_CLASS( imageheader_parent_class )->destroy( object );
@@ -773,8 +773,9 @@ imageheader_refresh( Imageheader *imageheader )
 {
 	DESTROY_GTK( imageheader->fields );
 
-	if( imageheader->conv && imageheader->conv->ii ) {
-		IMAGE *im = imageinfo_get( FALSE, imageheader->conv->ii );
+	if( imageheader->iimage && imageheader->iimage->value.ii ) {
+		Imageinfo *ii = imageheader->iimage->value.ii;
+		IMAGE *im = imageinfo_get( FALSE, ii );
 
 		imageheader->group = 
 			gtk_size_group_new( GTK_SIZE_GROUP_HORIZONTAL );
@@ -888,7 +889,7 @@ imageheader_init( Imageheader *imageheader )
 	printf( "imageheader_init: %s\n", IWINDOW( imageheader )->title );
 #endif /*DEBUG*/
 
-	imageheader->conv = NULL;
+	imageheader->iimage = NULL;
 }
 
 GtkType
@@ -917,7 +918,7 @@ imageheader_get_type( void )
 /* Conversion has changed signal.
  */
 static void
-imageheader_conv_changed( Model *model, Imageheader *imageheader )
+imageheader_ii_changed( Model *model, Imageheader *imageheader )
 {
 	g_assert( IS_MODEL( model ) );
 	g_assert( IS_IMAGEHEADER( imageheader ) );
@@ -926,22 +927,22 @@ imageheader_conv_changed( Model *model, Imageheader *imageheader )
 }
 
 static void
-imageheader_link( Imageheader *imageheader, Conversion *conv )
+imageheader_link( Imageheader *imageheader, iImage *iimage )
 {
-	imageheader->conv = conv;
-	g_object_ref( G_OBJECT( conv ) );
-	iobject_sink( IOBJECT( conv ) );
+	imageheader->iimage = iimage;
+	g_object_ref( G_OBJECT( iimage ) );
+	iobject_sink( IOBJECT( iimage ) );
 
-	listen_add( G_OBJECT( imageheader ), (GObject **) &imageheader->conv,
-		"changed", G_CALLBACK( imageheader_conv_changed ) );
+	listen_add( G_OBJECT( imageheader ), (GObject **) &imageheader->iimage,
+		"changed", G_CALLBACK( imageheader_ii_changed ) );
 }
 
 GtkWidget *
-imageheader_new( Conversion *conv )
+imageheader_new( iImage *iimage )
 {
 	Imageheader *imageheader = gtk_type_new( TYPE_IMAGEHEADER );
 
-	imageheader_link( imageheader, conv );
+	imageheader_link( imageheader, iimage );
 
 	return( GTK_WIDGET( imageheader ) );
 }

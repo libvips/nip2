@@ -320,6 +320,23 @@ model_edit( GtkWidget *parent, Model *model )
 }
 
 void *
+model_info( GtkWidget *parent, Model *model )
+{
+	ModelClass *model_class = MODEL_GET_CLASS( model );
+
+	if( model_class->info )
+		model_class->info( parent, model );
+	else {
+		error_top( _( "Not implemented." ) );
+		error_sub( _( "_%s() not implemented for class \"%s\"." ), 
+			"info", 
+			G_OBJECT_CLASS_NAME( model_class ) );
+	}
+
+	return( NULL );
+}
+
+void *
 model_save( Model *model, xmlNode *xnode )
 {
 	ModelClass *model_class = MODEL_GET_CLASS( model );

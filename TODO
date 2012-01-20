@@ -1,10 +1,24 @@
 
+- add a right-click menu to image area of iamge view windows
+
+  perhaps use a treeview to show fields? we'd get column sorting and stuff
+  then as well
+
+  decode enums where possible
+
+  add a filter thing
+
+  have model::info and iobject::info argh
+
+
+
+
+
 - fix vipsobject.c now we have a more complete vips8 API
 
   make a vipsoperation.c as well which does output gathering
 
   remember this is used to create Interpolate objects, see _types.def
-
 
 
 

@@ -117,6 +117,8 @@ typedef struct _ModelClass {
 
 		edit		open an editor on the model
 
+		info		view info about the model
+
 		scrollto	try to make views visible
 
 		reset		signals views to reset ... eg. textview pops
@@ -128,6 +130,7 @@ typedef struct _ModelClass {
 	 */
 
 	void (*edit)( GtkWidget *, Model * );
+	void (*info)( GtkWidget *, Model * );
 	void (*scrollto)( Model *, ModelScrollPosition );
 	void (*reset)( Model * );
 	void (*layout)( Model * );
@@ -175,6 +178,7 @@ void model_scrollto( Model *model, ModelScrollPosition position );
 void model_layout( Model *model );
 void *model_reset( Model *model );
 void *model_edit( GtkWidget *parent, Model *model );
+void *model_info( GtkWidget *parent, Model *model );
 
 void *model_save( Model *model, xmlNode * );
 gboolean model_save_test( Model *model );

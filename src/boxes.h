@@ -123,37 +123,6 @@ typedef struct _FindClass {
 GtkType find_get_type( void );
 GtkWidget *find_new( void );
 
-/* Image header dialog.
- */
-#define TYPE_IMAGEHEADER (imageheader_get_type())
-#define IMAGEHEADER( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_IMAGEHEADER, Imageheader ))
-#define IMAGEHEADER_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_IMAGEHEADER, ImageheaderClass ))
-#define IS_IMAGEHEADER( obj ) (GTK_CHECK_TYPE( (obj), TYPE_IMAGEHEADER ))
-#define IS_IMAGEHEADER_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_IMAGEHEADER ))
-
-typedef struct _Imageheader {
-	iDialog parent;
-
-	iImage *iimage;
-	GtkWidget *swin_fields;
-	GtkWidget *fields;
-	GtkSizeGroup *group;
-	GtkWidget *history;
-} Imageheader;
-
-typedef struct _ImageheaderClass {
-	iDialogClass parent_class;
-
-	/* My methods.
-	 */
-} ImageheaderClass;
-
-GtkType imageheader_get_type( void );
-GtkWidget *imageheader_new( iImage *iimage );
-
 void box_url( GtkWidget *par, const char *url );
 
 /* Font chooser window.

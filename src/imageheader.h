@@ -40,9 +40,8 @@ typedef struct _Imageheader {
 	iDialog parent;
 
 	iImage *iimage;
-	GtkWidget *swin_fields;
-	GtkWidget *fields;
-	GtkSizeGroup *group;
+	GtkListStore *store;		/* Model for list view */
+	GtkWidget *tree;		/* Displayed tree */
 	GtkWidget *history;
 } Imageheader;
 

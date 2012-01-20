@@ -35,6 +35,14 @@
 
 static iDialogClass *imageheader_parent_class = NULL;
 
+/* Our columns.
+ */
+enum {
+	NAME_COLUMN,		
+	VALUE_COLUMN,	
+	N_COLUMNS
+};
+
 static void
 imageheader_destroy( GtkObject *object )
 {
@@ -48,70 +56,47 @@ imageheader_destroy( GtkObject *object )
 	/* My instance destroy stuff.
 	 */
 	UNREF( imageheader->iimage );
+	UNREF( imageheader->store );
 
 	if( GTK_OBJECT_CLASS( imageheader_parent_class )->destroy )
 		GTK_OBJECT_CLASS( imageheader_parent_class )->destroy( object );
 }
 
-/* Make a row for the header display. Align the names with "group".
- */
-static GtkWidget *
-imageheader_row_new( GtkSizeGroup *group, const char *field, GValue *value )
+static void *
+imageheader_add_item( IMAGE *im, 
+	const char *field, GValue *value, Imageheader *imageheader )
 {
-	GtkWidget *hbox;
-	GtkWidget *label;
+	char txt[256];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
+	GtkTreeIter iter;
+        char *value_str;
 	const char *extra;
-        char *str_value;
 
-	hbox = gtk_hbox_new( FALSE, 12 );
-
-	label = gtk_label_new( field );
-	gtk_misc_set_alignment( GTK_MISC( label ), 0.0, 0.5 );
-        gtk_box_pack_start( GTK_BOX( hbox ), label, FALSE, FALSE, 2 );
-	gtk_size_group_add_widget( group, label );
-
-	label = gtk_label_new( "=" );
-        gtk_box_pack_start( GTK_BOX( hbox ), label, FALSE, FALSE, 2 );
-
-	label = gtk_label_new( "" );
-        gtk_box_pack_start( GTK_BOX( hbox ), label, FALSE, FALSE, 2 );
+	value_str = g_strdup_value_contents( value );
+	vips_buf_appendf( &buf, "%s", value_str );
 
 	/* Look for enums and decode them.
 	 */
 	extra = NULL;
-	if( strcmp( field, "Coding" ) == 0 )
-		extra = NN( im_Coding2char( g_value_get_int( value ) ) );
-	else if( strcmp( field, "BandFmt" ) == 0 )
-		extra = NN( im_BandFmt2char( g_value_get_int( value ) ) );
-	else if( strcmp( field, "Type" ) == 0 )
-		extra = NN( im_Type2char( g_value_get_int( value ) ) );
-
-	str_value = g_strdup_value_contents( value );
+	if( strcmp( field, "coding" ) == 0 )
+		extra = VIPS_ENUM_NICK( VIPS_TYPE_CODING, 
+			g_value_get_int( value ) );
+	else if( strcmp( field, "format" ) == 0 )
+		extra = VIPS_ENUM_NICK( VIPS_TYPE_BAND_FORMAT, 
+			g_value_get_int( value ) );
+	else if( strcmp( field, "interpretation" ) == 0 )
+		extra = VIPS_ENUM_NICK( VIPS_TYPE_INTERPRETATION, 
+			g_value_get_int( value ) );
 	if( extra )
-		set_glabel( label, "%s - %s", str_value, extra );
-	else
-		set_glabel( label, "%s", str_value );
-	g_free( str_value );
+		vips_buf_appendf( &buf, " - %s", extra );
 
-	return( hbox );
-}
+	gtk_list_store_append( imageheader->store, &iter );
+	gtk_list_store_set( imageheader->store, &iter,
+		NAME_COLUMN, field,
+		VALUE_COLUMN, vips_buf_all( &buf ),
+		-1 );
 
-/* Mapped over the header fields to make rows.
- */
-static void *
-imageheader_row_map_fn( IMAGE *im, 
-	const char *field, GValue *value, Imageheader *imageheader )
-{
-	GtkWidget *hbox;
-
-	/* This is just there for back compt, hide it.
-	 */
-	if( strcmp( field, "Bbits" ) == 0 )
-		return( NULL );
-
-	hbox = imageheader_row_new( imageheader->group, field, value );
-	gtk_box_pack_start( GTK_BOX( imageheader->fields ), 
-		hbox, FALSE, FALSE, 0 );
+	g_free( value_str );
 
 	return( NULL );
 }
@@ -119,22 +104,16 @@ imageheader_row_map_fn( IMAGE *im,
 static void
 imageheader_refresh( Imageheader *imageheader )
 {
-	DESTROY_GTK( imageheader->fields );
+	gtk_list_store_clear( imageheader->store );
 
-	if( imageheader->iimage && imageheader->iimage->value.ii ) {
+	if( imageheader->iimage && 
+		imageheader->iimage->value.ii ) {
 		Imageinfo *ii = imageheader->iimage->value.ii;
 		IMAGE *im = imageinfo_get( FALSE, ii );
 
-		imageheader->group = 
-			gtk_size_group_new( GTK_SIZE_GROUP_HORIZONTAL );
-		imageheader->fields = gtk_vbox_new( FALSE, 2 );
-		gtk_scrolled_window_add_with_viewport( 
-			GTK_SCROLLED_WINDOW( imageheader->swin_fields ), 
-			imageheader->fields );
 		im_header_map( im, 
-			(im_header_map_fn) imageheader_row_map_fn,
+			(im_header_map_fn) imageheader_add_item,
 			imageheader );
-		gtk_widget_show_all( imageheader->fields );
 
 		gtk_text_buffer_set_text( 
 			gtk_text_view_get_buffer( 
@@ -152,6 +131,8 @@ imageheader_build( GtkWidget *widget )
 {
 	Imageheader *imageheader = IMAGEHEADER( widget );
 	iDialog *idlg = IDIALOG( widget );
+	GtkCellRenderer *renderer;
+	GtkTreeViewColumn *column;
 
 	GtkWidget *label;
 	GtkWidget *swin;
@@ -171,23 +152,37 @@ imageheader_build( GtkWidget *widget )
 	pane = gtk_vpaned_new();
         gtk_box_pack_start( GTK_BOX( idlg->work ), pane, TRUE, TRUE, 2 );
 
-	/* Scrolled area to hold fields.
-	 */
-	vbox = gtk_vbox_new( FALSE, 2 );
-	gtk_paned_pack1( GTK_PANED( pane ), vbox, TRUE, FALSE );
-	label = gtk_label_new( _( "Image header fields" ) );
-	gtk_misc_set_alignment( GTK_MISC( label ), 0.0, 0.5 );
-        gtk_box_pack_start( GTK_BOX( vbox ), label, FALSE, FALSE, 2 );
-	imageheader->swin_fields = gtk_scrolled_window_new( NULL, NULL );
-	gtk_scrolled_window_set_policy( 
-		GTK_SCROLLED_WINDOW( imageheader->swin_fields ),
-		GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
-        gtk_box_pack_start( GTK_BOX( vbox ), 
-		imageheader->swin_fields, TRUE, TRUE, 2 );
+	imageheader->store = gtk_list_store_new( N_COLUMNS, 
+		G_TYPE_STRING, 
+		G_TYPE_STRING );
 
-	/* Created in _refresh()
-	 */
-	imageheader->fields = NULL;
+	imageheader->tree = gtk_tree_view_new_with_model( 
+		GTK_TREE_MODEL( imageheader->store ) );
+	gtk_tree_view_set_rules_hint( GTK_TREE_VIEW( imageheader->tree ),
+		TRUE );
+
+	renderer = gtk_cell_renderer_text_new();
+	column = gtk_tree_view_column_new_with_attributes( _( "Field" ),
+		   renderer, "text", NAME_COLUMN, NULL );
+	gtk_tree_view_column_set_resizable( column, TRUE );
+	gtk_tree_view_column_set_reorderable( column, TRUE );
+	gtk_tree_view_append_column( GTK_TREE_VIEW( imageheader->tree ), 
+		column );
+
+	renderer = gtk_cell_renderer_text_new();
+	column = gtk_tree_view_column_new_with_attributes( _( "Value" ),
+		   renderer, "text", VALUE_COLUMN, NULL );
+	gtk_tree_view_column_set_resizable( column, TRUE );
+	gtk_tree_view_column_set_reorderable( column, TRUE );
+	gtk_tree_view_append_column( GTK_TREE_VIEW( imageheader->tree ), 
+		column );
+
+	swin = gtk_scrolled_window_new( NULL, NULL );
+        gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( swin ),
+		GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
+	gtk_container_add( GTK_CONTAINER( swin ), imageheader->tree );
+
+	gtk_paned_pack1( GTK_PANED( pane ), swin, TRUE, FALSE );
 
 	vbox = gtk_vbox_new( FALSE, 2 );
 	gtk_paned_pack2( GTK_PANED( pane ), vbox, TRUE, FALSE );
@@ -211,6 +206,7 @@ imageheader_build( GtkWidget *widget )
 	imageheader_refresh( imageheader );
 
         gtk_window_set_default_size( GTK_WINDOW( imageheader ), 550, 550 );
+	gtk_paned_set_position( GTK_PANED( pane ), 400 );
 
 	gtk_widget_show_all( idlg->work );
 }

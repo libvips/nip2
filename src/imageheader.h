@@ -41,7 +41,9 @@ typedef struct _Imageheader {
 
 	iImage *iimage;
 	GtkListStore *store;		/* Model for list view */
+	GtkTreeModel *filter;		/* After filtering with search box */
 	GtkWidget *tree;		/* Displayed tree */
+	GtkWidget *entry;		/* Search widget */
 	GtkWidget *history;
 } Imageheader;
 

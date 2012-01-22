@@ -127,6 +127,45 @@ imageheader_refresh( Imageheader *imageheader )
 }
 
 static void
+imageheader_entry_changed_cb( GtkEditable *editable, 
+	Imageheader *imageheader )
+{
+	gtk_tree_model_filter_refilter( 
+		GTK_TREE_MODEL_FILTER( imageheader->filter ) );
+}
+
+static gboolean
+imageheader_visible_func( GtkTreeModel *model, GtkTreeIter *iter, 
+	gpointer data )
+{
+	Imageheader *imageheader = IMAGEHEADER( data );
+	const char *text = gtk_entry_get_text( 
+		GTK_ENTRY( imageheader->entry ) );
+	char *name;
+	char *value;
+	gboolean found;
+
+	found = FALSE;
+
+	gtk_tree_model_get( model, iter, NAME_COLUMN, &name, -1 );
+	if( name ) {
+		found = my_strcasestr( name, text ) != NULL;
+		g_free( name );
+	}
+
+	if( found )
+		return( TRUE );
+
+	gtk_tree_model_get( model, iter, VALUE_COLUMN, &value, -1 );
+	if( value ) {
+		found = my_strcasestr( value, text ) != NULL;
+		g_free( value );
+	}
+
+	return( found );
+}
+
+static void
 imageheader_build( GtkWidget *widget )
 {
 	Imageheader *imageheader = IMAGEHEADER( widget );
@@ -134,6 +173,7 @@ imageheader_build( GtkWidget *widget )
 	GtkCellRenderer *renderer;
 	GtkTreeViewColumn *column;
 
+	GtkWidget *top;
 	GtkWidget *label;
 	GtkWidget *swin;
 	GtkWidget *pane;
@@ -152,14 +192,42 @@ imageheader_build( GtkWidget *widget )
 	pane = gtk_vpaned_new();
         gtk_box_pack_start( GTK_BOX( idlg->work ), pane, TRUE, TRUE, 2 );
 
+	vbox = gtk_vbox_new( FALSE, 2 );
+	gtk_paned_pack1( GTK_PANED( pane ), vbox, TRUE, FALSE );
+
+	top = gtk_hbox_new( FALSE, 12 );
+        gtk_box_pack_start( GTK_BOX( vbox ), top, FALSE, FALSE, 2 );
+
+	imageheader->entry = gtk_entry_new();
+        gtk_signal_connect( GTK_OBJECT( imageheader->entry ), "changed", 
+		GTK_SIGNAL_FUNC( imageheader_entry_changed_cb ), 
+		imageheader );
+	gtk_box_pack_end( GTK_BOX( top ), 
+		imageheader->entry, FALSE, FALSE, 2 );
+
+	label = gtk_image_new_from_stock( GTK_STOCK_FIND, GTK_ICON_SIZE_MENU );
+	gtk_box_pack_end( GTK_BOX( top ), label, FALSE, FALSE, 0 );
+
+	swin = gtk_scrolled_window_new( NULL, NULL );
+        gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( swin ),
+		GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
+        gtk_box_pack_start( GTK_BOX( vbox ), swin, TRUE, TRUE, 2 );
+
 	imageheader->store = gtk_list_store_new( N_COLUMNS, 
 		G_TYPE_STRING, 
 		G_TYPE_STRING );
 
+	imageheader->filter = gtk_tree_model_filter_new( 
+		GTK_TREE_MODEL( imageheader->store ), NULL );
+	gtk_tree_model_filter_set_visible_func( 
+		GTK_TREE_MODEL_FILTER( imageheader->filter ), 
+		imageheader_visible_func, imageheader, NULL );
+
 	imageheader->tree = gtk_tree_view_new_with_model( 
-		GTK_TREE_MODEL( imageheader->store ) );
+		GTK_TREE_MODEL( imageheader->filter ) );
 	gtk_tree_view_set_rules_hint( GTK_TREE_VIEW( imageheader->tree ),
 		TRUE );
+	gtk_container_add( GTK_CONTAINER( swin ), imageheader->tree );
 
 	renderer = gtk_cell_renderer_text_new();
 	column = gtk_tree_view_column_new_with_attributes( _( "Field" ),
@@ -176,13 +244,6 @@ imageheader_build( GtkWidget *widget )
 	gtk_tree_view_column_set_reorderable( column, TRUE );
 	gtk_tree_view_append_column( GTK_TREE_VIEW( imageheader->tree ), 
 		column );
-
-	swin = gtk_scrolled_window_new( NULL, NULL );
-        gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( swin ),
-		GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
-	gtk_container_add( GTK_CONTAINER( swin ), imageheader->tree );
-
-	gtk_paned_pack1( GTK_PANED( pane ), swin, TRUE, FALSE );
 
 	vbox = gtk_vbox_new( FALSE, 2 );
 	gtk_paned_pack2( GTK_PANED( pane ), vbox, TRUE, FALSE );
@@ -206,7 +267,7 @@ imageheader_build( GtkWidget *widget )
 	imageheader_refresh( imageheader );
 
         gtk_window_set_default_size( GTK_WINDOW( imageheader ), 550, 550 );
-	gtk_paned_set_position( GTK_PANED( pane ), 400 );
+	gtk_paned_set_position( GTK_PANED( pane ), 350 );
 
 	gtk_widget_show_all( idlg->work );
 }

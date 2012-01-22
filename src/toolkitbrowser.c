@@ -238,8 +238,8 @@ toolkitbrowser_init( Toolkitbrowser *toolkitbrowser )
 		GTK_SIGNAL_FUNC( toolkitbrowser_entry_changed_cb ), 
 		toolkitbrowser );
 	gtk_box_pack_end( GTK_BOX( toolkitbrowser->top ), 
-		toolkitbrowser->entry, TRUE, TRUE, 2 );
-	label = gtk_label_new( _( "Search:" ) );
+		toolkitbrowser->entry, FALSE, FALSE, 2 );
+	label = gtk_image_new_from_stock( GTK_STOCK_FIND, GTK_ICON_SIZE_MENU );
 	gtk_box_pack_end( GTK_BOX( toolkitbrowser->top ), 
 		label, FALSE, FALSE, 0 );
         gtk_box_pack_start( GTK_BOX( toolkitbrowser ), 

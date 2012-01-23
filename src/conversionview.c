@@ -186,11 +186,9 @@ conversionview_offset_change_cb( Tslider *tslider, Conversionview *cv )
 static void
 conversionview_init( Conversionview *cv )
 {
-	GtkWidget *but;
-	GtkWidget *arrow;
+	Popupbutton *popupbutton;
 	GtkWidget *hb;
 	GtkWidget *sep;
-	GtkWidget *mb;
 
 	GtkWidget *pane;
 
@@ -221,13 +219,10 @@ conversionview_init( Conversionview *cv )
 	menu_add_but( pane, GTK_STOCK_CLOSE,
 		GTK_SIGNAL_FUNC( conversionview_hide_cb ), cv );
 
-        arrow = gtk_arrow_new( GTK_ARROW_RIGHT, GTK_SHADOW_OUT );
-	but = gtk_menu_item_new();
-        gtk_container_add( GTK_CONTAINER( but ), arrow );
-	gtk_menu_item_set_submenu( GTK_MENU_ITEM( but ), pane );
-	mb = gtk_menu_bar_new();
-	gtk_menu_bar_append( GTK_MENU_BAR( mb ), but );
-        gtk_box_pack_start( GTK_BOX( hb ), mb, FALSE, FALSE, 0 );
+	popupbutton = popupbutton_new();
+	popupbutton_set_menu( popupbutton, pane );
+        gtk_box_pack_start( GTK_BOX( hb ), GTK_WIDGET( popupbutton ), 
+		FALSE, FALSE, 0 );
 
 	cv->scale = tslider_new();
 	tslider_set_conversions( cv->scale, 

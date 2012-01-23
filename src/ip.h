@@ -355,6 +355,7 @@ typedef void *(*tool_map_fn)( Tool *, void *, void * );
 #include "iwindow.h"
 #include "idialog.h"
 #include "boxes.h"
+#include "popupbutton.h"
 #include "imageheader.h"
 #include "filesel.h"
 #include "managed.h"

@@ -333,8 +333,6 @@ static void
 imageheader_link( Imageheader *imageheader, iImage *iimage )
 {
 	imageheader->iimage = iimage;
-	g_object_ref( G_OBJECT( iimage ) );
-	iobject_sink( IOBJECT( iimage ) );
 
 	listen_add( G_OBJECT( imageheader ), (GObject **) &imageheader->iimage,
 		"changed", G_CALLBACK( imageheader_ii_changed ) );

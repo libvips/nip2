@@ -1,12 +1,6 @@
 - move other popupbutton uses to new thing
 
 
-- program window could have a search on it's treeview
-
-  move 'process' into the menu button to make space for it
-
-- better menu button widget
-
 - have model::info and iobject::info argh
 
 - we ref the iimage in imageheader ... should use listener instead?

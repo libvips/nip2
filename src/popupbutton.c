@@ -38,28 +38,9 @@
 static GtkToggleButtonClass *popupbutton_parent_class = NULL;
 
 static void
-popupbutton_destroy( GtkObject *object )
-{
-	Popupbutton *popupbutton;
-
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_POPUPBUTTON( object ) );
-
-	popupbutton = POPUPBUTTON( object );
-
-	VIPS_UNREF( popupbutton->menu );
-
-	GTK_OBJECT_CLASS( popupbutton_parent_class )->destroy( object );
-}
-
-static void
 popupbutton_class_init( PopupbuttonClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
-
 	popupbutton_parent_class = g_type_class_peek_parent( class );
-
-	object_class->destroy = popupbutton_destroy;
 }
 
 static void
@@ -101,7 +82,7 @@ popupbutton_position_func( GtkMenu *menu,
 	GtkTextDirection direction;
 	GtkAllocation allocation;
 
-	gtk_widget_size_request( GTK_WIDGET( menu ), &menu_req);
+	gtk_widget_size_request( GTK_WIDGET( menu ), &menu_req );
 
 	direction = gtk_widget_get_direction( button );
 
@@ -115,10 +96,7 @@ popupbutton_position_func( GtkMenu *menu,
 	else if( menu_req.width > allocation.width )
 		*x -= menu_req.width - allocation.width;
 
-	/* This might not work properly if the popup button is right at the
-	 * top of the screen, but really, what are the chances 
-	 */
-	*y -= menu_req.height;
+	*y += allocation.height;
 
 	*push_in = FALSE;
 }

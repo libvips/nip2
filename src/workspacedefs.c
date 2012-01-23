@@ -244,10 +244,9 @@ static void
 workspacedefs_init( Workspacedefs *workspacedefs )
 {
 	GtkWidget *pane;
+	Popupbutton *popupbutton;
 	GtkWidget *swin;
 	GtkWidget *hbox;
-	GtkWidget *arrow;
-	GtkWidget *mb;
 	GtkWidget *but;
 
 #ifdef DEBUG
@@ -268,16 +267,11 @@ workspacedefs_init( Workspacedefs *workspacedefs )
 	gtk_box_pack_start( GTK_BOX( workspacedefs ), hbox, FALSE, FALSE, 0 );
 	gtk_widget_show( hbox );
 
-	mb = gtk_menu_bar_new();
-	gtk_box_pack_start( GTK_BOX( hbox ), mb, FALSE, FALSE, 0 );
-	gtk_widget_show( mb );
-	but = gtk_menu_item_new();
-	gtk_menu_item_set_submenu( GTK_MENU_ITEM( but ), pane );
-	gtk_menu_bar_append( GTK_MENU_BAR( mb ), but );
-	gtk_widget_show( but );
-        arrow = gtk_arrow_new( GTK_ARROW_RIGHT, GTK_SHADOW_OUT );
-        gtk_container_add( GTK_CONTAINER( but ), arrow );
-	gtk_widget_show( arrow );
+	popupbutton = popupbutton_new();
+	popupbutton_set_menu( popupbutton, pane );
+        gtk_box_pack_start( GTK_BOX( hbox ), GTK_WIDGET( popupbutton ), 
+		FALSE, FALSE, 0 );
+	gtk_widget_show( GTK_WIDGET( popupbutton ) );
 
 	but = gtk_button_new_with_label( _( "Process" ) );
         g_signal_connect( G_OBJECT( but ), "clicked",

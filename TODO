@@ -1,9 +1,20 @@
 
-- add a right-click menu to image area of iamge view windows
+- add a right-click menu to image area of image view windows
 
-  image header column sorting?
+	view paint / display / status / rulers
+	view header
+	replace from file
+	save as
+	recalculate
+	close
 
-  have model::info and iobject::info argh
+- program window could have a search on it's treeview
+
+  move 'process' into the menu button to make space for it
+
+- better menu button widget
+
+- have model::info and iobject::info argh
 
 
 

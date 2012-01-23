@@ -233,7 +233,6 @@ imageheader_build( GtkWidget *widget )
 	column = gtk_tree_view_column_new_with_attributes( _( "Field" ),
 		   renderer, "text", NAME_COLUMN, NULL );
 	gtk_tree_view_column_set_resizable( column, TRUE );
-	gtk_tree_view_column_set_reorderable( column, TRUE );
 	gtk_tree_view_append_column( GTK_TREE_VIEW( imageheader->tree ), 
 		column );
 
@@ -241,7 +240,6 @@ imageheader_build( GtkWidget *widget )
 	column = gtk_tree_view_column_new_with_attributes( _( "Value" ),
 		   renderer, "text", VALUE_COLUMN, NULL );
 	gtk_tree_view_column_set_resizable( column, TRUE );
-	gtk_tree_view_column_set_reorderable( column, TRUE );
 	gtk_tree_view_append_column( GTK_TREE_VIEW( imageheader->tree ), 
 		column );
 

@@ -1,13 +1,3 @@
-
-- add a right-click menu to image area of image view windows
-
-	view paint / display / status / rulers
-	view header
-	replace from file
-	save as
-	recalculate
-	close
-
 - program window could have a search on it's treeview
 
   move 'process' into the menu button to make space for it

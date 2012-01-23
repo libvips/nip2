@@ -580,6 +580,7 @@ static GtkRadioActionEntry imageview_zoom_radio_actions[] = {
 
 static const char *imageview_menubar_ui_description =
 "<ui>"
+
 "  <menubar name='ImageviewMenubar'>"
 "    <menu action='FileMenu'>"
 "      <menu action='NewMenu'>"
@@ -636,19 +637,40 @@ static const char *imageview_menubar_ui_description =
 "      <menuitem action='Homepage'/>"
 "    </menu>"
 "  </menubar>"
+
+"  <popup name='ImageviewPopup'>"
+"    <menu action='ViewToolbarMenu'>"
+"      <menuitem action='Status'/>"
+"      <menuitem action='Control'/>"
+"      <menuitem action='Paint'/>"
+"      <menuitem action='Rulers'/>"
+"    </menu>"
+"    <menuitem action='Zoom100'/>"
+"    <menuitem action='ZoomFit'/>"
+"    <menuitem action='Header'/>"
+"    <separator/>"
+"    <menuitem action='Replace'/>"
+"    <menuitem action='SaveAs'/>"
+"    <menuitem action='Recalculate'/>"
+"    <separator/>"
+"    <menuitem action='Close'/>"
+"  </popup>"
+
 "</ui>";
 
-/* Spot mouse motion events, to update status bar.
- */
 static gint
 imageview_event( GtkWidget *widget, GdkEvent *event, Imageview *iv )
 {
+	gboolean handled = FALSE;
+
 #ifdef EVENT
 	if( event->type == GDK_BUTTON_PRESS )
 		printf( "imageview_event: GDK_BUTTON_PRESS\n" );
 #endif /*EVENT*/
 
-	if( event->type == GDK_MOTION_NOTIFY ) { 
+	switch( event->type ) { 
+	case GDK_MOTION_NOTIFY: 
+{
 		Imagemodel *imagemodel = iv->imagemodel;
 		Conversion *conv = imagemodel->conv;
 		int ix, iy;
@@ -657,9 +679,37 @@ imageview_event( GtkWidget *widget, GdkEvent *event, Imageview *iv )
 			event->button.x, event->button.y, &ix, &iy );
 
 		statusview_mouse( iv->sv, ix, iy );
+}
+
+		break;
+
+	case GDK_BUTTON_PRESS:
+		switch( event->button.button ) {
+		case 3:
+{
+			iWindow *iwnd = IWINDOW( iv );
+			GtkWidget *popup;
+
+			popup = gtk_ui_manager_get_widget( iwnd->ui_manager, 
+				"/ImageviewPopup" );
+			gtk_menu_popup( GTK_MENU( popup ), NULL, NULL,
+				(GtkMenuPositionFunc) NULL, NULL, 3, 
+				event->button.time );
+			handled = TRUE;
+}
+			break;
+
+		default:
+			break;
+		}
+
+		break;
+
+	default:
+		break;
 	}
 
-	return( FALSE );
+	return( handled );
 }
 
 static gboolean
@@ -761,7 +811,7 @@ imageview_build( Imageview *iv, GtkWidget *vbox, iImage *iimage )
 	iv->ip = imagepresent_new( iv->imagemodel );
 	gtk_container_add( GTK_CONTAINER( frame ), GTK_WIDGET( iv->ip ) );
 	gtk_widget_show( GTK_WIDGET( iv->ip ) );
-	gtk_signal_connect( GTK_OBJECT( iv->ip->id ), "event",
+	gtk_signal_connect_after( GTK_OBJECT( iv->ip->id ), "event",
 		GTK_SIGNAL_FUNC( imageview_event ), iv );
 
 	/* Position and size to restore?

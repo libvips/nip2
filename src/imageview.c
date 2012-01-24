@@ -355,7 +355,7 @@ imageview_header_action_cb( GtkAction *action, Imageview *iv )
 	Imagemodel *imagemodel = iv->imagemodel;
 	iImage *iimage = imagemodel->iimage;
 
-	iimage_header_dialog( GTK_WIDGET( iv ), MODEL( iimage ) );
+	iimage_header( GTK_WIDGET( iv ), MODEL( iimage ) );
 }
 
 static void

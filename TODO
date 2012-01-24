@@ -1,12 +1,3 @@
-- open image viewer, open header view, close image window, segv
-
-  did this work before? it was using conversion as the model then I guess
-
-- have model::info and iobject::info argh
-
-
-
-
 - fix vipsobject.c now we have a more complete vips8 API
 
   make a vipsoperation.c as well which does output gathering and uses the

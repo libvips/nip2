@@ -170,20 +170,6 @@ vo_set_optional( Vo *vo, PElement *list )
 	return( TRUE );
 }
 
-static gboolean
-vo_build_result( Vo *vo, PElement *out )
-{
-	Managedgobject *managedgobject;
-
-	if( !(managedgobject = managedgobject_new( vo->rc->heap, 
-		G_OBJECT( vo->object ) )) )
-		return( FALSE );
-
-	PEPUTP( out, ELEMENT_MANAGED, managedgobject );
-
-	return( TRUE );
-}
-
 /* We know we have three args: name, required, optional.
  */
 void
@@ -237,12 +223,13 @@ vo_object_new( Reduce *rc, const char *name,
 		reduce_throw( rc );
 	}
 
-	/* Build the return value.
+	/* Return the constructed object.
 	 */
-	if( !vo_build_result( vo, out ) ) {
-		vo_free( vo );
-		reduce_throw( rc );
-	}
+	if( !(managedgobject = managedgobject_new( vo->rc->heap, 
+		G_OBJECT( vo->object ) )) )
+		return( FALSE );
+
+	PEPUTP( out, ELEMENT_MANAGED, managedgobject );
 
 #ifdef DEBUG
 {

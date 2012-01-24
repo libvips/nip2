@@ -320,16 +320,16 @@ model_edit( GtkWidget *parent, Model *model )
 }
 
 void *
-model_info( GtkWidget *parent, Model *model )
+model_header( GtkWidget *parent, Model *model )
 {
 	ModelClass *model_class = MODEL_GET_CLASS( model );
 
-	if( model_class->info )
-		model_class->info( parent, model );
+	if( model_class->header )
+		model_class->header( parent, model );
 	else {
 		error_top( _( "Not implemented." ) );
 		error_sub( _( "_%s() not implemented for class \"%s\"." ), 
-			"info", 
+			"header", 
 			G_OBJECT_CLASS_NAME( model_class ) );
 	}
 

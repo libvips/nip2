@@ -291,13 +291,13 @@ rowview_edit_cb( GtkWidget *menu, GtkWidget *button, Rowview *rview )
 /* Show info.
  */
 static gboolean
-rowview_info( Rowview *rview )
+rowview_header( Rowview *rview )
 {
 	Row *row = ROW( VOBJECT( rview )->iobject );
 	Model *graphic = row->child_rhs->graphic;
 
 	if( graphic )
-		model_info( GTK_WIDGET( rview->sview ), graphic );
+		model_header( GTK_WIDGET( rview->sview ), graphic );
 
 	return( TRUE );
 }
@@ -305,9 +305,9 @@ rowview_info( Rowview *rview )
 /* Info in menu.
  */
 static void
-rowview_info_cb( GtkWidget *menu, GtkWidget *button, Rowview *rview )
+rowview_header_cb( GtkWidget *menu, GtkWidget *button, Rowview *rview )
 {
-	if( !rowview_info( rview ) ) 
+	if( !rowview_header( rview ) ) 
 		iwindow_alert( button, GTK_MESSAGE_ERROR );
 }
 
@@ -608,8 +608,8 @@ rowview_class_init( RowviewClass *class )
 	pane = rowview_popup_menu = popup_build( _( "Row menu" ) );
 	popup_add_but( pane, _( "_Edit" ), 
 		POPUP_FUNC( rowview_edit_cb ) );
-	popup_add_but( pane, _( "_Info" ), 
-		POPUP_FUNC( rowview_info_cb ) );
+	popup_add_but( pane, _( "_Header" ), 
+		POPUP_FUNC( rowview_header_cb ) );
 	popup_add_but( pane, STOCK_DUPLICATE,
 		POPUP_FUNC( rowview_clone_cb ) );
 	popup_add_but( pane, _( "U_ngroup" ), 

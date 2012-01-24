@@ -117,7 +117,7 @@ typedef struct _ModelClass {
 
 		edit		open an editor on the model
 
-		info		view info about the model
+		header		view model header 
 
 		scrollto	try to make views visible
 
@@ -130,7 +130,7 @@ typedef struct _ModelClass {
 	 */
 
 	void (*edit)( GtkWidget *, Model * );
-	void (*info)( GtkWidget *, Model * );
+	void (*header)( GtkWidget *, Model * );
 	void (*scrollto)( Model *, ModelScrollPosition );
 	void (*reset)( Model * );
 	void (*layout)( Model * );
@@ -178,7 +178,7 @@ void model_scrollto( Model *model, ModelScrollPosition position );
 void model_layout( Model *model );
 void *model_reset( Model *model );
 void *model_edit( GtkWidget *parent, Model *model );
-void *model_info( GtkWidget *parent, Model *model );
+void *model_header( GtkWidget *parent, Model *model );
 
 void *model_save( Model *model, xmlNode * );
 gboolean model_save_test( Model *model );

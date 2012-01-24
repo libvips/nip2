@@ -1031,7 +1031,8 @@ listen_source_destroy_cb( GObject *gobject, Listen *listen )
 	/* Zap gobject member pointer to source.
 	 */
 	if( listen->zap ) {
-		g_assert( !*(listen->zap) || *(listen->zap) == listen->source );
+		g_assert( !*(listen->zap) || 
+			*(listen->zap) == listen->source );
 
 		*(listen->zap) = NULL;
 	}

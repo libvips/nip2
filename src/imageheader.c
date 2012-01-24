@@ -55,7 +55,6 @@ imageheader_destroy( GtkObject *object )
 
 	/* My instance destroy stuff.
 	 */
-	UNREF( imageheader->iimage );
 	UNREF( imageheader->store );
 
 	if( GTK_OBJECT_CLASS( imageheader_parent_class )->destroy )

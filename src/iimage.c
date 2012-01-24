@@ -135,7 +135,7 @@ iimage_edit( GtkWidget *parent, Model *model )
 }
 
 void
-iimage_header_dialog( GtkWidget *parent, Model *model )
+iimage_header( GtkWidget *parent, Model *model )
 {
         iImage *iimage = IIMAGE( model );
 	Row *row = HEAPMODEL( iimage )->row;
@@ -419,7 +419,7 @@ iimage_class_init( iImageClass *class )
 
 	model_class->view_new = iimage_view_new;
 	model_class->edit = iimage_edit;
-	model_class->info = iimage_header_dialog;
+	model_class->header = iimage_header;
 	model_class->save = iimage_save;
 	model_class->load = iimage_load;
 

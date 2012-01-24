@@ -1,9 +1,9 @@
-- move other popupbutton uses to new thing
+- open image viewer, open header view, close image window, segv
 
+  did this work before? it was using conversion as the model then I guess
 
 - have model::info and iobject::info argh
 
-- we ref the iimage in imageheader ... should use listener instead?
 
 
 

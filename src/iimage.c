@@ -152,6 +152,7 @@ iimage_header_dialog( GtkWidget *parent, Model *model )
 	idialog_set_callbacks( IDIALOG( imageheader ), NULL, NULL, NULL, NULL );
 	idialog_add_ok( IDIALOG( imageheader ), iwindow_true_cb, _( "OK" ) );
 	iwindow_set_parent( IWINDOW( imageheader ), parent );
+	idialog_set_iobject( IDIALOG( imageheader ), IOBJECT( iimage ) );
 	iwindow_build( IWINDOW( imageheader ) );
 
 	gtk_widget_show( imageheader );

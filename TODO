@@ -1,11 +1,3 @@
-- vips_call doesnt seem to work
-
-	vips_call "add" [A1.value, A1.value] []
-
-  gives a bad args error
-
-
-
 - paint out peaks on FFT to remove scan artefacts is broken?
 
 - util.c:to_size() can be replaced with vips_buf_append_size()

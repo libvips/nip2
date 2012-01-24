@@ -59,11 +59,16 @@ typedef struct _Vo {
 	/* Number of output args the object has.
 	 */
 	int nargs_output;
+
+	/* A place to build the output, safe from the GC.
+	 */
+	Element out;
 } Vo;
 
 static void
 vo_free( Vo *vo )
 {
+	heap_unregister_element( vo->rc->heap, &vo->out );
 	VIPS_UNREF( vo->object );
 
 	im_free( vo );
@@ -86,6 +91,10 @@ vo_new( Reduce *rc, const char *name )
 	vo->nargs_supplied = 0;
 	vo->nargs_required = 0;
 	vo->nargs_output = 0;
+	vo->out.type = ELEMENT_NOVAL;
+	vo->out.ele = (void *) 12;
+
+	heap_register_element( rc->heap, &vo->out );
 
 	return( vo );
 }
@@ -356,6 +365,7 @@ vo_call( Reduce *rc, const char *name,
 	PElement *required, PElement *optional, PElement *out )
 {
 	Vo *vo;
+	PElement pe;
 
 	if( !(vo = vo_new( rc, name )) ) 
 		reduce_throw( rc );
@@ -376,14 +386,20 @@ vo_call( Reduce *rc, const char *name,
 		reduce_throw( rc );
 	}
 
+	/* We can't build the output object directly on out, since it might be
+	 * one of our inputs. We use the safe Element in vo for the build,
+	 * then copy at the end.
+	 */
+
 	/* Empty output list.
 	 */
-	heap_list_init( out );
+	PEPOINTE( &pe, &vo->out );
+	heap_list_init( &pe );
 
 	/* Append required outputs.
 	 */
 	if( vips_argument_map( VIPS_OBJECT( vo->object ),
-		(VipsArgumentMapFn) vo_get_required_output, vo, out ) ) {
+		(VipsArgumentMapFn) vo_get_required_output, vo, &pe ) ) {
 		vips_object_unref_outputs( vo->object );
 		vo_free( vo );
 		reduce_throw( rc );
@@ -391,11 +407,15 @@ vo_call( Reduce *rc, const char *name,
 
 	/* Append optional outputs.
 	 */
-	if( !vo_get_optional( vo, optional, out ) ) {
+	if( !vo_get_optional( vo, optional, &pe ) ) {
 		vips_object_unref_outputs( vo->object );
 		vo_free( vo );
 		reduce_throw( rc );
 	}
+
+	/* Now write the output object to out.
+	 */
+	PEPUTE( out, &vo->out );
 
 	vips_object_unref_outputs( vo->object );
 	vo_free( vo );

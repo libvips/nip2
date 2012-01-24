@@ -808,6 +808,33 @@ apply_vo_new_call( Reduce *rc,
 	vo_object_new( rc, buf, &required, &optional, out );
 }
 
+/* Args for "vips_call". 
+ */
+static BuiltinTypeSpot *vo_call_args[] = { 
+	&string_spot,
+	&list_spot,
+	&list_spot 
+};
+
+/* Do a vips_call call.
+ */
+static void
+apply_vo_call_call( Reduce *rc, 
+	const char *name, HeapNode **arg, PElement *out )
+{
+	PElement rhs;
+	char buf[256];
+	PElement required;
+	PElement optional;
+
+	PEPOINTRIGHT( arg[2], &rhs );
+	reduce_get_string( rc, &rhs, buf, 256 );
+	PEPOINTRIGHT( arg[1], &required );
+	PEPOINTRIGHT( arg[0], &optional );
+
+	vo_call( rc, buf, &required, &optional, out );
+}
+
 /* All ip's builtin functions. 
  */
 static BuiltinInfo builtin_table[] = {
@@ -826,6 +853,8 @@ static BuiltinInfo builtin_table[] = {
 	 */
 	{ "vips_object_new", FALSE, IM_NUMBER( vo_new_args ), 
 		&vo_new_args[0], apply_vo_new_call },
+	{ "vips_call", FALSE, IM_NUMBER( vo_call_args ), 
+		&vo_call_args[0], apply_vo_call_call },
 
 	/* Predicates.
 	 */

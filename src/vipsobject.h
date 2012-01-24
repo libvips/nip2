@@ -29,3 +29,6 @@
 
 void vo_object_new( Reduce *rc, const char *name, 
 	PElement *required, PElement *optional, PElement *out );
+void vo_call( Reduce *rc, const char *name,
+        PElement *required, PElement *optional, PElement *out );
+

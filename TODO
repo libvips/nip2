@@ -1,7 +1,8 @@
-- fix vipsobject.c now we have a more complete vips8 API
+- vips_call doesnt seem to work
 
-  make a vipsoperation.c as well which does output gathering and uses the
-  operation cache
+	vips_call "add" [A1.value, A1.value] []
+
+  gives a bad args error
 
 
 

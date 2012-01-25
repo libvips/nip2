@@ -1355,7 +1355,7 @@ get_image_info( VipsBuf *buf, const char *name )
 		else
 			/* No idea wtf this is, just put the size in.
 			 */
-			to_size( buf, st.st_size );
+			vips_buf_append_size( buf, st.st_size );
 	}
 }
 
@@ -2442,49 +2442,6 @@ find_space( const char *name )
 }
 #endif /*HAVE_SYS_STATVFS_H*/
 
-/* Turn a number of bytes into a sensible string ... eg "12", "12KB", "12MB",
- * "12GB" etc.
- */
-void
-to_size( VipsBuf *buf, double sz )
-{
-	const static char *size_names[] = { 
-		/* File length unit.
-		 */
-		N_( "bytes" ), 
-
-		/* Kilo byte unit.
-		 */
-		N_( "KB" ), 
-
-		/* Mega byte unit.
-		 */
-		N_( "MB" ), 
-
-		/* Giga byte unit.
-		 */
-		N_( "GB" ), 
-
-		/* Tera byte unit.
-		 */
-		N_( "TB" ) 
-	};
-	int i;
-
-	g_assert( sz >= 0 );
-
-	for( i = 0; sz > 1024 && i < IM_NUMBER( size_names ); sz /= 1024, i++ )
-		;
-
-	if( i == 0 )
-		/* No decimal places for bytes.
-		 */
-		vips_buf_appendf( buf, "%g %s", sz, _( size_names[i] ) );
-	else
-		vips_buf_appendf( buf, "%.2f %s", sz, _( size_names[i] ) );
-}
-
-
 /* Make a name for a temp file. Add the specified extension.
  */
 gboolean
@@ -2717,7 +2674,7 @@ imalloc( IMAGE *im, size_t len )
 		char txt[256];
 		VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-		to_size( &buf, len );
+		vips_buf_append_size( &buf, len );
 		error_top( _( "Out of memory." ) );
 		error_sub( _( "Request for %s of RAM triggered memory "
 			"allocation failure." ), vips_buf_all( &buf ) );

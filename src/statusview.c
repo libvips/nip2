@@ -227,7 +227,7 @@ statusview_changed_cb( Imagemodel *imagemodel, Statusview *sv )
 
 	vips_buf_appendf( &buf, "%s, ", 
 		NN( IOBJECT( iimage )->caption ) );
-	to_size( &buf, size );
+	vips_buf_append_size( &buf, size );
 	vips_buf_appendf( &buf, ", %.3gx%.3g p/mm", im->Xres, im->Yres );
 	set_gcaption( sv->top, "%s", vips_buf_all( &buf ) );
 

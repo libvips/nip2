@@ -872,7 +872,7 @@ main_check_temp( double total )
 		expand_variables( PATH_TMP, tmp );
 		nativeize_path( tmp );
 		absoluteize_path( tmp );
-		to_size( &buf, total );
+		vips_buf_append_size( &buf, total );
 
 		box_yesno( NULL,
 			main_toobig_done, iwindow_true_cb, NULL,

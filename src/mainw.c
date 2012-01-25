@@ -352,7 +352,7 @@ mainw_find_disc( VipsBuf *buf )
 		char txt[MAX_STRSIZE];
 		VipsBuf buf2 = VIPS_BUF_STATIC( txt );
 
-		to_size( &buf2, sz );
+		vips_buf_append_size( &buf2, sz );
 		vips_buf_appendf( buf, _( "%s free" ), vips_buf_all( &buf2 ) );
 	}
 }

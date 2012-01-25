@@ -360,11 +360,11 @@ about_build( iDialog *idlg, GtkWidget *work )
 		vips_tracked_get_allocs() );
         vips_buf_appends( &buf, "\n" );
 
-	to_size( &buf, vips_tracked_get_mem() );
+	vips_buf_append_size( &buf, vips_tracked_get_mem() );
         vips_buf_appendf( &buf, _( " of ram in pixel buffers" ) ); 
         vips_buf_appends( &buf, "\n" );
 
-	to_size( &buf, vips_tracked_get_mem_highwater() );
+	vips_buf_append_size( &buf, vips_tracked_get_mem_highwater() );
         vips_buf_appendf( &buf, _( " of ram highwater mark" ) ); 
         vips_buf_appends( &buf, "\n" );
 

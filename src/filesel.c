@@ -504,7 +504,7 @@ filesel_space_update( Filesel *filesel, const char *dirname )
 			char txt[MAX_STRSIZE];
 			VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-			to_size( &buf, sz );
+			vips_buf_append_size( &buf, sz );
 			vips_buf_appendf( &buf, " " );
 			/* Expands to (eg.) '6GB free in "/pics/tmp"'
 			 */

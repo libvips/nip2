@@ -327,7 +327,7 @@ iimageview_tooltip_generate( GtkWidget *widget,
 		double size = (double) im->Ysize * IM_IMAGE_SIZEOF_LINE( im );
 
 		vips_buf_appends( buf, ", " );
-		to_size( buf, size );
+		vips_buf_append_size( buf, size );
 		vips_buf_appendf( buf, ", %.3gx%.3g p/mm", im->Xres, im->Yres );
 	}
 }

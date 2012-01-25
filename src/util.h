@@ -285,7 +285,6 @@ const char *spc( int n );
 void number_to_string( int n, char *buf );
 
 double find_space( const char *name );
-void to_size( VipsBuf *buf, double sz );
 gboolean temp_name( char *name, const char *ext );
 int findmaxmin( IMAGE *in, 
 	int left, int top, int width, int height, double *min, double *max );

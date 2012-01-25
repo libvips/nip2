@@ -7,8 +7,6 @@
 
 - why is Segment in Morphology? wouldn't Select be a better place?
 
-- find hist should work on a uint image (eg. result of segment)
-
 - "save as bitmap" would be handy in chart view, see gnumeric
 
 - to_matrix does not work on Group

@@ -1,4 +1,4 @@
-startdir = $(pkgdatadir)/compat/7.24
+startdir = $(pkgdatadir)/compat/7.26
 
 start_DATA = \
 	Math.def \

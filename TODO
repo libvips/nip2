@@ -2,7 +2,7 @@
 
   fft of a non-square image seems buggered
 
-- why is Segment in Morphology? wouldn't Select be a better place?
+  actually, all ffts seem broken?
 
 - "save as bitmap" would be handy in chart view, see gnumeric
 

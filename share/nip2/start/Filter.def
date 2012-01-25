@@ -323,21 +323,6 @@ Filter_morphology_item = class
 		}
 	}
 
-	sep3 = Menuseparator;
-
-	Segment_item = class
-		Menuaction "_Segment" "break image into disjoint regions" {
-		action x = class 
-			_result {
-			_vislevel = 3;
-
-			segments
-				= Expression "Number of disjoint regions" 
-					(map_unary (get_header "n-segments") _result);
-
-			_result = map_unary segment x;
-		}
-	}
 }
 
 Filter_fourier_item = class

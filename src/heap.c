@@ -1934,7 +1934,17 @@ heap_gvalue_to_ip( GValue *in, PElement *out )
 		Managed *managed;
 
 		object = g_value_get_object( in );
-		managed = MANAGED( managedgobject_new( heap, object ) );
+
+		if( VIPS_IS_IMAGE( object ) ) {
+			VipsImage *image = VIPS_IMAGE( object ); 
+
+			g_object_ref( image ); 
+			managed = MANAGED( imageinfo_new( main_imageinfogroup, 
+				heap, image, image->filename ) );
+		}
+		else 
+			managed = MANAGED( managedgobject_new( heap, object ) );
+
 		PEPUTP( out, ELEMENT_MANAGED, managed );
 	}
 	else if( g_value_type_transformable( G_VALUE_TYPE( in ), 

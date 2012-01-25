@@ -1193,13 +1193,13 @@ Image_draw_item = class
 			x2 = Expression "End x" 100;
 			y2 = Expression "End y" 100;
 
-			ink = Expression "Ink" [0];
+			i = Expression "Ink" [0];
 
 			_result 
 				= map_unary line x
 			{
 				line im 
-					= draw_line x1.expr y1.expr x2.expr y2.expr ink.expr im;
+					= draw_line x1 y1 x2 y2 i.expr im;
 			}
 		}
 	}
@@ -1209,21 +1209,20 @@ Image_draw_item = class
 			_result {
 			_vislevel = 3;
 
-			left = Expression "Left" 50;
-			top = Expression "Top" 50;
-			width = Expression "Width" 100;
-			height = Expression "Height" 100;
+			l = Expression "Left" 50;
+			t = Expression "Top" 50;
+			w = Expression "Width" 100;
+			h = Expression "Height" 100;
 
-			fill = Toggle "Fill" true;
+			f = Toggle "Fill" true;
 
-			ink = Expression "Ink" [0];
+			i = Expression "Ink" [0];
 
 			_result 
 				= map_unary rect x
 			{
 				rect im 
-					= draw_rect left.expr top.expr width.expr height.expr
-							fill.value ink.expr im;
+					= draw_rect l t w h f i.expr im;
 			}
 		}
 	}
@@ -1237,16 +1236,15 @@ Image_draw_item = class
 			cy = Expression "Centre y" 100;
 			r = Expression "Radius" 50;
 
-			fill = Toggle "Fill" true;
+			f = Toggle "Fill" true;
 
-			ink = Expression "Ink" [0];
+			i = Expression "Ink" [0];
 
 			_result 
 				= map_unary circle x
 			{
 				circle im 
-					= draw_circle cx.expr cy.expr r.expr 
-						fill.value ink.expr im;
+					= draw_circle cx cy r f i.expr im;
 			}
 		}
 	}
@@ -1257,24 +1255,22 @@ Image_draw_item = class
 			_result {
 			_vislevel = 3;
 
-			startx = Expression "Start x" 100;
-			starty = Expression "Start y" 100;
+			sx = Expression "Start x" 100;
+			sy = Expression "Start y" 100;
 
-			edge = Option "Flood while" [
+			e = Option "Flood while" [
 				"Not equal to ink",
 				"Equal to start point"
 			] 0;
 
 			// pick a default ink that won't flood, if we can
-			ink 
+			i 
 				= Expression "Ink" default_ink
 			{
 				default_ink
 					= [0], ! has_image x
 					= pixel;
-				pixel = map mean (bandsplit (extract_area left top 1 1 im));
-				left = startx.expr;
-				top = starty.expr;
+				pixel = map mean (bandsplit (extract_area sx sy 1 1 im));
 				im = get_image x;
 			}
 
@@ -1282,12 +1278,8 @@ Image_draw_item = class
 				= map_unary flood x
 			{
 				flood im 
-					= draw_flood left top ink.expr im, edge == 0
-					= draw_flood_blob left top ink.expr im
-				{
-					left = startx.expr;
-					top = starty.expr;
-				}
+					= draw_flood sx sy i.expr im, e == 0
+					= draw_flood_blob sx sy i.expr im;
 			}
 		}
 	}

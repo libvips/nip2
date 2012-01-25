@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.18.0">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.28.0">
   <Workspace window_x="0" window_y="0" window_width="1005" window_height="688" filename="test_fourier.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_fourier" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="19" name="B" caption="Test images">
       <Subcolumn vislevel="3">

@@ -2,9 +2,6 @@
 
   fft of a non-square image seems buggered
 
-- Draw / Rectangle has fields called with/height ... messes up any downstream
-  stuff which tried to get these fields out of an image, argh
-
 - why is Segment in Morphology? wouldn't Select be a better place?
 
 - "save as bitmap" would be handy in chart view, see gnumeric

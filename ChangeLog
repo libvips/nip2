@@ -7,6 +7,8 @@ started 7.27.0, 23/8/11
 - rmb popup menu on imageview windows
 - popup menu button widget
 - added "vips_call" builtin to call any vips8 operation
+- added Matrix / New / Series
+- added Matrix / Sort
 
 started 7.26.5, 31/12/11
 - fix possible security thing in yyerror(), thanks Jay

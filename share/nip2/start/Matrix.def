@@ -37,6 +37,24 @@ Matrix_build_item = class
 		}
 	}
 
+	Matrix_series_item = class 
+		Menuaction "_Series" "make a series" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			s = Expression "Start value" 0;
+			t = Expression "Step by" 1;
+			e = Expression "End value" 5;
+
+			_result 
+				= Matrix (transpose [series])
+			{
+				series = [to_real s, to_real t..  to_real e];
+			}
+		}
+	}
+
 	Matrix_square_item = class 
 		Menuaction "_Square" "make a square matrix" {
 		action = class
@@ -387,6 +405,37 @@ Matrix_rotate_item = class
 }
 
 Matrix_flip_item = Image_transform_item.Flip_item;
+
+Matrix_sort_item = class 
+	Menuaction "_Sort" "sort by column or row" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		o = Option (_ "Orientation") [
+			_ "Sort by column",
+			_ "Sort by row"
+		] 0;
+		i = Expression (_ "Sort on index") 0;
+		d = Option (_ "Direction") [
+			_ "Ascending",
+			_ "Descending"
+		] 0;
+
+		_result 
+			= map_unary sort x
+		{
+			idx = to_real i;
+			pred a b 
+				= a?idx <= b?idx, d == 0
+				= a?idx >= b?idx;
+			sort x
+				= (x.Matrix_base @ sortc pred) x.value,
+					o == 0
+				= (x.Matrix_base @ transpose @ sortc pred @ transpose) x.value;
+		}
+	}
+}
 
 #separator
 

@@ -1,19 +1,8 @@
+- make save filesels larger
+
 - paint out peaks on FFT to remove scan artefacts is broken?
 
   fft of a non-square image seems buggered
-
-- util.c:to_size() can be replaced with vips_buf_append_size()
-
-- extract a line from an image, convert to matrix, get nonsense
-
-- replace flex/bison with
-
-	http://www.hwaci.com/sw/lemon/
-	http://re2c.org/
-
-- add matrix sort by row / col
-
-- insert row/col should have an option to add a value or a series
 
 - Draw / Rectangle has fields called with/height ... messes up any downstream
   stuff which tried to get these fields out of an image, argh

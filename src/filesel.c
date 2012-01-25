@@ -1122,6 +1122,9 @@ filesel_new( void )
 {
 	Filesel *filesel = (Filesel *) gtk_type_new( TYPE_FILESEL );
 
+	iwindow_set_size_prefs( IWINDOW( filesel ), 
+		"FILESEL_WINDOW_WIDTH", "FILESEL_WINDOW_HEIGHT" );
+
 	return( GTK_WIDGET( filesel ) );
 }
 

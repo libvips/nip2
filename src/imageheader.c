@@ -78,13 +78,13 @@ imageheader_add_item( IMAGE *im,
 	 */
 	extra = NULL;
 	if( strcmp( field, "coding" ) == 0 )
-		extra = VIPS_ENUM_NICK( VIPS_TYPE_CODING, 
+		extra = vips_enum_nick( VIPS_TYPE_CODING, 
 			g_value_get_int( value ) );
 	else if( strcmp( field, "format" ) == 0 )
-		extra = VIPS_ENUM_NICK( VIPS_TYPE_BAND_FORMAT, 
+		extra = vips_enum_nick( VIPS_TYPE_BAND_FORMAT, 
 			g_value_get_int( value ) );
 	else if( strcmp( field, "interpretation" ) == 0 )
-		extra = VIPS_ENUM_NICK( VIPS_TYPE_INTERPRETATION, 
+		extra = vips_enum_nick( VIPS_TYPE_INTERPRETATION, 
 			g_value_get_int( value ) );
 	if( extra )
 		vips_buf_appendf( &buf, " - %s", extra );

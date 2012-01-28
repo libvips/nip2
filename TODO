@@ -1,12 +1,9 @@
-- paint out peaks on FFT to remove scan artefacts is broken?
+- paint out peaks on FFT to remove scan artefacts is broken? needs testing,
+  might be fixed now
 
-  fft of a non-square image seems buggered
-
-  actually, all ffts seem broken?
+  getting some leak reports after FFT painting too?
 
 - "save as bitmap" would be handy in chart view, see gnumeric
-
-- to_matrix does not work on Group
 
 - the windows setup .exe install a bazillion .png icons we will never use,
   then installs them all again as .svg, which we will certainly never use

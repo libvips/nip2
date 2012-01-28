@@ -1,10 +1,3 @@
-- investigate 
-
-	imagepresent.c: In function ‘imagepresent_left_press’:
-	imagepresent.c:803:9: warning: variable ‘im’ set but not used [-Wunused-but-set-variable]
-
-
-
 - paint out peaks on FFT to remove scan artefacts is broken? needs testing,
   might be fixed now
 

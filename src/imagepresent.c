@@ -800,7 +800,7 @@ imagepresent_left_press( Imagepresent *ip, GdkEvent *ev, int x, int y )
 	Imagemodel *imagemodel = ip->imagemodel;
 	Conversion *conv = imagemodel->conv;
 	gboolean handled = FALSE;
-	IMAGE *im, *im2;
+	IMAGE *im2;
 	int ix, iy;
 
 	/* If there's a regionview grabbed already, block other actions. This
@@ -813,11 +813,6 @@ imagepresent_left_press( Imagepresent *ip, GdkEvent *ev, int x, int y )
 	switch( imagemodel->state ) {
 	case IMAGEMODEL_SELECT:
 		if( ev->button.state & GDK_CONTROL_MASK ) {
-			/* Do we need this call? Tets.
-			 * FIXME
-			 */
-			im = imageinfo_get( FALSE, conv->ii );
-
 			imagepresent_snap_point( ip, x, y, &x, &y );
 			conversion_disp_to_im( conv, x, y, &ix, &iy );
 			imagepresent_floating_new( ip,
@@ -869,8 +864,6 @@ imagepresent_left_press( Imagepresent *ip, GdkEvent *ev, int x, int y )
 		conversion_disp_to_im( conv, x, y, &ix, &iy );
 		ip->paint_last_x = ix;
 		ip->paint_last_y = iy;
-
-		im = imageinfo_get( FALSE, conv->ii );
 		imagepresent_floating_new( ip,
 			ix, iy, 0, 0,
 			TRUE, REGIONVIEW_LINE, REGIONVIEW_RESIZE_BOTTOMRIGHT,
@@ -881,7 +874,6 @@ imagepresent_left_press( Imagepresent *ip, GdkEvent *ev, int x, int y )
 	case IMAGEMODEL_RECT:
 		imagepresent_snap_point( ip, x, y, &x, &y );
 		conversion_disp_to_im( conv, x, y, &ix, &iy );
-		im = imageinfo_get( FALSE, conv->ii );
 		imagepresent_floating_new( ip,
 			ix, iy, 0, 0,
 			TRUE, REGIONVIEW_BOX, REGIONVIEW_RESIZE_BOTTOMRIGHT,
@@ -900,7 +892,6 @@ imagepresent_left_press( Imagepresent *ip, GdkEvent *ev, int x, int y )
 			break;
 		}
 
-		im = imageinfo_get( FALSE, conv->ii );
 		im2 = imageinfo_get( FALSE, imagemodel->text_mask );
 		imagepresent_floating_new( ip,
 			ix,

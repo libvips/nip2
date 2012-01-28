@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.28.0">
-  <Workspace window_x="0" window_y="0" window_width="1280" window_height="1168" filename="test_math.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_math" caption="Default empty workspace">
+  <Workspace window_x="0" window_y="0" window_width="1280" window_height="772" filename="workspaces/test_math.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_math" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="17" name="B" caption="Colour / Colourspace">
       <Subcolumn vislevel="3">
         <Row popup="false" name="B1">
@@ -12,7 +12,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="462" y="0" open="true" selected="true" sform="false" next="17" name="Y" caption="Math / Arithmetic">
+    <Column x="453" y="0" open="true" selected="false" sform="false" next="17" name="Y" caption="Math / Arithmetic">
       <Subcolumn vislevel="3">
         <Row popup="false" name="Y1">
           <Rhs vislevel="2" flags="5">
@@ -108,7 +108,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="978" y="0" open="true" selected="false" sform="false" next="15" name="JB" caption="Math / Trig">
+    <Column x="956" y="0" open="true" selected="false" sform="false" next="15" name="JB" caption="Math / Trig">
       <Subcolumn vislevel="3">
         <Row popup="false" name="JB1">
           <Rhs vislevel="1" flags="1">
@@ -199,7 +199,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1457" y="0" open="true" selected="false" sform="false" next="10" name="KB" caption="Math / Log">
+    <Column x="1424" y="0" open="true" selected="false" sform="false" next="10" name="KB" caption="Math / Log">
       <Subcolumn vislevel="3">
         <Row popup="false" name="KB1">
           <Rhs vislevel="1" flags="1">
@@ -250,7 +250,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1929" y="0" open="true" selected="false" sform="false" next="8" name="LB" caption="Math / Complex">
+    <Column x="1886" y="0" open="true" selected="false" sform="false" next="8" name="LB" caption="Math / Complex">
       <Subcolumn vislevel="3">
         <Row popup="false" name="LB1">
           <Rhs vislevel="1" flags="4">
@@ -289,7 +289,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="2772" y="0" open="true" selected="false" sform="false" next="19" name="MB" caption="Math / Boolean">
+    <Column x="2690" y="0" open="true" selected="false" sform="false" next="19" name="MB" caption="Math / Boolean">
       <Subcolumn vislevel="3">
         <Row popup="false" name="MB1">
           <Rhs vislevel="1" flags="1">
@@ -387,7 +387,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="4521" y="0" open="true" selected="false" sform="false" next="23" name="OB" caption="Math / List ">
+    <Column x="4346" y="0" open="true" selected="false" sform="false" next="23" name="OB" caption="Math / List ">
       <Subcolumn vislevel="3">
         <Row popup="false" name="OB1">
           <Rhs vislevel="1" flags="4">
@@ -491,7 +491,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="4886" y="0" open="true" selected="false" sform="false" next="5" name="PB" caption="Math / Round">
+    <Column x="4687" y="0" open="true" selected="false" sform="false" next="5" name="PB" caption="Math / Round">
       <Subcolumn vislevel="3">
         <Row popup="false" name="PB1">
           <Rhs vislevel="1" flags="1">
@@ -523,7 +523,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="5205" y="0" open="true" selected="false" sform="false" next="6" name="QB" caption="Math / Fourier">
+    <Column x="4998" y="0" open="true" selected="true" sform="false" next="13" name="QB" caption="Math / Fourier">
       <Subcolumn vislevel="3">
         <Row popup="false" name="QB1">
           <Rhs vislevel="1" flags="1">
@@ -532,20 +532,11 @@
             <iText formula="B1"/>
           </Rhs>
         </Row>
-        <Row popup="false" name="QB2">
-          <Rhs vislevel="1" flags="1">
-            <iRegion image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true" left="210" top="249" width="128" height="128">
-              <iRegiongroup/>
-            </iRegion>
-            <Subcolumn vislevel="0"/>
-            <iText formula="Region QB1 127 171 205 188"/>
-          </Rhs>
-        </Row>
         <Row popup="false" name="QB3">
           <Rhs vislevel="1" flags="1">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Math_fourier_item.Forward_item.action QB2"/>
+            <iText formula="Math_fourier_item.Forward_item.action QB1"/>
           </Rhs>
         </Row>
         <Row popup="false" name="QB4">
@@ -555,16 +546,26 @@
             <iText formula="Math_fourier_item.Reverse_item.action QB3"/>
           </Rhs>
         </Row>
+        <Row popup="false" name="QB6">
+          <Rhs vislevel="1" flags="4">
+            <iText formula="max (abs (QB4 - QB1))"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="QB7">
+          <Rhs vislevel="1" flags="4">
+            <iText formula="if QB6 &gt; 0.1 then error &quot;fft broken!&quot; else &quot;ok!&quot;"/>
+          </Rhs>
+        </Row>
         <Row popup="false" name="QB5">
           <Rhs vislevel="1" flags="1">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Math_fourier_item.Rotate_quadrants_item.action QB4"/>
+            <iText formula="Math_fourier_item.Rotate_quadrants_item.action QB1"/>
           </Rhs>
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="5679" y="0" open="true" selected="false" sform="false" next="33" name="RB" caption="Math / Statistics">
+    <Column x="5462" y="0" open="true" selected="false" sform="false" next="33" name="RB" caption="Math / Statistics">
       <Subcolumn vislevel="3">
         <Row popup="false" name="RB1">
           <Rhs vislevel="1" flags="1">
@@ -690,7 +691,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="6295" y="0" open="true" selected="false" sform="false" next="8" name="SB" caption="Math / Base">
+    <Column x="6101" y="0" open="true" selected="false" sform="false" next="8" name="SB" caption="Math / Base">
       <Subcolumn vislevel="3">
         <Row popup="false" name="SB1">
           <Rhs vislevel="1" flags="4">
@@ -714,7 +715,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="6490" y="0" open="true" selected="false" sform="false" next="5" name="C" caption="Math / Cluster">
+    <Column x="6286" y="0" open="true" selected="false" sform="false" next="5" name="C" caption="Math / Cluster">
       <Subcolumn vislevel="3">
         <Row popup="false" name="C1">
           <Rhs vislevel="1" flags="4">
@@ -729,7 +730,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3256" y="916" open="true" selected="false" sform="false" next="7" name="A" caption="test results of relational">
+    <Column x="3164" y="916" open="true" selected="false" sform="false" next="7" name="A" caption="test results of relational">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A4">
           <Rhs vislevel="2" flags="4">
@@ -748,7 +749,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3256" y="0" open="true" selected="false" sform="false" next="10" name="D" caption="Math / Relational">
+    <Column x="3164" y="0" open="true" selected="false" sform="false" next="10" name="D" caption="Math / Relational">
       <Subcolumn vislevel="3">
         <Row popup="false" name="D1">
           <Rhs vislevel="0" flags="4">
@@ -815,7 +816,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3889" y="0" open="true" selected="false" sform="false" next="11" name="E" caption="Math / Relational constant">
+    <Column x="3756" y="0" open="true" selected="false" sform="false" next="11" name="E" caption="Math / Relational constant">
       <Subcolumn vislevel="3">
         <Row popup="false" name="E1">
           <Rhs vislevel="0" flags="4">
@@ -873,7 +874,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3889" y="804" open="true" selected="false" sform="false" next="5" name="F" caption="test results of relational constant">
+    <Column x="3756" y="804" open="true" selected="false" sform="false" next="5" name="F" caption="test results of relational constant">
       <Subcolumn vislevel="3">
         <Row popup="false" name="F4">
           <Rhs vislevel="2" flags="4">
@@ -892,7 +893,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="2242" y="0" open="true" selected="false" sform="false" next="12" name="G" caption="Math / Complex">
+    <Column x="2172" y="0" open="true" selected="false" sform="false" next="12" name="G" caption="Math / Complex">
       <Subcolumn vislevel="3">
         <Row popup="false" name="G1">
           <Rhs vislevel="1" flags="1">

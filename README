@@ -41,7 +41,7 @@ I cross-compile from Linux, usually. See:
 Building nip2 on OS X
 ---------------------
 
-I used macports to help, see:
+I use jhbuild on OS X as well, see:
 
 	http://www.vips.ecs.soton.ac.uk/index.php?title=Build_on_OS_X
 
@@ -54,7 +54,7 @@ libxml2
 	all needed at runtime
 
 flex/bison
-	needed at compiletime
+	needed at compile time
 
 fftw3
 gsl

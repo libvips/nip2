@@ -12,16 +12,12 @@
 
   or maybe add an option to the tk browser to let it show all symbols?
 
-
-
 - add extract_volume, cf. "grid"
 
   record tile_size in meta somewhere? grid could set it, save a parameter off
   extract_volume
 
   also extract_sequence to get volume over time
-
-
 
 - image + complex constant would be nice
 

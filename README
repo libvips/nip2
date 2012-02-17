@@ -98,6 +98,12 @@ valgrind --suppressions=/home/john/nip2.supp \
 
 or put "--suppressions=/home/john/nip2.supp" into ~/.valgrindrc 
 
+profiling
+
+valgrind --tool=callgrind \
+  --suppressions=/home/john/nip2.supp \
+  nip2 ... > nip2-vg.log 2>&1
+
 Disclaimer: No guarantees of performance accompany this software, nor is any
 responsibility assumed on the part of the authors. Please read the licence
 agreement.

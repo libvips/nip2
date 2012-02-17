@@ -62,8 +62,8 @@
 
 /* Sometimes we need to be able to disable these at build time.
 #undef DEBUG_LEAK
-#undef DEBUG_FATAL
  */
+#undef DEBUG_FATAL
 
 /* General stuff. 
  */

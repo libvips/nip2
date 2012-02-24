@@ -1,3 +1,10 @@
+- expose more of the tone funcs in nip2
+
+- quite a few hist operations have no GUI ... lhisteq, for example? or
+  histspec?
+
+- nip2 should use zooming support, if possible
+
 - paint out peaks on FFT to remove scan artefacts is broken? needs testing,
   might be fixed now
 

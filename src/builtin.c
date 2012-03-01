@@ -748,11 +748,6 @@ apply_name2gtype_call( Reduce *rc, const char *name,
 	PEPOINTRIGHT( arg[0], &rhs );
 	(void) reduce_get_string( rc, &rhs, txt, FILENAME_MAX );
 
-	/* Hack ... map the old vips7 names to the new ones.
-	 */
-	if( strcmp( txt, "im_ref_string" ) == 0 )
-		strcpy( txt, "vips_ref_string" );
-
 	gtype = g_type_from_name( txt );
 
 	if( !heap_real_new( rc->heap, gtype, out ) )

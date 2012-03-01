@@ -1,4 +1,15 @@
-- add an expected fail to make check to ensure the tester is working
+- strange:
+
+	$ nip2 workspaces/test_image.ws 
+	(nip2:28201): GLib-GObject-WARNING **: value "((VipsInterpretation) 2)"
+	of type `VipsInterpretation' is invalid or out of range for property
+	`interpretation' of type `VipsInterpretation'
+
+- try:
+
+	testing overlay_blend.ws ... sanity failure: VipsImage (0x438a8a0) bad
+resolution
+
 
 - section on compat mode for the docs
 

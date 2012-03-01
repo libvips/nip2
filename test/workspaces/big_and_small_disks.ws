@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.28.0">
-  <Workspace window_x="0" window_y="0" window_width="1280" window_height="770" filename="workspaces/big_and_small_disks.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="359" lpane_open="true" rpane_position="1274" rpane_open="false" local_defs="// private definitions for this workspace&#10;summit in mask = class Image value {&#10;&#9;value = im_compass in mask;&#10;}&#10;&#10;main = WWWW7;" name="big_and_small_disks" caption="Default empty workspace">
+  <Workspace window_x="0" window_y="0" window_width="1280" window_height="770" filename="workspaces/big_and_small_disks.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="359" lpane_open="false" rpane_position="1274" rpane_open="false" local_defs="// private definitions for this workspace&#10;summit in mask = class Image value {&#10;&#9;value = im_compass in mask;&#10;}&#10;&#10;main = WWWW7;" name="big_and_small_disks" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="true" sform="false" next="9" name="J" caption="input image">
       <Subcolumn vislevel="3">
         <Row popup="false" name="J3">
@@ -599,21 +599,21 @@
         <Row popup="false" name="R5">
           <Rhs vislevel="4" flags="7">
             <Plot plot_left="0" plot_top="0" plot_mag="100" show_status="false"/>
-            <Subcolumn vislevel="2"/>
+            <Subcolumn vislevel="0"/>
             <iText formula="Hist_find_item.Indexed_item.action R4 R3"/>
           </Rhs>
         </Row>
         <Row popup="false" name="R6">
           <Rhs vislevel="3" flags="7">
             <Plot plot_left="0" plot_top="0" plot_mag="100" show_status="false"/>
-            <Subcolumn vislevel="1"/>
+            <Subcolumn vislevel="0"/>
             <iText formula="Hist_find_item.Oned_item.action R4"/>
           </Rhs>
         </Row>
         <Row popup="false" name="R7">
           <Rhs vislevel="3" flags="7">
             <Plot window_x="1412" window_y="667" window_width="500" window_height="500" plot_left="231" plot_top="200" plot_mag="100" show_status="true"/>
-            <Subcolumn vislevel="1"/>
+            <Subcolumn vislevel="0"/>
             <iText formula="R5/R6 + .5"/>
           </Rhs>
         </Row>
@@ -632,7 +632,7 @@
         <Row popup="false" name="R10">
           <Rhs vislevel="3" flags="7">
             <Matrix/>
-            <Subcolumn vislevel="1">
+            <Subcolumn vislevel="0">
               <Row name="x">
                 <Rhs vislevel="0" flags="4">
                   <iText/>
@@ -1025,7 +1025,7 @@
         <Row popup="false" name="L1">
           <Rhs vislevel="3" flags="7">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
-            <Subcolumn vislevel="1"/>
+            <Subcolumn vislevel="0"/>
             <iText formula="R1"/>
           </Rhs>
         </Row>
@@ -1080,6 +1080,13 @@
               <Row name="prec">
                 <Rhs vislevel="1" flags="1">
                   <Option caption="Precision" labelsn="2" labels0="Int" labels1="Float" value="1"/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="layers">
+                <Rhs vislevel="1" flags="1">
+                  <Slider/>
                   <Subcolumn vislevel="0"/>
                   <iText/>
                 </Rhs>
@@ -1586,7 +1593,7 @@
         <Row popup="false" name="AB2">
           <Rhs vislevel="3" flags="7">
             <iImage window_x="0" window_y="1" window_width="750" window_height="750" image_left="175" image_top="154" image_mag="2" show_status="true" show_paintbox="false" show_convert="true" show_rulers="true" scale="137.81365748984248" offset="0" falsecolour="false" type="true"/>
-            <Subcolumn vislevel="1"/>
+            <Subcolumn vislevel="0"/>
             <iText formula="Filter_morphology_item.Segment_item.action ~AB1"/>
           </Rhs>
         </Row>
@@ -1663,21 +1670,21 @@
         <Row popup="false" name="AB5">
           <Rhs vislevel="4" flags="7">
             <Plot plot_left="0" plot_top="0" plot_mag="100" show_status="false"/>
-            <Subcolumn vislevel="2"/>
+            <Subcolumn vislevel="0"/>
             <iText formula="Hist_find_item.Indexed_item.action AB3 AB4"/>
           </Rhs>
         </Row>
         <Row popup="false" name="AB6">
           <Rhs vislevel="3" flags="7">
             <Plot plot_left="0" plot_top="0" plot_mag="100" show_status="false"/>
-            <Subcolumn vislevel="1"/>
+            <Subcolumn vislevel="0"/>
             <iText formula="Hist_find_item.Oned_item.action AB3"/>
           </Rhs>
         </Row>
         <Row popup="false" name="AB7">
           <Rhs vislevel="3" flags="7">
             <Plot window_x="1412" window_y="667" window_width="500" window_height="500" plot_left="231" plot_top="200" plot_mag="100" show_status="true"/>
-            <Subcolumn vislevel="1"/>
+            <Subcolumn vislevel="0"/>
             <iText formula="AB5/AB6 + .5"/>
           </Rhs>
         </Row>
@@ -1696,7 +1703,7 @@
         <Row popup="false" name="AB11">
           <Rhs vislevel="3" flags="7">
             <Matrix/>
-            <Subcolumn vislevel="1">
+            <Subcolumn vislevel="0">
               <Row name="x">
                 <Rhs vislevel="0" flags="4">
                   <iText/>
@@ -2061,7 +2068,7 @@
         <Row popup="false" name="EB1">
           <Rhs vislevel="3" flags="7">
             <iImage window_x="0" window_y="0" window_width="1280" window_height="1024" image_left="1631" image_top="472" image_mag="1" show_status="false" show_paintbox="false" show_convert="false" show_rulers="true" scale="1" offset="0" falsecolour="false" type="true"/>
-            <Subcolumn vislevel="1"/>
+            <Subcolumn vislevel="0"/>
             <iText formula="AB2"/>
           </Rhs>
         </Row>
@@ -2116,6 +2123,13 @@
               <Row name="prec">
                 <Rhs vislevel="1" flags="1">
                   <Option caption="Precision" labelsn="2" labels0="Int" labels1="Float" value="1"/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="layers">
+                <Rhs vislevel="1" flags="1">
+                  <Slider/>
                   <Subcolumn vislevel="0"/>
                   <iText/>
                 </Rhs>

@@ -1,3 +1,7 @@
+- section on compat mode for the docs
+
+  see mail to MvGulick for some notes
+
 - expose more of the tone funcs in nip2
 
 - quite a few hist operations have no GUI ... lhisteq, for example? or

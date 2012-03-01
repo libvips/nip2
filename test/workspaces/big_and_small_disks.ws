@@ -523,7 +523,7 @@
           <Rhs vislevel="2" flags="5">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Filter_morphology_item.Segment_item.action ~R2"/>
+            <iText formula="Image_select_item.Segment_item.action ~R2"/>
           </Rhs>
         </Row>
         <Row popup="false" name="R4">
@@ -1594,7 +1594,7 @@
           <Rhs vislevel="3" flags="7">
             <iImage window_x="0" window_y="1" window_width="750" window_height="750" image_left="175" image_top="154" image_mag="2" show_status="true" show_paintbox="false" show_convert="true" show_rulers="true" scale="137.81365748984248" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Filter_morphology_item.Segment_item.action ~AB1"/>
+            <iText formula="Image_select_item.Segment_item.action ~AB1"/>
           </Rhs>
         </Row>
         <Row popup="false" name="AB3">

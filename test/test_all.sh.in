@@ -14,9 +14,16 @@ test_result() {
 # run the test workspaces
 test_workspaces() {
 	for i in @TOP_SRCDIR@/test/workspaces/*.ws; do
-		echo -n "testing `basename $i` ... "
+		base=$(basename $i)
+		echo -n "testing $base ... "
 		@TOP_SRCDIR@/src/nip2 --prefix=@TOP_SRCDIR@ --test $i
-		test_result
+
+		# test_fail.ws is supposed to fail
+		if test x$base = x"test_fail.ws" ; then
+			echo "fail expected for test_fail.ws"
+		else
+			test_result
+		fi
 	done
 }
 

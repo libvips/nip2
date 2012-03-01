@@ -423,7 +423,7 @@ get_header field x
 
 		itype = name2gtype "gint";
 		dtype = name2gtype "gdouble";
-		stype1 = name2gtype "im_ref_string";
+		stype1 = name2gtype "VipsRefString";
 		stype2 = name2gtype "gchararray";
 	}
 }

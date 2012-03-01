@@ -1,3 +1,5 @@
+- add an expected fail to make check to ensure the tester is working
+
 - section on compat mode for the docs
 
   see mail to MvGulick for some notes

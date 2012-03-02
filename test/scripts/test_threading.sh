@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#set -x
+# set -x
 
 top_srcdir=$1
 tmp=$top_srcdir/test/tmp

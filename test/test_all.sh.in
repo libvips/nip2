@@ -1,13 +1,24 @@
 #!/bin/sh
 
-result=0
+# set -x
+
+main_result=0
 
 test_result() {
-	if [ $? = 0 ]; then
+	if [ $1 = 0 ]; then
 		echo ok
 	else
 		echo failed
-		result=1
+		main_result=1
+	fi
+}
+
+test_result_fail() {
+	if [ $1 = 0 ]; then
+		echo error: did not fail
+		main_result=1
+	else
+		echo fail expected
 	fi
 }
 
@@ -16,13 +27,14 @@ test_workspaces() {
 	for i in @TOP_SRCDIR@/test/workspaces/*.ws; do
 		base=$(basename $i)
 		echo -n "testing $base ... "
-		@TOP_SRCDIR@/src/nip2 --prefix=@TOP_SRCDIR@ --test $i
+		@TOP_SRCDIR@/src/nip2 --prefix=@TOP_SRCDIR@ --test "$i"
+		result=$?
 
 		# test_fail.ws is supposed to fail
-		if test x$base = x"test_fail.ws" ; then
-			echo "fail expected for test_fail.ws"
+		if [ x"$base" = x"test_fail.ws" ]; then
+			test_result_fail $result
 		else
-			test_result
+			test_result $result
 		fi
 	done
 }
@@ -30,26 +42,29 @@ test_workspaces() {
 # run the test defs
 test_defs() {
 	for i in @TOP_SRCDIR@/test/workspaces/*.def; do
-		echo -n "testing `basename $i` ... "
+		base=$(basename $i)
+		echo -n "testing $base ... "
 		@TOP_SRCDIR@/src/nip2 --prefix=@TOP_SRCDIR@ --test $i
-		test_result
+		test_result $?
 	done
 }
 
 # load all the example workspaces too
 test_examples() {
 	for i in @TOP_SRCDIR@/share/nip2/data/examples/*/*.ws; do
+		base=$(basename $i)
+
 		# have to skip these two, they use a non-free plugin
-		if test x"`basename $i`" = x"framing.ws" ; then
+		if test x"$base" = x"framing.ws" ; then
 			continue
 		fi
-		if test x"`basename $i`" = x"registering.ws" ; then
+		if test x"$base" = x"registering.ws" ; then
 			continue
 		fi
 
-		echo -n "testing `basename $i` ... "
+		echo -n "testing $base ... "
 		@TOP_SRCDIR@/src/nip2 --prefix=@TOP_SRCDIR@ --test $i 
-		test_result
+		test_result $?
 	done
 }
 
@@ -61,9 +76,10 @@ test_scripts() {
 	mkdir -p tmp
 
 	for i in @TOP_SRCDIR@/test/scripts/*.sh; do
-		echo "running `basename $i`:"
+		base=$(basename $i)
+		echo "running $base:"
 		$i @TOP_SRCDIR@ 
-		test_result
+		test_result $?
 	done
 
 	rm -rf tmp
@@ -82,4 +98,4 @@ test_defs
 test_examples
 test_scripts
 
-exit $result
+exit $main_result

@@ -1,15 +1,3 @@
-- try:
-
-	testing overlay_blend.ws ... sanity failure: VipsImage (0x438a8a0) bad
-resolution
-
-  bug in vips, see TODO there
-
-- test_fail should test for $? failure
-
-
-
-
 - section on compat mode for the docs
 
   see mail to MvGulick for some notes

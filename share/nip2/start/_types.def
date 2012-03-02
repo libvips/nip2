@@ -801,19 +801,9 @@ Enum value = class
 Image_type = class {
 	MULTIBAND = 0;
 	B_W = 1;
-	LUMINANCE = 2;
-	XRAY = 3;
-	IR = 4;
-	YUV = 5;
-	RED_ONLY = 6;
-	GREEN_ONLY = 7;
-	BLUE_ONLY = 8;
-	POWER_SPECTRUM = 9;
 	HISTOGRAM = 10;
-	LUT = 11;
 	XYZ = 12;
 	LAB = 13;
-	CMC = 14;
 	CMYK = 15;
 	LABQ = 16;
 	RGB = 17;
@@ -825,25 +815,16 @@ Image_type = class {
 	FOURIER = 24;
 	RGB16 = 25;
 	GREY16 = 26;
+	ARRAY = 27;
 
 	/* Table to get names <-> numbers.
 	 */
 	type_names = Enum [
 		$MULTIBAND => MULTIBAND,
 		$B_W => B_W,
-		$LUMINANCE => LUMINANCE,
-		$XRAY => XRAY,
-		$IR => IR,
-		$YUV => YUV,
-		$RED_ONLY => RED_ONLY,
-		$GREEN_ONLY => GREEN_ONLY,
-		$BLUE_ONLY => BLUE_ONLY,
-		$POWER_SPECTRUM => POWER_SPECTRUM,
 		$HISTOGRAM => HISTOGRAM,
-		$LUT => LUT,
 		$XYZ => XYZ,
 		$LAB => LAB,
-		$CMC => CMC,
 		$CMYK => CMYK,
 		$LABQ => LABQ,
 		$RGB => RGB,
@@ -854,7 +835,8 @@ Image_type = class {
 		$YXY => YXY,
 		$FOURIER => FOURIER,
 		$RGB16 => RGB16,
-		$GREY16 => GREY16
+		$GREY16 => GREY16,
+		$ARRAY => ARRAY
 	];
 
 	/* Table relating nip's colour space names and VIPS's Type numbers.

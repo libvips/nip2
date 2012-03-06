@@ -1695,25 +1695,27 @@ draw_flood x y ink image
 /* This version of draw_rect uses insert_noexpand and will be fast, even for
  * huge images.
  */
-draw_rect x y w h f ink image
-	= oo_unary_function draw_rect_op image, is_class image
-	= my_draw_rect image (to_real x) (to_real y) 
-		(to_real w) (to_real h) (to_real f) ink, is_image image
-	= error (_ "bad arguments to " ++ "draw_rect")
+draw_rect_width x y w h f t ink image
+	= oo_unary_function draw_rect_width_op image, is_class image
+	= my_draw_rect_width image (to_int x) (to_int y) 
+		(to_int w) (to_int h) (to_int f) (to_int t) ink, 
+		is_image image
+	= error (_ "bad arguments to " ++ "draw_rect_width")
 {
-	draw_rect_op = Operator "draw_rect" 
-		(draw_rect x y w h f ink) Operator_type.COMPOUND_REWRAP false;
+	draw_rect_width_op = Operator "draw_rect_width" 
+		(draw_rect_width x y w h f t ink) 
+		Operator_type.COMPOUND_REWRAP false;
 
-	my_draw_rect im x y w h fill ink
-		= insert x' y' (block w' h') im, fill == 1
-		= (insert x' y' (block w' 1) @ 
-			insert (x' + w') y' (block 1 h') @ 
-			insert x' (y' + h') (block w' 1) @ 
-			insert x' y'  (block 1 h')) im
+	my_draw_rect_width image x y w h f t ink
+		= insert x' y' (block w' h') image, f == 1
+		= (insert x' y' (block w' t) @ 
+			insert (x' + w' - t) y' (block t h') @ 
+			insert x' (y' + h' - t) (block w' t) @ 
+			insert x' y' (block t h')) image
 	{
 		insert = insert_noexpand;
-		block w h = image_new w h (get_bands im) (get_format im)
-			(get_coding im) (get_type im) ink' 0 0;
+		block w h = image_new w h (get_bands image) (get_format image)
+			(get_coding image) (get_type image) ink' 0 0;
 		ink' 
 			= Vector ink, is_list ink
 			= ink;
@@ -1730,6 +1732,11 @@ draw_rect x y w h f ink image
 	}
 }
 
+/* Default to 1 pixel wide edges.
+ */
+draw_rect x y w h f ink image
+	= draw_rect_width x y w h f 1 ink image;
+
 /* This version of draw_rect uses the paintbox rect draw operation. It is an
  * inplace operation and will use bucketloads of memory.
  */
@@ -1737,7 +1744,7 @@ draw_rect_paintbox x y w h f ink image
 	= oo_unary_function draw_rect_op image, is_class image
 	= im_draw_rect image (to_real x) (to_real y) 
 		(to_real w) (to_real h) (to_real f) ink, is_image image
-	= error (_ "bad arguments to " ++ "draw_rect")
+	= error (_ "bad arguments to " ++ "draw_rect_paintbox")
 {
 	draw_rect_op = Operator "draw_rect" 
 		(draw_rect x y w h f ink) Operator_type.COMPOUND_REWRAP false;

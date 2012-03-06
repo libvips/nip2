@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=glib&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-02-24 17:28+0000\n"
+"POT-Creation-Date: 2012-03-02 20:44+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -62,7 +62,7 @@ msgstr ""
 msgid "Member not found."
 msgstr ""
 
-#: ../src/action.c:173 ../src/builtin.c:1039 ../src/call.c:249
+#: ../src/action.c:173 ../src/builtin.c:1034 ../src/call.c:249
 #: ../src/class.c:49 ../src/class.c:1027 ../src/reduce.c:898
 #: ../src/reduce.c:911
 msgid "Bad argument."
@@ -314,18 +314,18 @@ msgstr ""
 msgid "GType %u not found."
 msgstr ""
 
-#: ../src/builtin.c:936
+#: ../src/builtin.c:931
 msgid "GSL library error."
 msgstr ""
 
-#: ../src/builtin.c:985
+#: ../src/builtin.c:980
 #, c-format
 msgid "Builtin \"%s\" takes %d argument."
 msgid_plural "Builtin \"%s\" takes %d arguments."
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/builtin.c:1040
+#: ../src/builtin.c:1035
 #, c-format
 msgid ""
 "Argument %d to builtin \"%s\" should be \"%s\", you passed:\n"

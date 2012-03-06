@@ -1209,12 +1209,14 @@ Image_draw_item = class
 			_result {
 			_vislevel = 3;
 
-			l = Expression "Left" 50;
-			t = Expression "Top" 50;
-			w = Expression "Width" 100;
-			h = Expression "Height" 100;
+			rx = Expression "Left" 50;
+			ry = Expression "Top" 50;
+			rw = Expression "Width" 100;
+			rh = Expression "Height" 100;
 
 			f = Toggle "Fill" true;
+
+			t = Scale "Line thickness" 1 50 3;
 
 			i = Expression "Ink" [0];
 
@@ -1222,7 +1224,7 @@ Image_draw_item = class
 				= map_unary rect x
 			{
 				rect im 
-					= draw_rect l t w h f i.expr im;
+					= draw_rect_width rx ry rw rh f t i.expr im;
 			}
 		}
 	}
@@ -1283,6 +1285,37 @@ Image_draw_item = class
 			}
 		}
 	}
+
+	Draw_scalebar_item = class
+		Menuaction "_Scale" 
+        "draw scale bar" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			t = Scale "Line thickness" 1 50 3;
+			text = String "Dimension text" "50μ";
+			font = Fontname "Use font" Workspaces.Preferences.PAINTBOX_FONT;
+			dpi = Expression "DPI" 100;
+			ink = Colour "sRGB" [50,0,0];
+       
+			_result 
+				= map_unary process x
+            {
+				process x = out
+                {                               
+                _i1 = Image_new_item.Image_new_from_image_item.action x.image;
+                _i2 = draw_rect x.left x.top x.width t true [255] _i1;
+                _i3 = draw_rect x.left (x.top - (2 * t)) t (t * 5) true [255] _i2;
+                _i4 = draw_rect (x.left + x.width - t) (x.top - (2 * t)) t (t * 5) true [255] _i3;               
+                txt = Image (im_text text.value font.value x.width 1 (to_real dpi));
+                _i5 = insert_noexpand (x.left + floor ((x.width -
+txt.width)/2)) (x.top + (3 * t)) txt _i4;           
+                out = blend _i5 ink x.image;               
+                }
+            }
+        }
+    }
 }
 
 Image_join_item = class 

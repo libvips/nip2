@@ -125,6 +125,8 @@ to_real x
 		= error (_ "bad arguments to " ++ "to_real");
 }
 
+to_int x = (int) (to_real x);
+
 /* Try to make a list ... ungroup, basically. We remove the innermost layer of
  * Groups.
  */

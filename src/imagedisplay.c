@@ -439,30 +439,12 @@ imagedisplay_class_init( ImagedisplayClass *class )
 static void
 imagedisplay_make_gcs( Imagedisplay *id )
 {
-	/* Background stipple.
-	 */
-	static guchar stipple[8] = {
-		0xF0,    /*  ####----  */
-		0xE1,    /*  ###----#  */
-		0xC3,    /*  ##----##  */
-		0x87,    /*  #----###  */
-		0x0F,    /*  ----####  */
-		0x1E,    /*  ---####-  */
-		0x3C,    /*  --####--  */
-		0x78,    /*  -####---  */
-	};
-
-	GdkGCValues values;
 	GdkColor fg, bg;
 
 	if( id->back_gc )
 		return;
 
-	values.fill = GDK_OPAQUE_STIPPLED;
-	values.stipple = gdk_bitmap_create_from_data( main_window_gdk,
-		(char *) stipple, 8, 8 );
-	id->back_gc = gdk_gc_new_with_values( main_window_gdk, &values,
-		GDK_GC_FILL | GDK_GC_STIPPLE );
+	id->back_gc = gdk_gc_new( main_window_gdk );
 	fg.red = fg.green = fg.blue = 0x90 << 8;
 	bg.red = bg.green = bg.blue = 0xA0 << 8;
 	gdk_gc_set_rgb_fg_color( id->back_gc, &fg );

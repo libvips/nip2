@@ -1692,7 +1692,48 @@ draw_flood x y ink image
 		(draw_flood x y ink) Operator_type.COMPOUND_REWRAP false;
 }
 
+/* This version of draw_rect uses insert_noexpand and will be fast, even for
+ * huge images.
+ */
 draw_rect x y w h f ink image
+	= oo_unary_function draw_rect_op image, is_class image
+	= my_draw_rect image (to_real x) (to_real y) 
+		(to_real w) (to_real h) (to_real f) ink, is_image image
+	= error (_ "bad arguments to " ++ "draw_rect")
+{
+	draw_rect_op = Operator "draw_rect" 
+		(draw_rect x y w h f ink) Operator_type.COMPOUND_REWRAP false;
+
+	my_draw_rect im x y w h fill ink
+		= insert x' y' (block w' h') im, fill == 1
+		= (insert x' y' (block w' 1) @ 
+			insert (x' + w') y' (block 1 h') @ 
+			insert x' (y' + h') (block w' 1) @ 
+			insert x' y'  (block 1 h')) im
+	{
+		insert = insert_noexpand;
+		block w h = image_new w h (get_bands im) (get_format im)
+			(get_coding im) (get_type im) ink' 0 0;
+		ink' 
+			= Vector ink, is_list ink
+			= ink;
+
+		// wh may be negative for draw_rect .. flip around if it is
+		x'
+			= x + w, w < 0
+			= x;
+		y'
+			= y + h, h < 0
+			= y;
+		w' = abs w;
+		h' = abs h;
+	}
+}
+
+/* This version of draw_rect uses the paintbox rect draw operation. It is an
+ * inplace operation and will use bucketloads of memory.
+ */
+draw_rect_paintbox x y w h f ink image
 	= oo_unary_function draw_rect_op image, is_class image
 	= im_draw_rect image (to_real x) (to_real y) 
 		(to_real w) (to_real h) (to_real f) ink, is_image image

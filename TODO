@@ -1,9 +1,5 @@
 - draw_circle could extract, draw and insert for huge memuse reduction
 
-- add a border width option to draw_rect
-
-- add Joe's scale widget
-
 - section on compat mode for the docs
 
   see mail to MvGulick for some notes

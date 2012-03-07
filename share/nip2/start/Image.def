@@ -1293,25 +1293,44 @@ Image_draw_item = class
 			_result {
 			_vislevel = 3;
 
-			t = Scale "Line thickness" 1 50 3;
+			thick = Scale "Line thickness" 1 50 3;
 			text = String "Dimension text" "50μ";
 			font = Fontname "Use font" Workspaces.Preferences.PAINTBOX_FONT;
 			dpi = Expression "DPI" 100;
-			ink = Colour "sRGB" [50,0,0];
+			ink = Colour "Lab" [50,0,0];
        
 			_result 
 				= map_unary process x
             {
-				process x = out
-                {                               
-                _i1 = Image_new_item.Image_new_from_image_item.action x.image;
-                _i2 = draw_rect x.left x.top x.width t true [255] _i1;
-                _i3 = draw_rect x.left (x.top - (2 * t)) t (t * 5) true [255] _i2;
-                _i4 = draw_rect (x.left + x.width - t) (x.top - (2 * t)) t (t * 5) true [255] _i3;               
-                txt = Image (im_text text.value font.value x.width 1 (to_real dpi));
-                _i5 = insert_noexpand (x.left + floor ((x.width -
-txt.width)/2)) (x.top + (3 * t)) txt _i4;           
-                out = blend _i5 ink x.image;               
+				process r 
+					= blend (Image scale) ink' im
+                {
+					// underlying image
+					im = r.image;
+
+					// make an ink compatible with the image
+					ink' = colour_transform_to (get_type im) ink;
+
+					// normalised rect
+					x = r.nleft;
+					y = r.ntop;
+					w = r.nwidth;
+					h = r.nheight;
+
+					t = to_real thick;
+
+					bg = image_new (get_width im) (get_height im) (get_bands im)
+						(get_format im) (get_coding im) (get_type im) 0 0 0;
+					draw_block x y w h im =
+						draw_rect_width x y w h true 1 [255] im;
+					label = im_text text.value font.value w 1 (to_real dpi);
+					lw = get_width label;
+
+					scale = (draw_block x y w t @
+						draw_block (x - t / 2) (y - 2 * t) t (t * 5) @
+						draw_block (x + w - t / 2) (y - 2 * t) t (t * 5) @
+						insert_noexpand (x + w / 2 - lw / 2) (y + 3 * t) label)
+							bg;
                 }
             }
         }

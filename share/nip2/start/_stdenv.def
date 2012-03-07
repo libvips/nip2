@@ -940,7 +940,8 @@ blend cond in1 in2
 	= oo_binary_function blend_op cond [in1,in2], is_class cond
 	= im_blend (get_image cond) (get_image in1) (get_image in2),
 		has_image cond && has_image in1 && has_image in2
-	= error (_ "bad arguments to " ++ "blend")
+	= error (_ "bad arguments to " ++ "blend" ++ ": " ++
+		join_sep ", " (map print [cond, in1, in2]))
 {
 	blend_op = Operator "blend" 
 		blend_obj Operator_type.COMPOUND_REWRAP false;
@@ -1674,6 +1675,21 @@ icc_ac2rc profile in
 		Operator_type.COMPOUND_REWRAP false;
 }
 
+
+// Given a xywh rect, flip it around so wh are always positive
+rect_normalise x y w h 
+	= [x', y', w', h']
+{
+	x'
+		= x + w, w < 0
+		= x;
+	y'
+		= y + h, h < 0
+		= y;
+	w' = abs w;
+	h' = abs h;
+}
+
 draw_flood_blob x y ink image
 	= oo_unary_function draw_flood_blob_op image, is_class image
 	= im_draw_flood_blob image (to_real x) (to_real y) ink, is_image image
@@ -1719,16 +1735,7 @@ draw_rect_width x y w h f t ink image
 		ink' 
 			= Vector ink, is_list ink
 			= ink;
-
-		// wh may be negative for draw_rect .. flip around if it is
-		x'
-			= x + w, w < 0
-			= x;
-		y'
-			= y + h, h < 0
-			= y;
-		w' = abs w;
-		h' = abs h;
+		[x', y', w', h'] = rect_normalise x y w h;
 	}
 }
 

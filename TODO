@@ -1,3 +1,5 @@
+- doubelclick on matrix, get matrix name in edit box?
+
 - draw_circle could extract, draw and insert for huge memuse reduction
 
 - section on compat mode for the docs

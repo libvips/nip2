@@ -1,5 +1,6 @@
 started 7.26.5, 31/12/11
 - fix possible security thing in yyerror(), thanks Jay
+- --test was broken
 
 started 7.26.4, 14/9/11
 - better error messages for print-main

@@ -1503,8 +1503,11 @@ _( "A new directory has been created to hold startup, "
 		gtk_main();
 	}
 
-	if( main_option_test && expr_error_all )
-		main_error_exit( "--test: errors found" );
+	if( main_option_test ) {
+		symbol_recalculate_all_force( TRUE );
+		if( expr_error_all )
+			main_error_exit( "--test: errors found" );
+	}
 
 	/* No return from this.
 	 */

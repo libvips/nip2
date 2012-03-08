@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=glib&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2011-12-08 22:00+0000\n"
+"POT-Creation-Date: 2012-03-08 14:18+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1702,36 +1702,36 @@ msgstr ""
 msgid "Open the VIPS Homepage"
 msgstr ""
 
-#: lex.l:91 lex.l:101
+#: lex.l:90 lex.l:100
 msgid "line too long"
 msgstr ""
 
-#: lex.l:109
+#: lex.l:108
 msgid "end of line inside string"
 msgstr ""
 
-#: lex.l:111
+#: lex.l:110
 msgid "no end of string"
 msgstr ""
 
-#: lex.l:132 lex.l:142 lex.l:150
+#: lex.l:131 lex.l:141 lex.l:149
 msgid "bad char constant"
 msgstr ""
 
-#: lex.l:175
+#: lex.l:174
 msgid "nested comment"
 msgstr ""
 
-#: lex.l:181
+#: lex.l:180
 msgid "no end of comment"
 msgstr ""
 
-#: lex.l:311
+#: lex.l:310
 #, c-format
 msgid "bad number %s"
 msgstr ""
 
-#: lex.l:364
+#: lex.l:363
 #, c-format
 msgid "illegal character \"%c\""
 msgstr ""
@@ -2608,47 +2608,47 @@ msgstr ""
 msgid "left-hand-side pattern contains no identifiers"
 msgstr ""
 
-#: parse.y:1064 ../src/program.c:1421
+#: parse.y:1066 ../src/program.c:1421
 msgid "Parse error."
 msgstr ""
 
-#: parse.y:1067
+#: parse.y:1069
 #, c-format
 msgid "Error in %s: %s"
 msgstr ""
 
-#: parse.y:1070
+#: parse.y:1072
 #, c-format
 msgid "Error: %s"
 msgstr ""
 
-#: parse.y:1183
+#: parse.y:1193
 msgid "definition is too long"
 msgstr ""
 
-#: parse.y:1607
+#: parse.y:1617
 msgid "no leading identifier"
 msgstr ""
 
-#: parse.y:1613
+#: parse.y:1623
 msgid "'=' missing"
 msgstr ""
 
-#: parse.y:1643
+#: parse.y:1653
 msgid "identifier expected"
 msgstr ""
 
-#: parse.y:1653
+#: parse.y:1663
 #, c-format
 msgid "'%s' does not exist"
 msgstr ""
 
-#: parse.y:1655
+#: parse.y:1666
 #, c-format
 msgid "'%s' has no members"
 msgstr ""
 
-#: parse.y:1670
+#: parse.y:1682
 msgid "'.' or '=' expected"
 msgstr ""
 
@@ -3387,7 +3387,7 @@ msgstr ""
 
 #. Parameter, workspace, etc.
 #.
-#: ../src/symbol.c:773
+#: ../src/symbol.c:774
 #, c-format
 msgid "Can't redefine %s \"%s\"."
 msgstr ""

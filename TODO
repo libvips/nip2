@@ -1,3 +1,5 @@
+- seem to have a leak in the ws just before businesscard.ws?
+
 - doubelclick on matrix, get matrix name in edit box?
 
 - draw_circle could extract, draw and insert for huge memuse reduction

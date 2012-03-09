@@ -253,21 +253,19 @@ colour_edit( GtkWidget *parent, Model *model )
 	Colour *colour = COLOUR( model );
 	ColourEdit *eds = INEW( NULL, ColourEdit );
 	GtkWidget *idlg;
-	char txt[100];
-	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	eds->colour = colour;
 
 	idlg = idialog_new();
-	row_qualified_name( HEAPMODEL( colour )->row, &buf );
-	iwindow_set_title( IWINDOW( idlg ), 
-		_( "Edit Color \"%s\"" ), vips_buf_all( &buf ) );
+	iwindow_set_title( IWINDOW( idlg ), _( "Edit %s %s" ),
+		G_OBJECT_TYPE_NAME( model ),
+		IOBJECT( HEAPMODEL( model )->row )->name );
 	idialog_set_build( IDIALOG( idlg ), 
 		(iWindowBuildFn) colour_buildedit, eds, NULL, NULL );
 	idialog_set_callbacks( IDIALOG( idlg ), 
 		iwindow_true_cb, NULL, idialog_free_client, eds );
 	idialog_add_ok( IDIALOG( idlg ), 
-		colour_done_cb, _( "Set Color" ) );
+		colour_done_cb, _( "Set %s" ), G_OBJECT_TYPE_NAME( model ) );
 	iwindow_set_parent( IWINDOW( idlg ), parent );
 	idialog_set_iobject( IDIALOG( idlg ), IOBJECT( model ) );
 	idialog_set_pinup( IDIALOG( idlg ), TRUE );

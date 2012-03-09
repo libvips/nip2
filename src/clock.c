@@ -86,7 +86,6 @@ clock_edit( GtkWidget *parent, Model *model )
 	Clock *clock = CLOCK( model );
 	GtkWidget *ss = stringset_new();
 	char txt[256];
-	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	im_snprintf( txt, 256, "%g", clock->interval );
 	stringset_child_new( STRINGSET( ss ), 
@@ -95,13 +94,15 @@ clock_edit( GtkWidget *parent, Model *model )
 	stringset_child_new( STRINGSET( ss ), 
 		_( "Elapsed time" ), txt, _( "Elapsed time (seconds)" ) );
 
-	row_qualified_name( HEAPMODEL( clock )->row, &buf );
-	iwindow_set_title( IWINDOW( ss ), 
-		_( "Edit Clock \"%s\"" ), vips_buf_all( &buf ) );
+	/* Expands to eg. "Edit Toggle A1".
+	 */
+	iwindow_set_title( IWINDOW( ss ), _( "Edit %s %s" ),
+		G_OBJECT_TYPE_NAME( model ),
+		IOBJECT( HEAPMODEL( model )->row )->name );
 	idialog_set_callbacks( IDIALOG( ss ), 
 		iwindow_true_cb, NULL, NULL, clock );
 	idialog_add_ok( IDIALOG( ss ), 
-		clock_done_cb, _( "Set Clock" ) );
+		clock_done_cb, _( "Set %s" ), G_OBJECT_TYPE_NAME( model ) );
 	iwindow_set_parent( IWINDOW( ss ), GTK_WIDGET( parent ) );
 	idialog_set_iobject( IDIALOG( ss ), IOBJECT( model ) );
 	iwindow_build( IWINDOW( ss ) );

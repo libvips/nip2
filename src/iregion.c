@@ -214,10 +214,10 @@ iregion_edit( GtkWidget *parent, Model *model )
 	Classmodel *classmodel = CLASSMODEL( model );
 	iRegionInstance *instance = classmodel_get_instance( classmodel );
 	GtkWidget *ss = stringset_new();
-	char txt[256];
-	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	if( instance ) {
+		char txt[256];
+
 		im_snprintf( txt, 256, "%d", instance->area.left );
 		stringset_child_new( STRINGSET( ss ), 
 			_( "Left" ), txt, _( "Left edge of region" ) );
@@ -232,13 +232,13 @@ iregion_edit( GtkWidget *parent, Model *model )
 			_( "Height" ), txt, _( "Height of region" ) );
 	}
 
-	row_qualified_name( HEAPMODEL( model )->row, &buf );
-	iwindow_set_title( IWINDOW( ss ), 
-		_( "Edit \"%s\"" ), vips_buf_all( &buf ) );
+	iwindow_set_title( IWINDOW( ss ), _( "Edit %s %s" ),
+		G_OBJECT_TYPE_NAME( model ),
+		IOBJECT( HEAPMODEL( model )->row )->name );
 	idialog_set_callbacks( IDIALOG( ss ), 
 		iwindow_true_cb, NULL, NULL, classmodel );
 	idialog_add_ok( IDIALOG( ss ), 
-		iregion_done_cb, _( "Set Region" ) );
+		iregion_done_cb, _( "Set %s" ), G_OBJECT_TYPE_NAME( model ) );
 	iwindow_set_parent( IWINDOW( ss ), GTK_WIDGET( parent ) );
 	idialog_set_iobject( IDIALOG( ss ), IOBJECT( model ) );
 	idialog_set_pinup( IDIALOG( ss ), TRUE );

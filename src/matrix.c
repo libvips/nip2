@@ -184,19 +184,19 @@ matrix_edit( GtkWidget *parent, Model *model )
 	Matrix *matrix = MATRIX( model );
 	MatrixEdit *eds = INEW( NULL, MatrixEdit );
 	GtkWidget *idlg;
-	char txt[256];
-	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	eds->matrix = matrix;
 
 	idlg = idialog_new();
-	iwindow_set_title( IWINDOW( idlg ), 
-		_( "Edit Matrix \"%s\"" ), vips_buf_all( &buf ) );
+	iwindow_set_title( IWINDOW( idlg ), _( "Edit %s %s" ),
+		G_OBJECT_TYPE_NAME( model ),
+		IOBJECT( HEAPMODEL( model )->row )->name );
 	idialog_set_build( IDIALOG( idlg ), 
 		(iWindowBuildFn) matrix_buildedit, eds, NULL, NULL );
 	idialog_set_callbacks( IDIALOG( idlg ), 
 		iwindow_true_cb, NULL, idialog_free_client, eds );
-	idialog_add_ok( IDIALOG( idlg ), matrix_done_cb, _( "Set Matrix" ) );
+	idialog_add_ok( IDIALOG( idlg ), 
+		matrix_done_cb, _( "Set %s" ), G_OBJECT_TYPE_NAME( model ) );
 	iwindow_set_parent( IWINDOW( idlg ), parent );
 	idialog_set_iobject( IDIALOG( idlg ), IOBJECT( model ) );
 	iwindow_build( IWINDOW( idlg ) );

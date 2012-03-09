@@ -750,24 +750,23 @@ classmodel_edit( GtkWidget *parent, Model *model )
 	ClassmodelClass *class = CLASSMODEL_GET_CLASS( classmodel );
 
 	if( class->n_members ) {
-		Row *row = HEAPMODEL( classmodel )->row;
 		GtkWidget *idlg;
 		ClassmodelEdit *eds = INEW( NULL, ClassmodelEdit );
 
 		eds->classmodel = classmodel;
 
 		idlg = idialog_new();
-		/* Expands to "Edit Toggle A1".
+		/* Expands to eg. "Edit Toggle A1".
 		 */
 		iwindow_set_title( IWINDOW( idlg ), _( "Edit %s %s" ),
-			G_OBJECT_TYPE_NAME( classmodel ),
-			IOBJECT( row )->name );
+			G_OBJECT_TYPE_NAME( model ),
+			IOBJECT( HEAPMODEL( model )->row )->name );
 		idialog_set_build( IDIALOG( idlg ), 
 			(iWindowBuildFn) classmodel_buildedit, eds, 
 			NULL, NULL );
 		idialog_set_callbacks( IDIALOG( idlg ), 
 			iwindow_true_cb, NULL, idialog_free_client, eds );
-		/* Expands to "Set Toggle".
+		/* Expands to eg. "Set Toggle".
 		 */
 		idialog_add_ok( IDIALOG( idlg ), 
 			classmodel_done_cb, _( "Set %s" ), 

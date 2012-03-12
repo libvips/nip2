@@ -1,7 +1,5 @@
-Image_new_item = class 
-	Menupullright "_New" "make new things" {
-	Image_black_item = class 
-		Menuaction "_Image" "make a new image" {
+Image_new_item = class Menupullright "_New" "make new things" {
+	Image_black_item = class Menuaction "_Image" "make a new image" {
 		format_names = [
 			"8-bit unsigned int - UCHAR", 		// 0
 			"8-bit signed int - CHAR", 			// 1
@@ -1251,8 +1249,7 @@ Image_draw_item = class
 		}
 	}
 
-	Flood_item = class Menuaction "_Flood" 
-		"flood bounded area of image" {
+	Flood_item = class Menuaction "_Flood" "flood bounded area of image" {
 		action x = class
 			_result {
 			_vislevel = 3;
@@ -1286,55 +1283,65 @@ Image_draw_item = class
 		}
 	}
 
-	Draw_scalebar_item = class
-		Menuaction "_Scale" 
-        "draw scale bar" {
+	Draw_scalebar_item = class Menuaction "_Scale" "draw scale bar" {
 		action x = class
 			_result {
 			_vislevel = 3;
 
+			px = Expression "Left" 50;
+			py = Expression "Top" 50;
+			wid = Expression "Width" 100;
 			thick = Scale "Line thickness" 1 50 3;
-			text = String "Dimension text" "50μ";
+			text = String "Dimension text" "50μm";
 			font = Fontname "Use font" Workspaces.Preferences.PAINTBOX_FONT;
-			dpi = Expression "DPI" 100;
-			ink = Colour "Lab" [50,0,0];
-       
-			_result 
-				= map_unary process x
+			pos = Option "Position Text" ["Above", "Below"] 1;
+			vp = Option "Dimension by" [
+				"Inner Vertical Edge", 
+				"Centre of Vertical", 
+				"Outer Vertical Edge"
+			] 1;
+            dpi = Expression "DPI" 100;
+            ink = Colour "Lab" [50,0,0];
+      
+            _result
+                = map_unary process x
             {
-				process r 
-					= blend (Image scale) ink' im
+                process im
+                    = blend (Image scale) ink' im
                 {
-					// underlying image
-					im = r.image;
+                    // make an ink compatible with the image
+                    ink' = colour_transform_to (get_type im) ink;
 
-					// make an ink compatible with the image
-					ink' = colour_transform_to (get_type im) ink;
+                    x = to_real px;
+                    y = to_real py;
+                    w = to_real wid;
+                    d = to_real dpi;
 
-					// normalised rect
-					x = r.nleft;
-					y = r.ntop;
-					w = r.nwidth;
-					h = r.nheight;
+                    t = floor thick;
 
-					t = to_real thick;
-
-					bg = image_new (get_width im) (get_height im) (get_bands im)
-						(get_format im) (get_coding im) (get_type im) 0 0 0;
-					draw_block x y w h im =
-						draw_rect_width x y w h true 1 [255] im;
-					label = im_text text.value font.value w 1 (to_real dpi);
-					lw = get_width label;
+                    bg = image_new (get_width im) (get_height im) (get_bands im)
+                        (get_format im) (get_coding im) (get_type im) 0 0 0;
+                    draw_block x y w t im =
+                        draw_rect_width x y w t true 1 [255] im;
+                    label = im_text text.value font.value w 1 d;
+                    lw = get_width label;
+                    lh = get_height label;
+                    ly = [y - lh - t, y + 2 * t]?pos;
+                    vx = [
+						[x - t, x + w],
+						[x - t / 2, x + w - t / 2],
+						[x, x + w - t]
+					]?vp;
 
 					scale = (draw_block x y w t @
-						draw_block (x - t / 2) (y - 2 * t) t (t * 5) @
-						draw_block (x + w - t / 2) (y - 2 * t) t (t * 5) @
-						insert_noexpand (x + w / 2 - lw / 2) (y + 3 * t) label)
-							bg;
-                }
-            }
-        }
-    }
+						draw_block vx?0 (y - 2 * t) t (t * 5) @
+						draw_block vx?1 (y - 2 * t) t (t * 5) @
+						insert_noexpand (x + w / 2 - lw / 2) ly label)
+						bg;
+				}
+			}
+		}
+	}
 }
 
 Image_join_item = class 

@@ -1,6 +1,10 @@
-- seem to have a leak in the ws just before businesscard.ws?
+- global balance is leaking?
 
-  1pt and 2pts mosaic both report leaks
+	$ nip2 --test ~/test.ws
+
+- os x build reports missing jasper dylib?
+
+- load a radiance image in nip2, how do we decode? no menu for rad2float?
 
 - draw_circle could extract, draw and insert for huge memuse reduction
 

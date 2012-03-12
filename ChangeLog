@@ -1,4 +1,5 @@
 started 7.28.1, 12/3/12
+- oop, add Array to private Type decoder (thanks MvGulik)
 
 started 7.28.0, 30/1/12
 - bump for new stable version

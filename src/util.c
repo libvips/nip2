@@ -1305,7 +1305,8 @@ static const char *type_names[] = {
 	"Yxy",			/* IM_TYPE_YXY		23 */
 	"Fourier",		/* IM_TYPE_FOURIER	24 */
 	"RGB16",		/* IM_TYPE_RGB16	25 */
-	"GREY16"		/* IM_TYPE_GREY16	26 */
+	"GREY16",		/* IM_TYPE_GREY16	26 */
+	"Array"			/* VIPS_INTERPRETATION_ARRAY = 27 */
 };
 static const int ntype_names = IM_NUMBER( type_names );
 

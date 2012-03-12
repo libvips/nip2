@@ -1,3 +1,11 @@
+
+0) Clean nip2 work-space.
+1) Toolkit: Image, New, Image. (Image_new_item.Image_black_item.action)
+2) (new image settings) Changing the Image type to ARRAY(last option in list)
+crashes nip2.
+
+
+
 - seem to have a leak in the ws just before businesscard.ws?
 
 - doubelclick on matrix, get matrix name in edit box?

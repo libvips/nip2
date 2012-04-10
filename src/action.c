@@ -105,7 +105,7 @@ action_boperror( Reduce *rc, Compile *compile, const char *str,
 	}
 
 	error_top( "%s", top_str );
-	error_sub( _( "Error in binary \"%s\".\n"
+	error_sub( _( "Error in binary %s.\n"
 		"left = %s\n"
 		"right = %s\n%s" ),
 		op_name, 
@@ -189,7 +189,7 @@ action_uoperror( Reduce *rc, Compile *compile,
 	}
 
 	error_top( "%s", top_str );
-	error_sub( _( "Error in unary \"%s\".\n"
+	error_sub( _( "Error in unary %s.\n"
 		"argument = %s\n%s" ),
 		op_name, vips_buf_all( &buf ), vips_buf_all( &buf2 ) );
 
@@ -972,8 +972,8 @@ action_proc_div( Reduce *rc, Compile *compile,
 		double y2 = PEGETIMAGPART( b );
 
 		if( !heap_complex_new( heap, 
-			(x1*x2 + y1*y2)/(x2*x2 + y2*y2),
-			(y1*x2 - x1*y2)/(x2*x2 + y2*y2), out ) )
+			(x1 * x2 + y1 * y2) / (x2 * x2 + y2 * y2),
+			(y1 * x2 - x1 * y2) / (x2 * x2 + y2 * y2), out ) )
 			action_boperror( rc, compile, error_get_sub(), 
 				op, name, a, b );
 	}
@@ -983,8 +983,8 @@ action_proc_div( Reduce *rc, Compile *compile,
 		double x2 = PEGETREAL( b );
 
 		if( !heap_complex_new( heap, 
-			(x2*x1)/(x1*x1 + y1*y1),
-			(-x2*y1)/(x1*x1 + y1*y1), out ) )
+			(x1 * x2) / (x2 * x2),
+			(y1 * x2) / (x2 * x2), out ) )
 			action_boperror( rc, compile, error_get_sub(), 
 				op, name, a, b );
 	}
@@ -994,8 +994,8 @@ action_proc_div( Reduce *rc, Compile *compile,
 		double y2 = PEGETIMAGPART( b );
 
 		if( !heap_complex_new( heap, 
-			(x1*x2)/(x2*x2 + y2*y2),
-			(-x1*y2)/(x2*x2 + y2*y2), out ) )
+			(x1 * x2) / (x2 * x2 + y2 * y2),
+			(-x1 * y2) / (x2 * x2 + y2 * y2), out ) )
 			action_boperror( rc, compile, error_get_sub(), 
 				op, name, a, b );
 	}

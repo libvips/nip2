@@ -1,7 +1,82 @@
+// all the image formats we test, and their matching number format
+// we can't use uchar as a number format directly since it'll become 'a' or
+// whatever and arithmetic ops will start failing
+fmts = [
+	["uchar", cast_unsigned_char, cast_unsigned_int @ cast_unsigned_char],
+	["char", cast_signed_char, cast_signed_int @ cast_signed_char],
+	["ushort", cast_unsigned_short, cast_unsigned_short],
+	["short", cast_signed_short, cast_signed_short],
+	["uint", cast_unsigned_int, cast_unsigned_int],
+	["int", cast_signed_int, cast_signed_int],
+	["float", cast_float, cast_float],
+	["double", cast_double, cast_double],
+	["complex", cast_complex, cast_complex],
+	["dcomplex", cast_double_complex, cast_double_complex]
+];
+
+// we need a to_real that does images as well
+to_real x
+	= abs x, is_complex x
+	= mean x, is_Image x
+	= x;
+
+// numbers we test
+numbers = [-10, 0, 1, 10, 3.1415927];
+
+test_unary op_name fn
+	= foldr1 logical_and
+		[test fname ifmt nfmt x :: [fname, ifmt, nfmt] <- fmts; x <- numbers]
+{
+	// image == number can fail due to rounding differences
+	test fname ifmt nfmt x
+		= true, abs (image - number) < 0.001
+		= error (join_sep " " (map print 
+			["unary", fname, op_name, x, "==", image, number]))
+	{
+		image = (to_real @ fn @ ifmt @ to_image) x;
+		number = (to_real @ fn @ nfmt) x;
+	}
+}
+
+test_binary op_name fn
+	= foldr1 logical_and
+		[test fname ifmt nfmt x y :: 
+			[fname, ifmt, nfmt] <- fmts; x <- numbers; y <- numbers]
+{
+	// image == number can fail due to rounding differences
+	test fname ifmt nfmt x y
+		= true, abs (image - number) < 0.001
+		= error (join_sep " " (map print 
+			["binary", fname, x, op_name, y, "==", image, number]))
+	{
+		image = to_real (fn ((ifmt @ to_image) x) ((ifmt @ to_image) y));
+		number = to_real (fn (nfmt x) (nfmt y));
+	}
+}
+
 tests = [
+	test_binary "add" add,
+	test_binary "subtract" subtract,
+	test_binary "multiply" multiply,
+	test_binary "divide" test_div,
+	test_unary "square" square,
+	test_unary "constant plus" (add 12),
+	test_unary "plus constant" (converse add 12),
+	test_unary "divided by constant" (converse test_div 3),
+	test_unary "multiply constant" (multiply 7),
+	test_unary "constant multiplied by" (converse multiply 7),
+	test_unary "constant subtracted from" (subtract 4),
+	test_unary "subtract constant" (converse subtract 4),
 	"" ++ "a" == "a",
 	hd [1, error "nope"] == 1
-];
+]
+{
+	// libvips divide returns 0 for divide by zero
+	test_div a b
+		= 0, is_real b && b == 0
+		= 0, is_complex b && re b == 0 && im b == 0
+		= divide a b;
+}
 
 main 
 	= "all tests pass", fail == []

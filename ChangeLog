@@ -1,3 +1,6 @@
+started 7.28.2, 10/4/12
+- complex constant divided by real constant was wrong
+
 started 7.28.1, 12/3/12
 - oop, add Array to private Type decoder (thanks MvGulik)
 - new version of Draw / Scale (thanks Joe)

@@ -1,9 +1,13 @@
 started 7.29.0, 9/3/12
-- version bump
+
+started 7.28.3, 17/4/12
+- up max size of user defs, lets you work with larger groups
 
 started 7.28.2, 10/4/12
 - complex constant divided by real constant was wrong
 - more self-tests
+- disable the libvips operation cache, it doesn't know about invalidate and
+  breaks various things
 
 started 7.28.1, 12/3/12
 - oop, add Array to private Type decoder (thanks MvGulik)

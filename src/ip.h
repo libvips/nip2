@@ -186,7 +186,7 @@ extern int statfs();
 #define MAX_SYSTEM (50)		/* Max number of args we allow */
 #define MAX_BANDS (64)		/* Max number of bands in image */
 #define MAX_CSTACK (10)		/* Max number of cursors we stack */
-#define MAX_STRSIZE (32768)	/* Size of text for user defs */
+#define MAX_STRSIZE (100000)	/* Size of text for user defs */
 #define MAX_TRACE (1024)	/* Biggest thing we print in trace */
 #define MAX_SSTACK (40)		/* Scope stack for parser */
 #define VIPS_HOMEPAGE "http://www.vips.ecs.soton.ac.uk"

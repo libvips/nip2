@@ -991,7 +991,7 @@ mainw_open_done_cb( iWindow *iwnd, void *client,
 		return;
 	}
 
-	/* If there's nothing left to load (we only had workspaes to load and
+	/* If there's nothing left to load (we only had workspaces to load and
 	 * we've loaded them all) and the current workspace is smpty, we can 
 	 * junk it.
 	 */

@@ -32,7 +32,7 @@ msgstr ""
 #: ../src/action.c:108
 #, c-format
 msgid ""
-"Error in binary \"%s\".\n"
+"Error in binary %s.\n"
 "left = %s\n"
 "right = %s\n"
 "%s"
@@ -71,7 +71,7 @@ msgstr ""
 #: ../src/action.c:192
 #, c-format
 msgid ""
-"Error in unary \"%s\".\n"
+"Error in unary %s.\n"
 "argument = %s\n"
 "%s"
 msgstr ""
@@ -827,7 +827,7 @@ msgstr ""
 msgid "zombie"
 msgstr ""
 
-#: ../src/dump.c:189 ../src/util.c:1349
+#: ../src/dump.c:189 ../src/util.c:1350
 msgid "workspace"
 msgstr ""
 
@@ -1067,7 +1067,7 @@ msgstr ""
 msgid "free in \"%s\""
 msgstr ""
 
-#: ../src/filesel.c:759 ../src/util.c:1932 ../src/util.c:1938
+#: ../src/filesel.c:759 ../src/util.c:1933 ../src/util.c:1939
 msgid "Bad filename."
 msgstr ""
 
@@ -1972,11 +1972,11 @@ msgstr ""
 msgid "unable to make %s %s: %s"
 msgstr ""
 
-#: ../src/main.c:1074
+#: ../src/main.c:1079
 msgid "- image processing spreadsheet"
 msgstr ""
 
-#: ../src/main.c:1106
+#: ../src/main.c:1111
 #, c-format
 msgid "linked to vips-%s"
 msgstr ""
@@ -1984,34 +1984,34 @@ msgstr ""
 #. -1 means can't-be-set, at least on os x, so don't
 #. * warn.
 #.
-#: ../src/main.c:1158
+#: ../src/main.c:1163
 #, c-format
 msgid ""
 "unable to change max file descriptors\n"
 "max file descriptors still set to %d"
 msgstr ""
 
-#: ../src/main.c:1164
+#: ../src/main.c:1169
 msgid "unable to read max file descriptors"
 msgstr ""
 
-#: ../src/main.c:1388 ../src/main.c:1434
+#: ../src/main.c:1393 ../src/main.c:1439
 #, c-format
 msgid ""
 "Startup error log:\n"
 "%s"
 msgstr ""
 
-#: ../src/main.c:1433
+#: ../src/main.c:1438
 msgid "Startup error."
 msgstr ""
 
-#: ../src/main.c:1444
+#: ../src/main.c:1449
 #, c-format
 msgid "Welcome to %s-%s!"
 msgstr ""
 
-#: ../src/main.c:1449
+#: ../src/main.c:1454
 #, c-format
 msgid ""
 "A new directory has been created to hold startup, data and temporary files:\n"
@@ -3567,91 +3567,91 @@ msgstr ""
 msgid "<unknown format>"
 msgstr ""
 
-#: ../src/util.c:1316
+#: ../src/util.c:1317
 msgid "<unknown type>"
 msgstr ""
 
-#: ../src/util.c:1340
+#: ../src/util.c:1341
 msgid "directory"
 msgstr ""
 
-#: ../src/util.c:1599
+#: ../src/util.c:1600
 msgid "Unable to find install area."
 msgstr ""
 
-#: ../src/util.c:1775
+#: ../src/util.c:1776
 msgid "<charset conversion error>"
 msgstr ""
 
-#: ../src/util.c:1933
+#: ../src/util.c:1934
 msgid "Filename is too long."
 msgstr ""
 
-#: ../src/util.c:1939
+#: ../src/util.c:1940
 msgid "Filename contains only blank characters."
 msgstr ""
 
-#: ../src/util.c:2002 ../src/util.c:2011 ../src/util.c:2066
+#: ../src/util.c:2003 ../src/util.c:2012 ../src/util.c:2067
 msgid "Unable to open."
 msgstr ""
 
-#: ../src/util.c:2003 ../src/util.c:2012
+#: ../src/util.c:2004 ../src/util.c:2013
 #, c-format
 msgid ""
 "Unable to open file \"%s\" for reading.\n"
 "%s."
 msgstr ""
 
-#: ../src/util.c:2067
+#: ../src/util.c:2068
 #, c-format
 msgid ""
 "Unable to open file \"%s\" for writing.\n"
 "%s."
 msgstr ""
 
-#: ../src/util.c:2088
+#: ../src/util.c:2089
 msgid "Unable to write."
 msgstr ""
 
-#: ../src/util.c:2089
+#: ../src/util.c:2090
 #, c-format
 msgid ""
 "Unable to write to file \"%s\".\n"
 "%s."
 msgstr ""
 
-#: ../src/util.c:2124 ../src/util.c:2137 ../src/util.c:2162
+#: ../src/util.c:2125 ../src/util.c:2138 ../src/util.c:2163
 msgid "Unable to read."
 msgstr ""
 
-#: ../src/util.c:2125
+#: ../src/util.c:2126
 #, c-format
 msgid "File \"%s\" too large."
 msgstr ""
 
-#: ../src/util.c:2138 ../src/util.c:2163
+#: ../src/util.c:2139 ../src/util.c:2164
 #, c-format
 msgid ""
 "Unable to read from file \"%s\".\n"
 "%s."
 msgstr ""
 
-#: ../src/util.c:2470
+#: ../src/util.c:2471
 msgid "Unable to create temporary file."
 msgstr ""
 
-#: ../src/util.c:2471
+#: ../src/util.c:2472
 #, c-format
 msgid ""
 "Unable to make file \"%s\"\n"
 "%s"
 msgstr ""
 
-#: ../src/util.c:2678
+#: ../src/util.c:2679
 msgid "Out of memory."
 msgstr ""
 
-#: ../src/util.c:2679
+#: ../src/util.c:2680
 #, c-format
 msgid "Request for %s of RAM triggered memory allocation failure."
 msgstr ""

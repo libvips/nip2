@@ -346,6 +346,8 @@ const char *watch_string_get( Watchgroup *,
 	(watch_int_get( main_watchgroup, "TIFF_FORMAT", 0 ))
 #define IP_TIFF_PREDICTOR \
 	(watch_int_get( main_watchgroup, "TIFF_PREDICTOR", 0 ))
+#define IP_TIFF_BIGTIFF \
+	(watch_bool_get( main_watchgroup, "TIFF_BIGTIFF", FALSE ))
 
 /* Autoreload. 
  */

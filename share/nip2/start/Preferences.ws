@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.28.0">
-  <Workspace window_x="0" window_y="0" window_width="680" window_height="800" filename="/home/john/vips/share/nip2/start/Preferences.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="100" lpane_open="false" rpane_position="400" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="Preferences1">
+  <Workspace window_x="0" window_y="0" window_width="680" window_height="800" filename="Preferences.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="100" lpane_open="false" rpane_position="400" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="Preferences1">
     <Column x="0" y="3067" open="false" selected="false" sform="false" next="99" name="B" caption="Interface column -- don't touch this!">
       <Subcolumn vislevel="2">
         <Row popup="false" name="CSV_SEPARATOR">
@@ -181,6 +181,11 @@
         <Row popup="false" name="TIFF_PREDICTOR">
           <Rhs vislevel="1" flags="4">
             <iText formula="C25.value"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="TIFF_BIGTIFF">
+          <Rhs vislevel="1" flags="4">
+            <iText formula="C26.value"/>
           </Rhs>
         </Row>
         <Row popup="false" name="CALC_PATH_START">
@@ -584,7 +589,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="1620" open="true" selected="false" sform="false" next="25" name="C" caption="TIFF save">
+    <Column x="0" y="1620" open="true" selected="true" sform="false" next="27" name="C" caption="TIFF save">
       <Subcolumn vislevel="2">
         <Row popup="false" name="C1">
           <Rhs vislevel="1" flags="1">
@@ -640,6 +645,13 @@
             <Option/>
             <Subcolumn vislevel="0"/>
             <iText formula="Option &quot;Format&quot; [&quot;No truncation&quot;,&quot;Save 1 band 8 bit images as 1 bit&quot;] 0"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="C26">
+          <Rhs vislevel="1" flags="1">
+            <Toggle/>
+            <Subcolumn vislevel="0"/>
+            <iText formula="Toggle &quot;Save as BigTIFF&quot; false"/>
           </Rhs>
         </Row>
       </Subcolumn>
@@ -812,7 +824,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="0" open="true" selected="true" sform="false" next="46" name="D" caption="Calculation">
+    <Column x="0" y="0" open="true" selected="false" sform="false" next="46" name="D" caption="Calculation">
       <Subcolumn vislevel="2">
         <Row popup="false" name="D2">
           <Rhs vislevel="1" flags="1">

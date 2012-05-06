@@ -317,10 +317,11 @@ filesel_tiff_mode( char *out )
 		strcat( ltype, buf );
 	}
 
-	im_snprintf( out, 256, "%s,%s,%s,%s", 
+	im_snprintf( out, 256, "%s,%s,%s,%s,,,%s", 
 		ctype, ltype, 
 		decode_tiff_multires( IP_TIFF_MULTI_RES ),
-		decode_tiff_format( IP_TIFF_FORMAT ) );
+		decode_tiff_format( IP_TIFF_FORMAT ),
+		IP_TIFF_BIGTIFF ? "8" : "" );
 }
 
 /* Make a JPEG save format string.

@@ -1,3 +1,8 @@
+- colour find needs a "leave brightness" option
+
+- colour apply should not use the LUT for linear input option
+
+
 - global balance is leaking?
 
 0) Clean nip2 work-space.

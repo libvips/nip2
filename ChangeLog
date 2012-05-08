@@ -1,5 +1,8 @@
 started 7.29.0, 9/3/12
 
+started 7.28.5, 8/5/12
+- change keybinding for Delete to ctrl+bsp to work around a GTK bug
+
 started 7.28.4, 6/5/12
 - added bigtiff save option
 

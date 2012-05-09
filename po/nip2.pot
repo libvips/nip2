@@ -9,11 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=glib&keywords=I18N+L10N&component=general\n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2012-03-08 21:21+0000\n"
-=======
 "POT-Creation-Date: 2012-04-18 11:55+0100\n"
->>>>>>> origin/7.28
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1059,48 +1055,48 @@ msgstr ""
 msgid "image files"
 msgstr ""
 
-#: ../src/filesel.c:500
+#: ../src/filesel.c:501
 #, c-format
 msgid "Unable to determine space free in \"%s\"."
 msgstr ""
 
 #. Expands to (eg.) '6GB free in "/pics/tmp"'
 #.
-#: ../src/filesel.c:511
+#: ../src/filesel.c:512
 #, c-format
 msgid "free in \"%s\""
 msgstr ""
 
-#: ../src/filesel.c:759 ../src/util.c:1933 ../src/util.c:1939
+#: ../src/filesel.c:760 ../src/util.c:1933 ../src/util.c:1939
 msgid "Bad filename."
 msgstr ""
 
-#: ../src/filesel.c:760
+#: ../src/filesel.c:761
 msgid "No file selected."
 msgstr ""
 
-#: ../src/filesel.c:973
+#: ../src/filesel.c:974
 msgid "Increment filename"
 msgstr ""
 
-#: ../src/filesel.c:979
+#: ../src/filesel.c:980
 msgid "After Save, add 1 to the last number in the file name"
 msgstr ""
 
-#: ../src/filesel.c:1223
+#: ../src/filesel.c:1224
 #, c-format
 msgid "%s Save Preferences"
 msgstr ""
 
-#: ../src/filesel.c:1284
+#: ../src/filesel.c:1285
 msgid "Overwrite"
 msgstr ""
 
-#: ../src/filesel.c:1285
+#: ../src/filesel.c:1286
 msgid "Overwrite file?"
 msgstr ""
 
-#: ../src/filesel.c:1286
+#: ../src/filesel.c:1287
 #, c-format
 msgid "File \"%s\" exists. OK to overwrite?"
 msgstr ""

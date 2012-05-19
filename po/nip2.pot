@@ -9,7 +9,11 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=glib&keywords=I18N+L10N&component=general\n"
+<<<<<<< HEAD
 "POT-Creation-Date: 2012-05-07 10:19+0100\n"
+=======
+"POT-Creation-Date: 2012-04-18 11:55+0100\n"
+>>>>>>> e6def9257e354502bf53afa410bf89795361cc02
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"

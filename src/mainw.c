@@ -1699,7 +1699,7 @@ static GtkActionEntry mainw_actions[] = {
 		G_CALLBACK( mainw_recover_action_cb ) },
 
 	{ "Delete", 
-		GTK_STOCK_DELETE, N_( "_Delete" ), "<Shift>BackSpace",
+		GTK_STOCK_DELETE, N_( "_Delete" ), "<control>BackSpace",
 		N_( "Delete selected items" ), 
 		G_CALLBACK( mainw_selected_remove_action_cb ) },
 

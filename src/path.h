@@ -27,10 +27,6 @@
 
  */
 
-/* List of directories we have seen this session. 
- */
-extern GSList *path_session;
-
 extern GSList *path_search_default;
 extern GSList *path_start_default;
 extern const char *path_tmp_default;
@@ -38,6 +34,9 @@ extern const char *path_tmp_default;
 /* Type of path_map functions.
  */
 typedef void *(*path_map_fn)( const char *, void *, void *, void * );
+
+void path_rewrite_add( const char *old, const char *new );
+void path_rewrite( char *buf );
 
 GSList *path_parse( const char *path );
 char *path_unparse( GSList *path );
@@ -48,8 +47,5 @@ void *path_map( GSList *path, const char *patt, path_map_fn fn, void *a );
 void *path_map_dir( const char *dir, const char *patt, 
 	path_map_fn fn, void *a );
 char *path_find_file( GSList *path, const char *patt );
-
-void path_add_dir( const char *dir );
-void path_add_file( const char *file );
 
 void path_init( void );

@@ -949,6 +949,50 @@ main_set( const char *str )
 	return( TRUE );
 }
 
+static char prefix_buffer[FILENAME_MAX];
+static const char *prefix = NULL;
+
+static void
+set_prefix( const char *prefix )
+{
+	/* Override the install guess from vips. This won't pick up msg
+	 * cats sadly :( since we have to init i18n before arg parsing. Handy
+	 * for testing without installing.
+	 */
+	if( main_option_prefix ) {
+		char tmp[FILENAME_MAX];
+
+		im_strncpy( tmp, main_option_prefix, FILENAME_MAX );
+		nativeize_path( tmp );
+		absoluteize_path( tmp );
+		prefix = im_strdupn( tmp );
+		setenvf( "VIPSHOME", "%s", prefix );
+	}
+}
+
+/* Guess VIPSHOME, if we can.
+ */
+const char *
+get_prefix( void )
+{
+	if( !prefix ) {
+		if( !(prefix = im_guess_prefix( main_argv0, "VIPSHOME" )) ) {
+			error_top( _( "Unable to find install area." ) );
+			error_vips();
+
+			return( NULL );
+		}
+
+		im_strncpy( prefix_buffer, prefix, FILENAME_MAX );
+
+		absoluteize_path( prefix_buffer );
+		canonicalize_path( prefix_buffer );
+		setenvf( "VIPSHOME", "%s", prefix_buffer );
+	}
+
+	return( prefix_buffer );
+}
+
 /* Start here!
  */
 int
@@ -1061,7 +1105,7 @@ main( int argc, char *argv[] )
 	/* Init i18n ... get catalogues from $VIPSHOME/share/locale so we're
 	 * relocatable.
 	 */
-	prefix = im_guess_prefix( main_argv0, "VIPSHOME" );
+	prefix = get_vipshome();
 	im_snprintf( name, 256, 
 		"%s" G_DIR_SEPARATOR_S "share" G_DIR_SEPARATOR_S "locale", 
 		prefix );

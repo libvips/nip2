@@ -1587,32 +1587,6 @@ absoluteize_path( char *path )
 	}
 }
 
-/* Guess VIPSHOME, if we can.
- */
-const char *
-get_vipshome( const char *argv0 )
-{
-	static char prefix_buffer[FILENAME_MAX];
-	static const char *prefix;
-
-	if( !prefix ) {
-		if( !(prefix = im_guess_prefix( argv0, "VIPSHOME" )) ) {
-			error_top( _( "Unable to find install area." ) );
-			error_vips();
-
-			return( NULL );
-		}
-
-		im_strncpy( prefix_buffer, prefix, FILENAME_MAX );
-
-		absoluteize_path( prefix_buffer );
-		canonicalize_path( prefix_buffer );
-		setenvf( "VIPSHOME", "%s", prefix_buffer );
-	}
-
-	return( prefix_buffer );
-}
-
 /* Call a void*-valued function, building a string arg. We expand env. 
  * variables, but that's all.
  */

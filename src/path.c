@@ -35,17 +35,122 @@
 #define DEBUG_SEARCH
  */
 
-#include "ip.h"
-
-/* List of directories we have visited this session. Added to by fsb stuff.
+/* show path rewrites
  */
-GSList *path_session = NULL;
+#define DEBUG_REWRITE
+
+#include "ip.h"
 
 /* Default search paths if prefs fail.
  */
 GSList *path_start_default = NULL;
 GSList *path_search_default = NULL;
 const char *path_tmp_default = NULL;
+
+/* We rewrite paths to try to handle files referenced in workspaces in 
+ * directories that move.
+ *
+ * For example, suppose we have workspace.ws in /some/directory which loads
+ * image.v in that directory. The workspace will include a line like 
+ * (Image_file "/some/directory/image"). Now if directory is moved to
+ * /other/directory and workspace.ws reloaded, we want to rewrite the string
+ * "/some/directory/image.v" to "/other/directory/image.v". 
+ *
+ * Also consider picking ICC profiles in export/import: we want to avoid
+ * putting the path into the ws file, we need to go back to "$VIPSHOME" again.
+ */
+
+typedef struct _Rewrite {
+	char *old;
+	char *new;
+} Rewrite; 
+
+static GSList *rewrite_list = NULL;
+
+static gint
+path_rewrite_sort_fn( Rewrite *a, Rewrite *b )
+{
+        return( strlen( a->old ) - strlen( b->old ) );
+}
+
+/* Add a new rewrite pair to the rewrite list.
+ */
+void
+path_rewrite_add( const char *old, const char *new )
+{
+	GSList *p;
+	Rewrite *rewrite;
+
+	for( p = rewrite_list; p; p = p->next ) {
+		rewrite = (Rewrite *) p->data; 
+
+		if( strcmp( old, rewrite->old ) == 0 )
+			return;
+	}
+
+	rewrite = g_new( Rewrite, 1 );
+	rewrite->old = g_strdup( old );
+	rewrite->new = g_strdup( new );
+	rewrite_list = g_slist_prepend( rewrite_list, rewrite );
+
+	/* Keep longest old first, in case one old is a prefix of another.
+	 */
+        rewrite_list = g_slist_sort( rewrite_list, 
+		(GCompareFunc) path_rewrite_sort_fn );
+
+#ifdef DEBUG_REWRITE
+	printf( "path_rewrite_add: old = %s, new = %s\n", old, new );
+
+	for( p = rewrite_list; p; p = p->next ) {
+		rewrite = (Rewrite *) p->data; 
+
+		printf( "\told = %s, new = %s\n", rewrite->old, rewrite->new );
+	}
+#endif /*DEBUG_REWRITE*/
+}
+
+/* Rewrite a string using the rewrite list. buf must be FILENAME_MAX
+ * characters.
+ */
+void
+path_rewrite( char *buf )
+{
+	GSList *p;
+	gboolean changed;
+
+#ifdef DEBUG_REWRITE
+	printf( "path_rewrite: %s\n", buf );
+#endif /*DEBUG_REWRITE*/
+
+	do { 
+		changed = FALSE;
+
+		for( p = rewrite_list; p; p = p->next ) {
+			Rewrite *rewrite = (Rewrite *) p->data; 
+
+			if( is_prefix( rewrite->old, buf ) ) {
+				int olen = strlen( rewrite->old );
+				int nlen = strlen( rewrite->new );
+				int blen = strlen( buf );
+
+				if( blen - olen + nlen > FILENAME_MAX - 3 )
+					break;
+
+				memmove( buf + nlen - olen, buf + olen,
+					blen - olen );
+				memcpy( buf, rewrite->new, nlen );
+
+				changed = TRUE;
+
+				break;
+			}
+		}
+	} while( changed );
+
+#ifdef DEBUG_REWRITE
+	printf( "\t-> %s\n", buf );
+#endif /*DEBUG_REWRITE*/
+}
 
 /* Turn a search path (eg. "/pics/lr:/pics/hr") into a list of directory names.
  */
@@ -363,37 +468,11 @@ path_find_file( GSList *path, const char *filename )
 	return( NULL );
 }
 
-/* Add a directory to the session path, if it's not there already.
- */
-void
-path_add_dir( const char *dir )
-{
-        if( !slist_map( path_session, 
-		(SListMapFn) path_str_eq, (gpointer) dir ) ) {
-#ifdef DEBUG_SEARCH
-		printf( "path_add_dir: adding \"%s\"\n", dir );
-#endif /*DEBUG_SEARCH*/
-                path_session = g_slist_prepend( path_session, 
-			im_strdup( NULL, dir ) );
-	}
-}
-
-void
-path_add_file( const char *filename )
-{
-	char *p;
-	char buf[FILENAME_MAX];
-
-	im_strncpy( buf, filename, FILENAME_MAX );
-	if( (p = strrchr( buf, G_DIR_SEPARATOR )) )
-		*p = '\0';
-
-	path_add_dir( buf );
-}
-
 void
 path_init( void )
 {
+	path_rewrite_add( get_vipshome( main_argv0 ), "$VIPSHOME" )
+
 #ifdef DEBUG_LOCAL
 	printf( "path_init: loading start from \".\" only\n" );
 	path_start_default = path_parse( "." );

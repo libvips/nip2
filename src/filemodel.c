@@ -158,7 +158,8 @@ filemodel_info( iObject *iobject, VipsBuf *buf )
 
 	IOBJECT_CLASS( parent_class )->info( iobject, buf );
 
-	vips_buf_appendf( buf, "filename = \"%s\"\n", NN( filemodel->filename ) );
+	vips_buf_appendf( buf, "filename = \"%s\"\n", 
+		NN( filemodel->filename ) );
 	vips_buf_appendf( buf, "modified = \"%s\"\n", 
 		bool_to_char( filemodel->modified ) );
 	vips_buf_appendf( buf, "registered = \"%s\"\n", 

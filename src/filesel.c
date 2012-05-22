@@ -748,6 +748,7 @@ char *
 filesel_get_filename( Filesel *filesel )
 {
 	char *name;
+	char tmp[FILENAME_MAX];
 
 	name = gtk_file_chooser_get_filename(
 		GTK_FILE_CHOOSER( filesel->chooser ) );
@@ -766,7 +767,13 @@ filesel_get_filename( Filesel *filesel )
 		return( NULL );
 	}
 
-	return( name );
+	/* Rewrite to compact form, eg. "$HOME/fred".
+	 */
+	im_strncpy( tmp, name, FILENAME_MAX );
+	path_rewrite( tmp );
+	g_free( name );
+
+	return( g_strdup( tmp ) );
 }
 
 /* Get filename multi ... map over the selected filenames.

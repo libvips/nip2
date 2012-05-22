@@ -304,7 +304,7 @@ apply_image_call( Reduce *rc,
 
 	/* Try to load image from given string.
 	 */
-	if( !(fn = path_find_file( filename )) )
+	if( !(fn = path_rewrite_file( filename )) )
 		reduce_throw( rc );
 
 	/* Reattach the mode and load.

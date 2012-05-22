@@ -299,7 +299,7 @@ typedef int (*heap_max_fn)( Heap * );
 struct _Heap {
 	iObject parent_object;
 
-	Compile *compile;	/* Debugging ... if non-null, assos. compile */
+	Compile *compile;	/* If non-null, assoc. compile */
 
 	heap_max_fn max_fn;	/* Max nodes in this heap */
 	int mxb;		/* Max blocks until next check */

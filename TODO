@@ -1,4 +1,22 @@
-- filemodel needs to add to path_rewrite_add() when it sees a change
+- add rewrite stuff to filedrop_drag_data_received()
+
+
+
+
+- we need to rewrite things like Image_file as well argh
+  
+  otherwise it'll work on the first load from an alternative location, but
+  fail on subsequent loads
+
+  or we need to record the rewrites in the .ws file
+
+  when would we remove them? 
+
+  argh, don't bother ... better to rely on the user fixing their paths before
+  they modify and save
+ 
+
+
 
 
 

@@ -73,38 +73,70 @@ path_rewrite_sort_fn( Rewrite *a, Rewrite *b )
         return( strlen( b->old ) - strlen( a->old ) );
 }
 
+static Rewrite *
+path_rewrite_lookup( const char *old )
+{
+	GSList *p;
+	Rewrite *rewrite;
+
+	for( p = rewrite_list; p; p = p->next ) {
+		rewrite = (Rewrite *) p->data; 
+
+		if( strcmp( old, rewrite->old ) == 0 ) 
+			return( rewrite );
+	}
+
+	return( NULL );
+}
+
 /* Add a new rewrite pair to the rewrite list.
  */
 void
 path_rewrite_add( const char *old, const char *new )
 {
-	GSList *p;
 	Rewrite *rewrite;
 
 	g_return_if_fail( old );
-	g_return_if_fail( new );
 
-	if( strcmp( old, new ) == 0 )
-		return;
+	if( (rewrite = path_rewrite_lookup( old )) ) {
+		if( !new ||
+			strcmp( old, new ) == 0 ) {
+#ifdef DEBUG_REWRITE
+			printf( "path_rewrite_add: removing\n" );
+#endif /*DEBUG_REWRITE*/
 
-	for( p = rewrite_list; p; p = p->next ) {
-		rewrite = (Rewrite *) p->data; 
+			rewrite_list = g_slist_remove( rewrite_list, rewrite );
+		}
+		else if( new ) {
+#ifdef DEBUG_REWRITE
+			printf( "path_rewrite_add: updating\n" );
+#endif /*DEBUG_REWRITE*/
 
-		if( strcmp( old, rewrite->old ) == 0 )
-			return;
+			IM_SETSTR( rewrite->new, new );
+		}
+	}
+	else if( new &&
+		strcmp( old, new ) != 0 ) {
+#ifdef DEBUG_REWRITE
+		printf( "path_rewrite_add: adding\n" );
+#endif /*DEBUG_REWRITE*/
+
+		rewrite = g_new( Rewrite, 1 );
+		rewrite->old = g_strdup( old );
+		rewrite->new = g_strdup( new );
+		rewrite_list = g_slist_prepend( rewrite_list, rewrite );
 	}
 
-	rewrite = g_new( Rewrite, 1 );
-	rewrite->old = g_strdup( old );
-	rewrite->new = g_strdup( new );
-	rewrite_list = g_slist_prepend( rewrite_list, rewrite );
-
-	/* Keep longest old first, in case one old is a prefix of another.
+	/* Keep longest old first, in case one old is a prefix of 
+	 * another.
 	 */
-        rewrite_list = g_slist_sort( rewrite_list, 
+	rewrite_list = g_slist_sort( rewrite_list, 
 		(GCompareFunc) path_rewrite_sort_fn );
 
 #ifdef DEBUG_REWRITE
+{
+	GSList *p;
+
 	printf( "path_rewrite_add: old = %s, new = %s\n", old, new );
 
 	for( p = rewrite_list; p; p = p->next ) {
@@ -112,6 +144,7 @@ path_rewrite_add( const char *old, const char *new )
 
 		printf( "\told = %s, new = %s\n", rewrite->old, rewrite->new );
 	}
+}
 #endif /*DEBUG_REWRITE*/
 }
 
@@ -174,9 +207,14 @@ path_rewrite_file( const char *filename )
 	/* We want to find $HOME in  /home/john/../somefile, so rewrite first.
 	 * But we might have /home/./john/somefile which wouldn't match, so
 	 * rewrite again after removing ../.
+	 *
+	 * We have to use absoluteize_path() to remove . and .. since
+	 * canonicalize won't work with relative paths. But path_rewrite()
+	 * will get us back to relative again.
 	 */
+	nativeize_path( name );
 	path_rewrite( name );
-	canonicalize_path( name );
+	absoluteize_path( name );
 	path_rewrite( name );
 
 	if( existsf( "%s", name ) )
@@ -496,6 +534,7 @@ path_init( void )
 
 	path_rewrite_add( get_prefix(), "$VIPSHOME" );
 	path_rewrite_add( g_get_home_dir(), "$HOME" );
+	path_rewrite_add( g_get_current_dir(), "." );
 	path_rewrite_add( get_savedir(), "$SAVEDIR" );
 
 	/* And the expanded form too.

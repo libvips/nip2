@@ -1545,6 +1545,10 @@ workspace_new( Workspacegroup *wsg, const char *name )
 static gboolean
 workspace_load_empty( Workspace *ws, Workspacegroup *wsg, const char *filename )
 {
+	char *old_dir;
+	char *new_dir;
+	char tmp[FILENAME_MAX];
+
 	g_assert( workspace_is_empty( ws ) );
 
 	ws->load_type = WORKSPACE_LOAD_TOP;
@@ -1553,6 +1557,22 @@ workspace_load_empty( Workspace *ws, Workspacegroup *wsg, const char *filename )
 	if( !filemodel_load_all( FILEMODEL( ws ), MODEL( wsg ), filename ) ) 
 		return( FALSE );
 	filemodel_set_modified( FILEMODEL( ws ), FALSE );
+
+	/* FILEMODEL( ws )->filename has the file this workspace was saved to,
+	 * filename is the file we loaded from. If the directory has moved
+	 * we need to add a rewrite rule.
+	 *
+	 * The old filename could be non-native, so we must rewrite to native
+	 * form first.
+	 */
+	im_strncpy( tmp, FILEMODEL( ws )->filename, FILENAME_MAX );
+	nativeize_path( tmp );
+	old_dir = g_path_get_dirname( tmp ); 
+	new_dir = g_path_get_dirname( filename );
+	path_rewrite_add( old_dir, new_dir );
+	g_free( old_dir );
+	g_free( new_dir );
+
 	filemodel_set_filename( FILEMODEL( ws ), filename );
 
 	return( TRUE );

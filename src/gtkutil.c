@@ -1107,7 +1107,7 @@ image_new_from_file( const char *name )
 	GtkWidget *image;
 	char *file;
 
-	if( (file = path_find_file( PATH_SEARCH, name )) ) {
+	if( (file = path_find_file( name )) ) {
 		image = (GtkWidget *) callv_string_filename( 
 			(callv_string_fn) gtk_image_new_from_file, 
 			file, NULL, NULL, NULL );

@@ -127,7 +127,6 @@ classmodel_graphic_save_cb( iWindow *iwnd,
 	if( (filename = filesel_get_filename( filesel )) ) {
 		if( class->graphic_save( classmodel, 
 			GTK_WIDGET( iwnd ), filename ) ) {
-			path_add_file( filename );
 			IM_SETSTR( classmodel->filename, filename );
 			iobject_changed( IOBJECT( classmodel ) );
 
@@ -198,7 +197,6 @@ classmodel_graphic_replace_cb( iWindow *iwnd,
 			g_object_ref( G_OBJECT( classmodel ) );
 
 			symbol_recalculate_all();
-			path_add_file( filename );
 			IM_SETSTR( classmodel->filename, filename );
 			iobject_changed( IOBJECT( classmodel ) );
 

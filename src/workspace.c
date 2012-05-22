@@ -1238,7 +1238,7 @@ workspace_load_compat( Workspace *ws, int major, int minor )
 		"$VIPSHOME/share/" PACKAGE "/compat/%d.%d", 
 		best_major, best_minor );
 	path = path_parse( pathname );
-	if( path_map_exact( path, "*.def", 
+	if( path_map( path, "*.def", 
 		(path_map_fn) workspace_load_toolkit, ws->kitg ) ) {
 		path_free2( path );
 		return( FALSE );

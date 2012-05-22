@@ -304,7 +304,7 @@ apply_image_call( Reduce *rc,
 
 	/* Try to load image from given string.
 	 */
-	if( !(fn = path_find_file( PATH_SEARCH, filename )) )
+	if( !(fn = path_find_file( filename )) )
 		reduce_throw( rc );
 
 	/* Reattach the mode and load.
@@ -520,7 +520,7 @@ apply_search_call( Reduce *rc, const char *name, HeapNode **arg, PElement *out )
 	PEPOINTRIGHT( arg[0], &rhs );
 	(void) reduce_get_string( rc, &rhs, buf, MAX_STRSIZE );
 
-	if( !(fn = path_find_file( PATH_SEARCH, buf )) )
+	if( !(fn = path_find_file( buf )) )
 		/* If not found, return [].
 		 */
 		fn = im_strdup( NULL, "" );

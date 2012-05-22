@@ -32,8 +32,8 @@
  */
 
 /* show path searches
-#define DEBUG_SEARCH
  */
+#define DEBUG_SEARCH
 
 /* show path rewrites
  */
@@ -70,7 +70,7 @@ static GSList *rewrite_list = NULL;
 static gint
 path_rewrite_sort_fn( Rewrite *a, Rewrite *b )
 {
-        return( strlen( a->old ) - strlen( b->old ) );
+        return( strlen( b->old ) - strlen( a->old ) );
 }
 
 /* Add a new rewrite pair to the rewrite list.
@@ -80,6 +80,12 @@ path_rewrite_add( const char *old, const char *new )
 {
 	GSList *p;
 	Rewrite *rewrite;
+
+	g_return_if_fail( old );
+	g_return_if_fail( new );
+
+	if( strcmp( old, new ) == 0 )
+		return;
 
 	for( p = rewrite_list; p; p = p->next ) {
 		rewrite = (Rewrite *) p->data; 
@@ -136,8 +142,8 @@ path_rewrite( char *buf )
 				if( blen - olen + nlen > FILENAME_MAX - 3 )
 					break;
 
-				memmove( buf + nlen - olen, buf + olen,
-					blen - olen );
+				memmove( buf + nlen, buf + olen, 
+					blen - olen + 1 );
 				memcpy( buf, rewrite->new, nlen );
 
 				changed = TRUE;
@@ -150,6 +156,36 @@ path_rewrite( char *buf )
 #ifdef DEBUG_REWRITE
 	printf( "\t-> %s\n", buf );
 #endif /*DEBUG_REWRITE*/
+}
+
+/* Choose a file, rewriting the path. NULL for error, g_free() the result.
+ */
+char *
+path_rewrite_file( const char *filename )
+{
+	char name[FILENAME_MAX];
+
+#ifdef DEBUG_REWRITE
+	printf( "path_rewrite_file: %s\n", filename );
+#endif /*DEBUG_REWRITE*/
+
+	im_strncpy( name, filename, FILENAME_MAX );
+
+	/* We want to find $HOME in  /home/john/../somefile, so rewrite first.
+	 * But we might have /home/./john/somefile which wouldn't match, so
+	 * rewrite again after removing ../.
+	 */
+	path_rewrite( name );
+	canonicalize_path( name );
+	path_rewrite( name );
+
+	if( existsf( "%s", name ) )
+		return( im_strdupn( name ) );
+
+	error_top( _( "Not found." ) );
+	error_sub( _( "File \"%s\" not found" ), name );
+
+	return( NULL );
 }
 
 /* Turn a search path (eg. "/pics/lr:/pics/hr") into a list of directory names.
@@ -318,6 +354,13 @@ path_search_match( Search *search, const char *dir_name, const char *name )
 
 		im_snprintf( buf, FILENAME_MAX, 
 			"%s" G_DIR_SEPARATOR_S "%s", dir_name, name );
+
+		/* Remove . and .., compress to env var form.
+		 */
+		path_rewrite( buf );
+		canonicalize_path( buf );
+		path_rewrite( buf );
+
 #ifdef DEBUG_SEARCH
 		printf( "path_search_match: matched \"%s\"\n", buf );
 #endif /*DEBUG_SEARCH*/
@@ -372,28 +415,6 @@ path_scan_dir( const char *dir_name, Search *search )
 
  */
 void *
-path_map_exact( GSList *path, const char *patt, path_map_fn fn, void *a )
-{
-	Search search;
-	void *result;
-
-#ifdef DEBUG_SEARCH
-	printf( "path_map_exact: searching for \"%s\"\n", patt );
-#endif /*DEBUG_SEARCH*/
-
-	if( !path_search_init( &search, patt, fn, a ) )
-		return( NULL );
-
-	result = slist_map( path, (SListMapFn) path_scan_dir, &search );
-
-	path_search_free( &search );
-
-	return( result );
-}
-
-/* As above, but walk the session path too.
- */
-void *
 path_map( GSList *path, const char *patt, path_map_fn fn, void *a )
 {
 	Search search;
@@ -407,9 +428,6 @@ path_map( GSList *path, const char *patt, path_map_fn fn, void *a )
 		return( NULL );
 
 	result = slist_map( path, (SListMapFn) path_scan_dir, &search );
-	if( !result )
-		result = slist_map( path_session, 
-			(SListMapFn) path_scan_dir, &search );
 
 	path_search_free( &search );
 
@@ -443,13 +461,16 @@ path_map_dir( const char *dir, const char *patt, path_map_fn fn, void *a )
 	return( result );
 }
 
-/* Search for a file and return it's path. NULL for not found. Return a new
- * string.
+/* Search for a file on the search path. 
  */
 char *
-path_find_file( GSList *path, const char *filename )
+path_find_file( const char *filename )
 {
 	char *fname;
+
+#ifdef DEBUG_SEARCH
+	printf( "path_find_file: \"%s\"\n", filename );
+#endif /*DEBUG_SEARCH*/
 
 	/* Try file name exactly.
 	 */
@@ -458,7 +479,7 @@ path_find_file( GSList *path, const char *filename )
 
 	/* Search everywhere.
 	 */
-	if( (fname = path_map( path, filename,
+	if( (fname = path_map( PATH_SEARCH, filename,
 		(path_map_fn) im_strdupn, NULL )) )
 		return( fname );
 	
@@ -471,7 +492,16 @@ path_find_file( GSList *path, const char *filename )
 void
 path_init( void )
 {
-	path_rewrite_add( get_vipshome( main_argv0 ), "$VIPSHOME" )
+	char buf[FILENAME_MAX];
+
+	path_rewrite_add( get_prefix(), "$VIPSHOME" );
+	path_rewrite_add( g_get_home_dir(), "$HOME" );
+	path_rewrite_add( get_savedir(), "$SAVEDIR" );
+
+	/* And the expanded form too.
+	 */
+	expand_variables( get_savedir(), buf );
+	path_rewrite_add( buf, "$SAVEDIR" );
 
 #ifdef DEBUG_LOCAL
 	printf( "path_init: loading start from \".\" only\n" );
@@ -479,8 +509,6 @@ path_init( void )
 	path_search_default = path_parse( "." );
 	path_tmp_default = im_strdup( NULL, "." );
 #else /*!DEBUG_LOCAL*/
-	char buf[FILENAME_MAX];
-
 	im_snprintf( buf, FILENAME_MAX,
 		"%s" G_DIR_SEPARATOR_S "start" G_SEARCHPATH_SEPARATOR_S
 		"$VIPSHOME" G_DIR_SEPARATOR_S "share" G_DIR_SEPARATOR_S

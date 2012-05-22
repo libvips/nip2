@@ -58,18 +58,12 @@ pathname_view_new( Model *model, View *parent )
 static void *
 pathname_update_model( Heapmodel *heapmodel )
 {
-	Pathname *pathname = PATHNAME( heapmodel );
-
 #ifdef DEBUG
 	printf( "pathname_update_model\n" );
 #endif /*DEBUG*/
 
 	if( HEAPMODEL_CLASS( parent_class )->update_model( heapmodel ) )
 		return( heapmodel );
-
-	/* Make sure this directory is on the session path.
-	 */
-	path_add_file( pathname->value );
 
 	return( NULL );
 }

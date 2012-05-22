@@ -37,15 +37,14 @@ typedef void *(*path_map_fn)( const char *, void *, void *, void * );
 
 void path_rewrite_add( const char *old, const char *new );
 void path_rewrite( char *buf );
+char *path_rewrite_file( const char *patt );
 
 GSList *path_parse( const char *path );
 char *path_unparse( GSList *path );
 void path_free2( GSList *path );
-void *path_map_exact( GSList *path, 
-	const char *patt, path_map_fn fn, void *a );
 void *path_map( GSList *path, const char *patt, path_map_fn fn, void *a );
 void *path_map_dir( const char *dir, const char *patt, 
 	path_map_fn fn, void *a );
-char *path_find_file( GSList *path, const char *patt );
+char *path_find_file( const char *patt );
 
 void path_init( void );

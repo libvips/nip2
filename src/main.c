@@ -580,7 +580,7 @@ main_load_startup( void )
 
 	/* Load any plug-ins on PATH_START. 
 	 */
-	(void) path_map_exact( PATH_START, "*.plg", 
+	(void) path_map( PATH_START, "*.plg", 
 		(path_map_fn) main_load_plug, NULL );
 
 	/* Link all VIPS functions as SYM_EXTERNAL.
@@ -593,13 +593,13 @@ main_load_startup( void )
 #ifdef DEBUG
 	printf( "definitions init\n" );
 #endif/*DEBUG*/
-	(void) path_map_exact( PATH_START, "*.def", 
+	(void) path_map( PATH_START, "*.def", 
 		(path_map_fn) main_load_def, NULL );
 
 #ifdef DEBUG
 	printf( "ws init\n" );
 #endif/*DEBUG*/
-	(void) path_map_exact( PATH_START, "*.ws", 
+	(void) path_map( PATH_START, "*.ws", 
 		(path_map_fn) main_load_ws, NULL );
 
 	mainw_recent_thaw();
@@ -950,24 +950,18 @@ main_set( const char *str )
 }
 
 static char prefix_buffer[FILENAME_MAX];
-static const char *prefix = NULL;
+static gboolean prefix_valid = FALSE;
 
+/* Override the install guess from vips. Handy for testing. 
+ */
 static void
 set_prefix( const char *prefix )
 {
-	/* Override the install guess from vips. This won't pick up msg
-	 * cats sadly :( since we have to init i18n before arg parsing. Handy
-	 * for testing without installing.
-	 */
-	if( main_option_prefix ) {
-		char tmp[FILENAME_MAX];
-
-		im_strncpy( tmp, main_option_prefix, FILENAME_MAX );
-		nativeize_path( tmp );
-		absoluteize_path( tmp );
-		prefix = im_strdupn( tmp );
-		setenvf( "VIPSHOME", "%s", prefix );
-	}
+	im_strncpy( prefix_buffer, prefix, FILENAME_MAX );
+	nativeize_path( prefix_buffer );
+	absoluteize_path( prefix_buffer );
+	setenvf( "VIPSHOME", "%s", prefix_buffer );
+	prefix_valid = TRUE;
 }
 
 /* Guess VIPSHOME, if we can.
@@ -975,7 +969,9 @@ set_prefix( const char *prefix )
 const char *
 get_prefix( void )
 {
-	if( !prefix ) {
+	if( !prefix_valid ) {
+		const char *prefix;
+
 		if( !(prefix = im_guess_prefix( main_argv0, "VIPSHOME" )) ) {
 			error_top( _( "Unable to find install area." ) );
 			error_vips();
@@ -983,11 +979,7 @@ get_prefix( void )
 			return( NULL );
 		}
 
-		im_strncpy( prefix_buffer, prefix, FILENAME_MAX );
-
-		absoluteize_path( prefix_buffer );
-		canonicalize_path( prefix_buffer );
-		setenvf( "VIPSHOME", "%s", prefix_buffer );
+		set_prefix( prefix ); 
 	}
 
 	return( prefix_buffer );
@@ -1105,7 +1097,7 @@ main( int argc, char *argv[] )
 	/* Init i18n ... get catalogues from $VIPSHOME/share/locale so we're
 	 * relocatable.
 	 */
-	prefix = get_vipshome();
+	prefix = get_prefix();
 	im_snprintf( name, 256, 
 		"%s" G_DIR_SEPARATOR_S "share" G_DIR_SEPARATOR_S "locale", 
 		prefix );
@@ -1138,15 +1130,8 @@ main( int argc, char *argv[] )
 	 * cats sadly :( since we have to init i18n before arg parsing. Handy
 	 * for testing without installing.
 	 */
-	if( main_option_prefix ) {
-		char tmp[FILENAME_MAX];
-
-		im_strncpy( tmp, main_option_prefix, FILENAME_MAX );
-		nativeize_path( tmp );
-		absoluteize_path( tmp );
-		prefix = im_strdupn( tmp );
-		setenvf( "VIPSHOME", "%s", prefix );
-	}
+	if( main_option_prefix ) 
+		set_prefix( main_option_prefix );
 
 	if( main_option_version ) {
 		printf( "%s-%s", PACKAGE, VERSION );
@@ -1390,6 +1375,8 @@ main( int argc, char *argv[] )
 	expand_variables( PATH_TMP, buf );
 	nativeize_path( buf );
 	setenvf( "TMPDIR", "%s", buf );
+
+	path_rewrite_add( PATH_TMP, "$TMPDIR" );
 }
 
 	/* Measure amount of stuff in temp area ... need this for checking

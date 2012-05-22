@@ -1,3 +1,8 @@
+- filemodel needs to add to path_rewrite_add() when it sees a change
+
+
+
+
 - improve moving WSes between machines:
 
 	icc export, pick sRGB, save workspace ... workspace now has the path

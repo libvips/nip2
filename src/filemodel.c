@@ -359,8 +359,6 @@ filemodel_real_save_all( Filemodel *filemodel, const char *filename )
 		return( FALSE );
 	}
 
-	path_add_file( filename );
-
 	return( TRUE );
 }
 
@@ -586,8 +584,6 @@ filemodel_load_all( Filemodel *filemodel, Model *parent, const char *filename )
 		return( FALSE );
 	}
 
-	path_add_file( filename );
-
 	/* Don't recomp here, we may be loading a bunch of interdependent
 	 * files.
 	 */
@@ -626,8 +622,6 @@ filemodel_load_all_openfile( Filemodel *filemodel, Model *parent,
 			"load", tname );
 		return( FALSE );
 	}
-
-	path_add_file( of->fname );
 
 	/* Don't recomp here, we may be loading a bunch of interdependent
 	 * files.

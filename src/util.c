@@ -1973,7 +1973,7 @@ ifile_open_read( const char *name, ... )
 
 	if( !of )
 		return( NULL );
-	if( !(of->fname_real = path_find_file( PATH_SEARCH, of->fname )) ) {
+	if( !(of->fname_real = path_rewrite_file( of->fname )) ) {
 		error_top( _( "Unable to open." ) );
 		error_sub( _( "Unable to open file \"%s\" for reading.\n%s." ),
 			of->fname, g_strerror( errno ) );
@@ -2674,11 +2674,6 @@ recent_add( GSList *recent, const char *filename )
 	im_strncpy( absolute, filename, FILENAME_MAX );
 	absoluteize_path( absolute );
 
-	/* Bit of a hack ... handy place to make sure this directory is on the
-	 * session path.
-	 */
-	path_add_file( absolute );
-
 	for( p = recent; p; p = p->next ) {
 		const char *stored = p->data;
 
@@ -2785,7 +2780,7 @@ recent_save( GSList *recent, const char *filename )
 	recent_free( old_recent );
 }
 
-/* Return the name of the save dir we use ... eg. "/home/john/.nip2-7.10.8",
+/* Return the name of the save dir we use ... eg. "$HOME/.nip2-7.10.8",
  * or maybe "C:\Documents and Settings\john\Application Data"
  */
 const char *

@@ -1,13 +1,6 @@
 - add rewrite stuff to filedrop_drag_data_received()
 
-- rewrite (Image_file "xxx") expressions during load, don't add to the rewrite
-  table
-
-  need to remove from the rewrite table after load
-
-  some problem in the call to vips_buf_change() in lex.l just after
-  read_string()
-
+- need to remove load rewrites from the rewrite table after load
 
 
 

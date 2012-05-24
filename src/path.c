@@ -32,12 +32,12 @@
  */
 
 /* show path searches
- */
 #define DEBUG_SEARCH
+ */
 
 /* show path rewrites
- */
 #define DEBUG_REWRITE
+ */
 
 #include "ip.h"
 
@@ -97,6 +97,13 @@ path_rewrite_add( const char *old, const char *new )
 	Rewrite *rewrite;
 
 	g_return_if_fail( old );
+
+	if( strlen( old ) == 0 )
+		printf( "path_rewrite_add: argh!\n" );
+
+	/* old == "" will cause huge confusion.
+	 */
+	g_return_if_fail( strlen( old ) > 0 );
 
 	if( (rewrite = path_rewrite_lookup( old )) ) {
 		if( !new ||
@@ -512,8 +519,12 @@ path_init( void )
 
 	path_rewrite_add( get_prefix(), "$VIPSHOME" );
 	path_rewrite_add( g_get_home_dir(), "$HOME" );
-	path_rewrite_add( g_get_current_dir(), "." );
 	path_rewrite_add( get_savedir(), "$SAVEDIR" );
+
+	/* You might think we could add a rule to swap '.' for 
+	 * g_get_current_dir(), but that would then make workspaces depend on
+	 * a certain value of cwd before they could work.
+	 */
 
 	/* And the expanded form too.
 	 */

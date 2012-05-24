@@ -74,9 +74,8 @@
  * escaped with '\'.
  */
 static void
-read_string( char *buf2 )
+read_string( char *buf )
 {
-	char buf[MAX_STRSIZE];
 	int ch;
 	int i;
 
@@ -108,10 +107,6 @@ read_string( char *buf2 )
 		yyerror( _( "end of line inside string" ) );
 	if( ch == EOF || ch == '\0' )
 		yyerror( _( "no end of string" ) );
-
-	/* Interpret escapes.
-	 */
-	my_strccpy( buf2, buf );
 }
 
 /* Read a char constant. The leading ' has already been seen. Cases to consider:
@@ -347,7 +342,11 @@ FALSE {
 	BEGIN BINARY;
 
 	read_string( buf );
-	im_strncpy( buf2, buf, MAX_STRSIZE );
+
+	/* We need to keep buf as exactly the string in the source, including
+	 * before interpretation of \ escapes.
+	 */
+	my_strccpy( buf2, buf );
 	model_loadstate_rewrite_path( buf2 );
 	vips_buf_change( &lex_text, buf, buf2 );
 

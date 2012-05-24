@@ -89,7 +89,8 @@ path_rewrite_lookup( const char *old )
 	return( NULL );
 }
 
-/* Add a new rewrite pair to the rewrite list.
+/* Add a new rewrite pair to the rewrite list. @new can be NULL, meaning
+ * remove a rewrite rule.
  */
 void
 path_rewrite_add( const char *old, const char *new )

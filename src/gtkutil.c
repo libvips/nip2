@@ -871,6 +871,19 @@ typedef struct {
 	void *client;
 } FiledropInfo;
 
+static gboolean
+filedrop_trigger( FiledropInfo *fdi, const char *path )
+{
+	char buf[FILENAME_MAX];
+	gboolean result;
+
+	im_strncpy( buf, path, FILENAME_MAX );
+	path_compact( buf );
+	result = fdi->fn( fdi->client, buf );
+
+	return( result );
+}
+
 static void
 filedrop_drag_data_received( GtkWidget *widget, 
 	GdkDragContext *context,
@@ -897,12 +910,12 @@ filedrop_drag_data_received( GtkWidget *widget,
 		sPath = g_strndup( pFrom, pTo - pFrom );
 
 #if !GLIB_CHECK_VERSION (2,0,0)
-		result = fdi->fn( fdi->client, sPath );
+		result = filedrop_trigger( fdi, sPath );
 #else
 		/* format changed with Gtk+1.3, use conversion 
 		 */
 		pFrom = g_filename_from_uri( sPath, NULL, &error );
-		result = fdi->fn( fdi->client, pFrom );
+		result = filedrop_trigger( fdi, pFrom );
 		g_free( pFrom );
 #endif
 

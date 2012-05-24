@@ -1,6 +1,4 @@
-- add rewrite stuff to filedrop_drag_data_received()
-
-- need to remove load rewrites from the rewrite table after load
+- how about command-line workspace paths, do they need rewriting too?
 
 
 

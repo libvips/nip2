@@ -1,46 +1,8 @@
 - add rewrite stuff to filedrop_drag_data_received()
 
+- rewrite (Image_file "xxx") expressions during load, don't add to the rewrite
+  table
 
-
-
-- we need to rewrite things like Image_file as well argh
-  
-  otherwise it'll work on the first load from an alternative location, but
-  fail on subsequent loads
-
-  or we need to record the rewrites in the .ws file
-
-  when would we remove them? 
-
-  argh, don't bother ... better to rely on the user fixing their paths before
-  they modify and save
- 
-
-
-
-
-
-
-- improve moving WSes between machines:
-
-	icc export, pick sRGB, save workspace ... workspace now has the path
-	of the sRGB profile wired in, argh
-
-	dir contains a ws and some images, move dir, load ws, 
-	images are not found
-
-  rather than a session path, how about a rename path?
-
-  actually a set of renames ... eg. 
-
-  	"/home/john/vips" -> "$VIPSHOME"
-  	"/home/john/work" -> "/home/john/work2"
-
-  each LHS is a prefix for a path, try renaming repeatedly
-
-  do this instead of searching in vips_image etc. 
-
-  still search for loading startup files and stuff
 
 
 

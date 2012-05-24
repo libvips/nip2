@@ -1,7 +1,3 @@
-- how about command-line workspace paths, do they need rewriting too?
-
-
-
 - colour find needs a "leave brightness" option
 
 - colour apply should not use the LUT for linear input option

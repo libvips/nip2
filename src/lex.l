@@ -342,16 +342,20 @@ FALSE {
 }
 \" { 
 	char buf[MAX_STRSIZE];
+	char buf2[MAX_STRSIZE];
 
 	BEGIN BINARY;
 
 	read_string( buf );
+	im_strncpy( buf2, buf, MAX_STRSIZE );
+	model_loadstate_rewrite_path( buf2 );
+	vips_buf_change( &lex_text, buf, buf2 );
 
-	if( strcmp( buf, "" ) == 0 ) 
+	if( strcmp( buf2, "" ) == 0 ) 
 		yylval.yy_const.type = PARSE_CONST_ELIST;
 	else {
 		yylval.yy_const.type = PARSE_CONST_STR;
-		yylval.yy_const.val.str = im_strdupn( buf );
+		yylval.yy_const.val.str = im_strdupn( buf2 );
 	}
 
 	return( TK_CONST );

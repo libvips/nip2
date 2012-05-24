@@ -191,39 +191,21 @@ path_rewrite( char *buf )
 #endif /*DEBUG_REWRITE*/
 }
 
-/* Choose a file, rewriting the path. NULL for error, g_free() the result.
+/* Rewite a path to compact form. @path must be FILENAME_MAX characters.
+ *
+ * Examples:
+ *
+ * 	/home/john/../somefile 		-> $HOME/../somefile
+ * 	/home/./john/../somefile 	-> $HOME/../somefile
+ * 	fred				-> ./fred
  */
-char *
-path_rewrite_file( const char *filename )
+void
+path_compact( char *path )
 {
-	char name[FILENAME_MAX];
-
-#ifdef DEBUG_REWRITE
-	printf( "path_rewrite_file: %s\n", filename );
-#endif /*DEBUG_REWRITE*/
-
-	im_strncpy( name, filename, FILENAME_MAX );
-
-	/* We want to find $HOME in  /home/john/../somefile, so rewrite first.
-	 * But we might have /home/./john/somefile which wouldn't match, so
-	 * rewrite again after removing ../.
-	 *
-	 * We have to use absoluteize_path() to remove . and .. since
-	 * canonicalize won't work with relative paths. But path_rewrite()
-	 * will get us back to relative again.
-	 */
-	nativeize_path( name );
-	path_rewrite( name );
-	absoluteize_path( name );
-	path_rewrite( name );
-
-	if( existsf( "%s", name ) )
-		return( im_strdupn( name ) );
-
-	error_top( _( "Not found." ) );
-	error_sub( _( "File \"%s\" not found" ), name );
-
-	return( NULL );
+	nativeize_path( path );
+	path_rewrite( path );
+	absoluteize_path( path );
+	path_rewrite( path );
 }
 
 /* Turn a search path (eg. "/pics/lr:/pics/hr") into a list of directory names.
@@ -393,11 +375,7 @@ path_search_match( Search *search, const char *dir_name, const char *name )
 		im_snprintf( buf, FILENAME_MAX, 
 			"%s" G_DIR_SEPARATOR_S "%s", dir_name, name );
 
-		/* Remove . and .., compress to env var form.
-		 */
-		path_rewrite( buf );
-		canonicalize_path( buf );
-		path_rewrite( buf );
+		path_compact( buf );
 
 #ifdef DEBUG_SEARCH
 		printf( "path_search_match: matched \"%s\"\n", buf );

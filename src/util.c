@@ -1888,8 +1888,16 @@ is_absolute( const char *fname )
 	char buf[FILENAME_MAX];
 
 	expand_variables( fname, buf );
+	nativeize_path( buf );
 
-	if( g_path_is_absolute( buf ) )
+	/* We can't use g_path_is_absolute(), we might be given a Windows path
+	 * including a drive specifier, and g_path_is_absolute() on unix does
+	 * not know about Windows paths.
+	 *
+	 * We should probably look out for whitespace.
+	 */
+	if( buf[0] == '/' ||
+		(buf[0] != '\0' && buf[1] == ':') )
 		return( TRUE );
 	else
 		return( FALSE );
@@ -1973,7 +1981,7 @@ ifile_open_read( const char *name, ... )
 
 	if( !of )
 		return( NULL );
-	if( !(of->fname_real = path_rewrite_file( of->fname )) ) {
+	if( !(of->fname_real = path_find_file( of->fname )) ) {
 		error_top( _( "Unable to open." ) );
 		error_sub( _( "Unable to open file \"%s\" for reading.\n%s." ),
 			of->fname, g_strerror( errno ) );

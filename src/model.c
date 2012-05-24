@@ -145,6 +145,7 @@ model_loadstate_new( const char *filename )
 	state->major = MAJOR_VERSION;
 	state->minor = MINOR_VERSION;
 	state->micro = MICRO_VERSION;
+	state->rewrite_path = FALSE;
 	if( !(state->filename = im_strdup( NULL, filename )) ) {
 		model_loadstate_destroy( state );
 		return( NULL );
@@ -219,6 +220,22 @@ model_loadstate_rewrite_name( char *name )
 	return( NULL );
 }
 
+/* Rewrite a string. This is a filename argument. filename must be at least
+ * FILENAME_MAX chars.
+ */
+void
+model_loadstate_rewrite_path( char *path )
+{
+	ModelLoadState *state = model_loadstate;
+
+	if( !state || 
+		!state->rewrite_path )
+		return;
+
+	printf( "model_loadstate_rewrite_path:\n" );
+	path_compact( path );
+}
+
 /* Use the lexer to rewrite an expression, swapping all symbols on the rewrite 
  * list.
  */
@@ -240,8 +257,18 @@ model_loadstate_rewrite( ModelLoadState *state, char *old_rhs, char *new_rhs )
 
 	/* Lex and rewrite.
 	 */
-	while( (yychar = yylex()) > 0 ) 
+	while( (yychar = yylex()) > 0 ) {
+		state->rewrite_path = FALSE;
+
+		/* If we see an Image_file token, rewrite the following token
+		 * if it's a string constant.
+		 */
+		if( yychar == TK_IDENT &&
+			strcmp( yylval.yy_name, "Image_file" ) == 0 )
+			state->rewrite_path = TRUE;
+
 		free_lex( yychar );
+	}
 
 	model_loadstate = NULL;
 

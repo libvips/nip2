@@ -958,14 +958,14 @@ workspace_load( Model *model,
 	ModelLoadState *state, Model *parent, xmlNode *xnode )
 {
 	Workspace *ws = WORKSPACE( model );
-	char buf[256];
+	char buf[FILENAME_MAX];
 	char *txt;
 
 	g_assert( IS_WORKSPACEGROUP( parent ) );
 
 	/* "view" is optional, for backwards compatibility.
 	 */
-	if( get_sprop( xnode, "view", buf, 256 ) ) {
+	if( get_sprop( xnode, "view", buf, FILENAME_MAX ) ) {
 		WorkspaceMode mode = char_to_workspacemode( buf );
 
 		if( mode >= 0 )
@@ -988,11 +988,36 @@ workspace_load( Model *model,
 	(void) get_bprop( xnode, "rpane_open", &ws->rpane_open );
 	(void) get_iprop( xnode, "rpane_position", &ws->rpane_position );
 
-	if( get_sprop( xnode, "name", buf, 256 ) ) {
+	if( get_sprop( xnode, "name", buf, FILENAME_MAX ) ) {
 		IM_SETSTR( IOBJECT( ws )->name, buf );
 	}
-	if( get_sprop( xnode, "caption", buf, 256 ) ) {
+	if( get_sprop( xnode, "caption", buf, FILENAME_MAX ) ) {
 		IM_SETSTR( IOBJECT( ws )->caption, buf );
+	}
+
+	/* Get the filename this workspace was saved as. This is a filemodel
+	 * property (see filemodel_load()) but we need the value here before
+	 * we chain up. n0rty!
+	 *
+	 * Compare the save location to the load location to generate the
+	 * rewrite rule for loading of objects within this workspace.
+	 */
+	if( get_sprop( xnode, "filename", buf, FILENAME_MAX ) ) {
+		char *old_dir;
+		char *new_dir;
+
+		/* The old filename could be non-native, so we must rewrite 
+		 * to native form first.
+		 */
+		path_compact( buf );
+
+		old_dir = g_path_get_dirname( buf ); 
+		new_dir = g_path_get_dirname( state->filename );
+
+		path_rewrite_add( old_dir, new_dir );
+
+		g_free( old_dir );
+		g_free( new_dir );
 	}
 
 	/* Don't use get_sprop() and avoid a limit on def size.
@@ -1545,10 +1570,6 @@ workspace_new( Workspacegroup *wsg, const char *name )
 static gboolean
 workspace_load_empty( Workspace *ws, Workspacegroup *wsg, const char *filename )
 {
-	char *old_dir;
-	char *new_dir;
-	char tmp[FILENAME_MAX];
-
 	g_assert( workspace_is_empty( ws ) );
 
 	ws->load_type = WORKSPACE_LOAD_TOP;
@@ -1557,22 +1578,6 @@ workspace_load_empty( Workspace *ws, Workspacegroup *wsg, const char *filename )
 	if( !filemodel_load_all( FILEMODEL( ws ), MODEL( wsg ), filename ) ) 
 		return( FALSE );
 	filemodel_set_modified( FILEMODEL( ws ), FALSE );
-
-	/* FILEMODEL( ws )->filename has the file this workspace was saved to,
-	 * filename is the file we loaded from. If the directory has moved
-	 * we need to add a rewrite rule.
-	 *
-	 * The old filename could be non-native, so we must rewrite to native
-	 * form first.
-	 */
-	im_strncpy( tmp, FILEMODEL( ws )->filename, FILENAME_MAX );
-	nativeize_path( tmp );
-	old_dir = g_path_get_dirname( tmp ); 
-	new_dir = g_path_get_dirname( filename );
-	path_rewrite_add( old_dir, new_dir );
-	g_free( old_dir );
-	g_free( new_dir );
-
 	filemodel_set_filename( FILEMODEL( ws ), filename );
 
 	return( TRUE );

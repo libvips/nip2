@@ -232,7 +232,6 @@ model_loadstate_rewrite_path( char *path )
 		!state->rewrite_path )
 		return;
 
-	printf( "model_loadstate_rewrite_path:\n" );
 	path_compact( path );
 }
 

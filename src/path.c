@@ -99,12 +99,16 @@ path_rewrite_add( const char *old, const char *new )
 
 	g_return_if_fail( old );
 
-	if( strlen( old ) == 0 )
-		printf( "path_rewrite_add: argh!\n" );
-
 	/* old == "" will cause huge confusion.
 	 */
-	g_return_if_fail( strlen( old ) > 0 );
+	if( strlen( old ) == 0 )
+		return;
+
+	/* If old is a prefix of new we will get endless expansion.
+	 */
+	if( new &&
+		is_prefix( old, new ) )
+		return; 
 
 	if( (rewrite = path_rewrite_lookup( old )) ) {
 		if( !new ||

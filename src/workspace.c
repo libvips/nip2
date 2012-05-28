@@ -1015,7 +1015,13 @@ workspace_load( Model *model,
 		old_dir = g_path_get_dirname( buf ); 
 		new_dir = g_path_get_dirname( state->filename );
 
-		path_rewrite_add( old_dir, new_dir );
+		/* new_dir could be "." and we want to keep relative paths out
+		 * to avoid relying on cwd.
+		 */
+		im_strncpy( buf, new_dir, FILENAME_MAX );
+		path_compact( buf );
+
+		path_rewrite_add( old_dir, buf );
 	}
 
 	/* Don't use get_sprop() and avoid a limit on def size.

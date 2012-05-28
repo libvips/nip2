@@ -256,12 +256,12 @@ model_loadstate_rewrite( ModelLoadState *state, char *old_rhs, char *new_rhs )
 
 	/* Lex and rewrite.
 	 */
+	state->rewrite_path = FALSE;
 	while( (yychar = yylex()) > 0 ) {
-		state->rewrite_path = FALSE;
-
 		/* If we see an Image_file or Matrix_file token, rewrite the 
 		 * following token if it's a string constant.
 		 */
+		state->rewrite_path = FALSE;
 		if( yychar == TK_IDENT &&
 			strcmp( yylval.yy_name, "Image_file" ) == 0 )
 			state->rewrite_path = TRUE;

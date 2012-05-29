@@ -1,32 +1,32 @@
 <?xml version="1.0"?>
 <root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.28.0">
-  <Workspace filename="overlays_and_blending/overlay_blend.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1115" window_height="806" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="overlay_blend" caption="Default empty workspace">
+  <Workspace window_x="0" window_y="0" window_width="1115" window_height="800" filename="overlay_blend.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="overlay_blend" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="5" name="A" caption="Images">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
           <Rhs vislevel="1" flags="1">
             <iImage image_left="-1" image_top="-1" image_mag="-1" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="-1" offset="-1" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Image_file &quot;blend_example_ir.jpg&quot;"/>
+            <iText formula="Image_file &quot;$HOME/GIT/nip2/share/nip2/data/examples/overlays_and_blending/blend_example_ir.jpg&quot;"/>
           </Rhs>
         </Row>
         <Row popup="false" name="A2">
           <Rhs vislevel="1" flags="1">
             <iImage image_left="-1" image_top="-1" image_mag="-1" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="-1" offset="-1" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Image_file &quot;blend_example_vis.jpg&quot;"/>
+            <iText formula="Image_file &quot;$HOME/GIT/nip2/share/nip2/data/examples/overlays_and_blending/blend_example_vis.jpg&quot;"/>
           </Rhs>
         </Row>
         <Row popup="false" name="A3">
           <Rhs vislevel="1" flags="1">
             <iImage image_left="-1" image_top="-1" image_mag="-1" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="-1" offset="-1" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Image_file &quot;blend_example_xray.jpg&quot;"/>
+            <iText formula="Image_file &quot;$HOME/GIT/nip2/share/nip2/data/examples/overlays_and_blending/blend_example_xray.jpg&quot;"/>
           </Rhs>
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="478" y="0" open="true" selected="false" sform="false" next="5" name="B" caption="Complete Transparency">
+    <Column x="466" y="0" open="true" selected="false" sform="false" next="5" name="B" caption="Complete Transparency">
       <Subcolumn vislevel="3">
         <Row popup="false" name="B1">
           <Rhs vislevel="3" flags="7">
@@ -37,7 +37,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="478" y="207" open="true" selected="true" sform="false" next="3" name="C" caption="Blending Between two, then three Images">
+    <Column x="466" y="208" open="true" selected="true" sform="false" next="3" name="C" caption="Blending Between two, then three Images">
       <Subcolumn vislevel="3">
         <Row popup="false" name="C1">
           <Rhs vislevel="3" flags="7">
@@ -133,7 +133,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="937" y="0" open="true" selected="false" sform="false" next="2" name="D" caption="Overlay">
+    <Column x="945" y="0" open="true" selected="false" sform="false" next="2" name="D" caption="Overlay">
       <Subcolumn vislevel="3">
         <Row popup="false" name="D1">
           <Rhs vislevel="3" flags="7">

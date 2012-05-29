@@ -336,6 +336,8 @@ FALSE {
 	return( TK_CONST );
 }
 \" { 
+	ModelLoadState *state = model_loadstate;
+
 	char buf[MAX_STRSIZE];
 	char buf2[MAX_STRSIZE];
 
@@ -343,12 +345,17 @@ FALSE {
 
 	read_string( buf );
 
-	/* We need to keep buf as exactly the string in the source, including
-	 * before interpretation of \ escapes.
+	/* We need to keep buf as exactly the string in the source, 
+	 * including before interpretation of \ escapes, for the
+	 * vips_buf_change() to work.
 	 */
 	my_strccpy( buf2, buf );
-	model_loadstate_rewrite_path( buf2 );
-	vips_buf_change( &lex_text, buf, buf2 );
+
+	if( state &&
+		state->rewrite_path ) {
+		path_compact( buf2 );
+		vips_buf_change( &lex_text, buf, buf2 );
+	}
 
 	if( strcmp( buf2, "" ) == 0 ) 
 		yylval.yy_const.type = PARSE_CONST_ELIST;

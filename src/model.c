@@ -220,21 +220,6 @@ model_loadstate_rewrite_name( char *name )
 	return( NULL );
 }
 
-/* Rewrite a string. This is a filename argument. filename must be at least
- * FILENAME_MAX chars.
- */
-void
-model_loadstate_rewrite_path( char *path )
-{
-	ModelLoadState *state = model_loadstate;
-
-	if( !state || 
-		!state->rewrite_path )
-		return;
-
-	path_compact( path );
-}
-
 /* Use the lexer to rewrite an expression, swapping all symbols on the rewrite 
  * list.
  */

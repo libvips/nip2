@@ -1,67 +1,67 @@
 <?xml version="1.0"?>
 <root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.28.0">
-  <Workspace filename="1_point_mosaic/1pt_mosaic.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1046" window_height="748" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="pt_mosaic" caption="">
+  <Workspace window_x="0" window_y="0" window_width="1046" window_height="748" filename="1pt_mosaic.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="pt_mosaic" caption="">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="9" name="A" caption="source images">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
           <Rhs vislevel="1" flags="1">
             <iImage window_x="0" window_y="6" window_width="547" window_height="416" image_left="273" image_top="193" image_mag="1" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Image_file &quot;cd1.1.jpg&quot;"/>
+            <iText formula="Image_file &quot;$HOME/GIT/nip2/share/nip2/data/examples/1_point_mosaic/cd1.1.jpg&quot;"/>
           </Rhs>
         </Row>
         <Row popup="false" name="A2">
           <Rhs vislevel="1" flags="1">
             <iImage window_x="0" window_y="6" window_width="547" window_height="416" image_left="266" image_top="188" image_mag="1" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Image_file &quot;cd1.2.jpg&quot;"/>
+            <iText formula="Image_file &quot;$HOME/GIT/nip2/share/nip2/data/examples/1_point_mosaic/cd1.2.jpg&quot;"/>
           </Rhs>
         </Row>
         <Row popup="false" name="A3">
           <Rhs vislevel="1" flags="1">
             <iImage window_x="1" window_y="10" window_width="547" window_height="416" image_left="266" image_top="188" image_mag="1" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Image_file &quot;cd2.1.jpg&quot;"/>
+            <iText formula="Image_file &quot;$HOME/GIT/nip2/share/nip2/data/examples/1_point_mosaic/cd2.1.jpg&quot;"/>
           </Rhs>
         </Row>
         <Row popup="false" name="A4">
           <Rhs vislevel="1" flags="1">
             <iImage window_x="585" window_y="6" window_width="547" window_height="416" image_left="266" image_top="188" image_mag="1" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Image_file &quot;cd2.2.jpg&quot;"/>
+            <iText formula="Image_file &quot;$HOME/GIT/nip2/share/nip2/data/examples/1_point_mosaic/cd2.2.jpg&quot;"/>
           </Rhs>
         </Row>
         <Row popup="false" name="A5">
           <Rhs vislevel="1" flags="1">
             <iImage window_x="0" window_y="6" window_width="547" window_height="416" image_left="266" image_top="188" image_mag="1" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Image_file &quot;cd3.1.jpg&quot;"/>
+            <iText formula="Image_file &quot;$HOME/GIT/nip2/share/nip2/data/examples/1_point_mosaic/cd3.1.jpg&quot;"/>
           </Rhs>
         </Row>
         <Row popup="false" name="A6">
           <Rhs vislevel="1" flags="1">
             <iImage window_x="568" window_y="6" window_width="547" window_height="416" image_left="266" image_top="188" image_mag="1" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Image_file &quot;cd3.2.jpg&quot;"/>
+            <iText formula="Image_file &quot;$HOME/GIT/nip2/share/nip2/data/examples/1_point_mosaic/cd3.2.jpg&quot;"/>
           </Rhs>
         </Row>
         <Row popup="false" name="A7">
           <Rhs vislevel="1" flags="1">
             <iImage window_x="0" window_y="6" window_width="547" window_height="416" image_left="266" image_top="188" image_mag="1" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Image_file &quot;cd4.1.jpg&quot;"/>
+            <iText formula="Image_file &quot;$HOME/GIT/nip2/share/nip2/data/examples/1_point_mosaic/cd4.1.jpg&quot;"/>
           </Rhs>
         </Row>
         <Row popup="false" name="A8">
           <Rhs vislevel="1" flags="1">
             <iImage window_x="557" window_y="6" window_width="547" window_height="416" image_left="266" image_top="188" image_mag="1" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Image_file &quot;cd4.2.jpg&quot;"/>
+            <iText formula="Image_file &quot;$HOME/GIT/nip2/share/nip2/data/examples/1_point_mosaic/cd4.2.jpg&quot;"/>
           </Rhs>
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="390" y="0" open="true" selected="true" sform="false" next="23" name="B" caption="assemble tiles, fix brick walling">
+    <Column x="381" y="0" open="true" selected="true" sform="false" next="23" name="B" caption="assemble tiles, fix brick walling">
       <Subcolumn vislevel="3">
         <Row popup="false" name="B1">
           <Rhs vislevel="1" flags="1">
@@ -247,7 +247,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1021" y="0" open="true" selected="false" sform="false" next="7" name="C" caption="correct lighting, sharpen">
+    <Column x="1008" y="0" open="true" selected="false" sform="false" next="7" name="C" caption="correct lighting, sharpen">
       <Subcolumn vislevel="3">
         <Row popup="false" name="C1">
           <Rhs vislevel="0" flags="4">
@@ -357,6 +357,13 @@
               <Row name="prec">
                 <Rhs vislevel="1" flags="1">
                   <Option/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="layers">
+                <Rhs vislevel="1" flags="1">
+                  <Slider/>
                   <Subcolumn vislevel="0"/>
                   <iText/>
                 </Rhs>

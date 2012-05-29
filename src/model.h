@@ -173,7 +173,6 @@ ModelLoadState *model_loadstate_new( const char *filename );
 ModelLoadState *model_loadstate_new_openfile( iOpenFile *of );
 void model_loadstate_destroy( ModelLoadState *state );
 char *model_loadstate_rewrite_name( char *name );
-void model_loadstate_rewrite_path( char *path );
 void model_loadstate_rewrite( ModelLoadState *state, 
 	char *old_rhs, char *new_rhs );
 

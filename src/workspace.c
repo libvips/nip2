@@ -508,7 +508,9 @@ workspace_add_def_recalc( Workspace *ws, const char *str )
 gboolean
 workspace_load_file_buf( VipsBuf *buf, const char *filename )
 {
-	if( vips_format_for_file( filename ) ) 
+	if( callv_string_filenamef( 
+		(callv_string_fn) vips_format_for_file,
+		"%s", filename ) ) 
 		vips_buf_appends( buf, "Image_file" );
 	else
 		vips_buf_appends( buf, "Matrix_file" );

@@ -1008,20 +1008,14 @@ workspace_load( Model *model,
 	new_dir = NULL;
 	if( get_sprop( xnode, "filename", buf, FILENAME_MAX ) ) {
 		/* The old filename could be non-native, so we must rewrite 
-		 * to native form first.
+		 * to native form first so g_path_get_dirname() can work.
 		 */
 		path_compact( buf );
 
 		old_dir = g_path_get_dirname( buf ); 
 		new_dir = g_path_get_dirname( state->filename );
 
-		/* new_dir could be "." and we want to keep relative paths out
-		 * to avoid relying on cwd.
-		 */
-		im_strncpy( buf, new_dir, FILENAME_MAX );
-		path_compact( buf );
-
-		path_rewrite_add( old_dir, buf );
+		path_rewrite_add( old_dir, new_dir );
 	}
 
 	/* Don't use get_sprop() and avoid a limit on def size.

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.28.0">
-  <Workspace window_x="0" window_y="0" window_width="1280" window_height="722" filename="registering.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="registering" caption="Default empty workspace">
+  <Workspace window_x="0" window_y="0" window_width="1280" window_height="722" filename="$HOME/GIT/nip2/share/nip2/data/examples/registering/registering.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="registering" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="5" name="A" caption="Original Images">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
@@ -33,7 +33,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="480" y="0" open="true" selected="false" sform="false" next="4" name="B" caption="Images different size">
+    <Column x="476" y="0" open="true" selected="false" sform="false" next="4" name="B" caption="Images different size">
       <Subcolumn vislevel="3">
         <Row popup="false" name="B1">
           <Rhs vislevel="3" flags="7">
@@ -112,7 +112,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="480" y="358" open="true" selected="false" sform="false" next="2" name="C" caption="Correcting for slight rotation">
+    <Column x="476" y="358" open="true" selected="false" sform="false" next="2" name="C" caption="Correcting for slight rotation">
       <Subcolumn vislevel="3">
         <Row popup="false" name="C1">
           <Rhs vislevel="3" flags="7">
@@ -191,12 +191,12 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="480" y="716" open="true" selected="false" sform="false" next="2" name="D" caption="Correcting for perspective distortion">
+    <Column x="476" y="716" open="true" selected="false" sform="false" next="2" name="D" caption="Correcting for perspective distortion">
       <Subcolumn vislevel="3">
         <Row popup="false" name="D1">
           <Rhs vislevel="3" flags="7">
             <iImage image_left="-1" image_top="-1" image_mag="-1" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="-1" offset="-1" falsecolour="false" type="true"/>
-            <Subcolumn vislevel="0">
+            <Subcolumn vislevel="1">
               <Row name="super">
                 <Rhs vislevel="0" flags="4">
                   <iImage image_left="-1" image_top="-1" image_mag="-1" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="-1" offset="-1" falsecolour="false" type="true"/>
@@ -292,7 +292,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="889" y="0" open="true" selected="true" sform="false" next="4" name="E" caption="Comparisons after corrections">
+    <Column x="1014" y="0" open="true" selected="true" sform="false" next="4" name="E" caption="Comparisons after corrections">
       <Subcolumn vislevel="3">
         <Row popup="false" name="E1">
           <Rhs vislevel="3" flags="7">
@@ -311,7 +311,7 @@
         <Row popup="false" name="E3">
           <Rhs vislevel="3" flags="7">
             <iImage window_x="1979" window_y="209" window_width="552" window_height="600" image_left="134" image_top="130" image_mag="2" show_status="false" show_paintbox="false" show_convert="true" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
-            <Subcolumn vislevel="0"/>
+            <Subcolumn vislevel="1"/>
             <iText formula="Filter_blend_item.Line_blend_item.action A1 D1"/>
           </Rhs>
         </Row>

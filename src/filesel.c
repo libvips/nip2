@@ -770,7 +770,7 @@ filesel_get_filename( Filesel *filesel )
 	/* Rewrite to compact form, eg. "$HOME/fred".
 	 */
 	im_strncpy( tmp, name, FILENAME_MAX );
-	path_rewrite( tmp );
+	path_compact( tmp );
 	g_free( name );
 
 	return( g_strdup( tmp ) );
@@ -788,9 +788,14 @@ filesel_map_filename_multi( Filesel *filesel,
 
 	for( p = names; p; p = p->next ) {
 		char *filename = (char *) p->data;
+
+		char tmp[FILENAME_MAX];
 		void *res;
 
-		if( (res = fn( filesel, filename, a, b )) ) {
+		im_strncpy( tmp, filename, FILENAME_MAX );
+		path_compact( tmp );
+
+		if( (res = fn( filesel, tmp, a, b )) ) {
 			IM_FREEF( slist_free_all, names );
 			return( res );
 		}

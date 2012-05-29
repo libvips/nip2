@@ -95,14 +95,27 @@ path_rewrite_lookup( const char *old )
 void
 path_rewrite_add( const char *old, const char *new )
 {
+	char old_buf[FILENAME_MAX + 1];
+	char new_buf[FILENAME_MAX + 1];
+
 	Rewrite *rewrite;
 
 	g_return_if_fail( old );
 
-	/* old == "" will cause huge confusion.
+	/* We want the paths in canonical form, with a trailing '/'. The
+	 * trailing '/' will stop us rewriting filenames.
 	 */
-	if( strlen( old ) == 0 )
-		return;
+	im_strncpy( old_buf, old, FILENAME_MAX );
+	strcat( old_buf, G_DIR_SEPARATOR_S );
+	path_compact( old_buf );
+	old = old_buf;
+
+	if( new ) {
+		im_strncpy( new_buf, new, FILENAME_MAX );
+		strcat( new_buf, G_DIR_SEPARATOR_S );
+		path_compact( new_buf );
+		new = new_buf;
+	}
 
 	/* If old is a prefix of new we will get endless expansion.
 	 */
@@ -214,9 +227,12 @@ path_rewrite( char *buf )
 void
 path_compact( char *path )
 {
+	char buf[FILENAME_MAX];
+
+	expand_variables( path, buf );
 	nativeize_path( path );
-	path_rewrite( path );
 	absoluteize_path( path );
+	canonicalize_path( path );
 	path_rewrite( path );
 }
 

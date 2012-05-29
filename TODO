@@ -1,8 +1,3 @@
-- examples / framing is still broken
-
-  seems to be renaming parts of filenames?
-
-
 - colour find needs a "leave brightness" option
 
 - colour apply should not use the LUT for linear input option

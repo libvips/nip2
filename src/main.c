@@ -1412,9 +1412,18 @@ main( int argc, char *argv[] )
 	if( !main_option_no_load_args ) {
 		/* Load args as files, if we can. 
 		 */
-		for( i = 1; i < argc; i++ )
-			if( !main_load( ws, argv[i] ) ) 
+		for( i = 1; i < argc; i++ ) {
+			char buf[FILENAME_MAX];
+
+			/* We want to use the absolute, compact form of the 
+			 * filename object so we don't get a dependency on CWD.
+			 */
+			im_strncpy( buf, argv[i], FILENAME_MAX );
+			path_compact( buf );
+
+			if( !main_load( ws, buf ) ) 
 				main_log_add( "%s\n", error_get_sub() );
+		}
 	}
 
 	/* Abandon batch mode if there are startup errors.

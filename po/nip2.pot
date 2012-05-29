@@ -9,11 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=glib&keywords=I18N+L10N&component=general\n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2012-05-07 10:19+0100\n"
-=======
-"POT-Creation-Date: 2012-04-18 11:55+0100\n"
->>>>>>> e6def9257e354502bf53afa410bf89795361cc02
+"POT-Creation-Date: 2012-05-29 13:44+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -293,10 +289,10 @@ msgstr ""
 msgid "No GSL library available for gammq."
 msgstr ""
 
-#: ../src/builtin.c:422 ../src/classmodel.c:154 ../src/classmodel.c:227
-#: ../src/filemodel.c:100 ../src/filemodel.c:145 ../src/filemodel.c:357
-#: ../src/filemodel.c:583 ../src/filemodel.c:624 ../src/mainw.c:754
-#: ../src/mainw.c:762 ../src/model.c:313 ../src/model.c:330 ../src/model.c:385
+#: ../src/builtin.c:422 ../src/classmodel.c:153 ../src/classmodel.c:225
+#: ../src/filemodel.c:100 ../src/filemodel.c:145 ../src/filemodel.c:366
+#: ../src/filemodel.c:590 ../src/filemodel.c:629 ../src/mainw.c:754
+#: ../src/mainw.c:762 ../src/model.c:327 ../src/model.c:344 ../src/model.c:399
 #: ../src/rowview.c:479 ../src/view.c:820
 msgid "Not implemented."
 msgstr ""
@@ -495,7 +491,7 @@ msgstr ""
 msgid "Superclass constructor \"%s\" refers to non-local symbols %s"
 msgstr ""
 
-#: ../src/class.c:803 ../src/workspace.c:1693
+#: ../src/class.c:803 ../src/workspace.c:1724
 msgid "Wrong number of arguments."
 msgstr ""
 
@@ -530,107 +526,91 @@ msgstr ""
 msgid "Member \"%s\" of class \"%s\" should be of type \"%s\", instead it's:"
 msgstr ""
 
-#: ../src/classmodel.c:155 ../src/classmodel.c:228
+#: ../src/classmodel.c:154 ../src/classmodel.c:226
 #, c-format
 msgid "_%s() method not implemented for %s."
 msgstr ""
 
-#: ../src/classmodel.c:163
+#: ../src/classmodel.c:162
 #, c-format
 msgid "Save %s \"%s\""
 msgstr ""
 
-#: ../src/classmodel.c:237
+#: ../src/classmodel.c:235
 #, c-format
 msgid "Replace %s \"%s\""
 msgstr ""
 
-#: ../src/classmodel.c:695
+#: ../src/classmodel.c:693
 msgid "Set boolean value here"
 msgstr ""
 
-#: ../src/classmodel.c:701
+#: ../src/classmodel.c:699
 msgid "Enter a floating point number here"
 msgstr ""
 
-#: ../src/classmodel.c:708
+#: ../src/classmodel.c:706
 msgid "Enter a string here"
 msgstr ""
 
-#. Expands to "Edit Toggle A1".
+#. Expands to eg. "Edit Toggle A1".
 #.
-#: ../src/classmodel.c:762
+#: ../src/classmodel.c:759 ../src/clock.c:99 ../src/colour.c:260
+#: ../src/iregion.c:235 ../src/matrix.c:191
 #, c-format
 msgid "Edit %s %s"
 msgstr ""
 
-#: ../src/classmodel.c:773
+#: ../src/classmodel.c:770 ../src/clock.c:105 ../src/colour.c:268
+#: ../src/iregion.c:241 ../src/matrix.c:199
 #, c-format
 msgid "Set %s"
 msgstr ""
 
-#: ../src/classmodel.c:1069
+#: ../src/classmodel.c:1066
 msgid "Unknown option."
 msgstr ""
 
-#: ../src/classmodel.c:1070
+#: ../src/classmodel.c:1067
 #, c-format
 msgid "Option \"%s\" not known."
 msgstr ""
 
-#: ../src/classmodel.c:1144 ../src/matrixview.c:189 ../src/matrixview.c:210
+#: ../src/classmodel.c:1141 ../src/matrixview.c:189 ../src/matrixview.c:210
 #: ../src/plot.c:140 ../src/plot.c:150 ../src/plot.c:360 ../src/plot.c:379
 #: ../src/plot.c:392
 msgid "Bad value."
 msgstr ""
 
-#: ../src/classmodel.c:1145
+#: ../src/classmodel.c:1142
 #, c-format
 msgid "%d band value only"
 msgstr ""
 
-#: ../src/clock.c:59 ../src/clock.c:93 ../src/clock.c:190
+#: ../src/clock.c:59 ../src/clock.c:92 ../src/clock.c:191
 msgid "Interval"
 msgstr ""
 
-#: ../src/clock.c:60 ../src/clock.c:96
+#: ../src/clock.c:60 ../src/clock.c:95
 msgid "Elapsed time"
 msgstr ""
 
-#: ../src/clock.c:93
+#: ../src/clock.c:92
 msgid "Interval between ticks (seconds)"
 msgstr ""
 
-#: ../src/clock.c:96
+#: ../src/clock.c:95
 msgid "Elapsed time (seconds)"
 msgstr ""
 
-#: ../src/clock.c:100
-#, c-format
-msgid "Edit Clock \"%s\""
-msgstr ""
-
-#: ../src/clock.c:104
-msgid "Set Clock"
-msgstr ""
-
-#: ../src/clock.c:193 ../src/colour.c:305 ../src/fontname.c:61
+#: ../src/clock.c:194 ../src/colour.c:303 ../src/fontname.c:61
 #: ../src/matrix.c:262 ../src/number.c:51 ../src/option.c:71
-#: ../src/pathname.c:84 ../src/plot.c:340 ../src/slider.c:57
+#: ../src/pathname.c:78 ../src/plot.c:340 ../src/slider.c:57
 #: ../src/string.c:70 ../src/toggle.c:51
 msgid "Value"
 msgstr ""
 
-#: ../src/colour.c:264
-#, c-format
-msgid "Edit Color \"%s\""
-msgstr ""
-
-#: ../src/colour.c:270
-msgid "Set Color"
-msgstr ""
-
-#: ../src/colour.c:302
+#: ../src/colour.c:300
 msgid "Color Space"
 msgstr ""
 
@@ -638,7 +618,7 @@ msgstr ""
 msgid "Double-click to edit this color, or drag-and-drop between colors"
 msgstr ""
 
-#: ../src/column.c:326 ../src/tool.c:864 ../src/workspace.c:1529
+#: ../src/column.c:326 ../src/tool.c:864 ../src/workspace.c:1560
 #: ../src/workspacegroup.c:145
 msgid "Name clash."
 msgstr ""
@@ -941,74 +921,74 @@ msgstr ""
 msgid "of"
 msgstr ""
 
-#: ../src/filemodel.c:101 ../src/filemodel.c:146 ../src/filemodel.c:584
-#: ../src/filemodel.c:625 ../src/model.c:314 ../src/model.c:331
-#: ../src/model.c:386 ../src/model.c:405
+#: ../src/filemodel.c:101 ../src/filemodel.c:146 ../src/filemodel.c:591
+#: ../src/filemodel.c:630 ../src/model.c:328 ../src/model.c:345
+#: ../src/model.c:400 ../src/model.c:419
 #, c-format
 msgid "_%s() not implemented for class \"%s\"."
 msgstr ""
 
-#: ../src/filemodel.c:270 ../src/filemodel.c:285 ../src/model.c:436
+#: ../src/filemodel.c:279 ../src/filemodel.c:294 ../src/model.c:450
 msgid "XML library error."
 msgstr ""
 
-#: ../src/filemodel.c:271
+#: ../src/filemodel.c:280
 msgid "model_save_filename: xmlNewDoc() failed"
 msgstr ""
 
-#: ../src/filemodel.c:286
+#: ../src/filemodel.c:295
 msgid "model_save_filename: xmlNewDocNode() failed"
 msgstr ""
 
-#: ../src/filemodel.c:302
+#: ../src/filemodel.c:311
 msgid "Save failed."
 msgstr ""
 
-#: ../src/filemodel.c:303
+#: ../src/filemodel.c:312
 #, c-format
 msgid ""
 "Save of %s \"%s\" to file \"%s\" failed.\n"
 "%s"
 msgstr ""
 
-#: ../src/filemodel.c:358
+#: ../src/filemodel.c:367
 msgid "filemodel_real_save_all: no save method"
 msgstr ""
 
-#: ../src/filemodel.c:469 ../src/filemodel.c:478 ../src/filemodel.c:491
+#: ../src/filemodel.c:476 ../src/filemodel.c:485 ../src/filemodel.c:498
 #: ../src/mainw.c:1022 ../src/model.c:130
 msgid "Load failed."
 msgstr ""
 
-#: ../src/filemodel.c:470
+#: ../src/filemodel.c:477
 #, c-format
 msgid "Can't load XML file \"%s\", it's not a %s save file."
 msgstr ""
 
-#: ../src/filemodel.c:479
+#: ../src/filemodel.c:486
 #, c-format
 msgid ""
 "Can't load XML file \"%s\", unable to extract version information from "
 "namespace."
 msgstr ""
 
-#: ../src/filemodel.c:492
+#: ../src/filemodel.c:499
 #, c-format
 msgid "Can't load XML file \"%s\", the file does not contain a %s."
 msgstr ""
 
 #. Expands to (eg.) "Save Column A2".
 #.
-#: ../src/filemodel.c:677
+#: ../src/filemodel.c:680
 #, c-format
 msgid "Save %s %s"
 msgstr ""
 
-#: ../src/filemodel.c:753 ../src/filemodel.c:765
+#: ../src/filemodel.c:756 ../src/filemodel.c:768
 msgid "Object has been modified."
 msgstr ""
 
-#: ../src/filemodel.c:754
+#: ../src/filemodel.c:757
 #, c-format
 msgid ""
 "%s \"%s\" has been modified since you loaded it from file \"%s\".\n"
@@ -1016,7 +996,7 @@ msgid ""
 "Do you want to save your changes?"
 msgstr ""
 
-#: ../src/filemodel.c:766
+#: ../src/filemodel.c:769
 #, c-format
 msgid "%s \"%s\" has been modified. Do you want to save your changes?"
 msgstr ""
@@ -1071,42 +1051,42 @@ msgstr ""
 msgid "free in \"%s\""
 msgstr ""
 
-#: ../src/filesel.c:760 ../src/util.c:1933 ../src/util.c:1939
+#: ../src/filesel.c:761 ../src/util.c:1915 ../src/util.c:1921
 msgid "Bad filename."
 msgstr ""
 
-#: ../src/filesel.c:761
+#: ../src/filesel.c:762
 msgid "No file selected."
 msgstr ""
 
-#: ../src/filesel.c:974
+#: ../src/filesel.c:986
 msgid "Increment filename"
 msgstr ""
 
-#: ../src/filesel.c:980
+#: ../src/filesel.c:992
 msgid "After Save, add 1 to the last number in the file name"
 msgstr ""
 
-#: ../src/filesel.c:1224
+#: ../src/filesel.c:1236
 #, c-format
 msgid "%s Save Preferences"
 msgstr ""
 
-#: ../src/filesel.c:1285
+#: ../src/filesel.c:1297
 msgid "Overwrite"
 msgstr ""
 
-#: ../src/filesel.c:1286
+#: ../src/filesel.c:1298
 msgid "Overwrite file?"
 msgstr ""
 
-#: ../src/filesel.c:1287
+#: ../src/filesel.c:1299
 #, c-format
 msgid "File \"%s\" exists. OK to overwrite?"
 msgstr ""
 
 #: ../src/fontname.c:58 ../src/mainw.c:1369 ../src/mainw.c:1408
-#: ../src/number.c:48 ../src/option.c:65 ../src/pathname.c:81
+#: ../src/number.c:48 ../src/option.c:65 ../src/pathname.c:75
 #: ../src/program.c:1053 ../src/program.c:1095 ../src/slider.c:48
 #: ../src/string.c:67 ../src/toggle.c:48 ../src/workspacegroup.c:178
 #: ../src/workspacegroup.c:215
@@ -1654,15 +1634,6 @@ msgstr ""
 msgid "Height of region"
 msgstr ""
 
-#: ../src/iregion.c:237
-#, c-format
-msgid "Edit \"%s\""
-msgstr ""
-
-#: ../src/iregion.c:241
-msgid "Set Region"
-msgstr ""
-
 #: ../src/itext.c:67
 msgid "Formula"
 msgstr ""
@@ -1738,36 +1709,36 @@ msgstr ""
 msgid "Open the VIPS Homepage"
 msgstr ""
 
-#: lex.l:90 lex.l:100
+#: lex.l:89 lex.l:99
 msgid "line too long"
 msgstr ""
 
-#: lex.l:108
+#: lex.l:107
 msgid "end of line inside string"
 msgstr ""
 
-#: lex.l:110
+#: lex.l:109
 msgid "no end of string"
 msgstr ""
 
-#: lex.l:131 lex.l:141 lex.l:149
+#: lex.l:126 lex.l:136 lex.l:144
 msgid "bad char constant"
 msgstr ""
 
-#: lex.l:174
+#: lex.l:169
 msgid "nested comment"
 msgstr ""
 
-#: lex.l:180
+#: lex.l:175
 msgid "no end of comment"
 msgstr ""
 
-#: lex.l:310
+#: lex.l:305
 #, c-format
 msgid "bad number %s"
 msgstr ""
 
-#: lex.l:363
+#: lex.l:373
 #, c-format
 msgid "illegal character \"%c\""
 msgstr ""
@@ -1976,11 +1947,15 @@ msgstr ""
 msgid "unable to make %s %s: %s"
 msgstr ""
 
-#: ../src/main.c:1079
+#: ../src/main.c:976
+msgid "Unable to find install area."
+msgstr ""
+
+#: ../src/main.c:1115
 msgid "- image processing spreadsheet"
 msgstr ""
 
-#: ../src/main.c:1111
+#: ../src/main.c:1140
 #, c-format
 msgid "linked to vips-%s"
 msgstr ""
@@ -1988,34 +1963,34 @@ msgstr ""
 #. -1 means can't-be-set, at least on os x, so don't
 #. * warn.
 #.
-#: ../src/main.c:1163
+#: ../src/main.c:1192
 #, c-format
 msgid ""
 "unable to change max file descriptors\n"
 "max file descriptors still set to %d"
 msgstr ""
 
-#: ../src/main.c:1169
+#: ../src/main.c:1198
 msgid "unable to read max file descriptors"
 msgstr ""
 
-#: ../src/main.c:1393 ../src/main.c:1439
+#: ../src/main.c:1424 ../src/main.c:1470
 #, c-format
 msgid ""
 "Startup error log:\n"
 "%s"
 msgstr ""
 
-#: ../src/main.c:1438
+#: ../src/main.c:1469
 msgid "Startup error."
 msgstr ""
 
-#: ../src/main.c:1449
+#: ../src/main.c:1480
 #, c-format
 msgid "Welcome to %s-%s!"
 msgstr ""
 
-#: ../src/main.c:1454
+#: ../src/main.c:1485
 #, c-format
 msgid ""
 "A new directory has been created to hold startup, data and temporary files:\n"
@@ -2459,15 +2434,6 @@ msgstr ""
 msgid "Display as"
 msgstr ""
 
-#: ../src/matrix.c:194
-#, c-format
-msgid "Edit Matrix \"%s\""
-msgstr ""
-
-#: ../src/matrix.c:199
-msgid "Set Matrix"
-msgstr ""
-
 #: ../src/matrix.c:265 ../src/matrixview.c:425
 msgid "Scale"
 msgstr ""
@@ -2502,24 +2468,24 @@ msgid ""
 "%s"
 msgstr ""
 
-#: ../src/model.c:437
+#: ../src/model.c:451
 msgid "model_save: xmlNewChild() failed"
 msgstr ""
 
-#: ../src/model.c:504
+#: ../src/model.c:518
 msgid "XML load error."
 msgstr ""
 
-#: ../src/model.c:505
+#: ../src/model.c:519
 #, c-format
 msgid "Can't load node of type \"%s\" into object of type \"%s\""
 msgstr ""
 
-#: ../src/model.c:733
+#: ../src/model.c:747
 msgid "Delete?"
 msgstr ""
 
-#: ../src/model.c:734
+#: ../src/model.c:748
 #, c-format
 msgid "Are you sure you want to delete %s \"%s\"?"
 msgstr ""
@@ -2674,18 +2640,18 @@ msgstr ""
 
 #. Not found? Maybe - error message anyway.
 #.
-#: ../src/path.c:332 ../src/path.c:360 ../src/program.c:1440
+#: ../src/path.c:499 ../src/path.c:530 ../src/program.c:1440
 #: ../src/program.c:1492 ../src/program.c:1514 ../src/program.c:1522
 #: ../src/symbol.c:502
 msgid "Not found."
 msgstr ""
 
-#: ../src/path.c:333
+#: ../src/path.c:500
 #, c-format
 msgid "File \"%s\" not found."
 msgstr ""
 
-#: ../src/path.c:361
+#: ../src/path.c:531
 #, c-format
 msgid "File \"%s\" not found on path"
 msgstr ""
@@ -3177,7 +3143,7 @@ msgid "%s expected %s, instead saw:"
 msgstr ""
 
 #: ../src/reduce.c:148 ../src/reduce.c:1056 ../src/trace.c:126
-#: ../src/workspace.c:1704
+#: ../src/workspace.c:1735
 msgid "Overflow error."
 msgstr ""
 
@@ -3579,83 +3545,79 @@ msgstr ""
 msgid "directory"
 msgstr ""
 
-#: ../src/util.c:1600
-msgid "Unable to find install area."
-msgstr ""
-
-#: ../src/util.c:1776
+#: ../src/util.c:1750
 msgid "<charset conversion error>"
 msgstr ""
 
-#: ../src/util.c:1934
+#: ../src/util.c:1916
 msgid "Filename is too long."
 msgstr ""
 
-#: ../src/util.c:1940
+#: ../src/util.c:1922
 msgid "Filename contains only blank characters."
 msgstr ""
 
-#: ../src/util.c:2003 ../src/util.c:2012 ../src/util.c:2067
+#: ../src/util.c:1985 ../src/util.c:1994 ../src/util.c:2049
 msgid "Unable to open."
 msgstr ""
 
-#: ../src/util.c:2004 ../src/util.c:2013
+#: ../src/util.c:1986 ../src/util.c:1995
 #, c-format
 msgid ""
 "Unable to open file \"%s\" for reading.\n"
 "%s."
 msgstr ""
 
-#: ../src/util.c:2068
+#: ../src/util.c:2050
 #, c-format
 msgid ""
 "Unable to open file \"%s\" for writing.\n"
 "%s."
 msgstr ""
 
-#: ../src/util.c:2089
+#: ../src/util.c:2071
 msgid "Unable to write."
 msgstr ""
 
-#: ../src/util.c:2090
+#: ../src/util.c:2072
 #, c-format
 msgid ""
 "Unable to write to file \"%s\".\n"
 "%s."
 msgstr ""
 
-#: ../src/util.c:2125 ../src/util.c:2138 ../src/util.c:2163
+#: ../src/util.c:2107 ../src/util.c:2120 ../src/util.c:2145
 msgid "Unable to read."
 msgstr ""
 
-#: ../src/util.c:2126
+#: ../src/util.c:2108
 #, c-format
 msgid "File \"%s\" too large."
 msgstr ""
 
-#: ../src/util.c:2139 ../src/util.c:2164
+#: ../src/util.c:2121 ../src/util.c:2146
 #, c-format
 msgid ""
 "Unable to read from file \"%s\".\n"
 "%s."
 msgstr ""
 
-#: ../src/util.c:2471
+#: ../src/util.c:2453
 msgid "Unable to create temporary file."
 msgstr ""
 
-#: ../src/util.c:2472
+#: ../src/util.c:2454
 #, c-format
 msgid ""
 "Unable to make file \"%s\"\n"
 "%s"
 msgstr ""
 
-#: ../src/util.c:2679
+#: ../src/util.c:2661
 msgid "Out of memory."
 msgstr ""
 
-#: ../src/util.c:2680
+#: ../src/util.c:2662
 #, c-format
 msgid "Request for %s of RAM triggered memory allocation failure."
 msgstr ""
@@ -3715,60 +3677,60 @@ msgid ""
 "Found workspace \"%s\", dated %s. Do you want to recover this workspace?"
 msgstr ""
 
-#: ../src/workspace.c:1327
+#: ../src/workspace.c:1358
 msgid "Version mismatch."
 msgstr ""
 
-#: ../src/workspace.c:1328
+#: ../src/workspace.c:1359
 #, c-format
 msgid ""
 "File \"%s\" was saved from %s-%d.%d.%d. You may see compatibility problems."
 msgstr ""
 
-#: ../src/workspace.c:1485
+#: ../src/workspace.c:1516
 msgid "// private definitions for this workspace\n"
 msgstr ""
 
-#: ../src/workspace.c:1530
+#: ../src/workspace.c:1561
 #, c-format
 msgid "Can't create workspace \"%s\". A symbol with that name already exists."
 msgstr ""
 
-#: ../src/workspace.c:1621
+#: ../src/workspace.c:1652
 msgid "Default empty workspace"
 msgstr ""
 
-#: ../src/workspace.c:1694
+#: ../src/workspace.c:1725
 #, c-format
 msgid "%s needs %d arguments, there are %d selected."
 msgstr ""
 
-#: ../src/workspace.c:1705
+#: ../src/workspace.c:1736
 msgid "Too many names selected."
 msgstr ""
 
-#: ../src/workspace.c:1845
+#: ../src/workspace.c:1876
 msgid "You can only remove top level rows."
 msgstr ""
 
-#: ../src/workspace.c:1846
+#: ../src/workspace.c:1877
 msgid "Not all selected objects are top level rows."
 msgstr ""
 
-#: ../src/workspace.c:1896
+#: ../src/workspace.c:1927
 msgid "Delete selected objects?"
 msgstr ""
 
-#: ../src/workspace.c:1897
+#: ../src/workspace.c:1928
 #, c-format
 msgid "Are you sure you want to delete %s?"
 msgstr ""
 
-#: ../src/workspace.c:1955
+#: ../src/workspace.c:1986
 msgid "Unable to ungroup."
 msgstr ""
 
-#: ../src/workspace.c:1956
+#: ../src/workspace.c:1987
 #, c-format
 msgid "Row \"%s\" is not a Group or a list."
 msgstr ""

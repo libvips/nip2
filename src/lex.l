@@ -353,8 +353,20 @@ FALSE {
 
 	if( state &&
 		state->rewrite_path ) {
+		char buf3[FILENAME_MAX];
+
 		path_compact( buf2 );
-		vips_buf_change( &lex_text, buf, buf2 );
+
+		/* We've interpreted \n etc. in my_strccpy() above, plus we
+		 * have nativised paths from / to \ and therefore introduced
+		 * backslashes that weren't there before.
+		 *
+		 * Before we write source code out again, we must reescape
+		 * everything.
+		 */
+		my_strecpy( buf3, buf2, TRUE );
+
+		vips_buf_change( &lex_text, buf, buf3 );
 	}
 
 	if( strcmp( buf2, "" ) == 0 ) 

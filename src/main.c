@@ -49,8 +49,8 @@
 /* But some themes can trigger warnings, argh, so sometimes we need to
  * undef it. VipsObject sets can trigger warnings. libgoffice will warn about
  * precision issues if run under valgrind.
-#undef DEBUG_FATAL
  */
+#undef DEBUG_FATAL
 
 /* Time startup.
 #define DEBUG_TIME

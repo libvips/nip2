@@ -428,8 +428,8 @@ main_load( Workspace *ws, const char *filename )
 {
 	Workspace *new_ws;
 
-	if( (new_ws = 
-		workspace_new_from_file( main_workspacegroup, filename )) ) {
+	if( (new_ws = workspace_new_from_file( main_workspacegroup, 
+		filename, NULL )) ) {
 		Mainw *new_mainw;
 
 		if( !main_option_batch ) {
@@ -508,7 +508,8 @@ main_load_ws( const char *filename )
 
 	progress_update_loading( 0, im_skip_dir( filename ) );
 
-	if( !(ws = workspace_new_from_file( main_workspacegroup, filename )) ) 
+	if( !(ws = workspace_new_from_file( main_workspacegroup, 
+		filename, NULL )) ) 
 		iwindow_alert( NULL, GTK_MESSAGE_ERROR );
 	else {
 		filemodel_set_auto_load( FILEMODEL( ws ) );

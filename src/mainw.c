@@ -898,7 +898,7 @@ mainw_open_workspace( Workspacegroup *wsg, const char *filename )
 	Workspace *ws;
 	Mainw *mainw;
 
-	if( !(ws = workspace_new_from_file( wsg, filename )) ) 
+	if( !(ws = workspace_new_from_file( wsg, filename, NULL )) ) 
 		return( NULL );
 
 	mainw = mainw_new( ws );

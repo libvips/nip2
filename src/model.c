@@ -104,6 +104,7 @@ model_loadstate_destroy( ModelLoadState *state )
 	xmlSetGenericErrorFunc( NULL, NULL );
 
 	IM_FREE( state->filename );
+	IM_FREE( state->filename_user );
 	IM_FREEF( xmlFreeDoc, state->xdoc );
 	slist_map( state->renames, 
 		(SListMapFn) model_loadstate_rename_destroy, NULL );
@@ -134,7 +135,7 @@ model_loadstate_error_get( ModelLoadState *state )
 }
 
 ModelLoadState *
-model_loadstate_new( const char *filename )
+model_loadstate_new( const char *filename, const char *filename_user )
 {
 	ModelLoadState *state;
 
@@ -146,10 +147,18 @@ model_loadstate_new( const char *filename )
 	state->minor = MINOR_VERSION;
 	state->micro = MICRO_VERSION;
 	state->rewrite_path = FALSE;
-	if( !(state->filename = im_strdup( NULL, filename )) ) {
+
+	state->filename = im_strdup( NULL, filename );
+	if( filename_user )
+		state->filename_user = im_strdup( NULL, filename_user );
+	else
+		state->filename_user = im_strdup( NULL, filename );
+	if( !state->filename ||
+		!state->filename_user ) { 
 		model_loadstate_destroy( state );
 		return( NULL );
 	}
+
 	vips_buf_init_static( &state->error_log, 
 		state->error_log_buffer, MAX_STRSIZE );
 

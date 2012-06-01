@@ -252,7 +252,8 @@ toolkit_new_from_file( Toolkitgroup *kitg, const char *filename )
 	Toolkit *kit = toolkit_new_filename( kitg, filename );
 	gboolean res;
 
-	res = filemodel_load_all( FILEMODEL( kit ), MODEL( kitg ), filename );
+	res = filemodel_load_all( FILEMODEL( kit ), MODEL( kitg ), 
+		filename, NULL );
 	filemodel_set_modified( FILEMODEL( kit ), FALSE );
 
 	/* Don't remove the kit if load failed, we want to leave it so the 

@@ -173,15 +173,18 @@ filemodel_info( iObject *iobject, VipsBuf *buf )
 void
 filemodel_set_filename( Filemodel *filemodel, const char *filename )
 {
-	char buf[FILENAME_MAX];
+	if( filemodel->filename != filename ) {
+		char buf[FILENAME_MAX];
 
-	/* We want to keep the absolute, compact form of the filename inside
-	 * the object so we don't get a dependency on CWD.
-	 */
-	im_strncpy( buf, filename, FILENAME_MAX );
-	path_compact( buf );
+		/* We want to keep the absolute, compact form of the filename 
+		 * inside the object so we don't get a dependency on CWD.
+		 */
+		if( filename ) {
+			im_strncpy( buf, filename, FILENAME_MAX );
+			path_compact( buf );
+			filename = buf;
+		}
 
-	if( filemodel->filename != buf ) {
 		IM_SETSTR( filemodel->filename, buf );
 		iobject_changed( IOBJECT( filemodel ) );
 	}

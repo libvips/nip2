@@ -962,8 +962,6 @@ workspace_load( Model *model,
 	Workspace *ws = WORKSPACE( model );
 	char buf[FILENAME_MAX];
 	char *txt;
-	char *old_dir;
-	char *new_dir;
 
 	g_assert( IS_WORKSPACEGROUP( parent ) );
 
@@ -999,27 +997,6 @@ workspace_load( Model *model,
 		IM_SETSTR( IOBJECT( ws )->caption, buf );
 	}
 
-	/* Get the filename this workspace was saved as. This is a filemodel
-	 * property (see filemodel_load()) but we need the value here before
-	 * we chain up. n0rty!
-	 *
-	 * Compare the save location to the load location to generate the
-	 * rewrite rule for loading of objects within this workspace.
-	 */
-	old_dir = NULL;
-	new_dir = NULL;
-	if( get_sprop( xnode, "filename", buf, FILENAME_MAX ) ) {
-		/* The old filename could be non-native, so we must rewrite 
-		 * to native form first so g_path_get_dirname() can work.
-		 */
-		path_compact( buf );
-
-		old_dir = g_path_get_dirname( buf ); 
-		new_dir = g_path_get_dirname( state->filename_user );
-
-		path_rewrite_add( old_dir, new_dir );
-	}
-
 	/* Don't use get_sprop() and avoid a limit on def size.
 	 */
 	if( (txt = (char *) xmlGetProp( xnode, (xmlChar *) "local_defs" )) ) {
@@ -1029,14 +1006,6 @@ workspace_load( Model *model,
 
 	if( !MODEL_CLASS( parent_class )->load( model, state, parent, xnode ) )
 		return( FALSE );
-
-	/* Remove the rewrite rule we added.
-	 */
-	if( old_dir )
-		path_rewrite_add( old_dir, NULL );
-
-	IM_FREE( old_dir );
-	IM_FREE( new_dir );
 
 	return( TRUE );
 }
@@ -1202,8 +1171,7 @@ workspace_build_compat( void )
  * a set of compat defs.
  */
 static int
-workspace_have_compat( int major, int minor, 
-	int *best_major, int *best_minor )
+workspace_have_compat( int major, int minor, int *best_major, int *best_minor )
 {
 	int i;
 	int best;
@@ -1299,6 +1267,29 @@ workspace_top_load( Filemodel *filemodel,
 #ifdef DEBUG
 	printf( "workspace_top_load: from %s\n", state->filename );
 #endif /*DEBUG*/
+
+	/* The top node should be the saved workspace. Get the filename this
+	 * workspace was saved as so we can work out how to rewrite embedded
+	 * filenames.
+	 */
+	if( strcasecmp( (char *) xnode->name, "Workspace" ) == 0 &&
+		get_sprop( xnode, "filename", name, FILENAME_MAX ) ) {
+		char *old_dir;
+		char *new_dir;
+
+		/* The old filename could be non-native, so we must rewrite 
+		 * to native form first so g_path_get_dirname() can work.
+		 */
+		path_compact( name );
+
+		old_dir = g_path_get_dirname( name ); 
+		new_dir = g_path_get_dirname( state->filename_user );
+
+		path_rewrite_add( old_dir, new_dir );
+
+		g_free( old_dir );
+		g_free( new_dir );
+	}
 
 	switch( ws->load_type ) {
 	case WORKSPACE_LOAD_TOP:

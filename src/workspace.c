@@ -1588,7 +1588,8 @@ workspace_load_empty( Workspace *ws, Workspacegroup *wsg,
 		filename, filename_user ) ) 
 		return( FALSE );
 	filemodel_set_modified( FILEMODEL( ws ), FALSE );
-	filemodel_set_filename( FILEMODEL( ws ), filename_user );
+	filemodel_set_filename( FILEMODEL( ws ), 
+		filename_user ? filename_user : filename );
 
 	return( TRUE );
 }

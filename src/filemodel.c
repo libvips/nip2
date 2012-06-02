@@ -185,7 +185,7 @@ filemodel_set_filename( Filemodel *filemodel, const char *filename )
 			filename = buf;
 		}
 
-		IM_SETSTR( filemodel->filename, buf );
+		IM_SETSTR( filemodel->filename, filename );
 		iobject_changed( IOBJECT( filemodel ) );
 	}
 }

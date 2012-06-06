@@ -652,12 +652,10 @@ main_file_for_stock( GtkIconFactory *icon_factory,
 	GtkIconSource *icon_source;
 	GtkIconSet *icon_set;
 	char buf[FILENAME_MAX];
-	char buf2[FILENAME_MAX];
 
-	im_snprintf( buf2, FILENAME_MAX, 
+	im_snprintf( buf, FILENAME_MAX, 
 		"$VIPSHOME/share/$PACKAGE/data/%s", file );
-	expand_variables( buf2, buf );
-        nativeize_path( buf );
+	path_expand( buf );
 	icon_source = gtk_icon_source_new(); 
 	gtk_icon_source_set_filename( icon_source, buf );
 	icon_set = gtk_icon_set_new();
@@ -790,8 +788,9 @@ main_x_init( int *argc, char ***argv )
 
 	/* Set the default icon. 
 	 */
-	expand_variables( "$VIPSHOME/share/$PACKAGE/data/vips-128.png", buf );
-        nativeize_path( buf );
+	im_strncpy( buf, 
+		"$VIPSHOME/share/$PACKAGE/data/vips-128.png", FILENAME_MAX );
+	path_expand( buf );
 	gtk_window_set_default_icon_from_file( buf, NULL );
 
 	/* Turn off startup notification. Startup is done when we pop our
@@ -870,9 +869,8 @@ main_check_temp( double total )
 		VipsBuf buf = VIPS_BUF_STATIC( txt );
 		char tmp[FILENAME_MAX];
 
-		expand_variables( PATH_TMP, tmp );
-		nativeize_path( tmp );
-		absoluteize_path( tmp );
+		im_strncpy( tmp, PATH_TMP, FILENAME_MAX );
+		path_expand( tmp );
 		vips_buf_append_size( &buf, total );
 
 		box_yesno( NULL,
@@ -1373,8 +1371,8 @@ main( int argc, char *argv[] )
 {
 	char buf[FILENAME_MAX];
 
-	expand_variables( PATH_TMP, buf );
-	nativeize_path( buf );
+	im_strncpy( buf, PATH_TMP, FILENAME_MAX );
+	path_expand( buf );
 	setenvf( "TMPDIR", "%s", buf );
 
 	path_rewrite_add( PATH_TMP, "$TMPDIR" );
@@ -1488,8 +1486,8 @@ main( int argc, char *argv[] )
 
 			im_snprintf( buf, 256, 
 				_( "Welcome to %s-%s!" ), PACKAGE, VERSION );
-			expand_variables( get_savedir(), save_dir );
-			nativeize_path( save_dir );
+			im_strncpy( save_dir, get_savedir(), FILENAME_MAX );
+			path_expand( save_dir );
 			error_top( "%s", buf );
 			error_sub( 
 _( "A new directory has been created to hold startup, "

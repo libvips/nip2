@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=glib&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-05-30 12:42+0100\n"
+"POT-Creation-Date: 2012-06-03 12:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -290,9 +290,9 @@ msgid "No GSL library available for gammq."
 msgstr ""
 
 #: ../src/builtin.c:422 ../src/classmodel.c:153 ../src/classmodel.c:225
-#: ../src/filemodel.c:100 ../src/filemodel.c:145 ../src/filemodel.c:366
-#: ../src/filemodel.c:590 ../src/filemodel.c:629 ../src/mainw.c:754
-#: ../src/mainw.c:762 ../src/model.c:327 ../src/model.c:344 ../src/model.c:399
+#: ../src/filemodel.c:100 ../src/filemodel.c:145 ../src/filemodel.c:369
+#: ../src/filemodel.c:598 ../src/filemodel.c:637 ../src/mainw.c:754
+#: ../src/mainw.c:762 ../src/model.c:336 ../src/model.c:353 ../src/model.c:408
 #: ../src/rowview.c:479 ../src/view.c:820
 msgid "Not implemented."
 msgstr ""
@@ -491,7 +491,7 @@ msgstr ""
 msgid "Superclass constructor \"%s\" refers to non-local symbols %s"
 msgstr ""
 
-#: ../src/class.c:803 ../src/workspace.c:1726
+#: ../src/class.c:803 ../src/workspace.c:1721
 msgid "Wrong number of arguments."
 msgstr ""
 
@@ -618,7 +618,7 @@ msgstr ""
 msgid "Double-click to edit this color, or drag-and-drop between colors"
 msgstr ""
 
-#: ../src/column.c:326 ../src/tool.c:864 ../src/workspace.c:1562
+#: ../src/column.c:326 ../src/tool.c:864 ../src/workspace.c:1553
 #: ../src/workspacegroup.c:145
 msgid "Name clash."
 msgstr ""
@@ -921,74 +921,74 @@ msgstr ""
 msgid "of"
 msgstr ""
 
-#: ../src/filemodel.c:101 ../src/filemodel.c:146 ../src/filemodel.c:591
-#: ../src/filemodel.c:630 ../src/model.c:328 ../src/model.c:345
-#: ../src/model.c:400 ../src/model.c:419
+#: ../src/filemodel.c:101 ../src/filemodel.c:146 ../src/filemodel.c:599
+#: ../src/filemodel.c:638 ../src/model.c:337 ../src/model.c:354
+#: ../src/model.c:409 ../src/model.c:428
 #, c-format
 msgid "_%s() not implemented for class \"%s\"."
 msgstr ""
 
-#: ../src/filemodel.c:279 ../src/filemodel.c:294 ../src/model.c:450
+#: ../src/filemodel.c:282 ../src/filemodel.c:297 ../src/model.c:459
 msgid "XML library error."
 msgstr ""
 
-#: ../src/filemodel.c:280
+#: ../src/filemodel.c:283
 msgid "model_save_filename: xmlNewDoc() failed"
 msgstr ""
 
-#: ../src/filemodel.c:295
+#: ../src/filemodel.c:298
 msgid "model_save_filename: xmlNewDocNode() failed"
 msgstr ""
 
-#: ../src/filemodel.c:311
+#: ../src/filemodel.c:314
 msgid "Save failed."
 msgstr ""
 
-#: ../src/filemodel.c:312
+#: ../src/filemodel.c:315
 #, c-format
 msgid ""
 "Save of %s \"%s\" to file \"%s\" failed.\n"
 "%s"
 msgstr ""
 
-#: ../src/filemodel.c:367
+#: ../src/filemodel.c:370
 msgid "filemodel_real_save_all: no save method"
 msgstr ""
 
-#: ../src/filemodel.c:476 ../src/filemodel.c:485 ../src/filemodel.c:498
-#: ../src/mainw.c:1022 ../src/model.c:130
+#: ../src/filemodel.c:479 ../src/filemodel.c:488 ../src/filemodel.c:501
+#: ../src/mainw.c:1022 ../src/model.c:131
 msgid "Load failed."
 msgstr ""
 
-#: ../src/filemodel.c:477
+#: ../src/filemodel.c:480
 #, c-format
 msgid "Can't load XML file \"%s\", it's not a %s save file."
 msgstr ""
 
-#: ../src/filemodel.c:486
+#: ../src/filemodel.c:489
 #, c-format
 msgid ""
 "Can't load XML file \"%s\", unable to extract version information from "
 "namespace."
 msgstr ""
 
-#: ../src/filemodel.c:499
+#: ../src/filemodel.c:502
 #, c-format
 msgid "Can't load XML file \"%s\", the file does not contain a %s."
 msgstr ""
 
 #. Expands to (eg.) "Save Column A2".
 #.
-#: ../src/filemodel.c:680
+#: ../src/filemodel.c:688
 #, c-format
 msgid "Save %s %s"
 msgstr ""
 
-#: ../src/filemodel.c:756 ../src/filemodel.c:768
+#: ../src/filemodel.c:764 ../src/filemodel.c:776
 msgid "Object has been modified."
 msgstr ""
 
-#: ../src/filemodel.c:757
+#: ../src/filemodel.c:765
 #, c-format
 msgid ""
 "%s \"%s\" has been modified since you loaded it from file \"%s\".\n"
@@ -996,7 +996,7 @@ msgid ""
 "Do you want to save your changes?"
 msgstr ""
 
-#: ../src/filemodel.c:769
+#: ../src/filemodel.c:777
 #, c-format
 msgid "%s \"%s\" has been modified. Do you want to save your changes?"
 msgstr ""
@@ -1852,110 +1852,110 @@ msgstr ""
 msgid "Error loading plug-in \"%s\"."
 msgstr ""
 
-#: ../src/main.c:681
+#: ../src/main.c:682
 msgid "Next _Error"
 msgstr ""
 
-#: ../src/main.c:682
+#: ../src/main.c:683
 msgid "Ink dropper"
 msgstr ""
 
-#: ../src/main.c:683
+#: ../src/main.c:684
 msgid "D_uplicate"
 msgstr ""
 
-#: ../src/main.c:684
+#: ../src/main.c:685
 msgid "Pen"
 msgstr ""
 
-#: ../src/main.c:685 ../src/plot.c:94
+#: ../src/main.c:686 ../src/plot.c:94
 msgid "Line"
 msgstr ""
 
-#: ../src/main.c:686 ../src/matrix.c:149
+#: ../src/main.c:687 ../src/matrix.c:149
 msgid "Text"
 msgstr ""
 
 #. IMAGEMODEL_TEXT
-#: ../src/main.c:687 ../src/paintboxview.c:259
+#: ../src/main.c:688 ../src/paintboxview.c:259
 msgid "Smudge"
 msgstr ""
 
-#: ../src/main.c:688
+#: ../src/main.c:689
 msgid "Flood"
 msgstr ""
 
-#: ../src/main.c:689
+#: ../src/main.c:690
 msgid "Flood Blob"
 msgstr ""
 
-#: ../src/main.c:690
+#: ../src/main.c:691
 msgid "Fill Rectangle"
 msgstr ""
 
-#: ../src/main.c:691
+#: ../src/main.c:692
 msgid "Pan"
 msgstr ""
 
-#: ../src/main.c:692
+#: ../src/main.c:693
 msgid "Select"
 msgstr ""
 
 #. And the LEDs we use.
 #.
-#: ../src/main.c:696
+#: ../src/main.c:697
 msgid "Red LED"
 msgstr ""
 
-#: ../src/main.c:697
+#: ../src/main.c:698
 msgid "Green LED"
 msgstr ""
 
-#: ../src/main.c:698
+#: ../src/main.c:699
 msgid "Blue LED"
 msgstr ""
 
-#: ../src/main.c:699
+#: ../src/main.c:700
 msgid "Yellow LED"
 msgstr ""
 
-#: ../src/main.c:700
+#: ../src/main.c:701
 msgid "Cyan LED"
 msgstr ""
 
-#: ../src/main.c:701
+#: ../src/main.c:702
 msgid "Off LED"
 msgstr ""
 
-#: ../src/main.c:880
+#: ../src/main.c:881
 msgid "Empty temp area"
 msgstr ""
 
-#: ../src/main.c:881
+#: ../src/main.c:882
 msgid "Many files in temp area."
 msgstr ""
 
-#: ../src/main.c:882
+#: ../src/main.c:883
 #, c-format
 msgid ""
 "The temp area \"%s\" contains %s of files. Would you like to empty the temp "
 "area? This will delete any workspace backups and cannot be undone."
 msgstr ""
 
-#: ../src/main.c:898
+#: ../src/main.c:899
 #, c-format
 msgid "unable to make %s %s: %s"
 msgstr ""
 
-#: ../src/main.c:976
+#: ../src/main.c:977
 msgid "Unable to find install area."
 msgstr ""
 
-#: ../src/main.c:1115
+#: ../src/main.c:1116
 msgid "- image processing spreadsheet"
 msgstr ""
 
-#: ../src/main.c:1140
+#: ../src/main.c:1141
 #, c-format
 msgid "linked to vips-%s"
 msgstr ""
@@ -1963,34 +1963,34 @@ msgstr ""
 #. -1 means can't-be-set, at least on os x, so don't
 #. * warn.
 #.
-#: ../src/main.c:1192
+#: ../src/main.c:1193
 #, c-format
 msgid ""
 "unable to change max file descriptors\n"
 "max file descriptors still set to %d"
 msgstr ""
 
-#: ../src/main.c:1198
+#: ../src/main.c:1199
 msgid "unable to read max file descriptors"
 msgstr ""
 
-#: ../src/main.c:1433 ../src/main.c:1479
+#: ../src/main.c:1434 ../src/main.c:1480
 #, c-format
 msgid ""
 "Startup error log:\n"
 "%s"
 msgstr ""
 
-#: ../src/main.c:1478
+#: ../src/main.c:1479
 msgid "Startup error."
 msgstr ""
 
-#: ../src/main.c:1489
+#: ../src/main.c:1490
 #, c-format
 msgid "Welcome to %s-%s!"
 msgstr ""
 
-#: ../src/main.c:1494
+#: ../src/main.c:1495
 #, c-format
 msgid ""
 "A new directory has been created to hold startup, data and temporary files:\n"
@@ -2461,31 +2461,31 @@ msgstr ""
 msgid ": cell (%d, %d): %s"
 msgstr ""
 
-#: ../src/model.c:131
+#: ../src/model.c:132
 #, c-format
 msgid ""
 "Unable to load from file \"%s\". Error log is:\n"
 "%s"
 msgstr ""
 
-#: ../src/model.c:451
+#: ../src/model.c:460
 msgid "model_save: xmlNewChild() failed"
 msgstr ""
 
-#: ../src/model.c:518
+#: ../src/model.c:527
 msgid "XML load error."
 msgstr ""
 
-#: ../src/model.c:519
+#: ../src/model.c:528
 #, c-format
 msgid "Can't load node of type \"%s\" into object of type \"%s\""
 msgstr ""
 
-#: ../src/model.c:747
+#: ../src/model.c:756
 msgid "Delete?"
 msgstr ""
 
-#: ../src/model.c:748
+#: ../src/model.c:757
 #, c-format
 msgid "Are you sure you want to delete %s \"%s\"?"
 msgstr ""
@@ -3143,7 +3143,7 @@ msgid "%s expected %s, instead saw:"
 msgstr ""
 
 #: ../src/reduce.c:148 ../src/reduce.c:1056 ../src/trace.c:126
-#: ../src/workspace.c:1737
+#: ../src/workspace.c:1732
 msgid "Overflow error."
 msgstr ""
 
@@ -3677,60 +3677,60 @@ msgid ""
 "Found workspace \"%s\", dated %s. Do you want to recover this workspace?"
 msgstr ""
 
-#: ../src/workspace.c:1360
+#: ../src/workspace.c:1351
 msgid "Version mismatch."
 msgstr ""
 
-#: ../src/workspace.c:1361
+#: ../src/workspace.c:1352
 #, c-format
 msgid ""
 "File \"%s\" was saved from %s-%d.%d.%d. You may see compatibility problems."
 msgstr ""
 
-#: ../src/workspace.c:1518
+#: ../src/workspace.c:1509
 msgid "// private definitions for this workspace\n"
 msgstr ""
 
-#: ../src/workspace.c:1563
+#: ../src/workspace.c:1554
 #, c-format
 msgid "Can't create workspace \"%s\". A symbol with that name already exists."
 msgstr ""
 
-#: ../src/workspace.c:1654
+#: ../src/workspace.c:1649
 msgid "Default empty workspace"
 msgstr ""
 
-#: ../src/workspace.c:1727
+#: ../src/workspace.c:1722
 #, c-format
 msgid "%s needs %d arguments, there are %d selected."
 msgstr ""
 
-#: ../src/workspace.c:1738
+#: ../src/workspace.c:1733
 msgid "Too many names selected."
 msgstr ""
 
-#: ../src/workspace.c:1878
+#: ../src/workspace.c:1870
 msgid "You can only remove top level rows."
 msgstr ""
 
-#: ../src/workspace.c:1879
+#: ../src/workspace.c:1871
 msgid "Not all selected objects are top level rows."
 msgstr ""
 
-#: ../src/workspace.c:1929
+#: ../src/workspace.c:1921
 msgid "Delete selected objects?"
 msgstr ""
 
-#: ../src/workspace.c:1930
+#: ../src/workspace.c:1922
 #, c-format
 msgid "Are you sure you want to delete %s?"
 msgstr ""
 
-#: ../src/workspace.c:1988
+#: ../src/workspace.c:1980
 msgid "Unable to ungroup."
 msgstr ""
 
-#: ../src/workspace.c:1989
+#: ../src/workspace.c:1981
 #, c-format
 msgid "Row \"%s\" is not a Group or a list."
 msgstr ""

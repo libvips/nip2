@@ -711,7 +711,8 @@ workspace_test_file( char *name, char *name_sofar )
 	struct stat st;
 	int i;
 
-	(void) expand_variables( name, buf );
+	im_strncpy( buf, name, FILENAME_MAX );
+	path_expand( buf );
 	for( i = 0; i < WS_RETAIN; i++ )
 		if( retain_files[i] && 
 			strcmp( buf, retain_files[i] ) == 0 )

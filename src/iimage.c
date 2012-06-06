@@ -333,13 +333,20 @@ iimage_graphic_save( Classmodel *classmodel,
 {
 	iImage *iimage = IIMAGE( classmodel );
 	ImageValue *value = &iimage->value;
-	char buf[MAX_STRSIZE];
+	char buf[FILENAME_MAX];
 
 	/* Can't happen nested-ly, so a static is OK. 
 	 */
 	static GTimer *timer = NULL;
 
-	strcpy( buf, filename );
+	/* We don't want $VAR etc. in the filename we pass down to the file
+	 * ops.
+	 */
+	im_strncpy( buf, filename, FILENAME_MAX );
+	path_expand( buf );
+
+	/* Append the mode string. This needs an expanded filename.
+	 */
 	filesel_add_mode( buf );
 
 	if( !timer )

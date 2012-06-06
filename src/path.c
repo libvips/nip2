@@ -227,13 +227,22 @@ path_rewrite( char *buf )
 void
 path_compact( char *path )
 {
+	path_expand( path );
+	path_rewrite( path );
+}
+
+/* The inverse: rewrite in long form ready for file ops.
+ */
+void
+path_expand( char *path )
+{
 	char buf[FILENAME_MAX];
 
 	expand_variables( path, buf );
-	nativeize_path( path );
-	absoluteize_path( path );
-	canonicalize_path( path );
-	path_rewrite( path );
+	nativeize_path( buf );
+	absoluteize_path( buf );
+	canonicalize_path( buf );
+	im_strncpy( path, buf, FILENAME_MAX );
 }
 
 /* Turn a search path (eg. "/pics/lr:/pics/hr") into a list of directory names.

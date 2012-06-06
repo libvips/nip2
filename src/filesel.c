@@ -445,7 +445,8 @@ filesel_get_mode( const char *filename )
 	return( NULL );
 }
 
-/* Add our image save settings to the end of a filename.
+/* Add our image save settings to the end of a filename. filename must be
+ * at least FILENAME_MAX characters in size.
  */
 void
 filesel_add_mode( char *filename )
@@ -457,7 +458,7 @@ filesel_add_mode( char *filename )
 		int l = strlen( filename );
 
 		mode->mode_fn( ext );
-		im_snprintf( filename + l, MAX_STRSIZE - l, ":%s", ext );
+		im_snprintf( filename + l, FILENAME_MAX - l, ":%s", ext );
 	}
 }
 
@@ -520,10 +521,9 @@ filesel_add_volume( const char *dir, Filesel *filesel )
 {
 	char buf[FILENAME_MAX];
 
-        expand_variables( dir, buf );
-        nativeize_path( buf );
-	absoluteize_path( buf );
-	canonicalize_path( buf );
+	im_strncpy( buf, dir, FILENAME_MAX );
+	path_expand( buf );
+
 	gtk_file_chooser_add_shortcut_folder( 
 		GTK_FILE_CHOOSER( filesel->chooser ), buf, NULL );
 
@@ -713,9 +713,8 @@ filesel_set_filename( Filesel *filesel, const char *name )
 	if( !is_valid_filename( name ) ) 
 		return( FALSE );
 
-        expand_variables( name, buf );
-        nativeize_path( buf );
-	absoluteize_path( buf );
+	im_strncpy( buf, name, FILENAME_MAX );
+	path_expand( buf );
 
 #ifdef DEBUG
 	printf( "filesel_set_filename: %s\n", buf ); 

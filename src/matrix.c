@@ -210,11 +210,18 @@ matrix_graphic_save( Classmodel *classmodel,
 {
 	Matrix *matrix = MATRIX( classmodel );
 	DOUBLEMASK *dmask;
+	char buf[FILENAME_MAX];
 
 	if( !(dmask = matrix_model_to_dmask( matrix )) ) 
 		return( FALSE );
 
-	if( im_write_dmask_name( dmask, filename ) ) {
+	/* We don't want $VAR etc. in the filename we pass down to the file
+	 * ops.
+	 */
+	im_strncpy( buf, filename, FILENAME_MAX );
+	path_expand( buf );
+
+	if( im_write_dmask_name( dmask, buf ) ) {
 		error_vips_all();
 		IM_FREEF( im_free_dmask, dmask );
 		return( FALSE );
@@ -237,7 +244,13 @@ matrix_graphic_replace( Classmodel *classmodel,
 	char txt[MAX_STRSIZE];
 	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	if( !(dmask = im_read_dmask( filename )) ) {
+	/* We don't want $VAR etc. in the filename we pass down to the file
+	 * ops.
+	 */
+	im_strncpy( txt, filename, FILENAME_MAX );
+	path_expand( txt );
+
+	if( !(dmask = im_read_dmask( txt )) ) {
 		error_vips_all();
 		return( FALSE );
 	}

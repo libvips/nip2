@@ -76,6 +76,11 @@ typedef struct _ModelLoadState {
 	 * rewrite system.
 	 */
 	gboolean rewrite_path;
+
+	/* The old_dir we added with path_rewrite_add() ... if non, NULL,
+	 * unset this rewrite rule on close.
+	 */
+	char *old_dir;
 } ModelLoadState;
 
 #define TYPE_MODEL (model_get_type())

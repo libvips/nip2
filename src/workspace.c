@@ -1275,7 +1275,6 @@ workspace_top_load( Filemodel *filemodel,
 	 */
 	if( strcasecmp( (char *) xnode->name, "Workspace" ) == 0 &&
 		get_sprop( xnode, "filename", name, FILENAME_MAX ) ) {
-		char *old_dir;
 		char *new_dir;
 
 		/* The old filename could be non-native, so we must rewrite 
@@ -1283,12 +1282,11 @@ workspace_top_load( Filemodel *filemodel,
 		 */
 		path_compact( name );
 
-		old_dir = g_path_get_dirname( name ); 
+		state->old_dir = g_path_get_dirname( name ); 
 		new_dir = g_path_get_dirname( state->filename_user );
 
-		path_rewrite_add( old_dir, new_dir );
+		path_rewrite_add( state->old_dir, new_dir );
 
-		g_free( old_dir );
 		g_free( new_dir );
 	}
 

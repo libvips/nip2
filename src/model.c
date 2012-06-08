@@ -109,6 +109,12 @@ model_loadstate_destroy( ModelLoadState *state )
 	slist_map( state->renames, 
 		(SListMapFn) model_loadstate_rename_destroy, NULL );
 	g_slist_free( state->renames );
+	
+	if( state->old_dir ) {
+		path_rewrite_add( state->old_dir, NULL );
+		IM_FREE( state->old_dir );
+	}
+
 	IM_FREE( state );
 }
 
@@ -147,6 +153,7 @@ model_loadstate_new( const char *filename, const char *filename_user )
 	state->minor = MINOR_VERSION;
 	state->micro = MICRO_VERSION;
 	state->rewrite_path = FALSE;
+	state->old_dir = FALSE;
 
 	state->filename = im_strdup( NULL, filename );
 	if( filename_user )

@@ -607,7 +607,8 @@ workspace_clone_selected( Workspace *ws )
 	/* Try to load the clone file back again.
 	 */
         progress_begin();
-	if( !workspace_merge_column_file( ws, filename ) ) {
+	if( !workspace_merge_column_file( ws, 
+		filename, FILEMODEL( ws )->filename ) ) {
 		progress_end();
 		unlinkf( "%s", filename );
 
@@ -1654,14 +1655,15 @@ workspace_new_blank( Workspacegroup *wsg, const char *name )
  * like workspace_new_from_file() instead.
  */
 gboolean
-workspace_merge_file( Workspace *ws, const char *filename )
+workspace_merge_file( Workspace *ws, 
+	const char *filename, const char *filename_user )
 {
 	if( workspace_is_empty( ws ) ) {
 		model_empty( MODEL( ws ) );
 
 		if( !workspace_load_empty( ws, 
 			WORKSPACEGROUP( ICONTAINER( ws )->parent ), 
-			filename, NULL ) ) 
+			filename, filename_user ) ) 
 			return( FALSE );
 	}
 	else {
@@ -1670,7 +1672,8 @@ workspace_merge_file( Workspace *ws, const char *filename )
 			IM_RECT_RIGHT( &ws->area ) + WORKSPACEVIEW_MARGIN_LEFT,
 			WORKSPACEVIEW_MARGIN_TOP );
 		if( !filemodel_load_all( FILEMODEL( ws ), 
-			MODEL( ICONTAINER( ws )->parent ), filename, NULL ) ) 
+			MODEL( ICONTAINER( ws )->parent ), 
+			filename, filename_user ) ) 
 			return( FALSE );
 
 		filemodel_set_modified( FILEMODEL( ws ), TRUE );
@@ -1682,13 +1685,14 @@ workspace_merge_file( Workspace *ws, const char *filename )
 /* Merge file into the current column of this workspace.
  */
 gboolean
-workspace_merge_column_file( Workspace *ws, const char *filename )
+workspace_merge_column_file( Workspace *ws, 
+	const char *filename, const char *filename_user )
 {
 	ws->load_type = WORKSPACE_LOAD_ROWS;
 	column_set_offset( IM_RECT_RIGHT( &ws->area ), 
 		IM_RECT_BOTTOM( &ws->area ) );
 	if( !filemodel_load_all( FILEMODEL( ws ), 
-		MODEL( ICONTAINER( ws )->parent ), filename, NULL ) ) 
+		MODEL( ICONTAINER( ws )->parent ), filename, filename_user ) ) 
 		return( FALSE );
 
 	filemodel_set_modified( FILEMODEL( ws ), TRUE );

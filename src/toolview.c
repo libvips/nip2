@@ -77,7 +77,7 @@ toolview_activate_cb( GtkWidget *widget, Toolitem *toolitem )
 	switch( toolitem->tool->type ) {
 	case TOOL_DIA:
 		if( !workspace_merge_file( ws, 
-			FILEMODEL( toolitem->tool )->filename ) )
+			FILEMODEL( toolitem->tool )->filename, NULL ) )
 			iwindow_alert( widget, GTK_MESSAGE_ERROR );
 		symbol_recalculate_all();
 		break;

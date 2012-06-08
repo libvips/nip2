@@ -1235,7 +1235,7 @@ mainw_workspace_merge_fn( Filesel *filesel,
 {
 	Mainw *mainw = MAINW( a );
 
-	if( !workspace_merge_file( mainw->ws, filename ) )
+	if( !workspace_merge_file( mainw->ws, filename, NULL ) )
 		return( filesel );
 
 	/* Process some events to make sure we rethink the layout and

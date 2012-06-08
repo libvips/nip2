@@ -182,11 +182,13 @@ void workspace_auto_recover( Mainw *mainw );
 GType workspace_get_type( void );
 Workspace *workspace_new( Workspacegroup *wsg, const char *name );
 Workspace *workspace_new_from_file( Workspacegroup *wsg, 
-	const char *fname, const char *real_fname );
+	const char *filename, const char *filename_user );
 Workspace *workspace_new_from_openfile( Workspacegroup *wsg, iOpenFile *of );
 Workspace *workspace_new_blank( Workspacegroup *wsg, const char *name );
-gboolean workspace_merge_file( Workspace *ws, const char *fname );
-gboolean workspace_merge_column_file( Workspace *ws, const char *fname );
+gboolean workspace_merge_file( Workspace *ws, 
+	const char *filename, const char *filename_user );
+gboolean workspace_merge_column_file( Workspace *ws, 
+	const char *filename, const char *filename_user );
 
 Row *workspace_get_bottom( Workspace *ws );
 

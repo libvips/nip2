@@ -36,8 +36,8 @@
  */
 
 /* show path rewrites
- */
 #define DEBUG_REWRITE
+ */
 
 #include "ip.h"
 

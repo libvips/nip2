@@ -101,8 +101,8 @@ GType filemodel_get_type( void );
 
 void filemodel_set_offset( Filemodel *filemodel, int x_off, int y_off );
 gboolean filemodel_save_all( Filemodel *filemodel, const char *filename );
-gboolean filemodel_load_all( Filemodel *filemodel, 
-	Model *parent, const char *filename );
+gboolean filemodel_load_all( Filemodel *filemodel, Model *parent, 
+	const char *filename, const char *filename_user );
 gboolean filemodel_load_all_openfile( Filemodel *filemodel, 
 	Model *parent, iOpenFile *of );
 

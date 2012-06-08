@@ -47,6 +47,7 @@ typedef struct _ModelRename {
  */
 typedef struct _ModelLoadState {
 	char *filename;		/* Name we loaded from */
+	char *filename_user;	/* The filename to record in the model */
 	xmlDoc *xdoc;		/* Document we load from */
 
 	/* 
@@ -75,6 +76,11 @@ typedef struct _ModelLoadState {
 	 * rewrite system.
 	 */
 	gboolean rewrite_path;
+
+	/* The old_dir we added with path_rewrite_add() ... if non, NULL,
+	 * unset this rewrite rule on close.
+	 */
+	char *old_dir;
 } ModelLoadState;
 
 #define TYPE_MODEL (model_get_type())
@@ -169,7 +175,8 @@ extern ModelLoadState *model_loadstate;
 
 ModelRename *model_loadstate_rename_new( ModelLoadState *state, 
 	const char *old_name, const char *new_name );
-ModelLoadState *model_loadstate_new( const char *filename );
+ModelLoadState *model_loadstate_new( 
+	const char *filename, const char *filename_user );
 ModelLoadState *model_loadstate_new_openfile( iOpenFile *of );
 void model_loadstate_destroy( ModelLoadState *state );
 char *model_loadstate_rewrite_name( char *name );

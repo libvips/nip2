@@ -173,16 +173,19 @@ filemodel_info( iObject *iobject, VipsBuf *buf )
 void
 filemodel_set_filename( Filemodel *filemodel, const char *filename )
 {
-	char buf[FILENAME_MAX];
+	if( filemodel->filename != filename ) {
+		char buf[FILENAME_MAX];
 
-	/* We want to keep the absolute, compact form of the filename inside
-	 * the object so we don't get a dependency on CWD.
-	 */
-	im_strncpy( buf, filename, FILENAME_MAX );
-	path_compact( buf );
+		/* We want to keep the absolute, compact form of the filename 
+		 * inside the object so we don't get a dependency on CWD.
+		 */
+		if( filename ) {
+			im_strncpy( buf, filename, FILENAME_MAX );
+			path_compact( buf );
+			filename = buf;
+		}
 
-	if( filemodel->filename != buf ) {
-		IM_SETSTR( filemodel->filename, buf );
+		IM_SETSTR( filemodel->filename, filename );
 		iobject_changed( IOBJECT( filemodel ) );
 	}
 }
@@ -511,12 +514,12 @@ filemodel_load_all_xml( Filemodel *filemodel,
 }
 
 static gboolean
-filemodel_load_all_xml_file( Filemodel *filemodel, 
-	Model *parent, const char *filename )
+filemodel_load_all_xml_file( Filemodel *filemodel, Model *parent, 
+	const char *filename, const char *filename_user )
 {
 	ModelLoadState *state;
 
-	if( !(state = model_loadstate_new( filename )) )
+	if( !(state = model_loadstate_new( filename, filename_user )) )
 		return( FALSE );
 	if( !filemodel_load_all_xml( filemodel, parent, state ) ) {
 		model_loadstate_destroy( state );
@@ -545,8 +548,8 @@ filemodel_load_all_xml_openfile( Filemodel *filemodel,
 }
 
 static gboolean
-filemodel_load_all_text( Filemodel *filemodel, 
-	Model *parent, const char *filename )
+filemodel_load_all_text( Filemodel *filemodel, Model *parent, 
+	const char *filename, const char *filename_user )
 {
 	iOpenFile *of;
 
@@ -563,9 +566,13 @@ filemodel_load_all_text( Filemodel *filemodel,
 }
 
 /* Load filename into filemodel ... can mean merge as well as init.
+ *
+ * We load from @filename. If @filename_user is non-NULL, that's the filename
+ * we should record in the model.
  */
 gboolean
-filemodel_load_all( Filemodel *filemodel, Model *parent, const char *filename )
+filemodel_load_all( Filemodel *filemodel, Model *parent, 
+	const char *filename, const char *filename_user )
 {
 	ModelClass *model_class = MODEL_GET_CLASS( filemodel );
 	const char *tname = G_OBJECT_CLASS_NAME( model_class );
@@ -578,12 +585,13 @@ filemodel_load_all( Filemodel *filemodel, Model *parent, const char *filename )
 #endif /*DEBUG*/
 
 	if( model_class->load_text ) {
-		if( !filemodel_load_all_text( filemodel, parent, filename ) ) 
+		if( !filemodel_load_all_text( filemodel, parent, 
+			filename, filename_user ) ) 
 			return( FALSE );
 	}
 	else if( model_class->load ) {
-		if( !filemodel_load_all_xml_file( filemodel, 
-			parent, filename ) )
+		if( !filemodel_load_all_xml_file( filemodel, parent, 
+			filename, filename_user ) )
 			return( FALSE );
 	}
 	else {
@@ -828,8 +836,8 @@ filemodel_inter_load_cb( iWindow *iwnd,
 	if( (filename = filesel_get_filename( filesel )) ) {
 		filemodel_set_filename( filemodel, filename );
 
-		if( filemodel_load_all( filemodel, 
-			MODEL( parent ), filename ) ) 
+		if( filemodel_load_all( filemodel, MODEL( parent ), 
+			filename, NULL ) ) 
 			nfn( sys, IWINDOW_YES );
 		else
 			nfn( sys, IWINDOW_ERROR );

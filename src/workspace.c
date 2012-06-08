@@ -607,7 +607,8 @@ workspace_clone_selected( Workspace *ws )
 	/* Try to load the clone file back again.
 	 */
         progress_begin();
-	if( !workspace_merge_column_file( ws, filename ) ) {
+	if( !workspace_merge_column_file( ws, 
+		filename, FILEMODEL( ws )->filename ) ) {
 		progress_end();
 		unlinkf( "%s", filename );
 
@@ -711,7 +712,8 @@ workspace_test_file( char *name, char *name_sofar )
 	struct stat st;
 	int i;
 
-	(void) expand_variables( name, buf );
+	im_strncpy( buf, name, FILENAME_MAX );
+	path_expand( buf );
 	for( i = 0; i < WS_RETAIN; i++ )
 		if( retain_files[i] && 
 			strcmp( buf, retain_files[i] ) == 0 )
@@ -962,8 +964,6 @@ workspace_load( Model *model,
 	Workspace *ws = WORKSPACE( model );
 	char buf[FILENAME_MAX];
 	char *txt;
-	char *old_dir;
-	char *new_dir;
 
 	g_assert( IS_WORKSPACEGROUP( parent ) );
 
@@ -999,27 +999,6 @@ workspace_load( Model *model,
 		IM_SETSTR( IOBJECT( ws )->caption, buf );
 	}
 
-	/* Get the filename this workspace was saved as. This is a filemodel
-	 * property (see filemodel_load()) but we need the value here before
-	 * we chain up. n0rty!
-	 *
-	 * Compare the save location to the load location to generate the
-	 * rewrite rule for loading of objects within this workspace.
-	 */
-	old_dir = NULL;
-	new_dir = NULL;
-	if( get_sprop( xnode, "filename", buf, FILENAME_MAX ) ) {
-		/* The old filename could be non-native, so we must rewrite 
-		 * to native form first so g_path_get_dirname() can work.
-		 */
-		path_compact( buf );
-
-		old_dir = g_path_get_dirname( buf ); 
-		new_dir = g_path_get_dirname( state->filename );
-
-		path_rewrite_add( old_dir, new_dir );
-	}
-
 	/* Don't use get_sprop() and avoid a limit on def size.
 	 */
 	if( (txt = (char *) xmlGetProp( xnode, (xmlChar *) "local_defs" )) ) {
@@ -1029,14 +1008,6 @@ workspace_load( Model *model,
 
 	if( !MODEL_CLASS( parent_class )->load( model, state, parent, xnode ) )
 		return( FALSE );
-
-	/* Remove the rewrite rule we added.
-	 */
-	if( old_dir )
-		path_rewrite_add( old_dir, NULL );
-
-	IM_FREE( old_dir );
-	IM_FREE( new_dir );
 
 	return( TRUE );
 }
@@ -1202,8 +1173,7 @@ workspace_build_compat( void )
  * a set of compat defs.
  */
 static int
-workspace_have_compat( int major, int minor, 
-	int *best_major, int *best_minor )
+workspace_have_compat( int major, int minor, int *best_major, int *best_minor )
 {
 	int i;
 	int best;
@@ -1300,6 +1270,27 @@ workspace_top_load( Filemodel *filemodel,
 	printf( "workspace_top_load: from %s\n", state->filename );
 #endif /*DEBUG*/
 
+	/* The top node should be the saved workspace. Get the filename this
+	 * workspace was saved as so we can work out how to rewrite embedded
+	 * filenames.
+	 */
+	if( strcasecmp( (char *) xnode->name, "Workspace" ) == 0 &&
+		get_sprop( xnode, "filename", name, FILENAME_MAX ) ) {
+		char *new_dir;
+
+		/* The old filename could be non-native, so we must rewrite 
+		 * to native form first so g_path_get_dirname() can work.
+		 */
+		path_compact( name );
+
+		state->old_dir = g_path_get_dirname( name ); 
+		new_dir = g_path_get_dirname( state->filename_user );
+
+		path_rewrite_add( state->old_dir, new_dir );
+
+		g_free( new_dir );
+	}
+
 	switch( ws->load_type ) {
 	case WORKSPACE_LOAD_TOP:
 		/* Easy ... ws is a blank Workspace we are loading into. No
@@ -1309,7 +1300,7 @@ workspace_top_load( Filemodel *filemodel,
 		/* Set the workspace name from the filename, ignoring the name
 		 * saved in the file.
 		 */
-		name_from_filename( state->filename, name );
+		name_from_filename( state->filename_user, name );
 		while( compile_lookup( wsg->sym->expr->compile, name ) )
 			increment_name( name );
 		workspace_link( ws, wsg, name );
@@ -1576,17 +1567,20 @@ workspace_new( Workspacegroup *wsg, const char *name )
 /* Load into an empty workspace.
  */
 static gboolean
-workspace_load_empty( Workspace *ws, Workspacegroup *wsg, const char *filename )
+workspace_load_empty( Workspace *ws, Workspacegroup *wsg, 
+	const char *filename, const char *filename_user )
 {
 	g_assert( workspace_is_empty( ws ) );
 
 	ws->load_type = WORKSPACE_LOAD_TOP;
 	column_set_offset( WORKSPACEVIEW_MARGIN_LEFT, 
 		WORKSPACEVIEW_MARGIN_TOP );
-	if( !filemodel_load_all( FILEMODEL( ws ), MODEL( wsg ), filename ) ) 
+	if( !filemodel_load_all( FILEMODEL( ws ), MODEL( wsg ), 
+		filename, filename_user ) ) 
 		return( FALSE );
 	filemodel_set_modified( FILEMODEL( ws ), FALSE );
-	filemodel_set_filename( FILEMODEL( ws ), filename );
+	filemodel_set_filename( FILEMODEL( ws ), 
+		filename_user ? filename_user : filename );
 
 	return( TRUE );
 }
@@ -1594,7 +1588,8 @@ workspace_load_empty( Workspace *ws, Workspacegroup *wsg, const char *filename )
 /* New workspace from a file.
  */
 Workspace *
-workspace_new_from_file( Workspacegroup *wsg, const char *filename )
+workspace_new_from_file( Workspacegroup *wsg, 
+	const char *filename, const char *filename_user )
 {
 	Workspace *ws;
 
@@ -1603,7 +1598,7 @@ workspace_new_from_file( Workspacegroup *wsg, const char *filename )
 #endif /*DEBUG*/
 
 	ws = WORKSPACE( g_object_new( TYPE_WORKSPACE, NULL ) );
-	if( !workspace_load_empty( ws, wsg, filename ) ) {
+	if( !workspace_load_empty( ws, wsg, filename, filename_user ) ) {
 		g_object_unref( G_OBJECT( ws ) );
 		return( NULL );
 	}
@@ -1660,14 +1655,15 @@ workspace_new_blank( Workspacegroup *wsg, const char *name )
  * like workspace_new_from_file() instead.
  */
 gboolean
-workspace_merge_file( Workspace *ws, const char *filename )
+workspace_merge_file( Workspace *ws, 
+	const char *filename, const char *filename_user )
 {
 	if( workspace_is_empty( ws ) ) {
 		model_empty( MODEL( ws ) );
 
 		if( !workspace_load_empty( ws, 
 			WORKSPACEGROUP( ICONTAINER( ws )->parent ), 
-			filename ) ) 
+			filename, filename_user ) ) 
 			return( FALSE );
 	}
 	else {
@@ -1676,7 +1672,8 @@ workspace_merge_file( Workspace *ws, const char *filename )
 			IM_RECT_RIGHT( &ws->area ) + WORKSPACEVIEW_MARGIN_LEFT,
 			WORKSPACEVIEW_MARGIN_TOP );
 		if( !filemodel_load_all( FILEMODEL( ws ), 
-			MODEL( ICONTAINER( ws )->parent ), filename ) ) 
+			MODEL( ICONTAINER( ws )->parent ), 
+			filename, filename_user ) ) 
 			return( FALSE );
 
 		filemodel_set_modified( FILEMODEL( ws ), TRUE );
@@ -1688,13 +1685,14 @@ workspace_merge_file( Workspace *ws, const char *filename )
 /* Merge file into the current column of this workspace.
  */
 gboolean
-workspace_merge_column_file( Workspace *ws, const char *filename )
+workspace_merge_column_file( Workspace *ws, 
+	const char *filename, const char *filename_user )
 {
 	ws->load_type = WORKSPACE_LOAD_ROWS;
 	column_set_offset( IM_RECT_RIGHT( &ws->area ), 
 		IM_RECT_BOTTOM( &ws->area ) );
 	if( !filemodel_load_all( FILEMODEL( ws ), 
-		MODEL( ICONTAINER( ws )->parent ), filename ) ) 
+		MODEL( ICONTAINER( ws )->parent ), filename, filename_user ) ) 
 		return( FALSE );
 
 	filemodel_set_modified( FILEMODEL( ws ), TRUE );
@@ -1766,7 +1764,7 @@ workspace_clone( Workspace *ws )
 {
 	Workspacegroup *wsg = WORKSPACEGROUP( ICONTAINER( ws )->parent );
 	Workspace *nws;
-	char filename[4096];
+	char filename[FILENAME_MAX];
 
 	/* Make a name for our clone file.
 	 */
@@ -1776,15 +1774,12 @@ workspace_clone( Workspace *ws )
 
 	/* Try to load the clone file back again.
 	 */
-	if( !(nws = workspace_new_from_file( wsg, filename )) ) {
+	if( !(nws = workspace_new_from_file( wsg, 
+		filename, FILEMODEL( ws )->filename )) ) {
 		unlinkf( "%s", filename );
 		return( NULL );
 	}
 	unlinkf( "%s", filename );
-
-	/* Get rid of the crazy "nip-x-xxxx.ws" filename.
-	 */
-	filemodel_set_filename( FILEMODEL( nws ), NULL );
 
 	return( nws );
 }

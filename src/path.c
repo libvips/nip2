@@ -102,18 +102,22 @@ path_rewrite_add( const char *old, const char *new )
 
 	g_return_if_fail( old );
 
-	/* We want the paths in canonical form, with a trailing '/'. The
+	/* We want the old path in long form, with a trailing '/'. The
 	 * trailing '/' will stop us rewriting filenames.
+	 *
+	 * If we keep all @old paths in long form we can avoid rewrite loops.
 	 */
 	im_strncpy( old_buf, old, FILENAME_MAX );
 	strcat( old_buf, G_DIR_SEPARATOR_S );
-	path_compact( old_buf );
+	path_expand( old_buf );
 	old = old_buf;
 
 	if( new ) {
+		/* We must keep the new path in short (unexpanded) form, 
+		 * obviously.
+		 */
 		im_strncpy( new_buf, new, FILENAME_MAX );
 		strcat( new_buf, G_DIR_SEPARATOR_S );
-		path_compact( new_buf );
 		new = new_buf;
 	}
 
@@ -216,6 +220,20 @@ path_rewrite( char *buf )
 #endif /*DEBUG_REWRITE*/
 }
 
+/* The inverse: rewrite in long form ready for file ops.
+ */
+void
+path_expand( char *path )
+{
+	char buf[FILENAME_MAX];
+
+	expand_variables( path, buf );
+	nativeize_path( buf );
+	absoluteize_path( buf );
+	canonicalize_path( buf );
+	im_strncpy( path, buf, FILENAME_MAX );
+}
+
 /* Rewite a path to compact form. @path must be FILENAME_MAX characters.
  *
  * Examples:
@@ -227,12 +245,7 @@ path_rewrite( char *buf )
 void
 path_compact( char *path )
 {
-	char buf[FILENAME_MAX];
-
-	expand_variables( path, buf );
-	nativeize_path( path );
-	absoluteize_path( path );
-	canonicalize_path( path );
+	path_expand( path );
 	path_rewrite( path );
 }
 

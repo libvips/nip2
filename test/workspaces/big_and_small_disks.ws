@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.28.0">
-	<Workspace window_x="0" window_y="0" window_width="1280" window_height="770" filename="/home/john/GIT/nip2/test/workspaces/big_and_small_disks.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="359" lpane_open="false" rpane_position="1274" rpane_open="false" local_defs="// private definitions for this workspace&#10;summit in mask = class Image value {&#10;&#9;value = im_compass in mask;&#10;}&#10;&#10;main = WWWW7;" name="big_and_small_disks" caption="Default empty workspace">
+  <Workspace window_x="0" window_y="0" window_width="1280" window_height="770" filename="$HOME/GIT/nip2/test/workspaces/big_and_small_disks.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="359" lpane_open="false" rpane_position="1274" rpane_open="false" local_defs="// private definitions for this workspace&#10;summit in mask = class Image value {&#10;&#9;value = im_compass in mask;&#10;}&#10;&#10;main = WWWW7;" name="big_and_small_disks" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="true" sform="false" next="9" name="J" caption="input image">
       <Subcolumn vislevel="3">
         <Row popup="false" name="J3">
           <Rhs vislevel="2" flags="5">
             <iImage window_x="0" window_y="0" window_width="1674" window_height="999" image_left="1807" image_top="543" image_mag="1" show_status="false" show_paintbox="false" show_convert="false" show_rulers="true" scale="1" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-	    <iText formula="Image_file &quot;/home/john/GIT/nip2/test/workspaces/gold_sample.v&quot;"/>
+            <iText formula="Image_file &quot;$HOME/GIT/nip2/test/workspaces/gold_sample.v&quot;"/>
           </Rhs>
         </Row>
         <Row popup="false" name="J6">

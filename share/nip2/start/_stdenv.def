@@ -228,37 +228,49 @@ meang x
 
 skew x
 	= oo_unary_function skew_op x, is_class x
-	= sum ((x - m) ** 3) / ((N - 1) * s ** 3), is_image x || is_list x
+	= sum ((x - m) ** 3) / ((N - 1) * s ** 3), is_image x 
+	= sum ((Group x' - m) ** 3).value / ((N - 1) * s ** 3), is_list x
 	= error (_ "bad arguments (" ++ print x ++ ") to " ++ "skew")
 {
 	skew_op = Operator "skew" skew Operator_type.COMPOUND false;
 
-	m = mean x;
-	s = deviation x;
-	w = get_width x;
-	h = get_height x;
-	b = get_bands x;
+	// squash any large matrix down to a flat list ... much simpler
+	x' 
+		= x, is_image x;
+		= flatten x;
 
-	N
-		= len x, is_list x
-		= w * h * b;
+	m = mean x';
+	s = deviation x';
+	w = get_width x';
+	h = get_height x';
+	b = get_bands x';
+
+	N 
+		= w * h * b, is_image x'
+		= len x';
 }
 
 kurtosis x
 	= oo_unary_function kurtosis_op x, is_class x
-	= sum ((x - m) ** 4) / ((N - 1) * s ** 4), is_image x || is_list x
+	= sum ((x - m) ** 4) / ((N - 1) * s ** 4), is_image x 
+	= sum ((Group x' - m) ** 4).value / ((N - 1) * s ** 4), is_list x
 	= error (_ "bad arguments (" ++ print x ++ ") to " ++ "kurtosis")
 {
 	kurtosis_op = Operator "kurtosis" kurtosis Operator_type.COMPOUND false;
 
-	m = mean x;
-	s = deviation x;
-	w = get_width x;
-	h = get_height x;
-	b = get_bands x;
+	// squash any large matrix down to a flat list ... much simpler
+	x' 
+		= x, is_image x;
+		= flatten x;
+
+	m = mean x';
+	s = deviation x';
+	w = get_width x';
+	h = get_height x';
+	b = get_bands x';
 
 	N
-		= len x, is_list x;
+		= len x', is_list x';
 		= w * h * b;
 }
 

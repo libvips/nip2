@@ -78,6 +78,19 @@ filter fn l
 		= l;
 }
 
+/* flatten x: flatten a list of lists of things into a simple list
+ *
+ * flatten :: [[*]] -> [*]
+ */
+flatten x
+	= foldr flat [] x, is_list x
+	= x
+{
+	flat x sofar
+		= foldr flat sofar x, is_list x
+		= x : sofar;
+}
+
 /* foldl fn st l: fold list l from the left with function fn and start st
  *
  * Start from the left hand end of the list (unlike foldr, see below). 

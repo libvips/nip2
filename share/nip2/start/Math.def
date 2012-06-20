@@ -463,6 +463,16 @@ Math_stats_item = class
 		action a = map_unary deviationze a;
 	}
 
+	Skew_item = class 
+		Menuaction "S_kew" "skew of image or list or vector" {
+		action a = map_unary skew a;
+	}
+
+	Kurtosis_item = class 
+		Menuaction "Kurtosis" "kurtosis of image or list or vector" {
+		action a = map_unary kurtosis a;
+	}
+
 	Stats_item = class 
 		Menuaction "Ma_ny Stats" "calculate many stats in a single pass" {
 		action a = map_unary stats a;

@@ -1,3 +1,6 @@
+started 7.29.0  20/6/12
+- addesd skew and kurtosis
+
 started 7.28.5, 8/5/12
 - change keybinding for Delete to ctrl+bsp to work around a GTK bug
 - rewrite filenames on workspace load, file selection and file drag-drop

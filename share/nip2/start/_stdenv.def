@@ -226,6 +226,42 @@ meang x
 		= fn x;
 }
 
+skew x
+	= oo_unary_function skew_op x, is_class x
+	= sum ((x - m) ** 3) / ((N - 1) * s ** 3), is_image x || is_list x
+	= error (_ "bad arguments (" ++ print x ++ ") to " ++ "skew")
+{
+	skew_op = Operator "skew" skew Operator_type.COMPOUND false;
+
+	m = mean x;
+	s = deviation x;
+	w = get_width x;
+	h = get_height x;
+	b = get_bands x;
+
+	N
+		= len x, is_list x
+		= w * h * b;
+}
+
+kurtosis x
+	= oo_unary_function kurtosis_op x, is_class x
+	= sum ((x - m) ** 4) / ((N - 1) * s ** 4), is_image x || is_list x
+	= error (_ "bad arguments (" ++ print x ++ ") to " ++ "kurtosis")
+{
+	kurtosis_op = Operator "kurtosis" kurtosis Operator_type.COMPOUND false;
+
+	m = mean x;
+	s = deviation x;
+	w = get_width x;
+	h = get_height x;
+	b = get_bands x;
+
+	N
+		= len x, is_list x;
+		= w * h * b;
+}
+
 // zero-excluding mean
 meanze x
 	= oo_unary_function meanze_op x, is_class x

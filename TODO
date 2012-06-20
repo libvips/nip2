@@ -11,22 +11,6 @@
 
 	use first line of previous comment as docs
 
-- add skew, kurtosis to stats? we can make it work for lists and matrices
-  anyway
-
-  	m = mean x;
-	s = deviation x;
-
-	skew = sum ((x - mean) ** 3) / ((len x - 1) * s ** 3)
-
-	kurtosis = sum ((x - mean) ** 4) / ((len x - 1) * s ** 4)
-
-  actually, we could calculate those for an image pretty easily
-
-  does sum work on an image? easy to make it work
-
-  (product image) would be hard I guess
-
 
 
 - colour find needs a "leave brightness" option

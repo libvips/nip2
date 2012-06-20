@@ -1,4 +1,33 @@
-- test speed again vs. 7.26
+- program browser
+
+	eg. "what's the function that finds geometric mean?"
+
+	open the programming browser to the right og the programming window
+	(maybe use the pane system?)
+
+	type "mean" in the search bar
+
+	of the several things that are displayed, "meang" is the one we want
+
+	use first line of previous comment as docs
+
+- add skew, kurtosis to stats? we can make it work for lists and matrices
+  anyway
+
+  	m = mean x;
+	s = deviation x;
+
+	skew = sum ((x - mean) ** 3) / ((len x - 1) * s ** 3)
+
+	kurtosis = sum ((x - mean) ** 4) / ((len x - 1) * s ** 4)
+
+  actually, we could calculate those for an image pretty easily
+
+  does sum work on an image? easy to make it work
+
+  (product image) would be hard I guess
+
+
 
 - colour find needs a "leave brightness" option
 

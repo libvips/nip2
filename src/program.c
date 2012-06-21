@@ -1826,6 +1826,16 @@ static const char *program_menubar_ui_description =
 "  </menubar>"
 "</ui>";
 
+static void
+program_lpane_changed_cb( Pane *pane, Program *program )
+{
+}
+
+static void
+program_rpane_changed_cb( Pane *pane, Program *program )
+{
+}
+
 gboolean
 program_select( Program *program, Model *model )
 {
@@ -2165,16 +2175,26 @@ program_build( Program *program, GtkWidget *vbox )
 			GTK_WIDGET( IWINDOW( program )->infobar ), 
 			FALSE, FALSE, 0 );
 
-	program->pane = gtk_hpaned_new();
-	gtk_paned_set_position( GTK_PANED( program->pane ), 
+	program->rpane = pane_new( PANE_HIDE_RIGHT );
+	g_signal_connect( program->rpane, "changed",
+		G_CALLBACK( program_rpane_changed_cb ), program );
+	gtk_box_pack_start( GTK_BOX( vbox ), 
+		GTK_WIDGET( program->rpane ), TRUE, TRUE, 0 );
+	gtk_widget_show( GTK_WIDGET( program->rpane ) );
+
+	program->lpane = pane_new( PANE_HIDE_LEFT );
+	g_signal_connect( program->lpane, "changed",
+		G_CALLBACK( program_lpane_changed_cb ), program );
+	gtk_paned_set_position( GTK_PANED( program->lpane ), 
 		program->pane_position );
-	gtk_box_pack_start( GTK_BOX( vbox ), program->pane, TRUE, TRUE, 0 );
-	gtk_widget_show( program->pane );
+	gtk_paned_pack1( GTK_PANED( program->rpane ), 
+		GTK_WIDGET( program->lpane ), TRUE, FALSE );
+	gtk_widget_show( GTK_WIDGET( program->lpane ) );
 
 	swin = gtk_scrolled_window_new( NULL, NULL );
 	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( swin ),
 		GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
-	gtk_paned_pack1( GTK_PANED( program->pane ), swin, FALSE, FALSE );
+	gtk_paned_pack1( GTK_PANED( program->lpane ), swin, FALSE, FALSE );
 	gtk_widget_show( swin );
 
 	program->store = gtk_tree_store_new( N_COLUMNS, 
@@ -2217,10 +2237,13 @@ program_build( Program *program, GtkWidget *vbox )
 		GTK_SIGNAL_FUNC( program_tree_event_cb ), program );
 	gtk_widget_show( program->tree );
 
+	/* browser goes in pack2 of rpane
+	 */
+
 	swin = gtk_scrolled_window_new( NULL, NULL );
 	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( swin ),
 		GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
-	gtk_paned_pack2( GTK_PANED( program->pane ), swin, TRUE, TRUE );
+	gtk_paned_pack2( GTK_PANED( program->lpane ), swin, TRUE, TRUE );
 	gtk_widget_show( swin );
 
 	program->text = program_text_new();
@@ -2240,7 +2263,7 @@ program_popdown( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys )
 	Program *program = PROGRAM( iwnd );
 
 	prefs_set( "PROGRAM_PANE_POSITION", "%d", 
-		gtk_paned_get_position( GTK_PANED( program->pane ) ) );
+		gtk_paned_get_position( GTK_PANED( program->lpane ) ) );
 
         if( program->dirty && !program_parse( program ) )
                 nfn( sys, IWINDOW_ERROR );

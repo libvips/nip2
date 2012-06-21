@@ -46,7 +46,8 @@ struct _Program {
 	gboolean dirty;		/* Has the text changed since we set it */
 	guint text_hash;	/* Hash of the last text we set */
 	GtkWidget *tree;
-	GtkWidget *pane;
+	Pane *lpane;
+	Pane *rpane;
 	int pane_position;
 	guint refresh_timeout;	/* Timeout for UI refresh */
 	guint select_changed_sid;	

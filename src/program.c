@@ -2140,6 +2140,8 @@ program_build( Program *program, GtkWidget *vbox )
 	GtkTreeViewColumn *column;
 	GtkTreeSelection *select;
 	GtkWidget *swin;
+	Panechild *panechild;
+	GtkWidget *ebox;
 
         /* Make main menu bar
          */
@@ -2237,8 +2239,17 @@ program_build( Program *program, GtkWidget *vbox )
 		GTK_SIGNAL_FUNC( program_tree_event_cb ), program );
 	gtk_widget_show( program->tree );
 
-	/* browser goes in pack2 of rpane
+	/* Toolkit Browser pane.
 	 */
+	panechild = panechild_new( program->rpane, _( "Definition Browser" ) );
+	pane_set_state( program->rpane, TRUE, 500 );
+
+	/* Have to put toolkitbrowser in an ebox so the search entry gets
+	 * clipped to the pane size.
+	 */
+	ebox = gtk_event_box_new();
+	gtk_container_add( GTK_CONTAINER( panechild ), GTK_WIDGET( ebox ) );
+	gtk_widget_show( ebox );
 
 	swin = gtk_scrolled_window_new( NULL, NULL );
 	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( swin ),

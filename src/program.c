@@ -319,11 +319,14 @@ program_row_lookup( Program *program, Model *model, GtkTreeIter *return_iter )
 static gboolean
 program_refresh_timeout( Program *program )
 {
-	GtkTreePath *path;
-	GtkTreeIter iter;
+	iWindow *iwnd = IWINDOW( program );
+	Model *model = program_get_selected( program );
 	GtkTreeSelection *select = 
 		gtk_tree_view_get_selection( GTK_TREE_VIEW( program->tree ) );
-	Model *model = program_get_selected( program );
+
+	GtkTreePath *path;
+	GtkTreeIter iter;
+        GtkAction *action;
 
 	program->refresh_timeout = 0;
 
@@ -389,6 +392,11 @@ program_refresh_timeout( Program *program )
 
 	g_signal_handler_unblock( G_OBJECT( select ), 
 		program->select_changed_sid );
+
+	action = gtk_action_group_get_action( iwnd->action_group, 
+		"DefBrowser" );
+	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
+		program->rpane->open );
 
 	return( FALSE );
 }
@@ -1631,6 +1639,17 @@ program_tool_help_action_cb( GtkAction *action, Program *program )
 	}
 }
 
+/* Expose/hide the definition browser.
+ */
+static void
+program_defbrowser_action_cb( GtkToggleAction *action, Program *program )
+{
+	if( gtk_toggle_action_get_active( action ) )
+		pane_animate_open( program->rpane );
+	else
+		pane_animate_closed( program->rpane );
+}
+
 /* Our actions.
  */
 static GtkActionEntry program_actions[] = {
@@ -1771,6 +1790,13 @@ static GtkActionEntry program_actions[] = {
 		G_CALLBACK( program_tool_help_action_cb ) }
 };
 
+static GtkToggleActionEntry program_toggle_actions[] = {
+	{ "DefBrowser",
+		NULL, N_( "Definition _Browser" ), NULL,
+		N_( "Show definition browser" ),
+		G_CALLBACK( program_defbrowser_action_cb ), FALSE }
+};
+
 static const char *program_menubar_ui_description =
 "<ui>"
 "  <menubar name='ProgramMenubar'>"
@@ -1812,6 +1838,9 @@ static const char *program_menubar_ui_description =
 "      <separator/>"
 "      <menuitem action='Info'/>"
 "    </menu>"
+"    <menu action='ViewMenu'>"
+"      <menuitem action='DefBrowser'/>"
+"    </menu>"
 "    <menu action='DebugMenu'>"
 "      <menuitem action='Trace'/>"
 "      <menuitem action='Errors'/>"
@@ -1834,6 +1863,13 @@ program_lpane_changed_cb( Pane *pane, Program *program )
 static void
 program_rpane_changed_cb( Pane *pane, Program *program )
 {
+	if( program->rpane_open != pane->open ||
+		program->rpane_position != pane->user_position ) {
+		program->rpane_open = pane->open;
+		program->rpane_position = pane->user_position;
+
+		program_refresh( program );
+	}
 }
 
 gboolean
@@ -2148,6 +2184,9 @@ program_build( Program *program, GtkWidget *vbox )
 	gtk_action_group_add_actions( iwnd->action_group, 
 		program_actions, G_N_ELEMENTS( program_actions ), 
 		GTK_WINDOW( program ) );
+	gtk_action_group_add_toggle_actions( iwnd->action_group, 
+		program_toggle_actions, G_N_ELEMENTS( program_toggle_actions ), 
+		GTK_WINDOW( program ) );
 
 	error = NULL;
 	if( !gtk_ui_manager_add_ui_from_string( iwnd->ui_manager,
@@ -2242,7 +2281,6 @@ program_build( Program *program, GtkWidget *vbox )
 	/* Toolkit Browser pane.
 	 */
 	panechild = panechild_new( program->rpane, _( "Definition Browser" ) );
-	pane_set_state( program->rpane, TRUE, 500 );
 
 	/* Have to put toolkitbrowser in an ebox so the search entry gets
 	 * clipped to the pane size.
@@ -2250,6 +2288,14 @@ program_build( Program *program, GtkWidget *vbox )
 	ebox = gtk_event_box_new();
 	gtk_container_add( GTK_CONTAINER( panechild ), GTK_WIDGET( ebox ) );
 	gtk_widget_show( ebox );
+
+	program->defbrowser = defbrowser_new();
+	vobject_link( VOBJECT( program->defbrowser ), 
+		IOBJECT( program->kitg ) );
+	defbrowser_set_program( program->defbrowser, program );
+	gtk_container_add( GTK_CONTAINER( ebox ), 
+		GTK_WIDGET( program->defbrowser ) );
+	gtk_widget_show( GTK_WIDGET( program->defbrowser ) );
 
 	swin = gtk_scrolled_window_new( NULL, NULL );
 	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( swin ),

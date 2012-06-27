@@ -283,6 +283,8 @@ my_sources = \
 	toolkitgroupview.h \
 	toolkitview.c \
 	toolkitview.h \
+	defbrowser.c \
+	defbrowser.h \
 	toolkitbrowser.c \
 	toolkitbrowser.h \
 	toolview.c \

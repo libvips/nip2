@@ -421,6 +421,7 @@ typedef void *(*tool_map_fn)( Tool *, void *, void * );
  */
 #include "workspacedefs.h"
 #include "toolkitbrowser.h"
+#include "defbrowser.h"
 #include "log.h"
 #include "error.h"
 #include "trace.h"

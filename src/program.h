@@ -47,8 +47,11 @@ struct _Program {
 	guint text_hash;	/* Hash of the last text we set */
 	GtkWidget *tree;
 	Pane *lpane;
-	Pane *rpane;
 	int pane_position;
+	Pane *rpane;
+	int rpane_position;
+	gboolean rpane_open;
+	Defbrowser *defbrowser;
 	guint refresh_timeout;	/* Timeout for UI refresh */
 	guint select_changed_sid;	
 	guint row_inserted_sid;	

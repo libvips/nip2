@@ -202,9 +202,9 @@ toolkitbrowser_get_selected( Toolkitbrowser *toolkitbrowser )
 static gboolean
 toolkitbrowser_activate_selected( Toolkitbrowser *toolkitbrowser )
 {
-	Toolitem *toolitem = toolkitbrowser_get_selected( toolkitbrowser ); 
+	Toolitem *toolitem;
 
-        if( toolitem ) {
+        if( (toolitem = toolkitbrowser_get_selected( toolkitbrowser )) ) {
 		if( !workspace_add_action( toolkitbrowser->mainw->ws, 
 			toolitem->name, toolitem->action, 
 			toolitem->action_sym->expr->compile->nparam ) )

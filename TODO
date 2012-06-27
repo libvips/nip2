@@ -1,15 +1,12 @@
 - program browser
 
-	eg. "what's the function that finds geometric mean?"
+	look at extract first line of previous comment, again
 
-	open the programming browser to the right og the programming window
-	(maybe use the pane system?)
+	as we cursor around the source code, display a tooltip with the
+	results of search?
 
-	type "mean" in the search bar
+	save / restore rpane position
 
-	of the several things that are displayed, "meang" is the one we want
-
-	use first line of previous comment as docs
 
 
 

@@ -28,8 +28,8 @@
  */
 
 /*
-#define DEBUG
  */
+#define DEBUG
 
 #include "ip.h"
 
@@ -38,10 +38,10 @@ static ViewClass *parent_class = NULL;
 /* Our columns.
  */
 enum {
-	TOOLTIP_COLUMN,		/* Visible columns */
-	MENU_COLUMN, 		
-	NPARAM_COLUMN,
-	TOOLITEM_COLUMN,	/* Secret column */
+	NAME_COLUMN,			/* Kit or tool name */
+	TOOLTIP_COLUMN,	
+	TOOL_POINTER_COLUMN,		/* Pointer to tool */
+	KIT_POINTER_COLUMN,		/* Pointer to kit (if no tool) */
 	N_COLUMNS
 };
 
@@ -55,53 +55,33 @@ defbrowser_destroy( GtkObject *object )
 	GTK_OBJECT_CLASS( parent_class )->destroy( object );
 }
 
-static void *
-defbrowser_rebuild_item_sub( Symbol *param, VipsBuf *buf )
+static void 
+defbrowser_rebuild_item3( Defbrowser *defbrowser, 
+	const char *name, const char *tip, 
+	Tool *tool, Toolkit *kit )
 {
-	vips_buf_appends( buf, " " );
-	vips_buf_appends( buf, IOBJECT( param )->name );
+	GtkTreeIter iter;
 
-	return( NULL );
-}
-
-static void *
-defbrowser_rebuild_item3( Toolitem *toolitem,
-	Defbrowser *defbrowser )
-{
-	if( !toolitem->is_pullright && 
-		!toolitem->is_separator &&
-		toolitem->compile ) {
-		char txt[256];
-		VipsBuf buf = VIPS_BUF_STATIC( txt );
-		GtkTreeIter iter;
-
-		if( toolitem->action_sym && 
-			toolitem->action_sym->expr &&
-			toolitem->action_sym->expr->compile->param ) 
-			slist_map( toolitem->action_sym->expr->compile->param,
-				(SListMapFn) defbrowser_rebuild_item_sub, 
-				&buf );
-
-		gtk_list_store_append( defbrowser->store, &iter );
-		gtk_list_store_set( defbrowser->store, &iter,
-			TOOLTIP_COLUMN, toolitem->tooltip,
-			MENU_COLUMN, toolitem->user_path,
-			NPARAM_COLUMN, vips_buf_all( &buf ),
-			TOOLITEM_COLUMN, toolitem,
-			-1 );
-	}
-
-	slist_map( toolitem->children,
-		(SListMapFn) defbrowser_rebuild_item3, defbrowser );
-
-	return( NULL );
+	gtk_list_store_append( defbrowser->store, &iter );
+	gtk_list_store_set( defbrowser->store, &iter,
+		NAME_COLUMN, name, 
+		TOOLTIP_COLUMN, tip,
+		TOOL_POINTER_COLUMN, tool,
+		KIT_POINTER_COLUMN, kit,
+		-1 );
 }
 
 static void *
 defbrowser_rebuild_item2( Tool *tool, Defbrowser *defbrowser )
 {
 	if( tool->toolitem )
-		defbrowser_rebuild_item3( tool->toolitem, defbrowser );
+		defbrowser_rebuild_item3( defbrowser, 
+			IOBJECT( tool )->name, tool->toolitem->help,
+			tool, tool->kit );
+	else
+		defbrowser_rebuild_item3( defbrowser,
+			IOBJECT( tool )->name, NULL,
+			tool, tool->kit );
 
 	return( NULL );
 }
@@ -155,10 +135,14 @@ defbrowser_entry_changed_cb( GtkEditable *editable,
 }
 
 static gboolean
-defbrowser_rebuild_test( Toolitem *toolitem, const char *text )
+defbrowser_rebuild_test( Tool *tool, const char *text )
 {
-	if( my_strcasestr( toolitem->user_path, text ) || 
-		my_strcasestr( toolitem->tooltip, text ) )
+	if( tool->toolitem &&
+		tool->toolitem->tooltip ) {
+		if( my_strcasestr( tool->toolitem->tooltip, text ) )
+			return( TRUE );
+	}
+	if( my_strcasestr( IOBJECT( tool )->name, text ) )
 		return( TRUE );
 
 	return( FALSE );
@@ -171,29 +155,31 @@ defbrowser_visible_func( GtkTreeModel *model, GtkTreeIter *iter,
 	Defbrowser *defbrowser = DEFBROWSER( data );
 	const char *text = gtk_entry_get_text( 
 		GTK_ENTRY( defbrowser->entry ) );
-	Toolitem *toolitem;
+	Tool *tool;
 
-	gtk_tree_model_get( model, iter, TOOLITEM_COLUMN, &toolitem, -1 );
-	if( !toolitem )
+	gtk_tree_model_get( model, iter, 
+		TOOL_POINTER_COLUMN, &tool, 
+		-1 );
+	if( !tool )
 		return( FALSE );
 
-	return( defbrowser_rebuild_test( toolitem, text ) );
+	return( defbrowser_rebuild_test( tool, text ) );
 }
 
-static Toolitem *
+static Tool *
 defbrowser_get_selected( Defbrowser *defbrowser )
 {
 	GtkTreeSelection *selection = gtk_tree_view_get_selection( 
 		GTK_TREE_VIEW( defbrowser->tree ) );
 	GtkTreeIter iter;
 	GtkTreeModel *model;
-	Toolitem *toolitem; 
+	Tool *tool; 
 
         if( gtk_tree_selection_get_selected( selection, &model, &iter ) ) {
 		gtk_tree_model_get( model, &iter, 
-			TOOLITEM_COLUMN, &toolitem, -1 );
+			TOOL_POINTER_COLUMN, &tool, -1 );
 
-		return( toolitem );
+		return( tool );
         }
 
 	return( NULL );
@@ -202,16 +188,11 @@ defbrowser_get_selected( Defbrowser *defbrowser )
 static gboolean
 defbrowser_activate_selected( Defbrowser *defbrowser )
 {
-	Toolitem *toolitem = defbrowser_get_selected( defbrowser ); 
+	Tool *tool;
 
-        if( toolitem ) {
-		/*
-		if( !workspace_add_action( defbrowser->mainw->ws, 
-			toolitem->name, toolitem->action, 
-			toolitem->action_sym->expr->compile->nparam ) )
+        if( (tool = defbrowser_get_selected( defbrowser )) )
+		if( !program_select( defbrowser->program, MODEL( tool ) ) )
 			return( FALSE );
-		 */
-        }
 
 	return( TRUE );
 }
@@ -251,7 +232,7 @@ defbrowser_init( Defbrowser *defbrowser )
 	defbrowser->store = gtk_list_store_new( N_COLUMNS, 
 		G_TYPE_STRING, 
 		G_TYPE_STRING,
-		G_TYPE_STRING,
+		G_TYPE_POINTER,
 		G_TYPE_POINTER );
 
 	defbrowser->filter = gtk_tree_model_filter_new( 
@@ -266,26 +247,14 @@ defbrowser_init( Defbrowser *defbrowser )
 		TRUE );
 
 	renderer = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes( _( "Action" ),
-		   renderer, "text", TOOLTIP_COLUMN, NULL );
-	gtk_tree_view_column_set_resizable( column, TRUE );
-	gtk_tree_view_column_set_reorderable( column, TRUE );
+	column = gtk_tree_view_column_new_with_attributes( _( "Name" ),
+		renderer, "text", NAME_COLUMN, NULL );
 	gtk_tree_view_append_column( GTK_TREE_VIEW( defbrowser->tree ), 
 		column );
 
 	renderer = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes( _( "Parameters" ),
-		   renderer, "text", NPARAM_COLUMN, NULL );
-	gtk_tree_view_column_set_resizable( column, TRUE );
-	gtk_tree_view_column_set_reorderable( column, TRUE );
-	gtk_tree_view_append_column( GTK_TREE_VIEW( defbrowser->tree ), 
-		column );
-
-	renderer = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes( _( "Menu Item" ),
-		   renderer, "text", MENU_COLUMN, NULL );
-	gtk_tree_view_column_set_resizable( column, TRUE );
-	gtk_tree_view_column_set_reorderable( column, TRUE );
+	column = gtk_tree_view_column_new_with_attributes( _( "Tooltip" ),
+		renderer, "text", TOOLTIP_COLUMN, NULL );
 	gtk_tree_view_append_column( GTK_TREE_VIEW( defbrowser->tree ), 
 		column );
 

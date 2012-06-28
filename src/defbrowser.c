@@ -74,7 +74,8 @@ defbrowser_rebuild_item3( Defbrowser *defbrowser,
 static void *
 defbrowser_rebuild_item2( Tool *tool, Defbrowser *defbrowser )
 {
-	if( tool->toolitem )
+	if( tool->toolitem &&
+		tool->toolitem->help )
 		defbrowser_rebuild_item3( defbrowser, 
 			IOBJECT( tool )->name, tool->toolitem->help,
 			tool, tool->kit );
@@ -198,8 +199,7 @@ defbrowser_activate_selected( Defbrowser *defbrowser )
 }
 
 static void
-defbrowser_row_activated_cb( GtkTreeView *treeview,
-	GtkTreePath *arg1, GtkTreeViewColumn *arg2, 
+defbrowser_selection_changed_cb( GtkTreeSelection *select, 
 	Defbrowser *defbrowser )
 {
 	if( !defbrowser_activate_selected( defbrowser ) )
@@ -214,6 +214,7 @@ defbrowser_init( Defbrowser *defbrowser )
 	GtkTreeViewColumn *column;
 	GtkWidget *label;
 	GtkWidget *swin;
+	GtkTreeSelection *select;
 
 	defbrowser->top = gtk_hbox_new( FALSE, 12 );
 	defbrowser->entry = gtk_entry_new();
@@ -258,9 +259,11 @@ defbrowser_init( Defbrowser *defbrowser )
 	gtk_tree_view_append_column( GTK_TREE_VIEW( defbrowser->tree ), 
 		column );
 
-	g_signal_connect( G_OBJECT( defbrowser->tree ), "row-activated",
-		  G_CALLBACK( defbrowser_row_activated_cb ), 
-		  defbrowser );
+	select = gtk_tree_view_get_selection( 
+		GTK_TREE_VIEW( defbrowser->tree ) );
+	gtk_tree_selection_set_mode( select, GTK_SELECTION_SINGLE );
+	g_signal_connect( G_OBJECT( select ), "changed",
+		G_CALLBACK( defbrowser_selection_changed_cb ), defbrowser );
 
 	swin = gtk_scrolled_window_new( NULL, NULL );
         gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( swin ),

@@ -28,8 +28,8 @@
  */
 
 /*
- */
 #define DEBUG
+ */
 
 #include "ip.h"
 
@@ -75,13 +75,13 @@ static void *
 defbrowser_rebuild_item2( Tool *tool, Defbrowser *defbrowser )
 {
 	if( tool->toolitem &&
-		tool->toolitem->help )
+		tool->toolitem->tooltip )
 		defbrowser_rebuild_item3( defbrowser, 
-			IOBJECT( tool )->name, tool->toolitem->help,
+			IOBJECT( tool )->name, tool->toolitem->tooltip,
 			tool, tool->kit );
 	else
 		defbrowser_rebuild_item3( defbrowser,
-			IOBJECT( tool )->name, NULL,
+			IOBJECT( tool )->name, tool->help,
 			tool, tool->kit );
 
 	return( NULL );
@@ -246,6 +246,8 @@ defbrowser_init( Defbrowser *defbrowser )
 		GTK_TREE_MODEL( defbrowser->filter ) );
 	gtk_tree_view_set_rules_hint( GTK_TREE_VIEW( defbrowser->tree ),
 		TRUE );
+	gtk_tree_view_set_headers_visible( GTK_TREE_VIEW( defbrowser->tree ), 
+		FALSE );
 
 	renderer = gtk_cell_renderer_text_new();
 	column = gtk_tree_view_column_new_with_attributes( _( "Name" ),

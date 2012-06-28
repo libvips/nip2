@@ -38,7 +38,6 @@
  */
 enum {
 	NAME_COLUMN,			/* Kit or tool name */
-	NAME_I18N_COLUMN,		/* Localised tool name */
 	TOOL_POINTER_COLUMN,		/* Pointer to tool */
 	KIT_POINTER_COLUMN,		/* Pointer to kit (if no tool) */
 	N_COLUMNS
@@ -114,7 +113,7 @@ program_refresh_trim( Program *program, GtkTreePath *path )
 
 static void
 program_refresh_update( Program *program, GtkTreePath *path,
-	const char *name, const char *name_i18n, Tool *tool, Toolkit *kit )
+	const char *name, Tool *tool, Toolkit *kit )
 {
 	GtkTreeIter iter;
 	
@@ -125,21 +124,18 @@ program_refresh_update( Program *program, GtkTreePath *path,
 		/* Node exists.
  		 */
 		char *store_name;
-		char *store_name_i18n;
 		Tool *store_tool;
 		Toolkit *store_kit;
 
 		gtk_tree_model_get( GTK_TREE_MODEL( program->store ), &iter,
 			NAME_COLUMN, &store_name,
-			NAME_I18N_COLUMN, &store_name_i18n,
 			TOOL_POINTER_COLUMN, &store_tool,
 			KIT_POINTER_COLUMN, &store_kit,
 			-1 );
 
 		if( tool != store_tool ||
 			kit != store_kit ||
-			my_strcmp( name, store_name ) != 0 ||
-			my_strcmp( name_i18n, store_name_i18n ) != 0 ) {
+			my_strcmp( name, store_name ) != 0 ) {
 #ifdef DEBUG_TREE
 			printf( "program_refresh_update: updating \"%s\"\n",
 				name );
@@ -147,14 +143,12 @@ program_refresh_update( Program *program, GtkTreePath *path,
 			gtk_tree_store_set( program->store, 
 				&iter,
 				NAME_COLUMN, name,
-				NAME_I18N_COLUMN, name_i18n,
 				TOOL_POINTER_COLUMN, tool,
 				KIT_POINTER_COLUMN, kit,
 				-1 );
 		}
 
 		g_free( store_name );
-		g_free( store_name_i18n );
 
 		/* Make sure tool nodes have no children ... this can happen 
 		 * after some drags.
@@ -197,7 +191,6 @@ program_refresh_update( Program *program, GtkTreePath *path,
 		gtk_tree_store_append( program->store, &iter, piter );
 		gtk_tree_store_set( program->store, &iter,
 			NAME_COLUMN, name,
-			NAME_I18N_COLUMN, name_i18n,
 			TOOL_POINTER_COLUMN, tool,
 			KIT_POINTER_COLUMN, kit,
 			-1 );
@@ -209,12 +202,10 @@ program_refresh_tool( Tool *tool, Program *program, GtkTreePath *path )
 {
 	if( tool->toolitem )
 		program_refresh_update( program, path,
-			IOBJECT( tool )->name, tool->toolitem->name,
-			tool, tool->kit );
+			IOBJECT( tool )->name, tool, tool->kit );
 	else
 		program_refresh_update( program, path,
-			IOBJECT( tool )->name, NULL,
-			tool, tool->kit );
+			IOBJECT( tool )->name, tool, tool->kit );
 
 	gtk_tree_path_next( path );
 
@@ -225,7 +216,7 @@ static void *
 program_refresh_kit( Toolkit *kit, Program *program, GtkTreePath *path )
 {
 	program_refresh_update( program, path,
-		IOBJECT( kit )->name, NULL, NULL, kit );
+		IOBJECT( kit )->name, NULL, kit );
 
 	gtk_tree_path_down( path );
 	toolkit_map( kit, 
@@ -2240,7 +2231,6 @@ program_build( Program *program, GtkWidget *vbox )
 
 	program->store = gtk_tree_store_new( N_COLUMNS, 
 		G_TYPE_STRING, 
-		G_TYPE_STRING,
 		G_TYPE_POINTER,
 		G_TYPE_POINTER );
 	program->row_inserted_sid = g_signal_connect( 
@@ -2258,15 +2248,12 @@ program_build( Program *program, GtkWidget *vbox )
 		renderer, "text", NAME_COLUMN, NULL );
 	gtk_tree_view_append_column( GTK_TREE_VIEW( program->tree ), column );
 
-	renderer = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes( _( "Name" ),
-		renderer, "text", NAME_I18N_COLUMN, NULL );
-	gtk_tree_view_append_column( GTK_TREE_VIEW( program->tree ), column );
-
 	g_signal_connect( G_OBJECT( program->tree ), "row_collapsed",
 		G_CALLBACK( program_row_collapsed_cb ), program );
 
 	gtk_container_add( GTK_CONTAINER( swin ), program->tree );
+	gtk_tree_view_set_headers_visible( GTK_TREE_VIEW( program->tree ), 
+		FALSE );
 	gtk_tree_view_set_enable_search( GTK_TREE_VIEW( program->tree ), TRUE );
 	gtk_tree_view_set_reorderable( GTK_TREE_VIEW( program->tree ), TRUE );
 	select = gtk_tree_view_get_selection( GTK_TREE_VIEW( program->tree ) );

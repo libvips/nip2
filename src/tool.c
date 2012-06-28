@@ -439,37 +439,9 @@ toolitem_set_tooltip( Toolitem *toolitem, PElement *root )
 			MEMBER_TOOLTIP, value, MAX_NAME ) ) {
 		IM_SETSTR( toolitem->tooltip, _( value ) );
 	}
-	else {
-		char *p;
-
-		if( (p = toolitem->compile->text) ) {
-			/* Skip leading whitespace.
-			 */
-			while( isspace( (int)(*p) ) )
-				p++;
-
-			/* Skip leading comment, if any.
-			 */
-			if( p[0] == '/' && p[1] == '*' )
-				p += 2;
-			else if( p[0] == '/' && p[1] == '/' )
-				p += 2;
-
-			/* Skip more whitespace.
-			 */
-			while( isspace( (int)(*p) ) )
-				p++;
-
-			/* Limit to MAX_NAME chars or 1st line. Strip trailing
-			 * whitespace.
-			 */
-			im_strncpy( value, p, MAX_NAME );
-			if( (p = strchr( value, '\n' )) )
-				*p = '\0';
-			*((char *) my_strrspn( value, WHITESPACE )) = '\0';
-			IM_SETSTR( toolitem->tooltip, value );
-		}
-	}
+	else if( toolitem->tool &&
+		toolitem->tool->help ) 
+		IM_SETSTR( toolitem->tooltip, toolitem->tool->help );
 }
 
 static void
@@ -777,6 +749,53 @@ tool_new_value_cb( Symbol *sym, Tool *tool )
 	tool_toolitem_rebuild( tool );
 }
 
+static void
+tool_set_help( Tool *tool ) 
+{
+	char *p;
+	char value[MAX_NAME];
+
+	if( tool->sym &&
+		tool->sym->expr &&
+		tool->sym->expr->compile &&
+		(p = tool->sym->expr->compile->text) ) {
+		/* Skip leading whitespace.
+		 */
+		while( isspace( (int)(*p) ) )
+			p++;
+
+		/* Skip leading comment, if any.
+		 */
+		if( p[0] == '/' && p[1] == '*' )
+			p += 2;
+		else if( p[0] == '/' && p[1] == '/' )
+			p += 2;
+
+		/* Skip more whitespace.
+		 */
+		while( isspace( (int)(*p) ) )
+			p++;
+
+		/* Limit to MAX_NAME chars or 1st line. Strip trailing
+		 * whitespace.
+		 */
+		im_strncpy( value, p, MAX_NAME );
+		if( (p = strchr( value, '\n' )) )
+			*p = '\0';
+		*((char *) my_strrspn( value, WHITESPACE )) = '\0';
+
+		IM_SETSTR( tool->help, value );
+	}
+	else if( tool->sym &&
+		tool->sym->type == SYM_EXTERNAL )
+		IM_SETSTR( tool->help, tool->sym->function->desc );
+	else if( tool->sym &&
+		tool->sym->type == SYM_BUILTIN )
+		IM_SETSTR( tool->help, tool->sym->builtin->desc );
+	else
+		IM_SETSTR( tool->help, NULL );
+}
+
 /* Add a symbol to a toolkit. 
  */
 Tool *
@@ -789,9 +808,11 @@ tool_new_sym( Toolkit *kit, int pos, Symbol *sym )
 	/* Is there a tool we can reuse? Don't update pos .. assume we want to
 	 * keep the old one.
 	 */
-	if( sym->tool && sym->tool->kit == kit ) {
-		sym->tool->lineno = -1;
-		return( sym->tool );
+	if( (tool = sym->tool) &&
+		tool->kit == kit ) {
+		tool->lineno = -1;
+		tool_set_help( tool );
+		return( tool );
 	}
 
 	/* Junk any existing tool for this sym.
@@ -811,6 +832,8 @@ tool_new_sym( Toolkit *kit, int pos, Symbol *sym )
 		G_CALLBACK( tool_new_value_cb ), tool );
 	tool->link_sym = sym;
 	tool_link( tool, kit, pos, IOBJECT( sym )->name );
+
+	tool_set_help( tool );
 
 #ifdef DEBUG
 	printf( "tool_new_sym: new tool for " );

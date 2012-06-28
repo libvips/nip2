@@ -110,6 +110,11 @@ struct _Tool {
 	int lineno;		/* -1 for not known, or lineno in kit */
 
 	Toolitem *toolitem;	/* Items made by this tool */
+
+	/* The first line of the comment prior to the definition. Toolitem help
+	 * and tooltip can be generated from the Menuitem members.
+	 */
+	char *help;		/* eg. "concat l: join a list of .." */
 };
 
 typedef struct _ToolClass {

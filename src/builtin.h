@@ -42,6 +42,7 @@ typedef void (*builtin_fn)( Reduce *, const char *, HeapNode **, PElement * );
  */
 struct _BuiltinInfo {
 	const char *name;
+	const char *desc;
 	gboolean override;
 	int nargs;
 	BuiltinTypeSpot **args;

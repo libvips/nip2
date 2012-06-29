@@ -8,6 +8,12 @@
 	save / restore rpane position
 
 
+- program window, type a few chars, ^Q, segv as it tries to parse during
+  shutdown
+
+  program should ref enough stuff that it's always functional
+
+
 
 
 - colour find needs a "leave brightness" option

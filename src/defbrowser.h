@@ -59,4 +59,5 @@ GtkType defbrowser_get_type( void );
 void defbrowser_set_program( Defbrowser *defbrowser, Program *program );
 Defbrowser *defbrowser_new( void );
 int defbrowser_get_width( Defbrowser *defbrowser );
+void defbrowser_set_filter( Defbrowser *defbrowser, const char *filter );
 

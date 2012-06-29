@@ -329,3 +329,11 @@ defbrowser_get_width( Defbrowser *defbrowser )
 	else
 		return( 200 );
 }
+
+/* Set the filter string.
+ */
+void
+defbrowser_set_filter( Defbrowser *defbrowser, const char *filter )
+{
+	gtk_entry_set_text( GTK_ENTRY( defbrowser->entry ), filter );
+}

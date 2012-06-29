@@ -1,6 +1,7 @@
 started 7.29.0  20/6/12
 - added skew and kurtosis
-- added Definition Browser to program window
+- added Definition Browser to program window, shows stuff as you program
+- program window cleanups
 
 started 7.28.5, 8/5/12
 - change keybinding for Delete to ctrl+bsp to work around a GTK bug

@@ -772,6 +772,8 @@ program_init( Program *program )
 	program->tree = NULL;
 	program->store = NULL;
 	program->pane_position = PROGRAM_PANE_POSITION;
+	program->rpane_open = FALSE;
+	program->rpane_position = 500;
 	program->refresh_timeout = 0;
 
 	program->kitgroup_changed_sid = 0;
@@ -1881,12 +1883,59 @@ program_select( Program *program, Model *model )
 	return( TRUE );
 }
 
+/* Is a character one of those allowed in nip2 identifers?
+ */
+static gboolean
+is_ident( int ch )
+{
+	if( isalnum( ch ) ||
+		ch == '_' ||
+		ch == '\'' )
+		return( TRUE );
+
+	return( FALSE );
+}
+
 static void
 program_text_changed( GtkTextBuffer *buffer, Program *program )
 {
 	if( !program->dirty ) {
 		program->dirty = TRUE;
 		program_refresh( program );
+	}
+
+	if( program->rpane_open ) {
+		/* Fetch characters left of the cursor while we have stuff
+		 * that could be an identifier.
+		 */
+		GtkTextIter start;
+		GtkTextIter end;
+		char *line;
+		char *p;
+
+		/* Set iter at cursor.
+		 */
+		gtk_text_buffer_get_iter_at_mark( buffer,
+			&end, gtk_text_buffer_get_insert( buffer ) );
+
+		/* Point an iter at the start of this line.
+		 */
+		gtk_text_buffer_get_iter_at_line_index( buffer,
+			&start, gtk_text_iter_get_line( &end ), 0 ); 
+
+		line = gtk_text_buffer_get_text( buffer, &start, &end, FALSE );
+
+		/* Search back from the end of the string for the start of the
+		 * identifier.
+		 */
+		for( p = line + strlen( line ) - 1; 
+			p >= line && is_ident( *p ); 
+			p-- )
+			;
+
+		defbrowser_set_filter( program->defbrowser, p + 1 );
+
+		g_free( line );
 	}
 }
 
@@ -2335,6 +2384,9 @@ program_link( Program *program, Toolkitgroup *kitg )
 	program->kitgroup_destroy_sid = 
 		g_signal_connect( G_OBJECT( program->kitg ), "destroy",
 			G_CALLBACK( program_kitgroup_destroy ), program );
+
+	pane_set_state( program->rpane, 
+		program->rpane_open, program->rpane_position );
 }
 
 Program *

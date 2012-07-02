@@ -307,24 +307,23 @@ Tasks_capture_item = class
 			// from greyscale)
 			linearising_lut = Plot [$ymin => 0] _linear_lut;
 
-			// map the original image through the lineariser to 
-			// get linear 0-1 RGB image
-			_image' = hist_map linearising_lut.value image.value;
+			// map an image though the lineariser
+			linear x
+				= x, mode == 0
+				= hist_map linearising_lut.value x;
 
-			// remeasure and solve for RGB -> XYZ
-			_camera' = im_measure _image' 0 0 image.width image.height 6 4;
+			// map the chart measurements though the lineariser
+			_camera' = (to_matrix @ linear @ to_image) _camera;
+
+			// solve for RGB -> XYZ
 			_pinv = (transpose _camera' * _camera') ** -1;
 			M = transpose (_pinv * transpose _camera' * _true_XYZ);
 
-			// convert linear RGB camera to Lab 
-			_result = (Image @
-				colour_transform Image_type.XYZ Image_type.LAB @
-				cast_float @
-				recomb M) _image';
-
-			// measure again and compute dE76
-			_camera'' = im_measure _result.value 0 0 
-				image.width image.height 6 4;
+			// now turn the camera to LAB and calculate dE76
+			_camera'' = (to_matrix @ 
+				colour_transform Image_type.XYZ Image_type.LAB @ 
+				recomb M @ 
+				to_image) _camera';
 
 			_dEs = map abs_vec (_camera'' - _true_Lab).value;
 			final_dE76 = mean _dEs;
@@ -339,6 +338,13 @@ Tasks_capture_item = class
 					= macbeth_names?i, i >= 0 && i < len macbeth_names
 					= "Unknown";
 			}
+
+			// convert RGB camera to Lab
+			_result = (Image @
+				colour_transform Image_type.XYZ Image_type.LAB @
+				recomb M @
+				cast_float @
+				linear) image.value;
 		}
 	}
 
@@ -360,7 +366,9 @@ Tasks_capture_item = class
 
 				// map the original image through the lineariser to get 
 				// linear 0-1 RGB image
-				image' = hist_map calib.linearising_lut image;
+				image' 
+					= image, calib.mode == 0
+					= hist_map calib.linearising_lut image;
 
 				// convert linear RGB camera to Lab 
 				result = colour_transform Image_type.XYZ Image_type.LAB 

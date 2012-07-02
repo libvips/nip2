@@ -1,13 +1,3 @@
-- program browser
-
-	look at extract first line of previous comment, again
-
-	as we cursor around the source code, display a tooltip with the
-	results of search?
-
-	save / restore rpane position
-
-
 - program window, type a few chars, ^Q, segv as it tries to parse during
   shutdown
 

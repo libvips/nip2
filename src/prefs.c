@@ -226,7 +226,8 @@ prefs_set( const char *name, const char *fmt, ... )
 {
 	Watch *watch;
 
-	if( (watch = watch_find( main_watchgroup, name )) ) {
+	if( main_watchgroup &&
+		(watch = watch_find( main_watchgroup, name )) ) {
 		va_list args;
 
 		va_start( args, fmt );

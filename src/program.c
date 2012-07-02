@@ -2358,10 +2358,10 @@ program_popdown( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys )
 	prefs_set( "PROGRAM_PANE_POSITION", "%d", 
 		gtk_paned_get_position( GTK_PANED( program->lpane ) ) );
 
-        if( program->dirty && !program_parse( program ) )
-                nfn( sys, IWINDOW_ERROR );
-        else
-                nfn( sys, IWINDOW_YES );
+	/* We can't parse in popdown, we may have lost too much of the rest of 
+	 * nip2 before here.
+	 */
+	nfn( sys, IWINDOW_YES );
 }
 
 static void

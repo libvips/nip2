@@ -1122,7 +1122,7 @@ workspace_load_toolkit( const char *filename, Toolkitgroup *toolkitgroup )
 	return( NULL );
 }
 
-/* The compat modes this version of nip2 has. Search the compar dir and make a
+/* The compat modes this version of nip2 has. Search the compat dir and make a
  * list of these things.
  */
 #define MAX_COMPAT (100)

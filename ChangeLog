@@ -5,6 +5,7 @@ started 7.29.0  20/6/12
 - Find calib is much faster and handles linear float input better
 - Find calib optionally leaves brightness untouched
 - Apply calib handles linear float input better
+- add a 7.28 compat area
 
 started 7.28.5, 8/5/12
 - change keybinding for Delete to ctrl+bsp to work around a GTK bug

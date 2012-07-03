@@ -1,0 +1,447 @@
+
+/* is_colour_space str: is a string one of nip's colour space names
+ */
+is_colour_space str = Image_type.colour_spaces.present 0 str;
+
+/* is_colour_type n: is a number one of VIPS's colour spaces
+ */
+is_colour_type n = Image_type.colour_spaces.present 1 n;
+
+/* is_number: is a real or a complex number.
+ */
+is_number a = is_real a || is_complex a;
+
+/* is_int: is an integer
+ */
+is_int a = is_real a && a == (int) a;
+
+/* is_uint: is an unsigned integer
+ */
+is_uint a = is_int a && a >= 0;
+
+/* is_pint: is a positive integer
+ */
+is_pint a = is_int a && a > 0;
+
+/* is_preal: is a positive real
+ */
+is_preal a = is_real a && a > 0;
+
+/* is_ureal: is an unsigned real
+ */
+is_ureal a = is_real a && a >= 0;
+
+/* is_letter c: true if character c is an ASCII letter
+ *
+ * is_letter :: char -> bool
+ */
+is_letter c = ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+
+/* is_digit c: true if character c is an ASCII digit
+ *
+ * is_digit :: char->bool
+ */
+is_digit x = '0' <= x && x <= '9';
+
+/* A whitespace character.
+ *
+ * is_space :: char->bool
+ */
+is_space = member " \n\t";
+
+/* List str starts with section prefix.
+ *
+ * is_prefix "hell" "hello world!" == true
+ * is_prefix :: [*] -> [*] -> bool
+ */
+is_prefix prefix str = take (len prefix) str == prefix;
+
+/* List str ends with section suffix.
+ *
+ * is_suffix "ld!" "hello world!" == true
+ * is_suffix :: [*] -> [*] -> bool
+ */
+is_suffix suffix str = take (len suffix) (reverse str) == reverse suffix;
+
+/* List contains seqence.
+ *
+ * is_substr "llo" "hello world!" == true
+ * is_substr :: [*] -> [*] -> bool
+ */
+is_substr seq str = any (map (is_prefix seq) (iterate tl str));
+
+/* is_listof p s: true if finite list with p true for every element.
+ */
+is_listof p l = is_list l && all (map p l);
+
+/* is_string s: true if finite list of char.
+ */
+is_string s = is_listof is_char s;
+
+/* is_real_list l: is l a list of real numbers ... test each element,
+ * so no infinite lists pls.
+ */
+is_real_list l = is_listof is_real l;
+
+/* is_string_list l: is l a finite list of finite strings.
+ */
+is_string_list l = is_listof is_string l;
+
+/* Test list length ... quicker than len x == n for large lists.
+ */
+is_list_len n x
+	= true, x == [] && n == 0
+	= false, x == [] || n == 0
+	= is_list_len (n - 1) (tl x);
+
+is_list_len_more n x
+	= true, x != [] && n == 0
+	= false, x == [] || n == 0
+	= is_list_len_more (n - 1) (tl x);
+
+is_list_len_more_equal n x
+	= true, n == 0
+	= false, x == [] 
+	= is_list_len_more_equal (n - 1) (tl x);
+
+/* is_rectangular l: is l a rectangular data structure
+ */
+is_rectangular l
+	= true, !is_list l
+	= true, all (map is_obj l)
+	= true, all (map is_list l) &&
+		all (map (not @ is_obj) l) &&
+		all (map is_rectangular l) &&
+		is_list_len_more 0 l &&
+		all (map (is_list_len (len (hd l))) (tl l))
+	= false
+{
+	// treat strings as a base type, not [char]
+	is_obj x = !is_list x || is_string x;
+}
+
+/* is_matrix l: is l a list of lists of real numbers, all the same length
+ *
+ * [[]] is the empty matrix, [] is the empty list ... disallow []
+ */
+is_matrix l = l != [] && is_listof is_real_list l && is_rectangular l;
+
+/* is_square_matrix l: is l a matrix with width == height
+ */
+is_square_matrix l
+      = true, l == [[]]
+      = is_matrix l && is_list_len (len (hd l)) l;
+
+/* is_oddmatrix l: is l a matrix with odd-length sides
+ */
+is_oddmatrix l
+      = true, l == [[]]
+      = is_matrix l && len l % 2 == 1 && len l?0 % 2 == 1;
+
+/* is_odd_square_matrix l: is l a square_matrix with odd-length sides
+ */
+is_odd_square_matrix l = is_square_matrix l && len l % 2 == 1;
+
+/* Is an item in a column of a table?
+ */
+is_incolumn n table x = member (map (extract n) table) x;
+
+/* Is HGuide or VGuide.
+ */
+is_HGuide x = is_instanceof "HGuide" x;
+
+is_VGuide x = is_instanceof "VGuide" x;
+
+is_Guide x = is_HGuide x || is_VGuide x;
+
+is_Mark x = is_instanceof "Mark" x;
+
+is_Group x = is_instanceof "Group" x;
+
+is_NULL x = is_instanceof "NULL" x;
+
+is_List x = is_instanceof "List" x;
+
+is_Image x = is_instanceof "Image" x;
+
+is_Region x = is_instanceof "Region" x;
+
+is_Real x = is_instanceof "Real" x;
+
+is_Matrix x = is_instanceof "Matrix_base" x;
+
+is_Vector x = is_instanceof "Vector" x;
+
+is_Colour x = is_instanceof "Colour" x;
+
+is_Arrow x = is_instanceof "Arrow" x;
+
+is_Bool x = is_instanceof "Bool" x;
+
+is_Scale x = is_instanceof "Scale" x;
+
+is_Rect x = is_instanceof "Rect" x;
+
+is_Number x = is_instanceof "Number" x;
+
+is_Expression x = is_instanceof "Expression" x;
+
+is_String x = is_instanceof "String" x;
+
+/* A list of the form [[1,2],[3,4],[5,6]...]
+ */
+is_xy_list l 
+	= is_list l && all (map xy l)
+{
+	xy l = is_real_list l && is_list_len 2 l;
+}
+
+// does a nested list structure contain a Group object?
+contains_Group l
+	= true, is_list l && any (map is_Group l)
+	= any (map contains_Group l), is_list l
+	= false;
+
+/* Does an object have a sensible VIPS type?
+ */
+has_type x = is_image x || is_Image x || is_Arrow x || is_Colour x;
+
+/* Try to get a VIPS image type from an object.
+ */
+get_type x
+	= get_type_im x, is_image x
+	= get_type_im x.value, is_Image x
+	= get_type_im x.image.value, is_Arrow x
+	= Image_type.colour_spaces.lookup 0 1 x.colour_space, is_Colour x
+	// slightly odd ... but our display is always 0-255, so it makes sense for
+	// a plain number to be in the same range
+	= Image_type.sRGB, is_real x
+	= error ("get_type: unable to get type from " ++ print x)
+{
+	// get the type from a VIPS image ... but only if it makes sense with
+	// the rest of the image
+
+	// we often have Type set wrong, hence the ugly guessing :-(
+	// can have alpha, hence we let bands be one more than you might think
+
+	get_type_im im
+		= Image_type.LABQ, coding == Image_coding.LABPACK
+		= Image_type.GREY16, type == Image_type.GREY16 && is_bands 1
+		= Image_type.HISTOGRAM, type == Image_type.HISTOGRAM && 
+			(width == 1 || height == 1)
+		= Image_type.B_W, is_bands 1 
+		= Image_type.CMYK, type == Image_type.CMYK && is_bands 4
+		= type, is_colorimetric && is_bands 3
+		= Image_type.sRGB, !is_colorimetric && is_bands 3
+		= Image_type.MULTIBAND, !is_colorimetric && !is_bands 3
+		= type
+	{
+		type = get_header "Type" im;
+		coding = get_header "Coding" im;
+		bands = get_header "Bands" im;
+		width = get_header "Xsize" im;
+		height = get_header "Ysize" im;
+
+		// 3-band colorimetric types we allow ... the things which the 
+		// Colour/Convert To menu can make, excluding mono.
+		ok_types = [
+			Image_type.sRGB, 
+			Image_type.RGB16, 
+			Image_type.LAB, 
+			Image_type.LABQ, 
+			Image_type.LABS, 
+			Image_type.LCH, 
+			Image_type.XYZ, 
+			Image_type.YXY, 
+			Image_type.UCS
+		];
+		is_colorimetric = member ok_types type;
+
+		// is bands n, with an optional alpha (ie. can be n + 1 too)
+		is_bands n = bands == n || bands == n + 1;
+	}
+}
+
+has_format x = has_member "format" x || is_Arrow x || is_image x;
+
+get_format x 
+	= x.format, has_member "format" x
+	= x.image.format, is_Arrow x
+	= get_header "BandFmt" x, is_image x
+	= error ("get_format: unable to get format from " ++ print x);
+
+has_bits x = has_member "bits" x || is_Arrow x || is_image x;
+
+get_bits x 
+	= x.bits, has_member "bits" x
+	= x.image.bits, is_Arrow x
+	= get_header "Bbits" x, is_image x
+	= error ("get_bits: unable to get bits from " ++ print x);
+
+has_bands x = is_image x || has_member "bands" x || is_Arrow x;
+
+get_bands x 
+	= x.bands, has_member "bands" x
+	= x.image.bands, is_Arrow x
+	= get_header "Bands" x, is_image x
+	= 1, is_real x
+	= len x, is_real_list x
+	= error ("get_bands: unable to get bands from " ++ print x);
+
+has_coding x = has_member "coding" x || is_Arrow x || is_image x;
+
+get_coding x 
+	= x.coding, has_member "coding" x
+	= x.image.coding, is_Arrow x
+	= get_header "Coding" x, is_image x
+	= Image_coding.NOCODING, is_real x
+	= error ("get_coding: unable to get coding from " ++ print x);
+
+has_xres x = has_member "xres" x || is_Arrow x || is_image x;
+
+get_xres x 
+	= x.xres, has_member "xres" x
+	= x.image.xres, is_Arrow x
+	= get_header "Xres" x, is_image x
+	= error ("get_xres: unable to get xres from " ++ print x);
+
+has_yres x = has_member "yres" x || is_Arrow x || is_image x;
+
+get_yres x 
+	= x.yres, has_member "yres" x
+	= x.image.yres, is_Arrow x
+	= get_header "Yres" x, is_image x
+	= error ("get_yres: unable to get yres from " ++ print x);
+
+has_xoffset x = has_member "xoffset" x || is_Arrow x || is_image x;
+
+get_xoffset x 
+	= x.xoffset, has_member "xoffset" x
+	= x.image.xoffset, is_Arrow x
+	= get_header "Xoffset" x, is_image x
+	= error ("get_xoffset: unable to get xoffset from " ++ print x);
+
+has_yoffset x = has_member "yoffset" x || is_Arrow x || is_image x;
+
+get_yoffset x 
+	= x.yoffset, has_member "yoffset" x
+	= x.image.yoffset, is_Arrow x
+	= get_header "Yoffset" x, is_image x
+	= error ("get_yoffset: unable to get yoffset from " ++ print x);
+
+has_value = has_member "value";
+
+get_value x = x.value;
+
+has_image x = is_image x || is_Image x || is_Arrow x;
+
+get_image x 
+	= x.value, is_Image x
+	= x.image.value, is_Arrow x
+	= x, is_image x
+	= error ("get_image: unable to get image from " ++ print x);
+
+has_number x = is_number x || is_Real x;
+
+get_number x
+	= x.value, is_Real x
+	= x, is_number x 
+	= error ("get_number: unable to get number from " ++ print x);
+
+has_real x = is_real x || is_Real x;
+
+get_real x
+	= x.value, is_Real x
+	= x, is_real x
+	= error ("get_real: unable to get real from " ++ print x);
+
+has_width x = has_member "width" x || is_image x;
+
+get_width x
+	= x.width, has_member "width" x
+	= get_header "Xsize" x, is_image x
+	= error ("get_width: unable to get width from " ++ print x);
+
+has_height x = has_member "height" x || is_image x;
+
+get_height x
+	= x.height, has_member "height" x
+	= get_header "Ysize" x, is_image x
+	= error ("get_height: unable to get height from " ++ print x);
+
+has_left x = has_member "left" x;
+
+get_left x
+	= x.left, has_member "left" x
+	= error ("get_left: unable to get left from " ++ print x);
+
+has_top x = has_member "top" x;
+
+get_top x
+	= x.top, has_member "top" x
+	= error ("get_top: unable to get top from " ++ print x);
+
+// like has/get member, but first in a lst of objects
+has_member_list has objects
+	= filter has objects != [];
+
+// need one with the args swapped
+get_member = converse dot;
+
+// get a member from the first of a list of objects to have it
+get_member_list has get objects
+	= hd members, members != []
+	= error "unable to get property"
+{
+	members = map get (filter has objects);
+}
+
+is_hist x
+	= has_image x && (h == 1 || w == 1 || t == Image_type.HISTOGRAM)
+{
+	im = get_image x;
+	w = get_width im;
+	h = get_height im;
+	t = get_type im;
+}
+
+get_header field x
+	= oo_unary_function get_header_op x, is_class x
+	= get_header_image x, is_image x
+	= error (_ "bad arguments to " ++ "get_header")
+{
+	get_header_op = Operator "get_header" (get_header field)
+		Operator_type.COMPOUND false;
+	get_header_image im
+		= im_header_int field im, type == itype
+		= im_header_double field im, type == dtype
+		= im_header_string field im, type == stype1 || type == stype2
+		= error (_ "image has no field " ++ field), type == 0
+		= error (_ "unknown type for field " ++ field)
+	{
+		type = im_header_get_typeof field im;
+
+		itype = name2gtype "gint";
+		dtype = name2gtype "gdouble";
+		stype1 = name2gtype "VipsRefString";
+		stype2 = name2gtype "gchararray";
+	}
+}
+
+get_header_type field x
+	= oo_unary_function get_header_type_op x, is_class x
+	= im_header_get_typeof field x, is_image x
+	= error (_ "bad arguments to " ++ "get_header_type")
+{
+	get_header_type_op = Operator "get_header_type" (get_header_type field)
+		Operator_type.COMPOUND false;
+}
+
+set_header field value x
+	= oo_unary_function set_header_op x, is_class x
+	= im_copy_set_meta x field value, is_image x
+	= error (_ "bad arguments to " ++ "set_header")
+{
+	set_header_op = Operator "set_header" (set_header field value)
+		Operator_type.COMPOUND false;
+}

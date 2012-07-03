@@ -1,5 +1,3 @@
-- need a 7.28 compat thing for find_calib etc. changes
-
 - global balance is leaking?
 
 0) Clean nip2 work-space.

@@ -321,8 +321,8 @@ Tasks_capture_item = class
 			// get Y in 0-1.
 			_pinv = (transpose _camera' * _camera') ** -1;
 			_full_M = transpose (_pinv * transpose _camera' * _true_XYZ);
-			scale = sum _full_M.value?1;
 			M = _full_M / scale;
+			scale = sum _full_M.value?1;
 
 			// now turn the camera to LAB and calculate dE76
 			_camera'' = (to_matrix @ 
@@ -332,7 +332,7 @@ Tasks_capture_item = class
 				to_image) _camera';
 
 			_dEs = map abs_vec (_camera'' - _true_Lab).value;
-			final_dE76 = mean _dEs;
+			avg_dE76 = mean _dEs;
 			_max_dE = foldr max_pair 0 _dEs;
 			_worst = index (equal _max_dE) _dEs;
 			worst_patch 

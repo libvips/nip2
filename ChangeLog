@@ -3,6 +3,7 @@ started 7.29.0  20/6/12
 - added Definition Browser to program window, shows stuff as you program
 - program window cleanups
 - Find calib is much faster and handles linear float input better
+- Find calib optionally leaves brightness untouched
 - Apply calib handles linear float input better
 
 started 7.28.5, 8/5/12

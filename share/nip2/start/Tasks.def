@@ -264,10 +264,11 @@ Tasks_capture_item = class
 				"$VIPSHOME/share/$PACKAGE/data/macbeth_lab_d65.mat";
 
 			mode = Option "Input LUT" [
-				"Linear input",
+				"Linearize from chart greyscale",
 				"Fit intercept from chart greyscale",
-				"Linearize input from chart greyscale"
-			] 2;
+				"Linear input, set brightness from chart",
+				"Linear input"
+			] 0;
 
 			// get max of input image
 			_max_value = Image_format.maxval image.format;
@@ -290,10 +291,10 @@ Tasks_capture_item = class
 			_camera_grey' = map (map (multiply (1 / _max_value))) _camera_grey;
 			_true_grey_Y' = map (multiply (1 / 100)) _true_grey_Y;
 			_comb 
-				= Matrix [[0, 0], [1, 1]], mode == 0
+				= Matrix (map2 cons _true_grey_Y' _camera_grey'), mode == 0
 				= Matrix [0: intercepts, replicate (_camera.width + 1) 1], 
 					mode == 1
-				= Matrix (map2 cons _true_grey_Y' _camera_grey')
+				= Matrix [[0, 0], [1, 1]]
 			{
 				intercepts = [(linreg _true_grey_Y' cam).intercept :: 
 					cam <- transpose _camera_grey'];
@@ -309,20 +310,25 @@ Tasks_capture_item = class
 
 			// map an image though the lineariser
 			linear x
-				= x, mode == 0
-				= hist_map linearising_lut.value x;
+				= hist_map linearising_lut.value x, mode == 0 || mode == 1
+				= x;
 
 			// map the chart measurements though the lineariser
 			_camera' = (to_matrix @ linear @ to_image) _camera;
 
 			// solve for RGB -> XYZ
+			// normalise: the 2nd row is what makes Y, so divide by that to
+			// get Y in 0-1.
 			_pinv = (transpose _camera' * _camera') ** -1;
-			M = transpose (_pinv * transpose _camera' * _true_XYZ);
+			_full_M = transpose (_pinv * transpose _camera' * _true_XYZ);
+			scale = sum _full_M.value?1;
+			M = _full_M / scale;
 
 			// now turn the camera to LAB and calculate dE76
 			_camera'' = (to_matrix @ 
 				colour_transform Image_type.XYZ Image_type.LAB @ 
 				recomb M @ 
+				multiply scale @
 				to_image) _camera';
 
 			_dEs = map abs_vec (_camera'' - _true_Lab).value;
@@ -339,9 +345,16 @@ Tasks_capture_item = class
 					= "Unknown";
 			}
 
+			// normalise brightness ... in linear mode, we optionally don't
+			// set the brightness from the Macbeth chart
+			norm x 
+				= x * scale, mode != 3
+				= x;
+
 			// convert RGB camera to Lab
 			_result = (Image @
 				colour_transform Image_type.XYZ Image_type.LAB @
+				norm @
 				recomb M @
 				cast_float @
 				linear) image.value;
@@ -364,15 +377,12 @@ Tasks_capture_item = class
 				[image, calib] = sortc (const (is_instanceof calib_name)) 
 					[a, b];
 
-				// map the original image through the lineariser to get 
-				// linear 0-1 RGB image
-				image' 
-					= image, calib.mode == 0
-					= hist_map calib.linearising_lut image;
-
-				// convert linear RGB camera to Lab 
-				result = colour_transform Image_type.XYZ Image_type.LAB 
-					((float) (recomb calib.M image'));
+				result = (Image @
+					colour_transform Image_type.XYZ Image_type.LAB @
+					calib.norm @
+					recomb calib.M @
+					cast_float @
+					calib.linear) image.value;
 			}
 		}
 	}

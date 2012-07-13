@@ -1,17 +1,22 @@
-- global balance is leaking?
+- paint out peaks on FFT to remove scan artefacts is broken? needs testing,
+  might be fixed now
 
-0) Clean nip2 work-space.
-1) Toolkit: Image, New, Image. (Image_new_item.Image_black_item.action)
-2) (new image settings) Changing the Image type to ARRAY(last option in list)
-crashes nip2.
+  getting some leak reports after FFT painting too?
 
-- seem to have a leak in the ws just before businesscard.ws?
 
-	$ nip2 --test ~/test.ws
+  load jpg, ^Q, no leaks
+  load jpg, ->fourier, ^Q, no leaks 
+  load jpg, ->fourier, paint bar, ^Q, no leaks 
+  load jpg, paint bar, paint one dot, ^Q, no leaks 
+
+  load jpg, ->fourier, paint bar, paint one dot, ^Q, leaks 
+
+
+
+
+
 
 - os x build reports missing jasper dylib?
-
-- load a radiance image in nip2, how do we decode? no menu for rad2float?
 
 - draw_circle could extract, draw and insert for huge memuse reduction
 
@@ -21,24 +26,14 @@ crashes nip2.
 
 - expose more of the tone funcs in nip2
 
-- quite a few hist operations have no GUI ... lhisteq, for example? or
-  histspec?
+- quite a few hist operations have no GUI ... histspec, for example? 
 
 - nip2 should use zooming support, if possible
-
-- paint out peaks on FFT to remove scan artefacts is broken? needs testing,
-  might be fixed now
-
-  getting some leak reports after FFT painting too?
 
 - "save as bitmap" would be handy in chart view, see gnumeric
 
 - the windows setup .exe install a bazillion .png icons we will never use,
   then installs them all again as .svg, which we will certainly never use
-
-- toolkit browser for program window would be nice
-
-  or maybe add an option to the tk browser to let it show all symbols?
 
 - add extract_volume, cf. "grid"
 

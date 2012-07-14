@@ -850,16 +850,20 @@ imagepresent_left_press( Imagepresent *ip, GdkEvent *ev, int x, int y )
 
 	case IMAGEMODEL_PEN:
 	case IMAGEMODEL_SMUDGE:
-		imagemodel_refresh_nib( imagemodel );
 		imagepresent_snap_point( ip, x, y, &x, &y );
 		conversion_disp_to_im( conv, x, y, &ix, &iy );
 		ip->paint_last_x = ix;
 		ip->paint_last_y = iy;
 		handled = TRUE;
+
+		/* This can take ages and, via progress, actually process a
+		 * few events. Do it at the end.
+		 */
+		imagemodel_refresh_nib( imagemodel );
+
 		break;
 
 	case IMAGEMODEL_LINE:
-		imagemodel_refresh_nib( imagemodel );
 		imagepresent_snap_point( ip, x, y, &x, &y );
 		conversion_disp_to_im( conv, x, y, &ix, &iy );
 		ip->paint_last_x = ix;
@@ -869,6 +873,12 @@ imagepresent_left_press( Imagepresent *ip, GdkEvent *ev, int x, int y )
 			TRUE, REGIONVIEW_LINE, REGIONVIEW_RESIZE_BOTTOMRIGHT,
 			x, y );
 		handled = TRUE;
+
+		/* This can take ages and, via progress, actually process a
+		 * few events. Do it at the end.
+		 */
+		imagemodel_refresh_nib( imagemodel );
+
 		break;
 
 	case IMAGEMODEL_RECT:

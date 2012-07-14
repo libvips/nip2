@@ -11,9 +11,17 @@
 
   load jpg, ->fourier, paint bar, paint one dot, ^Q, leaks 
 
+  load jpg, rot quads, paint bar, paint one dot, ^Q, leaks 
+
+  load jpg, insert 900 0 A1 A1, paint bar, paint one dot, ^Q, leaks 
+
+  load jpg, extract area, paint bar, paint one dot, ^Q, leaks 
 
 
 
+
+- freehand draw in paint bar often connects initial line to end of previous
+  line? not initing the 'prev position' field on paint start?
 
 
 - os x build reports missing jasper dylib?

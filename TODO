@@ -1,27 +1,36 @@
-- paint out peaks on FFT to remove scan artefacts is broken? needs testing,
-  might be fixed now
-
-  getting some leak reports after FFT painting too?
-
-
-  load jpg, ^Q, no leaks
-  load jpg, ->fourier, ^Q, no leaks 
-  load jpg, ->fourier, paint bar, ^Q, no leaks 
+- load jpg, ^Q, no leaks
   load jpg, paint bar, paint one dot, ^Q, no leaks 
 
-  load jpg, ->fourier, paint bar, paint one dot, ^Q, leaks 
-
-  load jpg, rot quads, paint bar, paint one dot, ^Q, leaks 
-
-  load jpg, insert 900 0 A1 A1, paint bar, paint one dot, ^Q, leaks 
-
   load jpg, extract area, paint bar, paint one dot, ^Q, leaks 
+  load jpg, extract area, paint bar, paint one dot, ^Z, ^Q, leaks 
+  load jpg, extract area, paint bar, paint one dot, close window, ^Q, leaks 
 
+  seems to leak:
 
+  	original image, 
+  	one large regions on that image (full width)
+	extract area operation
+	extracted image
+	region a bit bigger than paint action on that image
 
+0) VipsRegion (0x8b052a0)
+VipsRegion (object), base class VipsRegion: 0x8b052a0, im = 0x887aad0, left =
+192, top = 128, width = 45, height = 2 VipsRegion (0x8b052a0)
+1) VipsImage (0x887aad0)
+VipsImage (image), image class 237x202 uchar, 3 bands, srgb, partial VipsImage
+(0x887aad0)
+2) VipsImage (0x8016b30)
+VipsImage (image), image class 972x1296 uchar, 3 bands, srgb, openin VipsImage
+(0x8016b30)
+3) VipsRegion (0x8b05340)
+VipsRegion (object), base class VipsRegion: 0x8b05340, im = 0x8016b30, left =
+0, top = 30, width = 972, height = 283 VipsRegion (0x8b05340)
+4) VipsExtractArea (0x882a910)
+VipsExtractArea (extract_area), extract an area from an image - extract_area
+((VipsImage*) 0x8016b30) 142 158 237 202 VipsExtractArea (0x882a910)
 
-- freehand draw in paint bar often connects initial line to end of previous
-  line? not initing the 'prev position' field on paint start?
+  something to do with vips_image_wio_input() and the way it rewinds a PARTIAL
+  image? called from im_rwcheck()
 
 
 - os x build reports missing jasper dylib?

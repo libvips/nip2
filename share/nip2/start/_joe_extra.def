@@ -232,32 +232,30 @@ Select_item = class
 		]?no;
 
 	Rectangle = class
-		Menuaction "_Rectangle"
-			"use line/arrow/rect x to define a rectangle"
-		{
-		action x = class
-			_result {
-			_vislevel = 3;
+        Menuaction "_Rectangle"
+            "use an Arrow or Region x to define a rectangle"
+        {
+        action x = class
+            _result {
+            _vislevel = 3;
 
-			control = _control;
+            control = _control;   
 
-			_result = control_selection mask im control
-  				{
-				mask = select_rect x;
-				im = get_image x;
-				select_rect x
-					= Image mask
-				{
-					im = Image (get_image x);
-					imc = make_xy im.width im.height;	
-					mask = imc?0 >= x.nleft & 
-							imc?0 < x.nright & 
-							imc?1 >= x.ntop & 
-							imc?1 < x.nbottom;
-				}
-				}
-			}
-		}
+            _result = control_selection mask im control
+                  {
+                	im = x.image;
+                	mask = Image m
+                    {
+						rx     
+							= x.region_rect, is_Region x
+							= x;
+						b     = image_new im.width im.height 1 0 0 1 0 0 0;
+						w     = image_new rx.nwidth rx.nheight 1 0 0 1 255 0 0;
+						m     = insert_noexpand rx.nleft rx.ntop w b; 
+                     }
+                   }
+            }
+        }
 
 	Elipse = class
 		Menuaction "_Ellipse"

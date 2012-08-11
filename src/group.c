@@ -38,13 +38,21 @@ static ValueClass *parent_class = NULL;
 static gboolean
 group_save_list( PElement *list, char *filename );
 
-/* Exported, since main.c uses this to save 'main' to a file.
+/* Exported, since main.c uses this to save 'main' to a file. @filename is
+ * incremented. 
  */
 gboolean
 group_save_item( PElement *item, char *filename )
 {
 	gboolean result;
 	Imageinfo *ii;
+	char buf[FILENAME_MAX];
+
+	/* We don't want $VAR etc. in the filename we pass down to the file
+	 * ops.
+	 */
+	im_strncpy( buf, filename, FILENAME_MAX );
+	path_expand( buf ); 
 
 	if( !heap_is_instanceof( CLASS_GROUP, item, &result ) )
 		return( FALSE );
@@ -59,15 +67,13 @@ group_save_item( PElement *item, char *filename )
 	if( !heap_is_instanceof( CLASS_IMAGE, item, &result ) )
 		return( FALSE );
 	if( result ) {
-		char filename_image[MAX_STRSIZE];
 		PElement value;
 
-		strcpy( filename_image, filename );
-		filesel_add_mode( filename_image );
+		filesel_add_mode( buf );
 
 		if( !class_get_member( item, MEMBER_VALUE, NULL, &value ) || 
 			!heap_get_image( &value, &ii ) ||
-			!imageinfo_write( ii, filename_image ) )
+			!imageinfo_write( ii, buf ) )
 			return( FALSE );
 
 		increment_filename( filename );
@@ -80,7 +86,7 @@ group_save_item( PElement *item, char *filename )
 
 		if( !(dmask = matrix_ip_to_dmask( item )) )
 			return( FALSE );
-		if( im_write_dmask_name( dmask, filename ) ) {
+		if( im_write_dmask_name( dmask, buf ) ) {
 			error_vips_all();
 			IM_FREEF( im_free_dmask, dmask );
 
@@ -92,13 +98,10 @@ group_save_item( PElement *item, char *filename )
 	}
 
 	if( PEISIMAGE( item ) ) {
-		char filename_image[MAX_STRSIZE];
-
-		strcpy( filename_image, filename );
-		filesel_add_mode( filename_image );
+		filesel_add_mode( buf );
 
 		if( !heap_get_image( item, &ii ) ||
-			!imageinfo_write( ii, filename_image ) )
+			!imageinfo_write( ii, buf ) )
 			return( FALSE );
 
 		increment_filename( filename );

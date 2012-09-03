@@ -131,7 +131,8 @@ toolview_refresh_sub( Toolitem *toolitem, Workspace *ws, GtkWidget *menu )
 				GTK_SIGNAL_FUNC( toolview_activate_cb ), 
 				toolitem );
 
-		if( toolitem->help )
+		if( toolitem->help && 
+			!toolitem->is_pullright )
 			set_tooltip( item, "%s", toolitem->help );
 
 		gtk_signal_connect( GTK_OBJECT( item ), "select", 

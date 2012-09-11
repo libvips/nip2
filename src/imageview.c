@@ -233,6 +233,10 @@ imageview_get_region_type( GtkAction *action )
 			return( (iRegionType) i );
 
 	g_assert( FALSE );
+	
+	/* Keep gcc happy.
+	 */
+	return( FALSE );
 }
 
 static void

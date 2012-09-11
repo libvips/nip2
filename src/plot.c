@@ -83,6 +83,10 @@ plot_f2c( PlotFormat format )
 
 	default:
 		g_assert( 0 );
+		
+		/* Keep gcc happy.
+		 */
+		return( 0 );
 	}
 }
 
@@ -97,6 +101,10 @@ plot_s2c( PlotStyle style )
 
 	default:
 		g_assert( 0 );
+		
+		/* Keep gcc happy.
+		 */
+		return( 0 );
 	}
 }
 

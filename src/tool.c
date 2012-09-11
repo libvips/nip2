@@ -200,6 +200,10 @@ tool_type_to_char( Tooltype type )
 
 	default:
 		g_assert( FALSE );
+		
+		/* Keep gcc happy.
+		 */
+		return( FALSE );
 	}
 }
 

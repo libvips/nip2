@@ -80,6 +80,10 @@ trace_get_trace_flag( GtkAction *action )
 			return( trace_types[i].flag );
 
 	g_assert( FALSE );
+	
+	/* Keep gcc happy.
+	 */
+	return( FALSE );
 }
 
 void

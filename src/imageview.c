@@ -452,27 +452,27 @@ static GtkActionEntry imageview_actions[] = {
 	/* Actions.
 	 */
 	{ "NewMark", 
-		GTK_STOCK_NEW, N_( "New _Mark" ), NULL, 
+		NULL, N_( "_Mark" ), NULL, 
 		N_( "Create a new mark" ), 
 		G_CALLBACK( imageview_new_arrow2_action_cb ) },
 
 	{ "NewHGuide", 
-		GTK_STOCK_NEW, N_( "New _Horizontal Guide" ), NULL, 
+		NULL, N_( "_Horizontal Guide" ), NULL, 
 		N_( "Create a new horizontal guide" ), 
 		G_CALLBACK( imageview_new_arrow2_action_cb ) },
 
 	{ "NewVGuide", 
-		GTK_STOCK_NEW, N_( "New _Vertical Guide" ), NULL, 
+		NULL, N_( "_Vertical Guide" ), NULL, 
 		N_( "Create a new vertical guide" ), 
 		G_CALLBACK( imageview_new_arrow2_action_cb ) },
 
 	{ "NewArrow", 
-		GTK_STOCK_NEW, N_( "New _Arrow" ), NULL, 
+		NULL, N_( "_Arrow" ), NULL, 
 		N_( "Create a new arrow" ), 
 		G_CALLBACK( imageview_new_arrow4_action_cb ) },
 
 	{ "NewRegion", 
-		GTK_STOCK_NEW, N_( "New _Region" ), NULL, 
+		NULL, N_( "_Region" ), NULL, 
 		N_( "Create a new region" ), 
 		G_CALLBACK( imageview_new_arrow4_action_cb ) },
 

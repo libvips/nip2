@@ -1,3 +1,9 @@
+- im_invertlut() as a menu item
+
+  handy for inverting the results of cum/norm/etc.
+
+
+
 - load jpg, ^Q, no leaks
   load jpg, paint bar, paint one dot, ^Q, no leaks 
 

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.28.0">
-  <Workspace filename="test_colour.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1280" window_height="771" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_colour" caption="Default empty workspace">
+  <Workspace window_x="0" window_y="0" window_width="1280" window_height="771" filename="$HOME/GIT/nip2/test/workspaces/test_colour.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_colour" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="10" name="A" caption="Colour / New">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
@@ -804,14 +804,14 @@
           </Rhs>
         </Row>
         <Row popup="false" name="I15">
-          <Rhs vislevel="1" flags="1">
+          <Rhs vislevel="2" flags="5">
             <Colour/>
             <Subcolumn vislevel="0"/>
             <iText formula="I14 + Vector [0, 4, -4]"/>
           </Rhs>
         </Row>
         <Row popup="false" name="I16">
-          <Rhs vislevel="1" flags="1">
+          <Rhs vislevel="2" flags="5">
             <iRegion image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true" left="10" top="10" width="10" height="10">
               <iRegiongroup/>
             </iRegion>
@@ -853,7 +853,7 @@
           </Rhs>
         </Row>
         <Row popup="false" name="I22">
-          <Rhs vislevel="1" flags="1">
+          <Rhs vislevel="2" flags="5">
             <Colour/>
             <Subcolumn vislevel="0"/>
             <iText formula="Colour_to_colour_item.action I21"/>
@@ -867,7 +867,7 @@
           </Rhs>
         </Row>
         <Row popup="false" name="I24">
-          <Rhs vislevel="1" flags="1">
+          <Rhs vislevel="2" flags="5">
             <Colour/>
             <Subcolumn vislevel="0"/>
             <iText formula="I23 + Vector [0, 0, 90]"/>
@@ -887,7 +887,7 @@
         </Row>
         <Row popup="false" name="I27">
           <Rhs vislevel="1" flags="4">
-            <iText formula="if I26 &gt; 0.1 then error &quot;fail&quot; else &quot;ok!&quot;"/>
+            <iText formula="if I26 &gt; 0.5 then error &quot;fail&quot; else &quot;ok!&quot;"/>
           </Rhs>
         </Row>
       </Subcolumn>

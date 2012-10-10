@@ -170,7 +170,7 @@ AC_ARG_WITH([gtksheet], AS_HELP_STRING([--without-gtksheet], [build without gtks
 # matrix widget if we have to
 if test "x$with_gtksheet" != "xno"; then
   PKG_CHECK_EXISTS(gtk+-2.0 >= 2.18,
-    [],
+    [with_gtksheet=yes],
     [with_gtksheet=no]
   )
 fi

@@ -1,3 +1,11 @@
+- definition browser could update on cursor move?
+
+  eg. mouse click on contains_Group, or move cursor into contains_Group with
+  kb, rhs changes to display contains_Group
+
+
+
+
 - load jpg, ^Q, no leaks
   load jpg, paint bar, paint one dot, ^Q, no leaks 
 

@@ -1,7 +1,12 @@
+
 - definition browser could update on cursor move?
 
   eg. mouse click on contains_Group, or move cursor into contains_Group with
   kb, rhs changes to display contains_Group
+
+- im_invertlut() as a menu item
+
+  handy for inverting the results of cum/norm/etc.
 
 
 

@@ -1,5 +1,5 @@
 
-/* Generated data (by glib-mkenums) */
+
 
 #ifndef __GTKSHEET_TYPE_BUILTINS_H__
 #define __GTKSHEET_TYPE_BUILTINS_H__
@@ -18,5 +18,5 @@ G_END_DECLS
 
 #endif /* __GTKSHEET_TYPE_BUILTINS_H__ */
 
-/* Generated data ends here */
+
 

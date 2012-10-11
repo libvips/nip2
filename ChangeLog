@@ -1,5 +1,8 @@
 started 7.31 3/9/12
 - don't show tooltips for toolkit menu items with submenus (thanks MvGulik)
+- better definition of foldr1
+- better definition of to_group (thanks MvGulik)
+- better defintion of scan, renamed as scanl
 
 started 7.30.1  7/8/12
 - update rectangle select (thanks Joe)

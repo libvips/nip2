@@ -135,10 +135,10 @@ to_list x
 	= Group (map to_list x.value), is_Group x
 	= x;
 
-/* Try to make a group. The innermost list objects become Group()'d.
+/* Try to make a group. The outermost list objects become Group()'d.
  */
 to_group x
-	= Group x, is_list x && !contains_Group x
+	= Group x, is_list x 
 	= Group (map to_group x.value), is_Group x
 	= x;
 

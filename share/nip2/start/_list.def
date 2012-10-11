@@ -121,14 +121,18 @@ foldr fn st l
 	= st, l == []
 	= fn (hd l) (foldr fn st (tl l));
 
-/* foldrl fn l: like foldr, but use the 1st element as the start value
+/* foldrl fn l: like foldr, but use the last element as the start value
  *
- * foldr1 fn [1,2,3,4] == (2 fn (3 fn (4 fn 1)))
+ * foldr1 fn [1,2,3,4] == (1 fn (2 fn (3 fn 4)))
  * foldr1 :: (* -> * -> *) -> [*] -> *
  */
 foldr1 fn l
 	= [], l == []
-	= foldr fn (hd l) (tl l);
+	= x, xs == []
+	= fn x (foldr1 fn xs)
+{
+	(x:xs) = l;
+}
 
 /* Search a list for an element, returning its index (or -1)
  *
@@ -295,20 +299,17 @@ replicate n x = take n (repeat x);
  */
 reverse l = foldl (converse cons) [] l;
 
-/* scan fn st l: apply (fold fn r) to every initial segment of a list
+/* scanl fn st l: apply (fold fn r) to every initial segment of a list
  *
- * scan add 0 [1,2,3] == [1,3,6]
- * scan :: (* -> ** -> *) -> * -> [**] -> [*]
+ * scanl add 0 [1,2,3] == [1,3,6]
+ * scanl :: (* -> ** -> *) -> * -> [**] -> [*]
  */
-scan fn 
-	= g 
+scanl fn st l
+	= st, l == []
+	= st' : scanl fn st' xs
 {
-	g st l
-		= [st], l == []
-		= st : g (fn st a) x
-	{
-		a:x = l;
-	}
+	(x:xs) = l;
+	st' = fn st x;
 }
 
 /* sort l: sort list l into ascending order

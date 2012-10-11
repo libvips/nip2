@@ -1,4 +1,6 @@
 
+- new foldr1 def ... look for problems!
+
 - definition browser could update on cursor move?
 
   eg. mouse click on contains_Group, or move cursor into contains_Group with

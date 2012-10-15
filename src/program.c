@@ -897,32 +897,64 @@ program_text_changed( GtkTextBuffer *buffer, Program *program )
 	}
 }
 
+static void 
+program_text_cursor_position( GtkTextBuffer *buffer, GParamSpec *pspec, 
+	Program *program )
+{
+	gboolean editable = !program->kit || !program->kit->pseudo;
+
+	if( program->rpane_open && 
+		editable ) {
+		/* Fetch characters left of the cursor while we have stuff
+		 * that could be an identifier.
+		 */
+		GtkTextIter start;
+		GtkTextIter cursor;
+		GtkTextIter end;
+		char *line;
+		char *p;
+
+		/* Get iters for start / cursor / end of line.
+		 */
+		gtk_text_buffer_get_iter_at_mark( buffer,
+			&cursor, gtk_text_buffer_get_insert( buffer ) );
+		gtk_text_buffer_get_iter_at_line_index( buffer,
+			&start, gtk_text_iter_get_line( &end ), 0 ); 
+		gtk_text_buffer_get_iter_at_line_index( buffer,
+			&end, gtk_text_iter_get_line( &end ), -1 ); 
+
+		line = gtk_text_buffer_get_text( buffer, &start, &end, FALSE );
+
+		printf( "line = <%s>\n", line ); 
+
+		g_free( line );
+	}
+}
+
 static void
 program_set_text( Program *program, const char *text, gboolean editable )
 {
 	GtkTextView *text_view = GTK_TEXT_VIEW( program->text );
+	GtkTextBuffer *text_buffer = gtk_text_view_get_buffer( text_view );
 	guint text_hash = g_str_hash( text );
 
 	if( text_hash != program->text_hash ) {
 		/* Stop ::changed from firing, we don't want it to update the
 		 * def browser filter.
 		 */
-		g_signal_handlers_block_by_func( 
-			gtk_text_view_get_buffer( text_view ),
+		g_signal_handlers_block_by_func( text_buffer,
 			G_CALLBACK( program_text_changed ), program );
+		g_signal_handlers_block_by_func( text_buffer,
+			G_CALLBACK( program_text_cursor_position ), program );
 
 		text_view_set_text( text_view, text, editable );
 		program->text_hash = text_hash;
 
-		g_signal_handlers_unblock_by_func( 
-			gtk_text_view_get_buffer( text_view ),
+		g_signal_handlers_unblock_by_func( text_buffer,
 			G_CALLBACK( program_text_changed ), program );
+		g_signal_handlers_unblock_by_func( text_buffer,
+			G_CALLBACK( program_text_cursor_position ), program );
 	}
-
-        g_signal_connect( 
-		gtk_text_view_get_buffer( GTK_TEXT_VIEW( program->text ) ),
-		"changed",
-                G_CALLBACK( program_text_changed ), program );
 
 	program->dirty = FALSE;
 }
@@ -2368,6 +2400,10 @@ program_build( Program *program, GtkWidget *vbox )
 		gtk_text_view_get_buffer( GTK_TEXT_VIEW( program->text ) ),
 		"changed",
                 G_CALLBACK( program_text_changed ), program );
+	g_signal_connect(
+		gtk_text_view_get_buffer( GTK_TEXT_VIEW( program->text ) ),
+		"notify::cursor-position",
+                G_CALLBACK( program_text_cursor_position ), program );
 	gtk_container_add( GTK_CONTAINER( swin ), program->text );
 	gtk_widget_show( program->text );
 

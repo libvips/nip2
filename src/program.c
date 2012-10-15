@@ -833,16 +833,96 @@ program_kit_destroy( Toolkit *kit, Program *program )
 	program_refresh( program );
 }
 
+/* Is a character one of those allowed in nip2 identifers?
+ */
+static gboolean
+is_ident( int ch )
+{
+	if( isalnum( ch ) ||
+		ch == '_' ||
+		ch == '\'' )
+		return( TRUE );
+
+	return( FALSE );
+}
+
+static void
+program_text_changed( GtkTextBuffer *buffer, Program *program )
+{
+	gboolean editable = !program->kit || !program->kit->pseudo;
+
+	if( !program->dirty ) {
+		program->dirty = TRUE;
+		program_refresh( program );
+	}
+
+	if( program->rpane_open && 
+		editable ) {
+		/* Fetch characters left of the cursor while we have stuff
+		 * that could be an identifier.
+		 */
+		GtkTextIter start;
+		GtkTextIter end;
+		char *line;
+		char *p;
+
+		/* Set iter at cursor.
+		 */
+		gtk_text_buffer_get_iter_at_mark( buffer,
+			&end, gtk_text_buffer_get_insert( buffer ) );
+
+		/* Point an iter at the start of this line.
+		 */
+		gtk_text_buffer_get_iter_at_line_index( buffer,
+			&start, gtk_text_iter_get_line( &end ), 0 ); 
+
+		line = gtk_text_buffer_get_text( buffer, &start, &end, FALSE );
+
+		/* Search back from the end of the string for the start of the
+		 * identifier.
+		 */
+		for( p = line + strlen( line ) - 1; 
+			p >= line && is_ident( *p ); 
+			p-- )
+			;
+
+		/* Don't update the filter for empty strings. This happens 
+		 * when the user clicks between tools, not when they type
+		 * stuff.
+		 */
+		if( strcmp( p + 1, "" ) != 0 )
+			defbrowser_set_filter( program->defbrowser, p + 1 );
+
+		g_free( line );
+	}
+}
+
 static void
 program_set_text( Program *program, const char *text, gboolean editable )
 {
+	GtkTextView *text_view = GTK_TEXT_VIEW( program->text );
 	guint text_hash = g_str_hash( text );
 
 	if( text_hash != program->text_hash ) {
-		text_view_set_text( GTK_TEXT_VIEW( program->text ), 
-			text, editable );
+		/* Stop ::changed from firing, we don't want it to update the
+		 * def browser filter.
+		 */
+		g_signal_handlers_block_by_func( 
+			gtk_text_view_get_buffer( text_view ),
+			G_CALLBACK( program_text_changed ), program );
+
+		text_view_set_text( text_view, text, editable );
 		program->text_hash = text_hash;
+
+		g_signal_handlers_unblock_by_func( 
+			gtk_text_view_get_buffer( text_view ),
+			G_CALLBACK( program_text_changed ), program );
 	}
+
+        g_signal_connect( 
+		gtk_text_view_get_buffer( GTK_TEXT_VIEW( program->text ) ),
+		"changed",
+                G_CALLBACK( program_text_changed ), program );
 
 	program->dirty = FALSE;
 }
@@ -1881,62 +1961,6 @@ program_select( Program *program, Model *model )
 	}
 
 	return( TRUE );
-}
-
-/* Is a character one of those allowed in nip2 identifers?
- */
-static gboolean
-is_ident( int ch )
-{
-	if( isalnum( ch ) ||
-		ch == '_' ||
-		ch == '\'' )
-		return( TRUE );
-
-	return( FALSE );
-}
-
-static void
-program_text_changed( GtkTextBuffer *buffer, Program *program )
-{
-	if( !program->dirty ) {
-		program->dirty = TRUE;
-		program_refresh( program );
-	}
-
-	if( program->rpane_open ) {
-		/* Fetch characters left of the cursor while we have stuff
-		 * that could be an identifier.
-		 */
-		GtkTextIter start;
-		GtkTextIter end;
-		char *line;
-		char *p;
-
-		/* Set iter at cursor.
-		 */
-		gtk_text_buffer_get_iter_at_mark( buffer,
-			&end, gtk_text_buffer_get_insert( buffer ) );
-
-		/* Point an iter at the start of this line.
-		 */
-		gtk_text_buffer_get_iter_at_line_index( buffer,
-			&start, gtk_text_iter_get_line( &end ), 0 ); 
-
-		line = gtk_text_buffer_get_text( buffer, &start, &end, FALSE );
-
-		/* Search back from the end of the string for the start of the
-		 * identifier.
-		 */
-		for( p = line + strlen( line ) - 1; 
-			p >= line && is_ident( *p ); 
-			p-- )
-			;
-
-		defbrowser_set_filter( program->defbrowser, p + 1 );
-
-		g_free( line );
-	}
 }
 
 /* Select a row from an iter.

@@ -1167,8 +1167,9 @@ void
 text_view_set_text( GtkTextView *text_view, 
 	const char *text, gboolean editable )
 {
-	gtk_text_buffer_set_text( gtk_text_view_get_buffer( text_view ),
-		text ? text : "", -1 );
+	GtkTextBuffer *text_buffer = gtk_text_view_get_buffer( text_view );
+
+	gtk_text_buffer_set_text( text_buffer, text ? text : "", -1 );
 
 	gtk_text_view_set_editable( text_view, editable );
 	gtk_text_view_set_cursor_visible( text_view, editable );

@@ -4,6 +4,7 @@ started 7.31 3/9/12
 - better definition of to_group (thanks MvGulik)
 - better defintion of scan, renamed as scanl
 - don't clear def browser filter on text buffer ::changed in program window
+- update filter on cursor move
 
 started 7.30.1  7/8/12
 - update rectangle select (thanks Joe)

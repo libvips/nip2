@@ -1,10 +1,7 @@
 
 - new foldr1 def ... look for problems!
 
-- definition browser could update on cursor move?
-
-  eg. mouse click on contains_Group, or move cursor into contains_Group with
-  kb, rhs changes to display contains_Group
+- breadcrumb trail for prog window, so you can get back to where you were?
 
 - im_invertlut() as a menu item
 

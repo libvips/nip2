@@ -846,57 +846,6 @@ is_ident( int ch )
 	return( FALSE );
 }
 
-static void
-program_text_changed( GtkTextBuffer *buffer, Program *program )
-{
-	gboolean editable = !program->kit || !program->kit->pseudo;
-
-	if( !program->dirty ) {
-		program->dirty = TRUE;
-		program_refresh( program );
-	}
-
-	if( program->rpane_open && 
-		editable ) {
-		/* Fetch characters left of the cursor while we have stuff
-		 * that could be an identifier.
-		 */
-		GtkTextIter start;
-		GtkTextIter end;
-		char *line;
-		char *p;
-
-		/* Set iter at cursor.
-		 */
-		gtk_text_buffer_get_iter_at_mark( buffer,
-			&end, gtk_text_buffer_get_insert( buffer ) );
-
-		/* Point an iter at the start of this line.
-		 */
-		gtk_text_buffer_get_iter_at_line_index( buffer,
-			&start, gtk_text_iter_get_line( &end ), 0 ); 
-
-		line = gtk_text_buffer_get_text( buffer, &start, &end, FALSE );
-
-		/* Search back from the end of the string for the start of the
-		 * identifier.
-		 */
-		for( p = line + strlen( line ) - 1; 
-			p >= line && is_ident( *p ); 
-			p-- )
-			;
-
-		/* Don't update the filter for empty strings. This happens 
-		 * when the user clicks between tools, not when they type
-		 * stuff.
-		 */
-		if( strcmp( p + 1, "" ) != 0 )
-			defbrowser_set_filter( program->defbrowser, p + 1 );
-
-		g_free( line );
-	}
-}
-
 static void 
 program_text_cursor_position( GtkTextBuffer *buffer, GParamSpec *pspec, 
 	Program *program )
@@ -912,20 +861,33 @@ program_text_cursor_position( GtkTextBuffer *buffer, GParamSpec *pspec,
 		GtkTextIter cursor;
 		GtkTextIter end;
 		char *line;
-		char *p;
+		char *p, *q, *r;
 
 		/* Get iters for start / cursor / end of line.
 		 */
 		gtk_text_buffer_get_iter_at_mark( buffer,
 			&cursor, gtk_text_buffer_get_insert( buffer ) );
 		gtk_text_buffer_get_iter_at_line_index( buffer,
-			&start, gtk_text_iter_get_line( &end ), 0 ); 
+			&start, gtk_text_iter_get_line( &cursor ), 0 ); 
 		gtk_text_buffer_get_iter_at_line_index( buffer,
-			&end, gtk_text_iter_get_line( &end ), -1 ); 
+			&end, gtk_text_iter_get_line( &cursor ), 0 ); 
+		gtk_text_iter_forward_to_line_end( &end );
 
 		line = gtk_text_buffer_get_text( buffer, &start, &end, FALSE );
+		p = line + gtk_text_iter_get_line_index( &cursor );
 
-		printf( "line = <%s>\n", line ); 
+		/* Search back from the cursor for the first non-identifier
+		 * char.
+		 */
+		for( q = p - 1; q >= line && is_ident( *q ); q-- )
+			;
+		q += 1;
+		for( r = p; r < line + strlen( line ) && is_ident( *r ); r++ )
+			;
+		*r= '\0';
+
+		if( strlen( q ) > 1 )
+			defbrowser_set_filter( program->defbrowser, q );
 
 		g_free( line );
 	}
@@ -943,15 +905,11 @@ program_set_text( Program *program, const char *text, gboolean editable )
 		 * def browser filter.
 		 */
 		g_signal_handlers_block_by_func( text_buffer,
-			G_CALLBACK( program_text_changed ), program );
-		g_signal_handlers_block_by_func( text_buffer,
 			G_CALLBACK( program_text_cursor_position ), program );
 
 		text_view_set_text( text_view, text, editable );
 		program->text_hash = text_hash;
 
-		g_signal_handlers_unblock_by_func( text_buffer,
-			G_CALLBACK( program_text_changed ), program );
 		g_signal_handlers_unblock_by_func( text_buffer,
 			G_CALLBACK( program_text_cursor_position ), program );
 	}
@@ -2396,10 +2354,6 @@ program_build( Program *program, GtkWidget *vbox )
 	gtk_widget_show( swin );
 
 	program->text = program_text_new();
-        g_signal_connect( 
-		gtk_text_view_get_buffer( GTK_TEXT_VIEW( program->text ) ),
-		"changed",
-                G_CALLBACK( program_text_changed ), program );
 	g_signal_connect(
 		gtk_text_view_get_buffer( GTK_TEXT_VIEW( program->text ) ),
 		"notify::cursor-position",

@@ -101,7 +101,10 @@ flatten x
  */
 foldl fn st l
 	= st, l == []
-	= foldl fn (fn st (hd l)) (tl l);
+	= foldl fn (fn st x) xs
+{
+	x:xs = l;
+}
 
 /* foldl1 fn l: like foldl, but use the 1st element as the start value
  *
@@ -110,7 +113,10 @@ foldl fn st l
  */
 foldl1 fn l
 	= [], l == []
-	= foldl fn (hd l) (tl l);
+	= foldl fn x xs
+{
+	x:xs = l;
+}
 
 /* foldr fn st l: fold list l from the right with function fn and start st
  *
@@ -119,9 +125,12 @@ foldl1 fn l
  */
 foldr fn st l
 	= st, l == []
-	= fn (hd l) (foldr fn st (tl l));
+	= fn x (foldr fn st xs)
+{
+	x:xs = l;
+}
 
-/* foldrl fn l: like foldr, but use the last element as the start value
+/* foldr1 fn l: like foldr, but use the last element as the start value
  *
  * foldr1 fn [1,2,3,4] == (1 fn (2 fn (3 fn 4)))
  * foldr1 :: (* -> * -> *) -> [*] -> *
@@ -131,7 +140,7 @@ foldr1 fn l
 	= x, xs == []
 	= fn x (foldr1 fn xs)
 {
-	(x:xs) = l;
+	x:xs = l;
 }
 
 /* Search a list for an element, returning its index (or -1)
@@ -144,8 +153,11 @@ index fn list
 {
 	search l n
 		= -1, l == []
-		= n, fn (hd l)
-		= search (tl l) (n + 1);
+		= n, fn x
+		= search xs (n + 1)
+		{
+			x:xs = l;
+		}
 }
 
 /* init l: remove last element of list l
@@ -157,7 +169,10 @@ index fn list
 init l
 	= error "init of []", l == [];
 	= [], tl l == [];
-	= hd l : init (tl l);
+	= x : init xs
+{
+	x:xs = l;
+}
 
 /* iterate f x: repeatedly apply f to x
  *
@@ -185,8 +200,11 @@ join_sep sep l
  */
 last l
 	= error "last of []", l == []
-	= hd l, tl l == []
-	= last (tl l);
+	= x, xs == []
+	= last xs
+{
+	x:xs = l;
+}
 
 /* len l: length of list l
  * (see also is_list_len and friends in predicate.def)
@@ -299,7 +317,7 @@ replicate n x = take n (repeat x);
  */
 reverse l = foldl (converse cons) [] l;
 
-/* scanl fn st l: apply (fold fn r) to every initial segment of a list
+/* scanl fn st l: apply (foldl fn r) to every initial segment of a list
  *
  * scanl add 0 [1,2,3] == [1,3,6]
  * scanl :: (* -> ** -> *) -> * -> [**] -> [*]
@@ -308,7 +326,7 @@ scanl fn st l
 	= st, l == []
 	= st' : scanl fn st' xs
 {
-	(x:xs) = l;
+	x:xs = l;
 	st' = fn st x;
 }
 

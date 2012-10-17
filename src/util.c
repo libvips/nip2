@@ -2096,6 +2096,7 @@ char *
 ifile_read( iOpenFile *of )
 {
 	long len;
+	size_t len2;
 	char *str;
 
 	/* Find length.
@@ -2113,16 +2114,14 @@ ifile_read( iOpenFile *of )
 	 */
 	if( !(str = imalloc( NULL, len + 1 )) ) 
 		return( NULL );
-	if( fread( str, sizeof( char ), (size_t) len, of->fp ) != 
-		(size_t) len ) {
-		of->last_errno = errno;
-		IM_FREE( str );
-		error_top( _( "Unable to read." ) );
-		error_sub( _( "Unable to read from file \"%s\".\n%s." ),
-			of->fname_real, g_strerror( of->last_errno ) );
-		return( NULL );
-	}
-	str[len] = '\0';
+
+	/* We can't check len2 against len, since we may be reading a text
+	 * file on Windows, in which case this fread will change CRLF to LF
+	 * and len2 will be less than len.
+	 */
+	len2 = fread( str, sizeof( char ), (size_t) len, of->fp );
+
+	str[len2] = '\0';
 
 	return( str );
 }

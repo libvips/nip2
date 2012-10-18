@@ -135,6 +135,23 @@ if test "${LEX}" = "flex"; then
   AC_DEFINE(HAVE_FLEX,1,[using flex, rather than lex])
 fi
 
+# flex >= 2.5.36 uses a nonstandard type for yyleng
+AC_MSG_CHECKING([whether yyleng is yy_size_t])
+cat > conftest.l <<EOF
+%%
+%%
+yy_size_t yyleng;
+EOF
+$LEX conftest.l
+AC_COMPILE_IFELSE([AC_LANG_DEFINES_PROVIDED [`cat $LEX_OUTPUT_ROOT.c`]], [
+  AC_MSG_RESULT(yes)
+  AC_DEFINE(YYLENG_IS_YY_SIZE_T,1,
+    [Define to 1 if lex declares yyleng to be yy_size_t.])
+], [
+  AC_MSG_RESULT(no)
+])
+rm -f conftest.l $LEX_OUTPUT_ROOT.c
+
 # get packages we need
 # gtk before 2.4.9 crashes with the way we use combobox :-(
 PKG_CHECK_MODULES(REQUIRED_PACKAGES, 

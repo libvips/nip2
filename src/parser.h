@@ -55,7 +55,13 @@ extern InputState input_state;
 void nip2yyerror( const char *sub, ... )
 	__attribute__((format(printf, 1, 2)));
 void yyerror( const char *msg ); 
+#ifdef YYLENG_IS_YY_SIZE_T
+/* Assume yy_size_t is size_t.
+ */
+extern size_t yyleng;
+#else
 extern int yyleng;			/* lex stuff */
+#endif
 
 /* Lex gathers tokens here for workspace.c
  */

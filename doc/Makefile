@@ -1,13 +1,13 @@
 #
 
-.PHONEY: all
+.PHONY: all
 all: $(PS)
 	cd nipguide; $(MAKE) 
 
-.PHONEY: clean
+.PHONY: clean
 clean: 
 	cd nipguide; $(MAKE) clean
 
-.PHONEY: install
+.PHONY: install
 install: 
 	cd nipguide; $(MAKE) install

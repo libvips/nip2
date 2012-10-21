@@ -30,7 +30,7 @@ $(PDF): $(SRC)
 	pdflatex nipguide.tex
 	pdflatex nipguide.tex
 
-.PHONEY: html
+.PHONY: html
 html: 
 	-rm -rf nipguide 
 	mkdir nipguide
@@ -39,7 +39,7 @@ html:
 	-rm nipguide/*.jpg
 	-rm nipguide/*.png
 
-.PHONEY: clean 
+.PHONY: clean 
 clean:
 	-rm -f *.4ct
 	-rm -f *.4tc

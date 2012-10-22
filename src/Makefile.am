@@ -328,27 +328,21 @@ nip2_SOURCES = \
 	$(my_sources)
 endif
 
-.PHONEY: helpindex.h
 helpindex.h: 
 	./makehelpindex.pl $(prefix) > helpindex.h
-.PHONEY: nipmarshal.h
 nipmarshal.h:
 	glib-genmarshal --prefix=nip --header nipmarshal.list > nipmarshal.h
-.PHONEY: nipmarshal.c
 nipmarshal.c:
 	echo "#include \"nipmarshal.h\"" > nipmarshal.c 
 	glib-genmarshal --prefix=nip --body nipmarshal.list >> nipmarshal.c
-.PHONEY: gtksheet-marshal.h
 gtksheet-marshal.h:
 	glib-genmarshal --prefix=gtksheet --header gtksheet-marshal.list > \
 		gtksheet-marshal.h
-.PHONEY: gtksheet-marshal.c
 gtksheet-marshal.c:
 	echo "#include \"gtksheet-marshal.h\"" > gtksheet-marshal.c 
 	glib-genmarshal --prefix=gtksheet --body gtksheet-marshal.list >> \
 		gtksheet-marshal.c
 
-.PHONEY: gtksheettypebuiltins.h
 gtksheettypebuiltins.h: $(gtksheet_public_h_sources)
 	( glib-mkenums \
 		--fhead "#ifndef __GTKSHEET_TYPE_BUILTINS_H__\n#define __GTKSHEET_TYPE_BUILTINS_H__\n\n#include <glib-object.h>\n\nG_BEGIN_DECLS\n" \
@@ -357,7 +351,6 @@ gtksheettypebuiltins.h: $(gtksheet_public_h_sources)
 		--ftail "G_END_DECLS\n\n#endif /* __GTKSHEET_TYPE_BUILTINS_H__ */" \
 		$(gtksheet_public_h_sources) ) > gtksheettypebuiltins.h
 
-.PHONEY: gtksheettypebuiltins.c
 gtksheettypebuiltins.c: $(gtksheet_public_h_sources)
 	( glib-mkenums \
 		--fhead "#define GTKSHEET_ENABLE_BROKEN\n#include \"gtksheet.h\"" \

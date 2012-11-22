@@ -506,11 +506,12 @@ conversion_make_repaint( Conversion *conv, IMAGE *in )
 
 	/* 7 is sRGB.
 
-		FIXME ... should let other displays be used here, see
-		../scraps/calibrate.[hc]
+		this is all deprecated and unused now with vips-7.31 and later
+		tag as unused to stop gcc complaints
 
 	 */
-	struct im_col_display *display = im_col_displays( 7 );
+	struct im_col_display *display __attribute__ ((unused)) = 
+		im_col_displays( 7 );
 
 	/* Do we do colorimetric type conversions? Look for
 	 * interpret-type-toggle.

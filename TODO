@@ -1,3 +1,8 @@
+- didn't we have band_and or equivalent somewhere?
+
+	  band x = foldr1 bitwise_and (bandsplit x)
+
+  necessary for im == Vector [1,2,3]
 
 - breadcrumb trail for prog window, so you can get back to where you were?
 

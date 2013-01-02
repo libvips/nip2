@@ -12,6 +12,12 @@
 
   handy for inverting the results of cum/norm/etc.
 
+- to_image on a hist should tag as image
+
+- lambdas don't pattern match?
+
+	(\[a, b] a + b)
+
 
 
 

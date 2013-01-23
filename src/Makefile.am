@@ -377,7 +377,7 @@ endif
 .y.c:
 	$(BISON) --defines=$*.h -o $*.c $<
 
-INCLUDES = @IP_CFLAGS@ 
+AM_CPPFLAGS = @IP_CFLAGS@ 
 LDADD = @IP_CFLAGS@ @IP_LIBS@
 AM_LDFLAGS = @LDFLAGS@
 

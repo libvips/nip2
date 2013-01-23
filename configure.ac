@@ -272,8 +272,11 @@ fi
 # optional ... use libgvc to draw graphs of workspace dependencies
 AC_ARG_WITH([libgvc], AS_HELP_STRING([--without-libgvc], [build without libgvc (default: test)]))
 
+# gvc 2.30 is broken in a number of ways and we can't use it, see for example
+# http://lists.research.att.com/pipermail/graphviz-devel/2012/001544.html
+
 if test "x$with_libgvc" != "xno"; then
-  PKG_CHECK_MODULES(LIBGVC, libgvc,
+  PKG_CHECK_MODULES(LIBGVC, libgvc < 2.30,
     [AC_DEFINE(HAVE_LIBGVC,1,[define if you have libgvc installed.])
      with_libgvc=yes
     ],
@@ -381,6 +384,7 @@ use fftw3 for FFT: 			$with_fftw3
 use gsl for numeric functions:		$with_gsl
 use libgoffice to show plots:		$with_libgoffice
 use libgvc to show ws dep graphs:	$with_libgvc
+  (requires gvc < 2.30)
 use gtksheet to show matrices:  	$with_gtksheet
   (requires gtk+-2.0 >= 2.18)
 use gtkinfobar to show messages:	$nip_use_infobar

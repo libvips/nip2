@@ -411,7 +411,7 @@ regionview_border_foreach( Regionview *regionview,
 /* Repaint ... as a rect_foreach function.
  */
 static void *
-regionview_queue_draw_area( Regionview *regionview, Rect *area )
+regionview_queue_draw_area( Regionview *regionview, Rect *area, void *dummy )
 {
 #ifdef DEBUG_PAINT
 	printf( "regionview_queue_draw_area: at %dx%d size %dx%d\n",
@@ -440,28 +440,28 @@ regionview_queue_draw( Regionview *regionview )
 	case REGIONVIEW_REGION:
 		conversion_im_to_disp_rect( conv, area, &dr );
 		(void) regionview_border_foreach( regionview, &dr, 
-			(regionview_rect_fn) regionview_queue_draw_area, NULL );
+			regionview_queue_draw_area, NULL );
 		break;
 
 	case REGIONVIEW_MARK:
 		conversion_im_to_disp( conv, area->left, area->top, &x, &y );
 		(void) regionview_crosshair_foreach( regionview, x, y, 
-			(regionview_rect_fn) regionview_queue_draw_area, NULL );
+			regionview_queue_draw_area, NULL );
 		break;
 
 	case REGIONVIEW_ARROW:
 		conversion_im_to_disp_rect( conv, area, &dr );
 		(void) regionview_crosshair_foreach( regionview, 
 			dr.left, dr.top,
-			(regionview_rect_fn) regionview_queue_draw_area, NULL );
+			regionview_queue_draw_area, NULL );
 		(void) regionview_crosshair_foreach( regionview, 
 			IM_RECT_RIGHT( &dr ), 
 			IM_RECT_BOTTOM( &dr ),
-			(regionview_rect_fn) regionview_queue_draw_area, NULL );
+			regionview_queue_draw_area, NULL );
 
 		im_rect_normalise( &dr );
 		im_rect_marginadjust( &dr, 2 );
-		regionview_queue_draw_area( regionview, &dr );
+		regionview_queue_draw_area( regionview, &dr, NULL );
 
 		break;
 
@@ -471,7 +471,7 @@ regionview_queue_draw( Regionview *regionview )
 		conversion_im_to_disp_rect( conv, area, &dr );
 		im_rect_normalise( &dr );
 		im_rect_marginadjust( &dr, 2 );
-		regionview_queue_draw_area( regionview, &dr );
+		regionview_queue_draw_area( regionview, &dr, NULL );
 		break;
 
 	case REGIONVIEW_BOX:
@@ -479,7 +479,7 @@ regionview_queue_draw( Regionview *regionview )
 		im_rect_normalise( &dr );
 		im_rect_marginadjust( &dr, -2 );
 		(void) regionview_border_foreach( regionview, &dr, 
-			(regionview_rect_fn) regionview_queue_draw_area, NULL );
+			regionview_queue_draw_area, NULL );
 		break;
 
 	default:

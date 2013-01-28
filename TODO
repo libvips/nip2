@@ -1,3 +1,9 @@
+- program window, new tool, enter
+
+	fred = 12
+
+  process ... does nothing!
+
 - didn't we have band_and or equivalent somewhere?
 
 	  band x = foldr1 bitwise_and (bandsplit x)

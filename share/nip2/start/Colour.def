@@ -34,6 +34,23 @@ Colour_new_item = class
 			Colour_edit colour_space value = widget colour_space value;
 		}
 	}
+
+	CCT_colour = class
+		Menuaction (_ "Colour from CCT") (_ "pick colour by CCT") {
+		action = widget 6500;
+
+		widget x = class
+			_result {
+			_vislevel = 3;
+
+			T = Scale "CCT" 1800 25000 x;
+
+			_result = colour_from_temp (to_real T);
+
+			Colour_edit space value 
+				= widget (temp_from_colour (Colour space value));
+		}
+	}
 }
 
 Colour_to_colour_item = class
@@ -188,7 +205,7 @@ Colour_tag_item = class
 }
 
 Colour_temperature_item = class
-	Menupullright (_ "Colour Te_mperature") 
+	Menupullright (_ "Te_mperature") 
 		(_ "colour temperature conversions") {
 	Whitepoint_item = class
 		Menuaction (_ "_Move Whitepoint") (_ "change whitepoint") {
@@ -293,6 +310,16 @@ Colour_temperature_item = class
 			(_ "XYZ to Lab with a D50 whitepoint") {
 		action x = map_unary (colour_unary im_D50XYZ2Lab) x;
 	}
+
+	sep1 = Menuseparator;
+
+	CCT_item = class
+		Menuaction (_ "Calculate temperature")
+			(_ "estimate CCT using the McCamy approximation") {
+		action z = map_unary temp_from_colour z;
+	}
+
+	Colour_item = Colour_new_item.CCT_colour;
 }
 
 Colour_icc_item = class

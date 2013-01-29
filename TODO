@@ -1,3 +1,7 @@
+- in OS X binary, click on sRGB.icm in Open dialog ... segv!
+
+  IM relocation problem?
+
 - program window, new tool, enter
 
 	fred = 12

@@ -2207,7 +2207,7 @@ program_text_new( void )
 	GtkWidget *text;
 
 	text = gtk_text_view_new();
-	font_desc = pango_font_description_from_string( "Mono" );
+	font_desc = pango_font_description_from_string( "Monospace" );
 	gtk_widget_modify_font( text, font_desc );
 	pango_font_description_free( font_desc );
 	tabs = program_tabs_new();

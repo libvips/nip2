@@ -83,7 +83,7 @@ log_build( GtkWidget *widget )
 	gtk_text_view_set_editable( GTK_TEXT_VIEW( log->view ), FALSE );
 	gtk_text_view_set_cursor_visible( GTK_TEXT_VIEW( log->view ), 
 		FALSE );
-	font_desc = pango_font_description_from_string( "Mono" );
+	font_desc = pango_font_description_from_string( "Monospace" );
 	gtk_widget_modify_font( log->view, font_desc );
 	pango_font_description_free( font_desc );
 

@@ -256,7 +256,7 @@ imageheader_build( GtkWidget *widget )
 		FALSE );
 	gtk_text_view_set_cursor_visible( GTK_TEXT_VIEW( imageheader->history ),
 		FALSE );
-	font_desc = pango_font_description_from_string( "Mono" );
+	font_desc = pango_font_description_from_string( "Monospace" );
 	gtk_widget_modify_font( imageheader->history, font_desc );
 	pango_font_description_free( font_desc );
 	gtk_container_add( GTK_CONTAINER( swin ), imageheader->history );

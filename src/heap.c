@@ -1883,7 +1883,9 @@ heap_gvalue_to_ip( GValue *in, PElement *out )
 		PEPUTP( out, ELEMENT_BOOL, (int) g_value_get_boolean( in ) );
 	}
 	else if( G_VALUE_HOLDS_CHAR( in ) ) {
-		PEPUTP( out, ELEMENT_CHAR, (int) g_value_get_schar( in ) );
+		/* g_value_get_schar() is not in older glibs.
+		 */
+		PEPUTP( out, ELEMENT_CHAR, (int) g_value_get_uchar( in ) );
 	}
 	else if( G_VALUE_HOLDS_UCHAR( in ) ) {
 		PEPUTP( out, ELEMENT_CHAR, (int) g_value_get_uchar( in ) );

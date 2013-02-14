@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=glib&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2012-08-30 16:55+0100\n"
+"POT-Creation-Date: 2013-02-14 12:02+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -743,8 +743,8 @@ msgid "Option \"%s\" not known."
 msgstr ""
 
 #: ../src/classmodel.c:1141 ../src/matrixview.c:189 ../src/matrixview.c:210
-#: ../src/plot.c:140 ../src/plot.c:150 ../src/plot.c:360 ../src/plot.c:379
-#: ../src/plot.c:392
+#: ../src/plot.c:148 ../src/plot.c:158 ../src/plot.c:368 ../src/plot.c:387
+#: ../src/plot.c:400
 msgid "Bad value."
 msgstr ""
 
@@ -771,7 +771,7 @@ msgstr ""
 
 #: ../src/clock.c:194 ../src/colour.c:303 ../src/fontname.c:61
 #: ../src/matrix.c:275 ../src/number.c:51 ../src/option.c:71
-#: ../src/pathname.c:78 ../src/plot.c:340 ../src/slider.c:57
+#: ../src/pathname.c:78 ../src/plot.c:348 ../src/slider.c:57
 #: ../src/string.c:70 ../src/toggle.c:51
 msgid "Value"
 msgstr ""
@@ -784,7 +784,7 @@ msgstr ""
 msgid "Double-click to edit this color, or drag-and-drop between colors"
 msgstr ""
 
-#: ../src/column.c:326 ../src/tool.c:887 ../src/workspace.c:1553
+#: ../src/column.c:326 ../src/tool.c:891 ../src/workspace.c:1553
 #: ../src/workspacegroup.c:145
 msgid "Name clash."
 msgstr ""
@@ -818,8 +818,8 @@ msgstr ""
 
 #: ../src/columnview.c:180 ../src/columnview.c:241 ../src/mainw.c:1371
 #: ../src/mainw.c:1409 ../src/program.c:595 ../src/program.c:624
-#: ../src/program.c:1053 ../src/program.c:1094 ../src/program.c:1140
-#: ../src/program.c:1172 ../src/program.c:1504 ../src/program.c:1545
+#: ../src/program.c:1123 ../src/program.c:1164 ../src/program.c:1210
+#: ../src/program.c:1242 ../src/program.c:1574 ../src/program.c:1615
 #: ../src/row.c:480 ../src/workspacegroup.c:177 ../src/workspacegroup.c:213
 msgid "Name"
 msgstr ""
@@ -829,8 +829,8 @@ msgid "Toolkit"
 msgstr ""
 
 #: ../src/columnview.c:182 ../src/columnview.c:245 ../src/matrix.c:284
-#: ../src/program.c:596 ../src/program.c:626 ../src/program.c:1141
-#: ../src/program.c:1174
+#: ../src/program.c:596 ../src/program.c:626 ../src/program.c:1211
+#: ../src/program.c:1244
 msgid "Filename"
 msgstr ""
 
@@ -883,7 +883,7 @@ msgstr ""
 msgid "_Edit Caption"
 msgstr ""
 
-#: ../src/columnview.c:896 ../src/mainw.c:1710 ../src/program.c:1731
+#: ../src/columnview.c:896 ../src/mainw.c:1710 ../src/program.c:1801
 msgid "Select _All"
 msgstr ""
 
@@ -1015,7 +1015,7 @@ msgstr ""
 msgid "No unresolved symbols found."
 msgstr ""
 
-#: ../src/error.c:115 ../src/trace.c:230
+#: ../src/error.c:115 ../src/trace.c:234
 msgid "_Clear"
 msgstr ""
 
@@ -1252,7 +1252,7 @@ msgstr ""
 
 #: ../src/fontname.c:58 ../src/mainw.c:1372 ../src/mainw.c:1411
 #: ../src/number.c:48 ../src/option.c:65 ../src/pathname.c:75
-#: ../src/program.c:1054 ../src/program.c:1096 ../src/slider.c:48
+#: ../src/program.c:1124 ../src/program.c:1166 ../src/slider.c:48
 #: ../src/string.c:67 ../src/toggle.c:48 ../src/workspacegroup.c:178
 #: ../src/workspacegroup.c:215
 msgid "Caption"
@@ -1460,44 +1460,44 @@ msgstr ""
 msgid "Image save took %g seconds."
 msgstr ""
 
-#: ../src/imageinfo.c:974
+#: ../src/imageinfo.c:977
 msgid "Unable to open image."
 msgstr ""
 
-#: ../src/imageinfo.c:975
+#: ../src/imageinfo.c:978
 #, c-format
 msgid "Unable to open file \"%s\" as image."
 msgstr ""
 
-#: ../src/imageinfo.c:1103
+#: ../src/imageinfo.c:1106
 msgid "Unable to write to file."
 msgstr ""
 
-#: ../src/imageinfo.c:1104
+#: ../src/imageinfo.c:1107
 #, c-format
 msgid "Error writing image to file \"%s\"."
 msgstr ""
 
-#: ../src/imageinfo.c:1120
+#: ../src/imageinfo.c:1123
 msgid "Unable to paint on image."
 msgstr ""
 
-#: ../src/imageinfo.c:1121
+#: ../src/imageinfo.c:1124
 #, c-format
 msgid ""
 "Unable to get write permission for file \"%s\".\n"
 "Check permission settings."
 msgstr ""
 
-#: ../src/imageinfo.c:1165
+#: ../src/imageinfo.c:1168
 msgid "Modify"
 msgstr ""
 
-#: ../src/imageinfo.c:1166
+#: ../src/imageinfo.c:1169
 msgid "Modify disc file?"
 msgstr ""
 
-#: ../src/imageinfo.c:1167
+#: ../src/imageinfo.c:1170
 #, c-format
 msgid ""
 "This image is being shown directly from the disc file:\n"
@@ -1508,11 +1508,11 @@ msgid ""
 "wrong, you may lose work. Are you sure you want to modify this file?"
 msgstr ""
 
-#: ../src/imageinfo.c:1769
+#: ../src/imageinfo.c:1772
 msgid "Unable to paint text."
 msgstr ""
 
-#: ../src/imageinfo.c:1770
+#: ../src/imageinfo.c:1773
 #, c-format
 msgid "Unable to paint text \"%s\" in font \"%s\"."
 msgstr ""
@@ -1541,224 +1541,224 @@ msgstr ""
 msgid "Show _Offset"
 msgstr ""
 
-#: ../src/imageview.c:451
-msgid "New _Mark"
-msgstr ""
-
-#: ../src/imageview.c:452
-msgid "Create a new mark"
+#: ../src/imageview.c:455
+msgid "_Mark"
 msgstr ""
 
 #: ../src/imageview.c:456
-msgid "New _Horizontal Guide"
+msgid "Create a new mark"
 msgstr ""
 
-#: ../src/imageview.c:457
-msgid "Create a new horizontal guide"
+#: ../src/imageview.c:460
+msgid "_Horizontal Guide"
 msgstr ""
 
 #: ../src/imageview.c:461
-msgid "New _Vertical Guide"
+msgid "Create a new horizontal guide"
 msgstr ""
 
-#: ../src/imageview.c:462
-msgid "Create a new vertical guide"
+#: ../src/imageview.c:465
+msgid "_Vertical Guide"
 msgstr ""
 
 #: ../src/imageview.c:466
-msgid "New _Arrow"
+msgid "Create a new vertical guide"
 msgstr ""
 
-#: ../src/imageview.c:467
-msgid "Create a new arrow"
+#: ../src/imageview.c:470
+msgid "_Arrow"
 msgstr ""
 
 #: ../src/imageview.c:471
-msgid "New _Region"
+msgid "Create a new arrow"
 msgstr ""
 
-#: ../src/imageview.c:472
-msgid "Create a new region"
+#: ../src/imageview.c:475
+msgid "_Region"
 msgstr ""
 
 #: ../src/imageview.c:476
+msgid "Create a new region"
+msgstr ""
+
+#: ../src/imageview.c:480
 msgid "Replace Image"
 msgstr ""
 
-#: ../src/imageview.c:477
+#: ../src/imageview.c:481
 msgid "Replace image from file"
 msgstr ""
 
-#: ../src/imageview.c:481
+#: ../src/imageview.c:485
 msgid "Save Image As"
 msgstr ""
 
-#: ../src/imageview.c:482
+#: ../src/imageview.c:486
 msgid "Save image to file"
 msgstr ""
 
-#: ../src/imageview.c:486 ../src/mainw.c:871
+#: ../src/imageview.c:490 ../src/mainw.c:871
 msgid "Recalculate"
 msgstr ""
 
-#: ../src/imageview.c:487
+#: ../src/imageview.c:491
 msgid "Recalculate image"
 msgstr ""
 
-#: ../src/imageview.c:491
+#: ../src/imageview.c:495
 msgid "Image _Header"
 msgstr ""
 
-#: ../src/imageview.c:492
+#: ../src/imageview.c:496
 msgid "View image header"
 msgstr ""
 
-#: ../src/imageview.c:496 ../src/imageview.c:550
+#: ../src/imageview.c:500 ../src/imageview.c:554
 msgid "Zoom _In"
 msgstr ""
 
-#: ../src/imageview.c:497 ../src/imageview.c:551
+#: ../src/imageview.c:501 ../src/imageview.c:555
 msgid "Zoom in on mouse cursor"
 msgstr ""
 
-#: ../src/imageview.c:501 ../src/imageview.c:555
+#: ../src/imageview.c:505 ../src/imageview.c:559
 msgid "Zoom _Out"
 msgstr ""
 
 #. IMAGEMODEL_MAGIN
-#: ../src/imageview.c:502 ../src/imageview.c:556 ../src/paintboxview.c:249
+#: ../src/imageview.c:506 ../src/imageview.c:560 ../src/paintboxview.c:249
 msgid "Zoom out"
 msgstr ""
 
-#: ../src/imageview.c:506
+#: ../src/imageview.c:510
 msgid "Zoom _100%"
 msgstr ""
 
-#: ../src/imageview.c:507 ../src/imageview.c:570
+#: ../src/imageview.c:511 ../src/imageview.c:574
 msgid "Zoom to 100%"
 msgstr ""
 
-#: ../src/imageview.c:511
+#: ../src/imageview.c:515
 msgid "Zoom to _Fit"
 msgstr ""
 
-#: ../src/imageview.c:512
+#: ../src/imageview.c:516
 msgid "Zoom to fit image to window"
 msgstr ""
 
-#: ../src/imageview.c:518 ../src/plotwindow.c:167
+#: ../src/imageview.c:522 ../src/plotwindow.c:167
 msgid "_Status"
 msgstr ""
 
-#: ../src/imageview.c:519 ../src/plotwindow.c:168
+#: ../src/imageview.c:523 ../src/plotwindow.c:168
 msgid "Show status bar"
 msgstr ""
 
-#: ../src/imageview.c:523
+#: ../src/imageview.c:527
 msgid "_Display Control"
 msgstr ""
 
-#: ../src/imageview.c:524
+#: ../src/imageview.c:528
 msgid "Show display control bar"
 msgstr ""
 
-#: ../src/imageview.c:528
+#: ../src/imageview.c:532
 msgid "_Paint"
 msgstr ""
 
-#: ../src/imageview.c:529
+#: ../src/imageview.c:533
 msgid "Show paint bar"
 msgstr ""
 
-#: ../src/imageview.c:533
+#: ../src/imageview.c:537
 msgid "_Rulers"
 msgstr ""
 
-#: ../src/imageview.c:534
+#: ../src/imageview.c:538
 msgid "Show rulers"
 msgstr ""
 
-#: ../src/imageview.c:540
+#: ../src/imageview.c:544
 msgid "_Select"
 msgstr ""
 
-#: ../src/imageview.c:541
+#: ../src/imageview.c:545
 msgid "Select and modify selections"
 msgstr ""
 
-#: ../src/imageview.c:545
+#: ../src/imageview.c:549
 msgid "_Pan"
 msgstr ""
 
-#: ../src/imageview.c:546
+#: ../src/imageview.c:550
 msgid "Pan image"
 msgstr ""
 
-#: ../src/imageview.c:562
+#: ../src/imageview.c:566
 msgid "6%"
 msgstr ""
 
-#: ../src/imageview.c:562
+#: ../src/imageview.c:566
 msgid "Zoom to 6%"
 msgstr ""
 
-#: ../src/imageview.c:564
+#: ../src/imageview.c:568
 msgid "12%"
 msgstr ""
 
-#: ../src/imageview.c:564
+#: ../src/imageview.c:568
 msgid "Zoom to 12%"
 msgstr ""
 
-#: ../src/imageview.c:566
+#: ../src/imageview.c:570
 msgid "25%"
 msgstr ""
 
-#: ../src/imageview.c:566
+#: ../src/imageview.c:570
 msgid "Zoom to 25%"
 msgstr ""
 
-#: ../src/imageview.c:568
+#: ../src/imageview.c:572
 msgid "50%"
 msgstr ""
 
-#: ../src/imageview.c:568
+#: ../src/imageview.c:572
 msgid "Zoom to 50%"
 msgstr ""
 
-#: ../src/imageview.c:570
+#: ../src/imageview.c:574
 msgid "100%"
 msgstr ""
 
-#: ../src/imageview.c:572
+#: ../src/imageview.c:576
 msgid "200%"
 msgstr ""
 
-#: ../src/imageview.c:572
+#: ../src/imageview.c:576
 msgid "Zoom to 200%"
 msgstr ""
 
-#: ../src/imageview.c:574
+#: ../src/imageview.c:578
 msgid "400%"
 msgstr ""
 
-#: ../src/imageview.c:574
+#: ../src/imageview.c:578
 msgid "Zoom to 400%"
 msgstr ""
 
-#: ../src/imageview.c:576
+#: ../src/imageview.c:580
 msgid "800%"
 msgstr ""
 
-#: ../src/imageview.c:576
+#: ../src/imageview.c:580
 msgid "Zoom to 800%"
 msgstr ""
 
-#: ../src/imageview.c:578
+#: ../src/imageview.c:582
 msgid "1600%"
 msgstr ""
 
-#: ../src/imageview.c:578
+#: ../src/imageview.c:582
 msgid "Zoom to 1600%"
 msgstr ""
 
@@ -2033,7 +2033,7 @@ msgstr ""
 msgid "Pen"
 msgstr ""
 
-#: ../src/main.c:684 ../src/plot.c:94
+#: ../src/main.c:684 ../src/plot.c:98
 msgid "Line"
 msgstr ""
 
@@ -2339,7 +2339,7 @@ msgstr ""
 msgid "Create a new column with a specified name"
 msgstr ""
 
-#: ../src/mainw.c:1665 ../src/program.c:1681
+#: ../src/mainw.c:1665 ../src/program.c:1751
 msgid "New _Workspace"
 msgstr ""
 
@@ -2403,7 +2403,7 @@ msgstr ""
 msgid "Load last automatically backed-up workspace"
 msgstr ""
 
-#: ../src/mainw.c:1705 ../src/program.c:1726
+#: ../src/mainw.c:1705 ../src/program.c:1796
 msgid "_Delete"
 msgstr ""
 
@@ -2439,7 +2439,7 @@ msgstr ""
 msgid "Align columns to grid"
 msgstr ""
 
-#: ../src/mainw.c:1730 ../src/program.c:1751
+#: ../src/mainw.c:1730 ../src/program.c:1821
 msgid "_Find"
 msgstr ""
 
@@ -2447,7 +2447,7 @@ msgstr ""
 msgid "Find in workspace"
 msgstr ""
 
-#: ../src/mainw.c:1735 ../src/program.c:1756
+#: ../src/mainw.c:1735 ../src/program.c:1826
 msgid "Find _Next"
 msgstr ""
 
@@ -2759,7 +2759,7 @@ msgstr ""
 msgid "left-hand-side pattern contains no identifiers"
 msgstr ""
 
-#: parse.y:1066 ../src/program.c:1422
+#: parse.y:1066 ../src/program.c:1492
 msgid "Parse error."
 msgstr ""
 
@@ -2805,8 +2805,8 @@ msgstr ""
 
 #. Not found? Maybe - error message anyway.
 #.
-#: ../src/path.c:512 ../src/path.c:543 ../src/program.c:1441
-#: ../src/program.c:1493 ../src/program.c:1515 ../src/program.c:1523
+#: ../src/path.c:512 ../src/path.c:543 ../src/program.c:1511
+#: ../src/program.c:1563 ../src/program.c:1585 ../src/program.c:1593
 #: ../src/symbol.c:502
 msgid "Not found."
 msgstr ""
@@ -2837,63 +2837,63 @@ msgstr ""
 msgid "XYXY"
 msgstr ""
 
-#: ../src/plot.c:93
+#: ../src/plot.c:97
 msgid "Point"
 msgstr ""
 
-#: ../src/plot.c:95
+#: ../src/plot.c:99
 msgid "Spline"
 msgstr ""
 
-#: ../src/plot.c:96
+#: ../src/plot.c:100
 msgid "Bar"
 msgstr ""
 
-#: ../src/plot.c:141
+#: ../src/plot.c:149
 msgid "More than one column needed or XY plots"
 msgstr ""
 
-#: ../src/plot.c:151
+#: ../src/plot.c:159
 msgid "Even number of columns only for XY format plots"
 msgstr ""
 
-#: ../src/plot.c:316
+#: ../src/plot.c:324
 msgid "Format"
 msgstr ""
 
-#: ../src/plot.c:319
+#: ../src/plot.c:327
 msgid "Style"
 msgstr ""
 
-#: ../src/plot.c:322
+#: ../src/plot.c:330
 msgid "Xmin"
 msgstr ""
 
-#: ../src/plot.c:325
+#: ../src/plot.c:333
 msgid "Xmax"
 msgstr ""
 
-#: ../src/plot.c:328
+#: ../src/plot.c:336
 msgid "Ymin"
 msgstr ""
 
-#: ../src/plot.c:331
+#: ../src/plot.c:339
 msgid "Ymax"
 msgstr ""
 
-#: ../src/plot.c:337
+#: ../src/plot.c:345
 msgid "Options"
 msgstr ""
 
-#: ../src/plot.c:361
+#: ../src/plot.c:369
 msgid "1xn or nx1 images only for Plot"
 msgstr ""
 
-#: ../src/plot.c:380
+#: ../src/plot.c:388
 msgid "Unable to prepare image."
 msgstr ""
 
-#: ../src/plot.c:393
+#: ../src/plot.c:401
 msgid "1xn or nx1 images only"
 msgstr ""
 
@@ -2967,322 +2967,322 @@ msgstr ""
 msgid "Toolkit menu"
 msgstr ""
 
-#: ../src/program.c:1094
+#: ../src/program.c:1164
 msgid "Set toolkit name here"
 msgstr ""
 
-#: ../src/program.c:1096
+#: ../src/program.c:1166
 msgid "Set toolkit caption here"
 msgstr ""
 
-#: ../src/program.c:1097
+#: ../src/program.c:1167
 msgid "New Toolkit"
 msgstr ""
 
-#: ../src/program.c:1101 ../src/program.c:1179
+#: ../src/program.c:1171 ../src/program.c:1249
 msgid "Create"
 msgstr ""
 
-#: ../src/program.c:1112
+#: ../src/program.c:1182
 msgid "Nothing selected."
 msgstr ""
 
-#: ../src/program.c:1113
+#: ../src/program.c:1183
 msgid "No toolkit selected."
 msgstr ""
 
-#: ../src/program.c:1172
+#: ../src/program.c:1242
 msgid "Display this name"
 msgstr ""
 
-#: ../src/program.c:1174
+#: ../src/program.c:1244
 msgid "Load this file"
 msgstr ""
 
-#: ../src/program.c:1242
+#: ../src/program.c:1312
 msgid "Load Definition"
 msgstr ""
 
-#: ../src/program.c:1296
+#: ../src/program.c:1366
 msgid "Reload"
 msgstr ""
 
-#: ../src/program.c:1297
+#: ../src/program.c:1367
 msgid "Reload startup objects?"
 msgstr ""
 
-#: ../src/program.c:1298
+#: ../src/program.c:1368
 msgid ""
 "Would you like to reload all startup menus, workspaces and plugins now? This "
 "may take a few seconds."
 msgstr ""
 
-#: ../src/program.c:1380
+#: ../src/program.c:1450
 msgid "No tool selected"
 msgstr ""
 
-#: ../src/program.c:1423
+#: ../src/program.c:1493
 msgid "Bad regular expression."
 msgstr ""
 
-#: ../src/program.c:1442
+#: ../src/program.c:1512
 #, c-format
 msgid "No match found for \"%s\"."
 msgstr ""
 
-#: ../src/program.c:1455
+#: ../src/program.c:1525
 msgid "Find in all Toolkits"
 msgstr ""
 
-#: ../src/program.c:1465
+#: ../src/program.c:1535
 msgid "Enter search string here"
 msgstr ""
 
-#: ../src/program.c:1516
+#: ../src/program.c:1586
 #, c-format
 msgid "No top-level symbol called \"%s\"."
 msgstr ""
 
-#: ../src/program.c:1524
+#: ../src/program.c:1594
 #, c-format
 msgid "Symbol \"%s\" has no tool inforation."
 msgstr ""
 
-#: ../src/program.c:1545
+#: ../src/program.c:1615
 msgid "Go to definition of this symbol"
 msgstr ""
 
-#: ../src/program.c:1547
+#: ../src/program.c:1617
 msgid "Go to Definition"
 msgstr ""
 
-#: ../src/program.c:1577
+#: ../src/program.c:1647
 msgid "Object information."
 msgstr ""
 
-#: ../src/program.c:1628
+#: ../src/program.c:1698
 msgid "No documentation available."
 msgstr ""
 
-#: ../src/program.c:1629
+#: ../src/program.c:1699
 msgid ""
 "On-line documentation is only currently available for VIPS functions and nip "
 "builtins."
 msgstr ""
 
-#: ../src/program.c:1656
+#: ../src/program.c:1726
 msgid "New _Tool"
 msgstr ""
 
-#: ../src/program.c:1657
+#: ../src/program.c:1727
 msgid "Make a new tool"
 msgstr ""
 
-#: ../src/program.c:1661
+#: ../src/program.c:1731
 msgid "New Tool_kit"
 msgstr ""
 
-#: ../src/program.c:1662
+#: ../src/program.c:1732
 msgid "Make a new toolkit"
 msgstr ""
 
-#: ../src/program.c:1666
+#: ../src/program.c:1736
 msgid "New _Separator"
 msgstr ""
 
-#: ../src/program.c:1667
+#: ../src/program.c:1737
 msgid "Make a new separator"
 msgstr ""
 
-#: ../src/program.c:1671
+#: ../src/program.c:1741
 msgid "New _Column Item"
 msgstr ""
 
-#: ../src/program.c:1672
+#: ../src/program.c:1742
 msgid "Make a new column item"
 msgstr ""
 
-#: ../src/program.c:1676
+#: ../src/program.c:1746
 msgid "New _Program Window"
 msgstr ""
 
-#: ../src/program.c:1677
+#: ../src/program.c:1747
 msgid "Make a new program window"
 msgstr ""
 
-#: ../src/program.c:1682
+#: ../src/program.c:1752
 msgid "Make a new workspace"
 msgstr ""
 
-#: ../src/program.c:1686
+#: ../src/program.c:1756
 msgid "_Open Toolkit"
 msgstr ""
 
-#: ../src/program.c:1687
+#: ../src/program.c:1757
 msgid "_Open toolkit"
 msgstr ""
 
-#: ../src/program.c:1691
+#: ../src/program.c:1761
 msgid "Save Toolkit"
 msgstr ""
 
-#: ../src/program.c:1692
+#: ../src/program.c:1762
 msgid "_Save toolkit"
 msgstr ""
 
-#: ../src/program.c:1696
+#: ../src/program.c:1766
 msgid "Save Toolkit _As"
 msgstr ""
 
-#: ../src/program.c:1697
+#: ../src/program.c:1767
 msgid "Save toolkit as"
 msgstr ""
 
-#: ../src/program.c:1701
+#: ../src/program.c:1771
 msgid "_Process"
 msgstr ""
 
-#: ../src/program.c:1702
+#: ../src/program.c:1772
 msgid "Process text"
 msgstr ""
 
-#: ../src/program.c:1706
+#: ../src/program.c:1776
 msgid "_Reload All Toolkits"
 msgstr ""
 
-#: ../src/program.c:1707
+#: ../src/program.c:1777
 msgid "Remove and reload all startup data"
 msgstr ""
 
-#: ../src/program.c:1711
+#: ../src/program.c:1781
 msgid "C_ut"
 msgstr ""
 
-#: ../src/program.c:1712
+#: ../src/program.c:1782
 msgid "Cut selected text"
 msgstr ""
 
-#: ../src/program.c:1716
+#: ../src/program.c:1786
 msgid "_Copy"
 msgstr ""
 
-#: ../src/program.c:1717
+#: ../src/program.c:1787
 msgid "Copy selected text"
 msgstr ""
 
-#: ../src/program.c:1721
+#: ../src/program.c:1791
 msgid "_Paste"
 msgstr ""
 
-#: ../src/program.c:1722
+#: ../src/program.c:1792
 msgid "Paste selected text"
 msgstr ""
 
-#: ../src/program.c:1727
+#: ../src/program.c:1797
 msgid "Delete selected text"
 msgstr ""
 
-#: ../src/program.c:1732
+#: ../src/program.c:1802
 msgid "Select all text"
 msgstr ""
 
-#: ../src/program.c:1736
+#: ../src/program.c:1806
 msgid "Dese_lect All"
 msgstr ""
 
-#: ../src/program.c:1737
+#: ../src/program.c:1807
 msgid "Deselect all text"
 msgstr ""
 
-#: ../src/program.c:1741
+#: ../src/program.c:1811
 msgid "Delete _Tool"
 msgstr ""
 
-#: ../src/program.c:1742
+#: ../src/program.c:1812
 msgid "Delete current tool"
 msgstr ""
 
-#: ../src/program.c:1746
+#: ../src/program.c:1816
 msgid "Delete Tool_kit"
 msgstr ""
 
-#: ../src/program.c:1747
+#: ../src/program.c:1817
 msgid "Delete current toolkit"
 msgstr ""
 
-#: ../src/program.c:1752
+#: ../src/program.c:1822
 msgid "Find text in toolkits"
 msgstr ""
 
-#: ../src/program.c:1757
+#: ../src/program.c:1827
 msgid "Find text again"
 msgstr ""
 
-#: ../src/program.c:1761
+#: ../src/program.c:1831
 msgid "_Jump To Definition"
 msgstr ""
 
-#: ../src/program.c:1762
+#: ../src/program.c:1832
 msgid "Jump to definition"
 msgstr ""
 
-#: ../src/program.c:1766
+#: ../src/program.c:1836
 msgid "_Info"
 msgstr ""
 
-#: ../src/program.c:1767
+#: ../src/program.c:1837
 msgid "Info on selected object"
 msgstr ""
 
-#: ../src/program.c:1771
+#: ../src/program.c:1841
 msgid "_Trace"
 msgstr ""
 
-#: ../src/program.c:1772
+#: ../src/program.c:1842
 msgid "Make a new trace window"
 msgstr ""
 
-#: ../src/program.c:1776
+#: ../src/program.c:1846
 msgid "_Errors"
 msgstr ""
 
-#: ../src/program.c:1777
+#: ../src/program.c:1847
 msgid "Show all errors"
 msgstr ""
 
-#: ../src/program.c:1781
+#: ../src/program.c:1851
 msgid "Help on _Tool"
 msgstr ""
 
-#: ../src/program.c:1782
+#: ../src/program.c:1852
 msgid "View docs for this tool"
 msgstr ""
 
-#: ../src/program.c:1788
+#: ../src/program.c:1858
 msgid "Definition _Browser"
 msgstr ""
 
-#: ../src/program.c:1789
+#: ../src/program.c:1859
 msgid "Show definition browser"
 msgstr ""
 
-#: ../src/program.c:2101
+#: ../src/program.c:2115
 msgid "Bad drag."
 msgstr ""
 
-#: ../src/program.c:2103
+#: ../src/program.c:2117
 msgid ""
 "Sorry, you can only drag tools between toolkits. You can't reorder toolkits, "
 "you can't nest toolkits and you can't drag tools to the top level."
 msgstr ""
 
-#: ../src/program.c:2296
+#: ../src/program.c:2310
 msgid "Tool"
 msgstr ""
 
 #. Toolkit Browser pane.
 #.
-#: ../src/program.c:2319
+#: ../src/program.c:2333
 msgid "Definition Browser"
 msgstr ""
 
@@ -3321,7 +3321,7 @@ msgstr ""
 msgid "%s expected %s, instead saw:"
 msgstr ""
 
-#: ../src/reduce.c:148 ../src/reduce.c:1056 ../src/trace.c:126
+#: ../src/reduce.c:148 ../src/reduce.c:1056 ../src/trace.c:130
 #: ../src/workspace.c:1735
 msgid "Overflow error."
 msgstr ""
@@ -3567,7 +3567,7 @@ msgstr ""
 msgid "refers to undefined symbol"
 msgstr ""
 
-#: ../src/tool.c:888
+#: ../src/tool.c:892
 #, c-format
 msgid ""
 "Can't create dialog with name \"%s\", an object with that name already "
@@ -3591,47 +3591,47 @@ msgstr ""
 msgid "Toolkits for %s"
 msgstr ""
 
-#: ../src/trace.c:127
+#: ../src/trace.c:131
 msgid "Trace buffer stack overflow."
 msgstr ""
 
-#: ../src/trace.c:231
+#: ../src/trace.c:235
 msgid "Clear trace window"
 msgstr ""
 
-#: ../src/trace.c:237
+#: ../src/trace.c:241
 msgid "_Operators"
 msgstr ""
 
-#: ../src/trace.c:238
+#: ../src/trace.c:242
 msgid "trace operators"
 msgstr ""
 
-#: ../src/trace.c:242
+#: ../src/trace.c:246
 msgid "_Builtin Functions"
 msgstr ""
 
-#: ../src/trace.c:243
+#: ../src/trace.c:247
 msgid "trace calls to built in functions"
 msgstr ""
 
-#: ../src/trace.c:247
+#: ../src/trace.c:251
 msgid "_Class Construction"
 msgstr ""
 
-#: ../src/trace.c:248
+#: ../src/trace.c:252
 msgid "trace class constructors"
 msgstr ""
 
-#: ../src/trace.c:252
+#: ../src/trace.c:256
 msgid "_VIPS Operations"
 msgstr ""
 
-#: ../src/trace.c:253
+#: ../src/trace.c:257
 msgid "trace calls to VIPS"
 msgstr ""
 
-#: ../src/trace.c:331
+#: ../src/trace.c:335
 msgid "Trace"
 msgstr ""
 
@@ -3765,38 +3765,38 @@ msgid ""
 "%s."
 msgstr ""
 
-#: ../src/util.c:2107 ../src/util.c:2120 ../src/util.c:2145
+#: ../src/util.c:2108 ../src/util.c:2144
 msgid "Unable to read."
 msgstr ""
 
-#: ../src/util.c:2108
+#: ../src/util.c:2109
 #, c-format
 msgid "File \"%s\" too large."
 msgstr ""
 
-#: ../src/util.c:2121 ../src/util.c:2146
+#: ../src/util.c:2145
 #, c-format
 msgid ""
 "Unable to read from file \"%s\".\n"
 "%s."
 msgstr ""
 
-#: ../src/util.c:2453
+#: ../src/util.c:2452
 msgid "Unable to create temporary file."
 msgstr ""
 
-#: ../src/util.c:2454
+#: ../src/util.c:2453
 #, c-format
 msgid ""
 "Unable to make file \"%s\"\n"
 "%s"
 msgstr ""
 
-#: ../src/util.c:2661
+#: ../src/util.c:2660
 msgid "Out of memory."
 msgstr ""
 
-#: ../src/util.c:2662
+#: ../src/util.c:2661
 #, c-format
 msgid "Request for %s of RAM triggered memory allocation failure."
 msgstr ""

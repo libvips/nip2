@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=glib&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2013-02-14 12:02+0000\n"
+"POT-Creation-Date: 2013-02-14 12:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1328,77 +1328,77 @@ msgstr ""
 msgid "Unimplemented list type."
 msgstr ""
 
-#: ../src/heap.c:1964
+#: ../src/heap.c:1966
 msgid "Unimplemented type."
 msgstr ""
 
-#: ../src/heap.c:1965
+#: ../src/heap.c:1967
 #, c-format
 msgid "Unable to convert %s to a nip type."
 msgstr ""
 
-#: ../src/heap.c:2128
+#: ../src/heap.c:2130
 msgid "circular"
 msgstr ""
 
-#: ../src/heap.c:2133
+#: ../src/heap.c:2135
 #, c-format
 msgid "circular to label %d"
 msgstr ""
 
-#: ../src/heap.c:2143
+#: ../src/heap.c:2145
 #, c-format
 msgid "label %d"
 msgstr ""
 
-#: ../src/heap.c:2160
+#: ../src/heap.c:2162
 msgid "unevaluated"
 msgstr ""
 
-#: ../src/heap.c:2195
+#: ../src/heap.c:2197
 #, c-format
 msgid "class (%p)"
 msgstr ""
 
-#: ../src/heap.c:2206
+#: ../src/heap.c:2208
 msgid "members"
 msgstr ""
 
-#: ../src/heap.c:2217
+#: ../src/heap.c:2219
 msgid "secret"
 msgstr ""
 
-#: ../src/heap.c:2270
+#: ../src/heap.c:2272
 #, c-format
 msgid "no value (type %d)"
 msgstr ""
 
-#: ../src/heap.c:2278
+#: ../src/heap.c:2280
 msgid "NULL pointer"
 msgstr ""
 
-#: ../src/heap.c:2287
+#: ../src/heap.c:2289
 msgid "symbol"
 msgstr ""
 
-#: ../src/heap.c:2295
+#: ../src/heap.c:2297
 msgid "constructor"
 msgstr ""
 
-#: ../src/heap.c:2303
+#: ../src/heap.c:2305
 msgid "symref"
 msgstr ""
 
-#: ../src/heap.c:2311
+#: ../src/heap.c:2313
 msgid "compileref"
 msgstr ""
 
-#: ../src/heap.c:2339
+#: ../src/heap.c:2341
 #, c-format
 msgid "tag \"%s\""
 msgstr ""
 
-#: ../src/heap.c:2354
+#: ../src/heap.c:2356
 #, c-format
 msgid "unknown element tag %d"
 msgstr ""

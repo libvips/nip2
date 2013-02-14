@@ -33,7 +33,7 @@ Object_break_item = class
 
 Object_assemble_item = class
 	Menuaction "_Assemble Objects" 
-		"assemble a list (or group) of objects into a single object" {
+		"assemble a list of objects into a single object" {
 	action x
 		= map_unary ass x
 	{

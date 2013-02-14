@@ -85,8 +85,8 @@ most of the jobs above are pushed down into vips8 now ... except for
 #define DEBUG
 #define DEBUG_MAKE
 #define DEBUG_RGB
-#define DEBUG_CHECK
 #define DEBUG_OPEN
+#define DEBUG_CHECK
  */
 
 static iContainerClass *imageinfogroup_parent_class = NULL;
@@ -901,13 +901,15 @@ imageinfo_open_image_input( const char *filename, ImageinfoOpen *open )
 gboolean 
 imageinfo_is_from_file( Imageinfo *imageinfo )
 {
-	return( IOBJECT( imageinfo )->name && imageinfo->from_file );
+	return( IOBJECT( imageinfo )->name && 
+		imageinfo->from_file );
 }
 
 static gint
 imageinfo_attach_check_cb( Imageinfo *imageinfo )
 {
-	if( imageinfo_is_from_file( imageinfo ) && imageinfo->check_tid ) {
+	if( imageinfo_is_from_file( imageinfo ) && 
+		imageinfo->check_tid ) {
 		struct stat buf;
 
 		if( !stat( IOBJECT( imageinfo )->name, &buf ) &&
@@ -925,10 +927,11 @@ imageinfo_attach_check_cb( Imageinfo *imageinfo )
 static void
 imageinfo_attach_check( Imageinfo *imageinfo )
 {
-	if( imageinfo_is_from_file( imageinfo ) && !imageinfo->check_tid ) {
+	if( imageinfo_is_from_file( imageinfo ) && 
+		!imageinfo->check_tid ) {
 		struct stat buf;
 
-		/* Need to be able to state to be able to track a file.
+		/* Need to be able to stat() to be able to track a file.
 		 */
 		if( stat( IOBJECT( imageinfo )->name, &buf ) )
 			return;

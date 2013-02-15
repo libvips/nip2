@@ -36,7 +36,7 @@ Matrix_build_item = class
 			s = Expression "Size" (len v);
 
 			_result 
-				= Matrix (identity_matrix s.expr), s.expr != len v;
+				= Matrix (identity_matrix (to_real s)), to_real s != len v;
 				= Matrix v;
 
 			Matrix_vips value scale offset filename display = identity value;
@@ -45,19 +45,29 @@ Matrix_build_item = class
 
 	Matrix_series_item = class 
 		Menuaction "_Series" "make a series" {
-		action = class
+		action = series (mkseries 0 1 5);
+
+		mkseries s t e 
+			= transpose [[to_real s, to_real s + to_real t .. to_real e]];
+
+		series v = class
 			_result {
 			_vislevel = 3;
 
-			s = Expression "Start value" 0;
-			t = Expression "Step by" 1;
-			e = Expression "End value" 5;
+			_s = v?0?0;
+			_t = v?1?0 - v?0?0;
+			_e = (last v)?0;
+
+			s = Expression "Start value" _s;
+			t = Expression "Step by" _t;
+			e = Expression "End value" _e;
 
 			_result 
-				= Matrix (transpose [series])
-			{
-				series = [to_real s, to_real t..  to_real e];
-			}
+				= Matrix (mkseries s t e), 
+						to_real s != _s || to_real t != _t || to_real e != _e
+				= Matrix v;
+
+			Matrix_vips value scale offset filename display = series value;
 		}
 	}
 

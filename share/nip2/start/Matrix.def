@@ -27,13 +27,19 @@ Matrix_build_item = class
 
 	Matrix_identity_item = class 
 		Menuaction "_Identity" "make an identity matrix" {
-		action = class
+		action = identity (identity_matrix 5);
+		
+		identity v = class 
 			_result {
 			_vislevel = 3;
 
-			s = Expression "Size" 5;
+			s = Expression "Size" (len v);
 
-			_result = Matrix (identity_matrix s.expr);
+			_result 
+				= Matrix (identity_matrix s.expr), s.expr != len v;
+				= Matrix v;
+
+			Matrix_vips value scale offset filename display = identity value;
 		}
 	}
 

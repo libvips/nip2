@@ -1,14 +1,22 @@
-- in OS X binary, click on sRGB.icm in Open dialog ... segv!
-
-  IM relocation problem?
-
-- os x binary can't save png?
 
 - Matrix / New / Laplacian
 
   edit a cell, turns into a plain matrix
 
   need to override edit method
+
+  Matrix / New / Identity etc. have the same problem
+
+  check the new behaviour of identity ... replicate this
+
+
+
+
+- in OS X binary, click on sRGB.icm in Open dialog ... segv!
+
+  IM relocation problem?
+
+- os x binary can't save png?
 
 - didn't we have band_and or equivalent somewhere?
 

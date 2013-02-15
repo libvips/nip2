@@ -33,13 +33,6 @@
 
 #include "ip.h"
 
-/* We have gtksheet patched into the nip sources as a temp measure, so call 
- * directly.
- */
-#ifdef USE_GTKSHEET
-#include "gtksheet.h"
-#endif /*USE_GTKSHEET*/
-
 /* Round N down to P boundary.
  */
 #define ROUND_DOWN(N,P) ((N) - ((N) % P))
@@ -85,27 +78,6 @@ matrixview_destroy( GtkObject *object )
 
     	GTK_OBJECT_CLASS( parent_class )->destroy( object );
 }
-
-#ifdef USE_GTKSHEET
-static gboolean
-matrixview_scan_string( char *txt, double *out, gboolean *changed )
-{
-    	double v;
-
-    	if( sscanf( txt, "%lg", &v ) != 1 ) {
-		error_top( _( "Bad floating point number." ) );
-		error_sub( _( "\"%s\" is not a floating point number." ), txt );
-    		return( FALSE );
-    	}
-
-    	if( *out != v ) {
-    		*out = v;
-    		*changed = TRUE;
-    	}
-
-    	return( TRUE );
-}
-#endif /*USE_GTKSHEET*/
 
 static gboolean
 matrixview_scan_text( Matrixview *matrixview, GtkWidget *txt, 
@@ -197,28 +169,6 @@ matrixview_scan( View *view )
     				}
     			}
 
-#ifdef USE_GTKSHEET
-    	if( matrixview->sheet ) {
-    		GtkSheet *sheet = GTK_SHEET( matrixview->sheet );
-
-    		for( y = 0; y < height; y++ )
-    			for( x = 0; x < width; x++ ) {
-    				char *txt = gtk_sheet_cell_get_text(
-    					sheet, y, x );
-				int i = x + y * width;
-
-    				if( !matrixview_scan_string( txt,
-    					&matrix->value.coeff[i], &changed ) ) {
-					error_top( _( "Bad value." ) );
-					error_sub( _( "Cell (%d, %d):\n%s" ), 
-    						x, y, error_get_sub() );
-					expr_error_set( expr );
-
-    					return( view );
-    				}
-    			}
-    	}
-#else
 {
 	GtkTreeModel *tree = GTK_TREE_MODEL( matrixview->store );
 
@@ -244,7 +194,6 @@ matrixview_scan( View *view )
 		gtk_tree_model_iter_next( tree, &iter );
 	}
 }
-#endif /*USE_GTKSHEET*/
 
     	if( changed ) 
     		classmodel_update( CLASSMODEL( matrix ) ) ;
@@ -466,7 +415,6 @@ matrixview_text_build_scale_offset( Matrixview *matrixview )
 	UNREF( group );
 }
 
-#ifndef USE_GTKSHEET
 /* Make a GtkListStore from a MatrixValue.
  */
 GtkListStore *
@@ -478,8 +426,6 @@ matrixview_liststore_new( MatrixValue *matrixvalue )
 	GType *types;
 	int i, y;
 	GtkListStore *store;
-
-	printf( "matrixview_liststore_new\n" ); 
 
 	types = g_new( GType, width );
 	for( i = 0; i < width; i++ )
@@ -654,253 +600,6 @@ matrixview_text_build( Matrixview *matrixview )
     		 */
     		matrixview_text_build_scale_offset( matrixview );
 }
-#endif /*!USE_GTKSHEET*/
-
-#ifdef USE_GTKSHEET
-static int 
-matrixview_text_traverse( GtkSheet *sheet,
-    	int old_row, int old_col, int *new_row, int *new_col,
-    	Matrixview *matrixview )
-{
-    	Matrix *matrix = MATRIX( VOBJECT( matrixview )->iobject );
-    	Row *row = HEAPMODEL( matrix )->row;
-
-    	char *new_text = gtk_sheet_cell_get_text( sheet, *new_row, *new_col );
-
-    	char txt[MAX_LINELENGTH];
-    	VipsBuf buf = VIPS_BUF_STATIC( txt );
-
-	/* Make a note of what's in this cell before any editing ... "changed"
-	 * does a strcmp() on this to spot edit actions.
-	 */
-	IM_SETSTR( matrixview->cell_text, new_text );
-	matrixview->cell_row = *new_row;
-	matrixview->cell_col = *new_col;
-
-    	row_qualified_name( row, &buf );
-	/* Expands to (eg) "A2: cell (1,2): 45" ... status line display during
-	 * matrix traverse.
-	 */
-    	vips_buf_appendf( &buf, _( ": cell (%d, %d): %s" ), 
-		*new_col, *new_row, new_text );
-	workspace_set_status( row->ws, "%s", vips_buf_all( &buf ) );
-
-    	return( TRUE );
-}
-
-static void 
-matrixview_text_changed( GtkSheet *sheet,
-    	int row, int col, Matrixview *matrixview )
-{
-	/* "changed" is emitted on many changes :-( compare text with start
-	 * text to see if we have an edit.
-	 */
-	if( matrixview->cell_text && 
-		!VIEW( matrixview )->scannable &&
-		row == matrixview->cell_row && col == matrixview->cell_col ) {
-		char *text = gtk_sheet_cell_get_text( sheet, row, col );
-
-		if( strcmp( matrixview->cell_text, text ) != 0 ) {
-#ifdef DEBUG
-			printf( "matrixview_text_changed: "
-				"old = \"%s\", new = \"%s\"\n",
-				matrixview->cell_text, text );
-#endif /*DEBUG*/
-
-			view_changed_cb( VIEW( matrixview ) );
-		}
-	}
-}
-
-static void 
-matrixview_select_range( GtkSheet *sheet, 
-	GtkSheetRange *range, Matrixview *matrixview )
-{
-    	Matrix *matrix = MATRIX( VOBJECT( matrixview )->iobject );
-
-	matrix_select( matrix,
-		range->col0, range->row0, 
-		(range->coli - range->col0) + 1, 
-		(range->rowi - range->row0) + 1 );
-}
-
-static void 
-matrixview_unselect_range( GtkSheet *sheet, 
-	GtkSheetRange *range, Matrixview *matrixview )
-{
-    	Matrix *matrix = MATRIX( VOBJECT( matrixview )->iobject );
-
-	matrix_deselect( matrix );
-}
-
-static gboolean
-matrixview_text_event( GtkWidget *widget, 
-	GdkEvent *ev, Matrixview *matrixview )
-{
-        if( ev->type != GDK_KEY_PRESS || ev->key.keyval != GDK_Return )
-                return( FALSE );
-
-	view_activate_cb( VIEW( matrixview ) );
-
-        return( FALSE );
-}
-
-static void
-matrixview_text_sheet_build( Matrixview *matrixview )
-{
-	GtkWidget *entry;
-	GtkAdjustment *hadj, *vadj;
-
-    	int cell_width;
-    	int cell_height;
-
-    	matrixview->sheet = gtk_sheet_new( matrixview->height, 
-		matrixview->width, "" );
-
-	/* Cool, but causes too many resizing problems in an embedded widget.
-	 */
-	gtk_sheet_columns_set_resizable( GTK_SHEET( matrixview->sheet ), 
-		FALSE );
-	gtk_sheet_rows_set_resizable( GTK_SHEET( matrixview->sheet ), 
-		FALSE );
-
-    	cell_width = GTK_SHEET( matrixview->sheet )->row_title_area.width;
-    	cell_height = GTK_SHEET( matrixview->sheet )->column_title_area.height;
-
-    	gtk_signal_connect( GTK_OBJECT( matrixview->sheet ), "traverse",
-    		GTK_SIGNAL_FUNC( matrixview_text_traverse ), matrixview );
-    	gtk_signal_connect( GTK_OBJECT( matrixview->sheet ), "changed",
-    		GTK_SIGNAL_FUNC( matrixview_text_changed ), matrixview );
-
-    	gtk_sheet_set_selection_mode( GTK_SHEET( matrixview->sheet ), 
-		GTK_SELECTION_MULTIPLE );
-
-    	g_signal_connect( matrixview->sheet, "select-range",
-    		G_CALLBACK( matrixview_select_range ), matrixview );
-    	g_signal_connect( matrixview->sheet, "unselect-range",
-    		G_CALLBACK( matrixview_unselect_range ), matrixview );
-
-	/* We can't connect to "activate" on sheet's entry :-( most
-	 * gtk_sheets fail to emit it. Have to parse events ourselves.
-	 */
-	entry = gtk_sheet_get_entry( GTK_SHEET( matrixview->sheet ) );
-	gtk_signal_connect( GTK_OBJECT( entry ), "event",
-    		GTK_SIGNAL_FUNC( matrixview_text_event ), 
-		GTK_OBJECT( matrixview ) );
-
-	/* For large matricies, display in a scrolled window.
-	 */
-	if( matrixview->width > matrixview_max_width || 
-		matrixview->height > matrixview_max_height ) {
-		GtkRequisition requisition;
-		gint spacing;
-		int border;
-		int width, height;
-
-		matrixview->swin = gtk_scrolled_window_new( NULL, NULL );
-		gtk_box_pack_start( GTK_BOX( matrixview->box ), 
-			matrixview->swin, FALSE, FALSE, 0 );
-		gtk_container_add( GTK_CONTAINER( matrixview->swin ), 
-			matrixview->sheet );
-		hadj = gtk_scrolled_window_get_hadjustment( 
-			GTK_SCROLLED_WINDOW( matrixview->swin ) );
-		vadj = gtk_scrolled_window_get_vadjustment( 
-			GTK_SCROLLED_WINDOW( matrixview->swin ) );
-
-		/* Pick a size for the scrolled window. This is horrible! We
-		 * need the inner area of the swin to be a certain size, so we
-		 * need to allow extra space for the sccrollbars and the swin
-		 * padding.
-		 */
-
-		/* There is a thing in swin in 2.8+ to get the scrollbar out, 
-		 * but we want to work with earlier gtk as well. Yuk!
-		 */
-		gtk_widget_size_request( 
-			GTK_SCROLLED_WINDOW( matrixview->swin )->hscrollbar, 
-			&requisition);
-		gtk_widget_style_get( GTK_WIDGET( matrixview->swin ),
-			"scrollbar-spacing", &spacing,
-			NULL );
-		border = requisition.height + spacing;
-
-		/* Subarea of matrix we show, in cells.
-		 */
-		width = IM_MIN( matrixview->width, matrixview_max_width );
-		height = IM_MIN( matrixview->height, matrixview_max_height );
-
-		/* If we're showing row/column headers, need an extra
-		 * row/column.
-		 */
-		if( matrixview->width > matrixview_max_width )
-			height += 1;
-		if( matrixview->height > matrixview_max_height )
-			width += 1;
-
-		/* Convert to pixels.
-		 */
-		width *= cell_width;
-		height *= cell_height;
-
-		/* Will we be showing scrollbars? Need to add a bit.
-		 */
-		if( matrixview->width > matrixview_max_width )
-			height += border;
-		if( matrixview->height > matrixview_max_height )
-			width += border;
-
-		gtk_widget_set_size_request( GTK_WIDGET( matrixview->swin ), 
-			width, height );
-
-		/* If we're not showing scrollbars, we can hide the
-		 * row/column headers.
-		 */
-		if( matrixview->height <= matrixview_max_height )
-			gtk_sheet_hide_row_titles( 
-				GTK_SHEET( matrixview->sheet ) );
-		if( matrixview->width <= matrixview_max_width )
-			gtk_sheet_hide_column_titles( 
-				GTK_SHEET( matrixview->sheet ) );
-
-		gtk_scrolled_window_set_policy( 
-			GTK_SCROLLED_WINDOW( matrixview->swin ),
-			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
-	}	
-	else {
-		hadj = GTK_ADJUSTMENT( 
-			gtk_adjustment_new( 0, 0, 100, 10, 10, 10 ) );
-		vadj = GTK_ADJUSTMENT( 
-			gtk_adjustment_new( 0, 0, 100, 10, 10, 10 ) );
-
-		/* No need for col/row titles for small matricies.
-		 */
-		gtk_sheet_hide_column_titles( GTK_SHEET( matrixview->sheet ) );
-		gtk_sheet_hide_row_titles( GTK_SHEET( matrixview->sheet ) );
-
-		gtk_widget_set_size_request( GTK_WIDGET( matrixview->sheet ), 
-			matrixview->width * cell_width, 
-			matrixview->height * cell_height );
-
-		gtk_box_pack_start( GTK_BOX( matrixview->box ), 
-			matrixview->sheet, FALSE, FALSE, 0 );
-	}
-
-    	gtk_sheet_set_hadjustment( GTK_SHEET( matrixview->sheet ), hadj );
-    	gtk_sheet_set_vadjustment( GTK_SHEET( matrixview->sheet ), vadj );
-}
-
-static void
-matrixview_text_build( Matrixview *matrixview )
-{
-	/* Sheet hates zero width/height. Can happen during class construct.
-	 */
-	if( matrixview->width > 0 && matrixview->height > 0 )
-		matrixview_text_sheet_build( matrixview );
-
-    	if( matrixview->display == MATRIX_DISPLAY_TEXT_SCALE_OFFSET )
-    		matrixview_text_build_scale_offset( matrixview );
-}
-#endif /*USE_GTKSHEET*/
 
 /* Set the label on a toggle button to reflect its value.
  */
@@ -980,7 +679,6 @@ matrixview_text_set( Matrixview *matrixview, GtkWidget *txt, double val )
     	}
 }
 
-#ifndef USE_GTKSHEET
 /* Fill the widgets!
  */
 static void
@@ -1012,73 +710,6 @@ matrixview_text_refresh( Matrixview *matrixview )
 		gtk_tree_model_iter_next( tree, &iter );
 	}
 }
-#endif /*!USE_GTKSHEET*/
-
-#ifdef USE_GTKSHEET
-static void
-matrixview_text_refresh( Matrixview *matrixview )
-{
-    	Matrix *matrix = MATRIX( VOBJECT( matrixview )->iobject );
-	GtkSheetRange *range = &GTK_SHEET( matrixview->sheet )->range;
-
-    	int x, y;
-
-	/* width and height can be zero (during class construct), in which
-	 * case they'll be no gtk_sheet.
-	 */
-	if( !matrixview->sheet )
-		return;
-
-	gtk_sheet_freeze( GTK_SHEET( matrixview->sheet ) );
-
-    	for( y = 0; y < matrixview->height; y++ )
-    		for( x = 0; x < matrixview->width; x++ ) {
-    			int i = x + y * matrix->value.width;
-    			double coeff = matrix->value.coeff[i];
-    			char buf[256];
-
-    			snprintf( buf, 256, "%g", coeff );
-			gtk_signal_handler_block_by_data( 
-				GTK_OBJECT( matrixview->sheet ), matrixview );
-    			gtk_sheet_set_cell_text( GTK_SHEET( matrixview->sheet ),
-                                        y, x, buf );
-			gtk_signal_handler_unblock_by_data( 
-				GTK_OBJECT( matrixview->sheet ), matrixview );
-
-			if( x == matrixview->cell_col && 
-				y == matrixview->cell_row ) 
-				IM_SETSTR( matrixview->cell_text, buf );
-    		}
-
-	/* Is the model's selection different from ours? Update ours if it is.
-	 * Annoyingly, we can only change the selection when the widget's
-	 * realized.
-	 */
-	if( GTK_WIDGET_REALIZED( matrixview->sheet ) ) {
-		if( !matrix->selected )
-			gtk_sheet_unselect_range( 
-				GTK_SHEET( matrixview->sheet ) );
-		else if( range->col0 != matrix->range.left ||
-			range->coli != IM_RECT_RIGHT( &matrix->range ) - 1 ||
-			range->row0 != matrix->range.top ||
-			range->rowi != IM_RECT_BOTTOM( &matrix->range ) - 1 ) {
-			GtkSheetRange new_range;
-
-			new_range.col0 = matrix->range.left;
-			new_range.row0 = matrix->range.top;
-			new_range.coli = IM_RECT_RIGHT( &matrix->range );
-			new_range.rowi = IM_RECT_BOTTOM( &matrix->range );
-			gtk_sheet_select_range( GTK_SHEET( matrixview->sheet ),
-				&new_range );
-		}
-	}
-
-	gtk_sheet_thaw( GTK_SHEET( matrixview->sheet ) );
-
-    	matrixview_text_set( matrixview, matrixview->scale, matrix->scale );
-    	matrixview_text_set( matrixview, matrixview->offset, matrix->offset );
-}
-#endif /*USE_GTKSHEET*/
 
 static void
 matrixview_refresh( vObject *vobject )

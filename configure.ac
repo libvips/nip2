@@ -179,26 +179,6 @@ if test x"$nip_use_infobar" = x"yes"; then
   AC_DEFINE(USE_INFOBAR,1,[define if you have GtkInfoBar])
 fi
 
-# building without gtksheet is an option
-AC_ARG_WITH([gtksheet], AS_HELP_STRING([--without-gtksheet], [build without gtksheet (default: test)]))
-
-# GtkEntryBuffer was added in gtk 2.18
-# we need it for our hacked-about gtksheet widget ... fall back to a treeview
-# matrix widget if we have to
-if test "x$with_gtksheet" != "xno"; then
-  PKG_CHECK_EXISTS(gtk+-2.0 >= 2.18,
-    [with_gtksheet=yes],
-    [with_gtksheet=no]
-  )
-fi
-
-if test x"$with_gtksheet" = x"no"; then
-  AM_CONDITIONAL(USE_GTKSHEET, false)
-else
-  AC_DEFINE(USE_GTKSHEET,1,[define if you have GtkEntryBuffer])
-  AM_CONDITIONAL(USE_GTKSHEET, true)
-fi
-
 # GRegex was added in glib-2.14
 # we need it for regex searching in the program window
 PKG_CHECK_EXISTS(glib-2.0 >= 2.14,
@@ -385,8 +365,6 @@ use gsl for numeric functions:		$with_gsl
 use libgoffice to show plots:		$with_libgoffice
 use libgvc to show ws dep graphs:	$with_libgvc
   (requires gvc < 2.30)
-use gtksheet to show matrices:  	$with_gtksheet
-  (requires gtk+-2.0 >= 2.18)
 use gtkinfobar to show messages:	$nip_use_infobar
   (requires gtk+-2.0 >= 2.18)
 allow regex searches: 			$nip_use_gregex

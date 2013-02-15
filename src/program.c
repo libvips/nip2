@@ -116,7 +116,7 @@ program_refresh_update( Program *program, GtkTreePath *path,
 	const char *name, Tool *tool, Toolkit *kit )
 {
 	GtkTreeIter iter;
-	
+
 	/* Update, or append if there's nothing to update.
 	 */
 	if( gtk_tree_model_get_iter( GTK_TREE_MODEL( program->store ), 

@@ -41,7 +41,7 @@ typedef struct _Matrixview {
 	GtkWidget *box;			/* Top level hbox we lay out in */
 
 	/* If we're displaying a matrix. We use the liststore if we can't
-	 * builf gtksheet on this gtk.
+	 * build gtksheet on this gtk.
 	 */
 	GtkListStore *store;
 	GtkWidget *sheet;

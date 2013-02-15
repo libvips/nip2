@@ -132,6 +132,8 @@ matrixview_scan( View *view )
 {
     	Matrixview *matrixview = MATRIXVIEW( view );
     	Matrix *matrix = MATRIX( VOBJECT( matrixview )->iobject );
+	int width = matrix->value.width;
+	int height = matrix->value.height;
     	Expr *expr = HEAPMODEL( matrix )->row->expr;
 
     	gboolean changed;
@@ -170,10 +172,10 @@ matrixview_scan( View *view )
     	/* Loop thru' all matrix widgets.
     	 */
     	if( matrixview->items ) 
-    		for( p = matrixview->items, y = 0; y < matrixview->height; y++ )
-    			for( x = 0; x < matrixview->width; x++, p = p->next ) {
+    		for( p = matrixview->items, y = 0; y < height; y++ )
+    			for( x = 0; x < width; x++, p = p->next ) {
     				GtkWidget *item = GTK_WIDGET( p->data );
-				int i = x + y * matrix->value.width;
+				int i = x + y * width;
 
     				GtkWidget *entry;
 
@@ -199,11 +201,11 @@ matrixview_scan( View *view )
     	if( matrixview->sheet ) {
     		GtkSheet *sheet = GTK_SHEET( matrixview->sheet );
 
-    		for( y = 0; y < matrixview->height; y++ )
-    			for( x = 0; x < matrixview->width; x++ ) {
+    		for( y = 0; y < height; y++ )
+    			for( x = 0; x < width; x++ ) {
     				char *txt = gtk_sheet_cell_get_text(
     					sheet, y, x );
-				int i = x + y * matrix->value.width;
+				int i = x + y * width;
 
     				if( !matrixview_scan_string( txt,
     					&matrix->value.coeff[i], &changed ) ) {
@@ -216,6 +218,30 @@ matrixview_scan( View *view )
     				}
     			}
     	}
+#else
+{
+	GtkTreeModel *tree = GTK_TREE_MODEL( matrixview->store );
+
+	int x, y;
+	GtkTreeIter iter;
+
+	printf( "scanning!\n" );
+
+	gtk_tree_model_get_iter_first( tree, &iter );
+
+	for( y = 0; y < height; y++ ) {
+		for( x = 0; x < width; x++ ) {
+			double d;
+
+			gtk_tree_model_get( tree, &iter, x, &d, -1 );
+			matrix->value.coeff[x + y * width] = d;
+
+			printf( "%d, %d = %g\n", x, y, d ); 
+		}
+
+		gtk_tree_model_iter_next( tree, &iter );
+	}
+}
 #endif /*USE_GTKSHEET*/
 
     	if( changed ) 
@@ -380,16 +406,20 @@ matrixview_slider_build( Matrixview *matrixview )
     		}
 }
 
-static void
-matrixview_text_focus_in( GtkWidget *entry )
+static gboolean
+matrixview_text_focus_in( GtkWidget *entry, GdkEvent *event, void *data )
 {
     	gtk_editable_select_region( GTK_EDITABLE( entry ), 0, -1 );
+
+	return( FALSE );
 }
 
-static void
-matrixview_text_focus_out( GtkWidget *entry )
+static gboolean
+matrixview_text_focus_out( GtkWidget *entry, GdkEvent *event, void *data )
 {
     	gtk_editable_select_region( GTK_EDITABLE( entry ), 0, 0 );
+
+	return( FALSE );
 }
 
 static void
@@ -466,6 +496,29 @@ matrixview_liststore_new( MatrixValue *matrixvalue )
 	return( store );
 }
 
+static void
+matrixview_edited( GtkCellRendererText *renderer, 
+	char *path, char *new_text, void *user_data )
+{
+	Matrixview *matrixview = MATRIXVIEW( user_data );
+	GtkTreeModel *tree = GTK_TREE_MODEL( matrixview->store );
+	GtkTreeIter iter;
+
+	if( gtk_tree_model_get_iter_from_string( tree, &iter, path ) ) {
+		int x = GPOINTER_TO_INT( g_object_get_data( 
+			G_OBJECT( renderer ), "nip2_column_num" ) );
+
+		gtk_list_store_set( GTK_LIST_STORE( tree ), &iter, 
+			x, atof( new_text ),
+			-1 ); 
+
+		printf( "matrixview_edited: %s %d = %s\n", path, x, new_text ); 
+
+		view_scannable_register( VIEW( matrixview ) );
+		symbol_recalculate_all();
+	}
+}
+
 /* Build a set of text items for a matrix. 
  */
 static void
@@ -473,11 +526,13 @@ matrixview_text_build( Matrixview *matrixview )
 {
     	Matrix *matrix = MATRIX( VOBJECT( matrixview )->iobject );
 
-	GtkCellRenderer *renderer;
 	int i;
 	GtkTreeViewColumn *column;
     	int cell_height;
 	GtkTreeSelection *selection;
+
+	if( !matrix->value.coeff )
+		return;
 
 	matrixview->store = matrixview_liststore_new( &matrix->value );
 	matrixview->sheet = gtk_tree_view_new_with_model( 
@@ -485,11 +540,16 @@ matrixview_text_build( Matrixview *matrixview )
 	gtk_tree_view_set_headers_visible( GTK_TREE_VIEW( matrixview->sheet ),
 		FALSE );
 
-	renderer = gtk_cell_renderer_text_new();
-	g_object_set( renderer, "editable", TRUE, NULL );
-
 	for( i = 0; i < matrix->value.width; i++ ) {
+		GtkCellRenderer *renderer;
 		char buf[256];
+
+		renderer = gtk_cell_renderer_text_new();
+		g_object_set( renderer, "editable", TRUE, NULL );
+		g_object_set_data( G_OBJECT( renderer ), 
+			"nip2_column_num", GINT_TO_POINTER( i ) );
+		g_signal_connect( G_OBJECT( renderer ), "edited",
+			G_CALLBACK( matrixview_edited ), matrixview );
 
 		column = gtk_tree_view_column_new();
 		gtk_tree_view_column_set_sizing( column, 
@@ -925,9 +985,30 @@ static void
 matrixview_text_refresh( Matrixview *matrixview )
 {
     	Matrix *matrix = MATRIX( VOBJECT( matrixview )->iobject );
+	MatrixValue *matrixvalue = &matrix->value;
+	int width = matrixvalue->width;
+	int height = matrixvalue->height;
+	GtkListStore *store = matrixview->store;
+
+	int i, y;
+
+	if( !matrixvalue->coeff )
+		return;
 
     	matrixview_text_set( matrixview, matrixview->scale, matrix->scale );
     	matrixview_text_set( matrixview, matrixview->offset, matrix->offset );
+
+	gtk_list_store_clear( store );
+
+	for( y = 0; y < height; y++ ) {
+		GtkTreeIter iter;
+
+		gtk_list_store_append( store, &iter );
+
+		for( i = 0; i < width; i++ ) 
+			gtk_list_store_set( store, &iter, 
+				i, matrixvalue->coeff[y * width + i], -1 );
+	}
 }
 #endif /*!USE_GTKSHEET*/
 

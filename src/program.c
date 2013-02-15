@@ -894,6 +894,15 @@ program_text_cursor_position( GtkTextBuffer *buffer, GParamSpec *pspec,
 }
 
 static void
+program_text_changed( GtkTextBuffer *buffer, Program *program )
+{
+	if( !program->dirty ) {
+		program->dirty = TRUE;
+		program_refresh( program );
+	}
+}
+
+static void
 program_set_text( Program *program, const char *text, gboolean editable )
 {
 	GtkTextView *text_view = GTK_TEXT_VIEW( program->text );
@@ -1090,7 +1099,8 @@ program_parse( Program *program )
 	}
 
 	program->dirty = FALSE;
-	filemodel_set_modified( FILEMODEL( program->kit ), TRUE );
+	if( program->kit )
+		filemodel_set_modified( FILEMODEL( program->kit ), TRUE );
 
 	/* Reselect last_sym, the last thing the parser saw. 
 	 */
@@ -1107,7 +1117,8 @@ program_tool_new_action_cb( GtkAction *action, Program *program )
 {
 	/* Existing text changed? Parse it.
 	 */
-	if( program->dirty && !program_parse( program ) ) {
+	if( program->dirty && 
+		!program_parse( program ) ) {
 		iwindow_alert( GTK_WIDGET( program ), GTK_MESSAGE_ERROR );
 		return;
 	}
@@ -2358,6 +2369,11 @@ program_build( Program *program, GtkWidget *vbox )
 		gtk_text_view_get_buffer( GTK_TEXT_VIEW( program->text ) ),
 		"notify::cursor-position",
                 G_CALLBACK( program_text_cursor_position ), program );
+	g_signal_connect(
+		gtk_text_view_get_buffer( GTK_TEXT_VIEW( program->text ) ),
+		"changed",
+                G_CALLBACK( program_text_changed ), program );
+
 	gtk_container_add( GTK_CONTAINER( swin ), program->text );
 	gtk_widget_show( program->text );
 

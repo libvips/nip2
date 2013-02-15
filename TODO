@@ -6,12 +6,6 @@
 
 - test Mono / Monospace thing
 
-- program window, new tool, enter
-
-	fred = 12
-
-  process ... does nothing!
-
 - didn't we have band_and or equivalent somewhere?
 
 	  band x = foldr1 bitwise_and (bandsplit x)
@@ -19,8 +13,6 @@
   necessary for im == Vector [1,2,3]
 
 - breadcrumb trail for prog window, so you can get back to where you were?
-
-- click away from a half-edited def should save somewhere?
 
 - im_invertlut() as a menu item
 

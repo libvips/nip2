@@ -225,18 +225,20 @@ matrixview_scan( View *view )
 	int x, y;
 	GtkTreeIter iter;
 
-	printf( "scanning!\n" );
-
 	gtk_tree_model_get_iter_first( tree, &iter );
 
 	for( y = 0; y < height; y++ ) {
 		for( x = 0; x < width; x++ ) {
+			double *out = &matrix->value.coeff[x + y * width];
+
 			double d;
 
 			gtk_tree_model_get( tree, &iter, x, &d, -1 );
-			matrix->value.coeff[x + y * width] = d;
 
-			printf( "%d, %d = %g\n", x, y, d ); 
+			if( *out != d ) {
+				*out = d;
+				changed = TRUE;
+			}
 		}
 
 		gtk_tree_model_iter_next( tree, &iter );
@@ -477,6 +479,8 @@ matrixview_liststore_new( MatrixValue *matrixvalue )
 	int i, y;
 	GtkListStore *store;
 
+	printf( "matrixview_liststore_new\n" ); 
+
 	types = g_new( GType, width );
 	for( i = 0; i < width; i++ )
 		types[i] = G_TYPE_DOUBLE;
@@ -511,8 +515,6 @@ matrixview_edited( GtkCellRendererText *renderer,
 		gtk_list_store_set( GTK_LIST_STORE( tree ), &iter, 
 			x, atof( new_text ),
 			-1 ); 
-
-		printf( "matrixview_edited: %s %d = %s\n", path, x, new_text ); 
 
 		view_scannable_register( VIEW( matrixview ) );
 		symbol_recalculate_all();
@@ -988,9 +990,10 @@ matrixview_text_refresh( Matrixview *matrixview )
 	MatrixValue *matrixvalue = &matrix->value;
 	int width = matrixvalue->width;
 	int height = matrixvalue->height;
-	GtkListStore *store = matrixview->store;
+	GtkTreeModel *tree = GTK_TREE_MODEL( matrixview->store );
 
-	int i, y;
+	int x, y;
+	GtkTreeIter iter;
 
 	if( !matrixvalue->coeff )
 		return;
@@ -998,16 +1001,15 @@ matrixview_text_refresh( Matrixview *matrixview )
     	matrixview_text_set( matrixview, matrixview->scale, matrix->scale );
     	matrixview_text_set( matrixview, matrixview->offset, matrix->offset );
 
-	gtk_list_store_clear( store );
+	gtk_tree_model_get_iter_first( tree, &iter );
 
 	for( y = 0; y < height; y++ ) {
-		GtkTreeIter iter;
+		for( x = 0; x < width; x++ ) 
+			gtk_list_store_set( matrixview->store, &iter, 
+				x, matrixvalue->coeff[x + y * width], 
+				-1 );
 
-		gtk_list_store_append( store, &iter );
-
-		for( i = 0; i < width; i++ ) 
-			gtk_list_store_set( store, &iter, 
-				i, matrixvalue->coeff[y * width + i], -1 );
+		gtk_tree_model_iter_next( tree, &iter );
 	}
 }
 #endif /*!USE_GTKSHEET*/

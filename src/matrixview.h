@@ -40,16 +40,13 @@ typedef struct _Matrixview {
 
 	GtkWidget *box;			/* Top level hbox we lay out in */
 
-	/* If we're displaying a matrix. We use the liststore if we can't
-	 * build gtksheet on this gtk.
+	/* If we're displaying a matrix with a gtktreeview. 
 	 */
 	GtkListStore *store;
 	GtkWidget *sheet;
 	GtkWidget *swin;
-	char *cell_text;		/* Last text set ... for edit detect */
-	int cell_row, cell_col;		/* Position of text */
 
-	/* Displaying a table of widgets.
+	/* Displaying a table of widgets: sliders or toggles. 
 	 */
 	GtkWidget *table;		/* Matrix table */
 	GSList *items; 			/* Widgets for elems */

@@ -49,9 +49,9 @@ static const int matrixview_max_height = 10;
 
 /* Show a matrix with fixed-width columns.
  */
-static const int matrixview_column_width = 70;
+static const int matrixview_column_width = 75;
 
-/* Limit non-gtksheet display size with these ... could be prefs?
+/* Limit number of sub-widgets with this ... could be prefs?
  */
 static const int matrixview_max_cells = 100;
 
@@ -74,7 +74,6 @@ matrixview_destroy( GtkObject *object )
     	/* My instance destroy stuff.
     	 */
     	IM_FREEF( g_slist_free, matrixview->items );
-	IM_FREE( matrixview->cell_text );
 
     	GTK_OBJECT_CLASS( parent_class )->destroy( object );
 }
@@ -141,22 +140,15 @@ matrixview_scan( View *view )
     		return( view );
     	}
 
-    	/* Loop thru' all matrix widgets.
+    	/* Loop thru' all matrix widgets. tsliders have text fields we must
+	 * scan too.
     	 */
     	if( matrixview->items ) 
     		for( p = matrixview->items, y = 0; y < height; y++ )
     			for( x = 0; x < width; x++, p = p->next ) {
     				GtkWidget *item = GTK_WIDGET( p->data );
+    				GtkWidget *entry = TSLIDER( item )->entry;
 				int i = x + y * width;
-
-    				GtkWidget *entry;
-
-    				/* It's either an entry, or a tslider.
-    				 */
-    				if( IS_TSLIDER( item ) ) 
-    					entry = TSLIDER( item )->entry;
-    				else
-    					entry = item;
 
     				if( !matrixview_scan_text( matrixview, entry,
     					&matrix->value.coeff[i], &changed ) ) {
@@ -169,31 +161,31 @@ matrixview_scan( View *view )
     				}
     			}
 
-{
-	GtkTreeModel *tree = GTK_TREE_MODEL( matrixview->store );
+	if( matrixview->store ) {
+		GtkTreeModel *tree = GTK_TREE_MODEL( matrixview->store );
 
-	int x, y;
-	GtkTreeIter iter;
+		GtkTreeIter iter;
 
-	gtk_tree_model_get_iter_first( tree, &iter );
+		gtk_tree_model_get_iter_first( tree, &iter );
 
-	for( y = 0; y < height; y++ ) {
-		for( x = 0; x < width; x++ ) {
-			double *out = &matrix->value.coeff[x + y * width];
+		for( y = 0; y < height; y++ ) {
+			for( x = 0; x < width; x++ ) {
+				double *out = 
+					&matrix->value.coeff[x + y * width];
 
-			double d;
+				double d;
 
-			gtk_tree_model_get( tree, &iter, x, &d, -1 );
+				gtk_tree_model_get( tree, &iter, x, &d, -1 );
 
-			if( *out != d ) {
-				*out = d;
-				changed = TRUE;
+				if( *out != d ) {
+					*out = d;
+					changed = TRUE;
+				}
 			}
-		}
 
-		gtk_tree_model_iter_next( tree, &iter );
+			gtk_tree_model_iter_next( tree, &iter );
+		}
 	}
-}
 
     	if( changed ) 
     		classmodel_update( CLASSMODEL( matrix ) ) ;
@@ -564,14 +556,6 @@ matrixview_text_build( Matrixview *matrixview )
 		width = IM_MIN( matrix->value.width, matrixview_max_width );
 		height = IM_MIN( matrix->value.height, matrixview_max_height );
 
-		/* If we're showing row/column headers, need an extra
-		 * row/column.
-		if( matrixview->width > matrixview_max_width )
-			height += 1;
-		if( matrixview->height > matrixview_max_height )
-			width += 1;
-		 */
-
 		/* Convert to pixels.
 		 */
 		width *= matrixview_column_width;
@@ -786,9 +770,6 @@ matrixview_refresh( vObject *vobject )
     		IM_FREEF( gtk_widget_destroy, matrixview->swin );
     		IM_FREEF( g_slist_free, matrixview->items );
     		IM_FREEF( gtk_widget_destroy, matrixview->cbox );
-		IM_FREE( matrixview->cell_text );
-		matrixview->cell_row = -1;
-		matrixview->cell_col = -1;
     		matrixview->scale = NULL;
     		matrixview->offset = NULL;
 
@@ -920,9 +901,6 @@ matrixview_init( Matrixview *matrixview )
     	matrixview->store = NULL;
     	matrixview->sheet = NULL;
     	matrixview->swin = NULL;
-    	matrixview->cell_text = NULL;
-    	matrixview->cell_row = -1;
-    	matrixview->cell_col = -1;
     	matrixview->table = NULL;
     	matrixview->items = NULL;
     	matrixview->width = -1;

@@ -209,8 +209,7 @@ formula_refresh( Formula *formula )
 	if( formula->edit && formula->needs_focus ) {
 		if( formula->expr )
 			gtk_editable_select_region( 
-				GTK_EDITABLE( formula->entry ),
-				0, strlen( formula->expr ) );
+				GTK_EDITABLE( formula->entry ), 0, -1 );
 		gtk_widget_grab_focus( formula->entry );
 		formula->needs_focus = FALSE;
 	}

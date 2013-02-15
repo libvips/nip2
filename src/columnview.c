@@ -785,8 +785,7 @@ columnview_refresh( vObject *vobject )
 			set_gentry( cview->capedit, "%s", 
 				IOBJECT( col )->caption );
 			gtk_editable_select_region( 
-				GTK_EDITABLE( cview->capedit ),
-				0, strlen( IOBJECT( col )->caption ) );
+				GTK_EDITABLE( cview->capedit ), 0, -1 );
 		}
                 gtk_widget_grab_focus( cview->capedit );
         }

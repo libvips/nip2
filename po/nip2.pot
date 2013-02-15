@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=glib&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2013-02-14 12:35+0000\n"
+"POT-Creation-Date: 2013-02-15 15:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,89 +19,320 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: ../src/action.c:87
-msgid "Bad arguments."
+#: ../src/conversionview.c:50
+msgid "Unable to find image range."
 msgstr ""
 
-#. Expands to eg. 'bad args to "+", called from "fred"'
+#: ../src/conversionview.c:51
+msgid "Find image range failed."
+msgstr ""
+
+#: ../src/conversionview.c:74
+msgid "Unable to scale image."
+msgstr ""
+
+#: ../src/conversionview.c:75
+msgid "Maximum and minimum pixel values are equal."
+msgstr ""
+
+#. Build menu. One for each window, as we need to track falsecolour
+#. * etc. toggles. Could just have one, and modify pre-popup, but this
+#. * is easier.
 #.
-#: ../src/action.c:102 ../src/action.c:186
-msgid "Called from"
+#: ../src/conversionview.c:207
+msgid "Convert menu"
 msgstr ""
 
-#: ../src/action.c:108
+#: ../src/conversionview.c:208
+msgid "_Scale"
+msgstr ""
+
+#: ../src/conversionview.c:210
+msgid "_False Color"
+msgstr ""
+
+#: ../src/conversionview.c:212
+msgid "_Interpret"
+msgstr ""
+
+#: ../src/conversionview.c:214 ../src/regionview.c:1019
+msgid "_Reset"
+msgstr ""
+
+#: ../src/conversionview.c:216
+msgid "Set As Workspace _Default"
+msgstr ""
+
+#: ../src/tslider.c:369
+msgid "Slider value ... edit!"
+msgstr ""
+
+#: ../src/tslider.c:390
+msgid "Left-drag to set number"
+msgstr ""
+
+#: ../src/fontnameview.c:63 ../src/optionview.c:172 ../src/sliderview.c:58
+#: ../src/gtkutil.c:756 ../src/gtkutil.c:791 ../src/gtkutil.c:845
+#: ../src/editview.c:60 ../src/pathnameview.c:63 ../src/formula.c:198
+#, c-format
+msgid "%s:"
+msgstr ""
+
+#: ../src/workspacegroup.c:145 ../src/column.c:326 ../src/workspace.c:1553
+#: ../src/tool.c:891
+msgid "Name clash."
+msgstr ""
+
+#: ../src/workspacegroup.c:146
 #, c-format
 msgid ""
-"Error in binary %s.\n"
-"left = %s\n"
-"right = %s\n"
-"%s"
+"Can't create workspacegroup \"%s\". A symbol with that name already exists."
 msgstr ""
 
-#: ../src/action.c:142 ../src/class.c:190
+#: ../src/workspacegroup.c:177 ../src/workspacegroup.c:213
+#: ../src/columnview.c:180 ../src/columnview.c:241 ../src/row.c:480
+#: ../src/mainw.c:1371 ../src/mainw.c:1409 ../src/defbrowser.c:253
+#: ../src/program.c:595 ../src/program.c:624 ../src/program.c:1123
+#: ../src/program.c:1164 ../src/program.c:1210 ../src/program.c:1242
+#: ../src/program.c:1574 ../src/program.c:1615
+msgid "Name"
+msgstr ""
+
+#: ../src/workspacegroup.c:178 ../src/workspacegroup.c:215 ../src/option.c:65
+#: ../src/slider.c:48 ../src/pathname.c:75 ../src/string.c:67
+#: ../src/number.c:48 ../src/mainw.c:1372 ../src/mainw.c:1411
+#: ../src/toggle.c:48 ../src/program.c:1124 ../src/program.c:1166
+#: ../src/fontname.c:58
+msgid "Caption"
+msgstr ""
+
+#: ../src/workspacegroup.c:213
+msgid "Set workspace name here"
+msgstr ""
+
+#: ../src/workspacegroup.c:215
+msgid "Set workspace caption here"
+msgstr ""
+
+#: ../src/workspacegroup.c:217
+msgid "New Workspace"
+msgstr ""
+
+#: ../src/workspacegroup.c:221
+msgid "Create Workspace"
+msgstr ""
+
+#: ../src/matrix.c:149 ../src/main.c:685
+msgid "Text"
+msgstr ""
+
+#: ../src/matrix.c:150
+msgid "Sliders"
+msgstr ""
+
+#: ../src/matrix.c:151
+msgid "Toggle buttons"
+msgstr ""
+
+#: ../src/matrix.c:152
+msgid "Text, plus scale and offset"
+msgstr ""
+
+#: ../src/matrix.c:163
+msgid "Display as"
+msgstr ""
+
+#. Expands to eg. "Edit Toggle A1".
+#.
+#: ../src/matrix.c:191 ../src/iregion.c:235 ../src/colour.c:260
+#: ../src/classmodel.c:759 ../src/clock.c:99
 #, c-format
-msgid "Member \"%s\" not found in class \"%s\"."
+msgid "Edit %s %s"
 msgstr ""
 
-#: ../src/action.c:149
+#: ../src/matrix.c:199 ../src/iregion.c:241 ../src/colour.c:268
+#: ../src/classmodel.c:770 ../src/clock.c:105
 #, c-format
-msgid "object = %s"
+msgid "Set %s"
 msgstr ""
 
-#: ../src/action.c:153
+#: ../src/matrix.c:275 ../src/option.c:71 ../src/slider.c:57
+#: ../src/pathname.c:78 ../src/string.c:70 ../src/colour.c:303
+#: ../src/number.c:51 ../src/imageheader.c:239 ../src/toggle.c:51
+#: ../src/clock.c:194 ../src/plot.c:348 ../src/fontname.c:61
+msgid "Value"
+msgstr ""
+
+#: ../src/matrix.c:278 ../src/matrixview.c:398
+msgid "Scale"
+msgstr ""
+
+#: ../src/matrix.c:281 ../src/matrixview.c:403
+msgid "Offset"
+msgstr ""
+
+#: ../src/matrix.c:284 ../src/columnview.c:182 ../src/columnview.c:245
+#: ../src/program.c:596 ../src/program.c:626 ../src/program.c:1211
+#: ../src/program.c:1244
+msgid "Filename"
+msgstr ""
+
+#: ../src/matrix.c:287
+msgid "Display"
+msgstr ""
+
+#: ../src/option.c:68
+msgid "Labels"
+msgstr ""
+
+#: ../src/vipsobject.c:106 ../src/call.c:269 ../src/class.c:657
+#: ../src/class.c:889 ../src/class.c:986 ../src/compile.c:1766
+msgid "Too many arguments."
+msgstr ""
+
+#: ../src/vipsobject.c:107
 #, c-format
-msgid "tag = %s"
+msgid "No more than %d arguments allowed."
 msgstr ""
 
-#: ../src/action.c:158
+#: ../src/vipsobject.c:213
+msgid "Wrong number of required arguments."
+msgstr ""
+
+#: ../src/vipsobject.c:214
 #, c-format
-msgid "Reference attempted in \"%s\"."
+msgid "Operation \"%s\" has %d required arguments, you supplied %d."
 msgstr ""
 
-#: ../src/action.c:162 ../src/class.c:189
-msgid "Member not found."
+#: ../src/vipsobject.c:250 ../src/vipsobject.c:382 ../src/util.c:191
+#: ../src/cache.c:875
+msgid "VIPS library error."
 msgstr ""
 
-#: ../src/action.c:173 ../src/builtin.c:1072 ../src/call.c:249
-#: ../src/class.c:49 ../src/class.c:1027 ../src/reduce.c:898
-#: ../src/reduce.c:911
-msgid "Bad argument."
+#: ../src/vipsobject.c:251 ../src/vipsobject.c:383
+msgid "Unable to build object."
 msgstr ""
 
-#: ../src/action.c:192
-#, c-format
+#: ../src/toolkitbrowser.c:267
+msgid "Action"
+msgstr ""
+
+#: ../src/toolkitbrowser.c:275
+msgid "Parameters"
+msgstr ""
+
+#: ../src/toolkitbrowser.c:283
+msgid "Menu Item"
+msgstr ""
+
+#. Need one menu per image window (could have a single menu for all
+#. * windows, but then we'd have to set the state of the toggle buttons
+#. * before mapping)
+#.
+#: ../src/imagepresent.c:1583
+msgid "Ruler menu"
+msgstr ""
+
+#: ../src/imagepresent.c:1584
+msgid "Rulers In _mm"
+msgstr ""
+
+#: ../src/imagepresent.c:1586
+msgid "Show _Offset"
+msgstr ""
+
+#. Create signals.
+#.
+#. Init methods.
+#.
+#: ../src/paintboxview.c:109
+msgid "Paintbox bar menu"
+msgstr ""
+
+#: ../src/paintboxview.c:210
+msgid "Clear undo history?"
+msgstr ""
+
+#: ../src/paintboxview.c:211
 msgid ""
-"Error in unary %s.\n"
-"argument = %s\n"
-"%s"
+"Are you sure you want to clear all undo and redo? This will free up memory, "
+"but you will no longer be able to undo or redo any of the painting you have "
+"done so far."
 msgstr ""
 
-#: ../src/action.c:359 ../src/action.c:377 ../src/action.c:407
-msgid "Bad right hand side of '.'."
+#: ../src/paintboxview.c:246
+msgid "Manipulate regions"
 msgstr ""
 
-#: ../src/action.c:369
-msgid "Symbol on left hand side of '.' is not scope"
+#. IMAGEMODEL_SELECT
+#: ../src/paintboxview.c:247
+msgid "Pan window"
 msgstr ""
 
-#: ../src/action.c:411
-msgid "Property not found."
+#. IMAGEMODEL_PAN
+#: ../src/paintboxview.c:248
+msgid "Zoom in on mouse"
 msgstr ""
 
-#: ../src/action.c:425
-msgid "Bad left hand side of '.'."
+#. IMAGEMODEL_MAGIN
+#: ../src/paintboxview.c:249 ../src/imageview.c:506 ../src/imageview.c:560
+msgid "Zoom out"
 msgstr ""
 
-#: ../src/action.c:937
-msgid "Division by zero."
+#. IMAGEMODEL_MAGOUT
+#: ../src/paintboxview.c:250
+msgid "Read pixel into inkwell"
 msgstr ""
 
-#: ../src/action.c:1313 ../src/action.c:1593
-msgid "Unimplemented."
+#. IMAGEMODEL_DROPPER
+#: ../src/paintboxview.c:251
+msgid "Freehand draw "
 msgstr ""
 
-#: ../src/action.c:1677 ../src/action.c:1713 ../src/action.c:1971
-msgid "invoking method:"
+#. IMAGEMODEL_PEN
+#: ../src/paintboxview.c:252
+msgid "Draw straight lines"
+msgstr ""
+
+#. IMAGEMODEL_LINE
+#: ../src/paintboxview.c:253
+msgid "Fill rectangles"
+msgstr ""
+
+#. IMAGEMODEL_RECT
+#: ../src/paintboxview.c:254
+msgid "Flood while pixel not equal to ink"
+msgstr ""
+
+#. IMAGEMODEL_FLOOD
+#: ../src/paintboxview.c:256
+msgid "Flood while pixel equal to click"
+msgstr ""
+
+#. IMAGEMODEL_BLOB
+#: ../src/paintboxview.c:258
+msgid "Draw text"
+msgstr ""
+
+#. IMAGEMODEL_TEXT
+#: ../src/paintboxview.c:259 ../src/main.c:686
+msgid "Smudge"
+msgstr ""
+
+#: ../src/paintboxview.c:309
+msgid "Undo last paint action"
+msgstr ""
+
+#: ../src/paintboxview.c:318
+msgid "Redo last paint action"
+msgstr ""
+
+#: ../src/paintboxview.c:327
+msgid "Clear all undo and redo buffers"
+msgstr ""
+
+#: ../src/paintboxview.c:376
+msgid "Enter text for text tool"
 msgstr ""
 
 #: ../src/boxes.c:251
@@ -273,542 +504,8 @@ msgstr ""
 msgid "Click to select font"
 msgstr ""
 
-#: ../src/builtin.c:257
-msgid "Out of range."
-msgstr ""
-
-#: ../src/builtin.c:258
-msgid "gammq arguments must be a > 0, x >= 0."
-msgstr ""
-
-#: ../src/builtin.c:265
-msgid "Not available."
-msgstr ""
-
-#: ../src/builtin.c:266
-msgid "No GSL library available for gammq."
-msgstr ""
-
-#: ../src/builtin.c:422 ../src/classmodel.c:153 ../src/classmodel.c:225
-#: ../src/filemodel.c:100 ../src/filemodel.c:145 ../src/filemodel.c:369
-#: ../src/filemodel.c:598 ../src/filemodel.c:637 ../src/mainw.c:757
-#: ../src/mainw.c:765 ../src/model.c:343 ../src/model.c:360 ../src/model.c:415
-#: ../src/rowview.c:479 ../src/view.c:820
-msgid "Not implemented."
-msgstr ""
-
-#: ../src/builtin.c:423
-msgid "Complex math ops not implemented."
-msgstr ""
-
-#: ../src/builtin.c:498
-msgid "Macro error."
-msgstr ""
-
-#: ../src/builtin.c:683
-msgid "No such type"
-msgstr ""
-
-#: ../src/builtin.c:684
-#, c-format
-msgid "GType %u not found."
-msgstr ""
-
-#. Other.
-#.
-#: ../src/builtin.c:838
-msgid "return list of names of members"
-msgstr ""
-
-#: ../src/builtin.c:840
-msgid "search for file"
-msgstr ""
-
-#: ../src/builtin.c:842
-msgid "raise error"
-msgstr ""
-
-#: ../src/builtin.c:844
-msgid "convert to [char]"
-msgstr ""
-
-#: ../src/builtin.c:846
-msgid "filexpand environment variables"
-msgstr ""
-
-#: ../src/builtin.c:848
-msgid "convert [char] to GType"
-msgstr ""
-
-#: ../src/builtin.c:850
-msgid "convert GType to [char]"
-msgstr ""
-
-#: ../src/builtin.c:852
-msgid "look up localised string"
-msgstr ""
-
-#. vips8 wrapper.
-#.
-#: ../src/builtin.c:857
-msgid "create new vips8 object"
-msgstr ""
-
-#: ../src/builtin.c:860
-msgid "call vips8 operator"
-msgstr ""
-
-#. Predicates.
-#.
-#: ../src/builtin.c:866
-msgid "true if argument is primitive image"
-msgstr ""
-
-#: ../src/builtin.c:869
-msgid "true if argument is primitive bool"
-msgstr ""
-
-#: ../src/builtin.c:872
-msgid "true if argument is primitive real number"
-msgstr ""
-
-#: ../src/builtin.c:875
-msgid "true if argument is class"
-msgstr ""
-
-#: ../src/builtin.c:878
-msgid "true if argument is primitive char"
-msgstr ""
-
-#: ../src/builtin.c:881
-msgid "true if argument is primitive list"
-msgstr ""
-
-#: ../src/builtin.c:884
-msgid "true if argument is primitive complex"
-msgstr ""
-
-#: ../src/builtin.c:887
-msgid "true if argument class instance of type"
-msgstr ""
-
-#: ../src/builtin.c:890
-msgid "true if class has named member"
-msgstr ""
-
-#. List and complex projections.
-#.
-#: ../src/builtin.c:896
-msgid "real part of complex"
-msgstr ""
-
-#: ../src/builtin.c:899
-msgid "imaginary part of complex"
-msgstr ""
-
-#: ../src/builtin.c:902
-msgid "head of list"
-msgstr ""
-
-#: ../src/builtin.c:905
-msgid "tail of list"
-msgstr ""
-
-#. Math.
-#.
-#: ../src/builtin.c:911
-msgid "sine of real number"
-msgstr ""
-
-#: ../src/builtin.c:914
-msgid "cosine of real number"
-msgstr ""
-
-#: ../src/builtin.c:917
-msgid "tangent of real number"
-msgstr ""
-
-#: ../src/builtin.c:920
-msgid "arc sine of real number"
-msgstr ""
-
-#: ../src/builtin.c:923
-msgid "arc cosine of real number"
-msgstr ""
-
-#: ../src/builtin.c:926
-msgid "arc tangent of real number"
-msgstr ""
-
-#: ../src/builtin.c:929
-msgid "log base e of real number"
-msgstr ""
-
-#: ../src/builtin.c:932
-msgid "log base 10 of real number"
-msgstr ""
-
-#: ../src/builtin.c:935
-msgid "e to the power of real number"
-msgstr ""
-
-#: ../src/builtin.c:938
-msgid "10 to the power of real number"
-msgstr ""
-
-#: ../src/builtin.c:941
-msgid "real to int, rounding up"
-msgstr ""
-
-#: ../src/builtin.c:944
-msgid "real to int, rounding down"
-msgstr ""
-
-#. Optional GSL funcs.
-#.
-#: ../src/builtin.c:950
-msgid "gamma function"
-msgstr ""
-
-#. Constructors.
-#.
-#: ../src/builtin.c:956
-msgid "load vips image"
-msgstr ""
-
-#: ../src/builtin.c:959
-msgid "load text file"
-msgstr ""
-
-#: ../src/builtin.c:969
-msgid "GSL library error."
-msgstr ""
-
-#: ../src/builtin.c:1018
-#, c-format
-msgid "Builtin \"%s\" takes %d argument."
-msgid_plural "Builtin \"%s\" takes %d arguments."
-msgstr[0] ""
-msgstr[1] ""
-
-#: ../src/builtin.c:1073
-#, c-format
-msgid ""
-"Argument %d to builtin \"%s\" should be \"%s\", you passed:\n"
-"  %s"
-msgstr ""
-
-#: ../src/cache.c:852 ../src/call.c:144 ../src/class.c:862
-msgid "You passed:"
-msgstr ""
-
-#: ../src/cache.c:875 ../src/util.c:191 ../src/vipsobject.c:250
-#: ../src/vipsobject.c:382
-msgid "VIPS library error."
-msgstr ""
-
-#: ../src/cache.c:878 ../src/call.c:133
-#, c-format
-msgid "Error calling library function \"%s\" (%s)."
-msgstr ""
-
-#: ../src/cache.c:881
-#, c-format
-msgid "VIPS library: %s"
-msgstr ""
-
-#: ../src/call.c:132
-msgid "CALL library error."
-msgstr ""
-
-#: ../src/call.c:192
-msgid "Usage:"
-msgstr ""
-
-#: ../src/call.c:194
-#, c-format
-msgid "CALL operator \"%s\""
-msgstr ""
-
-#: ../src/call.c:196
-#, c-format
-msgid "%s, from package \"%s\""
-msgstr ""
-
-#: ../src/call.c:201
-#, c-format
-msgid "\"%s\" takes %d argument:"
-msgid_plural "\"%s\" takes %d arguments:"
-msgstr[0] ""
-msgstr[1] ""
-
-#: ../src/call.c:208
-#, c-format
-msgid "And produces %d result:"
-msgid_plural "And produces %d results:"
-msgstr[0] ""
-msgstr[1] ""
-
-#. Print any flags this function has.
-#.
-#: ../src/call.c:216
-msgid "Flags:"
-msgstr ""
-
-#: ../src/call.c:220
-msgid "PIO function"
-msgstr ""
-
-#: ../src/call.c:222
-msgid "WIO function"
-msgstr ""
-
-#: ../src/call.c:225
-msgid "coordinate transformer"
-msgstr ""
-
-#: ../src/call.c:227
-msgid "no coordinate transformation"
-msgstr ""
-
-#: ../src/call.c:230
-msgid "point-to-point operation"
-msgstr ""
-
-#: ../src/call.c:232
-msgid "area operation"
-msgstr ""
-
-#: ../src/call.c:235
-msgid "uncacheable operation"
-msgstr ""
-
-#: ../src/call.c:237
-msgid "operation can be cached"
-msgstr ""
-
-#: ../src/call.c:252
-#, c-format
-msgid "Argument %d (%s) to \"%s\" is the wrong type."
-msgstr ""
-
-#: ../src/call.c:269 ../src/class.c:657 ../src/class.c:889 ../src/class.c:986
-#: ../src/compile.c:1766 ../src/vipsobject.c:106
-msgid "Too many arguments."
-msgstr ""
-
-#: ../src/call.c:272
-#, c-format
-msgid "Too many arguments to \"%s\"."
-msgstr ""
-
-#: ../src/call.c:290
-msgid "Unknown type."
-msgstr ""
-
-#: ../src/call.c:291
-#, c-format
-msgid "CALL type \"%s\" not supported"
-msgstr ""
-
-#: ../src/call.c:1262 ../src/call.c:1346
-#, c-format
-msgid "image \"%s\""
-msgstr ""
-
-#: ../src/call.c:1269
-msgid "no image"
-msgstr ""
-
-#: ../src/call.c:1300
-msgid "doublevec"
-msgstr ""
-
-#: ../src/call.c:1342
-msgid "imagevec"
-msgstr ""
-
-#: ../src/class.c:50
-#, c-format
-msgid "Object %s is not a class."
-msgstr ""
-
-#: ../src/class.c:333
-msgid "No such secret."
-msgstr ""
-
-#: ../src/class.c:334
-msgid ""
-"Editing local classes which reference non-local objects is a bit broken at "
-"the moment :-("
-msgstr ""
-
-#: ../src/class.c:658
-#, c-format
-msgid "You can't have more than %d arguments to a superclass constructor."
-msgstr ""
-
-#: ../src/class.c:794 ../src/class.c:854
-msgid "Bad superclass."
-msgstr ""
-
-#: ../src/class.c:795
-#, c-format
-msgid "Superclass constructor \"%s\" refers to non-local symbols %s"
-msgstr ""
-
-#: ../src/class.c:803 ../src/workspace.c:1724
-msgid "Wrong number of arguments."
-msgstr ""
-
-#: ../src/class.c:804
-#, c-format
-msgid "Superclass constructor \"%s\" expects %d arguments, not %d."
-msgstr ""
-
-#: ../src/class.c:858
-#, c-format
-msgid "First element in superclass of \"%s\" must be class or constructor."
-msgstr ""
-
-#: ../src/class.c:890 ../src/class.c:987
-#, c-format
-msgid ""
-"Too many arguments to class constructor \"%s\". No more than %d arguments "
-"are supported."
-msgstr ""
-
-#: ../src/class.c:980
-msgid "Class not found."
-msgstr ""
-
-#: ../src/class.c:981
-#, c-format
-msgid "Class \"%s\" not found."
-msgstr ""
-
-#: ../src/class.c:1018
-#, c-format
-msgid "Member \"%s\" of class \"%s\" should be of type \"%s\", instead it's:"
-msgstr ""
-
-#: ../src/classmodel.c:154 ../src/classmodel.c:226
-#, c-format
-msgid "_%s() method not implemented for %s."
-msgstr ""
-
-#: ../src/classmodel.c:162
-#, c-format
-msgid "Save %s \"%s\""
-msgstr ""
-
-#: ../src/classmodel.c:235
-#, c-format
-msgid "Replace %s \"%s\""
-msgstr ""
-
-#: ../src/classmodel.c:693
-msgid "Set boolean value here"
-msgstr ""
-
-#: ../src/classmodel.c:699
-msgid "Enter a floating point number here"
-msgstr ""
-
-#: ../src/classmodel.c:706
-msgid "Enter a string here"
-msgstr ""
-
-#. Expands to eg. "Edit Toggle A1".
-#.
-#: ../src/classmodel.c:759 ../src/clock.c:99 ../src/colour.c:260
-#: ../src/iregion.c:235 ../src/matrix.c:191
-#, c-format
-msgid "Edit %s %s"
-msgstr ""
-
-#: ../src/classmodel.c:770 ../src/clock.c:105 ../src/colour.c:268
-#: ../src/iregion.c:241 ../src/matrix.c:199
-#, c-format
-msgid "Set %s"
-msgstr ""
-
-#: ../src/classmodel.c:1066
-msgid "Unknown option."
-msgstr ""
-
-#: ../src/classmodel.c:1067
-#, c-format
-msgid "Option \"%s\" not known."
-msgstr ""
-
-#: ../src/classmodel.c:1141 ../src/matrixview.c:189 ../src/matrixview.c:210
-#: ../src/plot.c:148 ../src/plot.c:158 ../src/plot.c:368 ../src/plot.c:387
-#: ../src/plot.c:400
-msgid "Bad value."
-msgstr ""
-
-#: ../src/classmodel.c:1142
-#, c-format
-msgid "%d band value only"
-msgstr ""
-
-#: ../src/clock.c:59 ../src/clock.c:92 ../src/clock.c:191
-msgid "Interval"
-msgstr ""
-
-#: ../src/clock.c:60 ../src/clock.c:95
-msgid "Elapsed time"
-msgstr ""
-
-#: ../src/clock.c:92
-msgid "Interval between ticks (seconds)"
-msgstr ""
-
-#: ../src/clock.c:95
-msgid "Elapsed time (seconds)"
-msgstr ""
-
-#: ../src/clock.c:194 ../src/colour.c:303 ../src/fontname.c:61
-#: ../src/matrix.c:275 ../src/number.c:51 ../src/option.c:71
-#: ../src/pathname.c:78 ../src/plot.c:348 ../src/slider.c:57
-#: ../src/string.c:70 ../src/toggle.c:51
-msgid "Value"
-msgstr ""
-
-#: ../src/colour.c:300
-msgid "Color Space"
-msgstr ""
-
-#: ../src/colourdisplay.c:246
-msgid "Double-click to edit this color, or drag-and-drop between colors"
-msgstr ""
-
-#: ../src/column.c:326 ../src/tool.c:891 ../src/workspace.c:1553
-#: ../src/workspacegroup.c:145
-msgid "Name clash."
-msgstr ""
-
-#: ../src/column.c:327
-#, c-format
-msgid "Can't create column \"%s\". A column with that name already exists."
-msgstr ""
-
-#: ../src/column.c:364
-msgid "Empty column."
-msgstr ""
-
-#: ../src/column.c:365
-msgid "There are no objects in the current column."
-msgstr ""
-
-#: ../src/column.c:384
-msgid "Too few items."
-msgstr ""
-
-#: ../src/column.c:385
-#, c-format
-msgid "This column only has %d items, but %s needs %d items."
+#: ../src/toggleview.c:87 ../src/gtkutil.c:853
+msgid "Left-click to change value"
 msgstr ""
 
 #: ../src/columnview.c:133
@@ -816,22 +513,8 @@ msgstr ""
 msgid "Save Column \"%s\""
 msgstr ""
 
-#: ../src/columnview.c:180 ../src/columnview.c:241 ../src/mainw.c:1371
-#: ../src/mainw.c:1409 ../src/program.c:595 ../src/program.c:624
-#: ../src/program.c:1123 ../src/program.c:1164 ../src/program.c:1210
-#: ../src/program.c:1242 ../src/program.c:1574 ../src/program.c:1615
-#: ../src/row.c:480 ../src/workspacegroup.c:177 ../src/workspacegroup.c:213
-msgid "Name"
-msgstr ""
-
 #: ../src/columnview.c:181 ../src/columnview.c:243
 msgid "Toolkit"
-msgstr ""
-
-#: ../src/columnview.c:182 ../src/columnview.c:245 ../src/matrix.c:284
-#: ../src/program.c:596 ../src/program.c:626 ../src/program.c:1211
-#: ../src/program.c:1244
-msgid "Filename"
 msgstr ""
 
 #: ../src/columnview.c:241
@@ -875,437 +558,175 @@ msgstr ""
 msgid "Open the column"
 msgstr ""
 
-#: ../src/columnview.c:893
+#: ../src/columnview.c:892
 msgid "Column menu"
 msgstr ""
 
-#: ../src/columnview.c:894
+#: ../src/columnview.c:893
 msgid "_Edit Caption"
 msgstr ""
 
-#: ../src/columnview.c:896 ../src/mainw.c:1710 ../src/program.c:1801
+#: ../src/columnview.c:895 ../src/mainw.c:1710 ../src/program.c:1801
 msgid "Select _All"
 msgstr ""
 
-#: ../src/columnview.c:903
+#: ../src/columnview.c:902
 msgid "Make Column Into _Menu Item"
 msgstr ""
 
-#: ../src/columnview.c:940
+#: ../src/columnview.c:939
 msgid "Left-drag to move, left-double-click to set title, right-click for menu"
 msgstr ""
 
-#: ../src/columnview.c:973
+#: ../src/columnview.c:972
 msgid "Delete the column"
 msgstr ""
 
-#: ../src/compile.c:1448
-msgid "Too many shared nodes in graph."
+#: lex.l:89 lex.l:99
+msgid "line too long"
 msgstr ""
 
-#: ../src/compile.c:1450
-msgid "Raise MAX_RELOC"
+#: lex.l:107
+msgid "end of line inside string"
 msgstr ""
 
-#: ../src/compile.c:1767
+#: lex.l:109
+msgid "no end of string"
+msgstr ""
+
+#: lex.l:126 lex.l:136 lex.l:144
+msgid "bad char constant"
+msgstr ""
+
+#: lex.l:169
+msgid "nested comment"
+msgstr ""
+
+#: lex.l:175
+msgid "no end of comment"
+msgstr ""
+
+#: lex.l:305
 #, c-format
-msgid "Member \"%s\" of class \"%s\" should have no arguments."
+msgid "bad number %s"
 msgstr ""
 
-#: ../src/compile.c:2644
-msgid "pattern match failed"
+#: lex.l:385
+#, c-format
+msgid "illegal character \"%c\""
 msgstr ""
 
-#: ../src/conversion.c:473
-msgid "not uncoded"
+#: ../src/row.c:288
+msgid "Error in row."
 msgstr ""
 
-#: ../src/conversionview.c:50
-msgid "Unable to find image range."
-msgstr ""
-
-#: ../src/conversionview.c:51
-msgid "Find image range failed."
-msgstr ""
-
-#: ../src/conversionview.c:74
-msgid "Unable to scale image."
-msgstr ""
-
-#: ../src/conversionview.c:75
-msgid "Maximum and minimum pixel values are equal."
-msgstr ""
-
-#. Build menu. One for each window, as we need to track falsecolour
-#. * etc. toggles. Could just have one, and modify pre-popup, but this
-#. * is easier.
+#. Elements are name of row, principal error,
+#. * secondary error.
 #.
-#: ../src/conversionview.c:207
-msgid "Convert menu"
-msgstr ""
-
-#: ../src/conversionview.c:208
-msgid "_Scale"
-msgstr ""
-
-#: ../src/conversionview.c:210
-msgid "_False Color"
-msgstr ""
-
-#: ../src/conversionview.c:212
-msgid "_Interpret"
-msgstr ""
-
-#: ../src/conversionview.c:214 ../src/regionview.c:1019
-msgid "_Reset"
-msgstr ""
-
-#: ../src/conversionview.c:216
-msgid "Set As Workspace _Default"
-msgstr ""
-
-#: ../src/dump.c:186 ../src/expr.c:641
-msgid "value"
-msgstr ""
-
-#: ../src/dump.c:187
-msgid "parameter"
-msgstr ""
-
-#: ../src/dump.c:188
-msgid "zombie"
-msgstr ""
-
-#: ../src/dump.c:189 ../src/util.c:1350
-msgid "workspace"
-msgstr ""
-
-#: ../src/dump.c:190
-msgid "workspace group"
-msgstr ""
-
-#: ../src/dump.c:191
-msgid "root symbol"
-msgstr ""
-
-#: ../src/dump.c:192
-msgid "external symbol"
-msgstr ""
-
-#: ../src/dump.c:193
-msgid "built-in symbol"
-msgstr ""
-
-#: ../src/editview.c:60 ../src/fontnameview.c:63 ../src/formula.c:198
-#: ../src/gtkutil.c:756 ../src/gtkutil.c:791 ../src/gtkutil.c:845
-#: ../src/optionview.c:172 ../src/pathnameview.c:63 ../src/sliderview.c:58
-#, c-format
-msgid "%s:"
-msgstr ""
-
-#: ../src/editview.c:136
-msgid "Escape to cancel edit, press Return to accept edit and recalculate"
-msgstr ""
-
-#: ../src/error.c:60
-msgid "No ierrors found."
-msgstr ""
-
-#: ../src/error.c:100
-msgid "No unresolved symbols found."
-msgstr ""
-
-#: ../src/error.c:115 ../src/trace.c:234
-msgid "_Clear"
-msgstr ""
-
-#: ../src/error.c:116
-msgid "Clear ierror window"
-msgstr ""
-
-#: ../src/error.c:120
-msgid "List _iErrors"
-msgstr ""
-
-#: ../src/error.c:121
-msgid "Search for all ierrors"
-msgstr ""
-
-#: ../src/error.c:125
-msgid "List _Unresolved"
-msgstr ""
-
-#: ../src/error.c:126
-msgid "Search for all unresolved references"
-msgstr ""
-
-#: ../src/error.c:202
-#, c-format
-msgid "iError - %s"
-msgstr ""
-
-#: ../src/expr.c:64
-#, c-format
-msgid "error in \"%s\""
-msgstr ""
-
-#: ../src/expr.c:346
-msgid "Error"
-msgstr ""
-
-#: ../src/expr.c:613
-msgid "top level"
-msgstr ""
-
-#: ../src/expr.c:618
-msgid "class"
-msgstr ""
-
-#: ../src/expr.c:621
-msgid "instance"
-msgstr ""
-
-#: ../src/expr.c:625
-msgid "definition"
-msgstr ""
-
-#: ../src/expr.c:632
-#, c-format
-msgid "parameter \"%s\""
-msgstr ""
-
-#: ../src/expr.c:636
-msgid "member"
-msgstr ""
-
-#: ../src/expr.c:645 ../src/itext.c:446
-msgid "function"
-msgstr ""
-
-#: ../src/expr.c:654
-msgid "of"
-msgstr ""
-
-#: ../src/filemodel.c:101 ../src/filemodel.c:146 ../src/filemodel.c:599
-#: ../src/filemodel.c:638 ../src/model.c:344 ../src/model.c:361
-#: ../src/model.c:416 ../src/model.c:435
-#, c-format
-msgid "_%s() not implemented for class \"%s\"."
-msgstr ""
-
-#: ../src/filemodel.c:282 ../src/filemodel.c:297 ../src/model.c:466
-msgid "XML library error."
-msgstr ""
-
-#: ../src/filemodel.c:283
-msgid "model_save_filename: xmlNewDoc() failed"
-msgstr ""
-
-#: ../src/filemodel.c:298
-msgid "model_save_filename: xmlNewDocNode() failed"
-msgstr ""
-
-#: ../src/filemodel.c:314
-msgid "Save failed."
-msgstr ""
-
-#: ../src/filemodel.c:315
+#: ../src/row.c:292
 #, c-format
 msgid ""
-"Save of %s \"%s\" to file \"%s\" failed.\n"
+"Error in row %s: %s\n"
 "%s"
 msgstr ""
 
-#: ../src/filemodel.c:370
-msgid "filemodel_real_save_all: no save method"
-msgstr ""
-
-#: ../src/filemodel.c:479 ../src/filemodel.c:488 ../src/filemodel.c:501
-#: ../src/mainw.c:1025 ../src/model.c:137
-msgid "Load failed."
-msgstr ""
-
-#: ../src/filemodel.c:480
-#, c-format
-msgid "Can't load XML file \"%s\", it's not a %s save file."
-msgstr ""
-
-#: ../src/filemodel.c:489
-#, c-format
-msgid ""
-"Can't load XML file \"%s\", unable to extract version information from "
-"namespace."
-msgstr ""
-
-#: ../src/filemodel.c:502
-#, c-format
-msgid "Can't load XML file \"%s\", the file does not contain a %s."
-msgstr ""
-
-#. Expands to (eg.) "Save Column A2".
+#. Expands to eg. "B1 refers to: B2, B3".
 #.
-#: ../src/filemodel.c:688
-#, c-format
-msgid "Save %s %s"
+#: ../src/row.c:497
+msgid "refers to"
 msgstr ""
 
-#: ../src/filemodel.c:764 ../src/filemodel.c:776
-msgid "Object has been modified."
-msgstr ""
-
-#: ../src/filemodel.c:765
-#, c-format
-msgid ""
-"%s \"%s\" has been modified since you loaded it from file \"%s\".\n"
-"\n"
-"Do you want to save your changes?"
-msgstr ""
-
-#: ../src/filemodel.c:777
-#, c-format
-msgid "%s \"%s\" has been modified. Do you want to save your changes?"
-msgstr ""
-
-#: ../src/filesel.c:86
-msgid "Workspace files (*.ws)"
-msgstr ""
-
-#: ../src/filesel.c:88
-msgid "Recombination matrix files (*.rec)"
-msgstr ""
-
-#: ../src/filesel.c:90
-msgid "Morphology matrix files (*.mor)"
-msgstr ""
-
-#: ../src/filesel.c:92
-msgid "Convolution matrix files (*.con)"
-msgstr ""
-
-#: ../src/filesel.c:94
-msgid "Matrix files (*.mat)"
-msgstr ""
-
-#: ../src/filesel.c:96
-msgid "Definition files (*.def)"
-msgstr ""
-
-#: ../src/filesel.c:98
-msgid "ICC profiles (*.icc, *.icm)"
-msgstr ""
-
-#: ../src/filesel.c:100
-msgid "All files (*)"
-msgstr ""
-
-#. Used as eg. "VIPS image files (*.v)"
+#. Expands to eg. "B1 is referred to by: B2, B3".
 #.
-#: ../src/filesel.c:133
-msgid "image files"
+#: ../src/row.c:508
+msgid "is referred to by"
 msgstr ""
 
-#: ../src/filesel.c:502
+#: ../src/row.c:521
+msgid "is blocked on"
+msgstr ""
+
+#: ../src/imagemodel.c:491
+msgid "No text specified."
+msgstr ""
+
+#: ../src/imagemodel.c:492
+msgid "Enter some text to paint in the entry widget at the top of the window."
+msgstr ""
+
+#: ../src/matrixview.c:155 ../src/classmodel.c:1141 ../src/plot.c:148
+#: ../src/plot.c:158 ../src/plot.c:368 ../src/plot.c:387 ../src/plot.c:400
+msgid "Bad value."
+msgstr ""
+
+#: ../src/matrixview.c:156
 #, c-format
-msgid "Unable to determine space free in \"%s\"."
+msgid ""
+"Cell (%d, %d):\n"
+"%s"
 msgstr ""
 
-#. Expands to (eg.) '6GB free in "/pics/tmp"'
+#. Common menus.
 #.
-#: ../src/filesel.c:513
-#, c-format
-msgid "free in \"%s\""
+#: ../src/iwindow.c:659
+msgid "_File"
 msgstr ""
 
-#: ../src/filesel.c:760 ../src/util.c:1915 ../src/util.c:1921
-msgid "Bad filename."
+#: ../src/iwindow.c:660
+msgid "_New"
 msgstr ""
 
-#: ../src/filesel.c:761
-msgid "No file selected."
+#: ../src/iwindow.c:661 ../src/rowview.c:609 ../src/mainw.c:1767
+#: ../src/regionview.c:1015 ../src/program.c:726
+msgid "_Edit"
 msgstr ""
 
-#: ../src/filesel.c:985
-msgid "Increment filename"
+#: ../src/iwindow.c:662
+msgid "_View"
 msgstr ""
 
-#: ../src/filesel.c:991
-msgid "After Save, add 1 to the last number in the file name"
+#: ../src/iwindow.c:663
+msgid "_Help"
 msgstr ""
 
-#: ../src/filesel.c:1235
-#, c-format
-msgid "%s Save Preferences"
+#: ../src/iwindow.c:668
+msgid "_Close"
 msgstr ""
 
-#: ../src/filesel.c:1296
-msgid "Overwrite"
+#: ../src/iwindow.c:669
+msgid "Close"
 msgstr ""
 
-#: ../src/filesel.c:1297
-msgid "Overwrite file?"
+#: ../src/iwindow.c:673
+msgid "_Quit"
 msgstr ""
 
-#: ../src/filesel.c:1298
-#, c-format
-msgid "File \"%s\" exists. OK to overwrite?"
+#: ../src/iwindow.c:674
+msgid "Quit nip2"
 msgstr ""
 
-#: ../src/fontname.c:58 ../src/mainw.c:1372 ../src/mainw.c:1411
-#: ../src/number.c:48 ../src/option.c:65 ../src/pathname.c:75
-#: ../src/program.c:1124 ../src/program.c:1166 ../src/slider.c:48
-#: ../src/string.c:67 ../src/toggle.c:48 ../src/workspacegroup.c:178
-#: ../src/workspacegroup.c:215
-msgid "Caption"
+#: ../src/iwindow.c:677
+msgid "_Contents"
 msgstr ""
 
-#: ../src/formula.c:143
-msgid ""
-"Press Escape to cancel edit, press Return to accept edit and recalculate"
+#: ../src/iwindow.c:678
+msgid "Open the users guide"
 msgstr ""
 
-#: ../src/gtkutil.c:608
-msgid "Bad identifier."
+#: ../src/iwindow.c:682
+msgid "_About"
 msgstr ""
 
-#: ../src/gtkutil.c:610
-msgid ""
-"Enter an identifier. Identifiers start with a letter, and then contain only "
-"letters, numbers, apostrophy and underscore."
+#: ../src/iwindow.c:683
+msgid "About this program"
 msgstr ""
 
-#: ../src/gtkutil.c:663 ../src/gtkutil.c:671 ../src/matrixview.c:96
-msgid "Bad floating point number."
+#: ../src/iwindow.c:687
+msgid "_Website"
 msgstr ""
 
-#: ../src/gtkutil.c:664 ../src/matrixview.c:97
-#, c-format
-msgid "\"%s\" is not a floating point number."
-msgstr ""
-
-#: ../src/gtkutil.c:672
-#, c-format
-msgid "Extra characters \"%s\" after number."
-msgstr ""
-
-#: ../src/gtkutil.c:696
-msgid "Bad integer."
-msgstr ""
-
-#: ../src/gtkutil.c:697
-#, c-format
-msgid "\"%s\" is not an integer."
-msgstr ""
-
-#: ../src/gtkutil.c:715
-msgid "Bad unsigned integer."
-msgstr ""
-
-#: ../src/gtkutil.c:731
-msgid "Bad positive integer."
-msgstr ""
-
-#: ../src/gtkutil.c:853 ../src/toggleview.c:87
-msgid "Left-click to change value"
+#: ../src/iwindow.c:688
+msgid "Open the VIPS Homepage"
 msgstr ""
 
 #: ../src/heap.c:812
@@ -1403,142 +824,57 @@ msgstr ""
 msgid "unknown element tag %d"
 msgstr ""
 
-#: ../src/iarrow.c:117
-msgid "No image"
-msgstr ""
-
-#. Used in (eg.) "Mark at (10, 10) on [A1, A2]"
+#. Probably failed to load prefs on startup for some reason.
 #.
-#. Expands to (eg.) "Region on A1 at (10, 10), size (50, 50)"
-#.
-#: ../src/iarrow.c:130 ../src/iregion.c:156
-msgid "on"
+#: ../src/prefs.c:207
+msgid "Unable to display preferences."
 msgstr ""
 
-#: ../src/iarrow.c:148 ../src/iarrow.c:153
-#, c-format
-msgid "at %d"
-msgstr ""
-
-#: ../src/iarrow.c:158
-#, c-format
-msgid "at (%d, %d)"
-msgstr ""
-
-#: ../src/iarrow.c:165
-#, c-format
-msgid "at (%d, %d), offset (%d, %d)"
-msgstr ""
-
-#: ../src/idialog.c:432
-msgid "Pin up"
-msgstr ""
-
-#: ../src/idialog.c:434
-msgid "Check this to pin the dialog up"
-msgstr ""
-
-#: ../src/iimage.c:115
-msgid "Original filename"
-msgstr ""
-
-#: ../src/iimage.c:151
-#, c-format
-msgid "Header for \"%s\""
-msgstr ""
-
-#: ../src/iimage.c:153
-msgid "OK"
-msgstr ""
-
-#: ../src/iimage.c:366
-msgid "Save timer."
-msgstr ""
-
-#: ../src/iimage.c:367
-#, c-format
-msgid "Image save took %g seconds."
-msgstr ""
-
-#: ../src/imageinfo.c:977
-msgid "Unable to open image."
-msgstr ""
-
-#: ../src/imageinfo.c:978
-#, c-format
-msgid "Unable to open file \"%s\" as image."
-msgstr ""
-
-#: ../src/imageinfo.c:1106
-msgid "Unable to write to file."
-msgstr ""
-
-#: ../src/imageinfo.c:1107
-#, c-format
-msgid "Error writing image to file \"%s\"."
-msgstr ""
-
-#: ../src/imageinfo.c:1123
-msgid "Unable to paint on image."
-msgstr ""
-
-#: ../src/imageinfo.c:1124
+#: ../src/prefs.c:208
 #, c-format
 msgid ""
-"Unable to get write permission for file \"%s\".\n"
-"Check permission settings."
+"No preferences workspace was found. Preferences probably failed to load when "
+"%s started."
 msgstr ""
 
-#: ../src/imageinfo.c:1168
-msgid "Modify"
-msgstr ""
-
-#: ../src/imageinfo.c:1169
-msgid "Modify disc file?"
-msgstr ""
-
-#: ../src/imageinfo.c:1170
-#, c-format
-msgid ""
-"This image is being shown directly from the disc file:\n"
-"\n"
-"   %s\n"
-"\n"
-"If you paint on this file, it will be permanently changed. If something goes "
-"wrong, you may lose work. Are you sure you want to modify this file?"
-msgstr ""
-
-#: ../src/imageinfo.c:1772
-msgid "Unable to paint text."
-msgstr ""
-
-#: ../src/imageinfo.c:1773
-#, c-format
-msgid "Unable to paint text \"%s\" in font \"%s\"."
-msgstr ""
-
-#: ../src/imagemodel.c:491
-msgid "No text specified."
-msgstr ""
-
-#: ../src/imagemodel.c:492
-msgid "Enter some text to paint in the entry widget at the top of the window."
-msgstr ""
-
-#. Need one menu per image window (could have a single menu for all
-#. * windows, but then we'd have to set the state of the toggle buttons
-#. * before mapping)
+#. Not found? Maybe - error message anyway.
 #.
-#: ../src/imagepresent.c:1583
-msgid "Ruler menu"
+#: ../src/symbol.c:502 ../src/path.c:512 ../src/path.c:543
+#: ../src/program.c:1511 ../src/program.c:1563 ../src/program.c:1585
+#: ../src/program.c:1593
+msgid "Not found."
 msgstr ""
 
-#: ../src/imagepresent.c:1584
-msgid "Rulers In _mm"
+#: ../src/symbol.c:503
+#, c-format
+msgid "Symbol %s is not defined."
 msgstr ""
 
-#: ../src/imagepresent.c:1586
-msgid "Show _Offset"
+#: ../src/symbol.c:507
+#, c-format
+msgid "%s is referred to by"
+msgstr ""
+
+#: ../src/symbol.c:721
+#, c-format
+msgid "Redefinition of \"%s\"."
+msgstr ""
+
+#: ../src/symbol.c:725
+#, c-format
+msgid "Previously defined at line %d."
+msgstr ""
+
+#: ../src/symbol.c:748
+#, c-format
+msgid "Attempt to redefine root symbol \"%s\"."
+msgstr ""
+
+#. Parameter, workspace, etc.
+#.
+#: ../src/symbol.c:774
+#, c-format
+msgid "Can't redefine %s \"%s\"."
 msgstr ""
 
 #: ../src/imageview.c:455
@@ -1623,11 +959,6 @@ msgstr ""
 
 #: ../src/imageview.c:505 ../src/imageview.c:559
 msgid "Zoom _Out"
-msgstr ""
-
-#. IMAGEMODEL_MAGIN
-#: ../src/imageview.c:506 ../src/imageview.c:560 ../src/paintboxview.c:249
-msgid "Zoom out"
 msgstr ""
 
 #: ../src/imageview.c:510
@@ -1762,6 +1093,381 @@ msgstr ""
 msgid "Zoom to 1600%"
 msgstr ""
 
+#: parse.y:244 parse.y:255
+msgid "not top level"
+msgstr ""
+
+#: parse.y:260
+msgid "not strings"
+msgstr ""
+
+#: parse.y:318
+msgid "left-hand-side pattern contains no identifiers"
+msgstr ""
+
+#: parse.y:1066 ../src/program.c:1492
+msgid "Parse error."
+msgstr ""
+
+#: parse.y:1069
+#, c-format
+msgid "Error in %s: %s"
+msgstr ""
+
+#: parse.y:1072
+#, c-format
+msgid "Error: %s"
+msgstr ""
+
+#: parse.y:1193
+msgid "definition is too long"
+msgstr ""
+
+#: parse.y:1617
+msgid "no leading identifier"
+msgstr ""
+
+#: parse.y:1623
+msgid "'=' missing"
+msgstr ""
+
+#: parse.y:1653
+msgid "identifier expected"
+msgstr ""
+
+#: parse.y:1663
+#, c-format
+msgid "'%s' does not exist"
+msgstr ""
+
+#: parse.y:1666
+#, c-format
+msgid "'%s' has no members"
+msgstr ""
+
+#: parse.y:1682
+msgid "'.' or '=' expected"
+msgstr ""
+
+#: ../src/conversion.c:473
+msgid "not uncoded"
+msgstr ""
+
+#: ../src/trace.c:130 ../src/workspace.c:1735 ../src/reduce.c:148
+#: ../src/reduce.c:1056
+msgid "Overflow error."
+msgstr ""
+
+#: ../src/trace.c:131
+msgid "Trace buffer stack overflow."
+msgstr ""
+
+#: ../src/trace.c:234 ../src/error.c:115
+msgid "_Clear"
+msgstr ""
+
+#: ../src/trace.c:235
+msgid "Clear trace window"
+msgstr ""
+
+#: ../src/trace.c:241
+msgid "_Operators"
+msgstr ""
+
+#: ../src/trace.c:242
+msgid "trace operators"
+msgstr ""
+
+#: ../src/trace.c:246
+msgid "_Builtin Functions"
+msgstr ""
+
+#: ../src/trace.c:247
+msgid "trace calls to built in functions"
+msgstr ""
+
+#: ../src/trace.c:251
+msgid "_Class Construction"
+msgstr ""
+
+#: ../src/trace.c:252
+msgid "trace class constructors"
+msgstr ""
+
+#: ../src/trace.c:256
+msgid "_VIPS Operations"
+msgstr ""
+
+#: ../src/trace.c:257
+msgid "trace calls to VIPS"
+msgstr ""
+
+#: ../src/trace.c:335
+msgid "Trace"
+msgstr ""
+
+#: ../src/gtkutil.c:608
+msgid "Bad identifier."
+msgstr ""
+
+#: ../src/gtkutil.c:610
+msgid ""
+"Enter an identifier. Identifiers start with a letter, and then contain only "
+"letters, numbers, apostrophy and underscore."
+msgstr ""
+
+#: ../src/gtkutil.c:663 ../src/gtkutil.c:671
+msgid "Bad floating point number."
+msgstr ""
+
+#: ../src/gtkutil.c:664
+#, c-format
+msgid "\"%s\" is not a floating point number."
+msgstr ""
+
+#: ../src/gtkutil.c:672
+#, c-format
+msgid "Extra characters \"%s\" after number."
+msgstr ""
+
+#: ../src/gtkutil.c:696
+msgid "Bad integer."
+msgstr ""
+
+#: ../src/gtkutil.c:697
+#, c-format
+msgid "\"%s\" is not an integer."
+msgstr ""
+
+#: ../src/gtkutil.c:715
+msgid "Bad unsigned integer."
+msgstr ""
+
+#: ../src/gtkutil.c:731
+msgid "Bad positive integer."
+msgstr ""
+
+#: ../src/slider.c:51
+msgid "From"
+msgstr ""
+
+#: ../src/slider.c:54
+msgid "To"
+msgstr ""
+
+#: ../src/action.c:87
+msgid "Bad arguments."
+msgstr ""
+
+#. Expands to eg. 'bad args to "+", called from "fred"'
+#.
+#: ../src/action.c:102 ../src/action.c:186
+msgid "Called from"
+msgstr ""
+
+#: ../src/action.c:108
+#, c-format
+msgid ""
+"Error in binary %s.\n"
+"left = %s\n"
+"right = %s\n"
+"%s"
+msgstr ""
+
+#: ../src/action.c:142 ../src/class.c:190
+#, c-format
+msgid "Member \"%s\" not found in class \"%s\"."
+msgstr ""
+
+#: ../src/action.c:149
+#, c-format
+msgid "object = %s"
+msgstr ""
+
+#: ../src/action.c:153
+#, c-format
+msgid "tag = %s"
+msgstr ""
+
+#: ../src/action.c:158
+#, c-format
+msgid "Reference attempted in \"%s\"."
+msgstr ""
+
+#: ../src/action.c:162 ../src/class.c:189
+msgid "Member not found."
+msgstr ""
+
+#: ../src/action.c:173 ../src/call.c:249 ../src/class.c:49 ../src/class.c:1027
+#: ../src/builtin.c:1072 ../src/reduce.c:898 ../src/reduce.c:911
+msgid "Bad argument."
+msgstr ""
+
+#: ../src/action.c:192
+#, c-format
+msgid ""
+"Error in unary %s.\n"
+"argument = %s\n"
+"%s"
+msgstr ""
+
+#: ../src/action.c:359 ../src/action.c:377 ../src/action.c:407
+msgid "Bad right hand side of '.'."
+msgstr ""
+
+#: ../src/action.c:369
+msgid "Symbol on left hand side of '.' is not scope"
+msgstr ""
+
+#: ../src/action.c:411
+msgid "Property not found."
+msgstr ""
+
+#: ../src/action.c:425
+msgid "Bad left hand side of '.'."
+msgstr ""
+
+#: ../src/action.c:937
+msgid "Division by zero."
+msgstr ""
+
+#: ../src/action.c:1313 ../src/action.c:1593
+msgid "Unimplemented."
+msgstr ""
+
+#: ../src/action.c:1677 ../src/action.c:1713 ../src/action.c:1971
+msgid "invoking method:"
+msgstr ""
+
+#: ../src/rowview.c:325 ../src/regionview.c:934
+msgid "Can't duplicate."
+msgstr ""
+
+#: ../src/rowview.c:327
+msgid "You can only duplicate top level rows."
+msgstr ""
+
+#: ../src/rowview.c:479 ../src/model.c:343 ../src/model.c:360
+#: ../src/model.c:415 ../src/mainw.c:757 ../src/mainw.c:765
+#: ../src/filemodel.c:100 ../src/filemodel.c:145 ../src/filemodel.c:369
+#: ../src/filemodel.c:598 ../src/filemodel.c:637 ../src/builtin.c:422
+#: ../src/view.c:820 ../src/classmodel.c:153 ../src/classmodel.c:225
+msgid "Not implemented."
+msgstr ""
+
+#: ../src/rowview.c:480
+msgid "Drag between columns not yet implemented."
+msgstr ""
+
+#. Other init.
+#.
+#: ../src/rowview.c:608
+msgid "Row menu"
+msgstr ""
+
+#: ../src/rowview.c:611
+msgid "_Header"
+msgstr ""
+
+#: ../src/rowview.c:615 ../src/mainw.c:1750
+msgid "U_ngroup"
+msgstr ""
+
+#: ../src/rowview.c:619 ../src/workspacedefs.c:261
+msgid "Replace From _File"
+msgstr ""
+
+#: ../src/rowview.c:621 ../src/mainw.c:1720
+msgid "_Recalculate"
+msgstr ""
+
+#: ../src/rowview.c:623
+msgid "Re_set"
+msgstr ""
+
+#: ../src/rowview.c:689
+msgid "Click to open or close class"
+msgstr ""
+
+#: ../src/column.c:327
+#, c-format
+msgid "Can't create column \"%s\". A column with that name already exists."
+msgstr ""
+
+#: ../src/column.c:364
+msgid "Empty column."
+msgstr ""
+
+#: ../src/column.c:365
+msgid "There are no objects in the current column."
+msgstr ""
+
+#: ../src/column.c:384
+msgid "Too few items."
+msgstr ""
+
+#: ../src/column.c:385
+#, c-format
+msgid "This column only has %d items, but %s needs %d items."
+msgstr ""
+
+#: ../src/model.c:137 ../src/mainw.c:1025 ../src/filemodel.c:479
+#: ../src/filemodel.c:488 ../src/filemodel.c:501
+msgid "Load failed."
+msgstr ""
+
+#: ../src/model.c:138
+#, c-format
+msgid ""
+"Unable to load from file \"%s\". Error log is:\n"
+"%s"
+msgstr ""
+
+#: ../src/model.c:344 ../src/model.c:361 ../src/model.c:416 ../src/model.c:435
+#: ../src/filemodel.c:101 ../src/filemodel.c:146 ../src/filemodel.c:599
+#: ../src/filemodel.c:638
+#, c-format
+msgid "_%s() not implemented for class \"%s\"."
+msgstr ""
+
+#: ../src/model.c:466 ../src/filemodel.c:282 ../src/filemodel.c:297
+msgid "XML library error."
+msgstr ""
+
+#: ../src/model.c:467
+msgid "model_save: xmlNewChild() failed"
+msgstr ""
+
+#: ../src/model.c:534
+msgid "XML load error."
+msgstr ""
+
+#: ../src/model.c:535
+#, c-format
+msgid "Can't load node of type \"%s\" into object of type \"%s\""
+msgstr ""
+
+#: ../src/model.c:763
+msgid "Delete?"
+msgstr ""
+
+#: ../src/model.c:764
+#, c-format
+msgid "Are you sure you want to delete %s \"%s\"?"
+msgstr ""
+
+#: ../src/panechild.c:108
+msgid "Close the pane"
+msgstr ""
+
+#. Expands to (eg.) "Region on A1 at (10, 10), size (50, 50)"
+#.
+#. Used in (eg.) "Mark at (10, 10) on [A1, A2]"
+#.
+#: ../src/iregion.c:156 ../src/iarrow.c:130
+msgid "on"
+msgstr ""
+
 #: ../src/iregion.c:166
 #, c-format
 msgid "at (%d, %d), size (%d, %d)"
@@ -1799,6 +1505,52 @@ msgstr ""
 msgid "Height of region"
 msgstr ""
 
+#: ../src/expr.c:64
+#, c-format
+msgid "error in \"%s\""
+msgstr ""
+
+#: ../src/expr.c:346
+msgid "Error"
+msgstr ""
+
+#: ../src/expr.c:613
+msgid "top level"
+msgstr ""
+
+#: ../src/expr.c:618
+msgid "class"
+msgstr ""
+
+#: ../src/expr.c:621
+msgid "instance"
+msgstr ""
+
+#: ../src/expr.c:625
+msgid "definition"
+msgstr ""
+
+#: ../src/expr.c:632
+#, c-format
+msgid "parameter \"%s\""
+msgstr ""
+
+#: ../src/expr.c:636
+msgid "member"
+msgstr ""
+
+#: ../src/expr.c:641 ../src/dump.c:186
+msgid "value"
+msgstr ""
+
+#: ../src/expr.c:645 ../src/itext.c:446
+msgid "function"
+msgstr ""
+
+#: ../src/expr.c:654
+msgid "of"
+msgstr ""
+
 #: ../src/itext.c:67
 msgid "Formula"
 msgstr ""
@@ -1811,110 +1563,149 @@ msgstr ""
 msgid "Dirty value"
 msgstr ""
 
-#. Common menus.
-#.
-#: ../src/iwindow.c:659
-msgid "_File"
+#: ../src/iarrow.c:117
+msgid "No image"
 msgstr ""
 
-#: ../src/iwindow.c:660
-msgid "_New"
-msgstr ""
-
-#: ../src/iwindow.c:661 ../src/mainw.c:1767 ../src/program.c:726
-#: ../src/regionview.c:1015 ../src/rowview.c:609
-msgid "_Edit"
-msgstr ""
-
-#: ../src/iwindow.c:662
-msgid "_View"
-msgstr ""
-
-#: ../src/iwindow.c:663
-msgid "_Help"
-msgstr ""
-
-#: ../src/iwindow.c:668
-msgid "_Close"
-msgstr ""
-
-#: ../src/iwindow.c:669
-msgid "Close"
-msgstr ""
-
-#: ../src/iwindow.c:673
-msgid "_Quit"
-msgstr ""
-
-#: ../src/iwindow.c:674
-msgid "Quit nip2"
-msgstr ""
-
-#: ../src/iwindow.c:677
-msgid "_Contents"
-msgstr ""
-
-#: ../src/iwindow.c:678
-msgid "Open the users guide"
-msgstr ""
-
-#: ../src/iwindow.c:682
-msgid "_About"
-msgstr ""
-
-#: ../src/iwindow.c:683
-msgid "About this program"
-msgstr ""
-
-#: ../src/iwindow.c:687
-msgid "_Website"
-msgstr ""
-
-#: ../src/iwindow.c:688
-msgid "Open the VIPS Homepage"
-msgstr ""
-
-#: lex.l:89 lex.l:99
-msgid "line too long"
-msgstr ""
-
-#: lex.l:107
-msgid "end of line inside string"
-msgstr ""
-
-#: lex.l:109
-msgid "no end of string"
-msgstr ""
-
-#: lex.l:126 lex.l:136 lex.l:144
-msgid "bad char constant"
-msgstr ""
-
-#: lex.l:169
-msgid "nested comment"
-msgstr ""
-
-#: lex.l:175
-msgid "no end of comment"
-msgstr ""
-
-#: lex.l:305
+#: ../src/iarrow.c:148 ../src/iarrow.c:153
 #, c-format
-msgid "bad number %s"
+msgid "at %d"
 msgstr ""
 
-#: lex.l:385
+#: ../src/iarrow.c:158
 #, c-format
-msgid "illegal character \"%c\""
+msgid "at (%d, %d)"
 msgstr ""
 
-#: ../src/link.c:578
-msgid "Circular dependency."
-msgstr ""
-
-#: ../src/link.c:579
+#: ../src/iarrow.c:165
 #, c-format
-msgid "Circular dependency detected near symbol \"%s\"."
+msgid "at (%d, %d), offset (%d, %d)"
+msgstr ""
+
+#: ../src/workspace.c:156
+msgid "No objects selected."
+msgstr ""
+
+#: ../src/workspace.c:157 ../src/workspace.c:162
+msgid "Select exactly one object and try again."
+msgstr ""
+
+#: ../src/workspace.c:161
+msgid "More than one object selected."
+msgstr ""
+
+#: ../src/workspace.c:795 ../src/workspace.c:803
+msgid "No backup workspaces found."
+msgstr ""
+
+#: ../src/workspace.c:797
+msgid ""
+"You need to enable \"Auto workspace save\" in Preferences before automatic "
+"recovery works."
+msgstr ""
+
+#: ../src/workspace.c:804
+#, c-format
+msgid "No suitable workspace save files found in \"%s\""
+msgstr ""
+
+#: ../src/workspace.c:820
+msgid "Open workspace backup?"
+msgstr ""
+
+#: ../src/workspace.c:821
+#, c-format
+msgid ""
+"Found workspace \"%s\", dated %s. Do you want to recover this workspace?"
+msgstr ""
+
+#: ../src/workspace.c:1351
+msgid "Version mismatch."
+msgstr ""
+
+#: ../src/workspace.c:1352
+#, c-format
+msgid ""
+"File \"%s\" was saved from %s-%d.%d.%d. You may see compatibility problems."
+msgstr ""
+
+#: ../src/workspace.c:1509
+msgid "// private definitions for this workspace\n"
+msgstr ""
+
+#: ../src/workspace.c:1554
+#, c-format
+msgid "Can't create workspace \"%s\". A symbol with that name already exists."
+msgstr ""
+
+#: ../src/workspace.c:1649
+msgid "Default empty workspace"
+msgstr ""
+
+#: ../src/workspace.c:1724 ../src/class.c:803
+msgid "Wrong number of arguments."
+msgstr ""
+
+#: ../src/workspace.c:1725
+#, c-format
+msgid "%s needs %d arguments, there are %d selected."
+msgstr ""
+
+#: ../src/workspace.c:1736
+msgid "Too many names selected."
+msgstr ""
+
+#: ../src/workspace.c:1873
+msgid "You can only remove top level rows."
+msgstr ""
+
+#: ../src/workspace.c:1874
+msgid "Not all selected objects are top level rows."
+msgstr ""
+
+#: ../src/workspace.c:1924
+msgid "Delete selected objects?"
+msgstr ""
+
+#: ../src/workspace.c:1925
+#, c-format
+msgid "Are you sure you want to delete %s?"
+msgstr ""
+
+#: ../src/workspace.c:1983
+msgid "Unable to ungroup."
+msgstr ""
+
+#: ../src/workspace.c:1984
+#, c-format
+msgid "Row \"%s\" is not a Group or a list."
+msgstr ""
+
+#: ../src/toolkitgroup.c:120
+#, c-format
+msgid "Toolkits for %s"
+msgstr ""
+
+#: ../src/iimage.c:115
+msgid "Original filename"
+msgstr ""
+
+#: ../src/iimage.c:151
+#, c-format
+msgid "Header for \"%s\""
+msgstr ""
+
+#: ../src/iimage.c:153
+msgid "OK"
+msgstr ""
+
+#: ../src/iimage.c:366
+msgid "Save timer."
+msgstr ""
+
+#: ../src/iimage.c:367
+#, c-format
+msgid "Image save took %g seconds."
 msgstr ""
 
 #: ../src/main.c:107
@@ -2037,15 +1828,6 @@ msgstr ""
 msgid "Line"
 msgstr ""
 
-#: ../src/main.c:685 ../src/matrix.c:149
-msgid "Text"
-msgstr ""
-
-#. IMAGEMODEL_TEXT
-#: ../src/main.c:686 ../src/paintboxview.c:259
-msgid "Smudge"
-msgstr ""
-
 #: ../src/main.c:687
 msgid "Flood"
 msgstr ""
@@ -2164,6 +1946,99 @@ msgid ""
 "\n"
 "If you've used previous versions of %s, you might want to copy files over "
 "from your old work area."
+msgstr ""
+
+#: ../src/imageinfo.c:977
+msgid "Unable to open image."
+msgstr ""
+
+#: ../src/imageinfo.c:978
+#, c-format
+msgid "Unable to open file \"%s\" as image."
+msgstr ""
+
+#: ../src/imageinfo.c:1106
+msgid "Unable to write to file."
+msgstr ""
+
+#: ../src/imageinfo.c:1107
+#, c-format
+msgid "Error writing image to file \"%s\"."
+msgstr ""
+
+#: ../src/imageinfo.c:1123
+msgid "Unable to paint on image."
+msgstr ""
+
+#: ../src/imageinfo.c:1124
+#, c-format
+msgid ""
+"Unable to get write permission for file \"%s\".\n"
+"Check permission settings."
+msgstr ""
+
+#: ../src/imageinfo.c:1168
+msgid "Modify"
+msgstr ""
+
+#: ../src/imageinfo.c:1169
+msgid "Modify disc file?"
+msgstr ""
+
+#: ../src/imageinfo.c:1170
+#, c-format
+msgid ""
+"This image is being shown directly from the disc file:\n"
+"\n"
+"   %s\n"
+"\n"
+"If you paint on this file, it will be permanently changed. If something goes "
+"wrong, you may lose work. Are you sure you want to modify this file?"
+msgstr ""
+
+#: ../src/imageinfo.c:1772
+msgid "Unable to paint text."
+msgstr ""
+
+#: ../src/imageinfo.c:1773
+#, c-format
+msgid "Unable to paint text \"%s\" in font \"%s\"."
+msgstr ""
+
+#: ../src/editview.c:136
+msgid "Escape to cancel edit, press Return to accept edit and recalculate"
+msgstr ""
+
+#: ../src/dump.c:187
+msgid "parameter"
+msgstr ""
+
+#: ../src/dump.c:188
+msgid "zombie"
+msgstr ""
+
+#: ../src/dump.c:189 ../src/util.c:1350
+msgid "workspace"
+msgstr ""
+
+#: ../src/dump.c:190
+msgid "workspace group"
+msgstr ""
+
+#: ../src/dump.c:191
+msgid "root symbol"
+msgstr ""
+
+#: ../src/dump.c:192
+msgid "external symbol"
+msgstr ""
+
+#: ../src/dump.c:193
+msgid "built-in symbol"
+msgstr ""
+
+#: ../src/colour.c:300
+msgid "Color Space"
 msgstr ""
 
 #: ../src/mainw.c:176
@@ -2423,10 +2298,6 @@ msgstr ""
 msgid "Duplicate selected items"
 msgstr ""
 
-#: ../src/mainw.c:1720 ../src/rowview.c:621
-msgid "_Recalculate"
-msgstr ""
-
 #: ../src/mainw.c:1721
 msgid "Recalculate selected items"
 msgstr ""
@@ -2465,10 +2336,6 @@ msgstr ""
 
 #: ../src/mainw.c:1746
 msgid "Group selected items"
-msgstr ""
-
-#: ../src/mainw.c:1750 ../src/rowview.c:615
-msgid "U_ngroup"
 msgstr ""
 
 #: ../src/mainw.c:1751
@@ -2583,232 +2450,737 @@ msgstr ""
 msgid "Workspace Definitions"
 msgstr ""
 
-#: ../src/matrix.c:150
-msgid "Sliders"
+#: ../src/regionview.c:936
+msgid "You can only duplicate top level regions."
 msgstr ""
 
-#: ../src/matrix.c:151
-msgid "Toggle buttons"
+#: ../src/regionview.c:978
+msgid "Can't delete."
 msgstr ""
 
-#: ../src/matrix.c:152
-msgid "Text, plus scale and offset"
+#: ../src/regionview.c:979
+msgid "You can only delete top level regions."
 msgstr ""
 
-#: ../src/matrix.c:163
-msgid "Display as"
+#: ../src/regionview.c:988
+msgid "Delete Region?"
 msgstr ""
 
-#: ../src/matrix.c:278 ../src/matrixview.c:425
-msgid "Scale"
+#: ../src/regionview.c:989
+#, c-format
+msgid "Are you sure you want to delete Region \"%s\"?"
 msgstr ""
 
-#: ../src/matrix.c:281 ../src/matrixview.c:430
-msgid "Offset"
+#. Other init.
+#.
+#: ../src/regionview.c:1014
+msgid "Region menu"
 msgstr ""
 
-#: ../src/matrix.c:287
-msgid "Display"
+#: ../src/idialog.c:432
+msgid "Pin up"
 msgstr ""
 
-#: ../src/matrixview.c:190 ../src/matrixview.c:211
+#: ../src/idialog.c:434
+msgid "Check this to pin the dialog up"
+msgstr ""
+
+#: ../src/call.c:132
+msgid "CALL library error."
+msgstr ""
+
+#: ../src/call.c:133 ../src/cache.c:878
+#, c-format
+msgid "Error calling library function \"%s\" (%s)."
+msgstr ""
+
+#: ../src/call.c:144 ../src/class.c:862 ../src/cache.c:852
+msgid "You passed:"
+msgstr ""
+
+#: ../src/call.c:192
+msgid "Usage:"
+msgstr ""
+
+#: ../src/call.c:194
+#, c-format
+msgid "CALL operator \"%s\""
+msgstr ""
+
+#: ../src/call.c:196
+#, c-format
+msgid "%s, from package \"%s\""
+msgstr ""
+
+#: ../src/call.c:201
+#, c-format
+msgid "\"%s\" takes %d argument:"
+msgid_plural "\"%s\" takes %d arguments:"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../src/call.c:208
+#, c-format
+msgid "And produces %d result:"
+msgid_plural "And produces %d results:"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Print any flags this function has.
+#.
+#: ../src/call.c:216
+msgid "Flags:"
+msgstr ""
+
+#: ../src/call.c:220
+msgid "PIO function"
+msgstr ""
+
+#: ../src/call.c:222
+msgid "WIO function"
+msgstr ""
+
+#: ../src/call.c:225
+msgid "coordinate transformer"
+msgstr ""
+
+#: ../src/call.c:227
+msgid "no coordinate transformation"
+msgstr ""
+
+#: ../src/call.c:230
+msgid "point-to-point operation"
+msgstr ""
+
+#: ../src/call.c:232
+msgid "area operation"
+msgstr ""
+
+#: ../src/call.c:235
+msgid "uncacheable operation"
+msgstr ""
+
+#: ../src/call.c:237
+msgid "operation can be cached"
+msgstr ""
+
+#: ../src/call.c:252
+#, c-format
+msgid "Argument %d (%s) to \"%s\" is the wrong type."
+msgstr ""
+
+#: ../src/call.c:272
+#, c-format
+msgid "Too many arguments to \"%s\"."
+msgstr ""
+
+#: ../src/call.c:290
+msgid "Unknown type."
+msgstr ""
+
+#: ../src/call.c:291
+#, c-format
+msgid "CALL type \"%s\" not supported"
+msgstr ""
+
+#: ../src/call.c:1262 ../src/call.c:1346
+#, c-format
+msgid "image \"%s\""
+msgstr ""
+
+#: ../src/call.c:1269
+msgid "no image"
+msgstr ""
+
+#: ../src/call.c:1300
+msgid "doublevec"
+msgstr ""
+
+#: ../src/call.c:1342
+msgid "imagevec"
+msgstr ""
+
+#: ../src/class.c:50
+#, c-format
+msgid "Object %s is not a class."
+msgstr ""
+
+#: ../src/class.c:333
+msgid "No such secret."
+msgstr ""
+
+#: ../src/class.c:334
+msgid ""
+"Editing local classes which reference non-local objects is a bit broken at "
+"the moment :-("
+msgstr ""
+
+#: ../src/class.c:658
+#, c-format
+msgid "You can't have more than %d arguments to a superclass constructor."
+msgstr ""
+
+#: ../src/class.c:794 ../src/class.c:854
+msgid "Bad superclass."
+msgstr ""
+
+#: ../src/class.c:795
+#, c-format
+msgid "Superclass constructor \"%s\" refers to non-local symbols %s"
+msgstr ""
+
+#: ../src/class.c:804
+#, c-format
+msgid "Superclass constructor \"%s\" expects %d arguments, not %d."
+msgstr ""
+
+#: ../src/class.c:858
+#, c-format
+msgid "First element in superclass of \"%s\" must be class or constructor."
+msgstr ""
+
+#: ../src/class.c:890 ../src/class.c:987
 #, c-format
 msgid ""
-"Cell (%d, %d):\n"
+"Too many arguments to class constructor \"%s\". No more than %d arguments "
+"are supported."
+msgstr ""
+
+#: ../src/class.c:980
+msgid "Class not found."
+msgstr ""
+
+#: ../src/class.c:981
+#, c-format
+msgid "Class \"%s\" not found."
+msgstr ""
+
+#: ../src/class.c:1018
+#, c-format
+msgid "Member \"%s\" of class \"%s\" should be of type \"%s\", instead it's:"
+msgstr ""
+
+#: ../src/filemodel.c:283
+msgid "model_save_filename: xmlNewDoc() failed"
+msgstr ""
+
+#: ../src/filemodel.c:298
+msgid "model_save_filename: xmlNewDocNode() failed"
+msgstr ""
+
+#: ../src/filemodel.c:314
+msgid "Save failed."
+msgstr ""
+
+#: ../src/filemodel.c:315
+#, c-format
+msgid ""
+"Save of %s \"%s\" to file \"%s\" failed.\n"
 "%s"
 msgstr ""
 
-#. Expands to (eg) "A2: cell (1,2): 45" ... status line display during
-#. * matrix traverse.
-#.
-#: ../src/matrixview.c:622
-#, c-format
-msgid ": cell (%d, %d): %s"
+#: ../src/filemodel.c:370
+msgid "filemodel_real_save_all: no save method"
 msgstr ""
 
-#: ../src/model.c:138
+#: ../src/filemodel.c:480
+#, c-format
+msgid "Can't load XML file \"%s\", it's not a %s save file."
+msgstr ""
+
+#: ../src/filemodel.c:489
 #, c-format
 msgid ""
-"Unable to load from file \"%s\". Error log is:\n"
+"Can't load XML file \"%s\", unable to extract version information from "
+"namespace."
+msgstr ""
+
+#: ../src/filemodel.c:502
+#, c-format
+msgid "Can't load XML file \"%s\", the file does not contain a %s."
+msgstr ""
+
+#. Expands to (eg.) "Save Column A2".
+#.
+#: ../src/filemodel.c:688
+#, c-format
+msgid "Save %s %s"
+msgstr ""
+
+#: ../src/filemodel.c:764 ../src/filemodel.c:776
+msgid "Object has been modified."
+msgstr ""
+
+#: ../src/filemodel.c:765
+#, c-format
+msgid ""
+"%s \"%s\" has been modified since you loaded it from file \"%s\".\n"
+"\n"
+"Do you want to save your changes?"
+msgstr ""
+
+#: ../src/filemodel.c:777
+#, c-format
+msgid "%s \"%s\" has been modified. Do you want to save your changes?"
+msgstr ""
+
+#: ../src/builtin.c:257
+msgid "Out of range."
+msgstr ""
+
+#: ../src/builtin.c:258
+msgid "gammq arguments must be a > 0, x >= 0."
+msgstr ""
+
+#: ../src/builtin.c:265
+msgid "Not available."
+msgstr ""
+
+#: ../src/builtin.c:266
+msgid "No GSL library available for gammq."
+msgstr ""
+
+#: ../src/builtin.c:423
+msgid "Complex math ops not implemented."
+msgstr ""
+
+#: ../src/builtin.c:498
+msgid "Macro error."
+msgstr ""
+
+#: ../src/builtin.c:683
+msgid "No such type"
+msgstr ""
+
+#: ../src/builtin.c:684
+#, c-format
+msgid "GType %u not found."
+msgstr ""
+
+#. Other.
+#.
+#: ../src/builtin.c:838
+msgid "return list of names of members"
+msgstr ""
+
+#: ../src/builtin.c:840
+msgid "search for file"
+msgstr ""
+
+#: ../src/builtin.c:842
+msgid "raise error"
+msgstr ""
+
+#: ../src/builtin.c:844
+msgid "convert to [char]"
+msgstr ""
+
+#: ../src/builtin.c:846
+msgid "filexpand environment variables"
+msgstr ""
+
+#: ../src/builtin.c:848
+msgid "convert [char] to GType"
+msgstr ""
+
+#: ../src/builtin.c:850
+msgid "convert GType to [char]"
+msgstr ""
+
+#: ../src/builtin.c:852
+msgid "look up localised string"
+msgstr ""
+
+#. vips8 wrapper.
+#.
+#: ../src/builtin.c:857
+msgid "create new vips8 object"
+msgstr ""
+
+#: ../src/builtin.c:860
+msgid "call vips8 operator"
+msgstr ""
+
+#. Predicates.
+#.
+#: ../src/builtin.c:866
+msgid "true if argument is primitive image"
+msgstr ""
+
+#: ../src/builtin.c:869
+msgid "true if argument is primitive bool"
+msgstr ""
+
+#: ../src/builtin.c:872
+msgid "true if argument is primitive real number"
+msgstr ""
+
+#: ../src/builtin.c:875
+msgid "true if argument is class"
+msgstr ""
+
+#: ../src/builtin.c:878
+msgid "true if argument is primitive char"
+msgstr ""
+
+#: ../src/builtin.c:881
+msgid "true if argument is primitive list"
+msgstr ""
+
+#: ../src/builtin.c:884
+msgid "true if argument is primitive complex"
+msgstr ""
+
+#: ../src/builtin.c:887
+msgid "true if argument class instance of type"
+msgstr ""
+
+#: ../src/builtin.c:890
+msgid "true if class has named member"
+msgstr ""
+
+#. List and complex projections.
+#.
+#: ../src/builtin.c:896
+msgid "real part of complex"
+msgstr ""
+
+#: ../src/builtin.c:899
+msgid "imaginary part of complex"
+msgstr ""
+
+#: ../src/builtin.c:902
+msgid "head of list"
+msgstr ""
+
+#: ../src/builtin.c:905
+msgid "tail of list"
+msgstr ""
+
+#. Math.
+#.
+#: ../src/builtin.c:911
+msgid "sine of real number"
+msgstr ""
+
+#: ../src/builtin.c:914
+msgid "cosine of real number"
+msgstr ""
+
+#: ../src/builtin.c:917
+msgid "tangent of real number"
+msgstr ""
+
+#: ../src/builtin.c:920
+msgid "arc sine of real number"
+msgstr ""
+
+#: ../src/builtin.c:923
+msgid "arc cosine of real number"
+msgstr ""
+
+#: ../src/builtin.c:926
+msgid "arc tangent of real number"
+msgstr ""
+
+#: ../src/builtin.c:929
+msgid "log base e of real number"
+msgstr ""
+
+#: ../src/builtin.c:932
+msgid "log base 10 of real number"
+msgstr ""
+
+#: ../src/builtin.c:935
+msgid "e to the power of real number"
+msgstr ""
+
+#: ../src/builtin.c:938
+msgid "10 to the power of real number"
+msgstr ""
+
+#: ../src/builtin.c:941
+msgid "real to int, rounding up"
+msgstr ""
+
+#: ../src/builtin.c:944
+msgid "real to int, rounding down"
+msgstr ""
+
+#. Optional GSL funcs.
+#.
+#: ../src/builtin.c:950
+msgid "gamma function"
+msgstr ""
+
+#. Constructors.
+#.
+#: ../src/builtin.c:956
+msgid "load vips image"
+msgstr ""
+
+#: ../src/builtin.c:959
+msgid "load text file"
+msgstr ""
+
+#: ../src/builtin.c:969
+msgid "GSL library error."
+msgstr ""
+
+#: ../src/builtin.c:1018
+#, c-format
+msgid "Builtin \"%s\" takes %d argument."
+msgid_plural "Builtin \"%s\" takes %d arguments."
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../src/builtin.c:1073
+#, c-format
+msgid ""
+"Argument %d to builtin \"%s\" should be \"%s\", you passed:\n"
+"  %s"
+msgstr ""
+
+#: ../src/compile.c:1448
+msgid "Too many shared nodes in graph."
+msgstr ""
+
+#: ../src/compile.c:1450
+msgid "Raise MAX_RELOC"
+msgstr ""
+
+#: ../src/compile.c:1767
+#, c-format
+msgid "Member \"%s\" of class \"%s\" should have no arguments."
+msgstr ""
+
+#: ../src/compile.c:2644
+msgid "pattern match failed"
+msgstr ""
+
+#: ../src/pathnameview.c:153
+msgid "Select a new file name"
+msgstr ""
+
+#: ../src/spin.c:197
+msgid "Expand or collapse row"
+msgstr ""
+
+#: ../src/error.c:60
+msgid "No ierrors found."
+msgstr ""
+
+#: ../src/error.c:100
+msgid "No unresolved symbols found."
+msgstr ""
+
+#: ../src/error.c:116
+msgid "Clear ierror window"
+msgstr ""
+
+#: ../src/error.c:120
+msgid "List _iErrors"
+msgstr ""
+
+#: ../src/error.c:121
+msgid "Search for all ierrors"
+msgstr ""
+
+#: ../src/error.c:125
+msgid "List _Unresolved"
+msgstr ""
+
+#: ../src/error.c:126
+msgid "Search for all unresolved references"
+msgstr ""
+
+#: ../src/error.c:202
+#, c-format
+msgid "iError - %s"
+msgstr ""
+
+#. used as in "fred refers to undefined symbol jim"
+#.
+#: ../src/tool.c:75
+msgid "refers to undefined symbol"
+msgstr ""
+
+#: ../src/tool.c:892
+#, c-format
+msgid ""
+"Can't create dialog with name \"%s\", an object with that name already "
+"exists in kit \"%s\"."
+msgstr ""
+
+#: ../src/util.c:211
+msgid "Unable to set XML property."
+msgstr ""
+
+#: ../src/util.c:212
+#, c-format
+msgid "Unable to set property \"%s\" to value \"%s\"."
+msgstr ""
+
+#: ../src/util.c:830
+msgid "(no image)"
+msgstr ""
+
+#: ../src/util.c:844
+#, c-format
+msgid "%dx%d %s, %d band, %s"
+msgid_plural "%dx%d %s, %d bands, %s"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../src/util.c:1257
+msgid "8-bit unsigned integer"
+msgstr ""
+
+#. IM_BANDFMT_UCHAR
+#: ../src/util.c:1258
+msgid "8-bit signed integer"
+msgstr ""
+
+#. IM_BANDFMT_CHAR
+#: ../src/util.c:1259
+msgid "16-bit unsigned integer"
+msgstr ""
+
+#. IM_BANDFMT_USHORT
+#: ../src/util.c:1260
+msgid "16-bit signed integer"
+msgstr ""
+
+#. IM_BANDFMT_SHORT
+#: ../src/util.c:1261
+msgid "32-bit unsigned integer"
+msgstr ""
+
+#. IM_BANDFMT_UINT
+#: ../src/util.c:1262
+msgid "32-bit signed integer"
+msgstr ""
+
+#. IM_BANDFMT_INT
+#: ../src/util.c:1263
+msgid "32-bit float"
+msgstr ""
+
+#. IM_BANDFMT_FLOAT
+#: ../src/util.c:1264
+msgid "64-bit complex"
+msgstr ""
+
+#. IM_BANDFMT_COMPLEX
+#: ../src/util.c:1265
+msgid "64-bit float"
+msgstr ""
+
+#. IM_BANDFMT_DOUBLE
+#: ../src/util.c:1266
+msgid "128-bit complex"
+msgstr ""
+
+#: ../src/util.c:1274
+msgid "<unknown format>"
+msgstr ""
+
+#: ../src/util.c:1317
+msgid "<unknown type>"
+msgstr ""
+
+#: ../src/util.c:1341
+msgid "directory"
+msgstr ""
+
+#: ../src/util.c:1750
+msgid "<charset conversion error>"
+msgstr ""
+
+#: ../src/util.c:1915 ../src/util.c:1921 ../src/filesel.c:760
+msgid "Bad filename."
+msgstr ""
+
+#: ../src/util.c:1916
+msgid "Filename is too long."
+msgstr ""
+
+#: ../src/util.c:1922
+msgid "Filename contains only blank characters."
+msgstr ""
+
+#: ../src/util.c:1985 ../src/util.c:1994 ../src/util.c:2049
+msgid "Unable to open."
+msgstr ""
+
+#: ../src/util.c:1986 ../src/util.c:1995
+#, c-format
+msgid ""
+"Unable to open file \"%s\" for reading.\n"
+"%s."
+msgstr ""
+
+#: ../src/util.c:2050
+#, c-format
+msgid ""
+"Unable to open file \"%s\" for writing.\n"
+"%s."
+msgstr ""
+
+#: ../src/util.c:2071
+msgid "Unable to write."
+msgstr ""
+
+#: ../src/util.c:2072
+#, c-format
+msgid ""
+"Unable to write to file \"%s\".\n"
+"%s."
+msgstr ""
+
+#: ../src/util.c:2108 ../src/util.c:2144
+msgid "Unable to read."
+msgstr ""
+
+#: ../src/util.c:2109
+#, c-format
+msgid "File \"%s\" too large."
+msgstr ""
+
+#: ../src/util.c:2145
+#, c-format
+msgid ""
+"Unable to read from file \"%s\".\n"
+"%s."
+msgstr ""
+
+#: ../src/util.c:2452
+msgid "Unable to create temporary file."
+msgstr ""
+
+#: ../src/util.c:2453
+#, c-format
+msgid ""
+"Unable to make file \"%s\"\n"
 "%s"
 msgstr ""
 
-#: ../src/model.c:467
-msgid "model_save: xmlNewChild() failed"
+#: ../src/util.c:2660
+msgid "Out of memory."
 msgstr ""
 
-#: ../src/model.c:534
-msgid "XML load error."
-msgstr ""
-
-#: ../src/model.c:535
+#: ../src/util.c:2661
 #, c-format
-msgid "Can't load node of type \"%s\" into object of type \"%s\""
+msgid "Request for %s of RAM triggered memory allocation failure."
 msgstr ""
 
-#: ../src/model.c:763
-msgid "Delete?"
-msgstr ""
-
-#: ../src/model.c:764
-#, c-format
-msgid "Are you sure you want to delete %s \"%s\"?"
-msgstr ""
-
-#: ../src/option.c:68
-msgid "Labels"
-msgstr ""
-
-#. Create signals.
-#.
-#. Init methods.
-#.
-#: ../src/paintboxview.c:109
-msgid "Paintbox bar menu"
-msgstr ""
-
-#: ../src/paintboxview.c:210
-msgid "Clear undo history?"
-msgstr ""
-
-#: ../src/paintboxview.c:211
+#: ../src/formula.c:143
 msgid ""
-"Are you sure you want to clear all undo and redo? This will free up memory, "
-"but you will no longer be able to undo or redo any of the painting you have "
-"done so far."
+"Press Escape to cancel edit, press Return to accept edit and recalculate"
 msgstr ""
 
-#: ../src/paintboxview.c:246
-msgid "Manipulate regions"
-msgstr ""
-
-#. IMAGEMODEL_SELECT
-#: ../src/paintboxview.c:247
-msgid "Pan window"
-msgstr ""
-
-#. IMAGEMODEL_PAN
-#: ../src/paintboxview.c:248
-msgid "Zoom in on mouse"
-msgstr ""
-
-#. IMAGEMODEL_MAGOUT
-#: ../src/paintboxview.c:250
-msgid "Read pixel into inkwell"
-msgstr ""
-
-#. IMAGEMODEL_DROPPER
-#: ../src/paintboxview.c:251
-msgid "Freehand draw "
-msgstr ""
-
-#. IMAGEMODEL_PEN
-#: ../src/paintboxview.c:252
-msgid "Draw straight lines"
-msgstr ""
-
-#. IMAGEMODEL_LINE
-#: ../src/paintboxview.c:253
-msgid "Fill rectangles"
-msgstr ""
-
-#. IMAGEMODEL_RECT
-#: ../src/paintboxview.c:254
-msgid "Flood while pixel not equal to ink"
-msgstr ""
-
-#. IMAGEMODEL_FLOOD
-#: ../src/paintboxview.c:256
-msgid "Flood while pixel equal to click"
-msgstr ""
-
-#. IMAGEMODEL_BLOB
-#: ../src/paintboxview.c:258
-msgid "Draw text"
-msgstr ""
-
-#: ../src/paintboxview.c:309
-msgid "Undo last paint action"
-msgstr ""
-
-#: ../src/paintboxview.c:318
-msgid "Redo last paint action"
-msgstr ""
-
-#: ../src/paintboxview.c:327
-msgid "Clear all undo and redo buffers"
-msgstr ""
-
-#: ../src/paintboxview.c:376
-msgid "Enter text for text tool"
-msgstr ""
-
-#: ../src/panechild.c:108
-msgid "Close the pane"
-msgstr ""
-
-#: parse.y:244 parse.y:255
-msgid "not top level"
-msgstr ""
-
-#: parse.y:260
-msgid "not strings"
-msgstr ""
-
-#: parse.y:318
-msgid "left-hand-side pattern contains no identifiers"
-msgstr ""
-
-#: parse.y:1066 ../src/program.c:1492
-msgid "Parse error."
-msgstr ""
-
-#: parse.y:1069
-#, c-format
-msgid "Error in %s: %s"
-msgstr ""
-
-#: parse.y:1072
-#, c-format
-msgid "Error: %s"
-msgstr ""
-
-#: parse.y:1193
-msgid "definition is too long"
-msgstr ""
-
-#: parse.y:1617
-msgid "no leading identifier"
-msgstr ""
-
-#: parse.y:1623
-msgid "'=' missing"
-msgstr ""
-
-#: parse.y:1653
-msgid "identifier expected"
-msgstr ""
-
-#: parse.y:1663
-#, c-format
-msgid "'%s' does not exist"
-msgstr ""
-
-#: parse.y:1666
-#, c-format
-msgid "'%s' has no members"
-msgstr ""
-
-#: parse.y:1682
-msgid "'.' or '=' expected"
-msgstr ""
-
-#. Not found? Maybe - error message anyway.
-#.
-#: ../src/path.c:512 ../src/path.c:543 ../src/program.c:1511
-#: ../src/program.c:1563 ../src/program.c:1585 ../src/program.c:1593
-#: ../src/symbol.c:502
-msgid "Not found."
+#: ../src/colourdisplay.c:246
+msgid "Double-click to edit this color, or drag-and-drop between colors"
 msgstr ""
 
 #: ../src/path.c:513
@@ -2821,8 +3193,286 @@ msgstr ""
 msgid "File \"%s\" not found on path"
 msgstr ""
 
-#: ../src/pathnameview.c:153
-msgid "Select a new file name"
+#: ../src/imageheader.c:232
+msgid "Field"
+msgstr ""
+
+#: ../src/imageheader.c:247
+msgid "Image history"
+msgstr ""
+
+#: ../src/filesel.c:86
+msgid "Workspace files (*.ws)"
+msgstr ""
+
+#: ../src/filesel.c:88
+msgid "Recombination matrix files (*.rec)"
+msgstr ""
+
+#: ../src/filesel.c:90
+msgid "Morphology matrix files (*.mor)"
+msgstr ""
+
+#: ../src/filesel.c:92
+msgid "Convolution matrix files (*.con)"
+msgstr ""
+
+#: ../src/filesel.c:94
+msgid "Matrix files (*.mat)"
+msgstr ""
+
+#: ../src/filesel.c:96
+msgid "Definition files (*.def)"
+msgstr ""
+
+#: ../src/filesel.c:98
+msgid "ICC profiles (*.icc, *.icm)"
+msgstr ""
+
+#: ../src/filesel.c:100
+msgid "All files (*)"
+msgstr ""
+
+#. Used as eg. "VIPS image files (*.v)"
+#.
+#: ../src/filesel.c:133
+msgid "image files"
+msgstr ""
+
+#: ../src/filesel.c:502
+#, c-format
+msgid "Unable to determine space free in \"%s\"."
+msgstr ""
+
+#. Expands to (eg.) '6GB free in "/pics/tmp"'
+#.
+#: ../src/filesel.c:513
+#, c-format
+msgid "free in \"%s\""
+msgstr ""
+
+#: ../src/filesel.c:761
+msgid "No file selected."
+msgstr ""
+
+#: ../src/filesel.c:985
+msgid "Increment filename"
+msgstr ""
+
+#: ../src/filesel.c:991
+msgid "After Save, add 1 to the last number in the file name"
+msgstr ""
+
+#: ../src/filesel.c:1235
+#, c-format
+msgid "%s Save Preferences"
+msgstr ""
+
+#: ../src/filesel.c:1296
+msgid "Overwrite"
+msgstr ""
+
+#: ../src/filesel.c:1297
+msgid "Overwrite file?"
+msgstr ""
+
+#: ../src/filesel.c:1298
+#, c-format
+msgid "File \"%s\" exists. OK to overwrite?"
+msgstr ""
+
+#: ../src/link.c:578
+msgid "Circular dependency."
+msgstr ""
+
+#: ../src/link.c:579
+#, c-format
+msgid "Circular dependency detected near symbol \"%s\"."
+msgstr ""
+
+#: ../src/classmodel.c:154 ../src/classmodel.c:226
+#, c-format
+msgid "_%s() method not implemented for %s."
+msgstr ""
+
+#: ../src/classmodel.c:162
+#, c-format
+msgid "Save %s \"%s\""
+msgstr ""
+
+#: ../src/classmodel.c:235
+#, c-format
+msgid "Replace %s \"%s\""
+msgstr ""
+
+#: ../src/classmodel.c:693
+msgid "Set boolean value here"
+msgstr ""
+
+#: ../src/classmodel.c:699
+msgid "Enter a floating point number here"
+msgstr ""
+
+#: ../src/classmodel.c:706
+msgid "Enter a string here"
+msgstr ""
+
+#: ../src/classmodel.c:1066
+msgid "Unknown option."
+msgstr ""
+
+#: ../src/classmodel.c:1067
+#, c-format
+msgid "Option \"%s\" not known."
+msgstr ""
+
+#: ../src/classmodel.c:1142
+#, c-format
+msgid "%d band value only"
+msgstr ""
+
+#: ../src/clock.c:59 ../src/clock.c:92 ../src/clock.c:191
+msgid "Interval"
+msgstr ""
+
+#: ../src/clock.c:60 ../src/clock.c:95
+msgid "Elapsed time"
+msgstr ""
+
+#: ../src/clock.c:92
+msgid "Interval between ticks (seconds)"
+msgstr ""
+
+#: ../src/clock.c:95
+msgid "Elapsed time (seconds)"
+msgstr ""
+
+#: ../src/workspacedefs.c:97
+#, c-format
+msgid "%d definition"
+msgid_plural "%d definitions"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../src/workspacedefs.c:103
+msgid "errors"
+msgstr ""
+
+#: ../src/workspacedefs.c:108 ../src/program.c:254
+msgid "modified"
+msgstr ""
+
+#: ../src/workspacedefs.c:181
+msgid "Replace Definition From File"
+msgstr ""
+
+#: ../src/workspacedefs.c:260
+msgid "Workspace definitions"
+msgstr ""
+
+#: ../src/workspacedefs.c:276
+msgid "Process"
+msgstr ""
+
+#. Create signals.
+#.
+#. Init methods.
+#.
+#: ../src/statusview.c:108 ../src/plotstatus.c:99
+msgid "Status bar menu"
+msgstr ""
+
+#: ../src/statusview.c:223 ../src/statusview.c:226 ../src/plotstatus.c:190
+msgid "Magnification"
+msgstr ""
+
+#: ../src/reduce.c:135
+msgid "Typecheck error."
+msgstr ""
+
+#: ../src/reduce.c:137
+#, c-format
+msgid "%s expected %s, instead saw:"
+msgstr ""
+
+#: ../src/reduce.c:149
+#, c-format
+msgid "%s too long."
+msgstr ""
+
+#: ../src/reduce.c:532 ../src/reduce.c:597
+msgid "Not rectangular."
+msgstr ""
+
+#: ../src/reduce.c:533 ../src/reduce.c:598
+#, c-format
+msgid ""
+"Matrix of real is not rectangular. Found row of length %d, should be %d."
+msgstr ""
+
+#: ../src/reduce.c:557
+msgid "Zero dimension."
+msgstr ""
+
+#: ../src/reduce.c:558
+#, c-format
+msgid "Matrix has width %d, height %d."
+msgstr ""
+
+#: ../src/reduce.c:850
+msgid "List length"
+msgstr ""
+
+#: ../src/reduce.c:899
+#, c-format
+msgid "List index must be positive, not %d"
+msgstr ""
+
+#: ../src/reduce.c:907
+msgid "List index"
+msgstr ""
+
+#: ../src/reduce.c:912
+#, c-format
+msgid "List only has %d elements, unable to get element %d."
+msgstr ""
+
+#: ../src/reduce.c:955
+msgid "No arguments allowed."
+msgstr ""
+
+#: ../src/reduce.c:956
+#, c-format
+msgid "Object \"%s\" should have no arguments."
+msgstr ""
+
+#: ../src/reduce.c:1057
+msgid "C stack overflow. Expression too complex."
+msgstr ""
+
+#: ../src/reduce.c:1073
+msgid "Cancelled."
+msgstr ""
+
+#: ../src/reduce.c:1074
+msgid "Evaluation cancelled."
+msgstr ""
+
+#: ../src/reduce.c:1169
+msgid "No value."
+msgstr ""
+
+#: ../src/reduce.c:1170
+#, c-format
+msgid "Symbol \"%s\" has no value."
+msgstr ""
+
+#: ../src/reduce.c:1645 ../src/reduce.c:1650 ../src/reduce.c:1656
+msgid "List generator"
+msgstr ""
+
+#: ../src/defbrowser.c:259
+msgid "Tooltip"
 msgstr ""
 
 #: ../src/plot.c:80
@@ -2897,37 +3547,8 @@ msgstr ""
 msgid "1xn or nx1 images only"
 msgstr ""
 
-#. Create signals.
-#.
-#. Init methods.
-#.
-#: ../src/plotstatus.c:99 ../src/statusview.c:108
-msgid "Status bar menu"
-msgstr ""
-
-#: ../src/plotstatus.c:190 ../src/statusview.c:223 ../src/statusview.c:226
-msgid "Magnification"
-msgstr ""
-
-#. Probably failed to load prefs on startup for some reason.
-#.
-#: ../src/prefs.c:207
-msgid "Unable to display preferences."
-msgstr ""
-
-#: ../src/prefs.c:208
-#, c-format
-msgid ""
-"No preferences workspace was found. Preferences probably failed to load when "
-"%s started."
-msgstr ""
-
 #: ../src/program.c:72
 msgid "Edit window"
-msgstr ""
-
-#: ../src/program.c:254 ../src/workspacedefs.c:108
-msgid "modified"
 msgstr ""
 
 #: ../src/program.c:624
@@ -3286,6 +3907,11 @@ msgstr ""
 msgid "Definition Browser"
 msgstr ""
 
+#: ../src/cache.c:881
+#, c-format
+msgid "VIPS library: %s"
+msgstr ""
+
 #: ../src/progress.c:120
 msgid "Cancelling"
 msgstr ""
@@ -3310,651 +3936,4 @@ msgstr ""
 
 #: ../src/progress.c:197
 msgid "Loading"
-msgstr ""
-
-#: ../src/reduce.c:135
-msgid "Typecheck error."
-msgstr ""
-
-#: ../src/reduce.c:137
-#, c-format
-msgid "%s expected %s, instead saw:"
-msgstr ""
-
-#: ../src/reduce.c:148 ../src/reduce.c:1056 ../src/trace.c:130
-#: ../src/workspace.c:1735
-msgid "Overflow error."
-msgstr ""
-
-#: ../src/reduce.c:149
-#, c-format
-msgid "%s too long."
-msgstr ""
-
-#: ../src/reduce.c:532 ../src/reduce.c:597
-msgid "Not rectangular."
-msgstr ""
-
-#: ../src/reduce.c:533 ../src/reduce.c:598
-#, c-format
-msgid ""
-"Matrix of real is not rectangular. Found row of length %d, should be %d."
-msgstr ""
-
-#: ../src/reduce.c:557
-msgid "Zero dimension."
-msgstr ""
-
-#: ../src/reduce.c:558
-#, c-format
-msgid "Matrix has width %d, height %d."
-msgstr ""
-
-#: ../src/reduce.c:850
-msgid "List length"
-msgstr ""
-
-#: ../src/reduce.c:899
-#, c-format
-msgid "List index must be positive, not %d"
-msgstr ""
-
-#: ../src/reduce.c:907
-msgid "List index"
-msgstr ""
-
-#: ../src/reduce.c:912
-#, c-format
-msgid "List only has %d elements, unable to get element %d."
-msgstr ""
-
-#: ../src/reduce.c:955
-msgid "No arguments allowed."
-msgstr ""
-
-#: ../src/reduce.c:956
-#, c-format
-msgid "Object \"%s\" should have no arguments."
-msgstr ""
-
-#: ../src/reduce.c:1057
-msgid "C stack overflow. Expression too complex."
-msgstr ""
-
-#: ../src/reduce.c:1073
-msgid "Cancelled."
-msgstr ""
-
-#: ../src/reduce.c:1074
-msgid "Evaluation cancelled."
-msgstr ""
-
-#: ../src/reduce.c:1169
-msgid "No value."
-msgstr ""
-
-#: ../src/reduce.c:1170
-#, c-format
-msgid "Symbol \"%s\" has no value."
-msgstr ""
-
-#: ../src/reduce.c:1645 ../src/reduce.c:1650 ../src/reduce.c:1656
-msgid "List generator"
-msgstr ""
-
-#: ../src/reduce.h:75 ../src/reduce.h:105
-msgid "Stack overflow."
-msgstr ""
-
-#: ../src/reduce.h:76
-msgid "Spine stack overflow, runaway recursion?"
-msgstr ""
-
-#: ../src/reduce.h:106
-msgid "Frame stack overflow, expression too complex."
-msgstr ""
-
-#: ../src/reduce.h:119 ../src/reduce.h:131
-msgid "Stack underflow."
-msgstr ""
-
-#: ../src/reduce.h:120
-msgid "Frame stack underflow, you've found a bug!"
-msgstr ""
-
-#: ../src/reduce.h:132
-msgid "Spine stack underflow, you've found a bug!"
-msgstr ""
-
-#: ../src/regionview.c:934 ../src/rowview.c:325
-msgid "Can't duplicate."
-msgstr ""
-
-#: ../src/regionview.c:936
-msgid "You can only duplicate top level regions."
-msgstr ""
-
-#: ../src/regionview.c:978
-msgid "Can't delete."
-msgstr ""
-
-#: ../src/regionview.c:979
-msgid "You can only delete top level regions."
-msgstr ""
-
-#: ../src/regionview.c:988
-msgid "Delete Region?"
-msgstr ""
-
-#: ../src/regionview.c:989
-#, c-format
-msgid "Are you sure you want to delete Region \"%s\"?"
-msgstr ""
-
-#. Other init.
-#.
-#: ../src/regionview.c:1014
-msgid "Region menu"
-msgstr ""
-
-#: ../src/row.c:288
-msgid "Error in row."
-msgstr ""
-
-#. Elements are name of row, principal error,
-#. * secondary error.
-#.
-#: ../src/row.c:292
-#, c-format
-msgid ""
-"Error in row %s: %s\n"
-"%s"
-msgstr ""
-
-#. Expands to eg. "B1 refers to: B2, B3".
-#.
-#: ../src/row.c:497
-msgid "refers to"
-msgstr ""
-
-#. Expands to eg. "B1 is referred to by: B2, B3".
-#.
-#: ../src/row.c:508
-msgid "is referred to by"
-msgstr ""
-
-#: ../src/row.c:521
-msgid "is blocked on"
-msgstr ""
-
-#: ../src/rowview.c:327
-msgid "You can only duplicate top level rows."
-msgstr ""
-
-#: ../src/rowview.c:480
-msgid "Drag between columns not yet implemented."
-msgstr ""
-
-#. Other init.
-#.
-#: ../src/rowview.c:608
-msgid "Row menu"
-msgstr ""
-
-#: ../src/rowview.c:611
-msgid "_Header"
-msgstr ""
-
-#: ../src/rowview.c:619 ../src/workspacedefs.c:261
-msgid "Replace From _File"
-msgstr ""
-
-#: ../src/rowview.c:623
-msgid "Re_set"
-msgstr ""
-
-#: ../src/rowview.c:689
-msgid "Click to open or close class"
-msgstr ""
-
-#: ../src/slider.c:51
-msgid "From"
-msgstr ""
-
-#: ../src/slider.c:54
-msgid "To"
-msgstr ""
-
-#: ../src/spin.c:197
-msgid "Expand or collapse row"
-msgstr ""
-
-#: ../src/symbol.c:503
-#, c-format
-msgid "Symbol %s is not defined."
-msgstr ""
-
-#: ../src/symbol.c:507
-#, c-format
-msgid "%s is referred to by"
-msgstr ""
-
-#: ../src/symbol.c:721
-#, c-format
-msgid "Redefinition of \"%s\"."
-msgstr ""
-
-#: ../src/symbol.c:725
-#, c-format
-msgid "Previously defined at line %d."
-msgstr ""
-
-#: ../src/symbol.c:748
-#, c-format
-msgid "Attempt to redefine root symbol \"%s\"."
-msgstr ""
-
-#. Parameter, workspace, etc.
-#.
-#: ../src/symbol.c:774
-#, c-format
-msgid "Can't redefine %s \"%s\"."
-msgstr ""
-
-#. used as in "fred refers to undefined symbol jim"
-#.
-#: ../src/tool.c:75
-msgid "refers to undefined symbol"
-msgstr ""
-
-#: ../src/tool.c:892
-#, c-format
-msgid ""
-"Can't create dialog with name \"%s\", an object with that name already "
-"exists in kit \"%s\"."
-msgstr ""
-
-#: ../src/toolkitbrowser.c:267
-msgid "Action"
-msgstr ""
-
-#: ../src/toolkitbrowser.c:275
-msgid "Parameters"
-msgstr ""
-
-#: ../src/toolkitbrowser.c:283
-msgid "Menu Item"
-msgstr ""
-
-#: ../src/toolkitgroup.c:120
-#, c-format
-msgid "Toolkits for %s"
-msgstr ""
-
-#: ../src/trace.c:131
-msgid "Trace buffer stack overflow."
-msgstr ""
-
-#: ../src/trace.c:235
-msgid "Clear trace window"
-msgstr ""
-
-#: ../src/trace.c:241
-msgid "_Operators"
-msgstr ""
-
-#: ../src/trace.c:242
-msgid "trace operators"
-msgstr ""
-
-#: ../src/trace.c:246
-msgid "_Builtin Functions"
-msgstr ""
-
-#: ../src/trace.c:247
-msgid "trace calls to built in functions"
-msgstr ""
-
-#: ../src/trace.c:251
-msgid "_Class Construction"
-msgstr ""
-
-#: ../src/trace.c:252
-msgid "trace class constructors"
-msgstr ""
-
-#: ../src/trace.c:256
-msgid "_VIPS Operations"
-msgstr ""
-
-#: ../src/trace.c:257
-msgid "trace calls to VIPS"
-msgstr ""
-
-#: ../src/trace.c:335
-msgid "Trace"
-msgstr ""
-
-#: ../src/tslider.c:369
-msgid "Slider value ... edit!"
-msgstr ""
-
-#: ../src/tslider.c:390
-msgid "Left-drag to set number"
-msgstr ""
-
-#: ../src/util.c:211
-msgid "Unable to set XML property."
-msgstr ""
-
-#: ../src/util.c:212
-#, c-format
-msgid "Unable to set property \"%s\" to value \"%s\"."
-msgstr ""
-
-#: ../src/util.c:830
-msgid "(no image)"
-msgstr ""
-
-#: ../src/util.c:844
-#, c-format
-msgid "%dx%d %s, %d band, %s"
-msgid_plural "%dx%d %s, %d bands, %s"
-msgstr[0] ""
-msgstr[1] ""
-
-#: ../src/util.c:1257
-msgid "8-bit unsigned integer"
-msgstr ""
-
-#. IM_BANDFMT_UCHAR
-#: ../src/util.c:1258
-msgid "8-bit signed integer"
-msgstr ""
-
-#. IM_BANDFMT_CHAR
-#: ../src/util.c:1259
-msgid "16-bit unsigned integer"
-msgstr ""
-
-#. IM_BANDFMT_USHORT
-#: ../src/util.c:1260
-msgid "16-bit signed integer"
-msgstr ""
-
-#. IM_BANDFMT_SHORT
-#: ../src/util.c:1261
-msgid "32-bit unsigned integer"
-msgstr ""
-
-#. IM_BANDFMT_UINT
-#: ../src/util.c:1262
-msgid "32-bit signed integer"
-msgstr ""
-
-#. IM_BANDFMT_INT
-#: ../src/util.c:1263
-msgid "32-bit float"
-msgstr ""
-
-#. IM_BANDFMT_FLOAT
-#: ../src/util.c:1264
-msgid "64-bit complex"
-msgstr ""
-
-#. IM_BANDFMT_COMPLEX
-#: ../src/util.c:1265
-msgid "64-bit float"
-msgstr ""
-
-#. IM_BANDFMT_DOUBLE
-#: ../src/util.c:1266
-msgid "128-bit complex"
-msgstr ""
-
-#: ../src/util.c:1274
-msgid "<unknown format>"
-msgstr ""
-
-#: ../src/util.c:1317
-msgid "<unknown type>"
-msgstr ""
-
-#: ../src/util.c:1341
-msgid "directory"
-msgstr ""
-
-#: ../src/util.c:1750
-msgid "<charset conversion error>"
-msgstr ""
-
-#: ../src/util.c:1916
-msgid "Filename is too long."
-msgstr ""
-
-#: ../src/util.c:1922
-msgid "Filename contains only blank characters."
-msgstr ""
-
-#: ../src/util.c:1985 ../src/util.c:1994 ../src/util.c:2049
-msgid "Unable to open."
-msgstr ""
-
-#: ../src/util.c:1986 ../src/util.c:1995
-#, c-format
-msgid ""
-"Unable to open file \"%s\" for reading.\n"
-"%s."
-msgstr ""
-
-#: ../src/util.c:2050
-#, c-format
-msgid ""
-"Unable to open file \"%s\" for writing.\n"
-"%s."
-msgstr ""
-
-#: ../src/util.c:2071
-msgid "Unable to write."
-msgstr ""
-
-#: ../src/util.c:2072
-#, c-format
-msgid ""
-"Unable to write to file \"%s\".\n"
-"%s."
-msgstr ""
-
-#: ../src/util.c:2108 ../src/util.c:2144
-msgid "Unable to read."
-msgstr ""
-
-#: ../src/util.c:2109
-#, c-format
-msgid "File \"%s\" too large."
-msgstr ""
-
-#: ../src/util.c:2145
-#, c-format
-msgid ""
-"Unable to read from file \"%s\".\n"
-"%s."
-msgstr ""
-
-#: ../src/util.c:2452
-msgid "Unable to create temporary file."
-msgstr ""
-
-#: ../src/util.c:2453
-#, c-format
-msgid ""
-"Unable to make file \"%s\"\n"
-"%s"
-msgstr ""
-
-#: ../src/util.c:2660
-msgid "Out of memory."
-msgstr ""
-
-#: ../src/util.c:2661
-#, c-format
-msgid "Request for %s of RAM triggered memory allocation failure."
-msgstr ""
-
-#: ../src/vipsobject.c:107
-#, c-format
-msgid "No more than %d arguments allowed."
-msgstr ""
-
-#: ../src/vipsobject.c:213
-msgid "Wrong number of required arguments."
-msgstr ""
-
-#: ../src/vipsobject.c:214
-#, c-format
-msgid "Operation \"%s\" has %d required arguments, you supplied %d."
-msgstr ""
-
-#: ../src/vipsobject.c:251 ../src/vipsobject.c:383
-msgid "Unable to build object."
-msgstr ""
-
-#: ../src/workspace.c:156
-msgid "No objects selected."
-msgstr ""
-
-#: ../src/workspace.c:157 ../src/workspace.c:162
-msgid "Select exactly one object and try again."
-msgstr ""
-
-#: ../src/workspace.c:161
-msgid "More than one object selected."
-msgstr ""
-
-#: ../src/workspace.c:795 ../src/workspace.c:803
-msgid "No backup workspaces found."
-msgstr ""
-
-#: ../src/workspace.c:797
-msgid ""
-"You need to enable \"Auto workspace save\" in Preferences before automatic "
-"recovery works."
-msgstr ""
-
-#: ../src/workspace.c:804
-#, c-format
-msgid "No suitable workspace save files found in \"%s\""
-msgstr ""
-
-#: ../src/workspace.c:820
-msgid "Open workspace backup?"
-msgstr ""
-
-#: ../src/workspace.c:821
-#, c-format
-msgid ""
-"Found workspace \"%s\", dated %s. Do you want to recover this workspace?"
-msgstr ""
-
-#: ../src/workspace.c:1351
-msgid "Version mismatch."
-msgstr ""
-
-#: ../src/workspace.c:1352
-#, c-format
-msgid ""
-"File \"%s\" was saved from %s-%d.%d.%d. You may see compatibility problems."
-msgstr ""
-
-#: ../src/workspace.c:1509
-msgid "// private definitions for this workspace\n"
-msgstr ""
-
-#: ../src/workspace.c:1554
-#, c-format
-msgid "Can't create workspace \"%s\". A symbol with that name already exists."
-msgstr ""
-
-#: ../src/workspace.c:1649
-msgid "Default empty workspace"
-msgstr ""
-
-#: ../src/workspace.c:1725
-#, c-format
-msgid "%s needs %d arguments, there are %d selected."
-msgstr ""
-
-#: ../src/workspace.c:1736
-msgid "Too many names selected."
-msgstr ""
-
-#: ../src/workspace.c:1873
-msgid "You can only remove top level rows."
-msgstr ""
-
-#: ../src/workspace.c:1874
-msgid "Not all selected objects are top level rows."
-msgstr ""
-
-#: ../src/workspace.c:1924
-msgid "Delete selected objects?"
-msgstr ""
-
-#: ../src/workspace.c:1925
-#, c-format
-msgid "Are you sure you want to delete %s?"
-msgstr ""
-
-#: ../src/workspace.c:1983
-msgid "Unable to ungroup."
-msgstr ""
-
-#: ../src/workspace.c:1984
-#, c-format
-msgid "Row \"%s\" is not a Group or a list."
-msgstr ""
-
-#: ../src/workspacedefs.c:97
-#, c-format
-msgid "%d definition"
-msgid_plural "%d definitions"
-msgstr[0] ""
-msgstr[1] ""
-
-#: ../src/workspacedefs.c:103
-msgid "errors"
-msgstr ""
-
-#: ../src/workspacedefs.c:181
-msgid "Replace Definition From File"
-msgstr ""
-
-#: ../src/workspacedefs.c:260
-msgid "Workspace definitions"
-msgstr ""
-
-#: ../src/workspacedefs.c:276
-msgid "Process"
-msgstr ""
-
-#: ../src/workspacegroup.c:146
-#, c-format
-msgid ""
-"Can't create workspacegroup \"%s\". A symbol with that name already exists."
-msgstr ""
-
-#: ../src/workspacegroup.c:213
-msgid "Set workspace name here"
-msgstr ""
-
-#: ../src/workspacegroup.c:215
-msgid "Set workspace caption here"
-msgstr ""
-
-#: ../src/workspacegroup.c:217
-msgid "New Workspace"
-msgstr ""
-
-#: ../src/workspacegroup.c:221
-msgid "Create Workspace"
 msgstr ""

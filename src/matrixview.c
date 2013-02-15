@@ -49,7 +49,7 @@ static const int matrixview_max_height = 10;
 
 /* Show a matrix with fixed-width columns.
  */
-static const int matrixview_column_width = 75;
+static const int matrixview_column_width = 70;
 
 /* Limit number of sub-widgets with this ... could be prefs?
  */
@@ -439,7 +439,7 @@ matrixview_liststore_new( MatrixValue *matrixvalue )
 }
 
 static void
-matrixview_edited( GtkCellRendererText *renderer, 
+matrixview_edited_cb( GtkCellRendererText *renderer, 
 	char *path, char *new_text, void *user_data )
 {
 	Matrixview *matrixview = MATRIXVIEW( user_data );
@@ -447,16 +447,30 @@ matrixview_edited( GtkCellRendererText *renderer,
 	GtkTreeIter iter;
 
 	if( gtk_tree_model_get_iter_from_string( tree, &iter, path ) ) {
-		int x = GPOINTER_TO_INT( g_object_get_data( 
+		int col = GPOINTER_TO_INT( g_object_get_data( 
 			G_OBJECT( renderer ), "nip2_column_num" ) );
 
 		gtk_list_store_set( GTK_LIST_STORE( tree ), &iter, 
-			x, atof( new_text ),
+			col, atof( new_text ),
 			-1 ); 
 
 		view_scannable_register( VIEW( matrixview ) );
 		symbol_recalculate_all();
 	}
+}
+
+static void
+matrixview_cell_data_cb( GtkTreeViewColumn *tree_column, GtkCellRenderer *cell,
+	GtkTreeModel *tree, GtkTreeIter *iter, void *data )
+{
+	int col = GPOINTER_TO_INT( g_object_get_data( 
+		G_OBJECT( cell ), "nip2_column_num" ) );
+	double d;
+	char buf[256];
+
+	gtk_tree_model_get( tree, iter, col, &d, -1 );
+	vips_snprintf( buf, 256, "%g", d ); 
+	g_object_set( cell, "text", buf, NULL );
 }
 
 /* Build a set of text items for a matrix. 
@@ -489,7 +503,7 @@ matrixview_text_build( Matrixview *matrixview )
 		g_object_set_data( G_OBJECT( renderer ), 
 			"nip2_column_num", GINT_TO_POINTER( i ) );
 		g_signal_connect( G_OBJECT( renderer ), "edited",
-			G_CALLBACK( matrixview_edited ), matrixview );
+			G_CALLBACK( matrixview_edited_cb ), matrixview );
 
 		column = gtk_tree_view_column_new();
 		gtk_tree_view_column_set_sizing( column, 
@@ -502,6 +516,8 @@ matrixview_text_build( Matrixview *matrixview )
 		gtk_tree_view_column_set_attributes( column, renderer, 
 			"text", i, 
 			NULL );
+		gtk_tree_view_column_set_cell_data_func( column, renderer, 
+			matrixview_cell_data_cb, NULL, NULL ); 
 		gtk_tree_view_append_column( GTK_TREE_VIEW( matrixview->sheet ),
 			column );
 	}

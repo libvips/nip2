@@ -4,7 +4,11 @@
 
 - os x binary can't save png?
 
-- test Mono / Monospace thing
+- Matrix / New / Laplacian
+
+  edit a cell, turns into a plain matrix
+
+  need to override edit method
 
 - didn't we have band_and or equivalent somewhere?
 
@@ -13,10 +17,6 @@
   necessary for im == Vector [1,2,3]
 
 - breadcrumb trail for prog window, so you can get back to where you were?
-
-- im_invertlut() as a menu item
-
-  handy for inverting the results of cum/norm/etc.
 
 - to_image on a hist should tag as image
 

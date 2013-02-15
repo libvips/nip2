@@ -1,6 +1,7 @@
 started 7.32 22/1/13
 - added colour temperature to colour and colour to colour temperature
 - removed gtksheet, broken on windows, no future on anywhere
+- added histogram invert
 
 started 7.31 3/9/12
 - don't show tooltips for toolkit menu items with submenus (thanks MvGulik)

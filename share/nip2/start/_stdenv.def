@@ -1455,6 +1455,34 @@ hist_norm hist
 		hist_norm Operator_type.COMPOUND_REWRAP false;
 }
 
+hist_inv hist 
+	= oo_unary_function hist_inv_op hist, is_class hist
+	= inv hist, is_image hist
+	= error (_ "bad arguments to " ++ "hist_inv")
+{
+	hist_inv_op = Operator "hist_inv" 
+		hist_inv Operator_type.COMPOUND_REWRAP false;
+
+	inv im
+		= im_invertlut (to_matrix im''') len
+	{
+		// need a vertical doublemask
+		im' 
+			= rot90 im, get_width im > 1 && get_height im == 1 
+			= im, get_width im == 1 && get_height im > 1
+			= error (_ "not a hist");
+		len = get_height im';
+
+		// values must be scaled to 0 - 1
+		im'' = im' / (max im');
+		
+		// add an index column on the left
+		// again, must be in 0-1
+		y = ((make_xy 1 len)?1) / len;
+		im''' = y ++ im'';
+	}
+}
+
 hist_match in ref
 	= oo_binary_function hist_match_op in ref, is_class in
 	= oo_binary'_function hist_match_op in ref, is_class ref

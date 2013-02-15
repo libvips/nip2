@@ -135,6 +135,11 @@ Hist_norm_item = class
 	action x = map_unary hist_norm x;
 }
 
+Hist_inv_item = class 
+	Menuaction "In_vert" "invert a histogram" {
+	action x = map_unary hist_inv x;
+}
+
 Hist_match_item = class 
 	Menuaction "Ma_tch" 
 		"find LUT which will match first histogram to second" {

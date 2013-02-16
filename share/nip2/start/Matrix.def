@@ -73,42 +73,56 @@ Matrix_build_item = class
 
 	Matrix_square_item = class 
 		Menuaction "_Square" "make a square matrix" {
-		action = class
+		action = square (mksquare 5);
+
+		mksquare s = replicate s (take s [1, 1 ..]);
+
+		square v = class
 			_result {
 			_vislevel = 3;
 
-			s = Expression "Size" 5;
+			s = Expression "Size" (len v);
 
 			_result 
-				= Matrix_con (s.expr ** 2) 0 square
+				= Matrix_con (sum v) 0 v, len v == to_real s
+				= Matrix_con (sum m) 0 m
 			{
-				line = take s.expr [1, 1 ..];
-				square = replicate s.expr line;
+				m = mksquare (to_real s); 
 			}
+
+			Matrix_vips value scale offset filename display = square value;
 		}
 	}
 
 	Matrix_circular_item = class 
 		Menuaction "_Circular" "make a circular matrix" {
-		action = class
+		action = circle (mkcircle 3);
+
+		mkcircle r
+				= map2 (map2 pyth) xes yes
+		{
+			line = [-r .. r];
+			xes = replicate (2 * r + 1) line;
+			yes = transpose xes;
+			pyth a b 
+					= 1, (a**2 + b**2) ** 0.5 <= r
+					= 0;
+		}
+
+		circle v = class
 			_result {
 			_vislevel = 3;
 
-			r = Expression "Radius" 5;
+			r = Expression "Radius" ((len v - 1) / 2);
 
 			_result 
-				= Matrix_con (sum circle) 0 circle
+				= Matrix_con (sum v) 0 v, len v == r.expr * 2 + 1
+				= Matrix_con (sum m) 0 m
 			{
-				line = [-r.expr .. r.expr];
-				xes = replicate (2 * r.expr + 1) line;
-				yes = transpose xes;
-				circle = map2 (map2 pyth) xes yes
-				{
-					pyth a b 
-						= 1, (a**2 + b**2) ** 0.5 <= r.expr
-						= 0;
-				}
+				m = mkcircle (to_real r); 
 			}
+
+			Matrix_vips value scale offset filename display = circle value;
 		}
 	}
 

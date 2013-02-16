@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=glib&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2013-02-15 15:20+0000\n"
+"POT-Creation-Date: 2013-02-15 20:02+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -92,16 +92,16 @@ msgstr ""
 #: ../src/workspacegroup.c:177 ../src/workspacegroup.c:213
 #: ../src/columnview.c:180 ../src/columnview.c:241 ../src/row.c:480
 #: ../src/mainw.c:1371 ../src/mainw.c:1409 ../src/defbrowser.c:253
-#: ../src/program.c:595 ../src/program.c:624 ../src/program.c:1123
-#: ../src/program.c:1164 ../src/program.c:1210 ../src/program.c:1242
-#: ../src/program.c:1574 ../src/program.c:1615
+#: ../src/program.c:595 ../src/program.c:624 ../src/program.c:1134
+#: ../src/program.c:1175 ../src/program.c:1221 ../src/program.c:1253
+#: ../src/program.c:1585 ../src/program.c:1626
 msgid "Name"
 msgstr ""
 
 #: ../src/workspacegroup.c:178 ../src/workspacegroup.c:215 ../src/option.c:65
 #: ../src/slider.c:48 ../src/pathname.c:75 ../src/string.c:67
 #: ../src/number.c:48 ../src/mainw.c:1372 ../src/mainw.c:1411
-#: ../src/toggle.c:48 ../src/program.c:1124 ../src/program.c:1166
+#: ../src/toggle.c:48 ../src/program.c:1135 ../src/program.c:1177
 #: ../src/fontname.c:58
 msgid "Caption"
 msgstr ""
@@ -172,8 +172,8 @@ msgid "Offset"
 msgstr ""
 
 #: ../src/matrix.c:284 ../src/columnview.c:182 ../src/columnview.c:245
-#: ../src/program.c:596 ../src/program.c:626 ../src/program.c:1211
-#: ../src/program.c:1244
+#: ../src/program.c:596 ../src/program.c:626 ../src/program.c:1222
+#: ../src/program.c:1255
 msgid "Filename"
 msgstr ""
 
@@ -566,7 +566,7 @@ msgstr ""
 msgid "_Edit Caption"
 msgstr ""
 
-#: ../src/columnview.c:895 ../src/mainw.c:1710 ../src/program.c:1801
+#: ../src/columnview.c:895 ../src/mainw.c:1710 ../src/program.c:1812
 msgid "Select _All"
 msgstr ""
 
@@ -840,8 +840,8 @@ msgstr ""
 #. Not found? Maybe - error message anyway.
 #.
 #: ../src/symbol.c:502 ../src/path.c:512 ../src/path.c:543
-#: ../src/program.c:1511 ../src/program.c:1563 ../src/program.c:1585
-#: ../src/program.c:1593
+#: ../src/program.c:1522 ../src/program.c:1574 ../src/program.c:1596
+#: ../src/program.c:1604
 msgid "Not found."
 msgstr ""
 
@@ -1105,7 +1105,7 @@ msgstr ""
 msgid "left-hand-side pattern contains no identifiers"
 msgstr ""
 
-#: parse.y:1066 ../src/program.c:1492
+#: parse.y:1066 ../src/program.c:1503
 msgid "Parse error."
 msgstr ""
 
@@ -2214,7 +2214,7 @@ msgstr ""
 msgid "Create a new column with a specified name"
 msgstr ""
 
-#: ../src/mainw.c:1665 ../src/program.c:1751
+#: ../src/mainw.c:1665 ../src/program.c:1762
 msgid "New _Workspace"
 msgstr ""
 
@@ -2278,7 +2278,7 @@ msgstr ""
 msgid "Load last automatically backed-up workspace"
 msgstr ""
 
-#: ../src/mainw.c:1705 ../src/program.c:1796
+#: ../src/mainw.c:1705 ../src/program.c:1807
 msgid "_Delete"
 msgstr ""
 
@@ -2310,7 +2310,7 @@ msgstr ""
 msgid "Align columns to grid"
 msgstr ""
 
-#: ../src/mainw.c:1730 ../src/program.c:1821
+#: ../src/mainw.c:1730 ../src/program.c:1832
 msgid "_Find"
 msgstr ""
 
@@ -2318,7 +2318,7 @@ msgstr ""
 msgid "Find in workspace"
 msgstr ""
 
-#: ../src/mainw.c:1735 ../src/program.c:1826
+#: ../src/mainw.c:1735 ../src/program.c:1837
 msgid "Find _Next"
 msgstr ""
 
@@ -3588,322 +3588,322 @@ msgstr ""
 msgid "Toolkit menu"
 msgstr ""
 
-#: ../src/program.c:1164
+#: ../src/program.c:1175
 msgid "Set toolkit name here"
 msgstr ""
 
-#: ../src/program.c:1166
+#: ../src/program.c:1177
 msgid "Set toolkit caption here"
 msgstr ""
 
-#: ../src/program.c:1167
+#: ../src/program.c:1178
 msgid "New Toolkit"
 msgstr ""
 
-#: ../src/program.c:1171 ../src/program.c:1249
+#: ../src/program.c:1182 ../src/program.c:1260
 msgid "Create"
 msgstr ""
 
-#: ../src/program.c:1182
+#: ../src/program.c:1193
 msgid "Nothing selected."
 msgstr ""
 
-#: ../src/program.c:1183
+#: ../src/program.c:1194
 msgid "No toolkit selected."
 msgstr ""
 
-#: ../src/program.c:1242
+#: ../src/program.c:1253
 msgid "Display this name"
 msgstr ""
 
-#: ../src/program.c:1244
+#: ../src/program.c:1255
 msgid "Load this file"
 msgstr ""
 
-#: ../src/program.c:1312
+#: ../src/program.c:1323
 msgid "Load Definition"
 msgstr ""
 
-#: ../src/program.c:1366
+#: ../src/program.c:1377
 msgid "Reload"
 msgstr ""
 
-#: ../src/program.c:1367
+#: ../src/program.c:1378
 msgid "Reload startup objects?"
 msgstr ""
 
-#: ../src/program.c:1368
+#: ../src/program.c:1379
 msgid ""
 "Would you like to reload all startup menus, workspaces and plugins now? This "
 "may take a few seconds."
 msgstr ""
 
-#: ../src/program.c:1450
+#: ../src/program.c:1461
 msgid "No tool selected"
 msgstr ""
 
-#: ../src/program.c:1493
+#: ../src/program.c:1504
 msgid "Bad regular expression."
 msgstr ""
 
-#: ../src/program.c:1512
+#: ../src/program.c:1523
 #, c-format
 msgid "No match found for \"%s\"."
 msgstr ""
 
-#: ../src/program.c:1525
+#: ../src/program.c:1536
 msgid "Find in all Toolkits"
 msgstr ""
 
-#: ../src/program.c:1535
+#: ../src/program.c:1546
 msgid "Enter search string here"
 msgstr ""
 
-#: ../src/program.c:1586
+#: ../src/program.c:1597
 #, c-format
 msgid "No top-level symbol called \"%s\"."
 msgstr ""
 
-#: ../src/program.c:1594
+#: ../src/program.c:1605
 #, c-format
 msgid "Symbol \"%s\" has no tool inforation."
 msgstr ""
 
-#: ../src/program.c:1615
+#: ../src/program.c:1626
 msgid "Go to definition of this symbol"
 msgstr ""
 
-#: ../src/program.c:1617
+#: ../src/program.c:1628
 msgid "Go to Definition"
 msgstr ""
 
-#: ../src/program.c:1647
+#: ../src/program.c:1658
 msgid "Object information."
 msgstr ""
 
-#: ../src/program.c:1698
+#: ../src/program.c:1709
 msgid "No documentation available."
 msgstr ""
 
-#: ../src/program.c:1699
+#: ../src/program.c:1710
 msgid ""
 "On-line documentation is only currently available for VIPS functions and nip "
 "builtins."
 msgstr ""
 
-#: ../src/program.c:1726
+#: ../src/program.c:1737
 msgid "New _Tool"
 msgstr ""
 
-#: ../src/program.c:1727
+#: ../src/program.c:1738
 msgid "Make a new tool"
 msgstr ""
 
-#: ../src/program.c:1731
+#: ../src/program.c:1742
 msgid "New Tool_kit"
 msgstr ""
 
-#: ../src/program.c:1732
+#: ../src/program.c:1743
 msgid "Make a new toolkit"
 msgstr ""
 
-#: ../src/program.c:1736
+#: ../src/program.c:1747
 msgid "New _Separator"
 msgstr ""
 
-#: ../src/program.c:1737
+#: ../src/program.c:1748
 msgid "Make a new separator"
 msgstr ""
 
-#: ../src/program.c:1741
+#: ../src/program.c:1752
 msgid "New _Column Item"
 msgstr ""
 
-#: ../src/program.c:1742
+#: ../src/program.c:1753
 msgid "Make a new column item"
 msgstr ""
 
-#: ../src/program.c:1746
+#: ../src/program.c:1757
 msgid "New _Program Window"
 msgstr ""
 
-#: ../src/program.c:1747
+#: ../src/program.c:1758
 msgid "Make a new program window"
 msgstr ""
 
-#: ../src/program.c:1752
+#: ../src/program.c:1763
 msgid "Make a new workspace"
 msgstr ""
 
-#: ../src/program.c:1756
+#: ../src/program.c:1767
 msgid "_Open Toolkit"
 msgstr ""
 
-#: ../src/program.c:1757
+#: ../src/program.c:1768
 msgid "_Open toolkit"
 msgstr ""
 
-#: ../src/program.c:1761
+#: ../src/program.c:1772
 msgid "Save Toolkit"
 msgstr ""
 
-#: ../src/program.c:1762
+#: ../src/program.c:1773
 msgid "_Save toolkit"
 msgstr ""
 
-#: ../src/program.c:1766
+#: ../src/program.c:1777
 msgid "Save Toolkit _As"
 msgstr ""
 
-#: ../src/program.c:1767
+#: ../src/program.c:1778
 msgid "Save toolkit as"
 msgstr ""
 
-#: ../src/program.c:1771
+#: ../src/program.c:1782
 msgid "_Process"
 msgstr ""
 
-#: ../src/program.c:1772
+#: ../src/program.c:1783
 msgid "Process text"
 msgstr ""
 
-#: ../src/program.c:1776
+#: ../src/program.c:1787
 msgid "_Reload All Toolkits"
 msgstr ""
 
-#: ../src/program.c:1777
+#: ../src/program.c:1788
 msgid "Remove and reload all startup data"
 msgstr ""
 
-#: ../src/program.c:1781
+#: ../src/program.c:1792
 msgid "C_ut"
 msgstr ""
 
-#: ../src/program.c:1782
+#: ../src/program.c:1793
 msgid "Cut selected text"
 msgstr ""
 
-#: ../src/program.c:1786
+#: ../src/program.c:1797
 msgid "_Copy"
 msgstr ""
 
-#: ../src/program.c:1787
+#: ../src/program.c:1798
 msgid "Copy selected text"
 msgstr ""
 
-#: ../src/program.c:1791
+#: ../src/program.c:1802
 msgid "_Paste"
 msgstr ""
 
-#: ../src/program.c:1792
+#: ../src/program.c:1803
 msgid "Paste selected text"
 msgstr ""
 
-#: ../src/program.c:1797
+#: ../src/program.c:1808
 msgid "Delete selected text"
 msgstr ""
 
-#: ../src/program.c:1802
+#: ../src/program.c:1813
 msgid "Select all text"
 msgstr ""
 
-#: ../src/program.c:1806
+#: ../src/program.c:1817
 msgid "Dese_lect All"
 msgstr ""
 
-#: ../src/program.c:1807
+#: ../src/program.c:1818
 msgid "Deselect all text"
 msgstr ""
 
-#: ../src/program.c:1811
+#: ../src/program.c:1822
 msgid "Delete _Tool"
 msgstr ""
 
-#: ../src/program.c:1812
+#: ../src/program.c:1823
 msgid "Delete current tool"
 msgstr ""
 
-#: ../src/program.c:1816
+#: ../src/program.c:1827
 msgid "Delete Tool_kit"
 msgstr ""
 
-#: ../src/program.c:1817
+#: ../src/program.c:1828
 msgid "Delete current toolkit"
 msgstr ""
 
-#: ../src/program.c:1822
+#: ../src/program.c:1833
 msgid "Find text in toolkits"
 msgstr ""
 
-#: ../src/program.c:1827
+#: ../src/program.c:1838
 msgid "Find text again"
 msgstr ""
 
-#: ../src/program.c:1831
+#: ../src/program.c:1842
 msgid "_Jump To Definition"
 msgstr ""
 
-#: ../src/program.c:1832
+#: ../src/program.c:1843
 msgid "Jump to definition"
 msgstr ""
 
-#: ../src/program.c:1836
+#: ../src/program.c:1847
 msgid "_Info"
 msgstr ""
 
-#: ../src/program.c:1837
+#: ../src/program.c:1848
 msgid "Info on selected object"
 msgstr ""
 
-#: ../src/program.c:1841
+#: ../src/program.c:1852
 msgid "_Trace"
 msgstr ""
 
-#: ../src/program.c:1842
+#: ../src/program.c:1853
 msgid "Make a new trace window"
 msgstr ""
 
-#: ../src/program.c:1846
+#: ../src/program.c:1857
 msgid "_Errors"
 msgstr ""
 
-#: ../src/program.c:1847
+#: ../src/program.c:1858
 msgid "Show all errors"
 msgstr ""
 
-#: ../src/program.c:1851
+#: ../src/program.c:1862
 msgid "Help on _Tool"
 msgstr ""
 
-#: ../src/program.c:1852
+#: ../src/program.c:1863
 msgid "View docs for this tool"
 msgstr ""
 
-#: ../src/program.c:1858
+#: ../src/program.c:1869
 msgid "Definition _Browser"
 msgstr ""
 
-#: ../src/program.c:1859
+#: ../src/program.c:1870
 msgid "Show definition browser"
 msgstr ""
 
-#: ../src/program.c:2115
+#: ../src/program.c:2126
 msgid "Bad drag."
 msgstr ""
 
-#: ../src/program.c:2117
+#: ../src/program.c:2128
 msgid ""
 "Sorry, you can only drag tools between toolkits. You can't reorder toolkits, "
 "you can't nest toolkits and you can't drag tools to the top level."
 msgstr ""
 
-#: ../src/program.c:2310
+#: ../src/program.c:2321
 msgid "Tool"
 msgstr ""
 
 #. Toolkit Browser pane.
 #.
-#: ../src/program.c:2333
+#: ../src/program.c:2344
 msgid "Definition Browser"
 msgstr ""
 

@@ -27,6 +27,7 @@ to_matrix x
  */
 to_image x
 	= to_image x.expr, is_Expression x
+	= Image x.value, is_Plot x
 	= x, is_Image x
 	= Image (image_set_type 
 			(Image_type.colour_spaces.lookup 0 1 x.colour_space)

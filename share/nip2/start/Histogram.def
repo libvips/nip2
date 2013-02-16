@@ -1,7 +1,7 @@
 Hist_new_item = class
 	Menupullright "_New" "new histogram" {
 	Hist_item = class
-		Menuaction "Histogram" "make an identity histogram" {
+		Menuaction "_Identity" "make an identity histogram" {
 		action = class 
 			_result {
 			_vislevel = 3;

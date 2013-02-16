@@ -194,22 +194,22 @@ Math_complex_item = class
 Math_boolean_item = class 
 	Menupullright "_Boolean" "bitwise boolean operations for integer objects" {
 	And_item = class 
-		Menuaction "_And" "bitwise and of a and b" {
+		Menuaction "_AND" "bitwise AND of a and b" {
 		action a b = map_binary bitwise_and a b;
 	}
 
 	Or_item = class 
-		Menuaction "_Or" "bitwise or of a and b" {
+		Menuaction "_OR" "bitwise OR of a and b" {
 		action a b = map_binary bitwise_or a b;
 	}
 
 	Eor_item = class 
-		Menuaction "E_xclusive Or" "bitwise exclusive or of a and b" {
+		Menuaction "_XOR" "bitwise exclusive or of a and b" {
 		action a b = map_binary eor a b;
 	}
 
 	Not_item = class 
-		Menuaction "_Not" "invert a" {
+		Menuaction "_NOT" "invert a" {
 		action a = map_unary not a;
 	}
 
@@ -238,15 +238,9 @@ Math_boolean_item = class
 		}
 	}
 
-	Band_or_item = class 
-		Menuaction "Band O_r" "or the bands of an image together" {
-		action im = map_unary (foldr1 bitwise_or @ bandsplit) im;
-	}
+	Bandand_item = Image_band_item.Bandand_item; 
 
-	Band_and_item = class 
-		Menuaction "Band A_nd" "and the bands of an image together" {
-		action im = map_unary (foldr1 bitwise_and @ bandsplit) im;
-	}
+	Bandor_item = Image_band_item.Bandor_item; 
 }
 
 Math_relational_item = class 

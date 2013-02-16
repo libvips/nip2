@@ -163,6 +163,22 @@ bandjoin l
 	joined = im_gbandjoin (map get_image l);
 }
 
+bandand x
+	= oo_unary_function bandand_op x, is_class x
+	= foldr1 bitwise_and (bandsplit x), is_image x
+	= error (_ "bad arguments to " ++ "bandand")
+{
+	bandand_op = Operator "bandand" bandand Operator_type.COMPOUND_REWRAP false;
+}
+
+bandor x
+	= oo_unary_function bandor_op x, is_class x
+	= foldr1 bitwise_or (bandsplit x), is_image x
+	= error (_ "bad arguments to " ++ "bandor")
+{
+	bandor_op = Operator "bandor" bandor Operator_type.COMPOUND_REWRAP false;
+}
+
 sum x
 	= oo_unary_function sum_op x, is_class x
 	= im_avg x * (get_width x) * (get_height x) * (get_bands x), is_image x

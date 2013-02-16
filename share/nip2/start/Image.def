@@ -1023,6 +1023,18 @@ Image_band_item = class
 
     sep1 = Menuseparator;
 
+	Bandand_item = class
+		Menuaction "Bitwise Band AND" "bitwise AND of image bands" {
+		action x = bandand x;
+	}
+
+	Bandor_item = class
+		Menuaction "Bitwise Band OR" "bitwise OR of image bands" {
+		action x = bandor x;
+	}
+
+    sep2 = Menuseparator;
+
 	To_dimension_item = class 
 		Menuaction "To D_imension" "convert bands to width or height" {
 		action x = class
@@ -1347,7 +1359,7 @@ Image_draw_item = class
 Image_join_item = class 
 	Menupullright "_Join" "join two or more images together" {
 	Bandwise_item = class
-		Menuaction "_Bandwise" "join two images bandwise" {
+		Menuaction "_Bandwise Join" "join two images bandwise" {
 		action a b = join a b;
 	}
 

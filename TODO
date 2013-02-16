@@ -7,6 +7,8 @@
 
   same for gaussian
 
+  rather tricky, compared to square / circle etc. 
+
 
 
 - in OS X binary, click on sRGB.icm in Open dialog ... segv!
@@ -15,15 +17,7 @@
 
 - os x binary can't save png?
 
-- didn't we have band_and or equivalent somewhere?
-
-	  band x = foldr1 bitwise_and (bandsplit x)
-
-  necessary for im == Vector [1,2,3]
-
 - breadcrumb trail for prog window, so you can get back to where you were?
-
-- to_image on a hist should tag as image
 
 - lambdas don't pattern match?
 
@@ -344,6 +338,8 @@ sym-param found, argh: point.re
   cima is ~370s for this (!!)
 
   work machine is about 50s
+
+  dell vostro laptop is 45s without optimiser
 
 - turn on DEBUG in heap.c, run the fibonacci benchmark
 

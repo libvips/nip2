@@ -11,12 +11,6 @@
 
 
 
-- in OS X binary, click on sRGB.icm in Open dialog ... segv!
-
-  IM relocation problem?
-
-- os x binary can't save png?
-
 - breadcrumb trail for prog window, so you can get back to where you were?
 
 - lambdas don't pattern match?

@@ -526,11 +526,15 @@ Image_transform_item = class
 				_result 
 					= map_unary process x
 				{
-					process in = [
-						in, 
-						rot90 in,
-						rot180 in,
-						rot270 in
+					process = [
+						// we can't use id here since we want to "declass"
+						// the members of x ... consider if x is a crop class,
+						// for example, we don't want to inherit from crop, we
+						// want to make a new image class
+						rot180 @ rot180,
+						rot90,
+						rot180,
+						rot270
 					] ? angle;
 				}
 			}
@@ -1086,20 +1090,36 @@ Image_band_item = class
 
 Image_crop_item = class 
 	Menuaction "_Crop" "extract a rectangular area from an image" {
-	action x = class
+	action x 
+		= crop x [l, t, w, h]
+	{
+		fields = [
+			[has_left, get_left, 0],
+			[has_top, get_top, 0],
+			[has_width, get_width, 100],
+			[has_height, get_height, 100]
+		];
+
+		[l, t, w, h] 
+			= map get_default fields
+		{
+			get_default line
+				= get x, has x
+				= default
+			{
+				[has, get, default] = line;
+			}
+		}
+	}
+
+	crop x geo = class
 		_result {
 		_vislevel = 3;
 
-		// try to find the image geometry ... don't bother trying to look
-		// inside groups though
-		_geo
-			= x.rect, is_Image x
-			= Rect 0 0 100 100;
-
-		l = Expression "Crop left" ((int) (_geo.left + _geo.width / 4));
-		t = Expression "Crop top" ((int) (_geo.top + _geo.height / 4));
-		w = Expression "Crop width" (max_pair 1 ((int) (_geo.width / 2)));
-		h = Expression "Crop height" (max_pair 1 ((int) (_geo.height / 2)));
+		l = Expression "Crop left" ((int) (geo?0 + geo?2 / 4));
+		t = Expression "Crop top" ((int) (geo?1 + geo?3 / 4));
+		w = Expression "Crop width" (max_pair 1 ((int) (geo?2 / 2)));
+		h = Expression "Crop height" (max_pair 1 ((int) (geo?3 / 2)));
 
 		_result 
 			= map_nary (list_5ary extract) [x, l.expr, t.expr, w.expr, h.expr]

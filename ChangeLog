@@ -1,4 +1,8 @@
-started 7.32 22/1/13
+started 7.32.1 7/3/13
+- remove "fred" from dist
+- license updates, thanks Benjamin
+
+started 7.32.0 22/1/13
 - added colour temperature to colour and colour to colour temperature
 - removed gtksheet, broken on windows, no future on anywhere
 - added histogram invert

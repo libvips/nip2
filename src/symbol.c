@@ -1107,19 +1107,26 @@ static gint symbol_idle_id = 0;
 static gboolean
 symbol_recalculate_idle_cb( void )
 {
+	static GTimer *timer = NULL;
+
 	gboolean run_again;
+
+	if( !timer )
+		timer = g_timer_new();
 
 	run_again = TRUE;
 
 	if( !symbol_running ) {
 		progress_begin();
 
-		if( !symbol_recalculate_leaf() ) {
-			/* Nothing more to do: shut down idle recomp.
-			 */
-			symbol_idle_id = 0;
-			run_again = FALSE;
-		}
+		g_timer_reset( timer );
+
+		while( g_timer_elapsed( timer, NULL ) < 0.1 )
+			if( !symbol_recalculate_leaf() ) {
+				symbol_idle_id = 0;
+				run_again = FALSE;
+				break;
+			}
 
 		progress_end();
 	}

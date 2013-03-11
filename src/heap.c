@@ -40,6 +40,10 @@
 #define DEBUG_GETMEM
  */
 
+/* Time each GC, handy for benchmarking.
+#define DEBUG_GC_TIME
+ */
+
 #include "ip.h"
 
 static iObjectClass *parent_class = NULL;
@@ -631,7 +635,7 @@ heap_gc( Heap *heap )
 	int ncells;
 	int nblocks;
 
-#ifdef DEBUG
+#ifdef DEBUG_GC_TIME
 	static GTimer *GC_timer = NULL;
 
 	if( !GC_timer )
@@ -640,7 +644,7 @@ heap_gc( Heap *heap )
 	g_timer_reset( GC_timer );
 
 	printf( "heap_gc: starting GC for heap %s\n", IOBJECT( heap )->name );
-#endif /*DEBUG*/
+#endif /*DEBUG_GC_TIME*/
 
 	/* Clear marks on managed objects. Nodes should all be clear already.
 	 */
@@ -690,11 +694,11 @@ heap_gc( Heap *heap )
 	 */
 	managed_free_unused( heap );
 
-#ifdef DEBUG
+#ifdef DEBUG_GC_TIME
 	printf( "heap_gc: %d cells in %d blocks, %d in use\n",
 		ncells, nblocks, ncells - nfree );
 	printf( "(GC took %gs)\n",  g_timer_elapsed( GC_timer, NULL ) );
-#endif 
+#endif /*DEBUG_GC_TIME*/
 
 	return( TRUE );
 }

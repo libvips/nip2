@@ -1408,6 +1408,23 @@ main( int argc, char *argv[] )
 
 	filemodel_set_modified( FILEMODEL( kit ), FALSE );
 
+	/* Double-check: we often forget to move the prefs ws to the latest
+	 * version.
+	 */
+#ifdef DEBUG_LEAK
+{
+	Symbol *wsg_sym = main_workspacegroup->sym;
+	Symbol *ws_sym = SYMBOL( icontainer_child_lookup( 
+		ICONTAINER( wsg_sym->expr->compile ), "Preferences" ) );
+	Workspace *ws = ws_sym->ws;
+
+	if( ws->compat_major || 
+		ws->compat_minor ||
+		ws->compat_78 )
+		printf( "Preferences loaded in compat mode!\n" );
+}
+#endif /*DEBUG_LEAK*/
+
 	if( !main_option_no_load_args ) {
 		/* Load args as files, if we can. 
 		 */

@@ -1,3 +1,10 @@
+- workspacedefs
+  toolkitbrowser
+  toolview.c
+
+	go through mainw to get the ws to operate on, need to go via tab
+	instead
+
 - a ws file can have multiple workspaces:
 
 	<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.29.0">
@@ -48,35 +55,13 @@
 
   mainw title should show current tab title
 
+  these two should be exactly equivalent:
 
+  	$ nip2 a.ws b.ws
+	$ nip2 ab.ws
 
-
-- alternative:
-
-  structure as:
-
-  	Workbook poop.ws, window w=xxx, h=xxx, lpane=xx, defs=xxx
-	  Workspace tab1
-	    Column A
-	    Column B
-	  Workspace tab2
-	    Column A
-	    Column B
-
-  scope is:
-
-  	Workspaces
-	  compat defs
-	  ws local defs
-	  poop
-	    tab1
-	      A1
-	    tab2
-	      A1
-
-  on load, if the top-level of a file is a Workspace, create the workbook, 
-  and load the Workspace as the first tab of that, move defs and stuff to the
-  workbook
+  ie. a workbook is just two workspaces in one window ... we are just adding
+  MDI
 
 
   

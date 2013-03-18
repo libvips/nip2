@@ -43,6 +43,10 @@
 struct _Mainw {
 	iWindow parent_object;
 
+	/* We make and manage workspaces inside this.
+	 */
+	Workspacegroup *wsg;
+
 	/* Set of workspace tabs we display.
 	 */
 	GSList *tabs;
@@ -79,6 +83,9 @@ struct _Mainw {
 	 */
 	Toolkitgroupview *kitgview;
 	GtkWidget *toolbar;
+	GtkWidget *recent_menu;
+	GtkWidget *jump_to_column_menu;
+
 	GtkWidget *notebook;
 
 	GtkWidget *statusbar_main;

@@ -193,7 +193,10 @@ toolview_get_workspace( Toolview *tview )
 		view = view->parent ) 
 		;
 
-	return( TOOLKITGROUPVIEW( view )->mainw->ws );
+	printf( "toolview_get_workspace:\n" ); 
+
+	//return( TOOLKITGROUPVIEW( view )->mainw->ws );
+	return( NULL ); 
 }
 
 /* Our widget has been destroyed. NULL out or pointer to it, to stop us

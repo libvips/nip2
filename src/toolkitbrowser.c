@@ -122,13 +122,15 @@ toolkitbrowser_refresh( vObject *vobject )
 	Toolkitbrowser *toolkitbrowser = TOOLKITBROWSER( vobject );
 
 #ifdef DEBUG
-	printf( "toolkitbrowser_refresh:\n" );
 #endif /*DEBUG*/
+	printf( "toolkitbrowser_refresh:\n" );
 
+	/*
 	gtk_list_store_clear( toolkitbrowser->store );
 	toolkitgroup_map( toolkitbrowser->mainw->ws->kitg,
 		(toolkit_map_fn) toolkitbrowser_rebuild_item, 
 		toolkitbrowser, NULL );
+	 */
 
 	VOBJECT_CLASS( parent_class )->refresh( vobject );
 }
@@ -204,12 +206,16 @@ toolkitbrowser_activate_selected( Toolkitbrowser *toolkitbrowser )
 {
 	Toolitem *toolitem;
 
+	printf( "toolkitbrowser_activate_selected:\n" ); 
+
+	/*
         if( (toolitem = toolkitbrowser_get_selected( toolkitbrowser )) ) {
 		if( !workspace_add_action( toolkitbrowser->mainw->ws, 
 			toolitem->name, toolitem->action, 
 			toolitem->action_sym->expr->compile->nparam ) )
 			return( FALSE );
         }
+	 */
 
 	return( TRUE );
 }

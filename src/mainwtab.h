@@ -1,4 +1,4 @@
-/* A top level window holding some workspaces
+/* Declarations for mainw.
  */
 
 /*
@@ -43,16 +43,13 @@
 struct _Mainw {
 	iWindow parent_object;
 
-	/* Set of workspace tabs we display.
+	/* Workspace we display.
 	 */
-	GSList *tabs;
+	Workspace *ws;
+	guint changed_sid;
+	guint destroy_sid;
 
-	/* The current tab.
-	Mainwtab *current_tab;
-	 */
-
-	/* Watch for changed on heap and image, and prefs. Use to update
-	 * status bar and space free.
+	/* Also watch for changed on heap and image, and prefs.
 	 */
 	guint imageinfo_changed_sid;
 	guint heap_changed_sid;
@@ -75,11 +72,28 @@ struct _Mainw {
 	gboolean toolbar_visible;
 	gboolean statusbar_visible;
 
+	/* The last row we visited with the 'next-error' button.
+	 */
+	Row *row_last_error;
+
+	/* Wait before popping up the compat dialog. How stupid, but we have
+	 * to make sure our window is on the server before we can show an info
+	 * box off it.
+	 */
+	guint compat_timeout;
+
 	/* Component widgets.
 	 */
 	Toolkitgroupview *kitgview;
+	Toolkitbrowser *toolkitbrowser;
+	Workspacedefs *workspacedefs;
+	Workspaceview *wsview;
 	GtkWidget *toolbar;
-	GtkWidget *notebook;
+	GtkWidget *recent_menu;
+	GtkWidget *jump_to_column_menu;
+
+	GtkWidget *popup;
+	GtkWidget *popup_jump;
 
 	GtkWidget *statusbar_main;
 	GtkWidget *statusbar;
@@ -87,6 +101,11 @@ struct _Mainw {
 	GtkWidget *space_free_eb;	
 	GtkWidget *progress_box;
 	GtkWidget *progress;
+
+	/* Left and right panes ... program window and toolkit browser.
+	 */
+	Pane *lpane;
+	Pane *rpane;
 };
 
 typedef struct _MainwClass {

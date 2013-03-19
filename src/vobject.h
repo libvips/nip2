@@ -58,8 +58,15 @@ typedef struct _vObjectClass {
 		refresh		refresh widgets (don't look at heap value,
 				look at model)
 
+		link		this vobject has been linked to an iobject
+
+				we also have View::link() -- vObject::link is
+				a lower-level link which is handy for views 
+				which are not Views, eg. toolkitbrowser
+
 	 */
 	void (*refresh)( vObject * );
+	void (*link)( vObject *, iObject * );
 } vObjectClass;
 
 void *vobject_refresh_queue( vObject *vobject );

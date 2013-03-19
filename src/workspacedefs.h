@@ -41,7 +41,7 @@
 typedef struct _Workspacedefs {
 	vObject parent_object;
 
-	Mainw *mainw;			/* Mainw whose workspace we explore */
+	Workspace *ws;			/* Workspace we explore */
 
 	GtkWidget *text;	
 	gboolean changed;		/* Text has been edited */
@@ -56,4 +56,4 @@ typedef struct _WorkspacedefsClass {
 } WorkspacedefsClass;
 
 GtkType workspacedefs_get_type( void );
-Workspacedefs *workspacedefs_new( Mainw *mainw );
+Workspacedefs *workspacedefs_new();

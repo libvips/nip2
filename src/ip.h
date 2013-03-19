@@ -331,6 +331,7 @@ typedef struct _Prefcolumnview Prefcolumnview;
 typedef struct _iText iText;
 typedef struct _Expression Expression;
 typedef struct _Mainw Mainw;
+typedef struct _Mainwtab Mainwtab;
 typedef struct _Toolviewitemgroup Toolviewitemgroup;
 typedef struct _Panechild Panechild;
 
@@ -430,6 +431,7 @@ typedef void *(*tool_map_fn)( Tool *, void *, void * );
 #include "statusview.h"
 #include "plotstatus.h"
 #include "mainw.h"
+#include "mainwtab.h"
 #include "preview.h"
 #include "builtin.h"
 #include "compile.h"

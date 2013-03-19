@@ -481,7 +481,9 @@ mainw_refresh( Mainw *mainw )
 		TRUE );
 	 */
 
-	mainwtab_jump_update( mainw->current_tab, mainw->jump_to_column_menu );
+	if( mainw->current_tab )
+		mainwtab_jump_update( mainw->current_tab, 
+			mainw->jump_to_column_menu );
 }
 
 static void
@@ -581,25 +583,21 @@ mainw_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 static void
 mainw_ungroup_action_cb( GtkAction *action, Mainw *mainw )
 {
+	Workspace *ws = mainwtab_get_workspace( mainw->current_tab );
+
 	progress_begin();
-	if( !mainwtab_ungroup( mainw->current_tab ) )
+	if( !workspace_selected_ungroup( ws ) )
 		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
 	progress_end();
 }
 
 /* Group the selected object(s).
  */
-static void
+void
 mainw_group_action_cb( GtkAction *action, Mainw *mainw )
 {
-	printf( "mainw_group_action_cb: group selected\n" ); 
-			iwindow_alert( GTK_WIDGET( mainwtab ), GTK_MESSAGE_ERROR );
-}
-
-static void
-mainw_group_action_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
-{
-	mainw_group_action_cb( NULL, mainw );
+	if( !mainwtab_group( mainw->current_tab ) )
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
 }
 
 /* Select all objects.
@@ -607,8 +605,9 @@ mainw_group_action_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
 static void
 mainw_select_all_action_cb( GtkAction *action, Mainw *mainw )
 {
-	printf( "mainw_select_all_action_cb: select all in ws\n" ); 
-	//workspace_select_all( mainw->ws );
+	Workspace *ws = mainwtab_get_workspace( mainw->current_tab );
+
+	workspace_select_all( ws );
 }
 
 static void
@@ -627,24 +626,27 @@ mainw_find_again_action_cb( GtkAction *action, Mainw *mainw )
 	iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
 }
 
-/* Callback for next-error button.
- */
-static void
+void
 mainw_next_error_action_cb( GtkAction *action, Mainw *mainw )
 {
-	printf( "mainw_next_error_action_cb: next error\n" ); 
-}
-
-static void
-mainw_next_error_action_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
-{
-	mainw_next_error_action_cb( NULL, mainw );
+	if( !mainwtab_next_error( mainw->current_tab ) ) {
+		error_top( _( "No errors." ) );
+		error_sub( "%s", _( "There are no errors (that I can see) "
+			"in this workspace." ) );
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
+	}
 }
 
 static void
 mainw_force_calc_action_cb( GtkAction *action, Mainw *mainw )
 {
-	printf( "mainw_force_calc_action_cb: force calc\n" ); 
+	Workspace *ws = mainwtab_get_workspace( mainw->current_tab );
+
+        if( workspace_selected_any( ws ) ) 
+		if( !workspace_selected_recalc( ws ) ) 
+			iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
+	else 
+		symbol_recalculate_all_force( FALSE );
 }
 
 /* Callback for save workspace.
@@ -652,8 +654,9 @@ mainw_force_calc_action_cb( GtkAction *action, Mainw *mainw )
 static void
 mainw_workspace_save_action_cb( GtkAction *action, Mainw *mainw )
 {
-	printf( "mainw_workspace_save_action_cb: save\n" ); 
-	//filemodel_inter_save( IWINDOW( mainw ), FILEMODEL( mainw->ws ) );
+	Workspace *ws = mainwtab_get_workspace( mainw->current_tab );
+
+	filemodel_inter_save( IWINDOW( mainw ), FILEMODEL( ws ) );
 }
 
 /* Callback for "save as .." workspace.
@@ -661,8 +664,33 @@ mainw_workspace_save_action_cb( GtkAction *action, Mainw *mainw )
 static void
 mainw_workspace_save_as_action_cb( GtkAction *action, Mainw *mainw )
 {
-	printf( "mainw_workspace_save_as_action_cb: save as\n" ); 
-	//filemodel_inter_saveas( IWINDOW( mainw ), FILEMODEL( mainw->ws ) );
+	Workspace *ws = mainwtab_get_workspace( mainw->current_tab );
+
+	filemodel_inter_saveas( IWINDOW( mainw ), FILEMODEL( ws ) );
+}
+
+static void
+mainw_add_workspace( Mainw *mainw, Workspace *ws )
+{
+	Mainwtab *tab;
+	GtkWidget *label;
+
+	tab = mainwtab_new();
+        gtk_widget_show( GTK_WIDGET( tab ) );
+	label = gtk_label_new( "poooop" );
+
+	gtk_notebook_append_page( GTK_NOTEBOOK( mainw->notebook ),
+		GTK_WIDGET( tab ), label );
+	gtk_notebook_set_tab_reorderable( GTK_NOTEBOOK( mainw->notebook ),
+		GTK_WIDGET( tab ), TRUE );
+	gtk_notebook_set_tab_detachable( GTK_NOTEBOOK( mainw->notebook ),
+		GTK_WIDGET( tab ), TRUE );
+
+	vobject_link( VOBJECT( tab ), IOBJECT( ws ) );
+
+	mainw->current_tab = tab;
+
+	mainw->tabs = g_slist_append( mainw->tabs, tab );
 }
 
 static Workspace *
@@ -843,16 +871,10 @@ mainw_open( Mainw *mainw )
 	gtk_widget_show( GTK_WIDGET( filesel ) );
 }
 
-static void
+void
 mainw_open_action_cb( GtkAction *action, Mainw *mainw )
 {
 	mainw_open( mainw );
-}
-
-static void
-mainw_open_action_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
-{
-	mainw_open_action_cb( NULL, mainw );
 }
 
 /* Open one of the example workspaces ... just a shortcut.
@@ -1027,13 +1049,10 @@ mainw_workspace_merge_fn( Filesel *filesel,
 	const char *filename, void *a, void *b )
 {
 	Mainw *mainw = MAINW( a );
+	Workspace *ws = mainwtab_get_workspace( mainw->current_tab );
 
-	printf( "mainw_workspace_merge_fn:\n" ); 
-
-	/*
-	if( !workspace_merge_file( mainw->ws, filename, NULL ) )
+	if( !workspace_merge_file( ws, filename, NULL ) )
 		return( filesel );
-	 */
 
 	/* Process some events to make sure we rethink the layout and
 	 * are able to get the append-at-RHS offsets.
@@ -1090,23 +1109,25 @@ mainw_workspace_merge( Mainw *mainw )
 static void
 mainw_workspace_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 {
+	Workspace *ws = mainwtab_get_workspace( mainw->current_tab );
+
 	Workspace *new_ws;
 	Mainw *new_mainw;
 
+	/*
 	progress_begin();
 
 	printf( "mainw_workspace_duplicate_action_cb:\n" ); 
 
-	/*
-	if( !(new_ws = workspace_clone( mainw->ws )) ) {
+	if( !(new_ws = workspace_clone( ws )) ) {
 		progress_end();
 		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
 		return;
 	}
-	 */
 
 	new_mainw = mainw_new( new_ws );
 	gtk_widget_show( GTK_WIDGET( new_mainw ) );
+	 */
 
 	/* We have to show before recalculate or the window never appears, not
 	 * sure why.
@@ -1116,17 +1137,10 @@ mainw_workspace_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 	progress_end();
 }
 
-static void
+void
 mainw_workspace_merge_action_cb( GtkAction *action, Mainw *mainw )
 {
 	mainw_workspace_merge( mainw );
-}
-
-static void
-mainw_workspace_merge_action_cb2( GtkWidget *wid, GtkWidget *host, 
-	Mainw *mainw )
-{
-	mainw_workspace_merge_action_cb( NULL, mainw );
 }
 
 /* Auto recover.
@@ -1139,30 +1153,20 @@ mainw_recover_action_cb( GtkAction *action, Mainw *mainw )
 
 /* Callback from make new column.
  */
-static void
+void
 mainw_column_new_action_cb( GtkAction *action, Mainw *mainw )
 {
-	printf( "mainw_column_new_action_cb:\n" ); 
+	Workspace *ws = mainwtab_get_workspace( mainw->current_tab );
 
-	/*
 	char *name;
 	Column *col;
 
-	name = workspace_column_name_new( mainw->ws, NULL );
-	if( !(col = column_new( mainw->ws, name )) ) 
+	name = workspace_column_name_new( ws, NULL );
+	if( !(col = column_new( ws, name )) ) 
 		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
 	else
-		workspace_column_select( mainw->ws, col );
+		workspace_column_select( ws, col );
 	IM_FREE( name );
-	 */
-}
-
-/* Same, but from the popup.
- */
-static void
-mainw_column_new_action_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
-{
-	mainw_column_new_action_cb( NULL, mainw );
 }
 
 /* Done button hit.
@@ -1172,6 +1176,7 @@ mainw_column_new_cb( iWindow *iwnd, void *client,
 	iWindowNotifyFn nfn, void *sys )
 {
 	Mainw *mainw = MAINW( client );
+	Workspace *ws = mainwtab_get_workspace( mainw->current_tab );
 	Stringset *ss = STRINGSET( iwnd );
 	StringsetChild *name = stringset_child_get( ss, _( "Name" ) );
 	StringsetChild *caption = stringset_child_get( ss, _( "Caption" ) );
@@ -1187,10 +1192,7 @@ mainw_column_new_cb( iWindow *iwnd, void *client,
 		return;
 	}
 
-	printf( "mainw_column_new_cb:\n" ); 
-
-	/*
-	if( !(col = column_new( mainw->ws, name_text )) ) {
+	if( !(col = column_new( ws, name_text )) ) {
 		nfn( sys, IWINDOW_ERROR );
 		return;
 	}
@@ -1198,8 +1200,7 @@ mainw_column_new_cb( iWindow *iwnd, void *client,
 	if( strcmp( caption_text, "" ) != 0 )
 		iobject_set( IOBJECT( col ), NULL, caption_text );
 
-	workspace_column_select( mainw->ws, col );
-	 */
+	workspace_column_select( ws, col );
 
 	nfn( sys, IWINDOW_YES );
 }
@@ -1335,7 +1336,7 @@ mainw_workspacedefs_action_cb( GtkToggleAction *action, Mainw *mainw )
 
 /* Layout columns.
  */
-static void
+void
 mainw_layout_action_cb( GtkAction *action, Mainw *mainw )
 {
 	printf( "mainw_layout_action_cb:\n" );
@@ -1343,12 +1344,6 @@ mainw_layout_action_cb( GtkAction *action, Mainw *mainw )
 	/*
 	model_layout( MODEL( mainw->ws ) );
 	 */
-}
-
-static void
-mainw_layout_action_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
-{
-	mainw_layout_action_cb( NULL, mainw );
 }
 
 /* Remove selected items.
@@ -1900,37 +1895,13 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	gtk_notebook_set_tab_pos( GTK_NOTEBOOK( mainw->notebook ), 
 		GTK_POS_BOTTOM );
 
-	child = gtk_vbox_new( FALSE, 2 );
-	build_glabeltext3( child, "poop!" );
-        gtk_widget_show_all( child );
-	label = gtk_label_new( "poooop" );
-
-	gtk_notebook_append_page( GTK_NOTEBOOK( mainw->notebook ),
-		child, label );
-	gtk_notebook_set_tab_reorderable( GTK_NOTEBOOK( mainw->notebook ),
-		child, TRUE );
-	gtk_notebook_set_tab_detachable( GTK_NOTEBOOK( mainw->notebook ),
-		child, TRUE );
-
-	child = gtk_vbox_new( FALSE, 2 );
-	build_glabeltext3( child, "fart!" );
-        gtk_widget_show_all( child );
-	label = gtk_label_new( "fffffatrt" );
-
-	gtk_notebook_append_page( GTK_NOTEBOOK( mainw->notebook ),
-		child, label );
-	gtk_notebook_set_tab_reorderable( GTK_NOTEBOOK( mainw->notebook ),
-		child, TRUE );
-	gtk_notebook_set_tab_detachable( GTK_NOTEBOOK( mainw->notebook ),
-		child, TRUE );
-
 	gtk_box_pack_start( GTK_BOX( vbox ), 
 		GTK_WIDGET( mainw->notebook ), TRUE, TRUE, 0 );
 	gtk_widget_show( GTK_WIDGET( mainw->notebook ) );
 
 	printf( "mainw_build: make toolkit menu\n" ); 
 
-	/* Make toolkit/workspace displays.
+	/* Make toolkit menu.
 	mainw->kitgview = TOOLKITGROUPVIEW( 
 		model_view_new( MODEL( mainw->ws->kitg ), NULL ) );
 	g_object_ref( G_OBJECT( mainw->kitgview ) );
@@ -1947,10 +1918,6 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 		TRUE, FALSE );
 	gtk_widget_show( GTK_WIDGET( mainw->wsview ) );
 	 */
-
-	/* Set start state.
-	 */
-	(void) mainw_refresh( mainw );
 
 	/* Any changes to prefs, refresh (yuk!).
 	 */
@@ -2018,6 +1985,12 @@ mainw_link( Mainw *mainw, Workspace *ws )
 	pane_set_state( mainw->lpane, ws->lpane_open, ws->lpane_position );
 	pane_set_state( mainw->rpane, ws->rpane_open, ws->rpane_position );
 	 */
+
+	mainw_add_workspace( mainw, ws );
+
+	/* Set start state.
+	 */
+	(void) mainw_refresh( mainw );
 }
 
 Mainw *
@@ -2025,9 +1998,8 @@ mainw_new( Workspace *ws )
 {
 	Mainw *mainw;
 
-	symbol_recalculate_all_force( FALSE );
-
 	mainw = MAINW( g_object_new( TYPE_MAINW, NULL ) );
+
 	mainw_link( mainw, ws );
 
 	return( mainw );

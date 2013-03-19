@@ -72,10 +72,13 @@ GType mainwtab_get_type( void );
 
 void mainwtab_jump_update( Mainwtab *mainwtab, GtkWidget *menu );
 
+Workspace *mainwtab_get_workspace( Mainwtab *mainwtab );
+
 int mainwtab_clone( Mainwtab *mainwtab );
 gboolean mainwtab_ungroup( Mainwtab *mainwtab );
+gboolean mainwtab_group( Mainwtab *mainwtab );
+void mainwtab_select_all( Mainwtab *mainwtab );
+gboolean mainwtab_next_error( Mainwtab *mainwtab );
 
-Workspace *mainwtab_open_file_into_workspace( Mainwtab *mainwtab, 
-	const char *filename );
-Mainwtab *mainwtab_new( Workspace *ws );
+Mainwtab *mainwtab_new();
 

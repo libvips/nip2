@@ -136,6 +136,19 @@ toolkitbrowser_refresh( vObject *vobject )
 }
 
 static void
+toolkitbrowser_link( vObject *vobject, iObject *iobject )
+{
+	Toolkitbrowser *toolkitbrowser = TOOLKITBROWSER( vobject );
+	Toolkitgroup *kitg = TOOLKITGROUP( iobject );
+
+	g_assert( !toolkitbrowser->mainw );
+
+	toolkitbrowser->mainw = mainw;
+
+	VOBJECT_CLASS( parent_class )->link( vobject, iobject );
+}
+
+static void
 toolkitbrowser_class_init( ToolkitbrowserClass *class )
 {
 	GtkObjectClass *object_class = (GtkObjectClass *) class;
@@ -146,6 +159,7 @@ toolkitbrowser_class_init( ToolkitbrowserClass *class )
 	object_class->destroy = toolkitbrowser_destroy;
 
 	vobject_class->refresh = toolkitbrowser_refresh;
+	vobject_class->link = toolkitbrowser_link;
 }
 
 static void
@@ -327,18 +341,6 @@ toolkitbrowser_get_type( void )
 	}
 
 	return( type );
-}
-
-void
-toolkitbrowser_set_mainw( Toolkitbrowser *toolkitbrowser, Mainw *mainw )
-{
-	g_assert( !toolkitbrowser->mainw );
-
-#ifdef DEBUG
-	printf( "toolkitbrowser_set_mainw:\n" );
-#endif /*DEBUG*/
-
-	toolkitbrowser->mainw = mainw;
 }
 
 Toolkitbrowser *

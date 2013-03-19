@@ -174,6 +174,8 @@ nip2_SOURCES = \
 	main.h \
 	mainw.c \
 	mainw.h \
+	mainwtab.c \
+	mainwtab.h \
 	matrix.c \
 	matrix.h \
 	matrixview.c \

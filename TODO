@@ -1,3 +1,8 @@
+- toolkitbrowser_set_mainw() ... shouldn't we use the thing that sets the
+  iobject for a vobject?
+
+  see also wsdefs
+
 - workspacedefs
   toolkitbrowser
   toolview.c

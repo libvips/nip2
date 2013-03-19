@@ -127,6 +127,15 @@ void mainw_find_heap( VipsBuf *buf, Heap *heap );
 void mainw_homepage_action_cb( GtkAction *action, iWindow *iwnd );
 void mainw_about_action_cb( GtkAction *action, iWindow *iwnd );
 void mainw_guide_action_cb( GtkAction *action, iWindow *iwnd );
+
+void mainw_column_new_action_cb( GtkAction *action, Mainw *mainw );
+void mainw_workspace_merge_action_cb( GtkAction *action, Mainw *mainw );
+void mainw_layout_action_cb( GtkAction *action, Mainw *mainw );
+void mainw_group_action_cb( GtkAction *action, Mainw *mainw );
+void mainw_next_error_action_cb2( GtkAction *action, Mainw *mainw );
+void mainw_open_action_cb( GtkAction *action, Mainw *mainw );
+
 Workspace *mainw_open_file_into_workspace( Mainw *mainw, const char *filename );
+
 Mainw *mainw_new( Workspace *ws );
 

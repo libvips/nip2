@@ -122,15 +122,13 @@ toolkitbrowser_refresh( vObject *vobject )
 	Toolkitbrowser *toolkitbrowser = TOOLKITBROWSER( vobject );
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "toolkitbrowser_refresh:\n" );
+#endif /*DEBUG*/
 
-	/*
 	gtk_list_store_clear( toolkitbrowser->store );
-	toolkitgroup_map( toolkitbrowser->mainw->ws->kitg,
+	toolkitgroup_map( toolkitbrowser->kitg,
 		(toolkit_map_fn) toolkitbrowser_rebuild_item, 
 		toolkitbrowser, NULL );
-	 */
 
 	VOBJECT_CLASS( parent_class )->refresh( vobject );
 }
@@ -141,9 +139,9 @@ toolkitbrowser_link( vObject *vobject, iObject *iobject )
 	Toolkitbrowser *toolkitbrowser = TOOLKITBROWSER( vobject );
 	Toolkitgroup *kitg = TOOLKITGROUP( iobject );
 
-	g_assert( !toolkitbrowser->mainw );
+	g_assert( !toolkitbrowser->kitg );
 
-	toolkitbrowser->mainw = mainw;
+	toolkitbrowser->kitg = kitg;
 
 	VOBJECT_CLASS( parent_class )->link( vobject, iobject );
 }
@@ -220,16 +218,12 @@ toolkitbrowser_activate_selected( Toolkitbrowser *toolkitbrowser )
 {
 	Toolitem *toolitem;
 
-	printf( "toolkitbrowser_activate_selected:\n" ); 
-
-	/*
         if( (toolitem = toolkitbrowser_get_selected( toolkitbrowser )) ) {
-		if( !workspace_add_action( toolkitbrowser->mainw->ws, 
+		if( !workspace_add_action( toolkitbrowser->ws, 
 			toolitem->name, toolitem->action, 
 			toolitem->action_sym->expr->compile->nparam ) )
 			return( FALSE );
         }
-	 */
 
 	return( TRUE );
 }
@@ -360,4 +354,12 @@ toolkitbrowser_get_width( Toolkitbrowser *toolkitbrowser )
 		return( toolkitbrowser->top->requisition.width );
 	else
 		return( 200 );
+}
+
+void
+toolkitbrowser_set_workspace( Toolkitbrowser *toolkitbrowser, Workspace *ws )
+{
+	g_assert( !toolkitbrowser->ws );
+
+	toolkitbrowser->ws = ws;
 }

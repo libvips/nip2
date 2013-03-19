@@ -1033,6 +1033,8 @@ columnview_new( void )
 {
 	Columnview *cview = gtk_type_new( TYPE_COLUMNVIEW );
 
+	printf( "columnview_new\n" ); 
+
 	return( VIEW( cview ) );
 }
 

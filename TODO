@@ -1,7 +1,8 @@
-- toolkitbrowser_set_mainw() ... shouldn't we use the thing that sets the
-  iobject for a vobject?
+- we make a columnview, we just never see it
 
-  see also wsdefs
+  seems to be because we now link the ws to the wsview in mainwtab_link()
+
+
 
 - workspacedefs
   toolkitbrowser

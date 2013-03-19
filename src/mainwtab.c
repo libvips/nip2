@@ -240,6 +240,7 @@ mainwtab_link( vObject *vobject, iObject *iobject )
 
 	vobject_link( VOBJECT( mainwtab->toolkitbrowser ), 
 		IOBJECT( mainwtab->ws->kitg ) );
+	toolkitbrowser_set_workspace( mainwtab->toolkitbrowser, ws );
 
 	vobject_link( VOBJECT( mainwtab->workspacedefs ), 
 		IOBJECT( mainwtab->ws ) );

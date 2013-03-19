@@ -676,8 +676,9 @@ mainw_add_workspace( Mainw *mainw, Workspace *ws )
 	GtkWidget *label;
 
 	tab = mainwtab_new();
+	vobject_link( VOBJECT( tab ), IOBJECT( ws ) );
         gtk_widget_show( GTK_WIDGET( tab ) );
-	label = gtk_label_new( "poooop" );
+	label = gtk_label_new( NN( IOBJECT( ws->sym )->name ) );
 
 	gtk_notebook_append_page( GTK_NOTEBOOK( mainw->notebook ),
 		GTK_WIDGET( tab ), label );
@@ -685,8 +686,6 @@ mainw_add_workspace( Mainw *mainw, Workspace *ws )
 		GTK_WIDGET( tab ), TRUE );
 	gtk_notebook_set_tab_detachable( GTK_NOTEBOOK( mainw->notebook ),
 		GTK_WIDGET( tab ), TRUE );
-
-	vobject_link( VOBJECT( tab ), IOBJECT( ws ) );
 
 	mainw->current_tab = tab;
 

@@ -41,7 +41,8 @@
 typedef struct _Toolkitbrowser {
 	vObject parent_object;
 
-	Mainw *mainw;			/* Mainw whose kits we explore */
+	Toolkitgroup *kitg;
+	Workspace *ws;
 
 	GtkListStore *store;		/* Model for list view */
 	GtkTreeModel *filter;		/* After filtering with search box */
@@ -59,4 +60,6 @@ GtkType toolkitbrowser_get_type( void );
 void toolkitbrowser_set_mainw( Toolkitbrowser *toolkitbrowser, Mainw *mainw );
 Toolkitbrowser *toolkitbrowser_new( void );
 int toolkitbrowser_get_width( Toolkitbrowser *toolkitbrowser );
+void toolkitbrowser_set_workspace( Toolkitbrowser *toolkitbrowser, 
+	Workspace *ws );
 

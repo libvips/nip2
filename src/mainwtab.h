@@ -1,4 +1,4 @@
-/* Declarations for mainw.
+/* Declarations for mainwtab.
  */
 
 /*
@@ -27,80 +27,33 @@
 
  */
 
-#define TYPE_MAINW (mainw_get_type())
-#define MAINW( obj ) (GTK_CHECK_CAST( (obj), TYPE_MAINW, Mainw ))
-#define MAINW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_MAINW, MainwClass ))
-#define IS_MAINW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_MAINW ))
-#define IS_MAINW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_MAINW ))
+#define TYPE_MAINWTAB (mainwtab_get_type())
+#define MAINWTAB( obj ) (GTK_CHECK_CAST( (obj), TYPE_MAINWTAB, Mainwtab ))
+#define MAINWTAB_CLASS( klass ) \
+	(GTK_CHECK_CLASS_CAST( (klass), TYPE_MAINWTAB, MainwtabClass ))
+#define IS_MAINWTAB( obj ) (GTK_CHECK_TYPE( (obj), TYPE_MAINWTAB ))
+#define IS_MAINWTAB_CLASS( klass ) \
+	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_MAINWTAB ))
 
-/* Get a widget's enclosing Mainw.
- */
-#define GET_MAINW( W ) \
-	MAINW( idialog_get_root( GTK_WIDGET( W ) ) )
+struct _Mainwtab {
+	vObject parent_object;
 
-struct _Mainw {
-	iWindow parent_object;
-
-	/* Workspace we display.
+	/* Workspace we display, also in parent_object->iobject.
 	 */
 	Workspace *ws;
-	guint changed_sid;
-	guint destroy_sid;
-
-	/* Also watch for changed on heap and image, and prefs.
-	 */
-	guint imageinfo_changed_sid;
-	guint heap_changed_sid;
-	guint watch_changed_sid;
-
-	/* Link to progress system.
-	 */
-	guint begin_sid;	
-	guint update_sid;	
-	guint end_sid;	
-	gboolean cancel;
-
-	/* Display MB free in tmp, or cells free in heap.
-	 */
-	gboolean free_type;
-
-	/* View menu show/hide toggle states. The pane states are in the ws as
-	 * we need to save them to the ws file.
-	 */
-	gboolean toolbar_visible;
-	gboolean statusbar_visible;
 
 	/* The last row we visited with the 'next-error' button.
 	 */
 	Row *row_last_error;
 
-	/* Wait before popping up the compat dialog. How stupid, but we have
-	 * to make sure our window is on the server before we can show an info
-	 * box off it.
-	 */
-	guint compat_timeout;
-
 	/* Component widgets.
 	 */
-	Toolkitgroupview *kitgview;
 	Toolkitbrowser *toolkitbrowser;
 	Workspacedefs *workspacedefs;
 	Workspaceview *wsview;
-	GtkWidget *toolbar;
-	GtkWidget *recent_menu;
-	GtkWidget *jump_to_column_menu;
 
 	GtkWidget *popup;
 	GtkWidget *popup_jump;
-
-	GtkWidget *statusbar_main;
-	GtkWidget *statusbar;
-	GtkWidget *space_free;	
-	GtkWidget *space_free_eb;	
-	GtkWidget *progress_box;
-	GtkWidget *progress;
 
 	/* Left and right panes ... program window and toolkit browser.
 	 */
@@ -108,37 +61,21 @@ struct _Mainw {
 	Pane *rpane;
 };
 
-typedef struct _MainwClass {
-	iWindowClass parent_class;
+typedef struct _MainwtabClass {
+	vObjectClass parent_class;
 
 	/* My methods.
 	 */
-} MainwClass;
+} MainwtabClass;
 
-extern GSList *mainw_recent_workspace;
-extern GSList *mainw_recent_image;
-extern GSList *mainw_recent_matrix;
+GType mainwtab_get_type( void );
 
-extern gboolean mainw_auto_recalc;
+void mainwtab_jump_update( Mainwtab *mainwtab, GtkWidget *menu );
 
-extern gboolean mainw_cancel;
+int mainwtab_clone( Mainwtab *mainwtab );
+gboolean mainwtab_ungroup( Mainwtab *mainwtab );
 
-void mainw_startup( void );
-void mainw_shutdown( void );
-void mainw_recent_freeze( void );
-void mainw_recent_thaw( void );
-void mainw_recent_add( GSList **recent, const char *filename );
-
-int mainw_number( void );
-Mainw *mainw_pick_one( void );
-GType mainw_get_type( void );
-
-void mainw_find_disc( VipsBuf *buf );
-void mainw_find_heap( VipsBuf *buf, Heap *heap );
-
-void mainw_homepage_action_cb( GtkAction *action, iWindow *iwnd );
-void mainw_about_action_cb( GtkAction *action, iWindow *iwnd );
-void mainw_guide_action_cb( GtkAction *action, iWindow *iwnd );
-Workspace *mainw_open_file_into_workspace( Mainw *mainw, const char *filename );
-Mainw *mainw_new( Workspace *ws );
+Workspace *mainwtab_open_file_into_workspace( Mainwtab *mainwtab, 
+	const char *filename );
+Mainwtab *mainwtab_new( Workspace *ws );
 

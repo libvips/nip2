@@ -481,7 +481,7 @@ mainw_refresh( Mainw *mainw )
 		TRUE );
 	 */
 
-	printf( "mainw_refresh: update jump menu on current tab\n" );
+	mainwtab_jump_update( mainw->current_tab, mainw->jump_to_column_menu );
 }
 
 static void
@@ -570,9 +570,10 @@ mainw_guide_action_cb( GtkAction *action, iWindow *iwnd )
 static void
 mainw_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 {
-	printf( "mainw_duplicate_action_cb: duplicate selected in ws\n" ); 
-
-	//mainw_clone( mainw );
+	progress_begin();
+	if( !mainwtab_clone( mainw->current_tab ) )
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
+	progress_end();
 }
 
 /* Ungroup the selected object(s), or the bottom object.
@@ -580,14 +581,10 @@ mainw_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 static void
 mainw_ungroup_action_cb( GtkAction *action, Mainw *mainw )
 {
-	printf( "mainw_ungroup_action_cb: ungroup selected\n" ); 
-
-	/* 
 	progress_begin();
-	if( !workspace_selected_ungroup( mainw->ws ) )
+	if( !mainwtab_ungroup( mainw->current_tab ) )
 		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
 	progress_end();
-	 */
 }
 
 /* Group the selected object(s).
@@ -596,6 +593,7 @@ static void
 mainw_group_action_cb( GtkAction *action, Mainw *mainw )
 {
 	printf( "mainw_group_action_cb: group selected\n" ); 
+			iwindow_alert( GTK_WIDGET( mainwtab ), GTK_MESSAGE_ERROR );
 }
 
 static void
@@ -1763,7 +1761,8 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 
         GtkWidget *mbar;
 	GtkWidget *frame;
-	GtkWidget *ebox;
+	GtkWidget *child;
+	GtkWidget *label;
 	GError *error;
 	GtkWidget *cancel;
 	GtkWidget *item;
@@ -1893,6 +1892,41 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 
         gtk_box_pack_end( GTK_BOX( mainw->statusbar_main ), 
 		mainw->progress_box, FALSE, TRUE, 0 );
+
+	mainw->notebook = gtk_notebook_new();
+	gtk_notebook_set_scrollable( GTK_NOTEBOOK( mainw->notebook ), TRUE );
+	gtk_notebook_popup_enable( GTK_NOTEBOOK( mainw->notebook ) );
+	gtk_notebook_set_group_name( GTK_NOTEBOOK( mainw->notebook ), "mainw" );
+	gtk_notebook_set_tab_pos( GTK_NOTEBOOK( mainw->notebook ), 
+		GTK_POS_BOTTOM );
+
+	child = gtk_vbox_new( FALSE, 2 );
+	build_glabeltext3( child, "poop!" );
+        gtk_widget_show_all( child );
+	label = gtk_label_new( "poooop" );
+
+	gtk_notebook_append_page( GTK_NOTEBOOK( mainw->notebook ),
+		child, label );
+	gtk_notebook_set_tab_reorderable( GTK_NOTEBOOK( mainw->notebook ),
+		child, TRUE );
+	gtk_notebook_set_tab_detachable( GTK_NOTEBOOK( mainw->notebook ),
+		child, TRUE );
+
+	child = gtk_vbox_new( FALSE, 2 );
+	build_glabeltext3( child, "fart!" );
+        gtk_widget_show_all( child );
+	label = gtk_label_new( "fffffatrt" );
+
+	gtk_notebook_append_page( GTK_NOTEBOOK( mainw->notebook ),
+		child, label );
+	gtk_notebook_set_tab_reorderable( GTK_NOTEBOOK( mainw->notebook ),
+		child, TRUE );
+	gtk_notebook_set_tab_detachable( GTK_NOTEBOOK( mainw->notebook ),
+		child, TRUE );
+
+	gtk_box_pack_start( GTK_BOX( vbox ), 
+		GTK_WIDGET( mainw->notebook ), TRUE, TRUE, 0 );
+	gtk_widget_show( GTK_WIDGET( mainw->notebook ) );
 
 	printf( "mainw_build: make toolkit menu\n" ); 
 

@@ -1,6 +1,6 @@
-- we make a columnview, we just never see it
+- mainw->wsg is always NULL 
 
-  seems to be because we now link the ws to the wsview in mainwtab_link()
+  how odd
 
 
 

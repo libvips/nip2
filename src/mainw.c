@@ -642,9 +642,10 @@ mainw_force_calc_action_cb( GtkAction *action, Mainw *mainw )
 {
 	Workspace *ws = mainwtab_get_workspace( mainw->current_tab );
 
-        if( workspace_selected_any( ws ) ) 
+        if( workspace_selected_any( ws ) )  {
 		if( !workspace_selected_recalc( ws ) ) 
 			iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
+	}
 	else 
 		symbol_recalculate_all_force( FALSE );
 }
@@ -692,69 +693,36 @@ mainw_add_workspace( Mainw *mainw, Workspace *ws )
 	mainw->tabs = g_slist_append( mainw->tabs, tab );
 }
 
-static Workspace *
-mainw_open_workspace( Workspacegroup *wsg, const char *filename )
+Workspace *
+mainw_open_workspace( Mainw *mainw, const char *filename )
 {
 	Workspace *ws;
 
-	printf( "mainw_open_workspace:\n" );
+	/* If the mainw we are loading into has a single, empty workspace,
+	 * close that.
+	 */
+	if( g_slist_length( mainw->tabs ) == 1 &&
+		(ws = mainwtab_get_workspace( mainw->current_tab )) && 
+		workspace_is_empty( ws ) ) {
+		filemodel_set_modified( FILEMODEL( ws ), FALSE );
+		iobject_destroy( IOBJECT( ws ) ); 
+	}
 
-	/*
-	Mainwtab *tab;
-
-	if( !(ws = workspace_new_from_file( wsg, filename, NULL )) ) 
+	if( !(ws = workspace_new_from_file( mainw->wsg, filename, NULL )) ) 
 		return( NULL );
 
-	tab = mainwtab_new( ws );
+	mainw_add_workspace( mainw, ws ); 
 	mainw_recent_add( &mainw_recent_workspace, filename );
 
 	symbol_recalculate_all();
-	 */
 
 	return( ws );
-}
-
-/* Open a new workspace, close the current one if it's empty. 
- *
- * The idea is that if you have a blank workspace and do file-open, you want
- * to load into the blank. However, we can't actually do this, since the new
- * workspace might need a different set of menus. 
- *
- * We could sniff the file and then call workspace_merge_file() if the
- * workspace was compatible with the current one, but why bother.
- */
-Workspace *
-mainw_open_file_into_workspace( Mainw *mainw, const char *filename )
-{
-	Workspacegroup *wsg = mainw->wsg;
-
-	Workspace *new_ws;
-
-	printf( "mainw_open_file_into_workspace:\n" );
-
-	/* Add a tab.
-	 */
-
-	if( !(new_ws = mainw_open_workspace( wsg, filename )) ) 
-		return( NULL );
-
-	/*
-	if( workspace_is_empty( mainw->ws ) ) {
-		* Make sure modified isn't set ... otherwise we'll get a
-		 * "save before close" dialog.
-		 *
-		filemodel_set_modified( FILEMODEL( mainw->ws ), FALSE );
-		iwindow_kill( IWINDOW( mainw ) );
-	}
-	 */
-
-	return( new_ws );
 }
 
 /* Track these during a load.
  */
 typedef struct {
-	Workspacegroup *wsg;
+	Mainw *mainw;
 	VipsBuf *buf;
 	int nitems;
 } MainwLoad;
@@ -766,7 +734,7 @@ static void *
 mainw_open_fn( Filesel *filesel, const char *filename, MainwLoad *load )
 {
 	if( is_file_type( &filesel_wfile_type, filename ) ) {
-		if( !mainw_open_workspace( load->wsg, filename ) )
+		if( !mainw_open_workspace( load->mainw, filename ) )
 			return( filesel );
 	}
 	else {
@@ -788,12 +756,13 @@ mainw_open_done_cb( iWindow *iwnd, void *client,
 	iWindowNotifyFn nfn, void *sys )
 {
 	Mainw *mainw = MAINW( client );
+	Workspace *ws = mainwtab_get_workspace( mainw->current_tab );
 	Filesel *filesel = FILESEL( iwnd );
 	char txt[MAX_STRSIZE];
 	VipsBuf buf = VIPS_BUF_STATIC( txt );
 	MainwLoad load;
 
-	load.wsg = mainw->wsg;
+	load.mainw = mainw;
 	load.buf = &buf;
 	load.nitems = 0;
 
@@ -802,19 +771,6 @@ mainw_open_done_cb( iWindow *iwnd, void *client,
 		nfn( sys, IWINDOW_ERROR );
 		return;
 	}
-
-	/* If there's nothing left to load (we only had workspaces to load and
-	 * we've loaded them all) and the current workspace is empty, we can 
-	 * junk it.
-	if( !load.nitems && 
-		workspace_is_empty( mainw->ws ) ) {
-		* Make sure modified isn't set ... otherwise we'll get a
-		 * "save before close" dialog.
-		 *
-		filemodel_set_modified( FILEMODEL( mainw->ws ), FALSE );
-		iwindow_kill( IWINDOW( mainw ) );
-	}
-	 */
 
 	/* Some actual files (image, matrix) were selected. Load into
 	 * the current workspace.
@@ -829,20 +785,13 @@ mainw_open_done_cb( iWindow *iwnd, void *client,
 		else
 			vips_buf_appends( &buf2, vips_buf_all( &buf ) );
 
-
-		printf( "mainw_open_done_cb: load into current workspace %s\n", 
-			vips_buf_all( &buf2 ) );
-
-		/*
-		if( !workspace_add_def_recalc( mainw->ws, 
-			vips_buf_all( &buf2 ) ) ) {
+		if( !workspace_add_def_recalc( ws, vips_buf_all( &buf2 ) ) ) {
 			error_top( _( "Load failed." ) );
 			error_sub( _( "Unable to execute:\n   %s" ), 
 				vips_buf_all( &buf2 ) );
 			nfn( sys, IWINDOW_ERROR );
 			return;
 		}
-		 */
 	}
 
 	nfn( sys, IWINDOW_YES );
@@ -916,17 +865,14 @@ static gboolean
 mainw_recent_open( Mainw *mainw, const char *filename )
 {
 	if( is_file_type( &filesel_wfile_type, filename ) ) {
-		if( !mainw_open_file_into_workspace( mainw, filename ) )
+		if( !mainw_open_workspace( mainw, filename ) )
 			return( FALSE );
 	}
 	else {
-		printf( "mainw_recent_open: load %s into current workspace\n",
-			filename ); 
+		Workspace *ws = mainwtab_get_workspace( mainw->current_tab );
 
-		/*
-		if( !workspace_load_file( mainw->ws, filename ) )
+		if( !workspace_load_file( ws, filename ) )
 			return( FALSE );
-		 */
 	}
 
 	return( TRUE );
@@ -1113,10 +1059,7 @@ mainw_workspace_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 	Workspace *new_ws;
 	Mainw *new_mainw;
 
-	/*
 	progress_begin();
-
-	printf( "mainw_workspace_duplicate_action_cb:\n" ); 
 
 	if( !(new_ws = workspace_clone( ws )) ) {
 		progress_end();
@@ -1124,13 +1067,8 @@ mainw_workspace_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 		return;
 	}
 
-	new_mainw = mainw_new( new_ws );
-	gtk_widget_show( GTK_WIDGET( new_mainw ) );
-	 */
+	mainw_add_workspace( mainw, new_ws );
 
-	/* We have to show before recalculate or the window never appears, not
-	 * sure why.
-	 */
 	symbol_recalculate_all();
 
 	progress_end();

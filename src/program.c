@@ -1274,13 +1274,6 @@ program_program_new_action_cb( GtkAction *action, Program *program )
 	gtk_widget_show( GTK_WIDGET( program2 ) ); 
 }
 
-static void
-program_workspace_new_action_cb( GtkAction *action, Program *program )
-{
-	workspacegroup_workspace_new( main_workspacegroup, 
-		GTK_WIDGET( program ) );
-}
-
 static void *
 program_load_file_fn( Filesel *filesel, 
 	const char *filename, Program *program, void *b )
@@ -1758,11 +1751,6 @@ static GtkActionEntry program_actions[] = {
 		N_( "Make a new program window" ), 
 		G_CALLBACK( program_program_new_action_cb ) },
 
-	{ "NewWorkspace", 
-		GTK_STOCK_NEW, N_( "New _Workspace" ), NULL, 
-		N_( "Make a new workspace" ), 
-		G_CALLBACK( program_workspace_new_action_cb ) },
-
 	{ "Open", 
 		GTK_STOCK_OPEN, N_( "_Open Toolkit" ), NULL,
 		N_( "_Open toolkit" ), 
@@ -1881,7 +1869,6 @@ static const char *program_menubar_ui_description =
 "        <menuitem action='NewSeparator'/>"
 "        <menuitem action='NewColumnItem'/>"
 "        <menuitem action='NewProgram'/>"
-"        <menuitem action='NewWorkspace'/>"
 "      </menu>"
 "      <menuitem action='Open'/>"
 "      <separator/>"

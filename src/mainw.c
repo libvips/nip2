@@ -289,6 +289,18 @@ mainw_cancel_cb( GtkWidget *wid, Mainw *mainw )
 	mainw->cancel = TRUE;
 }
 
+static void                
+mainw_switch_page_cb( GtkNotebook *notebook, 
+	GtkWidget *page, guint page_num, gpointer user_data )
+{
+	Mainw *mainw = MAINW( user_data );
+
+	printf( "mainw_switch_page_cb: switch to page %d\n", page_num );
+	printf( "mainw_switch_page_cb: child = %p\n", page );
+
+	mainw->current_tab = MAINWTAB( page );
+}
+
 void
 mainw_find_disc( VipsBuf *buf )
 {
@@ -1074,6 +1086,12 @@ mainw_recover_action_cb( GtkAction *action, Mainw *mainw )
 	workspace_auto_recover( mainw );
 }
 
+static void
+mainw_close_action_cb( GtkAction *action, Mainw *mainw )
+{
+	iobject_destroy( IOBJECT( mainw->current_tab ) );
+}
+
 /* Callback from make new column.
  */
 void
@@ -1176,14 +1194,64 @@ mainw_program_new_action_cb( GtkAction *action, Mainw *mainw )
 	 */
 }
 
+/* Done button hit.
+ */
+static void
+mainw_workspace_new_done_cb( iWindow *iwnd, void *client, 
+	iWindowNotifyFn nfn, void *sys )
+{
+	Mainw *mainw = MAINW( client );
+	Stringset *ss = STRINGSET( iwnd );
+	StringsetChild *name = stringset_child_get( ss, _( "Name" ) );
+	StringsetChild *caption = stringset_child_get( ss, _( "Caption" ) );
+
+	Workspace *ws;
+
+	char name_text[1024];
+	char caption_text[1024];
+
+	if( !get_geditable_name( name->entry, name_text, 1024 ) ||
+		!get_geditable_string( caption->entry, caption_text, 1024 ) ) {
+		nfn( sys, IWINDOW_ERROR );
+		return;
+	}
+
+	if( !(ws = workspace_new_blank( mainw->wsg, name_text )) ) {
+		nfn( sys, IWINDOW_ERROR );
+		return;
+	}
+
+	iobject_set( IOBJECT( ws ), NULL, caption_text );
+
+	mainw_add_workspace( mainw, ws );
+
+	nfn( sys, IWINDOW_YES );
+}
+
 /* New ws callback.
  */
 static void
 mainw_workspace_new_action_cb( GtkAction *action, Mainw *mainw )
 {
 	Workspacegroup *wsg = mainw->wsg; 
+	GtkWidget *ss = stringset_new();
+	char name[256];
 
-	workspacegroup_workspace_new( wsg, GTK_WIDGET( mainw ) );
+	workspacegroup_name_new( wsg, name );
+	stringset_child_new( STRINGSET( ss ), 
+		_( "Name" ), name, _( "Set workspace name here" ) );
+	stringset_child_new( STRINGSET( ss ), 
+		_( "Caption" ), "", _( "Set workspace caption here" ) );
+
+	iwindow_set_title( IWINDOW( ss ), _( "New Workspace" ) );
+	idialog_set_callbacks( IDIALOG( ss ), 
+		iwindow_true_cb, NULL, NULL, mainw );
+	idialog_add_ok( IDIALOG( ss ), 
+		mainw_workspace_new_done_cb, _( "Create Workspace" ) );
+	iwindow_set_parent( IWINDOW( ss ), GTK_WIDGET( mainw ) );
+	iwindow_build( IWINDOW( ss ) );
+
+	gtk_widget_show( ss );
 }
 
 /* Callback from auto-recalc toggle.
@@ -1464,6 +1532,11 @@ static GtkActionEntry mainw_actions[] = {
 		N_( "Load last automatically backed-up workspace" ), 
 		G_CALLBACK( mainw_recover_action_cb ) },
 
+	{ "CloseTab", 
+		GTK_STOCK_CLOSE, N_( "_Close current tab" ), NULL,
+		N_( "Close Tab" ), 
+		G_CALLBACK( mainw_close_action_cb ) },
+
 	{ "Delete", 
 		GTK_STOCK_DELETE, N_( "_Delete" ), "<control>BackSpace",
 		N_( "Delete selected items" ), 
@@ -1597,7 +1670,7 @@ static const char *mainw_menubar_ui_description =
 "      <separator/>"
 "      <menuitem action='Recover'/>"
 "      <separator/>"
-"      <menuitem action='Close'/>"
+"      <menuitem action='CloseTab'/>"
 "      <menuitem action='Quit'/>"
 "    </menu>"
 "    <menu action='EditMenu'>"
@@ -1817,6 +1890,8 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	gtk_notebook_set_group_name( GTK_NOTEBOOK( mainw->notebook ), "mainw" );
 	gtk_notebook_set_tab_pos( GTK_NOTEBOOK( mainw->notebook ), 
 		GTK_POS_BOTTOM );
+	g_signal_connect( mainw->notebook, "switch_page", 
+		G_CALLBACK( mainw_switch_page_cb ), mainw );
 
 	gtk_box_pack_start( GTK_BOX( vbox ), 
 		GTK_WIDGET( mainw->notebook ), TRUE, TRUE, 0 );

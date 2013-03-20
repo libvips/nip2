@@ -62,4 +62,3 @@ GType workspacegroup_get_type( void );
 Workspacegroup *workspacegroup_new( const char *name );
 
 void workspacegroup_name_new( Workspacegroup *wsg, char *name );
-void workspacegroup_workspace_new( Workspacegroup *wsg, GtkWidget *parent );

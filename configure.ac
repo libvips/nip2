@@ -1,5 +1,7 @@
 # Process this file with autoconf to produce a configure script.
-AC_INIT(src/ip.h)
+
+AC_INIT([nip2], [7.32.1])
+AM_INIT_AUTOMAKE([-Wall])
 AC_CONFIG_HEADERS(config.h)
 
 dnl
@@ -14,16 +16,12 @@ m4_define([nip_micro_version], [1])
 m4_define([nip_version],
           [nip_major_version.nip_minor_version.nip_micro_version])
 
-PACKAGE=nip2
 MAJOR_VERSION=nip_major_version()
 MINOR_VERSION=nip_minor_version()
 MICRO_VERSION=nip_micro_version()
-VERSION=nip_version()
 
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
-
-AM_INIT_AUTOMAKE($PACKAGE,$VERSION)
 
 AC_DEFINE_UNQUOTED(MAJOR_VERSION, $MAJOR_VERSION, [Major version number])
 AC_DEFINE_UNQUOTED(MINOR_VERSION, $MINOR_VERSION, [Minor version number])

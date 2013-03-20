@@ -1,6 +1,20 @@
-- mainw->wsg is always NULL 
+- next: look for notebook page switches and update current_tab
 
-  how odd
+  also, on page removal by iobject_destroy() do we update current_tab?
+
+- test file drop on mainw, esp. workspaces
+
+  need to remove empty wses in more places, eg. on ws load, ws drop etc.
+
+	/* If the mainw we are loading into has a single, empty workspace,
+	 * close that.
+	 */
+	if( g_slist_length( mainw->tabs ) == 1 &&
+		(old_ws = mainwtab_get_workspace( mainw->current_tab )) && 
+		workspace_is_empty( old_ws ) ) {
+		filemodel_set_modified( FILEMODEL( old_ws ), FALSE );
+		iobject_destroy( IOBJECT( old_ws ) ); 
+	}
 
 
 

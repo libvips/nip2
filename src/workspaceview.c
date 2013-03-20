@@ -827,9 +827,11 @@ static gboolean
 workspaceview_filedrop( Workspaceview *wview, const char *filename )
 {
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+	Mainw *mainw = MAINW( iwindow_get_root( GTK_WIDGET( wview ) ) );
+
 	gboolean result;
 
-	result = main_load( ws, filename );
+	result = main_load( mainw, ws, filename );
 	if( result )
 		symbol_recalculate_all();
 

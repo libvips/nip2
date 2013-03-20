@@ -670,7 +670,7 @@ mainw_workspace_save_as_action_cb( GtkAction *action, Mainw *mainw )
 	filemodel_inter_saveas( IWINDOW( mainw ), FILEMODEL( ws ) );
 }
 
-static void
+void
 mainw_add_workspace( Mainw *mainw, Workspace *ws )
 {
 	Mainwtab *tab;
@@ -689,7 +689,6 @@ mainw_add_workspace( Mainw *mainw, Workspace *ws )
 		GTK_WIDGET( tab ), TRUE );
 
 	mainw->current_tab = tab;
-
 	mainw->tabs = g_slist_append( mainw->tabs, tab );
 }
 
@@ -698,23 +697,10 @@ mainw_open_workspace( Mainw *mainw, const char *filename )
 {
 	Workspace *ws;
 
-	/* If the mainw we are loading into has a single, empty workspace,
-	 * close that.
-	 */
-	if( g_slist_length( mainw->tabs ) == 1 &&
-		(ws = mainwtab_get_workspace( mainw->current_tab )) && 
-		workspace_is_empty( ws ) ) {
-		filemodel_set_modified( FILEMODEL( ws ), FALSE );
-		iobject_destroy( IOBJECT( ws ) ); 
-	}
-
 	if( !(ws = workspace_new_from_file( mainw->wsg, filename, NULL )) ) 
 		return( NULL );
-
 	mainw_add_workspace( mainw, ws ); 
 	mainw_recent_add( &mainw_recent_workspace, filename );
-
-	symbol_recalculate_all();
 
 	return( ws );
 }
@@ -1848,14 +1834,6 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 		iwnd->accel_group );
 	 */
 
-	/*
-	mainw->wsview = WORKSPACEVIEW( 
-		model_view_new( MODEL( mainw->ws ), NULL ) );
-	gtk_paned_pack2( GTK_PANED( mainw->lpane ), GTK_WIDGET( mainw->wsview ),
-		TRUE, FALSE );
-	gtk_widget_show( GTK_WIDGET( mainw->wsview ) );
-	 */
-
 	/* Any changes to prefs, refresh (yuk!).
 	 */
 	mainw->watch_changed_sid = g_signal_connect( main_watchgroup, 
@@ -1888,42 +1866,16 @@ mainw_popdown( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys )
 }
 
 static void
-mainw_link( Mainw *mainw, Workspace *ws )
+mainw_link( Mainw *mainw, Workspacegroup *wsg )
 {
+	mainw->wsg = wsg;
+
 	iwindow_set_build( IWINDOW( mainw ), 
-		(iWindowBuildFn) mainw_build, ws, NULL, NULL );
+		(iWindowBuildFn) mainw_build, wsg, NULL, NULL );
 	iwindow_set_popdown( IWINDOW( mainw ), mainw_popdown, NULL );
-	filemodel_set_window_hint( FILEMODEL( ws ), IWINDOW( mainw ) );
-
-	/* If we have a saved size for this workspace, set that. Otherwise,
-	 * default to the default.
-	 */
-	if( !ws->window_width ) {
-		iwindow_set_size_prefs( IWINDOW( mainw ), 
-			"MAINW_WINDOW_WIDTH", "MAINW_WINDOW_HEIGHT" );
-	}
-
+	iwindow_set_size_prefs( IWINDOW( mainw ), 
+		"MAINW_WINDOW_WIDTH", "MAINW_WINDOW_HEIGHT" );
 	iwindow_build( IWINDOW( mainw ) );
-
-	if( ws->window_width ) {
-		GdkScreen *screen = 
-			gtk_widget_get_screen( GTK_WIDGET( mainw ) );
-
-		gtk_window_set_default_size( GTK_WINDOW( mainw ), 
-			IM_MIN( ws->window_width, 
-				gdk_screen_get_width( screen ) ),
-			IM_MIN( ws->window_height, 
-				gdk_screen_get_height( screen ) ) );
-	}
-
-	printf( "mainw_link: set pane state from prefs\n" ); 
-
-	/*
-	pane_set_state( mainw->lpane, ws->lpane_open, ws->lpane_position );
-	pane_set_state( mainw->rpane, ws->rpane_open, ws->rpane_position );
-	 */
-
-	mainw_add_workspace( mainw, ws );
 
 	/* Set start state.
 	 */
@@ -1931,13 +1883,13 @@ mainw_link( Mainw *mainw, Workspace *ws )
 }
 
 Mainw *
-mainw_new( Workspace *ws )
+mainw_new( Workspacegroup *wsg )
 {
 	Mainw *mainw;
 
 	mainw = MAINW( g_object_new( TYPE_MAINW, NULL ) );
 
-	mainw_link( mainw, ws );
+	mainw_link( mainw, wsg );
 
 	return( mainw );
 }

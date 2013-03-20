@@ -135,7 +135,8 @@ void mainw_group_action_cb( GtkAction *action, Mainw *mainw );
 void mainw_next_error_action_cb( GtkAction *action, Mainw *mainw );
 void mainw_open_action_cb( GtkAction *action, Mainw *mainw );
 
+void mainw_add_workspace( Mainw *mainw, Workspace *ws );
 Workspace *mainw_open_workspace( Mainw *mainw, const char *filename );
 
-Mainw *mainw_new( Workspace *ws );
+Mainw *mainw_new( Workspacegroup *wsg );
 

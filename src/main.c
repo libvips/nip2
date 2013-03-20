@@ -424,22 +424,13 @@ main_watchgroup_changed_cb( void )
  * experimentally, win32 pops up an annoying error dialog if you try that.
  */
 gboolean
-main_load( Workspace *ws, const char *filename )
+main_load( Mainw *mainw, Workspace *ws, const char *filename )
 {
 	Workspace *new_ws;
 
-	if( (new_ws = workspace_new_from_file( main_workspacegroup, 
-		filename, NULL )) ) {
-		Mainw *new_mainw;
-
-		if( !main_option_batch ) {
-			new_mainw = mainw_new( new_ws );
-			gtk_widget_show( GTK_WIDGET( new_mainw ) );
-		}
-		mainw_recent_add( &mainw_recent_workspace, filename );
-
+	if( (new_ws = mainw_open_workspace( mainw, filename )) ) 
 		return( TRUE );
-	}
+
 	error_clear();
 
 	/* workspace_load_file() needs to recalc to work, try to avoid that by
@@ -991,6 +982,7 @@ main( int argc, char *argv[] )
 {
 	gboolean welcome_message = FALSE;
 	Workspace *ws;
+	Mainw *mainw;
 	GError *error = NULL;
 	GOptionContext *context;
 	const char *prefix;
@@ -1352,6 +1344,12 @@ main( int argc, char *argv[] )
 		ws = workspace_new_blank( main_workspacegroup, name );
 	}
 
+	/* Make a mainw to hold any workspaces we load. Only show this in
+	 * interactive mode, see below.
+	 */
+	mainw = mainw_new( main_workspacegroup );
+	mainw_add_workspace( mainw, ws );
+
 	/* Reset IM_CONCURRENCY if a watch changes. Need to do this after
 	 * parsing options so we skip in batch mode.
 	 */
@@ -1420,7 +1418,7 @@ main( int argc, char *argv[] )
 			im_strncpy( buf, argv[i], FILENAME_MAX );
 			path_compact( buf );
 
-			if( !main_load( ws, buf ) ) 
+			if( !main_load( mainw, ws, buf ) ) 
 				main_log_add( "%s\n", error_get_sub() );
 		}
 	}
@@ -1448,6 +1446,15 @@ main( int argc, char *argv[] )
 	 */
 	filemodel_set_modified( FILEMODEL( ws ), FALSE );
 
+	/* If the start ws is empty (we didn't load anything into it) and we
+	 * loaded some other workspaces, we can junk it. 
+	 */
+	if( g_slist_length( mainw->tabs ) > 1 &&
+		workspace_is_empty( ws ) ) {
+		iobject_destroy( IOBJECT( ws ) ); 
+		ws = NULL;
+	}
+
 #ifdef DEBUG_TIME
 	printf( "DEBUG_TIME: main init in %gs\n",  
 		g_timer_elapsed( startup_timer, NULL ) );
@@ -1456,15 +1463,7 @@ main( int argc, char *argv[] )
 	/* Are we running interactively? Start the main window and loop.
 	 */
 	if( !main_option_batch ) {
-		/* Only display our initial ws if it's not blank, or if it is
-		 * blank, if there are no other windows up.
-		 */
-		if( !workspace_is_empty( ws ) || mainw_number() == 0 ) {
-			Mainw *mainw;
-			
-			mainw = mainw_new( ws );
-			gtk_widget_show( GTK_WIDGET( mainw ) );
-		}
+		gtk_widget_show( GTK_WIDGET( mainw ) );
 
 		/* Process a few events ... we want the window to be mapped so
 		 * that log/welcome/clean? messages we pop appear in the right
@@ -1499,20 +1498,14 @@ _( "A new directory has been created to hold startup, "
 			iwindow_alert( NULL, GTK_MESSAGE_INFO );
 		}
 
-		/* Offer to junk temps.
-		 */
 		main_check_temp( total );
 
 #ifdef DEBUG
 		printf( "starting event dispatch loop\n" );
 #endif/*DEBUG*/
 
-		/* Through startup.
-		 */
 		main_starting = FALSE;
 
-		/* Make sure we have a recalc queued.
-		 */
 		symbol_recalculate_all_force( FALSE );
 
 		gtk_main();

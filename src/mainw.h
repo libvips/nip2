@@ -132,7 +132,7 @@ void mainw_column_new_action_cb( GtkAction *action, Mainw *mainw );
 void mainw_workspace_merge_action_cb( GtkAction *action, Mainw *mainw );
 void mainw_layout_action_cb( GtkAction *action, Mainw *mainw );
 void mainw_group_action_cb( GtkAction *action, Mainw *mainw );
-void mainw_next_error_action_cb2( GtkAction *action, Mainw *mainw );
+void mainw_next_error_action_cb( GtkAction *action, Mainw *mainw );
 void mainw_open_action_cb( GtkAction *action, Mainw *mainw );
 
 Workspace *mainw_open_file_into_workspace( Mainw *mainw, const char *filename );

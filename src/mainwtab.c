@@ -317,7 +317,7 @@ mainwtab_init( Mainwtab *mainwtab )
 	g_signal_connect( mainwtab->rpane, "changed",
 		G_CALLBACK( mainwtab_rpane_changed_cb ), mainwtab );
 	gtk_box_pack_start( GTK_BOX( mainwtab ), 
-		GTK_WIDGET( mainwtab->rpane ), FALSE, FALSE, 2 );
+		GTK_WIDGET( mainwtab->rpane ), TRUE, TRUE, 2 );
 	gtk_widget_show( GTK_WIDGET( mainwtab->rpane ) );
 
 	mainwtab->lpane = pane_new( PANE_HIDE_LEFT );

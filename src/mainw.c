@@ -1398,15 +1398,12 @@ void
 mainw_revert_ok_cb( iWindow *iwnd, void *client, 
 	iWindowNotifyFn nfn, void *sys ) 
 {
-	Mainw *mainw = MAINW( client );
-	Workspace *ws;
+	Prefs *prefs = PREFS( client );
 
-	if( mainw->current_tab &&
-		(ws = mainwtab_get_workspace( mainw->current_tab )) && 
-		FILEMODEL( ws )->filename ) {
+	if( FILEMODEL( prefs->ws )->filename ) {
 		printf( "mainw_revert_ok_cb: unlinking %s", 
-			FILEMODEL( ws )->filename ); 
-		//(void) unlinkf( "%s", FILEMODEL( ws )->filename );
+			FILEMODEL( prefs->ws )->filename ); 
+		(void) unlinkf( "%s", FILEMODEL( prefs->ws )->filename );
 		main_reload();
 		symbol_recalculate_all();
 	}
@@ -1417,10 +1414,10 @@ mainw_revert_ok_cb( iWindow *iwnd, void *client,
 void 
 mainw_revert_cb( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys ) 
 {
-	Mainw *mainw = MAINW( client );
+	Prefs *prefs = PREFS( client );
 
 	box_yesno( GTK_WIDGET( iwnd ),
-		mainw_revert_ok_cb, iwindow_true_cb, mainw,
+		mainw_revert_ok_cb, iwindow_true_cb, prefs,
 		nfn, sys,
 		_( "Revert to Defaults" ), 
 		_( "Revert to installation defaults?" ),
@@ -1444,7 +1441,7 @@ mainw_preferences_action_cb( GtkAction *action, Mainw *mainw )
 	iwindow_set_title( IWINDOW( prefs ), _( "Preferences" ) );
 	iwindow_set_parent( IWINDOW( prefs ), GTK_WIDGET( mainw ) );
 	idialog_set_callbacks( IDIALOG( prefs ), 
-		NULL, NULL, NULL, mainw );
+		NULL, NULL, NULL, prefs );
 	idialog_add_ok( IDIALOG( prefs ), 
 		mainw_revert_cb, _( "Revert to Defaults ..." ) );
 	idialog_add_ok( IDIALOG( prefs ), iwindow_true_cb, GTK_STOCK_CLOSE );

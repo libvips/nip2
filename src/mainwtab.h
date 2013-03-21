@@ -52,6 +52,10 @@ struct _Mainwtab {
 	Workspacedefs *workspacedefs;
 	Workspaceview *wsview;
 
+	/* Set by our parent: the label we update with the ws name and state.
+	 */
+	GtkWidget *label;
+
 	GtkWidget *popup;
 	GtkWidget *popup_jump;
 
@@ -59,6 +63,10 @@ struct _Mainwtab {
 	 */
 	Pane *lpane;
 	Pane *rpane;
+
+	/* Only show the compat warning once.
+	 */
+	gboolean popped_compat;
 };
 
 typedef struct _MainwtabClass {
@@ -68,17 +76,19 @@ typedef struct _MainwtabClass {
 	 */
 } MainwtabClass;
 
-GType mainwtab_get_type( void );
-
 void mainwtab_jump_update( Mainwtab *mainwtab, GtkWidget *menu );
 
-Workspace *mainwtab_get_workspace( Mainwtab *mainwtab );
+GType mainwtab_get_type( void );
+Mainwtab *mainwtab_new();
 
+Workspace *mainwtab_get_workspace( Mainwtab *mainwtab );
+void mainwtab_set_label( Mainwtab *mainwtab, GtkWidget *label );
 int mainwtab_clone( Mainwtab *mainwtab );
 gboolean mainwtab_ungroup( Mainwtab *mainwtab );
 gboolean mainwtab_group( Mainwtab *mainwtab );
 void mainwtab_select_all( Mainwtab *mainwtab );
 gboolean mainwtab_next_error( Mainwtab *mainwtab );
+Pane *mainwtab_get_defs_pane( Mainwtab *tab );
+Pane *mainwtab_get_browse_pane( Mainwtab *tab );
 
-Mainwtab *mainwtab_new();
 

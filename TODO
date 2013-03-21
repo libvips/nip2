@@ -1,6 +1,4 @@
-- next: look for notebook page switches and update current_tab
-
-  also, on page removal by iobject_destroy() do we update current_tab?
+- close ws defs with X button, menu does not update
 
 - test file drop on mainw, esp. workspaces
 

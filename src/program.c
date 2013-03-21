@@ -308,8 +308,9 @@ program_row_lookup( Program *program, Model *model, GtkTreeIter *return_iter )
 }
 
 static gboolean
-program_refresh_timeout( Program *program )
+program_refresh_timeout( gpointer user_data )
 {
+	Program *program = PROGRAM( user_data ); 
 	iWindow *iwnd = IWINDOW( program );
 	Model *model = program_get_selected( program );
 	GtkTreeSelection *select = 
@@ -399,9 +400,9 @@ program_refresh( Program *program )
 {
 	IM_FREEF( g_source_remove, program->refresh_timeout );
 	
-	/* 1ms to make sure we run after idle (is this right?)
+	/* 10ms to make sure we run after idle (is this right?)
 	 */
-	program->refresh_timeout = g_timeout_add( 1, 
+	program->refresh_timeout = g_timeout_add( 10, 
 		(GSourceFunc) program_refresh_timeout, program );
 }
 

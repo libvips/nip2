@@ -38,12 +38,12 @@ static vObjectClass *parent_class = NULL;
 static void
 mainwtab_destroy( GtkObject *object )
 {
-	Mainwtab *mainwtab;
+	Mainwtab *tab;
 
 	g_return_if_fail( object != NULL );
 	g_return_if_fail( IS_MAINWTAB( object ) );
 
-	mainwtab = MAINWTAB( object );
+	tab = MAINWTAB( object );
 
 #ifdef DEBUG
 	printf( "mainwtab_destroy\n" );
@@ -51,13 +51,13 @@ mainwtab_destroy( GtkObject *object )
 
 	/* My instance destroy stuff.
 	 */
-	if( mainwtab->ws ) {
-		mainwtab->ws->iwnd = NULL;
+	if( tab->ws ) {
+		tab->ws->iwnd = NULL;
 
-		filemodel_set_window_hint( FILEMODEL( mainwtab->ws ), NULL );
+		filemodel_set_window_hint( FILEMODEL( tab->ws ), NULL );
 	}
 
-	DESTROY_GTK( mainwtab->popup );
+	DESTROY_GTK( tab->popup );
 
 	GTK_OBJECT_CLASS( parent_class )->destroy( object );
 }
@@ -65,17 +65,20 @@ mainwtab_destroy( GtkObject *object )
 static void
 mainwtab_map( GtkWidget *widget )
 {
-	Mainwtab *mainwtab = MAINWTAB( widget );
+	Mainwtab *tab = MAINWTAB( widget );
 
-	if( mainwtab->ws->compat_major ) {
+	if( tab->ws->compat_major &&
+		!tab->popped_compat ) {
 		error_top( _( "Compatibility mode." ) );
 		error_sub( _( "This workspace was created by version %d.%d.%d. "
 			"A set of compatibility menus have been loaded "
 			"for this window." ),
-			FILEMODEL( mainwtab->ws )->major,
-			FILEMODEL( mainwtab->ws )->minor,
-			FILEMODEL( mainwtab->ws )->micro );
-		iwindow_alert( GTK_WIDGET( mainwtab ), GTK_MESSAGE_INFO );
+			FILEMODEL( tab->ws )->major,
+			FILEMODEL( tab->ws )->minor,
+			FILEMODEL( tab->ws )->micro );
+		iwindow_alert( GTK_WIDGET( tab ), GTK_MESSAGE_INFO );
+
+		tab->popped_compat = TRUE;
 	}
 
 	GTK_WIDGET_CLASS( parent_class )->map( widget );
@@ -84,10 +87,10 @@ mainwtab_map( GtkWidget *widget )
 static gboolean
 mainwtab_configure_event( GtkWidget *widget, GdkEventConfigure *event )
 {
-	Mainwtab *mainwtab = MAINWTAB( widget );
+	Mainwtab *tab = MAINWTAB( widget );
 
-	mainwtab->ws->window_width = event->width;
-	mainwtab->ws->window_height = event->height;
+	tab->ws->window_width = event->width;
+	tab->ws->window_height = event->height;
 
 	return( GTK_WIDGET_CLASS( parent_class )->
 		configure_event( widget, event ) );
@@ -134,7 +137,7 @@ mainwtab_jump_build( Column *column, GtkWidget *menu )
 /* Update a menu with the set of current columns.
  */
 void
-mainwtab_jump_update( Mainwtab *mainwtab, GtkWidget *menu )
+mainwtab_jump_update( Mainwtab *tab, GtkWidget *menu )
 {
 	GtkWidget *item;
 	GSList *columns;
@@ -146,7 +149,7 @@ mainwtab_jump_update( Mainwtab *mainwtab, GtkWidget *menu )
 	gtk_menu_append( GTK_MENU( menu ), item );
 	gtk_widget_show( item );
 
-	columns = icontainer_get_children( ICONTAINER( mainwtab->ws ) );
+	columns = icontainer_get_children( ICONTAINER( tab->ws ) );
         columns = g_slist_sort( columns, 
 		(GCompareFunc) mainwtab_jump_name_compare );
 	slist_map( columns, (SListMapFn) mainwtab_jump_build, menu );
@@ -157,13 +160,48 @@ mainwtab_jump_update( Mainwtab *mainwtab, GtkWidget *menu )
 static void 
 mainwtab_refresh( vObject *vobject )
 {
-	Mainwtab *mainwtab = MAINWTAB( vobject );
+	Mainwtab *tab = MAINWTAB( vobject );
 
 #ifdef DEBUG
-	printf( "mainwtab_refresh\n" );
 #endif /*DEBUG*/
+	printf( "mainwtab_refresh: update panes\n" );
 
-	mainwtab_jump_update( mainwtab, mainwtab->popup_jump );
+	mainwtab_jump_update( tab, tab->popup_jump );
+
+	if( tab->label ) { 
+		char txt[512];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
+
+		if( FILEMODEL( tab->ws )->modified ) 
+			vips_buf_appendf( &buf, "*" ); 
+		vips_buf_appendf( &buf, "%s", 
+			NN( IOBJECT( tab->ws->sym )->name ) );
+		gtk_label_set_text( GTK_LABEL( tab->label ), 
+			vips_buf_all( &buf ) );
+
+		vips_buf_rewind( &buf );
+
+		if( FILEMODEL( tab->ws )->filename )
+			vips_buf_appendf( &buf, "%s", 
+				FILEMODEL( tab->ws )->filename );
+		else 
+			vips_buf_appends( &buf, _( "unsaved workspace" ) );
+
+		if( FILEMODEL( tab->ws )->modified ) {
+			vips_buf_appendf( &buf, ", " ); 
+			vips_buf_appendf( &buf, _( "modified" ) ); 
+		}
+
+		if( tab->ws->compat_major ) {
+			vips_buf_appends( &buf, ", " );
+			vips_buf_appends( &buf, _( "compatibility mode" ) );
+			vips_buf_appendf( &buf, " %d.%d", 
+				tab->ws->compat_major, 
+				tab->ws->compat_minor ); 
+		}
+
+		set_tooltip( tab->label, "%s", vips_buf_all( &buf ) );
+	}
 
 	VOBJECT_CLASS( parent_class )->refresh( vobject );
 }
@@ -208,45 +246,45 @@ mainwtab_open_action_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
 static void
 mainwtab_link( vObject *vobject, iObject *iobject )
 {
-	Mainwtab *mainwtab = MAINWTAB( vobject );
+	Mainwtab *tab = MAINWTAB( vobject );
 	Workspace *ws = WORKSPACE( iobject );
 
-	g_assert( !mainwtab->ws );
+	g_assert( !tab->ws );
 
-	mainwtab->ws = ws;
+	tab->ws = ws;
 
-	mainwtab->popup = popup_build( _( "Workspace menu" ) );
+	tab->popup = popup_build( _( "Workspace menu" ) );
 
-	popup_add_but( mainwtab->popup, _( "New C_olumn" ),
+	popup_add_but( tab->popup, _( "New C_olumn" ),
 		POPUP_FUNC( mainwtab_column_new_action_cb2 ) ); 
-	mainwtab->popup_jump = popup_add_pullright( mainwtab->popup, 
+	tab->popup_jump = popup_add_pullright( tab->popup, 
 		_( "Jump to _Column" ) ); 
-	popup_add_but( mainwtab->popup, _( "Align _Columns" ),
+	popup_add_but( tab->popup, _( "Align _Columns" ),
 		POPUP_FUNC( mainwtab_layout_action_cb2 ) ); 
-	menu_add_sep( mainwtab->popup );
-	popup_add_but( mainwtab->popup, GTK_STOCK_OPEN,
+	menu_add_sep( tab->popup );
+	popup_add_but( tab->popup, GTK_STOCK_OPEN,
 		POPUP_FUNC( mainwtab_open_action_cb2 ) ); 
-	popup_add_but( mainwtab->popup, _( "_Merge Workspace from File" ),
+	popup_add_but( tab->popup, _( "_Merge Workspace from File" ),
 		POPUP_FUNC( mainwtab_workspace_merge_action_cb2 ) ); 
-	menu_add_sep( mainwtab->popup );
-	popup_add_but( mainwtab->popup, _( "_Group Selected" ),
+	menu_add_sep( tab->popup );
+	popup_add_but( tab->popup, _( "_Group Selected" ),
 		POPUP_FUNC( mainwtab_group_action_cb2 ) ); 
-	menu_add_sep( mainwtab->popup );
-	popup_add_but( mainwtab->popup, STOCK_NEXT_ERROR,
+	menu_add_sep( tab->popup );
+	popup_add_but( tab->popup, STOCK_NEXT_ERROR,
 		POPUP_FUNC( mainwtab_next_error_action_cb2 ) ); 
-	popup_attach( mainwtab->wsview->fixed, mainwtab->popup, mainwtab );
+	popup_attach( tab->wsview->fixed, tab->popup, tab );
 
-	view_link( VIEW( mainwtab->wsview ), MODEL( ws ), NULL );
+	view_link( VIEW( tab->wsview ), MODEL( ws ), NULL );
 
-	vobject_link( VOBJECT( mainwtab->toolkitbrowser ), 
-		IOBJECT( mainwtab->ws->kitg ) );
-	toolkitbrowser_set_workspace( mainwtab->toolkitbrowser, ws );
+	vobject_link( VOBJECT( tab->toolkitbrowser ), 
+		IOBJECT( tab->ws->kitg ) );
+	toolkitbrowser_set_workspace( tab->toolkitbrowser, ws );
 
-	vobject_link( VOBJECT( mainwtab->workspacedefs ), 
-		IOBJECT( mainwtab->ws ) );
+	vobject_link( VOBJECT( tab->workspacedefs ), 
+		IOBJECT( tab->ws ) );
 
-	pane_set_state( mainwtab->lpane, ws->lpane_open, ws->lpane_position );
-	pane_set_state( mainwtab->rpane, ws->rpane_open, ws->rpane_position );
+	pane_set_state( tab->lpane, ws->lpane_open, ws->lpane_position );
+	pane_set_state( tab->rpane, ws->rpane_open, ws->rpane_position );
 
 	VOBJECT_CLASS( parent_class )->link( vobject, iobject );
 }
@@ -272,69 +310,66 @@ mainwtab_class_init( MainwtabClass *class )
 }
 
 static void
-mainwtab_lpane_changed_cb( Pane *pane, Mainwtab *mainwtab )
+mainwtab_lpane_changed_cb( Pane *pane, Mainwtab *tab )
 {
-	if( mainwtab->ws->lpane_open != pane->open ||
-		mainwtab->ws->lpane_position != pane->user_position ) {
-		mainwtab->ws->lpane_open = pane->open;
-		mainwtab->ws->lpane_position = pane->user_position;
+	if( tab->ws->lpane_open != pane->open ||
+		tab->ws->lpane_position != pane->user_position ) {
+		tab->ws->lpane_open = pane->open;
+		tab->ws->lpane_position = pane->user_position;
 
-		iobject_changed( IOBJECT( mainwtab->ws ) );
+		iobject_changed( IOBJECT( tab->ws ) );
 	}
 }
 
 static void
-mainwtab_rpane_changed_cb( Pane *pane, Mainwtab *mainwtab )
+mainwtab_rpane_changed_cb( Pane *pane, Mainwtab *tab )
 {
-	if( mainwtab->ws->rpane_open != pane->open ||
-		mainwtab->ws->rpane_position != pane->user_position ) {
-		mainwtab->ws->rpane_open = pane->open;
-		mainwtab->ws->rpane_position = pane->user_position;
+	if( tab->ws->rpane_open != pane->open ||
+		tab->ws->rpane_position != pane->user_position ) {
+		tab->ws->rpane_open = pane->open;
+		tab->ws->rpane_position = pane->user_position;
 
-		iobject_changed( IOBJECT( mainwtab->ws ) );
+		iobject_changed( IOBJECT( tab->ws ) );
 	}
 }
 
 static void
-mainwtab_init( Mainwtab *mainwtab )
+mainwtab_init( Mainwtab *tab )
 {
-        GtkWidget *mbar;
-	GtkWidget *frame;
 	GtkWidget *ebox;
-	GError *error;
-	GtkWidget *cancel;
-	GtkWidget *item;
 	Panechild *panechild;
 
-	mainwtab->ws = NULL;
-	mainwtab->row_last_error = NULL;
+	tab->ws = NULL;
+	tab->row_last_error = NULL;
+	tab->popped_compat = FALSE;
+	tab->label = NULL;
 
 #ifdef DEBUG
-	printf( "mainwtab_init: %p\n", mainwtab );
+	printf( "mainwtab_init: %p\n", tab );
 #endif /*DEBUG*/
 
-	mainwtab->rpane = pane_new( PANE_HIDE_RIGHT );
-	g_signal_connect( mainwtab->rpane, "changed",
-		G_CALLBACK( mainwtab_rpane_changed_cb ), mainwtab );
-	gtk_box_pack_start( GTK_BOX( mainwtab ), 
-		GTK_WIDGET( mainwtab->rpane ), TRUE, TRUE, 2 );
-	gtk_widget_show( GTK_WIDGET( mainwtab->rpane ) );
+	tab->rpane = pane_new( PANE_HIDE_RIGHT );
+	g_signal_connect( tab->rpane, "changed",
+		G_CALLBACK( mainwtab_rpane_changed_cb ), tab );
+	gtk_box_pack_start( GTK_BOX( tab ), 
+		GTK_WIDGET( tab->rpane ), TRUE, TRUE, 2 );
+	gtk_widget_show( GTK_WIDGET( tab->rpane ) );
 
-	mainwtab->lpane = pane_new( PANE_HIDE_LEFT );
-	g_signal_connect( mainwtab->lpane, "changed",
-		G_CALLBACK( mainwtab_lpane_changed_cb ), mainwtab );
-	gtk_paned_pack1( GTK_PANED( mainwtab->rpane ), 
-		GTK_WIDGET( mainwtab->lpane ), TRUE, FALSE );
-	gtk_widget_show( GTK_WIDGET( mainwtab->lpane ) );
+	tab->lpane = pane_new( PANE_HIDE_LEFT );
+	g_signal_connect( tab->lpane, "changed",
+		G_CALLBACK( mainwtab_lpane_changed_cb ), tab );
+	gtk_paned_pack1( GTK_PANED( tab->rpane ), 
+		GTK_WIDGET( tab->lpane ), TRUE, FALSE );
+	gtk_widget_show( GTK_WIDGET( tab->lpane ) );
 
-	mainwtab->wsview = WORKSPACEVIEW( workspaceview_new() ); 
-	gtk_paned_pack2( GTK_PANED( mainwtab->lpane ), 
-		GTK_WIDGET( mainwtab->wsview ), TRUE, FALSE );
-	gtk_widget_show( GTK_WIDGET( mainwtab->wsview ) );
+	tab->wsview = WORKSPACEVIEW( workspaceview_new() ); 
+	gtk_paned_pack2( GTK_PANED( tab->lpane ), 
+		GTK_WIDGET( tab->wsview ), TRUE, FALSE );
+	gtk_widget_show( GTK_WIDGET( tab->wsview ) );
 
 	/* Toolkit Browser pane.
 	 */
-	panechild = panechild_new( mainwtab->rpane, 
+	panechild = panechild_new( tab->rpane, 
 		_( "Toolkit Browser" ) );
 
 	/* Have to put toolkitbrowser in an ebox so the search entry gets
@@ -344,22 +379,22 @@ mainwtab_init( Mainwtab *mainwtab )
 	gtk_container_add( GTK_CONTAINER( panechild ), GTK_WIDGET( ebox ) );
 	gtk_widget_show( ebox );
 
-	mainwtab->toolkitbrowser = toolkitbrowser_new();
+	tab->toolkitbrowser = toolkitbrowser_new();
 
 	gtk_container_add( GTK_CONTAINER( ebox ), 
-		GTK_WIDGET( mainwtab->toolkitbrowser ) );
-	gtk_widget_show( GTK_WIDGET( mainwtab->toolkitbrowser ) );
+		GTK_WIDGET( tab->toolkitbrowser ) );
+	gtk_widget_show( GTK_WIDGET( tab->toolkitbrowser ) );
 
 	/* Workspace-local defs pane.
 	 */
-	panechild = panechild_new( mainwtab->lpane, 
+	panechild = panechild_new( tab->lpane, 
 		_( "Workspace Definitions" ) );
 
-	mainwtab->workspacedefs = workspacedefs_new();
+	tab->workspacedefs = workspacedefs_new();
 
 	gtk_container_add( GTK_CONTAINER( panechild ), 
-		GTK_WIDGET( mainwtab->workspacedefs ) );
-	gtk_widget_show( GTK_WIDGET( mainwtab->workspacedefs ) );
+		GTK_WIDGET( tab->workspacedefs ) );
+	gtk_widget_show( GTK_WIDGET( tab->workspacedefs ) );
 }
 
 GType
@@ -387,16 +422,34 @@ mainwtab_get_type( void )
 	return( type );
 }
 
-Workspace *
-mainwtab_get_workspace( Mainwtab *mainwtab )
+Mainwtab *
+mainwtab_new( void )
 {
-	return( mainwtab->ws );
+	Mainwtab *tab;
+
+	tab = MAINWTAB( g_object_new( TYPE_MAINWTAB, NULL ) );
+
+	return( tab );
+}
+
+Workspace *
+mainwtab_get_workspace( Mainwtab *tab )
+{
+	return( tab->ws );
+}
+
+void 
+mainwtab_set_label( Mainwtab *tab, GtkWidget *label )
+{
+	g_assert( !tab->label );
+
+	tab->label = label;
 }
 
 gboolean
-mainwtab_clone( Mainwtab *mainwtab )
+mainwtab_clone( Mainwtab *tab )
 {
-	Workspace *ws = mainwtab->ws;
+	Workspace *ws = tab->ws;
 
 	if( !workspace_selected_any( ws ) ) {
 		Row *row;
@@ -422,9 +475,9 @@ mainwtab_clone( Mainwtab *mainwtab )
 /* Group the selected object(s).
  */
 gboolean
-mainwtab_group( Mainwtab *mainwtab )
+mainwtab_group( Mainwtab *tab )
 {
-	Workspace *ws = mainwtab->ws;
+	Workspace *ws = tab->ws;
 	char txt[MAX_STRSIZE];
 	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
@@ -447,7 +500,7 @@ mainwtab_group( Mainwtab *mainwtab )
 }
 
 static Row *
-mainwtab_test_error( Row *row, Mainwtab *mainwtab, int *found )
+mainwtab_test_error( Row *row, Mainwtab *tab, int *found )
 {
 	g_assert( row->err );
 
@@ -456,7 +509,7 @@ mainwtab_test_error( Row *row, Mainwtab *mainwtab, int *found )
 	if( *found )
 		return( row );
 
-	if( row == mainwtab->row_last_error ) {
+	if( row == tab->row_last_error ) {
 		/* Found the last one ... return the next one.
 		 */
 		*found = 1;
@@ -469,9 +522,9 @@ mainwtab_test_error( Row *row, Mainwtab *mainwtab, int *found )
 /* FALSE for no errors.
  */
 gboolean
-mainwtab_next_error( Mainwtab *mainwtab )
+mainwtab_next_error( Mainwtab *tab )
 {
-	Workspace *ws = mainwtab->ws;
+	Workspace *ws = tab->ws;
 
 	char txt[MAX_LINELENGTH];
 	VipsBuf buf = VIPS_BUF_STATIC( txt );
@@ -484,37 +537,39 @@ mainwtab_next_error( Mainwtab *mainwtab )
 	/* Search for the one after the last one.
 	 */
 	found = 0;
-	mainwtab->row_last_error = (Row *) slist_map2( ws->errors, 
-		(SListMap2Fn) mainwtab_test_error, mainwtab, &found );
+	tab->row_last_error = (Row *) slist_map2( ws->errors, 
+		(SListMap2Fn) mainwtab_test_error, tab, &found );
 
 	/* NULL? We've hit end of table, start again.
 	 */
-	if( !mainwtab->row_last_error ) {
+	if( !tab->row_last_error ) {
 		found = 1;
-		mainwtab->row_last_error = (Row *) slist_map2( ws->errors, 
-			(SListMap2Fn) mainwtab_test_error, mainwtab, &found );
+		tab->row_last_error = (Row *) slist_map2( ws->errors, 
+			(SListMap2Fn) mainwtab_test_error, tab, &found );
 	}
 
 	/* *must* have one now.
 	 */
-	g_assert( mainwtab->row_last_error && mainwtab->row_last_error->err );
+	g_assert( tab->row_last_error && tab->row_last_error->err );
 
-	model_scrollto( MODEL( mainwtab->row_last_error ), MODEL_SCROLL_TOP );
+	model_scrollto( MODEL( tab->row_last_error ), MODEL_SCROLL_TOP );
 
-	row_qualified_name( mainwtab->row_last_error->expr->row, &buf );
+	row_qualified_name( tab->row_last_error->expr->row, &buf );
 	vips_buf_appends( &buf, ": " );
-	vips_buf_appends( &buf, mainwtab->row_last_error->expr->error_top );
+	vips_buf_appends( &buf, tab->row_last_error->expr->error_top );
 	workspace_set_status( ws, "%s", vips_buf_firstline( &buf ) );
 
 	return( TRUE ); 
 }
 
-Mainwtab *
-mainwtab_new( void )
+Pane *
+mainwtab_get_defs_pane( Mainwtab *tab )
 {
-	Mainwtab *mainwtab;
+	return( tab->lpane );
+}
 
-	mainwtab = MAINWTAB( g_object_new( TYPE_MAINWTAB, NULL ) );
-
-	return( mainwtab );
+Pane *
+mainwtab_get_browse_pane( Mainwtab *tab )
+{
+	return( tab->rpane );
 }

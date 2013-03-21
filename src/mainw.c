@@ -144,6 +144,8 @@ mainw_destroy( GtkObject *object )
 	printf( "mainw_destroy\n" );
 #endif /*DEBUG*/
 
+	IM_FREEF( g_source_remove, mainw->refresh_timeout );
+
 	FREESID( mainw->imageinfo_changed_sid, main_imageinfogroup );
 	FREESID( mainw->heap_changed_sid, reduce_context->heap );
 	FREESID( mainw->watch_changed_sid, main_watchgroup );
@@ -289,18 +291,6 @@ mainw_cancel_cb( GtkWidget *wid, Mainw *mainw )
 	mainw->cancel = TRUE;
 }
 
-static void                
-mainw_switch_page_cb( GtkNotebook *notebook, 
-	GtkWidget *page, guint page_num, gpointer user_data )
-{
-	Mainw *mainw = MAINW( user_data );
-
-	printf( "mainw_switch_page_cb: switch to page %d\n", page_num );
-	printf( "mainw_switch_page_cb: child = %p\n", page );
-
-	mainw->current_tab = MAINWTAB( page );
-}
-
 void
 mainw_find_disc( VipsBuf *buf )
 {
@@ -337,18 +327,16 @@ mainw_free_update( Mainw *mainw )
 	Heap *heap = reduce_context->heap;
 	char txt[80];
 	VipsBuf buf = VIPS_BUF_STATIC( txt );
+	Workspace *ws;
 
-	printf( "mainw_free_update: display names of selected rows?\n" ); 
-	/* 
-	if( workspace_selected_any( mainw->ws ) ) {
+	if( mainw->current_tab &&
+		(ws = mainwtab_get_workspace( mainw->current_tab )) &&
+		workspace_selected_any( ws ) ) {
 		vips_buf_appends( &buf, _( "Selected:" ) );
 		vips_buf_appends( &buf, " " );
-		workspace_selected_names( mainw->ws, &buf, ", " );
+		workspace_selected_names( ws, &buf, ", " );
 	}
-	else 
-	*/
-
-	{
+	else {
 		/* Out of space? Make sure we swap to cell display.
 		 */
 		if( !heap->free )
@@ -366,48 +354,46 @@ mainw_free_update( Mainw *mainw )
 static void
 mainw_title_update( Mainw *mainw )
 {
-	char txt[512];
-	VipsBuf buf = VIPS_BUF_STATIC( txt );
+	Workspace *ws;
 
-	printf( "mainw_title_update: update title from current tab\n" ); 
+	if( mainw->current_tab &&
+		(ws = mainwtab_get_workspace( mainw->current_tab )) ) {
+		char txt[512];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	/*
-	if( FILEMODEL( mainw->ws )->modified ) 
-		vips_buf_appendf( &buf, "*" ); 
-	vips_buf_appendf( &buf, "%s", NN( IOBJECT( mainw->ws->sym )->name ) );
-	if( mainw->ws->compat_major ) {
-		vips_buf_appends( &buf, " - " );
-		vips_buf_appends( &buf, _( "compatibility mode" ) );
-		vips_buf_appendf( &buf, " %d.%d", 
-			mainw->ws->compat_major, 
-			mainw->ws->compat_minor ); 
+		if( FILEMODEL( ws )->modified ) 
+			vips_buf_appendf( &buf, "*" ); 
+		vips_buf_appendf( &buf, "%s", NN( IOBJECT( ws->sym )->name ) );
+		if( ws->compat_major ) {
+			vips_buf_appends( &buf, " - " );
+			vips_buf_appends( &buf, _( "compatibility mode" ) );
+			vips_buf_appendf( &buf, " %d.%d", 
+				ws->compat_major, 
+				ws->compat_minor ); 
+		}
+		if( FILEMODEL( ws )->filename )
+			vips_buf_appendf( &buf, " - %s", 
+				FILEMODEL( ws )->filename );
+		else {
+			vips_buf_appends( &buf, " - " );
+			vips_buf_appends( &buf, _( "unsaved workspace" ) );
+		}
+
+		iwindow_set_title( IWINDOW( mainw ), 
+			"%s", vips_buf_all( &buf ) );
 	}
-	if( FILEMODEL( mainw->ws )->filename )
-		vips_buf_appendf( &buf, " - %s", 
-			FILEMODEL( mainw->ws )->filename );
-	else {
-		vips_buf_appends( &buf, " - " );
-		vips_buf_appends( &buf, _( "unsaved workspace" ) );
-	}
-	 */
-
-	iwindow_set_title( IWINDOW( mainw ), "%s", vips_buf_all( &buf ) );
 }
 
 static void 
 mainw_status_update( Mainw *mainw )
 {
-	printf( "mainw_status_update: update status from current tab\n" ); 
+	Workspace *ws;
 
-	/*
-	if( mainw->ws->status ) {
-		gtk_label_set_text( GTK_LABEL( mainw->statusbar ), 
-			mainw->ws->status ); 
-	}
-	else 
-	 */
-
-	{
+	if( mainw->current_tab &&
+		(ws = mainwtab_get_workspace( mainw->current_tab )) &&
+		ws->status ) 
+		gtk_label_set_text( GTK_LABEL( mainw->statusbar ), ws->status );
+	else {
 		char txt[256];
 
 		im_snprintf( txt, 256, _( NIP_COPYRIGHT ), PACKAGE );
@@ -415,8 +401,8 @@ mainw_status_update( Mainw *mainw )
 	}
 }
 
-static void
-mainw_refresh( Mainw *mainw )
+static gboolean
+mainw_refresh_timeout_cb( gpointer user_data )
 {
 	static GtkToolbarStyle styles[] = {
 		99,			/* Overwrite with system default */
@@ -434,14 +420,15 @@ mainw_refresh( Mainw *mainw )
 		"NoEdit"
 	};
 
+	Mainw *mainw = MAINW( user_data );
 	iWindow *iwnd = IWINDOW( mainw );
 	int pref = IM_CLIP( 0, MAINW_TOOLBAR_STYLE, IM_NUMBER( styles ) - 1 );
 
         GtkAction *action;
 
 #ifdef DEBUG
-	printf( "mainw_refresh: %p\n", mainw );
 #endif /*DEBUG*/
+	printf( "mainw_refresh_timeout_cb: %p\n", mainw );
 
 	mainw_status_update( mainw );
 	mainw_free_update( mainw );
@@ -470,21 +457,24 @@ mainw_refresh( Mainw *mainw )
 		mainw->statusbar_visible );
         widget_visible( mainw->statusbar_main, mainw->statusbar_visible );
 
-	printf( "mainw_refresh: refresh panes\n" ); 
+	if( mainw->current_tab ) {
+		Pane *pane;
 
-	/*
-	action = gtk_action_group_get_action( iwnd->action_group, 
-		"WorkspaceDefs" );
-	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
-		mainw->lpane->open );
+		pane = mainwtab_get_defs_pane( mainw->current_tab );
+		action = gtk_action_group_get_action( iwnd->action_group, 
+			"WorkspaceDefs" );
+		gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
+			pane->open );
 
-	action = gtk_action_group_get_action( iwnd->action_group, 
-		"ToolkitBrowser" );
-	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
-		mainw->rpane->open );
-	 */
+		pane = mainwtab_get_browse_pane( mainw->current_tab );
+		action = gtk_action_group_get_action( iwnd->action_group, 
+			"ToolkitBrowser" );
+		gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
+			pane->open );
+	}
 
-	printf( "mainw_refresh: update toggle menu to reflect ws view mode\n" ); 
+	printf( "mainw_refresh_timeout_cb: "
+		"update toggle menu to reflect ws view mode\n" ); 
 
 	/*
 	action = gtk_action_group_get_action( iwnd->action_group, 
@@ -496,6 +486,52 @@ mainw_refresh( Mainw *mainw )
 	if( mainw->current_tab )
 		mainwtab_jump_update( mainw->current_tab, 
 			mainw->jump_to_column_menu );
+
+	return( FALSE );
+}
+
+static void
+mainw_refresh( Mainw *mainw )
+{
+	IM_FREEF( g_source_remove, mainw->refresh_timeout );
+
+	mainw->refresh_timeout = g_timeout_add( 100, 
+		(GSourceFunc) mainw_refresh_timeout_cb, mainw );
+}
+
+static void                
+mainw_page_removed_cb( GtkNotebook *notebook, 
+	GtkWidget *page, guint page_num, gpointer user_data )
+{
+	Mainwtab *tab = MAINWTAB( page );
+	Mainw *mainw = MAINW( user_data );
+	Workspace *ws = mainwtab_get_workspace( tab );
+
+	printf( "mainw_page_removed_cb: removed %d\n", page_num );
+	printf( "mainw_page_removed_cb: child = %p\n", tab );
+
+	if( mainw->current_tab == tab ) {
+		mainw->current_tab = NULL;
+		mainw_refresh( mainw );
+	}
+
+	mainw->tabs = g_slist_remove( mainw->tabs, tab );
+}
+
+static void                
+mainw_switch_page_cb( GtkNotebook *notebook, 
+	GtkWidget *page, guint page_num, gpointer user_data )
+{
+	Mainwtab *tab = MAINWTAB( page );
+	Mainw *mainw = MAINW( user_data );
+	Workspace *ws = mainwtab_get_workspace( tab );
+
+	printf( "mainw_switch_page_cb: switch to page %d\n", page_num );
+	printf( "mainw_switch_page_cb: child = %p\n", tab );
+
+	mainw->current_tab = tab;
+
+	mainw_refresh( mainw );
 }
 
 static void
@@ -692,6 +728,7 @@ mainw_add_workspace( Mainw *mainw, Workspace *ws )
 	vobject_link( VOBJECT( tab ), IOBJECT( ws ) );
         gtk_widget_show( GTK_WIDGET( tab ) );
 	label = gtk_label_new( NN( IOBJECT( ws->sym )->name ) );
+	mainwtab_set_label( tab, label );
 
 	gtk_notebook_append_page( GTK_NOTEBOOK( mainw->notebook ),
 		GTK_WIDGET( tab ), label );
@@ -1304,14 +1341,16 @@ mainw_statusbar_action_cb( GtkToggleAction *action, Mainw *mainw )
 static void
 mainw_toolkitbrowser_action_cb( GtkToggleAction *action, Mainw *mainw )
 {
-	printf( "mainw_toolkitbrowser_action_cb:\n" ); 
+	if( mainw->current_tab ) {
+		Pane *pane;
 
-	/*
-	if( gtk_toggle_action_get_active( action ) )
-		pane_animate_open( mainw->rpane );
-	else
-		pane_animate_closed( mainw->rpane );
-	 */
+		pane = mainwtab_get_browse_pane( mainw->current_tab );
+
+		if( gtk_toggle_action_get_active( action ) )
+			pane_animate_open( pane );
+		else
+			pane_animate_closed( pane );
+	}
 }
 
 /* Expose/hide the workspace defs.
@@ -1319,14 +1358,16 @@ mainw_toolkitbrowser_action_cb( GtkToggleAction *action, Mainw *mainw )
 static void
 mainw_workspacedefs_action_cb( GtkToggleAction *action, Mainw *mainw )
 {
-	printf( "mainw_workspacedefs_action_cb:\n" ); 
+	if( mainw->current_tab ) {
+		Pane *pane;
 
-	/*
-	if( gtk_toggle_action_get_active( action ) )
-		pane_animate_open( mainw->lpane );
-	else
-		pane_animate_closed( mainw->lpane );
-	 */
+		pane = mainwtab_get_defs_pane( mainw->current_tab );
+
+		if( gtk_toggle_action_get_active( action ) )
+			pane_animate_open( pane );
+		else
+			pane_animate_closed( pane );
+	}
 }
 
 /* Layout columns.
@@ -1334,11 +1375,11 @@ mainw_workspacedefs_action_cb( GtkToggleAction *action, Mainw *mainw )
 void
 mainw_layout_action_cb( GtkAction *action, Mainw *mainw )
 {
-	printf( "mainw_layout_action_cb:\n" );
+	Workspace *ws;
 
-	/*
-	model_layout( MODEL( mainw->ws ) );
-	 */
+	if( mainw->current_tab &&
+		(ws = mainwtab_get_workspace( mainw->current_tab )) ) 
+		model_layout( MODEL( ws ) );
 }
 
 /* Remove selected items.
@@ -1346,28 +1387,29 @@ mainw_layout_action_cb( GtkAction *action, Mainw *mainw )
 static void
 mainw_selected_remove_action_cb( GtkAction *action, Mainw *mainw )
 {
-	printf( "mainw_selected_remove_action_cb:\n" );
+	Workspace *ws;
 
-	/*
-	workspace_selected_remove_yesno( mainw->ws, GTK_WIDGET( mainw ) );
-	 */
+	if( mainw->current_tab &&
+		(ws = mainwtab_get_workspace( mainw->current_tab )) ) 
+		workspace_selected_remove_yesno( ws, GTK_WIDGET( mainw ) );
 }
 
 void 
 mainw_revert_ok_cb( iWindow *iwnd, void *client, 
 	iWindowNotifyFn nfn, void *sys ) 
 {
-	printf( "mainw_revert_ok_cb:\n" ); 
-
-	/*
 	Mainw *mainw = MAINW( client );
+	Workspace *ws;
 
-	if( FILEMODEL( mainw->ws )->filename ) {
-		(void) unlinkf( "%s", FILEMODEL( mainw->ws )->filename );
+	if( mainw->current_tab &&
+		(ws = mainwtab_get_workspace( mainw->current_tab )) && 
+		FILEMODEL( ws )->filename ) {
+		printf( "mainw_revert_ok_cb: unlinking %s", 
+			FILEMODEL( ws )->filename ); 
+		//(void) unlinkf( "%s", FILEMODEL( ws )->filename );
 		main_reload();
 		symbol_recalculate_all();
 	}
-	 */
 
 	nfn( sys, IWINDOW_YES );
 }
@@ -1896,6 +1938,8 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 		GTK_POS_BOTTOM );
 	g_signal_connect( mainw->notebook, "switch_page", 
 		G_CALLBACK( mainw_switch_page_cb ), mainw );
+	g_signal_connect( mainw->notebook, "page_removed", 
+		G_CALLBACK( mainw_page_removed_cb ), mainw );
 
 	gtk_box_pack_start( GTK_BOX( vbox ), 
 		GTK_WIDGET( mainw->notebook ), TRUE, TRUE, 0 );

@@ -51,9 +51,9 @@ struct _Mainw {
 	 */
 	GSList *tabs;
 
-	/* The current tab.
-	 */
 	Mainwtab *current_tab;
+
+	guint refresh_timeout;
 
 	/* Watch for changed on heap and image, and prefs. Use to update
 	 * status bar and space free.

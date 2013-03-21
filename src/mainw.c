@@ -1089,7 +1089,11 @@ mainw_recover_action_cb( GtkAction *action, Mainw *mainw )
 static void
 mainw_close_action_cb( GtkAction *action, Mainw *mainw )
 {
-	iobject_destroy( IOBJECT( mainw->current_tab ) );
+	Workspace *ws = mainwtab_get_workspace( mainw->current_tab );
+
+	printf( "mainw_close_action_cb: need to do save if modified\n" );
+
+	iobject_destroy( IOBJECT( ws ) );
 }
 
 /* Callback from make new column.

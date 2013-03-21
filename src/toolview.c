@@ -188,15 +188,18 @@ static Workspace *
 toolview_get_workspace( Toolview *tview )
 {
 	View *view;
+	Mainw *mainw;
 
 	for( view = VIEW( tview ); !IS_TOOLKITGROUPVIEW( view ); 
 		view = view->parent ) 
 		;
 
-	printf( "toolview_get_workspace:\n" ); 
+	mainw = TOOLKITGROUPVIEW( view )->mainw;
 
-	//return( TOOLKITGROUPVIEW( view )->mainw->ws );
-	return( NULL ); 
+	if( mainw->current_tab )
+		return( mainwtab_get_workspace( mainw->current_tab ) );
+	else
+		return( NULL );
 }
 
 /* Our widget has been destroyed. NULL out or pointer to it, to stop us

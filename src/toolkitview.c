@@ -28,8 +28,8 @@
  */
 
 /*
-#define DEBUG
  */
+#define DEBUG
 
 #include "ip.h"
 
@@ -116,6 +116,9 @@ toolkitview_refresh( vObject *vobject )
 		iWindow *iwnd = IWINDOW( iwindow_get_root( menu ) );
 		char path[256];
 		GtkWidget *item;
+
+		if( !iwnd )
+			printf( "poop:\n" );
 
 		kview->menu = gtk_menu_new();
 		gtk_menu_set_accel_group( GTK_MENU( kview->menu ),

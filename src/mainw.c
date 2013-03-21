@@ -487,6 +487,24 @@ mainw_refresh_timeout_cb( gpointer user_data )
 		mainwtab_jump_update( mainw->current_tab, 
 			mainw->jump_to_column_menu );
 
+	/* Make toolkit menu.
+	 */
+	if( mainw->current_tab ) {
+		Workspace *ws;
+
+		ws = mainwtab_get_workspace( mainw->current_tab );
+
+		UNREF( mainw->kitgview );
+
+		mainw->kitgview = TOOLKITGROUPVIEW( 
+			model_view_new( MODEL( ws->kitg ), NULL ) );
+		g_object_ref( G_OBJECT( mainw->kitgview ) );
+		gtk_object_sink( GTK_OBJECT( mainw->kitgview ) );
+		toolkitgroupview_set_mainw( mainw->kitgview, mainw );
+		gtk_menu_set_accel_group( GTK_MENU( mainw->kitgview->menu ),
+			iwnd->accel_group );
+	}
+
 	return( FALSE );
 }
 
@@ -739,6 +757,8 @@ mainw_add_workspace( Mainw *mainw, Workspace *ws )
 
 	mainw->current_tab = tab;
 	mainw->tabs = g_slist_append( mainw->tabs, tab );
+
+	ws->iwnd = IWINDOW( mainw );
 }
 
 Workspace *
@@ -1941,18 +1961,6 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	gtk_box_pack_start( GTK_BOX( vbox ), 
 		GTK_WIDGET( mainw->notebook ), TRUE, TRUE, 0 );
 	gtk_widget_show( GTK_WIDGET( mainw->notebook ) );
-
-	printf( "mainw_build: make toolkit menu\n" ); 
-
-	/* Make toolkit menu.
-	mainw->kitgview = TOOLKITGROUPVIEW( 
-		model_view_new( MODEL( mainw->ws->kitg ), NULL ) );
-	g_object_ref( G_OBJECT( mainw->kitgview ) );
-	gtk_object_sink( GTK_OBJECT( mainw->kitgview ) );
-	toolkitgroupview_set_mainw( mainw->kitgview, mainw );
-	gtk_menu_set_accel_group( GTK_MENU( mainw->kitgview->menu ),
-		iwnd->accel_group );
-	 */
 
 	/* Any changes to prefs, refresh (yuk!).
 	 */

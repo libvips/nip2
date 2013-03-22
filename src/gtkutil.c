@@ -364,6 +364,11 @@ popup_attach( GtkWidget *host, GtkWidget *popup, void *data )
 	guint sid;
 
 	popup_link( host, popup, data );
+
+	/* We can't just use gtk_menu_attach_to_widget(), since that can only
+	 * attach a menu to a single widget. We want to be able to attach a
+	 * single menu to meny widgets.
+	 */
         sid = gtk_signal_connect( GTK_OBJECT( host ), "event",
                 GTK_SIGNAL_FUNC( popup_handle_event ), NULL );
 

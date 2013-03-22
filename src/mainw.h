@@ -91,6 +91,7 @@ struct _Mainw {
 	GtkWidget *toolbar;
 	GtkWidget *recent_menu;
 	GtkWidget *jump_to_column_menu;
+	GtkWidget *tab_menu;
 
 	GtkWidget *notebook;
 

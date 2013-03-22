@@ -474,22 +474,18 @@ mainw_refresh_timeout_cb( gpointer user_data )
 			pane->open );
 	}
 
-	printf( "mainw_refresh_timeout_cb: "
-		"update toggle menu to reflect ws view mode\n" ); 
-
-	/*
-	action = gtk_action_group_get_action( iwnd->action_group, 
-		view_mode[ws->mode] );
-	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
-		TRUE );
-	 */
+	if( mainw->current_tab &&
+		(ws = mainwtab_get_workspace( mainw->current_tab )) ) { 
+		action = gtk_action_group_get_action( iwnd->action_group, 
+			view_mode[ws->mode] );
+		gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
+			TRUE );
+	}
 
 	if( mainw->current_tab )
 		mainwtab_jump_update( mainw->current_tab, 
 			mainw->jump_to_column_menu );
 
-	/* Make toolkit menu.
-	 */
 	if( mainw->current_tab &&
 		(ws = mainwtab_get_workspace( mainw->current_tab )) &&
 		mainw->kitg != ws->kitg ) {
@@ -551,6 +547,26 @@ mainw_switch_page_cb( GtkNotebook *notebook,
 	mainw->current_tab = tab;
 
 	mainw_refresh( mainw );
+}
+
+static void                
+mainw_tab_duplicate_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
+{
+}
+
+static void                
+mainw_tab_save_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
+{
+}
+
+static void                
+mainw_tab_save_as_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
+{
+}
+
+static void                
+mainw_tab_close_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
+{
 }
 
 static void
@@ -741,16 +757,24 @@ void
 mainw_add_workspace( Mainw *mainw, Workspace *ws )
 {
 	Mainwtab *tab;
+	GtkWidget *ebox;
 	GtkWidget *label;
 
 	tab = mainwtab_new();
 	vobject_link( VOBJECT( tab ), IOBJECT( ws ) );
         gtk_widget_show( GTK_WIDGET( tab ) );
+
+        ebox = gtk_event_box_new();
+	gtk_widget_add_events( GTK_WIDGET( ebox ), 
+		GDK_BUTTON_PRESS_MASK ); 
 	label = gtk_label_new( NN( IOBJECT( ws->sym )->name ) );
+        gtk_container_add( GTK_CONTAINER( ebox ), label );
+        gtk_widget_show( GTK_WIDGET( label ) );
 	mainwtab_set_label( tab, label );
+	popup_attach( ebox, mainw->tab_menu, mainw );
 
 	gtk_notebook_append_page( GTK_NOTEBOOK( mainw->notebook ),
-		GTK_WIDGET( tab ), label );
+		GTK_WIDGET( tab ), ebox );
 	gtk_notebook_set_tab_reorderable( GTK_NOTEBOOK( mainw->notebook ),
 		GTK_WIDGET( tab ), TRUE );
 	gtk_notebook_set_tab_detachable( GTK_NOTEBOOK( mainw->notebook ),
@@ -1823,7 +1847,7 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	GtkWidget *item;
 
 #ifdef DEBUG
-	printf( "mainw_init: %p\n", mainw );
+	printf( "mainw_build: %p\n", mainw );
 #endif /*DEBUG*/
 
         /* Make main menu bar
@@ -1950,7 +1974,6 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 
 	mainw->notebook = gtk_notebook_new();
 	gtk_notebook_set_scrollable( GTK_NOTEBOOK( mainw->notebook ), TRUE );
-	gtk_notebook_popup_enable( GTK_NOTEBOOK( mainw->notebook ) );
 	gtk_notebook_set_group_name( GTK_NOTEBOOK( mainw->notebook ), "mainw" );
 	gtk_notebook_set_tab_pos( GTK_NOTEBOOK( mainw->notebook ), 
 		GTK_POS_BOTTOM );
@@ -1962,6 +1985,17 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	gtk_box_pack_start( GTK_BOX( vbox ), 
 		GTK_WIDGET( mainw->notebook ), TRUE, TRUE, 0 );
 	gtk_widget_show( GTK_WIDGET( mainw->notebook ) );
+
+	mainw->tab_menu = popup_build( _( "Tab menu" ) );
+	popup_add_but( mainw->tab_menu, STOCK_DUPLICATE,
+		POPUP_FUNC( mainw_tab_duplicate_cb2 ) ); 
+	popup_add_but( mainw->tab_menu, GTK_STOCK_SAVE,
+		POPUP_FUNC( mainw_tab_save_cb2 ) ); 
+	popup_add_but( mainw->tab_menu, GTK_STOCK_SAVE_AS,
+		POPUP_FUNC( mainw_tab_save_as_cb2 ) ); 
+	menu_add_sep( mainw->tab_menu );
+	popup_add_but( mainw->tab_menu, GTK_STOCK_CLOSE,
+		POPUP_FUNC( mainw_tab_close_cb2 ) ); 
 
 	/* Any changes to prefs, refresh (yuk!).
 	 */

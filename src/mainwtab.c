@@ -423,6 +423,20 @@ mainwtab_set_label( Mainwtab *tab, GtkWidget *label )
 	tab->label = label;
 }
 
+void 
+mainwtab_set_mainw( Mainwtab *tab, Mainw *mainw )
+{
+	g_assert( !tab->mainw );
+
+	tab->mainw = mainw;
+}
+
+Mainw *
+mainwtab_get_mainw( Mainwtab *tab )
+{
+	return( tab->mainw );
+}
+
 gboolean
 mainwtab_clone( Mainwtab *tab )
 {

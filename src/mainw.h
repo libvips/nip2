@@ -50,7 +50,6 @@ struct _Mainw {
 	/* Set of workspace tabs we display.
 	 */
 	Mainwtab *current_tab;
-	GSList *tabs;
 
 	/* Watch for changed on heap and image, and prefs. Use to update
 	 * status bar and space free.
@@ -142,8 +141,10 @@ void mainw_group_action_cb( GtkAction *action, Mainw *mainw );
 void mainw_next_error_action_cb( GtkAction *action, Mainw *mainw );
 void mainw_open_action_cb( GtkAction *action, Mainw *mainw );
 
-void mainw_add_workspace( Mainw *mainw, Workspace *ws );
+Mainwtab *mainw_add_workspace( Mainw *mainw, Mainwtab *old_tab, Workspace *ws );
 Workspace *mainw_open_workspace( Mainw *mainw, const char *filename );
 
 Mainw *mainw_new( Workspacegroup *wsg );
+
+int mainw_get_n_tabs( Mainw *mainw );
 

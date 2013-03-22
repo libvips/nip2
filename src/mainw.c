@@ -202,8 +202,6 @@ mainw_init( Mainw *mainw )
 {
 	mainw->wsg = NULL;
 
-	mainw->tabs = NULL;
-
 	mainw->imageinfo_changed_sid = 0;
 	mainw->heap_changed_sid = 0;
 	mainw->watch_changed_sid = 0;
@@ -503,8 +501,6 @@ mainw_page_removed_cb( GtkNotebook *notebook,
 		mainw->current_tab = NULL;
 		mainw_refresh( mainw );
 	}
-
-	mainw->tabs = g_slist_remove( mainw->tabs, tab );
 }
 
 static void                
@@ -537,24 +533,163 @@ mainw_switch_page_cb( GtkNotebook *notebook,
 	}
 }
 
-static void                
-mainw_tab_duplicate_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
+/* Add a tab to the right of old_tab.
+ */
+Mainwtab *
+mainw_add_workspace( Mainw *mainw, Mainwtab *old_tab, Workspace *ws )
 {
+	Mainwtab *tab;
+	GtkWidget *ebox;
+	GtkWidget *label;
+	int page;
+
+	tab = mainwtab_new();
+	vobject_link( VOBJECT( tab ), IOBJECT( ws ) );
+        gtk_widget_show( GTK_WIDGET( tab ) );
+
+        ebox = gtk_event_box_new();
+	gtk_widget_add_events( GTK_WIDGET( ebox ), 
+		GDK_BUTTON_PRESS_MASK ); 
+	label = gtk_label_new( NN( IOBJECT( ws->sym )->name ) );
+        gtk_container_add( GTK_CONTAINER( ebox ), label );
+        gtk_widget_show( GTK_WIDGET( label ) );
+	mainwtab_set_label( tab, label );
+	mainwtab_set_mainw( tab, mainw );
+	popup_attach( ebox, mainw->tab_menu, tab );
+
+	if( old_tab ) {
+		page = gtk_notebook_page_num( GTK_NOTEBOOK( mainw->notebook ), 
+			GTK_WIDGET( old_tab ) );
+		page += 1;
+	}
+	else
+		page = -1;
+
+	gtk_notebook_insert_page( GTK_NOTEBOOK( mainw->notebook ),
+		GTK_WIDGET( tab ), ebox, page );
+	gtk_notebook_set_tab_reorderable( GTK_NOTEBOOK( mainw->notebook ),
+		GTK_WIDGET( tab ), TRUE );
+	gtk_notebook_set_tab_detachable( GTK_NOTEBOOK( mainw->notebook ),
+		GTK_WIDGET( tab ), TRUE );
+
+	mainw->current_tab = tab;
+
+	ws->iwnd = IWINDOW( mainw );
+
+	return( tab );
+}
+
+static void
+mainw_select_tab( Mainw *mainw, Mainwtab *tab )
+{
+	int page;
+
+	page = gtk_notebook_page_num( GTK_NOTEBOOK( mainw->notebook ), 
+		GTK_WIDGET( tab ) );
+	gtk_notebook_set_current_page( GTK_NOTEBOOK( mainw->notebook ),
+		page );
+}
+
+static void *
+mainw_duplicate_tab( Mainw *mainw, Mainwtab *tab )
+{
+	Workspace *ws = mainwtab_get_workspace( tab );
+
+	Workspace *new_ws;
+	Mainwtab *new_tab;
+
+	if( !(new_ws = workspace_clone( ws )) ) 
+		return( NULL );
+	new_tab = mainw_add_workspace( mainw, tab, new_ws );
+
+	mainw_select_tab( mainw, new_tab );
+
+	symbol_recalculate_all();
+
+	return( new_tab ); 
+}
+
+static void
+mainw_workspace_duplicate_action_cb( GtkAction *action, Mainw *mainw )
+{
+	progress_begin();
+
+	if( !mainw_duplicate_tab( mainw, mainw->current_tab ) ) {
+		progress_end();
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
+		return;
+	}
+
+	progress_end();
 }
 
 static void                
-mainw_tab_save_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
+mainw_tab_duplicate_cb2( GtkWidget *wid, GtkWidget *host, Mainwtab *tab )
 {
+	Mainw *mainw = mainwtab_get_mainw( tab );
+
+	progress_begin();
+
+	if( !mainw_duplicate_tab( mainw, tab ) ) {
+		progress_end();
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
+		return;
+	}
+
+	progress_end();
+}
+
+static void
+mainw_workspace_save_action_cb( GtkAction *action, Mainw *mainw )
+{
+	Workspace *ws = mainwtab_get_workspace( mainw->current_tab );
+
+	filemodel_inter_save( IWINDOW( mainw ), FILEMODEL( ws ) );
 }
 
 static void                
-mainw_tab_save_as_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
+mainw_tab_save_cb2( GtkWidget *wid, GtkWidget *host, Mainwtab *tab )
 {
+	Mainw *mainw = mainwtab_get_mainw( tab );
+	Workspace *ws = mainwtab_get_workspace( tab );
+
+	filemodel_inter_save( IWINDOW( mainw ), FILEMODEL( ws ) );
+}
+
+static void
+mainw_workspace_save_as_action_cb( GtkAction *action, Mainw *mainw )
+{
+	Workspace *ws = mainwtab_get_workspace( mainw->current_tab );
+
+	filemodel_inter_saveas( IWINDOW( mainw ), FILEMODEL( ws ) );
 }
 
 static void                
-mainw_tab_close_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
+mainw_tab_save_as_cb2( GtkWidget *wid, GtkWidget *host, Mainwtab *tab )
 {
+	Mainw *mainw = mainwtab_get_mainw( tab );
+	Workspace *ws = mainwtab_get_workspace( tab );
+
+	filemodel_inter_saveas( IWINDOW( mainw ), FILEMODEL( ws ) );
+}
+
+static void
+mainw_workspace_close_action_cb( GtkAction *action, Mainw *mainw )
+{
+	Workspace *ws = mainwtab_get_workspace( mainw->current_tab );
+
+	printf( "mainw_workspace_close_action_cb: "
+		"need to do save if modified\n" );
+
+	iobject_destroy( IOBJECT( ws ) );
+}
+
+static void                
+mainw_tab_close_cb2( GtkWidget *wid, GtkWidget *host, Mainwtab *tab )
+{
+	Workspace *ws = mainwtab_get_workspace( tab );
+
+	iobject_destroy( IOBJECT( ws ) );
 }
 
 static void
@@ -721,59 +856,6 @@ mainw_force_calc_action_cb( GtkAction *action, Mainw *mainw )
 		symbol_recalculate_all_force( FALSE );
 }
 
-/* Callback for save workspace.
- */
-static void
-mainw_workspace_save_action_cb( GtkAction *action, Mainw *mainw )
-{
-	Workspace *ws = mainwtab_get_workspace( mainw->current_tab );
-
-	filemodel_inter_save( IWINDOW( mainw ), FILEMODEL( ws ) );
-}
-
-/* Callback for "save as .." workspace.
- */
-static void
-mainw_workspace_save_as_action_cb( GtkAction *action, Mainw *mainw )
-{
-	Workspace *ws = mainwtab_get_workspace( mainw->current_tab );
-
-	filemodel_inter_saveas( IWINDOW( mainw ), FILEMODEL( ws ) );
-}
-
-void
-mainw_add_workspace( Mainw *mainw, Workspace *ws )
-{
-	Mainwtab *tab;
-	GtkWidget *ebox;
-	GtkWidget *label;
-
-	tab = mainwtab_new();
-	vobject_link( VOBJECT( tab ), IOBJECT( ws ) );
-        gtk_widget_show( GTK_WIDGET( tab ) );
-
-        ebox = gtk_event_box_new();
-	gtk_widget_add_events( GTK_WIDGET( ebox ), 
-		GDK_BUTTON_PRESS_MASK ); 
-	label = gtk_label_new( NN( IOBJECT( ws->sym )->name ) );
-        gtk_container_add( GTK_CONTAINER( ebox ), label );
-        gtk_widget_show( GTK_WIDGET( label ) );
-	mainwtab_set_label( tab, label );
-	popup_attach( ebox, mainw->tab_menu, mainw );
-
-	gtk_notebook_append_page( GTK_NOTEBOOK( mainw->notebook ),
-		GTK_WIDGET( tab ), ebox );
-	gtk_notebook_set_tab_reorderable( GTK_NOTEBOOK( mainw->notebook ),
-		GTK_WIDGET( tab ), TRUE );
-	gtk_notebook_set_tab_detachable( GTK_NOTEBOOK( mainw->notebook ),
-		GTK_WIDGET( tab ), TRUE );
-
-	mainw->current_tab = tab;
-	mainw->tabs = g_slist_append( mainw->tabs, tab );
-
-	ws->iwnd = IWINDOW( mainw );
-}
-
 Workspace *
 mainw_open_workspace( Mainw *mainw, const char *filename )
 {
@@ -781,7 +863,7 @@ mainw_open_workspace( Mainw *mainw, const char *filename )
 
 	if( !(ws = workspace_new_from_file( mainw->wsg, filename, NULL )) ) 
 		return( NULL );
-	mainw_add_workspace( mainw, ws ); 
+	mainw_add_workspace( mainw, mainw->current_tab, ws ); 
 	mainw_recent_add( &mainw_recent_workspace, filename );
 
 	return( ws );
@@ -1119,29 +1201,6 @@ mainw_workspace_merge( Mainw *mainw )
 	gtk_widget_show( GTK_WIDGET( filesel ) );
 }
 
-static void
-mainw_workspace_duplicate_action_cb( GtkAction *action, Mainw *mainw )
-{
-	Workspace *ws = mainwtab_get_workspace( mainw->current_tab );
-
-	Workspace *new_ws;
-	Mainw *new_mainw;
-
-	progress_begin();
-
-	if( !(new_ws = workspace_clone( ws )) ) {
-		progress_end();
-		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
-		return;
-	}
-
-	mainw_add_workspace( mainw, new_ws );
-
-	symbol_recalculate_all();
-
-	progress_end();
-}
-
 void
 mainw_workspace_merge_action_cb( GtkAction *action, Mainw *mainw )
 {
@@ -1154,16 +1213,6 @@ static void
 mainw_recover_action_cb( GtkAction *action, Mainw *mainw )
 {
 	workspace_auto_recover( mainw );
-}
-
-static void
-mainw_close_action_cb( GtkAction *action, Mainw *mainw )
-{
-	Workspace *ws = mainwtab_get_workspace( mainw->current_tab );
-
-	printf( "mainw_close_action_cb: need to do save if modified\n" );
-
-	iobject_destroy( IOBJECT( ws ) );
 }
 
 /* Callback from make new column.
@@ -1297,7 +1346,7 @@ mainw_workspace_new_done_cb( iWindow *iwnd, void *client,
 
 	iobject_set( IOBJECT( ws ), NULL, caption_text );
 
-	mainw_add_workspace( mainw, ws );
+	mainw_add_workspace( mainw, mainw->current_tab, ws );
 
 	nfn( sys, IWINDOW_YES );
 }
@@ -1611,7 +1660,7 @@ static GtkActionEntry mainw_actions[] = {
 	{ "CloseTab", 
 		GTK_STOCK_CLOSE, N_( "_Close current tab" ), NULL,
 		N_( "Close Tab" ), 
-		G_CALLBACK( mainw_close_action_cb ) },
+		G_CALLBACK( mainw_workspace_close_action_cb ) },
 
 	{ "Delete", 
 		GTK_STOCK_DELETE, N_( "_Delete" ), "<control>BackSpace",
@@ -2043,4 +2092,10 @@ mainw_new( Workspacegroup *wsg )
 	mainw_link( mainw, wsg );
 
 	return( mainw );
+}
+
+int
+mainw_get_n_tabs( Mainw *mainw )
+{
+	return( gtk_notebook_get_n_pages( GTK_NOTEBOOK( mainw->notebook ) ) );
 }

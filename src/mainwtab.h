@@ -38,6 +38,10 @@
 struct _Mainwtab {
 	vObject parent_object;
 
+	/* Mainw we are inside.
+	 */
+	Mainw *mainw;
+
 	/* Workspace we display, also in parent_object->iobject.
 	 */
 	Workspace *ws;
@@ -76,18 +80,20 @@ typedef struct _MainwtabClass {
 	 */
 } MainwtabClass;
 
-void mainwtab_jump_update( Mainwtab *mainwtab, GtkWidget *menu );
+void mainwtab_jump_update( Mainwtab *tab, GtkWidget *menu );
 
 GType mainwtab_get_type( void );
 Mainwtab *mainwtab_new();
 
-Workspace *mainwtab_get_workspace( Mainwtab *mainwtab );
-void mainwtab_set_label( Mainwtab *mainwtab, GtkWidget *label );
-int mainwtab_clone( Mainwtab *mainwtab );
-gboolean mainwtab_ungroup( Mainwtab *mainwtab );
-gboolean mainwtab_group( Mainwtab *mainwtab );
-void mainwtab_select_all( Mainwtab *mainwtab );
-gboolean mainwtab_next_error( Mainwtab *mainwtab );
+Workspace *mainwtab_get_workspace( Mainwtab *tab );
+Mainw *mainwtab_get_mainw( Mainwtab *tab );
+void mainwtab_set_label( Mainwtab *tab, GtkWidget *label );
+void mainwtab_set_mainw( Mainwtab *tab, Mainw *mainw );
+int mainwtab_clone( Mainwtab *tab );
+gboolean mainwtab_ungroup( Mainwtab *tab );
+gboolean mainwtab_group( Mainwtab *tab );
+void mainwtab_select_all( Mainwtab *tab );
+gboolean mainwtab_next_error( Mainwtab *tab );
 Pane *mainwtab_get_defs_pane( Mainwtab *tab );
 Pane *mainwtab_get_browse_pane( Mainwtab *tab );
 

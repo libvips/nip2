@@ -1348,7 +1348,7 @@ main( int argc, char *argv[] )
 	 * interactive mode, see below.
 	 */
 	mainw = mainw_new( main_workspacegroup );
-	mainw_add_workspace( mainw, ws );
+	mainw_add_workspace( mainw, NULL, ws );
 
 	/* Reset IM_CONCURRENCY if a watch changes. Need to do this after
 	 * parsing options so we skip in batch mode.
@@ -1449,7 +1449,7 @@ main( int argc, char *argv[] )
 	/* If the start ws is empty (we didn't load anything into it) and we
 	 * loaded some other workspaces, we can junk it. 
 	 */
-	if( g_slist_length( mainw->tabs ) > 1 &&
+	if( mainw_get_n_tabs( mainw ) > 1 &&
 		workspace_is_empty( ws ) ) {
 		iobject_destroy( IOBJECT( ws ) ); 
 		ws = NULL;

@@ -49,11 +49,8 @@ struct _Mainw {
 
 	/* Set of workspace tabs we display.
 	 */
-	GSList *tabs;
-
 	Mainwtab *current_tab;
-
-	guint refresh_timeout;
+	GSList *tabs;
 
 	/* Watch for changed on heap and image, and prefs. Use to update
 	 * status bar and space free.
@@ -69,6 +66,10 @@ struct _Mainw {
 	guint end_sid;	
 	gboolean cancel;
 
+	/* Batch refresh with this, it's slow.
+	 */
+	guint refresh_timeout;
+
 	/* Display MB free in tmp, or cells free in heap.
 	 */
 	gboolean free_type;
@@ -78,6 +79,11 @@ struct _Mainw {
 	 */
 	gboolean toolbar_visible;
 	gboolean statusbar_visible;
+
+	/* The kitg the toolkit menu is currently displaying. Use this to
+	 * avoid rebuilding the toolkit menu on every tab switch.
+	 */
+	Toolkitgroup *kitg;
 
 	/* Component widgets.
 	 */

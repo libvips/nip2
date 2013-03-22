@@ -425,6 +425,7 @@ mainw_refresh_timeout_cb( gpointer user_data )
 	int pref = IM_CLIP( 0, MAINW_TOOLBAR_STYLE, IM_NUMBER( styles ) - 1 );
 
         GtkAction *action;
+	Workspace *ws;
 
 #ifdef DEBUG
 #endif /*DEBUG*/
@@ -489,11 +490,9 @@ mainw_refresh_timeout_cb( gpointer user_data )
 
 	/* Make toolkit menu.
 	 */
-	if( mainw->current_tab ) {
-		Workspace *ws;
-
-		ws = mainwtab_get_workspace( mainw->current_tab );
-
+	if( mainw->current_tab &&
+		(ws = mainwtab_get_workspace( mainw->current_tab )) &&
+		mainw->kitg != ws->kitg ) {
 		UNREF( mainw->kitgview );
 
 		mainw->kitgview = TOOLKITGROUPVIEW( 
@@ -503,6 +502,8 @@ mainw_refresh_timeout_cb( gpointer user_data )
 		toolkitgroupview_set_mainw( mainw->kitgview, mainw );
 		gtk_menu_set_accel_group( GTK_MENU( mainw->kitgview->menu ),
 			iwnd->accel_group );
+
+		mainw->kitg = ws->kitg;
 	}
 
 	return( FALSE );

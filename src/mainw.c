@@ -162,39 +162,13 @@ mainw_destroy( GtkObject *object )
 }
 
 static void
-mainw_map( GtkWidget *widget )
-{
-	Mainw *mainw = MAINW( widget );
-
-	printf( "mainw_map: how do we put in compat warnings?\n" );
-
-	/*
-	if( mainw->ws->compat_major ) {
-		error_top( _( "Compatibility mode." ) );
-		error_sub( _( "This workspace was created by version %d.%d.%d. "
-			"A set of compatibility menus have been loaded "
-			"for this window." ),
-			FILEMODEL( mainw->ws )->major,
-			FILEMODEL( mainw->ws )->minor,
-			FILEMODEL( mainw->ws )->micro );
-		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
-	}
-	 */
-
-	GTK_WIDGET_CLASS( parent_class )->map( widget );
-}
-
-static void
 mainw_class_init( MainwClass *class )
 {
 	GtkObjectClass *object_class = (GtkObjectClass *) class;
-	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
 
 	object_class->destroy = mainw_destroy;
-
-	widget_class->map = mainw_map;
 }
 
 static void
@@ -547,6 +521,20 @@ mainw_switch_page_cb( GtkNotebook *notebook,
 	mainw->current_tab = tab;
 
 	mainw_refresh( mainw );
+
+	if( ws->compat_major &&
+		!tab->popped_compat ) {
+		error_top( _( "Compatibility mode." ) );
+		error_sub( _( "This workspace was created by version %d.%d.%d. "
+			"A set of compatibility menus have been loaded "
+			"for this window." ),
+			FILEMODEL( ws )->major,
+			FILEMODEL( ws )->minor,
+			FILEMODEL( ws )->micro );
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
+
+		tab->popped_compat = TRUE;
+	}
 }
 
 static void                

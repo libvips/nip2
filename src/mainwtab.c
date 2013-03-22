@@ -62,28 +62,6 @@ mainwtab_destroy( GtkObject *object )
 	GTK_OBJECT_CLASS( parent_class )->destroy( object );
 }
 
-static void
-mainwtab_map( GtkWidget *widget )
-{
-	Mainwtab *tab = MAINWTAB( widget );
-
-	if( tab->ws->compat_major &&
-		!tab->popped_compat ) {
-		error_top( _( "Compatibility mode." ) );
-		error_sub( _( "This workspace was created by version %d.%d.%d. "
-			"A set of compatibility menus have been loaded "
-			"for this window." ),
-			FILEMODEL( tab->ws )->major,
-			FILEMODEL( tab->ws )->minor,
-			FILEMODEL( tab->ws )->micro );
-		iwindow_alert( GTK_WIDGET( tab ), GTK_MESSAGE_INFO );
-
-		tab->popped_compat = TRUE;
-	}
-
-	GTK_WIDGET_CLASS( parent_class )->map( widget );
-}
-
 static gboolean
 mainwtab_configure_event( GtkWidget *widget, GdkEventConfigure *event )
 {
@@ -300,7 +278,6 @@ mainwtab_class_init( MainwtabClass *class )
 
 	object_class->destroy = mainwtab_destroy;
 
-	widget_class->map = mainwtab_map;
 	widget_class->configure_event = mainwtab_configure_event;
 
 	widget_class->configure_event = mainwtab_configure_event;

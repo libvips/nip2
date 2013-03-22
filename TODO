@@ -1,3 +1,15 @@
+
+- toolkit menu destroy & rebuild on page flip is broken
+
+- save on quit is broken
+
+- save on quit messages are not over a mainw
+
+- get rid of unmapped root window? annoying on composited screen
+
+
+
+
 - close ws defs with X button, menu does not update
 
 - test file drop on mainw, esp. workspaces

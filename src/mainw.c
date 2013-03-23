@@ -688,6 +688,31 @@ mainw_workspace_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 	progress_end();
 }
 
+static void
+mainw_workbook_duplicate_action_cb( GtkAction *action, Mainw *mainw )
+{
+	Mainw *new_mainw;
+	Workspace *new_ws;
+
+	progress_begin();
+
+	new_mainw = mainw_new( main_workspacegroup );
+	workspacegroup_name_new( main_workspacegroup, name );
+	new_ws = workspace_new_blank( main_workspacegroup, name );
+	mainw_add_workspace( new_mainw, NULL, new_ws );
+	gtk_widget_show( GTK_WIDGET( new_mainw ) );
+}
+
+	if( mainw->current_tab &&
+		!mainw_duplicate_tab( mainw, mainw->current_tab ) ) {
+		progress_end();
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
+		return;
+	}
+
+	progress_end();
+}
+
 static void                
 mainw_tab_duplicate_cb2( GtkWidget *wid, GtkWidget *host, Mainwtab *tab )
 {
@@ -1452,6 +1477,22 @@ mainw_workspace_new_action_cb( GtkAction *action, Mainw *mainw )
 	gtk_widget_show( ss );
 }
 
+/* New workbook.
+ */
+static void
+mainw_workbook_new_action_cb( GtkAction *action, Mainw *mainw )
+{
+	Mainw *new_mainw;
+	Workspace *new_ws;
+	char name[256];
+
+	new_mainw = mainw_new( main_workspacegroup );
+	workspacegroup_name_new( main_workspacegroup, name );
+	new_ws = workspace_new_blank( main_workspacegroup, name );
+	mainw_add_workspace( new_mainw, NULL, new_ws );
+	gtk_widget_show( GTK_WIDGET( new_mainw ) );
+}
+
 /* Callback from auto-recalc toggle.
  */
 static void
@@ -1685,7 +1726,7 @@ static GtkActionEntry mainw_actions[] = {
 		G_CALLBACK( mainw_column_new_action_cb ) },
 
 	{ "NewColumnName", 
-		GTK_STOCK_NEW, N_( "New Named C_olumn" ), NULL, 
+		GTK_STOCK_NEW, N_( "New C_olumn" ), NULL, 
 		N_( "Create a new column with a specified name" ), 
 		G_CALLBACK( mainw_column_new_named_action_cb ) },
 
@@ -1693,6 +1734,11 @@ static GtkActionEntry mainw_actions[] = {
 		GTK_STOCK_NEW, N_( "New _Workspace" ), NULL, 
 		N_( "Create a new workspace" ), 
 		G_CALLBACK( mainw_workspace_new_action_cb ) },
+
+	{ "NewWorkbook", 
+		GTK_STOCK_NEW, N_( "New _Workbook" ), NULL, 
+		N_( "Create a new workbook" ), 
+		G_CALLBACK( mainw_workbook_new_action_cb ) },
 
 	{ "Open", 
 		GTK_STOCK_OPEN, N_( "_Open" ), NULL,
@@ -1708,6 +1754,11 @@ static GtkActionEntry mainw_actions[] = {
 		STOCK_DUPLICATE, N_( "_Duplicate Workspace" ), NULL,
 		N_( "Duplicate workspace" ), 
 		G_CALLBACK( mainw_workspace_duplicate_action_cb ) },
+
+	{ "DuplicateWorkbook", 
+		STOCK_DUPLICATE, N_( "_Duplicate Workbook" ), NULL,
+		N_( "Duplicate workbook" ), 
+		G_CALLBACK( mainw_workbook_duplicate_action_cb ) },
 
 	{ "Merge", 
 		NULL, N_( "_Merge Workspace" ), NULL, 
@@ -1730,7 +1781,7 @@ static GtkActionEntry mainw_actions[] = {
 		G_CALLBACK( mainw_recover_action_cb ) },
 
 	{ "CloseTab", 
-		GTK_STOCK_CLOSE, N_( "_Close current tab" ), NULL,
+		GTK_STOCK_CLOSE, N_( "_Close Workspace" ), NULL,
 		N_( "Close Tab" ), 
 		G_CALLBACK( mainw_workspace_close_action_cb ) },
 
@@ -1853,6 +1904,7 @@ static const char *mainw_menubar_ui_description =
 "      <menu action='NewMenu'>"
 "        <menuitem action='NewColumnName'/>"
 "        <menuitem action='NewWorkspace'/>"
+"        <menuitem action='NewWorkbook'/>"
 "      </menu>"
 "      <menuitem action='Open'/>"
 "      <menu action='RecentMenu'>"
@@ -1860,7 +1912,7 @@ static const char *mainw_menubar_ui_description =
 "      </menu>"
 "      <menuitem action='OpenExamples'/>"
 "      <separator/>"
-"      <menuitem action='DuplicateWorkspace'/>"
+"      <menuitem action='DuplicateWorkbook'/>"
 "      <menuitem action='Merge'/>"
 "      <menuitem action='Save'/>"
 "      <menuitem action='SaveAs'/>"

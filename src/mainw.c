@@ -165,7 +165,7 @@ mainw_dispose( GObject *object )
 
 	IM_FREEF( g_source_remove, mainw->refresh_timeout );
 
-	FREESID( mainw->ws_changed_sid, mainw->ws_changed_tab );
+	FREESID( mainw->ws_changed_sid, mainw->ws_changed );
 
 	FREESID( mainw->imageinfo_changed_sid, main_imageinfogroup );
 	FREESID( mainw->heap_changed_sid, reduce_context->heap );
@@ -223,7 +223,7 @@ mainw_init( Mainw *mainw )
 	mainw->wsg = NULL;
 
 	mainw->ws_changed_sid = 0;
-	mainw->ws_changed_tab = NULL;
+	mainw->ws_changed = NULL;
 
 	mainw->imageinfo_changed_sid = 0;
 	mainw->heap_changed_sid = 0;
@@ -429,8 +429,8 @@ mainw_refresh_timeout_cb( gpointer user_data )
 	Workspace *ws;
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "mainw_refresh_timeout_cb: %p\n", mainw );
+#endif /*DEBUG*/
 
 	mainw_status_update( mainw );
 	mainw_free_update( mainw );
@@ -521,7 +521,7 @@ mainw_page_removed_cb( GtkNotebook *notebook,
 	Mainw *mainw = MAINW( user_data );
 
 	if( mainw->current_tab == tab ) {
-		FREESID( mainw->ws_changed_sid, mainw->ws_changed_tab );
+		FREESID( mainw->ws_changed_sid, mainw->ws_changed );
 		mainw->current_tab = NULL;
 		mainw_refresh( mainw );
 	}
@@ -544,11 +544,11 @@ mainw_switch_page_cb( GtkNotebook *notebook,
 	Mainw *mainw = MAINW( user_data );
 	Workspace *ws = mainwtab_get_workspace( tab );
 
-	FREESID( mainw->ws_changed_sid, mainw->ws_changed_tab );
+	FREESID( mainw->ws_changed_sid, mainw->ws_changed );
 	mainw->current_tab = tab;
 	mainw->ws_changed_sid = g_signal_connect( ws, "changed",
 		G_CALLBACK( mainw_workspace_changed_cb ), mainw );
-	mainw->ws_changed_tab = tab;
+	mainw->ws_changed = ws;
 
 	mainw_refresh( mainw );
 
@@ -610,6 +610,35 @@ mainw_add_workspace( Mainw *mainw, Mainwtab *old_tab, Workspace *ws )
 	mainw->current_tab = tab;
 
 	ws->iwnd = IWINDOW( mainw );
+
+	return( tab );
+}
+
+/* As mainw_add_workspace(), but if there's an empty ws in the mainw already,
+ * junk it. 
+ */
+static Mainwtab *
+mainw_add_workspace_trim( Mainw *mainw, Mainwtab *old_tab, Workspace *ws )
+{
+	gboolean delete_ws;
+	Workspace *old_ws;
+	Mainwtab *tab;
+
+	/* If the mainw has a single, empty workspace, unmodified workspace in
+	 * already, we remove it. We can't remove until we've added the new ws
+	 * though or our mainw will be destroyed.  
+	 */
+	delete_ws = FALSE;
+	if( mainw_get_n_tabs( mainw ) == 1 &&
+		(old_ws = mainw_get_workspace( mainw )) &&
+		workspace_is_empty( old_ws ) &&
+		!FILEMODEL( old_ws )->modified ) 
+		delete_ws = TRUE;
+
+	tab = mainw_add_workspace( mainw, old_tab, ws );
+
+	if( delete_ws )
+		iobject_destroy( IOBJECT( old_ws ) ); 
 
 	return( tab );
 }
@@ -747,7 +776,8 @@ mainw_space_free_tooltip_generate( GtkWidget *widget, VipsBuf *buf,
 	Mainw *mainw )
 {
 	Heap *heap = reduce_context->heap;
-	//Symbol *sym = mainw->ws->sym;
+
+	Workspace *ws;
 
 	mainw_find_disc( buf );
 	/* Expands to (eg.) "14GB free in /pics/tmp" */
@@ -759,14 +789,13 @@ mainw_space_free_tooltip_generate( GtkWidget *widget, VipsBuf *buf,
                 heap->ncells, heap->nfree, heap->max_fn( heap ) );
         vips_buf_appends( buf, ", " );
 
-	printf( "mainw_space_free_tooltip_generate: "
-		"count objects in workspace\n" );
+	if( (ws = mainw_get_workspace( mainw )) ) {
+		Compile *compile = ws->sym->expr->compile;
 
-	/*
-        vips_buf_appendf( buf, _( "%d objects in workspace" ),
-		g_slist_length( ICONTAINER( sym->expr->compile )->children ) );
-        vips_buf_appends( buf, ", " );
-	 */
+		vips_buf_appendf( buf, _( "%d objects in workspace" ),
+			g_slist_length( ICONTAINER( compile )->children ) );
+		vips_buf_appends( buf, ", " );
+	}
 
         vips_buf_appendf( buf, _( "%d vips calls cached" ), 
 		cache_history_size );
@@ -895,10 +924,12 @@ Workspace *
 mainw_open_workspace( Mainw *mainw, const char *filename )
 {
 	Workspace *ws;
+	Mainwtab *tab;
 
 	if( !(ws = workspace_new_from_file( mainw->wsg, filename, NULL )) ) 
 		return( NULL );
-	mainw_add_workspace( mainw, mainw->current_tab, ws ); 
+	tab = mainw_add_workspace_trim( mainw, mainw->current_tab, ws ); 
+	mainw_select_tab( mainw, tab ); 
 	mainw_recent_add( &mainw_recent_workspace, filename );
 
 	return( ws );
@@ -1969,6 +2000,13 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 		"/MainwMenubar/EditMenu/JumpToColumnMenu/Stub" );
 	mainw->jump_to_column_menu = 
 		gtk_widget_get_parent( GTK_WIDGET( item ) );
+
+	/* Same for the tk menu. 
+	 */
+        item = gtk_ui_manager_get_widget( iwnd->ui_manager,
+		"/MainwMenubar/ToolkitsMenu/Stub" );
+        mainw->toolkit_menu = gtk_widget_get_parent( GTK_WIDGET( item ) );
+	gtk_widget_destroy( item ); 
 
 	/* Attach toolbar.
   	 */

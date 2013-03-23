@@ -1447,7 +1447,7 @@ main( int argc, char *argv[] )
 	filemodel_set_modified( FILEMODEL( ws ), FALSE );
 
 	/* If the start ws is empty (we didn't load anything into it) and we
-	 * loaded some other workspaces, we can junk it. 
+	 * loaded some other workspaces, we can junk the empty ws. 
 	 */
 	if( mainw_get_n_tabs( mainw ) > 1 &&
 		workspace_is_empty( ws ) ) {

@@ -66,8 +66,8 @@ workspacedefs_refresh( vObject *vobject )
 	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "workspacedefs_refresh:\n" );
+#endif /*DEBUG*/
 
 	if( !workspacedefs->changed ) {
 		guint text_hash = g_str_hash( ws->local_defs );

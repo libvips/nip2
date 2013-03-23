@@ -141,8 +141,8 @@ mainwtab_refresh( vObject *vobject )
 	Mainwtab *tab = MAINWTAB( vobject );
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "mainwtab_refresh: update panes\n" );
+#endif /*DEBUG*/
 
 	mainwtab_jump_update( tab, tab->popup_jump );
 

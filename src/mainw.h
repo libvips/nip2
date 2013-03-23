@@ -51,11 +51,11 @@ struct _Mainw {
 	 */
 	Mainwtab *current_tab;
 
-	/* WS in current tab has changed, plus the tab we attached the 
+	/* WS in current tab has changed, plus the ws we attached the 
 	 * signal to.
 	 */
 	guint ws_changed_sid;
-	Mainwtab *ws_changed_tab;
+	Workspace *ws_changed;
 
 	/* Watch for changed on heap and image, and prefs. Use to update
 	 * status bar and space free.
@@ -97,6 +97,7 @@ struct _Mainw {
 	GtkWidget *recent_menu;
 	GtkWidget *jump_to_column_menu;
 	GtkWidget *tab_menu;
+	GtkWidget *toolkit_menu;
 
 	GtkWidget *notebook;
 

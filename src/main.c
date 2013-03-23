@@ -428,7 +428,7 @@ main_load( Mainw *mainw, Workspace *ws, const char *filename )
 {
 	Workspace *new_ws;
 
-	if( (new_ws = mainw_open_workspace( mainw, filename )) ) 
+	if( (new_ws = mainw_open_workspace( mainw, filename, FALSE )) ) 
 		return( TRUE );
 
 	error_clear();
@@ -1348,7 +1348,7 @@ main( int argc, char *argv[] )
 	 * interactive mode, see below.
 	 */
 	mainw = mainw_new( main_workspacegroup );
-	mainw_add_workspace( mainw, NULL, ws );
+	mainw_add_workspace( mainw, NULL, ws, FALSE );
 
 	/* Reset IM_CONCURRENCY if a watch changes. Need to do this after
 	 * parsing options so we skip in batch mode.

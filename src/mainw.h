@@ -148,10 +148,13 @@ void mainw_group_action_cb( GtkAction *action, Mainw *mainw );
 void mainw_next_error_action_cb( GtkAction *action, Mainw *mainw );
 void mainw_open_action_cb( GtkAction *action, Mainw *mainw );
 
-Mainwtab *mainw_add_workspace( Mainw *mainw, Mainwtab *old_tab, Workspace *ws );
-Workspace *mainw_open_workspace( Mainw *mainw, const char *filename );
+Mainwtab *mainw_add_workspace( Mainw *mainw, 
+	Mainwtab *old_tab, Workspace *ws, gboolean trim );
+Workspace *mainw_open_workspace( Mainw *mainw, 
+	const char *filename, gboolean trim );
 
 Mainw *mainw_new( Workspacegroup *wsg );
 
 int mainw_get_n_tabs( Mainw *mainw );
+Mainwtab *mainw_get_nth_tab( Mainw *mainw, int i );
 

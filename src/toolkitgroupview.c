@@ -120,8 +120,6 @@ toolkitgroupview_new( void )
 void
 toolkitgroupview_set_mainw( Toolkitgroupview *kitgview, Mainw *mainw )
 {
-	GtkWidget *item;
-
 	kitgview->mainw = mainw;
         kitgview->menu = mainw->toolkit_menu;
 }

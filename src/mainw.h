@@ -51,6 +51,12 @@ struct _Mainw {
 	 */
 	Mainwtab *current_tab;
 
+	/* WS in current tab has changed, plus the tab we attached the 
+	 * signal to.
+	 */
+	guint ws_changed_sid;
+	Mainwtab *ws_changed_tab;
+
 	/* Watch for changed on heap and image, and prefs. Use to update
 	 * status bar and space free.
 	 */

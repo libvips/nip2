@@ -1,12 +1,7 @@
 
 - toolkit menu destroy & rebuild on page flip is broken
 
-- save on quit is broken
-
-- save on quit messages are not over a mainw
-
-- get rid of unmapped root window? annoying on composited screen
-
+- change ws, mainw does not update, just the tab
 
 
 

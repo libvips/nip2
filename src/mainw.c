@@ -314,7 +314,7 @@ mainw_find_heap( VipsBuf *buf, Heap *heap )
 	vips_buf_appendf( buf, _( "%d cells free" ), heap->nfree + togo );
 }
 
-static Workspace *
+Workspace *
 mainw_get_workspace( Mainw *mainw )
 {
 	if( !mainw->current_tab )
@@ -526,8 +526,51 @@ mainw_page_removed_cb( GtkNotebook *notebook,
 		mainw_refresh( mainw );
 	}
 
+	mainwtab_set_label( tab, NULL );
+
 	if( mainw_get_n_tabs( mainw ) == 0 )
 		iwindow_kill( IWINDOW( mainw ) );
+}
+
+static void                
+mainw_page_added_cb( GtkNotebook *notebook, 
+	GtkWidget *page, guint page_num, gpointer user_data )
+{
+	Mainwtab *tab = MAINWTAB( page );
+	Workspace *ws = mainwtab_get_workspace( tab );
+	Mainw *mainw = MAINW( user_data );
+
+	filemodel_set_window_hint( FILEMODEL( ws ), IWINDOW( mainw ) );
+	mainwtab_set_mainw( tab, mainw );
+	ws->iwnd = IWINDOW( mainw );
+}
+
+static GtkNotebook *                
+mainw_create_window_cb( GtkNotebook *notebook, 
+	GtkWidget *page, int x, int y, gpointer user_data )
+{
+	int page_num = gtk_notebook_page_num( GTK_NOTEBOOK( notebook ), page );
+	Mainwtab *tab = MAINWTAB( page );
+	Mainw *mainw = MAINW( user_data );
+
+	Mainw *new_mainw;
+
+	new_mainw = mainw_new( main_workspacegroup );
+	gtk_window_move( GTK_WINDOW( new_mainw ), x, y );
+
+	g_object_ref( page );
+
+	/*
+	gtk_notebook_remove_page( notebook, page_num );
+	gtk_notebook_insert_page( GTK_NOTEBOOK( new_mainw->notebook ), 
+		page, NULL, -1 );
+	 */
+
+	g_object_unref( page );
+
+	gtk_widget_show( GTK_WIDGET( new_mainw ) );
+
+	return( GTK_NOTEBOOK( mainw->notebook ) ); 
 }
 
 static void
@@ -594,7 +637,6 @@ mainw_add_workspace( Mainw *mainw,
 
 	tab = mainwtab_new();
 	vobject_link( VOBJECT( tab ), IOBJECT( ws ) );
-	filemodel_set_window_hint( FILEMODEL( ws ), IWINDOW( mainw ) );
         gtk_widget_show( GTK_WIDGET( tab ) );
 
         ebox = gtk_event_box_new();
@@ -604,7 +646,6 @@ mainw_add_workspace( Mainw *mainw,
         gtk_container_add( GTK_CONTAINER( ebox ), label );
         gtk_widget_show( GTK_WIDGET( label ) );
 	mainwtab_set_label( tab, label );
-	mainwtab_set_mainw( tab, mainw );
 	popup_attach( ebox, mainw->tab_menu, tab );
 
 	if( old_tab ) {
@@ -623,8 +664,6 @@ mainw_add_workspace( Mainw *mainw,
 		GTK_WIDGET( tab ), TRUE );
 
 	mainw->current_tab = tab;
-
-	ws->iwnd = IWINDOW( mainw );
 
 	if( delete_ws )
 		iobject_destroy( IOBJECT( old_ws ) ); 
@@ -2141,8 +2180,12 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 		GTK_POS_BOTTOM );
 	g_signal_connect( mainw->notebook, "switch_page", 
 		G_CALLBACK( mainw_switch_page_cb ), mainw );
+	g_signal_connect( mainw->notebook, "page_added", 
+		G_CALLBACK( mainw_page_added_cb ), mainw );
 	g_signal_connect( mainw->notebook, "page_removed", 
 		G_CALLBACK( mainw_page_removed_cb ), mainw );
+	g_signal_connect( mainw->notebook, "create_window", 
+		G_CALLBACK( mainw_create_window_cb ), mainw );
 
 	gtk_box_pack_start( GTK_BOX( vbox ), 
 		GTK_WIDGET( mainw->notebook ), TRUE, TRUE, 0 );

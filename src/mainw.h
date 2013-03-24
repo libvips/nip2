@@ -136,6 +136,7 @@ GType mainw_get_type( void );
 
 void mainw_find_disc( VipsBuf *buf );
 void mainw_find_heap( VipsBuf *buf, Heap *heap );
+Workspace *mainw_get_workspace( Mainw *mainw );
 
 void mainw_homepage_action_cb( GtkAction *action, iWindow *iwnd );
 void mainw_about_action_cb( GtkAction *action, iWindow *iwnd );

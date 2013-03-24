@@ -418,7 +418,7 @@ mainwtab_get_workspace( Mainwtab *tab )
 void 
 mainwtab_set_label( Mainwtab *tab, GtkWidget *label )
 {
-	g_assert( !tab->label );
+	g_assert( !label || !tab->label );
 
 	tab->label = label;
 }
@@ -426,8 +426,8 @@ mainwtab_set_label( Mainwtab *tab, GtkWidget *label )
 void 
 mainwtab_set_mainw( Mainwtab *tab, Mainw *mainw )
 {
-	g_assert( !tab->mainw );
-
+	/* This can be called repeatedly if tabs are moved between windows.
+	 */
 	tab->mainw = mainw;
 }
 

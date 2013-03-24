@@ -122,8 +122,8 @@ filemodel_set_modified( Filemodel *filemodel, gboolean modified )
 void 
 filemodel_set_window_hint( Filemodel *filemodel, iWindow *iwnd )
 {
-	g_assert( !filemodel->window_hint );
-
+	/* This can be called repeatedly if objects are moved between windows.
+	 */
 	filemodel->window_hint = iwnd;
 }
 

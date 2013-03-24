@@ -1,19 +1,12 @@
-- tk menu items are bound to a certain ws ... they should be bound to a mainw
-  instead and then operate on current_tab
 
-  see also workspacedefs and toolkitbrowser
+- rethink File menu
+
+  should operate only on current tab, to reduce confusion, except for a
+  "workbook" submenu with save / duplicate
+
+- drag tabs out to new top-level is not working
 
 - test file drop on mainw, esp. workspaces
-
-
-
-
-- workspacedefs
-  toolkitbrowser
-  toolview.c
-
-	go through mainw to get the ws to operate on, need to go via tab
-	instead
 
 - a ws file can have multiple workspaces:
 

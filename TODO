@@ -1,12 +1,30 @@
 
-- rethink File menu
-
-  should operate only on current tab, to reduce confusion, except for a
-  "workbook" submenu with save / duplicate
 
 - drag tabs out to new top-level is not working
 
+  see how notebook does it for drags between existing windows?
+
+- 2nd and subsequent tabs from cmdline do not init correctly
+
 - test file drop on mainw, esp. workspaces
+
+- do we need a filemodel for group-of-workspaces?
+
+  at the moment, workspacegroup is a singleton, perhaps make it our new class?
+
+  currently derives from Model, would need to swap to Filemodel (which in
+  turns derives from Model)
+
+  mainw could become workspacegroupview 
+
+  ... probably not a good idea to go the whole hog, we don't want to enforce
+  workbook behaviour for plain MDI use of multiple wses
+
+  though what if someone loads a set of tabs? they should all go into a new
+  mainw, and if they change something, we then want save/save-as to operate on
+  the whole file
+
+
 
 - a ws file can have multiple workspaces:
 

@@ -809,6 +809,15 @@ mainw_workspace_save_as_action_cb( GtkAction *action, Mainw *mainw )
 		filemodel_inter_saveas( IWINDOW( mainw ), FILEMODEL( ws ) );
 }
 
+static void
+mainw_workspace_save_tabs_as_action_cb( GtkAction *action, Mainw *mainw )
+{
+	Workspace *ws;
+
+	if( (ws = mainw_get_workspace( mainw )) )
+		filemodel_inter_saveas( IWINDOW( mainw ), FILEMODEL( ws ) );
+}
+
 static void                
 mainw_tab_save_as_cb2( GtkWidget *wid, GtkWidget *host, Mainwtab *tab )
 {
@@ -999,7 +1008,8 @@ mainw_force_calc_action_cb( GtkAction *action, Mainw *mainw )
 }
 
 Workspace *
-mainw_open_workspace( Mainw *mainw, const char *filename, gboolean trim )
+mainw_open_workspace( Mainw *mainw, 
+	const char *filename, gboolean trim, gboolean select )
 {
 	Workspace *ws;
 	Mainwtab *tab;
@@ -1007,7 +1017,8 @@ mainw_open_workspace( Mainw *mainw, const char *filename, gboolean trim )
 	if( !(ws = workspace_new_from_file( mainw->wsg, filename, NULL )) ) 
 		return( NULL );
 	tab = mainw_add_workspace( mainw, mainw->current_tab, ws, trim ); 
-	mainw_select_tab( mainw, tab ); 
+	if( select )
+		mainw_select_tab( mainw, tab ); 
 	mainw_recent_add( &mainw_recent_workspace, filename );
 
 	return( ws );
@@ -1028,7 +1039,7 @@ static void *
 mainw_open_fn( Filesel *filesel, const char *filename, MainwLoad *load )
 {
 	if( is_file_type( &filesel_wfile_type, filename ) ) {
-		if( !mainw_open_workspace( load->mainw, filename, TRUE ) )
+		if( !mainw_open_workspace( load->mainw, filename, TRUE, TRUE ) )
 			return( filesel );
 	}
 	else {
@@ -1160,7 +1171,7 @@ static gboolean
 mainw_recent_open( Mainw *mainw, const char *filename )
 {
 	if( is_file_type( &filesel_wfile_type, filename ) ) {
-		if( !mainw_open_workspace( mainw, filename, TRUE ) )
+		if( !mainw_open_workspace( mainw, filename, TRUE, TRUE ) )
 			return( FALSE );
 	}
 	else {
@@ -1774,23 +1785,23 @@ static GtkActionEntry mainw_actions[] = {
 	/* Actions.
 	 */
 	{ "NewColumn", 
-		GTK_STOCK_NEW, N_( "New C_olumn" ), NULL, 
+		GTK_STOCK_NEW, N_( "C_olumn" ), NULL, 
 		N_( "Create a new column" ), 
 		G_CALLBACK( mainw_column_new_action_cb ) },
 
 	{ "NewColumnName", 
-		GTK_STOCK_NEW, N_( "New C_olumn" ), NULL, 
+		GTK_STOCK_NEW, N_( "C_olumn" ), NULL, 
 		N_( "Create a new column with a specified name" ), 
 		G_CALLBACK( mainw_column_new_named_action_cb ) },
 
 	{ "NewWorkspace", 
-		GTK_STOCK_NEW, N_( "New _Workspace" ), NULL, 
+		GTK_STOCK_NEW, N_( "_Workspace" ), NULL, 
 		N_( "Create a new workspace" ), 
 		G_CALLBACK( mainw_workspace_new_action_cb ) },
 
-	{ "NewWorkbook", 
-		GTK_STOCK_NEW, N_( "New _Workbook" ), NULL, 
-		N_( "Create a new workbook" ), 
+	{ "NewWindow", 
+		GTK_STOCK_NEW, N_( "_Window" ), NULL, 
+		N_( "Create a new window" ), 
 		G_CALLBACK( mainw_workbook_new_action_cb ) },
 
 	{ "Open", 
@@ -1808,9 +1819,9 @@ static GtkActionEntry mainw_actions[] = {
 		N_( "Duplicate workspace" ), 
 		G_CALLBACK( mainw_workspace_duplicate_action_cb ) },
 
-	{ "DuplicateWorkbook", 
-		STOCK_DUPLICATE, N_( "_Duplicate Workbook" ), NULL,
-		N_( "Duplicate workbook" ), 
+	{ "DuplicateWindow", 
+		STOCK_DUPLICATE, N_( "_Duplicate Window" ), NULL,
+		N_( "Duplicate window" ), 
 		G_CALLBACK( mainw_workbook_duplicate_action_cb ) },
 
 	{ "Merge", 
@@ -1827,6 +1838,11 @@ static GtkActionEntry mainw_actions[] = {
 		GTK_STOCK_SAVE_AS, N_( "_Save Workspace As" ), NULL,
 		N_( "Save workspace as" ), 
 		G_CALLBACK( mainw_workspace_save_as_action_cb ) },
+
+	{ "SaveTabs", 
+		GTK_STOCK_SAVE_AS, N_( "_Save All Tabs As" ), NULL,
+		N_( "Save all tabs to a workspace" ), 
+		G_CALLBACK( mainw_workspace_save_tabs_as_action_cb ) },
 
 	{ "Recover", 
 		NULL, N_( "Search for Workspace _Backups" ), NULL,
@@ -1957,7 +1973,7 @@ static const char *mainw_menubar_ui_description =
 "      <menu action='NewMenu'>"
 "        <menuitem action='NewColumnName'/>"
 "        <menuitem action='NewWorkspace'/>"
-"        <menuitem action='NewWorkbook'/>"
+"        <menuitem action='NewWindow'/>"
 "      </menu>"
 "      <menuitem action='Open'/>"
 "      <menu action='RecentMenu'>"
@@ -1965,10 +1981,11 @@ static const char *mainw_menubar_ui_description =
 "      </menu>"
 "      <menuitem action='OpenExamples'/>"
 "      <separator/>"
-"      <menuitem action='DuplicateWorkbook'/>"
+"      <menuitem action='DuplicateWindow'/>"
 "      <menuitem action='Merge'/>"
 "      <menuitem action='Save'/>"
 "      <menuitem action='SaveAs'/>"
+"      <menuitem action='SaveTabs'/>"
 "      <separator/>"
 "      <menuitem action='Recover'/>"
 "      <separator/>"

@@ -152,7 +152,7 @@ void mainw_open_action_cb( GtkAction *action, Mainw *mainw );
 Mainwtab *mainw_add_workspace( Mainw *mainw, 
 	Mainwtab *old_tab, Workspace *ws, gboolean trim );
 Workspace *mainw_open_workspace( Mainw *mainw, 
-	const char *filename, gboolean trim );
+	const char *filename, gboolean trim, gboolean select );
 
 Mainw *mainw_new( Workspacegroup *wsg );
 

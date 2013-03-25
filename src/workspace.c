@@ -748,7 +748,7 @@ workspace_auto_recover_load( iWindow *iwnd,
 	/* Load ws file.
 	 */
         progress_begin();
-	ws = mainw_open_workspace( mainw, filename, TRUE );
+	ws = mainw_open_workspace( mainw, filename, TRUE, TRUE );
 	progress_end();
 
 	if( ws ) {

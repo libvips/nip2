@@ -428,7 +428,7 @@ main_load( Mainw *mainw, Workspace *ws, const char *filename )
 {
 	Workspace *new_ws;
 
-	if( (new_ws = mainw_open_workspace( mainw, filename, FALSE )) ) 
+	if( (new_ws = mainw_open_workspace( mainw, filename, FALSE, FALSE )) ) 
 		return( TRUE );
 
 	error_clear();

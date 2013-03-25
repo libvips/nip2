@@ -558,19 +558,9 @@ mainw_create_window_cb( GtkNotebook *notebook,
 	new_mainw = mainw_new( mainw->wsg );
 	gtk_window_move( GTK_WINDOW( new_mainw ), x, y );
 
-	g_object_ref( page );
-
-	/*
-	gtk_notebook_remove_page( notebook, page_num );
-	gtk_notebook_insert_page( GTK_NOTEBOOK( new_mainw->notebook ), 
-		page, NULL, -1 );
-	 */
-
-	g_object_unref( page );
-
 	gtk_widget_show( GTK_WIDGET( new_mainw ) );
 
-	return( GTK_NOTEBOOK( mainw->notebook ) ); 
+	return( GTK_NOTEBOOK( new_mainw->notebook ) ); 
 }
 
 /* Add a tab to the right of old_tab.

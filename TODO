@@ -1,9 +1,4 @@
 
-
-- drag tabs out to new top-level is not working
-
-  see how notebook does it for drags between existing windows?
-
 - 2nd and subsequent tabs from cmdline do not init correctly
 
 - test file drop on mainw, esp. workspaces

@@ -177,6 +177,16 @@ if test x"$nip_use_infobar" = x"yes"; then
   AC_DEFINE(USE_INFOBAR,1,[define if you have GtkInfoBar])
 fi
 
+# notebook action widgets came in 2.20
+PKG_CHECK_EXISTS(gtk+-2.0 >= 2.20,
+  [nip_use_notebook_action=yes],
+  [nip_use_notebook_action=no]
+)
+
+if test x"$nip_use_notebook_action" = x"yes"; then
+  AC_DEFINE(USE_NOTEBOOK_ACTION,1,[define if you have gtk_notebook_set_action_widget()])
+fi
+
 # GRegex was added in glib-2.14
 # we need it for regex searching in the program window
 PKG_CHECK_EXISTS(glib-2.0 >= 2.14,
@@ -365,6 +375,8 @@ use libgvc to show ws dep graphs:	$with_libgvc
   (requires gvc < 2.30)
 use gtkinfobar to show messages:	$nip_use_infobar
   (requires gtk+-2.0 >= 2.18)
+use notebook action widget:  		$nip_use_notebook_action
+  (requires gtk+-2.0 >= 2.20)
 allow regex searches: 			$nip_use_gregex
   (requires glib-2.0 >= 2.14)
 display help files with xdg:		$XDG_OPEN

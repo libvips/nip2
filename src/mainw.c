@@ -555,7 +555,7 @@ mainw_create_window_cb( GtkNotebook *notebook,
 
 	Mainw *new_mainw;
 
-	new_mainw = mainw_new( main_workspacegroup );
+	new_mainw = mainw_new( mainw->wsg );
 	gtk_window_move( GTK_WINDOW( new_mainw ), x, y );
 
 	g_object_ref( page );
@@ -571,43 +571,6 @@ mainw_create_window_cb( GtkNotebook *notebook,
 	gtk_widget_show( GTK_WIDGET( new_mainw ) );
 
 	return( GTK_NOTEBOOK( mainw->notebook ) ); 
-}
-
-static void
-mainw_workspace_changed_cb( gpointer *dummy, Mainw *mainw )
-{
-	mainw_refresh( mainw );
-}
-
-static void                
-mainw_switch_page_cb( GtkNotebook *notebook, 
-	GtkWidget *page, guint page_num, gpointer user_data )
-{
-	Mainwtab *tab = MAINWTAB( page );
-	Mainw *mainw = MAINW( user_data );
-	Workspace *ws = mainwtab_get_workspace( tab );
-
-	FREESID( mainw->ws_changed_sid, mainw->ws_changed );
-	mainw->current_tab = tab;
-	mainw->ws_changed_sid = g_signal_connect( ws, "changed",
-		G_CALLBACK( mainw_workspace_changed_cb ), mainw );
-	mainw->ws_changed = ws;
-
-	mainw_refresh( mainw );
-
-	if( ws->compat_major &&
-		!tab->popped_compat ) {
-		error_top( _( "Compatibility mode." ) );
-		error_sub( _( "This workspace was created by version %d.%d.%d. "
-			"A set of compatibility menus have been loaded "
-			"for this window." ),
-			FILEMODEL( ws )->major,
-			FILEMODEL( ws )->minor,
-			FILEMODEL( ws )->micro );
-		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
-
-		tab->popped_compat = TRUE;
-	}
 }
 
 /* Add a tab to the right of old_tab.
@@ -682,6 +645,61 @@ mainw_select_tab( Mainw *mainw, Mainwtab *tab )
 		page );
 }
 
+#ifdef USE_NOTEBOOK_ACTION
+static void
+mainw_add_workspace_cb( GtkWidget *wid, Mainw *mainw )
+{
+	char name[256];
+	Workspace *ws;
+	Mainwtab *tab;
+
+	workspacegroup_name_new( mainw->wsg, name );
+	if( !(ws = workspace_new_blank( mainw->wsg, name )) ) {
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
+		return;
+	}
+	tab = mainw_add_workspace( mainw, mainw->current_tab, ws, FALSE );
+	mainw_select_tab( mainw, tab );
+}
+#endif /*USE_NOTEBOOK_ACTION*/
+
+static void
+mainw_workspace_changed_cb( gpointer *dummy, Mainw *mainw )
+{
+	mainw_refresh( mainw );
+}
+
+static void                
+mainw_switch_page_cb( GtkNotebook *notebook, 
+	GtkWidget *page, guint page_num, gpointer user_data )
+{
+	Mainwtab *tab = MAINWTAB( page );
+	Mainw *mainw = MAINW( user_data );
+	Workspace *ws = mainwtab_get_workspace( tab );
+
+	FREESID( mainw->ws_changed_sid, mainw->ws_changed );
+	mainw->current_tab = tab;
+	mainw->ws_changed_sid = g_signal_connect( ws, "changed",
+		G_CALLBACK( mainw_workspace_changed_cb ), mainw );
+	mainw->ws_changed = ws;
+
+	mainw_refresh( mainw );
+
+	if( ws->compat_major &&
+		!tab->popped_compat ) {
+		error_top( _( "Compatibility mode." ) );
+		error_sub( _( "This workspace was created by version %d.%d.%d. "
+			"A set of compatibility menus have been loaded "
+			"for this window." ),
+			FILEMODEL( ws )->major,
+			FILEMODEL( ws )->minor,
+			FILEMODEL( ws )->micro );
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
+
+		tab->popped_compat = TRUE;
+	}
+}
+
 static void *
 mainw_duplicate_tab( Mainw *mainw, Mainwtab *tab )
 {
@@ -726,7 +744,7 @@ mainw_workbook_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 
 	progress_begin();
 
-	new_mainw = mainw_new( main_workspacegroup );
+	new_mainw = mainw_new( mainw->wsg );
 
 	gtk_widget_show( GTK_WIDGET( new_mainw ) );
 
@@ -1481,7 +1499,7 @@ mainw_workspace_new_done_cb( iWindow *iwnd, void *client,
 
 	iobject_set( IOBJECT( ws ), NULL, caption_text );
 
-	mainw_add_workspace( mainw, mainw->current_tab, ws, TRUE );
+	mainw_add_workspace( mainw, mainw->current_tab, ws, FALSE );
 
 	nfn( sys, IWINDOW_YES );
 }
@@ -1521,9 +1539,9 @@ mainw_workbook_new_action_cb( GtkAction *action, Mainw *mainw )
 	Workspace *new_ws;
 	char name[256];
 
-	new_mainw = mainw_new( main_workspacegroup );
-	workspacegroup_name_new( main_workspacegroup, name );
-	new_ws = workspace_new_blank( main_workspacegroup, name );
+	new_mainw = mainw_new( mainw->wsg );
+	workspacegroup_name_new( mainw->wsg, name );
+	new_ws = workspace_new_blank( mainw->wsg, name );
 	mainw_add_workspace( new_mainw, NULL, new_ws, FALSE );
 	gtk_widget_show( GTK_WIDGET( new_mainw ) );
 }
@@ -2187,9 +2205,28 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	g_signal_connect( mainw->notebook, "create_window", 
 		G_CALLBACK( mainw_create_window_cb ), mainw );
 
+#ifdef USE_NOTEBOOK_ACTION
+{
+	GtkWidget *but;
+	GtkWidget *icon;
+
+        but = gtk_button_new();
+        gtk_button_set_relief( GTK_BUTTON( but ), GTK_RELIEF_NONE );
+        set_tooltip( but, _( "Add a workspace" ) );
+	icon = gtk_image_new_from_stock( GTK_STOCK_ADD, GTK_ICON_SIZE_MENU );
+        gtk_container_add( GTK_CONTAINER( but ), icon );
+	gtk_widget_show( icon );
+	gtk_widget_show( but );
+	gtk_notebook_set_action_widget( GTK_NOTEBOOK( mainw->notebook ), 
+		but, GTK_PACK_END );
+        gtk_signal_connect( GTK_OBJECT( but ), "clicked",
+                GTK_SIGNAL_FUNC( mainw_add_workspace_cb ), mainw );
+}
+#endif /*USE_NOTEBOOK_ACTION*/
+
 	gtk_box_pack_start( GTK_BOX( vbox ), 
-		GTK_WIDGET( mainw->notebook ), TRUE, TRUE, 0 );
-	gtk_widget_show( GTK_WIDGET( mainw->notebook ) );
+		mainw->notebook, TRUE, TRUE, 0 );
+	gtk_widget_show( mainw->notebook );
 
 	mainw->tab_menu = popup_build( _( "Tab menu" ) );
 	popup_add_but( mainw->tab_menu, STOCK_DUPLICATE,

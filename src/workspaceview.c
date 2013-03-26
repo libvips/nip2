@@ -128,7 +128,7 @@ workspaceview_scroll_update( Workspaceview *wview )
 	ws->vp = wview->vp;
 
 #ifdef DEBUG
-	printf( "workspaceview_scroll_update:\n" );
+	printf( "workspaceview_scroll_update: %s\n", IOBJECT( ws )->name );
 	printf( "  wview->vp: l=%d, t=%d, w=%d, h=%d; fixed w=%d; h=%d\n",
 		wview->vp.left, wview->vp.top, 
 		wview->vp.width, wview->vp.height,
@@ -411,13 +411,19 @@ workspaceview_destroy( GtkObject *object )
 	Workspaceview *wview;
 
 #ifdef DEBUG
-	printf( "workspaceview_destroy\n" );
+	printf( "workspaceview_destroy: %p\n", object );
 #endif /*DEBUG*/
 
 	g_return_if_fail( object != NULL );
 	g_return_if_fail( IS_WORKSPACEVIEW( object ) );
 
 	wview = WORKSPACEVIEW( object );
+
+{
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+
+	printf( "\t%s\n", ws ? IOBJECT( ws )->name : "null ws" );
+}
 
 	/* Instance destroy.
 	 */
@@ -431,6 +437,15 @@ workspaceview_destroy( GtkObject *object )
 static void
 workspaceview_realize( GtkWidget *widget )
 {
+#ifdef DEBUG
+{
+	Workspaceview *wview = WORKSPACEVIEW( widget );
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+
+	printf( "workspaceview_realize: %s\n", IOBJECT( ws )->name );
+}
+#endif /*DEBUG*/
+
 	GTK_WIDGET_CLASS( parent_class )->realize( widget );
 
 	/* Mark us as a symbol drag-to widget. 
@@ -544,12 +559,17 @@ workspaceview_child_size_cb( Columnview *cview,
 	wview->bounding.height += 30;
 
 #ifdef DEBUG
-	printf( "workspaceview_child_size_cb: "
+{
+	Column *col = COLUMN( VOBJECT( cview )->iobject );
+
+	printf( "workspaceview_child_size_cb: cview %s "
 		"bb left=%d, top=%d, width=%d, height=%d\n",
+		IOBJECT( col )->name, 
 		wview->bounding.left,
 		wview->bounding.top,
 		wview->bounding.width,
 		wview->bounding.height );
+}
 #endif /*DEBUG*/
 
 	/* Resize our fixed if necessary.
@@ -634,7 +654,10 @@ static void
 workspaceview_refresh( vObject *vobject )
 {
 #ifdef DEBUG
-	printf( "workspaceview_refresh\n" );
+	Workspaceview *wview = WORKSPACEVIEW( vobject );
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+
+	printf( "workspaceview_refresh: %s\n", IOBJECT( ws )->name );
 #endif /*DEBUG*/
 
 	VOBJECT_CLASS( parent_class )->refresh( vobject );

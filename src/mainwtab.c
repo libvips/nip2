@@ -185,40 +185,52 @@ mainwtab_refresh( vObject *vobject )
 }
 
 static void
-mainwtab_column_new_action_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
+mainwtab_column_new_action_cb2( GtkWidget *wid, GtkWidget *host, Mainwtab *tab )
 {
+	Mainw *mainw = mainwtab_get_mainw( tab );
+
 	mainw_column_new_action_cb( NULL, mainw );
 }
 
 static void
-mainwtab_workspace_merge_action_cb2( GtkWidget *wid, GtkWidget *host, 
-	Mainw *mainw )
+mainwtab_layout_action_cb2( GtkWidget *wid, GtkWidget *host, Mainwtab *tab )
 {
-	mainw_workspace_merge_action_cb( NULL, mainw );
-}
+	Mainw *mainw = mainwtab_get_mainw( tab );
 
-static void
-mainwtab_layout_action_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
-{
 	mainw_layout_action_cb( NULL, mainw );
 }
 
 static void
-mainwtab_group_action_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
+mainwtab_open_action_cb2( GtkWidget *wid, GtkWidget *host, Mainwtab *tab )
 {
+	Mainw *mainw = mainwtab_get_mainw( tab );
+
+	mainw_open_action_cb( NULL, mainw );
+}
+
+static void
+mainwtab_workspace_merge_action_cb2( GtkWidget *wid, GtkWidget *host, 
+	Mainwtab *tab )
+{
+	Mainw *mainw = mainwtab_get_mainw( tab );
+
+	mainw_workspace_merge_action_cb( NULL, mainw );
+}
+
+static void
+mainwtab_group_action_cb2( GtkWidget *wid, GtkWidget *host, Mainwtab *tab )
+{
+	Mainw *mainw = mainwtab_get_mainw( tab );
+
 	mainw_group_action_cb( NULL, mainw );
 }
 
 static void
-mainwtab_next_error_action_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
+mainwtab_next_error_action_cb2( GtkWidget *wid, GtkWidget *host, Mainwtab *tab )
 {
-	mainw_next_error_action_cb( NULL, mainw );
-}
+	Mainw *mainw = mainwtab_get_mainw( tab );
 
-static void
-mainwtab_open_action_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
-{
-	mainw_open_action_cb( NULL, mainw );
+	mainw_next_error_action_cb( NULL, mainw );
 }
 
 static void

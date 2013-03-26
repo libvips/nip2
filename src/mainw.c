@@ -30,8 +30,8 @@
 #include "ip.h"
 
 /* 
-#define DEBUG
  */
+#define DEBUG
 
 /* Load and save recent items here.
  */
@@ -136,7 +136,7 @@ mainw_finalize( GObject *gobject )
 	Mainw *mainw;
 
 #ifdef DEBUG
-	printf( "mainw_finalize: %s\n", NN( IOBJECT( gobject )->name ) );
+	printf( "mainw_finalize: %p\n", gobject );
 #endif /*DEBUG*/
 
 	g_return_if_fail( gobject != NULL );

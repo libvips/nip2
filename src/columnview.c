@@ -28,8 +28,8 @@
  */
 
 /* 
- */
 #define DEBUG
+ */
 
 #include "ip.h"
 
@@ -518,7 +518,13 @@ columnview_event_cb( GtkWidget *widget, GdkEvent *ev, Columnview *cview )
 	gboolean handled = FALSE;
 
 #ifdef DEBUG
-	printf( "columnview_event_cb %d\n", ev->type );
+{
+	Column *col = COLUMN( VOBJECT( cview )->iobject );
+
+	printf( "columnview_event_cb: %s %d\n", 
+		IOBJECT( col )->name, 
+		ev->type );
+}
 #endif /*DEBUG*/
 
         switch( ev->type ) {

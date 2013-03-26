@@ -57,5 +57,4 @@ extern GtkStyle *dirty_style;
 void main_quit_test( void );
 void main_reload( void );
 const char *get_prefix( void );
-gboolean main_load( Mainw *mainw, Workspace *ws, const char *filename );
 

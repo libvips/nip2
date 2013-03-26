@@ -823,6 +823,41 @@ workspaceview_class_init( WorkspaceviewClass *class )
 	view_class->layout = workspaceview_layout;
 }
 
+/* Can't use main_load(), we want to select wses after load.
+ */
+static gboolean
+workspaceview_load( Mainw *mainw, Workspace *ws, const char *filename )
+{
+	Workspace *new_ws;
+
+	if( (new_ws = mainw_open_workspace( mainw, filename, TRUE, TRUE )) ) 
+		return( TRUE );
+
+	error_clear();
+
+	/* workspace_load_file() needs to recalc to work, try to avoid that by
+	 * doing .defs first.
+	 */
+	if( is_file_type( &filesel_dfile_type, filename ) ) {
+		if( toolkit_new_from_file( main_toolkitgroup, filename ) )
+			return( TRUE );
+
+		error_clear();
+	}
+
+	/* Try as matrix or image. Have to do these via definitions.
+	 */
+	if( workspace_load_file( ws, filename ) ) 
+		return( TRUE );
+
+	error_clear();
+
+	error_top( _( "Unknown file type." ) );
+	error_sub( _( "Unable to load \"%s\"." ), filename );
+
+	return( FALSE );
+}
+
 static gboolean
 workspaceview_filedrop( Workspaceview *wview, const char *filename )
 {
@@ -831,7 +866,7 @@ workspaceview_filedrop( Workspaceview *wview, const char *filename )
 
 	gboolean result;
 
-	result = main_load( mainw, ws, filename );
+	result = workspaceview_load( mainw, ws, filename );
 	if( result )
 		symbol_recalculate_all();
 

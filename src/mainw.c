@@ -549,15 +549,12 @@ static GtkNotebook *
 mainw_create_window_cb( GtkNotebook *notebook, 
 	GtkWidget *page, int x, int y, gpointer user_data )
 {
-	int page_num = gtk_notebook_page_num( GTK_NOTEBOOK( notebook ), page );
-	Mainwtab *tab = MAINWTAB( page );
 	Mainw *mainw = MAINW( user_data );
 
 	Mainw *new_mainw;
 
 	new_mainw = mainw_new( mainw->wsg );
 	gtk_window_move( GTK_WINDOW( new_mainw ), x, y );
-
 	gtk_widget_show( GTK_WIDGET( new_mainw ) );
 
 	return( GTK_NOTEBOOK( new_mainw->notebook ) ); 

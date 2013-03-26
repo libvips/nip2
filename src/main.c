@@ -423,7 +423,7 @@ main_watchgroup_changed_cb( void )
 /* Try to load a thing, anything at all. Actually, we don't load plugins
  * experimentally, win32 pops up an annoying error dialog if you try that.
  */
-gboolean
+static gboolean
 main_load( Mainw *mainw, Workspace *ws, const char *filename )
 {
 	Workspace *new_ws;

@@ -28,8 +28,8 @@
  */
 
 /* 
-#define DEBUG
  */
+#define DEBUG
 
 #include "ip.h"
 
@@ -708,6 +708,10 @@ columnview_refresh( vObject *vobject )
 	Column *col = COLUMN( VOBJECT( cview )->iobject );
 	gboolean editable = col->ws->mode != WORKSPACE_MODE_NOEDIT;
 
+#ifdef DEBUG
+	printf( "columnview_refresh: %s\n", IOBJECT( col )->name );
+#endif /*DEBUG*/
+
 	/* Update position.
 	 */
 	if( col->x != cview->lx || col->y != cview->ly ) {
@@ -1032,8 +1036,6 @@ View *
 columnview_new( void )
 {
 	Columnview *cview = gtk_type_new( TYPE_COLUMNVIEW );
-
-	printf( "columnview_new\n" ); 
 
 	return( VIEW( cview ) );
 }

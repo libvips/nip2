@@ -1,6 +1,4 @@
 
-- why do we do so many path_adds? two for each ws load
-
 - test file drop on mainw, esp. workspaces
 
 - do we need a filemodel for group-of-workspaces?

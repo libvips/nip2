@@ -419,12 +419,6 @@ workspaceview_destroy( GtkObject *object )
 
 	wview = WORKSPACEVIEW( object );
 
-{
-	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
-
-	printf( "\t%s\n", ws ? IOBJECT( ws )->name : "null ws" );
-}
-
 	/* Instance destroy.
 	 */
 	workspaceview_scroll_stop( wview );

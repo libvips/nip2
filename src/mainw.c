@@ -30,8 +30,8 @@
 #include "ip.h"
 
 /* 
- */
 #define DEBUG
+ */
 
 /* Load and save recent items here.
  */

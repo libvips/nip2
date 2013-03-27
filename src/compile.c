@@ -2113,7 +2113,7 @@ compile_copy_sym( Symbol *sym, Compile *dest )
 		break;
 
 	case SYM_WORKSPACE:
-	case SYM_WORKSPACEGROUP:
+	case SYM_WORKSPACEROOT:
 	case SYM_ROOT:
 	case SYM_EXTERNAL:
 	case SYM_BUILTIN:

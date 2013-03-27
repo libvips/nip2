@@ -1,3 +1,17 @@
+- we must do it properly, with one file per mainw, it'd be much too confusing
+  to have save sometimes save a tab and sometimes save the whole book
+
+  so we must convert old ws files to workspacegroups with a single tab on load
+
+  we need a workspacegroup filemodel object to hold a set of workspaces
+
+  add workspacegroup ... a filemodel that represents a loaded workspace file,
+  has a list of workspaces as children
+
+  mainw displays a workspacegroup
+
+
+
 
 - test file drop on mainw, esp. workspaces
 

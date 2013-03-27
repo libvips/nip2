@@ -2071,7 +2071,7 @@ row_parse_name_row( Row *context, const char *path )
 }
 
 /* Parse a qualified name .. eg. "untitled.A1.name" and find the row. Find
- * relative to context. Context is a sym, so we can have workspacegroups etc.
+ * relative to context. Context is a sym, so we can have workspaceroot etc.
  */
 Row *
 row_parse_name( Symbol *context, const char *path )
@@ -2103,7 +2103,7 @@ row_parse_name( Symbol *context, const char *path )
 	 */
 	switch( context->type ) {
 	case SYM_WORKSPACE:
-	case SYM_WORKSPACEGROUP:
+	case SYM_WORKSPACEROOT:
 	case SYM_ROOT:
 		if( !(sym = compile_lookup( context->expr->compile, name )) ) 
 			return( NULL );

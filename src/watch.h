@@ -47,7 +47,7 @@ typedef struct _Watchgroup {
 
 	/* Workspaces we work within. Assume we are destroyed before this.
 	 */
-	Workspacegroup *workspacegroup;
+	Workspaceroot *workspaceroot;
 
 	/* Name of workspace our watchers check for their syms.
 	 */
@@ -71,7 +71,7 @@ typedef struct _WatchgroupClass {
 } WatchgroupClass;
 
 GType watchgroup_get_type( void );
-Watchgroup *watchgroup_new( Workspacegroup *workspacegroup, const char *name );
+Watchgroup *watchgroup_new( Workspaceroot *workspaceroot, const char *name );
 void watchgroup_flush( Watchgroup *watchgroup );
 
 /* Abstract base class for something that watches a row.

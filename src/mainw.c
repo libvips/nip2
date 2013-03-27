@@ -220,7 +220,7 @@ mainw_progress_end( Progress *progress, Mainw *mainw )
 static void
 mainw_init( Mainw *mainw )
 {
-	mainw->wsg = NULL;
+	mainw->wsr = NULL;
 
 	mainw->ws_changed_sid = 0;
 	mainw->ws_changed = NULL;
@@ -553,7 +553,7 @@ mainw_create_window_cb( GtkNotebook *notebook,
 
 	Mainw *new_mainw;
 
-	new_mainw = mainw_new( mainw->wsg );
+	new_mainw = mainw_new( mainw->wsr );
 	gtk_window_move( GTK_WINDOW( new_mainw ), x, y );
 	gtk_widget_show( GTK_WIDGET( new_mainw ) );
 
@@ -640,8 +640,8 @@ mainw_add_workspace_cb( GtkWidget *wid, Mainw *mainw )
 	Workspace *ws;
 	Mainwtab *tab;
 
-	workspacegroup_name_new( mainw->wsg, name );
-	if( !(ws = workspace_new_blank( mainw->wsg, name )) ) {
+	workspaceroot_name_new( mainw->wsr, name );
+	if( !(ws = workspace_new_blank( mainw->wsr, name )) ) {
 		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
 		return;
 	}
@@ -739,7 +739,7 @@ mainw_workbook_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 
 	progress_begin();
 
-	new_mainw = mainw_new( mainw->wsg );
+	new_mainw = mainw_new( mainw->wsr );
 
 	gtk_widget_show( GTK_WIDGET( new_mainw ) );
 
@@ -1009,7 +1009,7 @@ mainw_open_workspace( Mainw *mainw,
 	Workspace *ws;
 	Mainwtab *tab;
 
-	if( !(ws = workspace_new_from_file( mainw->wsg, filename, NULL )) ) 
+	if( !(ws = workspace_new_from_file( mainw->wsr, filename, NULL )) ) 
 		return( NULL );
 	tab = mainw_add_workspace( mainw, mainw->current_tab, ws, trim ); 
 	if( select )
@@ -1498,7 +1498,7 @@ mainw_workspace_new_done_cb( iWindow *iwnd, void *client,
 		return;
 	}
 
-	if( !(ws = workspace_new_blank( mainw->wsg, name_text )) ) {
+	if( !(ws = workspace_new_blank( mainw->wsr, name_text )) ) {
 		nfn( sys, IWINDOW_ERROR );
 		return;
 	}
@@ -1515,11 +1515,11 @@ mainw_workspace_new_done_cb( iWindow *iwnd, void *client,
 static void
 mainw_workspace_new_action_cb( GtkAction *action, Mainw *mainw )
 {
-	Workspacegroup *wsg = mainw->wsg; 
+	Workspaceroot *wsr = mainw->wsr; 
 	GtkWidget *ss = stringset_new();
 	char name[256];
 
-	workspacegroup_name_new( wsg, name );
+	workspaceroot_name_new( wsr, name );
 	stringset_child_new( STRINGSET( ss ), 
 		_( "Name" ), name, _( "Set workspace name here" ) );
 	stringset_child_new( STRINGSET( ss ), 
@@ -1545,9 +1545,9 @@ mainw_workbook_new_action_cb( GtkAction *action, Mainw *mainw )
 	Workspace *new_ws;
 	char name[256];
 
-	new_mainw = mainw_new( mainw->wsg );
-	workspacegroup_name_new( mainw->wsg, name );
-	new_ws = workspace_new_blank( mainw->wsg, name );
+	new_mainw = mainw_new( mainw->wsr );
+	workspaceroot_name_new( mainw->wsr, name );
+	new_ws = workspace_new_blank( mainw->wsr, name );
 	mainw_add_workspace( new_mainw, NULL, new_ws, FALSE );
 	gtk_widget_show( GTK_WIDGET( new_mainw ) );
 }
@@ -1721,7 +1721,7 @@ static void
 mainw_magic_cb( gpointer callback_data, guint callback_action,
         GtkWidget *widget )
 {
-	Workspace *ws = main_workspacegroup->current;
+	Workspace *ws = main_workspaceroot->current;
 	Row *row = workspace_selected_one( ws );
 
 	if( !row )
@@ -2282,12 +2282,12 @@ mainw_popdown( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys )
 }
 
 static void
-mainw_link( Mainw *mainw, Workspacegroup *wsg )
+mainw_link( Mainw *mainw, Workspaceroot *wsr )
 {
-	mainw->wsg = wsg;
+	mainw->wsr = wsr;
 
 	iwindow_set_build( IWINDOW( mainw ), 
-		(iWindowBuildFn) mainw_build, wsg, NULL, NULL );
+		(iWindowBuildFn) mainw_build, wsr, NULL, NULL );
 	iwindow_set_popdown( IWINDOW( mainw ), mainw_popdown, NULL );
 	iwindow_set_size_prefs( IWINDOW( mainw ), 
 		"MAINW_WINDOW_WIDTH", "MAINW_WINDOW_HEIGHT" );
@@ -2299,13 +2299,13 @@ mainw_link( Mainw *mainw, Workspacegroup *wsg )
 }
 
 Mainw *
-mainw_new( Workspacegroup *wsg )
+mainw_new( Workspaceroot *wsr )
 {
 	Mainw *mainw;
 
 	mainw = MAINW( g_object_new( TYPE_MAINW, NULL ) );
 
-	mainw_link( mainw, wsg );
+	mainw_link( mainw, wsr );
 
 	return( mainw );
 }

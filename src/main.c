@@ -70,7 +70,7 @@
 GdkWindow *main_window_gdk;			/* Top GdkWindow */
 GtkWidget *main_window_top = NULL;		/* Secret top window */
 
-Workspacegroup *main_workspacegroup = NULL;	/* All the workspaces */
+Workspaceroot *main_workspaceroot = NULL;	/* All the workspaces */
 Toolkitgroup *main_toolkitgroup = NULL;		/* All the toolkits */
 Symbol *main_symbol_root = NULL;		/* Root of symtable */
 Watchgroup *main_watchgroup = NULL;		/* All of the watches */
@@ -316,7 +316,7 @@ main_quit( void )
 	UNREF( main_watchgroup );
 	UNREF( main_symbol_root );
 	UNREF( main_toolkitgroup );
-	UNREF( main_workspacegroup );
+	UNREF( main_workspaceroot );
 
 	/* Junk reduction machine ... this should remove all image temps.
 	 */
@@ -499,7 +499,7 @@ main_load_ws( const char *filename )
 
 	progress_update_loading( 0, im_skip_dir( filename ) );
 
-	if( !(ws = workspace_new_from_file( main_workspacegroup, 
+	if( !(ws = workspace_new_from_file( main_workspaceroot, 
 		filename, NULL )) ) 
 		iwindow_alert( NULL, GTK_MESSAGE_ERROR );
 	else {
@@ -1229,10 +1229,10 @@ main( int argc, char *argv[] )
 	g_object_ref( G_OBJECT( main_symbol_root ) );
 	iobject_sink( IOBJECT( main_symbol_root ) );
 	model_base_init();
-	main_workspacegroup = workspacegroup_new( "Workspaces" );
-	g_object_ref( G_OBJECT( main_workspacegroup ) );
-	iobject_sink( IOBJECT( main_workspacegroup ) );
-	main_watchgroup = watchgroup_new( main_workspacegroup, "Preferences" );
+	main_workspaceroot = workspaceroot_new( "Workspaces" );
+	g_object_ref( G_OBJECT( main_workspaceroot ) );
+	iobject_sink( IOBJECT( main_workspaceroot ) );
+	main_watchgroup = watchgroup_new( main_workspaceroot, "Preferences" );
 	g_object_ref( G_OBJECT( main_watchgroup ) );
 	iobject_sink( IOBJECT( main_watchgroup ) );
 	main_toolkitgroup = toolkitgroup_new( symbol_root );
@@ -1329,7 +1329,7 @@ main( int argc, char *argv[] )
 
 	if( main_option_stdin_ws ) {
 		if( !(ws = workspace_new_from_openfile( 
-			main_workspacegroup, main_stdin )) ) 
+			main_workspaceroot, main_stdin )) ) 
 			main_log_add( "%s\n", error_get_sub() );
 		else 
 			/* Don't want to have "stdin" as the filename.
@@ -1340,14 +1340,14 @@ main( int argc, char *argv[] )
 	/* Make sure we have a start workspace.
 	 */
 	if( !ws ) {
-		workspacegroup_name_new( main_workspacegroup, name );
-		ws = workspace_new_blank( main_workspacegroup, name );
+		workspaceroot_name_new( main_workspaceroot, name );
+		ws = workspace_new_blank( main_workspaceroot, name );
 	}
 
 	/* Make a mainw to hold any workspaces we load. Only show this in
 	 * interactive mode, see below.
 	 */
-	mainw = mainw_new( main_workspacegroup );
+	mainw = mainw_new( main_workspaceroot );
 	mainw_add_workspace( mainw, NULL, ws, FALSE );
 
 	/* Reset IM_CONCURRENCY if a watch changes. Need to do this after

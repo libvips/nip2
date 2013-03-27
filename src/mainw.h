@@ -45,7 +45,7 @@ struct _Mainw {
 
 	/* We make and manage workspaces inside this.
 	 */
-	Workspacegroup *wsg;
+	Workspaceroot *wsr;
 
 	/* Set of workspace tabs we display.
 	 */
@@ -154,7 +154,7 @@ Mainwtab *mainw_add_workspace( Mainw *mainw,
 Workspace *mainw_open_workspace( Mainw *mainw, 
 	const char *filename, gboolean trim, gboolean select );
 
-Mainw *mainw_new( Workspacegroup *wsg );
+Mainw *mainw_new( Workspaceroot *wsr );
 
 int mainw_get_n_tabs( Mainw *mainw );
 Mainwtab *mainw_get_nth_tab( Mainw *mainw, int i );

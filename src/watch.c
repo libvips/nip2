@@ -102,7 +102,7 @@ watchgroup_get_type( void )
 }
 
 Watchgroup *
-watchgroup_new( Workspacegroup *workspacegroup, const char *name )
+watchgroup_new( Workspaceroot *workspaceroot, const char *name )
 {
 	Watchgroup *watchgroup = WATCHGROUP( 
 		g_object_new( TYPE_WATCHGROUP, NULL ) );
@@ -111,7 +111,7 @@ watchgroup_new( Workspacegroup *workspacegroup, const char *name )
 	 */
 	watchgroup->name = name;
 
-	watchgroup->workspacegroup = workspacegroup;
+	watchgroup->workspaceroot = workspaceroot;
 	icontainer_set_hash( ICONTAINER( watchgroup ) );
 
 	return( watchgroup );
@@ -125,10 +125,10 @@ watchgroup_get_workspace( Watchgroup *watchgroup )
 	Compile *compile;
 	Symbol *sym;
 
-	if( !watchgroup->workspacegroup->sym )
+	if( !watchgroup->workspaceroot->sym )
 		return( NULL );
 
-	compile = watchgroup->workspacegroup->sym->expr->compile;
+	compile = watchgroup->workspaceroot->sym->expr->compile;
 
 	if( !(sym = compile_lookup( compile, watchgroup->name )) ||
 		!sym->expr->compile ||

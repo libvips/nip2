@@ -1321,7 +1321,7 @@ reduce_start:
 
 		case SYM_ROOT:
 		case SYM_WORKSPACE:
-		case SYM_WORKSPACEGROUP:
+		case SYM_WORKSPACEROOT:
 			/* Becomes a symref ... base type.
 			 */
 			PEPUTP( &np, ELEMENT_SYMREF, sym );

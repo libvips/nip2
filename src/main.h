@@ -30,7 +30,7 @@
 extern GtkWidget *main_window_top;		/* Secret base window */
 extern GdkWindow *main_window_gdk;		/* gdk base window */
 
-extern Workspacegroup *main_workspacegroup;	/* All the workspaces */
+extern Workspaceroot *main_workspaceroot;	/* All the workspaces */
 extern Toolkitgroup *main_toolkitgroup;		/* All the toolkits */
 extern Symbol *main_symbol_root;		/* Root of symtable */
 extern Watchgroup *main_watchgroup;		/* All of the watches */

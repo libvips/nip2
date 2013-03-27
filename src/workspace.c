@@ -37,10 +37,10 @@ static FilemodelClass *parent_class = NULL;
 
 static GSList *workspace_all = NULL;
 
-Workspacegroup *
-workspace_get_workspacegroup( Workspace *ws )
+Workspaceroot *
+workspace_get_workspaceroot( Workspace *ws )
 {
-	return( WORKSPACEGROUP( ICONTAINER( ws )->parent ) );
+	return( WORKSPACEROOT( ICONTAINER( ws )->parent ) );
 }
 
 /* Over all workspaces.
@@ -48,7 +48,7 @@ workspace_get_workspacegroup( Workspace *ws )
 void *
 workspace_map( workspace_map_fn fn, void *a, void *b )
 {
-	return( icontainer_map( ICONTAINER( main_workspacegroup ), 
+	return( icontainer_map( ICONTAINER( main_workspaceroot ), 
 		(icontainer_map_fn) fn, a, b ) );
 }
 
@@ -897,7 +897,7 @@ workspace_child_remove( iContainer *parent, iContainer *child )
 }
 
 static void
-workspace_link( Workspace *ws, Workspacegroup *wsg, const char *name )
+workspace_link( Workspace *ws, Workspaceroot *wsr, const char *name )
 {
 	Symbol *sym;
 
@@ -905,7 +905,7 @@ workspace_link( Workspace *ws, Workspacegroup *wsg, const char *name )
 	printf( "workspace_link: naming ws as %s\n", name );
 #endif /*DEBUG*/
 
-	sym = symbol_new_defining( wsg->sym->expr->compile, name );
+	sym = symbol_new_defining( wsr->sym->expr->compile, name );
 
 	ws->sym = sym;
 	sym->type = SYM_WORKSPACE;
@@ -965,7 +965,7 @@ workspace_load( Model *model,
 	char buf[FILENAME_MAX];
 	char *txt;
 
-	g_assert( IS_WORKSPACEGROUP( parent ) );
+	g_assert( IS_WORKSPACEROOT( parent ) );
 
 	/* "view" is optional, for backwards compatibility.
 	 */
@@ -1259,7 +1259,7 @@ workspace_top_load( Filemodel *filemodel,
 	ModelLoadState *state, Model *parent, xmlNode *xnode )
 {
 	Workspace *ws = WORKSPACE( filemodel );
-	Workspacegroup *wsg = WORKSPACEGROUP( parent );
+	Workspaceroot *wsr = WORKSPACEROOT( parent );
 	Column *current_col;
 	xmlNode *i, *j, *k;
 	char name[FILENAME_MAX];
@@ -1301,9 +1301,9 @@ workspace_top_load( Filemodel *filemodel,
 		 * saved in the file.
 		 */
 		name_from_filename( state->filename_user, name );
-		while( compile_lookup( wsg->sym->expr->compile, name ) )
+		while( compile_lookup( wsr->sym->expr->compile, name ) )
 			increment_name( name );
-		workspace_link( ws, wsg, name );
+		workspace_link( ws, wsr, name );
 
 		filemodel->major = state->major;
 		filemodel->minor = state->minor;
@@ -1541,7 +1541,7 @@ workspace_get_type( void )
 }
 
 Workspace *
-workspace_new( Workspacegroup *wsg, const char *name )
+workspace_new( Workspaceroot *wsr, const char *name )
 {
 	Workspace *ws;
 
@@ -1549,7 +1549,7 @@ workspace_new( Workspacegroup *wsg, const char *name )
 	printf( "workspace_new: %s\n", name );
 #endif /*DEBUG*/
 
-	if( compile_lookup( wsg->sym->expr->compile, name ) ) {
+	if( compile_lookup( wsr->sym->expr->compile, name ) ) {
 		error_top( _( "Name clash." ) );
 		error_sub( _( "Can't create workspace \"%s\". "
 			"A symbol with that name already exists." ), name );
@@ -1557,8 +1557,8 @@ workspace_new( Workspacegroup *wsg, const char *name )
 	}
 
 	ws = WORKSPACE( g_object_new( TYPE_WORKSPACE, NULL ) );
-	icontainer_child_add( ICONTAINER( wsg ), ICONTAINER( ws ), -1 );
-	workspace_link( ws, wsg, name );
+	icontainer_child_add( ICONTAINER( wsr ), ICONTAINER( ws ), -1 );
+	workspace_link( ws, wsr, name );
 	(void) workspace_column_pick( ws );
 
 	return( ws );
@@ -1567,7 +1567,7 @@ workspace_new( Workspacegroup *wsg, const char *name )
 /* Load into an empty workspace.
  */
 static gboolean
-workspace_load_empty( Workspace *ws, Workspacegroup *wsg, 
+workspace_load_empty( Workspace *ws, Workspaceroot *wsr, 
 	const char *filename, const char *filename_user )
 {
 	g_assert( workspace_is_empty( ws ) );
@@ -1575,7 +1575,7 @@ workspace_load_empty( Workspace *ws, Workspacegroup *wsg,
 	ws->load_type = WORKSPACE_LOAD_TOP;
 	column_set_offset( WORKSPACEVIEW_MARGIN_LEFT, 
 		WORKSPACEVIEW_MARGIN_TOP );
-	if( !filemodel_load_all( FILEMODEL( ws ), MODEL( wsg ), 
+	if( !filemodel_load_all( FILEMODEL( ws ), MODEL( wsr ), 
 		filename, filename_user ) ) 
 		return( FALSE );
 	filemodel_set_modified( FILEMODEL( ws ), FALSE );
@@ -1588,7 +1588,7 @@ workspace_load_empty( Workspace *ws, Workspacegroup *wsg,
 /* New workspace from a file.
  */
 Workspace *
-workspace_new_from_file( Workspacegroup *wsg, 
+workspace_new_from_file( Workspaceroot *wsr, 
 	const char *filename, const char *filename_user )
 {
 	Workspace *ws;
@@ -1598,7 +1598,7 @@ workspace_new_from_file( Workspacegroup *wsg,
 #endif /*DEBUG*/
 
 	ws = WORKSPACE( g_object_new( TYPE_WORKSPACE, NULL ) );
-	if( !workspace_load_empty( ws, wsg, filename, filename_user ) ) {
+	if( !workspace_load_empty( ws, wsr, filename, filename_user ) ) {
 		g_object_unref( G_OBJECT( ws ) );
 		return( NULL );
 	}
@@ -1609,7 +1609,7 @@ workspace_new_from_file( Workspacegroup *wsg,
 /* New workspace from a file.
  */
 Workspace *
-workspace_new_from_openfile( Workspacegroup *wsg, iOpenFile *of )
+workspace_new_from_openfile( Workspaceroot *wsr, iOpenFile *of )
 {
 	Workspace *ws;
 
@@ -1620,7 +1620,7 @@ workspace_new_from_openfile( Workspacegroup *wsg, iOpenFile *of )
 	ws = WORKSPACE( g_object_new( TYPE_WORKSPACE, NULL ) );
 	ws->load_type = WORKSPACE_LOAD_TOP;
 	if( !filemodel_load_all_openfile( FILEMODEL( ws ), 
-		MODEL( wsg ), of ) ) {
+		MODEL( wsr ), of ) ) {
 		g_object_unref( G_OBJECT( ws ) );
 		return( NULL );
 	}
@@ -1639,11 +1639,11 @@ workspace_new_from_openfile( Workspacegroup *wsg, iOpenFile *of )
  * anything else).
  */
 Workspace *
-workspace_new_blank( Workspacegroup *wsg, const char *name )
+workspace_new_blank( Workspaceroot *wsr, const char *name )
 {
 	Workspace *ws;
 
-	if( !(ws = workspace_new( wsg, name )) )
+	if( !(ws = workspace_new( wsr, name )) )
 		return( NULL );
 
 	iobject_set( IOBJECT( ws ), NULL, _( "Default empty workspace" ) );
@@ -1662,7 +1662,7 @@ workspace_merge_file( Workspace *ws,
 		model_empty( MODEL( ws ) );
 
 		if( !workspace_load_empty( ws, 
-			WORKSPACEGROUP( ICONTAINER( ws )->parent ), 
+			WORKSPACEROOT( ICONTAINER( ws )->parent ), 
 			filename, filename_user ) ) 
 			return( FALSE );
 	}
@@ -1762,7 +1762,7 @@ workspace_number( void )
 Workspace *
 workspace_clone( Workspace *ws )
 {
-	Workspacegroup *wsg = WORKSPACEGROUP( ICONTAINER( ws )->parent );
+	Workspaceroot *wsr = WORKSPACEROOT( ICONTAINER( ws )->parent );
 	Workspace *nws;
 	char filename[FILENAME_MAX];
 
@@ -1774,7 +1774,7 @@ workspace_clone( Workspace *ws )
 
 	/* Try to load the clone file back again.
 	 */
-	if( !(nws = workspace_new_from_file( wsg, 
+	if( !(nws = workspace_new_from_file( wsr, 
 		filename, FILEMODEL( ws )->filename )) ) {
 		unlinkf( "%s", filename );
 		return( NULL );

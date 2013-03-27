@@ -1,4 +1,4 @@
-/* Group workspacegroup files together.
+/* The root of all workspaces. A singleton all workspaces are children of.
  */
 
 /*
@@ -36,43 +36,43 @@
 static ModelClass *parent_class = NULL;
 
 static void
-workspacegroup_dispose( GObject *gobject )
+workspaceroot_dispose( GObject *gobject )
 {
-	Workspacegroup *wsg;
+	Workspaceroot *wsr;
 
 #ifdef DEBUG
-	printf( "workspacegroup_dispose\n" );
+	printf( "workspaceroot_dispose\n" );
 #endif /*DEBUG*/
 
 	g_return_if_fail( gobject != NULL );
-	g_return_if_fail( IS_WORKSPACEGROUP( gobject ) );
+	g_return_if_fail( IS_WORKSPACEROOT( gobject ) );
 
-	wsg = WORKSPACEGROUP( gobject );
+	wsr = WORKSPACEROOT( gobject );
 
-	wsg->sym = NULL;
+	wsr->sym = NULL;
 
 	G_OBJECT_CLASS( parent_class )->dispose( gobject );
 }
 
 static void
-workspacegroup_child_add( iContainer *parent, iContainer *child, int pos )
+workspaceroot_child_add( iContainer *parent, iContainer *child, int pos )
 {
 	ICONTAINER_CLASS( parent_class )->child_add( parent, child, pos );
 
 #ifdef DEBUG
-	printf( "workspacegroup_child_add: added %s\n",
+	printf( "workspaceroot_child_add: added %s\n",
 		IOBJECT( child )->name );
 #endif /*DEBUG*/
 }
 
 static void
-workspacegroup_child_remove( iContainer *parent, iContainer *child )
+workspaceroot_child_remove( iContainer *parent, iContainer *child )
 {
 	ICONTAINER_CLASS( parent_class )->child_remove( parent, child );
 }
 
 static void
-workspacegroup_class_init( WorkspacegroupClass *class )
+workspaceroot_class_init( WorkspacerootClass *class )
 {
 	GObjectClass *gobject_class = (GObjectClass *) class;
 	iContainerClass *icontainer_class = (iContainerClass *) class;
@@ -84,82 +84,82 @@ workspacegroup_class_init( WorkspacegroupClass *class )
 
 	/* Init methods.
 	 */
-	gobject_class->dispose = workspacegroup_dispose;
+	gobject_class->dispose = workspaceroot_dispose;
 
-	icontainer_class->child_add = workspacegroup_child_add;
-	icontainer_class->child_remove = workspacegroup_child_remove;
+	icontainer_class->child_add = workspaceroot_child_add;
+	icontainer_class->child_remove = workspaceroot_child_remove;
 }
 
 static void
-workspacegroup_init( Workspacegroup *wsg )
+workspaceroot_init( Workspaceroot *wsr )
 {
-	wsg->sym = NULL;
+	wsr->sym = NULL;
 }
 
 GType
-workspacegroup_get_type( void )
+workspaceroot_get_type( void )
 {
 	static GType type = 0;
 
 	if( !type ) {
 		static const GTypeInfo info = {
-			sizeof( WorkspacegroupClass ),
+			sizeof( WorkspacerootClass ),
 			NULL,           /* base_init */
 			NULL,           /* base_finalize */
-			(GClassInitFunc) workspacegroup_class_init,
+			(GClassInitFunc) workspaceroot_class_init,
 			NULL,           /* class_finalize */
 			NULL,           /* class_data */
-			sizeof( Workspacegroup ),
+			sizeof( Workspaceroot ),
 			32,             /* n_preallocs */
-			(GInstanceInitFunc) workspacegroup_init,
+			(GInstanceInitFunc) workspaceroot_init,
 		};
 
 		type = g_type_register_static( TYPE_MODEL, 
-			"Workspacegroup", &info, 0 );
+			"Workspaceroot", &info, 0 );
 	}
 
 	return( type );
 }
 
 static void
-workspacegroup_link( Workspacegroup *wsg, const char *name )
+workspaceroot_link( Workspaceroot *wsr, const char *name )
 {
 	Symbol *sym;
 
-	iobject_set( IOBJECT( wsg ), name, NULL );
+	iobject_set( IOBJECT( wsr ), name, NULL );
 
-	wsg->sym = sym = symbol_new( symbol_root->expr->compile, name );
-	sym->type = SYM_WORKSPACEGROUP;
-	sym->wsg = wsg;
+	wsr->sym = sym = symbol_new( symbol_root->expr->compile, name );
+	sym->type = SYM_WORKSPACEROOT;
+	sym->wsr = wsr;
 	sym->expr = expr_new( sym );
 	(void) compile_new( sym->expr );
 	symbol_made( sym );
 }
 
-Workspacegroup *
-workspacegroup_new( const char *name )
+Workspaceroot *
+workspaceroot_new( const char *name )
 {
-	Workspacegroup *wsg;
+	Workspaceroot *wsr;
 
 	if( compile_lookup( symbol_root->expr->compile, name ) ) {
 		error_top( _( "Name clash." ) );
-		error_sub( _( "Can't create workspacegroup \"%s\". "
+		error_sub( _( "Can't create workspaceroot \"%s\". "
 			"A symbol with that name already exists." ), name );
 		return( NULL );
 	}
 
-	wsg = WORKSPACEGROUP( g_object_new( TYPE_WORKSPACEGROUP, NULL ) );
-	workspacegroup_link( wsg, name );
+	wsr = WORKSPACEROOT( g_object_new( TYPE_WORKSPACEROOT, NULL ) );
+	workspaceroot_link( wsr, name );
 
-	return( wsg );
+	return( wsr );
 }
 
 /* Make up a new workspace name.
  */
 void
-workspacegroup_name_new( Workspacegroup *wsg, char *name )
+workspaceroot_name_new( Workspaceroot *wsr, char *name )
 {
-	Compile *compile = wsg->sym->expr->compile;
+	Compile *compile = wsr->sym->expr->compile;
 
 	strcpy( name, "untitled" );
 	while( compile_lookup( compile, name ) )

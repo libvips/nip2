@@ -196,9 +196,9 @@ prefs_column_compare( Column *a, Column *b )
 Prefs *
 prefs_new( const char *caption_filter )
 {
-	Symbol *wsg_sym = main_workspacegroup->sym;
+	Symbol *wsr_sym = main_workspaceroot->sym;
 	Symbol *ws_sym = SYMBOL( icontainer_child_lookup( 
-		ICONTAINER( wsg_sym->expr->compile ), "Preferences" ) );
+		ICONTAINER( wsr_sym->expr->compile ), "Preferences" ) );
 	Prefs *prefs;
 
 	if( !ws_sym ) {

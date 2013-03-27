@@ -112,7 +112,7 @@ iimageview_drag_data_get( GtkWidget *widget, GdkDragContext *context,
 
 		/* Drag the fully-qualified row name.
 		 */
-		row_qualified_name_relative( main_workspacegroup->sym, 
+		row_qualified_name_relative( main_workspaceroot->sym, 
 			row, &buf );
 		gtk_selection_data_set( selection_data,
 			gdk_atom_intern( "text/symbol", FALSE ), 8, 
@@ -146,7 +146,7 @@ iimageview_drag_data_received( GtkWidget *widget, GdkDragContext *context,
 
 		/* Block drags to ourselves ... pointless.
 		 */
-		if( (from_row = row_parse_name( main_workspacegroup->sym,
+		if( (from_row = row_parse_name( main_workspaceroot->sym,
 			from_row_path )) && 
 			from_row != row ) {
 			iText *itext = ITEXT( HEAPMODEL( iimage )->rhs->itext );

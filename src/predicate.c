@@ -126,11 +126,11 @@ gboolean
 is_scope( Symbol *sym )
 {
 	return( sym->type == SYM_ROOT || sym->type == SYM_WORKSPACE || 
-		sym->type == SYM_WORKSPACEGROUP || !symbol_get_parent( sym ) );
+		sym->type == SYM_WORKSPACEROOT || !symbol_get_parent( sym ) );
 }
 
 /* Is a symbol a top-level definition. Tops are symbols whose parents are 
- * all SYM_ROOT, SYM_WORKSPACE or SYM_WORKSPACEGROUP.
+ * all SYM_ROOT, SYM_WORKSPACE or SYM_WORKSPACEROOT.
  */
 gboolean
 is_top( Symbol *sym )

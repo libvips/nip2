@@ -470,7 +470,7 @@ workspaceview_drag_data_received( GtkWidget *widget, GdkDragContext *context,
 		selection_data->format == 8 &&
 		workspaceview_is_background( wview, 
 			GTK_WIDGET( wview->fixed )->window, x, y ) &&
-		(from_row = row_parse_name( main_workspacegroup->sym, 
+		(from_row = row_parse_name( main_workspaceroot->sym, 
 			from_row_path )) ) {
 		char *name;
 		Column *col;
@@ -895,8 +895,6 @@ workspaceview_init( Workspaceview *wview )
 {
 	GtkAdjustment *hadj;
 	GtkAdjustment *vadj;
-
-	wview->wgview = NULL;
 
 	wview->fixed = NULL;
 	wview->window = NULL;

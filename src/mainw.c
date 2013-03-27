@@ -685,6 +685,14 @@ mainw_switch_page_cb( GtkNotebook *notebook,
 
 		tab->popped_compat = TRUE;
 	}
+
+	/* How bizarre, pages sometimes fail to set up correctly. Force a
+	 * resize to get everything to init. 
+	 */
+	if( tab->wsview &&
+		tab->wsview->fixed ) 
+		gtk_container_check_resize( 
+			GTK_CONTAINER( tab->wsview->fixed ) );
 }
 
 static void *

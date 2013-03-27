@@ -28,8 +28,8 @@
  */
 
 /* 
-#define DEBUG
  */
+#define DEBUG
 
 /* Define to trace button press events.
 #define EVENT

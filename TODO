@@ -1,8 +1,6 @@
 
 - why do we do so many path_adds? two for each ws load
 
-- 2nd and subsequent tabs from cmdline do not init correctly
-
 - test file drop on mainw, esp. workspaces
 
 - do we need a filemodel for group-of-workspaces?

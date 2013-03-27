@@ -1373,7 +1373,7 @@ main( int argc, char *argv[] )
 	path_expand( buf );
 	setenvf( "TMPDIR", "%s", buf );
 
-	path_rewrite_add( PATH_TMP, "$TMPDIR" );
+	path_rewrite_add( PATH_TMP, "$TMPDIR", TRUE );
 }
 
 	/* Measure amount of stuff in temp area ... need this for checking

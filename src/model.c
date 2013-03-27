@@ -109,9 +109,9 @@ model_loadstate_destroy( ModelLoadState *state )
 	slist_map( state->renames, 
 		(SListMapFn) model_loadstate_rename_destroy, NULL );
 	g_slist_free( state->renames );
-	
+
 	if( state->old_dir ) {
-		path_rewrite_add( state->old_dir, NULL );
+		path_rewrite_add( state->old_dir, NULL, FALSE );
 		IM_FREE( state->old_dir );
 	}
 

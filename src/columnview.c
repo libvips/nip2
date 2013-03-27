@@ -28,8 +28,8 @@
  */
 
 /* 
- */
 #define DEBUG
+ */
 
 #include "ip.h"
 

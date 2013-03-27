@@ -1286,7 +1286,7 @@ workspace_top_load( Filemodel *filemodel,
 		state->old_dir = g_path_get_dirname( name ); 
 		new_dir = g_path_get_dirname( state->filename_user );
 
-		path_rewrite_add( state->old_dir, new_dir );
+		path_rewrite_add( state->old_dir, new_dir, FALSE );
 
 		g_free( new_dir );
 	}

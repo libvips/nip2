@@ -103,7 +103,6 @@ prefworkspaceview_class_init( PrefworkspaceviewClass *class )
 static void
 prefworkspaceview_init( Prefworkspaceview *pwview )
 {
-	pwview->wgview = NULL;
 	pwview->caption_filter = NULL; 
 }
 

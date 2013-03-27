@@ -174,6 +174,8 @@ nip2_SOURCES = \
 	main.h \
 	mainw.c \
 	mainw.h \
+	mainwtab.c \
+	mainwtab.h \
 	matrix.c \
 	matrix.h \
 	matrixview.c \
@@ -289,8 +291,8 @@ nip2_SOURCES = \
 	workspace.h \
 	workspacedefs.c \
 	workspacedefs.h \
-	workspacegroup.c \
-	workspacegroup.h \
+	workspaceroot.c \
+	workspaceroot.h \
 	workspaceview.c \
 	workspaceview.h 
 

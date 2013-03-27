@@ -138,7 +138,7 @@ typedef struct _WorkspaceClass {
 	 */
 } WorkspaceClass;
 
-Workspacegroup *workspace_get_workspacegroup( Workspace *ws );
+Workspaceroot *workspace_get_workspaceroot( Workspace *ws );
 
 void *workspace_map( workspace_map_fn fn, void *a, void *b );
 void *workspace_map_column( Workspace *ws, column_map_fn fn, void *a );
@@ -180,11 +180,11 @@ void workspace_retain_clean( void );
 void workspace_auto_recover( Mainw *mainw );
 
 GType workspace_get_type( void );
-Workspace *workspace_new( Workspacegroup *wsg, const char *name );
-Workspace *workspace_new_from_file( Workspacegroup *wsg, 
+Workspace *workspace_new( Workspaceroot *wsr, const char *name );
+Workspace *workspace_new_from_file( Workspaceroot *wsr, 
 	const char *filename, const char *filename_user );
-Workspace *workspace_new_from_openfile( Workspacegroup *wsg, iOpenFile *of );
-Workspace *workspace_new_blank( Workspacegroup *wsg, const char *name );
+Workspace *workspace_new_from_openfile( Workspaceroot *wsr, iOpenFile *of );
+Workspace *workspace_new_blank( Workspaceroot *wsr, const char *name );
 gboolean workspace_merge_file( Workspace *ws, 
 	const char *filename, const char *filename_user );
 gboolean workspace_merge_column_file( Workspace *ws, 

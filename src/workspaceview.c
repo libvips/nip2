@@ -128,7 +128,7 @@ workspaceview_scroll_update( Workspaceview *wview )
 	ws->vp = wview->vp;
 
 #ifdef DEBUG
-	printf( "workspaceview_scroll_update:\n" );
+	printf( "workspaceview_scroll_update: %s\n", IOBJECT( ws )->name );
 	printf( "  wview->vp: l=%d, t=%d, w=%d, h=%d; fixed w=%d; h=%d\n",
 		wview->vp.left, wview->vp.top, 
 		wview->vp.width, wview->vp.height,
@@ -411,7 +411,7 @@ workspaceview_destroy( GtkObject *object )
 	Workspaceview *wview;
 
 #ifdef DEBUG
-	printf( "workspaceview_destroy\n" );
+	printf( "workspaceview_destroy: %p\n", object );
 #endif /*DEBUG*/
 
 	g_return_if_fail( object != NULL );
@@ -431,6 +431,15 @@ workspaceview_destroy( GtkObject *object )
 static void
 workspaceview_realize( GtkWidget *widget )
 {
+#ifdef DEBUG
+{
+	Workspaceview *wview = WORKSPACEVIEW( widget );
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+
+	printf( "workspaceview_realize: %s\n", IOBJECT( ws )->name );
+}
+#endif /*DEBUG*/
+
 	GTK_WIDGET_CLASS( parent_class )->realize( widget );
 
 	/* Mark us as a symbol drag-to widget. 
@@ -461,7 +470,7 @@ workspaceview_drag_data_received( GtkWidget *widget, GdkDragContext *context,
 		selection_data->format == 8 &&
 		workspaceview_is_background( wview, 
 			GTK_WIDGET( wview->fixed )->window, x, y ) &&
-		(from_row = row_parse_name( main_workspacegroup->sym, 
+		(from_row = row_parse_name( main_workspaceroot->sym, 
 			from_row_path )) ) {
 		char *name;
 		Column *col;
@@ -544,12 +553,17 @@ workspaceview_child_size_cb( Columnview *cview,
 	wview->bounding.height += 30;
 
 #ifdef DEBUG
-	printf( "workspaceview_child_size_cb: "
+{
+	Column *col = COLUMN( VOBJECT( cview )->iobject );
+
+	printf( "workspaceview_child_size_cb: cview %s "
 		"bb left=%d, top=%d, width=%d, height=%d\n",
+		IOBJECT( col )->name, 
 		wview->bounding.left,
 		wview->bounding.top,
 		wview->bounding.width,
 		wview->bounding.height );
+}
 #endif /*DEBUG*/
 
 	/* Resize our fixed if necessary.
@@ -634,7 +648,10 @@ static void
 workspaceview_refresh( vObject *vobject )
 {
 #ifdef DEBUG
-	printf( "workspaceview_refresh\n" );
+	Workspaceview *wview = WORKSPACEVIEW( vobject );
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+
+	printf( "workspaceview_refresh: %s\n", IOBJECT( ws )->name );
 #endif /*DEBUG*/
 
 	VOBJECT_CLASS( parent_class )->refresh( vobject );
@@ -823,13 +840,50 @@ workspaceview_class_init( WorkspaceviewClass *class )
 	view_class->layout = workspaceview_layout;
 }
 
+/* Can't use main_load(), we want to select wses after load.
+ */
+static gboolean
+workspaceview_load( Mainw *mainw, Workspace *ws, const char *filename )
+{
+	Workspace *new_ws;
+
+	if( (new_ws = mainw_open_workspace( mainw, filename, TRUE, TRUE )) ) 
+		return( TRUE );
+
+	error_clear();
+
+	/* workspace_load_file() needs to recalc to work, try to avoid that by
+	 * doing .defs first.
+	 */
+	if( is_file_type( &filesel_dfile_type, filename ) ) {
+		if( toolkit_new_from_file( main_toolkitgroup, filename ) )
+			return( TRUE );
+
+		error_clear();
+	}
+
+	/* Try as matrix or image. Have to do these via definitions.
+	 */
+	if( workspace_load_file( ws, filename ) ) 
+		return( TRUE );
+
+	error_clear();
+
+	error_top( _( "Unknown file type." ) );
+	error_sub( _( "Unable to load \"%s\"." ), filename );
+
+	return( FALSE );
+}
+
 static gboolean
 workspaceview_filedrop( Workspaceview *wview, const char *filename )
 {
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+	Mainw *mainw = MAINW( iwindow_get_root( GTK_WIDGET( wview ) ) );
+
 	gboolean result;
 
-	result = main_load( ws, filename );
+	result = workspaceview_load( mainw, ws, filename );
 	if( result )
 		symbol_recalculate_all();
 
@@ -841,8 +895,6 @@ workspaceview_init( Workspaceview *wview )
 {
 	GtkAdjustment *hadj;
 	GtkAdjustment *vadj;
-
-	wview->wgview = NULL;
 
 	wview->fixed = NULL;
 	wview->window = NULL;

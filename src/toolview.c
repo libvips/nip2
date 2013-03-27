@@ -35,9 +35,32 @@
 
 static ViewClass *parent_class = NULL;
 
-/* Link menus to workspaces with this.
+/* Link menu items to toolview with this.
  */
-static GQuark toolview_ws_quark = 0;
+static GQuark toolview_quark = 0;
+
+static Workspace *
+toolview_get_workspace( Toolview *tview )
+{
+	Mainw *mainw = tview->kview->kitgview->mainw;
+
+	if( !mainw )
+		return( NULL );
+
+	return( mainw_get_workspace( mainw ) ); 
+}
+
+static Workspace *
+item_get_workspace( GtkWidget *item )
+{
+	Toolview *tview = 
+		gtk_object_get_data_by_id( GTK_OBJECT( item ), toolview_quark );
+
+	if( !tview )
+		return( NULL );
+
+	return( toolview_get_workspace( tview ) );
+}
 
 static void 
 toolview_destroy( GtkObject *object )
@@ -71,8 +94,7 @@ toolview_finalize( GObject *gobject )
 static void
 toolview_activate_cb( GtkWidget *widget, Toolitem *toolitem )
 {
-	Workspace *ws = gtk_object_get_data_by_id( GTK_OBJECT( widget ), 
-		toolview_ws_quark );
+	Workspace *ws = item_get_workspace( widget );
 
 	switch( toolitem->tool->type ) {
 	case TOOL_DIA:
@@ -99,8 +121,7 @@ toolview_activate_cb( GtkWidget *widget, Toolitem *toolitem )
 static void 
 toolview_select_cb( GtkWidget *widget, Toolitem *toolitem )
 {
-	Workspace *ws = gtk_object_get_data_by_id( GTK_OBJECT( widget ), 
-		toolview_ws_quark );
+	Workspace *ws = item_get_workspace( widget );
 
 	if( ws && toolitem->help )
 		workspace_set_status( ws, "%s", toolitem->help );
@@ -109,7 +130,8 @@ toolview_select_cb( GtkWidget *widget, Toolitem *toolitem )
 /* Sub fn of below ... build a menu item for a TOOL_SYM. 
  */
 static GtkWidget *
-toolview_refresh_sub( Toolitem *toolitem, Workspace *ws, GtkWidget *menu )
+toolview_refresh_sub( Toolview *tview, 
+	Toolitem *toolitem, Workspace *ws, GtkWidget *menu )
 {
 	GtkWidget *item;
 
@@ -119,7 +141,7 @@ toolview_refresh_sub( Toolitem *toolitem, Workspace *ws, GtkWidget *menu )
 		item = gtk_image_menu_item_new_with_mnemonic( toolitem->label );
 
 		gtk_object_set_data_by_id( GTK_OBJECT( item ),
-			toolview_ws_quark, ws );
+			toolview_quark, tview );
 
 		if( toolitem->icon )
 			gtk_image_menu_item_set_image( 
@@ -158,7 +180,8 @@ toolview_refresh_sub( Toolitem *toolitem, Workspace *ws, GtkWidget *menu )
 			for( p = toolitem->children; p; p = p->next ) {
 				Toolitem *child = p->data;
 
-				toolview_refresh_sub( child, ws, submenu );
+				toolview_refresh_sub( tview, 
+					child, ws, submenu );
 			}
 
 			gtk_menu_item_set_submenu( GTK_MENU_ITEM( item ), 
@@ -180,20 +203,6 @@ toolview_refresh_sub( Toolitem *toolitem, Workspace *ws, GtkWidget *menu )
 	gtk_widget_show( item );
 
 	return( item );
-}
-
-/* Get the workspace we act on.
- */
-static Workspace *
-toolview_get_workspace( Toolview *tview )
-{
-	View *view;
-
-	for( view = VIEW( tview ); !IS_TOOLKITGROUPVIEW( view ); 
-		view = view->parent ) 
-		;
-
-	return( TOOLKITGROUPVIEW( view )->mainw->ws );
 }
 
 /* Our widget has been destroyed. NULL out or pointer to it, to stop us
@@ -222,14 +231,14 @@ toolview_refresh( vObject *vobject )
 	iobject_print( VOBJECT( tview )->iobject );
 #endif /*DEBUG*/
 
-	if( !toolview_ws_quark ) 
-		toolview_ws_quark = 
-			g_quark_from_static_string( "toolview_ws_quark" );
+	if( !toolview_quark ) 
+		toolview_quark = 
+			g_quark_from_static_string( "toolview_quark" );
 
 	DESTROY_GTK( tview->item );
 
 	if( tool->toolitem ) 
-		tview->item = toolview_refresh_sub( tool->toolitem, 
+		tview->item = toolview_refresh_sub( tview, tool->toolitem, 
 			ws, kview->menu );
 
 	if( tview->item )

@@ -308,8 +308,9 @@ program_row_lookup( Program *program, Model *model, GtkTreeIter *return_iter )
 }
 
 static gboolean
-program_refresh_timeout( Program *program )
+program_refresh_timeout( gpointer user_data )
 {
+	Program *program = PROGRAM( user_data ); 
 	iWindow *iwnd = IWINDOW( program );
 	Model *model = program_get_selected( program );
 	GtkTreeSelection *select = 
@@ -399,9 +400,9 @@ program_refresh( Program *program )
 {
 	IM_FREEF( g_source_remove, program->refresh_timeout );
 	
-	/* 1ms to make sure we run after idle (is this right?)
+	/* 10ms to make sure we run after idle (is this right?)
 	 */
-	program->refresh_timeout = g_timeout_add( 1, 
+	program->refresh_timeout = g_timeout_add( 10, 
 		(GSourceFunc) program_refresh_timeout, program );
 }
 
@@ -1274,13 +1275,6 @@ program_program_new_action_cb( GtkAction *action, Program *program )
 	gtk_widget_show( GTK_WIDGET( program2 ) ); 
 }
 
-static void
-program_workspace_new_action_cb( GtkAction *action, Program *program )
-{
-	workspacegroup_workspace_new( main_workspacegroup, 
-		GTK_WIDGET( program ) );
-}
-
 static void *
 program_load_file_fn( Filesel *filesel, 
 	const char *filename, Program *program, void *b )
@@ -1758,11 +1752,6 @@ static GtkActionEntry program_actions[] = {
 		N_( "Make a new program window" ), 
 		G_CALLBACK( program_program_new_action_cb ) },
 
-	{ "NewWorkspace", 
-		GTK_STOCK_NEW, N_( "New _Workspace" ), NULL, 
-		N_( "Make a new workspace" ), 
-		G_CALLBACK( program_workspace_new_action_cb ) },
-
 	{ "Open", 
 		GTK_STOCK_OPEN, N_( "_Open Toolkit" ), NULL,
 		N_( "_Open toolkit" ), 
@@ -1881,7 +1870,6 @@ static const char *program_menubar_ui_description =
 "        <menuitem action='NewSeparator'/>"
 "        <menuitem action='NewColumnItem'/>"
 "        <menuitem action='NewProgram'/>"
-"        <menuitem action='NewWorkspace'/>"
 "      </menu>"
 "      <menuitem action='Open'/>"
 "      <separator/>"

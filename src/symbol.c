@@ -300,7 +300,7 @@ symbol_clear( Symbol *sym )
 
 	sym->builtin = NULL;
 
-	sym->wsg = NULL;
+	sym->wsr = NULL;
 
 	sym->ws = NULL;
 }
@@ -415,11 +415,11 @@ symbol_strip( Symbol *sym )
 	 */
 	IM_FREEF( g_slist_free, sym->patch );
 
-	/* Workspacegroup? Unlink from wsg.
+	/* Workspaceroot? Unlink from wsr.
 	 */
-	if( sym->wsg ) {
-		sym->wsg->sym = NULL;
-		sym->wsg = NULL;
+	if( sym->wsr ) {
+		sym->wsr->sym = NULL;
+		sym->wsr = NULL;
 	}
 
 	/* Workspace? Unlink from ws.

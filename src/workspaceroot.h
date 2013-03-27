@@ -1,4 +1,4 @@
-/* Declarations for workspacegroup.c
+/* The root of all workspaces. A singleton all workspaces are children of.
  */
 
 /*
@@ -27,39 +27,38 @@
 
  */
 
-#define TYPE_WORKSPACEGROUP (workspacegroup_get_type())
-#define WORKSPACEGROUP( obj ) \
-	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_WORKSPACEGROUP, \
-		Workspacegroup ))
-#define WORKSPACEGROUP_CLASS( klass ) \
-	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_WORKSPACEGROUP, \
-		WorkspacegroupClass))
-#define IS_WORKSPACEGROUP( obj ) \
-	(G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_WORKSPACEGROUP ))
-#define IS_WORKSPACEGROUP_CLASS( klass ) \
-	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_WORKSPACEGROUP ))
-#define WORKSPACEGROUP_GET_CLASS( obj ) \
-	(G_TYPE_INSTANCE_GET_CLASS( (obj), TYPE_WORKSPACEGROUP, \
-		WorkspacegroupClass ))
+#define TYPE_WORKSPACEROOT (workspaceroot_get_type())
+#define WORKSPACEROOT( obj ) \
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_WORKSPACEROOT, \
+		Workspaceroot ))
+#define WORKSPACEROOT_CLASS( klass ) \
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_WORKSPACEROOT, \
+		WorkspacerootClass))
+#define IS_WORKSPACEROOT( obj ) \
+	(G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_WORKSPACEROOT ))
+#define IS_WORKSPACEROOT_CLASS( klass ) \
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_WORKSPACEROOT ))
+#define WORKSPACEROOT_GET_CLASS( obj ) \
+	(G_TYPE_INSTANCE_GET_CLASS( (obj), TYPE_WORKSPACEROOT, \
+		WorkspacerootClass ))
 
-/* A workspacegroup.
+/* A workspaceroot.
  */
-struct _Workspacegroup {
+struct _Workspaceroot {
 	Model parent_object;
 
 	Symbol *sym;			/* Workspace in this group in this */
 };
 
-typedef struct _WorkspacegroupClass {
+typedef struct _WorkspacerootClass {
 	ModelClass parent_class;
 
 	/* Methods.
 	 */
-} WorkspacegroupClass;
+} WorkspacerootClass;
 
-GType workspacegroup_get_type( void );
+GType workspaceroot_get_type( void );
 
-Workspacegroup *workspacegroup_new( const char *name );
+Workspaceroot *workspaceroot_new( const char *name );
 
-void workspacegroup_name_new( Workspacegroup *wsg, char *name );
-void workspacegroup_workspace_new( Workspacegroup *wsg, GtkWidget *parent );
+void workspaceroot_name_new( Workspaceroot *wsr, char *name );

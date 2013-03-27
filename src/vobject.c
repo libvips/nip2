@@ -197,14 +197,12 @@ vobject_iobject_destroy( iObject *iobject, vObject *vobject )
 void 
 vobject_link( vObject *vobject, iObject *iobject )
 {
+	vObjectClass *vobject_class = VOBJECT_GET_CLASS( vobject );
+
 	g_assert( !vobject->iobject );
 
-	vobject->iobject = iobject;
-
-	vobject->changed_sid = g_signal_connect( iobject, "changed", 
-		G_CALLBACK( vobject_iobject_changed ), vobject );
-	vobject->destroy_sid = g_signal_connect( iobject, "destroy", 
-		G_CALLBACK( vobject_iobject_destroy ), vobject );
+	if( vobject_class->link ) 
+		vobject_class->link( vobject, iobject );
 
 	/* Queue a refresh ... we always need at least one.
 	 */
@@ -251,6 +249,17 @@ vobject_real_refresh( vObject *vobject )
 }
 
 static void
+vobject_real_link( vObject *vobject, iObject *iobject )
+{
+	vobject->iobject = iobject;
+
+	vobject->changed_sid = g_signal_connect( iobject, "changed", 
+		G_CALLBACK( vobject_iobject_changed ), vobject );
+	vobject->destroy_sid = g_signal_connect( iobject, "destroy", 
+		G_CALLBACK( vobject_iobject_destroy ), vobject );
+}
+
+static void
 vobject_class_init( vObjectClass *class )
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
@@ -268,6 +277,7 @@ vobject_class_init( vObjectClass *class )
 	/* Init default methods.
 	 */
 	class->refresh = vobject_real_refresh;
+	class->link = vobject_real_link;
 
 	/* Static init.
 	 */

@@ -1,4 +1,4 @@
-/* Declarations for mainw.
+/* A top level window holding some workspaces
  */
 
 /*
@@ -43,13 +43,22 @@
 struct _Mainw {
 	iWindow parent_object;
 
-	/* Workspace we display.
+	/* We make and manage workspaces inside this.
 	 */
-	Workspace *ws;
-	guint changed_sid;
-	guint destroy_sid;
+	Workspaceroot *wsr;
 
-	/* Also watch for changed on heap and image, and prefs.
+	/* Set of workspace tabs we display.
+	 */
+	Mainwtab *current_tab;
+
+	/* WS in current tab has changed, plus the ws we attached the 
+	 * signal to.
+	 */
+	guint ws_changed_sid;
+	Workspace *ws_changed;
+
+	/* Watch for changed on heap and image, and prefs. Use to update
+	 * status bar and space free.
 	 */
 	guint imageinfo_changed_sid;
 	guint heap_changed_sid;
@@ -62,6 +71,10 @@ struct _Mainw {
 	guint end_sid;	
 	gboolean cancel;
 
+	/* Batch refresh with this, it's slow.
+	 */
+	guint refresh_timeout;
+
 	/* Display MB free in tmp, or cells free in heap.
 	 */
 	gboolean free_type;
@@ -72,28 +85,21 @@ struct _Mainw {
 	gboolean toolbar_visible;
 	gboolean statusbar_visible;
 
-	/* The last row we visited with the 'next-error' button.
+	/* The kitg the toolkit menu is currently displaying. Use this to
+	 * avoid rebuilding the toolkit menu on every tab switch.
 	 */
-	Row *row_last_error;
-
-	/* Wait before popping up the compat dialog. How stupid, but we have
-	 * to make sure our window is on the server before we can show an info
-	 * box off it.
-	 */
-	guint compat_timeout;
+	Toolkitgroup *kitg;
 
 	/* Component widgets.
 	 */
 	Toolkitgroupview *kitgview;
-	Toolkitbrowser *toolkitbrowser;
-	Workspacedefs *workspacedefs;
-	Workspaceview *wsview;
 	GtkWidget *toolbar;
 	GtkWidget *recent_menu;
 	GtkWidget *jump_to_column_menu;
+	GtkWidget *tab_menu;
+	GtkWidget *toolkit_menu;
 
-	GtkWidget *popup;
-	GtkWidget *popup_jump;
+	GtkWidget *notebook;
 
 	GtkWidget *statusbar_main;
 	GtkWidget *statusbar;
@@ -101,11 +107,6 @@ struct _Mainw {
 	GtkWidget *space_free_eb;	
 	GtkWidget *progress_box;
 	GtkWidget *progress;
-
-	/* Left and right panes ... program window and toolkit browser.
-	 */
-	Pane *lpane;
-	Pane *rpane;
 };
 
 typedef struct _MainwClass {
@@ -135,10 +136,26 @@ GType mainw_get_type( void );
 
 void mainw_find_disc( VipsBuf *buf );
 void mainw_find_heap( VipsBuf *buf, Heap *heap );
+Workspace *mainw_get_workspace( Mainw *mainw );
 
 void mainw_homepage_action_cb( GtkAction *action, iWindow *iwnd );
 void mainw_about_action_cb( GtkAction *action, iWindow *iwnd );
 void mainw_guide_action_cb( GtkAction *action, iWindow *iwnd );
-Workspace *mainw_open_file_into_workspace( Mainw *mainw, const char *filename );
-Mainw *mainw_new( Workspace *ws );
+
+void mainw_column_new_action_cb( GtkAction *action, Mainw *mainw );
+void mainw_workspace_merge_action_cb( GtkAction *action, Mainw *mainw );
+void mainw_layout_action_cb( GtkAction *action, Mainw *mainw );
+void mainw_group_action_cb( GtkAction *action, Mainw *mainw );
+void mainw_next_error_action_cb( GtkAction *action, Mainw *mainw );
+void mainw_open_action_cb( GtkAction *action, Mainw *mainw );
+
+Mainwtab *mainw_add_workspace( Mainw *mainw, 
+	Mainwtab *old_tab, Workspace *ws, gboolean trim );
+Workspace *mainw_open_workspace( Mainw *mainw, 
+	const char *filename, gboolean trim, gboolean select );
+
+Mainw *mainw_new( Workspaceroot *wsr );
+
+int mainw_get_n_tabs( Mainw *mainw );
+Mainwtab *mainw_get_nth_tab( Mainw *mainw, int i );
 

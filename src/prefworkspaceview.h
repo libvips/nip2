@@ -41,8 +41,6 @@
 struct _Prefworkspaceview {
 	View view;
 
-	Workspacegroupview *wgview;
-
 	/* If set, only display the columns whose caption includes this string 
 	 * (eg. "JPEG"). Used to display tiny prefs windows for jpeg save etc.
 	 */

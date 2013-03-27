@@ -138,9 +138,12 @@ column_parent_add( iContainer *child )
 
 	ICONTAINER_CLASS( parent_class )->parent_add( child );
 
+	g_assert( IS_WORKSPACE( child->parent ) );
+
 	/* Update our context.
 	 */
 	col->ws = column_get_workspace( col );
+	g_assert( IS_WORKSPACE( child->parent ) );
 }
 
 static View *

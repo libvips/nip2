@@ -58,11 +58,15 @@ const char *path_tmp_default = NULL;
  *
  * Also consider picking ICC profiles in export/import: we want to avoid
  * putting the path into the ws file, we need to go back to "$VIPSHOME" again.
+ *
+ * Rewrite rules can be "locked". For example, we don't want the rewrite from
+ * "/home/john" to "$HOME" to ever be removed. 
  */
 
 typedef struct _Rewrite {
 	char *old;
 	char *new;
+	gboolean lock;
 } Rewrite; 
 
 static GSList *rewrite_list = NULL;
@@ -93,12 +97,17 @@ path_rewrite_lookup( const char *old )
  * remove a rewrite rule.
  */
 void
-path_rewrite_add( const char *old, const char *new )
+path_rewrite_add( const char *old, const char *new, gboolean lock )
 {
 	char old_buf[FILENAME_MAX + 1];
 	char new_buf[FILENAME_MAX + 1];
 
 	Rewrite *rewrite;
+
+#ifdef DEBUG_REWRITE
+	printf( "path_rewrite_add: old = %s, new = %s, lock = %d\n", 
+		old, new, lock );
+#endif /*DEBUG_REWRITE*/
 
 	g_return_if_fail( old );
 
@@ -128,20 +137,27 @@ path_rewrite_add( const char *old, const char *new )
 		return; 
 
 	if( (rewrite = path_rewrite_lookup( old )) ) {
-		if( !new ||
-			strcmp( old, new ) == 0 ) {
+		if( !rewrite->lock &&
+			(!new ||
+			 strcmp( old, new ) == 0) ) {
 #ifdef DEBUG_REWRITE
 			printf( "path_rewrite_add: removing\n" );
 #endif /*DEBUG_REWRITE*/
 
 			rewrite_list = g_slist_remove( rewrite_list, rewrite );
 		}
-		else if( new ) {
+		else if( !rewrite->lock &&
+			new ) {
 #ifdef DEBUG_REWRITE
 			printf( "path_rewrite_add: updating\n" );
 #endif /*DEBUG_REWRITE*/
 
 			IM_SETSTR( rewrite->new, new );
+		}
+		else {
+#ifdef DEBUG_REWRITE
+			printf( "path_rewrite_add: rewrite rule locked\n" );
+#endif /*DEBUG_REWRITE*/
 		}
 	}
 	else if( new &&
@@ -153,6 +169,7 @@ path_rewrite_add( const char *old, const char *new )
 		rewrite = g_new( Rewrite, 1 );
 		rewrite->old = g_strdup( old );
 		rewrite->new = g_strdup( new );
+		rewrite->lock = lock;
 		rewrite_list = g_slist_prepend( rewrite_list, rewrite );
 	}
 
@@ -166,7 +183,7 @@ path_rewrite_add( const char *old, const char *new )
 {
 	GSList *p;
 
-	printf( "path_rewrite_add: old = %s, new = %s\n", old, new );
+	printf( "path_rewrite_add: state:\n" );
 
 	for( p = rewrite_list; p; p = p->next ) {
 		rewrite = (Rewrite *) p->data; 
@@ -551,9 +568,9 @@ path_init( void )
 {
 	char buf[FILENAME_MAX];
 
-	path_rewrite_add( get_prefix(), "$VIPSHOME" );
-	path_rewrite_add( g_get_home_dir(), "$HOME" );
-	path_rewrite_add( get_savedir(), "$SAVEDIR" );
+	path_rewrite_add( get_prefix(), "$VIPSHOME", TRUE );
+	path_rewrite_add( g_get_home_dir(), "$HOME", TRUE );
+	path_rewrite_add( get_savedir(), "$SAVEDIR", TRUE );
 
 	/* You might think we could add a rule to swap '.' for 
 	 * g_get_current_dir(), but that would then make workspaces depend on
@@ -563,7 +580,7 @@ path_init( void )
 	/* And the expanded form too.
 	 */
 	expand_variables( get_savedir(), buf );
-	path_rewrite_add( buf, "$SAVEDIR" );
+	path_rewrite_add( buf, "$SAVEDIR", TRUE );
 
 #ifdef DEBUG_LOCAL
 	printf( "path_init: loading start from \".\" only\n" );

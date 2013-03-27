@@ -53,7 +53,7 @@ workspacedefs_text_changed( GtkTextBuffer *buffer,
 		/* The workspace hasn't changed, but this will queue a refresh
 		 * on us.
 		 */
-		iobject_changed( IOBJECT( workspacedefs->mainw->ws ) );
+		iobject_changed( IOBJECT( workspacedefs->ws ) );
 	}
 }
 
@@ -61,8 +61,7 @@ static void
 workspacedefs_refresh( vObject *vobject )
 {
 	Workspacedefs *workspacedefs = WORKSPACEDEFS( vobject );
-	Mainw *mainw = workspacedefs->mainw;
-	Workspace *ws = mainw->ws;
+	Workspace *ws = workspacedefs->ws;
 	char txt[256];
 	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
@@ -90,9 +89,9 @@ workspacedefs_refresh( vObject *vobject )
 		}
 	}
 
-	if( workspacedefs->mainw->ws->local_kit ) {
+	if( ws->local_kit ) {
 		int n = icontainer_get_n_children( ICONTAINER( 
-			workspacedefs->mainw->ws->local_kit ) );
+			ws->local_kit ) );
 
 		vips_buf_appendf( &buf, ngettext( "%d definition", 
 			"%d definitions", n ), n );
@@ -113,6 +112,19 @@ workspacedefs_refresh( vObject *vobject )
 }
 
 static void
+workspacedefs_link( vObject *vobject, iObject *iobject )
+{
+	Workspacedefs *workspacedefs = WORKSPACEDEFS( vobject );
+	Workspace *ws = WORKSPACE( iobject );
+
+	g_assert( !workspacedefs->ws );
+
+	workspacedefs->ws = ws;
+
+	VOBJECT_CLASS( parent_class )->link( vobject, iobject );
+}
+
+static void
 workspacedefs_class_init( WorkspacedefsClass *class )
 {
 	vObjectClass *vobject_class = (vObjectClass *) class;
@@ -120,14 +132,14 @@ workspacedefs_class_init( WorkspacedefsClass *class )
 	parent_class = g_type_class_peek_parent( class );
 
 	vobject_class->refresh = workspacedefs_refresh;
+	vobject_class->link = workspacedefs_link;
 }
 
 static gboolean
 workspacedefs_set_text_from_file( Workspacedefs *workspacedefs, 
 	const char *fname )
 {
-	Mainw *mainw = workspacedefs->mainw;
-	Workspace *ws = mainw->ws;
+	Workspace *ws = workspacedefs->ws;
 
 	workspacedefs->changed = FALSE;
 	workspacedefs->errors = FALSE;
@@ -173,7 +185,6 @@ workspacedefs_load_file_cb( iWindow *iwnd,
 static void
 workspacedefs_replace_cb( GtkWidget *wid, Workspacedefs *workspacedefs )
 {
-	Mainw *mainw = workspacedefs->mainw;
 	GtkWidget *filesel;
 
 	filesel = filesel_new();
@@ -181,7 +192,7 @@ workspacedefs_replace_cb( GtkWidget *wid, Workspacedefs *workspacedefs )
 		_( "Replace Definition From File" ) );
 	filesel_set_flags( FILESEL( filesel ), FALSE, FALSE );
 	filesel_set_filetype( FILESEL( filesel ), filesel_type_definition, 0 ); 
-	iwindow_set_parent( IWINDOW( filesel ), GTK_WIDGET( mainw ) );
+	iwindow_set_parent( IWINDOW( filesel ), GTK_WIDGET( wid ) );
 	filesel_set_done( FILESEL( filesel ), 
 		workspacedefs_load_file_cb, workspacedefs );
 	iwindow_build( IWINDOW( filesel ) );
@@ -192,19 +203,17 @@ workspacedefs_replace_cb( GtkWidget *wid, Workspacedefs *workspacedefs )
 static void
 workspacedefs_save_as_cb( GtkWidget *wid, Workspacedefs *workspacedefs )
 {
-	Mainw *mainw = workspacedefs->mainw;
-	Workspace *ws = mainw->ws;
+	Workspace *ws = workspacedefs->ws;
 
 	if( ws->local_kit )
-		filemodel_inter_saveas( IWINDOW( workspacedefs->mainw ), 
+		filemodel_inter_saveas( IWINDOW( wid ), 
 			FILEMODEL( ws->local_kit ) );
 }
 
 static gboolean
 workspacedefs_set_text( Workspacedefs *workspacedefs, const char *txt )
 {
-	Mainw *mainw = workspacedefs->mainw;
-	Workspace *ws = mainw->ws;
+	Workspace *ws = workspacedefs->ws;
 
 	workspacedefs->changed = FALSE;
 	workspacedefs->errors = FALSE;
@@ -324,8 +333,6 @@ Workspacedefs *
 workspacedefs_new( Mainw *mainw )
 {
 	Workspacedefs *workspacedefs = gtk_type_new( TYPE_WORKSPACEDEFS );
-
-	workspacedefs->mainw = mainw;
 
 	return( workspacedefs );
 }

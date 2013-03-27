@@ -1,3 +1,100 @@
+- we must do it properly, with one file per mainw, it'd be much too confusing
+  to have save sometimes save a tab and sometimes save the whole book
+
+  so we must convert old ws files to workspacegroups with a single tab on load
+
+  we need a workspacegroup filemodel object to hold a set of workspaces
+
+  add workspacegroup ... a filemodel that represents a loaded workspace file,
+  has a list of workspaces as children
+
+  mainw displays a workspacegroup
+
+
+
+
+- test file drop on mainw, esp. workspaces
+
+- do we need a filemodel for group-of-workspaces?
+
+  at the moment, workspacegroup is a singleton, perhaps make it our new class?
+
+  currently derives from Model, would need to swap to Filemodel (which in
+  turns derives from Model)
+
+  mainw could become workspacegroupview 
+
+  ... probably not a good idea to go the whole hog, we don't want to enforce
+  workbook behaviour for plain MDI use of multiple wses
+
+  though what if someone loads a set of tabs? they should all go into a new
+  mainw, and if they change something, we then want save/save-as to operate on
+  the whole file
+
+
+
+- a ws file can have multiple workspaces:
+
+	<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.29.0">
+	  <Workspace ..>
+	  </Workspace>
+	  <Workspace ..>
+	  </Workspace>
+	</root>
+
+  ie. it's just a container
+
+  alternative: how about:
+
+	<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.29.0">
+	  <Workspace ..>
+	  </Workspace>
+	</root>
+	<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.29.0">
+	  <Workspace ..>
+	  </Workspace>
+	</root>
+
+  would that be better for compat? can the first one load into an old nip2?
+
+  scope and internal structure is exactly as now
+
+  now we can drag tabs into top-level windows and back!
+
+  so mainw is just a top-level window with a list of mainwtab, each mainwtab
+  shows one workspace, mainw is split into two pretty simply
+
+  what do we do for:
+
+  	$ nip2 a.ws b.ws
+
+  show one window, or two?
+
+  should probably show one window, why would you want two separate workspaces 
+
+  file / save then means "save current tab", have an special item for "save
+  all tabs as workbook"
+
+  on popdown, have to loop through all tabs checking for save or quit
+
+  need to swap the toolkit menu on notebook tab switch
+
+  lpane / rpane must be inside tab
+
+  mainw title should show current tab title
+
+  these two should be exactly equivalent:
+
+  	$ nip2 a.ws b.ws
+	$ nip2 ab.ws
+
+  ie. a workbook is just two workspaces in one window ... we are just adding
+  MDI
+
+
+  
+
+
 
 - Matrix / New / Laplacian
 

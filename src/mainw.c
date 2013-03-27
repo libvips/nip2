@@ -131,7 +131,26 @@ mainw_pick_one( void )
 }
 
 static void
-mainw_destroy( GtkObject *object )
+mainw_finalize( GObject *gobject )
+{
+	Mainw *mainw;
+
+#ifdef DEBUG
+	printf( "mainw_finalize: %p\n", gobject );
+#endif /*DEBUG*/
+
+	g_return_if_fail( gobject != NULL );
+	g_return_if_fail( IS_MAINW( gobject ) );
+
+	mainw = MAINW( gobject );
+
+	mainw_all = g_slist_remove( mainw_all, mainw );
+
+	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+}
+
+static void
+mainw_dispose( GObject *object )
 {
 	Mainw *mainw;
 
@@ -141,91 +160,35 @@ mainw_destroy( GtkObject *object )
 	mainw = MAINW( object );
 
 #ifdef DEBUG
-	printf( "mainw_destroy\n" );
+	printf( "mainw_dispose\n" );
 #endif /*DEBUG*/
 
-	/* My instance destroy stuff.
-	 */
-	if( mainw->ws ) {
-		mainw->ws->iwnd = NULL;
+	IM_FREEF( g_source_remove, mainw->refresh_timeout );
 
-		filemodel_set_window_hint( FILEMODEL( mainw->ws ), NULL );
-		FREESID( mainw->destroy_sid, mainw->ws );
-		FREESID( mainw->changed_sid, mainw->ws );
-	}
+	FREESID( mainw->ws_changed_sid, mainw->ws_changed );
 
 	FREESID( mainw->imageinfo_changed_sid, main_imageinfogroup );
 	FREESID( mainw->heap_changed_sid, reduce_context->heap );
 	FREESID( mainw->watch_changed_sid, main_watchgroup );
+
 	FREESID( mainw->begin_sid, progress_get() );
 	FREESID( mainw->update_sid, progress_get() );
 	FREESID( mainw->end_sid, progress_get() );
-	DESTROY_GTK( mainw->popup );
+
 	UNREF( mainw->kitgview );
 
-	mainw_all = g_slist_remove( mainw_all, mainw );
-
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
-}
-
-static gboolean
-mainw_compat_timeout( Mainw *mainw )
-{
-	mainw->compat_timeout = 0;
-
-	error_top( _( "Compatibility mode." ) );
-	error_sub( _( "This workspace was created by version %d.%d.%d. "
-		"A set of compatibility menus have been loaded "
-		"for this window." ),
-		FILEMODEL( mainw->ws )->major,
-		FILEMODEL( mainw->ws )->minor,
-		FILEMODEL( mainw->ws )->micro );
-	iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
-
-	return( FALSE );
-}
-
-static void
-mainw_map( GtkWidget *widget )
-{
-	Mainw *mainw = MAINW( widget );
-
-	g_assert( !mainw->compat_timeout );
-
-	/* Popping up the info dialog immediately gives us stacking problems
-	 * :(
-	 */
-	if( mainw->ws->compat_major )
-		mainw->compat_timeout = g_timeout_add( 500, 
-			(GSourceFunc) mainw_compat_timeout, mainw );
-
-	GTK_WIDGET_CLASS( parent_class )->map( widget );
-}
-
-static gboolean
-mainw_configure_event( GtkWidget *widget, GdkEventConfigure *event )
-{
-	Mainw *mainw = MAINW( widget );
-
-	mainw->ws->window_width = event->width;
-	mainw->ws->window_height = event->height;
-
-	return( GTK_WIDGET_CLASS( parent_class )->
-		configure_event( widget, event ) );
+	G_OBJECT_CLASS( parent_class )->dispose( object );
 }
 
 static void
 mainw_class_init( MainwClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
-	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
+	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
 
 	parent_class = g_type_class_peek_parent( class );
 
-	object_class->destroy = mainw_destroy;
-
-	widget_class->map = mainw_map;
-	widget_class->configure_event = mainw_configure_event;
+	gobject_class->finalize = mainw_finalize;
+	gobject_class->dispose = mainw_dispose;
 }
 
 static void
@@ -257,9 +220,11 @@ mainw_progress_end( Progress *progress, Mainw *mainw )
 static void
 mainw_init( Mainw *mainw )
 {
-	mainw->ws = NULL;
-	mainw->destroy_sid = 0;
-	mainw->changed_sid = 0;
+	mainw->wsr = NULL;
+
+	mainw->ws_changed_sid = 0;
+	mainw->ws_changed = NULL;
+
 	mainw->imageinfo_changed_sid = 0;
 	mainw->heap_changed_sid = 0;
 	mainw->watch_changed_sid = 0;
@@ -277,13 +242,7 @@ mainw_init( Mainw *mainw )
 	mainw->toolbar_visible = MAINW_TOOLBAR;
 	mainw->statusbar_visible = MAINW_STATUSBAR;
 
-	mainw->row_last_error = NULL;
-
-	mainw->compat_timeout = 0;
-
 	mainw->kitgview = NULL;
-	mainw->toolkitbrowser = NULL;
-	mainw->wsview = NULL;
 	mainw->toolbar = NULL;
 
 	mainw->statusbar_main = NULL;
@@ -292,9 +251,6 @@ mainw_init( Mainw *mainw )
 	mainw->space_free_eb = NULL;
 	mainw->progress_box = NULL;
 	mainw->progress = NULL;
-
-	mainw->lpane = NULL;
-	mainw->rpane = NULL;
 
 	mainw_all = g_slist_prepend( mainw_all, mainw );
 }
@@ -330,20 +286,6 @@ mainw_cancel_cb( GtkWidget *wid, Mainw *mainw )
 	mainw->cancel = TRUE;
 }
 
-static void
-mainw_workspace_destroy_cb( Workspace *ws, Mainw *mainw )
-{
-#ifdef DEBUG
-	printf( "mainw_workspace_destroy_cb: %p\n", mainw );
-#endif /*DEBUG*/
-
-	mainw->destroy_sid = 0;
-	mainw->changed_sid = 0;
-	mainw->ws = NULL;
-
-	iwindow_kill( IWINDOW( mainw ) );
-}
-
 void
 mainw_find_disc( VipsBuf *buf )
 {
@@ -372,6 +314,15 @@ mainw_find_heap( VipsBuf *buf, Heap *heap )
 	vips_buf_appendf( buf, _( "%d cells free" ), heap->nfree + togo );
 }
 
+Workspace *
+mainw_get_workspace( Mainw *mainw )
+{
+	if( !mainw->current_tab )
+		return( NULL );
+
+	return( mainwtab_get_workspace( mainw->current_tab ) );
+}
+
 /* Update the space remaining indicator. 
  */
 static void
@@ -380,13 +331,13 @@ mainw_free_update( Mainw *mainw )
 	Heap *heap = reduce_context->heap;
 	char txt[80];
 	VipsBuf buf = VIPS_BUF_STATIC( txt );
+	Workspace *ws;
 
-	if( workspace_selected_any( mainw->ws ) ) {
-		/* Display select message instead.
-		 */
+	if( (ws = mainw_get_workspace( mainw )) &&
+		workspace_selected_any( ws ) ) {
 		vips_buf_appends( &buf, _( "Selected:" ) );
 		vips_buf_appends( &buf, " " );
-		workspace_selected_names( mainw->ws, &buf, ", " );
+		workspace_selected_names( ws, &buf, ", " );
 	}
 	else {
 		/* Out of space? Make sure we swap to cell display.
@@ -406,37 +357,43 @@ mainw_free_update( Mainw *mainw )
 static void
 mainw_title_update( Mainw *mainw )
 {
-	char txt[512];
-	VipsBuf buf = VIPS_BUF_STATIC( txt );
+	Workspace *ws;
 
-	if( FILEMODEL( mainw->ws )->modified ) 
-		vips_buf_appendf( &buf, "*" ); 
-	vips_buf_appendf( &buf, "%s", NN( IOBJECT( mainw->ws->sym )->name ) );
-	if( mainw->ws->compat_major ) {
-		vips_buf_appends( &buf, " - " );
-		vips_buf_appends( &buf, _( "compatibility mode" ) );
-		vips_buf_appendf( &buf, " %d.%d", 
-			mainw->ws->compat_major, 
-			mainw->ws->compat_minor ); 
-	}
-	if( FILEMODEL( mainw->ws )->filename )
-		vips_buf_appendf( &buf, " - %s", 
-			FILEMODEL( mainw->ws )->filename );
-	else {
-		vips_buf_appends( &buf, " - " );
-		vips_buf_appends( &buf, _( "unsaved workspace" ) );
-	}
+	if( (ws = mainw_get_workspace( mainw )) ) {
+		char txt[512];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	iwindow_set_title( IWINDOW( mainw ), "%s", vips_buf_all( &buf ) );
+		if( FILEMODEL( ws )->modified ) 
+			vips_buf_appendf( &buf, "*" ); 
+		vips_buf_appendf( &buf, "%s", NN( IOBJECT( ws->sym )->name ) );
+		if( ws->compat_major ) {
+			vips_buf_appends( &buf, " - " );
+			vips_buf_appends( &buf, _( "compatibility mode" ) );
+			vips_buf_appendf( &buf, " %d.%d", 
+				ws->compat_major, 
+				ws->compat_minor ); 
+		}
+		if( FILEMODEL( ws )->filename )
+			vips_buf_appendf( &buf, " - %s", 
+				FILEMODEL( ws )->filename );
+		else {
+			vips_buf_appends( &buf, " - " );
+			vips_buf_appends( &buf, _( "unsaved workspace" ) );
+		}
+
+		iwindow_set_title( IWINDOW( mainw ), 
+			"%s", vips_buf_all( &buf ) );
+	}
 }
 
 static void 
 mainw_status_update( Mainw *mainw )
 {
-	if( mainw->ws->status ) {
-		gtk_label_set_text( GTK_LABEL( mainw->statusbar ), 
-			mainw->ws->status ); 
-	}
+	Workspace *ws;
+
+	if( (ws = mainw_get_workspace( mainw )) &&
+		ws->status ) 
+		gtk_label_set_text( GTK_LABEL( mainw->statusbar ), ws->status );
 	else {
 		char txt[256];
 
@@ -445,67 +402,8 @@ mainw_status_update( Mainw *mainw )
 	}
 }
 
-static gint
-mainw_jump_name_compare( iContainer *a, iContainer *b )
-{
-	int la = strlen( IOBJECT( a )->name );
-	int lb = strlen( IOBJECT( b )->name );
-
-	/* Smaller names first.
-	 */
-	if( la == lb )
-		return( strcmp( IOBJECT( a )->name, IOBJECT( b )->name ) );
-	else
-		return( la - lb );
-}
-
-static void
-mainw_jump_column_cb( GtkWidget *item, Column *column )
-{
-	model_scrollto( MODEL( column ), MODEL_SCROLL_TOP );
-}
-
-static void *
-mainw_jump_build( Column *column, GtkWidget *menu )
-{
-	GtkWidget *item;
-	char txt[256];
-	VipsBuf buf = VIPS_BUF_STATIC( txt );
-
-	vips_buf_appendf( &buf, "%s - %s", 
-		IOBJECT( column )->name, IOBJECT( column )->caption );
-	item = gtk_menu_item_new_with_label( vips_buf_all( &buf ) );
-	g_signal_connect( item, "activate",
-		G_CALLBACK( mainw_jump_column_cb ), column );
-	gtk_menu_append( GTK_MENU( menu ), item );
-	gtk_widget_show( item );
-
-	return( NULL );
-}
-
-static void
-mainw_jump_update( Mainw *mainw, GtkWidget *menu )
-{
-	GtkWidget *item;
-	GSList *columns;
-
-	gtk_container_foreach( GTK_CONTAINER( menu ),
-		(GtkCallback) gtk_widget_destroy, NULL );
-
-	item = gtk_tearoff_menu_item_new();
-	gtk_menu_append( GTK_MENU( menu ), item );
-	gtk_widget_show( item );
-
-	columns = icontainer_get_children( ICONTAINER( mainw->ws ) );
-        columns = g_slist_sort( columns, 
-		(GCompareFunc) mainw_jump_name_compare );
-	slist_map( columns, (SListMapFn) mainw_jump_build, menu );
-
-	g_slist_free( columns );
-}
-
-static void
-mainw_refresh( Mainw *mainw )
+static gboolean
+mainw_refresh_timeout_cb( gpointer user_data )
 {
 	static GtkToolbarStyle styles[] = {
 		99,			/* Overwrite with system default */
@@ -523,14 +421,15 @@ mainw_refresh( Mainw *mainw )
 		"NoEdit"
 	};
 
+	Mainw *mainw = MAINW( user_data );
 	iWindow *iwnd = IWINDOW( mainw );
-	Workspace *ws = mainw->ws;
 	int pref = IM_CLIP( 0, MAINW_TOOLBAR_STYLE, IM_NUMBER( styles ) - 1 );
 
         GtkAction *action;
+	Workspace *ws;
 
 #ifdef DEBUG
-	printf( "mainw_refresh: %p\n", mainw );
+	printf( "mainw_refresh_timeout_cb: %p\n", mainw );
 #endif /*DEBUG*/
 
 	mainw_status_update( mainw );
@@ -560,29 +459,385 @@ mainw_refresh( Mainw *mainw )
 		mainw->statusbar_visible );
         widget_visible( mainw->statusbar_main, mainw->statusbar_visible );
 
-	action = gtk_action_group_get_action( iwnd->action_group, 
-		"WorkspaceDefs" );
-	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
-		mainw->lpane->open );
+	if( mainw->current_tab ) {
+		Pane *pane;
 
-	action = gtk_action_group_get_action( iwnd->action_group, 
-		"ToolkitBrowser" );
-	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
-		mainw->rpane->open );
+		pane = mainwtab_get_defs_pane( mainw->current_tab );
+		action = gtk_action_group_get_action( iwnd->action_group, 
+			"WorkspaceDefs" );
+		gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
+			pane->open );
 
-	action = gtk_action_group_get_action( iwnd->action_group, 
-		view_mode[ws->mode] );
-	gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
-		TRUE );
+		pane = mainwtab_get_browse_pane( mainw->current_tab );
+		action = gtk_action_group_get_action( iwnd->action_group, 
+			"ToolkitBrowser" );
+		gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
+			pane->open );
+	}
 
-	mainw_jump_update( mainw, mainw->jump_to_column_menu );
-	mainw_jump_update( mainw, mainw->popup_jump );
+	if( (ws = mainw_get_workspace( mainw )) ) { 
+		action = gtk_action_group_get_action( iwnd->action_group, 
+			view_mode[ws->mode] );
+		gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
+			TRUE );
+	}
+
+	if( mainw->current_tab )
+		mainwtab_jump_update( mainw->current_tab, 
+			mainw->jump_to_column_menu );
+
+	if( (ws = mainw_get_workspace( mainw )) &&
+		mainw->kitg != ws->kitg ) {
+		UNREF( mainw->kitgview );
+
+		mainw->kitgview = TOOLKITGROUPVIEW( 
+			model_view_new( MODEL( ws->kitg ), NULL ) );
+		g_object_ref( G_OBJECT( mainw->kitgview ) );
+		gtk_object_sink( GTK_OBJECT( mainw->kitgview ) );
+		toolkitgroupview_set_mainw( mainw->kitgview, mainw );
+		gtk_menu_set_accel_group( GTK_MENU( mainw->kitgview->menu ),
+			iwnd->accel_group );
+
+		mainw->kitg = ws->kitg;
+	}
+
+	return( FALSE );
 }
 
 static void
-mainw_workspace_changed_cb( Workspace *ws, Mainw *mainw )
+mainw_refresh( Mainw *mainw )
+{
+	IM_FREEF( g_source_remove, mainw->refresh_timeout );
+
+	mainw->refresh_timeout = g_timeout_add( 100, 
+		(GSourceFunc) mainw_refresh_timeout_cb, mainw );
+}
+
+static void                
+mainw_page_removed_cb( GtkNotebook *notebook, 
+	GtkWidget *page, guint page_num, gpointer user_data )
+{
+	Mainwtab *tab = MAINWTAB( page );
+	Mainw *mainw = MAINW( user_data );
+
+	if( mainw->current_tab == tab ) {
+		FREESID( mainw->ws_changed_sid, mainw->ws_changed );
+		mainw->current_tab = NULL;
+		mainw_refresh( mainw );
+	}
+
+	mainwtab_set_label( tab, NULL );
+
+	if( mainw_get_n_tabs( mainw ) == 0 )
+		iwindow_kill( IWINDOW( mainw ) );
+}
+
+static void                
+mainw_page_added_cb( GtkNotebook *notebook, 
+	GtkWidget *page, guint page_num, gpointer user_data )
+{
+	Mainwtab *tab = MAINWTAB( page );
+	Workspace *ws = mainwtab_get_workspace( tab );
+	Mainw *mainw = MAINW( user_data );
+
+	filemodel_set_window_hint( FILEMODEL( ws ), IWINDOW( mainw ) );
+	mainwtab_set_mainw( tab, mainw );
+	ws->iwnd = IWINDOW( mainw );
+}
+
+static GtkNotebook *                
+mainw_create_window_cb( GtkNotebook *notebook, 
+	GtkWidget *page, int x, int y, gpointer user_data )
+{
+	Mainw *mainw = MAINW( user_data );
+
+	Mainw *new_mainw;
+
+	new_mainw = mainw_new( mainw->wsr );
+	gtk_window_move( GTK_WINDOW( new_mainw ), x, y );
+	gtk_widget_show( GTK_WIDGET( new_mainw ) );
+
+	return( GTK_NOTEBOOK( new_mainw->notebook ) ); 
+}
+
+/* Add a tab to the right of old_tab.
+ */
+Mainwtab *
+mainw_add_workspace( Mainw *mainw, 
+	Mainwtab *old_tab, Workspace *ws, gboolean trim )
+{
+	gboolean delete_ws;
+	Workspace *old_ws;
+	Mainwtab *tab;
+	GtkWidget *ebox;
+	GtkWidget *label;
+	int page;
+
+	/* If the mainw has a single, empty workspace, unmodified workspace in
+	 * already, we optionally trim it. We can't remove until we've added 
+	 * the new ws though or our mainw will be destroyed.  
+	 */
+	delete_ws = FALSE;
+	if( trim &&
+		mainw_get_n_tabs( mainw ) == 1 &&
+		(old_ws = mainw_get_workspace( mainw )) &&
+		workspace_is_empty( old_ws ) &&
+		!FILEMODEL( old_ws )->modified ) 
+		delete_ws = TRUE;
+
+	tab = mainwtab_new();
+	vobject_link( VOBJECT( tab ), IOBJECT( ws ) );
+        gtk_widget_show( GTK_WIDGET( tab ) );
+
+        ebox = gtk_event_box_new();
+	gtk_widget_add_events( GTK_WIDGET( ebox ), 
+		GDK_BUTTON_PRESS_MASK ); 
+	label = gtk_label_new( NN( IOBJECT( ws->sym )->name ) );
+        gtk_container_add( GTK_CONTAINER( ebox ), label );
+        gtk_widget_show( GTK_WIDGET( label ) );
+	mainwtab_set_label( tab, label );
+	popup_attach( ebox, mainw->tab_menu, tab );
+
+	if( old_tab ) {
+		page = gtk_notebook_page_num( GTK_NOTEBOOK( mainw->notebook ), 
+			GTK_WIDGET( old_tab ) );
+		page += 1;
+	}
+	else
+		page = -1;
+
+	gtk_notebook_insert_page( GTK_NOTEBOOK( mainw->notebook ),
+		GTK_WIDGET( tab ), ebox, page );
+	gtk_notebook_set_tab_reorderable( GTK_NOTEBOOK( mainw->notebook ),
+		GTK_WIDGET( tab ), TRUE );
+	gtk_notebook_set_tab_detachable( GTK_NOTEBOOK( mainw->notebook ),
+		GTK_WIDGET( tab ), TRUE );
+
+	mainw->current_tab = tab;
+
+	if( delete_ws )
+		iobject_destroy( IOBJECT( old_ws ) ); 
+
+	return( tab );
+}
+
+static void
+mainw_select_tab( Mainw *mainw, Mainwtab *tab )
+{
+	int page;
+
+	page = gtk_notebook_page_num( GTK_NOTEBOOK( mainw->notebook ), 
+		GTK_WIDGET( tab ) );
+	gtk_notebook_set_current_page( GTK_NOTEBOOK( mainw->notebook ),
+		page );
+}
+
+#ifdef USE_NOTEBOOK_ACTION
+static void
+mainw_add_workspace_cb( GtkWidget *wid, Mainw *mainw )
+{
+	char name[256];
+	Workspace *ws;
+	Mainwtab *tab;
+
+	workspaceroot_name_new( mainw->wsr, name );
+	if( !(ws = workspace_new_blank( mainw->wsr, name )) ) {
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
+		return;
+	}
+	tab = mainw_add_workspace( mainw, mainw->current_tab, ws, FALSE );
+	mainw_select_tab( mainw, tab );
+}
+#endif /*USE_NOTEBOOK_ACTION*/
+
+static void
+mainw_workspace_changed_cb( gpointer *dummy, Mainw *mainw )
 {
 	mainw_refresh( mainw );
+}
+
+static void                
+mainw_switch_page_cb( GtkNotebook *notebook, 
+	GtkWidget *page, guint page_num, gpointer user_data )
+{
+	Mainwtab *tab = MAINWTAB( page );
+	Mainw *mainw = MAINW( user_data );
+	Workspace *ws = mainwtab_get_workspace( tab );
+
+	FREESID( mainw->ws_changed_sid, mainw->ws_changed );
+	mainw->current_tab = tab;
+	mainw->ws_changed_sid = g_signal_connect( ws, "changed",
+		G_CALLBACK( mainw_workspace_changed_cb ), mainw );
+	mainw->ws_changed = ws;
+
+	mainw_refresh( mainw );
+
+	if( ws->compat_major &&
+		!tab->popped_compat ) {
+		error_top( _( "Compatibility mode." ) );
+		error_sub( _( "This workspace was created by version %d.%d.%d. "
+			"A set of compatibility menus have been loaded "
+			"for this window." ),
+			FILEMODEL( ws )->major,
+			FILEMODEL( ws )->minor,
+			FILEMODEL( ws )->micro );
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
+
+		tab->popped_compat = TRUE;
+	}
+
+	/* How bizarre, pages sometimes fail to set up correctly. Force a
+	 * resize to get everything to init. 
+	 */
+	if( tab->wsview &&
+		tab->wsview->fixed ) 
+		gtk_container_check_resize( 
+			GTK_CONTAINER( tab->wsview->fixed ) );
+}
+
+static void *
+mainw_duplicate_tab( Mainw *mainw, Mainwtab *tab )
+{
+	Workspace *ws = mainwtab_get_workspace( tab );
+
+	Workspace *new_ws;
+	Mainwtab *new_tab;
+
+	if( !(new_ws = workspace_clone( ws )) ) 
+		return( NULL );
+	new_tab = mainw_add_workspace( mainw, tab, new_ws, FALSE );
+
+	mainw_select_tab( mainw, new_tab );
+
+	symbol_recalculate_all();
+
+	return( new_tab ); 
+}
+
+static void
+mainw_workspace_duplicate_action_cb( GtkAction *action, Mainw *mainw )
+{
+	progress_begin();
+
+	if( mainw->current_tab &&
+		!mainw_duplicate_tab( mainw, mainw->current_tab ) ) {
+		progress_end();
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
+		return;
+	}
+
+	progress_end();
+}
+
+static void
+mainw_workbook_duplicate_action_cb( GtkAction *action, Mainw *mainw )
+{
+	int n_tabs = mainw_get_n_tabs( mainw );
+
+	Mainw *new_mainw;
+	int i;
+
+	progress_begin();
+
+	new_mainw = mainw_new( mainw->wsr );
+
+	gtk_widget_show( GTK_WIDGET( new_mainw ) );
+
+	for( i = 0; i < n_tabs; i++ ) {
+		Mainwtab *old_tab = mainw_get_nth_tab( mainw, i );
+		Workspace *old_ws = mainwtab_get_workspace( old_tab );
+
+		Workspace *new_ws;
+
+		if( !(new_ws = workspace_clone( old_ws )) ) {
+			iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
+			return;
+		}
+		mainw_add_workspace( new_mainw, NULL, new_ws, FALSE );
+	}
+
+	symbol_recalculate_all();
+
+	progress_end();
+}
+
+static void                
+mainw_tab_duplicate_cb2( GtkWidget *wid, GtkWidget *host, Mainwtab *tab )
+{
+	Mainw *mainw = mainwtab_get_mainw( tab );
+
+	progress_begin();
+
+	if( !mainw_duplicate_tab( mainw, tab ) ) {
+		progress_end();
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
+		return;
+	}
+
+	progress_end();
+}
+
+static void
+mainw_workspace_save_action_cb( GtkAction *action, Mainw *mainw )
+{
+	Workspace *ws;
+
+	if( (ws = mainw_get_workspace( mainw )) )
+		filemodel_inter_save( IWINDOW( mainw ), FILEMODEL( ws ) );
+}
+
+static void                
+mainw_tab_save_cb2( GtkWidget *wid, GtkWidget *host, Mainwtab *tab )
+{
+	Mainw *mainw = mainwtab_get_mainw( tab );
+	Workspace *ws = mainwtab_get_workspace( tab );
+
+	filemodel_inter_save( IWINDOW( mainw ), FILEMODEL( ws ) );
+}
+
+static void
+mainw_workspace_save_as_action_cb( GtkAction *action, Mainw *mainw )
+{
+	Workspace *ws;
+
+	if( (ws = mainw_get_workspace( mainw )) )
+		filemodel_inter_saveas( IWINDOW( mainw ), FILEMODEL( ws ) );
+}
+
+static void
+mainw_workspace_save_tabs_as_action_cb( GtkAction *action, Mainw *mainw )
+{
+	Workspace *ws;
+
+	if( (ws = mainw_get_workspace( mainw )) )
+		filemodel_inter_saveas( IWINDOW( mainw ), FILEMODEL( ws ) );
+}
+
+static void                
+mainw_tab_save_as_cb2( GtkWidget *wid, GtkWidget *host, Mainwtab *tab )
+{
+	Mainw *mainw = mainwtab_get_mainw( tab );
+	Workspace *ws = mainwtab_get_workspace( tab );
+
+	filemodel_inter_saveas( IWINDOW( mainw ), FILEMODEL( ws ) );
+}
+
+static void
+mainw_workspace_close_action_cb( GtkAction *action, Mainw *mainw )
+{
+	Workspace *ws;
+
+	if( (ws = mainw_get_workspace( mainw )) )
+		filemodel_inter_savenclose( IWINDOW( mainw ), FILEMODEL( ws ) );
+}
+
+static void                
+mainw_tab_close_cb2( GtkWidget *wid, GtkWidget *host, Mainwtab *tab )
+{
+	Workspace *ws = mainwtab_get_workspace( tab );
+	Mainw *mainw = mainwtab_get_mainw( tab );
+
+	filemodel_inter_savenclose( IWINDOW( mainw ), FILEMODEL( ws ) );
 }
 
 /* Event in the "space free" display ... toggle mode on left click.
@@ -603,7 +858,8 @@ mainw_space_free_tooltip_generate( GtkWidget *widget, VipsBuf *buf,
 	Mainw *mainw )
 {
 	Heap *heap = reduce_context->heap;
-	Symbol *sym = mainw->ws->sym;
+
+	Workspace *ws;
 
 	mainw_find_disc( buf );
 	/* Expands to (eg.) "14GB free in /pics/tmp" */
@@ -615,9 +871,13 @@ mainw_space_free_tooltip_generate( GtkWidget *widget, VipsBuf *buf,
                 heap->ncells, heap->nfree, heap->max_fn( heap ) );
         vips_buf_appends( buf, ", " );
 
-        vips_buf_appendf( buf, _( "%d objects in workspace" ),
-		g_slist_length( ICONTAINER( sym->expr->compile )->children ) );
-        vips_buf_appends( buf, ", " );
+	if( (ws = mainw_get_workspace( mainw )) ) {
+		Compile *compile = ws->sym->expr->compile;
+
+		vips_buf_appendf( buf, _( "%d objects in workspace" ),
+			g_slist_length( ICONTAINER( compile )->children ) );
+		vips_buf_appends( buf, ", " );
+	}
 
         vips_buf_appendf( buf, _( "%d vips calls cached" ), 
 		cache_history_size );
@@ -658,41 +918,12 @@ mainw_guide_action_cb( GtkAction *action, iWindow *iwnd )
 }
 
 static void
-mainw_clone( Mainw *mainw )
-{
-	Workspace *ws = mainw->ws;
-
-	if( !workspace_selected_any( ws ) ) {
-		/* Nothing selected -- select bottom object.
-		 */
-		Row *row = workspace_get_bottom( ws );
-
-		if( !row ) {
-			iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
-			return;
-		}
-		row_select( row );
-	}
-
-	/* Clone selected symbols.
-	 */
-	progress_begin();
-	if( !workspace_clone_selected( ws ) ) { 
-		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
-		progress_end();
-		return;
-	}
-	symbol_recalculate_all();
-	workspace_deselect_all( ws );
-	progress_end();
-
-	model_scrollto( MODEL( ws->current ), MODEL_SCROLL_TOP );
-}
-
-static void
 mainw_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 {
-	mainw_clone( mainw );
+	progress_begin();
+	if( !mainwtab_clone( mainw->current_tab ) )
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
+	progress_end();
 }
 
 /* Ungroup the selected object(s), or the bottom object.
@@ -700,47 +931,23 @@ mainw_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 static void
 mainw_ungroup_action_cb( GtkAction *action, Mainw *mainw )
 {
+	Workspace *ws;
+
 	progress_begin();
-	if( !workspace_selected_ungroup( mainw->ws ) )
+	if( (ws = mainw_get_workspace( mainw )) &&
+		!workspace_selected_ungroup( ws ) )
 		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
 	progress_end();
 }
 
 /* Group the selected object(s).
  */
-static void
+void
 mainw_group_action_cb( GtkAction *action, Mainw *mainw )
 {
-	Workspace *ws = mainw->ws;
-	char txt[MAX_STRSIZE];
-	VipsBuf buf = VIPS_BUF_STATIC( txt );
-
-	if( !workspace_selected_any( ws ) ) {
-		/* Nothing selected -- select bottom object.
-		 */
-		Row *row = workspace_get_bottom( ws );
-
-		if( !row ) {
-			iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
-			return;
-		}
-		row_select( row );
-	}
-
-	vips_buf_appends( &buf, "Group [" );
-	workspace_selected_names( ws, &buf, "," );
-	vips_buf_appends( &buf, "]" );
-	if( !workspace_add_def_recalc( ws, vips_buf_all( &buf ) ) ) {
+	if( mainw->current_tab &&
+		!mainwtab_group( mainw->current_tab ) )
 		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
-		return;
-	}
-	workspace_deselect_all( ws );
-}
-
-static void
-mainw_group_action_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
-{
-	mainw_group_action_cb( NULL, mainw );
 }
 
 /* Select all objects.
@@ -748,7 +955,10 @@ mainw_group_action_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
 static void
 mainw_select_all_action_cb( GtkAction *action, Mainw *mainw )
 {
-	workspace_select_all( mainw->ws );
+	Workspace *ws;
+
+	if( (ws = mainw_get_workspace( mainw )) )
+		workspace_select_all( ws );
 }
 
 static void
@@ -767,185 +977,52 @@ mainw_find_again_action_cb( GtkAction *action, Mainw *mainw )
 	iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
 }
 
-static Row *
-mainw_test_error( Row *row, Mainw *mainw, int *found )
-{
-	g_assert( row->err );
-
-	/* Found next?
-	 */
-	if( *found )
-		return( row );
-
-	if( row == mainw->row_last_error ) {
-		/* Found the last one ... return the next one.
-		 */
-		*found = 1;
-		return( NULL );
-	}
-
-	return( NULL );
-}
-
-/* Callback for next-error button.
- */
-static void
+void
 mainw_next_error_action_cb( GtkAction *action, Mainw *mainw )
 {
-	char txt[MAX_LINELENGTH];
-	VipsBuf buf = VIPS_BUF_STATIC( txt );
-
-	int found;
-
-	if( !mainw->ws->errors ) {
+	if( !mainwtab_next_error( mainw->current_tab ) ) {
 		error_top( _( "No errors." ) );
 		error_sub( "%s", _( "There are no errors (that I can see) "
 			"in this workspace." ) );
 		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
-		return;
 	}
-
-	/* Search for the one after the last one.
-	 */
-	found = 0;
-	mainw->row_last_error = (Row *) slist_map2( mainw->ws->errors, 
-		(SListMap2Fn) mainw_test_error, mainw, &found );
-
-	/* NULL? We've hit end of table, start again.
-	 */
-	if( !mainw->row_last_error ) {
-		found = 1;
-		mainw->row_last_error = (Row *) slist_map2( mainw->ws->errors, 
-			(SListMap2Fn) mainw_test_error, mainw, &found );
-	}
-
-	/* *must* have one now.
-	 */
-	g_assert( mainw->row_last_error && mainw->row_last_error->err );
-
-	model_scrollto( MODEL( mainw->row_last_error ), MODEL_SCROLL_TOP );
-
-	row_qualified_name( mainw->row_last_error->expr->row, &buf );
-	vips_buf_appends( &buf, ": " );
-	vips_buf_appends( &buf, mainw->row_last_error->expr->error_top );
-	workspace_set_status( mainw->ws, "%s", vips_buf_firstline( &buf ) );
 }
 
-static void
-mainw_next_error_action_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
-{
-	mainw_next_error_action_cb( NULL, mainw );
-}
-
-/* Callback for box_yesno in mainw_force_calc_cb. Recalc selected items.
- */
-static void
-mainw_selected_recalc_dia( iWindow *iwnd, void *client, 
-	iWindowNotifyFn nfn, void *sys )
-{
-	Mainw *mainw = MAINW( client );
-
-	if( workspace_selected_recalc( mainw->ws ) )
-		nfn( sys, IWINDOW_YES );
-	else
-		nfn( sys, IWINDOW_ERROR );
-}
-
-/* If symbols are selected, make them very dirty and recalculate. If not, 
- * just recalculate symbols which are already dirty.
- */
 static void
 mainw_force_calc_action_cb( GtkAction *action, Mainw *mainw )
 {
-	Workspace *ws = mainw->ws;
+	Workspace *ws;
 
-        if( workspace_selected_any( ws ) ) {
-		char txt[30];
-		VipsBuf buf = VIPS_BUF_STATIC( txt );
-
-		workspace_selected_names( ws, &buf, ", " );
-
-		box_yesno( GTK_WIDGET( mainw ), 
-			mainw_selected_recalc_dia, iwindow_true_cb, mainw, 
-			iwindow_notify_null, NULL,
-			_( "Recalculate" ), 
-			_( "Completely recalculate?" ),
-			( "Are you sure you want to "
-			"completely recalculate %s?" ), vips_buf_all( &buf ) );
+	if( (ws = mainw_get_workspace( mainw )) &&
+		workspace_selected_any( ws ) ) {
+		if( !workspace_selected_recalc( ws ) ) 
+			iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
 	}
 	else 
-		/* Recalculate.
-		 */
 		symbol_recalculate_all_force( FALSE );
 }
 
-/* Callback for save workspace.
- */
-static void
-mainw_workspace_save_action_cb( GtkAction *action, Mainw *mainw )
-{
-	filemodel_inter_save( IWINDOW( mainw ), FILEMODEL( mainw->ws ) );
-}
-
-/* Callback for "save as .." workspace.
- */
-static void
-mainw_workspace_save_as_action_cb( GtkAction *action, Mainw *mainw )
-{
-	filemodel_inter_saveas( IWINDOW( mainw ), FILEMODEL( mainw->ws ) );
-}
-
-static Workspace *
-mainw_open_workspace( Workspacegroup *wsg, const char *filename )
+Workspace *
+mainw_open_workspace( Mainw *mainw, 
+	const char *filename, gboolean trim, gboolean select )
 {
 	Workspace *ws;
-	Mainw *mainw;
+	Mainwtab *tab;
 
-	if( !(ws = workspace_new_from_file( wsg, filename, NULL )) ) 
+	if( !(ws = workspace_new_from_file( mainw->wsr, filename, NULL )) ) 
 		return( NULL );
-
-	mainw = mainw_new( ws );
-	gtk_widget_show( GTK_WIDGET( mainw ) );
+	tab = mainw_add_workspace( mainw, mainw->current_tab, ws, trim ); 
+	if( select )
+		mainw_select_tab( mainw, tab ); 
 	mainw_recent_add( &mainw_recent_workspace, filename );
 
-	symbol_recalculate_all();
-
 	return( ws );
-}
-
-/* Open a new workspace, close the current one if it's empty. 
- *
- * The idea is that if you have a blank workspace and do file-open, you want
- * to load into the blank. However, we can't actually do this, since the new
- * workspace might need a different set of menus. 
- *
- * We could sniff the file and then call workspace_merge_file() if the
- * workspace was compatible with the current one, but why bother.
- */
-Workspace *
-mainw_open_file_into_workspace( Mainw *mainw, const char *filename )
-{
-	Workspacegroup *wsg = WORKSPACEGROUP( ICONTAINER( mainw->ws )->parent );
-	Workspace *new_ws;
-
-	if( !(new_ws = mainw_open_workspace( wsg, filename )) ) 
-		return( NULL );
-
-	if( workspace_is_empty( mainw->ws ) ) {
-		/* Make sure modified isn't set ... otherwise we'll get a
-		 * "save before close" dialog.
-		 */
-		filemodel_set_modified( FILEMODEL( mainw->ws ), FALSE );
-		iwindow_kill( IWINDOW( mainw ) );
-	}
-
-	return( new_ws );
 }
 
 /* Track these during a load.
  */
 typedef struct {
-	Workspacegroup *wsg;
+	Mainw *mainw;
 	VipsBuf *buf;
 	int nitems;
 } MainwLoad;
@@ -957,7 +1034,7 @@ static void *
 mainw_open_fn( Filesel *filesel, const char *filename, MainwLoad *load )
 {
 	if( is_file_type( &filesel_wfile_type, filename ) ) {
-		if( !mainw_open_workspace( load->wsg, filename ) )
+		if( !mainw_open_workspace( load->mainw, filename, TRUE, TRUE ) )
 			return( filesel );
 	}
 	else {
@@ -983,8 +1060,9 @@ mainw_open_done_cb( iWindow *iwnd, void *client,
 	char txt[MAX_STRSIZE];
 	VipsBuf buf = VIPS_BUF_STATIC( txt );
 	MainwLoad load;
+	Workspace *ws;
 
-	load.wsg = WORKSPACEGROUP( ICONTAINER( mainw->ws )->parent );
+	load.mainw = mainw;
 	load.buf = &buf;
 	load.nitems = 0;
 
@@ -994,23 +1072,11 @@ mainw_open_done_cb( iWindow *iwnd, void *client,
 		return;
 	}
 
-	/* If there's nothing left to load (we only had workspaces to load and
-	 * we've loaded them all) and the current workspace is smpty, we can 
-	 * junk it.
-	 */
-	if( !load.nitems && 
-		workspace_is_empty( mainw->ws ) ) {
-		/* Make sure modified isn't set ... otherwise we'll get a
-		 * "save before close" dialog.
-		 */
-		filemodel_set_modified( FILEMODEL( mainw->ws ), FALSE );
-		iwindow_kill( IWINDOW( mainw ) );
-	}
-
 	/* Some actual files (image, matrix) were selected. Load into
 	 * the current workspace.
 	 */
-	if( load.nitems ) {
+	if( load.nitems &&
+		(ws = mainw_get_workspace( mainw )) ) { 
 		char txt2[MAX_STRSIZE];
 		VipsBuf buf2 = VIPS_BUF_STATIC( txt2 );
 
@@ -1020,8 +1086,7 @@ mainw_open_done_cb( iWindow *iwnd, void *client,
 		else
 			vips_buf_appends( &buf2, vips_buf_all( &buf ) );
 
-		if( !workspace_add_def_recalc( mainw->ws, 
-			vips_buf_all( &buf2 ) ) ) {
+		if( !workspace_add_def_recalc( ws, vips_buf_all( &buf2 ) ) ) {
 			error_top( _( "Load failed." ) );
 			error_sub( _( "Unable to execute:\n   %s" ), 
 				vips_buf_all( &buf2 ) );
@@ -1055,16 +1120,10 @@ mainw_open( Mainw *mainw )
 	gtk_widget_show( GTK_WIDGET( filesel ) );
 }
 
-static void
+void
 mainw_open_action_cb( GtkAction *action, Mainw *mainw )
 {
 	mainw_open( mainw );
-}
-
-static void
-mainw_open_action_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
-{
-	mainw_open_action_cb( NULL, mainw );
 }
 
 /* Open one of the example workspaces ... just a shortcut.
@@ -1107,11 +1166,14 @@ static gboolean
 mainw_recent_open( Mainw *mainw, const char *filename )
 {
 	if( is_file_type( &filesel_wfile_type, filename ) ) {
-		if( !mainw_open_file_into_workspace( mainw, filename ) )
+		if( !mainw_open_workspace( mainw, filename, TRUE, TRUE ) )
 			return( FALSE );
 	}
 	else {
-		if( !workspace_load_file( mainw->ws, filename ) )
+		Workspace *ws;
+
+		if( (ws = mainw_get_workspace( mainw )) &&
+			!workspace_load_file( ws, filename ) )
 			return( FALSE );
 	}
 
@@ -1234,8 +1296,10 @@ mainw_workspace_merge_fn( Filesel *filesel,
 	const char *filename, void *a, void *b )
 {
 	Mainw *mainw = MAINW( a );
+	Workspace *ws;
 
-	if( !workspace_merge_file( mainw->ws, filename, NULL ) )
+	if( (ws = mainw_get_workspace( mainw )) &&
+		!workspace_merge_file( ws, filename, NULL ) )
 		return( filesel );
 
 	/* Process some events to make sure we rethink the layout and
@@ -1290,42 +1354,10 @@ mainw_workspace_merge( Mainw *mainw )
 	gtk_widget_show( GTK_WIDGET( filesel ) );
 }
 
-static void
-mainw_workspace_duplicate_action_cb( GtkAction *action, Mainw *mainw )
-{
-	Workspace *new_ws;
-	Mainw *new_mainw;
-
-	progress_begin();
-
-	if( !(new_ws = workspace_clone( mainw->ws )) ) {
-		progress_end();
-		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
-		return;
-	}
-
-	new_mainw = mainw_new( new_ws );
-	gtk_widget_show( GTK_WIDGET( new_mainw ) );
-
-	/* We have to show before recalculate or the window never appears, not
-	 * sure why.
-	 */
-	symbol_recalculate_all();
-
-	progress_end();
-}
-
-static void
+void
 mainw_workspace_merge_action_cb( GtkAction *action, Mainw *mainw )
 {
 	mainw_workspace_merge( mainw );
-}
-
-static void
-mainw_workspace_merge_action_cb2( GtkWidget *wid, GtkWidget *host, 
-	Mainw *mainw )
-{
-	mainw_workspace_merge_action_cb( NULL, mainw );
 }
 
 /* Auto recover.
@@ -1338,26 +1370,22 @@ mainw_recover_action_cb( GtkAction *action, Mainw *mainw )
 
 /* Callback from make new column.
  */
-static void
+void
 mainw_column_new_action_cb( GtkAction *action, Mainw *mainw )
 {
-	char *name;
-	Column *col;
+	Workspace *ws;
 
-	name = workspace_column_name_new( mainw->ws, NULL );
-	if( !(col = column_new( mainw->ws, name )) ) 
-		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
-	else
-		workspace_column_select( mainw->ws, col );
-	IM_FREE( name );
-}
+	if( (ws = mainw_get_workspace( mainw )) ) { 
+		char *name;
+		Column *col;
 
-/* Same, but from the popup.
- */
-static void
-mainw_column_new_action_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
-{
-	mainw_column_new_action_cb( NULL, mainw );
+		name = workspace_column_name_new( ws, NULL );
+		if( !(col = column_new( ws, name )) ) 
+			iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
+		else
+			workspace_column_select( ws, col );
+		IM_FREE( name );
+	}
 }
 
 /* Done button hit.
@@ -1371,10 +1399,16 @@ mainw_column_new_cb( iWindow *iwnd, void *client,
 	StringsetChild *name = stringset_child_get( ss, _( "Name" ) );
 	StringsetChild *caption = stringset_child_get( ss, _( "Caption" ) );
 
+	Workspace *ws;
 	Column *col;
 
 	char name_text[1024];
 	char caption_text[1024];
+
+	if( !(ws = mainw_get_workspace( mainw )) ) {
+		nfn( sys, IWINDOW_YES );
+		return;
+	}
 
 	if( !get_geditable_name( name->entry, name_text, 1024 ) ||
 		!get_geditable_string( caption->entry, caption_text, 1024 ) ) {
@@ -1382,7 +1416,7 @@ mainw_column_new_cb( iWindow *iwnd, void *client,
 		return;
 	}
 
-	if( !(col = column_new( mainw->ws, name_text )) ) {
+	if( !(col = column_new( ws, name_text )) ) {
 		nfn( sys, IWINDOW_ERROR );
 		return;
 	}
@@ -1390,7 +1424,7 @@ mainw_column_new_cb( iWindow *iwnd, void *client,
 	if( strcmp( caption_text, "" ) != 0 )
 		iobject_set( IOBJECT( col ), NULL, caption_text );
 
-	workspace_column_select( mainw->ws, col );
+	workspace_column_select( ws, col );
 
 	nfn( sys, IWINDOW_YES );
 }
@@ -1402,8 +1436,12 @@ mainw_column_new_named_action_cb( GtkAction *action, Mainw *mainw )
 {
 	GtkWidget *ss = stringset_new();
 	char *name;
+	Workspace *ws;
 
-	name = workspace_column_name_new( mainw->ws, NULL );
+	if( !(ws = mainw_get_workspace( mainw )) ) 
+		return;
+
+	name = workspace_column_name_new( ws, NULL );
 
 	stringset_child_new( STRINGSET( ss ), 
 		_( "Name" ), name, _( "Set column name here" ) );
@@ -1428,11 +1466,48 @@ mainw_column_new_named_action_cb( GtkAction *action, Mainw *mainw )
 static void
 mainw_program_new_action_cb( GtkAction *action, Mainw *mainw )
 {
-	Program *program;
+	Workspace *ws;
 
-	program = program_new( mainw->ws->kitg );
+	if( (ws = mainw_get_workspace( mainw )) ) {
+		Program *program;
 
-	gtk_widget_show( GTK_WIDGET( program ) ); 
+		program = program_new( ws->kitg );
+		gtk_widget_show( GTK_WIDGET( program ) ); 
+	}
+}
+
+/* Done button hit.
+ */
+static void
+mainw_workspace_new_done_cb( iWindow *iwnd, void *client, 
+	iWindowNotifyFn nfn, void *sys )
+{
+	Mainw *mainw = MAINW( client );
+	Stringset *ss = STRINGSET( iwnd );
+	StringsetChild *name = stringset_child_get( ss, _( "Name" ) );
+	StringsetChild *caption = stringset_child_get( ss, _( "Caption" ) );
+
+	Workspace *ws;
+
+	char name_text[1024];
+	char caption_text[1024];
+
+	if( !get_geditable_name( name->entry, name_text, 1024 ) ||
+		!get_geditable_string( caption->entry, caption_text, 1024 ) ) {
+		nfn( sys, IWINDOW_ERROR );
+		return;
+	}
+
+	if( !(ws = workspace_new_blank( mainw->wsr, name_text )) ) {
+		nfn( sys, IWINDOW_ERROR );
+		return;
+	}
+
+	iobject_set( IOBJECT( ws ), NULL, caption_text );
+
+	mainw_add_workspace( mainw, mainw->current_tab, ws, FALSE );
+
+	nfn( sys, IWINDOW_YES );
 }
 
 /* New ws callback.
@@ -1440,9 +1515,41 @@ mainw_program_new_action_cb( GtkAction *action, Mainw *mainw )
 static void
 mainw_workspace_new_action_cb( GtkAction *action, Mainw *mainw )
 {
-	Workspacegroup *wsg = WORKSPACEGROUP( ICONTAINER( mainw->ws )->parent );
+	Workspaceroot *wsr = mainw->wsr; 
+	GtkWidget *ss = stringset_new();
+	char name[256];
 
-	workspacegroup_workspace_new( wsg, GTK_WIDGET( mainw ) );
+	workspaceroot_name_new( wsr, name );
+	stringset_child_new( STRINGSET( ss ), 
+		_( "Name" ), name, _( "Set workspace name here" ) );
+	stringset_child_new( STRINGSET( ss ), 
+		_( "Caption" ), "", _( "Set workspace caption here" ) );
+
+	iwindow_set_title( IWINDOW( ss ), _( "New Workspace" ) );
+	idialog_set_callbacks( IDIALOG( ss ), 
+		iwindow_true_cb, NULL, NULL, mainw );
+	idialog_add_ok( IDIALOG( ss ), 
+		mainw_workspace_new_done_cb, _( "Create Workspace" ) );
+	iwindow_set_parent( IWINDOW( ss ), GTK_WIDGET( mainw ) );
+	iwindow_build( IWINDOW( ss ) );
+
+	gtk_widget_show( ss );
+}
+
+/* New workbook.
+ */
+static void
+mainw_workbook_new_action_cb( GtkAction *action, Mainw *mainw )
+{
+	Mainw *new_mainw;
+	Workspace *new_ws;
+	char name[256];
+
+	new_mainw = mainw_new( mainw->wsr );
+	workspaceroot_name_new( mainw->wsr, name );
+	new_ws = workspace_new_blank( mainw->wsr, name );
+	mainw_add_workspace( new_mainw, NULL, new_ws, FALSE );
+	gtk_widget_show( GTK_WIDGET( new_mainw ) );
 }
 
 /* Callback from auto-recalc toggle.
@@ -1491,10 +1598,16 @@ mainw_statusbar_action_cb( GtkToggleAction *action, Mainw *mainw )
 static void
 mainw_toolkitbrowser_action_cb( GtkToggleAction *action, Mainw *mainw )
 {
-	if( gtk_toggle_action_get_active( action ) )
-		pane_animate_open( mainw->rpane );
-	else
-		pane_animate_closed( mainw->rpane );
+	if( mainw->current_tab ) {
+		Pane *pane;
+
+		pane = mainwtab_get_browse_pane( mainw->current_tab );
+
+		if( gtk_toggle_action_get_active( action ) )
+			pane_animate_open( pane );
+		else
+			pane_animate_closed( pane );
+	}
 }
 
 /* Expose/hide the workspace defs.
@@ -1502,24 +1615,27 @@ mainw_toolkitbrowser_action_cb( GtkToggleAction *action, Mainw *mainw )
 static void
 mainw_workspacedefs_action_cb( GtkToggleAction *action, Mainw *mainw )
 {
-	if( gtk_toggle_action_get_active( action ) )
-		pane_animate_open( mainw->lpane );
-	else
-		pane_animate_closed( mainw->lpane );
+	if( mainw->current_tab ) {
+		Pane *pane;
+
+		pane = mainwtab_get_defs_pane( mainw->current_tab );
+
+		if( gtk_toggle_action_get_active( action ) )
+			pane_animate_open( pane );
+		else
+			pane_animate_closed( pane );
+	}
 }
 
 /* Layout columns.
  */
-static void
+void
 mainw_layout_action_cb( GtkAction *action, Mainw *mainw )
 {
-	model_layout( MODEL( mainw->ws ) );
-}
+	Workspace *ws;
 
-static void
-mainw_layout_action_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
-{
-	mainw_layout_action_cb( NULL, mainw );
+	if( (ws = mainw_get_workspace( mainw )) ) 
+		model_layout( MODEL( ws ) );
 }
 
 /* Remove selected items.
@@ -1527,17 +1643,22 @@ mainw_layout_action_cb2( GtkWidget *wid, GtkWidget *host, Mainw *mainw )
 static void
 mainw_selected_remove_action_cb( GtkAction *action, Mainw *mainw )
 {
-	workspace_selected_remove_yesno( mainw->ws, GTK_WIDGET( mainw ) );
+	Workspace *ws;
+
+	if( (ws = mainw_get_workspace( mainw )) ) 
+		workspace_selected_remove_yesno( ws, GTK_WIDGET( mainw ) );
 }
 
 void 
 mainw_revert_ok_cb( iWindow *iwnd, void *client, 
 	iWindowNotifyFn nfn, void *sys ) 
 {
-	Mainw *mainw = MAINW( client );
+	Prefs *prefs = PREFS( client );
 
-	if( FILEMODEL( mainw->ws )->filename ) {
-		(void) unlinkf( "%s", FILEMODEL( mainw->ws )->filename );
+	if( FILEMODEL( prefs->ws )->filename ) {
+		printf( "mainw_revert_ok_cb: unlinking %s", 
+			FILEMODEL( prefs->ws )->filename ); 
+		(void) unlinkf( "%s", FILEMODEL( prefs->ws )->filename );
 		main_reload();
 		symbol_recalculate_all();
 	}
@@ -1548,10 +1669,10 @@ mainw_revert_ok_cb( iWindow *iwnd, void *client,
 void 
 mainw_revert_cb( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys ) 
 {
-	Mainw *mainw = MAINW( client );
+	Prefs *prefs = PREFS( client );
 
 	box_yesno( GTK_WIDGET( iwnd ),
-		mainw_revert_ok_cb, iwindow_true_cb, mainw,
+		mainw_revert_ok_cb, iwindow_true_cb, prefs,
 		nfn, sys,
 		_( "Revert to Defaults" ), 
 		_( "Revert to installation defaults?" ),
@@ -1575,7 +1696,7 @@ mainw_preferences_action_cb( GtkAction *action, Mainw *mainw )
 	iwindow_set_title( IWINDOW( prefs ), _( "Preferences" ) );
 	iwindow_set_parent( IWINDOW( prefs ), GTK_WIDGET( mainw ) );
 	idialog_set_callbacks( IDIALOG( prefs ), 
-		NULL, NULL, NULL, mainw );
+		NULL, NULL, NULL, prefs );
 	idialog_add_ok( IDIALOG( prefs ), 
 		mainw_revert_cb, _( "Revert to Defaults ..." ) );
 	idialog_add_ok( IDIALOG( prefs ), iwindow_true_cb, GTK_STOCK_CLOSE );
@@ -1600,7 +1721,7 @@ static void
 mainw_magic_cb( gpointer callback_data, guint callback_action,
         GtkWidget *widget )
 {
-	Workspace *ws = main_workspacegroup->current;
+	Workspace *ws = main_workspaceroot->current;
 	Row *row = workspace_selected_one( ws );
 
 	if( !row )
@@ -1618,10 +1739,14 @@ mainw_magic_cb( gpointer callback_data, guint callback_action,
 static void
 mainw_graph_action_cb( GtkAction *action, Mainw *mainw )
 {
-	Graphwindow *graphwindow;
+	Workspace *ws;
 
-	graphwindow = graphwindow_new( mainw->ws, GTK_WIDGET( mainw ) );
-	gtk_widget_show( GTK_WIDGET( graphwindow ) );
+	if( (ws = mainw_get_workspace( mainw )) ) { 
+		Graphwindow *graphwindow;
+
+		graphwindow = graphwindow_new( ws, GTK_WIDGET( mainw ) );
+		gtk_widget_show( GTK_WIDGET( graphwindow ) );
+	}
 }
 #endif /*HAVE_LIBGVC*/
 
@@ -1631,8 +1756,11 @@ static void
 mainw_mode_action_cb( GtkRadioAction *action, GtkRadioAction *current, 
 	Mainw *mainw )
 {
-	workspace_set_mode( mainw->ws, 
-		gtk_radio_action_get_current_value( action ) );
+	Workspace *ws;
+
+	if( (ws = mainw_get_workspace( mainw )) ) 
+		workspace_set_mode( ws, 
+			gtk_radio_action_get_current_value( action ) );
 }
 
 /* Our actions.
@@ -1652,19 +1780,24 @@ static GtkActionEntry mainw_actions[] = {
 	/* Actions.
 	 */
 	{ "NewColumn", 
-		GTK_STOCK_NEW, N_( "New C_olumn" ), NULL, 
+		GTK_STOCK_NEW, N_( "C_olumn" ), NULL, 
 		N_( "Create a new column" ), 
 		G_CALLBACK( mainw_column_new_action_cb ) },
 
 	{ "NewColumnName", 
-		GTK_STOCK_NEW, N_( "New Named C_olumn" ), NULL, 
+		GTK_STOCK_NEW, N_( "C_olumn" ), NULL, 
 		N_( "Create a new column with a specified name" ), 
 		G_CALLBACK( mainw_column_new_named_action_cb ) },
 
 	{ "NewWorkspace", 
-		GTK_STOCK_NEW, N_( "New _Workspace" ), NULL, 
+		GTK_STOCK_NEW, N_( "_Workspace" ), NULL, 
 		N_( "Create a new workspace" ), 
 		G_CALLBACK( mainw_workspace_new_action_cb ) },
+
+	{ "NewWindow", 
+		GTK_STOCK_NEW, N_( "_Window" ), NULL, 
+		N_( "Create a new window" ), 
+		G_CALLBACK( mainw_workbook_new_action_cb ) },
 
 	{ "Open", 
 		GTK_STOCK_OPEN, N_( "_Open" ), NULL,
@@ -1681,6 +1814,11 @@ static GtkActionEntry mainw_actions[] = {
 		N_( "Duplicate workspace" ), 
 		G_CALLBACK( mainw_workspace_duplicate_action_cb ) },
 
+	{ "DuplicateWindow", 
+		STOCK_DUPLICATE, N_( "_Duplicate Window" ), NULL,
+		N_( "Duplicate window" ), 
+		G_CALLBACK( mainw_workbook_duplicate_action_cb ) },
+
 	{ "Merge", 
 		NULL, N_( "_Merge Workspace" ), NULL, 
 		N_( "Merge workspace into this workspace" ), 
@@ -1696,10 +1834,20 @@ static GtkActionEntry mainw_actions[] = {
 		N_( "Save workspace as" ), 
 		G_CALLBACK( mainw_workspace_save_as_action_cb ) },
 
+	{ "SaveTabs", 
+		GTK_STOCK_SAVE_AS, N_( "_Save All Tabs As" ), NULL,
+		N_( "Save all tabs to a workspace" ), 
+		G_CALLBACK( mainw_workspace_save_tabs_as_action_cb ) },
+
 	{ "Recover", 
 		NULL, N_( "Search for Workspace _Backups" ), NULL,
 		N_( "Load last automatically backed-up workspace" ), 
 		G_CALLBACK( mainw_recover_action_cb ) },
+
+	{ "CloseTab", 
+		GTK_STOCK_CLOSE, N_( "_Close Workspace" ), NULL,
+		N_( "Close Tab" ), 
+		G_CALLBACK( mainw_workspace_close_action_cb ) },
 
 	{ "Delete", 
 		GTK_STOCK_DELETE, N_( "_Delete" ), "<control>BackSpace",
@@ -1820,6 +1968,7 @@ static const char *mainw_menubar_ui_description =
 "      <menu action='NewMenu'>"
 "        <menuitem action='NewColumnName'/>"
 "        <menuitem action='NewWorkspace'/>"
+"        <menuitem action='NewWindow'/>"
 "      </menu>"
 "      <menuitem action='Open'/>"
 "      <menu action='RecentMenu'>"
@@ -1827,14 +1976,15 @@ static const char *mainw_menubar_ui_description =
 "      </menu>"
 "      <menuitem action='OpenExamples'/>"
 "      <separator/>"
-"      <menuitem action='DuplicateWorkspace'/>"
+"      <menuitem action='DuplicateWindow'/>"
 "      <menuitem action='Merge'/>"
 "      <menuitem action='Save'/>"
 "      <menuitem action='SaveAs'/>"
+"      <menuitem action='SaveTabs'/>"
 "      <separator/>"
 "      <menuitem action='Recover'/>"
 "      <separator/>"
-"      <menuitem action='Close'/>"
+"      <menuitem action='CloseTab'/>"
 "      <menuitem action='Quit'/>"
 "    </menu>"
 "    <menu action='EditMenu'>"
@@ -1899,30 +2049,6 @@ static const char *mainw_toolbar_ui_description =
 "</ui>";
 
 static void
-mainw_lpane_changed_cb( Pane *pane, Mainw *mainw )
-{
-	if( mainw->ws->lpane_open != pane->open ||
-		mainw->ws->lpane_position != pane->user_position ) {
-		mainw->ws->lpane_open = pane->open;
-		mainw->ws->lpane_position = pane->user_position;
-
-		mainw_refresh( mainw );
-	}
-}
-
-static void
-mainw_rpane_changed_cb( Pane *pane, Mainw *mainw )
-{
-	if( mainw->ws->rpane_open != pane->open ||
-		mainw->ws->rpane_position != pane->user_position ) {
-		mainw->ws->rpane_open = pane->open;
-		mainw->ws->rpane_position = pane->user_position;
-
-		mainw_refresh( mainw );
-	}
-}
-
-static void
 mainw_watch_changed_cb( Watchgroup *watchgroup, Watch *watch, Mainw *mainw )
 {
 	if( strcmp( IOBJECT( watch )->name, "MAINW_TOOLBAR_STYLE" ) == 0 )
@@ -1940,14 +2066,12 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 
         GtkWidget *mbar;
 	GtkWidget *frame;
-	GtkWidget *ebox;
 	GError *error;
 	GtkWidget *cancel;
 	GtkWidget *item;
-	Panechild *panechild;
 
 #ifdef DEBUG
-	printf( "mainw_init: %p\n", mainw );
+	printf( "mainw_build: %p\n", mainw );
 #endif /*DEBUG*/
 
         /* Make main menu bar
@@ -1993,6 +2117,13 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 		"/MainwMenubar/EditMenu/JumpToColumnMenu/Stub" );
 	mainw->jump_to_column_menu = 
 		gtk_widget_get_parent( GTK_WIDGET( item ) );
+
+	/* Same for the tk menu. 
+	 */
+        item = gtk_ui_manager_get_widget( iwnd->ui_manager,
+		"/MainwMenubar/ToolkitsMenu/Stub" );
+        mainw->toolkit_menu = gtk_widget_get_parent( GTK_WIDGET( item ) );
+	gtk_widget_destroy( item ); 
 
 	/* Attach toolbar.
   	 */
@@ -2072,88 +2203,53 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
         gtk_box_pack_end( GTK_BOX( mainw->statusbar_main ), 
 		mainw->progress_box, FALSE, TRUE, 0 );
 
-	/* Make toolkit/workspace displays.
-	 */
-	mainw->kitgview = TOOLKITGROUPVIEW( 
-		model_view_new( MODEL( mainw->ws->kitg ), NULL ) );
-	g_object_ref( G_OBJECT( mainw->kitgview ) );
-	gtk_object_sink( GTK_OBJECT( mainw->kitgview ) );
-	toolkitgroupview_set_mainw( mainw->kitgview, mainw );
-	gtk_menu_set_accel_group( GTK_MENU( mainw->kitgview->menu ),
-		iwnd->accel_group );
+	mainw->notebook = gtk_notebook_new();
+	gtk_notebook_set_scrollable( GTK_NOTEBOOK( mainw->notebook ), TRUE );
+	gtk_notebook_set_group_name( GTK_NOTEBOOK( mainw->notebook ), "mainw" );
+	gtk_notebook_set_tab_pos( GTK_NOTEBOOK( mainw->notebook ), 
+		GTK_POS_BOTTOM );
+	g_signal_connect( mainw->notebook, "switch_page", 
+		G_CALLBACK( mainw_switch_page_cb ), mainw );
+	g_signal_connect( mainw->notebook, "page_added", 
+		G_CALLBACK( mainw_page_added_cb ), mainw );
+	g_signal_connect( mainw->notebook, "page_removed", 
+		G_CALLBACK( mainw_page_removed_cb ), mainw );
+	g_signal_connect( mainw->notebook, "create_window", 
+		G_CALLBACK( mainw_create_window_cb ), mainw );
 
-	mainw->rpane = pane_new( PANE_HIDE_RIGHT );
-	g_signal_connect( mainw->rpane, "changed",
-		G_CALLBACK( mainw_rpane_changed_cb ), mainw );
+#ifdef USE_NOTEBOOK_ACTION
+{
+	GtkWidget *but;
+	GtkWidget *icon;
+
+        but = gtk_button_new();
+        gtk_button_set_relief( GTK_BUTTON( but ), GTK_RELIEF_NONE );
+        set_tooltip( but, _( "Add a workspace" ) );
+	icon = gtk_image_new_from_stock( GTK_STOCK_ADD, GTK_ICON_SIZE_MENU );
+        gtk_container_add( GTK_CONTAINER( but ), icon );
+	gtk_widget_show( icon );
+	gtk_widget_show( but );
+	gtk_notebook_set_action_widget( GTK_NOTEBOOK( mainw->notebook ), 
+		but, GTK_PACK_END );
+        gtk_signal_connect( GTK_OBJECT( but ), "clicked",
+                GTK_SIGNAL_FUNC( mainw_add_workspace_cb ), mainw );
+}
+#endif /*USE_NOTEBOOK_ACTION*/
+
 	gtk_box_pack_start( GTK_BOX( vbox ), 
-		GTK_WIDGET( mainw->rpane ), TRUE, TRUE, 0 );
-	gtk_widget_show( GTK_WIDGET( mainw->rpane ) );
+		mainw->notebook, TRUE, TRUE, 0 );
+	gtk_widget_show( mainw->notebook );
 
-	mainw->lpane = pane_new( PANE_HIDE_LEFT );
-	g_signal_connect( mainw->lpane, "changed",
-		G_CALLBACK( mainw_lpane_changed_cb ), mainw );
-	gtk_paned_pack1( GTK_PANED( mainw->rpane ), GTK_WIDGET( mainw->lpane ),
-		TRUE, FALSE );
-	gtk_widget_show( GTK_WIDGET( mainw->lpane ) );
-
-	mainw->wsview = WORKSPACEVIEW( 
-		model_view_new( MODEL( mainw->ws ), NULL ) );
-	gtk_paned_pack2( GTK_PANED( mainw->lpane ), GTK_WIDGET( mainw->wsview ),
-		TRUE, FALSE );
-	gtk_widget_show( GTK_WIDGET( mainw->wsview ) );
-
-	mainw->popup = popup_build( _( "Workspace menu" ) );
-	popup_add_but( mainw->popup, _( "New C_olumn" ),
-		POPUP_FUNC( mainw_column_new_action_cb2 ) ); 
-	mainw->popup_jump =
-		popup_add_pullright( mainw->popup, _( "Jump to _Column" ) ); 
-	popup_add_but( mainw->popup, _( "Align _Columns" ),
-		POPUP_FUNC( mainw_layout_action_cb2 ) ); 
-	menu_add_sep( mainw->popup );
-	popup_add_but( mainw->popup, GTK_STOCK_OPEN,
-		POPUP_FUNC( mainw_open_action_cb2 ) ); 
-	popup_add_but( mainw->popup, _( "_Merge Workspace from File" ),
-		POPUP_FUNC( mainw_workspace_merge_action_cb2 ) ); 
-	menu_add_sep( mainw->popup );
-	popup_add_but( mainw->popup, _( "_Group Selected" ),
-		POPUP_FUNC( mainw_group_action_cb2 ) ); 
-	menu_add_sep( mainw->popup );
-	popup_add_but( mainw->popup, STOCK_NEXT_ERROR,
-		POPUP_FUNC( mainw_next_error_action_cb2 ) ); 
-        popup_attach( mainw->wsview->fixed, mainw->popup, mainw );
-
-	/* Toolkit Browser pane.
-	 */
-	panechild = panechild_new( mainw->rpane, _( "Toolkit Browser" ) );
-
-	/* Have to put toolkitbrowser in an ebox so the search entry gets
-	 * clipped to the pane size.
-	 */
-	ebox = gtk_event_box_new();
-	gtk_container_add( GTK_CONTAINER( panechild ), GTK_WIDGET( ebox ) );
-	gtk_widget_show( ebox );
-
-	mainw->toolkitbrowser = toolkitbrowser_new();
-	vobject_link( VOBJECT( mainw->toolkitbrowser ), 
-		IOBJECT( mainw->ws->kitg ) );
-	toolkitbrowser_set_mainw( mainw->toolkitbrowser, mainw );
-	gtk_container_add( GTK_CONTAINER( ebox ), 
-		GTK_WIDGET( mainw->toolkitbrowser ) );
-	gtk_widget_show( GTK_WIDGET( mainw->toolkitbrowser ) );
-
-	/* Workspace-local defs pane.
-	 */
-	panechild = panechild_new( mainw->lpane, _( "Workspace Definitions" ) );
-
-	mainw->workspacedefs = workspacedefs_new( mainw );
-	vobject_link( VOBJECT( mainw->workspacedefs ), IOBJECT( mainw->ws ) );
-	gtk_container_add( GTK_CONTAINER( panechild ), 
-		GTK_WIDGET( mainw->workspacedefs ) );
-	gtk_widget_show( GTK_WIDGET( mainw->workspacedefs ) );
-
-	/* Set start state.
-	 */
-	(void) mainw_refresh( mainw );
+	mainw->tab_menu = popup_build( _( "Tab menu" ) );
+	popup_add_but( mainw->tab_menu, STOCK_DUPLICATE,
+		POPUP_FUNC( mainw_tab_duplicate_cb2 ) ); 
+	popup_add_but( mainw->tab_menu, GTK_STOCK_SAVE,
+		POPUP_FUNC( mainw_tab_save_cb2 ) ); 
+	popup_add_but( mainw->tab_menu, GTK_STOCK_SAVE_AS,
+		POPUP_FUNC( mainw_tab_save_as_cb2 ) ); 
+	menu_add_sep( mainw->tab_menu );
+	popup_add_but( mainw->tab_menu, GTK_STOCK_CLOSE,
+		POPUP_FUNC( mainw_tab_close_cb2 ) ); 
 
 	/* Any changes to prefs, refresh (yuk!).
 	 */
@@ -2166,75 +2262,68 @@ static void
 mainw_popdown( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys )
 {
 	Mainw *mainw = MAINW( iwnd );
+	Workspace *ws;
 
 	/* We can be destroyed in two ways: either our iwnd tells us to go, or
 	 * our model is destroyed under us. If the model has gone, we just go.
 	 * If the model is still there, we need to ask about saving and
 	 * quitting.
 	 */
-	if( mainw->ws ) {
-		/* Argh, cancel this immediately, in case we close before
-		 * we're up properly.
-		 */
-		IM_FREEF( g_source_remove, mainw->compat_timeout );
+
+	if( (ws = mainw_get_workspace( mainw )) ) { 
+		iWindowSusp *susp = iwindow_susp_new( mainw_popdown, 
+			iwnd, client, nfn, sys );
 
 		filemodel_inter_savenclose_cb( IWINDOW( mainw ), 
-			FILEMODEL( mainw->ws ), nfn, sys );
+			FILEMODEL( ws ), iwindow_susp_comp, susp );
 	}
 	else
 		nfn( sys, IWINDOW_YES );
 }
 
 static void
-mainw_link( Mainw *mainw, Workspace *ws )
+mainw_link( Mainw *mainw, Workspaceroot *wsr )
 {
-	g_assert( !mainw->ws );
+	mainw->wsr = wsr;
 
-	mainw->ws = ws;
-	ws->iwnd = IWINDOW( mainw );
-	mainw->destroy_sid = g_signal_connect( ws, "destroy",
-		G_CALLBACK( mainw_workspace_destroy_cb ), mainw );
-	mainw->changed_sid = g_signal_connect( ws, "changed",
-		G_CALLBACK( mainw_workspace_changed_cb ), mainw );
 	iwindow_set_build( IWINDOW( mainw ), 
-		(iWindowBuildFn) mainw_build, ws, NULL, NULL );
+		(iWindowBuildFn) mainw_build, wsr, NULL, NULL );
 	iwindow_set_popdown( IWINDOW( mainw ), mainw_popdown, NULL );
-	filemodel_set_window_hint( FILEMODEL( ws ), IWINDOW( mainw ) );
-
-	/* If we have a saved size for this workspace, set that. Otherwise,
-	 * default to the default.
-	 */
-	if( !ws->window_width ) {
-		iwindow_set_size_prefs( IWINDOW( mainw ), 
-			"MAINW_WINDOW_WIDTH", "MAINW_WINDOW_HEIGHT" );
-	}
-
+	iwindow_set_size_prefs( IWINDOW( mainw ), 
+		"MAINW_WINDOW_WIDTH", "MAINW_WINDOW_HEIGHT" );
 	iwindow_build( IWINDOW( mainw ) );
 
-	if( ws->window_width ) {
-		GdkScreen *screen = 
-			gtk_widget_get_screen( GTK_WIDGET( mainw ) );
-
-		gtk_window_set_default_size( GTK_WINDOW( mainw ), 
-			IM_MIN( ws->window_width, 
-				gdk_screen_get_width( screen ) ),
-			IM_MIN( ws->window_height, 
-				gdk_screen_get_height( screen ) ) );
-	}
-
-	pane_set_state( mainw->lpane, ws->lpane_open, ws->lpane_position );
-	pane_set_state( mainw->rpane, ws->rpane_open, ws->rpane_position );
+	/* Set start state.
+	 */
+	(void) mainw_refresh( mainw );
 }
 
 Mainw *
-mainw_new( Workspace *ws )
+mainw_new( Workspaceroot *wsr )
 {
 	Mainw *mainw;
 
-	symbol_recalculate_all_force( FALSE );
-
 	mainw = MAINW( g_object_new( TYPE_MAINW, NULL ) );
-	mainw_link( mainw, ws );
+
+	mainw_link( mainw, wsr );
 
 	return( mainw );
+}
+
+int
+mainw_get_n_tabs( Mainw *mainw )
+{
+	return( gtk_notebook_get_n_pages( GTK_NOTEBOOK( mainw->notebook ) ) );
+}
+
+Mainwtab *
+mainw_get_nth_tab( Mainw *mainw, int i )
+{
+	GtkWidget *old_tab = gtk_notebook_get_nth_page( 
+		GTK_NOTEBOOK( mainw->notebook ), i );
+
+	if( !old_tab )
+		return( NULL );
+
+	return( MAINWTAB( old_tab ) ); 
 }

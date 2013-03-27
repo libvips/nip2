@@ -70,7 +70,7 @@
 GdkWindow *main_window_gdk;			/* Top GdkWindow */
 GtkWidget *main_window_top = NULL;		/* Secret top window */
 
-Workspacegroup *main_workspacegroup = NULL;	/* All the workspaces */
+Workspaceroot *main_workspaceroot = NULL;	/* All the workspaces */
 Toolkitgroup *main_toolkitgroup = NULL;		/* All the toolkits */
 Symbol *main_symbol_root = NULL;		/* Root of symtable */
 Watchgroup *main_watchgroup = NULL;		/* All of the watches */
@@ -316,7 +316,7 @@ main_quit( void )
 	UNREF( main_watchgroup );
 	UNREF( main_symbol_root );
 	UNREF( main_toolkitgroup );
-	UNREF( main_workspacegroup );
+	UNREF( main_workspaceroot );
 
 	/* Junk reduction machine ... this should remove all image temps.
 	 */
@@ -406,7 +406,7 @@ main_quit_test( void )
 
 	/* Close registered models.
 	 */
-	filemodel_inter_close_registered_cb( IWINDOW( main_window_top ), NULL,
+	filemodel_inter_close_registered_cb( IWINDOW( mainw_pick_one() ), NULL,
 		main_quit_test_cb, NULL );
 }
 
@@ -423,23 +423,14 @@ main_watchgroup_changed_cb( void )
 /* Try to load a thing, anything at all. Actually, we don't load plugins
  * experimentally, win32 pops up an annoying error dialog if you try that.
  */
-gboolean
-main_load( Workspace *ws, const char *filename )
+static gboolean
+main_load( Mainw *mainw, Workspace *ws, const char *filename )
 {
 	Workspace *new_ws;
 
-	if( (new_ws = workspace_new_from_file( main_workspacegroup, 
-		filename, NULL )) ) {
-		Mainw *new_mainw;
-
-		if( !main_option_batch ) {
-			new_mainw = mainw_new( new_ws );
-			gtk_widget_show( GTK_WIDGET( new_mainw ) );
-		}
-		mainw_recent_add( &mainw_recent_workspace, filename );
-
+	if( (new_ws = mainw_open_workspace( mainw, filename, FALSE, FALSE )) ) 
 		return( TRUE );
-	}
+
 	error_clear();
 
 	/* workspace_load_file() needs to recalc to work, try to avoid that by
@@ -508,7 +499,7 @@ main_load_ws( const char *filename )
 
 	progress_update_loading( 0, im_skip_dir( filename ) );
 
-	if( !(ws = workspace_new_from_file( main_workspacegroup, 
+	if( !(ws = workspace_new_from_file( main_workspaceroot, 
 		filename, NULL )) ) 
 		iwindow_alert( NULL, GTK_MESSAGE_ERROR );
 	else {
@@ -991,6 +982,7 @@ main( int argc, char *argv[] )
 {
 	gboolean welcome_message = FALSE;
 	Workspace *ws;
+	Mainw *mainw;
 	GError *error = NULL;
 	GOptionContext *context;
 	const char *prefix;
@@ -1237,10 +1229,10 @@ main( int argc, char *argv[] )
 	g_object_ref( G_OBJECT( main_symbol_root ) );
 	iobject_sink( IOBJECT( main_symbol_root ) );
 	model_base_init();
-	main_workspacegroup = workspacegroup_new( "Workspaces" );
-	g_object_ref( G_OBJECT( main_workspacegroup ) );
-	iobject_sink( IOBJECT( main_workspacegroup ) );
-	main_watchgroup = watchgroup_new( main_workspacegroup, "Preferences" );
+	main_workspaceroot = workspaceroot_new( "Workspaces" );
+	g_object_ref( G_OBJECT( main_workspaceroot ) );
+	iobject_sink( IOBJECT( main_workspaceroot ) );
+	main_watchgroup = watchgroup_new( main_workspaceroot, "Preferences" );
 	g_object_ref( G_OBJECT( main_watchgroup ) );
 	iobject_sink( IOBJECT( main_watchgroup ) );
 	main_toolkitgroup = toolkitgroup_new( symbol_root );
@@ -1337,7 +1329,7 @@ main( int argc, char *argv[] )
 
 	if( main_option_stdin_ws ) {
 		if( !(ws = workspace_new_from_openfile( 
-			main_workspacegroup, main_stdin )) ) 
+			main_workspaceroot, main_stdin )) ) 
 			main_log_add( "%s\n", error_get_sub() );
 		else 
 			/* Don't want to have "stdin" as the filename.
@@ -1348,9 +1340,15 @@ main( int argc, char *argv[] )
 	/* Make sure we have a start workspace.
 	 */
 	if( !ws ) {
-		workspacegroup_name_new( main_workspacegroup, name );
-		ws = workspace_new_blank( main_workspacegroup, name );
+		workspaceroot_name_new( main_workspaceroot, name );
+		ws = workspace_new_blank( main_workspaceroot, name );
 	}
+
+	/* Make a mainw to hold any workspaces we load. Only show this in
+	 * interactive mode, see below.
+	 */
+	mainw = mainw_new( main_workspaceroot );
+	mainw_add_workspace( mainw, NULL, ws, FALSE );
 
 	/* Reset IM_CONCURRENCY if a watch changes. Need to do this after
 	 * parsing options so we skip in batch mode.
@@ -1375,7 +1373,7 @@ main( int argc, char *argv[] )
 	path_expand( buf );
 	setenvf( "TMPDIR", "%s", buf );
 
-	path_rewrite_add( PATH_TMP, "$TMPDIR" );
+	path_rewrite_add( PATH_TMP, "$TMPDIR", TRUE );
 }
 
 	/* Measure amount of stuff in temp area ... need this for checking
@@ -1437,7 +1435,7 @@ main( int argc, char *argv[] )
 			im_strncpy( buf, argv[i], FILENAME_MAX );
 			path_compact( buf );
 
-			if( !main_load( ws, buf ) ) 
+			if( !main_load( mainw, ws, buf ) ) 
 				main_log_add( "%s\n", error_get_sub() );
 		}
 	}
@@ -1465,6 +1463,15 @@ main( int argc, char *argv[] )
 	 */
 	filemodel_set_modified( FILEMODEL( ws ), FALSE );
 
+	/* If the start ws is empty (we didn't load anything into it) and we
+	 * loaded some other workspaces, we can junk the empty ws. 
+	 */
+	if( mainw_get_n_tabs( mainw ) > 1 &&
+		workspace_is_empty( ws ) ) {
+		iobject_destroy( IOBJECT( ws ) ); 
+		ws = NULL;
+	}
+
 #ifdef DEBUG_TIME
 	printf( "DEBUG_TIME: main init in %gs\n",  
 		g_timer_elapsed( startup_timer, NULL ) );
@@ -1473,15 +1480,7 @@ main( int argc, char *argv[] )
 	/* Are we running interactively? Start the main window and loop.
 	 */
 	if( !main_option_batch ) {
-		/* Only display our initial ws if it's not blank, or if it is
-		 * blank, if there are no other windows up.
-		 */
-		if( !workspace_is_empty( ws ) || mainw_number() == 0 ) {
-			Mainw *mainw;
-			
-			mainw = mainw_new( ws );
-			gtk_widget_show( GTK_WIDGET( mainw ) );
-		}
+		gtk_widget_show( GTK_WIDGET( mainw ) );
 
 		/* Process a few events ... we want the window to be mapped so
 		 * that log/welcome/clean? messages we pop appear in the right
@@ -1516,20 +1515,14 @@ _( "A new directory has been created to hold startup, "
 			iwindow_alert( NULL, GTK_MESSAGE_INFO );
 		}
 
-		/* Offer to junk temps.
-		 */
 		main_check_temp( total );
 
 #ifdef DEBUG
 		printf( "starting event dispatch loop\n" );
 #endif/*DEBUG*/
 
-		/* Through startup.
-		 */
 		main_starting = FALSE;
 
-		/* Make sure we have a recalc queued.
-		 */
 		symbol_recalculate_all_force( FALSE );
 
 		gtk_main();

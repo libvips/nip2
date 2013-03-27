@@ -166,7 +166,7 @@ decode_SymbolType( SymbolType t )
 	case SYM_PARAM:		return( "SYM_PARAM" );
 	case SYM_ZOMBIE:	return( "SYM_ZOMBIE" );
 	case SYM_WORKSPACE:	return( "SYM_WORKSPACE" );
-	case SYM_WORKSPACEGROUP:return( "SYM_WORKSPACEGROUP" );
+	case SYM_WORKSPACEROOT:return( "SYM_WORKSPACEROOT" );
 	case SYM_ROOT:		return( "SYM_ROOT" );
 	case SYM_EXTERNAL:	return( "SYM_EXTERNAL" );
 	case SYM_BUILTIN:	return( "SYM_BUILTIN" );
@@ -187,7 +187,7 @@ decode_SymbolType_user( SymbolType t )
 	case SYM_PARAM:		return( _( "parameter" ) );
 	case SYM_ZOMBIE:	return( _( "zombie" ) );
 	case SYM_WORKSPACE:	return( _( "workspace" ) );
-	case SYM_WORKSPACEGROUP:return( _( "workspace group" ) );
+	case SYM_WORKSPACEROOT:	return( _( "workspace root" ) );
 	case SYM_ROOT:		return( _( "root symbol" ) );
 	case SYM_EXTERNAL:	return( _( "external symbol" ) );
 	case SYM_BUILTIN:	return( _( "built-in symbol" ) );

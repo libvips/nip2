@@ -45,8 +45,6 @@
 struct _Workspaceview {
 	View view;
 
-	Workspacegroupview *wgview;
-
 	GtkWidget *fixed;		/* GtkFixed for tally */
 	GtkWidget *window;		/* ScrolledWindow holding fixed */
 

@@ -518,7 +518,13 @@ columnview_event_cb( GtkWidget *widget, GdkEvent *ev, Columnview *cview )
 	gboolean handled = FALSE;
 
 #ifdef DEBUG
-	printf( "columnview_event_cb %d\n", ev->type );
+{
+	Column *col = COLUMN( VOBJECT( cview )->iobject );
+
+	printf( "columnview_event_cb: %s %d\n", 
+		IOBJECT( col )->name, 
+		ev->type );
+}
 #endif /*DEBUG*/
 
         switch( ev->type ) {
@@ -707,6 +713,10 @@ columnview_refresh( vObject *vobject )
 	Columnview *cview = COLUMNVIEW( vobject );
 	Column *col = COLUMN( VOBJECT( cview )->iobject );
 	gboolean editable = col->ws->mode != WORKSPACE_MODE_NOEDIT;
+
+#ifdef DEBUG
+	printf( "columnview_refresh: %s\n", IOBJECT( col )->name );
+#endif /*DEBUG*/
 
 	/* Update position.
 	 */

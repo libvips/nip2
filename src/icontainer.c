@@ -330,7 +330,7 @@ icontainer_custom_sort( iContainer *icontainer, GCompareFunc fn )
 	iobject_changed( IOBJECT( icontainer ) );
 }
 
-/* Add a child.
+/* Add a child. pos == -1 for append. 
  */
 void
 icontainer_child_add( iContainer *parent, iContainer *child, int pos )

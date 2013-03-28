@@ -42,14 +42,6 @@
 /* Three sorts of workspace file load.
  */
 typedef enum {
-	WORKSPACE_MODE_REGULAR, /* Vanilla! */
-	WORKSPACE_MODE_FORMULA, /* Show formula, not values */
-	WORKSPACE_MODE_NOEDIT	/* Shut down all edits */
-} WorkspaceMode;
-
-/* Three sorts of workspace file load.
- */
-typedef enum {
 	WORKSPACE_LOAD_TOP,	/* Load as new workspace */
 	WORKSPACE_LOAD_COLUMNS,	/* Merge columns into current workspace */
 	WORKSPACE_LOAD_ROWS	/* Merge rows into current column */
@@ -61,6 +53,14 @@ typedef enum {
 	WORKSPACE_SAVE_ALL,	/* Save all rows */
 	WORKSPACE_SAVE_SELECTED	/* Only save selected rows */
 } WorkspaceSaveType;
+
+/* Three sorts of workspace display.
+ */
+typedef enum {
+	WORKSPACE_MODE_REGULAR, /* Vanilla! */
+	WORKSPACE_MODE_FORMULA, /* Show formula, not values */
+	WORKSPACE_MODE_NOEDIT	/* Shut down all edits */
+} WorkspaceMode;
 
 /* A workspace.
  */
@@ -82,11 +82,6 @@ struct _Workspace {
 	GSList *selected;	/* Rows selected in this workspace */
 	GSList *errors;		/* Rows with errors */
         WorkspaceMode mode;	/* Display mode */
-
-	/* Compatibility. 7.8.x used different names for Marks and had strange
-	 * position behaviour.
-	 */
-	gboolean compat_78;	/* In 7.8.x compatibility mode */
 
 	/* Some versions (7.10 etc.) need special compat toolkits. 0 here for
 	 * no compat toolkits loaded.
@@ -138,8 +133,6 @@ typedef struct _WorkspaceClass {
 	 */
 } WorkspaceClass;
 
-Workspaceroot *workspace_get_workspaceroot( Workspace *ws );
-
 void *workspace_map( workspace_map_fn fn, void *a, void *b );
 void *workspace_map_column( Workspace *ws, column_map_fn fn, void *a );
 void *workspace_map_symbol( Workspace *ws, symbol_map_fn fn, void *a );
@@ -180,11 +173,11 @@ void workspace_retain_clean( void );
 void workspace_auto_recover( Mainw *mainw );
 
 GType workspace_get_type( void );
-Workspace *workspace_new( Workspaceroot *wsr, const char *name );
-Workspace *workspace_new_from_file( Workspaceroot *wsr, 
+Workspace *workspace_new( Workspacegroup *wsg, const char *name );
+Workspace *workspace_new_from_file( Workspacegroup *wsg, 
 	const char *filename, const char *filename_user );
-Workspace *workspace_new_from_openfile( Workspaceroot *wsr, iOpenFile *of );
-Workspace *workspace_new_blank( Workspaceroot *wsr, const char *name );
+Workspace *workspace_new_from_openfile( Workspacegroup *wsg, iOpenFile *of );
+Workspace *workspace_new_blank( Workspacegroup *wsg, const char *name );
 gboolean workspace_merge_file( Workspace *ws, 
 	const char *filename, const char *filename_user );
 gboolean workspace_merge_column_file( Workspace *ws, 

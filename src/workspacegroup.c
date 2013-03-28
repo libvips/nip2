@@ -42,6 +42,29 @@ workspacegroup_map( Workspacegroup *wsg, workspace_map_fn fn, void *a, void *b )
 		(icontainer_map_fn) fn, a, b ) );
 }
 
+static void *
+workspacegroup_is_empty_sub( Workspace *ws, gboolean *empty )
+{
+	if( !workspace_is_empty( ws ) ) {
+		*empty = FALSE;
+		return( ws );
+	}
+
+	return( NULL );
+}
+
+gboolean 
+workspacegroup_is_empty( Workspacegroup *wsg )
+{
+	gboolean empty;
+
+	empty = TRUE;
+	(void) workspacegroup_map( wsg, 
+		(workspace_map_fn) workspacegroup_is_empty_sub, &empty, NULL );
+
+	return( empty );
+}
+
 static void 
 workspacegroup_dispose( GObject *gobject )
 {
@@ -66,8 +89,6 @@ static void
 workspacegroup_class_init( WorkspacegroupClass *class )
 {
 	GObjectClass *gobject_class = (GObjectClass *) class;
-	iObjectClass *iobject_class = (iObjectClass *) class;
-	ModelClass *model_class = (ModelClass *) class;
 	FilemodelClass *filemodel_class = (FilemodelClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
@@ -115,18 +136,16 @@ workspacegroup_get_type( void )
 static void
 workspacegroup_link( Workspacegroup *wsg, Workspaceroot *wsr, const char *name )
 {
-	iobject_set( IOBJECT( kit ), name, NULL );
+	iobject_set( IOBJECT( wsg ), name, NULL );
 	icontainer_child_add( ICONTAINER( wsr ), ICONTAINER( wsg ), -1 );
-	wsg->wsr = wse;
+	wsg->wsr = wsr;
 	filemodel_register( FILEMODEL( wsg ) );
-	if( name[0] == '_' )
-		MODEL( kit )->display = FALSE;
 }
 
 Workspacegroup *
 workspacegroup_new( Workspaceroot *wsr, const char *name )
 {
-	Workspacegroup *kit;
+	Workspacegroup *wsg;
 
 #ifdef DEBUG
 	printf( "workspacegroup_new: %s\n", name );
@@ -134,6 +153,27 @@ workspacegroup_new( Workspaceroot *wsr, const char *name )
 
 	wsg = WORKSPACEGROUP( g_object_new( TYPE_WORKSPACEGROUP, NULL ) );
 	workspacegroup_link( wsg, wsr, name );
+
+	return( wsg );
+}
+
+/* Make the blank workspacegroup we present the user with (in the absence of
+ * anything else).
+ */
+Workspacegroup *
+workspacegroup_new_blank( Workspaceroot *wsr, const char *name )
+{
+	Workspacegroup *wsg;
+	Workspace *ws;
+
+	if( !(wsg = workspacegroup_new( wsr, name )) )
+		return( NULL );
+	iobject_set( IOBJECT( wsg ), NULL, _( "Default empty workspace" ) );
+
+	if( !(ws = workspace_new( wsg, "tab1" )) ) {
+		iobject_destroy( IOBJECT( wsg ) );
+		return( NULL );
+	}
 
 	return( wsg );
 }
@@ -151,25 +191,58 @@ workspacegroup_new_filename( Workspaceroot *wsr, const char *filename )
 	return( wsg );
 }
 
+static gboolean
+workspacegroup_load_empty( Workspacegroup *wsg, Workspaceroot *wsr, 
+	const char *filename, const char *filename_user )
+{
+	printf( "workspacegroup_load_empty:\n" ); 
+
+	return( TRUE );
+}
+
 /* Load a file as a workspacegroup.
  */
 Workspacegroup *
-workspacegroup_new_from_file( Workspaceroot *wsr, const char *filename )
+workspacegroup_new_from_file( Workspaceroot *wsr, 
+	const char *filename, const char *filename_user )
 {
-	Workspacegroup *wsg = workspacegroup_new_filename( wsr, filename );
-	gboolean res;
+	Workspacegroup *wsg;
 
-	res = filemodel_load_all( FILEMODEL( wsg ), MODEL( wsr ), 
-		filename, NULL );
-	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
-
-	/* Don't remove the kit if load failed, we want to leave it so the 
-	 * user can try to fix the problem.
-	 */
-
-	if( res )
-		return( wsg );
-	else
+	wsg = WORKSPACEGROUP( g_object_new( TYPE_WORKSPACEGROUP, NULL ) );
+	if( !workspacegroup_load_empty( wsg, wsr, filename, filename_user ) ) {
+		g_object_unref( G_OBJECT( wsg ) );
 		return( NULL );
+	}
+
+	return( wsg );
+}
+
+/* New workspacegroup from a file.
+ */
+Workspacegroup *
+workspacegroup_new_from_openfile( Workspaceroot *wsr, iOpenFile *of )
+{
+	Workspacegroup *wsg;
+
+#ifdef DEBUG
+	printf( "workspacegroup_new_from_openfile: %s\n", of->fname );
+#endif /*DEBUG*/
+
+	wsg = WORKSPACEGROUP( g_object_new( TYPE_WORKSPACEGROUP, NULL ) );
+	wsg->load_type = WORKSPACEGROUP_LOAD_TOP;
+	if( !filemodel_load_all_openfile( FILEMODEL( wsg ), 
+		MODEL( wsr ), of ) ) {
+		g_object_unref( G_OBJECT( wsg ) );
+		return( NULL );
+	}
+
+	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
+	filemodel_set_filename( FILEMODEL( wsg ), of->fname );
+
+#ifdef DEBUG
+	printf( "(set name = %s)\n", IOBJECT( wsg )->name );
+#endif /*DEBUG*/
+
+	return( wsg );
 }
 

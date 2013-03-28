@@ -1,3 +1,9 @@
+- why do we have mainw_recent_add()? move it to path.c?
+
+  see main_load() ... it has to call mainw_recent_add() explicitly, this
+  should be automatic
+
+
 - we must do it properly, with one file per mainw, it'd be much too confusing
   to have save sometimes save a tab and sometimes save the whole book
 

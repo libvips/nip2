@@ -43,11 +43,13 @@
 struct _Mainw {
 	iWindow parent_object;
 
-	/* We make and manage workspaces inside this.
-	 */
 	Workspaceroot *wsr;
 
-	/* Set of workspace tabs we display.
+	/* The set of workspaces we manage.
+	 */
+	Workspacegroup *wsg;
+
+	/* Currently selected tab.
 	 */
 	Mainwtab *current_tab;
 
@@ -154,7 +156,7 @@ Mainwtab *mainw_add_workspace( Mainw *mainw,
 Workspace *mainw_open_workspace( Mainw *mainw, 
 	const char *filename, gboolean trim, gboolean select );
 
-Mainw *mainw_new( Workspaceroot *wsr );
+Mainw *mainw_new( Workspacegroup *wsg );
 
 int mainw_get_n_tabs( Mainw *mainw );
 Mainwtab *mainw_get_nth_tab( Mainw *mainw, int i );

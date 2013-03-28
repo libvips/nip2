@@ -325,6 +325,7 @@ typedef struct _View View;
 typedef struct _Workspace Workspace;
 typedef struct _Workspaceview Workspaceview;
 typedef struct _Workspaceroot Workspaceroot;
+typedef struct _Workspacegroup Workspacegroup;
 typedef struct _Prefworkspaceview Prefworkspaceview;
 typedef struct _Prefcolumnview Prefcolumnview;
 typedef struct _iText iText;
@@ -389,6 +390,7 @@ typedef void *(*tool_map_fn)( Tool *, void *, void * );
 #include "filemodel.h"
 #include "symbol.h"
 #include "workspace.h"
+#include "workspacegroup.h"
 #include "workspaceroot.h"
 #include "toolkitgroup.h"
 #include "secret.h"

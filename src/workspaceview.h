@@ -48,6 +48,27 @@ struct _Workspaceview {
 	GtkWidget *fixed;		/* GtkFixed for tally */
 	GtkWidget *window;		/* ScrolledWindow holding fixed */
 
+	/* Component widgets.
+	 */
+	Workspacedefs *workspacedefs;
+	Toolkitbrowser *toolkitbrowser;
+	GtkWidget *popup;
+	GtkWidget *popup_jump;
+	Pane *lpane;			/* WS local defs */
+	Pane *rpane;			/* TK browser */
+
+	/* Set by our parent: the label we update with the ws name and state.
+	 */
+	GtkWidget *label;
+
+	/* Only show the compat warning once.
+	 */
+	gboolean popped_compat;
+
+	/* The last row we visited with the 'next-error' button.
+	 */
+	Row *row_last_error;
+
 	/* Background window scroll.
 	 */
 	guint timer;
@@ -103,3 +124,7 @@ View *workspaceview_new( void );
 void workspaceview_select( Workspaceview *wview );
 
 void workspaceview_pick_xy( Workspaceview *wview, int *x, int *y );
+
+void workspaceview_set_label( Mainwtab *tab, GtkWidget *label );
+
+

@@ -37,12 +37,6 @@ static FilemodelClass *parent_class = NULL;
 
 static GSList *workspace_all = NULL;
 
-Workspaceroot *
-workspace_get_workspaceroot( Workspace *ws )
-{
-	return( WORKSPACEROOT( ICONTAINER( ws )->parent ) );
-}
-
 /* Over all workspaces.
  */
 void *
@@ -1224,11 +1218,6 @@ workspace_load_compat( Workspace *ws, int major, int minor )
 	if( !workspace_have_compat( major, minor, &best_major, &best_minor ) )
 		return( TRUE );
 
-	/* Do we need broken region handling?
-	 */
-	if( major == 7 && minor == 8 ) 
-		ws->compat_78 = TRUE;
-
 	/* Make a private toolkitgroup local to this workspace to hold the
 	 * compatibility defs we are planning to load.
 	 */
@@ -1476,7 +1465,6 @@ workspace_init( Workspace *ws )
 	ws->errors = NULL;
         ws->mode = WORKSPACE_MODE_REGULAR;
 
-	ws->compat_78 = FALSE;
 	ws->compat_major = 0;
 	ws->compat_minor = 0;
 

@@ -46,7 +46,7 @@ typedef enum {
 } ColumnviewState;
 
 struct _Columnview {
-	View view;
+	View parent_object;
 
 	/* Our enclosing workspaceview.
 	 */

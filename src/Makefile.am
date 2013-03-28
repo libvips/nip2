@@ -293,6 +293,8 @@ nip2_SOURCES = \
 	workspacedefs.h \
 	workspaceroot.c \
 	workspaceroot.h \
+	workspacegroup.c \
+	workspacegroup.h \
 	workspaceview.c \
 	workspaceview.h 
 

@@ -424,17 +424,27 @@ main_watchgroup_changed_cb( void )
  * experimentally, win32 pops up an annoying error dialog if you try that.
  */
 static gboolean
-main_load( Mainw *mainw, Workspace *ws, const char *filename )
+main_load( Workspacegroup *wsg, const char *filename )
 {
-	Workspace *new_ws;
+	Workspacegroup *new_wsg;
 
-	if( (new_ws = mainw_open_workspace( mainw, filename, FALSE, FALSE )) ) 
+	if( (new_wsg = workspacegroup_new_from_file( main_workspaceroot, 
+		filename, NULL )) ) {
+		if( !main_option_batch ) {
+			Mainw *new_mainw;
+
+			new_mainw = mainw_new( new_wsg );
+			gtk_widget_show( GTK_WIDGET( new_mainw ) );
+		}
+		mainw_recent_add( &mainw_recent_workspace, filename );
+
 		return( TRUE );
+	}
 
 	error_clear();
 
-	/* workspace_load_file() needs to recalc to work, try to avoid that by
-	 * doing .defs first.
+	/* workspacegroup_load_file() needs to recalc to work, try to avoid 
+	 * that by doing .defs first.
 	 */
 	if( is_file_type( &filesel_dfile_type, filename ) ) {
 		if( toolkit_new_from_file( main_toolkitgroup, filename ) )
@@ -443,7 +453,7 @@ main_load( Mainw *mainw, Workspace *ws, const char *filename )
 
 	/* Try as matrix or image. Have to do these via definitions.
 	 */
-	if( workspace_load_file( ws, filename ) ) 
+	if( workspacegroup_load_file( wsg, filename ) ) 
 		return( TRUE );
 
 	error_clear();
@@ -489,21 +499,21 @@ main_load_def( const char *filename )
 }
 
 static void *
-main_load_ws( const char *filename )
+main_load_wsg( const char *filename )
 {
-	Workspace *ws;
+	Workspacegroup *wsg;
 
 #ifdef DEBUG
-	printf( "main_load_ws: %s\n", filename );
+	printf( "main_load_wsg: %s\n", filename );
 #endif/*DEBUG*/
 
 	progress_update_loading( 0, im_skip_dir( filename ) );
 
-	if( !(ws = workspace_new_from_file( main_workspaceroot, 
+	if( !(wsg = workspacegroup_new_from_file( main_workspaceroot, 
 		filename, NULL )) ) 
 		iwindow_alert( NULL, GTK_MESSAGE_ERROR );
 	else {
-		filemodel_set_auto_load( FILEMODEL( ws ) );
+		filemodel_set_auto_load( FILEMODEL( wsg ) );
 	}
 
 	return( NULL );
@@ -592,7 +602,7 @@ main_load_startup( void )
 	printf( "ws init\n" );
 #endif/*DEBUG*/
 	(void) path_map( PATH_START, "*.ws", 
-		(path_map_fn) main_load_ws, NULL );
+		(path_map_fn) main_load_wsg, NULL );
 
 	mainw_recent_thaw();
 }
@@ -981,8 +991,7 @@ int
 main( int argc, char *argv[] )
 {
 	gboolean welcome_message = FALSE;
-	Workspace *ws;
-	Mainw *mainw;
+	Workspacegroup *wsg;
 	GError *error = NULL;
 	GOptionContext *context;
 	const char *prefix;
@@ -1301,7 +1310,7 @@ main( int argc, char *argv[] )
 	/* Might make this from stdin/whatever if we have a special
 	 * command-line flag.
 	 */
-	ws = NULL;
+	wsg = NULL;
 
 	/* Second command-line pass. This time we do any actions.
 	 */
@@ -1328,27 +1337,21 @@ main( int argc, char *argv[] )
 	}
 
 	if( main_option_stdin_ws ) {
-		if( !(ws = workspace_new_from_openfile( 
+		if( !(wsg = workspacegroup_new_from_openfile( 
 			main_workspaceroot, main_stdin )) ) 
 			main_log_add( "%s\n", error_get_sub() );
 		else 
 			/* Don't want to have "stdin" as the filename.
 			 */
-			filemodel_set_filename( FILEMODEL( ws ), NULL );
+			filemodel_set_filename( FILEMODEL( wsg ), NULL );
 	}
 
 	/* Make sure we have a start workspace.
 	 */
-	if( !ws ) {
+	if( !wsg ) {
 		workspaceroot_name_new( main_workspaceroot, name );
-		ws = workspace_new_blank( main_workspaceroot, name );
+		wsg = workspacegroup_new_blank( main_workspaceroot, name );
 	}
-
-	/* Make a mainw to hold any workspaces we load. Only show this in
-	 * interactive mode, see below.
-	 */
-	mainw = mainw_new( main_workspaceroot );
-	mainw_add_workspace( mainw, NULL, ws, FALSE );
 
 	/* Reset IM_CONCURRENCY if a watch changes. Need to do this after
 	 * parsing options so we skip in batch mode.
@@ -1411,14 +1414,13 @@ main( int argc, char *argv[] )
 	 */
 #ifdef DEBUG_LEAK
 {
-	Symbol *wsg_sym = main_workspacegroup->sym;
+	Symbol *wsr_sym = main_workspaceroot->sym;
 	Symbol *ws_sym = SYMBOL( icontainer_child_lookup( 
-		ICONTAINER( wsg_sym->expr->compile ), "Preferences" ) );
+		ICONTAINER( wsr_sym->expr->compile ), "Preferences" ) );
 	Workspace *ws = ws_sym->ws;
 
 	if( ws->compat_major || 
-		ws->compat_minor ||
-		ws->compat_78 )
+		ws->compat_minor )
 		printf( "Preferences loaded in compat mode!\n" );
 }
 #endif /*DEBUG_LEAK*/
@@ -1435,7 +1437,7 @@ main( int argc, char *argv[] )
 			im_strncpy( buf, argv[i], FILENAME_MAX );
 			path_compact( buf );
 
-			if( !main_load( mainw, ws, buf ) ) 
+			if( !main_load( wsg, buf ) ) 
 				main_log_add( "%s\n", error_get_sub() );
 		}
 	}
@@ -1461,15 +1463,18 @@ main( int argc, char *argv[] )
 	/* Make sure our start ws doesn't have modified set. We may have
 	 * loaded some images or whatever into it.
 	 */
-	filemodel_set_modified( FILEMODEL( ws ), FALSE );
+	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
 
-	/* If the start ws is empty (we didn't load anything into it) and we
-	 * loaded some other workspaces, we can junk the empty ws. 
+	/* If the start wsg is empty (we didn't load anything into it) and we
+	 * loaded some other wsgs, we can junk the empty wsg. 
+	 *
+	 * Test >2 because prefs will be a workspace.
 	 */
-	if( mainw_get_n_tabs( mainw ) > 1 &&
-		workspace_is_empty( ws ) ) {
-		iobject_destroy( IOBJECT( ws ) ); 
-		ws = NULL;
+	if( workspacegroup_is_empty( wsg ) &&
+		icontainer_get_n_children( 
+			ICONTAINER( main_workspaceroot ) ) > 2  ) {
+		iobject_destroy( IOBJECT( wsg ) ); 
+		wsg = NULL;
 	}
 
 #ifdef DEBUG_TIME
@@ -1480,6 +1485,9 @@ main( int argc, char *argv[] )
 	/* Are we running interactively? Start the main window and loop.
 	 */
 	if( !main_option_batch ) {
+		Mainw *mainw;
+
+		mainw = mainw_new( wsg ); 
 		gtk_widget_show( GTK_WIDGET( mainw ) );
 
 		/* Process a few events ... we want the window to be mapped so

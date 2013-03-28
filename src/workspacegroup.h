@@ -42,6 +42,21 @@
 	(G_TYPE_INSTANCE_GET_CLASS( (obj), \
 		TYPE_WORKSPACEGROUP, WorkspacegroupClass ))
 
+/* Three sorts of workspace file load.
+ */
+typedef enum {
+	WORKSPACEGROUP_LOAD_TOP,	/* Load as new workspace */
+	WORKSPACEGROUP_LOAD_COLUMNS,	/* Merge into current workspace */
+	WORKSPACEGROUP_LOAD_ROWS	/* Merge rows into current column */
+} WorkspacegroupLoadType;
+
+/* Save mode ... controls behaviour of column_save_test() and row_save_test()
+ */
+typedef enum {
+	WORKSPACEGROUP_SAVE_ALL,	/* Save all rows */
+	WORKSPACEGROUP_SAVE_SELECTED	/* Only save selected rows */
+} WorkspacegroupSaveType;
+
 /* Workspacegroups: group workspaces with these. One workspacegroup per 
  * file loaded.
  */
@@ -49,6 +64,11 @@ struct _Workspacegroup {
 	Filemodel parent_class;
 
 	Workspaceroot *wsr;
+
+	/* Control load/save for this ws.
+	 */
+	WorkspacegroupLoadType load_type;
+	WorkspacegroupSaveType save_type;
 
 };
 
@@ -64,9 +84,17 @@ Workspace *workspacegroup_map( Workspacegroup *wsg,
 
 GType workspacegroup_get_type( void );
 
-Workspacegroup *workspacegroup_new( Workspaceroot *wsr, const char *filename );
+gboolean workspacegroup_is_empty( Workspacegroup *wsg );
 
+Workspacegroup *workspacegroup_new( Workspaceroot *wsr, const char *name );
+Workspacegroup *workspacegroup_new_blank( Workspaceroot *wsr, 
+	const char *name );
 Workspacegroup *workspacegroup_new_filename( Workspaceroot *wsr, 
 	const char *filename );
 Workspacegroup *workspacegroup_new_from_file( Workspaceroot *wsr, 
-	const char *filename );
+	const char *filename, const char *filename_user );
+Workspacegroup *workspacegroup_new_from_openfile( Workspaceroot *wsr, 
+	iOpenFile *of );
+
+gboolean workspacegroup_load_file( Workspacegroup *wsg, const char *filename );
+

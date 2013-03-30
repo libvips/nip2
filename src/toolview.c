@@ -39,12 +39,22 @@ static ViewClass *parent_class = NULL;
  */
 static GQuark toolview_quark = 0;
 
+static Mainw *
+toolview_get_mainw( Toolview *tview )
+{
+	if( !tview->kview ||
+		!tview->kview->kitgview )
+		return( NULL );
+
+	return( tview->kview->kitgview->mainw );
+}
+
 static Workspace *
 toolview_get_workspace( Toolview *tview )
 {
-	Mainw *mainw = tview->kview->kitgview->mainw;
+	Mainw *mainw;
 
-	if( !mainw )
+	if( !(mainw = toolview_get_mainw( tview )) )
 		return( NULL );
 
 	return( mainw_get_workspace( mainw ) ); 
@@ -53,10 +63,10 @@ toolview_get_workspace( Toolview *tview )
 static Workspace *
 item_get_workspace( GtkWidget *item )
 {
-	Toolview *tview = 
-		gtk_object_get_data_by_id( GTK_OBJECT( item ), toolview_quark );
+	Toolview *tview;
 
-	if( !tview )
+	if( !(tview = gtk_object_get_data_by_id( GTK_OBJECT( item ), 
+		toolview_quark )) )
 		return( NULL );
 
 	return( toolview_get_workspace( tview ) );
@@ -133,6 +143,7 @@ static GtkWidget *
 toolview_refresh_sub( Toolview *tview, 
 	Toolitem *toolitem, Workspace *ws, GtkWidget *menu )
 {
+	Mainw *mainw = toolview_get_mainw( tview );
 	GtkWidget *item;
 
 	if( toolitem->is_separator ) 
@@ -168,7 +179,7 @@ toolview_refresh_sub( Toolview *tview,
 			GSList *p;
 
 			gtk_menu_set_accel_group( GTK_MENU( submenu ), 
-				ws->iwnd->accel_group );
+				IWINDOW( mainw )->accel_group );
 			gtk_menu_set_accel_path( GTK_MENU( submenu ), 
 				toolitem->path );
 

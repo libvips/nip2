@@ -49,7 +49,7 @@ struct _Mainw {
 
 	/* Set of workspace tabs we display.
 	 */
-	Mainwtab *current_tab;
+	Workspaceview *current_tab;
 
 	/* WS in current tab has changed, plus the ws we attached the 
 	 * signal to.
@@ -149,13 +149,13 @@ void mainw_group_action_cb( GtkAction *action, Mainw *mainw );
 void mainw_next_error_action_cb( GtkAction *action, Mainw *mainw );
 void mainw_open_action_cb( GtkAction *action, Mainw *mainw );
 
-Mainwtab *mainw_add_workspace( Mainw *mainw, 
-	Mainwtab *old_tab, Workspace *ws, gboolean trim );
+Workspaceview *mainw_add_workspace( Mainw *mainw, 
+	Workspaceview *old_tab, Workspace *ws, gboolean trim );
 Workspace *mainw_open_workspace( Mainw *mainw, 
 	const char *filename, gboolean trim, gboolean select );
 
 Mainw *mainw_new( Workspaceroot *wsr );
 
 int mainw_get_n_tabs( Mainw *mainw );
-Mainwtab *mainw_get_nth_tab( Mainw *mainw, int i );
+Workspaceview *mainw_get_nth_tab( Mainw *mainw, int i );
 

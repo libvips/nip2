@@ -38,7 +38,7 @@
 #define IS_WORKSPACEDEFS_CLASS( klass ) \
 	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_WORKSPACEDEFS ))
 
-typedef struct _Workspacedefs {
+struct _Workspacedefs {
 	vObject parent_object;
 
 	Workspace *ws;			/* Workspace we explore */
@@ -48,7 +48,7 @@ typedef struct _Workspacedefs {
 	gboolean errors;		/* Error on last process */
 	guint text_hash;		/* Hash of the last text we set */
 	GtkWidget *status;	
-} Workspacedefs;
+};
 
 typedef struct _WorkspacedefsClass {
 	vObjectClass parent_class;

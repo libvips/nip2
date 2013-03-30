@@ -424,6 +424,7 @@ workspaceview_destroy( GtkObject *object )
 	workspaceview_scroll_stop( wview );
 	IM_FREEF( iwindow_cursor_context_destroy, wview->context );
 	FREESID( wview->watch_changed_sid, main_watchgroup );
+	DESTROY_GTK( wview->popup );
 
 	GTK_OBJECT_CLASS( parent_class )->destroy( object );
 }
@@ -580,6 +581,31 @@ workspaceview_child_size_cb( Columnview *cview,
 	}
 }
 
+/* Pick an xy position for the next column.
+ */
+static void
+workspaceview_pick_xy( Workspaceview *wview, int *x, int *y )
+{
+	/* Position already set? No change.
+	 */
+	if( *x >= 0 )
+		return;
+
+	/* Set this position.
+	 */
+	*x = wview->next_x + wview->vp.left;
+	*y = wview->next_y + wview->vp.top;
+
+	/* And move on.
+	 */
+	wview->next_x += 30;
+	wview->next_y += 30;
+	if( wview->next_x > 300 )
+		wview->next_x = 3;
+	if( wview->next_y > 200 )
+		wview->next_y = 3;
+}
+
 static void
 workspaceview_child_add( View *parent, View *child )
 {
@@ -644,15 +670,117 @@ workspaceview_child_front( View *parent, View *child )
 	}
 }
 
+static gint
+workspaceview_jump_name_compare( iContainer *a, iContainer *b )
+{
+	int la = strlen( IOBJECT( a )->name );
+	int lb = strlen( IOBJECT( b )->name );
+
+	/* Smaller names first.
+	 */
+	if( la == lb )
+		return( strcmp( IOBJECT( a )->name, IOBJECT( b )->name ) );
+	else
+		return( la - lb );
+}
+
+static void
+workspaceview_jump_column_cb( GtkWidget *item, Column *column )
+{
+	model_scrollto( MODEL( column ), MODEL_SCROLL_TOP );
+}
+
+static void *
+workspaceview_jump_build( Column *column, GtkWidget *menu )
+{
+	GtkWidget *item;
+	char txt[256];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
+
+	vips_buf_appendf( &buf, "%s - %s", 
+		IOBJECT( column )->name, IOBJECT( column )->caption );
+	item = gtk_menu_item_new_with_label( vips_buf_all( &buf ) );
+	g_signal_connect( item, "activate",
+		G_CALLBACK( workspaceview_jump_column_cb ), column );
+	gtk_menu_append( GTK_MENU( menu ), item );
+	gtk_widget_show( item );
+
+	return( NULL );
+}
+
+/* Update a menu with the set of current columns.
+ */
+void
+workspaceview_jump_update( Workspaceview *wview, GtkWidget *menu )
+{
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+
+	GtkWidget *item;
+	GSList *columns;
+
+	gtk_container_foreach( GTK_CONTAINER( menu ),
+		(GtkCallback) gtk_widget_destroy, NULL );
+
+	item = gtk_tearoff_menu_item_new();
+	gtk_menu_append( GTK_MENU( menu ), item );
+	gtk_widget_show( item );
+
+	columns = icontainer_get_children( ICONTAINER( ws ) );
+        columns = g_slist_sort( columns, 
+		(GCompareFunc) workspaceview_jump_name_compare );
+	slist_map( columns, (SListMapFn) workspaceview_jump_build, menu );
+
+	g_slist_free( columns );
+}
+
 static void 
 workspaceview_refresh( vObject *vobject )
 {
-#ifdef DEBUG
 	Workspaceview *wview = WORKSPACEVIEW( vobject );
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
 
+#ifdef DEBUG
 	printf( "workspaceview_refresh: %s\n", IOBJECT( ws )->name );
 #endif /*DEBUG*/
+
+	filemodel_set_window_hint( FILEMODEL( ws ), 
+		IWINDOW( iwindow_get_root_noparent( wview ) ) );
+
+	workspaceview_jump_update( wview, wview->popup_jump );
+
+	if( wview->label ) { 
+		char txt[512];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
+
+		if( FILEMODEL( ws )->modified ) 
+			vips_buf_appendf( &buf, "*" ); 
+		vips_buf_appendf( &buf, "%s", NN( IOBJECT( ws->sym )->name ) );
+		gtk_label_set_text( GTK_LABEL( wview->label ), 
+			vips_buf_all( &buf ) );
+
+		vips_buf_rewind( &buf );
+
+		if( FILEMODEL( ws )->filename )
+			vips_buf_appendf( &buf, "%s", 
+				FILEMODEL( ws )->filename );
+		else 
+			vips_buf_appends( &buf, _( "unsaved workspace" ) );
+
+		if( FILEMODEL( ws )->modified ) {
+			vips_buf_appendf( &buf, ", " ); 
+			vips_buf_appendf( &buf, _( "modified" ) ); 
+		}
+
+		if( ws->compat_major ) {
+			vips_buf_appends( &buf, ", " );
+			vips_buf_appends( &buf, _( "compatibility mode" ) );
+			vips_buf_appendf( &buf, " %d.%d", 
+				ws->compat_major, 
+				ws->compat_minor ); 
+		}
+
+		set_tooltip( wview->label, "%s", vips_buf_all( &buf ) );
+	}
 
 	VOBJECT_CLASS( parent_class )->refresh( vobject );
 }
@@ -875,6 +1003,34 @@ workspaceview_load( Mainw *mainw, Workspace *ws, const char *filename )
 	return( FALSE );
 }
 
+static void
+workspaceview_lpane_changed_cb( Pane *pane, Workspaceview *wview )
+{
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+
+	if( ws->lpane_open != pane->open ||
+		ws->lpane_position != pane->user_position ) {
+		ws->lpane_open = pane->open;
+		ws->lpane_position = pane->user_position;
+
+		iobject_changed( IOBJECT( ws ) );
+	}
+}
+
+static void
+workspaceview_rpane_changed_cb( Pane *pane, Workspaceview *wview )
+{
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+
+	if( ws->rpane_open != pane->open ||
+		ws->rpane_position != pane->user_position ) {
+		ws->rpane_open = pane->open;
+		ws->rpane_position = pane->user_position;
+
+		iobject_changed( IOBJECT( ws ) );
+	}
+}
+
 static gboolean
 workspaceview_filedrop( Workspaceview *wview, const char *filename )
 {
@@ -891,8 +1047,52 @@ workspaceview_filedrop( Workspaceview *wview, const char *filename )
 }
 
 static void
+workspaceview_column_new_action_cb2( GtkWidget *wid, GtkWidget *host, 
+	Workspaceview *wview )
+{
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+
+	if( !workspace_column_new( ws ) ) 
+		iwindow_alert( GTK_WIDGET( wview ), GTK_MESSAGE_ERROR );
+}
+
+static void
+workspaceview_layout_action_cb2( GtkWidget *wid, GtkWidget *host, 
+	Workspaceview *wview )
+{
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+
+	model_layout( MODEL( ws ) );
+}
+
+static void
+workspaceview_group_action_cb2( GtkWidget *wid, GtkWidget *host, 
+	Workspaceview *wview )
+{
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+
+	workspace_selected_group( ws );
+}
+
+static void
+workspaceview_next_error_action_cb2( GtkWidget *wid, GtkWidget *host, 
+	Workspaceview *wview )
+{
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+
+	if( !workspace_next_error( ws ) ) {
+		error_top( _( "No errors." ) );
+		error_sub( "%s", _( "There are no errors (that I can see) "
+			"in this workspace." ) );
+		iwindow_alert( GTK_WIDGET( wview ), GTK_MESSAGE_INFO );
+	}
+}
+
+static void
 workspaceview_init( Workspaceview *wview )
 {
+	GtkWidget *ebox;
+	Panechild *panechild;
 	GtkAdjustment *hadj;
 	GtkAdjustment *vadj;
 
@@ -928,6 +1128,20 @@ workspaceview_init( Workspaceview *wview )
 	wview->watch_changed_sid = g_signal_connect( main_watchgroup, 
 		"watch_changed",
 		G_CALLBACK( workspaceview_watch_changed_cb ), wview );
+
+	wview->rpane = pane_new( PANE_HIDE_RIGHT );
+	g_signal_connect( wview->rpane, "changed",
+		G_CALLBACK( workspaceview_rpane_changed_cb ), wview );
+	gtk_box_pack_start( GTK_BOX( wview ), 
+		GTK_WIDGET( wview->rpane ), TRUE, TRUE, 2 );
+	gtk_widget_show( GTK_WIDGET( wview->rpane ) );
+
+	wview->lpane = pane_new( PANE_HIDE_LEFT );
+	g_signal_connect( wview->lpane, "changed",
+		G_CALLBACK( workspaceview_lpane_changed_cb ), wview );
+	gtk_paned_pack1( GTK_PANED( wview->rpane ), 
+		GTK_WIDGET( wview->lpane ), TRUE, FALSE );
+	gtk_widget_show( GTK_WIDGET( wview->lpane ) );
 
 	/* Ask for our own window so we can spot events on the window 
 	 * background.
@@ -971,10 +1185,27 @@ workspaceview_init( Workspaceview *wview )
          * ourselves .. see rowview.c.
          */
 
-	gtk_box_pack_end( GTK_BOX( wview ), wview->window, TRUE, TRUE, 0 );
+	gtk_paned_pack2( GTK_PANED( wview->lpane ), 
+		GTK_WIDGET( wview->window ), TRUE, FALSE );
 
 	filedrop_register( GTK_WIDGET( wview ),
 		(FiledropFunc) workspaceview_filedrop, wview );
+
+	wview->popup = popup_build( _( "Workspace menu" ) );
+
+	popup_add_but( wview->popup, _( "New C_olumn" ),
+		POPUP_FUNC( workspaceview_column_new_action_cb2 ) ); 
+	wview->popup_jump = popup_add_pullright( wview->popup, 
+		_( "Jump to _Column" ) ); 
+	popup_add_but( wview->popup, _( "Align _Columns" ),
+		POPUP_FUNC( workspaceview_layout_action_cb2 ) ); 
+	menu_add_sep( wview->popup );
+	popup_add_but( wview->popup, _( "_Group Selected" ),
+		POPUP_FUNC( workspaceview_group_action_cb2 ) ); 
+	menu_add_sep( wview->popup );
+	popup_add_but( wview->popup, STOCK_NEXT_ERROR,
+		POPUP_FUNC( workspaceview_next_error_action_cb2 ) ); 
+	popup_attach( wview->fixed, wview->popup, wview );
 
 	gtk_widget_show_all( wview->window );
 }
@@ -1010,28 +1241,22 @@ workspaceview_new( void )
 	return( VIEW( wview ) );
 }
 
-/* Pick an xy position for the next column.
- */
-void
-workspaceview_pick_xy( Workspaceview *wview, int *x, int *y )
+void 
+workspaceview_set_label( Workspaceview *wview, GtkWidget *label )
 {
-	/* Position already set? No change.
-	 */
-	if( *x >= 0 )
-		return;
+	g_assert( !label || !wview->label );
 
-	/* Set this position.
-	 */
-	*x = wview->next_x + wview->vp.left;
-	*y = wview->next_y + wview->vp.top;
-
-	/* And move on.
-	 */
-	wview->next_x += 30;
-	wview->next_y += 30;
-	if( wview->next_x > 300 )
-		wview->next_x = 3;
-	if( wview->next_y > 200 )
-		wview->next_y = 3;
+	wview->label = label;
 }
 
+Pane *
+workspaceview_get_defs_pane( Workspaceview *wview )
+{
+	return( wview->lpane );
+}
+
+Pane *
+workspaceview_get_browse_pane( Workspaceview *wview )
+{
+	return( wview->rpane );
+}

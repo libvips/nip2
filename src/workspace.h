@@ -94,6 +94,10 @@ struct _Workspace {
 	int compat_major;
 	int compat_minor;
 
+	/* The last row we scrolled to on next-error.
+	 */
+	Row *last_error;
+
 	/* Control load/save for this ws.
 	 */
 	WorkspaceLoadType load_type;
@@ -111,12 +115,6 @@ struct _Workspace {
 	guint auto_save_timeout;/* Timeout for next autosave */
 
 	char *status;		/* Status message */
-
-	/* Toolkit menus associated with this WS need to know where to show
-	 * their error boxes. Our mainws pops their pointers in here to be 
-	 * picked up by them.
-	 */
-	iWindow *iwnd;
 
 	/* Visualisation defaults for this ws.
 	 */
@@ -167,6 +165,7 @@ Column *workspace_column_get( Workspace *ws, const char *name );
 char *workspace_column_name_new( Workspace *ws, xmlNode *columns );
 Column *workspace_column_pick( Workspace *ws );
 void workspace_column_select( Workspace *ws, Column *col );
+gboolean workspace_column_new( Workspace *ws );
 
 Symbol *workspace_add_def( Workspace *ws, const char *str );
 Symbol *workspace_add_def_recalc( Workspace *ws, const char *str );
@@ -201,6 +200,9 @@ Workspace *workspace_clone( Workspace *ws );
 gboolean workspace_selected_recalc( Workspace *ws );
 void workspace_selected_remove_yesno( Workspace *ws, GtkWidget *parent );
 gboolean workspace_selected_ungroup( Workspace *ws );
+gboolean workspace_selected_group( Workspace *ws );
+
+gboolean workspace_next_error( Workspace *ws );
 
 void workspace_set_status( Workspace *ws, const char *fmt, ... )
 	__attribute__((format(printf, 2, 3)));

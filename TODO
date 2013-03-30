@@ -1,3 +1,33 @@
+- workspaceview must stay as a view, we need to be able to save chunks of them
+  and stuff like that ... and scroll and things too
+
+
+
+  tab
+
+- scrap workspace->window_width and _height ? don't save this to files anymore
+
+
+- restructure as
+
+	model		view
+
+	workspace	workspaceview, does tkbrowser, local defs as well
+	workspacegroup	workspacegroupview ... runs notebook
+
+	mainw displays a workspacegroup with some menus and stuff
+
+  so .. push mainwtab into workspaceview
+
+
+
+
+- why do we have mainw_recent_add()? move it to path.c?
+
+  see main_load() ... it has to call mainw_recent_add() explicitly, this
+  should be automatic
+
+
 - we must do it properly, with one file per mainw, it'd be much too confusing
   to have save sometimes save a tab and sometimes save the whole book
 

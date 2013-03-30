@@ -47,6 +47,20 @@ struct _Workspaceview {
 
 	GtkWidget *fixed;		/* GtkFixed for tally */
 	GtkWidget *window;		/* ScrolledWindow holding fixed */
+	Toolkitbrowser *toolkitbrowser;
+	Workspacedefs *workspacedefs;
+
+	/* Left and right panes ... program window and toolkit browser.
+	 */
+	Pane *lpane;
+	Pane *rpane;
+
+	/* Set by our parent: the label we update with the ws name and state.
+	 */
+	GtkWidget *label;
+
+	GtkWidget *popup;
+	GtkWidget *popup_jump;
 
 	/* Background window scroll.
 	 */
@@ -83,6 +97,10 @@ struct _Workspaceview {
 	/* Follow prefs changes.
 	 */
 	guint watch_changed_sid;
+
+	/* Only show the compat warning once.
+	 */
+	gboolean popped_compat;
 };
 
 typedef struct _WorkspaceviewClass {
@@ -97,9 +115,12 @@ void workspaceview_scroll_background( Workspaceview *wview, int u, int v );
 
 void workspaceview_set_cursor( Workspaceview *wview, iWindowShape shape );
 
+void workspaceview_jump_update( Workspaceview *wview, GtkWidget *menu );
+
 GtkType workspaceview_get_type( void );
 View *workspaceview_new( void );
 
-void workspaceview_select( Workspaceview *wview );
+void workspaceview_set_label( Workspaceview *wview, GtkWidget *label );
 
-void workspaceview_pick_xy( Workspaceview *wview, int *x, int *y );
+Pane *workspaceview_get_defs_pane( Workspaceview *wview );
+Pane *workspaceview_get_browse_pane( Workspaceview *wview );

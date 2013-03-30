@@ -1020,7 +1020,8 @@ iwindow_get_root_noparent( GtkWidget *widget )
 	/* If this is a transient, get the window we popped up from.
 	 */
 	if( IS_IWINDOW( toplevel ) && IWINDOW( toplevel )->parent ) 
-		return( iwindow_get_root( IWINDOW( toplevel )->parent ) );
+		return( iwindow_get_root_noparent( 
+			IWINDOW( toplevel )->parent ) );
 	else
 		return( toplevel );
 }

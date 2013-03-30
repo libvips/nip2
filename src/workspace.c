@@ -397,6 +397,26 @@ workspace_column_select( Workspace *ws, Column *col )
 	}
 }
 
+/* Make and select a column.
+ */
+gboolean
+workspace_column_new( Workspace *ws )
+{
+	char *name;
+	Column *col;
+
+	name = workspace_column_name_new( ws, NULL );
+	if( !(col = column_new( ws, name )) ) {
+		return( FALSE );
+		IM_FREE( name );
+	}
+
+	workspace_column_select( ws, col );
+	IM_FREE( name );
+
+	return( TRUE );
+}
+
 /* Make a new symbol, part of the current column.
  */
 static Symbol *
@@ -594,6 +614,15 @@ workspace_clone_selected( Workspace *ws )
 {
 	char filename[FILENAME_MAX];
 
+	if( !workspace_selected_any( ws ) ) {
+		Row *row;
+
+		if( !(row = workspace_get_bottom( ws )) )
+			return( FALSE );
+
+		row_select( row );
+	}
+
 	/* Make a name for our clone file.
 	 */
 	if( !temp_name( filename, "ws" ) )
@@ -614,8 +643,12 @@ workspace_clone_selected( Workspace *ws )
 
 		return( FALSE );
 	}
-	progress_end();
 	unlinkf( "%s", filename );
+
+	symbol_recalculate_all();
+	workspace_deselect_all( ws );
+	model_scrollto( MODEL( ws->current ), MODEL_SCROLL_TOP );
+	progress_end();
 
 	return( TRUE );
 }
@@ -1291,6 +1324,10 @@ workspace_top_load( Filemodel *filemodel,
 		g_free( new_dir );
 	}
 
+	/* See commened ot ode in COLUMN load below.
+	 */
+	printf( "workspace_top_load: compat check on merge is broken!\n" );
+
 	switch( ws->load_type ) {
 	case WORKSPACE_LOAD_TOP:
 		/* Easy ... ws is a blank Workspace we are loading into. No
@@ -1343,7 +1380,6 @@ workspace_top_load( Filemodel *filemodel,
 				return( FALSE );
 
 		/* Is there a version mismatch? Issue a warning.
-		 */
 		if( workspace_have_compat( state->major, state->minor, 
 			&best_major, &best_minor ) &&
 			(best_major != filemodel->major ||
@@ -1356,6 +1392,7 @@ workspace_top_load( Filemodel *filemodel,
 			iwindow_alert( GTK_WIDGET( ws->iwnd ), 
 				GTK_MESSAGE_INFO );
 		}
+		 */
 
 		break;
 
@@ -2018,6 +2055,93 @@ workspace_selected_ungroup( Workspace *ws )
 	}
 
 	return( TRUE );
+}
+
+/* Group the selected object(s).
+ */
+gboolean
+workspace_selected_group( Workspace *ws )
+{
+	char txt[MAX_STRSIZE];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
+
+	if( !workspace_selected_any( ws ) ) {
+		Row *row;
+
+		if( !(row = workspace_get_bottom( ws )) )
+			return( FALSE );
+		row_select( row );
+	}
+
+	vips_buf_appends( &buf, "Group [" );
+	workspace_selected_names( ws, &buf, "," );
+	vips_buf_appends( &buf, "]" );
+	if( !workspace_add_def_recalc( ws, vips_buf_all( &buf ) ) ) 
+		return( FALSE );
+	workspace_deselect_all( ws );
+
+	return( TRUE );
+}
+
+static Row *
+workspace_test_error( Row *row, Workspace *ws, int *found )
+{
+	g_assert( row->err );
+
+	/* Found next?
+	 */
+	if( *found )
+		return( row );
+
+	if( row == ws->last_error ) {
+		/* Found the last one ... return the next one.
+		 */
+		*found = 1;
+		return( NULL );
+	}
+
+	return( NULL );
+}
+
+/* FALSE for no errors.
+ */
+gboolean
+workspace_next_error( Workspace *ws )
+{
+	char txt[MAX_LINELENGTH];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
+
+	int found;
+
+	if( !ws->errors ) 
+		return( FALSE ); 
+
+	/* Search for the one after the last one.
+	 */
+	found = 0;
+	ws->last_error = (Row *) slist_map2( ws->errors, 
+		(SListMap2Fn) workspace_test_error, ws, &found );
+
+	/* NULL? We've hit end of table, start again.
+	 */
+	if( !ws->last_error ) {
+		found = 1;
+		ws->last_error = (Row *) slist_map2( ws->errors, 
+			(SListMap2Fn) workspace_test_error, ws, &found );
+	}
+
+	/* *must* have one now.
+	 */
+	g_assert( ws->last_error && ws->last_error->err );
+
+	model_scrollto( MODEL( ws->last_error ), MODEL_SCROLL_TOP );
+
+	row_qualified_name( ws->last_error->expr->row, &buf );
+	vips_buf_appends( &buf, ": " );
+	vips_buf_appends( &buf, ws->last_error->expr->error_top );
+	workspace_set_status( ws, "%s", vips_buf_firstline( &buf ) );
+
+	return( TRUE ); 
 }
 
 void

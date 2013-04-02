@@ -670,69 +670,6 @@ workspaceview_child_front( View *parent, View *child )
 	}
 }
 
-static gint
-workspaceview_jump_name_compare( iContainer *a, iContainer *b )
-{
-	int la = strlen( IOBJECT( a )->name );
-	int lb = strlen( IOBJECT( b )->name );
-
-	/* Smaller names first.
-	 */
-	if( la == lb )
-		return( strcmp( IOBJECT( a )->name, IOBJECT( b )->name ) );
-	else
-		return( la - lb );
-}
-
-static void
-workspaceview_jump_column_cb( GtkWidget *item, Column *column )
-{
-	model_scrollto( MODEL( column ), MODEL_SCROLL_TOP );
-}
-
-static void *
-workspaceview_jump_build( Column *column, GtkWidget *menu )
-{
-	GtkWidget *item;
-	char txt[256];
-	VipsBuf buf = VIPS_BUF_STATIC( txt );
-
-	vips_buf_appendf( &buf, "%s - %s", 
-		IOBJECT( column )->name, IOBJECT( column )->caption );
-	item = gtk_menu_item_new_with_label( vips_buf_all( &buf ) );
-	g_signal_connect( item, "activate",
-		G_CALLBACK( workspaceview_jump_column_cb ), column );
-	gtk_menu_append( GTK_MENU( menu ), item );
-	gtk_widget_show( item );
-
-	return( NULL );
-}
-
-/* Update a menu with the set of current columns.
- */
-void
-workspaceview_jump_update( Workspaceview *wview, GtkWidget *menu )
-{
-	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
-
-	GtkWidget *item;
-	GSList *columns;
-
-	gtk_container_foreach( GTK_CONTAINER( menu ),
-		(GtkCallback) gtk_widget_destroy, NULL );
-
-	item = gtk_tearoff_menu_item_new();
-	gtk_menu_append( GTK_MENU( menu ), item );
-	gtk_widget_show( item );
-
-	columns = icontainer_get_children( ICONTAINER( ws ) );
-        columns = g_slist_sort( columns, 
-		(GCompareFunc) workspaceview_jump_name_compare );
-	slist_map( columns, (SListMapFn) workspaceview_jump_build, menu );
-
-	g_slist_free( columns );
-}
-
 static void 
 workspaceview_refresh( vObject *vobject )
 {
@@ -744,9 +681,9 @@ workspaceview_refresh( vObject *vobject )
 #endif /*DEBUG*/
 
 	filemodel_set_window_hint( FILEMODEL( ws ), 
-		IWINDOW( iwindow_get_root_noparent( wview ) ) );
+		IWINDOW( iwindow_get_root_noparent( GTK_WIDGET( wview ) ) ) );
 
-	workspaceview_jump_update( wview, wview->popup_jump );
+	workspace_jump_update( ws, wview->popup_jump );
 
 	if( wview->label ) { 
 		char txt[512];
@@ -781,6 +718,16 @@ workspaceview_refresh( vObject *vobject )
 
 		set_tooltip( wview->label, "%s", vips_buf_all( &buf ) );
 	}
+
+	if( ws->rpane_open && !wview->rpane->open )
+		pane_animate_open( wview->rpane );
+	if( !ws->rpane_open && wview->rpane->open )
+		pane_animate_closed( wview->rpane );
+
+	if( ws->lpane_open && !wview->lpane->open )
+		pane_animate_open( wview->lpane );
+	if( !ws->lpane_open && wview->lpane->open )
+		pane_animate_closed( wview->lpane );
 
 	VOBJECT_CLASS( parent_class )->refresh( vobject );
 }
@@ -971,11 +918,14 @@ workspaceview_class_init( WorkspaceviewClass *class )
 /* Can't use main_load(), we want to select wses after load.
  */
 static gboolean
-workspaceview_load( Mainw *mainw, Workspace *ws, const char *filename )
+workspaceview_load( Workspace *ws, const char *filename )
 {
-	Workspace *new_ws;
+	Workspacegroup *wsg = WORKSPACEGROUP( ICONTAINER( ws )->parent );
+	Workspaceroot *wsr = wsg->wsr; 
 
-	if( (new_ws = mainw_open_workspace( mainw, filename, TRUE, TRUE )) ) 
+	Workspacegroup *new_wsg;
+
+	if( (new_wsg = mainw_open_workspace( wsr, filename )) ) 
 		return( TRUE );
 
 	error_clear();
@@ -1035,11 +985,10 @@ static gboolean
 workspaceview_filedrop( Workspaceview *wview, const char *filename )
 {
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
-	Mainw *mainw = MAINW( iwindow_get_root( GTK_WIDGET( wview ) ) );
 
 	gboolean result;
 
-	result = workspaceview_load( mainw, ws, filename );
+	result = workspaceview_load( ws, filename );
 	if( result )
 		symbol_recalculate_all();
 
@@ -1091,8 +1040,6 @@ workspaceview_next_error_action_cb2( GtkWidget *wid, GtkWidget *host,
 static void
 workspaceview_init( Workspaceview *wview )
 {
-	GtkWidget *ebox;
-	Panechild *panechild;
 	GtkAdjustment *hadj;
 	GtkAdjustment *vadj;
 
@@ -1247,16 +1194,4 @@ workspaceview_set_label( Workspaceview *wview, GtkWidget *label )
 	g_assert( !label || !wview->label );
 
 	wview->label = label;
-}
-
-Pane *
-workspaceview_get_defs_pane( Workspaceview *wview )
-{
-	return( wview->lpane );
-}
-
-Pane *
-workspaceview_get_browse_pane( Workspaceview *wview )
-{
-	return( wview->rpane );
 }

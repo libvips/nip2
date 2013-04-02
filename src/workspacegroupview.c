@@ -82,6 +82,7 @@ workspacegroupview_child_add( View *parent, View *child )
 	Workspace *ws = WORKSPACE( VOBJECT( child )->iobject );
 
 	GtkWidget *ebox;
+	GtkWidget *label;
 
 	VIEW_CLASS( parent_class )->child_add( parent, child );
 
@@ -132,18 +133,12 @@ workspacegroupview_child_front( View *parent, View *child )
 	Workspacegroupview *wsgview = WORKSPACEGROUPVIEW( parent );
 	Workspaceview *wview = WORKSPACEVIEW( child );
 
-	if( wsgview->front != wview ) {
-		int page;
+	int page;
 
-		page = gtk_notebook_page_num( 
-			GTK_NOTEBOOK( wsgview->notebook ), 
-			GTK_WIDGET( wview ) );
-		gtk_notebook_set_current_page( 
-			GTK_NOTEBOOK( wsgview->notebook ),
-			page );
-
-		wsgview->front = wview;
-	}
+	page = gtk_notebook_page_num( GTK_NOTEBOOK( wsgview->notebook ), 
+		GTK_WIDGET( wview ) );
+	gtk_notebook_set_current_page( GTK_NOTEBOOK( wsgview->notebook ),
+		page );
 }
 
 static void 
@@ -185,20 +180,11 @@ static void
 workspacegroupview_switch_page_cb( GtkNotebook *notebook, 
 	GtkWidget *page, guint page_num, gpointer user_data )
 {
-	Workspaceview *tab = WORKSPACEVIEW( page );
-	Mainw *mainw = MAINW( user_data );
-	Workspace *ws = WORKSPACE( VOBJECT( tab )->iobject );
+	Workspaceview *wview = WORKSPACEVIEW( page );
+	Workspacegroupview *wsgview = WORKSPACEGROUPVIEW( user_data );
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
 
-	FREESID( mainw->ws_changed_sid, mainw->ws_changed );
-	mainw->current_tab = tab;
-	mainw->ws_changed_sid = g_signal_connect( ws, "changed",
-		G_CALLBACK( mainw_workspace_changed_cb ), mainw );
-	mainw->ws_changed = ws;
-
-	mainw_refresh( mainw );
-
-	if( ws->compat_major &&
-		!tab->popped_compat ) {
+	if( ws->compat_major ) { 
 		error_top( _( "Compatibility mode." ) );
 		error_sub( _( "This workspace was created by version %d.%d.%d. "
 			"A set of compatibility menus have been loaded "
@@ -206,34 +192,29 @@ workspacegroupview_switch_page_cb( GtkNotebook *notebook,
 			FILEMODEL( ws )->major,
 			FILEMODEL( ws )->minor,
 			FILEMODEL( ws )->micro );
-		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
-
-		tab->popped_compat = TRUE;
+		iwindow_alert( GTK_WIDGET( wview ), GTK_MESSAGE_INFO );
 	}
 
 	/* How bizarre, pages sometimes fail to set up correctly. Force a
 	 * resize to get everything to init. 
 	 */
-	if( tab->fixed ) 
-		gtk_container_check_resize( GTK_CONTAINER( tab->fixed ) );
+	if( wview->fixed ) 
+		gtk_container_check_resize( GTK_CONTAINER( wview->fixed ) );
 }
 
 static void                
 workspacegroupview_page_removed_cb( GtkNotebook *notebook, 
 	GtkWidget *page, guint page_num, gpointer user_data )
 {
-	Workspaceview *tab = WORKSPACEVIEW( page );
-	Mainw *mainw = MAINW( user_data );
+	Workspaceview *wview = WORKSPACEVIEW( page );
+	Workspacegroupview *wsgview = 
+		WORKSPACEGROUPVIEW( VIEW( wview )->parent );
+	Workspacegroup *wsg = WORKSPACEGROUP( VOBJECT( wsgview )->iobject );
+	Mainw *mainw = MAINW( iwindow_get_root( page ) );
 
-	if( mainw->current_tab == tab ) {
-		FREESID( mainw->ws_changed_sid, mainw->ws_changed );
-		mainw->current_tab = NULL;
-		mainw_refresh( mainw );
-	}
+	workspaceview_set_label( wview, NULL );
 
-	workspaceview_set_label( tab, NULL );
-
-	if( mainw_get_n_tabs( mainw ) == 0 )
+	if( icontainer_get_n_children( ICONTAINER( wsg ) ) == 0 ) 
 		iwindow_kill( IWINDOW( mainw ) );
 }
 
@@ -241,9 +222,10 @@ static void
 workspacegroupview_page_added_cb( GtkNotebook *notebook, 
 	GtkWidget *page, guint page_num, gpointer user_data )
 {
-	Workspaceview *tab = WORKSPACEVIEW( page );
-	Workspace *ws = WORKSPACE( VOBJECT( tab )->iobject );
-	Mainw *mainw = MAINW( user_data );
+	Workspaceview *wview = WORKSPACEVIEW( page );
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+	Workspacegroupview *wsgview = WORKSPACEGROUPVIEW( user_data );
+	Mainw *mainw = MAINW( iwindow_get_root( page ) );
 
 	filemodel_set_window_hint( FILEMODEL( ws ), IWINDOW( mainw ) );
 }
@@ -252,15 +234,23 @@ static GtkNotebook *
 workspacegroupview_create_window_cb( GtkNotebook *notebook, 
 	GtkWidget *page, int x, int y, gpointer user_data )
 {
-	Mainw *mainw = MAINW( user_data );
+	Workspaceview *wview = WORKSPACEVIEW( page );
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+	Workspacegroupview *wsgview = WORKSPACEGROUPVIEW( user_data );
+	Workspacegroup *wsg = WORKSPACEGROUP( ICONTAINER( ws )->parent );
+	Workspaceroot *wsr = wsg->wsr; 
 
 	Mainw *new_mainw;
+	Workspacegroup *new_wsg;
+	char name[256];
 
-	new_mainw = mainw_new( mainw->wsr );
+	workspaceroot_name_new( wsr, name );
+	new_wsg = workspacegroup_new_blank( wsr, name );
+	new_mainw = mainw_new( new_wsg );
 	gtk_window_move( GTK_WINDOW( new_mainw ), x, y );
 	gtk_widget_show( GTK_WIDGET( new_mainw ) );
 
-	return( GTK_NOTEBOOK( new_mainw->notebook ) ); 
+	return( GTK_NOTEBOOK( new_mainw->wsgview->notebook ) ); 
 }
 
 #ifdef USE_NOTEBOOK_ACTION
@@ -275,11 +265,10 @@ workspacegroupview_add_workspace_cb( GtkWidget *wid,
 
 	workspaceroot_name_new( wsg->wsr, name );
 	if( !(new_ws = workspace_new_blank( wsg, name )) ) {
-		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
+		iwindow_alert( GTK_WIDGET( wsgview ), GTK_MESSAGE_ERROR );
 		return;
 	}
-	printf( "workspacegroupview_add_workspace_cb: need model_front()\n" ); 
-	//model_front( new_ws );
+	model_front( MODEL( new_ws ) );
 }
 #endif /*USE_NOTEBOOK_ACTION*/
 
@@ -297,16 +286,14 @@ workspacegroupview_duplicate_cb( GtkWidget *wid, GtkWidget *host,
 		iwindow_alert( host, GTK_MESSAGE_ERROR );
 		return;
 	}
-	printf( "workspacegroupview_duplicate_cb: need model_front()\n" ); 
-	//model_front( new_ws );
-	// send a msg from model to all views
+	model_front( MODEL( new_ws ) );
 	symbol_recalculate_all();
 
 	progress_end();
 }
 
 static void                
-workspacegroupview_tab_save_cb( GtkWidget *wid, GtkWidget *host, 
+workspacegroupview_save_cb( GtkWidget *wid, GtkWidget *host, 
 	Workspaceview *wview )
 {
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
@@ -315,7 +302,7 @@ workspacegroupview_tab_save_cb( GtkWidget *wid, GtkWidget *host,
 }
 
 static void                
-workspacegroupview_tab_save_as_cb( GtkWidget *wid, GtkWidget *host, 
+workspacegroupview_save_as_cb( GtkWidget *wid, GtkWidget *host, 
 	Workspaceview *wview )
 {
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
@@ -324,7 +311,7 @@ workspacegroupview_tab_save_as_cb( GtkWidget *wid, GtkWidget *host,
 }
 
 static void                
-workspacegroupview_tab_close_cb( GtkWidget *wid, GtkWidget *host, 
+workspacegroupview_close_cb( GtkWidget *wid, GtkWidget *host, 
 	Workspaceview *wview )
 {
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
@@ -381,14 +368,14 @@ workspacegroupview_init( Workspacegroupview *wsgview )
 
 	wsgview->tab_menu = popup_build( _( "Tab menu" ) );
 	popup_add_but( wsgview->tab_menu, STOCK_DUPLICATE,
-		POPUP_FUNC( workspacegroupview_tab_duplicate_cb ) ); 
+		POPUP_FUNC( workspacegroupview_duplicate_cb ) ); 
 	popup_add_but( wsgview->tab_menu, GTK_STOCK_SAVE,
-		POPUP_FUNC( workspacegroupview_tab_save_cb ) ); 
+		POPUP_FUNC( workspacegroupview_save_cb ) ); 
 	popup_add_but( wsgview->tab_menu, GTK_STOCK_SAVE_AS,
-		POPUP_FUNC( workspacegroupview_tab_save_as_cb ) ); 
+		POPUP_FUNC( workspacegroupview_save_as_cb ) ); 
 	menu_add_sep( wsgview->tab_menu );
 	popup_add_but( wsgview->tab_menu, GTK_STOCK_CLOSE,
-		POPUP_FUNC( workspacegroupview_tab_close_cb ) ); 
+		POPUP_FUNC( workspacegroupview_close_cb ) ); 
 }
 
 GtkType

@@ -89,7 +89,7 @@ typedef struct _iContainerClass {
 	void (*child_remove)( iContainer *parent, iContainer *child );
 	void (*parent_add)( iContainer *child );
 	void (*parent_remove)( iContainer *child );
-	void (*child_current)( iContainer *child );
+	void (*child_current)( iContainer *parent, iContainer *child );
 } iContainerClass;
 
 typedef void *(*icontainer_map_fn)( iContainer *, 
@@ -139,7 +139,7 @@ void icontainer_child_add_before( iContainer *parent,
 	iContainer *child, iContainer *before );
 void icontainer_child_move( iContainer *child, int pos );
 void *icontainer_child_remove( iContainer *child );
-void *icontainer_child_current( iContainer *child );
+void icontainer_child_current( iContainer *parent, iContainer *child );
 
 GType icontainer_get_type( void );
 

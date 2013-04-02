@@ -98,3 +98,4 @@ Workspacegroup *workspacegroup_new_from_openfile( Workspaceroot *wsr,
 
 gboolean workspacegroup_load_file( Workspacegroup *wsg, const char *filename );
 
+Workspacegroup *workspacegroup_duplicate( Workspacegroup *wsg );

@@ -1,12 +1,29 @@
-- move ->current into icontainer
+- remove compat_78
 
 
-- add model_front() ... pushes model to front of peers using
-  view_child_front()
 
-  model could have a current_model field in the paret which this updates?
+- look at column, make it use icontainer_child_current() and model_front()
 
-  look at column, could we make use of this there?
+  columnview should not use view_child_front()
+
+
+
+
+
+- where does this go back
+
+	/* If the mainw has a single, empty workspace, unmodified workspace in
+	 * already, we optionally trim it. We can't remove until we've added 
+	 * the new ws though or our mainw will be destroyed.  
+	 */
+	delete_ws = FALSE;
+	if( trim &&
+		mainw_get_n_tabs( mainw ) == 1 &&
+		(old_ws = mainw_get_workspace( mainw )) &&
+		workspace_is_empty( old_ws ) &&
+		!FILEMODEL( old_ws )->modified ) 
+		delete_ws = TRUE;
+
 
 
 - workspaceview must stay as a view, we need to be able to save chunks of them

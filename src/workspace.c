@@ -776,21 +776,23 @@ workspace_auto_recover_load( iWindow *iwnd,
 {
 	char *filename = (char *) client;
 	Mainw *mainw = MAINW( iwindow_get_root_noparent( GTK_WIDGET( iwnd ) ) );
-	Workspace *ws;
+	Workspaceroot *wsr = mainw->wsg->wsr; 
+
+	Workspacegroup *wsg;
 
 	/* Load ws file.
 	 */
         progress_begin();
-	ws = mainw_open_workspace( mainw, filename, TRUE, TRUE );
+	wsg = mainw_open_workspace( wsr, filename );
 	progress_end();
 
-	if( ws ) {
+	if( wsg ) {
 		/* The filename will be something like
 		 * "~/.nip2-7.9.6/tmp/untitled-nip2-0-3904875.ws", very
 		 * unhelpful.
 		 */
-		IM_FREE( FILEMODEL( ws )->filename );
-		iobject_changed( IOBJECT( ws ) );
+		IM_FREE( FILEMODEL( wsg )->filename );
+		iobject_changed( IOBJECT( wsg ) );
 
 		nfn( sys, IWINDOW_YES );
 	}
@@ -932,13 +934,15 @@ workspace_child_remove( iContainer *parent, iContainer *child )
 static void
 workspace_link( Workspace *ws, Workspacegroup *wsg, const char *name )
 {
+	Workspaceroot *wsr = wsg->wsr;
+
 	Symbol *sym;
 
 #ifdef DEBUG
 	printf( "workspace_link: naming ws as %s\n", name );
 #endif /*DEBUG*/
 
-	sym = symbol_new_defining( wsg->sym->expr->compile, name );
+	sym = symbol_new_defining( wsr->sym->expr->compile, name );
 
 	ws->sym = sym;
 	sym->type = SYM_WORKSPACE;
@@ -1292,7 +1296,8 @@ workspace_top_load( Filemodel *filemodel,
 	ModelLoadState *state, Model *parent, xmlNode *xnode )
 {
 	Workspace *ws = WORKSPACE( filemodel );
-	Workspaceroot *wsr = WORKSPACEROOT( parent );
+	Workspacegroup *wsg = WORKSPACEGROUP( parent );
+	Workspaceroot *wsr = wsg->wsr;
 	Column *current_col;
 	xmlNode *i, *j, *k;
 	char name[FILENAME_MAX];
@@ -1340,7 +1345,7 @@ workspace_top_load( Filemodel *filemodel,
 		name_from_filename( state->filename_user, name );
 		while( compile_lookup( wsr->sym->expr->compile, name ) )
 			increment_name( name );
-		workspace_link( ws, wsr, name );
+		workspace_link( ws, wsg, name );
 
 		filemodel->major = state->major;
 		filemodel->minor = state->minor;
@@ -1580,6 +1585,8 @@ workspace_get_type( void )
 Workspace *
 workspace_new( Workspacegroup *wsg, const char *name )
 {
+	Workspaceroot *wsr = wsg->wsr;
+
 	Workspace *ws;
 
 #ifdef DEBUG
@@ -1597,18 +1604,6 @@ workspace_new( Workspacegroup *wsg, const char *name )
 	icontainer_child_add( ICONTAINER( wsg ), ICONTAINER( ws ), -1 );
 	workspace_link( ws, wsg, name );
 	(void) workspace_column_pick( ws );
-
-	/* If the mainw has a single, empty workspace, unmodified workspace in
-	 * already, we optionally trim it. We can't remove until we've added 
-	 * the new ws though or our mainw will be destroyed.  
-	 */
-	delete_ws = FALSE;
-	if( trim &&
-		mainw_get_n_tabs( mainw ) == 1 &&
-		(old_ws = mainw_get_workspace( mainw )) &&
-		workspace_is_empty( old_ws ) &&
-		!FILEMODEL( old_ws )->modified ) 
-		delete_ws = TRUE;
 
 	return( ws );
 }
@@ -1688,11 +1683,11 @@ workspace_new_from_openfile( Workspaceroot *wsr, iOpenFile *of )
  * anything else).
  */
 Workspace *
-workspace_new_blank( Workspaceroot *wsr, const char *name )
+workspace_new_blank( Workspacegroup *wsg, const char *name )
 {
 	Workspace *ws;
 
-	if( !(ws = workspace_new( wsr, name )) )
+	if( !(ws = workspace_new( wsg, name )) )
 		return( NULL );
 
 	iobject_set( IOBJECT( ws ), NULL, _( "Default empty workspace" ) );
@@ -1811,7 +1806,9 @@ workspace_number( void )
 Workspace *
 workspace_clone( Workspace *ws )
 {
-	Workspaceroot *wsr = WORKSPACEROOT( ICONTAINER( ws )->parent );
+	Workspacegroup *wsg = WORKSPACEGROUP( ICONTAINER( ws )->parent );
+	Workspaceroot *wsr = wsg->wsr;
+
 	Workspace *nws;
 	char filename[FILENAME_MAX];
 
@@ -2233,4 +2230,66 @@ workspace_local_set_from_file( Workspace *ws, const char *fname )
 	ifile_close( of );
 
 	return( TRUE );
+}
+
+static gint
+workspace_jump_name_compare( iContainer *a, iContainer *b )
+{
+	int la = strlen( IOBJECT( a )->name );
+	int lb = strlen( IOBJECT( b )->name );
+
+	/* Smaller names first.
+	 */
+	if( la == lb )
+		return( strcmp( IOBJECT( a )->name, IOBJECT( b )->name ) );
+	else
+		return( la - lb );
+}
+
+static void
+workspace_jump_column_cb( GtkWidget *item, Column *column )
+{
+	model_scrollto( MODEL( column ), MODEL_SCROLL_TOP );
+}
+
+static void *
+workspace_jump_build( Column *column, GtkWidget *menu )
+{
+	GtkWidget *item;
+	char txt[256];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
+
+	vips_buf_appendf( &buf, "%s - %s", 
+		IOBJECT( column )->name, IOBJECT( column )->caption );
+	item = gtk_menu_item_new_with_label( vips_buf_all( &buf ) );
+	g_signal_connect( item, "activate",
+		G_CALLBACK( workspace_jump_column_cb ), column );
+	gtk_menu_append( GTK_MENU( menu ), item );
+	gtk_widget_show( item );
+
+	return( NULL );
+}
+
+/* Update a menu with the set of current columns.
+ */
+void
+workspace_jump_update( Workspace *ws, GtkWidget *menu )
+{
+	GtkWidget *item;
+	GSList *columns;
+
+	gtk_container_foreach( GTK_CONTAINER( menu ),
+		(GtkCallback) gtk_widget_destroy, NULL );
+
+	item = gtk_tearoff_menu_item_new();
+	gtk_menu_append( GTK_MENU( menu ), item );
+	gtk_widget_show( item );
+
+	columns = icontainer_get_children( ICONTAINER( ws ) );
+
+        columns = g_slist_sort( columns, 
+		(GCompareFunc) workspace_jump_name_compare );
+	slist_map( columns, (SListMapFn) workspace_jump_build, menu );
+
+	g_slist_free( columns );
 }

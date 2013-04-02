@@ -115,12 +115,7 @@ void workspaceview_scroll_background( Workspaceview *wview, int u, int v );
 
 void workspaceview_set_cursor( Workspaceview *wview, iWindowShape shape );
 
-void workspaceview_jump_update( Workspaceview *wview, GtkWidget *menu );
-
 GtkType workspaceview_get_type( void );
 View *workspaceview_new( void );
 
 void workspaceview_set_label( Workspaceview *wview, GtkWidget *label );
-
-Pane *workspaceview_get_defs_pane( Workspaceview *wview );
-Pane *workspaceview_get_browse_pane( Workspaceview *wview );

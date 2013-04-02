@@ -241,3 +241,17 @@ workspacegroup_new_from_openfile( Workspaceroot *wsr, iOpenFile *of )
 	return( wsg );
 }
 
+Workspacegroup *
+workspacegroup_duplicate( Workspacegroup *wsg )
+{
+	Workspacegroup *new_wsg;
+
+	new_wsg = workspacegroup_new_blank( wsg->wsr, NULL );
+
+	/* Save to file, load back again, see workspace_clone().
+	 */
+	printf( "workspacegroup_duplicate:\n" );
+
+	return( new_wsg );
+}
+

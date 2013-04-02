@@ -47,15 +47,9 @@ struct _Mainw {
 	 */
 	Workspacegroup *wsg;
 
-	/* Set of workspace tabs we display.
+	/* Our model has changed. 
 	 */
-	Workspaceview *current_tab;
-
-	/* WS in current tab has changed, plus the ws we attached the 
-	 * signal to.
-	 */
-	guint ws_changed_sid;
-	Workspace *ws_changed;
+	guint changed_sid;
 
 	/* Watch for changed on heap and image, and prefs. Use to update
 	 * status bar and space free.
@@ -135,6 +129,7 @@ GType mainw_get_type( void );
 
 void mainw_find_disc( VipsBuf *buf );
 void mainw_find_heap( VipsBuf *buf, Heap *heap );
+
 Workspace *mainw_get_workspace( Mainw *mainw );
 
 void mainw_homepage_action_cb( GtkAction *action, iWindow *iwnd );
@@ -148,10 +143,8 @@ void mainw_group_action_cb( GtkAction *action, Mainw *mainw );
 void mainw_next_error_action_cb( GtkAction *action, Mainw *mainw );
 void mainw_open_action_cb( GtkAction *action, Mainw *mainw );
 
-Workspaceview *mainw_add_workspace( Mainw *mainw, 
-	Workspaceview *old_tab, Workspace *ws, gboolean trim );
-Workspace *mainw_open_workspace( Mainw *mainw, 
-	const char *filename, gboolean trim, gboolean select );
+Workspacegroup *mainw_open_workspace( Workspaceroot *wsr, 
+	const char *filename );
 
 Mainw *mainw_new( Workspacegroup *wsg );
 

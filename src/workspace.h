@@ -183,7 +183,7 @@ Workspace *workspace_new( Workspacegroup *wsg, const char *name );
 Workspace *workspace_new_from_file( Workspaceroot *wsr, 
 	const char *filename, const char *filename_user );
 Workspace *workspace_new_from_openfile( Workspaceroot *wsr, iOpenFile *of );
-Workspace *workspace_new_blank( Workspaceroot *wsr, const char *name );
+Workspace *workspace_new_blank( Workspacegroup *wsg, const char *name );
 gboolean workspace_merge_file( Workspace *ws, 
 	const char *filename, const char *filename_user );
 gboolean workspace_merge_column_file( Workspace *ws, 
@@ -211,3 +211,5 @@ void workspace_set_mode( Workspace *ws, WorkspaceMode mode );
 
 gboolean workspace_local_set( Workspace *ws, const char *txt );
 gboolean workspace_local_set_from_file( Workspace *ws, const char *fname );
+
+void workspace_jump_update( Workspace *ws, GtkWidget *menu );

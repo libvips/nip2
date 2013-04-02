@@ -692,7 +692,7 @@ icontainer_class_init( iContainerClass *class )
 		g_cclosure_marshal_VOID__POINTER,
 		G_TYPE_NONE, 1,
 		G_TYPE_POINTER );
-	icontainer_signals[SIG_CHILD_REMOVE] = g_signal_new( "child_current",
+	icontainer_signals[SIG_CHILD_CURRENT] = g_signal_new( "child_current",
 		G_OBJECT_CLASS_TYPE( gobject_class ),
 		G_SIGNAL_RUN_LAST,
 		G_STRUCT_OFFSET( iContainerClass, child_current ),

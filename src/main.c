@@ -506,7 +506,7 @@ main_load_ws( const char *filename )
 
 	progress_update_loading( 0, im_skip_dir( filename ) );
 
-	if( !(ws = workspace_new_from_file( main_workspaceroot, 
+	if( !(ws = workspacegroup_new_from_file( main_workspaceroot, 
 		filename, NULL )) ) 
 		iwindow_alert( NULL, GTK_MESSAGE_ERROR );
 	else {

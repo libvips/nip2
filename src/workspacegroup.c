@@ -85,6 +85,152 @@ workspacegroup_dispose( GObject *gobject )
 	G_OBJECT_CLASS( parent_class )->dispose( gobject );
 }
 
+static gboolean
+workspacegroup_top_load( Filemodel *filemodel,
+	ModelLoadState *state, Model *parent, xmlNode *xnode )
+{
+	Workspacegroup *wsg = WORKSPACEGROUP( filemodel );
+	Workspaceroot *wsr = WORKSPACEROOT( parent );
+
+	Workspace *ws;
+	Column *current_col;
+	xmlNode *i, *j, *k;
+	char name[FILENAME_MAX];
+	int best_major;
+	int best_minor;
+
+#ifdef DEBUG
+	printf( "workspacegroup_top_load: from %s\n", state->filename );
+#endif /*DEBUG*/
+
+	/* The top node should be the first workspace. Get the filename this
+	 * workspace was saved as so we can work out how to rewrite embedded
+	 * filenames.
+	 */
+	if( strcasecmp( (char *) xnode->name, "Workspace" ) == 0 &&
+		get_sprop( xnode, "filename", name, FILENAME_MAX ) ) {
+		char *new_dir;
+
+		/* The old filename could be non-native, so we must rewrite 
+		 * to native form first so g_path_get_dirname() can work.
+		 */
+		path_compact( name );
+
+		state->old_dir = g_path_get_dirname( name ); 
+
+		new_dir = g_path_get_dirname( state->filename_user );
+		path_rewrite_add( state->old_dir, new_dir, FALSE );
+		g_free( new_dir );
+
+
+	}
+
+	record the filename in the wsg as well
+
+	/* See commened ot ode in COLUMN load below.
+	 */
+	printf( "workspace_top_load: compat check on merge is broken!\n" );
+
+	switch( ws->load_type ) {
+	case WORKSPACE_LOAD_TOP:
+		/* Easy ... ws is a blank Workspace we are loading into. No
+		 * renaming needed, except for the ws.
+		 */
+
+		/* Set the workspace name from the filename, ignoring the name
+		 * saved in the file.
+		 */
+		name_from_filename( state->filename_user, name );
+		while( compile_lookup( wsr->sym->expr->compile, name ) )
+			increment_name( name );
+		workspace_link( ws, wsg, name );
+
+		filemodel->major = state->major;
+		filemodel->minor = state->minor;
+		filemodel->micro = state->micro;
+		filemodel->versioned = TRUE;
+
+		/* If necessary, load up compatibility definitions.
+		 */
+		if( !workspace_load_compat( ws, 
+			filemodel->major, filemodel->minor ) ) 
+			return( FALSE );
+
+		if( model_load( MODEL( ws ), state, parent, xnode ) )
+			return( FALSE );
+
+		/* The model_load() will set the name from the name saved in
+		 * the XML. We want to override that with the name from the
+		 * filename.
+		 */
+		iobject_set( IOBJECT( ws ), name, NULL );
+
+		break;
+
+	case WORKSPACE_LOAD_COLUMNS:
+		/* Load at column level ... rename columns which clash with 
+		 * columns in the current workspace. Also look out for clashes
+		 * with columns we will load.
+		 */
+		for( i = xnode->children; i; i = i->next ) 
+			workspace_rename_column_node( ws, 
+				state, i, xnode->children );
+
+		/* Load those columns.
+		 */
+		for( i = xnode->children; i; i = i->next ) 
+			if( !model_new_xml( state, MODEL( ws ), i ) )
+				return( FALSE );
+
+		/* Is there a version mismatch? Issue a warning.
+		if( workspace_have_compat( state->major, state->minor, 
+			&best_major, &best_minor ) &&
+			(best_major != filemodel->major ||
+			best_minor != filemodel->minor) ) {
+			error_top( _( "Version mismatch." ) );
+			error_sub( _( "File \"%s\" was saved from %s-%d.%d.%d. "
+				"You may see compatibility problems." ),
+				state->filename, PACKAGE,
+				state->major, state->minor, state->micro );
+			iwindow_alert( GTK_WIDGET( ws->iwnd ), 
+				GTK_MESSAGE_INFO );
+		}
+		 */
+
+		break;
+
+	case WORKSPACE_LOAD_ROWS:
+		current_col = workspace_column_pick( ws );
+
+		/* Rename all rows into current column ... loop over column,
+		 * subcolumns, rows.
+		 */
+		for( i = xnode->children; i; i = i->next ) 
+			for( j = i->children; j; j = j->next ) 
+				for( k = j->children; k; k = k->next ) 
+					workspace_rename_row_node( state, 
+						current_col, k );
+
+		/* And load rows.
+		 */
+		for( i = xnode->children; i; i = i->next ) 
+			for( j = i->children; j; j = j->next ) 
+				for( k = j->children; k; k = k->next ) 
+					if( !model_new_xml( state, 
+						MODEL( current_col->scol ), 
+						k ) )
+						return( FALSE );
+
+		break;
+
+	default:
+		g_assert( FALSE );
+	}
+
+	return( FILEMODEL_CLASS( parent_class )->top_load( filemodel, 
+		state, parent, xnode ) );
+}
+
 static void
 workspacegroup_class_init( WorkspacegroupClass *class )
 {
@@ -101,6 +247,7 @@ workspacegroup_class_init( WorkspacegroupClass *class )
 	gobject_class->dispose = workspacegroup_dispose;
 
 	filemodel_class->filetype = filesel_type_workspace;
+	filemodel_class->top_load = workspace_top_load;
 }
 
 static void

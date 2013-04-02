@@ -55,6 +55,14 @@ struct _iContainer {
 	iContainer *parent;	/* iContainer we are inside */
 	guint destroy_sid;	/* Parent listens for our "destroy" here */
 	GHashTable *child_hash;	/* Optional: hash of children by their name */
+
+	/* Can have a currently selected child ... eg. the
+	 * current column in a workspace, or the current tab in a
+	 * workspacegroup.
+	 *
+	 * NULL if not relevant.
+	 */
+	iContainer *current;
 };
 
 typedef struct _iContainerClass {
@@ -72,6 +80,8 @@ typedef struct _iContainerClass {
 
 		parent_remove	parent is about to be removed
 
+		child_current	make the current of parent
+
 	 */
 
 	void (*pos_changed)( iContainer *icontainer );
@@ -79,6 +89,7 @@ typedef struct _iContainerClass {
 	void (*child_remove)( iContainer *parent, iContainer *child );
 	void (*parent_add)( iContainer *child );
 	void (*parent_remove)( iContainer *child );
+	void (*child_current)( iContainer *child );
 } iContainerClass;
 
 typedef void *(*icontainer_map_fn)( iContainer *, 
@@ -128,6 +139,7 @@ void icontainer_child_add_before( iContainer *parent,
 	iContainer *child, iContainer *before );
 void icontainer_child_move( iContainer *child, int pos );
 void *icontainer_child_remove( iContainer *child );
+void *icontainer_child_current( iContainer *child );
 
 GType icontainer_get_type( void );
 

@@ -1,3 +1,14 @@
+- move ->current into icontainer
+
+
+- add model_front() ... pushes model to front of peers using
+  view_child_front()
+
+  model could have a current_model field in the paret which this updates?
+
+  look at column, could we make use of this there?
+
+
 - workspaceview must stay as a view, we need to be able to save chunks of them
   and stuff like that ... and scroll and things too
 

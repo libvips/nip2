@@ -96,7 +96,7 @@ typedef struct _ModelLoadState {
 	(G_TYPE_INSTANCE_GET_CLASS( (obj), TYPE_MODEL, ModelClass ))
 
 struct _Model {
-	iContainer parent;
+	iContainer parent_object;
 
 	/* My instance vars.
 	 */
@@ -138,6 +138,8 @@ typedef struct _ModelClass {
 
 		layout 		try to lay child view out
 
+		front		trigger view_child_front() for all views
+
 	 */
 
 	void (*edit)( GtkWidget *, Model * );
@@ -145,6 +147,7 @@ typedef struct _ModelClass {
 	void (*scrollto)( Model *, ModelScrollPosition );
 	void (*reset)( Model * );
 	void (*layout)( Model * );
+	void (*front)( Model * );
 
 	/* Load and save methods.
 
@@ -191,6 +194,7 @@ void model_layout( Model *model );
 void *model_reset( Model *model );
 void *model_edit( GtkWidget *parent, Model *model );
 void *model_header( GtkWidget *parent, Model *model );
+void model_front( Model *model );
 
 void *model_save( Model *model, xmlNode * );
 gboolean model_save_test( Model *model );

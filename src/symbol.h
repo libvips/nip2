@@ -46,7 +46,7 @@ typedef enum {
 	SYM_PARAM,		/* A parameter to a user function */
 	SYM_ZOMBIE,		/* A referred to but not defined */
 	SYM_WORKSPACE,		/* A loaded workspace */
-	SYM_WORKSPACEROOT,	/* A collection of workspaces */
+	SYM_WORKSPACEROOT,	/* Base of all workspaces */
 	SYM_ROOT,		/* The root symbol */
 	SYM_EXTERNAL,		/* A reference to an external function */
 	SYM_BUILTIN		/* A reference to a built-in function */

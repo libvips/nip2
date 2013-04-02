@@ -297,6 +297,7 @@ view_unlink( View *view )
 	FREESID( view->scrollto_sid, VOBJECT( view )->iobject );
 	FREESID( view->layout_sid, VOBJECT( view )->iobject );
 	FREESID( view->reset_sid, VOBJECT( view )->iobject );
+	FREESID( view->front_sid, VOBJECT( view )->iobject );
 	FREESID( view->child_add_sid, VOBJECT( view )->iobject );
 	FREESID( view->child_remove_sid, VOBJECT( view )->iobject );
 }
@@ -409,6 +410,21 @@ view_model_reset( Model *model, View *view )
 	view_reset( view );
 }
 
+/* Called for model front signal ... bring view to front.
+ */
+static void
+view_model_front( Model *model, View *view )
+{
+	g_assert( IS_MODEL( model ) );
+	g_assert( IS_VIEW( view ) );
+
+#ifdef DEBUG
+	printf( "view_model_front: %s\n", IOBJECT( model )->name );
+#endif /*DEBUG*/
+
+	view_child_front( view );
+}
+
 /* Called for model child_add signal ... start watching that child.
  */
 static void
@@ -499,6 +515,8 @@ view_real_link( View *view, Model *model, View *parent_view )
 		G_CALLBACK( view_model_layout ), view );
 	view->reset_sid = g_signal_connect( model, "reset", 
 		G_CALLBACK( view_model_reset ), view );
+	view->front_sid = g_signal_connect( model, "front", 
+		G_CALLBACK( view_model_front ), view );
 	view->child_add_sid = g_signal_connect( model, "child_add", 
 		G_CALLBACK( view_model_child_add ), view );
 	view->child_remove_sid = g_signal_connect( model, "child_remove", 
@@ -643,6 +661,7 @@ view_init( View *view )
 	view->scrollto_sid = 0;
 	view->layout_sid = 0;
 	view->reset_sid = 0;
+	view->front_sid = 0;
 	view->child_add_sid = 0;
 	view->child_remove_sid = 0;
 

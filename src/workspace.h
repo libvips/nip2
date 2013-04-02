@@ -179,7 +179,7 @@ void workspace_retain_clean( void );
 void workspace_auto_recover( Mainw *mainw );
 
 GType workspace_get_type( void );
-Workspace *workspace_new( Workspaceroot *wsr, const char *name );
+Workspace *workspace_new( Workspacegroup *wsg, const char *name );
 Workspace *workspace_new_from_file( Workspaceroot *wsr, 
 	const char *filename, const char *filename_user );
 Workspace *workspace_new_from_openfile( Workspaceroot *wsr, iOpenFile *of );

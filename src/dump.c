@@ -166,7 +166,7 @@ decode_SymbolType( SymbolType t )
 	case SYM_PARAM:		return( "SYM_PARAM" );
 	case SYM_ZOMBIE:	return( "SYM_ZOMBIE" );
 	case SYM_WORKSPACE:	return( "SYM_WORKSPACE" );
-	case SYM_WORKSPACEROOT:return( "SYM_WORKSPACEROOT" );
+	case SYM_WORKSPACEROOT:	return( "SYM_WORKSPACEROOT" );
 	case SYM_ROOT:		return( "SYM_ROOT" );
 	case SYM_EXTERNAL:	return( "SYM_EXTERNAL" );
 	case SYM_BUILTIN:	return( "SYM_BUILTIN" );

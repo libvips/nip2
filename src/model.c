@@ -45,6 +45,8 @@ enum {
 	SIG_SCROLLTO,	/* Views should try to make themselves visible */
 	SIG_LAYOUT,	/* Views should lay out their children */
 	SIG_RESET,	/* Reset edit mode in views */
+	SIG_CURRENT,	/* Make this model the current of parent */
+	SIG_FRONT,	/* Bring views to front */
 	SIG_LAST
 };
 
@@ -322,6 +324,22 @@ model_layout( Model *model )
 	g_signal_emit( G_OBJECT( model ), model_signals[SIG_LAYOUT], 0 );
 }
 
+void
+model_current( Model *model )
+{
+	g_assert( IS_MODEL( model ) );
+
+	g_signal_emit( G_OBJECT( model ), model_signals[SIG_CURRENT], 0 );
+}
+
+void
+model_front( Model *model )
+{
+	g_assert( IS_MODEL( model ) );
+
+	g_signal_emit( G_OBJECT( model ), model_signals[SIG_FRONT], 0 );
+}
+
 void *
 model_reset( Model *model )
 {
@@ -456,6 +474,33 @@ model_real_scrollto( Model *model, ModelScrollPosition position )
 {
 }
 
+static void
+model_real_current( Model *model )
+{
+	Model *parent;
+
+	if( ICONTAINER( model )->parent &&
+		IS_MODEL( ICONTAINER( model )->parent ) &&
+		(parent = MODEL( ICONTAINER( model )->parent )) &&
+		parent->current != model ) {
+		Model *old_current;
+
+		old_current = parent->current;
+		parent->current = model;
+
+		iobject_changed( IOBJECT( old_current ) );
+		iobject_changed( IOBJECT( model ) );
+		iobject_changed( IOBJECT( parent ) );
+
+		model_front( model );
+	}
+}
+
+static void
+model_real_front( Model *model )
+{
+}
+
 static xmlNode *
 model_real_save( Model *model, xmlNode *xnode )
 {
@@ -577,6 +622,8 @@ model_class_init( ModelClass *class )
 	class->edit = NULL;
 	class->scrollto = model_real_scrollto;
 	class->layout = NULL;
+	class->current = model_real_current;
+	class->front = model_real_front;
 	class->reset = NULL;
 	class->save = model_real_save;
 	class->save_test = NULL;
@@ -599,6 +646,20 @@ model_class_init( ModelClass *class )
 		G_OBJECT_CLASS_TYPE( object_class ),
 		G_SIGNAL_RUN_FIRST,
 		G_STRUCT_OFFSET( ModelClass, layout ),
+		NULL, NULL,
+		g_cclosure_marshal_VOID__VOID,
+		G_TYPE_NONE, 0 );
+	model_signals[SIG_CURRENT] = g_signal_new( "current",
+		G_OBJECT_CLASS_TYPE( object_class ),
+		G_SIGNAL_RUN_FIRST,
+		G_STRUCT_OFFSET( ModelClass, current ),
+		NULL, NULL,
+		g_cclosure_marshal_VOID__VOID,
+		G_TYPE_NONE, 0 );
+	model_signals[SIG_CURRENT] = g_signal_new( "front",
+		G_OBJECT_CLASS_TYPE( object_class ),
+		G_SIGNAL_RUN_FIRST,
+		G_STRUCT_OFFSET( ModelClass, front ),
 		NULL, NULL,
 		g_cclosure_marshal_VOID__VOID,
 		G_TYPE_NONE, 0 );

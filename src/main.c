@@ -424,12 +424,19 @@ main_watchgroup_changed_cb( void )
  * experimentally, win32 pops up an annoying error dialog if you try that.
  */
 static gboolean
-main_load( Mainw *mainw, Workspace *ws, const char *filename )
+main_load( Workspace *ws, const char *filename )
 {
-	Workspace *new_ws;
+	Workspacegroup *new_wsg;
 
-	if( (new_ws = mainw_open_workspace( mainw, filename, FALSE, FALSE )) ) 
+	if( (new_wsg = workspacegroup_new_from_file( main_workspaceroot, 
+		filename, NULL )) ) {
+		Mainw *mainw;
+
+		mainw = mainw_new( new_wsg );
+		gtk_widget_show( GTK_WIDGET( mainw ) );
+
 		return( TRUE );
+	}
 
 	error_clear();
 
@@ -981,8 +988,8 @@ int
 main( int argc, char *argv[] )
 {
 	gboolean welcome_message = FALSE;
+	Workspacegroup *wsg;
 	Workspace *ws;
-	Mainw *mainw;
 	GError *error = NULL;
 	GOptionContext *context;
 	const char *prefix;
@@ -1301,6 +1308,7 @@ main( int argc, char *argv[] )
 	/* Might make this from stdin/whatever if we have a special
 	 * command-line flag.
 	 */
+	wsg = NULL;
 	ws = NULL;
 
 	/* Second command-line pass. This time we do any actions.
@@ -1328,27 +1336,23 @@ main( int argc, char *argv[] )
 	}
 
 	if( main_option_stdin_ws ) {
-		if( !(ws = workspace_new_from_openfile( 
+		if( !(wsg = workspacegroup_new_from_openfile( 
 			main_workspaceroot, main_stdin )) ) 
 			main_log_add( "%s\n", error_get_sub() );
 		else 
 			/* Don't want to have "stdin" as the filename.
 			 */
-			filemodel_set_filename( FILEMODEL( ws ), NULL );
+			filemodel_set_filename( FILEMODEL( wsg ), NULL );
 	}
 
-	/* Make sure we have a start workspace.
+	/* Make a start workspace and workspacegroup to load
+	 * stuff into.
 	 */
-	if( !ws ) {
+	if( !wsg ) {
 		workspaceroot_name_new( main_workspaceroot, name );
-		ws = workspace_new_blank( main_workspaceroot, name );
+		wsg = workspacegroup_new_blank( main_workspaceroot, name );
+		ws = workspace_new( wsg, "tab1" );
 	}
-
-	/* Make a mainw to hold any workspaces we load. Only show this in
-	 * interactive mode, see below.
-	 */
-	mainw = mainw_new( main_workspaceroot );
-	mainw_add_workspace( mainw, NULL, ws, FALSE );
 
 	/* Reset IM_CONCURRENCY if a watch changes. Need to do this after
 	 * parsing options so we skip in batch mode.
@@ -1411,9 +1415,9 @@ main( int argc, char *argv[] )
 	 */
 #ifdef DEBUG_LEAK
 {
-	Symbol *wsg_sym = main_workspaceroot->sym;
+	Symbol *wsr_sym = main_workspaceroot->sym;
 	Symbol *ws_sym = SYMBOL( icontainer_child_lookup( 
-		ICONTAINER( wsg_sym->expr->compile ), "Preferences" ) );
+		ICONTAINER( wsr_sym->expr->compile ), "Preferences" ) );
 	Workspace *ws = ws_sym->ws;
 
 	if( ws->compat_major || 
@@ -1435,7 +1439,7 @@ main( int argc, char *argv[] )
 			im_strncpy( buf, argv[i], FILENAME_MAX );
 			path_compact( buf );
 
-			if( !main_load( mainw, ws, buf ) ) 
+			if( !main_load( ws, buf ) ) 
 				main_log_add( "%s\n", error_get_sub() );
 		}
 	}
@@ -1466,9 +1470,10 @@ main( int argc, char *argv[] )
 	/* If the start ws is empty (we didn't load anything into it) and we
 	 * loaded some other workspaces, we can junk the empty ws. 
 	 */
-	if( mainw_get_n_tabs( mainw ) > 1 &&
+	if( icontainer_get_n_children( ICONTAINER( main_workspaceroot ) ) > 2 &&
 		workspace_is_empty( ws ) ) {
-		iobject_destroy( IOBJECT( ws ) ); 
+		iobject_destroy( IOBJECT( wsg ) ); 
+		wsg = NULL;
 		ws = NULL;
 	}
 
@@ -1480,6 +1485,9 @@ main( int argc, char *argv[] )
 	/* Are we running interactively? Start the main window and loop.
 	 */
 	if( !main_option_batch ) {
+		Mainw *mainw;
+
+		mainw = mainw_new( wsg );
 		gtk_widget_show( GTK_WIDGET( mainw ) );
 
 		/* Process a few events ... we want the window to be mapped so

@@ -418,6 +418,36 @@ icontainer_child_remove( iContainer *child )
 	return( NULL );
 }
 
+void 
+icontainer_child_current( iContainer *child )
+{
+	iContainer *parent = child->parent;
+
+	g_assert( parent );
+	g_assert( ICONTAINER_IS_CHILD( parent, child ) );
+
+#ifdef DEBUG
+	printf( "icontainer_child_remove: (child %p)\n", child );
+	printf( "\tchild: %s \"%s\"\n",
+		G_OBJECT_TYPE_NAME( child ), 
+		NN( IOBJECT( child )->name ) );
+#endif /*DEBUG*/
+
+#ifdef DEBUG_SANITY
+	icontainer_sanity( parent );
+	icontainer_sanity( child );
+#endif /*DEBUG_SANITY*/
+
+	g_signal_emit( G_OBJECT( parent ), 
+		icontainer_signals[SIG_CHILD_REMOVE], 0, child );
+
+#ifdef DEBUG_SANITY
+	icontainer_sanity( parent );
+#endif /*DEBUG_SANITY*/
+
+	return( NULL );
+}
+
 static void
 icontainer_dispose( GObject *gobject )
 {

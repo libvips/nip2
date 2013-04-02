@@ -930,7 +930,7 @@ workspace_child_remove( iContainer *parent, iContainer *child )
 }
 
 static void
-workspace_link( Workspace *ws, Workspaceroot *wsr, const char *name )
+workspace_link( Workspace *ws, Workspacegroup *wsg, const char *name )
 {
 	Symbol *sym;
 
@@ -938,7 +938,7 @@ workspace_link( Workspace *ws, Workspaceroot *wsr, const char *name )
 	printf( "workspace_link: naming ws as %s\n", name );
 #endif /*DEBUG*/
 
-	sym = symbol_new_defining( wsr->sym->expr->compile, name );
+	sym = symbol_new_defining( wsg->sym->expr->compile, name );
 
 	ws->sym = sym;
 	sym->type = SYM_WORKSPACE;
@@ -1578,7 +1578,7 @@ workspace_get_type( void )
 }
 
 Workspace *
-workspace_new( Workspaceroot *wsr, const char *name )
+workspace_new( Workspacegroup *wsg, const char *name )
 {
 	Workspace *ws;
 
@@ -1594,9 +1594,21 @@ workspace_new( Workspaceroot *wsr, const char *name )
 	}
 
 	ws = WORKSPACE( g_object_new( TYPE_WORKSPACE, NULL ) );
-	icontainer_child_add( ICONTAINER( wsr ), ICONTAINER( ws ), -1 );
-	workspace_link( ws, wsr, name );
+	icontainer_child_add( ICONTAINER( wsg ), ICONTAINER( ws ), -1 );
+	workspace_link( ws, wsg, name );
 	(void) workspace_column_pick( ws );
+
+	/* If the mainw has a single, empty workspace, unmodified workspace in
+	 * already, we optionally trim it. We can't remove until we've added 
+	 * the new ws though or our mainw will be destroyed.  
+	 */
+	delete_ws = FALSE;
+	if( trim &&
+		mainw_get_n_tabs( mainw ) == 1 &&
+		(old_ws = mainw_get_workspace( mainw )) &&
+		workspace_is_empty( old_ws ) &&
+		!FILEMODEL( old_ws )->modified ) 
+		delete_ws = TRUE;
 
 	return( ws );
 }

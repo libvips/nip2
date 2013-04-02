@@ -55,6 +55,7 @@ struct _View {
 	guint pos_changed_sid;		/* Signals we use to watch iObject */
 	guint scrollto_sid;
 	guint layout_sid;
+	guint front_sid;
 	guint reset_sid;
 	guint child_add_sid;
 	guint child_remove_sid;

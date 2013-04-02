@@ -43,9 +43,9 @@
 struct _Mainw {
 	iWindow parent_object;
 
-	/* We make and manage workspaces inside this.
+	/* Our model.
 	 */
-	Workspaceroot *wsr;
+	Workspacegroup *wsg;
 
 	/* Set of workspace tabs we display.
 	 */
@@ -96,10 +96,9 @@ struct _Mainw {
 	GtkWidget *toolbar;
 	GtkWidget *recent_menu;
 	GtkWidget *jump_to_column_menu;
-	GtkWidget *tab_menu;
 	GtkWidget *toolkit_menu;
 
-	GtkWidget *notebook;
+	Workspacegroupview *wsgview;
 
 	GtkWidget *statusbar_main;
 	GtkWidget *statusbar;
@@ -154,8 +153,5 @@ Workspaceview *mainw_add_workspace( Mainw *mainw,
 Workspace *mainw_open_workspace( Mainw *mainw, 
 	const char *filename, gboolean trim, gboolean select );
 
-Mainw *mainw_new( Workspaceroot *wsr );
-
-int mainw_get_n_tabs( Mainw *mainw );
-Workspaceview *mainw_get_nth_tab( Mainw *mainw, int i );
+Mainw *mainw_new( Workspacegroup *wsg );
 

@@ -163,8 +163,7 @@ iimageview_drag_data_received( GtkWidget *widget, GdkDragContext *context,
 				itext_set_edited( itext, TRUE );
 				(void) expr_dirty( row->expr, 
 					link_serial_new() );
-				filemodel_set_modified( FILEMODEL( row->ws ), 
-					TRUE );
+				workspace_set_modified( row->ws, TRUE );
 				symbol_recalculate_all();
 			}
 

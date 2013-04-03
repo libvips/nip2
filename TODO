@@ -18,6 +18,15 @@
 
   should do this across a whole file load, not just a single ws load
 
+- we call 
+
+	workspace_set_modified( column->ws, TRUE );
+
+  all the time, is there no neater way to do this?
+
+- make Workspace into a plain model once all the top-level load/save stuff 
+  is moved out
+
 
 
 - look at column, make it use icontainer_child_current() and model_front()

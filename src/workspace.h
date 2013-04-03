@@ -129,7 +129,9 @@ typedef struct _WorkspaceClass {
 	 */
 } WorkspaceClass;
 
+Workspacegroup *workspace_get_workspacegroup( Workspace *ws );
 Workspaceroot *workspace_get_workspaceroot( Workspace *ws );
+void workspace_set_modified( Workspace *ws, gboolean modified );
 
 void *workspace_map( workspace_map_fn fn, void *a, void *b );
 void *workspace_map_column( Workspace *ws, column_map_fn fn, void *a );

@@ -80,7 +80,6 @@ workspacegroup_dispose( GObject *gobject )
 #endif /*DEBUG*/
 
 	IM_FREEF( g_source_remove, wsg->autosave_timeout );
-
 	icontainer_map( ICONTAINER( wsg ),
 		(icontainer_map_fn) icontainer_child_remove, NULL, NULL );
 
@@ -456,6 +455,7 @@ workspacegroup_new( Workspaceroot *wsr )
 
 	wsg = WORKSPACEGROUP( g_object_new( TYPE_WORKSPACEGROUP, NULL ) );
 	workspacegroup_link( wsg, wsr );
+	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
 
 	return( wsg );
 }
@@ -471,6 +471,7 @@ workspacegroup_new_blank( Workspaceroot *wsr, const char *name )
 	if( !(wsg = workspacegroup_new( wsr )) )
 		return( NULL );
 	iobject_set( IOBJECT( wsg ), name, _( "Default empty workspace" ) );
+	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
 
 	return( wsg );
 }
@@ -486,6 +487,7 @@ workspacegroup_new_filename( Workspaceroot *wsr, const char *filename )
 	name_from_filename( filename, name );
 	iobject_set( IOBJECT( wsg ), name, _( "Default empty workspace" ) );
 	filemodel_set_filename( FILEMODEL( wsg ), filename );
+	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
 
 	return( wsg );
 }
@@ -508,9 +510,9 @@ workspacegroup_new_from_file( Workspaceroot *wsr,
 		return( NULL );
 	}
 
-	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
 	filemodel_set_filename( FILEMODEL( wsg ), 
 		filename_user ? filename_user : filename );
+	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
 
 	return( wsg );
 }
@@ -534,8 +536,8 @@ workspacegroup_new_from_openfile( Workspaceroot *wsr, iOpenFile *of )
 		return( NULL );
 	}
 
-	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
 	filemodel_set_filename( FILEMODEL( wsg ), of->fname );
+	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
 
 #ifdef DEBUG
 	printf( "(set name = %s)\n", IOBJECT( wsg )->name );

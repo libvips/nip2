@@ -496,7 +496,7 @@ columnview_left_release( Columnview *cview, GdkEvent *ev )
         case COL_DRAG:
                 cview->state = COL_WAIT;
 		workspaceview_scroll_background( wview, 0, 0 );
-		filemodel_set_modified( FILEMODEL( ws ), TRUE );
+		workspace_set_modified( ws, TRUE );
 		workspaceview_set_cursor( wview, IWINDOW_SHAPE_NONE );
 
                 break;
@@ -615,7 +615,7 @@ columnview_caption_enter_cb( GtkWidget *wid, Columnview *cview )
 	if( strcmp( text, "" ) != 0 ) 
 		iobject_set( IOBJECT( col ), NULL, text );
 
-	filemodel_set_modified( FILEMODEL( ws ), TRUE );
+	workspace_set_modified( ws, TRUE );
 
 	/* The ws view needs to update the jumpto menus.
 	 */

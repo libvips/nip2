@@ -1469,7 +1469,7 @@ main( int argc, char *argv[] )
 	/* Make sure our start ws doesn't have modified set. We may have
 	 * loaded some images or whatever into it.
 	 */
-	filemodel_set_modified( FILEMODEL( ws ), FALSE );
+	workspace_set_modified( ws, FALSE );
 
 	/* If the start ws is empty (we didn't load anything into it) and we
 	 * loaded some other workspaces, we can junk the empty ws. 

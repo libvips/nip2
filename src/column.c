@@ -118,7 +118,7 @@ column_child_remove( iContainer *parent, iContainer *child )
 {
 	Column *col = COLUMN( parent );
 
-	filemodel_set_modified( FILEMODEL( col->ws ), TRUE );
+	workspace_set_modified( col->ws, TRUE );
 
 	ICONTAINER_CLASS( parent_class )->child_remove( parent, child );
 }
@@ -487,7 +487,7 @@ column_set_open( Column *col, gboolean open )
 		Workspace *ws = col->ws;
 
 		col->open = open;
-		filemodel_set_modified( FILEMODEL( ws ), TRUE );
+		workspace_set_modified( ws, TRUE );
 		iobject_changed( IOBJECT( col ) );
 
 		if( !col->open_timeout ) {

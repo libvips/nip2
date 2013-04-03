@@ -46,10 +46,8 @@ struct _Mainw {
 	/* Our model.
 	 */
 	Workspacegroup *wsg;
-
-	/* Our model has changed. 
-	 */
 	guint changed_sid;
+	guint destroy_sid;
 
 	/* Watch for changed on heap and image, and prefs. Use to update
 	 * status bar and space free.

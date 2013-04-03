@@ -814,7 +814,7 @@ workspaceview_layout_set_pos( Columnview *cview, WorkspaceLayout *layout )
 		layout->area.width = GTK_WIDGET( cview )->allocation.width;
 
 	iobject_changed( IOBJECT( column ) );
-	filemodel_set_modified( FILEMODEL( column->ws ), TRUE );
+	workspace_set_modified( column->ws, TRUE );
 
 	return( NULL );
 }

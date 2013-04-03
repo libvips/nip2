@@ -316,10 +316,13 @@ mainw_find_heap( VipsBuf *buf, Heap *heap )
 Workspace *
 mainw_get_workspace( Mainw *mainw )
 {
-	if( !ICONTAINER( mainw->wsg )->current )
-		return( NULL );
-	else
-		return( WORKSPACE( ICONTAINER( mainw->wsg )->current ) );
+	Workspace *ws;
+
+	if( mainw->wsg &&
+		(ws = WORKSPACE( ICONTAINER( mainw->wsg )->current )) )
+		return( ws );
+
+	return( NULL );
 }
 
 /* Update the space remaining indicator. 
@@ -363,7 +366,14 @@ mainw_title_update( Mainw *mainw )
 	if( FILEMODEL( mainw->wsg )->modified ) 
 		vips_buf_appendf( &buf, "*" ); 
 
+	if( FILEMODEL( mainw->wsg )->filename )
+		vips_buf_appendf( &buf, "%s", 
+			FILEMODEL( mainw->wsg )->filename );
+	else 
+		vips_buf_appends( &buf, _( "unsaved workspace" ) );
+
 	if( (ws = mainw_get_workspace( mainw )) ) {
+		vips_buf_appends( &buf, " - " );
 		vips_buf_appendf( &buf, "%s", NN( IOBJECT( ws->sym )->name ) );
 		if( ws->compat_major ) {
 			vips_buf_appends( &buf, " - " );
@@ -374,16 +384,7 @@ mainw_title_update( Mainw *mainw )
 		}
 	}
 
-	if( FILEMODEL( mainw->wsg )->filename )
-		vips_buf_appendf( &buf, " - %s", 
-			FILEMODEL( mainw->wsg )->filename );
-	else {
-		vips_buf_appends( &buf, " - " );
-		vips_buf_appends( &buf, _( "unsaved workspace" ) );
-	}
-
-	iwindow_set_title( IWINDOW( mainw ), 
-		"%s", vips_buf_all( &buf ) );
+	iwindow_set_title( IWINDOW( mainw ), "%s", vips_buf_all( &buf ) );
 }
 
 static void 
@@ -2021,7 +2022,6 @@ static void
 mainw_popdown( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys )
 {
 	Mainw *mainw = MAINW( iwnd );
-	Workspace *ws;
 
 	/* We can be destroyed in two ways: either our iwnd tells us to go, or
 	 * our model is destroyed under us. If the model has gone, we just go.
@@ -2029,12 +2029,12 @@ mainw_popdown( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys )
 	 * quitting.
 	 */
 
-	if( (ws = mainw_get_workspace( mainw )) ) { 
+	if( mainw->wsg ) { 
 		iWindowSusp *susp = iwindow_susp_new( mainw_popdown, 
 			iwnd, client, nfn, sys );
 
 		filemodel_inter_savenclose_cb( IWINDOW( mainw ), 
-			FILEMODEL( ws ), iwindow_susp_comp, susp );
+			FILEMODEL( mainw->wsg ), iwindow_susp_comp, susp );
 	}
 	else
 		nfn( sys, IWINDOW_YES );
@@ -2046,6 +2046,14 @@ mainw_wsg_changed_cb( Workspacegroup *wsg, Mainw *mainw )
 	printf( "mainw_wsg_changed_cb\n" ); 
 
 	mainw_refresh( mainw );
+}
+
+static void
+mainw_wsg_destroy_cb( Workspacegroup *wsg, Mainw *mainw )
+{
+	printf( "mainw_wsg_destroy_cb\n" ); 
+
+	mainw->wsg = NULL;
 }
 
 static void
@@ -2067,6 +2075,9 @@ mainw_link( Mainw *mainw, Workspacegroup *wsg )
 	mainw->changed_sid = g_signal_connect( mainw->wsg, 
 		"changed", 
 		G_CALLBACK( mainw_wsg_changed_cb ), mainw );
+	mainw->destroy_sid = g_signal_connect( mainw->wsg, 
+		"destroy", 
+		G_CALLBACK( mainw_wsg_destroy_cb ), mainw );
 }
 
 Mainw *

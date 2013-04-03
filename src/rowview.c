@@ -438,7 +438,7 @@ rowview_spin_up_cb( GtkWidget *widget, gpointer client )
 	Rhs *rhs = row->child_rhs;
 
 	rhs_vislevel_down( rhs );
-	filemodel_set_modified( FILEMODEL( row->ws ), TRUE );
+	workspace_set_modified( row->ws, TRUE );
 }
 
 static void
@@ -449,7 +449,7 @@ rowview_spin_down_cb( GtkWidget *widget, gpointer client )
 	Rhs *rhs = row->child_rhs;
 
 	rhs_vislevel_up( rhs );
-	filemodel_set_modified( FILEMODEL( row->ws ), TRUE );
+	workspace_set_modified( row->ws, TRUE );
 }
 
 /* Scroll to make tally entry visible. 

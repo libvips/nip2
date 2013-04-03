@@ -1440,7 +1440,7 @@ classmodel_update( Classmodel *classmodel )
 	 */
 	classmodel_set_edited( classmodel, TRUE );
 	expr_dirty( row->expr, link_serial_new() );
-	filemodel_set_modified( FILEMODEL( row->ws ), TRUE );
+	workspace_set_modified( row->ws, TRUE );
 }
 
 /* Make a new classmodel subtype (eg. TYPE_PATHNAME) and link it on.

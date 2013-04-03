@@ -37,10 +37,25 @@ static FilemodelClass *parent_class = NULL;
 
 static GSList *workspace_all = NULL;
 
+Workspacegroup *
+workspace_get_workspacegroup( Workspace *ws )
+{
+	return( WORKSPACEGROUP( ICONTAINER( ws )->parent ) );
+}
+
 Workspaceroot *
 workspace_get_workspaceroot( Workspace *ws )
 {
-	return( WORKSPACEROOT( ICONTAINER( ws )->parent ) );
+	return( workspace_get_workspacegroup( ws )->wsr );
+}
+
+void
+workspace_set_modified( Workspace *ws, gboolean modified )
+{
+	Workspacegroup *wsg;
+
+	if( (wsg = workspace_get_workspacegroup( ws )) )
+		filemodel_set_modified( FILEMODEL( wsg ), modified );
 }
 
 /* Over all workspaces.
@@ -486,7 +501,7 @@ workspace_add_def( Workspace *ws, const char *str )
 	if( !sym->expr->row )
 		(void) row_new( col->scol, sym, &sym->expr->root );
 	symbol_made( sym );
-	filemodel_set_modified( FILEMODEL( ws ), TRUE );
+	workspace_set_modified( ws, TRUE );
 
 	return( sym );
 }
@@ -720,7 +735,7 @@ workspace_child_remove( iContainer *parent, iContainer *child )
 	if( ws->current == col )
 		workspace_column_select( ws, NULL );
 
-	filemodel_set_modified( FILEMODEL( ws ), TRUE );
+	workspace_set_modified( ws, TRUE );
 
 	ICONTAINER_CLASS( parent_class )->child_remove( parent, child );
 }
@@ -1103,17 +1118,6 @@ workspace_save_all( Filemodel *filemodel, const char *filename )
 }
 
 static void
-workspace_set_modified( Filemodel *filemodel, gboolean modified )
-{
-	Workspace *ws = WORKSPACE( filemodel );
-	Workspacegroup *wsg = WORKSPACEGROUP( ICONTAINER( ws )->parent );
-
-	filemodel_set_modified( FILEMODEL( wsg ), TRUE );
-
-	FILEMODEL_CLASS( parent_class )->set_modified( filemodel, modified );
-}
-
-static void
 workspace_class_init( WorkspaceClass *class )
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
@@ -1140,7 +1144,6 @@ workspace_class_init( WorkspaceClass *class )
 	model_class->empty = workspace_empty;
 
 	filemodel_class->save_all = workspace_save_all;
-	filemodel_class->set_modified = workspace_set_modified;
 	filemodel_class->filetype = filesel_type_workspace;
 
 	/* Static init.
@@ -1195,8 +1198,6 @@ workspace_init( Workspace *ws )
 		"// private definitions for this workspace\n" ) );
 	ws->local_kitg = NULL;
 	ws->local_kit = NULL;
-
-	filemodel_register( FILEMODEL( ws ) );
 
 	workspace_all = g_slist_prepend( workspace_all, ws );
 }
@@ -1266,7 +1267,7 @@ workspace_load_empty( Workspace *ws, Workspaceroot *wsr,
 	if( !filemodel_load_all( FILEMODEL( ws ), MODEL( wsr ), 
 		filename, filename_user ) ) 
 		return( FALSE );
-	filemodel_set_modified( FILEMODEL( ws ), FALSE );
+	workspace_set_modified( ws, FALSE );
 	filemodel_set_filename( FILEMODEL( ws ), 
 		filename_user ? filename_user : filename );
 
@@ -1313,7 +1314,7 @@ workspace_new_from_openfile( Workspaceroot *wsr, iOpenFile *of )
 		return( NULL );
 	}
 
-	filemodel_set_modified( FILEMODEL( ws ), FALSE );
+	workspace_set_modified( ws, FALSE );
 	filemodel_set_filename( FILEMODEL( ws ), of->fname );
 
 #ifdef DEBUG
@@ -1364,7 +1365,7 @@ workspace_merge_file( Workspace *ws,
 			filename, filename_user ) ) 
 			return( FALSE );
 
-		filemodel_set_modified( FILEMODEL( ws ), TRUE );
+		workspace_set_modified( ws, TRUE );
 	}
 
 	return( TRUE );
@@ -1383,7 +1384,7 @@ workspace_merge_column_file( Workspace *ws,
 		MODEL( ICONTAINER( ws )->parent ), filename, filename_user ) ) 
 		return( FALSE );
 
-	filemodel_set_modified( FILEMODEL( ws ), TRUE );
+	workspace_set_modified( ws, TRUE );
 
 	return( TRUE );
 }
@@ -1575,7 +1576,7 @@ workspace_selected_remove( Workspace *ws )
 
 	IM_FREEF( g_slist_free, cs );
 	symbol_recalculate_all();
-	filemodel_set_modified( FILEMODEL( ws ), TRUE );
+	workspace_set_modified( ws, TRUE );
 
 	return( TRUE );
 }
@@ -1842,7 +1843,7 @@ workspace_local_set( Workspace *ws, const char *txt )
 	IM_SETSTR( ws->local_defs, txt );
 	iobject_changed( IOBJECT( ws ) );
 
-	filemodel_set_modified( FILEMODEL( ws ), TRUE );
+	workspace_set_modified( ws, TRUE );
 	attach_input_string( txt );
 	if( !parse_toplevel( ws->local_kit, 0 ) ) 
 		return( FALSE );

@@ -215,7 +215,7 @@ workspacegroupview_page_removed_cb( GtkNotebook *notebook,
 	Workspacegroupview *wsgview = 
 		WORKSPACEGROUPVIEW( VIEW( wview )->parent );
 	Workspacegroup *wsg = WORKSPACEGROUP( VOBJECT( wsgview )->iobject );
-	Mainw *mainw = MAINW( iwindow_get_root( page ) );
+	Mainw *mainw = MAINW( iwindow_get_root( notebook ) );
 
 	workspaceview_set_label( wview, NULL );
 

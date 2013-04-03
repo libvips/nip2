@@ -429,8 +429,8 @@ mainw_refresh_timeout_cb( gpointer user_data )
 	Workspace *ws;
 
 #ifdef DEBUG
-	printf( "mainw_refresh_timeout_cb: %p\n", mainw );
 #endif /*DEBUG*/
+	printf( "mainw_refresh_timeout_cb: %p\n", mainw );
 
 	mainw_status_update( mainw );
 	mainw_free_update( mainw );
@@ -2003,9 +2003,9 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 		mainw->progress_box, FALSE, TRUE, 0 );
 
 	mainw->wsgview = WORKSPACEGROUPVIEW( workspacegroupview_new() );
-	view_link( VIEW( mainw->wsgview ), MODEL( mainw->wsg ), NULL );
 	gtk_box_pack_start( GTK_BOX( vbox ), 
 		GTK_WIDGET( mainw->wsgview ), TRUE, TRUE, 0 );
+	view_link( VIEW( mainw->wsgview ), MODEL( mainw->wsg ), NULL );
 	gtk_widget_show( GTK_WIDGET( mainw->wsgview ) );
 
 	/* Any changes to prefs, refresh (yuk!).
@@ -2013,6 +2013,8 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	mainw->watch_changed_sid = g_signal_connect( main_watchgroup, 
 		"watch_changed",
 		G_CALLBACK( mainw_watch_changed_cb ), mainw );
+
+
 }
 
 static void
@@ -2039,6 +2041,14 @@ mainw_popdown( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys )
 }
 
 static void
+mainw_wsg_changed_cb( Workspacegroup *wsg, Mainw *mainw )
+{
+	printf( "mainw_wsg_changed_cb\n" ); 
+
+	mainw_refresh( mainw );
+}
+
+static void
 mainw_link( Mainw *mainw, Workspacegroup *wsg )
 {
 	mainw->wsg = wsg;
@@ -2053,6 +2063,10 @@ mainw_link( Mainw *mainw, Workspacegroup *wsg )
 	/* Set start state.
 	 */
 	(void) mainw_refresh( mainw );
+
+	mainw->changed_sid = g_signal_connect( mainw->wsg, 
+		"changed", 
+		G_CALLBACK( mainw_wsg_changed_cb ), mainw );
 }
 
 Mainw *

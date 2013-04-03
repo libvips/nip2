@@ -96,7 +96,7 @@ workspacegroupview_child_add( View *parent, View *child )
 	popup_attach( ebox, wsgview->tab_menu, wview );
 
 	gtk_notebook_insert_page( GTK_NOTEBOOK( wsgview->notebook ),
-		GTK_WIDGET( wview ), ebox, ICONTAINER( wview )->pos );
+		GTK_WIDGET( wview ), ebox, ICONTAINER( ws )->pos );
 	gtk_notebook_set_tab_reorderable( GTK_NOTEBOOK( wsgview->notebook ),
 		GTK_WIDGET( wview ), TRUE );
 	gtk_notebook_set_tab_detachable( GTK_NOTEBOOK( wsgview->notebook ),
@@ -181,8 +181,13 @@ workspacegroupview_switch_page_cb( GtkNotebook *notebook,
 	GtkWidget *page, guint page_num, gpointer user_data )
 {
 	Workspaceview *wview = WORKSPACEVIEW( page );
-	Workspacegroupview *wsgview = WORKSPACEGROUPVIEW( user_data );
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+	Workspacegroupview *wsgview = WORKSPACEGROUPVIEW( user_data );
+	Workspacegroup *wsg = WORKSPACEGROUP( VOBJECT( wsgview )->iobject );
+
+	printf( "workspacegroupview_switch_page_cb:\n" ); 
+
+	icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
 
 	if( ws->compat_major ) { 
 		error_top( _( "Compatibility mode." ) );
@@ -225,7 +230,7 @@ workspacegroupview_page_added_cb( GtkNotebook *notebook,
 	Workspaceview *wview = WORKSPACEVIEW( page );
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
 	Workspacegroupview *wsgview = WORKSPACEGROUPVIEW( user_data );
-	Mainw *mainw = MAINW( iwindow_get_root( page ) );
+	Mainw *mainw = MAINW( iwindow_get_root( notebook ) );
 
 	filemodel_set_window_hint( FILEMODEL( ws ), IWINDOW( mainw ) );
 }

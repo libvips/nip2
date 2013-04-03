@@ -640,11 +640,13 @@ icontainer_real_child_current( iContainer *parent, iContainer *child )
 	old_current = parent->current;
 	parent->current = child;
 
-	if( old_current )
-		iobject_changed( IOBJECT( old_current ) );
-	if( child )
-		iobject_changed( IOBJECT( child ) );
-	iobject_changed( IOBJECT( parent ) );
+	if( old_current != child ) {
+		if( old_current )
+			iobject_changed( IOBJECT( old_current ) );
+		if( child )
+			iobject_changed( IOBJECT( child ) );
+		iobject_changed( IOBJECT( parent ) );
+	}
 }
 
 static void

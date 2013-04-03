@@ -1103,6 +1103,17 @@ workspace_save_all( Filemodel *filemodel, const char *filename )
 }
 
 static void
+workspace_set_modified( Filemodel *filemodel, gboolean modified )
+{
+	Workspace *ws = WORKSPACE( filemodel );
+	Workspacegroup *wsg = WORKSPACEGROUP( ICONTAINER( ws )->parent );
+
+	filemodel_set_modified( FILEMODEL( wsg ), TRUE );
+
+	FILEMODEL_CLASS( parent_class )->set_modified( filemodel, modified );
+}
+
+static void
 workspace_class_init( WorkspaceClass *class )
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
@@ -1129,6 +1140,7 @@ workspace_class_init( WorkspaceClass *class )
 	model_class->empty = workspace_empty;
 
 	filemodel_class->save_all = workspace_save_all;
+	filemodel_class->set_modified = workspace_set_modified;
 	filemodel_class->filetype = filesel_type_workspace;
 
 	/* Static init.

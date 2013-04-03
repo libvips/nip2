@@ -496,21 +496,21 @@ main_load_def( const char *filename )
 }
 
 static void *
-main_load_ws( const char *filename )
+main_load_wsg( const char *filename )
 {
-	Workspace *ws;
+	Workspacegroup *wsg;
 
 #ifdef DEBUG
-	printf( "main_load_ws: %s\n", filename );
+	printf( "main_load_wsg: %s\n", filename );
 #endif/*DEBUG*/
 
 	progress_update_loading( 0, im_skip_dir( filename ) );
 
-	if( !(ws = workspacegroup_new_from_file( main_workspaceroot, 
+	if( !(wsg = workspacegroup_new_from_file( main_workspaceroot, 
 		filename, NULL )) ) 
 		iwindow_alert( NULL, GTK_MESSAGE_ERROR );
 	else {
-		filemodel_set_auto_load( FILEMODEL( ws ) );
+		filemodel_set_auto_load( FILEMODEL( wsg ) );
 	}
 
 	return( NULL );
@@ -599,7 +599,7 @@ main_load_startup( void )
 	printf( "ws init\n" );
 #endif/*DEBUG*/
 	(void) path_map( PATH_START, "*.ws", 
-		(path_map_fn) main_load_ws, NULL );
+		(path_map_fn) main_load_wsg, NULL );
 
 	mainw_recent_thaw();
 }

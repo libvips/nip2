@@ -653,211 +653,6 @@ workspace_clone_selected( Workspace *ws )
 	return( TRUE );
 }
 
-/* Keep the last WS_RETAIN workspaces as ipfl*.ws files.
- */
-#define WS_RETAIN (10)
-
-/* Array of names of workspace files we are keeping.
- */
-static char *retain_files[WS_RETAIN] = { NULL };
-
-/* The next one we allocate.
- */
-static int retain_next = 0;
-
-/* Save the workspace to one of our temp files.
- */
-static gboolean
-workspace_checkmark_timeout( Workspace *ws )
-{
-	ws->auto_save_timeout = 0;
-
-	if( !AUTO_WS_SAVE )
-		return( FALSE );
-
-	/* Don't backup auto loaded workspace (eg. preferences). These are
-	 * system things and don't need it.
-	 */
-	if( FILEMODEL( ws )->auto_load )
-		return( FALSE );
-
-	/* Do we have a name for this retain file?
-	 */
-	if( !retain_files[retain_next] ) {
-		char filename[FILENAME_MAX];
-
-		/* No name yet - make one up.
-		 */
-		if( !temp_name( filename, "ws" ) )
-			return( FALSE );
-		retain_files[retain_next] = im_strdup( NULL, filename );
-	}
- 
-	if( !filemodel_save_all( FILEMODEL( ws ), retain_files[retain_next] ) )
-		return( FALSE );
-
-	retain_next = (retain_next + 1) % WS_RETAIN;
-
-	return( FALSE );
-}
-
-/* Save the workspace to one of our temp files. Don't save directly (pretty
- * slow), instead set a timeout and save when we're quiet for >1s.
- */
-static void
-workspace_checkmark( Workspace *ws )
-{
-	if( !AUTO_WS_SAVE )
-		return;
-	if( FILEMODEL( ws )->auto_load )
-		return;
-
-	IM_FREEF( g_source_remove, ws->auto_save_timeout );
-	ws->auto_save_timeout = g_timeout_add( 1000, 
-		(GSourceFunc) workspace_checkmark_timeout, ws );
-}
-
-/* On safe exit, remove all ws checkmarks.
- */
-void
-workspace_retain_clean( void )
-{
-	int i;
-
-	for( i = 0; i < WS_RETAIN; i++ ) {
-		if( retain_files[i] ) {
-			unlinkf( "%s", retain_files[i] );
-			IM_FREE( retain_files[i] );
-		}
-	}
-}
-
-/* Track best-so-far file date here during search.
- */
-static time_t date_sofar;
-
-/* This file any better than the previous best candidate? Subfn of below.
- */
-static char *
-workspace_test_file( char *name, char *name_sofar )
-{
-	char buf[FILENAME_MAX];
-	struct stat st;
-	int i;
-
-	im_strncpy( buf, name, FILENAME_MAX );
-	path_expand( buf );
-	for( i = 0; i < WS_RETAIN; i++ )
-		if( retain_files[i] && 
-			strcmp( buf, retain_files[i] ) == 0 )
-			return( NULL );
-	if( stat( buf, &st ) == -1 )
-		return( NULL );
-#ifdef HAVE_GETEUID
-	if( st.st_uid != geteuid() )
-		return( NULL );
-#endif /*HAVE_GETEUID*/
-	if( st.st_size == 0 )
-		return( NULL );
-	if( date_sofar > 0 && st.st_mtime < date_sofar )
-		return( NULL );
-	
-	strcpy( name_sofar, name );
-	date_sofar = st.st_mtime;
-
-	return( NULL );
-}
-
-/* Load a workspace, called from a yesno dialog.
- */
-static void
-workspace_auto_recover_load( iWindow *iwnd, 
-	void *client, iWindowNotifyFn nfn, void *sys )
-{
-	char *filename = (char *) client;
-	Mainw *mainw = MAINW( iwindow_get_root_noparent( GTK_WIDGET( iwnd ) ) );
-	Workspaceroot *wsr = mainw->wsg->wsr; 
-
-	Workspacegroup *wsg;
-
-	/* Load ws file.
-	 */
-        progress_begin();
-	wsg = mainw_open_workspace( wsr, filename );
-	progress_end();
-
-	if( wsg ) {
-		/* The filename will be something like
-		 * "~/.nip2-7.9.6/tmp/untitled-nip2-0-3904875.ws", very
-		 * unhelpful.
-		 */
-		IM_FREE( FILEMODEL( wsg )->filename );
-		iobject_changed( IOBJECT( wsg ) );
-
-		nfn( sys, IWINDOW_YES );
-	}
-	else
-		nfn( sys, IWINDOW_ERROR );
-}
-
-/* Do an auto-recover ... search for and load the most recent "ipfl*.ws" file 
- * in the tmp area owned by us, with a size > 0, that's not in our
- * retain_files[] set.
- */
-void
-workspace_auto_recover( Mainw *mainw )
-{
-	char *p;
-	char *name;
-	char buf[FILENAME_MAX];
-	char buf2[FILENAME_MAX];
-
-	/* Find the dir we are saving temp files to.
-	 */
-	if( !temp_name( buf, "ws" ) ) {
-		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
-		return;
-	}
-
-	if( (p = strrchr( buf, G_DIR_SEPARATOR )) )
-		*p = '\0';
-
-	date_sofar = -1;
-	(void) path_map_dir( buf, "*.ws", 
-		(path_map_fn) workspace_test_file, buf2 );
-	if( date_sofar == -1 ) {
-		if( !AUTO_WS_SAVE ) {
-			error_top( _( "No backup workspaces found." ) );
-			error_sub( "%s", 
-				_( "You need to enable \"Auto workspace "
-				"save\" in Preferences "
-				"before automatic recovery works." ) );
-			iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
-		}
-		else {
-			error_top( _( "No backup workspaces found." ) );
-			error_sub( _( "No suitable workspace save files found "
-				"in \"%s\"" ), buf );
-			iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
-		}
-
-		return;
-	}
-
-	/* Tricksy ... free str with notify callack from yesno.
-	 */
-	name = im_strdupn( buf2 );
-
-	box_yesno( GTK_WIDGET( mainw ), 
-		workspace_auto_recover_load, iwindow_true_cb, name, 
-		(iWindowNotifyFn) im_free, name,
-		GTK_STOCK_OPEN, 
-		_( "Open workspace backup?" ),
-		_( "Found workspace \"%s\", dated %s. "
-		"Do you want to recover this workspace?" ),
-		name, ctime( &date_sofar ) );
-}
-
 static void
 workspace_dispose( GObject *gobject )
 {
@@ -872,7 +667,6 @@ workspace_dispose( GObject *gobject )
 
 	ws = WORKSPACE( gobject );
 
-	IM_FREEF( g_source_remove, ws->auto_save_timeout );
 	UNREF( ws->kitg );
 	UNREF( ws->local_kitg );
 	IDESTROY( ws->sym );
@@ -1094,7 +888,7 @@ workspace_empty( Model *model )
 	MODEL_CLASS( parent_class )->empty( model );
 }
 
-static void
+void
 workspace_rename_row_node( ModelLoadState *state, Column *col, xmlNode *xnode )
 {
 	char name[MAX_STRSIZE];
@@ -1112,7 +906,7 @@ workspace_rename_row_node( ModelLoadState *state, Column *col, xmlNode *xnode )
 
 /* Rename column if there's one of that name in workspace. 
  */
-static void
+void
 workspace_rename_column_node( Workspace *ws, 
 	ModelLoadState *state, xmlNode *xnode, xmlNode *columns )
 {
@@ -1250,7 +1044,7 @@ workspace_have_compat( int major, int minor, int *best_major, int *best_minor )
 	return( 1 );
 }
 
-static gboolean
+gboolean
 workspace_load_compat( Workspace *ws, int major, int minor )
 {
 	char pathname[FILENAME_MAX];
@@ -1260,11 +1054,6 @@ workspace_load_compat( Workspace *ws, int major, int minor )
 
 	if( !workspace_have_compat( major, minor, &best_major, &best_minor ) )
 		return( TRUE );
-
-	/* Do we need broken region handling?
-	 */
-	if( major == 7 && minor == 8 ) 
-		ws->compat_78 = TRUE;
 
 	/* Make a private toolkitgroup local to this workspace to hold the
 	 * compatibility defs we are planning to load.
@@ -1289,158 +1078,6 @@ workspace_load_compat( Workspace *ws, int major, int minor )
 	ws->compat_minor = best_minor;
 
 	return( TRUE );
-}
-
-static gboolean
-workspace_top_load( Filemodel *filemodel,
-	ModelLoadState *state, Model *parent, xmlNode *xnode )
-{
-	Workspace *ws = WORKSPACE( filemodel );
-	Workspacegroup *wsg = WORKSPACEGROUP( parent );
-	Workspaceroot *wsr = wsg->wsr;
-	Column *current_col;
-	xmlNode *i, *j, *k;
-	char name[FILENAME_MAX];
-	int best_major;
-	int best_minor;
-
-#ifdef DEBUG
-	printf( "workspace_top_load: from %s\n", state->filename );
-#endif /*DEBUG*/
-
-	/* The top node should be the saved workspace. Get the filename this
-	 * workspace was saved as so we can work out how to rewrite embedded
-	 * filenames.
-	 */
-	if( strcasecmp( (char *) xnode->name, "Workspace" ) == 0 &&
-		get_sprop( xnode, "filename", name, FILENAME_MAX ) ) {
-		char *new_dir;
-
-		/* The old filename could be non-native, so we must rewrite 
-		 * to native form first so g_path_get_dirname() can work.
-		 */
-		path_compact( name );
-
-		state->old_dir = g_path_get_dirname( name ); 
-		new_dir = g_path_get_dirname( state->filename_user );
-
-		path_rewrite_add( state->old_dir, new_dir, FALSE );
-
-		g_free( new_dir );
-	}
-
-	/* See commened ot ode in COLUMN load below.
-	 */
-	printf( "workspace_top_load: compat check on merge is broken!\n" );
-
-	switch( ws->load_type ) {
-	case WORKSPACE_LOAD_TOP:
-		/* Easy ... ws is a blank Workspace we are loading into. No
-		 * renaming needed, except for the ws.
-		 */
-
-		/* Set the workspace name from the filename, ignoring the name
-		 * saved in the file.
-		 */
-		name_from_filename( state->filename_user, name );
-		while( compile_lookup( wsr->sym->expr->compile, name ) )
-			increment_name( name );
-		workspace_link( ws, wsg, name );
-
-		filemodel->major = state->major;
-		filemodel->minor = state->minor;
-		filemodel->micro = state->micro;
-		filemodel->versioned = TRUE;
-
-		/* If necessary, load up compatibility definitions.
-		 */
-		if( !workspace_load_compat( ws, 
-			filemodel->major, filemodel->minor ) ) 
-			return( FALSE );
-
-		if( model_load( MODEL( ws ), state, parent, xnode ) )
-			return( FALSE );
-
-		/* The model_load() will set the name from the name saved in
-		 * the XML. We want to override that with the name from the
-		 * filename.
-		 */
-		iobject_set( IOBJECT( ws ), name, NULL );
-
-		break;
-
-	case WORKSPACE_LOAD_COLUMNS:
-		/* Load at column level ... rename columns which clash with 
-		 * columns in the current workspace. Also look out for clashes
-		 * with columns we will load.
-		 */
-		for( i = xnode->children; i; i = i->next ) 
-			workspace_rename_column_node( ws, 
-				state, i, xnode->children );
-
-		/* Load those columns.
-		 */
-		for( i = xnode->children; i; i = i->next ) 
-			if( !model_new_xml( state, MODEL( ws ), i ) )
-				return( FALSE );
-
-		/* Is there a version mismatch? Issue a warning.
-		if( workspace_have_compat( state->major, state->minor, 
-			&best_major, &best_minor ) &&
-			(best_major != filemodel->major ||
-			best_minor != filemodel->minor) ) {
-			error_top( _( "Version mismatch." ) );
-			error_sub( _( "File \"%s\" was saved from %s-%d.%d.%d. "
-				"You may see compatibility problems." ),
-				state->filename, PACKAGE,
-				state->major, state->minor, state->micro );
-			iwindow_alert( GTK_WIDGET( ws->iwnd ), 
-				GTK_MESSAGE_INFO );
-		}
-		 */
-
-		break;
-
-	case WORKSPACE_LOAD_ROWS:
-		current_col = workspace_column_pick( ws );
-
-		/* Rename all rows into current column ... loop over column,
-		 * subcolumns, rows.
-		 */
-		for( i = xnode->children; i; i = i->next ) 
-			for( j = i->children; j; j = j->next ) 
-				for( k = j->children; k; k = k->next ) 
-					workspace_rename_row_node( state, 
-						current_col, k );
-
-		/* And load rows.
-		 */
-		for( i = xnode->children; i; i = i->next ) 
-			for( j = i->children; j; j = j->next ) 
-				for( k = j->children; k; k = k->next ) 
-					if( !model_new_xml( state, 
-						MODEL( current_col->scol ), 
-						k ) )
-						return( FALSE );
-
-		break;
-
-	default:
-		g_assert( FALSE );
-	}
-
-	return( FILEMODEL_CLASS( parent_class )->top_load( filemodel, 
-		state, parent, xnode ) );
-}
-
-static void 
-workspace_set_modified( Filemodel *filemodel, gboolean modified )
-{
-	Workspace *ws = WORKSPACE( filemodel );
-
-	workspace_checkmark( ws );
-
-	FILEMODEL_CLASS( parent_class )->set_modified( filemodel, modified );
 }
 
 static gboolean
@@ -1491,8 +1128,6 @@ workspace_class_init( WorkspaceClass *class )
 	model_class->save = workspace_save;
 	model_class->empty = workspace_empty;
 
-	filemodel_class->top_load = workspace_top_load;
-	filemodel_class->set_modified = workspace_set_modified;
 	filemodel_class->save_all = workspace_save_all;
 	filemodel_class->filetype = filesel_type_workspace;
 
@@ -1518,7 +1153,6 @@ workspace_init( Workspace *ws )
 	ws->errors = NULL;
         ws->mode = WORKSPACE_MODE_REGULAR;
 
-	ws->compat_78 = FALSE;
 	ws->compat_major = 0;
 	ws->compat_minor = 0;
 
@@ -1539,8 +1173,6 @@ workspace_init( Workspace *ws )
 	ws->lpane_position = WORKSPACE_RPANE_POSITION;
 	ws->rpane_open = WORKSPACE_LPANE_OPEN;
 	ws->rpane_position = WORKSPACE_LPANE_POSITION;
-
-	ws->auto_save_timeout = 0;
 
 	ws->status = NULL;
 
@@ -1590,8 +1222,8 @@ workspace_new( Workspacegroup *wsg, const char *name )
 	Workspace *ws;
 
 #ifdef DEBUG
-	printf( "workspace_new: %s\n", name );
 #endif /*DEBUG*/
+	printf( "workspace_new: %s\n", name );
 
 	if( compile_lookup( wsr->sym->expr->compile, name ) ) {
 		error_top( _( "Name clash." ) );

@@ -1110,12 +1110,72 @@ mainw_workspace_merge_action_cb( GtkAction *action, Mainw *mainw )
 	mainw_workspace_merge( mainw );
 }
 
+/* Load a workspace, called from a yesno dialog.
+ */
+static void
+mainw_auto_recover_cb( iWindow *iwnd, 
+	void *client, iWindowNotifyFn nfn, void *sys )
+{
+	Mainw *mainw = MAINW( iwnd );
+	char *filename = (char *) client;
+	Workspaceroot *wsr = mainw->wsg->wsr; 
+
+	Workspacegroup *wsg;
+
+        progress_begin();
+	wsg = workspacegroup_new_from_file( wsr, filename, NULL );
+	progress_end();
+
+	if( wsg ) {
+		/* The filename will be something like
+		 * "~/.nip2-7.9.6/tmp/untitled-nip2-0-3904875.ws", very
+		 * unhelpful.
+		 */
+		IM_FREE( FILEMODEL( wsg )->filename );
+		iobject_changed( IOBJECT( wsg ) );
+
+		nfn( sys, IWINDOW_YES );
+	}
+	else
+		nfn( sys, IWINDOW_ERROR );
+}
+
 /* Auto recover.
  */
 static void
 mainw_recover_action_cb( GtkAction *action, Mainw *mainw )
 {
-	workspace_auto_recover( mainw );
+	char *filename;
+	
+	if( !(filename = workspacegroup_autosave_recover()) ) { 
+		if( !AUTO_WS_SAVE ) {
+			error_top( _( "No backup workspaces found." ) );
+			error_sub( "%s", 
+				_( "You need to enable \"Auto workspace "
+				"save\" in Preferences "
+				"before automatic recovery works." ) );
+		}
+		else {
+			error_top( _( "No backup workspaces found." ) );
+			error_sub( _( "No suitable workspace save files found "
+				"in \"%s\"" ), PATH_TMP );
+		}
+
+		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
+		return;
+	}
+
+	/* Tricksy ... free str with notify callack from yesno.
+	 */
+
+	box_yesno( GTK_WIDGET( mainw ), 
+		mainw_auto_recover_cb, iwindow_true_cb, filename, 
+		(iWindowNotifyFn) im_free, filename,
+		GTK_STOCK_OPEN, 
+		_( "Open workspace backup?" ),
+		_( "Found workspace \"%s\". "
+		"Do you want to recover this workspace?" ),
+		filename ); 
 }
 
 /* Callback from make new column.

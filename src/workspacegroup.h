@@ -70,6 +70,8 @@ struct _Workspacegroup {
 	WorkspacegroupLoadType load_type;
 	WorkspacegroupSaveType save_type;
 
+	guint autosave_timeout;
+
 };
 
 typedef struct _WorkspacegroupClass {
@@ -82,11 +84,14 @@ typedef struct _WorkspacegroupClass {
 Workspace *workspacegroup_map( Workspacegroup *wsg, 
 	workspace_map_fn fn, void *a, void *b );
 
+char *workspacegroup_autosave_recover( void );
+void workspacegroup_autosave_clean( void );
+
 GType workspacegroup_get_type( void );
 
 gboolean workspacegroup_is_empty( Workspacegroup *wsg );
 
-Workspacegroup *workspacegroup_new( Workspaceroot *wsr, const char *name );
+Workspacegroup *workspacegroup_new( Workspaceroot *wsr );
 Workspacegroup *workspacegroup_new_blank( Workspaceroot *wsr, 
 	const char *name );
 Workspacegroup *workspacegroup_new_filename( Workspaceroot *wsr, 

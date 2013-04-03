@@ -238,6 +238,8 @@ gboolean existsf( const char *name, ... )
 	__attribute__((format(printf, 1, 2)));
 gboolean isdir( const char *filename, ... )
 	__attribute__((format(printf, 1, 2)));
+time_t mtime( const char *filename, ... )
+	__attribute__((format(printf, 1, 2)));
 gboolean mkdirf( const char *name, ... )
 	__attribute__((format(printf, 1, 2)));
 int systemf( const char *fmt, ... )

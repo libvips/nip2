@@ -1056,28 +1056,9 @@ imagepresent_left_release( Imagepresent *ip, GdkEvent *ev, int x, int y )
 			VipsBuf buf = VIPS_BUF_STATIC( txt );
 			Symbol *sym;
 
-			/* In compatibility mode, we need to un-offset, since
-			 * mark/etc. will re-offset.
-			 */
-			if( row->ws->compat_78 ) {
-				Conversion *conv = ip->id->conv;
-				IMAGE *im = imageinfo_get( FALSE, conv->ii );
-
-				ip->floating.left -= im->Xoffset;
-				ip->floating.top -= im->Yoffset;
-			}
-
 			switch( ip->regionview->type ) {
 			case REGIONVIEW_MARK:
-				/* How annoying, this used to be called
-				 * "Point".
-				 */
-				if( row->ws->compat_78 )
-					vips_buf_appends( &buf, "Point " );
-				else
-					vips_buf_appendf( &buf, "%s ", 
-						CLASS_MARK );
-
+				vips_buf_appendf( &buf, "%s ", CLASS_MARK );
 				row_qualified_name( row, &buf );
 				vips_buf_appendd( &buf, ip->floating.left );
 				vips_buf_appendd( &buf, ip->floating.top );

@@ -308,7 +308,7 @@ main_quit( void )
 
 	/* Remove any ws retain files.
 	 */
-	workspace_retain_clean();
+	workspacegroup_autosave_clean();
 
 	/* Junk all symbols. This may remove a bunch of intermediate images
 	 * too.
@@ -501,8 +501,8 @@ main_load_wsg( const char *filename )
 	Workspacegroup *wsg;
 
 #ifdef DEBUG
-	printf( "main_load_wsg: %s\n", filename );
 #endif/*DEBUG*/
+	printf( "main_load_wsg: %s\n", filename );
 
 	progress_update_loading( 0, im_skip_dir( filename ) );
 
@@ -1418,12 +1418,16 @@ main( int argc, char *argv[] )
 	Symbol *wsr_sym = main_workspaceroot->sym;
 	Symbol *ws_sym = SYMBOL( icontainer_child_lookup( 
 		ICONTAINER( wsr_sym->expr->compile ), "Preferences" ) );
-	Workspace *ws = ws_sym->ws;
 
-	if( ws->compat_major || 
-		ws->compat_minor ||
-		ws->compat_78 )
-		printf( "Preferences loaded in compat mode!\n" );
+	if( !ws_sym )
+		printf( "No prefs workspace!\n" ); 
+	else {
+		Workspace *ws = ws_sym->ws;
+
+		if( ws->compat_major || 
+			ws->compat_minor )
+			printf( "Preferences loaded in compat mode!\n" );
+	}
 }
 #endif /*DEBUG_LEAK*/
 

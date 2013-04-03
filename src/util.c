@@ -1818,6 +1818,38 @@ isdir( const char *filename, ... )
 	return( res );
 }
 
+
+static void *
+mtime_sub( const char *filename, time_t *time )
+{
+	struct stat st;
+
+	if( stat( filename, &st ) == -1 )
+		return( NULL );
+#ifdef HAVE_GETEUID
+	if( st.st_uid != geteuid() )
+		return( NULL );
+#endif /*HAVE_GETEUID*/
+	*time = st.st_mtime;
+
+	return( NULL );
+}
+
+time_t
+mtime( const char *filename, ... )
+{
+	va_list ap;
+	time_t time;
+
+	time = 0;
+        va_start( ap, filename );
+        (void) callv_string_filenameva( 
+		(callv_string_fn) mtime_sub, filename, ap, &time, NULL, NULL );
+        va_end( ap );
+
+	return( time );
+}
+
 gboolean
 mkdirf( const char *name, ... )
 {

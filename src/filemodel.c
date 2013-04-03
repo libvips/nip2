@@ -468,10 +468,7 @@ static gboolean
 filemodel_load_all_xml( Filemodel *filemodel, 
 	Model *parent, ModelLoadState *state )
 {
-	const char *tname = G_OBJECT_TYPE_NAME( filemodel );
-
 	xmlNode *xnode;
-	xmlNode *xstart;
 
 	/* Check the root element for type/version compatibility.
 	 */
@@ -495,21 +492,11 @@ filemodel_load_all_xml( Filemodel *filemodel,
 	}
 
 #ifdef DEBUG
+#endif /*DEBUG*/
 	printf( "filemodel_load_all_xml: major = %d, minor = %d, micro = %d\n",
 		state->major, state->minor, state->micro );
-#endif /*DEBUG*/
 
-	if( !(xstart = get_node( xnode, tname )) ) {
-		error_top( _( "Load failed." ) );
-		error_sub( _( "Can't load XML file \"%s\", "
-			"the file does not contain a %s." ), 
-			state->filename, tname );
-		return( FALSE );
-	}
-
-	/* Set the global loadstate so the lexer can see it.
-	 */
-	if( filemodel_top_load( filemodel, state, parent, xstart ) ) 
+	if( filemodel_top_load( filemodel, state, parent, xnode ) ) 
 		return( FALSE );
 
 	return( TRUE );

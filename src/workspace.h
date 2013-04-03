@@ -83,11 +83,6 @@ struct _Workspace {
 	GSList *errors;		/* Rows with errors */
         WorkspaceMode mode;	/* Display mode */
 
-	/* Compatibility. 7.8.x used different names for Marks and had strange
-	 * position behaviour.
-	 */
-	gboolean compat_78;	/* In 7.8.x compatibility mode */
-
 	/* Some versions (7.10 etc.) need special compat toolkits. 0 here for
 	 * no compat toolkits loaded.
 	 */
@@ -111,8 +106,6 @@ struct _Workspace {
 	int lpane_position;	
 	gboolean rpane_open;
 	int rpane_position;
-
-	guint auto_save_timeout;/* Timeout for next autosave */
 
 	char *status;		/* Status message */
 
@@ -175,8 +168,12 @@ Symbol *workspace_load_file( Workspace *ws, const char *filename );
 gboolean workspace_selected_save( Workspace *ws, const char *filename );
 gboolean workspace_clone_selected( Workspace *ws );
 
-void workspace_retain_clean( void );
-void workspace_auto_recover( Mainw *mainw );
+void workspace_rename_column_node( Workspace *ws, 
+	ModelLoadState *state, xmlNode *xnode, xmlNode *columns );
+void workspace_rename_row_node( ModelLoadState *state, 
+	Column *col, xmlNode *xnode );
+
+gboolean workspace_load_compat( Workspace *ws, int major, int minor );
 
 GType workspace_get_type( void );
 Workspace *workspace_new( Workspacegroup *wsg, const char *name );

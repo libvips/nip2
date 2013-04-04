@@ -1489,10 +1489,12 @@ main( int argc, char *argv[] )
 	/* Are we running interactively? Start the main window and loop.
 	 */
 	if( !main_option_batch ) {
-		Mainw *mainw;
+		if( wsg ) { 
+			Mainw *mainw;
 
-		mainw = mainw_new( wsg );
-		gtk_widget_show( GTK_WIDGET( mainw ) );
+			mainw = mainw_new( wsg );
+			gtk_widget_show( GTK_WIDGET( mainw ) );
+		}
 
 		/* Process a few events ... we want the window to be mapped so
 		 * that log/welcome/clean? messages we pop appear in the right

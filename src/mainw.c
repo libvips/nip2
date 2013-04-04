@@ -2014,8 +2014,6 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	mainw->watch_changed_sid = g_signal_connect( main_watchgroup, 
 		"watch_changed",
 		G_CALLBACK( mainw_watch_changed_cb ), mainw );
-
-
 }
 
 static void

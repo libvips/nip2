@@ -280,6 +280,8 @@ filemodel_save_all_xml( Filemodel *filemodel, const char *filename )
 	xmlDoc *xdoc;
 	char namespace[256];
 
+	printf( "filemodel_save_all_xml: %s\n", filename );
+
 	if( !(xdoc = xmlNewDoc( (xmlChar *) "1.0" )) ) {
 		error_top( _( "XML library error." ) );
 		error_sub( _( "model_save_filename: xmlNewDoc() failed" ) );

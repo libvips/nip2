@@ -862,6 +862,7 @@ static xmlNode *
 workspace_save( Model *model, xmlNode *xnode )
 {
 	Workspace *ws = WORKSPACE( model );
+	Workspacegroup *wsg = WORKSPACEGROUP( ICONTAINER( ws )->parent );
 	xmlNode *xthis;
 
 	if( !(xthis = MODEL_CLASS( parent_class )->save( model, xnode )) )
@@ -883,6 +884,12 @@ workspace_save( Model *model, xmlNode *xnode )
 		!set_sprop( xthis, "local_defs", ws->local_defs ) ||
 		!set_sprop( xthis, "name", IOBJECT( ws )->name ) ||
 		!set_sprop( xthis, "caption", IOBJECT( ws )->caption ) ) 
+		return( NULL );
+
+	/* We have to save our workspacegroup's filename here for compt with
+	 * older nip2.
+	 */
+	if( !set_sprop( xthis, "filename", FILEMODEL( wsg )->filename ) )
 		return( NULL );
 
 	return( xthis );
@@ -1095,28 +1102,6 @@ workspace_load_compat( Workspace *ws, int major, int minor )
 	return( TRUE );
 }
 
-static gboolean
-workspace_save_all( Filemodel *filemodel, const char *filename )
-{
-	gboolean result;
-
-#ifdef DEBUG
-	printf( "workspace_save_all: %s to %s\n",
-		NN( IOBJECT( filemodel )->name ), filename );
-#endif /*DEBUG*/
-
-	if( (result = FILEMODEL_CLASS( parent_class )->
-		save_all( filemodel, filename )) )
-		/* This will add save-as files to recent too. Don't note
-		 * auto_load on recent, since it won't have been loaded by the
-		 * user.
-		 */
-		if( !filemodel->auto_load )
-			mainw_recent_add( &mainw_recent_workspace, filename );
-
-	return( result );
-}
-
 static void
 workspace_class_init( WorkspaceClass *class )
 {
@@ -1142,9 +1127,6 @@ workspace_class_init( WorkspaceClass *class )
 	model_class->load = workspace_load;
 	model_class->save = workspace_save;
 	model_class->empty = workspace_empty;
-
-	filemodel_class->save_all = workspace_save_all;
-	filemodel_class->filetype = filesel_type_workspace;
 
 	/* Static init.
 	 */
@@ -1246,8 +1228,8 @@ workspace_new( Workspacegroup *wsg, const char *name )
 	}
 
 	ws = WORKSPACE( g_object_new( TYPE_WORKSPACE, NULL ) );
-	icontainer_child_add( ICONTAINER( wsg ), ICONTAINER( ws ), -1 );
 	workspace_link( ws, wsg, name );
+	icontainer_child_add( ICONTAINER( wsg ), ICONTAINER( ws ), -1 );
 	(void) workspace_column_pick( ws );
 
 	return( ws );

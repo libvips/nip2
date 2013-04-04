@@ -1,12 +1,14 @@
-- remove compat_78
+- load a ws, get an empty column left over from load
+
+- start nip2, make a workspace, save, filename  member of workspace is not
+  saved since it's NULL at the time of saving
+
+- fix naming: for the user, a mainw displays a workspace and a workspace has
+  tabs
+
+- save selected, various duplicate actions need fixing
 
 - major / minor / micro need to be in workspace, as well as root
-
-- at root, do 
-
-	for( i = xnode->children; i; i = i->next ) 
-
-  and top-load all the workspaces into the same wsg
 
 - workspacegroup_top_load() row and column mode are broken
 
@@ -27,7 +29,11 @@
 - make Workspace into a plain model once all the top-level load/save stuff 
   is moved out
 
+- double-click on tab gutter to make new tab, right-buttn menu with new tab
+  item
 
+- hide tabs if only one tab in window, we'd need to allow tab drop anywhere in
+  window for that
 
 - look at column, make it use icontainer_child_current() and model_front()
 

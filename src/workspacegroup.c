@@ -86,6 +86,33 @@ workspacegroup_dispose( GObject *gobject )
 	G_OBJECT_CLASS( parent_class )->dispose( gobject );
 }
 
+static View *
+workspacegroup_view_new( Model *model, View *parent )
+{
+	return( workspacegroupview_new() );
+}
+
+static xmlNode *
+workspacegroup_save( Model *model, xmlNode *xnode )
+{
+	/* We normally chain up like this:
+	 *
+	 * 	xthis = MODEL_CLASS( parent_class )->save( model, xnode )
+	 *
+	 * but that will make a workspacegroup holding our workspaces. Instead 
+	 * we want to save all our workspaces directly to xnode with nothing 
+	 * about us in there.
+	 *
+	 * See model_real_save().
+	 */
+
+	if( icontainer_map( ICONTAINER( model ), 
+		(icontainer_map_fn) model_save, xnode, NULL ) )
+		return( NULL );
+
+	return( xnode );
+}
+
 static gboolean
 workspacegroup_top_load( Filemodel *filemodel,
 	ModelLoadState *state, Model *parent, xmlNode *xroot )
@@ -108,24 +135,22 @@ workspacegroup_top_load( Filemodel *filemodel,
 	/* The top node should be the first workspace. Get the filename this
 	 * workspace was saved as so we can work out how to rewrite embedded
 	 * filenames.
+	 *
+	 * The filename field can be missing. 
 	 */
-	if( !(xnode = get_node( xroot, "Workspace" )) ||
-		!get_sprop( xnode, "filename", name, FILENAME_MAX ) ) {
-		error_top( _( "XML load error." ) );
-		error_sub( _( "No Workspace node." ) ); 
-		return( FALSE ); 
+	if( (xnode = get_node( xroot, "Workspace" )) &&
+		get_sprop( xnode, "filename", name, FILENAME_MAX ) ) {
+		/* The old filename could be non-native, so we must rewrite 
+		 * to native form first so g_path_get_dirname() can work.
+		 */
+		path_compact( name );
+
+		state->old_dir = g_path_get_dirname( name ); 
+
+		new_dir = g_path_get_dirname( state->filename_user );
+		path_rewrite_add( state->old_dir, new_dir, FALSE );
+		g_free( new_dir );
 	}
-
-	/* The old filename could be non-native, so we must rewrite 
-	 * to native form first so g_path_get_dirname() can work.
-	 */
-	path_compact( name );
-
-	state->old_dir = g_path_get_dirname( name ); 
-
-	new_dir = g_path_get_dirname( state->filename_user );
-	path_rewrite_add( state->old_dir, new_dir, FALSE );
-	g_free( new_dir );
 
 	/* See commented out ode in COLUMN load below.
 	 */
@@ -386,10 +411,33 @@ workspacegroup_set_modified( Filemodel *filemodel, gboolean modified )
 	FILEMODEL_CLASS( parent_class )->set_modified( filemodel, modified );
 }
 
+static gboolean
+workspacegroup_save_all( Filemodel *filemodel, const char *filename )
+{
+	gboolean result;
+
+#ifdef DEBUG
+	printf( "workspacegroup_save_all: %s to %s\n",
+		NN( IOBJECT( filemodel )->name ), filename );
+#endif /*DEBUG*/
+
+	if( (result = FILEMODEL_CLASS( parent_class )->
+		save_all( filemodel, filename )) )
+		/* This will add save-as files to recent too. Don't note
+		 * auto_load on recent, since it won't have been loaded by the
+		 * user.
+		 */
+		if( !filemodel->auto_load )
+			mainw_recent_add( &mainw_recent_workspace, filename );
+
+	return( result );
+}
+
 static void
 workspacegroup_class_init( WorkspacegroupClass *class )
 {
 	GObjectClass *gobject_class = (GObjectClass *) class;
+	ModelClass *model_class = (ModelClass *) class;
 	FilemodelClass *filemodel_class = (FilemodelClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
@@ -401,8 +449,14 @@ workspacegroup_class_init( WorkspacegroupClass *class )
 	 */
 	gobject_class->dispose = workspacegroup_dispose;
 
+	/* ->load() is done by workspace_top_load().
+	 */
+	model_class->view_new = workspacegroup_view_new;
+	model_class->save = workspacegroup_save;
+
 	filemodel_class->filetype = filesel_type_workspace;
 	filemodel_class->top_load = workspacegroup_top_load;
+	filemodel_class->save_all = workspacegroup_save_all;
 	filemodel_class->set_modified = workspacegroup_set_modified;
 }
 

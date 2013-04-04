@@ -1230,13 +1230,10 @@ workspace_new( Workspacegroup *wsg, const char *name )
 	ws = WORKSPACE( g_object_new( TYPE_WORKSPACE, NULL ) );
 	workspace_link( ws, wsg, name );
 	icontainer_child_add( ICONTAINER( wsg ), ICONTAINER( ws ), -1 );
-	(void) workspace_column_pick( ws );
 
 	return( ws );
 }
 
-/* Load into an empty workspace.
- */
 static gboolean
 workspace_load_empty( Workspace *ws, Workspaceroot *wsr, 
 	const char *filename, const char *filename_user )
@@ -1256,56 +1253,6 @@ workspace_load_empty( Workspace *ws, Workspaceroot *wsr,
 	return( TRUE );
 }
 
-/* New workspace from a file.
- */
-Workspace *
-workspace_new_from_file( Workspaceroot *wsr, 
-	const char *filename, const char *filename_user )
-{
-	Workspace *ws;
-
-#ifdef DEBUG
-	printf( "workspace_new_from_file: %s\n", filename );
-#endif /*DEBUG*/
-
-	ws = WORKSPACE( g_object_new( TYPE_WORKSPACE, NULL ) );
-	if( !workspace_load_empty( ws, wsr, filename, filename_user ) ) {
-		g_object_unref( G_OBJECT( ws ) );
-		return( NULL );
-	}
-
-	return( ws );
-}
-
-/* New workspace from a file.
- */
-Workspace *
-workspace_new_from_openfile( Workspaceroot *wsr, iOpenFile *of )
-{
-	Workspace *ws;
-
-#ifdef DEBUG
-	printf( "workspace_new_from_openfile: %s\n", of->fname );
-#endif /*DEBUG*/
-
-	ws = WORKSPACE( g_object_new( TYPE_WORKSPACE, NULL ) );
-	ws->load_type = WORKSPACE_LOAD_TOP;
-	if( !filemodel_load_all_openfile( FILEMODEL( ws ), 
-		MODEL( wsr ), of ) ) {
-		g_object_unref( G_OBJECT( ws ) );
-		return( NULL );
-	}
-
-	workspace_set_modified( ws, FALSE );
-	filemodel_set_filename( FILEMODEL( ws ), of->fname );
-
-#ifdef DEBUG
-	printf( "(set name = %s)\n", IOBJECT( ws )->name );
-#endif /*DEBUG*/
-
-	return( ws );
-}
-
 /* Make the blank workspace we present the user with (in the absence of
  * anything else).
  */
@@ -1317,7 +1264,11 @@ workspace_new_blank( Workspacegroup *wsg, const char *name )
 	if( !(ws = workspace_new( wsg, name )) )
 		return( NULL );
 
-	iobject_set( IOBJECT( ws ), NULL, _( "Default empty workspace" ) );
+	/* Make an empty column.
+	 */
+	(void) workspace_column_pick( ws );
+
+	iobject_set( IOBJECT( ws ), NULL, _( "Default empty tab" ) );
 
 	return( ws );
 }
@@ -1446,13 +1397,13 @@ workspace_clone( Workspace *ws )
 		return( NULL );
 
 	/* Try to load the clone file back again.
-	 */
 	if( !(nws = workspace_new_from_file( wsr, 
 		filename, FILEMODEL( ws )->filename )) ) {
 		unlinkf( "%s", filename );
 		return( NULL );
 	}
 	unlinkf( "%s", filename );
+	 */
 
 	return( nws );
 }

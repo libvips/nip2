@@ -507,26 +507,7 @@ mainw_refresh( Mainw *mainw )
 }
 
 static void
-mainw_workspace_duplicate_action_cb( GtkAction *action, Mainw *mainw )
-{
-	Workspace *ws;
-
-	progress_begin();
-
-	if( (ws = mainw_get_workspace( mainw )) &&
-		!workspace_clone( ws ) ) {
-		progress_end();
-		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
-		return;
-	}
-
-	symbol_recalculate_all();
-
-	progress_end();
-}
-
-static void
-mainw_workbook_duplicate_action_cb( GtkAction *action, Mainw *mainw )
+mainw_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 {
 	Workspacegroup *new_wsg;
 	Mainw *new_mainw;
@@ -548,39 +529,15 @@ mainw_workbook_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 }
 
 static void
-mainw_workspace_save_action_cb( GtkAction *action, Mainw *mainw )
+mainw_save_action_cb( GtkAction *action, Mainw *mainw )
 {
-	Workspace *ws;
-
-	if( (ws = mainw_get_workspace( mainw )) )
-		filemodel_inter_save( IWINDOW( mainw ), FILEMODEL( ws ) );
+	filemodel_inter_save( IWINDOW( mainw ), FILEMODEL( mainw->wsg ) );
 }
 
 static void
-mainw_workspace_save_as_action_cb( GtkAction *action, Mainw *mainw )
+mainw_save_as_action_cb( GtkAction *action, Mainw *mainw )
 {
-	Workspace *ws;
-
-	if( (ws = mainw_get_workspace( mainw )) )
-		filemodel_inter_saveas( IWINDOW( mainw ), FILEMODEL( ws ) );
-}
-
-static void
-mainw_workspace_save_tabs_as_action_cb( GtkAction *action, Mainw *mainw )
-{
-	Workspace *ws;
-
-	if( (ws = mainw_get_workspace( mainw )) )
-		filemodel_inter_saveas( IWINDOW( mainw ), FILEMODEL( ws ) );
-}
-
-static void
-mainw_workspace_close_action_cb( GtkAction *action, Mainw *mainw )
-{
-	Workspace *ws;
-
-	if( (ws = mainw_get_workspace( mainw )) )
-		filemodel_inter_savenclose( IWINDOW( mainw ), FILEMODEL( ws ) );
+	filemodel_inter_saveas( IWINDOW( mainw ), FILEMODEL( mainw->wsg ) );
 }
 
 /* Event in the "space free" display ... toggle mode on left click.
@@ -1309,12 +1266,13 @@ mainw_workspace_new_done_cb( iWindow *iwnd, void *client,
 		return;
 	}
 
-	if( !(ws = workspace_new( mainw->wsg, name_text )) ) {
+	if( !(ws = workspace_new_blank( mainw->wsg, name_text )) ) {
 		nfn( sys, IWINDOW_ERROR );
 		return;
 	}
 
 	iobject_set( IOBJECT( ws ), NULL, caption_text );
+	model_front( MODEL( ws ) );
 
 	nfn( sys, IWINDOW_YES );
 }
@@ -1330,15 +1288,15 @@ mainw_workspace_new_action_cb( GtkAction *action, Mainw *mainw )
 
 	workspaceroot_name_new( wsr, name );
 	stringset_child_new( STRINGSET( ss ), 
-		_( "Name" ), name, _( "Set workspace name here" ) );
+		_( "Name" ), name, _( "Set tab name here" ) );
 	stringset_child_new( STRINGSET( ss ), 
-		_( "Caption" ), "", _( "Set workspace caption here" ) );
+		_( "Caption" ), "", _( "Set tab caption here" ) );
 
-	iwindow_set_title( IWINDOW( ss ), _( "New Workspace" ) );
+	iwindow_set_title( IWINDOW( ss ), _( "New Tab" ) );
 	idialog_set_callbacks( IDIALOG( ss ), 
 		iwindow_true_cb, NULL, NULL, mainw );
 	idialog_add_ok( IDIALOG( ss ), 
-		mainw_workspace_new_done_cb, _( "Create Workspace" ) );
+		mainw_workspace_new_done_cb, _( "Create Tab" ) );
 	iwindow_set_parent( IWINDOW( ss ), GTK_WIDGET( mainw ) );
 	iwindow_build( IWINDOW( ss ) );
 
@@ -1589,14 +1547,14 @@ static GtkActionEntry mainw_actions[] = {
 		N_( "Create a new column with a specified name" ), 
 		G_CALLBACK( mainw_column_new_named_action_cb ) },
 
+	{ "NewTab", 
+		GTK_STOCK_NEW, N_( "_Tab" ), NULL, 
+		N_( "Create a new tab" ), 
+		G_CALLBACK( mainw_workspace_new_action_cb ) },
+
 	{ "NewWorkspace", 
 		GTK_STOCK_NEW, N_( "_Workspace" ), NULL, 
 		N_( "Create a new workspace" ), 
-		G_CALLBACK( mainw_workspace_new_action_cb ) },
-
-	{ "NewWindow", 
-		GTK_STOCK_NEW, N_( "_Window" ), NULL, 
-		N_( "Create a new window" ), 
 		G_CALLBACK( mainw_workbook_new_action_cb ) },
 
 	{ "Open", 
@@ -1612,12 +1570,7 @@ static GtkActionEntry mainw_actions[] = {
 	{ "DuplicateWorkspace", 
 		STOCK_DUPLICATE, N_( "_Duplicate Workspace" ), NULL,
 		N_( "Duplicate workspace" ), 
-		G_CALLBACK( mainw_workspace_duplicate_action_cb ) },
-
-	{ "DuplicateWindow", 
-		STOCK_DUPLICATE, N_( "_Duplicate Window" ), NULL,
-		N_( "Duplicate window" ), 
-		G_CALLBACK( mainw_workbook_duplicate_action_cb ) },
+		G_CALLBACK( mainw_duplicate_action_cb ) },
 
 	{ "Merge", 
 		NULL, N_( "_Merge Workspace" ), NULL, 
@@ -1627,27 +1580,17 @@ static GtkActionEntry mainw_actions[] = {
 	{ "Save", 
 		GTK_STOCK_SAVE, N_( "_Save Workspace" ), NULL,
 		N_( "Save workspace" ), 
-		G_CALLBACK( mainw_workspace_save_action_cb ) },
+		G_CALLBACK( mainw_save_action_cb ) },
 
 	{ "SaveAs", 
 		GTK_STOCK_SAVE_AS, N_( "_Save Workspace As" ), NULL,
 		N_( "Save workspace as" ), 
-		G_CALLBACK( mainw_workspace_save_as_action_cb ) },
-
-	{ "SaveTabs", 
-		GTK_STOCK_SAVE_AS, N_( "_Save All Tabs As" ), NULL,
-		N_( "Save all tabs to a workspace" ), 
-		G_CALLBACK( mainw_workspace_save_tabs_as_action_cb ) },
+		G_CALLBACK( mainw_save_as_action_cb ) },
 
 	{ "Recover", 
 		NULL, N_( "Search for Workspace _Backups" ), NULL,
 		N_( "Load last automatically backed-up workspace" ), 
 		G_CALLBACK( mainw_recover_action_cb ) },
-
-	{ "CloseTab", 
-		GTK_STOCK_CLOSE, N_( "_Close Workspace" ), NULL,
-		N_( "Close Tab" ), 
-		G_CALLBACK( mainw_workspace_close_action_cb ) },
 
 	{ "Delete", 
 		GTK_STOCK_DELETE, N_( "_Delete" ), "<control>BackSpace",
@@ -1767,8 +1710,8 @@ static const char *mainw_menubar_ui_description =
 "    <menu action='FileMenu'>"
 "      <menu action='NewMenu'>"
 "        <menuitem action='NewColumnName'/>"
+"        <menuitem action='NewTab'/>"
 "        <menuitem action='NewWorkspace'/>"
-"        <menuitem action='NewWindow'/>"
 "      </menu>"
 "      <menuitem action='Open'/>"
 "      <menu action='RecentMenu'>"
@@ -1776,15 +1719,14 @@ static const char *mainw_menubar_ui_description =
 "      </menu>"
 "      <menuitem action='OpenExamples'/>"
 "      <separator/>"
-"      <menuitem action='DuplicateWindow'/>"
+"      <menuitem action='DuplicateWorkspace'/>"
 "      <menuitem action='Merge'/>"
 "      <menuitem action='Save'/>"
 "      <menuitem action='SaveAs'/>"
-"      <menuitem action='SaveTabs'/>"
 "      <separator/>"
 "      <menuitem action='Recover'/>"
 "      <separator/>"
-"      <menuitem action='CloseTab'/>"
+"      <menuitem action='Close'/>"
 "      <menuitem action='Quit'/>"
 "    </menu>"
 "    <menu action='EditMenu'>"

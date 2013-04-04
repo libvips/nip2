@@ -521,10 +521,12 @@ Workspacegroup *
 workspacegroup_new_blank( Workspaceroot *wsr, const char *name )
 {
 	Workspacegroup *wsg;
+	Workspace *ws;
 
 	if( !(wsg = workspacegroup_new( wsr )) )
 		return( NULL );
 	iobject_set( IOBJECT( wsg ), name, _( "Default empty workspace" ) );
+	workspace_new_blank( wsg, "tab1" );
 	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
 
 	return( wsg );

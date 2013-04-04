@@ -104,6 +104,7 @@ typedef void *(*icontainer_map5_fn)( iContainer *,
 typedef gint (*icontainer_sort_fn)( iContainer *a, iContainer *b );
 
 int icontainer_get_n_children( iContainer *icontainer );
+iContainer *icontainer_get_nth_child( iContainer *icontainer, int n );
 GSList *icontainer_get_children( iContainer *icontainer );
 void *icontainer_map( iContainer *icontainer, 
 	icontainer_map_fn fn, void *a, void *b );

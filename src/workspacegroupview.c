@@ -84,6 +84,8 @@ workspacegroupview_child_add( View *parent, View *child )
 	GtkWidget *ebox;
 	GtkWidget *label;
 
+	printf( "workspacegroupview_child_add:\n" ); 
+
 	VIEW_CLASS( parent_class )->child_add( parent, child );
 
         ebox = gtk_event_box_new();
@@ -230,7 +232,7 @@ workspacegroupview_page_added_cb( GtkNotebook *notebook,
 	Workspaceview *wview = WORKSPACEVIEW( page );
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
 	Workspacegroupview *wsgview = WORKSPACEGROUPVIEW( user_data );
-	Mainw *mainw = MAINW( iwindow_get_root( notebook ) );
+	Mainw *mainw = MAINW( iwindow_get_root( GTK_WIDGET( notebook ) ) );
 
 	filemodel_set_window_hint( FILEMODEL( ws ), IWINDOW( mainw ) );
 }
@@ -250,12 +252,26 @@ workspacegroupview_create_window_cb( GtkNotebook *notebook,
 	char name[256];
 
 	workspaceroot_name_new( wsr, name );
-	new_wsg = workspacegroup_new_blank( wsr, name );
+	new_wsg = workspacegroup_new( wsr );
+	iobject_set( IOBJECT( new_wsg ), name, NULL );
 	new_mainw = mainw_new( new_wsg );
 	gtk_window_move( GTK_WINDOW( new_mainw ), x, y );
 	gtk_widget_show( GTK_WIDGET( new_mainw ) );
 
 	return( GTK_NOTEBOOK( new_mainw->wsgview->notebook ) ); 
+}
+
+static void                
+workspacegroupview_reorder_tab_cb( GtkNotebook *notebook, 
+	GtkWidget *page, guint page_num, gpointer user_data )
+{
+	Workspaceview *wview = WORKSPACEVIEW( page );
+	Workspacegroupview *wsgview = 
+		WORKSPACEGROUPVIEW( VIEW( wview )->parent );
+	Workspacegroup *wsg = WORKSPACEGROUP( VOBJECT( wsgview )->iobject );
+	Mainw *mainw = MAINW( iwindow_get_root( GTK_WIDGET( notebook ) ) );
+
+	printf( "workspacegroupview_reorder_tab_cb: %d\n", page_num );
 }
 
 #ifdef USE_NOTEBOOK_ACTION
@@ -344,6 +360,8 @@ workspacegroupview_init( Workspacegroupview *wsgview )
 		G_CALLBACK( workspacegroupview_page_added_cb ), wsgview );
 	g_signal_connect( wsgview->notebook, "page_removed", 
 		G_CALLBACK( workspacegroupview_page_removed_cb ), wsgview );
+	g_signal_connect( wsgview->notebook, "reorder_tab", 
+		G_CALLBACK( workspacegroupview_reorder_tab_cb ), wsgview );
 	g_signal_connect( wsgview->notebook, "create_window", 
 		G_CALLBACK( workspacegroupview_create_window_cb ), wsgview );
 

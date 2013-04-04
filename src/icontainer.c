@@ -55,6 +55,12 @@ icontainer_get_n_children( iContainer *icontainer )
 	return( g_slist_length( icontainer->children ) );
 }
 
+iContainer *
+icontainer_get_nth_child( iContainer *icontainer, int n )
+{
+	return( ICONTAINER( g_slist_nth_data( icontainer->children, n ) ) );
+}
+
 GSList *
 icontainer_get_children( iContainer *icontainer )
 {

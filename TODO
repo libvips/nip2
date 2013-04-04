@@ -1,10 +1,9 @@
-- load a ws, get an empty column left over from load
-
-- start nip2, make a workspace, save, filename  member of workspace is not
-  saved since it's NULL at the time of saving
-
 - fix naming: for the user, a mainw displays a workspace and a workspace has
   tabs
+
+- workspacegroupview_reorder_tab_cb() is never called?
+
+- no longer need to update tab labels? we could remove the set_label stuff
 
 - save selected, various duplicate actions need fixing
 

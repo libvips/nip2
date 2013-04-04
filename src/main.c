@@ -1351,7 +1351,8 @@ main( int argc, char *argv[] )
 	if( !wsg ) {
 		workspaceroot_name_new( main_workspaceroot, name );
 		wsg = workspacegroup_new_blank( main_workspaceroot, name );
-		ws = workspace_new( wsg, "tab1" );
+		ws = WORKSPACE( icontainer_get_nth_child( 
+			ICONTAINER( wsg ), 0 ) ); 
 	}
 
 	/* Reset IM_CONCURRENCY if a watch changes. Need to do this after

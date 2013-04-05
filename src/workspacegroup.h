@@ -45,7 +45,7 @@
 /* Three sorts of workspace file load.
  */
 typedef enum {
-	WORKSPACEGROUP_LOAD_TOP,	/* Load as new workspace */
+	WORKSPACEGROUP_LOAD_NEW,	/* Load as new workspace */
 	WORKSPACEGROUP_LOAD_COLUMNS,	/* Merge into current workspace */
 	WORKSPACEGROUP_LOAD_ROWS	/* Merge rows into current column */
 } WorkspacegroupLoadType;
@@ -53,7 +53,8 @@ typedef enum {
 /* Save mode ... controls behaviour of column_save_test() and row_save_test()
  */
 typedef enum {
-	WORKSPACEGROUP_SAVE_ALL,	/* Save all rows */
+	WORKSPACEGROUP_SAVE_ALL,	/* Save everything */
+	WORKSPACEGROUP_SAVE_WORKSPACE,	/* Save current workspace */
 	WORKSPACEGROUP_SAVE_SELECTED	/* Only save selected rows */
 } WorkspacegroupSaveType;
 
@@ -101,6 +102,15 @@ Workspacegroup *workspacegroup_new_from_file( Workspaceroot *wsr,
 Workspacegroup *workspacegroup_new_from_openfile( Workspaceroot *wsr, 
 	iOpenFile *of );
 
+Workspacegroup *workspacegroup_duplicate( Workspacegroup *wsg );
+
+gboolean workspacegroup_selected_save( Workspacegroup *wsg, 
+	const char *filename );
+gboolean workspacegroup_current_save( Workspacegroup *wsg, 
+	const char *filename );
+gboolean workspacegroup_merge_file( Workspacegroup *wsg, 
+	const char *filename, const char *filename_user );
+gboolean workspacegroup_selected_duplicate( Workspacegroup *wsg );
+
 gboolean workspacegroup_load_file( Workspacegroup *wsg, const char *filename );
 
-Workspacegroup *workspacegroup_duplicate( Workspacegroup *wsg );

@@ -145,7 +145,8 @@ watchgroup_save( Watchgroup *watchgroup )
 	Workspace *ws;
 
 	if( (ws = watchgroup_get_workspace( watchgroup )) ) {
-		Filemodel *filemodel = FILEMODEL( ws );
+		Workspacegroup *wsg = workspace_get_workspacegroup( ws );
+		Filemodel *filemodel = FILEMODEL( wsg );
 
 		if( filemodel->modified ) {
 			symbol_recalculate_all();
@@ -179,6 +180,7 @@ watchgroup_dirty( Watchgroup *watchgroup )
 	/* Find the preferences workspace.
 	 */
 	if( (ws = watchgroup_get_workspace( watchgroup )) ) {
+		Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 		Filemodel *filemodel = FILEMODEL( ws );
 
 		/* Mark ws dirty, start save timer.

@@ -195,9 +195,9 @@ workspacegroupview_switch_page_cb( GtkNotebook *notebook,
 		error_sub( _( "This workspace was created by version %d.%d.%d. "
 			"A set of compatibility menus have been loaded "
 			"for this window." ),
-			FILEMODEL( ws )->major,
-			FILEMODEL( ws )->minor,
-			FILEMODEL( ws )->micro );
+			FILEMODEL( wsg )->major,
+			FILEMODEL( wsg )->minor,
+			FILEMODEL( wsg )->micro );
 		iwindow_alert( GTK_WIDGET( wview ), GTK_MESSAGE_INFO );
 	}
 
@@ -216,7 +216,7 @@ workspacegroupview_page_removed_cb( GtkNotebook *notebook,
 	Workspacegroupview *wsgview = 
 		WORKSPACEGROUPVIEW( VIEW( wview )->parent );
 	Workspacegroup *wsg = WORKSPACEGROUP( VOBJECT( wsgview )->iobject );
-	Mainw *mainw = MAINW( iwindow_get_root( notebook ) );
+	Mainw *mainw = MAINW( iwindow_get_root( GTK_WIDGET( notebook ) ) );
 
 	if( icontainer_get_n_children( ICONTAINER( wsg ) ) == 0 ) 
 		iwindow_kill( IWINDOW( mainw ) );
@@ -228,10 +228,11 @@ workspacegroupview_page_added_cb( GtkNotebook *notebook,
 {
 	Workspaceview *wview = WORKSPACEVIEW( page );
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+	Workspacegroup *wsg = WORKSPACEGROUP( ICONTAINER( ws )->parent );
 	Workspacegroupview *wsgview = WORKSPACEGROUPVIEW( user_data );
 	Mainw *mainw = MAINW( iwindow_get_root( GTK_WIDGET( notebook ) ) );
 
-	filemodel_set_window_hint( FILEMODEL( ws ), IWINDOW( mainw ) );
+	filemodel_set_window_hint( FILEMODEL( wsg ), IWINDOW( mainw ) );
 }
 
 static GtkNotebook *                
@@ -295,11 +296,13 @@ workspacegroupview_duplicate_cb( GtkWidget *wid, GtkWidget *host,
 	Workspaceview *wview )
 {
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
+
 	Workspace *new_ws;
 
 	progress_begin();
 
-	if( !(new_ws = workspace_clone( ws )) ) {
+	if( !(new_ws = workspacegroup_duplicate( wsg )) ) {
 		progress_end();
 		iwindow_alert( host, GTK_MESSAGE_ERROR );
 		return;
@@ -315,8 +318,9 @@ workspacegroupview_save_cb( GtkWidget *wid, GtkWidget *host,
 	Workspaceview *wview )
 {
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
-	filemodel_inter_save( IWINDOW( host ), FILEMODEL( ws ) );
+	filemodel_inter_save( IWINDOW( host ), FILEMODEL( wsg ) );
 }
 
 static void                
@@ -324,8 +328,9 @@ workspacegroupview_save_as_cb( GtkWidget *wid, GtkWidget *host,
 	Workspaceview *wview )
 {
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
-	filemodel_inter_saveas( IWINDOW( host ), FILEMODEL( ws ) );
+	filemodel_inter_saveas( IWINDOW( host ), FILEMODEL( wsg ) );
 }
 
 static void                
@@ -333,8 +338,9 @@ workspacegroupview_close_cb( GtkWidget *wid, GtkWidget *host,
 	Workspaceview *wview )
 {
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
-	filemodel_inter_savenclose( IWINDOW( host ), FILEMODEL( ws ) );
+	filemodel_inter_savenclose( IWINDOW( host ), FILEMODEL( wsg ) );
 }
 
 static void

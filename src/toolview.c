@@ -105,10 +105,11 @@ static void
 toolview_activate_cb( GtkWidget *widget, Toolitem *toolitem )
 {
 	Workspace *ws = item_get_workspace( widget );
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
 	switch( toolitem->tool->type ) {
 	case TOOL_DIA:
-		if( !workspace_merge_file( ws, 
+		if( !workspacegroup_merge_file( wsg, 
 			FILEMODEL( toolitem->tool )->filename, NULL ) )
 			iwindow_alert( widget, GTK_MESSAGE_ERROR );
 		symbol_recalculate_all();

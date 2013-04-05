@@ -813,7 +813,6 @@ static void
 regionview_model_update( Regionview *regionview )
 {
 	Classmodel *classmodel = regionview->classmodel;
-	Imagepresent *ip = regionview->ip;
 	Rect *model_area = regionview_get_model( regionview );
 
 #ifdef DEBUG
@@ -898,6 +897,7 @@ regionview_clone_cb( GtkWidget *menu, Regionview *regionview, Imagepresent *ip )
 {
 	Row *row = HEAPMODEL( regionview->classmodel )->row;
 	Workspace *ws = row->top_col->ws;
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
 	if( row->top_row != row ) {
 		error_top( _( "Can't duplicate." ) );
@@ -909,7 +909,7 @@ regionview_clone_cb( GtkWidget *menu, Regionview *regionview, Imagepresent *ip )
 
         workspace_deselect_all( ws );
         row_select( row );
-        if( !workspace_clone_selected( ws ) )
+        if( !workspacegroup_selected_duplicate( wsg ) )
 		iwindow_alert( GTK_WIDGET( regionview ), GTK_MESSAGE_ERROR );
         workspace_deselect_all( ws );
 

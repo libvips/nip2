@@ -824,13 +824,15 @@ row_save_test( Model *model )
 {
 	Row *row = ROW( model );
 	Workspace *ws = row->ws;
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
+
 	gboolean save;
 
 	if( row == row->top_row ) {
 		/* This is a top-level row ... save unless we're in
 		 * only-save-selected mode.
 		 */
-		if( ws->save_type == WORKSPACE_SAVE_SELECTED )
+		if( wsg->save_type == WORKSPACEGROUP_SAVE_SELECTED )
 			save = row->selected;
 		else
 			save = TRUE;
@@ -846,7 +848,6 @@ row_save_test( Model *model )
 				(icontainer_map_fn) row_calculate_to_save, 
 				NULL );
 		}
-
 	}
 	else 
 		save = row->to_save;

@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static FilemodelClass *parent_class = NULL;
+static ModelClass *parent_class = NULL;
 
 static GSList *workspace_all = NULL;
 
@@ -576,98 +576,6 @@ workspace_load_file( Workspace *ws, const char *filename )
 	return( sym );
 }
 
-/* Bounding box of columns to be saved. Though we only really set top/left.
- */
-static void *
-workspace_selected_save_box( Column *col, Rect *box )
-{
-	if( model_save_test( MODEL( col ) ) ) {
-		if( im_rect_isempty( box ) ) {
-			box->left = col->x;
-			box->top = col->y;
-			box->width = 100;
-			box->height = 100;
-		}
-		else {
-			box->left = IM_MIN( box->left, col->x );
-			box->top = IM_MIN( box->top, col->y );
-		}
-	}
-
-	return( NULL );
-}
-
-/* Save just the selected objects.
- */
-gboolean
-workspace_selected_save( Workspace *ws, const char *filename )
-{
-	WorkspaceSaveType save = ws->save_type;
-	Rect box = { 0 };
-
-	ws->save_type = WORKSPACE_SAVE_SELECTED;
-
-	workspace_map_column( ws, 
-		(column_map_fn) workspace_selected_save_box, &box );
-	filemodel_set_offset( FILEMODEL( ws ), box.left, box.top );
-
-	if( !filemodel_save_all( FILEMODEL( ws ), filename ) ) {
-		ws->save_type = save;
-		unlinkf( "%s", filename );
-
-		return( FALSE );
-	}
-	ws->save_type = save;
-
-	return( TRUE );
-}
-
-/* Clone all selected symbols.
- */
-gboolean 
-workspace_clone_selected( Workspace *ws )
-{
-	char filename[FILENAME_MAX];
-
-	if( !workspace_selected_any( ws ) ) {
-		Row *row;
-
-		if( !(row = workspace_get_bottom( ws )) )
-			return( FALSE );
-
-		row_select( row );
-	}
-
-	/* Make a name for our clone file.
-	 */
-	if( !temp_name( filename, "ws" ) )
-		return( FALSE );
-
-	/* Save selected objects.
-	 */
-	if( !workspace_selected_save( ws, filename ) ) 
-		return( FALSE );
-
-	/* Try to load the clone file back again.
-	 */
-        progress_begin();
-	if( !workspace_merge_column_file( ws, 
-		filename, FILEMODEL( ws )->filename ) ) {
-		progress_end();
-		unlinkf( "%s", filename );
-
-		return( FALSE );
-	}
-	unlinkf( "%s", filename );
-
-	symbol_recalculate_all();
-	workspace_deselect_all( ws );
-	model_scrollto( MODEL( ws->current ), MODEL_SCROLL_TOP );
-	progress_end();
-
-	return( TRUE );
-}
-
 static void
 workspace_dispose( GObject *gobject )
 {
@@ -811,7 +719,7 @@ workspace_load( Model *model,
 	char buf[FILENAME_MAX];
 	char *txt;
 
-	g_assert( IS_WORKSPACEROOT( parent ) );
+	g_assert( IS_WORKSPACEGROUP( parent ) );
 
 	/* "view" is optional, for backwards compatibility.
 	 */
@@ -908,62 +816,6 @@ workspace_empty( Model *model )
 	ws->area.height = 0;
 
 	MODEL_CLASS( parent_class )->empty( model );
-}
-
-void
-workspace_rename_row_node( ModelLoadState *state, Column *col, xmlNode *xnode )
-{
-	char name[MAX_STRSIZE];
-
-	if( strcmp( (char *) xnode->name, "Row" ) == 0 &&
-		get_sprop( xnode, "name", name, MAX_STRSIZE ) ) {
-		char *new_name;
-
-		new_name = column_name_new( col );
-		(void) set_sprop( xnode, "name", new_name );
-		(void) model_loadstate_rename_new( state, name, new_name );
-		IM_FREE( new_name );
-	}
-}
-
-/* Rename column if there's one of that name in workspace. 
- */
-void
-workspace_rename_column_node( Workspace *ws, 
-	ModelLoadState *state, xmlNode *xnode, xmlNode *columns )
-{
-	char name[MAX_STRSIZE];
-
-	if( strcmp( (char *) xnode->name, "Column" ) == 0 &&
-		get_sprop( xnode, "name", name, MAX_STRSIZE ) &&
-		icontainer_map( ICONTAINER( ws ), 
-			(icontainer_map_fn) iobject_test_name, name, NULL ) ) {
-		char *new_name;
-		Column *col;
-		xmlNode *i;
-
-		/* Exists already ... rename this column.
-		 */
-		new_name = workspace_column_name_new( ws, columns );
-		col = column_new( ws, new_name );
-
-#ifdef DEBUG
-		printf( "workspace_rename_column_node: renaming column "
-			"%s to %s\n", 
-			name, new_name );
-#endif /*DEBUG*/
-
-		(void) set_sprop( xnode, "name", new_name );
-		IM_FREE( new_name );
-
-		/* And allocate new names for all rows in the subcolumn.
-		 */
-		for( i = get_node( xnode, "Subcolumn" )->children; 
-			i; i = i->next ) 
-			workspace_rename_row_node( state, col, i );
-
-		IDESTROY( col );
-	}
 }
 
 static void *
@@ -1108,7 +960,6 @@ workspace_class_init( WorkspaceClass *class )
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
 	iContainerClass *icontainer_class = (iContainerClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
-	FilemodelClass *filemodel_class = (FilemodelClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
 
@@ -1152,9 +1003,6 @@ workspace_init( Workspace *ws )
 
 	ws->compat_major = 0;
 	ws->compat_minor = 0;
-
-	ws->load_type = WORKSPACE_LOAD_TOP;
-	ws->save_type = WORKSPACE_SAVE_ALL;
 
 	ws->area.left = 0;
 	ws->area.top = 0;
@@ -1202,7 +1050,7 @@ workspace_get_type( void )
 			(GInstanceInitFunc) workspace_init,
 		};
 
-		workspace_type = g_type_register_static( TYPE_FILEMODEL, 
+		workspace_type = g_type_register_static( TYPE_MODEL, 
 			"Workspace", &info, 0 );
 	}
 
@@ -1234,25 +1082,6 @@ workspace_new( Workspacegroup *wsg, const char *name )
 	return( ws );
 }
 
-static gboolean
-workspace_load_empty( Workspace *ws, Workspaceroot *wsr, 
-	const char *filename, const char *filename_user )
-{
-	g_assert( workspace_is_empty( ws ) );
-
-	ws->load_type = WORKSPACE_LOAD_TOP;
-	column_set_offset( WORKSPACEVIEW_MARGIN_LEFT, 
-		WORKSPACEVIEW_MARGIN_TOP );
-	if( !filemodel_load_all( FILEMODEL( ws ), MODEL( wsr ), 
-		filename, filename_user ) ) 
-		return( FALSE );
-	workspace_set_modified( ws, FALSE );
-	filemodel_set_filename( FILEMODEL( ws ), 
-		filename_user ? filename_user : filename );
-
-	return( TRUE );
-}
-
 /* Make the blank workspace we present the user with (in the absence of
  * anything else).
  */
@@ -1271,55 +1100,6 @@ workspace_new_blank( Workspacegroup *wsg, const char *name )
 	iobject_set( IOBJECT( ws ), NULL, _( "Default empty tab" ) );
 
 	return( ws );
-}
-
-/* Merge file into this workspace. If this workspace is blank, then behave
- * like workspace_new_from_file() instead.
- */
-gboolean
-workspace_merge_file( Workspace *ws, 
-	const char *filename, const char *filename_user )
-{
-	if( workspace_is_empty( ws ) ) {
-		model_empty( MODEL( ws ) );
-
-		if( !workspace_load_empty( ws, 
-			WORKSPACEROOT( ICONTAINER( ws )->parent ), 
-			filename, filename_user ) ) 
-			return( FALSE );
-	}
-	else {
-		ws->load_type = WORKSPACE_LOAD_COLUMNS;
-		column_set_offset( 
-			IM_RECT_RIGHT( &ws->area ) + WORKSPACEVIEW_MARGIN_LEFT,
-			WORKSPACEVIEW_MARGIN_TOP );
-		if( !filemodel_load_all( FILEMODEL( ws ), 
-			MODEL( ICONTAINER( ws )->parent ), 
-			filename, filename_user ) ) 
-			return( FALSE );
-
-		workspace_set_modified( ws, TRUE );
-	}
-
-	return( TRUE );
-}
-
-/* Merge file into the current column of this workspace.
- */
-gboolean
-workspace_merge_column_file( Workspace *ws, 
-	const char *filename, const char *filename_user )
-{
-	ws->load_type = WORKSPACE_LOAD_ROWS;
-	column_set_offset( IM_RECT_RIGHT( &ws->area ), 
-		IM_RECT_BOTTOM( &ws->area ) );
-	if( !filemodel_load_all( FILEMODEL( ws ), 
-		MODEL( ICONTAINER( ws )->parent ), filename, filename_user ) ) 
-		return( FALSE );
-
-	workspace_set_modified( ws, TRUE );
-
-	return( TRUE );
 }
 
 /* Get the bottom row from the current column.
@@ -1379,33 +1159,6 @@ int
 workspace_number( void )
 {
 	return( g_slist_length( workspace_all ) );
-}
-
-Workspace *
-workspace_clone( Workspace *ws )
-{
-	Workspacegroup *wsg = WORKSPACEGROUP( ICONTAINER( ws )->parent );
-	Workspaceroot *wsr = wsg->wsr;
-
-	Workspace *nws;
-	char filename[FILENAME_MAX];
-
-	/* Make a name for our clone file.
-	 */
-	if( !temp_name( filename, "ws" ) ||
-		!filemodel_save_all( FILEMODEL( ws ), filename ) ) 
-		return( NULL );
-
-	/* Try to load the clone file back again.
-	if( !(nws = workspace_new_from_file( wsr, 
-		filename, FILEMODEL( ws )->filename )) ) {
-		unlinkf( "%s", filename );
-		return( NULL );
-	}
-	unlinkf( "%s", filename );
-	 */
-
-	return( nws );
 }
 
 static void *

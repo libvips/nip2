@@ -72,6 +72,7 @@ columnview_clone_cb( GtkWidget *wid, GtkWidget *host, Columnview *cview )
 {
 	Column *col = COLUMN( VOBJECT( cview )->iobject );
 	Workspace *ws = col->ws;
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 	char *newname = workspace_column_name_new( ws, NULL );
         Column *newcol = workspace_column_get( ws, newname );
 
@@ -83,7 +84,7 @@ columnview_clone_cb( GtkWidget *wid, GtkWidget *host, Columnview *cview )
 	workspace_deselect_all( ws );
         column_select_symbols( col );
 	workspace_column_select( ws, newcol );
-        if( !workspace_clone_selected( ws ) )
+        if( !workspacegroup_selected_duplicate( wsg ) )
 		iwindow_alert( GTK_WIDGET( cview ), GTK_MESSAGE_ERROR );
 	workspace_deselect_all( ws );
 
@@ -99,13 +100,14 @@ columnview_save_as_sub( iWindow *iwnd,
 	Filesel *filesel = FILESEL( iwnd );
 	Column *col = COLUMN( client );
 	Workspace *ws = col->ws;
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 	char *filename;
 
 	workspace_deselect_all( ws );
         column_select_symbols( col );
 
 	if( (filename = filesel_get_filename( filesel )) ) {
-		if( workspace_selected_save( ws, filename ) ) {
+		if( workspacegroup_selected_save( wsg, filename ) ) {
 			workspace_deselect_all( ws );
 			nfn( sys, IWINDOW_YES );
 		}
@@ -176,6 +178,7 @@ columnview_to_menu_done_cb( iWindow *iwnd, void *client,
 {
 	Column *col = COLUMN( client );
 	Workspace *ws = col->ws;
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 	Stringset *ss = STRINGSET( iwnd );
 	StringsetChild *name = stringset_child_get( ss, _( "Name" ) );
 	StringsetChild *toolkit = stringset_child_get( ss, _( "Toolkit" ) );
@@ -197,7 +200,7 @@ columnview_to_menu_done_cb( iWindow *iwnd, void *client,
 	workspace_deselect_all( ws );
         column_select_symbols( col );
 
-	if( !workspace_selected_save( ws, file_text ) ) {
+	if( !workspacegroup_selected_save( wsg, file_text ) ) {
 		nfn( sys, IWINDOW_ERROR );
 		return;
 	}

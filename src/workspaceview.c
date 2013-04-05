@@ -534,6 +534,7 @@ workspaceview_child_size_cb( Columnview *cview,
 	GtkAllocation *allocation, Workspaceview *wview )
 {
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
 	int right, bottom;
 
@@ -576,7 +577,7 @@ workspaceview_child_size_cb( Columnview *cview,
 		 * loads and saves.
 		 */
 		ws->area = wview->bounding;
-		filemodel_set_offset( FILEMODEL( ws ), 
+		filemodel_set_offset( FILEMODEL( wsg ), 
 			ws->area.left, ws->area.top );
 	}
 }
@@ -675,12 +676,13 @@ workspaceview_refresh( vObject *vobject )
 {
 	Workspaceview *wview = WORKSPACEVIEW( vobject );
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
 #ifdef DEBUG
 	printf( "workspaceview_refresh: %s\n", IOBJECT( ws )->name );
 #endif /*DEBUG*/
 
-	filemodel_set_window_hint( FILEMODEL( ws ), 
+	filemodel_set_window_hint( FILEMODEL( wsg ), 
 		IWINDOW( iwindow_get_root_noparent( GTK_WIDGET( wview ) ) ) );
 
 	workspace_jump_update( ws, wview->popup_jump );
@@ -886,7 +888,7 @@ workspaceview_class_init( WorkspaceviewClass *class )
 static gboolean
 workspaceview_load( Workspace *ws, const char *filename )
 {
-	Workspacegroup *wsg = WORKSPACEGROUP( ICONTAINER( ws )->parent );
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 	Workspaceroot *wsr = wsg->wsr; 
 
 	Workspacegroup *new_wsg;

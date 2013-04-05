@@ -67,12 +67,13 @@ expr_error_print( Expr *expr, VipsBuf *buf )
 		tool_error( expr->sym->tool, buf );
 	else if( expr->row ) {
 		Workspace *ws = expr->row->ws;
+		Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
 		vips_buf_appendf( buf, " (" );
 		row_qualified_name( expr->row, buf );
-		if( FILEMODEL( ws )->filename )
+		if( FILEMODEL( wsg )->filename )
 			vips_buf_appendf( buf, " - %s", 
-				FILEMODEL( ws )->filename );
+				FILEMODEL( wsg )->filename );
 		vips_buf_appendf( buf, ")" );
 	}
 

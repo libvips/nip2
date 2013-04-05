@@ -35,6 +35,36 @@
 
 static FilemodelClass *parent_class = NULL;
 
+static Workspace *
+workspacegroup_get_workspace( Workspacegroup *wsg )
+{
+	if( !ICONTAINER( wsg )->current )
+		return( NULL );
+
+	return( WORKSPACE( ICONTAINER( wsg )->current ) ); 
+}
+
+static Workspace *
+workspacegroup_workspace_pick( Workspacegroup *wsg )
+{
+	Workspace *ws;
+
+	if( (ws = workspacegroup_get_workspace( wsg )) )
+		return( ws );
+
+	if( ICONTAINER( wsg )->children ) {
+		ws = WORKSPACE( ICONTAINER( wsg )->children->data );
+		icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
+
+		return( ws );
+	}
+
+	ws = workspace_new( wsg, "tab1" );
+	icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
+
+	return( ws );
+}
+
 Workspace *
 workspacegroup_map( Workspacegroup *wsg, workspace_map_fn fn, void *a, void *b )
 {
@@ -99,9 +129,13 @@ workspacegroup_save_workspace( iContainer *icontainer, void *a, void *b )
 	xmlNode *xnode = (xmlNode *) a;
 	Workspacegroup *wsg = WORKSPACEGROUP( b );
 
-	in save-selected mode, save just the current WS
+	/* Only save all workspaces in save-all mode. 
+	 */
+	if( wsg->save_type != WORKSPACEGROUP_SAVE_ALL &&
+		WORKSPACE( ICONTAINER( wsg )->current ) != ws )
+		return( NULL );
 
-	return( model_save( ws, xnode ) );
+	return( model_save( MODEL( ws ), xnode ) );
 }
 
 static xmlNode *
@@ -125,24 +159,217 @@ workspacegroup_save( Model *model, xmlNode *xnode )
 	return( xnode );
 }
 
+/* Loops over xml trees follow this pattern.
+ */
+#define FOR_ALL_XML( ROOT, CHILD, CHILD_NAME ) { \
+	xmlNode *CHILD; \
+	\
+	for( CHILD = ROOT->children; CHILD; CHILD = CHILD->next ) { \
+		if( strcmp( (char *) CHILD->name, CHILD_NAME ) != 0 ) \
+			continue;
+
+#define FOR_ALL_XML_END } }
+
+/* Load all workspaces into this wsg.
+ */
+static gboolean
+workspacegroup_load_new( Workspacegroup *wsg, 
+	ModelLoadState *state, xmlNode *xroot )
+{
+	Workspaceroot *wsr = wsg->wsr;
+
+	FOR_ALL_XML( xroot, xws, "Workspace" ) {
+		char name[MAX_STRSIZE];
+		Workspace *ws;
+
+		column_set_offset( WORKSPACEVIEW_MARGIN_LEFT, 
+			WORKSPACEVIEW_MARGIN_TOP );
+
+		/* Rename to avoid clashes. 
+		 */
+		if( !get_sprop( xws, "name", name, FILENAME_MAX ) ) 
+			return( FALSE );
+		while( compile_lookup( wsr->sym->expr->compile, name ) )
+			increment_name( name );
+		ws = workspace_new( wsg, name );
+
+		if( get_iprop( xws, "major", &FILEMODEL( wsg )->major ) &&
+			get_iprop( xws, "minor", &FILEMODEL( wsg )->minor ) &&
+			get_iprop( xws, "micro", &FILEMODEL( wsg )->micro ) )
+			FILEMODEL( wsg )->versioned = TRUE;
+
+		/* If necessary, load up compatibility definitions.
+		 */
+		if( !workspace_load_compat( ws, 
+			FILEMODEL( wsg )->major, FILEMODEL( wsg )->minor ) ) 
+			return( FALSE );
+
+		if( model_load( MODEL( ws ), state, MODEL( wsg ), xws ) )
+			return( FALSE );
+	} FOR_ALL_XML_END
+
+	return( TRUE );
+}
+
+static void
+workspacegroup_rename_row_node( Workspacegroup *wsg, 
+	ModelLoadState *state, Column *col, xmlNode *xrow )
+{
+	char name[MAX_STRSIZE];
+	char *new_name;
+
+	if( !get_sprop( xrow, "name", name, MAX_STRSIZE ) )
+		return;
+
+	new_name = column_name_new( col );
+	(void) set_sprop( xrow, "name", new_name );
+	(void) model_loadstate_rename_new( state, name, new_name );
+	IM_FREE( new_name );
+}
+
+/* Rename column if there's one of that name in workspace. 
+ */
+static void
+workspacegroup_rename_column_node( Workspacegroup *wsg, 
+	Workspace *ws, ModelLoadState *state, xmlNode *xcol, xmlNode *columns )
+{
+	char name[MAX_STRSIZE];
+	char *new_name;
+	Column *col;
+
+	if( !get_sprop( xcol, "name", name, MAX_STRSIZE ) )
+		return;
+
+	if( !icontainer_map( ICONTAINER( ws ), 
+		(icontainer_map_fn) iobject_test_name, name, NULL ) )
+		return;
+
+	/* Exists already ... rename this column.
+	 */
+	new_name = workspace_column_name_new( ws, columns );
+	col = column_new( ws, new_name );
+
+#ifdef DEBUG
+	printf( "workspace_rename_column_node: renaming column "
+		"%s to %s\n", 
+		name, new_name );
+#endif /*DEBUG*/
+
+	(void) set_sprop( xcol, "name", new_name );
+	IM_FREE( new_name );
+
+	/* And allocate new names for all rows in the subcolumn.
+	 */
+	FOR_ALL_XML( xcol, xsub, "Subcolumn" ) {
+		FOR_ALL_XML( xsub, xrow, "Row" ) {
+			workspacegroup_rename_row_node( wsg, state, col, xrow );
+		} FOR_ALL_XML_END
+	} FOR_ALL_XML_END
+
+	IDESTROY( col );
+}
+
+/* Load at column level ... rename columns which clash with 
+ * columns in the current workspace. Also look out for clashes
+ * with columns we will load.
+ */
+static gboolean
+workspacegroup_load_columns( Workspacegroup *wsg, 
+	ModelLoadState *state, xmlNode *xroot )
+{
+	Workspace *ws = workspacegroup_workspace_pick( wsg );
+
+	/* Is there a version mismatch? Issue a warning.
+	int best_major;
+	int best_minor;
+	if( workspace_have_compat( state->major, state->minor, 
+		&best_major, &best_minor ) &&
+		(best_major != filemodel->major ||
+		best_minor != filemodel->minor) ) {
+		error_top( _( "Version mismatch." ) );
+		error_sub( _( "File \"%s\" was saved from %s-%d.%d.%d. "
+			"You may see compatibility problems." ),
+			state->filename, PACKAGE,
+			state->major, state->minor, state->micro );
+		iwindow_alert( GTK_WIDGET( ws->iwnd ), 
+			GTK_MESSAGE_INFO );
+	}
+	 */
+
+	/* Search all the columns we will load for their names and add rename
+	 * rules.
+	 */
+	FOR_ALL_XML( xroot, xws, "Workspace" ) { 
+		FOR_ALL_XML( xws, xcol, "Column" ) { 
+			workspacegroup_rename_column_node( wsg, ws, 
+				state, xcol, xcol->children );
+		} FOR_ALL_XML_END
+	} FOR_ALL_XML_END
+
+	/* Load those columns.
+	 */
+	FOR_ALL_XML( xroot, xws, "Workspace" ) { 
+		FOR_ALL_XML( xws, xcol, "Column" ) { 
+			if( !model_new_xml( state, MODEL( ws ), xcol ) )
+				return( FALSE );
+		} FOR_ALL_XML_END
+	} FOR_ALL_XML_END
+
+	return( TRUE ); 
+}
+
+/* Load at row level ... merge into the current column.
+ */
+static gboolean
+workspacegroup_load_rows( Workspacegroup *wsg, 
+	ModelLoadState *state, xmlNode *xroot )
+{
+	Workspace *ws = workspacegroup_workspace_pick( wsg );
+	Column *col = workspace_column_pick( ws );
+
+	FOR_ALL_XML( xroot, xws, "Workspace" ) {
+		FOR_ALL_XML( xws, xcol, "Column" ) {
+			FOR_ALL_XML( xcol, xsub, "Subcolumn" ) {
+				FOR_ALL_XML( xsub, xrow, "Row" ) {
+					workspacegroup_rename_row_node( wsg, 
+						state, col, xrow );
+				} FOR_ALL_XML_END
+			} FOR_ALL_XML_END
+		} FOR_ALL_XML_END
+	} FOR_ALL_XML_END
+
+	FOR_ALL_XML( xroot, xws, "Workspace" ) {
+		FOR_ALL_XML( xws, xcol, "Column" ) {
+			FOR_ALL_XML( xcol, xsub, "Subcolumn" ) {
+				FOR_ALL_XML( xsub, xrow, "Row" ) {
+					if( !model_new_xml( state,
+						MODEL( col->scol ),
+						xrow ) )
+						return( FALSE );
+				} FOR_ALL_XML_END
+			} FOR_ALL_XML_END
+		} FOR_ALL_XML_END
+	} FOR_ALL_XML_END
+
+	return( TRUE ); 
+}
+
 static gboolean
 workspacegroup_top_load( Filemodel *filemodel,
 	ModelLoadState *state, Model *parent, xmlNode *xroot )
 {
 	Workspacegroup *wsg = WORKSPACEGROUP( filemodel );
-	Workspaceroot *wsr = WORKSPACEROOT( parent );
 
-	char *new_dir;
-	Workspace *ws;
-	Column *current_col;
-	xmlNode *i, *j, *k, *xnode;
+	xmlNode *xnode;
 	char name[FILENAME_MAX];
-	int best_major;
-	int best_minor;
 
 #ifdef DEBUG
 #endif /*DEBUG*/
 	printf( "workspacegroup_top_load: from %s\n", state->filename );
+
+	/* See workspacegroup_load_column().
+	 */
+	printf( "workspacegroup_top_load: missing compat tests\n" ); 
 
 	/* The top node should be the first workspace. Get the filename this
 	 * workspace was saved as so we can work out how to rewrite embedded
@@ -152,6 +379,8 @@ workspacegroup_top_load( Filemodel *filemodel,
 	 */
 	if( (xnode = get_node( xroot, "Workspace" )) &&
 		get_sprop( xnode, "filename", name, FILENAME_MAX ) ) {
+		char *new_dir;
+
 		/* The old filename could be non-native, so we must rewrite 
 		 * to native form first so g_path_get_dirname() can work.
 		 */
@@ -164,108 +393,20 @@ workspacegroup_top_load( Filemodel *filemodel,
 		g_free( new_dir );
 	}
 
-	/* See commented out ode in COLUMN load below.
-	 */
-	printf( "workspace_top_load: compat check on merge is broken!\n" );
-
 	switch( wsg->load_type ) {
-	case WORKSPACEGROUP_LOAD_TOP:
-		/* Load all workspaces into this wsg.
-		 */
-		for( xnode = xroot->children; xnode; xnode = xnode->next ) {
-			if( strcmp( (char *) xnode->name, "Workspace" ) != 0 )
-				continue;
-
-			column_set_offset( WORKSPACEVIEW_MARGIN_LEFT, 
-				WORKSPACEVIEW_MARGIN_TOP );
-
-			/* Rename to avoid clashes. 
-			 */
-			if( !get_sprop( xnode, "name", name, FILENAME_MAX ) ) 
-				return( FALSE );
-			while( compile_lookup( wsr->sym->expr->compile, name ) )
-				increment_name( name );
-			ws = workspace_new( wsg, name );
-
-			if( get_iprop( xnode, "major", 
-					&FILEMODEL( ws )->major ) &&
-				get_iprop( xnode, "minor", 
-					&FILEMODEL( ws )->minor ) &&
-				get_iprop( xnode, "micro", 
-					&FILEMODEL( ws )->micro ) )
-				FILEMODEL( ws )->versioned = TRUE;
-
-			/* If necessary, load up compatibility definitions.
-			 */
-			if( !workspace_load_compat( ws, 
-				FILEMODEL( ws )->major, 
-				FILEMODEL( ws )->minor ) ) 
-				return( FALSE );
-
-			if( model_load( MODEL( ws ), state, parent, xnode ) )
-				return( FALSE );
-		}
-
+	case WORKSPACEGROUP_LOAD_NEW:
+		if( !workspacegroup_load_new( wsg, state, xroot ) )
+			return( FALSE );
 		break;
 
-	case WORKSPACE_LOAD_COLUMNS:
-		printf( "workspacegroup_top_load: column load not done\n" ); 
-
-		/* Load at column level ... rename columns which clash with 
-		 * columns in the current workspace. Also look out for clashes
-		 * with columns we will load.
-		 */
-		for( i = xnode->children; i; i = i->next ) 
-			workspace_rename_column_node( ws, 
-				state, i, xnode->children );
-
-		/* Load those columns.
-		 */
-		for( i = xnode->children; i; i = i->next ) 
-			if( !model_new_xml( state, MODEL( ws ), i ) )
-				return( FALSE );
-
-		/* Is there a version mismatch? Issue a warning.
-		if( workspace_have_compat( state->major, state->minor, 
-			&best_major, &best_minor ) &&
-			(best_major != filemodel->major ||
-			best_minor != filemodel->minor) ) {
-			error_top( _( "Version mismatch." ) );
-			error_sub( _( "File \"%s\" was saved from %s-%d.%d.%d. "
-				"You may see compatibility problems." ),
-				state->filename, PACKAGE,
-				state->major, state->minor, state->micro );
-			iwindow_alert( GTK_WIDGET( ws->iwnd ), 
-				GTK_MESSAGE_INFO );
-		}
-		 */
-
+	case WORKSPACEGROUP_LOAD_COLUMNS:
+		if( !workspacegroup_load_columns( wsg, state, xroot ) )
+			return( FALSE );
 		break;
 
-	case WORKSPACE_LOAD_ROWS:
-		printf( "workspacegroup_top_load: row load not done\n" ); 
-
-		current_col = workspace_column_pick( ws );
-
-		/* Rename all rows into current column ... loop over column,
-		 * subcolumns, rows.
-		 */
-		for( i = xnode->children; i; i = i->next ) 
-			for( j = i->children; j; j = j->next ) 
-				for( k = j->children; k; k = k->next ) 
-					workspace_rename_row_node( state, 
-						current_col, k );
-
-		/* And load rows.
-		 */
-		for( i = xnode->children; i; i = i->next ) 
-			for( j = i->children; j; j = j->next ) 
-				for( k = j->children; k; k = k->next ) 
-					if( !model_new_xml( state, 
-						MODEL( current_col->scol ), 
-						k ) )
-						return( FALSE );
-
+	case WORKSPACEGROUP_LOAD_ROWS:
+		if( !workspacegroup_load_rows( wsg, state, xroot ) )
+			return( FALSE );
 		break;
 
 	default:
@@ -533,12 +674,11 @@ Workspacegroup *
 workspacegroup_new_blank( Workspaceroot *wsr, const char *name )
 {
 	Workspacegroup *wsg;
-	Workspace *ws;
 
 	if( !(wsg = workspacegroup_new( wsr )) )
 		return( NULL );
 	iobject_set( IOBJECT( wsg ), name, _( "Default empty workspace" ) );
-	workspace_new_blank( wsg, "tab1" );
+	(void) workspacegroup_workspace_pick( wsg ); 
 	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
 
 	return( wsg );
@@ -570,7 +710,7 @@ workspacegroup_new_from_file( Workspaceroot *wsr,
 
 	if( !(wsg = workspacegroup_new( wsr )) )
 		return( NULL );
-	wsg->load_type = WORKSPACEGROUP_LOAD_TOP;
+	wsg->load_type = WORKSPACEGROUP_LOAD_NEW;
 
 	if( !filemodel_load_all( FILEMODEL( wsg ), 
 		MODEL( wsr ), filename, filename_user ) ) {
@@ -617,14 +757,163 @@ workspacegroup_new_from_openfile( Workspaceroot *wsr, iOpenFile *of )
 Workspacegroup *
 workspacegroup_duplicate( Workspacegroup *wsg )
 {
+	Workspaceroot *wsr = wsg->wsr;
+
 	Workspacegroup *new_wsg;
+	char filename[FILENAME_MAX];
 
-	new_wsg = workspacegroup_new_blank( wsg->wsr, NULL );
+	if( !temp_name( filename, "ws" ) ||
+		!filemodel_save_all( FILEMODEL( wsg ), filename ) ) 
+		return( NULL );
 
-	/* Save to file, load back again, see workspace_clone().
-	 */
-	printf( "workspacegroup_duplicate:\n" );
+	if( !(new_wsg = workspacegroup_new_from_file( wsr, 
+		filename, FILEMODEL( wsg )->filename )) ) {
+		unlinkf( "%s", filename );
+		return( NULL );
+	}
+	unlinkf( "%s", filename );
 
 	return( new_wsg );
+}
+
+/* Bounding box of columns to be saved. Though we only really set top/left.
+ */
+static void *
+workspacegroup_selected_save_box( Column *col, Rect *box )
+{
+	if( model_save_test( MODEL( col ) ) ) {
+		if( im_rect_isempty( box ) ) {
+			box->left = col->x;
+			box->top = col->y;
+			box->width = 100;
+			box->height = 100;
+		}
+		else {
+			box->left = IM_MIN( box->left, col->x );
+			box->top = IM_MIN( box->top, col->y );
+		}
+	}
+
+	return( NULL );
+}
+
+/* Save just the selected objects.
+ */
+gboolean
+workspacegroup_selected_save( Workspacegroup *wsg, const char *filename )
+{
+	Workspace *ws;
+	WorkspacegroupSaveType save = wsg->save_type;
+
+	if( (ws = workspacegroup_get_workspace( wsg )) ) {
+		Rect box = { 0 };
+
+		workspace_map_column( ws, 
+			(column_map_fn) workspacegroup_selected_save_box, 
+			&box );
+
+		filemodel_set_offset( FILEMODEL( wsg ), box.left, box.top );
+	}
+	else
+		filemodel_set_offset( FILEMODEL( wsg ), 0, 0 );
+
+	wsg->save_type = WORKSPACEGROUP_SAVE_SELECTED;
+	if( !filemodel_save_all( FILEMODEL( wsg ), filename ) ) {
+		wsg->save_type = save;
+		unlinkf( "%s", filename );
+
+		return( FALSE );
+	}
+	wsg->save_type = save;
+
+	return( TRUE );
+}
+
+/* Save just the current workspace. 
+ */
+gboolean
+workspacegroup_current_save( Workspacegroup *wsg, const char *filename )
+{
+	WorkspacegroupSaveType save = wsg->save_type;
+
+	wsg->save_type = WORKSPACEGROUP_SAVE_WORKSPACE;
+	if( !filemodel_save_all( FILEMODEL( wsg ), filename ) ) {
+		wsg->save_type = save;
+		unlinkf( "%s", filename );
+
+		return( FALSE );
+	}
+	wsg->save_type = save;
+
+	return( TRUE );
+}
+
+/* Merge file into the current workspace. 
+ */
+gboolean
+workspacegroup_merge_file( Workspacegroup *wsg, 
+	const char *filename, const char *filename_user )
+{
+	Workspace *ws = workspacegroup_workspace_pick( wsg );
+
+	column_set_offset( 
+		IM_RECT_RIGHT( &ws->area ) + WORKSPACEVIEW_MARGIN_LEFT,
+		WORKSPACEVIEW_MARGIN_TOP );
+
+	wsg->load_type = WORKSPACEGROUP_LOAD_COLUMNS;
+
+	if( !filemodel_load_all( FILEMODEL( wsg ), MODEL( wsg->wsr ), 
+		filename, filename_user ) ) 
+		return( FALSE );
+
+	filemodel_set_modified( FILEMODEL( wsg ), TRUE );
+
+	return( TRUE );
+}
+
+/* Duplicate selected rows in the current workspace.
+ */
+gboolean 
+workspacegroup_selected_duplicate( Workspacegroup *wsg )
+{
+	Workspace *ws;
+	char filename[FILENAME_MAX];
+
+	if( !(ws = workspacegroup_get_workspace( wsg )) || 
+		!(wsg = workspace_get_workspacegroup( ws )) )
+		return( TRUE );
+
+	if( !workspace_selected_any( ws ) ) {
+		Row *row;
+
+		if( !(row = workspace_get_bottom( ws )) )
+			return( FALSE );
+
+		row_select( row );
+	}
+
+	if( !temp_name( filename, "ws" ) )
+		return( FALSE );
+	if( !workspacegroup_selected_save( wsg, filename ) ) 
+		return( FALSE );
+
+        progress_begin();
+
+	if( !workspacegroup_merge_file( wsg, 
+		filename, FILEMODEL( wsg )->filename ) ) {
+		progress_end();
+		unlinkf( "%s", filename );
+
+		return( FALSE );
+	}
+	unlinkf( "%s", filename );
+
+	symbol_recalculate_all();
+	workspace_deselect_all( ws );
+	model_scrollto( MODEL( ws->current ), MODEL_SCROLL_TOP );
+
+	progress_end();
+
+	return( TRUE );
 }
 

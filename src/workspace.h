@@ -47,25 +47,10 @@ typedef enum {
 	WORKSPACE_MODE_NOEDIT	/* Shut down all edits */
 } WorkspaceMode;
 
-/* Three sorts of workspace file load.
- */
-typedef enum {
-	WORKSPACE_LOAD_TOP,	/* Load as new workspace */
-	WORKSPACE_LOAD_COLUMNS,	/* Merge columns into current workspace */
-	WORKSPACE_LOAD_ROWS	/* Merge rows into current column */
-} WorkspaceLoadType;
-
-/* Save mode ... controls behaviour of column_save_test() and row_save_test()
- */
-typedef enum {
-	WORKSPACE_SAVE_ALL,	/* Save all rows */
-	WORKSPACE_SAVE_SELECTED	/* Only save selected rows */
-} WorkspaceSaveType;
-
 /* A workspace.
  */
 struct _Workspace {
-	Filemodel parent_object;
+	Model parent_object;
 
 	/* Our rows are part of this symbol.
 	 */
@@ -93,11 +78,6 @@ struct _Workspace {
 	 */
 	Row *last_error;
 
-	/* Control load/save for this ws.
-	 */
-	WorkspaceLoadType load_type;
-	WorkspaceSaveType save_type;
-
 	Rect area;		/* Rect enclosing the set of columns */
 	Rect vp;		/* Viewport hint ... set by views */
 	int window_width;	/* Enclosing window size ... set by views */
@@ -123,7 +103,7 @@ struct _Workspace {
 };
 
 typedef struct _WorkspaceClass {
-	FilemodelClass parent_class;
+	ModelClass parent_class;
 
 	/* Methods.
 	 */
@@ -167,26 +147,11 @@ Symbol *workspace_add_def_recalc( Workspace *ws, const char *str );
 gboolean workspace_load_file_buf( VipsBuf *buf, const char *filename );
 Symbol *workspace_load_file( Workspace *ws, const char *filename );
 
-gboolean workspace_selected_save( Workspace *ws, const char *filename );
-gboolean workspace_clone_selected( Workspace *ws );
-
-void workspace_rename_column_node( Workspace *ws, 
-	ModelLoadState *state, xmlNode *xnode, xmlNode *columns );
-void workspace_rename_row_node( ModelLoadState *state, 
-	Column *col, xmlNode *xnode );
-
 gboolean workspace_load_compat( Workspace *ws, int major, int minor );
 
 GType workspace_get_type( void );
 Workspace *workspace_new( Workspacegroup *wsg, const char *name );
-Workspace *workspace_new_from_file( Workspaceroot *wsr, 
-	const char *filename, const char *filename_user );
-Workspace *workspace_new_from_openfile( Workspaceroot *wsr, iOpenFile *of );
 Workspace *workspace_new_blank( Workspacegroup *wsg, const char *name );
-gboolean workspace_merge_file( Workspace *ws, 
-	const char *filename, const char *filename_user );
-gboolean workspace_merge_column_file( Workspace *ws, 
-	const char *filename, const char *filename_user );
 
 Row *workspace_get_bottom( Workspace *ws );
 
@@ -195,7 +160,6 @@ gboolean workspace_add_action( Workspace *ws,
 
 int workspace_number( void );
 
-Workspace *workspace_clone( Workspace *ws );
 gboolean workspace_selected_recalc( Workspace *ws );
 void workspace_selected_remove_yesno( Workspace *ws, GtkWidget *parent );
 gboolean workspace_selected_ungroup( Workspace *ws );

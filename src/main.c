@@ -1477,7 +1477,7 @@ main( int argc, char *argv[] )
 	 */
 	if( icontainer_get_n_children( ICONTAINER( main_workspaceroot ) ) > 2 &&
 		workspace_is_empty( ws ) ) {
-		iobject_destroy( IOBJECT( wsg ) ); 
+		IDESTROY( wsg ); 
 		wsg = NULL;
 		ws = NULL;
 	}

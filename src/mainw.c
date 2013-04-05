@@ -621,10 +621,12 @@ static void
 mainw_selected_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 {
 	Workspace *ws;
+	Workspacegroup *wsg;
 
 	progress_begin();
 	if( (ws = mainw_get_workspace( mainw )) &&
-		!workspace_clone_selected( ws ) )
+		(wsg = workspace_get_workspacegroup( ws )) &&
+		!workspacegroup_selected_duplicate( wsg ) )
 		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
 	progress_end();
 }
@@ -1005,9 +1007,13 @@ mainw_workspace_merge_fn( Filesel *filesel,
 {
 	Mainw *mainw = MAINW( a );
 	Workspace *ws;
+	Workspacegroup *wsg;
 
-	if( (ws = mainw_get_workspace( mainw )) &&
-		!workspace_merge_file( ws, filename, NULL ) )
+	if( !(ws = mainw_get_workspace( mainw )) ||
+		!(wsg = workspace_get_workspacegroup( ws )) )
+		return( NULL );
+
+	if( !workspacegroup_merge_file( wsg, filename, NULL ) )
 		return( filesel );
 
 	/* Process some events to make sure we rethink the layout and

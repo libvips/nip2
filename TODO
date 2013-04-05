@@ -7,11 +7,6 @@
 
 - major / minor / micro need to be in workspace, as well as root
 
-- workspacegroup_top_load() row and column mode are broken
-
-  do we need the load_type member in wsgroup? would ModelLoadState be a more
-  natural place for it?
-
 - when we rename workspaces on load to avoid clashes, could we rewrite
   expressions too?
 
@@ -22,9 +17,6 @@
 	workspace_set_modified( column->ws, TRUE );
 
   all the time, is there no neater way to do this?
-
-- make Workspace into a plain model once all the top-level load/save stuff 
-  is moved out
 
 - double-click on tab gutter to make new tab, right-buttn menu with new tab
   item

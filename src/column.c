@@ -194,8 +194,9 @@ column_save_test( Model *model )
 {
 	Column *col = COLUMN( model );
 	Workspace *ws = col->ws;
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
-	if( ws->save_type == WORKSPACE_SAVE_SELECTED ) 
+	if( wsg->save_type == WORKSPACEGROUP_SAVE_SELECTED ) 
 		/* Only save columns containing selected rows.
 		 */
 		return( column_map( col, 

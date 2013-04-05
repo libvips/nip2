@@ -36,26 +36,6 @@
 static ViewClass *parent_class = NULL;
 
 static void
-workspacegroupview_destroy( GtkObject *object )
-{
-	Workspacegroupview *wsgview;
-
-#ifdef DEBUG
-	printf( "workspacegroupview_destroy: %p\n", object );
-#endif /*DEBUG*/
-
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_WORKSPACEGROUPVIEW( object ) );
-
-	wsgview = WORKSPACEGROUPVIEW( object );
-
-	/* Instance destroy.
-	 */
-
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
-}
-
-static void
 workspacegroupview_realize( GtkWidget *widget )
 {
 #ifdef DEBUG
@@ -107,10 +87,10 @@ workspacegroupview_child_add( View *parent, View *child )
 static void
 workspacegroupview_child_remove( View *parent, View *child )
 {
+	/* Stuff.
 	Workspacegroupview *wsgview = WORKSPACEGROUPVIEW( parent );
 	Workspaceview *wview = WORKSPACEVIEW( child );
 
-	/* Stuff.
 	 */
 
 	VIEW_CLASS( parent_class )->child_remove( parent, child );
@@ -145,8 +125,10 @@ workspacegroupview_child_front( View *parent, View *child )
 static void 
 workspacegroupview_refresh( vObject *vobject )
 {
+	/*
 	Workspacegroupview *wsgview = WORKSPACEGROUPVIEW( vobject );
 	Workspacegroup *wsg = WORKSPACEGROUP( VOBJECT( wsgview )->iobject );
+	 */
 
 #ifdef DEBUG
 	printf( "workspacegroupview_refresh: %s\n", IOBJECT( wsg )->name );
@@ -158,14 +140,11 @@ workspacegroupview_refresh( vObject *vobject )
 static void
 workspacegroupview_class_init( WorkspacegroupviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
-
-	object_class->destroy = workspacegroupview_destroy;
 
 	widget_class->realize = workspacegroupview_realize;
 
@@ -229,7 +208,6 @@ workspacegroupview_page_added_cb( GtkNotebook *notebook,
 	Workspaceview *wview = WORKSPACEVIEW( page );
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
 	Workspacegroup *wsg = WORKSPACEGROUP( ICONTAINER( ws )->parent );
-	Workspacegroupview *wsgview = WORKSPACEGROUPVIEW( user_data );
 	Mainw *mainw = MAINW( iwindow_get_root( GTK_WIDGET( notebook ) ) );
 
 	filemodel_set_window_hint( FILEMODEL( wsg ), IWINDOW( mainw ) );
@@ -241,7 +219,6 @@ workspacegroupview_create_window_cb( GtkNotebook *notebook,
 {
 	Workspaceview *wview = WORKSPACEVIEW( page );
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
-	Workspacegroupview *wsgview = WORKSPACEGROUPVIEW( user_data );
 	Workspacegroup *wsg = WORKSPACEGROUP( ICONTAINER( ws )->parent );
 	Workspaceroot *wsr = wsg->wsr; 
 
@@ -263,11 +240,13 @@ static void
 workspacegroupview_reorder_tab_cb( GtkNotebook *notebook, 
 	GtkWidget *page, guint page_num, gpointer user_data )
 {
+	/*
 	Workspaceview *wview = WORKSPACEVIEW( page );
 	Workspacegroupview *wsgview = 
 		WORKSPACEGROUPVIEW( VIEW( wview )->parent );
 	Workspacegroup *wsg = WORKSPACEGROUP( VOBJECT( wsgview )->iobject );
 	Mainw *mainw = MAINW( iwindow_get_root( GTK_WIDGET( notebook ) ) );
+	 */
 
 	printf( "workspacegroupview_reorder_tab_cb: %d\n", page_num );
 }
@@ -298,16 +277,19 @@ workspacegroupview_duplicate_cb( GtkWidget *wid, GtkWidget *host,
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
 	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
-	Workspace *new_ws;
+	Workspacegroup *new_wsg;
+	Mainw *new_mainw;
 
 	progress_begin();
 
-	if( !(new_ws = workspacegroup_duplicate( wsg )) ) {
+	if( !(new_wsg = workspacegroup_duplicate( wsg )) ) {
 		progress_end();
 		iwindow_alert( host, GTK_MESSAGE_ERROR );
 		return;
 	}
-	model_front( MODEL( new_ws ) );
+	new_mainw = mainw_new( new_wsg );
+	gtk_widget_show( GTK_WIDGET( new_mainw ) );
+	model_front( MODEL( new_wsg ) );
 	symbol_recalculate_all();
 
 	progress_end();
@@ -346,11 +328,6 @@ workspacegroupview_close_cb( GtkWidget *wid, GtkWidget *host,
 static void
 workspacegroupview_init( Workspacegroupview *wsgview )
 {
-	GtkWidget *ebox;
-	Panechild *panechild;
-	GtkAdjustment *hadj;
-	GtkAdjustment *vadj;
-
 	wsgview->notebook = gtk_notebook_new();
 	gtk_notebook_set_scrollable( GTK_NOTEBOOK( wsgview->notebook ), TRUE );
 	gtk_notebook_set_group_name( GTK_NOTEBOOK( wsgview->notebook ), 

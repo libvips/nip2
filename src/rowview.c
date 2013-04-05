@@ -318,7 +318,6 @@ rowview_clone_cb( GtkWidget *menu, GtkWidget *button, Rowview *rview )
 {
 	Row *row = ROW( VOBJECT( rview )->iobject );
 	Workspace *ws = row->top_col->ws;
-	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
 	/* Only allow clone of top level rows.
 	 */
@@ -332,7 +331,7 @@ rowview_clone_cb( GtkWidget *menu, GtkWidget *button, Rowview *rview )
 
         workspace_deselect_all( ws );
         row_select( row );
-        if( !workspacegroup_selected_duplicate( wsg ) )
+        if( !workspace_selected_duplicate( ws ) )
 		iwindow_alert( button, GTK_MESSAGE_ERROR );
         workspace_deselect_all( ws );
 

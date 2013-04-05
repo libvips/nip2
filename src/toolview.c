@@ -105,12 +105,11 @@ static void
 toolview_activate_cb( GtkWidget *widget, Toolitem *toolitem )
 {
 	Workspace *ws = item_get_workspace( widget );
-	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
 	switch( toolitem->tool->type ) {
 	case TOOL_DIA:
-		if( !workspacegroup_merge_file( wsg, 
-			FILEMODEL( toolitem->tool )->filename, NULL ) )
+		if( !workspace_merge_file( ws, 
+			FILEMODEL( toolitem->tool )->filename ) )
 			iwindow_alert( widget, GTK_MESSAGE_ERROR );
 		symbol_recalculate_all();
 		break;
@@ -134,7 +133,8 @@ toolview_select_cb( GtkWidget *widget, Toolitem *toolitem )
 {
 	Workspace *ws = item_get_workspace( widget );
 
-	if( ws && toolitem->help )
+	if( ws && 
+		toolitem->help )
 		workspace_set_status( ws, "%s", toolitem->help );
 }
 

@@ -897,7 +897,6 @@ regionview_clone_cb( GtkWidget *menu, Regionview *regionview, Imagepresent *ip )
 {
 	Row *row = HEAPMODEL( regionview->classmodel )->row;
 	Workspace *ws = row->top_col->ws;
-	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
 	if( row->top_row != row ) {
 		error_top( _( "Can't duplicate." ) );
@@ -909,7 +908,7 @@ regionview_clone_cb( GtkWidget *menu, Regionview *regionview, Imagepresent *ip )
 
         workspace_deselect_all( ws );
         row_select( row );
-        if( !workspacegroup_selected_duplicate( wsg ) )
+        if( !workspace_selected_duplicate( ws ) )
 		iwindow_alert( GTK_WIDGET( regionview ), GTK_MESSAGE_ERROR );
         workspace_deselect_all( ws );
 

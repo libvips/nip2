@@ -1634,7 +1634,7 @@ workspace_merge_file( Workspace *ws, const char *filename )
 
 	icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
 
-	return( workspacegroup_merge_file_current( wsg, filename ) );
+	return( workspacegroup_merge_columns( wsg, filename ) );
 }
 
 /* Duplicate selected rows in this workspace.
@@ -1656,13 +1656,12 @@ workspace_selected_duplicate( Workspace *ws )
 
 	if( !temp_name( filename, "ws" ) )
 		return( FALSE );
-	if( !workspacegroup_selected_save( wsg, filename ) ) 
+	if( !workspace_selected_save( ws, filename ) ) 
 		return( FALSE );
 
         progress_begin();
 
-	if( !workspacegroup_merge_file_current( wsg, 
-		filename, FILEMODEL( wsg )->filename ) ) {
+	if( !workspacegroup_merge_rows( wsg, filename ) ) {
 		progress_end();
 		unlinkf( "%s", filename );
 
@@ -1712,19 +1711,13 @@ workspace_selected_save( Workspace *ws, const char *filename )
 	icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
 
 	workspace_map_column( ws, 
-		(column_map_fn) workspacegroup_selected_save_box, 
+		(column_map_fn) workspace_selected_save_box, 
 		&box );
 
 	filemodel_set_offset( FILEMODEL( wsg ), box.left, box.top );
 
-	wsg->save_type = WORKSPACEGROUP_SAVE_SELECTED;
-	if( !filemodel_save_all( FILEMODEL( wsg ), filename ) ) {
-		wsg->save_type = save;
-		unlinkf( "%s", filename );
-
+	if( !workspacegroup_save_selected( wsg, filename ) ) 
 		return( FALSE );
-	}
-	wsg->save_type = save;
 
 	return( TRUE );
 }

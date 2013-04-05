@@ -73,14 +73,14 @@ typedef struct _FilemodelClass {
 
 		set_modified	set/clear the modified state
 
-		save_all	top level save ... intercept this to override
+		top_save	top level save ... intercept this to override
 
 	 */
 
 	gboolean (*top_load)( Filemodel *filemodel, 
 		ModelLoadState *state, Model *parent, xmlNode *xnode );
 	void (*set_modified)( Filemodel *filemodel, gboolean modified );
-	gboolean (*save_all)( Filemodel *filemodel, const char *filename );
+	gboolean (*top_save)( Filemodel *filemodel, const char *filename );
 
 	FileselFileType **filetype;
 	const char *filetype_pref;
@@ -100,7 +100,7 @@ iWindow *filemodel_get_window_hint( Filemodel *filemodel );
 GType filemodel_get_type( void );
 
 void filemodel_set_offset( Filemodel *filemodel, int x_off, int y_off );
-gboolean filemodel_save_all( Filemodel *filemodel, const char *filename );
+gboolean filemodel_top_save( Filemodel *filemodel, const char *filename );
 gboolean filemodel_load_all( Filemodel *filemodel, Model *parent, 
 	const char *filename, const char *filename_user );
 gboolean filemodel_load_all_openfile( Filemodel *filemodel, 

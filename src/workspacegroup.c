@@ -424,17 +424,17 @@ workspacegroup_top_load( Filemodel *filemodel,
 }
 
 static gboolean
-workspacegroup_save_all( Filemodel *filemodel, const char *filename )
+workspacegroup_top_save( Filemodel *filemodel, const char *filename )
 {
 	gboolean result;
 
 #ifdef DEBUG
-	printf( "workspacegroup_save_all: %s to %s\n",
+	printf( "workspacegroup_top_save: %s to %s\n",
 		NN( IOBJECT( filemodel )->name ), filename );
 #endif /*DEBUG*/
 
 	if( (result = FILEMODEL_CLASS( parent_class )->
-		save_all( filemodel, filename )) )
+		top_save( filemodel, filename )) )
 		/* This will add save-as files to recent too. Don't note
 		 * auto_load on recent, since it won't have been loaded by the
 		 * user.
@@ -443,6 +443,143 @@ workspacegroup_save_all( Filemodel *filemodel, const char *filename )
 			mainw_recent_add( &mainw_recent_workspace, filename );
 
 	return( result );
+}
+
+/* Backup the last WS_RETAIN workspaces.
+ */
+#define WS_RETAIN (10)
+
+/* Array of names of workspace files we are keeping.
+ */
+static char *retain_files[WS_RETAIN] = { NULL };
+
+/* On safe exit, remove all ws checkmarks.
+ */
+void
+workspacegroup_autosave_clean( void )
+{
+	int i;
+
+	for( i = 0; i < WS_RETAIN; i++ ) {
+		if( retain_files[i] ) {
+			unlinkf( "%s", retain_files[i] );
+			IM_FREE( retain_files[i] );
+		}
+	}
+}
+
+/* Save the workspace to one of our temp files.
+ */
+static gboolean
+workspacegroup_checkmark_timeout( Workspacegroup *wsg )
+{
+	/* The next one we allocate.
+	 */
+	static int retain_next = 0;
+
+	wsg->autosave_timeout = 0;
+
+	if( !AUTO_WS_SAVE )
+		return( FALSE );
+
+	/* Don't backup auto loaded workspace (eg. preferences). These are
+	 * system things and don't need it.
+	 */
+	if( FILEMODEL( wsg )->auto_load )
+		return( FALSE );
+
+	/* Do we have a name for this retain file?
+	 */
+	if( !retain_files[retain_next] ) {
+		char filename[FILENAME_MAX];
+
+		/* No name yet - make one up.
+		 */
+		if( !temp_name( filename, "ws" ) )
+			return( FALSE );
+		retain_files[retain_next] = im_strdup( NULL, filename );
+	}
+ 
+	if( !filemodel_top_save( FILEMODEL( wsg ), retain_files[retain_next] ) )
+		return( FALSE );
+
+	retain_next = (retain_next + 1) % WS_RETAIN;
+
+	return( FALSE );
+}
+
+/* Save the workspace to one of our temp files. Don't save directly (pretty
+ * slow), instead set a timeout and save when we're quiet for >1s.
+ */
+static void
+workspacegroup_checkmark( Workspacegroup *wsg )
+{
+	if( !AUTO_WS_SAVE )
+		return;
+	if( FILEMODEL( wsg )->auto_load )
+		return;
+
+	IM_FREEF( g_source_remove, wsg->autosave_timeout );
+	wsg->autosave_timeout = g_timeout_add( 1000, 
+		(GSourceFunc) workspacegroup_checkmark_timeout, wsg );
+}
+
+typedef struct {
+	/* Best so far filename.
+	 */
+	char filename[FILENAME_MAX];
+
+	/* Best-so-far file date.
+	 */
+	time_t time;
+} AutoRecover;
+
+/* This file any better than the previous best candidate? Subfn of below.
+ */
+static void *
+workspacegroup_test_file( const char *name, void *a, void *b, void *c )
+{
+	AutoRecover *recover = (AutoRecover *) a;
+
+	char buf[FILENAME_MAX];
+	time_t time;
+	int i;
+
+	im_strncpy( buf, name, FILENAME_MAX );
+	path_expand( buf );
+	for( i = 0; i < WS_RETAIN; i++ )
+		if( retain_files[i] && 
+			strcmp( buf, retain_files[i] ) == 0 )
+			return( NULL );
+	if( !(time = mtime( "%s", buf )) )
+		return( NULL );
+	if( recover->time > 0 && time < recover->time )
+		return( NULL );
+	
+	strcpy( recover->filename, buf );
+	recover->time = time;
+
+	return( NULL );
+}
+
+/* Search for the most recent "*.ws" file 
+ * in the tmp area owned by us, with a size > 0, that's not in our
+ * retain_files[] set.
+ */
+char *
+workspacegroup_autosave_recover( void )
+{
+	AutoRecover recover;
+
+	strcpy( recover.filename, "" ); 
+	recover.time = 0;  
+	(void) path_map_dir( PATH_TMP, "*.ws", 
+		(path_map_fn) workspacegroup_test_file, &recover );
+
+	if( !recover.time )
+		return( NULL );
+
+	return( g_strdup( recover.filename ) ); 
 }
 
 static void 
@@ -478,7 +615,7 @@ workspacegroup_class_init( WorkspacegroupClass *class )
 
 	filemodel_class->filetype = filesel_type_workspace;
 	filemodel_class->top_load = workspacegroup_top_load;
-	filemodel_class->save_all = workspacegroup_save_all;
+	filemodel_class->top_save = workspacegroup_top_save;
 	filemodel_class->set_modified = workspacegroup_set_modified;
 }
 
@@ -683,7 +820,7 @@ gboolean
 workspacegroup_save_selected( Workspacegroup *wsg, const char *filename )
 {
 	wsg->save_type = WORKSPACEGROUP_SAVE_SELECTED;
-	if( !filemodel_save_all( FILEMODEL( wsg ), filename ) ) {
+	if( !filemodel_top_save( FILEMODEL( wsg ), filename ) ) {
 		unlinkf( "%s", filename );
 
 		return( FALSE );
@@ -697,8 +834,8 @@ workspacegroup_save_selected( Workspacegroup *wsg, const char *filename )
 gboolean
 workspacegroup_save_current( Workspacegroup *wsg, const char *filename )
 {
-	wsg->save_type = WORKSPACEGROUP_SAVE_CURRENT;
-	if( !filemodel_save_all( FILEMODEL( wsg ), filename ) ) {
+	wsg->save_type = WORKSPACEGROUP_SAVE_WORKSPACE;
+	if( !filemodel_top_save( FILEMODEL( wsg ), filename ) ) {
 		unlinkf( "%s", filename );
 
 		return( FALSE );
@@ -713,7 +850,7 @@ gboolean
 workspacegroup_save_all( Workspacegroup *wsg, const char *filename )
 {
 	wsg->save_type = WORKSPACEGROUP_SAVE_ALL;
-	if( !filemodel_save_all( FILEMODEL( wsg ), filename ) ) {
+	if( !filemodel_top_save( FILEMODEL( wsg ), filename ) ) {
 		unlinkf( "%s", filename );
 
 		return( FALSE );
@@ -731,7 +868,7 @@ workspacegroup_duplicate( Workspacegroup *wsg )
 	char filename[FILENAME_MAX];
 
 	if( !temp_name( filename, "ws" ) ||
-		!filemodel_save_all( FILEMODEL( wsg ), filename ) ) 
+		!filemodel_top_save( FILEMODEL( wsg ), filename ) ) 
 		return( NULL );
 
 	if( !(new_wsg = workspacegroup_new_from_file( wsr, 
@@ -742,141 +879,4 @@ workspacegroup_duplicate( Workspacegroup *wsg )
 	unlinkf( "%s", filename );
 
 	return( new_wsg );
-}
-
-/* Backup the last WS_RETAIN workspaces.
- */
-#define WS_RETAIN (10)
-
-/* Array of names of workspace files we are keeping.
- */
-static char *retain_files[WS_RETAIN] = { NULL };
-
-/* On safe exit, remove all ws checkmarks.
- */
-void
-workspacegroup_autosave_clean( void )
-{
-	int i;
-
-	for( i = 0; i < WS_RETAIN; i++ ) {
-		if( retain_files[i] ) {
-			unlinkf( "%s", retain_files[i] );
-			IM_FREE( retain_files[i] );
-		}
-	}
-}
-
-/* Save the workspace to one of our temp files.
- */
-static gboolean
-workspacegroup_checkmark_timeout( Workspacegroup *wsg )
-{
-	/* The next one we allocate.
-	 */
-	static int retain_next = 0;
-
-	wsg->autosave_timeout = 0;
-
-	if( !AUTO_WS_SAVE )
-		return( FALSE );
-
-	/* Don't backup auto loaded workspace (eg. preferences). These are
-	 * system things and don't need it.
-	 */
-	if( FILEMODEL( wsg )->auto_load )
-		return( FALSE );
-
-	/* Do we have a name for this retain file?
-	 */
-	if( !retain_files[retain_next] ) {
-		char filename[FILENAME_MAX];
-
-		/* No name yet - make one up.
-		 */
-		if( !temp_name( filename, "ws" ) )
-			return( FALSE );
-		retain_files[retain_next] = im_strdup( NULL, filename );
-	}
- 
-	if( !filemodel_save_all( FILEMODEL( wsg ), retain_files[retain_next] ) )
-		return( FALSE );
-
-	retain_next = (retain_next + 1) % WS_RETAIN;
-
-	return( FALSE );
-}
-
-/* Save the workspace to one of our temp files. Don't save directly (pretty
- * slow), instead set a timeout and save when we're quiet for >1s.
- */
-static void
-workspacegroup_checkmark( Workspacegroup *wsg )
-{
-	if( !AUTO_WS_SAVE )
-		return;
-	if( FILEMODEL( wsg )->auto_load )
-		return;
-
-	IM_FREEF( g_source_remove, wsg->autosave_timeout );
-	wsg->autosave_timeout = g_timeout_add( 1000, 
-		(GSourceFunc) workspacegroup_checkmark_timeout, wsg );
-}
-
-typedef struct {
-	/* Best so far filename.
-	 */
-	char filename[FILENAME_MAX];
-
-	/* Best-so-far file date.
-	 */
-	time_t time;
-} AutoRecover;
-
-/* This file any better than the previous best candidate? Subfn of below.
- */
-static void *
-workspacegroup_test_file( const char *name, void *a, void *b, void *c )
-{
-	AutoRecover *recover = (AutoRecover *) a;
-
-	char buf[FILENAME_MAX];
-	time_t time;
-	int i;
-
-	im_strncpy( buf, name, FILENAME_MAX );
-	path_expand( buf );
-	for( i = 0; i < WS_RETAIN; i++ )
-		if( retain_files[i] && 
-			strcmp( buf, retain_files[i] ) == 0 )
-			return( NULL );
-	if( !(time = mtime( "%s", buf )) )
-		return( NULL );
-	if( recover->time > 0 && time < recover->time )
-		return( NULL );
-	
-	strcpy( recover->filename, buf );
-	recover->time = time;
-
-	return( NULL );
-}
-
-/* Search for the most recent "*.ws" file 
- * in the tmp area owned by us, with a size > 0, that's not in our
- * retain_files[] set.
- */
-char *
-workspacegroup_autosave_recover( void )
-{
-	AutoRecover recover;
-
-	strcpy( recover.filename, "" ); 
-	recover.time = 0;  
-	(void) path_map_dir( PATH_TMP, "*.ws", 
-		(path_map_fn) workspacegroup_test_file, &recover );
-
-	if( !recover.time )
-		return( NULL );
-
-	return( g_strdup( recover.filename ) ); 
 }

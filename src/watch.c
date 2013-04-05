@@ -154,7 +154,7 @@ watchgroup_save( Watchgroup *watchgroup )
 			/* Ignore error returns ... hmm! Tricky: we can come
 			 * here during shutdown.
 			 */
-			(void) filemodel_save_all( filemodel, 
+			(void) filemodel_top_save( filemodel, 
 				filemodel->filename );
 
 			filemodel_set_modified( filemodel, FALSE );

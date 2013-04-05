@@ -53,7 +53,7 @@ prefs_destroy( GtkObject *object )
 		symbol_recalculate_all_force( TRUE );
 
 		if( filemodel->modified &&
-			filemodel_save_all( filemodel, filemodel->filename ) ) 
+			filemodel_top_save( filemodel, filemodel->filename ) ) 
 			filemodel_set_modified( filemodel, FALSE );
 	}
 

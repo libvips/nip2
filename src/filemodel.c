@@ -137,16 +137,16 @@ filemodel_get_window_hint( Filemodel *filemodel )
 }
 
 gboolean
-filemodel_save_all( Filemodel *filemodel, const char *filename )
+filemodel_top_save( Filemodel *filemodel, const char *filename )
 {
 	FilemodelClass *filemodel_class = FILEMODEL_GET_CLASS( filemodel );
 
-	if( filemodel_class->save_all ) 
-		return( filemodel_class->save_all( filemodel, filename ) );
+	if( filemodel_class->top_save ) 
+		return( filemodel_class->top_save( filemodel, filename ) );
 	else {
 		error_top( _( "Not implemented." ) );
 		error_sub( _( "_%s() not implemented for class \"%s\"." ), 
-			"save_all",
+			"top_save",
 			G_OBJECT_CLASS_NAME( filemodel_class ) );
 
 		return( FALSE );
@@ -275,12 +275,12 @@ filemodel_real_set_modified( Filemodel *filemodel, gboolean modified )
 /* Save to filemodel->filename.
  */
 static gboolean
-filemodel_save_all_xml( Filemodel *filemodel, const char *filename )
+filemodel_top_save_xml( Filemodel *filemodel, const char *filename )
 {
 	xmlDoc *xdoc;
 	char namespace[256];
 
-	printf( "filemodel_save_all_xml: %s\n", filename );
+	printf( "filemodel_top_save_xml: %s\n", filename );
 
 	if( !(xdoc = xmlNewDoc( (xmlChar *) "1.0" )) ) {
 		error_top( _( "XML library error." ) );
@@ -332,7 +332,7 @@ filemodel_save_all_xml( Filemodel *filemodel, const char *filename )
 }
 
 static gboolean
-filemodel_save_all_text( Filemodel *filemodel, const char *filename )
+filemodel_top_save_text( Filemodel *filemodel, const char *filename )
 {
 	iOpenFile *of;
 
@@ -350,28 +350,28 @@ filemodel_save_all_text( Filemodel *filemodel, const char *filename )
 }
 
 static gboolean
-filemodel_real_save_all( Filemodel *filemodel, const char *filename )
+filemodel_real_top_save( Filemodel *filemodel, const char *filename )
 {
 	ModelClass *model_class = MODEL_GET_CLASS( filemodel );
 
 #ifdef DEBUG
-	printf( "filemodel_real_save_all: save %s \"%s\" to file \"%s\"\n", 
+	printf( "filemodel_real_top_save: save %s \"%s\" to file \"%s\"\n", 
 		G_OBJECT_TYPE_NAME( filemodel ), 
 		NN( IOBJECT( filemodel )->name ),
 		filename );
 #endif /*DEBUG*/
 
 	if( model_class->save_text ) {
-		if( !filemodel_save_all_text( filemodel, filename ) )
+		if( !filemodel_top_save_text( filemodel, filename ) )
 			return( FALSE );
 	}
 	else if( model_class->save ) {
-		if( !filemodel_save_all_xml( filemodel, filename ) )
+		if( !filemodel_top_save_xml( filemodel, filename ) )
 			return( FALSE );
 	}
 	else {
 		error_top( _( "Not implemented." ) );
-		error_sub( _( "filemodel_real_save_all: no save method" ) );
+		error_sub( _( "filemodel_real_top_save: no save method" ) );
 		return( FALSE );
 	}
 
@@ -396,7 +396,7 @@ filemodel_class_init( FilemodelClass *class )
 	
 	class->top_load = filemodel_real_top_load;
 	class->set_modified = filemodel_real_set_modified;
-	class->save_all = filemodel_real_save_all;
+	class->top_save = filemodel_real_top_save;
 
 	/* NULL isn't an allowed value -- this gets overridden by our
 	 * subclasses.
@@ -652,7 +652,7 @@ filemodel_inter_save_cb( iWindow *iwnd,
 	if( (filename = filesel_get_filename( filesel )) ) {
 		filemodel_set_filename( filemodel, filename );
 
-		if( filemodel_save_all( filemodel, filename ) ) {
+		if( filemodel_top_save( filemodel, filename ) ) {
 			filemodel_set_modified( filemodel, FALSE );
 			nfn( sys, IWINDOW_YES );
 		}
@@ -704,7 +704,7 @@ void
 filemodel_inter_save( iWindow *parent, Filemodel *filemodel )
 {
 	if( filemodel->filename ) {
-		if( !filemodel_save_all( filemodel, filemodel->filename ) ) 
+		if( !filemodel_top_save( filemodel, filemodel->filename ) ) 
 			iwindow_alert( GTK_WIDGET( parent ), 
 				GTK_MESSAGE_ERROR );
 		else 

@@ -3,8 +3,6 @@
 
 - workspacegroupview_reorder_tab_cb() is never called?
 
-- no longer need to update tab labels? we could remove the set_label stuff
-
 - save selected, various duplicate actions need fixing
 
 - major / minor / micro need to be in workspace, as well as root

@@ -92,6 +92,18 @@ workspacegroup_view_new( Model *model, View *parent )
 	return( workspacegroupview_new() );
 }
 
+void *
+workspacegroup_save_workspace( iContainer *icontainer, void *a, void *b )
+{
+	Workspace *ws = WORKSPACE( icontainer );
+	xmlNode *xnode = (xmlNode *) a;
+	Workspacegroup *wsg = WORKSPACEGROUP( b );
+
+	in save-selected mode, save just the current WS
+
+	return( model_save( ws, xnode ) );
+}
+
 static xmlNode *
 workspacegroup_save( Model *model, xmlNode *xnode )
 {
@@ -107,7 +119,7 @@ workspacegroup_save( Model *model, xmlNode *xnode )
 	 */
 
 	if( icontainer_map( ICONTAINER( model ), 
-		(icontainer_map_fn) model_save, xnode, NULL ) )
+		workspacegroup_save_workspace, xnode, model ) )
 		return( NULL );
 
 	return( xnode );

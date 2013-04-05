@@ -685,40 +685,6 @@ workspaceview_refresh( vObject *vobject )
 
 	workspace_jump_update( ws, wview->popup_jump );
 
-	if( wview->label ) { 
-		char txt[512];
-		VipsBuf buf = VIPS_BUF_STATIC( txt );
-
-		if( FILEMODEL( ws )->modified ) 
-			vips_buf_appendf( &buf, "*" ); 
-		vips_buf_appendf( &buf, "%s", NN( IOBJECT( ws->sym )->name ) );
-		gtk_label_set_text( GTK_LABEL( wview->label ), 
-			vips_buf_all( &buf ) );
-
-		vips_buf_rewind( &buf );
-
-		if( FILEMODEL( ws )->filename )
-			vips_buf_appendf( &buf, "%s", 
-				FILEMODEL( ws )->filename );
-		else 
-			vips_buf_appends( &buf, _( "unsaved workspace" ) );
-
-		if( FILEMODEL( ws )->modified ) {
-			vips_buf_appendf( &buf, ", " ); 
-			vips_buf_appendf( &buf, _( "modified" ) ); 
-		}
-
-		if( ws->compat_major ) {
-			vips_buf_appends( &buf, ", " );
-			vips_buf_appends( &buf, _( "compatibility mode" ) );
-			vips_buf_appendf( &buf, " %d.%d", 
-				ws->compat_major, 
-				ws->compat_minor ); 
-		}
-
-		set_tooltip( wview->label, "%s", vips_buf_all( &buf ) );
-	}
-
 	if( ws->rpane_open && !wview->rpane->open )
 		pane_animate_open( wview->rpane );
 	if( !ws->rpane_open && wview->rpane->open )
@@ -1188,10 +1154,3 @@ workspaceview_new( void )
 	return( VIEW( wview ) );
 }
 
-void 
-workspaceview_set_label( Workspaceview *wview, GtkWidget *label )
-{
-	g_assert( !label || !wview->label );
-
-	wview->label = label;
-}

@@ -94,7 +94,6 @@ workspacegroupview_child_add( View *parent, View *child )
 	label = gtk_label_new( NN( IOBJECT( ws->sym )->name ) );
         gtk_container_add( GTK_CONTAINER( ebox ), label );
         gtk_widget_show( GTK_WIDGET( label ) );
-	workspaceview_set_label( wview, label );
 	popup_attach( ebox, wsgview->tab_menu, wview );
 
 	gtk_notebook_insert_page( GTK_NOTEBOOK( wsgview->notebook ),
@@ -218,8 +217,6 @@ workspacegroupview_page_removed_cb( GtkNotebook *notebook,
 		WORKSPACEGROUPVIEW( VIEW( wview )->parent );
 	Workspacegroup *wsg = WORKSPACEGROUP( VOBJECT( wsgview )->iobject );
 	Mainw *mainw = MAINW( iwindow_get_root( notebook ) );
-
-	workspaceview_set_label( wview, NULL );
 
 	if( icontainer_get_n_children( ICONTAINER( wsg ) ) == 0 ) 
 		iwindow_kill( IWINDOW( mainw ) );

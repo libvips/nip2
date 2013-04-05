@@ -55,10 +55,6 @@ struct _Workspaceview {
 	Pane *lpane;
 	Pane *rpane;
 
-	/* Set by our parent: the label we update with the ws name and state.
-	 */
-	GtkWidget *label;
-
 	GtkWidget *popup;
 	GtkWidget *popup_jump;
 
@@ -118,4 +114,3 @@ void workspaceview_set_cursor( Workspaceview *wview, iWindowShape shape );
 GtkType workspaceview_get_type( void );
 View *workspaceview_new( void );
 
-void workspaceview_set_label( Workspaceview *wview, GtkWidget *label );

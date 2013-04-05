@@ -85,9 +85,6 @@ typedef struct _WorkspacegroupClass {
 Workspace *workspacegroup_map( Workspacegroup *wsg, 
 	workspace_map_fn fn, void *a, void *b );
 
-char *workspacegroup_autosave_recover( void );
-void workspacegroup_autosave_clean( void );
-
 GType workspacegroup_get_type( void );
 
 gboolean workspacegroup_is_empty( Workspacegroup *wsg );
@@ -102,15 +99,22 @@ Workspacegroup *workspacegroup_new_from_file( Workspaceroot *wsr,
 Workspacegroup *workspacegroup_new_from_openfile( Workspaceroot *wsr, 
 	iOpenFile *of );
 
+gboolean workspacegroup_merge_workspaces( Workspacegroup *wsg, 
+	const char *filename );
+gboolean workspacegroup_merge_columns( Workspacegroup *wsg, 
+	const char *filename );
+gboolean workspacegroup_merge_rows( Workspacegroup *wsg, 
+	const char *filename );
+
+gboolean workspacegroup_save_selected( Workspacegroup *wsg, 
+	const char *filename );
+gboolean workspacegroup_save_current( Workspacegroup *wsg, 
+	const char *filename );
+gboolean workspacegroup_save_all( Workspacegroup *wsg, 
+	const char *filename );
+
 Workspacegroup *workspacegroup_duplicate( Workspacegroup *wsg );
 
-gboolean workspacegroup_selected_save( Workspacegroup *wsg, 
-	const char *filename );
-gboolean workspacegroup_current_save( Workspacegroup *wsg, 
-	const char *filename );
-gboolean workspacegroup_merge_file( Workspacegroup *wsg, 
-	const char *filename, const char *filename_user );
-gboolean workspacegroup_selected_duplicate( Workspacegroup *wsg );
-
-gboolean workspacegroup_load_file( Workspacegroup *wsg, const char *filename );
+char *workspacegroup_autosave_recover( void );
+void workspacegroup_autosave_clean( void );
 

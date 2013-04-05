@@ -1,3 +1,9 @@
+- fix up workspace duplicate, workspace_duplicate_selected, column_duplicate
+  using new workspacegroup load/save/merge functions
+
+
+- right-click on tab, duplicate, does nothing
+
 - fix naming: for the user, a mainw displays a workspace and a workspace has
   tabs
 

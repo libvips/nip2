@@ -356,7 +356,7 @@ workspacegroupview_init( Workspacegroupview *wsgview )
 	gtk_notebook_set_group_name( GTK_NOTEBOOK( wsgview->notebook ), 
 		"wsgview" );
 	gtk_notebook_set_tab_pos( GTK_NOTEBOOK( wsgview->notebook ), 
-		GTK_POS_BOTTOM );
+		GTK_POS_TOP );
 	g_signal_connect( wsgview->notebook, "switch_page", 
 		G_CALLBACK( workspacegroupview_switch_page_cb ), wsgview );
 	g_signal_connect( wsgview->notebook, "page_added", 

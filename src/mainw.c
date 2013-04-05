@@ -1554,7 +1554,7 @@ static GtkActionEntry mainw_actions[] = {
 		G_CALLBACK( mainw_column_new_named_action_cb ) },
 
 	{ "NewTab", 
-		GTK_STOCK_NEW, N_( "_Tab" ), NULL, 
+		GTK_STOCK_NEW, N_( "_Tab" ), "<control>T", 
 		N_( "Create a new tab" ), 
 		G_CALLBACK( mainw_workspace_new_action_cb ) },
 

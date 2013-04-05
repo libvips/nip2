@@ -326,6 +326,8 @@ column_new( Workspace *ws, const char *name )
 
 	Column *col;
 
+	printf( "column_new: %s\n", name ); 
+
 	if( workspace_column_find( ws, name ) ) {
 		error_top( _( "Name clash." ) );
 		error_sub( _( "Can't create column \"%s\". A column with that "

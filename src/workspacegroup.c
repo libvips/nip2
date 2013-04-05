@@ -48,6 +48,7 @@ static Workspace *
 workspacegroup_workspace_pick( Workspacegroup *wsg )
 {
 	Workspace *ws;
+	char name[MAX_STRSIZE];
 
 	if( (ws = workspacegroup_get_workspace( wsg )) )
 		return( ws );
@@ -59,8 +60,13 @@ workspacegroup_workspace_pick( Workspacegroup *wsg )
 		return( ws );
 	}
 
-	ws = workspace_new( wsg, "tab1" );
+	strcpy( name, "tab1" );
+	while( compile_lookup( wsg->wsr->sym->expr->compile, name ) )
+		increment_name( name );
+	ws = workspace_new( wsg, name );
 	icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
+
+	(void) workspace_column_pick( ws ); 
 
 	return( ws );
 }
@@ -122,8 +128,8 @@ workspacegroup_view_new( Model *model, View *parent )
 	return( workspacegroupview_new() );
 }
 
-void *
-workspacegroup_save_workspace( iContainer *icontainer, void *a, void *b )
+static void *
+workspacegroup_save_sub( iContainer *icontainer, void *a, void *b )
 {
 	Workspace *ws = WORKSPACE( icontainer );
 	xmlNode *xnode = (xmlNode *) a;
@@ -153,7 +159,7 @@ workspacegroup_save( Model *model, xmlNode *xnode )
 	 */
 
 	if( icontainer_map( ICONTAINER( model ), 
-		workspacegroup_save_workspace, xnode, model ) )
+		workspacegroup_save_sub, xnode, model ) )
 		return( NULL );
 
 	return( xnode );
@@ -417,6 +423,327 @@ workspacegroup_top_load( Filemodel *filemodel,
 		state, parent, xnode ) );
 }
 
+static gboolean
+workspacegroup_save_all( Filemodel *filemodel, const char *filename )
+{
+	gboolean result;
+
+#ifdef DEBUG
+	printf( "workspacegroup_save_all: %s to %s\n",
+		NN( IOBJECT( filemodel )->name ), filename );
+#endif /*DEBUG*/
+
+	if( (result = FILEMODEL_CLASS( parent_class )->
+		save_all( filemodel, filename )) )
+		/* This will add save-as files to recent too. Don't note
+		 * auto_load on recent, since it won't have been loaded by the
+		 * user.
+		 */
+		if( !filemodel->auto_load )
+			mainw_recent_add( &mainw_recent_workspace, filename );
+
+	return( result );
+}
+
+static void 
+workspacegroup_set_modified( Filemodel *filemodel, gboolean modified )
+{
+	Workspacegroup *wsg = WORKSPACEGROUP( filemodel );
+
+	workspacegroup_checkmark( wsg );
+
+	FILEMODEL_CLASS( parent_class )->set_modified( filemodel, modified );
+}
+
+static void
+workspacegroup_class_init( WorkspacegroupClass *class )
+{
+	GObjectClass *gobject_class = (GObjectClass *) class;
+	ModelClass *model_class = (ModelClass *) class;
+	FilemodelClass *filemodel_class = (FilemodelClass *) class;
+
+	parent_class = g_type_class_peek_parent( class );
+
+	/* Create signals.
+	 */
+
+	/* Init methods.
+	 */
+	gobject_class->dispose = workspacegroup_dispose;
+
+	/* ->load() is done by workspace_top_load().
+	 */
+	model_class->view_new = workspacegroup_view_new;
+	model_class->save = workspacegroup_save;
+
+	filemodel_class->filetype = filesel_type_workspace;
+	filemodel_class->top_load = workspacegroup_top_load;
+	filemodel_class->save_all = workspacegroup_save_all;
+	filemodel_class->set_modified = workspacegroup_set_modified;
+}
+
+static void
+workspacegroup_init( Workspacegroup *wsg )
+{
+}
+
+GType
+workspacegroup_get_type( void )
+{
+	static GType type = 0;
+
+	if( !type ) {
+		static const GTypeInfo info = {
+			sizeof( WorkspacegroupClass ),
+			NULL,           /* base_init */
+			NULL,           /* base_finalize */
+			(GClassInitFunc) workspacegroup_class_init,
+			NULL,           /* class_finalize */
+			NULL,           /* class_data */
+			sizeof( Workspacegroup ),
+			32,             /* n_preallocs */
+			(GInstanceInitFunc) workspacegroup_init,
+		};
+
+		type = g_type_register_static( TYPE_FILEMODEL, 
+			"Workspacegroup", &info, 0 );
+	}
+
+	return( type );
+}
+
+static void
+workspacegroup_link( Workspacegroup *wsg, Workspaceroot *wsr )
+{
+	icontainer_child_add( ICONTAINER( wsr ), ICONTAINER( wsg ), -1 );
+	wsg->wsr = wsr;
+	filemodel_register( FILEMODEL( wsg ) );
+}
+
+Workspacegroup *
+workspacegroup_new( Workspaceroot *wsr )
+{
+	Workspacegroup *wsg;
+
+#ifdef DEBUG
+#endif /*DEBUG*/
+	printf( "workspacegroup_new:\n" ); 
+
+	wsg = WORKSPACEGROUP( g_object_new( TYPE_WORKSPACEGROUP, NULL ) );
+	workspacegroup_link( wsg, wsr );
+	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
+
+	return( wsg );
+}
+
+/* Make the blank workspacegroup we present the user with (in the absence of
+ * anything else).
+ */
+Workspacegroup *
+workspacegroup_new_blank( Workspaceroot *wsr, const char *name )
+{
+	Workspacegroup *wsg;
+
+	if( !(wsg = workspacegroup_new( wsr )) )
+		return( NULL );
+	iobject_set( IOBJECT( wsg ), name, _( "Default empty workspace" ) );
+	(void) workspacegroup_workspace_pick( wsg ); 
+	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
+
+	return( wsg );
+}
+
+Workspacegroup *
+workspacegroup_new_filename( Workspaceroot *wsr, const char *filename )
+{
+	Workspacegroup *wsg;
+	char name[FILENAME_MAX];
+
+	if( !(wsg = workspacegroup_new( wsr )) )
+		return( NULL ); 
+	name_from_filename( filename, name );
+	iobject_set( IOBJECT( wsg ), name, _( "Default empty workspace" ) );
+	filemodel_set_filename( FILEMODEL( wsg ), filename );
+	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
+
+	return( wsg );
+}
+
+/* Load a file as a workspacegroup.
+ */
+Workspacegroup *
+workspacegroup_new_from_file( Workspaceroot *wsr, 
+	const char *filename, const char *filename_user )
+{
+	Workspacegroup *wsg;
+
+	if( !(wsg = workspacegroup_new( wsr )) )
+		return( NULL );
+
+	wsg->load_type = WORKSPACEGROUP_LOAD_NEW;
+	if( !filemodel_load_all( FILEMODEL( wsg ), 
+		MODEL( wsr ), filename, filename_user ) ) {
+		g_object_unref( G_OBJECT( wsg ) );
+		return( NULL );
+	}
+
+	filemodel_set_filename( FILEMODEL( wsg ), 
+		filename_user ? filename_user : filename );
+	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
+
+	return( wsg );
+}
+
+/* New workspacegroup from a file.
+ */
+Workspacegroup *
+workspacegroup_new_from_openfile( Workspaceroot *wsr, iOpenFile *of )
+{
+	Workspacegroup *wsg;
+
+#ifdef DEBUG
+	printf( "workspacegroup_new_from_openfile: %s\n", of->fname );
+#endif /*DEBUG*/
+
+	if( !(wsg = workspacegroup_new( wsr )) )
+		return( NULL );
+
+	wsg->load_type = WORKSPACEGROUP_LOAD_NEW;
+	if( !filemodel_load_all_openfile( FILEMODEL( wsg ), 
+		MODEL( wsr ), of ) ) {
+		g_object_unref( G_OBJECT( wsg ) );
+		return( NULL );
+	}
+
+	filemodel_set_filename( FILEMODEL( wsg ), of->fname );
+	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
+
+#ifdef DEBUG
+	printf( "(set name = %s)\n", IOBJECT( wsg )->name );
+#endif /*DEBUG*/
+
+	return( wsg );
+}
+
+/* Merge into workspacegroup as a set of new workspaces.
+ */
+gboolean
+workspacegroup_merge_workspaces( Workspacegroup *wsg, const char *filename )
+{
+	wsg->load_type = WORKSPACEGROUP_LOAD_NEW;
+	if( !filemodel_load_all( FILEMODEL( wsg ), MODEL( wsg->wsr ), 
+		filename, NULL ) ) 
+		return( FALSE );
+
+	filemodel_set_modified( FILEMODEL( wsg ), TRUE );
+
+	return( TRUE );
+}
+
+/* Merge into the current workspace as a set of columns. 
+ */
+gboolean
+workspacegroup_merge_columns( Workspacegroup *wsg, const char *filename )
+{
+	Workspace *ws;
+
+	if( (ws = workspacegroup_get_workspace( wsg )) ) 
+		column_set_offset( 
+			IM_RECT_RIGHT( &ws->area ) + WORKSPACEVIEW_MARGIN_LEFT,
+			WORKSPACEVIEW_MARGIN_TOP );
+
+	wsg->load_type = WORKSPACEGROUP_LOAD_COLUMNS;
+	if( !filemodel_load_all( FILEMODEL( wsg ), MODEL( wsg->wsr ), 
+		filename, NULL ) ) 
+		return( FALSE );
+
+	filemodel_set_modified( FILEMODEL( wsg ), TRUE );
+
+	return( TRUE );
+}
+
+/* Merge into the current workspace as a set of rows.  
+ */
+gboolean
+workspacegroup_merge_rows( Workspacegroup *wsg, const char *filename )
+{
+	wsg->load_type = WORKSPACEGROUP_LOAD_ROWS;
+	if( !filemodel_load_all( FILEMODEL( wsg ), MODEL( wsg->wsr ), 
+		filename, NULL ) ) 
+		return( FALSE );
+
+	filemodel_set_modified( FILEMODEL( wsg ), TRUE );
+
+	return( TRUE );
+}
+
+/* Save just the selected objects in the current workspace. 
+ */
+gboolean
+workspacegroup_save_selected( Workspacegroup *wsg, const char *filename )
+{
+	wsg->save_type = WORKSPACEGROUP_SAVE_SELECTED;
+	if( !filemodel_save_all( FILEMODEL( wsg ), filename ) ) {
+		unlinkf( "%s", filename );
+
+		return( FALSE );
+	}
+
+	return( TRUE );
+}
+
+/* Save just the current workspace. 
+ */
+gboolean
+workspacegroup_save_current( Workspacegroup *wsg, const char *filename )
+{
+	wsg->save_type = WORKSPACEGROUP_SAVE_CURRENT;
+	if( !filemodel_save_all( FILEMODEL( wsg ), filename ) ) {
+		unlinkf( "%s", filename );
+
+		return( FALSE );
+	}
+
+	return( TRUE );
+}
+
+/* Save an entire workspacegroup.
+ */
+gboolean
+workspacegroup_save_all( Workspacegroup *wsg, const char *filename )
+{
+	wsg->save_type = WORKSPACEGROUP_SAVE_ALL;
+	if( !filemodel_save_all( FILEMODEL( wsg ), filename ) ) {
+		unlinkf( "%s", filename );
+
+		return( FALSE );
+	}
+
+	return( TRUE );
+}
+
+Workspacegroup *
+workspacegroup_duplicate( Workspacegroup *wsg )
+{
+	Workspaceroot *wsr = wsg->wsr;
+
+	Workspacegroup *new_wsg;
+	char filename[FILENAME_MAX];
+
+	if( !temp_name( filename, "ws" ) ||
+		!filemodel_save_all( FILEMODEL( wsg ), filename ) ) 
+		return( NULL );
+
+	if( !(new_wsg = workspacegroup_new_from_file( wsr, 
+		filename, FILEMODEL( wsg )->filename )) ) {
+		unlinkf( "%s", filename );
+		return( NULL );
+	}
+	unlinkf( "%s", filename );
+
+	return( new_wsg );
+}
+
 /* Backup the last WS_RETAIN workspaces.
  */
 #define WS_RETAIN (10)
@@ -553,367 +880,3 @@ workspacegroup_autosave_recover( void )
 
 	return( g_strdup( recover.filename ) ); 
 }
-
-static void 
-workspacegroup_set_modified( Filemodel *filemodel, gboolean modified )
-{
-	Workspacegroup *wsg = WORKSPACEGROUP( filemodel );
-
-	workspacegroup_checkmark( wsg );
-
-	FILEMODEL_CLASS( parent_class )->set_modified( filemodel, modified );
-}
-
-static gboolean
-workspacegroup_save_all( Filemodel *filemodel, const char *filename )
-{
-	gboolean result;
-
-#ifdef DEBUG
-	printf( "workspacegroup_save_all: %s to %s\n",
-		NN( IOBJECT( filemodel )->name ), filename );
-#endif /*DEBUG*/
-
-	if( (result = FILEMODEL_CLASS( parent_class )->
-		save_all( filemodel, filename )) )
-		/* This will add save-as files to recent too. Don't note
-		 * auto_load on recent, since it won't have been loaded by the
-		 * user.
-		 */
-		if( !filemodel->auto_load )
-			mainw_recent_add( &mainw_recent_workspace, filename );
-
-	return( result );
-}
-
-static void
-workspacegroup_class_init( WorkspacegroupClass *class )
-{
-	GObjectClass *gobject_class = (GObjectClass *) class;
-	ModelClass *model_class = (ModelClass *) class;
-	FilemodelClass *filemodel_class = (FilemodelClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
-
-	/* Create signals.
-	 */
-
-	/* Init methods.
-	 */
-	gobject_class->dispose = workspacegroup_dispose;
-
-	/* ->load() is done by workspace_top_load().
-	 */
-	model_class->view_new = workspacegroup_view_new;
-	model_class->save = workspacegroup_save;
-
-	filemodel_class->filetype = filesel_type_workspace;
-	filemodel_class->top_load = workspacegroup_top_load;
-	filemodel_class->save_all = workspacegroup_save_all;
-	filemodel_class->set_modified = workspacegroup_set_modified;
-}
-
-static void
-workspacegroup_init( Workspacegroup *wsg )
-{
-}
-
-GType
-workspacegroup_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( WorkspacegroupClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) workspacegroup_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Workspacegroup ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) workspacegroup_init,
-		};
-
-		type = g_type_register_static( TYPE_FILEMODEL, 
-			"Workspacegroup", &info, 0 );
-	}
-
-	return( type );
-}
-
-static void
-workspacegroup_link( Workspacegroup *wsg, Workspaceroot *wsr )
-{
-	icontainer_child_add( ICONTAINER( wsr ), ICONTAINER( wsg ), -1 );
-	wsg->wsr = wsr;
-	filemodel_register( FILEMODEL( wsg ) );
-}
-
-Workspacegroup *
-workspacegroup_new( Workspaceroot *wsr )
-{
-	Workspacegroup *wsg;
-
-#ifdef DEBUG
-#endif /*DEBUG*/
-	printf( "workspacegroup_new:\n" ); 
-
-	wsg = WORKSPACEGROUP( g_object_new( TYPE_WORKSPACEGROUP, NULL ) );
-	workspacegroup_link( wsg, wsr );
-	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
-
-	return( wsg );
-}
-
-/* Make the blank workspacegroup we present the user with (in the absence of
- * anything else).
- */
-Workspacegroup *
-workspacegroup_new_blank( Workspaceroot *wsr, const char *name )
-{
-	Workspacegroup *wsg;
-
-	if( !(wsg = workspacegroup_new( wsr )) )
-		return( NULL );
-	iobject_set( IOBJECT( wsg ), name, _( "Default empty workspace" ) );
-	(void) workspacegroup_workspace_pick( wsg ); 
-	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
-
-	return( wsg );
-}
-
-Workspacegroup *
-workspacegroup_new_filename( Workspaceroot *wsr, const char *filename )
-{
-	Workspacegroup *wsg;
-	char name[FILENAME_MAX];
-
-	if( !(wsg = workspacegroup_new( wsr )) )
-		return( NULL ); 
-	name_from_filename( filename, name );
-	iobject_set( IOBJECT( wsg ), name, _( "Default empty workspace" ) );
-	filemodel_set_filename( FILEMODEL( wsg ), filename );
-	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
-
-	return( wsg );
-}
-
-/* Load a file as a workspacegroup.
- */
-Workspacegroup *
-workspacegroup_new_from_file( Workspaceroot *wsr, 
-	const char *filename, const char *filename_user )
-{
-	Workspacegroup *wsg;
-
-	if( !(wsg = workspacegroup_new( wsr )) )
-		return( NULL );
-	wsg->load_type = WORKSPACEGROUP_LOAD_NEW;
-
-	if( !filemodel_load_all( FILEMODEL( wsg ), 
-		MODEL( wsr ), filename, filename_user ) ) {
-		g_object_unref( G_OBJECT( wsg ) );
-		return( NULL );
-	}
-
-	filemodel_set_filename( FILEMODEL( wsg ), 
-		filename_user ? filename_user : filename );
-	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
-
-	return( wsg );
-}
-
-/* New workspacegroup from a file.
- */
-Workspacegroup *
-workspacegroup_new_from_openfile( Workspaceroot *wsr, iOpenFile *of )
-{
-	Workspacegroup *wsg;
-
-#ifdef DEBUG
-	printf( "workspacegroup_new_from_openfile: %s\n", of->fname );
-#endif /*DEBUG*/
-
-	if( !(wsg = workspacegroup_new( wsr )) )
-		return( NULL );
-	if( !filemodel_load_all_openfile( FILEMODEL( wsg ), 
-		MODEL( wsr ), of ) ) {
-		g_object_unref( G_OBJECT( wsg ) );
-		return( NULL );
-	}
-
-	filemodel_set_filename( FILEMODEL( wsg ), of->fname );
-	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
-
-#ifdef DEBUG
-	printf( "(set name = %s)\n", IOBJECT( wsg )->name );
-#endif /*DEBUG*/
-
-	return( wsg );
-}
-
-Workspacegroup *
-workspacegroup_duplicate( Workspacegroup *wsg )
-{
-	Workspaceroot *wsr = wsg->wsr;
-
-	Workspacegroup *new_wsg;
-	char filename[FILENAME_MAX];
-
-	if( !temp_name( filename, "ws" ) ||
-		!filemodel_save_all( FILEMODEL( wsg ), filename ) ) 
-		return( NULL );
-
-	if( !(new_wsg = workspacegroup_new_from_file( wsr, 
-		filename, FILEMODEL( wsg )->filename )) ) {
-		unlinkf( "%s", filename );
-		return( NULL );
-	}
-	unlinkf( "%s", filename );
-
-	return( new_wsg );
-}
-
-/* Bounding box of columns to be saved. Though we only really set top/left.
- */
-static void *
-workspacegroup_selected_save_box( Column *col, Rect *box )
-{
-	if( model_save_test( MODEL( col ) ) ) {
-		if( im_rect_isempty( box ) ) {
-			box->left = col->x;
-			box->top = col->y;
-			box->width = 100;
-			box->height = 100;
-		}
-		else {
-			box->left = IM_MIN( box->left, col->x );
-			box->top = IM_MIN( box->top, col->y );
-		}
-	}
-
-	return( NULL );
-}
-
-/* Save just the selected objects.
- */
-gboolean
-workspacegroup_selected_save( Workspacegroup *wsg, const char *filename )
-{
-	Workspace *ws;
-	WorkspacegroupSaveType save = wsg->save_type;
-
-	if( (ws = workspacegroup_get_workspace( wsg )) ) {
-		Rect box = { 0 };
-
-		workspace_map_column( ws, 
-			(column_map_fn) workspacegroup_selected_save_box, 
-			&box );
-
-		filemodel_set_offset( FILEMODEL( wsg ), box.left, box.top );
-	}
-	else
-		filemodel_set_offset( FILEMODEL( wsg ), 0, 0 );
-
-	wsg->save_type = WORKSPACEGROUP_SAVE_SELECTED;
-	if( !filemodel_save_all( FILEMODEL( wsg ), filename ) ) {
-		wsg->save_type = save;
-		unlinkf( "%s", filename );
-
-		return( FALSE );
-	}
-	wsg->save_type = save;
-
-	return( TRUE );
-}
-
-/* Save just the current workspace. 
- */
-gboolean
-workspacegroup_current_save( Workspacegroup *wsg, const char *filename )
-{
-	WorkspacegroupSaveType save = wsg->save_type;
-
-	wsg->save_type = WORKSPACEGROUP_SAVE_WORKSPACE;
-	if( !filemodel_save_all( FILEMODEL( wsg ), filename ) ) {
-		wsg->save_type = save;
-		unlinkf( "%s", filename );
-
-		return( FALSE );
-	}
-	wsg->save_type = save;
-
-	return( TRUE );
-}
-
-/* Merge file into the current workspace. 
- */
-gboolean
-workspacegroup_merge_file( Workspacegroup *wsg, 
-	const char *filename, const char *filename_user )
-{
-	Workspace *ws = workspacegroup_workspace_pick( wsg );
-
-	column_set_offset( 
-		IM_RECT_RIGHT( &ws->area ) + WORKSPACEVIEW_MARGIN_LEFT,
-		WORKSPACEVIEW_MARGIN_TOP );
-
-	wsg->load_type = WORKSPACEGROUP_LOAD_COLUMNS;
-
-	if( !filemodel_load_all( FILEMODEL( wsg ), MODEL( wsg->wsr ), 
-		filename, filename_user ) ) 
-		return( FALSE );
-
-	filemodel_set_modified( FILEMODEL( wsg ), TRUE );
-
-	return( TRUE );
-}
-
-/* Duplicate selected rows in the current workspace.
- */
-gboolean 
-workspacegroup_selected_duplicate( Workspacegroup *wsg )
-{
-	Workspace *ws;
-	char filename[FILENAME_MAX];
-
-	if( !(ws = workspacegroup_get_workspace( wsg )) || 
-		!(wsg = workspace_get_workspacegroup( ws )) )
-		return( TRUE );
-
-	if( !workspace_selected_any( ws ) ) {
-		Row *row;
-
-		if( !(row = workspace_get_bottom( ws )) )
-			return( FALSE );
-
-		row_select( row );
-	}
-
-	if( !temp_name( filename, "ws" ) )
-		return( FALSE );
-	if( !workspacegroup_selected_save( wsg, filename ) ) 
-		return( FALSE );
-
-        progress_begin();
-
-	if( !workspacegroup_merge_file( wsg, 
-		filename, FILEMODEL( wsg )->filename ) ) {
-		progress_end();
-		unlinkf( "%s", filename );
-
-		return( FALSE );
-	}
-	unlinkf( "%s", filename );
-
-	symbol_recalculate_all();
-	workspace_deselect_all( ws );
-	model_scrollto( MODEL( ws->current ), MODEL_SCROLL_TOP );
-
-	progress_end();
-
-	return( TRUE );
-}
-

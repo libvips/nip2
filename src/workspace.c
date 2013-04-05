@@ -1624,3 +1624,107 @@ workspace_jump_update( Workspace *ws, GtkWidget *menu )
 
 	g_slist_free( columns );
 }
+
+/* Merge file into this workspace. 
+ */
+gboolean
+workspace_merge_file( Workspace *ws, const char *filename )
+{
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
+
+	icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
+
+	return( workspacegroup_merge_file_current( wsg, filename ) );
+}
+
+/* Duplicate selected rows in this workspace.
+ */
+gboolean 
+workspace_selected_duplicate( Workspace *ws )
+{
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
+	char filename[FILENAME_MAX];
+
+	if( !workspace_selected_any( ws ) ) {
+		Row *row;
+
+		if( !(row = workspace_get_bottom( ws )) )
+			return( FALSE );
+
+		row_select( row );
+	}
+
+	if( !temp_name( filename, "ws" ) )
+		return( FALSE );
+	if( !workspacegroup_selected_save( wsg, filename ) ) 
+		return( FALSE );
+
+        progress_begin();
+
+	if( !workspacegroup_merge_file_current( wsg, 
+		filename, FILEMODEL( wsg )->filename ) ) {
+		progress_end();
+		unlinkf( "%s", filename );
+
+		return( FALSE );
+	}
+	unlinkf( "%s", filename );
+
+	symbol_recalculate_all();
+	workspace_deselect_all( ws );
+	model_scrollto( MODEL( ws->current ), MODEL_SCROLL_TOP );
+
+	progress_end();
+
+	return( TRUE );
+}
+
+/* Bounding box of columns to be saved. Though we only really set top/left.
+ */
+static void *
+workspace_selected_save_box( Column *col, Rect *box )
+{
+	if( model_save_test( MODEL( col ) ) ) {
+		if( im_rect_isempty( box ) ) {
+			box->left = col->x;
+			box->top = col->y;
+			box->width = 100;
+			box->height = 100;
+		}
+		else {
+			box->left = IM_MIN( box->left, col->x );
+			box->top = IM_MIN( box->top, col->y );
+		}
+	}
+
+	return( NULL );
+}
+
+/* Save just the selected objects.
+ */
+gboolean
+workspace_selected_save( Workspace *ws, const char *filename )
+{
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
+
+	Rect box = { 0 };
+
+	icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
+
+	workspace_map_column( ws, 
+		(column_map_fn) workspacegroup_selected_save_box, 
+		&box );
+
+	filemodel_set_offset( FILEMODEL( wsg ), box.left, box.top );
+
+	wsg->save_type = WORKSPACEGROUP_SAVE_SELECTED;
+	if( !filemodel_save_all( FILEMODEL( wsg ), filename ) ) {
+		wsg->save_type = save;
+		unlinkf( "%s", filename );
+
+		return( FALSE );
+	}
+	wsg->save_type = save;
+
+	return( TRUE );
+}

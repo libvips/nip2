@@ -181,11 +181,10 @@ watchgroup_dirty( Watchgroup *watchgroup )
 	 */
 	if( (ws = watchgroup_get_workspace( watchgroup )) ) {
 		Workspacegroup *wsg = workspace_get_workspacegroup( ws );
-		Filemodel *filemodel = FILEMODEL( ws );
 
 		/* Mark ws dirty, start save timer.
 		 */
-		filemodel_set_modified( filemodel, TRUE );
+		filemodel_set_modified( FILEMODEL( wsg ), TRUE );
 
 		IM_FREEF( g_source_remove, watchgroup->auto_save_timeout );
 		watchgroup->auto_save_timeout = g_timeout_add( 1000, 

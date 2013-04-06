@@ -270,39 +270,99 @@ workspacegroupview_add_workspace_cb( GtkWidget *wid,
 }
 #endif /*USE_NOTEBOOK_ACTION*/
 
+static void
+workspacegroupview_rename_sub( iWindow *iwnd, void *client, 
+	iWindowNotifyFn nfn, void *sys )
+{
+	Workspace *ws = WORKSPACE( client );
+	Stringset *ss = STRINGSET( iwnd );
+	StringsetChild *name = stringset_child_get( ss, _( "Name" ) );
+	StringsetChild *caption = stringset_child_get( ss, _( "Caption" ) );
+
+	char name_text[1024];
+	char caption_text[1024];
+
+	if( !get_geditable_name( name->entry, name_text, 1024 ) ||
+		!get_geditable_string( caption->entry, caption_text, 1024 ) ) {
+		nfn( sys, IWINDOW_ERROR );
+		return;
+	}
+
+	if( !workspace_rename( ws, name_text, caption_text ) ) {
+		nfn( sys, IWINDOW_ERROR );
+		return;
+	}
+
+	nfn( sys, IWINDOW_YES );
+}
+
+static void                
+workspacegroupview_rename_cb( GtkWidget *wid, GtkWidget *host, 
+	Workspaceview *wview )
+{
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+	GtkWidget *ss = stringset_new();
+
+	stringset_child_new( STRINGSET( ss ), 
+		_( "Name" ), IOBJECT( ws )->name, 
+		_( "Set tab name here" ) );
+	stringset_child_new( STRINGSET( ss ), 
+		_( "Caption" ), IOBJECT( ws )->caption, 
+		_( "Set tab caption here" ) );
+
+	iwindow_set_title( IWINDOW( ss ), _( "Rename Tab" ) );
+	idialog_set_callbacks( IDIALOG( ss ), 
+		iwindow_true_cb, NULL, NULL, ws );
+	idialog_add_ok( IDIALOG( ss ), 
+		workspacegroupview_rename_sub, _( "Rename Tab" ) );
+	iwindow_set_parent( IWINDOW( ss ), GTK_WIDGET( wview ) );
+	iwindow_build( IWINDOW( ss ) );
+
+	gtk_widget_show( ss );
+}
+
+static void                
+workspacegroupview_select_all_cb( GtkWidget *wid, GtkWidget *host, 
+	Workspaceview *wview )
+{
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+
+	workspace_select_all( ws );
+}
+
 static void                
 workspacegroupview_duplicate_cb( GtkWidget *wid, GtkWidget *host, 
 	Workspaceview *wview )
 {
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
-	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
-	Workspacegroup *new_wsg;
-	Mainw *new_mainw;
-
-	progress_begin();
-
-	if( !(new_wsg = workspacegroup_duplicate( wsg )) ) {
-		progress_end();
+	if( !workspace_duplicate( ws ) ) {
 		iwindow_alert( host, GTK_MESSAGE_ERROR );
 		return;
 	}
-	new_mainw = mainw_new( new_wsg );
-	gtk_widget_show( GTK_WIDGET( new_mainw ) );
-	model_front( MODEL( new_wsg ) );
-	symbol_recalculate_all();
-
-	progress_end();
 }
 
-static void                
-workspacegroupview_save_cb( GtkWidget *wid, GtkWidget *host, 
-	Workspaceview *wview )
+static void
+workspacegroupview_save_as_sub( iWindow *iwnd, 
+	void *client, iWindowNotifyFn nfn, void *sys )
 {
-	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+	Filesel *filesel = FILESEL( iwnd );
+	Workspace *ws = WORKSPACE( client );
 	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
-	filemodel_inter_save( IWINDOW( host ), FILEMODEL( wsg ) );
+	char *filename;
+
+	if( (filename = filesel_get_filename( filesel )) ) {
+		icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
+		if( !workspacegroup_save_current( wsg, filename ) ) 
+			nfn( sys, IWINDOW_ERROR );
+		else
+			nfn( sys, IWINDOW_YES );
+
+		g_free( filename );
+	}
+	else
+		nfn( sys, IWINDOW_ERROR );
 }
 
 static void                
@@ -310,19 +370,29 @@ workspacegroupview_save_as_cb( GtkWidget *wid, GtkWidget *host,
 	Workspaceview *wview )
 {
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
-	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
+	iWindow *iwnd = IWINDOW( view_get_toplevel( VIEW( wview ) ) );
+	GtkWidget *filesel = filesel_new();
 
-	filemodel_inter_saveas( IWINDOW( host ), FILEMODEL( wsg ) );
+	iwindow_set_title( IWINDOW( filesel ), 
+		_( "Save Tab \"%s\"" ), IOBJECT( ws )->name );
+	filesel_set_flags( FILESEL( filesel ), FALSE, TRUE );
+	filesel_set_filetype( FILESEL( filesel ), filesel_type_workspace, 0 ); 
+	iwindow_set_parent( IWINDOW( filesel ), GTK_WIDGET( iwnd ) );
+	idialog_set_iobject( IDIALOG( filesel ), IOBJECT( ws ) );
+	filesel_set_done( FILESEL( filesel ), 
+		workspacegroupview_save_as_sub, ws );
+	iwindow_build( IWINDOW( filesel ) );
+
+	gtk_widget_show( GTK_WIDGET( filesel ) );
 }
 
 static void                
-workspacegroupview_close_cb( GtkWidget *wid, GtkWidget *host, 
+workspacegroupview_delete_cb( GtkWidget *wid, GtkWidget *host, 
 	Workspaceview *wview )
 {
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
-	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
-	filemodel_inter_savenclose( IWINDOW( host ), FILEMODEL( wsg ) );
+	model_check_destroy( view_get_toplevel( VIEW( wview ) ), MODEL( ws ) );
 }
 
 static void
@@ -370,15 +440,17 @@ workspacegroupview_init( Workspacegroupview *wsgview )
 	gtk_widget_show( wsgview->notebook );
 
 	wsgview->tab_menu = popup_build( _( "Tab menu" ) );
+	popup_add_but( wsgview->tab_menu, _( "Rename" ),
+		POPUP_FUNC( workspacegroupview_rename_cb ) ); 
+	popup_add_but( wsgview->tab_menu, _( "Select All" ),
+		POPUP_FUNC( workspacegroupview_select_all_cb ) ); 
 	popup_add_but( wsgview->tab_menu, STOCK_DUPLICATE,
 		POPUP_FUNC( workspacegroupview_duplicate_cb ) ); 
-	popup_add_but( wsgview->tab_menu, GTK_STOCK_SAVE,
-		POPUP_FUNC( workspacegroupview_save_cb ) ); 
 	popup_add_but( wsgview->tab_menu, GTK_STOCK_SAVE_AS,
 		POPUP_FUNC( workspacegroupview_save_as_cb ) ); 
 	menu_add_sep( wsgview->tab_menu );
-	popup_add_but( wsgview->tab_menu, GTK_STOCK_CLOSE,
-		POPUP_FUNC( workspacegroupview_close_cb ) ); 
+	popup_add_but( wsgview->tab_menu, GTK_STOCK_DELETE,
+		POPUP_FUNC( workspacegroupview_delete_cb ) ); 
 }
 
 GtkType

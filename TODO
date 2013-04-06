@@ -1,15 +1,45 @@
-- fix up workspace duplicate, workspace_duplicate_selected, column_duplicate
-  using new workspacegroup load/save/merge functions
+- need a tooltip on tabs showing the caption
 
+  needs a ->label on workspaceview
 
-- right-click on tab, duplicate, does nothing
+  also for rename tab
+
+- how odd, in workspacegroup_load_new() we do:
+
+	if( first_ws ) {
+		icontainer_child_current( ICONTAINER( wsg ), 
+			ICONTAINER( first_ws ) ); 
+		model_front( MODEL( first_ws ) );
+	}
+
+  do we need both? shouldn't _current() do _front() for us? or vice-versa?
+
+- select a row, status does not update
+
+- right-click on tab3, delete, offers to delete tab1, actually deletes tab3
+
+- delete final tab in ws does not close mainw
+
+- tab rename needs implementing
+
+- right-click on tab, delete, dialog says
+
+	Are you sure you want to delete Workspace "tab1"?
+
+  argh workspace
+
+  don't display internal class names, have a class member in iobject for
+  i18n'd class name
+
+  similarly, ^W on a mainw, message is
+
+  	Workspacegroup "untitled" has been modified. Do you want to
+	save your changes?
 
 - fix naming: for the user, a mainw displays a workspace and a workspace has
   tabs
 
 - workspacegroupview_reorder_tab_cb() is never called?
-
-- save selected, various duplicate actions need fixing
 
 - major / minor / micro need to be in workspace, as well as root
 

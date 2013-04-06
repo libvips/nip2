@@ -1721,3 +1721,55 @@ workspace_selected_save( Workspace *ws, const char *filename )
 
 	return( TRUE );
 }
+
+gboolean
+workspace_rename( Workspace *ws, const char *name, const char *caption )
+{
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
+
+	/* Don't prevent rename if the new name is the same as the old.
+	 */
+	if( strcmp( IOBJECT( ws )->name, name ) != 0 &&
+		compile_lookup( wsg->wsr->sym->expr->compile, name ) ) {
+		error_top( _( "Tab exists." ) );
+		error_sub( _( "A tab called \"%s\" already exists. "
+			"Pick another name." ), name );
+		return( FALSE );
+	}
+
+	iobject_set( IOBJECT( ws ), name, caption );
+
+	return( TRUE );
+}
+
+gboolean
+workspace_duplicate( Workspace *ws )
+{
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
+
+	char filename[FILENAME_MAX];
+
+	if( !temp_name( filename, "ws" ) )
+		return( FALSE );
+	icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
+	if( !workspacegroup_save_current( wsg, filename ) ) 
+		return( FALSE );
+
+        progress_begin();
+
+	if( !workspacegroup_merge_workspaces( wsg, filename ) ) {
+		progress_end();
+		unlinkf( "%s", filename );
+
+		return( FALSE );
+	}
+	unlinkf( "%s", filename );
+
+	symbol_recalculate_all();
+
+	progress_end();
+
+	return( TRUE );
+}
+
+

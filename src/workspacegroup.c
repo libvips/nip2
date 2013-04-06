@@ -35,6 +35,20 @@
 
 static FilemodelClass *parent_class = NULL;
 
+void
+workspacegroup_set_load_type( Workspacegroup *wsg, 
+	WorkspacegroupLoadType load_type )
+{
+	wsg->load_type = load_type;
+}
+
+void
+workspacegroup_set_save_type( Workspacegroup *wsg, 
+	WorkspacegroupSaveType save_type )
+{
+	wsg->save_type = save_type;
+}
+
 static Workspace *
 workspacegroup_get_workspace( Workspacegroup *wsg )
 {
@@ -183,6 +197,12 @@ workspacegroup_load_new( Workspacegroup *wsg,
 	ModelLoadState *state, xmlNode *xroot )
 {
 	Workspaceroot *wsr = wsg->wsr;
+	Workspace *first_ws;
+
+	/* _front() the first ws we load. Needed for things like duplicate ws
+	 * and merge wses.
+	 */
+	first_ws = NULL;
 
 	FOR_ALL_XML( xroot, xws, "Workspace" ) {
 		char name[MAX_STRSIZE];
@@ -212,7 +232,16 @@ workspacegroup_load_new( Workspacegroup *wsg,
 
 		if( model_load( MODEL( ws ), state, MODEL( wsg ), xws ) )
 			return( FALSE );
+
+		if( !first_ws )
+			first_ws = ws;
 	} FOR_ALL_XML_END
+
+	if( first_ws ) {
+		icontainer_child_current( ICONTAINER( wsg ), 
+			ICONTAINER( first_ws ) ); 
+		model_front( MODEL( first_ws ) );
+	}
 
 	return( TRUE );
 }
@@ -717,7 +746,7 @@ workspacegroup_new_from_file( Workspaceroot *wsr,
 	if( !(wsg = workspacegroup_new( wsr )) )
 		return( NULL );
 
-	wsg->load_type = WORKSPACEGROUP_LOAD_NEW;
+	workspacegroup_set_load_type( wsg, WORKSPACEGROUP_LOAD_NEW );
 	if( !filemodel_load_all( FILEMODEL( wsg ), 
 		MODEL( wsr ), filename, filename_user ) ) {
 		g_object_unref( G_OBJECT( wsg ) );
@@ -745,7 +774,7 @@ workspacegroup_new_from_openfile( Workspaceroot *wsr, iOpenFile *of )
 	if( !(wsg = workspacegroup_new( wsr )) )
 		return( NULL );
 
-	wsg->load_type = WORKSPACEGROUP_LOAD_NEW;
+	workspacegroup_set_load_type( wsg, WORKSPACEGROUP_LOAD_NEW );
 	if( !filemodel_load_all_openfile( FILEMODEL( wsg ), 
 		MODEL( wsr ), of ) ) {
 		g_object_unref( G_OBJECT( wsg ) );
@@ -767,7 +796,7 @@ workspacegroup_new_from_openfile( Workspaceroot *wsr, iOpenFile *of )
 gboolean
 workspacegroup_merge_workspaces( Workspacegroup *wsg, const char *filename )
 {
-	wsg->load_type = WORKSPACEGROUP_LOAD_NEW;
+	workspacegroup_set_load_type( wsg, WORKSPACEGROUP_LOAD_NEW );
 	if( !filemodel_load_all( FILEMODEL( wsg ), MODEL( wsg->wsr ), 
 		filename, NULL ) ) 
 		return( FALSE );
@@ -789,7 +818,7 @@ workspacegroup_merge_columns( Workspacegroup *wsg, const char *filename )
 			IM_RECT_RIGHT( &ws->area ) + WORKSPACEVIEW_MARGIN_LEFT,
 			WORKSPACEVIEW_MARGIN_TOP );
 
-	wsg->load_type = WORKSPACEGROUP_LOAD_COLUMNS;
+	workspacegroup_set_load_type( wsg, WORKSPACEGROUP_LOAD_COLUMNS );
 	if( !filemodel_load_all( FILEMODEL( wsg ), MODEL( wsg->wsr ), 
 		filename, NULL ) ) 
 		return( FALSE );
@@ -804,7 +833,7 @@ workspacegroup_merge_columns( Workspacegroup *wsg, const char *filename )
 gboolean
 workspacegroup_merge_rows( Workspacegroup *wsg, const char *filename )
 {
-	wsg->load_type = WORKSPACEGROUP_LOAD_ROWS;
+	workspacegroup_set_load_type( wsg, WORKSPACEGROUP_LOAD_ROWS );
 	if( !filemodel_load_all( FILEMODEL( wsg ), MODEL( wsg->wsr ), 
 		filename, NULL ) ) 
 		return( FALSE );
@@ -819,7 +848,7 @@ workspacegroup_merge_rows( Workspacegroup *wsg, const char *filename )
 gboolean
 workspacegroup_save_selected( Workspacegroup *wsg, const char *filename )
 {
-	wsg->save_type = WORKSPACEGROUP_SAVE_SELECTED;
+	workspacegroup_set_save_type( wsg, WORKSPACEGROUP_SAVE_SELECTED );
 	if( !filemodel_top_save( FILEMODEL( wsg ), filename ) ) {
 		unlinkf( "%s", filename );
 
@@ -834,7 +863,7 @@ workspacegroup_save_selected( Workspacegroup *wsg, const char *filename )
 gboolean
 workspacegroup_save_current( Workspacegroup *wsg, const char *filename )
 {
-	wsg->save_type = WORKSPACEGROUP_SAVE_WORKSPACE;
+	workspacegroup_set_save_type( wsg, WORKSPACEGROUP_SAVE_WORKSPACE );
 	if( !filemodel_top_save( FILEMODEL( wsg ), filename ) ) {
 		unlinkf( "%s", filename );
 
@@ -849,7 +878,7 @@ workspacegroup_save_current( Workspacegroup *wsg, const char *filename )
 gboolean
 workspacegroup_save_all( Workspacegroup *wsg, const char *filename )
 {
-	wsg->save_type = WORKSPACEGROUP_SAVE_ALL;
+	workspacegroup_set_save_type( wsg, WORKSPACEGROUP_SAVE_ALL );
 	if( !filemodel_top_save( FILEMODEL( wsg ), filename ) ) {
 		unlinkf( "%s", filename );
 
@@ -868,7 +897,7 @@ workspacegroup_duplicate( Workspacegroup *wsg )
 	char filename[FILENAME_MAX];
 
 	if( !temp_name( filename, "ws" ) ||
-		!filemodel_top_save( FILEMODEL( wsg ), filename ) ) 
+		!workspacegroup_save_all( wsg, filename ) ) 
 		return( NULL );
 
 	if( !(new_wsg = workspacegroup_new_from_file( wsr, 

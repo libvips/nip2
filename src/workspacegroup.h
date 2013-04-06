@@ -82,6 +82,11 @@ typedef struct _WorkspacegroupClass {
 	 */
 } WorkspacegroupClass;
 
+void workspacegroup_set_load_type( Workspacegroup *wsg, 
+	WorkspacegroupLoadType load_type );
+void workspacegroup_set_save_type( Workspacegroup *wsg, 
+	WorkspacegroupSaveType save_type );
+
 Workspace *workspacegroup_map( Workspacegroup *wsg, 
 	workspace_map_fn fn, void *a, void *b );
 

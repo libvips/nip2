@@ -531,12 +531,14 @@ mainw_duplicate_action_cb( GtkAction *action, Mainw *mainw )
 static void
 mainw_save_action_cb( GtkAction *action, Mainw *mainw )
 {
+	workspacegroup_set_save_type( mainw->wsg, WORKSPACEGROUP_SAVE_ALL );
 	filemodel_inter_save( IWINDOW( mainw ), FILEMODEL( mainw->wsg ) );
 }
 
 static void
 mainw_save_as_action_cb( GtkAction *action, Mainw *mainw )
 {
+	workspacegroup_set_save_type( mainw->wsg, WORKSPACEGROUP_SAVE_ALL );
 	filemodel_inter_saveas( IWINDOW( mainw ), FILEMODEL( mainw->wsg ) );
 }
 

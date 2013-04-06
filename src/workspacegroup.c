@@ -217,7 +217,6 @@ static gboolean
 workspacegroup_load_new( Workspacegroup *wsg, 
 	ModelLoadState *state, xmlNode *xroot )
 {
-	Workspaceroot *wsr = wsg->wsr;
 	Workspace *first_ws;
 
 	/* Rename ... new names for any workspaces which clash. 

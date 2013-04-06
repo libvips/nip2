@@ -1056,16 +1056,21 @@ workspace_new( Workspacegroup *wsg, const char *name )
  * anything else).
  */
 Workspace *
-workspace_new_blank( Workspacegroup *wsg, const char *name )
+workspace_new_blank( Workspacegroup *wsg )
 {
+	char name[256];
 	Workspace *ws;
 
+	workspaceroot_name_new( wsg->wsr, name );
 	if( !(ws = workspace_new( wsg, name )) )
 		return( NULL );
 
 	/* Make an empty column.
 	 */
 	(void) workspace_column_pick( ws );
+
+	icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
+	model_front( MODEL( ws ) );
 
 	iobject_set( IOBJECT( ws ), NULL, _( "Default empty tab" ) );
 

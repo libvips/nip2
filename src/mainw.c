@@ -1243,63 +1243,10 @@ mainw_program_new_action_cb( GtkAction *action, Mainw *mainw )
 	}
 }
 
-/* Done button hit.
- */
-static void
-mainw_workspace_new_done_cb( iWindow *iwnd, void *client, 
-	iWindowNotifyFn nfn, void *sys )
-{
-	Mainw *mainw = MAINW( client );
-	Stringset *ss = STRINGSET( iwnd );
-	StringsetChild *name = stringset_child_get( ss, _( "Name" ) );
-	StringsetChild *caption = stringset_child_get( ss, _( "Caption" ) );
-
-	Workspace *ws;
-
-	char name_text[1024];
-	char caption_text[1024];
-
-	if( !get_geditable_name( name->entry, name_text, 1024 ) ||
-		!get_geditable_string( caption->entry, caption_text, 1024 ) ) {
-		nfn( sys, IWINDOW_ERROR );
-		return;
-	}
-
-	if( !(ws = workspace_new_blank( mainw->wsg, name_text )) ) {
-		nfn( sys, IWINDOW_ERROR );
-		return;
-	}
-
-	iobject_set( IOBJECT( ws ), NULL, caption_text );
-	model_front( MODEL( ws ) );
-
-	nfn( sys, IWINDOW_YES );
-}
-
-/* New ws callback.
- */
 static void
 mainw_workspace_new_action_cb( GtkAction *action, Mainw *mainw )
 {
-	Workspaceroot *wsr = mainw->wsg->wsr; 
-	GtkWidget *ss = stringset_new();
-	char name[256];
-
-	workspaceroot_name_new( wsr, name );
-	stringset_child_new( STRINGSET( ss ), 
-		_( "Name" ), name, _( "Set tab name here" ) );
-	stringset_child_new( STRINGSET( ss ), 
-		_( "Caption" ), "", _( "Set tab caption here" ) );
-
-	iwindow_set_title( IWINDOW( ss ), _( "New Tab" ) );
-	idialog_set_callbacks( IDIALOG( ss ), 
-		iwindow_true_cb, NULL, NULL, mainw );
-	idialog_add_ok( IDIALOG( ss ), 
-		mainw_workspace_new_done_cb, _( "Create Tab" ) );
-	iwindow_set_parent( IWINDOW( ss ), GTK_WIDGET( mainw ) );
-	iwindow_build( IWINDOW( ss ) );
-
-	gtk_widget_show( ss );
+	workspace_new_blank( mainw->wsg );
 }
 
 /* New workbook.

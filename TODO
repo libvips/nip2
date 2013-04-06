@@ -1,20 +1,3 @@
-- workspacegroup_top_load() has to do three types of renaming:
-
-  case WORKSPACEGROUP_LOAD_NEW:
-
-  	rename workspaces, but nothing else
-
-  case WORKSPACEGROUP_LOAD_COLUMNS:
-
-  	rename 
-
-
-
-
-- rmb duplicate tab, name does not change
-
-  we rename the symbol (we get Workspaces.tab2), but the ->name on the WS is
-  not changed
 
 - how odd, in workspacegroup_load_new() we do:
 
@@ -31,8 +14,6 @@
 - right-click on tab3, delete, offers to delete tab1, actually deletes tab3
 
 - delete final tab in ws does not close mainw
-
-- tab rename needs implementing
 
 - right-click on tab, delete, dialog says
 
@@ -54,11 +35,6 @@
 - workspacegroupview_reorder_tab_cb() is never called?
 
 - major / minor / micro need to be in workspace, as well as root
-
-- when we rename workspaces on load to avoid clashes, could we rewrite
-  expressions too?
-
-  should do this across a whole file load, not just a single ws load
 
 - we call 
 

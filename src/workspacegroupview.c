@@ -259,15 +259,8 @@ workspacegroupview_add_workspace_cb( GtkWidget *wid,
 {
 	Workspacegroup *wsg = WORKSPACEGROUP( VOBJECT( wsgview )->iobject );
 
-	char name[256];
-	Workspace *new_ws;
-
-	workspaceroot_name_new( wsg->wsr, name );
-	if( !(new_ws = workspace_new_blank( wsg, name )) ) {
+	if( !workspace_new_blank( wsg ) ) 
 		iwindow_alert( GTK_WIDGET( wsgview ), GTK_MESSAGE_ERROR );
-		return;
-	}
-	model_front( MODEL( new_ws ) );
 }
 #endif /*USE_NOTEBOOK_ACTION*/
 

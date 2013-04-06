@@ -161,7 +161,7 @@ workspaceroot_name_new( Workspaceroot *wsr, char *name )
 {
 	Compile *compile = wsr->sym->expr->compile;
 
-	strcpy( name, "untitled" );
+	strcpy( name, "tab1" );
 	while( compile_lookup( compile, name ) )
 		increment_name( name );
 }

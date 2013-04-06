@@ -160,6 +160,7 @@ void *symbol_patch_add( void **pnt, Symbol *sym );
 Symbol *symbol_root_init( void );
 
 Symbol *symbol_new( Compile *compile, const char *name );
+gboolean symbol_rename( Symbol *sym, const char *new_name );
 void symbol_error_redefine( Symbol *sym );
 Symbol *symbol_new_defining( Compile *compile, const char *name );
 Symbol *symbol_new_reference( Compile *compile, const char *name );

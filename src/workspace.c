@@ -325,40 +325,14 @@ workspace_column_get( Workspace *ws, const char *name )
 	return( column_new( ws, name ) );
 }
 
-/* Make up a new column name. Check for not already in workspace, and not in 
- * xml file (if columns non-NULL).
+/* Make up a new column name. Check for not already in workspace.
  */
-char *
-workspace_column_name_new( Workspace *ws, xmlNode *columns )
+void
+workspace_column_name_new( Workspace *ws, char *name )
 {
-	char buf[256];
-
-	/* Search for one not in use.
-	 */
-	for(;;) {
-		number_to_string( ws->next++, buf );
-
-		if( workspace_column_find( ws, buf ) ) 
-			continue;
-		if( columns ) {
-			xmlNode *i;
-
-			for( i = columns; i; i = i->next ) {
-				char name[MAX_STRSIZE];
-
-				if( strcmp( (char *) i->name, "Column" ) == 0 &&
-					get_sprop( i, "name", 
-						name, MAX_STRSIZE ) )
-					if( strcmp( name, buf ) == 0 )
-						break;
-			}
-
-			if( i )
-				continue;
-		}
-
-		return( im_strdup( NULL, buf ) );
-	}
+	do {
+		number_to_string( ws->next++, name );
+	} while( workspace_column_find( ws, name ) );
 }
 
 /* Make sure we have a column selected ... pick one of the existing columns; if 
@@ -417,17 +391,13 @@ workspace_column_select( Workspace *ws, Column *col )
 gboolean
 workspace_column_new( Workspace *ws )
 {
-	char *name;
+	char new_name[MAX_STRSIZE];
 	Column *col;
 
-	name = workspace_column_name_new( ws, NULL );
-	if( !(col = column_new( ws, name )) ) {
+	workspace_column_name_new( ws, new_name );
+	if( !(col = column_new( ws, new_name )) ) 
 		return( FALSE );
-		IM_FREE( name );
-	}
-
 	workspace_column_select( ws, col );
-	IM_FREE( name );
 
 	return( TRUE );
 }
@@ -656,8 +626,8 @@ workspace_link( Workspace *ws, Workspacegroup *wsg, const char *name )
 	Symbol *sym;
 
 #ifdef DEBUG
-	printf( "workspace_link: naming ws as %s\n", name );
 #endif /*DEBUG*/
+	printf( "workspace_link: naming ws %p as %s\n", ws, name );
 
 	sym = symbol_new_defining( wsr->sym->expr->compile, name );
 
@@ -1727,17 +1697,20 @@ workspace_rename( Workspace *ws, const char *name, const char *caption )
 {
 	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
-	/* Don't prevent rename if the new name is the same as the old.
-	 */
-	if( strcmp( IOBJECT( ws )->name, name ) != 0 &&
-		compile_lookup( wsg->wsr->sym->expr->compile, name ) ) {
-		error_top( _( "Tab exists." ) );
-		error_sub( _( "A tab called \"%s\" already exists. "
-			"Pick another name." ), name );
+	if( !symbol_rename( ws->sym, name ) )
 		return( FALSE );
-	}
 
-	iobject_set( IOBJECT( ws ), name, caption );
+	g_object_ref( ws );
+
+	icontainer_child_remove( ICONTAINER( ws ) );
+	iobject_set( IOBJECT( ws ), IOBJECT( ws->sym )->name, caption );
+	icontainer_child_add( ICONTAINER( wsg ), ICONTAINER( ws ),
+		ICONTAINER( ws )->pos );
+
+	g_object_unref( ws );
+
+	// do we need this? unclear
+	//iobject_changed( IOBJECT( wsg ) );
 
 	return( TRUE );
 }

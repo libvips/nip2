@@ -68,7 +68,7 @@ ModelLoadState *model_loadstate = NULL;
 /* Rename list functions.
  */
 static void *
-model_loadstate_rename_destroy( ModelRename *rename )
+model_rename_destroy( ModelRename *rename )
 {
 	IM_FREE( rename->old_name );
 	IM_FREE( rename->new_name );
@@ -77,9 +77,8 @@ model_loadstate_rename_destroy( ModelRename *rename )
 	return( NULL );
 }
 
-ModelRename *
-model_loadstate_rename_new( ModelLoadState *state, 
-	const char *old_name, const char *new_name )
+static ModelRename *
+model_rename_new( const char *old_name, const char *new_name )
 {
 	ModelRename *rename;
 
@@ -88,13 +87,65 @@ model_loadstate_rename_new( ModelLoadState *state,
 	rename->old_name = im_strdup( NULL, old_name );
 	rename->new_name = im_strdup( NULL, new_name );
 	if( !rename->old_name || !rename->new_name ) {
-		model_loadstate_rename_destroy( rename );
+		model_rename_destroy( rename );
 		return( NULL );
 	}
 
+	return( rename );
+}
+
+static void *
+model_loadstate_taken_sub( ModelRename *rename, const char *name )
+{
+	if( strcmp( rename->new_name, name ) == 0 )
+		return( rename );
+
+	return( NULL );
+}
+
+/* Is something already being renamed to @name.
+ */
+gboolean
+model_loadstate_taken( ModelLoadState *state, const char *name )
+{
+	return( !!slist_map( state->renames, 
+		(SListMapFn) model_loadstate_taken_sub, (char *) name ) );
+}
+
+ModelRename *
+model_loadstate_rename_new( ModelLoadState *state, 
+	const char *old_name, const char *new_name )
+{
+	ModelRename *rename;
+
+	if( !(rename = model_rename_new( old_name, new_name )) )
+		return( NULL );
 	state->renames = g_slist_prepend( state->renames, rename );
 
 	return( rename );
+}
+
+ModelRename *
+model_loadstate_column_rename_new( ModelLoadState *state, 
+	const char *old_name, const char *new_name )
+{
+	ModelRename *rename;
+
+	if( !(rename = model_rename_new( old_name, new_name )) )
+		return( NULL );
+	state->column_renames = 
+		g_slist_prepend( state->column_renames, rename );
+
+	return( rename );
+}
+
+/* Is something already being renamed to @name.
+ */
+gboolean
+model_loadstate_column_taken( ModelLoadState *state, const char *name )
+{
+	return( !!slist_map( state->column_renames, 
+		(SListMapFn) model_loadstate_taken_sub, (char *) name ) );
 }
 
 void
@@ -108,7 +159,9 @@ model_loadstate_destroy( ModelLoadState *state )
 	IM_FREE( state->filename_user );
 	IM_FREEF( xmlFreeDoc, state->xdoc );
 	slist_map( state->renames, 
-		(SListMapFn) model_loadstate_rename_destroy, NULL );
+		(SListMapFn) model_rename_destroy, NULL );
+	slist_map( state->column_renames, 
+		(SListMapFn) model_rename_destroy, NULL );
 	g_slist_free( state->renames );
 
 	if( state->old_dir ) {
@@ -150,6 +203,7 @@ model_loadstate_new( const char *filename, const char *filename_user )
 		return( NULL );
 	state->xdoc = NULL;
 	state->renames = NULL;
+	state->column_renames = NULL; 
 	state->major = MAJOR_VERSION;
 	state->minor = MINOR_VERSION;
 	state->micro = MICRO_VERSION;

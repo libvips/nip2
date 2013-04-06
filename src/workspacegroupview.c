@@ -74,6 +74,7 @@ workspacegroupview_child_add( View *parent, View *child )
 	label = gtk_label_new( NN( IOBJECT( ws->sym )->name ) );
         gtk_container_add( GTK_CONTAINER( ebox ), label );
         gtk_widget_show( GTK_WIDGET( label ) );
+	workspaceview_set_label( wview, label );
 	popup_attach( ebox, wsgview->tab_menu, wview );
 
 	gtk_notebook_insert_page( GTK_NOTEBOOK( wsgview->notebook ),
@@ -292,6 +293,7 @@ workspacegroupview_rename_sub( iWindow *iwnd, void *client,
 		nfn( sys, IWINDOW_ERROR );
 		return;
 	}
+	model_front( MODEL( ws ) );
 
 	nfn( sys, IWINDOW_YES );
 }

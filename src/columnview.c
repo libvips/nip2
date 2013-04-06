@@ -72,10 +72,12 @@ columnview_clone_cb( GtkWidget *wid, GtkWidget *host, Columnview *cview )
 {
 	Column *col = COLUMN( VOBJECT( cview )->iobject );
 	Workspace *ws = col->ws;
-	char *newname = workspace_column_name_new( ws, NULL );
-        Column *newcol = workspace_column_get( ws, newname );
 
-	IM_FREE( newname );
+	char new_name[MAX_STRSIZE];
+        Column *newcol;
+
+	workspace_column_name_new( ws, new_name );
+        newcol = workspace_column_get( ws, new_name );
         iobject_set( IOBJECT( newcol ), NULL, IOBJECT( col )->caption );
         newcol->x = col->x + 30;
         newcol->y = col->y + 30;

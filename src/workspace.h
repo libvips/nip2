@@ -137,7 +137,7 @@ Column *workspace_is_one_empty( Workspace *ws );
 
 Column *workspace_column_find( Workspace *ws, const char *name );
 Column *workspace_column_get( Workspace *ws, const char *name );
-char *workspace_column_name_new( Workspace *ws, xmlNode *columns );
+void workspace_column_name_new( Workspace *ws, char *name );
 Column *workspace_column_pick( Workspace *ws );
 void workspace_column_select( Workspace *ws, Column *col );
 gboolean workspace_column_new( Workspace *ws );

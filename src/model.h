@@ -55,11 +55,15 @@ typedef struct _ModelLoadState {
 		FIXME ... a linked list? try a hash sometime
 		see model_loadstate_rewrite_name()
 
-		would probably only see a speedup for merging large
+		would probably only see a speedup for merging very large
 		workspaces, not something we do often
 
 	 */
 	GSList *renames;	/* Rename table for this load context */
+
+	/* The column renames we have planned. Don't rewrite exprs with these.
+	 */
+	GSList *column_renames;
 
 	/* Version info we read from this XML file.
 	 */
@@ -176,7 +180,12 @@ typedef struct _ModelClass {
 
 extern ModelLoadState *model_loadstate;
 
+gboolean model_loadstate_taken( ModelLoadState *state, const char *name );
 ModelRename *model_loadstate_rename_new( ModelLoadState *state, 
+	const char *old_name, const char *new_name );
+gboolean model_loadstate_column_taken( ModelLoadState *state, 
+	const char *name );
+ModelRename *model_loadstate_column_rename_new( ModelLoadState *state, 
 	const char *old_name, const char *new_name );
 ModelLoadState *model_loadstate_new( 
 	const char *filename, const char *filename_user );

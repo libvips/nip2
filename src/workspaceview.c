@@ -473,41 +473,36 @@ workspaceview_drag_data_received( GtkWidget *widget, GdkDragContext *context,
 			GTK_WIDGET( wview->fixed )->window, x, y ) &&
 		(from_row = row_parse_name( main_workspaceroot->sym, 
 			from_row_path )) ) {
-		char *name;
+		char new_name[MAX_STRSIZE];
 		Column *col;
+		char vips_buf_text[256];
+		VipsBuf buf = VIPS_BUF_STATIC( vips_buf_text );
+		Symbol *sym;
 
-		name = workspace_column_name_new( ws, NULL );
-		if( !(col = column_new( ws, name )) )
+		workspace_column_name_new( ws, new_name );
+		col = column_new( ws, new_name );
+
+		col->x = x;
+		col->y = y;
+		workspace_column_select( ws, col );
+
+		/* Qualify relative to us. We don't want to embed
+		 * workspace names unless we have to.
+		 */
+		row_qualified_name_relative( ws->sym, from_row, &buf );
+
+		if( !(sym = workspace_add_def( ws, vips_buf_all( &buf ) )) ) 
 			iwindow_alert( widget, GTK_MESSAGE_ERROR );
-		IM_FREE( name );
 
-		if( col ) {
-			char vips_buf_text[256];
-			VipsBuf buf = VIPS_BUF_STATIC( vips_buf_text );
-			Symbol *sym;
+		symbol_recalculate_all();
 
-			col->x = x;
-			col->y = y;
-			workspace_column_select( ws, col );
-
-			/* Qualify relative to us. We don't want to embed
-			 * workspace names unless we have to.
-			 */
-			row_qualified_name_relative( ws->sym, 
-				from_row, &buf );
-
-			if( !(sym = workspace_add_def( ws, 
-				vips_buf_all( &buf ) )) ) 
-				iwindow_alert( widget, GTK_MESSAGE_ERROR );
-
-			symbol_recalculate_all();
-
-			/* Usually the drag-from row will be selected, very
-			 * annoying. Select the drag-to row.
-			 */
-			if( sym && sym->expr && sym->expr->row )
-				row_select( sym->expr->row );
-		}
+		/* Usually the drag-from row will be selected, very
+		 * annoying. Select the drag-to row.
+		 */
+		if( sym && 
+			sym->expr && 
+			sym->expr->row )
+			row_select( sym->expr->row );
 	}
 }
 
@@ -679,8 +674,8 @@ workspaceview_refresh( vObject *vobject )
 	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
 #ifdef DEBUG
-	printf( "workspaceview_refresh: %s\n", IOBJECT( ws )->name );
 #endif /*DEBUG*/
+	printf( "workspaceview_refresh: %p %s\n", ws, IOBJECT( ws )->name );
 
 	filemodel_set_window_hint( FILEMODEL( wsg ), 
 		IWINDOW( iwindow_get_root_noparent( GTK_WIDGET( wview ) ) ) );
@@ -696,6 +691,14 @@ workspaceview_refresh( vObject *vobject )
 		pane_animate_open( wview->lpane );
 	if( !ws->lpane_open && wview->lpane->open )
 		pane_animate_closed( wview->lpane );
+
+	if( wview->label ) {
+		gtk_label_set_text( GTK_LABEL( wview->label ),
+			IOBJECT( ws )->name );
+		if( IOBJECT( ws )->caption )
+			set_tooltip( wview->label, 
+				"%s", IOBJECT( ws )->caption );
+	}
 
 	VOBJECT_CLASS( parent_class )->refresh( vobject );
 }
@@ -1156,3 +1159,10 @@ workspaceview_new( void )
 	return( VIEW( wview ) );
 }
 
+void
+workspaceview_set_label( Workspaceview *wview, GtkWidget *label )
+{
+	g_assert( !wview->label );
+
+	wview->label = label;
+}

@@ -1,8 +1,20 @@
-- need a tooltip on tabs showing the caption
+- workspacegroup_top_load() has to do three types of renaming:
 
-  needs a ->label on workspaceview
+  case WORKSPACEGROUP_LOAD_NEW:
 
-  also for rename tab
+  	rename workspaces, but nothing else
+
+  case WORKSPACEGROUP_LOAD_COLUMNS:
+
+  	rename 
+
+
+
+
+- rmb duplicate tab, name does not change
+
+  we rename the symbol (we get Workspaces.tab2), but the ->name on the WS is
+  not changed
 
 - how odd, in workspacegroup_load_new() we do:
 

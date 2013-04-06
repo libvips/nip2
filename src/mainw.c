@@ -1148,15 +1148,12 @@ mainw_column_new_action_cb( GtkAction *action, Mainw *mainw )
 	Workspace *ws;
 
 	if( (ws = mainw_get_workspace( mainw )) ) { 
-		char *name;
+		char new_name[MAX_STRSIZE];
 		Column *col;
 
-		name = workspace_column_name_new( ws, NULL );
-		if( !(col = column_new( ws, name )) ) 
-			iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
-		else
-			workspace_column_select( ws, col );
-		IM_FREE( name );
+		workspace_column_name_new( ws, new_name );
+		col = workspace_column_get( ws, new_name );
+		workspace_column_select( ws, col );
 	}
 }
 
@@ -1207,16 +1204,16 @@ static void
 mainw_column_new_named_action_cb( GtkAction *action, Mainw *mainw )
 {
 	GtkWidget *ss = stringset_new();
-	char *name;
+	char new_name[MAX_STRSIZE];
 	Workspace *ws;
 
 	if( !(ws = mainw_get_workspace( mainw )) ) 
 		return;
 
-	name = workspace_column_name_new( ws, NULL );
+	workspace_column_name_new( ws, new_name );
 
 	stringset_child_new( STRINGSET( ss ), 
-		_( "Name" ), name, _( "Set column name here" ) );
+		_( "Name" ), new_name, _( "Set column name here" ) );
 	stringset_child_new( STRINGSET( ss ), 
 		_( "Caption" ), "", _( "Set column caption here" ) );
 
@@ -1229,8 +1226,6 @@ mainw_column_new_named_action_cb( GtkAction *action, Mainw *mainw )
 	iwindow_build( IWINDOW( ss ) );
 
 	gtk_widget_show( ss );
-
-	IM_FREE( name );
 }
 
 /* Callback from program.

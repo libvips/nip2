@@ -190,6 +190,27 @@ workspacegroup_save( Model *model, xmlNode *xnode )
 
 #define FOR_ALL_XML_END } }
 
+static void
+workspacegroup_rename_workspace_node( Workspacegroup *wsg, 
+	ModelLoadState *state, xmlNode *xws )
+{
+	Workspaceroot *wsr = wsg->wsr;
+
+	char name[MAX_STRSIZE];
+	char new_name[MAX_STRSIZE];
+
+	if( !get_sprop( xws, "name", name, MAX_STRSIZE ) )
+		return;
+
+	strcpy( new_name, name );
+	while( compile_lookup( wsr->sym->expr->compile, new_name ) ||
+		model_loadstate_taken( state, new_name ) )
+		increment_name( new_name );
+
+	(void) set_sprop( xws, "name", new_name );
+	(void) model_loadstate_rename_new( state, name, new_name );
+}
+
 /* Load all workspaces into this wsg.
  */
 static gboolean
@@ -198,6 +219,12 @@ workspacegroup_load_new( Workspacegroup *wsg,
 {
 	Workspaceroot *wsr = wsg->wsr;
 	Workspace *first_ws;
+
+	/* Rename ... new names for any workspaces which clash. 
+	 */
+	FOR_ALL_XML( xroot, xws, "Workspace" ) {
+		workspacegroup_rename_workspace_node( wsg, state, xws );
+	} FOR_ALL_XML_END
 
 	/* _front() the first ws we load. Needed for things like duplicate ws
 	 * and merge wses.
@@ -211,12 +238,8 @@ workspacegroup_load_new( Workspacegroup *wsg,
 		column_set_offset( WORKSPACEVIEW_MARGIN_LEFT, 
 			WORKSPACEVIEW_MARGIN_TOP );
 
-		/* Rename to avoid clashes. 
-		 */
 		if( !get_sprop( xws, "name", name, FILENAME_MAX ) ) 
 			return( FALSE );
-		while( compile_lookup( wsr->sym->expr->compile, name ) )
-			increment_name( name );
 		ws = workspace_new( wsg, name );
 
 		if( get_iprop( xws, "major", &FILEMODEL( wsg )->major ) &&
@@ -248,41 +271,41 @@ workspacegroup_load_new( Workspacegroup *wsg,
 
 static void
 workspacegroup_rename_row_node( Workspacegroup *wsg, 
-	ModelLoadState *state, Column *col, xmlNode *xrow )
+	ModelLoadState *state, const char *col_name, xmlNode *xrow )
 {
 	char name[MAX_STRSIZE];
-	char *new_name;
+	char new_name[MAX_STRSIZE];
 
 	if( !get_sprop( xrow, "name", name, MAX_STRSIZE ) )
 		return;
 
-	new_name = column_name_new( col );
+	im_snprintf( new_name, MAX_STRSIZE, "%s1", col_name );
+	while( model_loadstate_taken( state, new_name ) )
+		increment_name( new_name );
+
 	(void) set_sprop( xrow, "name", new_name );
 	(void) model_loadstate_rename_new( state, name, new_name );
-	IM_FREE( new_name );
 }
 
 /* Rename column if there's one of that name in workspace. 
  */
 static void
 workspacegroup_rename_column_node( Workspacegroup *wsg, 
-	Workspace *ws, ModelLoadState *state, xmlNode *xcol, xmlNode *columns )
+	Workspace *ws, ModelLoadState *state, xmlNode *xcol )
 {
 	char name[MAX_STRSIZE];
-	char *new_name;
-	Column *col;
+	char new_name[256];
 
 	if( !get_sprop( xcol, "name", name, MAX_STRSIZE ) )
 		return;
 
-	if( !icontainer_map( ICONTAINER( ws ), 
-		(icontainer_map_fn) iobject_test_name, name, NULL ) )
-		return;
-
-	/* Exists already ... rename this column.
+	/* Name must not exist in workspace, or in other columns we may load.
 	 */
-	new_name = workspace_column_name_new( ws, columns );
-	col = column_new( ws, new_name );
+	im_strncpy( new_name, name, 256 );
+	while( workspace_column_find( ws, new_name ) ||
+		model_loadstate_column_taken( state, new_name ) ) {
+		workspace_column_name_new( ws, new_name );
+	}
 
 #ifdef DEBUG
 	printf( "workspace_rename_column_node: renaming column "
@@ -291,17 +314,16 @@ workspacegroup_rename_column_node( Workspacegroup *wsg,
 #endif /*DEBUG*/
 
 	(void) set_sprop( xcol, "name", new_name );
-	IM_FREE( new_name );
+	(void) model_loadstate_column_rename_new( state, name, new_name ); 
 
 	/* And allocate new names for all rows in the subcolumn.
 	 */
 	FOR_ALL_XML( xcol, xsub, "Subcolumn" ) {
 		FOR_ALL_XML( xsub, xrow, "Row" ) {
-			workspacegroup_rename_row_node( wsg, state, col, xrow );
+			workspacegroup_rename_row_node( wsg, state, 
+				new_name, xrow );
 		} FOR_ALL_XML_END
 	} FOR_ALL_XML_END
-
-	IDESTROY( col );
 }
 
 /* Load at column level ... rename columns which clash with 
@@ -337,7 +359,7 @@ workspacegroup_load_columns( Workspacegroup *wsg,
 	FOR_ALL_XML( xroot, xws, "Workspace" ) { 
 		FOR_ALL_XML( xws, xcol, "Column" ) { 
 			workspacegroup_rename_column_node( wsg, ws, 
-				state, xcol, xcol->children );
+				state, xcol );
 		} FOR_ALL_XML_END
 	} FOR_ALL_XML_END
 
@@ -367,7 +389,8 @@ workspacegroup_load_rows( Workspacegroup *wsg,
 			FOR_ALL_XML( xcol, xsub, "Subcolumn" ) {
 				FOR_ALL_XML( xsub, xrow, "Row" ) {
 					workspacegroup_rename_row_node( wsg, 
-						state, col, xrow );
+						state, IOBJECT( col )->name, 
+						xrow );
 				} FOR_ALL_XML_END
 			} FOR_ALL_XML_END
 		} FOR_ALL_XML_END
@@ -753,8 +776,7 @@ workspacegroup_new_from_file( Workspaceroot *wsr,
 		return( NULL );
 	}
 
-	filemodel_set_filename( FILEMODEL( wsg ), 
-		filename_user ? filename_user : filename );
+	filemodel_set_filename( FILEMODEL( wsg ), filename_user );
 	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
 
 	return( wsg );

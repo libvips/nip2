@@ -49,6 +49,7 @@ struct _Workspaceview {
 	GtkWidget *window;		/* ScrolledWindow holding fixed */
 	Toolkitbrowser *toolkitbrowser;
 	Workspacedefs *workspacedefs;
+	GtkWidget *label;		/* Tab label */
 
 	/* Left and right panes ... program window and toolkit browser.
 	 */
@@ -114,3 +115,4 @@ void workspaceview_set_cursor( Workspaceview *wview, iWindowShape shape );
 GtkType workspaceview_get_type( void );
 View *workspaceview_new( void );
 
+void workspaceview_set_label( Workspaceview *wview, GtkWidget *label );

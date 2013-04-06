@@ -60,9 +60,10 @@ number_class_init( NumberClass *class )
 
 	parent_class = g_type_class_peek_parent( class );
 
-
 	/* Init methods.
 	 */
+	iobject_class->user_name = _( "Number" );
+
 	model_class->view_new = number_view_new;
 
 	/* Static init.

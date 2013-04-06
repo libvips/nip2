@@ -10,8 +10,6 @@
 
 - select a row, status does not update
 
-- right-click on tab3, delete, offers to delete tab1, actually deletes tab3
-
 - delete final tab in ws does not close mainw
 
 - fix naming: for the user, a mainw displays a workspace and a workspace has

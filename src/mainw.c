@@ -999,19 +999,15 @@ mainw_recent_map_cb( GtkWidget *widget, Mainw *mainw )
 	}
 }
 
-/* Load a workspace at the top level.
+/* Merge a .ws into this wsg.
  */
 static void *
 mainw_workspace_merge_fn( Filesel *filesel,
 	const char *filename, void *a, void *b )
 {
 	Mainw *mainw = MAINW( a );
-	Workspace *ws;
 
-	if( !(ws = mainw_get_workspace( mainw )) )
-		return( NULL );
-
-	if( !workspace_merge_file( ws, filename ) )
+	if( !workspacegroup_merge_workspaces( mainw->wsg, filename ) )
 		return( filesel );
 
 	/* Process some events to make sure we rethink the layout and
@@ -1078,28 +1074,29 @@ static void
 mainw_auto_recover_cb( iWindow *iwnd, 
 	void *client, iWindowNotifyFn nfn, void *sys )
 {
-	Mainw *mainw = MAINW( iwnd );
 	char *filename = (char *) client;
-	Workspaceroot *wsr = mainw->wsg->wsr; 
 
-	Workspacegroup *wsg;
+	Workspacegroup *new_wsg;
+	Mainw *new_mainw;
 
         progress_begin();
-	wsg = workspacegroup_new_from_file( wsr, filename, NULL );
+
+	if( !(new_wsg = workspacegroup_new_from_file( main_workspaceroot, 
+		filename, NULL )) ) {
+		progress_end();
+		nfn( sys, IWINDOW_ERROR );
+	}
+
+	filemodel_set_filename( FILEMODEL( new_wsg ), NULL );
+
+	new_mainw = mainw_new( new_wsg );
+	gtk_widget_show( GTK_WIDGET( new_mainw ) );
+
+	symbol_recalculate_all();
+
 	progress_end();
 
-	if( wsg ) {
-		/* The filename will be something like
-		 * "~/.nip2-7.9.6/tmp/untitled-nip2-0-3904875.ws", very
-		 * unhelpful.
-		 */
-		IM_FREE( FILEMODEL( wsg )->filename );
-		iobject_changed( IOBJECT( wsg ) );
-
-		nfn( sys, IWINDOW_YES );
-	}
-	else
-		nfn( sys, IWINDOW_ERROR );
+	nfn( sys, IWINDOW_YES );
 }
 
 /* Auto recover.
@@ -1135,7 +1132,7 @@ mainw_recover_action_cb( GtkAction *action, Mainw *mainw )
 		(iWindowNotifyFn) im_free, filename,
 		GTK_STOCK_OPEN, 
 		_( "Open workspace backup?" ),
-		_( "Found workspace \"%s\". "
+		_( "Found workspace backup:\n\n\t%s\n\n"
 		"Do you want to recover this workspace?" ),
 		filename ); 
 }

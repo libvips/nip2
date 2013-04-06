@@ -421,6 +421,7 @@ iimage_class_init( iImageClass *class )
 	gobject_class->dispose = iimage_dispose;
 	gobject_class->finalize = iimage_finalize;
 
+	iobject_class->user_name = _( "Image" );
 	iobject_class->generate_caption = iimage_generate_caption;
 	iobject_class->info = iimage_info;
 

@@ -62,7 +62,6 @@ static Workspace *
 workspacegroup_workspace_pick( Workspacegroup *wsg )
 {
 	Workspace *ws;
-	char name[MAX_STRSIZE];
 
 	if( (ws = workspacegroup_get_workspace( wsg )) )
 		return( ws );
@@ -74,11 +73,7 @@ workspacegroup_workspace_pick( Workspacegroup *wsg )
 		return( ws );
 	}
 
-	strcpy( name, "tab1" );
-	while( compile_lookup( wsg->wsr->sym->expr->compile, name ) )
-		increment_name( name );
-	ws = workspace_new( wsg, name );
-	icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
+	ws = workspace_new_blank( wsg );
 
 	(void) workspace_column_pick( ws ); 
 
@@ -202,10 +197,17 @@ workspacegroup_rename_workspace_node( Workspacegroup *wsg,
 	if( !get_sprop( xws, "name", name, MAX_STRSIZE ) )
 		return;
 
+	/* If the name is free, just use it.
+	 *
+	 * If we need to pick a new name, it must be free AND not have been
+	 * used for a previous rename.
+	 */
 	strcpy( new_name, name );
-	while( compile_lookup( wsr->sym->expr->compile, new_name ) ||
-		model_loadstate_taken( state, new_name ) )
-		increment_name( new_name );
+	if( compile_lookup( wsr->sym->expr->compile, new_name ) ) {
+		while( compile_lookup( wsr->sym->expr->compile, new_name ) ||
+			model_loadstate_taken( state, new_name ) )
+			increment_name( new_name );
+	}
 
 	(void) set_sprop( xws, "name", new_name );
 	(void) model_loadstate_rename_new( state, name, new_name );
@@ -298,12 +300,17 @@ workspacegroup_rename_column_node( Workspacegroup *wsg,
 	if( !get_sprop( xcol, "name", name, MAX_STRSIZE ) )
 		return;
 
-	/* Name must not exist in workspace, or in other columns we may load.
+	/* If the name is free, just use it.
+	 *
+	 * If we need to pick a new name, it must be free AND not have been
+	 * used for a previous rename.
 	 */
 	im_strncpy( new_name, name, 256 );
-	while( workspace_column_find( ws, new_name ) ||
-		model_loadstate_column_taken( state, new_name ) ) {
-		workspace_column_name_new( ws, new_name );
+	if( workspace_column_find( ws, new_name ) ) {
+		while( workspace_column_find( ws, new_name ) ||
+			model_loadstate_column_taken( state, new_name ) ) {
+			workspace_column_name_new( ws, new_name );
+		}
 	}
 
 #ifdef DEBUG
@@ -647,6 +654,7 @@ static void
 workspacegroup_class_init( WorkspacegroupClass *class )
 {
 	GObjectClass *gobject_class = (GObjectClass *) class;
+	iObjectClass *iobject_class = (iObjectClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 	FilemodelClass *filemodel_class = (FilemodelClass *) class;
 
@@ -658,6 +666,8 @@ workspacegroup_class_init( WorkspacegroupClass *class )
 	/* Init methods.
 	 */
 	gobject_class->dispose = workspacegroup_dispose;
+
+	iobject_class->user_name = _( "Workspace" );
 
 	/* ->load() is done by workspace_top_load().
 	 */

@@ -245,6 +245,7 @@ static void
 column_class_init( ColumnClass *class )
 {
 	GObjectClass *gobject_class = (GObjectClass *) class;
+	iObjectClass *iobject_class = (iObjectClass *) class;
 	iContainerClass *icontainer_class = (iContainerClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 	FilemodelClass *filemodel_class = (FilemodelClass *) class;
@@ -258,6 +259,8 @@ column_class_init( ColumnClass *class )
 
 	/* Init methods.
 	 */
+	iobject_class->user_name = _( "Column" );
+
 	icontainer_class->child_add = column_child_add;
 	icontainer_class->child_remove = column_child_remove;
 	icontainer_class->parent_add = column_parent_add;

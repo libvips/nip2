@@ -838,7 +838,7 @@ model_check_destroy( GtkWidget *parent, Model *model )
 		GTK_STOCK_DELETE, 
 		_( "Delete?" ),
 		_( "Are you sure you want to delete %s \"%s\"?" ), 
-		G_OBJECT_TYPE_NAME( model ), name );
+		IOBJECT_GET_CLASS_NAME( model ), name );
 
 	/* In case someone else kills this model before we do.
 	 */

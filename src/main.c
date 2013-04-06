@@ -429,7 +429,7 @@ main_load( Workspace *ws, const char *filename )
 	Workspacegroup *new_wsg;
 
 	if( (new_wsg = workspacegroup_new_from_file( main_workspaceroot, 
-		filename, NULL )) ) {
+		filename, filename )) ) {
 		Mainw *mainw;
 
 		mainw = mainw_new( new_wsg );
@@ -507,7 +507,7 @@ main_load_wsg( const char *filename )
 	progress_update_loading( 0, im_skip_dir( filename ) );
 
 	if( !(wsg = workspacegroup_new_from_file( main_workspaceroot, 
-		filename, NULL )) ) 
+		filename, filename )) ) 
 		iwindow_alert( NULL, GTK_MESSAGE_ERROR );
 	else {
 		filemodel_set_auto_load( FILEMODEL( wsg ) );
@@ -1349,8 +1349,8 @@ main( int argc, char *argv[] )
 	 * stuff into.
 	 */
 	if( !wsg ) {
-		workspaceroot_name_new( main_workspaceroot, name );
-		wsg = workspacegroup_new_blank( main_workspaceroot, name );
+		wsg = workspacegroup_new_blank( main_workspaceroot, 
+			"untitled" );
 		ws = WORKSPACE( icontainer_get_nth_child( 
 			ICONTAINER( wsg ), 0 ) ); 
 	}

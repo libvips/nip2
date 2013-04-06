@@ -928,6 +928,7 @@ static void
 workspace_class_init( WorkspaceClass *class )
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
+	iObjectClass *iobject_class = IOBJECT_CLASS( class );
 	iContainerClass *icontainer_class = (iContainerClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 
@@ -940,6 +941,8 @@ workspace_class_init( WorkspaceClass *class )
 	 */
 	gobject_class->dispose = workspace_dispose;
 	gobject_class->finalize = workspace_finalize;
+
+	iobject_class->user_name = _( "Tab" );
 
 	icontainer_class->child_add = workspace_child_add;
 	icontainer_class->child_remove = workspace_child_remove;

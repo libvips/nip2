@@ -88,7 +88,16 @@ typedef struct _iObjectClass {
 	 * the caption to be an explanatory note about the object. 
 	 */
 	const char *(*generate_caption)( iObject * );
+
+	/* The i18n name for this class we show the user. FOr example,
+	 * Workspace is referred to as "tab" by the user.
+	 */
+	const char *user_name;
 } iObjectClass;
+
+#define IOBJECT_GET_CLASS_NAME( obj ) \
+	((G_TYPE_INSTANCE_GET_CLASS( (obj), \
+		TYPE_IOBJECT, iObjectClass ))->user_name)
 
 void *iobject_destroy( iObject *iobject );
 void *iobject_changed( iObject *iobject );

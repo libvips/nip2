@@ -317,7 +317,7 @@ filemodel_top_save_xml( Filemodel *filemodel, const char *filename )
 			filename, xdoc, NULL, NULL ) == -1 ) {
 		error_top( _( "Save failed." ) );
 		error_sub( _( "Save of %s \"%s\" to file \"%s\" failed.\n%s" ),
-			G_OBJECT_TYPE_NAME( filemodel ), 
+			IOBJECT_GET_CLASS_NAME( filemodel ), 
 			NN( IOBJECT( filemodel )->name ),
 			NN( filename ),
 			g_strerror( errno ) );
@@ -677,7 +677,7 @@ filemodel_inter_saveas_cb( iWindow *iwnd, void *client,
 	/* Expands to (eg.) "Save Column A2".
 	 */
 	iwindow_set_title( IWINDOW( filesel ), _( "Save %s %s" ),
-		G_OBJECT_TYPE_NAME( filemodel ), 
+		IOBJECT_GET_CLASS_NAME( filemodel ), 
 		NN( IOBJECT( filemodel )->name ) );
 	filesel_set_flags( filesel, FALSE, TRUE );
 	filesel_set_filetype( filesel, 
@@ -744,7 +744,7 @@ filemodel_inter_savenempty_cb( iWindow *iwnd, void *client,
 	iWindowNotifyFn nfn, void *sys )
 {
 	Filemodel *filemodel = FILEMODEL( client );
-	const char *tname = G_OBJECT_TYPE_NAME( filemodel );
+	const char *tname = IOBJECT_GET_CLASS_NAME( filemodel );
 
 	if( filemodel->modified ) {
 		if( filemodel->filename )
@@ -753,11 +753,10 @@ filemodel_inter_savenempty_cb( iWindow *iwnd, void *client,
 				filemodel_inter_empty_cb, filemodel, 
 				nfn, sys, 
 				_( "Object has been modified." ),
-				_( "%s \"%s\" has been modified since you "
+				_( "%s has been modified since you "
 				"loaded it from file \"%s\".\n\n"
 				"Do you want to save your changes?" ),
 				tname, 
-				NN( IOBJECT( filemodel )->name ),
 				NN( filemodel->filename ) );
 		else
 			box_savenosave( GTK_WIDGET( iwnd ), 
@@ -765,10 +764,9 @@ filemodel_inter_savenempty_cb( iWindow *iwnd, void *client,
 				filemodel_inter_empty_cb, filemodel, 
 				nfn, sys, 
 				_( "Object has been modified." ),
-				_( "%s \"%s\" has been modified. "
+				_( "%s has been modified. "
 				"Do you want to save your changes?" ),
-				tname, 
-				NN( IOBJECT( filemodel )->name ) );
+				tname );  
 	}
 	else
 		filemodel_inter_empty_cb( NULL, filemodel, nfn, sys );
@@ -849,7 +847,7 @@ filemodel_inter_loadas_cb( iWindow *iwnd, void *client,
 	Filesel *filesel = FILESEL( filesel_new() );
 
 	iwindow_set_title( IWINDOW( filesel ), "Load %s",
-		G_OBJECT_TYPE_NAME( filemodel ) );
+		IOBJECT_GET_CLASS_NAME( filemodel ) );
 	filesel_set_flags( filesel, FALSE, TRUE );
 	filesel_set_filetype( filesel, 
 		class->filetype, 

@@ -40,7 +40,12 @@ static GSList *workspace_all = NULL;
 Workspacegroup *
 workspace_get_workspacegroup( Workspace *ws )
 {
-	return( WORKSPACEGROUP( ICONTAINER( ws )->parent ) );
+	iContainer *parent; 
+
+	if( (parent = ICONTAINER( ws )->parent) )
+		return( WORKSPACEGROUP( parent ) );
+
+	return( NULL );
 }
 
 Workspaceroot *
@@ -335,6 +340,23 @@ workspace_column_name_new( Workspace *ws, char *name )
 	} while( workspace_column_find( ws, name ) );
 }
 
+Column *
+workspace_get_column( Workspace *ws )
+{
+	if( ICONTAINER( ws )->current )
+		return( COLUMN( ICONTAINER( ws )->current ) );
+
+	return( NULL );
+}
+
+/* Select a column. Can select NULL for no current col in this ws.
+ */
+void
+workspace_column_select( Workspace *ws, Column *col )
+{
+	icontainer_child_current( ICONTAINER( ws ), ICONTAINER( col ) ); 
+}
+
 /* Make sure we have a column selected ... pick one of the existing columns; if 
  * there are none, make a column.
  */
@@ -343,13 +365,11 @@ workspace_column_pick( Workspace *ws )
 {
 	Column *col;
 
-	if( ws->current )
-		return( ws->current );
-
-	if( ICONTAINER( ws )->children ) {
-		col = COLUMN( ICONTAINER( ws )->children->data );
-		workspace_column_select( ws, col );
-
+	if( (col = workspace_get_column( ws )) )
+		return( col );
+	if( (col = COLUMN( icontainer_get_nth_child( 
+		ICONTAINER( ws ), 0 ) )) ) {
+		workspace_column_select( ws, col ); 
 		return( col );
 	}
 
@@ -361,29 +381,6 @@ workspace_column_pick( Workspace *ws )
 	workspace_column_select( ws, col );
 
 	return( col );
-}
-
-/* Select a column. Can select NULL for no current col in this ws.
- */
-void
-workspace_column_select( Workspace *ws, Column *col )
-{
-	g_assert( !col || ICONTAINER_IS_CHILD( ws, col ) ); 
-
-	if( col && col == ws->current )
-		return;
-
-	if( ws->current ) {
-		ws->current->selected = FALSE;
-		iobject_changed( IOBJECT( ws->current ) );
-	}
-
-	ws->current = col;
-
-	if( col ) {
-		col->selected = TRUE;
-		iobject_changed( IOBJECT( col ) );
-	}
 }
 
 /* Make and select a column.
@@ -590,6 +587,31 @@ workspace_finalize( GObject *gobject )
 }
 
 static void
+workspace_changed( iObject *iobject )
+{
+	Workspace *ws;
+	Workspacegroup *wsg;
+
+#ifdef DEBUG
+	printf( "workspace_changed: %s\n", NN( iobject->name ) );
+#endif /*DEBUG*/
+
+	g_return_if_fail( iobject != NULL );
+	g_return_if_fail( IS_WORKSPACE( iobject ) );
+
+	ws = WORKSPACE( iobject );
+	wsg = workspace_get_workspacegroup( ws );
+
+	/* Signal changed on our workspacegroup, if we're the current object.
+	 */
+	if( wsg &&
+		ICONTAINER( wsg )->current == ICONTAINER( iobject ) )
+		iobject_changed( IOBJECT( wsg ) );
+
+	IOBJECT_CLASS( parent_class )->changed( iobject );
+}
+
+static void
 workspace_child_add( iContainer *parent, iContainer *child, int pos )
 {
 	Workspace *ws = WORKSPACE( parent );
@@ -606,16 +628,32 @@ workspace_child_remove( iContainer *parent, iContainer *child )
 {
 	Workspace *ws = WORKSPACE( parent );
 	Column *col = COLUMN( child );
+	Column *current = workspace_get_column( ws );
 
 	/* Will we remove the current column? If yes, make sure
 	 * current_column is NULL.
 	 */
-	if( ws->current == col )
+	if( current == col )
 		workspace_column_select( ws, NULL );
 
 	workspace_set_modified( ws, TRUE );
 
 	ICONTAINER_CLASS( parent_class )->child_remove( parent, child );
+}
+
+static void
+workspace_child_current( iContainer *parent, iContainer *child )
+{
+	Workspace *ws = WORKSPACE( parent );
+	Column *col = COLUMN( child );
+	Column *current = workspace_get_column( ws );
+
+	if( current )
+		current->selected = FALSE;
+	if( col )
+		col->selected = TRUE;
+
+	ICONTAINER_CLASS( parent_class )->child_current( parent, child );
 }
 
 static void
@@ -708,9 +746,6 @@ workspace_load( Model *model,
 	(void) get_dprop( xnode, "scale", &ws->scale );
 	(void) get_dprop( xnode, "offset", &ws->offset );
 
-	(void) get_iprop( xnode, "window_width", &ws->window_width );
-	(void) get_iprop( xnode, "window_height", &ws->window_height );
-
 	(void) get_bprop( xnode, "lpane_open", &ws->lpane_open );
 	(void) get_iprop( xnode, "lpane_position", &ws->lpane_position );
 	(void) get_bprop( xnode, "rpane_open", &ws->rpane_open );
@@ -740,7 +775,7 @@ static xmlNode *
 workspace_save( Model *model, xmlNode *xnode )
 {
 	Workspace *ws = WORKSPACE( model );
-	Workspacegroup *wsg = WORKSPACEGROUP( ICONTAINER( ws )->parent );
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 	xmlNode *xthis;
 
 	if( !(xthis = MODEL_CLASS( parent_class )->save( model, xnode )) )
@@ -749,8 +784,6 @@ workspace_save( Model *model, xmlNode *xnode )
 	if( !set_sprop( xthis, "view", workspacemode_to_char( ws->mode ) ) ||
 		!set_dprop( xthis, "scale", ws->scale ) ||
 		!set_dprop( xthis, "offset", ws->offset ) ||
-		!set_prop( xthis, "window_width", "%d", ws->window_width ) ||
-		!set_prop( xthis, "window_height", "%d", ws->window_height ) ||
 		!set_prop( xthis, "lpane_position", "%d", 
 			ws->lpane_position ) ||
 		!set_sprop( xthis, "lpane_open", 
@@ -942,10 +975,12 @@ workspace_class_init( WorkspaceClass *class )
 	gobject_class->dispose = workspace_dispose;
 	gobject_class->finalize = workspace_finalize;
 
+	iobject_class->changed = workspace_changed;
 	iobject_class->user_name = _( "Tab" );
 
 	icontainer_class->child_add = workspace_child_add;
 	icontainer_class->child_remove = workspace_child_remove;
+	icontainer_class->child_current = workspace_child_current;
 
 	model_class->view_new = workspace_view_new;
 	model_class->load = workspace_load;
@@ -969,7 +1004,6 @@ workspace_init( Workspace *ws )
 	g_object_ref( G_OBJECT( ws->kitg ) );
 
 	ws->next = 0;
-	ws->current = NULL;
 	ws->selected = NULL;
 	ws->errors = NULL;
         ws->mode = WORKSPACE_MODE_REGULAR;
@@ -982,8 +1016,6 @@ workspace_init( Workspace *ws )
 	ws->area.width = 0;
 	ws->area.height = 0;
 	ws->vp = ws->area;
-	ws->window_width = 0;
-	ws->window_height = 0;
 
 	/* Overwritten by mainw.
 	 */
@@ -1073,7 +1105,6 @@ workspace_new_blank( Workspacegroup *wsg )
 	(void) workspace_column_pick( ws );
 
 	icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
-	model_front( MODEL( ws ) );
 
 	iobject_set( IOBJECT( ws ), NULL, _( "Default empty tab" ) );
 
@@ -1621,6 +1652,7 @@ gboolean
 workspace_selected_duplicate( Workspace *ws )
 {
 	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
+
 	char filename[FILENAME_MAX];
 
 	if( !workspace_selected_any( ws ) ) {
@@ -1649,7 +1681,7 @@ workspace_selected_duplicate( Workspace *ws )
 
 	symbol_recalculate_all();
 	workspace_deselect_all( ws );
-	model_scrollto( MODEL( ws->current ), MODEL_SCROLL_TOP );
+	model_scrollto( MODEL( workspace_get_column( ws ) ), MODEL_SCROLL_TOP );
 
 	progress_end();
 

@@ -491,7 +491,6 @@ columnview_left_release( Columnview *cview, GdkEvent *ev )
         case COL_SELECT:
                 cview->state = COL_WAIT;
                 workspace_column_select( ws, col );
-                view_child_front( VIEW( cview ) );
 
                 break;
 

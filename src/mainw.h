@@ -121,7 +121,6 @@ void mainw_recent_freeze( void );
 void mainw_recent_thaw( void );
 void mainw_recent_add( GSList **recent, const char *filename );
 
-int mainw_number( void );
 Mainw *mainw_pick_one( void );
 GType mainw_get_type( void );
 

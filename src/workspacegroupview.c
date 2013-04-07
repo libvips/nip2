@@ -338,6 +338,57 @@ workspacegroupview_duplicate_cb( GtkWidget *wid, GtkWidget *host,
 }
 
 static void
+workspacegroupview_merge_sub( iWindow *iwnd, 
+	void *client, iWindowNotifyFn nfn, void *sys )
+{
+	Filesel *filesel = FILESEL( iwnd );
+	Workspace *ws = WORKSPACE( client );
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
+
+	char *filename;
+
+	if( (filename = filesel_get_filename( filesel )) ) {
+		icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
+
+		progress_begin();
+
+		if( !workspace_merge_file( ws, filename ) ) 
+			nfn( sys, IWINDOW_ERROR );
+		else {
+			symbol_recalculate_all();
+			nfn( sys, IWINDOW_YES );
+		}
+
+		progress_end();
+
+		g_free( filename );
+	}
+	else
+		nfn( sys, IWINDOW_ERROR );
+}
+
+static void                
+workspacegroupview_merge_cb( GtkWidget *wid, GtkWidget *host, 
+	Workspaceview *wview )
+{
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+	iWindow *iwnd = IWINDOW( view_get_toplevel( VIEW( wview ) ) );
+	GtkWidget *filesel = filesel_new();
+
+	iwindow_set_title( IWINDOW( filesel ), 
+		_( "Merge Into Tab \"%s\"" ), IOBJECT( ws )->name );
+	filesel_set_flags( FILESEL( filesel ), FALSE, FALSE );
+	filesel_set_filetype( FILESEL( filesel ), filesel_type_workspace, 0 ); 
+	iwindow_set_parent( IWINDOW( filesel ), GTK_WIDGET( iwnd ) );
+	idialog_set_iobject( IDIALOG( filesel ), IOBJECT( ws ) );
+	filesel_set_done( FILESEL( filesel ), 
+		workspacegroupview_merge_sub, ws );
+	iwindow_build( IWINDOW( filesel ) );
+
+	gtk_widget_show( GTK_WIDGET( filesel ) );
+}
+
+static void
 workspacegroupview_save_as_sub( iWindow *iwnd, 
 	void *client, iWindowNotifyFn nfn, void *sys )
 {
@@ -441,6 +492,8 @@ workspacegroupview_init( Workspacegroupview *wsgview )
 		POPUP_FUNC( workspacegroupview_select_all_cb ) ); 
 	popup_add_but( wsgview->tab_menu, STOCK_DUPLICATE,
 		POPUP_FUNC( workspacegroupview_duplicate_cb ) ); 
+	popup_add_but( wsgview->tab_menu, "Merge",
+		POPUP_FUNC( workspacegroupview_merge_cb ) ); 
 	popup_add_but( wsgview->tab_menu, GTK_STOCK_SAVE_AS,
 		POPUP_FUNC( workspacegroupview_save_as_cb ) ); 
 	menu_add_sep( wsgview->tab_menu );

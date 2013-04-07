@@ -261,11 +261,9 @@ workspacegroup_load_new( Workspacegroup *wsg,
 			first_ws = ws;
 	} FOR_ALL_XML_END
 
-	if( first_ws ) {
+	if( first_ws ) 
 		icontainer_child_current( ICONTAINER( wsg ), 
 			ICONTAINER( first_ws ) ); 
-		model_front( MODEL( first_ws ) );
-	}
 
 	return( TRUE );
 }

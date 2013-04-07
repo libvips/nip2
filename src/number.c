@@ -55,6 +55,7 @@ static ClassmodelMember number_members[] = {
 static void
 number_class_init( NumberClass *class )
 {
+	iObjectClass *iobject_class = (iObjectClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 	ClassmodelClass *classmodel_class = (ClassmodelClass *) class;
 

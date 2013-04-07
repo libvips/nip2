@@ -63,7 +63,6 @@ struct _Workspace {
 	/* State.
 	 */
 	int next;		/* Index for next column name */
-	Column *current;	/* Current column */
 	GSList *selected;	/* Rows selected in this workspace */
 	GSList *errors;		/* Rows with errors */
         WorkspaceMode mode;	/* Display mode */
@@ -80,8 +79,6 @@ struct _Workspace {
 
 	Rect area;		/* Rect enclosing the set of columns */
 	Rect vp;		/* Viewport hint ... set by views */
-	int window_width;	/* Enclosing window size ... set by views */
-	int window_height;
 	gboolean lpane_open;	/* Pane model */
 	int lpane_position;	
 	gboolean rpane_open;

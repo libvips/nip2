@@ -58,11 +58,11 @@ filemodel_register( Filemodel *filemodel )
 			filemodel );
 
 #ifdef DEBUG
+#endif /*DEBUG*/
 		printf( "filemodel_register: %s \"%s\" (%p)\n",
 			G_OBJECT_TYPE_NAME( filemodel ),
 			IOBJECT( filemodel )->name,
 			filemodel );
-#endif /*DEBUG*/
 	}
 }
 
@@ -75,11 +75,11 @@ filemodel_unregister( Filemodel *filemodel )
 			filemodel );
 
 #ifdef DEBUG
+#endif /*DEBUG*/
 		printf( "filemodel_unregister: %s \"%s\" (%p)\n",
 			G_OBJECT_TYPE_NAME( filemodel ),
 			IOBJECT( filemodel )->name,
 			filemodel );
-#endif /*DEBUG*/
 	}
 }
 
@@ -210,9 +210,30 @@ filemodel_finalize( GObject *gobject )
 #endif /*DEBUG*/
 
 	IM_FREE( filemodel->filename );
-	filemodel_unregister( filemodel );
 
 	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+}
+
+static void
+filemodel_dispose( GObject *gobject )
+{
+	Filemodel *filemodel;
+
+	g_return_if_fail( gobject != NULL );
+	g_return_if_fail( IS_FILEMODEL( gobject ) );
+
+	filemodel = FILEMODEL( gobject );
+
+#ifdef DEBUG
+	printf( "filemodel_dispose: %s \"%s\" (%s)\n", 
+		G_OBJECT_TYPE_NAME( filemodel ), 
+		NN( IOBJECT( filemodel )->name ),
+		NN( filemodel->filename ) );
+#endif /*DEBUG*/
+
+	filemodel_unregister( filemodel );
+
+	G_OBJECT_CLASS( parent_class )->dispose( gobject );
 }
 
 static xmlNode *
@@ -388,6 +409,7 @@ filemodel_class_init( FilemodelClass *class )
 	parent_class = g_type_class_peek_parent( class );
 
 	gobject_class->finalize = filemodel_finalize;
+	gobject_class->dispose = filemodel_dispose;
 
 	iobject_class->info = filemodel_info;
 

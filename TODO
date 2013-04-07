@@ -1,21 +1,24 @@
-- how odd, in workspacegroup_load_new() we do:
+- popup menu on tab should have merge item
 
-	if( first_ws ) {
-		icontainer_child_current( ICONTAINER( wsg ), 
-			ICONTAINER( first_ws ) ); 
-		model_front( MODEL( first_ws ) );
-	}
+- where does this go back
 
-  do we need both? shouldn't _current() do _front() for us? or vice-versa?
-
-- select a row, status does not update
-
-- delete final tab in ws does not close mainw
-
-- fix naming: for the user, a mainw displays a workspace and a workspace has
-  tabs
+	/* If the mainw has a single, empty, unmodified workspace in
+	 * already, we optionally trim it. We can't remove until we've added 
+	 * the new ws though or our mainw will be destroyed.  
+	 */
+	delete_ws = FALSE;
+	if( trim &&
+		mainw_get_n_tabs( mainw ) == 1 &&
+		(old_ws = mainw_get_workspace( mainw )) &&
+		workspace_is_empty( old_ws ) &&
+		!FILEMODEL( old_ws )->modified ) 
+		delete_ws = TRUE;
 
 - workspacegroupview_reorder_tab_cb() is never called?
+
+- fix drag tabs between mainw
+
+- fix drag tabs to root
 
 - major / minor / micro need to be in workspace, as well as root
 
@@ -31,155 +34,7 @@
 - hide tabs if only one tab in window, we'd need to allow tab drop anywhere in
   window for that
 
-- look at column, make it use icontainer_child_current() and model_front()
-
-  columnview should not use view_child_front()
-
-
-
-
-
-- where does this go back
-
-	/* If the mainw has a single, empty workspace, unmodified workspace in
-	 * already, we optionally trim it. We can't remove until we've added 
-	 * the new ws though or our mainw will be destroyed.  
-	 */
-	delete_ws = FALSE;
-	if( trim &&
-		mainw_get_n_tabs( mainw ) == 1 &&
-		(old_ws = mainw_get_workspace( mainw )) &&
-		workspace_is_empty( old_ws ) &&
-		!FILEMODEL( old_ws )->modified ) 
-		delete_ws = TRUE;
-
-
-
-- workspaceview must stay as a view, we need to be able to save chunks of them
-  and stuff like that ... and scroll and things too
-
-
-
-  tab
-
-- scrap workspace->window_width and _height ? don't save this to files anymore
-
-
-- restructure as
-
-	model		view
-
-	workspace	workspaceview, does tkbrowser, local defs as well
-	workspacegroup	workspacegroupview ... runs notebook
-
-	mainw displays a workspacegroup with some menus and stuff
-
-  so .. push mainwtab into workspaceview
-
-
-
-
-- why do we have mainw_recent_add()? move it to path.c?
-
-  see main_load() ... it has to call mainw_recent_add() explicitly, this
-  should be automatic
-
-
-- we must do it properly, with one file per mainw, it'd be much too confusing
-  to have save sometimes save a tab and sometimes save the whole book
-
-  so we must convert old ws files to workspacegroups with a single tab on load
-
-  we need a workspacegroup filemodel object to hold a set of workspaces
-
-  add workspacegroup ... a filemodel that represents a loaded workspace file,
-  has a list of workspaces as children
-
-  mainw displays a workspacegroup
-
-
-
-
 - test file drop on mainw, esp. workspaces
-
-- do we need a filemodel for group-of-workspaces?
-
-  at the moment, workspacegroup is a singleton, perhaps make it our new class?
-
-  currently derives from Model, would need to swap to Filemodel (which in
-  turns derives from Model)
-
-  mainw could become workspacegroupview 
-
-  ... probably not a good idea to go the whole hog, we don't want to enforce
-  workbook behaviour for plain MDI use of multiple wses
-
-  though what if someone loads a set of tabs? they should all go into a new
-  mainw, and if they change something, we then want save/save-as to operate on
-  the whole file
-
-
-
-- a ws file can have multiple workspaces:
-
-	<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.29.0">
-	  <Workspace ..>
-	  </Workspace>
-	  <Workspace ..>
-	  </Workspace>
-	</root>
-
-  ie. it's just a container
-
-  alternative: how about:
-
-	<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.29.0">
-	  <Workspace ..>
-	  </Workspace>
-	</root>
-	<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.29.0">
-	  <Workspace ..>
-	  </Workspace>
-	</root>
-
-  would that be better for compat? can the first one load into an old nip2?
-
-  scope and internal structure is exactly as now
-
-  now we can drag tabs into top-level windows and back!
-
-  so mainw is just a top-level window with a list of mainwtab, each mainwtab
-  shows one workspace, mainw is split into two pretty simply
-
-  what do we do for:
-
-  	$ nip2 a.ws b.ws
-
-  show one window, or two?
-
-  should probably show one window, why would you want two separate workspaces 
-
-  file / save then means "save current tab", have an special item for "save
-  all tabs as workbook"
-
-  on popdown, have to loop through all tabs checking for save or quit
-
-  need to swap the toolkit menu on notebook tab switch
-
-  lpane / rpane must be inside tab
-
-  mainw title should show current tab title
-
-  these two should be exactly equivalent:
-
-  	$ nip2 a.ws b.ws
-	$ nip2 ab.ws
-
-  ie. a workbook is just two workspaces in one window ... we are just adding
-  MDI
-
-
-  
 
 
 

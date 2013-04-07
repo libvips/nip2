@@ -429,7 +429,10 @@ void
 icontainer_child_current( iContainer *parent, iContainer *child )
 {
 	g_assert( parent );
-	g_assert( ICONTAINER_IS_CHILD( parent, child ) );
+	g_assert( !child || ICONTAINER_IS_CHILD( parent, child ) );
+
+	if( parent->current == child )
+		return; 
 
 #ifdef DEBUG
 	printf( "icontainer_child_current: (child %p)\n", child );
@@ -653,6 +656,9 @@ icontainer_real_child_current( iContainer *parent, iContainer *child )
 			iobject_changed( IOBJECT( child ) );
 		iobject_changed( IOBJECT( parent ) );
 	}
+
+	if( child )
+		model_front( MODEL( child ) );
 }
 
 static void

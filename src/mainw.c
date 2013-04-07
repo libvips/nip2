@@ -112,12 +112,6 @@ mainw_recent_add( GSList **recent, const char *filename )
 	}
 }
 
-int
-mainw_number( void )
-{
-	return( g_slist_length( mainw_all ) );
-}
-
 /* Pick a mainw at random. Used if we need a window for a dialog, and we're
  * not sure which to pick.
  */
@@ -363,10 +357,12 @@ mainw_title_update( Mainw *mainw )
 	char txt[512];
 	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
-	if( FILEMODEL( mainw->wsg )->modified ) 
+	if( mainw->wsg &&
+		FILEMODEL( mainw->wsg )->modified ) 
 		vips_buf_appendf( &buf, "*" ); 
 
-	if( FILEMODEL( mainw->wsg )->filename )
+	if( mainw->wsg &&
+		FILEMODEL( mainw->wsg )->filename )
 		vips_buf_appendf( &buf, "%s", 
 			FILEMODEL( mainw->wsg )->filename );
 	else 
@@ -1929,6 +1925,10 @@ mainw_wsg_changed_cb( Workspacegroup *wsg, Mainw *mainw )
 	printf( "mainw_wsg_changed_cb\n" ); 
 
 	mainw_refresh( mainw );
+
+	if( mainw->wsg &&
+		!ICONTAINER( mainw->wsg )->children )
+		iwindow_kill( IWINDOW( mainw ) ); 
 }
 
 static void

@@ -540,7 +540,7 @@ subcolumn_save( Model *model, xmlNode *xnode )
 	if( !(xthis = MODEL_CLASS( parent_class )->save( model, xnode )) )
 		return( NULL );
 
-	if( !set_prop( xthis, "vislevel", "%d", scol->vislevel ) )
+	if( !set_iprop( xthis, "vislevel", scol->vislevel ) )
 		return( NULL );
 
 	return( xthis );

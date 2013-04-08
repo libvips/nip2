@@ -1944,6 +1944,8 @@ mainw_link( Mainw *mainw, Workspacegroup *wsg )
 {
 	mainw->wsg = wsg;
 
+	wsg->iwnd = IWINDOW( mainw );
+
 	iwindow_set_build( IWINDOW( mainw ), 
 		(iWindowBuildFn) mainw_build, wsg, NULL, NULL );
 	iwindow_set_popdown( IWINDOW( mainw ), mainw_popdown, NULL );

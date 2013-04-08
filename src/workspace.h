@@ -144,6 +144,9 @@ Symbol *workspace_add_def_recalc( Workspace *ws, const char *str );
 gboolean workspace_load_file_buf( VipsBuf *buf, const char *filename );
 Symbol *workspace_load_file( Workspace *ws, const char *filename );
 
+void workspace_get_version( Workspace *ws, int *major, int *minor );
+int workspace_have_compat( int major, int minor, 
+	int *best_major, int *best_minor );
 gboolean workspace_load_compat( Workspace *ws, int major, int minor );
 
 GType workspace_get_type( void );

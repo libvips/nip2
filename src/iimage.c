@@ -169,9 +169,9 @@ iimage_save( Model *model, xmlNode *xnode )
 
 	/* We always rebuild the value from the expr ... don't save.
 	 */
-	if( !set_prop( xthis, "image_left", "%d", iimage->image_left ) ||
-		!set_prop( xthis, "image_top", "%d", iimage->image_top ) ||
-		!set_prop( xthis, "image_mag", "%d", iimage->image_mag ) ||
+	if( !set_iprop( xthis, "image_left", iimage->image_left ) ||
+		!set_iprop( xthis, "image_top", iimage->image_top ) ||
+		!set_iprop( xthis, "image_mag", iimage->image_mag ) ||
 		!set_sprop( xthis, "show_status",
 			bool_to_char( iimage->show_status ) ) ||
 		!set_sprop( xthis, "show_paintbox",

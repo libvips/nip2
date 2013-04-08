@@ -765,6 +765,9 @@ workspace_load( Model *model,
 		IM_FREEF( xmlFree, txt );
 	}
 
+	(void) get_iprop( xnode, "major", &ws->compat_major );
+	(void) get_iprop( xnode, "minor", &ws->compat_minor );
+
 	if( !MODEL_CLASS( parent_class )->load( model, state, parent, xnode ) )
 		return( FALSE );
 
@@ -784,12 +787,10 @@ workspace_save( Model *model, xmlNode *xnode )
 	if( !set_sprop( xthis, "view", workspacemode_to_char( ws->mode ) ) ||
 		!set_dprop( xthis, "scale", ws->scale ) ||
 		!set_dprop( xthis, "offset", ws->offset ) ||
-		!set_prop( xthis, "lpane_position", "%d", 
-			ws->lpane_position ) ||
+		!set_iprop( xthis, "lpane_position", ws->lpane_position ) ||
 		!set_sprop( xthis, "lpane_open", 
 			bool_to_char( ws->lpane_open ) ) ||
-		!set_prop( xthis, "rpane_position", "%d", 
-			ws->rpane_position ) ||
+		!set_iprop( xthis, "rpane_position", ws->rpane_position ) ||
 		!set_sprop( xthis, "rpane_open", 
 			bool_to_char( ws->rpane_open ) ) ||
 		!set_sprop( xthis, "local_defs", ws->local_defs ) ||
@@ -802,6 +803,12 @@ workspace_save( Model *model, xmlNode *xnode )
 	 */
 	if( !set_sprop( xthis, "filename", FILEMODEL( wsg )->filename ) )
 		return( NULL );
+
+	if( ws->compat_major ) {
+		if( !set_iprop( xthis, "major", ws->compat_major ) ||
+			!set_iprop( xthis, "minor", ws->compat_minor ) )
+			return( NULL );
+	}
 
 	return( xthis );
 }
@@ -880,15 +887,15 @@ workspace_build_compat( void )
 /* Given a major/minor (eg. read from a ws header), return non-zero if we have 
  * a set of compat defs.
  */
-static int
+int
 workspace_have_compat( int major, int minor, int *best_major, int *best_minor )
 {
 	int i;
 	int best;
 
 #ifdef DEBUG
-	printf( "workspace_have_compat: searching for %d.%d\n", major, minor );
 #endif /*DEBUG*/
+	printf( "workspace_have_compat: searching for %d.%d\n", major, minor );
 
 	/* Sets of ws compatibility defs cover themselves and any earlier
 	 * releases, as far back as the next set of compat defs. We need to
@@ -910,8 +917,8 @@ workspace_have_compat( int major, int minor, int *best_major, int *best_minor )
 		return( 0 );
 
 #ifdef DEBUG
-	printf( "\tfound %d.%d\n", compat_major[best], compat_minor[best] );
 #endif /*DEBUG*/
+	printf( "\tfound %d.%d\n", compat_major[best], compat_minor[best] );
 
 	if( best_major )
 		*best_major = compat_major[best];
@@ -919,6 +926,19 @@ workspace_have_compat( int major, int minor, int *best_major, int *best_minor )
 		*best_minor = compat_minor[best];
 
 	return( 1 );
+}
+
+void
+workspace_get_version( Workspace *ws, int *major, int *minor )
+{
+	if( ws->compat_major ) {
+		*major = ws->compat_major;
+		*minor = ws->compat_minor;
+	}
+	else {
+		*major = MAJOR_VERSION;
+		*minor = MINOR_VERSION;
+	}
 }
 
 gboolean
@@ -929,30 +949,35 @@ workspace_load_compat( Workspace *ws, int major, int minor )
 	int best_major;
 	int best_minor;
 
-	if( !workspace_have_compat( major, minor, &best_major, &best_minor ) )
-		return( TRUE );
+	if( workspace_have_compat( major, minor, &best_major, &best_minor ) ) {
+		/* Make a private toolkitgroup local to this workspace to 
+		 * hold the compatibility defs we are planning to load.
+		 */
+		UNREF( ws->kitg );
+		ws->kitg = toolkitgroup_new( ws->sym );
+		g_object_ref( G_OBJECT( ws->kitg ) );
+		iobject_sink( IOBJECT( ws->kitg ) );
 
-	/* Make a private toolkitgroup local to this workspace to hold the
-	 * compatibility defs we are planning to load.
-	 */
-	UNREF( ws->kitg );
-	ws->kitg = toolkitgroup_new( ws->sym );
-	g_object_ref( G_OBJECT( ws->kitg ) );
-	iobject_sink( IOBJECT( ws->kitg ) );
-
-	im_snprintf( pathname, FILENAME_MAX, 
-		"$VIPSHOME/share/" PACKAGE "/compat/%d.%d", 
-		best_major, best_minor );
-	path = path_parse( pathname );
-	if( path_map( path, "*.def", 
-		(path_map_fn) workspace_load_toolkit, ws->kitg ) ) {
+		im_snprintf( pathname, FILENAME_MAX, 
+			"$VIPSHOME/share/" PACKAGE "/compat/%d.%d", 
+			best_major, best_minor );
+		path = path_parse( pathname );
+		if( path_map( path, "*.def", 
+			(path_map_fn) workspace_load_toolkit, ws->kitg ) ) {
+			path_free2( path );
+			return( FALSE );
+		}
 		path_free2( path );
-		return( FALSE );
-	}
-	path_free2( path );
 
-	ws->compat_major = best_major;
-	ws->compat_minor = best_minor;
+		ws->compat_major = best_major;
+		ws->compat_minor = best_minor;
+	}
+	else {
+		/* No compat defs necessary for this ws. 
+		 */
+		ws->compat_major = 0;
+		ws->compat_minor = 0;
+	}
 
 	return( TRUE );
 }

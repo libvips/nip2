@@ -79,6 +79,7 @@ gboolean vips_buf_appendsc( VipsBuf *buf, gboolean quote, const char *str );
 gboolean set_prop( xmlNode *xnode, const char *name, const char *fmt, ... )
 	__attribute__((format(printf, 3, 4)));
 gboolean set_sprop( xmlNode *xnode, const char *name, const char *value );
+gboolean set_iprop( xmlNode *xnode, const char *name, int value );
 gboolean set_dprop( xmlNode *xnode, const char *name, double value );
 gboolean set_slprop( xmlNode *xnode, const char *name, GSList *labels );
 gboolean set_dlprop( xmlNode *xnode, const char *name, double *values, int n );

@@ -1,5 +1,12 @@
 
-- major / minor / micro need to be in workspace as well as root
+- test new compat stuff
+
+  test for warning on merge incompatible ws
+
+  check that we set version numbers correctly on load, save and load again of
+  incompatible workspaces
+
+  check toolkit menu switching
 
 - workspacegroupview_reorder_tab_cb() is never called?
 

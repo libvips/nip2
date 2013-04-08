@@ -229,6 +229,14 @@ set_sprop( xmlNode *xnode, const char *name, const char *value )
 	return( TRUE );
 }
 
+/* Set an xml property from an optionally NULL string.
+ */
+gboolean
+set_iprop( xmlNode *xnode, const char *name, int value )
+{
+	return( set_prop( xnode, name, "%d", value ) );
+}
+
 /* Save a list of strings. For name=="fred" and n strings in list, save as
  * "fredn" == n, "fred0" == list[0], etc.
  */

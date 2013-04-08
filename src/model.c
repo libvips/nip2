@@ -541,11 +541,11 @@ model_real_save( Model *model, xmlNode *xnode )
 		return( NULL );
 
 	if( model->window_width != -1 ) {
-		if( !set_prop( xthis, "window_x", "%d", model->window_x ) ||
-			!set_prop( xthis, "window_y", "%d", model->window_y ) ||
-			!set_prop( xthis, "window_width", "%d", 
+		if( !set_iprop( xthis, "window_x", model->window_x ) ||
+			!set_iprop( xthis, "window_y", model->window_y ) ||
+			!set_iprop( xthis, "window_width", 
 				model->window_width ) ||
-			!set_prop( xthis, "window_height", "%d", 
+			!set_iprop( xthis, "window_height", 
 				model->window_height ) )
 			return( NULL );
 	}

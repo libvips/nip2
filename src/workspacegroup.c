@@ -213,6 +213,31 @@ workspacegroup_rename_workspace_node( Workspacegroup *wsg,
 	(void) model_loadstate_rename_new( state, name, new_name );
 }
 
+/* Does a scrap of XML need compat defs?
+ */
+static gboolean
+workspacegroup_xml_needs_compat( ModelLoadState *state, xmlNode *xws, 
+	int *best_major, int *best_minor )
+{
+	int major;
+	int minor;
+
+	/* What version is the XML expecting? A combination of the version of
+	 * nip that saved the file, and any compat notes on the workspace XML
+	 */
+	if( !get_iprop( xws, "major", &major ) ||
+		!get_iprop( xws, "minor", &minor ) ) {
+		/* Fall back to the version number in the xml header.
+		 */
+		major = state->major;
+		minor = state->minor;
+	}
+
+	/* Find the best set of compat we have.
+	 */
+	return( workspace_have_compat( major, minor, best_major, best_minor ) );
+}
+
 /* Load all workspaces into this wsg.
  */
 static gboolean
@@ -235,6 +260,8 @@ workspacegroup_load_new( Workspacegroup *wsg,
 	FOR_ALL_XML( xroot, xws, "Workspace" ) {
 		char name[MAX_STRSIZE];
 		Workspace *ws;
+		int major;
+		int minor;
 
 		column_set_offset( WORKSPACEVIEW_MARGIN_LEFT, 
 			WORKSPACEVIEW_MARGIN_TOP );
@@ -243,15 +270,9 @@ workspacegroup_load_new( Workspacegroup *wsg,
 			return( FALSE );
 		ws = workspace_new( wsg, name );
 
-		if( get_iprop( xws, "major", &FILEMODEL( wsg )->major ) &&
-			get_iprop( xws, "minor", &FILEMODEL( wsg )->minor ) &&
-			get_iprop( xws, "micro", &FILEMODEL( wsg )->micro ) )
-			FILEMODEL( wsg )->versioned = TRUE;
-
-		/* If necessary, load up compatibility definitions.
-		 */
-		if( !workspace_load_compat( ws, 
-			FILEMODEL( wsg )->major, FILEMODEL( wsg )->minor ) ) 
+		if( workspacegroup_xml_needs_compat( state, xws, 
+			&major, &minor ) &&
+			!workspace_load_compat( ws, major, minor ) ) 
 			return( FALSE );
 
 		if( model_load( MODEL( ws ), state, MODEL( wsg ), xws ) )
@@ -340,22 +361,33 @@ workspacegroup_load_columns( Workspacegroup *wsg,
 {
 	Workspace *ws = workspacegroup_workspace_pick( wsg );
 
-	/* Is there a version mismatch? Issue a warning.
-	int best_major;
-	int best_minor;
-	if( workspace_have_compat( state->major, state->minor, 
-		&best_major, &best_minor ) &&
-		(best_major != filemodel->major ||
-		best_minor != filemodel->minor) ) {
-		error_top( _( "Version mismatch." ) );
-		error_sub( _( "File \"%s\" was saved from %s-%d.%d.%d. "
-			"You may see compatibility problems." ),
-			state->filename, PACKAGE,
-			state->major, state->minor, state->micro );
-		iwindow_alert( GTK_WIDGET( ws->iwnd ), 
-			GTK_MESSAGE_INFO );
-	}
+	int xml_major;
+	int xml_minor;
+	gboolean found;
+	int ws_major;
+	int ws_minor;
+
+	/* Look for any compat problems.
 	 */
+	found = FALSE;
+	FOR_ALL_XML( xroot, xws, "Workspace" ) { 
+		if( workspacegroup_xml_needs_compat( state, xws, 
+			&xml_major, &xml_minor ) ) {
+			found = TRUE;
+			break;
+		}
+	} FOR_ALL_XML_END
+
+	workspace_get_version( ws, &ws_major, &ws_minor );
+	if( found &&
+		(xml_major != ws_major ||
+		xml_minor != ws_minor) ) {
+		error_top( _( "Version mismatch." ) );
+		error_sub( _( "File \"%s\" needs version %d.%d. Merging "
+			"into this tab may cause compatibility problems." ),
+			state->filename, xml_major, xml_minor );
+		iwindow_alert( GTK_WIDGET( wsg->iwnd ), GTK_MESSAGE_INFO );
+	}
 
 	/* Search all the columns we will load for their names and add rename
 	 * rules.
@@ -387,6 +419,34 @@ workspacegroup_load_rows( Workspacegroup *wsg,
 {
 	Workspace *ws = workspacegroup_workspace_pick( wsg );
 	Column *col = workspace_column_pick( ws );
+
+	int xml_major;
+	int xml_minor;
+	gboolean found;
+	int ws_major;
+	int ws_minor;
+
+	/* Look for any compat problems.
+	 */
+	found = FALSE;
+	FOR_ALL_XML( xroot, xws, "Workspace" ) { 
+		if( workspacegroup_xml_needs_compat( state, xws, 
+			&xml_major, &xml_minor ) ) {
+			found = TRUE;
+			break;
+		}
+	} FOR_ALL_XML_END
+
+	workspace_get_version( ws, &ws_major, &ws_minor );
+	if( found &&
+		(xml_major != ws_major ||
+		xml_minor != ws_minor) ) {
+		error_top( _( "Version mismatch." ) );
+		error_sub( _( "File \"%s\" needs version %d.%d. Merging "
+			"into this tab may cause compatibility problems." ),
+			state->filename, xml_major, xml_minor );
+		iwindow_alert( GTK_WIDGET( wsg->iwnd ), GTK_MESSAGE_INFO );
+	}
 
 	FOR_ALL_XML( xroot, xws, "Workspace" ) {
 		FOR_ALL_XML( xws, xcol, "Column" ) {

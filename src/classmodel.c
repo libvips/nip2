@@ -786,7 +786,7 @@ classmodel_save_member( Classmodel *classmodel,
 	switch( m->type ) {
 	case CLASSMODEL_MEMBER_INT:
 	case CLASSMODEL_MEMBER_ENUM:
-		if( !set_prop( xthis, m->save_name, "%d", 
+		if( !set_iprop( xthis, m->save_name, 
 			G_STRUCT_MEMBER( int, classmodel, m->offset ) ) )
 			return( FALSE );
 		break;
@@ -804,7 +804,7 @@ classmodel_save_member( Classmodel *classmodel,
 		break;
 
 	case CLASSMODEL_MEMBER_STRING:
-		if( !set_prop( xthis, m->save_name, "%s", 
+		if( !set_sprop( xthis, m->save_name, 
 			G_STRUCT_MEMBER( char *, classmodel, m->offset ) ) )
 			return( FALSE );
 		break;
@@ -833,8 +833,8 @@ classmodel_save_member( Classmodel *classmodel,
 		const int n = value->width * value->height;
 
 		if( !set_dlprop( xthis, "value", value->coeff, n ) ||
-			!set_prop( xthis, "width", "%d", value->width ) ||
-			!set_prop( xthis, "height", "%d", value->height ) )
+			!set_iprop( xthis, "width", value->width ) ||
+			!set_iprop( xthis, "height", value->height ) )
 			return( FALSE );
 
 		break;

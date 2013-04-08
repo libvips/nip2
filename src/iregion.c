@@ -283,10 +283,10 @@ iregion_save( Model *model, xmlNode *xnode )
 	if( instance && CLASSMODEL( model )->edited ) {
 		Rect *area = &instance->area;
 
-		if( !set_prop( xthis, "left", "%d", area->left ) ||
-			!set_prop( xthis, "top", "%d", area->top ) ||
-			!set_prop( xthis, "width", "%d", area->width ) ||
-			!set_prop( xthis, "height", "%d", area->height ) )
+		if( !set_iprop( xthis, "left", area->left ) ||
+			!set_iprop( xthis, "top", area->top ) ||
+			!set_iprop( xthis, "width", area->width ) ||
+			!set_iprop( xthis, "height", area->height ) )
 			return( NULL );
 	}
 

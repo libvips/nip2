@@ -73,6 +73,11 @@ struct _Workspacegroup {
 
 	guint autosave_timeout;
 
+	/* workspacegroup_load_columns() etc. use this to display warnings
+	 * during load.
+	 */
+	iWindow *iwnd;
+
 };
 
 typedef struct _WorkspacegroupClass {

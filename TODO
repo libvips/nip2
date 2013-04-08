@@ -1,32 +1,11 @@
-- popup menu on tab should have merge item
 
-- where does this go back
-
-	/* If the mainw has a single, empty, unmodified workspace in
-	 * already, we optionally trim it. We can't remove until we've added 
-	 * the new ws though or our mainw will be destroyed.  
-	 */
-	delete_ws = FALSE;
-	if( trim &&
-		mainw_get_n_tabs( mainw ) == 1 &&
-		(old_ws = mainw_get_workspace( mainw )) &&
-		workspace_is_empty( old_ws ) &&
-		!FILEMODEL( old_ws )->modified ) 
-		delete_ws = TRUE;
+- major / minor / micro need to be in workspace as well as root
 
 - workspacegroupview_reorder_tab_cb() is never called?
 
 - fix drag tabs between mainw
 
 - fix drag tabs to root
-
-- major / minor / micro need to be in workspace, as well as root
-
-- we call 
-
-	workspace_set_modified( column->ws, TRUE );
-
-  all the time, is there no neater way to do this?
 
 - double-click on tab gutter to make new tab, right-buttn menu with new tab
   item
@@ -35,6 +14,8 @@
   window for that
 
 - test file drop on mainw, esp. workspaces
+
+- leaktest
 
 
 

@@ -180,13 +180,13 @@ typedef struct _ModelClass {
 
 extern ModelLoadState *model_loadstate;
 
+gboolean model_loadstate_rename_new( ModelLoadState *state, 
+	const char *old_name, const char *new_name );
 gboolean model_loadstate_taken( ModelLoadState *state, const char *name );
-ModelRename *model_loadstate_rename_new( ModelLoadState *state, 
+gboolean model_loadstate_column_rename_new( ModelLoadState *state, 
 	const char *old_name, const char *new_name );
 gboolean model_loadstate_column_taken( ModelLoadState *state, 
 	const char *name );
-ModelRename *model_loadstate_column_rename_new( ModelLoadState *state, 
-	const char *old_name, const char *new_name );
 ModelLoadState *model_loadstate_new( 
 	const char *filename, const char *filename_user );
 ModelLoadState *model_loadstate_new_openfile( iOpenFile *of );

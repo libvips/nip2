@@ -94,6 +94,21 @@ model_rename_new( const char *old_name, const char *new_name )
 	return( rename );
 }
 
+gboolean
+model_loadstate_rename_new( ModelLoadState *state, 
+	const char *old_name, const char *new_name )
+{
+	if( strcmp( old_name, new_name ) != 0 ) { 
+		ModelRename *rename;
+
+		if( !(rename = model_rename_new( old_name, new_name )) )
+			return( FALSE );
+		state->renames = g_slist_prepend( state->renames, rename );
+	}
+
+	return( TRUE );
+}
+
 static void *
 model_loadstate_taken_sub( ModelRename *rename, const char *name )
 {
@@ -112,31 +127,20 @@ model_loadstate_taken( ModelLoadState *state, const char *name )
 		(SListMapFn) model_loadstate_taken_sub, (char *) name ) );
 }
 
-ModelRename *
-model_loadstate_rename_new( ModelLoadState *state, 
-	const char *old_name, const char *new_name )
-{
-	ModelRename *rename;
-
-	if( !(rename = model_rename_new( old_name, new_name )) )
-		return( NULL );
-	state->renames = g_slist_prepend( state->renames, rename );
-
-	return( rename );
-}
-
-ModelRename *
+gboolean
 model_loadstate_column_rename_new( ModelLoadState *state, 
 	const char *old_name, const char *new_name )
 {
-	ModelRename *rename;
+	if( strcmp( old_name, new_name ) != 0 ) { 
+		ModelRename *rename;
 
-	if( !(rename = model_rename_new( old_name, new_name )) )
-		return( NULL );
-	state->column_renames = 
-		g_slist_prepend( state->column_renames, rename );
+		if( !(rename = model_rename_new( old_name, new_name )) )
+			return( FALSE );
+		state->column_renames = 
+			g_slist_prepend( state->column_renames, rename );
+	}
 
-	return( rename );
+	return( TRUE );
 }
 
 /* Is something already being renamed to @name.

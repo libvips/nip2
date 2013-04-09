@@ -197,17 +197,13 @@ workspacegroup_rename_workspace_node( Workspacegroup *wsg,
 	if( !get_sprop( xws, "name", name, MAX_STRSIZE ) )
 		return;
 
-	/* If the name is free, just use it.
-	 *
-	 * If we need to pick a new name, it must be free AND not have been
-	 * used for a previous rename.
-	 */
 	strcpy( new_name, name );
-	if( compile_lookup( wsr->sym->expr->compile, new_name ) ) {
-		while( compile_lookup( wsr->sym->expr->compile, new_name ) ||
-			model_loadstate_taken( state, new_name ) )
-			increment_name( new_name );
-	}
+	while( compile_lookup( wsr->sym->expr->compile, new_name ) ||
+		model_loadstate_taken( state, new_name ) )
+		increment_name( new_name );
+
+	printf( "workspacegroup_rename_workspace_node: renaming %s as %s\n", 
+		name, new_name ); 
 
 	(void) set_sprop( xws, "name", new_name );
 	(void) model_loadstate_rename_new( state, name, new_name );
@@ -266,9 +262,9 @@ workspacegroup_load_new( Workspacegroup *wsg,
 		column_set_offset( WORKSPACEVIEW_MARGIN_LEFT, 
 			WORKSPACEVIEW_MARGIN_TOP );
 
-		if( !get_sprop( xws, "name", name, FILENAME_MAX ) ) 
+		if( !get_sprop( xws, "name", name, FILENAME_MAX ) || 
+			!(ws = workspace_new( wsg, name )) )
 			return( FALSE );
-		ws = workspace_new( wsg, name );
 
 		if( workspacegroup_xml_needs_compat( state, xws, 
 			&major, &minor ) &&
@@ -319,36 +315,30 @@ workspacegroup_rename_column_node( Workspacegroup *wsg,
 	if( !get_sprop( xcol, "name", name, MAX_STRSIZE ) )
 		return;
 
-	/* If the name is free, just use it.
-	 *
-	 * If we need to pick a new name, it must be free AND not have been
-	 * used for a previous rename.
-	 */
 	im_strncpy( new_name, name, 256 );
-	if( workspace_column_find( ws, new_name ) ) {
-		while( workspace_column_find( ws, new_name ) ||
-			model_loadstate_column_taken( state, new_name ) ) {
-			workspace_column_name_new( ws, new_name );
-		}
-	}
+	while( workspace_column_find( ws, new_name ) ||
+		model_loadstate_column_taken( state, new_name ) ) 
+		workspace_column_name_new( ws, new_name );
 
+	if( strcmp( name, new_name ) != 0 ) { 
 #ifdef DEBUG
-	printf( "workspace_rename_column_node: renaming column "
-		"%s to %s\n", 
-		name, new_name );
 #endif /*DEBUG*/
+		printf( "workspace_rename_column_node: renaming column "
+			"%s to %s\n", name, new_name );
 
-	(void) set_sprop( xcol, "name", new_name );
-	(void) model_loadstate_column_rename_new( state, name, new_name ); 
+		(void) set_sprop( xcol, "name", new_name );
+		(void) model_loadstate_column_rename_new( state, 
+			name, new_name ); 
 
-	/* And allocate new names for all rows in the subcolumn.
-	 */
-	FOR_ALL_XML( xcol, xsub, "Subcolumn" ) {
-		FOR_ALL_XML( xsub, xrow, "Row" ) {
-			workspacegroup_rename_row_node( wsg, state, 
-				new_name, xrow );
+		/* And allocate new names for all rows in the subcolumn.
+		 */
+		FOR_ALL_XML( xcol, xsub, "Subcolumn" ) {
+			FOR_ALL_XML( xsub, xrow, "Row" ) {
+				workspacegroup_rename_row_node( wsg, state, 
+					new_name, xrow );
+			} FOR_ALL_XML_END
 		} FOR_ALL_XML_END
-	} FOR_ALL_XML_END
+	}
 }
 
 /* Load at column level ... rename columns which clash with 
@@ -488,10 +478,6 @@ workspacegroup_top_load( Filemodel *filemodel,
 #ifdef DEBUG
 #endif /*DEBUG*/
 	printf( "workspacegroup_top_load: from %s\n", state->filename );
-
-	/* See workspacegroup_load_column().
-	 */
-	printf( "workspacegroup_top_load: missing compat tests\n" ); 
 
 	/* The top node should be the first workspace. Get the filename this
 	 * workspace was saved as so we can work out how to rewrite embedded
@@ -838,10 +824,8 @@ workspacegroup_new_from_file( Workspaceroot *wsr,
 
 	workspacegroup_set_load_type( wsg, WORKSPACEGROUP_LOAD_NEW );
 	if( !filemodel_load_all( FILEMODEL( wsg ), 
-		MODEL( wsr ), filename, filename_user ) ) {
-		g_object_unref( G_OBJECT( wsg ) );
+		MODEL( wsr ), filename, filename_user ) ) 
 		return( NULL );
-	}
 
 	filemodel_set_filename( FILEMODEL( wsg ), filename_user );
 	filemodel_set_modified( FILEMODEL( wsg ), FALSE );

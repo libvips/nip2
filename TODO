@@ -1,3 +1,62 @@
+- on tab drag we need to reparent the icontainers and the associated view
+  trees
+
+  - don't destroy on parent_remove / child_remove, just unlink
+
+    view watches model parent_remove / child_remove and does the same
+
+    view only does gtk_destroy() when it sees _dispose() on the model
+
+    means both views and models must be able to have an "unattached" state:
+
+    	_ref
+	_remove
+	** in unattached state
+	_add
+	_unref
+
+  
+
+
+
+
+  - alternative: add a "reparent" to icontainer, watch this from the view, and
+    trigger a separate "reparent" event there too, possibly less intrusive
+
+  
+
+
+- load logo2.ws, drag a tab into it, see:
+
+workspacegroupview_switch_page_cb: 0 wsg = untitled, ws = tab1
+	mainw_wsg_changed_cb
+	mainw_wsg_changed_cb
+	workspacegroupview_switch_page_cb: 1 wsg = untitled, ws = tab1
+	workspacegroupview_switch_page_cb: 1 all done
+workspacegroupview_switch_page_cb: 0 all done
+
+workspacegroupview_page_removed_cb: wsg = untitled, ws = tab2
+workspacegroupview_page_added_cb: wsg = untitled, ws = tab2
+workspacegroupview_switch_page_cb: 0 wsg = (null), ws = tab2
+	workspacegroupview_switch_page_cb: 0 moving tab
+	workspacegroupview_page_removed_cb: wsg = untitled, ws = tab2
+	mainw_wsg_changed_cb
+	mainw_wsg_changed_cb
+	workspacegroupview_child_add:
+	workspacegroupview_page_added_cb: wsg = (null), ws = tab2
+	workspacegroupview_switch_page_cb: 0 tab move done
+	mainw_wsg_changed_cb
+	mainw_wsg_changed_cb
+	workspacegroupview_switch_page_cb: 1 wsg = (null), ws = tab2
+	workspacegroupview_switch_page_cb: 1 all done
+
+CRASH
+
+
+
+
+
+
 - column menu needs a merge item too
 
 - test new compat stuff

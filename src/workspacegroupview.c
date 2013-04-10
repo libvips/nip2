@@ -116,11 +116,21 @@ workspacegroupview_child_front( View *parent, View *child )
 	Workspaceview *wview = WORKSPACEVIEW( child );
 
 	int page;
+	GtkWidget *current_front;
 
-	page = gtk_notebook_page_num( GTK_NOTEBOOK( wsgview->notebook ), 
-		GTK_WIDGET( wview ) );
-	gtk_notebook_set_current_page( GTK_NOTEBOOK( wsgview->notebook ),
-		page );
+	page = gtk_notebook_get_current_page( 
+		GTK_NOTEBOOK( wsgview->notebook ) );
+	current_front = gtk_notebook_get_nth_page( 
+		GTK_NOTEBOOK( wsgview->notebook ), page );
+
+	if( current_front != GTK_WIDGET( wview ) ) { 
+		page = gtk_notebook_page_num( 
+			GTK_NOTEBOOK( wsgview->notebook ), 
+			GTK_WIDGET( wview ) );
+		gtk_notebook_set_current_page( 
+			GTK_NOTEBOOK( wsgview->notebook ),
+			page );
+	}
 }
 
 static void 
@@ -162,16 +172,25 @@ static void
 workspacegroupview_switch_page_cb( GtkNotebook *notebook, 
 	GtkWidget *page, guint page_num, gpointer user_data )
 {
+	static int level = 0;
+
 	Workspaceview *wview = WORKSPACEVIEW( page );
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
 	Workspacegroupview *wsgview = WORKSPACEGROUPVIEW( user_data );
 	Workspacegroup *wsg = WORKSPACEGROUP( VOBJECT( wsgview )->iobject );
 
-	printf( "workspacegroupview_switch_page_cb: wsg = %s, ws = %s\n",
+	int this_level;
+
+	this_level = level;
+	level += 1;
+
+	printf( "workspacegroupview_switch_page_cb: %d wsg = %s, ws = %s\n",
+		this_level,
 		NN( IOBJECT( wsg )->name ), NN( IOBJECT( ws )->name ) ); 
 
 	if( ICONTAINER( ws )->parent != ICONTAINER( wsg ) ) {
-		printf( "workspacegroupview_switch_page_cb: moving tab\n" ); 
+		printf( "workspacegroupview_switch_page_cb: %d moving tab\n",
+			this_level ); 
 
 		g_object_ref( ws );
 
@@ -181,7 +200,8 @@ workspacegroupview_switch_page_cb( GtkNotebook *notebook,
 
 		g_object_unref( ws );
 
-		printf( "workspacegroupview_switch_page_cb: tab move done\n" ); 
+		printf( "workspacegroupview_switch_page_cb: %d tab move done\n",
+			this_level ); 
 	}
 
 	icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
@@ -203,7 +223,10 @@ workspacegroupview_switch_page_cb( GtkNotebook *notebook,
 	if( wview->fixed ) 
 		gtk_container_check_resize( GTK_CONTAINER( wview->fixed ) );
 
-	printf( "workspacegroupview_switch_page_cb: all done\n" ); 
+	printf( "workspacegroupview_switch_page_cb: %d all done\n",
+		this_level );
+
+	level -= 1;
 }
 
 static void                

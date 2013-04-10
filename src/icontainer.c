@@ -177,7 +177,6 @@ icontainer_sanity_child( iContainer *child, iContainer *parent )
 	g_assert( IS_ICONTAINER( child ) );
 	g_assert( IS_ICONTAINER( parent ) );
 	g_assert( child->parent == parent );
-	g_assert( child->destroy_sid );
 	g_assert( child->pos >= 0 );
 	g_assert( g_slist_find( parent->children, child ) );
 
@@ -398,29 +397,30 @@ icontainer_child_move( iContainer *child, int pos )
 void *
 icontainer_child_remove( iContainer *child )
 {
-	iContainer *parent = child->parent;
+	iContainer *parent;
 
-	g_assert( parent );
-	g_assert( ICONTAINER_IS_CHILD( parent, child ) );
+	if( (parent = child->parent) ) {
+		g_assert( ICONTAINER_IS_CHILD( parent, child ) );
 
 #ifdef DEBUG
-	printf( "icontainer_child_remove: (child %p)\n", child );
-	printf( "\tchild: %s \"%s\"\n",
-		G_OBJECT_TYPE_NAME( child ), 
-		NN( IOBJECT( child )->name ) );
+		printf( "icontainer_child_remove: (child %p)\n", child );
+		printf( "\tchild: %s \"%s\"\n",
+			G_OBJECT_TYPE_NAME( child ), 
+			NN( IOBJECT( child )->name ) );
 #endif /*DEBUG*/
 
 #ifdef DEBUG_SANITY
-	icontainer_sanity( parent );
-	icontainer_sanity( child );
+		icontainer_sanity( parent );
+		icontainer_sanity( child );
 #endif /*DEBUG_SANITY*/
 
-	g_signal_emit( G_OBJECT( parent ), 
-		icontainer_signals[SIG_CHILD_REMOVE], 0, child );
+		g_signal_emit( G_OBJECT( parent ), 
+			icontainer_signals[SIG_CHILD_REMOVE], 0, child );
 
 #ifdef DEBUG_SANITY
-	icontainer_sanity( parent );
+		icontainer_sanity( parent );
 #endif /*DEBUG_SANITY*/
+	}
 
 	return( NULL );
 }
@@ -476,6 +476,7 @@ icontainer_dispose( GObject *gobject )
 
 	icontainer_map( icontainer,
 		(icontainer_map_fn) icontainer_child_remove, NULL, NULL );
+	icontainer_child_remove( icontainer );
 
 	G_OBJECT_CLASS( parent_class )->dispose( gobject );
 }
@@ -491,8 +492,6 @@ icontainer_finalize( GObject *gobject )
 	icontainer = ICONTAINER( gobject );
 
 	IM_FREEF( g_hash_table_destroy, icontainer->child_hash );
-
-	FREESID( icontainer->destroy_sid, icontainer );
 
 	G_OBJECT_CLASS( parent_class )->finalize( gobject );
 }
@@ -519,7 +518,6 @@ icontainer_real_child_add( iContainer *parent, iContainer *child, int pos )
 
         g_assert( IS_ICONTAINER( parent ) && IS_ICONTAINER( child ) );
         g_assert( child->parent == NULL );
-        g_assert( child->destroy_sid == 0 );
 
 #ifdef DEBUG
 	printf( "icontainer_real_child_add:\n\tparent " );
@@ -536,8 +534,6 @@ icontainer_real_child_add( iContainer *parent, iContainer *child, int pos )
                 parent->children = g_slist_append( parent->children, child );
         child->parent = parent;
         child->pos = pos;
-	child->destroy_sid = g_signal_connect( child, "destroy", 
-		G_CALLBACK( icontainer_child_remove ), NULL );
 	if( parent->child_hash ) {
 		g_assert( !g_hash_table_lookup( parent->child_hash, 
 			IOBJECT( child )->name ) );
@@ -587,7 +583,6 @@ icontainer_real_child_remove( iContainer *parent, iContainer *child )
 	child->parent = NULL;
 	if( parent->current == child )
 		parent->current = NULL;
-	FREESID( child->destroy_sid, child );
 	if( parent->child_hash ) {
 		g_assert( g_hash_table_lookup( parent->child_hash, 
 			IOBJECT( child )->name ) );
@@ -728,7 +723,6 @@ icontainer_init( iContainer *icontainer )
 	icontainer->children = NULL;
 	icontainer->pos = -1;
 	icontainer->parent = NULL;
-	icontainer->destroy_sid = 0;
 	icontainer->child_hash = NULL;
 }
 

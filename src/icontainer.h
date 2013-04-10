@@ -53,7 +53,6 @@ struct _iContainer {
 	GSList *children;	/* iContainers which are inside this one */
 	int pos;		/* Position in parent */
 	iContainer *parent;	/* iContainer we are inside */
-	guint destroy_sid;	/* Parent listens for our "destroy" here */
 	GHashTable *child_hash;	/* Optional: hash of children by their name */
 
 	/* Can have a currently selected child ... eg. the

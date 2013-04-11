@@ -850,28 +850,14 @@ model_check_destroy( GtkWidget *parent, Model *model )
 		G_CALLBACK( model_check_destroy_destroy_cb ), mcd );
 }
 
-/* Set the ->display var ... return TRUE if we change something.
- */
-gboolean
+void
 model_set_display( Model *model, gboolean display )
 {
-	gboolean changed = FALSE;
-
-	/* Do as two ifs to in case we're not using 0/1 for bool.
-	 */
-	if( model && display && !model->display ) {
-		model->display = TRUE;
-		changed = TRUE;
-	} 
-	else if( model && !display && model->display ) {
-		model->display = FALSE;
-		changed = TRUE;
-	}
-
-	if( changed )
+	if( model &&
+		display != model->display ) {
+		model->display = display;
 		iobject_changed( IOBJECT( model ) );
-
-	return( changed );
+	}
 }
 
 /* Useful for icontainer_map_all() ... trigger all heapmodel_clear_edited()

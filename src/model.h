@@ -223,6 +223,6 @@ View *model_build_display_all( Model *model, View *parent );
 
 void model_check_destroy( GtkWidget *parent, Model *model );
 
-gboolean model_set_display( Model *model, gboolean display );
+void model_set_display( Model *model, gboolean display );
 
 void *model_clear_edited( Model *model );

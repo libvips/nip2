@@ -235,8 +235,7 @@ workspacegroupview_page_removed_cb( GtkNotebook *notebook,
 {
 	Workspaceview *wview = WORKSPACEVIEW( page );
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
-	Workspacegroupview *wsgview = 
-		WORKSPACEGROUPVIEW( VIEW( wview )->parent );
+	Workspacegroupview *wsgview = WORKSPACEGROUPVIEW( user_data );
 	Workspacegroup *wsg = WORKSPACEGROUP( VOBJECT( wsgview )->iobject );
 	Mainw *mainw = MAINW( iwindow_get_root( GTK_WIDGET( notebook ) ) );
 

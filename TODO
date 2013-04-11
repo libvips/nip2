@@ -15,8 +15,39 @@
 	_add
 	_unref
 
-  
+	view1
+	  ->parent (parent view)
+ 	  ->managed
+	  	|
+		+-> viewchild1
+		|	|
+		|	+->parent_view (view1)
+		|	+->child_model
+		|	+->child_view
+		|	+->child_model_changed_sid
+		+-> viewchild2 
+		|	etc.
 
+    so on child_remove, don't remove and views, just destroy the viewchild
+    that links the two views together, and NULL the ->parent link in the child
+
+    only DESTROY_GTK() a view when the model is destroyed (or disposed?)
+
+    actually, vobject (View's superclass) already does this
+
+    sort-of working now, but column open / close is not working
+
+    we're calling model_set_display() on the rows, but that's just making the
+    row labels appear and disappear, not the whole rows
+
+    rowview and rhsview are actually peers: they both attach to a gtktable
+    provided by the subcolumnview ... destroying the rowview will not
+    automatically destroy the rhsview
+
+    also row arrow up/down
+
+
+- col->open_timeout and col->open_frames should be in columnview, not column
 
 
 

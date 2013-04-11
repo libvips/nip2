@@ -664,8 +664,8 @@ workspace_link( Workspace *ws, Workspacegroup *wsg, const char *name )
 	Symbol *sym;
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "workspace_link: naming ws %p as %s\n", ws, name );
+#endif /*DEBUG*/
 
 	sym = symbol_new_defining( wsr->sym->expr->compile, name );
 
@@ -894,8 +894,8 @@ workspace_have_compat( int major, int minor, int *best_major, int *best_minor )
 	int best;
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "workspace_have_compat: searching for %d.%d\n", major, minor );
+#endif /*DEBUG*/
 
 	/* Sets of ws compatibility defs cover themselves and any earlier
 	 * releases, as far back as the next set of compat defs. We need to
@@ -917,8 +917,8 @@ workspace_have_compat( int major, int minor, int *best_major, int *best_minor )
 		return( 0 );
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "\tfound %d.%d\n", compat_major[best], compat_minor[best] );
+#endif /*DEBUG*/
 
 	if( best_major )
 		*best_major = compat_major[best];
@@ -1095,8 +1095,8 @@ workspace_new( Workspacegroup *wsg, const char *name )
 	Workspace *ws;
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "workspace_new: %s\n", name );
+#endif /*DEBUG*/
 
 	if( compile_lookup( wsr->sym->expr->compile, name ) ) {
 		error_top( _( "Name clash." ) );

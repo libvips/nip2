@@ -45,7 +45,7 @@ rhsview_reset( View *view )
 	Rhs *rhs = RHS( VOBJECT( rhsview )->iobject );
 	Row *row = HEAPMODEL( rhs )->row;
 
-	model_set_display( rhs->itext, 
+	model_display( rhs->itext, 
 		row->ws->mode == WORKSPACE_MODE_FORMULA || 
 		rhs->flags & RHS_ITEXT );
 
@@ -74,16 +74,16 @@ rhsview_refresh( vObject *vobject )
 
 	/* Add/remove children according to rhs->flags. 
 	 */
-	model_set_display( rhs->graphic, rhs->flags & RHS_GRAPHIC );
-	model_set_display( rhs->scol, rhs->flags & RHS_SCOL );
+	model_display( rhs->graphic, rhs->flags & RHS_GRAPHIC );
+	model_display( rhs->scol, rhs->flags & RHS_SCOL );
 
 	switch( row->ws->mode ) {
 	case WORKSPACE_MODE_REGULAR:
-		model_set_display( rhs->itext, rhs->flags & RHS_ITEXT );
+		model_display( rhs->itext, rhs->flags & RHS_ITEXT );
 		break;
 
 	case WORKSPACE_MODE_FORMULA:
-		model_set_display( rhs->itext, TRUE );
+		model_display( rhs->itext, TRUE );
 		break;
 
 	case WORKSPACE_MODE_NOEDIT:
@@ -92,12 +92,12 @@ rhsview_refresh( vObject *vobject )
 		 */
 		if( rhs->graphic &&
 			rhs->flags & RHS_GRAPHIC )
-			model_set_display( rhs->itext, FALSE );
+			model_display( rhs->itext, FALSE );
 		else if( rhs->scol &&
 			rhs->flags & RHS_SCOL )
-			model_set_display( rhs->itext, FALSE );
+			model_display( rhs->itext, FALSE );
 		else
-			model_set_display( rhs->itext, 
+			model_display( rhs->itext, 
 				rhs->flags & RHS_ITEXT );
 		break;
 

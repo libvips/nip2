@@ -64,8 +64,6 @@ workspacegroupview_child_add( View *parent, View *child )
 	GtkWidget *ebox;
 	GtkWidget *label;
 
-	printf( "workspacegroupview_child_add:\n" ); 
-
 	VIEW_CLASS( parent_class )->child_add( parent, child );
 
         ebox = gtk_event_box_new();
@@ -137,11 +135,11 @@ static void
 workspacegroupview_refresh( vObject *vobject )
 {
 #ifdef DEBUG
-#endif /*DEBUG*/
 	Workspacegroupview *wsgview = WORKSPACEGROUPVIEW( vobject );
 	Workspacegroup *wsg = WORKSPACEGROUP( VOBJECT( wsgview )->iobject );
 
 	printf( "workspacegroupview_refresh: %s\n", IOBJECT( wsg )->name );
+#endif /*DEBUG*/
 
 	VOBJECT_CLASS( parent_class )->refresh( vobject );
 }
@@ -184,13 +182,17 @@ workspacegroupview_switch_page_cb( GtkNotebook *notebook,
 	this_level = level;
 	level += 1;
 
+	/*
 	printf( "workspacegroupview_switch_page_cb: %d wsg = %s, ws = %s\n",
 		this_level,
 		NN( IOBJECT( wsg )->name ), NN( IOBJECT( ws )->name ) ); 
+	 */
 
 	if( ICONTAINER( ws )->parent != ICONTAINER( wsg ) ) {
+		/*
 		printf( "workspacegroupview_switch_page_cb: %d moving tab\n",
 			this_level ); 
+		 */
 
 		g_object_ref( ws );
 
@@ -200,8 +202,10 @@ workspacegroupview_switch_page_cb( GtkNotebook *notebook,
 
 		g_object_unref( ws );
 
+		/*
 		printf( "workspacegroupview_switch_page_cb: %d tab move done\n",
 			this_level ); 
+		 */
 	}
 
 	icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
@@ -223,10 +227,12 @@ workspacegroupview_switch_page_cb( GtkNotebook *notebook,
 	if( wview->fixed ) 
 		gtk_container_check_resize( GTK_CONTAINER( wview->fixed ) );
 
+	/*
 	printf( "workspacegroupview_switch_page_cb: %d all done\n",
 		this_level );
 
 	level -= 1;
+	 */
 }
 
 static void                
@@ -234,16 +240,19 @@ workspacegroupview_page_removed_cb( GtkNotebook *notebook,
 	GtkWidget *page, guint page_num, gpointer user_data )
 {
 	Workspaceview *wview = WORKSPACEVIEW( page );
-	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
 	Workspacegroupview *wsgview = WORKSPACEGROUPVIEW( user_data );
 	Workspacegroup *wsg = WORKSPACEGROUP( VOBJECT( wsgview )->iobject );
 	Mainw *mainw = MAINW( iwindow_get_root( GTK_WIDGET( notebook ) ) );
 
+	/*
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+
 	printf( "workspacegroupview_page_removed_cb: wsg = %s, ws = %s\n",
 		NN( IOBJECT( wsg )->name ), NN( IOBJECT( ws )->name ) ); 
+	 */
 
 	if( icontainer_get_n_children( ICONTAINER( wsg ) ) == 0 ) {
-		printf( "workspacegroupview_page_removed_cb: killing mainw\n" );
+		//printf( "workspacegroupview_page_removed_cb: killing mainw\n" );
 		iwindow_kill( IWINDOW( mainw ) );
 	}
 }
@@ -257,8 +266,10 @@ workspacegroupview_page_added_cb( GtkNotebook *notebook,
 	Workspacegroup *wsg = WORKSPACEGROUP( ICONTAINER( ws )->parent );
 	Mainw *mainw = MAINW( iwindow_get_root( GTK_WIDGET( notebook ) ) );
 
+	/*
 	printf( "workspacegroupview_page_added_cb: wsg = %s, ws = %s\n",
 		NN( IOBJECT( wsg )->name ), NN( IOBJECT( ws )->name ) ); 
+	 */
 
 	filemodel_set_window_hint( FILEMODEL( wsg ), IWINDOW( mainw ) );
 }

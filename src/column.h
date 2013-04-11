@@ -52,8 +52,6 @@ struct _Column {
         int x, y;		/* Position */
         gboolean open;		/* Currently popped down */
         gboolean selected;
-        gboolean open_timeout;	/* Open animate timeout */
-        gboolean open_frames;	/* Frames we've animated */
 
 	/* Other state.
 	 */

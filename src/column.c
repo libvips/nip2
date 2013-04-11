@@ -70,17 +70,12 @@ column_map_symbol( Column *col, symbol_map_fn fn, void *a )
 static void
 column_finalize( GObject *gobject )
 {
-	Column *col;
-
 #ifdef DEBUG
 	printf( "column_finalize\n" );
 #endif /*DEBUG*/
 
 	g_return_if_fail( gobject != NULL );
 	g_return_if_fail( IS_COLUMN( gobject ) );
-
-	col = COLUMN( gobject );
-	IM_FREEF( g_source_remove, col->open_timeout );
 
 	G_OBJECT_CLASS( parent_class )->finalize( gobject );
 }
@@ -329,8 +324,6 @@ column_new( Workspace *ws, const char *name )
 
 	Column *col;
 
-	printf( "column_new: %s\n", name ); 
-
 	if( workspace_column_find( ws, name ) ) {
 		error_top( _( "Name clash." ) );
 		error_sub( _( "Can't create column \"%s\". A column with that "
@@ -443,49 +436,6 @@ column_name_new( Column *col )
 	return( im_strdup( NULL, buf ) );
 }
 
-static Row *
-column_open_find( Row *row, Column *col )
-{
-	if( MODEL( row )->display != col->open )
-		return( row );
-
-	return( NULL );
-}
-
-static gboolean
-column_open_timeout_cb( Column *col )
-{
-	void *(*map_fn)( iContainer *, icontainer_map_fn, void *, void * );
-	Row *row;
-	gboolean again = TRUE;
-
-	if( !col->scol ) {
-		col->open_timeout = 0;
-		return( FALSE );
-	}
-
-	if( col->open ) 
-		map_fn = icontainer_map_rev;
-	else
-		map_fn = icontainer_map;
-
-	while( (row = ROW( map_fn( ICONTAINER( col->scol ),
-		(icontainer_map_fn) column_open_find, col, NULL ) )) ) {
-		model_set_display( MODEL( row ), col->open );
-		col->open_frames += 1;
-
-		if( col->open_frames < column_open_max_frames )
-			break;
-	}
-
-	if( !row ) {
-		col->open_timeout = 0;
-		again = FALSE;
-	}
-
-	return( again );
-}
-
 void 
 column_set_open( Column *col, gboolean open )
 {
@@ -496,10 +446,6 @@ column_set_open( Column *col, gboolean open )
 		workspace_set_modified( ws, TRUE );
 		iobject_changed( IOBJECT( col ) );
 
-		if( !col->open_timeout ) {
-			col->open_frames = 0;
-			col->open_timeout = g_timeout_add( 20, 
-				(GSourceFunc) column_open_timeout_cb, col );
-		}
+		model_display( MODEL( col->scol ), col->open );
 	}
 }

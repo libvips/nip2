@@ -47,9 +47,6 @@
     also row arrow up/down
 
 
-- col->open_timeout and col->open_frames should be in columnview, not column
-
-
 
   - alternative: add a "reparent" to icontainer, watch this from the view, and
     trigger a separate "reparent" event there too, possibly less intrusive
@@ -87,6 +84,8 @@ CRASH
 
 
 
+
+- duplicate selected is broken
 
 - column menu needs a merge item too
 

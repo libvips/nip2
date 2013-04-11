@@ -58,11 +58,11 @@ filemodel_register( Filemodel *filemodel )
 			filemodel );
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 		printf( "filemodel_register: %s \"%s\" (%p)\n",
 			G_OBJECT_TYPE_NAME( filemodel ),
 			IOBJECT( filemodel )->name,
 			filemodel );
+#endif /*DEBUG*/
 	}
 }
 
@@ -75,11 +75,11 @@ filemodel_unregister( Filemodel *filemodel )
 			filemodel );
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 		printf( "filemodel_unregister: %s \"%s\" (%p)\n",
 			G_OBJECT_TYPE_NAME( filemodel ),
 			IOBJECT( filemodel )->name,
 			filemodel );
+#endif /*DEBUG*/
 	}
 }
 
@@ -301,8 +301,6 @@ filemodel_top_save_xml( Filemodel *filemodel, const char *filename )
 	xmlDoc *xdoc;
 	char namespace[256];
 
-	printf( "filemodel_top_save_xml: %s\n", filename );
-
 	if( !(xdoc = xmlNewDoc( (xmlChar *) "1.0" )) ) {
 		error_top( _( "XML library error." ) );
 		error_sub( _( "model_save_filename: xmlNewDoc() failed" ) );
@@ -516,9 +514,9 @@ filemodel_load_all_xml( Filemodel *filemodel,
 	}
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "filemodel_load_all_xml: major = %d, minor = %d, micro = %d\n",
 		state->major, state->minor, state->micro );
+#endif /*DEBUG*/
 
 	if( filemodel_top_load( filemodel, state, parent, xnode ) ) 
 		return( FALSE );

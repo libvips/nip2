@@ -46,6 +46,7 @@ enum {
 	SIG_LAYOUT,	/* Views should lay out their children */
 	SIG_RESET,	/* Reset edit mode in views */
 	SIG_FRONT,	/* Bring views to front */
+	SIG_DISPLAY,	/* Display on/off */
 	SIG_LAST
 };
 
@@ -369,8 +370,8 @@ model_scrollto( Model *model, ModelScrollPosition position )
 {
 	g_assert( IS_MODEL( model ) );
 
-	g_signal_emit( G_OBJECT( model ), model_signals[SIG_SCROLLTO], 0, 
-		position );
+	g_signal_emit( G_OBJECT( model ), 
+		model_signals[SIG_SCROLLTO], 0, position );
 }
 
 void
@@ -387,6 +388,17 @@ model_front( Model *model )
 	g_assert( IS_MODEL( model ) );
 
 	g_signal_emit( G_OBJECT( model ), model_signals[SIG_FRONT], 0 );
+}
+
+void
+model_display( Model *model, gboolean display )
+{
+	if( model ) { 
+		g_assert( IS_MODEL( model ) );
+
+		g_signal_emit( G_OBJECT( model ), 
+			model_signals[SIG_DISPLAY], 0, display );
+	}
 }
 
 void *
@@ -528,6 +540,15 @@ model_real_front( Model *model )
 {
 }
 
+static void
+model_real_display( Model *model, gboolean display )
+{
+	if( display != model->display ) {
+		model->display = display;
+		iobject_changed( IOBJECT( model ) );
+	}
+}
+
 static xmlNode *
 model_real_save( Model *model, xmlNode *xnode )
 {
@@ -650,6 +671,7 @@ model_class_init( ModelClass *class )
 	class->scrollto = model_real_scrollto;
 	class->layout = NULL;
 	class->front = model_real_front;
+	class->display = model_real_display;
 	class->reset = NULL;
 	class->save = model_real_save;
 	class->save_test = NULL;
@@ -689,6 +711,14 @@ model_class_init( ModelClass *class )
 		NULL, NULL,
 		g_cclosure_marshal_VOID__VOID,
 		G_TYPE_NONE, 0 );
+	model_signals[SIG_DISPLAY] = g_signal_new( "display",
+		G_OBJECT_CLASS_TYPE( object_class ),
+		G_SIGNAL_RUN_FIRST,
+		G_STRUCT_OFFSET( ModelClass, display ),
+		NULL, NULL,
+		g_cclosure_marshal_VOID__BOOLEAN,
+		G_TYPE_NONE, 1,
+		G_TYPE_BOOLEAN );
 }
 
 static void
@@ -848,16 +878,6 @@ model_check_destroy( GtkWidget *parent, Model *model )
 	 */
 	mcd->destroy_sid = g_signal_connect( model, "destroy",
 		G_CALLBACK( model_check_destroy_destroy_cb ), mcd );
-}
-
-void
-model_set_display( Model *model, gboolean display )
-{
-	if( model &&
-		display != model->display ) {
-		model->display = display;
-		iobject_changed( IOBJECT( model ) );
-	}
 }
 
 /* Useful for icontainer_map_all() ... trigger all heapmodel_clear_edited()

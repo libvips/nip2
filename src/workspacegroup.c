@@ -202,9 +202,6 @@ workspacegroup_rename_workspace_node( Workspacegroup *wsg,
 		model_loadstate_taken( state, new_name ) )
 		increment_name( new_name );
 
-	printf( "workspacegroup_rename_workspace_node: renaming %s as %s\n", 
-		name, new_name ); 
-
 	(void) set_sprop( xws, "name", new_name );
 	(void) model_loadstate_rename_new( state, name, new_name );
 }
@@ -322,9 +319,9 @@ workspacegroup_rename_column_node( Workspacegroup *wsg,
 
 	if( strcmp( name, new_name ) != 0 ) { 
 #ifdef DEBUG
-#endif /*DEBUG*/
 		printf( "workspace_rename_column_node: renaming column "
 			"%s to %s\n", name, new_name );
+#endif /*DEBUG*/
 
 		(void) set_sprop( xcol, "name", new_name );
 		(void) model_loadstate_column_rename_new( state, 
@@ -476,8 +473,8 @@ workspacegroup_top_load( Filemodel *filemodel,
 	char name[FILENAME_MAX];
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "workspacegroup_top_load: from %s\n", state->filename );
+#endif /*DEBUG*/
 
 	/* The top node should be the first workspace. Get the filename this
 	 * workspace was saved as so we can work out how to rewrite embedded
@@ -768,8 +765,8 @@ workspacegroup_new( Workspaceroot *wsr )
 	Workspacegroup *wsg;
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "workspacegroup_new:\n" ); 
+#endif /*DEBUG*/
 
 	wsg = WORKSPACEGROUP( g_object_new( TYPE_WORKSPACEGROUP, NULL ) );
 	workspacegroup_link( wsg, wsr );

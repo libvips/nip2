@@ -129,8 +129,9 @@ static void
 view_viewchild_changed( Model *model, ViewChild *viewchild )
 {
 	gboolean display = view_viewchild_display( viewchild );
+	View *child = viewchild->child_view;
 
-	if( !display && viewchild->child_view ) {
+	if( !display && child ) {
 #ifdef DEBUG_VIEWCHILD
 #endif /*DEBUG_VIEWCHILD*/
 		printf( "view_viewchild_changed: %s \"%s\", removing view\n", 
@@ -138,11 +139,11 @@ view_viewchild_changed( Model *model, ViewChild *viewchild )
 			NN( IOBJECT( model )->name ) );
 
 		printf( "view_viewchild_changed: %s\n", 
-			G_OBJECT_TYPE_NAME( viewchild->child_view ) ); 
+			G_OBJECT_TYPE_NAME( child ) ); 
 
-		DESTROY_GTK( viewchild->child_view );
+		DESTROY_GTK( child );
 	}
-	else if( display && !viewchild->child_view ) {
+	else if( display && !child ) {
 #ifdef DEBUG_VIEWCHILD
 		printf( "view_viewchild_changed: %s \"%s\", adding view\n", 
 			G_OBJECT_TYPE_NAME( model ), 
@@ -571,9 +572,9 @@ view_real_child_remove( View *parent, View *child )
 	ViewChild *viewchild;
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "view_real_child_remove: parent %s, child %s\n", 
 		G_OBJECT_TYPE_NAME( parent ), G_OBJECT_TYPE_NAME( child ) );
+#endif /*DEBUG*/
 
 	viewchild = slist_map( parent->managed,
 		(SListMapFn) view_viewchild_test_child_model, 

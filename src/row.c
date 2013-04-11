@@ -703,7 +703,7 @@ row_load( Model *model,
 	 * is off.
 	 */
 	if( scol->is_top && !scol->top_col->open )
-		model_set_display( MODEL( row ), FALSE );
+		model_display( MODEL( row ), FALSE );
 
 	return( TRUE );
 }
@@ -879,13 +879,13 @@ row_new_heap( Heapmodel *heapmodel, PElement *root )
 		if( is_super( row->sym ) && PEISCLASS( root ) &&
 			*IOBJECT( PEGETCLASSCOMPILE( root )->sym )->name == 
 			'_' )
-			model_set_display( MODEL( row ), FALSE );
+			model_display( MODEL( row ), FALSE );
 		/* Hide top-level rows in closed columns.
 		 */
 		else if( row->scol->is_top && !row->top_col->open )
-			model_set_display( MODEL( row ), FALSE );
+			model_display( MODEL( row ), FALSE );
 		else
-			model_set_display( MODEL( row ), TRUE );
+			model_display( MODEL( row ), TRUE );
 	}
 
 	/* New value ... reset error state.

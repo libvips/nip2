@@ -144,6 +144,8 @@ typedef struct _ModelClass {
 
 		front		trigger view_child_front() for all views
 
+		display		create and destroy views
+
 	 */
 
 	void (*edit)( GtkWidget *, Model * );
@@ -152,6 +154,7 @@ typedef struct _ModelClass {
 	void (*reset)( Model * );
 	void (*layout)( Model * );
 	void (*front)( Model * );
+	void (*display)( Model *, gboolean display );
 
 	/* Load and save methods.
 
@@ -204,6 +207,7 @@ void *model_reset( Model *model );
 void *model_edit( GtkWidget *parent, Model *model );
 void *model_header( GtkWidget *parent, Model *model );
 void model_front( Model *model );
+void model_display( Model *model, gboolean display );
 
 void *model_save( Model *model, xmlNode * );
 gboolean model_save_test( Model *model );
@@ -222,7 +226,5 @@ void model_base_init( void );
 View *model_build_display_all( Model *model, View *parent );
 
 void model_check_destroy( GtkWidget *parent, Model *model );
-
-void model_set_display( Model *model, gboolean display );
 
 void *model_clear_edited( Model *model );

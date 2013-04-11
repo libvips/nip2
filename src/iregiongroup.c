@@ -50,7 +50,7 @@ iregiongroup_update_model( Heapmodel *heapmodel )
 	/* Only display most-derived classes. Don't display "this".
 	 */
 	if( heapmodel->row->sym )
-		model_set_display( MODEL( heapmodel ),
+		model_display( MODEL( heapmodel ),
 			!is_super( heapmodel->row->sym ) &&
 			!is_this( heapmodel->row->sym ) );
 

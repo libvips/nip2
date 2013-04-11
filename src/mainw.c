@@ -426,8 +426,8 @@ mainw_refresh_timeout_cb( gpointer user_data )
 	Workspace *ws;
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "mainw_refresh_timeout_cb: %p\n", mainw );
+#endif /*DEBUG*/
 
 	mainw_status_update( mainw );
 	mainw_free_update( mainw );
@@ -1922,8 +1922,6 @@ mainw_popdown( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys )
 static void
 mainw_wsg_changed_cb( Workspacegroup *wsg, Mainw *mainw )
 {
-	printf( "mainw_wsg_changed_cb\n" ); 
-
 	mainw_refresh( mainw );
 
 	if( mainw->wsg &&
@@ -1934,8 +1932,6 @@ mainw_wsg_changed_cb( Workspacegroup *wsg, Mainw *mainw )
 static void
 mainw_wsg_destroy_cb( Workspacegroup *wsg, Mainw *mainw )
 {
-	printf( "mainw_wsg_destroy_cb\n" ); 
-
 	mainw->wsg = NULL;
 }
 

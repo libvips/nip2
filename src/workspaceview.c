@@ -674,8 +674,8 @@ workspaceview_refresh( vObject *vobject )
 	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "workspaceview_refresh: %p %s\n", ws, IOBJECT( ws )->name );
+#endif /*DEBUG*/
 
 	filemodel_set_window_hint( FILEMODEL( wsg ), 
 		IWINDOW( iwindow_get_root_noparent( GTK_WIDGET( wview ) ) ) );

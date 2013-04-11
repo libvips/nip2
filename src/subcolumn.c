@@ -513,6 +513,16 @@ subcolumn_view_new( Model *model, View *parent )
 	return( subcolumnview_new() );
 }
 
+static void
+subcolumn_display( Model *model, gboolean display )
+{
+	printf( "subcolumn_display: " ); 
+	row_name_print( HEAPMODEL( model )->row );
+	printf( " %d\n", display ); 
+
+	MODEL_CLASS( parent_class )->display( model, display );
+}
+
 static gboolean
 subcolumn_load( Model *model, 
 	ModelLoadState *state, Model *parent, xmlNode *xnode )
@@ -568,6 +578,7 @@ subcolumn_class_init( SubcolumnClass *class )
 	icontainer_class->parent_add = subcolumn_parent_add;
 
 	model_class->view_new = subcolumn_view_new;
+	model_class->display = subcolumn_display;
 	model_class->load = subcolumn_load;
 	model_class->save = subcolumn_save;
 

@@ -501,8 +501,8 @@ main_load_wsg( const char *filename )
 	Workspacegroup *wsg;
 
 #ifdef DEBUG
-#endif/*DEBUG*/
 	printf( "main_load_wsg: %s\n", filename );
+#endif/*DEBUG*/
 
 	progress_update_loading( 0, im_skip_dir( filename ) );
 

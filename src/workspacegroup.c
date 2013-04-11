@@ -283,21 +283,25 @@ workspacegroup_load_new( Workspacegroup *wsg,
 }
 
 static void
-workspacegroup_rename_row_node( Workspacegroup *wsg, 
+workspacegroup_rename_row_node( Workspace *ws, 
 	ModelLoadState *state, const char *col_name, xmlNode *xrow )
 {
-	char name[MAX_STRSIZE];
+	char old_name[MAX_STRSIZE];
 	char new_name[MAX_STRSIZE];
 
-	if( !get_sprop( xrow, "name", name, MAX_STRSIZE ) )
+	if( !get_sprop( xrow, "name", old_name, MAX_STRSIZE ) )
 		return;
 
 	im_snprintf( new_name, MAX_STRSIZE, "%s1", col_name );
-	while( model_loadstate_taken( state, new_name ) )
+	while( compile_lookup( ws->sym->expr->compile, new_name ) ||
+		model_loadstate_taken( state, new_name ) )
 		increment_name( new_name );
 
 	(void) set_sprop( xrow, "name", new_name );
-	(void) model_loadstate_rename_new( state, name, new_name );
+	(void) model_loadstate_rename_new( state, old_name, new_name );
+
+	printf( "workspacegroup_rename_row_node: renamed %s as %s\n",
+		old_name, new_name );
 }
 
 /* Rename column if there's one of that name in workspace. 
@@ -319,9 +323,9 @@ workspacegroup_rename_column_node( Workspacegroup *wsg,
 
 	if( strcmp( name, new_name ) != 0 ) { 
 #ifdef DEBUG
+#endif /*DEBUG*/
 		printf( "workspace_rename_column_node: renaming column "
 			"%s to %s\n", name, new_name );
-#endif /*DEBUG*/
 
 		(void) set_sprop( xcol, "name", new_name );
 		(void) model_loadstate_column_rename_new( state, 
@@ -331,7 +335,7 @@ workspacegroup_rename_column_node( Workspacegroup *wsg,
 		 */
 		FOR_ALL_XML( xcol, xsub, "Subcolumn" ) {
 			FOR_ALL_XML( xsub, xrow, "Row" ) {
-				workspacegroup_rename_row_node( wsg, state, 
+				workspacegroup_rename_row_node( ws, state, 
 					new_name, xrow );
 			} FOR_ALL_XML_END
 		} FOR_ALL_XML_END
@@ -439,7 +443,7 @@ workspacegroup_load_rows( Workspacegroup *wsg,
 		FOR_ALL_XML( xws, xcol, "Column" ) {
 			FOR_ALL_XML( xcol, xsub, "Subcolumn" ) {
 				FOR_ALL_XML( xsub, xrow, "Row" ) {
-					workspacegroup_rename_row_node( wsg, 
+					workspacegroup_rename_row_node( ws, 
 						state, IOBJECT( col )->name, 
 						xrow );
 				} FOR_ALL_XML_END

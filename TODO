@@ -1,3 +1,11 @@
+- tiny ws, save-as, quit, 
+
+[Thread 0x7fffd233b700 (LWP 12489) exited]
+(nip2:12480): GLib-GObject-WARNING **: invalid uninstantiatable type `(null)'
+in
+ cast to `Filemodel'
+
+
 - drag tabs between windows still sometimes crashes
 
 - drag tab to desktop is still broken

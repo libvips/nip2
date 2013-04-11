@@ -570,7 +570,7 @@ workspacegroupview_init( Workspacegroupview *wsgview )
 		POPUP_FUNC( workspacegroupview_select_all_cb ) ); 
 	popup_add_but( wsgview->tab_menu, STOCK_DUPLICATE,
 		POPUP_FUNC( workspacegroupview_duplicate_cb ) ); 
-	popup_add_but( wsgview->tab_menu, "Merge",
+	popup_add_but( wsgview->tab_menu, _( "Merge" ),
 		POPUP_FUNC( workspacegroupview_merge_cb ) ); 
 	popup_add_but( wsgview->tab_menu, GTK_STOCK_SAVE_AS,
 		POPUP_FUNC( workspacegroupview_save_as_cb ) ); 

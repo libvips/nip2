@@ -92,6 +92,53 @@ columnview_clone_cb( GtkWidget *wid, GtkWidget *host, Columnview *cview )
         symbol_recalculate_all();
 }
 
+static void
+columnview_merge_sub( iWindow *iwnd, 
+	void *client, iWindowNotifyFn nfn, void *sys )
+{
+	Filesel *filesel = FILESEL( iwnd );
+	Column *col = COLUMN( client );
+	Workspace *ws = col->ws;
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
+
+	char *filename;
+	iWindowResult result;
+
+	result = IWINDOW_YES;
+	progress_begin();
+
+	if( (filename = filesel_get_filename( filesel )) ) {
+		if( !workspacegroup_merge_rows( wsg, filename ) ) 
+			result = IWINDOW_ERROR;
+
+		g_free( filename );
+	}
+
+	symbol_recalculate_all();
+	progress_end();
+
+	nfn( sys, result );
+}
+
+static void
+columnview_merge_cb( GtkWidget *wid, GtkWidget *host, Columnview *cview )
+{
+	Column *col = COLUMN( VOBJECT( cview )->iobject );
+	iWindow *iwnd = IWINDOW( view_get_toplevel( VIEW( cview ) ) );
+	GtkWidget *filesel = filesel_new();
+
+	iwindow_set_title( IWINDOW( filesel ), 
+		_( "Merge Into Column \"%s\"" ), IOBJECT( col )->name );
+	filesel_set_flags( FILESEL( filesel ), FALSE, FALSE );
+	filesel_set_filetype( FILESEL( filesel ), filesel_type_workspace, 0 ); 
+	iwindow_set_parent( IWINDOW( filesel ), GTK_WIDGET( iwnd ) );
+	idialog_set_iobject( IDIALOG( filesel ), IOBJECT( col ) );
+	filesel_set_done( FILESEL( filesel ), columnview_merge_sub, col );
+	iwindow_build( IWINDOW( filesel ) );
+
+	gtk_widget_show( GTK_WIDGET( filesel ) );
+}
+
 /* Callback from save browser.
  */
 static void
@@ -907,6 +954,8 @@ columnview_class_init( ColumnviewClass *class )
 		POPUP_FUNC( columnview_select_cb ) );
 	popup_add_but( pane, STOCK_DUPLICATE,
 		POPUP_FUNC( columnview_clone_cb ) );
+	popup_add_but( pane, _( "Merge" ),
+		POPUP_FUNC( columnview_merge_cb ) );
 	popup_add_but( pane, GTK_STOCK_SAVE_AS,
 		POPUP_FUNC( columnview_save_as_cb ) );
 	menu_add_sep( pane );

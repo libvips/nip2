@@ -182,30 +182,46 @@ workspacegroupview_switch_page_cb( GtkNotebook *notebook,
 	this_level = level;
 	level += 1;
 
-	/*
 	printf( "workspacegroupview_switch_page_cb: %d wsg = %s, ws = %s\n",
 		this_level,
 		NN( IOBJECT( wsg )->name ), NN( IOBJECT( ws )->name ) ); 
-	 */
 
 	if( ICONTAINER( ws )->parent != ICONTAINER( wsg ) ) {
-		/*
 		printf( "workspacegroupview_switch_page_cb: %d moving tab\n",
 			this_level ); 
+
+		filemodel_set_modified( FILEMODEL( ICONTAINER( ws )->parent ), 
+			TRUE );
+		filemodel_set_modified( FILEMODEL( wsg ), TRUE );
+
+		/* Don't try to move the view over, it doesn't really support
+		 * a "floating" state where we could move it.
+		 *
+		 * Instead, destroy the view now and rebuild the other side.
 		 */
+		model_display( MODEL( ws ), FALSE );
 
 		g_object_ref( ws );
 
 		icontainer_child_remove( ICONTAINER( ws ) );
+
+		printf( "workspacegroupview_switch_page_cb: %d about to add\n",
+			this_level ); 
+
 		icontainer_child_add( ICONTAINER( wsg ), 
 			ICONTAINER( ws ), page_num );
 
+		model_display( MODEL( ws ), TRUE );
+
 		g_object_unref( ws );
 
-		/*
 		printf( "workspacegroupview_switch_page_cb: %d tab move done\n",
 			this_level ); 
+
+		/* We've rebuilt the view, so invalidate.
 		 */
+		wview = NULL;
+		wsgview = NULL;
 	}
 
 	icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
@@ -224,15 +240,14 @@ workspacegroupview_switch_page_cb( GtkNotebook *notebook,
 	/* How bizarre, pages sometimes fail to set up correctly. Force a
 	 * resize to get everything to init. 
 	 */
-	if( wview->fixed ) 
+	if( wview &&
+		wview->fixed ) 
 		gtk_container_check_resize( GTK_CONTAINER( wview->fixed ) );
 
-	/*
 	printf( "workspacegroupview_switch_page_cb: %d all done\n",
 		this_level );
 
 	level -= 1;
-	 */
 }
 
 static void                

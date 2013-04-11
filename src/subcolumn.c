@@ -516,9 +516,11 @@ subcolumn_view_new( Model *model, View *parent )
 static void
 subcolumn_display( Model *model, gboolean display )
 {
+	/*
 	printf( "subcolumn_display: " ); 
 	row_name_print( HEAPMODEL( model )->row );
 	printf( " %d\n", display ); 
+	 */
 
 	MODEL_CLASS( parent_class )->display( model, display );
 }

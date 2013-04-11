@@ -133,13 +133,13 @@ view_viewchild_changed( Model *model, ViewChild *viewchild )
 
 	if( !display && child ) {
 #ifdef DEBUG_VIEWCHILD
-#endif /*DEBUG_VIEWCHILD*/
 		printf( "view_viewchild_changed: %s \"%s\", removing view\n", 
 			G_OBJECT_TYPE_NAME( model ), 
 			NN( IOBJECT( model )->name ) );
 
 		printf( "view_viewchild_changed: %s\n", 
 			G_OBJECT_TYPE_NAME( child ) ); 
+#endif /*DEBUG_VIEWCHILD*/
 
 		DESTROY_GTK( child );
 	}
@@ -161,7 +161,7 @@ view_viewchild_new( View *parent_view, Model *child_model )
 
 #ifdef DEBUG_VIEWCHILD
 	printf( "view_viewchild_new: view \"%s\" watching %s \"%s\"\n", 
-		G_OBJECT_TYPE_NAME( view ), 
+		G_OBJECT_TYPE_NAME( parent_view ), 
 		G_OBJECT_TYPE_NAME( child_model ), 
 		NN( IOBJECT( child_model )->name ) );
 #endif /*DEBUG_VIEWCHILD*/
@@ -201,7 +201,6 @@ view_viewchild_destroy( ViewChild *viewchild )
 	if( child_view ) { 
 		g_assert( child_view->parent == parent_view );
 		child_view->parent = NULL;
-		//DESTROY_GTK( child_view );
 	}
 	FREESID( viewchild->child_model_changed_sid, viewchild->child_model );
 	parent_view->managed = 
@@ -425,7 +424,9 @@ view_model_front( Model *model, View *view )
 	g_assert( IS_VIEW( view ) );
 
 #ifdef DEBUG
-	printf( "view_model_front: %s\n", IOBJECT( model )->name );
+	printf( "view_model_front: model %s \"%s\"\n", 
+		G_OBJECT_TYPE_NAME( model ), NN( IOBJECT( model )->name ) );
+	printf( "\tview %s\n", G_OBJECT_TYPE_NAME( view ) );
 #endif /*DEBUG*/
 
 	view_child_front( view );
@@ -543,8 +544,11 @@ view_real_child_add( View *parent, View *child )
 	g_assert( child->parent == NULL );
 
 #ifdef DEBUG
-	printf( "view_real_child_add: parent %s, child %s\n", 
-		G_OBJECT_TYPE_NAME( parent ), G_OBJECT_TYPE_NAME( child ) );
+	printf( "view_real_child_add: parent %p %s, child %p %s\n", 
+		parent,
+		G_OBJECT_TYPE_NAME( parent ), 
+		child,
+		G_OBJECT_TYPE_NAME( child ) );
 #endif /*DEBUG*/
 
 	viewchild = slist_map( parent->managed,

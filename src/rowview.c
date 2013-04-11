@@ -59,10 +59,10 @@ rowview_destroy( GtkObject *object )
 	rview = ROWVIEW( object );
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "rowview_destroy: " );
 	row_name_print( ROW( VOBJECT( rview )->iobject ) );
 	printf( "\n" );
+#endif /*DEBUG*/
 
 	IM_FREE( rview->last_tooltip );
 

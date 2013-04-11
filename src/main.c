@@ -1411,7 +1411,7 @@ main( int argc, char *argv[] )
 	 */
 #ifdef DEBUG_LEAK
 {
-	Symbol *wsg_sym = main_workspacegroup->sym;
+	Symbol *wsg_sym = main_workspaceroot->sym;
 	Symbol *ws_sym = SYMBOL( icontainer_child_lookup( 
 		ICONTAINER( wsg_sym->expr->compile ), "Preferences" ) );
 	Workspace *ws = ws_sym->ws;

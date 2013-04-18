@@ -275,14 +275,16 @@ workspacegroupview_page_removed_cb( GtkNotebook *notebook,
 	Workspaceview *wview = WORKSPACEVIEW( page );
 	Workspacegroupview *wsgview = WORKSPACEGROUPVIEW( user_data );
 	Workspacegroup *wsg = WORKSPACEGROUP( VOBJECT( wsgview )->iobject );
-	Mainw *mainw = MAINW( iwindow_get_root( GTK_WIDGET( notebook ) ) );
 
 	/*
 	 */
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
 
-	printf( "workspacegroupview_page_removed_cb: wsg = %s, ws = %s\n",
-		NN( IOBJECT( wsg )->name ), NN( IOBJECT( ws )->name ) ); 
+	if( wsg ) 
+		printf( "workspacegroupview_page_removed_cb: "
+			"wsg = %s, ws = %s\n",
+			NN( IOBJECT( wsg )->name ), 
+			NN( IOBJECT( ws )->name ) ); 
 }
 
 static void                

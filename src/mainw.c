@@ -127,18 +127,12 @@ mainw_pick_one( void )
 static void
 mainw_finalize( GObject *gobject )
 {
-	Mainw *mainw;
-
 #ifdef DEBUG
-	printf( "mainw_finalize: %p\n", gobject );
 #endif /*DEBUG*/
+	printf( "mainw_finalize: %p\n", gobject );
 
 	g_return_if_fail( gobject != NULL );
 	g_return_if_fail( IS_MAINW( gobject ) );
-
-	mainw = MAINW( gobject );
-
-	mainw_all = g_slist_remove( mainw_all, mainw );
 
 	G_OBJECT_CLASS( parent_class )->finalize( gobject );
 }
@@ -154,8 +148,8 @@ mainw_dispose( GObject *object )
 	mainw = MAINW( object );
 
 #ifdef DEBUG
-	printf( "mainw_dispose\n" );
 #endif /*DEBUG*/
+	printf( "mainw_dispose\n" );
 
 	IM_FREEF( g_source_remove, mainw->refresh_timeout );
 
@@ -170,6 +164,8 @@ mainw_dispose( GObject *object )
 	FREESID( mainw->end_sid, progress_get() );
 
 	UNREF( mainw->kitgview );
+
+	mainw_all = g_slist_remove( mainw_all, mainw );
 
 	G_OBJECT_CLASS( parent_class )->dispose( object );
 }

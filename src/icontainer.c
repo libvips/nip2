@@ -574,6 +574,9 @@ icontainer_real_child_remove( iContainer *parent, iContainer *child )
 		G_OBJECT_TYPE_NAME( child ), NN( IOBJECT( child )->name ) );
 #endif /*DEBUG*/
 
+	if( parent->current == child )
+		icontainer_child_current( parent, NULL ); 
+
 	/* We're about to break the link ... trigger the parent_remove() on 
 	 * the child.
 	 */
@@ -581,8 +584,6 @@ icontainer_real_child_remove( iContainer *parent, iContainer *child )
 
 	parent->children = g_slist_remove( parent->children, child );
 	child->parent = NULL;
-	if( parent->current == child )
-		parent->current = NULL;
 	if( parent->child_hash ) {
 		g_assert( g_hash_table_lookup( parent->child_hash, 
 			IOBJECT( child )->name ) );

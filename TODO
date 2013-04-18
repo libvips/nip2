@@ -1,12 +1,9 @@
-- close wsg on removal of final tab
+- close final tab should close window?
 
-  can't do automatically, eg. on page_remove, since that path is run during
-  saveandquit
+  tricky to do ... most obvious ways cause segvs on shutdown
 
-  do check as part of response to user action, wg. rioght-click / delete, or
-  ^W
+  it needs to be part of the response to rmb / delete-tab
 
-  don't offer to save, since the wsg is empty
 
 - drag tabs between windows still sometimes crashes
 
@@ -26,10 +23,6 @@
   check toolkit menu switching
 
 - workspacegroupview_reorder_tab_cb() is never called?
-
-- fix drag tabs between mainw
-
-- fix drag tabs to root
 
 - double-click on tab gutter to make new tab, right-buttn menu with new tab
   item

@@ -627,14 +627,6 @@ static void
 workspace_child_remove( iContainer *parent, iContainer *child )
 {
 	Workspace *ws = WORKSPACE( parent );
-	Column *col = COLUMN( child );
-	Column *current = workspace_get_column( ws );
-
-	/* Will we remove the current column? If yes, make sure
-	 * current_column is NULL.
-	 */
-	if( current == col )
-		workspace_column_select( ws, NULL );
 
 	workspace_set_modified( ws, TRUE );
 

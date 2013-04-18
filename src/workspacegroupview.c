@@ -36,6 +36,21 @@
 static ViewClass *parent_class = NULL;
 
 static void
+workspacegroupview_dispose( GObject *gobject )
+{
+	Workspace *ws;
+
+#ifdef DEBUG
+	printf( "workspacegroupview_dispose:\n" );
+#endif /*DEBUG*/
+
+	g_return_if_fail( gobject != NULL );
+	g_return_if_fail( IS_WORKSPACEGROUPVIEW( gobject ) );
+
+	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+}
+
+static void
 workspacegroupview_realize( GtkWidget *widget )
 {
 #ifdef DEBUG
@@ -147,11 +162,14 @@ workspacegroupview_refresh( vObject *vobject )
 static void
 workspacegroupview_class_init( WorkspacegroupviewClass *class )
 {
+	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
+
+	gobject_class->dispose = workspacegroupview_dispose;
 
 	widget_class->realize = workspacegroupview_realize;
 
@@ -260,16 +278,11 @@ workspacegroupview_page_removed_cb( GtkNotebook *notebook,
 	Mainw *mainw = MAINW( iwindow_get_root( GTK_WIDGET( notebook ) ) );
 
 	/*
+	 */
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
 
 	printf( "workspacegroupview_page_removed_cb: wsg = %s, ws = %s\n",
 		NN( IOBJECT( wsg )->name ), NN( IOBJECT( ws )->name ) ); 
-	 */
-
-	if( icontainer_get_n_children( ICONTAINER( wsg ) ) == 0 ) {
-		//printf( "workspacegroupview_page_removed_cb: killing mainw\n" );
-		iwindow_kill( IWINDOW( mainw ) );
-	}
 }
 
 static void                

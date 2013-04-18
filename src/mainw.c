@@ -1923,10 +1923,6 @@ static void
 mainw_wsg_changed_cb( Workspacegroup *wsg, Mainw *mainw )
 {
 	mainw_refresh( mainw );
-
-	if( mainw->wsg &&
-		!ICONTAINER( mainw->wsg )->children )
-		iwindow_kill( IWINDOW( mainw ) ); 
 }
 
 static void

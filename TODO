@@ -1,3 +1,24 @@
+- start, ^Q, 
+
+==10270== Invalid read of size 8
+==10270==    at 0x457A65: filemodel_set_modified (filemodel.c:118)
+==10270==    by 0x45914C: filemodel_inter_empty_cb (filemodel.c:747)
+==10270==    by 0x459343: filemodel_inter_savenempty_cb (filemodel.c:792)
+==10270==    by 0x459447: filemodel_inter_savenclose_cb (filemodel.c:823)
+==10270==    by 0x459893: filemodel_inter_close_registered_cb (filemodel.c:925)
+==10270==    by 0x4870D5: iwindow_susp_comp (iwindow.c:435)
+==10270==    by 0x4593ED: filemodel_inter_close_cb (filemodel.c:813)
+==10270==    by 0x4870D5: iwindow_susp_comp (iwindow.c:435)
+==10270==    by 0x45915E: filemodel_inter_empty_cb (filemodel.c:749)
+==10270==    by 0x459343: filemodel_inter_savenempty_cb (filemodel.c:792)
+==10270==    by 0x459447: filemodel_inter_savenclose_cb (filemodel.c:823)
+==10270==    by 0x459893: filemodel_inter_close_registered_cb (filemodel.c:925)
+==10270==  Address 0x158 is not stack'd, malloc'd or (recently) free'd
+
+  unreffing wsg too early?
+
+
+
 - tiny ws, save-as, quit, 
 
 [Thread 0x7fffd233b700 (LWP 12489) exited]

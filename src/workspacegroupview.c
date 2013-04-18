@@ -208,38 +208,11 @@ workspacegroupview_switch_page_cb( GtkNotebook *notebook,
 		printf( "workspacegroupview_switch_page_cb: %d moving tab\n",
 			this_level ); 
 
-		filemodel_set_modified( FILEMODEL( ICONTAINER( ws )->parent ), 
-			TRUE );
-		filemodel_set_modified( FILEMODEL( wsg ), TRUE );
-
-		/* Don't try to move the view over, it doesn't really support
-		 * a "floating" state where we could move it.
-		 *
-		 * Instead, destroy the view now and rebuild the other side.
-		 */
-		model_display( MODEL( ws ), FALSE );
-
-		g_object_ref( ws );
-
-		icontainer_child_remove( ICONTAINER( ws ) );
-
-		printf( "workspacegroupview_switch_page_cb: %d about to add\n",
-			this_level ); 
-
-		icontainer_child_add( ICONTAINER( wsg ), 
-			ICONTAINER( ws ), page_num );
-
-		model_display( MODEL( ws ), TRUE );
-
-		g_object_unref( ws );
+		icontainer_reparent( ICONTAINER( wsg ), 
+			ICONTAINER( ws ), -1 );
 
 		printf( "workspacegroupview_switch_page_cb: %d tab move done\n",
 			this_level ); 
-
-		/* We've rebuilt the view, so invalidate.
-		 */
-		wview = NULL;
-		wsgview = NULL;
 	}
 
 	icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
@@ -292,14 +265,17 @@ workspacegroupview_page_added_cb( GtkNotebook *notebook,
 	GtkWidget *page, guint page_num, gpointer user_data )
 {
 	Workspaceview *wview = WORKSPACEVIEW( page );
+	Workspacegroupview *wsgview = WORKSPACEGROUPVIEW( user_data );
+
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
-	Workspacegroup *wsg = WORKSPACEGROUP( ICONTAINER( ws )->parent );
+	Workspacegroup *wsg = WORKSPACEGROUP( VOBJECT( wsgview )->iobject );
+
 	Mainw *mainw = MAINW( iwindow_get_root( GTK_WIDGET( notebook ) ) );
 
 	/*
+	 */
 	printf( "workspacegroupview_page_added_cb: wsg = %s, ws = %s\n",
 		NN( IOBJECT( wsg )->name ), NN( IOBJECT( ws )->name ) ); 
-	 */
 
 	filemodel_set_window_hint( FILEMODEL( wsg ), IWINDOW( mainw ) );
 }
@@ -322,6 +298,9 @@ workspacegroupview_create_window_cb( GtkNotebook *notebook,
 
 	workspaceroot_name_new( wsr, name );
 	new_wsg = workspacegroup_new( wsr );
+
+	printf( "workspacegroupview_create_window_cb: new wsg = %s\n", name );
+
 	iobject_set( IOBJECT( new_wsg ), name, NULL );
 	new_mainw = mainw_new( new_wsg );
 	gtk_window_move( GTK_WINDOW( new_mainw ), x, y );

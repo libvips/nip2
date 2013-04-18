@@ -79,7 +79,9 @@ typedef struct _iContainerClass {
 
 		parent_remove	parent is about to be removed
 
-		child_current	make the current of parent
+		current		make the current of parent
+
+		reparent	set new parent
 
 	 */
 
@@ -88,7 +90,8 @@ typedef struct _iContainerClass {
 	void (*child_remove)( iContainer *parent, iContainer *child );
 	void (*parent_add)( iContainer *child );
 	void (*parent_remove)( iContainer *child );
-	void (*child_current)( iContainer *parent, iContainer *child );
+	void (*current)( iContainer *parent, iContainer *child );
+	void (*reparent)( iContainer *parent, iContainer *child, -1 );
 } iContainerClass;
 
 typedef void *(*icontainer_map_fn)( iContainer *, 
@@ -139,7 +142,8 @@ void icontainer_child_add_before( iContainer *parent,
 	iContainer *child, iContainer *before );
 void icontainer_child_move( iContainer *child, int pos );
 void *icontainer_child_remove( iContainer *child );
-void icontainer_child_current( iContainer *parent, iContainer *child );
+void icontainer_current( iContainer *parent, iContainer *child );
+void icontainer_reparent( iContainer *parent, iContainer *child, int pos );
 
 GType icontainer_get_type( void );
 

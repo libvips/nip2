@@ -835,6 +835,7 @@ workspacegroup_new_from_file( Workspaceroot *wsr,
 	const char *filename, const char *filename_user )
 {
 	Workspacegroup *wsg;
+	char name[FILENAME_MAX];
 
 	if( !(wsg = workspacegroup_new( wsr )) )
 		return( NULL );
@@ -847,6 +848,9 @@ workspacegroup_new_from_file( Workspaceroot *wsr,
 	filemodel_set_filename( FILEMODEL( wsg ), filename_user );
 	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
 
+	name_from_filename( filename_user, name );
+	iobject_set( IOBJECT( wsg ), name, NULL );
+
 	return( wsg );
 }
 
@@ -856,6 +860,7 @@ Workspacegroup *
 workspacegroup_new_from_openfile( Workspaceroot *wsr, iOpenFile *of )
 {
 	Workspacegroup *wsg;
+	char name[FILENAME_MAX];
 
 #ifdef DEBUG
 	printf( "workspacegroup_new_from_openfile: %s\n", of->fname );
@@ -874,9 +879,8 @@ workspacegroup_new_from_openfile( Workspaceroot *wsr, iOpenFile *of )
 	filemodel_set_filename( FILEMODEL( wsg ), of->fname );
 	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
 
-#ifdef DEBUG
-	printf( "(set name = %s)\n", IOBJECT( wsg )->name );
-#endif /*DEBUG*/
+	name_from_filename( of->fname, name );
+	iobject_set( IOBJECT( wsg ), name, NULL );
 
 	return( wsg );
 }

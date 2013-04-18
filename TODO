@@ -1,8 +1,131 @@
-- close final tab should close window?
+- need a reparent() method on container
 
-  tricky to do ... most obvious ways cause segvs on shutdown
+  if we remove/add, the remove will destroy our view, which we don't want
 
-  it needs to be part of the response to rmb / delete-tab
+  rename icontainer_child_current() as icontainer_current()
+
+
+
+- had this code in tab move
+
+	if( ICONTAINER( ws )->parent != ICONTAINER( wsg ) ) {
+		printf( "workspacegroupview_switch_page_cb: %d moving tab\n",
+			this_level ); 
+
+		filemodel_set_modified( FILEMODEL( ICONTAINER( ws )->parent ), 
+			TRUE );
+		filemodel_set_modified( FILEMODEL( wsg ), TRUE );
+
+		/* Don't try to move the view over, it doesn't really support
+		 * a "floating" state where we could move it.
+		 *
+		 * Instead, destroy the view now and rebuild the other side.
+		 */
+		model_display( MODEL( ws ), FALSE );
+
+		g_object_ref( ws );
+
+		icontainer_child_remove( ICONTAINER( ws ) );
+
+		printf( "workspacegroupview_switch_page_cb: %d about to add\n",
+			this_level ); 
+
+		icontainer_child_add( ICONTAINER( wsg ), 
+			ICONTAINER( ws ), page_num );
+
+		model_display( MODEL( ws ), TRUE );
+
+		g_object_unref( ws );
+
+		printf( "workspacegroupview_switch_page_cb: %d tab move done\n",
+			this_level ); 
+
+		/* We've rebuilt the view, so invalidate.
+		 */
+		wview = NULL;
+		wsgview = NULL;
+	}
+
+
+
+
+
+- drag tab to desktop:
+
+// drag tabA to desktop
+workspacegroupview_create_window_cb: wsg = test, ws = tabA
+workspacegroupview_create_window_cb: new wsg = tab1
+
+// tabB comes to top
+workspacegroupview_switch_page_cb: 0 wsg = test, ws = tabB
+workspacegroupview_switch_page_cb: 0 all done
+
+// remove tabA page from old notebook 
+workspacegroupview_page_removed_cb: wsg = test, ws = tabA
+
+// add tabA page to new notebook
+workspacegroupview_page_added_cb: wsg = tab1, ws = tabA
+
+workspacegroupview_switch_page_cb: 0 wsg = tab1, ws = tabA
+workspacegroupview_switch_page_cb: 0 moving tab
+// destroying old view
+workspacegroupview_page_removed_cb: wsg = tab1, ws = tabA
+workspacegroupview_switch_page_cb: 0 about to add
+// building new view
+workspacegroupview_page_added_cb: wsg = tab1, ws = tabA
+// recursive switch_page to select new tab
+workspacegroupview_switch_page_cb: 1 wsg = tab1, ws = tabA
+workspacegroupview_switch_page_cb: 1 all done
+workspacegroupview_switch_page_cb: 0 tab move done
+
+workspacegroupview_switch_page_cb: 0 all done
+
+
+
+
+// drag tabA to desktop
+workspacegroupview_create_window_cb: wsg = test, ws = tabA
+workspacegroupview_create_window_cb: new wsg = tab1
+
+// tabB comes to top
+workspacegroupview_switch_page_cb: 0 wsg = test, ws = tabB
+workspacegroupview_switch_page_cb: 0 all done
+
+// tabA removed from old wsg
+workspacegroupview_page_removed_cb: wsg = test, ws = tabA
+
+// tabA added to new wsg
+workspacegroupview_page_added_cb: wsg = test, ws = tabA
+workspacegroupview_switch_page_cb: 0 wsg = tab1, ws = tabA
+workspacegroupview_switch_page_cb: 0 moving tab
+workspacegroupview_page_removed_cb: wsg = tab1, ws = tabA
+workspacegroupview_switch_page_cb: 0 about to add
+workspacegroupview_page_added_cb: wsg = tab1, ws = tabA
+workspacegroupview_switch_page_cb: 1 wsg = tab1, ws = tabA
+workspacegroupview_switch_page_cb: 1 all done
+workspacegroupview_switch_page_cb: 0 tab move done
+workspacegroupview_switch_page_cb: 0 all done
+
+
+// drag tab2 from test to desktop
+workspacegroupview_create_window_cb: wsg = test, ws = tab2
+workspacegroupview_create_window_cb: new wsg = tab1
+
+// tab "test" on orig. workspace goes to top
+workspacegroupview_switch_page_cb: 0 wsg = test, ws = test
+workspacegroupview_switch_page_cb: 0 all done
+
+// tab2 removed from old wsg
+workspacegroupview_page_removed_cb: wsg = test, ws = tab2
+
+workspacegroupview_switch_page_cb: 0 wsg = tab1, ws = tab2
+workspacegroupview_switch_page_cb: 0 moving tab
+workspacegroupview_page_removed_cb: wsg = tab1, ws = tab2
+workspacegroupview_switch_page_cb: 0 about to add
+workspacegroupview_switch_page_cb: 1 wsg = tab1, ws = tab2
+workspacegroupview_switch_page_cb: 1 all done
+workspacegroupview_switch_page_cb: 0 tab move done
+workspacegroupview_switch_page_cb: 0 all done
 
 
 - drag tabs between windows still sometimes crashes
@@ -33,6 +156,14 @@
 - test file drop on mainw, esp. workspaces
 
 - leaktest
+
+
+
+- close final tab should close window?
+
+  tricky to do ... most obvious ways cause segvs on shutdown
+
+  it needs to be part of the response to rmb / delete-tab
 
 
 

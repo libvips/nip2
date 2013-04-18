@@ -4,6 +4,11 @@
 
   rename icontainer_child_current() as icontainer_current()
 
+  we don't issue any parent_add/_remove child_add/_remove signals on reparent,
+  is this OK? 
+
+
+
 
 
 - had this code in tab move

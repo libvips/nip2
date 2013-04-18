@@ -68,7 +68,7 @@ workspacegroup_workspace_pick( Workspacegroup *wsg )
 
 	if( ICONTAINER( wsg )->children ) {
 		ws = WORKSPACE( ICONTAINER( wsg )->children->data );
-		icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
+		icontainer_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
 
 		return( ws );
 	}
@@ -291,8 +291,7 @@ workspacegroup_load_new( Workspacegroup *wsg,
 	} FOR_ALL_XML_END
 
 	if( first_ws ) 
-		icontainer_child_current( ICONTAINER( wsg ), 
-			ICONTAINER( first_ws ) ); 
+		icontainer_current( ICONTAINER( wsg ), ICONTAINER( first_ws ) );
 
 	return( TRUE );
 }

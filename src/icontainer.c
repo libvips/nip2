@@ -462,10 +462,7 @@ void
 icontainer_reparent( iContainer *parent, iContainer *child, int pos )
 {
 	g_assert( parent );
-	g_assert( ICONTAINER_IS_CHILD( parent, child ) );
-
-	if( child->parent == parent )
-		return; 
+	g_assert( child );
 
 #ifdef DEBUG_SANITY
 	icontainer_sanity( parent );
@@ -698,10 +695,10 @@ icontainer_real_current( iContainer *parent, iContainer *child )
 static void
 icontainer_real_reparent( iContainer *parent, iContainer *child, int pos )
 {
-	iContainerClass *icontainer_class = ICONTAINER_GET_CLASS( child );
+	iContainer *old_parent = child->parent; 
 
         g_assert( IS_ICONTAINER( parent ) && IS_ICONTAINER( child ) );
-        g_assert( child->parent == NULL );
+        g_assert( child->parent != NULL );
 
 #ifdef DEBUG
 	printf( "icontainer_real_reparent:\n\tparent " );
@@ -711,8 +708,14 @@ icontainer_real_reparent( iContainer *parent, iContainer *child, int pos )
 	printf( "\tpos = %d\n", pos );
 #endif /*DEBUG*/
 
-	icontainer_unlink( child ); 
-	icontainer_link( parent, child, pos ); 
+	if( parent != old_parent ) {
+		icontainer_unlink( child ); 
+		icontainer_link( parent, child, pos ); 
+
+		/* parent and child have changed signalled below.
+		 */
+		iobject_changed( IOBJECT( old_parent ) );
+	}
 
 	/* Renumber to get all the pos set. 
 	 */

@@ -91,7 +91,7 @@ typedef struct _iContainerClass {
 	void (*parent_add)( iContainer *child );
 	void (*parent_remove)( iContainer *child );
 	void (*current)( iContainer *parent, iContainer *child );
-	void (*reparent)( iContainer *parent, iContainer *child, -1 );
+	void (*reparent)( iContainer *parent, iContainer *child, int );
 } iContainerClass;
 
 typedef void *(*icontainer_map_fn)( iContainer *, 

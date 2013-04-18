@@ -354,7 +354,7 @@ workspace_get_column( Workspace *ws )
 void
 workspace_column_select( Workspace *ws, Column *col )
 {
-	icontainer_child_current( ICONTAINER( ws ), ICONTAINER( col ) ); 
+	icontainer_current( ICONTAINER( ws ), ICONTAINER( col ) ); 
 }
 
 /* Make sure we have a column selected ... pick one of the existing columns; if 
@@ -634,7 +634,7 @@ workspace_child_remove( iContainer *parent, iContainer *child )
 }
 
 static void
-workspace_child_current( iContainer *parent, iContainer *child )
+workspace_current( iContainer *parent, iContainer *child )
 {
 	Workspace *ws = WORKSPACE( parent );
 	Column *col = COLUMN( child );
@@ -645,7 +645,7 @@ workspace_child_current( iContainer *parent, iContainer *child )
 	if( col )
 		col->selected = TRUE;
 
-	ICONTAINER_CLASS( parent_class )->child_current( parent, child );
+	ICONTAINER_CLASS( parent_class )->current( parent, child );
 }
 
 static void
@@ -997,7 +997,7 @@ workspace_class_init( WorkspaceClass *class )
 
 	icontainer_class->child_add = workspace_child_add;
 	icontainer_class->child_remove = workspace_child_remove;
-	icontainer_class->child_current = workspace_child_current;
+	icontainer_class->current = workspace_current;
 
 	model_class->view_new = workspace_view_new;
 	model_class->load = workspace_load;
@@ -1121,7 +1121,7 @@ workspace_new_blank( Workspacegroup *wsg )
 	 */
 	(void) workspace_column_pick( ws );
 
-	icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
+	icontainer_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
 
 	iobject_set( IOBJECT( ws ), NULL, _( "Default empty tab" ) );
 
@@ -1658,7 +1658,7 @@ workspace_merge_file( Workspace *ws, const char *filename )
 {
 	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
-	icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
+	icontainer_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
 
 	return( workspacegroup_merge_columns( wsg, filename ) );
 }
@@ -1735,7 +1735,7 @@ workspace_selected_save( Workspace *ws, const char *filename )
 
 	Rect box = { 0 };
 
-	icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
+	icontainer_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
 
 	workspace_map_column( ws, 
 		(column_map_fn) workspace_selected_save_box, 
@@ -1781,7 +1781,7 @@ workspace_duplicate( Workspace *ws )
 
 	if( !temp_name( filename, "ws" ) )
 		return( FALSE );
-	icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
+	icontainer_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
 	if( !workspacegroup_save_current( wsg, filename ) ) 
 		return( FALSE );
 

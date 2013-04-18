@@ -215,7 +215,7 @@ workspacegroupview_switch_page_cb( GtkNotebook *notebook,
 			this_level ); 
 	}
 
-	icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
+	icontainer_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
 
 	if( ws->compat_major ) { 
 		error_top( _( "Compatibility mode." ) );
@@ -420,7 +420,7 @@ workspacegroupview_merge_sub( iWindow *iwnd,
 	char *filename;
 
 	if( (filename = filesel_get_filename( filesel )) ) {
-		icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
+		icontainer_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
 
 		progress_begin();
 
@@ -471,7 +471,7 @@ workspacegroupview_save_as_sub( iWindow *iwnd,
 	char *filename;
 
 	if( (filename = filesel_get_filename( filesel )) ) {
-		icontainer_child_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
+		icontainer_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
 		if( !workspacegroup_save_current( wsg, filename ) ) 
 			nfn( sys, IWINDOW_ERROR );
 		else

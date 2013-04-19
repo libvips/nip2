@@ -295,6 +295,7 @@ workspacegroupview_create_window_cb( GtkNotebook *notebook,
 
 	printf( "workspacegroupview_create_window_cb: wsg = %s, ws = %s\n",
 		NN( IOBJECT( wsg )->name ), NN( IOBJECT( ws )->name ) ); 
+	printf( "workspacegroupview_create_window_cb: x = %d, y = %d\n", x, y );
 
 	workspaceroot_name_new( wsr, name );
 	new_wsg = workspacegroup_new( wsr );

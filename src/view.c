@@ -28,8 +28,8 @@
  */
 
 /*
-#define DEBUG_VIEWCHILD
 #define DEBUG
+#define DEBUG_VIEWCHILD
  */
 
 /* Time each refresh
@@ -179,10 +179,6 @@ view_viewchild_new( View *parent_view, Model *child_model )
 	parent_view->managed = 
 		g_slist_append( parent_view->managed, viewchild );
 
-	/* Make a view for this child, if we need one.
-	 */
-	view_viewchild_changed( child_model, viewchild );
-
 	return( viewchild );
 }
 
@@ -305,7 +301,8 @@ view_unlink( View *view )
 	FREESID( view->front_sid, VOBJECT( view )->iobject );
 	FREESID( view->child_add_sid, VOBJECT( view )->iobject );
 	FREESID( view->child_remove_sid, VOBJECT( view )->iobject );
-	FREESID( view->reparent_sid, VOBJECT( view )->iobject );
+	FREESID( view->child_detach_sid, VOBJECT( view )->iobject );
+	FREESID( view->child_attach_sid, VOBJECT( view )->iobject );
 }
 
 static void
@@ -438,9 +435,9 @@ view_model_front( Model *model, View *view )
 static void
 view_model_child_add( Model *parent, Model *child, int pos, View *parent_view )
 {
-#ifdef DEBUG
 	ViewChild *viewchild;
 
+#ifdef DEBUG
 	printf( "view_model_child_add: parent %s \"%s\"\n", 
 		G_OBJECT_TYPE_NAME( parent ), NN( IOBJECT( parent )->name ) );
 #endif /*DEBUG*/
@@ -455,7 +452,8 @@ view_model_child_add( Model *parent, Model *child, int pos, View *parent_view )
 	g_assert( !viewchild );
 #endif /*DEBUG*/
 
-	(void) view_viewchild_new( parent_view, child ); 
+	viewchild = view_viewchild_new( parent_view, child ); 
+	view_viewchild_changed( child, viewchild );
 }
 
 /* Called for model child_remove signal ... stop watching that child. child
@@ -488,45 +486,70 @@ view_model_child_remove( iContainer *parent, iContainer *child,
 	(void) view_viewchild_destroy( viewchild ); 
 }
 
-/* Called for model reparent signal ... move viewchild over from the old 
- * parent. 
+/* Called for model parent_detach signal ... remove the viewchild for this
+ * child. child_attach will build a new one. 
  */
 static void
-view_model_reparent( iContainer *new_parent, iContainer *child, int pos, 
-	View *new_parent_view )
+view_model_child_detach( iContainer *old_parent, iContainer *child, 
+	View *old_parent_view )
 {
-	iContainer *old_parent = child->parent; 
 	ViewChild *viewchild;
 
 #ifdef DEBUG
 {
-	printf( "view_model_reparent: child %s \"%s\"; "
-		"new_parent %s \"%s\"; " 
+	printf( "view_model_child_detach: child %s \"%s\"; "
 		"old_parent %s \"%s\"\n", 
-		G_OBJECT_TYPE_NAME( child ), NN( IOBJECT( child )->name ),
-		G_OBJECT_TYPE_NAME( new_parent ), 
-			NN( IOBJECT( new_parent )->name ),
+		G_OBJECT_TYPE_NAME( child ), 
+		NN( IOBJECT( child )->name ),
 		G_OBJECT_TYPE_NAME( old_parent ), 
-			NN( IOBJECT( old_parent )->name ) );
+		NN( IOBJECT( old_parent )->name ) );
 
-	printf( "view_model_reparent: parent_view = view of %s \"%s\"\n",
-		G_OBJECT_TYPE_NAME( VOBJECT( new_parent_view )->iobject ), 
-		NN( IOBJECT( VOBJECT( new_parent_view )->iobject )->name ) );
+	printf( "view_model_child_detach: old_parent_view = "
+			"view of %s \"%s\"\n",
+		G_OBJECT_TYPE_NAME( VOBJECT( old_parent_view )->iobject ), 
+		NN( IOBJECT( VOBJECT( old_parent_view )->iobject )->name ) );
 }
 #endif /*DEBUG*/
 
-	viewchild = slist_map( parent_view->managed,
+	viewchild = slist_map( old_parent_view->managed,
 		(SListMapFn) view_viewchild_test_child_model, child );
 
 	g_assert( viewchild );
+	g_assert( !child->temp_view );
+
+	child->temp_view = viewchild->child_view;
 
 	(void) view_viewchild_destroy( viewchild ); 
+}
+
+/* Called for model child_attach signal ... make a new viewchild on the new
+ * parent view.
+ */
+static void
+view_model_child_attach( iContainer *new_parent, iContainer *child, int pos,
+	View *new_parent_view )
+{
+	ViewChild *viewchild;
+
+	g_assert( !slist_map( new_parent_view->managed,
+		(SListMapFn) view_viewchild_test_child_model, child ) ); 
+
+	viewchild = view_viewchild_new( new_parent_view, MODEL( child ) ); 
+
+	g_assert( child->temp_view && IS_VIEW( child->temp_view ) );
+	viewchild->child_view = child->temp_view;
+	child->temp_view = NULL;
+
+	viewchild->child_view->parent = new_parent_view;
 }
 
 static void *
 view_real_link_sub( Model *child_model, View *parent_view )
 {
-	(void) view_viewchild_new( parent_view, child_model ); 
+	ViewChild *viewchild;
+
+	viewchild = view_viewchild_new( parent_view, child_model ); 
+	view_viewchild_changed( child_model, viewchild );
 
 	return( NULL );
 }
@@ -564,8 +587,10 @@ view_real_link( View *view, Model *model, View *parent_view )
 		G_CALLBACK( view_model_child_add ), view );
 	view->child_remove_sid = g_signal_connect( model, "child_remove", 
 		G_CALLBACK( view_model_child_remove ), view );
-	view->reparent_sid = g_signal_connect( model, "reparent", 
-		G_CALLBACK( view_model_reparent ), view );
+	view->child_detach_sid = g_signal_connect( model, "child_detach", 
+		G_CALLBACK( view_model_child_detach ), view );
+	view->child_attach_sid = g_signal_connect( model, "child_attach", 
+		G_CALLBACK( view_model_child_attach ), view );
 
 	icontainer_map( ICONTAINER( model ),
 		(icontainer_map_fn) view_real_link_sub, view, NULL );
@@ -712,7 +737,8 @@ view_init( View *view )
 	view->front_sid = 0;
 	view->child_add_sid = 0;
 	view->child_remove_sid = 0;
-	view->reparent_sid = 0;
+	view->child_detach_sid = 0;
+	view->child_attach_sid = 0;
 
 	view->parent = NULL;
 

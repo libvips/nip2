@@ -62,6 +62,10 @@ struct _iContainer {
 	 * NULL if not relevant.
 	 */
 	iContainer *current;
+
+	/* Track the view here during reparent.
+	 */
+	View *temp_view;
 };
 
 typedef struct _iContainerClass {
@@ -81,7 +85,14 @@ typedef struct _iContainerClass {
 
 		current		make the current of parent
 
-		reparent	set new parent
+		child_detach	on old parent, unlink child
+		child_attach  	on new_paerent, link on child
+
+					there are used as a pair to do 
+					reparent -- the old parent gets a 
+					chance to detach in ::parent_detach, 
+					the new parent attaches in 
+					::child_attach
 
 	 */
 
@@ -91,7 +102,8 @@ typedef struct _iContainerClass {
 	void (*parent_add)( iContainer *child );
 	void (*parent_remove)( iContainer *child );
 	void (*current)( iContainer *parent, iContainer *child );
-	void (*reparent)( iContainer *parent, iContainer *child, int );
+	void (*child_detach)( iContainer *parent, iContainer *child );
+	void (*child_attach)( iContainer *parent, iContainer *child, int );
 } iContainerClass;
 
 typedef void *(*icontainer_map_fn)( iContainer *, 

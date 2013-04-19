@@ -42,7 +42,8 @@ enum {
 	SIG_CHILD_ADD,		/* iContainer is about to gain a child */
 	SIG_CHILD_REMOVE,	/* iContainer is about to loose a child */
 	SIG_CURRENT,		/* Make child current of parent */
-	SIG_REPARENT,		/* Set new parent */
+	SIG_CHILD_DETACH,	/* Used as a pair to do reparent */
+	SIG_CHILD_ATTACH,
 	SIG_LAST
 };
 
@@ -461,18 +462,31 @@ icontainer_current( iContainer *parent, iContainer *child )
 void 
 icontainer_reparent( iContainer *parent, iContainer *child, int pos )
 {
+	iContainer *old_parent = child->parent;
+
 	g_assert( parent );
 	g_assert( child );
 
 #ifdef DEBUG_SANITY
+	icontainer_sanity( old_parent );
 	icontainer_sanity( parent );
 	icontainer_sanity( child );
 #endif /*DEBUG_SANITY*/
 
+	/* These must always happen as a pair.
+	 */
+	g_signal_emit( G_OBJECT( old_parent ), 
+		icontainer_signals[SIG_CHILD_DETACH], 0, child );
 	g_signal_emit( G_OBJECT( parent ), 
-		icontainer_signals[SIG_REPARENT], 0, child );
+		icontainer_signals[SIG_CHILD_ATTACH], 0, child, pos );
+
+        icontainer_pos_renumber( parent );
+	iobject_changed( IOBJECT( parent ) );
+	iobject_changed( IOBJECT( old_parent ) );
+	iobject_changed( IOBJECT( child ) );
 
 #ifdef DEBUG_SANITY
+	icontainer_sanity( old_parent );
 	icontainer_sanity( parent );
 	icontainer_sanity( child );
 #endif /*DEBUG_SANITY*/
@@ -693,39 +707,24 @@ icontainer_real_current( iContainer *parent, iContainer *child )
 }
 
 static void
-icontainer_real_reparent( iContainer *parent, iContainer *child, int pos )
+icontainer_real_child_detach( iContainer *parent, iContainer *child )
 {
-	iContainer *old_parent = child->parent; 
-
-        g_assert( IS_ICONTAINER( parent ) && IS_ICONTAINER( child ) );
+        g_assert( IS_ICONTAINER( parent ) ); 
+        g_assert( IS_ICONTAINER( child ) );
         g_assert( child->parent != NULL );
+	g_assert( ICONTAINER_IS_CHILD( parent, child ) );
 
-#ifdef DEBUG
-	printf( "icontainer_real_reparent:\n\tparent " );
-	iobject_print( IOBJECT( parent ) );
-	printf( "\tchild " );
-	iobject_print( IOBJECT( child ) );
-	printf( "\tpos = %d\n", pos );
-#endif /*DEBUG*/
+	icontainer_unlink( child ); 
+}
 
-	if( parent != old_parent ) {
-		icontainer_unlink( child ); 
-		icontainer_link( parent, child, pos ); 
+static void
+icontainer_real_child_attach( iContainer *parent, iContainer *child, int pos )
+{
+        g_assert( IS_ICONTAINER( parent ) ); 
+        g_assert( IS_ICONTAINER( child ) );
+        g_assert( child->parent == NULL );
 
-		/* parent and child have changed signalled below.
-		 */
-		iobject_changed( IOBJECT( old_parent ) );
-	}
-
-	/* Renumber to get all the pos set. 
-	 */
-        icontainer_pos_renumber( parent );
-	iobject_changed( IOBJECT( child ) );
-
-#ifdef DEBUG_VERBOSE
-        printf( "icontainer_real_reparent: " );
-	iobject_print( IOBJECT( parent ) );
-#endif /*DEBUG_VERBOSE*/
+	icontainer_link( parent, child, pos ); 
 }
 
 static void
@@ -747,7 +746,8 @@ icontainer_class_init( iContainerClass *class )
 	class->parent_add = icontainer_real_parent_add;
 	class->parent_remove = icontainer_real_parent_remove;
 	class->current = icontainer_real_current;
-	class->reparent = icontainer_real_reparent;
+	class->child_detach = icontainer_real_child_detach;
+	class->child_attach = icontainer_real_child_attach;
 
 	/* Create signals.
 	 */
@@ -758,6 +758,7 @@ icontainer_class_init( iContainerClass *class )
 		NULL, NULL,
 		g_cclosure_marshal_VOID__VOID,
 		G_TYPE_NONE, 0 );
+
 	icontainer_signals[SIG_CHILD_ADD] = g_signal_new( "child_add",
 		G_OBJECT_CLASS_TYPE( gobject_class ),
 		G_SIGNAL_RUN_FIRST,
@@ -766,6 +767,7 @@ icontainer_class_init( iContainerClass *class )
 		nip_VOID__OBJECT_INT,
 		G_TYPE_NONE, 2,
 		TYPE_ICONTAINER, GTK_TYPE_INT );
+
 	icontainer_signals[SIG_CHILD_REMOVE] = g_signal_new( "child_remove",
 		G_OBJECT_CLASS_TYPE( gobject_class ),
 		G_SIGNAL_RUN_LAST,
@@ -773,7 +775,8 @@ icontainer_class_init( iContainerClass *class )
 		NULL, NULL,
 		g_cclosure_marshal_VOID__POINTER,
 		G_TYPE_NONE, 1,
-		G_TYPE_POINTER );
+		TYPE_ICONTAINER );
+
 	icontainer_signals[SIG_CURRENT] = g_signal_new( "current",
 		G_OBJECT_CLASS_TYPE( gobject_class ),
 		G_SIGNAL_RUN_LAST,
@@ -781,11 +784,21 @@ icontainer_class_init( iContainerClass *class )
 		NULL, NULL,
 		g_cclosure_marshal_VOID__POINTER,
 		G_TYPE_NONE, 1,
-		G_TYPE_POINTER );
-	icontainer_signals[SIG_REPARENT] = g_signal_new( "reparent",
+		TYPE_ICONTAINER );
+
+	icontainer_signals[SIG_CHILD_DETACH] = g_signal_new( "child_detach",
+		G_OBJECT_CLASS_TYPE( gobject_class ),
+		G_SIGNAL_RUN_LAST,
+		G_STRUCT_OFFSET( iContainerClass, child_detach ),
+		NULL, NULL,
+		g_cclosure_marshal_VOID__POINTER,
+		G_TYPE_NONE, 1,
+		TYPE_ICONTAINER );
+
+	icontainer_signals[SIG_CHILD_ATTACH] = g_signal_new( "child_attach",
 		G_OBJECT_CLASS_TYPE( gobject_class ),
 		G_SIGNAL_RUN_FIRST,
-		G_STRUCT_OFFSET( iContainerClass, reparent ),
+		G_STRUCT_OFFSET( iContainerClass, child_attach ),
 		NULL, NULL,
 		nip_VOID__OBJECT_INT,
 		G_TYPE_NONE, 2,

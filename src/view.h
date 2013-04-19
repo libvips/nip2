@@ -59,6 +59,7 @@ struct _View {
 	guint reset_sid;
 	guint child_add_sid;
 	guint child_remove_sid;
+	guint reparent_sid;
 
 	View *parent;			/* Enclosing view (if any) */
 	GSList *managed;		/* List of ViewChild for us */

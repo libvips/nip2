@@ -1,3 +1,52 @@
+- ::reparent should be called ::new_parent and shoyuld be a signal on the
+  child
+
+  that way the child view can get to move the viewchild to the new place
+
+  argh then we can't get the new parent_view
+
+  split the signal in two: signal on new parent, signal on old parent
+
+
+
+
+
+- this gets called on the new parent view:
+
+static void
+view_model_reparent( iContainer *new_parent, iContainer *child, int pos, 
+	View *new_parent_view )
+
+  but we need to get the viewchild off the old parent view, how do we find
+  that?
+
+  need two reparent signals, one on the old parent and one on the new
+
+  ::unparent on the old parent needs to remove the old viewchild
+
+  ::parent on the new parent needs to make a new viewchild
+
+
+- View and ViewChild need to update on _reparent()
+
+  _reparent() is signalled on the new parent, so:
+
+  old_wsg		old_wsgview
+  			  viewchild
+   ws			    wsview
+
+
+  new_wsg		new_wsgview
+
+
+  new_wsgview needs to watch "reparent" on new_wsg
+
+  wsview can stay watching ws
+
+  we need to move viewchild over to new_wsgview
+
+
+
 - need a reparent() method on container
 
   if we remove/add, the remove will destroy our view, which we don't want

@@ -128,8 +128,8 @@ static void
 mainw_finalize( GObject *gobject )
 {
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "mainw_finalize: %p\n", gobject );
+#endif /*DEBUG*/
 
 	g_return_if_fail( gobject != NULL );
 	g_return_if_fail( IS_MAINW( gobject ) );
@@ -148,8 +148,8 @@ mainw_dispose( GObject *object )
 	mainw = MAINW( object );
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "mainw_dispose\n" );
+#endif /*DEBUG*/
 
 	IM_FREEF( g_source_remove, mainw->refresh_timeout );
 
@@ -422,8 +422,8 @@ mainw_refresh_timeout_cb( gpointer user_data )
 	Workspace *ws;
 
 #ifdef DEBUG
-	printf( "mainw_refresh_timeout_cb: %p\n", mainw );
 #endif /*DEBUG*/
+	printf( "mainw_refresh_timeout_cb: %p\n", mainw );
 
 	mainw_status_update( mainw );
 	mainw_free_update( mainw );
@@ -471,8 +471,12 @@ mainw_refresh_timeout_cb( gpointer user_data )
 		workspace_jump_update( ws, mainw->jump_to_column_menu );
 
 		if( mainw->kitg != ws->kitg ) {
+			printf( "mainw_refresh_timeout_cb: unreffing old "
+					"kitgview\n" ); 
 			UNREF( mainw->kitgview );
 
+			printf( "mainw_refresh_timeout_cb: building new "
+					"kitgview\n" ); 
 			mainw->kitgview = TOOLKITGROUPVIEW( 
 				model_view_new( MODEL( ws->kitg ), NULL ) );
 			g_object_ref( G_OBJECT( mainw->kitgview ) );

@@ -39,8 +39,8 @@ static void
 toolkitgroupview_finalize( GObject *gobject )
 {
 #ifdef DEBUG
-	printf( "toolkitgroupview_finalize: %p\n", gobject );
 #endif /*DEBUG*/
+	printf( "toolkitgroupview_finalize: %p\n", gobject );
 
 	G_OBJECT_CLASS( parent_class )->finalize( gobject );
 }

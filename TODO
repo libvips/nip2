@@ -1,3 +1,15 @@
+- try:
+
+	./nip2 ~/Desktop/test.ws ../share/nip2/data/examples/logo/logo2.ws 
+
+  then drag logo2 tab to test.ws
+
+  every time we swicth tabs and rebuild the toolkitmenu, it grows
+
+  the top set of itenms are the valid ones, the lower ones cause a segv
+
+  we don't seem to be removing old items in toolkitview_destroy()
+
 - get this sometimes on shutdown?
 
 (nip2:11768): GLib-GObject-WARNING **: invalid uninstantiatable type `(null)'

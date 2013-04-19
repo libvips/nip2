@@ -237,7 +237,6 @@ workspacegroupview_page_removed_cb( GtkNotebook *notebook,
 	Workspacegroup *wsg = WORKSPACEGROUP( VOBJECT( wsgview )->iobject );
 
 	/*
-	 */
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
 
 	if( wsg ) 
@@ -245,6 +244,7 @@ workspacegroupview_page_removed_cb( GtkNotebook *notebook,
 			"wsg = %s, ws = %s\n",
 			NN( IOBJECT( wsg )->name ), 
 			NN( IOBJECT( ws )->name ) ); 
+	 */
 }
 
 static void                
@@ -260,9 +260,9 @@ workspacegroupview_page_added_cb( GtkNotebook *notebook,
 	Mainw *mainw = MAINW( iwindow_get_root( GTK_WIDGET( notebook ) ) );
 
 	/*
-	 */
 	printf( "workspacegroupview_page_added_cb: wsg = %s, ws = %s\n",
 		NN( IOBJECT( wsg )->name ), NN( IOBJECT( ws )->name ) ); 
+	 */
 
 	filemodel_set_window_hint( FILEMODEL( wsg ), IWINDOW( mainw ) );
 }

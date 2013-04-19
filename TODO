@@ -1,17 +1,6 @@
-
-- get this sometimes on shutdown?
-
-(nip2:11768): GLib-GObject-WARNING **: invalid uninstantiatable type `(null)'
-in cast to `Workspace'
-
-- test new compat stuff
-
-  test for warning on merge incompatible ws
-
-  check that we set version numbers correctly on load, save and load again of
-  incompatible workspaces
-
 - workspacegroupview_reorder_tab_cb() is never called?
+
+  when should we update pos from tab order?
 
 - double-click on tab gutter to make new tab, right-buttn menu with new tab
   item
@@ -22,6 +11,8 @@ in cast to `Workspace'
 - test file drop on mainw, esp. workspaces
 
 - leaktest
+
+- get rid of the invisible top-level window? shows up on gnome-shell
 
 
 

@@ -99,13 +99,14 @@ gboolean
 model_loadstate_rename_new( ModelLoadState *state, 
 	const char *old_name, const char *new_name )
 {
-	if( strcmp( old_name, new_name ) != 0 ) { 
-		ModelRename *rename;
+	/* Make a rename, even if old_name == new_name, since we want to have
+	 * new_name on the taken list.
+	 */
+	ModelRename *rename;
 
-		if( !(rename = model_rename_new( old_name, new_name )) )
-			return( FALSE );
-		state->renames = g_slist_prepend( state->renames, rename );
-	}
+	if( !(rename = model_rename_new( old_name, new_name )) )
+		return( FALSE );
+	state->renames = g_slist_prepend( state->renames, rename );
 
 	return( TRUE );
 }
@@ -124,8 +125,9 @@ model_loadstate_taken_sub( ModelRename *rename, const char *name )
 gboolean
 model_loadstate_taken( ModelLoadState *state, const char *name )
 {
-	return( !!slist_map( state->renames, 
-		(SListMapFn) model_loadstate_taken_sub, (char *) name ) );
+	return( slist_map( state->renames, 
+		(SListMapFn) model_loadstate_taken_sub, (char *) name ) != 
+		NULL ); 
 }
 
 gboolean

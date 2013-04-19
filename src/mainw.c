@@ -1508,7 +1508,7 @@ static GtkActionEntry mainw_actions[] = {
 		G_CALLBACK( mainw_duplicate_action_cb ) },
 
 	{ "Merge", 
-		NULL, N_( "_Merge Workspace" ), NULL, 
+		NULL, N_( "_Merge Into Workspace" ), NULL, 
 		N_( "Merge workspace into this workspace" ), 
 		G_CALLBACK( mainw_workspace_merge_action_cb ) },
 

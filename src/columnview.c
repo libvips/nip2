@@ -956,7 +956,7 @@ columnview_class_init( ColumnviewClass *class )
 		POPUP_FUNC( columnview_select_cb ) );
 	popup_add_but( pane, STOCK_DUPLICATE,
 		POPUP_FUNC( columnview_clone_cb ) );
-	popup_add_but( pane, _( "Merge" ),
+	popup_add_but( pane, _( "Merge Into Column" ),
 		POPUP_FUNC( columnview_merge_cb ) );
 	popup_add_but( pane, GTK_STOCK_SAVE_AS,
 		POPUP_FUNC( columnview_save_as_cb ) );

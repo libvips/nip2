@@ -280,14 +280,18 @@ workspacegroupview_create_window_cb( GtkNotebook *notebook,
 	Workspacegroup *new_wsg;
 	char name[256];
 
+	/*
 	printf( "workspacegroupview_create_window_cb: wsg = %s, ws = %s\n",
 		NN( IOBJECT( wsg )->name ), NN( IOBJECT( ws )->name ) ); 
 	printf( "workspacegroupview_create_window_cb: x = %d, y = %d\n", x, y );
+	 */
 
 	workspaceroot_name_new( wsr, name );
 	new_wsg = workspacegroup_new( wsr );
 
+	/*
 	printf( "workspacegroupview_create_window_cb: new wsg = %s\n", name );
+	 */
 
 	iobject_set( IOBJECT( new_wsg ), name, NULL );
 	new_mainw = mainw_new( new_wsg );
@@ -564,7 +568,7 @@ workspacegroupview_init( Workspacegroupview *wsgview )
 		POPUP_FUNC( workspacegroupview_select_all_cb ) ); 
 	popup_add_but( wsgview->tab_menu, STOCK_DUPLICATE,
 		POPUP_FUNC( workspacegroupview_duplicate_cb ) ); 
-	popup_add_but( wsgview->tab_menu, _( "Merge" ),
+	popup_add_but( wsgview->tab_menu, _( "Merge Into Tab" ),
 		POPUP_FUNC( workspacegroupview_merge_cb ) ); 
 	popup_add_but( wsgview->tab_menu, GTK_STOCK_SAVE_AS,
 		POPUP_FUNC( workspacegroupview_save_as_cb ) ); 

@@ -314,8 +314,10 @@ workspacegroup_rename_row_node( Workspace *ws,
 	(void) set_sprop( xrow, "name", new_name );
 	(void) model_loadstate_rename_new( state, old_name, new_name );
 
-	printf( "workspacegroup_rename_row_node: renamed %s as %s\n",
-		old_name, new_name );
+#ifdef DEBUG
+	printf( "workspacegroup_rename_row_node: renaming "
+		"'%s' to '%s'\n", old_name, new_name );
+#endif
 }
 
 /* Rename column if there's one of that name in workspace. 
@@ -337,9 +339,9 @@ workspacegroup_rename_column_node( Workspacegroup *wsg,
 
 	if( strcmp( name, new_name ) != 0 ) { 
 #ifdef DEBUG
-#endif /*DEBUG*/
 		printf( "workspace_rename_column_node: renaming column "
 			"%s to %s\n", name, new_name );
+#endif /*DEBUG*/
 
 		(void) set_sprop( xcol, "name", new_name );
 		(void) model_loadstate_column_rename_new( state, 

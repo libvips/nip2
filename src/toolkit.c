@@ -56,11 +56,6 @@ toolkit_dispose( GObject *gobject )
 	printf( "toolkit_dispose %s\n", IOBJECT( kit )->name );
 #endif /*DEBUG*/
 
-	/* Kill all the symbols we contain.
-	 */
-	icontainer_map( ICONTAINER( kit ),
-		(icontainer_map_fn) icontainer_child_remove, NULL, NULL );
-
 	G_OBJECT_CLASS( parent_class )->dispose( gobject );
 }
 

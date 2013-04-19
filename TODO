@@ -1,23 +1,8 @@
-- try:
-
-	./nip2 ~/Desktop/test.ws ../share/nip2/data/examples/logo/logo2.ws 
-
-  then drag logo2 tab to test.ws
-
-  every time we swicth tabs and rebuild the toolkitmenu, it grows
-
-  the top set of itenms are the valid ones, the lower ones cause a segv
-
-  we don't seem to be removing old items in toolkitview_destroy()
 
 - get this sometimes on shutdown?
 
 (nip2:11768): GLib-GObject-WARNING **: invalid uninstantiatable type `(null)'
 in cast to `Workspace'
-
-- drag tab to desktop puts window in wrong place?
-
-  could just be the WM on my desktop PC, try at home
 
 - test new compat stuff
 
@@ -25,10 +10,6 @@ in cast to `Workspace'
 
   check that we set version numbers correctly on load, save and load again of
   incompatible workspaces
-
-  check toolkit menu switching
-
-  check toolkit menu switching after dragging tabs between workspaces
 
 - workspacegroupview_reorder_tab_cb() is never called?
 

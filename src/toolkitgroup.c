@@ -42,6 +42,24 @@ toolkitgroup_map( Toolkitgroup *kitg, toolkit_map_fn fn, void *a, void *b )
 		(icontainer_map_fn) fn, a, b ) );
 }
 
+static void 
+toolkitgroup_dispose( GObject *gobject )
+{
+	Toolkitgroup *kitg;
+
+	g_return_if_fail( gobject != NULL );
+	g_return_if_fail( IS_TOOLKITGROUP( gobject ) );
+
+	kitg = TOOLKITGROUP( gobject );
+
+#ifdef DEBUG
+	printf( "toolkitgroup_dispose: " ); 
+	iobject_print( IOBJECT( gobject ) );
+#endif /*DEBUG*/
+
+	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+}
+
 static void
 toolkitgroup_changed( iObject *iobject )
 {
@@ -62,6 +80,7 @@ toolkitgroup_view_new( Model *model, View *parent )
 static void
 toolkitgroup_class_init( ToolkitgroupClass *class )
 {
+	GObjectClass *gobject_class = (GObjectClass *) class;
 	iObjectClass *iobject_class = (iObjectClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 
@@ -72,6 +91,7 @@ toolkitgroup_class_init( ToolkitgroupClass *class )
 
 	/* Init methods.
 	 */
+	gobject_class->dispose = toolkitgroup_dispose;
 
 	iobject_class->changed = toolkitgroup_changed;
 

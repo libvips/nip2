@@ -799,6 +799,7 @@ typedef struct {
 	iDialog *idlg;		/* The yesno we run */
 	Model *model;		/* The model we watch */
 	guint destroy_sid;	/* sid for the destroy */
+	iWindowFn done_cb;	/* Call this at the end */
 } ModelCheckDestroy;
 
 /* OK to destroy.
@@ -813,7 +814,7 @@ model_check_destroy_sub( iWindow *iwnd, void *client,
 	IDESTROY( mcd->model );
 	symbol_recalculate_all();
 
-	nfn( sys, IWINDOW_YES );
+	mcd->done_cb( iwnd, NULL, nfn, sys );
 }
 
 /* The model we are watching has been killed, maybe by us.
@@ -848,7 +849,7 @@ model_check_destroy_finished( void *client, iWindowResult result )
 }
 
 void
-model_check_destroy( GtkWidget *parent, Model *model )
+model_check_destroy( GtkWidget *parent, Model *model, iWindowFn done_cb )
 {
 	char txt[30];
 	VipsBuf buf = VIPS_BUF_STATIC( txt );
@@ -858,6 +859,7 @@ model_check_destroy( GtkWidget *parent, Model *model )
 
 	mcd->idlg = NULL;
 	mcd->model = model;
+	mcd->done_cb = done_cb ? done_cb : iwindow_true_cb;
 
 	if( IS_SYMBOL( model ) ) {
 		symbol_qualified_name( SYMBOL( model ), &buf );

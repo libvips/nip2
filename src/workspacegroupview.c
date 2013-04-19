@@ -188,31 +188,23 @@ static void
 workspacegroupview_switch_page_cb( GtkNotebook *notebook, 
 	GtkWidget *page, guint page_num, gpointer user_data )
 {
-	static int level = 0;
-
 	Workspaceview *wview = WORKSPACEVIEW( page );
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+	Workspacegroup *old_wsg = WORKSPACEGROUP( ICONTAINER( ws )->parent );
 	Workspacegroupview *wsgview = WORKSPACEGROUPVIEW( user_data );
 	Workspacegroup *wsg = WORKSPACEGROUP( VOBJECT( wsgview )->iobject );
 
-	int this_level;
-
-	this_level = level;
-	level += 1;
-
-	printf( "workspacegroupview_switch_page_cb: %d wsg = %s, ws = %s\n",
-		this_level,
-		NN( IOBJECT( wsg )->name ), NN( IOBJECT( ws )->name ) ); 
-
 	if( ICONTAINER( ws )->parent != ICONTAINER( wsg ) ) {
-		printf( "workspacegroupview_switch_page_cb: %d moving tab\n",
-			this_level ); 
-
 		icontainer_reparent( ICONTAINER( wsg ), 
 			ICONTAINER( ws ), -1 );
 
-		printf( "workspacegroupview_switch_page_cb: %d tab move done\n",
-			this_level ); 
+		filemodel_set_modified( FILEMODEL( wsg ), TRUE );
+		filemodel_set_modified( FILEMODEL( old_wsg ), TRUE );
+
+		/* If dragging the tab has emptied the old wsg, we can junk
+		 * the window.
+		 */
+		mainw_cull();
 	}
 
 	icontainer_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
@@ -234,11 +226,6 @@ workspacegroupview_switch_page_cb( GtkNotebook *notebook,
 	if( wview &&
 		wview->fixed ) 
 		gtk_container_check_resize( GTK_CONTAINER( wview->fixed ) );
-
-	printf( "workspacegroupview_switch_page_cb: %d all done\n",
-		this_level );
-
-	level -= 1;
 }
 
 static void                
@@ -505,13 +492,25 @@ workspacegroupview_save_as_cb( GtkWidget *wid, GtkWidget *host,
 	gtk_widget_show( GTK_WIDGET( filesel ) );
 }
 
+/* ws has been destroyed. 
+ */
+static void
+workspacegroupview_delete_done_cb( iWindow *iwnd, void *client, 
+	iWindowNotifyFn nfn, void *sys )
+{
+	mainw_cull();
+
+	nfn( sys, IWINDOW_YES );
+}
+
 static void                
 workspacegroupview_delete_cb( GtkWidget *wid, GtkWidget *host, 
 	Workspaceview *wview )
 {
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
 
-	model_check_destroy( view_get_toplevel( VIEW( wview ) ), MODEL( ws ) );
+	model_check_destroy( view_get_toplevel( VIEW( wview ) ), 
+		MODEL( ws ), workspacegroupview_delete_done_cb );
 }
 
 static void

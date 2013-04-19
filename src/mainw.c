@@ -1965,3 +1965,20 @@ mainw_new( Workspacegroup *wsg )
 	return( mainw );
 }
 
+static void *
+mainw_cull_sub( Mainw *mainw )
+{
+	if( !ICONTAINER( mainw->wsg )->children ) {
+		filemodel_set_modified( FILEMODEL( mainw->wsg ), FALSE );
+		iwindow_kill( IWINDOW( mainw ) );
+	}
+
+	return( NULL );
+}
+
+void
+mainw_cull( void )
+{
+	slist_map( mainw_all,
+		(SListMapFn) mainw_cull_sub, NULL );
+}

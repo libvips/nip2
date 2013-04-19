@@ -7,11 +7,6 @@ in cast to `Workspace'
 
   could just be the WM on my desktop PC, try at home
 
-- we really do need a close-mainw-on-no-ws thing
-
-  can't put this in at a low level, must happen at the top level in response
-  to some specific user action, eg. on clicking "YES" on "close tab" dialog
-
 - test new compat stuff
 
   test for warning on merge incompatible ws

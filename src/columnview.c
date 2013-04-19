@@ -635,7 +635,8 @@ columnview_destroy_cb( GtkWidget *wid, GtkWidget *host, Columnview *cview )
 {
 	Column *col = COLUMN( VOBJECT( cview )->iobject );
 
-	model_check_destroy( view_get_toplevel( VIEW( cview ) ), MODEL( col ) );
+	model_check_destroy( view_get_toplevel( VIEW( cview ) ), 
+		MODEL( col ), NULL );
 }
 
 /* Delete this column with a click on the 'x' button.
@@ -645,7 +646,8 @@ columnview_destroy2_cb( GtkWidget *wid, Columnview *cview )
 {
 	Column *col = COLUMN( VOBJECT( cview )->iobject );
 
-	model_check_destroy( view_get_toplevel( VIEW( cview ) ), MODEL( col ) );
+	model_check_destroy( view_get_toplevel( VIEW( cview ) ), 
+		MODEL( col ), NULL );
 }
 
 /* Callback for enter in caption edit box.

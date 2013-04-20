@@ -1752,22 +1752,9 @@ workspace_selected_save( Workspace *ws, const char *filename )
 gboolean
 workspace_rename( Workspace *ws, const char *name, const char *caption )
 {
-	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
-
 	if( !symbol_rename( ws->sym, name ) )
 		return( FALSE );
-
-	g_object_ref( ws );
-
-	icontainer_child_remove( ICONTAINER( ws ) );
 	iobject_set( IOBJECT( ws ), IOBJECT( ws->sym )->name, caption );
-	icontainer_child_add( ICONTAINER( wsg ), ICONTAINER( ws ),
-		ICONTAINER( ws )->pos );
-
-	g_object_unref( ws );
-
-	// do we need this? unclear
-	//iobject_changed( IOBJECT( wsg ) );
 
 	return( TRUE );
 }

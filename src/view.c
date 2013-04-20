@@ -282,7 +282,8 @@ view_child_front( View *child )
 {
 	View *parent = child->parent;
 
-	VIEW_GET_CLASS( parent )->child_front( parent, child );
+	if( parent )
+		VIEW_GET_CLASS( parent )->child_front( parent, child );
 }
 
 /* Break link to model. 

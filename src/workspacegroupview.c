@@ -311,6 +311,7 @@ workspacegroupview_rename_sub( iWindow *iwnd, void *client,
 		nfn( sys, IWINDOW_ERROR );
 		return;
 	}
+
 	model_front( MODEL( ws ) );
 
 	nfn( sys, IWINDOW_YES );

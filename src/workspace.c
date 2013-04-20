@@ -33,14 +33,34 @@
 
 #include "ip.h"
 
-static FilemodelClass *parent_class = NULL;
+static ModelClass *parent_class = NULL;
 
 static GSList *workspace_all = NULL;
+
+Workspacegroup *
+workspace_get_workspacegroup( Workspace *ws )
+{
+	iContainer *parent; 
+
+	if( (parent = ICONTAINER( ws )->parent) )
+		return( WORKSPACEGROUP( parent ) );
+
+	return( NULL );
+}
 
 Workspaceroot *
 workspace_get_workspaceroot( Workspace *ws )
 {
-	return( WORKSPACEROOT( ICONTAINER( ws )->parent ) );
+	return( workspace_get_workspacegroup( ws )->wsr );
+}
+
+void
+workspace_set_modified( Workspace *ws, gboolean modified )
+{
+	Workspacegroup *wsg;
+
+	if( (wsg = workspace_get_workspacegroup( ws )) )
+		filemodel_set_modified( FILEMODEL( wsg ), modified );
 }
 
 /* Over all workspaces.
@@ -310,40 +330,31 @@ workspace_column_get( Workspace *ws, const char *name )
 	return( column_new( ws, name ) );
 }
 
-/* Make up a new column name. Check for not already in workspace, and not in 
- * xml file (if columns non-NULL).
+/* Make up a new column name. Check for not already in workspace.
  */
-char *
-workspace_column_name_new( Workspace *ws, xmlNode *columns )
+void
+workspace_column_name_new( Workspace *ws, char *name )
 {
-	char buf[256];
+	do {
+		number_to_string( ws->next++, name );
+	} while( workspace_column_find( ws, name ) );
+}
 
-	/* Search for one not in use.
-	 */
-	for(;;) {
-		number_to_string( ws->next++, buf );
+Column *
+workspace_get_column( Workspace *ws )
+{
+	if( ICONTAINER( ws )->current )
+		return( COLUMN( ICONTAINER( ws )->current ) );
 
-		if( workspace_column_find( ws, buf ) ) 
-			continue;
-		if( columns ) {
-			xmlNode *i;
+	return( NULL );
+}
 
-			for( i = columns; i; i = i->next ) {
-				char name[MAX_STRSIZE];
-
-				if( strcmp( (char *) i->name, "Column" ) == 0 &&
-					get_sprop( i, "name", 
-						name, MAX_STRSIZE ) )
-					if( strcmp( name, buf ) == 0 )
-						break;
-			}
-
-			if( i )
-				continue;
-		}
-
-		return( im_strdup( NULL, buf ) );
-	}
+/* Select a column. Can select NULL for no current col in this ws.
+ */
+void
+workspace_column_select( Workspace *ws, Column *col )
+{
+	icontainer_current( ICONTAINER( ws ), ICONTAINER( col ) ); 
 }
 
 /* Make sure we have a column selected ... pick one of the existing columns; if 
@@ -354,13 +365,11 @@ workspace_column_pick( Workspace *ws )
 {
 	Column *col;
 
-	if( ws->current )
-		return( ws->current );
-
-	if( ICONTAINER( ws )->children ) {
-		col = COLUMN( ICONTAINER( ws )->children->data );
-		workspace_column_select( ws, col );
-
+	if( (col = workspace_get_column( ws )) )
+		return( col );
+	if( (col = COLUMN( icontainer_get_nth_child( 
+		ICONTAINER( ws ), 0 ) )) ) {
+		workspace_column_select( ws, col ); 
 		return( col );
 	}
 
@@ -374,27 +383,20 @@ workspace_column_pick( Workspace *ws )
 	return( col );
 }
 
-/* Select a column. Can select NULL for no current col in this ws.
+/* Make and select a column.
  */
-void
-workspace_column_select( Workspace *ws, Column *col )
+gboolean
+workspace_column_new( Workspace *ws )
 {
-	g_assert( !col || ICONTAINER_IS_CHILD( ws, col ) ); 
+	char new_name[MAX_STRSIZE];
+	Column *col;
 
-	if( col && col == ws->current )
-		return;
+	workspace_column_name_new( ws, new_name );
+	if( !(col = column_new( ws, new_name )) ) 
+		return( FALSE );
+	workspace_column_select( ws, col );
 
-	if( ws->current ) {
-		ws->current->selected = FALSE;
-		iobject_changed( IOBJECT( ws->current ) );
-	}
-
-	ws->current = col;
-
-	if( col ) {
-		col->selected = TRUE;
-		iobject_changed( IOBJECT( col ) );
-	}
+	return( TRUE );
 }
 
 /* Make a new symbol, part of the current column.
@@ -466,7 +468,7 @@ workspace_add_def( Workspace *ws, const char *str )
 	if( !sym->expr->row )
 		(void) row_new( col->scol, sym, &sym->expr->root );
 	symbol_made( sym );
-	filemodel_set_modified( FILEMODEL( ws ), TRUE );
+	workspace_set_modified( ws, TRUE );
 
 	return( sym );
 }
@@ -541,288 +543,6 @@ workspace_load_file( Workspace *ws, const char *filename )
 	return( sym );
 }
 
-/* Bounding box of columns to be saved. Though we only really set top/left.
- */
-static void *
-workspace_selected_save_box( Column *col, Rect *box )
-{
-	if( model_save_test( MODEL( col ) ) ) {
-		if( im_rect_isempty( box ) ) {
-			box->left = col->x;
-			box->top = col->y;
-			box->width = 100;
-			box->height = 100;
-		}
-		else {
-			box->left = IM_MIN( box->left, col->x );
-			box->top = IM_MIN( box->top, col->y );
-		}
-	}
-
-	return( NULL );
-}
-
-/* Save just the selected objects.
- */
-gboolean
-workspace_selected_save( Workspace *ws, const char *filename )
-{
-	WorkspaceSaveType save = ws->save_type;
-	Rect box = { 0 };
-
-	ws->save_type = WORKSPACE_SAVE_SELECTED;
-
-	workspace_map_column( ws, 
-		(column_map_fn) workspace_selected_save_box, &box );
-	filemodel_set_offset( FILEMODEL( ws ), box.left, box.top );
-
-	if( !filemodel_save_all( FILEMODEL( ws ), filename ) ) {
-		ws->save_type = save;
-		unlinkf( "%s", filename );
-
-		return( FALSE );
-	}
-	ws->save_type = save;
-
-	return( TRUE );
-}
-
-/* Clone all selected symbols.
- */
-gboolean 
-workspace_clone_selected( Workspace *ws )
-{
-	char filename[FILENAME_MAX];
-
-	/* Make a name for our clone file.
-	 */
-	if( !temp_name( filename, "ws" ) )
-		return( FALSE );
-
-	/* Save selected objects.
-	 */
-	if( !workspace_selected_save( ws, filename ) ) 
-		return( FALSE );
-
-	/* Try to load the clone file back again.
-	 */
-        progress_begin();
-	if( !workspace_merge_column_file( ws, 
-		filename, FILEMODEL( ws )->filename ) ) {
-		progress_end();
-		unlinkf( "%s", filename );
-
-		return( FALSE );
-	}
-	progress_end();
-	unlinkf( "%s", filename );
-
-	return( TRUE );
-}
-
-/* Keep the last WS_RETAIN workspaces as ipfl*.ws files.
- */
-#define WS_RETAIN (10)
-
-/* Array of names of workspace files we are keeping.
- */
-static char *retain_files[WS_RETAIN] = { NULL };
-
-/* The next one we allocate.
- */
-static int retain_next = 0;
-
-/* Save the workspace to one of our temp files.
- */
-static gboolean
-workspace_checkmark_timeout( Workspace *ws )
-{
-	ws->auto_save_timeout = 0;
-
-	if( !AUTO_WS_SAVE )
-		return( FALSE );
-
-	/* Don't backup auto loaded workspace (eg. preferences). These are
-	 * system things and don't need it.
-	 */
-	if( FILEMODEL( ws )->auto_load )
-		return( FALSE );
-
-	/* Do we have a name for this retain file?
-	 */
-	if( !retain_files[retain_next] ) {
-		char filename[FILENAME_MAX];
-
-		/* No name yet - make one up.
-		 */
-		if( !temp_name( filename, "ws" ) )
-			return( FALSE );
-		retain_files[retain_next] = im_strdup( NULL, filename );
-	}
- 
-	if( !filemodel_save_all( FILEMODEL( ws ), retain_files[retain_next] ) )
-		return( FALSE );
-
-	retain_next = (retain_next + 1) % WS_RETAIN;
-
-	return( FALSE );
-}
-
-/* Save the workspace to one of our temp files. Don't save directly (pretty
- * slow), instead set a timeout and save when we're quiet for >1s.
- */
-static void
-workspace_checkmark( Workspace *ws )
-{
-	if( !AUTO_WS_SAVE )
-		return;
-	if( FILEMODEL( ws )->auto_load )
-		return;
-
-	IM_FREEF( g_source_remove, ws->auto_save_timeout );
-	ws->auto_save_timeout = g_timeout_add( 1000, 
-		(GSourceFunc) workspace_checkmark_timeout, ws );
-}
-
-/* On safe exit, remove all ws checkmarks.
- */
-void
-workspace_retain_clean( void )
-{
-	int i;
-
-	for( i = 0; i < WS_RETAIN; i++ ) {
-		if( retain_files[i] ) {
-			unlinkf( "%s", retain_files[i] );
-			IM_FREE( retain_files[i] );
-		}
-	}
-}
-
-/* Track best-so-far file date here during search.
- */
-static time_t date_sofar;
-
-/* This file any better than the previous best candidate? Subfn of below.
- */
-static char *
-workspace_test_file( char *name, char *name_sofar )
-{
-	char buf[FILENAME_MAX];
-	struct stat st;
-	int i;
-
-	im_strncpy( buf, name, FILENAME_MAX );
-	path_expand( buf );
-	for( i = 0; i < WS_RETAIN; i++ )
-		if( retain_files[i] && 
-			strcmp( buf, retain_files[i] ) == 0 )
-			return( NULL );
-	if( stat( buf, &st ) == -1 )
-		return( NULL );
-#ifdef HAVE_GETEUID
-	if( st.st_uid != geteuid() )
-		return( NULL );
-#endif /*HAVE_GETEUID*/
-	if( st.st_size == 0 )
-		return( NULL );
-	if( date_sofar > 0 && st.st_mtime < date_sofar )
-		return( NULL );
-	
-	strcpy( name_sofar, name );
-	date_sofar = st.st_mtime;
-
-	return( NULL );
-}
-
-/* Load a workspace, called from a yesno dialog.
- */
-static void
-workspace_auto_recover_load( iWindow *iwnd, 
-	void *client, iWindowNotifyFn nfn, void *sys )
-{
-	char *filename = (char *) client;
-	Mainw *mainw = MAINW( iwindow_get_root_noparent( GTK_WIDGET( iwnd ) ) );
-	Workspace *ws;
-
-	/* Load ws file.
-	 */
-        progress_begin();
-	ws = mainw_open_workspace( mainw, filename, TRUE, TRUE );
-	progress_end();
-
-	if( ws ) {
-		/* The filename will be something like
-		 * "~/.nip2-7.9.6/tmp/untitled-nip2-0-3904875.ws", very
-		 * unhelpful.
-		 */
-		IM_FREE( FILEMODEL( ws )->filename );
-		iobject_changed( IOBJECT( ws ) );
-
-		nfn( sys, IWINDOW_YES );
-	}
-	else
-		nfn( sys, IWINDOW_ERROR );
-}
-
-/* Do an auto-recover ... search for and load the most recent "ipfl*.ws" file 
- * in the tmp area owned by us, with a size > 0, that's not in our
- * retain_files[] set.
- */
-void
-workspace_auto_recover( Mainw *mainw )
-{
-	char *p;
-	char *name;
-	char buf[FILENAME_MAX];
-	char buf2[FILENAME_MAX];
-
-	/* Find the dir we are saving temp files to.
-	 */
-	if( !temp_name( buf, "ws" ) ) {
-		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
-		return;
-	}
-
-	if( (p = strrchr( buf, G_DIR_SEPARATOR )) )
-		*p = '\0';
-
-	date_sofar = -1;
-	(void) path_map_dir( buf, "*.ws", 
-		(path_map_fn) workspace_test_file, buf2 );
-	if( date_sofar == -1 ) {
-		if( !AUTO_WS_SAVE ) {
-			error_top( _( "No backup workspaces found." ) );
-			error_sub( "%s", 
-				_( "You need to enable \"Auto workspace "
-				"save\" in Preferences "
-				"before automatic recovery works." ) );
-			iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
-		}
-		else {
-			error_top( _( "No backup workspaces found." ) );
-			error_sub( _( "No suitable workspace save files found "
-				"in \"%s\"" ), buf );
-			iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
-		}
-
-		return;
-	}
-
-	/* Tricksy ... free str with notify callack from yesno.
-	 */
-	name = im_strdupn( buf2 );
-
-	box_yesno( GTK_WIDGET( mainw ), 
-		workspace_auto_recover_load, iwindow_true_cb, name, 
-		(iWindowNotifyFn) im_free, name,
-		GTK_STOCK_OPEN, 
-		_( "Open workspace backup?" ),
-		_( "Found workspace \"%s\", dated %s. "
-		"Do you want to recover this workspace?" ),
-		name, ctime( &date_sofar ) );
-}
-
 static void
 workspace_dispose( GObject *gobject )
 {
@@ -837,7 +557,6 @@ workspace_dispose( GObject *gobject )
 
 	ws = WORKSPACE( gobject );
 
-	IM_FREEF( g_source_remove, ws->auto_save_timeout );
 	UNREF( ws->kitg );
 	UNREF( ws->local_kitg );
 	IDESTROY( ws->sym );
@@ -868,6 +587,31 @@ workspace_finalize( GObject *gobject )
 }
 
 static void
+workspace_changed( iObject *iobject )
+{
+	Workspace *ws;
+	Workspacegroup *wsg;
+
+#ifdef DEBUG
+	printf( "workspace_changed: %s\n", NN( iobject->name ) );
+#endif /*DEBUG*/
+
+	g_return_if_fail( iobject != NULL );
+	g_return_if_fail( IS_WORKSPACE( iobject ) );
+
+	ws = WORKSPACE( iobject );
+	wsg = workspace_get_workspacegroup( ws );
+
+	/* Signal changed on our workspacegroup, if we're the current object.
+	 */
+	if( wsg &&
+		ICONTAINER( wsg )->current == ICONTAINER( iobject ) )
+		iobject_changed( IOBJECT( wsg ) );
+
+	IOBJECT_CLASS( parent_class )->changed( iobject );
+}
+
+static void
 workspace_child_add( iContainer *parent, iContainer *child, int pos )
 {
 	Workspace *ws = WORKSPACE( parent );
@@ -883,26 +627,36 @@ static void
 workspace_child_remove( iContainer *parent, iContainer *child )
 {
 	Workspace *ws = WORKSPACE( parent );
-	Column *col = COLUMN( child );
 
-	/* Will we remove the current column? If yes, make sure
-	 * current_column is NULL.
-	 */
-	if( ws->current == col )
-		workspace_column_select( ws, NULL );
-
-	filemodel_set_modified( FILEMODEL( ws ), TRUE );
+	workspace_set_modified( ws, TRUE );
 
 	ICONTAINER_CLASS( parent_class )->child_remove( parent, child );
 }
 
 static void
-workspace_link( Workspace *ws, Workspaceroot *wsr, const char *name )
+workspace_current( iContainer *parent, iContainer *child )
 {
+	Workspace *ws = WORKSPACE( parent );
+	Column *col = COLUMN( child );
+	Column *current = workspace_get_column( ws );
+
+	if( current )
+		current->selected = FALSE;
+	if( col )
+		col->selected = TRUE;
+
+	ICONTAINER_CLASS( parent_class )->current( parent, child );
+}
+
+static void
+workspace_link( Workspace *ws, Workspacegroup *wsg, const char *name )
+{
+	Workspaceroot *wsr = wsg->wsr;
+
 	Symbol *sym;
 
 #ifdef DEBUG
-	printf( "workspace_link: naming ws as %s\n", name );
+	printf( "workspace_link: naming ws %p as %s\n", ws, name );
 #endif /*DEBUG*/
 
 	sym = symbol_new_defining( wsr->sym->expr->compile, name );
@@ -965,7 +719,7 @@ workspace_load( Model *model,
 	char buf[FILENAME_MAX];
 	char *txt;
 
-	g_assert( IS_WORKSPACEROOT( parent ) );
+	g_assert( IS_WORKSPACEGROUP( parent ) );
 
 	/* "view" is optional, for backwards compatibility.
 	 */
@@ -983,9 +737,6 @@ workspace_load( Model *model,
 	 */
 	(void) get_dprop( xnode, "scale", &ws->scale );
 	(void) get_dprop( xnode, "offset", &ws->offset );
-
-	(void) get_iprop( xnode, "window_width", &ws->window_width );
-	(void) get_iprop( xnode, "window_height", &ws->window_height );
 
 	(void) get_bprop( xnode, "lpane_open", &ws->lpane_open );
 	(void) get_iprop( xnode, "lpane_position", &ws->lpane_position );
@@ -1006,6 +757,9 @@ workspace_load( Model *model,
 		IM_FREEF( xmlFree, txt );
 	}
 
+	(void) get_iprop( xnode, "major", &ws->compat_major );
+	(void) get_iprop( xnode, "minor", &ws->compat_minor );
+
 	if( !MODEL_CLASS( parent_class )->load( model, state, parent, xnode ) )
 		return( FALSE );
 
@@ -1016,6 +770,7 @@ static xmlNode *
 workspace_save( Model *model, xmlNode *xnode )
 {
 	Workspace *ws = WORKSPACE( model );
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 	xmlNode *xthis;
 
 	if( !(xthis = MODEL_CLASS( parent_class )->save( model, xnode )) )
@@ -1024,20 +779,28 @@ workspace_save( Model *model, xmlNode *xnode )
 	if( !set_sprop( xthis, "view", workspacemode_to_char( ws->mode ) ) ||
 		!set_dprop( xthis, "scale", ws->scale ) ||
 		!set_dprop( xthis, "offset", ws->offset ) ||
-		!set_prop( xthis, "window_width", "%d", ws->window_width ) ||
-		!set_prop( xthis, "window_height", "%d", ws->window_height ) ||
-		!set_prop( xthis, "lpane_position", "%d", 
-			ws->lpane_position ) ||
+		!set_iprop( xthis, "lpane_position", ws->lpane_position ) ||
 		!set_sprop( xthis, "lpane_open", 
 			bool_to_char( ws->lpane_open ) ) ||
-		!set_prop( xthis, "rpane_position", "%d", 
-			ws->rpane_position ) ||
+		!set_iprop( xthis, "rpane_position", ws->rpane_position ) ||
 		!set_sprop( xthis, "rpane_open", 
 			bool_to_char( ws->rpane_open ) ) ||
 		!set_sprop( xthis, "local_defs", ws->local_defs ) ||
 		!set_sprop( xthis, "name", IOBJECT( ws )->name ) ||
 		!set_sprop( xthis, "caption", IOBJECT( ws )->caption ) ) 
 		return( NULL );
+
+	/* We have to save our workspacegroup's filename here for compt with
+	 * older nip2.
+	 */
+	if( !set_sprop( xthis, "filename", FILEMODEL( wsg )->filename ) )
+		return( NULL );
+
+	if( ws->compat_major ) {
+		if( !set_iprop( xthis, "major", ws->compat_major ) ||
+			!set_iprop( xthis, "minor", ws->compat_minor ) )
+			return( NULL );
+	}
 
 	return( xthis );
 }
@@ -1055,62 +818,6 @@ workspace_empty( Model *model )
 	ws->area.height = 0;
 
 	MODEL_CLASS( parent_class )->empty( model );
-}
-
-static void
-workspace_rename_row_node( ModelLoadState *state, Column *col, xmlNode *xnode )
-{
-	char name[MAX_STRSIZE];
-
-	if( strcmp( (char *) xnode->name, "Row" ) == 0 &&
-		get_sprop( xnode, "name", name, MAX_STRSIZE ) ) {
-		char *new_name;
-
-		new_name = column_name_new( col );
-		(void) set_sprop( xnode, "name", new_name );
-		(void) model_loadstate_rename_new( state, name, new_name );
-		IM_FREE( new_name );
-	}
-}
-
-/* Rename column if there's one of that name in workspace. 
- */
-static void
-workspace_rename_column_node( Workspace *ws, 
-	ModelLoadState *state, xmlNode *xnode, xmlNode *columns )
-{
-	char name[MAX_STRSIZE];
-
-	if( strcmp( (char *) xnode->name, "Column" ) == 0 &&
-		get_sprop( xnode, "name", name, MAX_STRSIZE ) &&
-		icontainer_map( ICONTAINER( ws ), 
-			(icontainer_map_fn) iobject_test_name, name, NULL ) ) {
-		char *new_name;
-		Column *col;
-		xmlNode *i;
-
-		/* Exists already ... rename this column.
-		 */
-		new_name = workspace_column_name_new( ws, columns );
-		col = column_new( ws, new_name );
-
-#ifdef DEBUG
-		printf( "workspace_rename_column_node: renaming column "
-			"%s to %s\n", 
-			name, new_name );
-#endif /*DEBUG*/
-
-		(void) set_sprop( xnode, "name", new_name );
-		IM_FREE( new_name );
-
-		/* And allocate new names for all rows in the subcolumn.
-		 */
-		for( i = get_node( xnode, "Subcolumn" )->children; 
-			i; i = i->next ) 
-			workspace_rename_row_node( state, col, i );
-
-		IDESTROY( col );
-	}
 }
 
 static void *
@@ -1172,7 +879,7 @@ workspace_build_compat( void )
 /* Given a major/minor (eg. read from a ws header), return non-zero if we have 
  * a set of compat defs.
  */
-static int
+int
 workspace_have_compat( int major, int minor, int *best_major, int *best_minor )
 {
 	int i;
@@ -1213,7 +920,20 @@ workspace_have_compat( int major, int minor, int *best_major, int *best_minor )
 	return( 1 );
 }
 
-static gboolean
+void
+workspace_get_version( Workspace *ws, int *major, int *minor )
+{
+	if( ws->compat_major ) {
+		*major = ws->compat_major;
+		*minor = ws->compat_minor;
+	}
+	else {
+		*major = MAJOR_VERSION;
+		*minor = MINOR_VERSION;
+	}
+}
+
+gboolean
 workspace_load_compat( Workspace *ws, int major, int minor )
 {
 	char pathname[FILENAME_MAX];
@@ -1221,215 +941,46 @@ workspace_load_compat( Workspace *ws, int major, int minor )
 	int best_major;
 	int best_minor;
 
-	if( !workspace_have_compat( major, minor, &best_major, &best_minor ) )
-		return( TRUE );
+	if( workspace_have_compat( major, minor, &best_major, &best_minor ) ) {
+		/* Make a private toolkitgroup local to this workspace to 
+		 * hold the compatibility defs we are planning to load.
+		 */
+		UNREF( ws->kitg );
+		ws->kitg = toolkitgroup_new( ws->sym );
+		g_object_ref( G_OBJECT( ws->kitg ) );
+		iobject_sink( IOBJECT( ws->kitg ) );
 
-	/* Do we need broken region handling?
-	 */
-	if( major == 7 && minor == 8 ) 
-		ws->compat_78 = TRUE;
-
-	/* Make a private toolkitgroup local to this workspace to hold the
-	 * compatibility defs we are planning to load.
-	 */
-	UNREF( ws->kitg );
-	ws->kitg = toolkitgroup_new( ws->sym );
-	g_object_ref( G_OBJECT( ws->kitg ) );
-	iobject_sink( IOBJECT( ws->kitg ) );
-
-	im_snprintf( pathname, FILENAME_MAX, 
-		"$VIPSHOME/share/" PACKAGE "/compat/%d.%d", 
-		best_major, best_minor );
-	path = path_parse( pathname );
-	if( path_map( path, "*.def", 
-		(path_map_fn) workspace_load_toolkit, ws->kitg ) ) {
+		im_snprintf( pathname, FILENAME_MAX, 
+			"$VIPSHOME/share/" PACKAGE "/compat/%d.%d", 
+			best_major, best_minor );
+		path = path_parse( pathname );
+		if( path_map( path, "*.def", 
+			(path_map_fn) workspace_load_toolkit, ws->kitg ) ) {
+			path_free2( path );
+			return( FALSE );
+		}
 		path_free2( path );
-		return( FALSE );
-	}
-	path_free2( path );
 
-	ws->compat_major = best_major;
-	ws->compat_minor = best_minor;
+		ws->compat_major = best_major;
+		ws->compat_minor = best_minor;
+	}
+	else {
+		/* No compat defs necessary for this ws. 
+		 */
+		ws->compat_major = 0;
+		ws->compat_minor = 0;
+	}
 
 	return( TRUE );
-}
-
-static gboolean
-workspace_top_load( Filemodel *filemodel,
-	ModelLoadState *state, Model *parent, xmlNode *xnode )
-{
-	Workspace *ws = WORKSPACE( filemodel );
-	Workspaceroot *wsr = WORKSPACEROOT( parent );
-	Column *current_col;
-	xmlNode *i, *j, *k;
-	char name[FILENAME_MAX];
-	int best_major;
-	int best_minor;
-
-#ifdef DEBUG
-	printf( "workspace_top_load: from %s\n", state->filename );
-#endif /*DEBUG*/
-
-	/* The top node should be the saved workspace. Get the filename this
-	 * workspace was saved as so we can work out how to rewrite embedded
-	 * filenames.
-	 */
-	if( strcasecmp( (char *) xnode->name, "Workspace" ) == 0 &&
-		get_sprop( xnode, "filename", name, FILENAME_MAX ) ) {
-		char *new_dir;
-
-		/* The old filename could be non-native, so we must rewrite 
-		 * to native form first so g_path_get_dirname() can work.
-		 */
-		path_compact( name );
-
-		state->old_dir = g_path_get_dirname( name ); 
-		new_dir = g_path_get_dirname( state->filename_user );
-
-		path_rewrite_add( state->old_dir, new_dir, FALSE );
-
-		g_free( new_dir );
-	}
-
-	switch( ws->load_type ) {
-	case WORKSPACE_LOAD_TOP:
-		/* Easy ... ws is a blank Workspace we are loading into. No
-		 * renaming needed, except for the ws.
-		 */
-
-		/* Set the workspace name from the filename, ignoring the name
-		 * saved in the file.
-		 */
-		name_from_filename( state->filename_user, name );
-		while( compile_lookup( wsr->sym->expr->compile, name ) )
-			increment_name( name );
-		workspace_link( ws, wsr, name );
-
-		filemodel->major = state->major;
-		filemodel->minor = state->minor;
-		filemodel->micro = state->micro;
-		filemodel->versioned = TRUE;
-
-		/* If necessary, load up compatibility definitions.
-		 */
-		if( !workspace_load_compat( ws, 
-			filemodel->major, filemodel->minor ) ) 
-			return( FALSE );
-
-		if( model_load( MODEL( ws ), state, parent, xnode ) )
-			return( FALSE );
-
-		/* The model_load() will set the name from the name saved in
-		 * the XML. We want to override that with the name from the
-		 * filename.
-		 */
-		iobject_set( IOBJECT( ws ), name, NULL );
-
-		break;
-
-	case WORKSPACE_LOAD_COLUMNS:
-		/* Load at column level ... rename columns which clash with 
-		 * columns in the current workspace. Also look out for clashes
-		 * with columns we will load.
-		 */
-		for( i = xnode->children; i; i = i->next ) 
-			workspace_rename_column_node( ws, 
-				state, i, xnode->children );
-
-		/* Load those columns.
-		 */
-		for( i = xnode->children; i; i = i->next ) 
-			if( !model_new_xml( state, MODEL( ws ), i ) )
-				return( FALSE );
-
-		/* Is there a version mismatch? Issue a warning.
-		 */
-		if( workspace_have_compat( state->major, state->minor, 
-			&best_major, &best_minor ) &&
-			(best_major != filemodel->major ||
-			best_minor != filemodel->minor) ) {
-			error_top( _( "Version mismatch." ) );
-			error_sub( _( "File \"%s\" was saved from %s-%d.%d.%d. "
-				"You may see compatibility problems." ),
-				state->filename, PACKAGE,
-				state->major, state->minor, state->micro );
-			iwindow_alert( GTK_WIDGET( ws->iwnd ), 
-				GTK_MESSAGE_INFO );
-		}
-
-		break;
-
-	case WORKSPACE_LOAD_ROWS:
-		current_col = workspace_column_pick( ws );
-
-		/* Rename all rows into current column ... loop over column,
-		 * subcolumns, rows.
-		 */
-		for( i = xnode->children; i; i = i->next ) 
-			for( j = i->children; j; j = j->next ) 
-				for( k = j->children; k; k = k->next ) 
-					workspace_rename_row_node( state, 
-						current_col, k );
-
-		/* And load rows.
-		 */
-		for( i = xnode->children; i; i = i->next ) 
-			for( j = i->children; j; j = j->next ) 
-				for( k = j->children; k; k = k->next ) 
-					if( !model_new_xml( state, 
-						MODEL( current_col->scol ), 
-						k ) )
-						return( FALSE );
-
-		break;
-
-	default:
-		g_assert( FALSE );
-	}
-
-	return( FILEMODEL_CLASS( parent_class )->top_load( filemodel, 
-		state, parent, xnode ) );
-}
-
-static void 
-workspace_set_modified( Filemodel *filemodel, gboolean modified )
-{
-	Workspace *ws = WORKSPACE( filemodel );
-
-	workspace_checkmark( ws );
-
-	FILEMODEL_CLASS( parent_class )->set_modified( filemodel, modified );
-}
-
-static gboolean
-workspace_save_all( Filemodel *filemodel, const char *filename )
-{
-	gboolean result;
-
-#ifdef DEBUG
-	printf( "workspace_save_all: %s to %s\n",
-		NN( IOBJECT( filemodel )->name ), filename );
-#endif /*DEBUG*/
-
-	if( (result = FILEMODEL_CLASS( parent_class )->
-		save_all( filemodel, filename )) )
-		/* This will add save-as files to recent too. Don't note
-		 * auto_load on recent, since it won't have been loaded by the
-		 * user.
-		 */
-		if( !filemodel->auto_load )
-			mainw_recent_add( &mainw_recent_workspace, filename );
-
-	return( result );
 }
 
 static void
 workspace_class_init( WorkspaceClass *class )
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
+	iObjectClass *iobject_class = IOBJECT_CLASS( class );
 	iContainerClass *icontainer_class = (iContainerClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
-	FilemodelClass *filemodel_class = (FilemodelClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
 
@@ -1441,18 +992,17 @@ workspace_class_init( WorkspaceClass *class )
 	gobject_class->dispose = workspace_dispose;
 	gobject_class->finalize = workspace_finalize;
 
+	iobject_class->changed = workspace_changed;
+	iobject_class->user_name = _( "Tab" );
+
 	icontainer_class->child_add = workspace_child_add;
 	icontainer_class->child_remove = workspace_child_remove;
+	icontainer_class->current = workspace_current;
 
 	model_class->view_new = workspace_view_new;
 	model_class->load = workspace_load;
 	model_class->save = workspace_save;
 	model_class->empty = workspace_empty;
-
-	filemodel_class->top_load = workspace_top_load;
-	filemodel_class->set_modified = workspace_set_modified;
-	filemodel_class->save_all = workspace_save_all;
-	filemodel_class->filetype = filesel_type_workspace;
 
 	/* Static init.
 	 */
@@ -1471,25 +1021,18 @@ workspace_init( Workspace *ws )
 	g_object_ref( G_OBJECT( ws->kitg ) );
 
 	ws->next = 0;
-	ws->current = NULL;
 	ws->selected = NULL;
 	ws->errors = NULL;
         ws->mode = WORKSPACE_MODE_REGULAR;
 
-	ws->compat_78 = FALSE;
 	ws->compat_major = 0;
 	ws->compat_minor = 0;
-
-	ws->load_type = WORKSPACE_LOAD_TOP;
-	ws->save_type = WORKSPACE_SAVE_ALL;
 
 	ws->area.left = 0;
 	ws->area.top = 0;
 	ws->area.width = 0;
 	ws->area.height = 0;
 	ws->vp = ws->area;
-	ws->window_width = 0;
-	ws->window_height = 0;
 
 	/* Overwritten by mainw.
 	 */
@@ -1497,8 +1040,6 @@ workspace_init( Workspace *ws )
 	ws->lpane_position = WORKSPACE_RPANE_POSITION;
 	ws->rpane_open = WORKSPACE_LPANE_OPEN;
 	ws->rpane_position = WORKSPACE_LPANE_POSITION;
-
-	ws->auto_save_timeout = 0;
 
 	ws->status = NULL;
 
@@ -1509,8 +1050,6 @@ workspace_init( Workspace *ws )
 		"// private definitions for this workspace\n" ) );
 	ws->local_kitg = NULL;
 	ws->local_kit = NULL;
-
-	filemodel_register( FILEMODEL( ws ) );
 
 	workspace_all = g_slist_prepend( workspace_all, ws );
 }
@@ -1533,7 +1072,7 @@ workspace_get_type( void )
 			(GInstanceInitFunc) workspace_init,
 		};
 
-		workspace_type = g_type_register_static( TYPE_FILEMODEL, 
+		workspace_type = g_type_register_static( TYPE_MODEL, 
 			"Workspace", &info, 0 );
 	}
 
@@ -1541,8 +1080,10 @@ workspace_get_type( void )
 }
 
 Workspace *
-workspace_new( Workspaceroot *wsr, const char *name )
+workspace_new( Workspacegroup *wsg, const char *name )
 {
+	Workspaceroot *wsr = wsg->wsr;
+
 	Workspace *ws;
 
 #ifdef DEBUG
@@ -1557,80 +1098,8 @@ workspace_new( Workspaceroot *wsr, const char *name )
 	}
 
 	ws = WORKSPACE( g_object_new( TYPE_WORKSPACE, NULL ) );
-	icontainer_child_add( ICONTAINER( wsr ), ICONTAINER( ws ), -1 );
-	workspace_link( ws, wsr, name );
-	(void) workspace_column_pick( ws );
-
-	return( ws );
-}
-
-/* Load into an empty workspace.
- */
-static gboolean
-workspace_load_empty( Workspace *ws, Workspaceroot *wsr, 
-	const char *filename, const char *filename_user )
-{
-	g_assert( workspace_is_empty( ws ) );
-
-	ws->load_type = WORKSPACE_LOAD_TOP;
-	column_set_offset( WORKSPACEVIEW_MARGIN_LEFT, 
-		WORKSPACEVIEW_MARGIN_TOP );
-	if( !filemodel_load_all( FILEMODEL( ws ), MODEL( wsr ), 
-		filename, filename_user ) ) 
-		return( FALSE );
-	filemodel_set_modified( FILEMODEL( ws ), FALSE );
-	filemodel_set_filename( FILEMODEL( ws ), 
-		filename_user ? filename_user : filename );
-
-	return( TRUE );
-}
-
-/* New workspace from a file.
- */
-Workspace *
-workspace_new_from_file( Workspaceroot *wsr, 
-	const char *filename, const char *filename_user )
-{
-	Workspace *ws;
-
-#ifdef DEBUG
-	printf( "workspace_new_from_file: %s\n", filename );
-#endif /*DEBUG*/
-
-	ws = WORKSPACE( g_object_new( TYPE_WORKSPACE, NULL ) );
-	if( !workspace_load_empty( ws, wsr, filename, filename_user ) ) {
-		g_object_unref( G_OBJECT( ws ) );
-		return( NULL );
-	}
-
-	return( ws );
-}
-
-/* New workspace from a file.
- */
-Workspace *
-workspace_new_from_openfile( Workspaceroot *wsr, iOpenFile *of )
-{
-	Workspace *ws;
-
-#ifdef DEBUG
-	printf( "workspace_new_from_openfile: %s\n", of->fname );
-#endif /*DEBUG*/
-
-	ws = WORKSPACE( g_object_new( TYPE_WORKSPACE, NULL ) );
-	ws->load_type = WORKSPACE_LOAD_TOP;
-	if( !filemodel_load_all_openfile( FILEMODEL( ws ), 
-		MODEL( wsr ), of ) ) {
-		g_object_unref( G_OBJECT( ws ) );
-		return( NULL );
-	}
-
-	filemodel_set_modified( FILEMODEL( ws ), FALSE );
-	filemodel_set_filename( FILEMODEL( ws ), of->fname );
-
-#ifdef DEBUG
-	printf( "(set name = %s)\n", IOBJECT( ws )->name );
-#endif /*DEBUG*/
+	workspace_link( ws, wsg, name );
+	icontainer_child_add( ICONTAINER( wsg ), ICONTAINER( ws ), -1 );
 
 	return( ws );
 }
@@ -1639,65 +1108,24 @@ workspace_new_from_openfile( Workspaceroot *wsr, iOpenFile *of )
  * anything else).
  */
 Workspace *
-workspace_new_blank( Workspaceroot *wsr, const char *name )
+workspace_new_blank( Workspacegroup *wsg )
 {
+	char name[256];
 	Workspace *ws;
 
-	if( !(ws = workspace_new( wsr, name )) )
+	workspaceroot_name_new( wsg->wsr, name );
+	if( !(ws = workspace_new( wsg, name )) )
 		return( NULL );
 
-	iobject_set( IOBJECT( ws ), NULL, _( "Default empty workspace" ) );
+	/* Make an empty column.
+	 */
+	(void) workspace_column_pick( ws );
+
+	icontainer_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
+
+	iobject_set( IOBJECT( ws ), NULL, _( "Default empty tab" ) );
 
 	return( ws );
-}
-
-/* Merge file into this workspace. If this workspace is blank, then behave
- * like workspace_new_from_file() instead.
- */
-gboolean
-workspace_merge_file( Workspace *ws, 
-	const char *filename, const char *filename_user )
-{
-	if( workspace_is_empty( ws ) ) {
-		model_empty( MODEL( ws ) );
-
-		if( !workspace_load_empty( ws, 
-			WORKSPACEROOT( ICONTAINER( ws )->parent ), 
-			filename, filename_user ) ) 
-			return( FALSE );
-	}
-	else {
-		ws->load_type = WORKSPACE_LOAD_COLUMNS;
-		column_set_offset( 
-			IM_RECT_RIGHT( &ws->area ) + WORKSPACEVIEW_MARGIN_LEFT,
-			WORKSPACEVIEW_MARGIN_TOP );
-		if( !filemodel_load_all( FILEMODEL( ws ), 
-			MODEL( ICONTAINER( ws )->parent ), 
-			filename, filename_user ) ) 
-			return( FALSE );
-
-		filemodel_set_modified( FILEMODEL( ws ), TRUE );
-	}
-
-	return( TRUE );
-}
-
-/* Merge file into the current column of this workspace.
- */
-gboolean
-workspace_merge_column_file( Workspace *ws, 
-	const char *filename, const char *filename_user )
-{
-	ws->load_type = WORKSPACE_LOAD_ROWS;
-	column_set_offset( IM_RECT_RIGHT( &ws->area ), 
-		IM_RECT_BOTTOM( &ws->area ) );
-	if( !filemodel_load_all( FILEMODEL( ws ), 
-		MODEL( ICONTAINER( ws )->parent ), filename, filename_user ) ) 
-		return( FALSE );
-
-	filemodel_set_modified( FILEMODEL( ws ), TRUE );
-
-	return( TRUE );
 }
 
 /* Get the bottom row from the current column.
@@ -1757,31 +1185,6 @@ int
 workspace_number( void )
 {
 	return( g_slist_length( workspace_all ) );
-}
-
-Workspace *
-workspace_clone( Workspace *ws )
-{
-	Workspaceroot *wsr = WORKSPACEROOT( ICONTAINER( ws )->parent );
-	Workspace *nws;
-	char filename[FILENAME_MAX];
-
-	/* Make a name for our clone file.
-	 */
-	if( !temp_name( filename, "ws" ) ||
-		!filemodel_save_all( FILEMODEL( ws ), filename ) ) 
-		return( NULL );
-
-	/* Try to load the clone file back again.
-	 */
-	if( !(nws = workspace_new_from_file( wsr, 
-		filename, FILEMODEL( ws )->filename )) ) {
-		unlinkf( "%s", filename );
-		return( NULL );
-	}
-	unlinkf( "%s", filename );
-
-	return( nws );
 }
 
 static void *
@@ -1885,7 +1288,7 @@ workspace_selected_remove( Workspace *ws )
 
 	IM_FREEF( g_slist_free, cs );
 	symbol_recalculate_all();
-	filemodel_set_modified( FILEMODEL( ws ), TRUE );
+	workspace_set_modified( ws, TRUE );
 
 	return( TRUE );
 }
@@ -2020,6 +1423,93 @@ workspace_selected_ungroup( Workspace *ws )
 	return( TRUE );
 }
 
+/* Group the selected object(s).
+ */
+gboolean
+workspace_selected_group( Workspace *ws )
+{
+	char txt[MAX_STRSIZE];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
+
+	if( !workspace_selected_any( ws ) ) {
+		Row *row;
+
+		if( !(row = workspace_get_bottom( ws )) )
+			return( FALSE );
+		row_select( row );
+	}
+
+	vips_buf_appends( &buf, "Group [" );
+	workspace_selected_names( ws, &buf, "," );
+	vips_buf_appends( &buf, "]" );
+	if( !workspace_add_def_recalc( ws, vips_buf_all( &buf ) ) ) 
+		return( FALSE );
+	workspace_deselect_all( ws );
+
+	return( TRUE );
+}
+
+static Row *
+workspace_test_error( Row *row, Workspace *ws, int *found )
+{
+	g_assert( row->err );
+
+	/* Found next?
+	 */
+	if( *found )
+		return( row );
+
+	if( row == ws->last_error ) {
+		/* Found the last one ... return the next one.
+		 */
+		*found = 1;
+		return( NULL );
+	}
+
+	return( NULL );
+}
+
+/* FALSE for no errors.
+ */
+gboolean
+workspace_next_error( Workspace *ws )
+{
+	char txt[MAX_LINELENGTH];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
+
+	int found;
+
+	if( !ws->errors ) 
+		return( FALSE ); 
+
+	/* Search for the one after the last one.
+	 */
+	found = 0;
+	ws->last_error = (Row *) slist_map2( ws->errors, 
+		(SListMap2Fn) workspace_test_error, ws, &found );
+
+	/* NULL? We've hit end of table, start again.
+	 */
+	if( !ws->last_error ) {
+		found = 1;
+		ws->last_error = (Row *) slist_map2( ws->errors, 
+			(SListMap2Fn) workspace_test_error, ws, &found );
+	}
+
+	/* *must* have one now.
+	 */
+	g_assert( ws->last_error && ws->last_error->err );
+
+	model_scrollto( MODEL( ws->last_error ), MODEL_SCROLL_TOP );
+
+	row_qualified_name( ws->last_error->expr->row, &buf );
+	vips_buf_appends( &buf, ": " );
+	vips_buf_appends( &buf, ws->last_error->expr->error_top );
+	workspace_set_status( ws, "%s", vips_buf_firstline( &buf ) );
+
+	return( TRUE ); 
+}
+
 void
 workspace_set_status( Workspace *ws, const char *fmt, ... )
 {
@@ -2065,7 +1555,7 @@ workspace_local_set( Workspace *ws, const char *txt )
 	IM_SETSTR( ws->local_defs, txt );
 	iobject_changed( IOBJECT( ws ) );
 
-	filemodel_set_modified( FILEMODEL( ws ), TRUE );
+	workspace_set_modified( ws, TRUE );
 	attach_input_string( txt );
 	if( !parse_toplevel( ws->local_kit, 0 ) ) 
 		return( FALSE );
@@ -2098,3 +1588,205 @@ workspace_local_set_from_file( Workspace *ws, const char *fname )
 
 	return( TRUE );
 }
+
+static gint
+workspace_jump_name_compare( iContainer *a, iContainer *b )
+{
+	int la = strlen( IOBJECT( a )->name );
+	int lb = strlen( IOBJECT( b )->name );
+
+	/* Smaller names first.
+	 */
+	if( la == lb )
+		return( strcmp( IOBJECT( a )->name, IOBJECT( b )->name ) );
+	else
+		return( la - lb );
+}
+
+static void
+workspace_jump_column_cb( GtkWidget *item, Column *column )
+{
+	model_scrollto( MODEL( column ), MODEL_SCROLL_TOP );
+}
+
+static void *
+workspace_jump_build( Column *column, GtkWidget *menu )
+{
+	GtkWidget *item;
+	char txt[256];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
+
+	vips_buf_appendf( &buf, "%s - %s", 
+		IOBJECT( column )->name, IOBJECT( column )->caption );
+	item = gtk_menu_item_new_with_label( vips_buf_all( &buf ) );
+	g_signal_connect( item, "activate",
+		G_CALLBACK( workspace_jump_column_cb ), column );
+	gtk_menu_append( GTK_MENU( menu ), item );
+	gtk_widget_show( item );
+
+	return( NULL );
+}
+
+/* Update a menu with the set of current columns.
+ */
+void
+workspace_jump_update( Workspace *ws, GtkWidget *menu )
+{
+	GtkWidget *item;
+	GSList *columns;
+
+	gtk_container_foreach( GTK_CONTAINER( menu ),
+		(GtkCallback) gtk_widget_destroy, NULL );
+
+	item = gtk_tearoff_menu_item_new();
+	gtk_menu_append( GTK_MENU( menu ), item );
+	gtk_widget_show( item );
+
+	columns = icontainer_get_children( ICONTAINER( ws ) );
+
+        columns = g_slist_sort( columns, 
+		(GCompareFunc) workspace_jump_name_compare );
+	slist_map( columns, (SListMapFn) workspace_jump_build, menu );
+
+	g_slist_free( columns );
+}
+
+/* Merge file into this workspace. 
+ */
+gboolean
+workspace_merge_file( Workspace *ws, const char *filename )
+{
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
+
+	icontainer_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
+
+	return( workspacegroup_merge_columns( wsg, filename ) );
+}
+
+/* Duplicate selected rows in this workspace.
+ */
+gboolean 
+workspace_selected_duplicate( Workspace *ws )
+{
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
+
+	char filename[FILENAME_MAX];
+
+	if( !workspace_selected_any( ws ) ) {
+		Row *row;
+
+		if( !(row = workspace_get_bottom( ws )) )
+			return( FALSE );
+
+		row_select( row );
+	}
+
+	if( !temp_name( filename, "ws" ) )
+		return( FALSE );
+	if( !workspace_selected_save( ws, filename ) ) 
+		return( FALSE );
+
+        progress_begin();
+
+	if( !workspacegroup_merge_rows( wsg, filename ) ) {
+		progress_end();
+		unlinkf( "%s", filename );
+
+		return( FALSE );
+	}
+	unlinkf( "%s", filename );
+
+	symbol_recalculate_all();
+	workspace_deselect_all( ws );
+	model_scrollto( MODEL( workspace_get_column( ws ) ), MODEL_SCROLL_TOP );
+
+	progress_end();
+
+	return( TRUE );
+}
+
+/* Bounding box of columns to be saved. Though we only really set top/left.
+ */
+static void *
+workspace_selected_save_box( Column *col, Rect *box )
+{
+	if( model_save_test( MODEL( col ) ) ) {
+		if( im_rect_isempty( box ) ) {
+			box->left = col->x;
+			box->top = col->y;
+			box->width = 100;
+			box->height = 100;
+		}
+		else {
+			box->left = IM_MIN( box->left, col->x );
+			box->top = IM_MIN( box->top, col->y );
+		}
+	}
+
+	return( NULL );
+}
+
+/* Save just the selected objects.
+ */
+gboolean
+workspace_selected_save( Workspace *ws, const char *filename )
+{
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
+
+	Rect box = { 0 };
+
+	icontainer_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
+
+	workspace_map_column( ws, 
+		(column_map_fn) workspace_selected_save_box, 
+		&box );
+
+	filemodel_set_offset( FILEMODEL( wsg ), box.left, box.top );
+
+	if( !workspacegroup_save_selected( wsg, filename ) ) 
+		return( FALSE );
+
+	return( TRUE );
+}
+
+gboolean
+workspace_rename( Workspace *ws, const char *name, const char *caption )
+{
+	if( !symbol_rename( ws->sym, name ) )
+		return( FALSE );
+	iobject_set( IOBJECT( ws ), IOBJECT( ws->sym )->name, caption );
+
+	return( TRUE );
+}
+
+gboolean
+workspace_duplicate( Workspace *ws )
+{
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
+
+	char filename[FILENAME_MAX];
+
+	if( !temp_name( filename, "ws" ) )
+		return( FALSE );
+	icontainer_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
+	if( !workspacegroup_save_current( wsg, filename ) ) 
+		return( FALSE );
+
+        progress_begin();
+
+	if( !workspacegroup_merge_workspaces( wsg, filename ) ) {
+		progress_end();
+		unlinkf( "%s", filename );
+
+		return( FALSE );
+	}
+	unlinkf( "%s", filename );
+
+	symbol_recalculate_all();
+
+	progress_end();
+
+	return( TRUE );
+}
+
+

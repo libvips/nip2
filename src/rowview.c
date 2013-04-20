@@ -64,7 +64,6 @@ rowview_destroy( GtkObject *object )
 	printf( "\n" );
 #endif /*DEBUG*/
 
-	IM_FREEF( g_source_remove, rview->set_name_tid );
 	IM_FREE( rview->last_tooltip );
 
 	/* Kill children ... must do this ourselves, since we are not a
@@ -92,53 +91,6 @@ rowview_attach( Rowview *rview, GtkWidget *child, int x,
 		xoptions, yoptions, 0, 0 );
 
 	gtk_widget_unref( child );
-}
-
-static gboolean
-rowview_set_name_cb( Rowview *rview )
-{
-	rview->set_name_tid = 0;
-
-#ifdef DEBUG
-	printf( "rowview_set_name_cb: " );
-	row_name_print( ROW( VOBJECT( rview )->iobject ) );
-	printf( ".name = %s\n", rview->to_set_name );
-#endif /*DEBUG*/
-
-	gtk_widget_set_name( rview->but, rview->to_set_name );
-	rview->set_name = rview->to_set_name;
-	rview->to_set_name = NULL;
-
-	return( FALSE );
-}
-
-static void
-rowview_set_name( Rowview *rview, const char *set_name )
-{
-	gboolean changed = FALSE;
-
-	/* If there's a timeout currently set, test against the name we're
-	 * planning to set. Pointer equality is mostly good enough .. we are 
-	 * setting with static strings.
-	 */
-	if( rview->set_name_tid && set_name != rview->to_set_name ) {
-		rview->to_set_name = set_name;
-		changed = TRUE;
-	}
-	/* No timeout? Test against the current name.
-	 */
-	else if( set_name != rview->set_name ) {
-		rview->to_set_name = set_name;
-		changed = TRUE;
-	}
-
-	if( changed ) {
-		/* Reset the timeout.
-		 */
-		IM_FREEF( g_source_remove, rview->set_name_tid );
-		rview->set_name_tid = g_timeout_add( 200, 
-			(GSourceFunc) rowview_set_name_cb, rview );
-	}
 }
 
 static void
@@ -220,7 +172,7 @@ rowview_update_widgets( Rowview *rview )
 		else if( row->dirty )
 			name = "dirty_widget";
 
-		rowview_set_name( rview, name );
+		gtk_widget_set_name( rview->but, name );
 	}
 	widget_visible( rview->led, 
 		rview->visible && CALC_DISPLAY_LED && editable );
@@ -331,7 +283,7 @@ rowview_clone_cb( GtkWidget *menu, GtkWidget *button, Rowview *rview )
 
         workspace_deselect_all( ws );
         row_select( row );
-        if( !workspace_clone_selected( ws ) )
+        if( !workspace_selected_duplicate( ws ) )
 		iwindow_alert( button, GTK_MESSAGE_ERROR );
         workspace_deselect_all( ws );
 
@@ -438,7 +390,7 @@ rowview_spin_up_cb( GtkWidget *widget, gpointer client )
 	Rhs *rhs = row->child_rhs;
 
 	rhs_vislevel_down( rhs );
-	filemodel_set_modified( FILEMODEL( row->ws ), TRUE );
+	workspace_set_modified( row->ws, TRUE );
 }
 
 static void
@@ -449,7 +401,7 @@ rowview_spin_down_cb( GtkWidget *widget, gpointer client )
 	Rhs *rhs = row->child_rhs;
 
 	rhs_vislevel_up( rhs );
-	filemodel_set_modified( FILEMODEL( row->ws ), TRUE );
+	workspace_set_modified( row->ws, TRUE );
 }
 
 /* Scroll to make tally entry visible. 
@@ -550,13 +502,13 @@ rowview_link( View *view, Model *model, View *parent )
 	 */
 	if( row->top_row == row ) {
 		gtk_drag_source_set( rview->but, GDK_BUTTON1_MASK, 
-			rowview_target_table, IM_NUMBER( rowview_target_table ), 
+			rowview_target_table, IM_NUMBER( rowview_target_table ),
 			GDK_ACTION_COPY );
 		gtk_signal_connect( GTK_OBJECT( rview->but ), "drag_data_get",
 			GTK_SIGNAL_FUNC( rowview_drag_data_get ), rview );
 
 		gtk_drag_dest_set( rview->but, GTK_DEST_DEFAULT_ALL,
-			rowview_target_table, IM_NUMBER( rowview_target_table ), 
+			rowview_target_table, IM_NUMBER( rowview_target_table ),
 			GDK_ACTION_COPY );
 		gtk_signal_connect( GTK_OBJECT( rview->but ), 
 			"drag_data_received",
@@ -580,6 +532,19 @@ rowview_child_add( View *parent, View *child )
 }
 
 static void
+rowview_child_remove( View *parent, View *child )
+{
+	Rowview *rowview = ROWVIEW( parent );
+
+	g_assert( IS_RHSVIEW( child ) );
+	g_assert( rowview->rhsview );
+
+	rowview->rhsview = NULL;
+
+	VIEW_CLASS( parent_class )->child_remove( parent, child );
+}
+
+static void
 rowview_class_init( RowviewClass *class )
 {
 	GtkWidget *pane;
@@ -600,6 +565,7 @@ rowview_class_init( RowviewClass *class )
 
 	view_class->link = rowview_link;
 	view_class->child_add = rowview_child_add;
+	view_class->child_remove = rowview_child_remove;
 	view_class->reset = rowview_reset;
 	view_class->scrollto = rowview_scrollto;
 
@@ -666,9 +632,6 @@ rowview_init( Rowview *rview )
 {
         rview->visible = TRUE; 
 	rview->rnum = -1;
-        rview->set_name_tid = 0; 
-        rview->set_name = NULL; 
-        rview->to_set_name = NULL; 
         rview->last_tooltip = NULL; 
 
 	/* Make leds.

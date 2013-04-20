@@ -711,6 +711,37 @@ symbol_new( Compile *compile, const char *name )
 	return( sym );
 }
 
+gboolean
+symbol_rename( Symbol *sym, const char *new_name )
+{
+	Compile *compile = COMPILE( ICONTAINER( sym )->parent );
+	Symbol *old_sym;
+
+	if( strcmp( IOBJECT( sym )->name, new_name ) == 0 )
+		return( TRUE );
+	
+	if( (old_sym = compile_lookup( compile, new_name )) ) {
+		error_top( "%s", _( "Name in use." ) );
+		error_sub( _( "Can't rename %s \"%s\" as \"%s\". "
+			"The name is already in use." ), 
+			decode_SymbolType_user( sym->type ), 
+			IOBJECT( sym )->name,
+			new_name );
+		return( FALSE );
+	}
+
+	g_object_ref( sym );
+
+	icontainer_child_remove( ICONTAINER( sym ) );
+	iobject_set( IOBJECT( sym ), new_name, NULL );
+	icontainer_child_add( ICONTAINER( compile ), ICONTAINER( sym ),
+		ICONTAINER( sym )->pos );
+
+	g_object_unref( sym );
+
+	return( TRUE );
+}
+
 void
 symbol_error_redefine( Symbol *sym )
 {

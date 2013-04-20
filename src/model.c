@@ -45,6 +45,8 @@ enum {
 	SIG_SCROLLTO,	/* Views should try to make themselves visible */
 	SIG_LAYOUT,	/* Views should lay out their children */
 	SIG_RESET,	/* Reset edit mode in views */
+	SIG_FRONT,	/* Bring views to front */
+	SIG_DISPLAY,	/* Display on/off */
 	SIG_LAST
 };
 
@@ -67,7 +69,7 @@ ModelLoadState *model_loadstate = NULL;
 /* Rename list functions.
  */
 static void *
-model_loadstate_rename_destroy( ModelRename *rename )
+model_rename_destroy( ModelRename *rename )
 {
 	IM_FREE( rename->old_name );
 	IM_FREE( rename->new_name );
@@ -76,9 +78,8 @@ model_loadstate_rename_destroy( ModelRename *rename )
 	return( NULL );
 }
 
-ModelRename *
-model_loadstate_rename_new( ModelLoadState *state, 
-	const char *old_name, const char *new_name )
+static ModelRename *
+model_rename_new( const char *old_name, const char *new_name )
 {
 	ModelRename *rename;
 
@@ -87,13 +88,71 @@ model_loadstate_rename_new( ModelLoadState *state,
 	rename->old_name = im_strdup( NULL, old_name );
 	rename->new_name = im_strdup( NULL, new_name );
 	if( !rename->old_name || !rename->new_name ) {
-		model_loadstate_rename_destroy( rename );
+		model_rename_destroy( rename );
 		return( NULL );
 	}
 
+	return( rename );
+}
+
+gboolean
+model_loadstate_rename_new( ModelLoadState *state, 
+	const char *old_name, const char *new_name )
+{
+	/* Make a rename, even if old_name == new_name, since we want to have
+	 * new_name on the taken list.
+	 */
+	ModelRename *rename;
+
+	if( !(rename = model_rename_new( old_name, new_name )) )
+		return( FALSE );
 	state->renames = g_slist_prepend( state->renames, rename );
 
-	return( rename );
+	return( TRUE );
+}
+
+static void *
+model_loadstate_taken_sub( ModelRename *rename, const char *name )
+{
+	if( strcmp( rename->new_name, name ) == 0 )
+		return( rename );
+
+	return( NULL );
+}
+
+/* Is something already being renamed to @name.
+ */
+gboolean
+model_loadstate_taken( ModelLoadState *state, const char *name )
+{
+	return( slist_map( state->renames, 
+		(SListMapFn) model_loadstate_taken_sub, (char *) name ) != 
+		NULL ); 
+}
+
+gboolean
+model_loadstate_column_rename_new( ModelLoadState *state, 
+	const char *old_name, const char *new_name )
+{
+	if( strcmp( old_name, new_name ) != 0 ) { 
+		ModelRename *rename;
+
+		if( !(rename = model_rename_new( old_name, new_name )) )
+			return( FALSE );
+		state->column_renames = 
+			g_slist_prepend( state->column_renames, rename );
+	}
+
+	return( TRUE );
+}
+
+/* Is something already being renamed to @name.
+ */
+gboolean
+model_loadstate_column_taken( ModelLoadState *state, const char *name )
+{
+	return( !!slist_map( state->column_renames, 
+		(SListMapFn) model_loadstate_taken_sub, (char *) name ) );
 }
 
 void
@@ -107,7 +166,9 @@ model_loadstate_destroy( ModelLoadState *state )
 	IM_FREE( state->filename_user );
 	IM_FREEF( xmlFreeDoc, state->xdoc );
 	slist_map( state->renames, 
-		(SListMapFn) model_loadstate_rename_destroy, NULL );
+		(SListMapFn) model_rename_destroy, NULL );
+	slist_map( state->column_renames, 
+		(SListMapFn) model_rename_destroy, NULL );
 	g_slist_free( state->renames );
 
 	if( state->old_dir ) {
@@ -149,6 +210,7 @@ model_loadstate_new( const char *filename, const char *filename_user )
 		return( NULL );
 	state->xdoc = NULL;
 	state->renames = NULL;
+	state->column_renames = NULL; 
 	state->major = MAJOR_VERSION;
 	state->minor = MINOR_VERSION;
 	state->micro = MICRO_VERSION;
@@ -310,8 +372,8 @@ model_scrollto( Model *model, ModelScrollPosition position )
 {
 	g_assert( IS_MODEL( model ) );
 
-	g_signal_emit( G_OBJECT( model ), model_signals[SIG_SCROLLTO], 0, 
-		position );
+	g_signal_emit( G_OBJECT( model ), 
+		model_signals[SIG_SCROLLTO], 0, position );
 }
 
 void
@@ -320,6 +382,25 @@ model_layout( Model *model )
 	g_assert( IS_MODEL( model ) );
 
 	g_signal_emit( G_OBJECT( model ), model_signals[SIG_LAYOUT], 0 );
+}
+
+void
+model_front( Model *model )
+{
+	g_assert( IS_MODEL( model ) );
+
+	g_signal_emit( G_OBJECT( model ), model_signals[SIG_FRONT], 0 );
+}
+
+void
+model_display( Model *model, gboolean display )
+{
+	if( model ) { 
+		g_assert( IS_MODEL( model ) );
+
+		g_signal_emit( G_OBJECT( model ), 
+			model_signals[SIG_DISPLAY], 0, display );
+	}
 }
 
 void *
@@ -456,6 +537,20 @@ model_real_scrollto( Model *model, ModelScrollPosition position )
 {
 }
 
+static void
+model_real_front( Model *model )
+{
+}
+
+static void
+model_real_display( Model *model, gboolean display )
+{
+	if( display != model->display ) {
+		model->display = display;
+		iobject_changed( IOBJECT( model ) );
+	}
+}
+
 static xmlNode *
 model_real_save( Model *model, xmlNode *xnode )
 {
@@ -473,11 +568,11 @@ model_real_save( Model *model, xmlNode *xnode )
 		return( NULL );
 
 	if( model->window_width != -1 ) {
-		if( !set_prop( xthis, "window_x", "%d", model->window_x ) ||
-			!set_prop( xthis, "window_y", "%d", model->window_y ) ||
-			!set_prop( xthis, "window_width", "%d", 
+		if( !set_iprop( xthis, "window_x", model->window_x ) ||
+			!set_iprop( xthis, "window_y", model->window_y ) ||
+			!set_iprop( xthis, "window_width", 
 				model->window_width ) ||
-			!set_prop( xthis, "window_height", "%d", 
+			!set_iprop( xthis, "window_height", 
 				model->window_height ) )
 			return( NULL );
 	}
@@ -577,6 +672,8 @@ model_class_init( ModelClass *class )
 	class->edit = NULL;
 	class->scrollto = model_real_scrollto;
 	class->layout = NULL;
+	class->front = model_real_front;
+	class->display = model_real_display;
 	class->reset = NULL;
 	class->save = model_real_save;
 	class->save_test = NULL;
@@ -602,6 +699,13 @@ model_class_init( ModelClass *class )
 		NULL, NULL,
 		g_cclosure_marshal_VOID__VOID,
 		G_TYPE_NONE, 0 );
+	model_signals[SIG_FRONT] = g_signal_new( "front",
+		G_OBJECT_CLASS_TYPE( object_class ),
+		G_SIGNAL_RUN_FIRST,
+		G_STRUCT_OFFSET( ModelClass, front ),
+		NULL, NULL,
+		g_cclosure_marshal_VOID__VOID,
+		G_TYPE_NONE, 0 );
 	model_signals[SIG_RESET] = g_signal_new( "reset",
 		G_OBJECT_CLASS_TYPE( object_class ),
 		G_SIGNAL_RUN_FIRST,
@@ -609,6 +713,14 @@ model_class_init( ModelClass *class )
 		NULL, NULL,
 		g_cclosure_marshal_VOID__VOID,
 		G_TYPE_NONE, 0 );
+	model_signals[SIG_DISPLAY] = g_signal_new( "display",
+		G_OBJECT_CLASS_TYPE( object_class ),
+		G_SIGNAL_RUN_FIRST,
+		G_STRUCT_OFFSET( ModelClass, display ),
+		NULL, NULL,
+		g_cclosure_marshal_VOID__BOOLEAN,
+		G_TYPE_NONE, 1,
+		G_TYPE_BOOLEAN );
 }
 
 static void
@@ -689,6 +801,7 @@ typedef struct {
 	iDialog *idlg;		/* The yesno we run */
 	Model *model;		/* The model we watch */
 	guint destroy_sid;	/* sid for the destroy */
+	iWindowFn done_cb;	/* Call this at the end */
 } ModelCheckDestroy;
 
 /* OK to destroy.
@@ -703,7 +816,7 @@ model_check_destroy_sub( iWindow *iwnd, void *client,
 	IDESTROY( mcd->model );
 	symbol_recalculate_all();
 
-	nfn( sys, IWINDOW_YES );
+	mcd->done_cb( iwnd, NULL, nfn, sys );
 }
 
 /* The model we are watching has been killed, maybe by us.
@@ -738,7 +851,7 @@ model_check_destroy_finished( void *client, iWindowResult result )
 }
 
 void
-model_check_destroy( GtkWidget *parent, Model *model )
+model_check_destroy( GtkWidget *parent, Model *model, iWindowFn done_cb )
 {
 	char txt[30];
 	VipsBuf buf = VIPS_BUF_STATIC( txt );
@@ -748,6 +861,7 @@ model_check_destroy( GtkWidget *parent, Model *model )
 
 	mcd->idlg = NULL;
 	mcd->model = model;
+	mcd->done_cb = done_cb ? done_cb : iwindow_true_cb;
 
 	if( IS_SYMBOL( model ) ) {
 		symbol_qualified_name( SYMBOL( model ), &buf );
@@ -762,36 +876,12 @@ model_check_destroy( GtkWidget *parent, Model *model )
 		GTK_STOCK_DELETE, 
 		_( "Delete?" ),
 		_( "Are you sure you want to delete %s \"%s\"?" ), 
-		G_OBJECT_TYPE_NAME( model ), name );
+		IOBJECT_GET_CLASS_NAME( model ), name );
 
 	/* In case someone else kills this model before we do.
 	 */
 	mcd->destroy_sid = g_signal_connect( model, "destroy",
 		G_CALLBACK( model_check_destroy_destroy_cb ), mcd );
-}
-
-/* Set the ->display var ... return TRUE if we change something.
- */
-gboolean
-model_set_display( Model *model, gboolean display )
-{
-	gboolean changed = FALSE;
-
-	/* Do as two ifs to in case we're not using 0/1 for bool.
-	 */
-	if( model && display && !model->display ) {
-		model->display = TRUE;
-		changed = TRUE;
-	} 
-	else if( model && !display && model->display ) {
-		model->display = FALSE;
-		changed = TRUE;
-	}
-
-	if( changed )
-		iobject_changed( IOBJECT( model ) );
-
-	return( changed );
 }
 
 /* Useful for icontainer_map_all() ... trigger all heapmodel_clear_edited()

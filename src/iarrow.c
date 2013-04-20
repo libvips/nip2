@@ -83,20 +83,10 @@ iarrow_generate_caption_sub( iImage *iimage, iArrow *iarrow, gboolean *first )
 static const char *
 iarrow_generate_caption( iObject *iobject )
 {
-	static const char *names_current[] = {
+	static const char *names[] = {
 		CLASS_HGUIDE,
 		CLASS_VGUIDE,
 		CLASS_MARK,
-		CLASS_ARROW,
-		NULL
-	};
-
-	/* 7.8 used slightly different names :-(
-	 */
-	static const char *names_compatibility[] = {
-		CLASS_HGUIDE,
-		CLASS_VGUIDE,
-		CLASS_POINT,
 		CLASS_ARROW,
 		NULL
 	};
@@ -106,7 +96,6 @@ iarrow_generate_caption( iObject *iobject )
 	const int nimages = g_slist_length( CLASSMODEL( iarrow )->iimages );
 	Expr *expr;
 	gboolean result;
-	const char **names;
 	gboolean first;
 	int i;
 
@@ -115,11 +104,6 @@ iarrow_generate_caption( iObject *iobject )
 		!heap_is_class( &expr->root, &result ) || 
 		!result )
 		return( _( "No image" ) );
-
-	if( HEAPMODEL( iarrow )->row->ws->compat_78 ) 
-		names = names_compatibility;
-	else
-		names = names_current;
 
 	vips_buf_rewind( buf );
 	heapmodel_name( HEAPMODEL( iarrow ), buf );

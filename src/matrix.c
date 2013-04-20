@@ -189,14 +189,15 @@ matrix_edit( GtkWidget *parent, Model *model )
 
 	idlg = idialog_new();
 	iwindow_set_title( IWINDOW( idlg ), _( "Edit %s %s" ),
-		G_OBJECT_TYPE_NAME( model ),
+		IOBJECT_GET_CLASS_NAME( model ),
 		IOBJECT( HEAPMODEL( model )->row )->name );
 	idialog_set_build( IDIALOG( idlg ), 
 		(iWindowBuildFn) matrix_buildedit, eds, NULL, NULL );
 	idialog_set_callbacks( IDIALOG( idlg ), 
 		iwindow_true_cb, NULL, idialog_free_client, eds );
 	idialog_add_ok( IDIALOG( idlg ), 
-		matrix_done_cb, _( "Set %s" ), G_OBJECT_TYPE_NAME( model ) );
+		matrix_done_cb, _( "Set %s" ), 
+		IOBJECT_GET_CLASS_NAME( model ) );
 	iwindow_set_parent( IWINDOW( idlg ), parent );
 	idialog_set_iobject( IDIALOG( idlg ), IOBJECT( model ) );
 	iwindow_build( IWINDOW( idlg ) );
@@ -292,6 +293,7 @@ static void
 matrix_class_init( MatrixClass *class )
 {
 	GObjectClass *gobject_class = (GObjectClass *) class;
+	iObjectClass *iobject_class = (iObjectClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 	ClassmodelClass *classmodel_class = (ClassmodelClass *) class;
 
@@ -303,6 +305,8 @@ matrix_class_init( MatrixClass *class )
 	/* Init methods.
 	 */
 	gobject_class->finalize = matrix_finalize;
+
+	iobject_class->user_name = _( "Matrix" );
 
 	model_class->view_new = matrix_view_new;
 	model_class->edit = matrix_edit;

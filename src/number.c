@@ -55,14 +55,16 @@ static ClassmodelMember number_members[] = {
 static void
 number_class_init( NumberClass *class )
 {
+	iObjectClass *iobject_class = (iObjectClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 	ClassmodelClass *classmodel_class = (ClassmodelClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
 
-
 	/* Init methods.
 	 */
+	iobject_class->user_name = _( "Number" );
+
 	model_class->view_new = number_view_new;
 
 	/* Static init.

@@ -35,14 +35,28 @@
 
 static ViewClass *parent_class = NULL;
 
+static void *
+toolkitgroupview_dispose_sub( View *view, void *a, void *b )
+{
+	DESTROY_GTK( view );
+
+	return( NULL );
+}
+
 static void
-toolkitgroupview_finalize( GObject *gobject )
+toolkitgroupview_dispose( GObject *gobject )
 {
 #ifdef DEBUG
-	printf( "toolkitgroupview_finalize: %p\n", gobject );
+	printf( "toolkitgroupview_dispose: %p\n", gobject );
 #endif /*DEBUG*/
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	/* Toolkitviews are not child widgets of us, they are menu items pased
+	 * into the TK. Destroy them explicitly.
+	 */
+	view_map( VIEW( gobject ), 
+		toolkitgroupview_dispose_sub, NULL, NULL ); 
+
+	G_OBJECT_CLASS( parent_class )->dispose( gobject );
 }
 
 static void 
@@ -71,7 +85,7 @@ toolkitgroupview_class_init( ToolkitgroupviewClass *class )
 
 	parent_class = g_type_class_peek_parent( class );
 
-	gobject_class->finalize = toolkitgroupview_finalize;
+	gobject_class->dispose = toolkitgroupview_dispose;
 
 	/* Create signals.
 	 */

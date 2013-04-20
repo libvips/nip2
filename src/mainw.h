@@ -43,19 +43,11 @@
 struct _Mainw {
 	iWindow parent_object;
 
-	/* We make and manage workspaces inside this.
+	/* Our model.
 	 */
-	Workspaceroot *wsr;
-
-	/* Set of workspace tabs we display.
-	 */
-	Mainwtab *current_tab;
-
-	/* WS in current tab has changed, plus the ws we attached the 
-	 * signal to.
-	 */
-	guint ws_changed_sid;
-	Workspace *ws_changed;
+	Workspacegroup *wsg;
+	guint changed_sid;
+	guint destroy_sid;
 
 	/* Watch for changed on heap and image, and prefs. Use to update
 	 * status bar and space free.
@@ -96,10 +88,9 @@ struct _Mainw {
 	GtkWidget *toolbar;
 	GtkWidget *recent_menu;
 	GtkWidget *jump_to_column_menu;
-	GtkWidget *tab_menu;
 	GtkWidget *toolkit_menu;
 
-	GtkWidget *notebook;
+	Workspacegroupview *wsgview;
 
 	GtkWidget *statusbar_main;
 	GtkWidget *statusbar;
@@ -130,12 +121,12 @@ void mainw_recent_freeze( void );
 void mainw_recent_thaw( void );
 void mainw_recent_add( GSList **recent, const char *filename );
 
-int mainw_number( void );
 Mainw *mainw_pick_one( void );
 GType mainw_get_type( void );
 
 void mainw_find_disc( VipsBuf *buf );
 void mainw_find_heap( VipsBuf *buf, Heap *heap );
+
 Workspace *mainw_get_workspace( Mainw *mainw );
 
 void mainw_homepage_action_cb( GtkAction *action, iWindow *iwnd );
@@ -149,13 +140,9 @@ void mainw_group_action_cb( GtkAction *action, Mainw *mainw );
 void mainw_next_error_action_cb( GtkAction *action, Mainw *mainw );
 void mainw_open_action_cb( GtkAction *action, Mainw *mainw );
 
-Mainwtab *mainw_add_workspace( Mainw *mainw, 
-	Mainwtab *old_tab, Workspace *ws, gboolean trim );
-Workspace *mainw_open_workspace( Mainw *mainw, 
-	const char *filename, gboolean trim, gboolean select );
+Workspacegroup *mainw_open_workspace( Workspaceroot *wsr, 
+	const char *filename );
 
-Mainw *mainw_new( Workspaceroot *wsr );
+Mainw *mainw_new( Workspacegroup *wsg );
 
-int mainw_get_n_tabs( Mainw *mainw );
-Mainwtab *mainw_get_nth_tab( Mainw *mainw, int i );
-
+void mainw_cull( void );

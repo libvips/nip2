@@ -229,6 +229,14 @@ set_sprop( xmlNode *xnode, const char *name, const char *value )
 	return( TRUE );
 }
 
+/* Set an xml property from an optionally NULL string.
+ */
+gboolean
+set_iprop( xmlNode *xnode, const char *name, int value )
+{
+	return( set_prop( xnode, name, "%d", value ) );
+}
+
 /* Save a list of strings. For name=="fred" and n strings in list, save as
  * "fredn" == n, "fred0" == list[0], etc.
  */
@@ -1816,6 +1824,38 @@ isdir( const char *filename, ... )
         va_end( ap );
 
 	return( res );
+}
+
+
+static void *
+mtime_sub( const char *filename, time_t *time )
+{
+	struct stat st;
+
+	if( stat( filename, &st ) == -1 )
+		return( NULL );
+#ifdef HAVE_GETEUID
+	if( st.st_uid != geteuid() )
+		return( NULL );
+#endif /*HAVE_GETEUID*/
+	*time = st.st_mtime;
+
+	return( NULL );
+}
+
+time_t
+mtime( const char *filename, ... )
+{
+	va_list ap;
+	time_t time;
+
+	time = 0;
+        va_start( ap, filename );
+        (void) callv_string_filenameva( 
+		(callv_string_fn) mtime_sub, filename, ap, &time, NULL, NULL );
+        va_end( ap );
+
+	return( time );
 }
 
 gboolean

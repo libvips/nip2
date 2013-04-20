@@ -120,8 +120,8 @@ rhs_save( Model *model, xmlNode *xnode )
 	if( !(xthis = MODEL_CLASS( parent_class )->save( model, xnode )) )
 		return( NULL );
 
-	if( !set_prop( xthis, "vislevel", "%d", rhs->vislevel ) ||
-		!set_prop( xthis, "flags", "%d", rhs->flags ) )
+	if( !set_iprop( xthis, "vislevel", rhs->vislevel ) ||
+		!set_iprop( xthis, "flags", rhs->flags ) )
 		return( NULL );
 
 	return( xthis );

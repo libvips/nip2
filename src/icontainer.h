@@ -53,8 +53,19 @@ struct _iContainer {
 	GSList *children;	/* iContainers which are inside this one */
 	int pos;		/* Position in parent */
 	iContainer *parent;	/* iContainer we are inside */
-	guint destroy_sid;	/* Parent listens for our "destroy" here */
 	GHashTable *child_hash;	/* Optional: hash of children by their name */
+
+	/* Can have a currently selected child ... eg. the
+	 * current column in a workspace, or the current tab in a
+	 * workspacegroup.
+	 *
+	 * NULL if not relevant.
+	 */
+	iContainer *current;
+
+	/* Track the view here during reparent.
+	 */
+	View *temp_view;
 };
 
 typedef struct _iContainerClass {
@@ -72,6 +83,17 @@ typedef struct _iContainerClass {
 
 		parent_remove	parent is about to be removed
 
+		current		make the current of parent
+
+		child_detach	on old parent, unlink child
+		child_attach  	on new_paerent, link on child
+
+					there are used as a pair to do 
+					reparent -- the old parent gets a 
+					chance to detach in ::parent_detach, 
+					the new parent attaches in 
+					::child_attach
+
 	 */
 
 	void (*pos_changed)( iContainer *icontainer );
@@ -79,6 +101,9 @@ typedef struct _iContainerClass {
 	void (*child_remove)( iContainer *parent, iContainer *child );
 	void (*parent_add)( iContainer *child );
 	void (*parent_remove)( iContainer *child );
+	void (*current)( iContainer *parent, iContainer *child );
+	void (*child_detach)( iContainer *parent, iContainer *child );
+	void (*child_attach)( iContainer *parent, iContainer *child, int );
 } iContainerClass;
 
 typedef void *(*icontainer_map_fn)( iContainer *, 
@@ -93,6 +118,7 @@ typedef void *(*icontainer_map5_fn)( iContainer *,
 typedef gint (*icontainer_sort_fn)( iContainer *a, iContainer *b );
 
 int icontainer_get_n_children( iContainer *icontainer );
+iContainer *icontainer_get_nth_child( iContainer *icontainer, int n );
 GSList *icontainer_get_children( iContainer *icontainer );
 void *icontainer_map( iContainer *icontainer, 
 	icontainer_map_fn fn, void *a, void *b );
@@ -128,6 +154,8 @@ void icontainer_child_add_before( iContainer *parent,
 	iContainer *child, iContainer *before );
 void icontainer_child_move( iContainer *child, int pos );
 void *icontainer_child_remove( iContainer *child );
+void icontainer_current( iContainer *parent, iContainer *child );
+void icontainer_reparent( iContainer *parent, iContainer *child, int pos );
 
 GType icontainer_get_type( void );
 

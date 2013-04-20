@@ -41,6 +41,9 @@ enum {
 	SIG_POS_CHANGED,	/* Member has moved */
 	SIG_CHILD_ADD,		/* iContainer is about to gain a child */
 	SIG_CHILD_REMOVE,	/* iContainer is about to loose a child */
+	SIG_CURRENT,		/* Make child current of parent */
+	SIG_CHILD_DETACH,	/* Used as a pair to do reparent */
+	SIG_CHILD_ATTACH,
 	SIG_LAST
 };
 
@@ -52,6 +55,12 @@ int
 icontainer_get_n_children( iContainer *icontainer )
 {
 	return( g_slist_length( icontainer->children ) );
+}
+
+iContainer *
+icontainer_get_nth_child( iContainer *icontainer, int n )
+{
+	return( ICONTAINER( g_slist_nth_data( icontainer->children, n ) ) );
 }
 
 GSList *
@@ -170,7 +179,6 @@ icontainer_sanity_child( iContainer *child, iContainer *parent )
 	g_assert( IS_ICONTAINER( child ) );
 	g_assert( IS_ICONTAINER( parent ) );
 	g_assert( child->parent == parent );
-	g_assert( child->destroy_sid );
 	g_assert( child->pos >= 0 );
 	g_assert( g_slist_find( parent->children, child ) );
 
@@ -391,13 +399,45 @@ icontainer_child_move( iContainer *child, int pos )
 void *
 icontainer_child_remove( iContainer *child )
 {
-	iContainer *parent = child->parent;
+	iContainer *parent;
 
-	g_assert( parent );
-	g_assert( ICONTAINER_IS_CHILD( parent, child ) );
+	if( (parent = child->parent) ) {
+		g_assert( ICONTAINER_IS_CHILD( parent, child ) );
 
 #ifdef DEBUG
-	printf( "icontainer_child_remove: (child %p)\n", child );
+		printf( "icontainer_child_remove: (child %p)\n", child );
+		printf( "\tchild: %s \"%s\"\n",
+			G_OBJECT_TYPE_NAME( child ), 
+			NN( IOBJECT( child )->name ) );
+#endif /*DEBUG*/
+
+#ifdef DEBUG_SANITY
+		icontainer_sanity( parent );
+		icontainer_sanity( child );
+#endif /*DEBUG_SANITY*/
+
+		g_signal_emit( G_OBJECT( parent ), 
+			icontainer_signals[SIG_CHILD_REMOVE], 0, child );
+
+#ifdef DEBUG_SANITY
+		icontainer_sanity( parent );
+#endif /*DEBUG_SANITY*/
+	}
+
+	return( NULL );
+}
+
+void 
+icontainer_current( iContainer *parent, iContainer *child )
+{
+	g_assert( parent );
+	g_assert( !child || ICONTAINER_IS_CHILD( parent, child ) );
+
+	if( parent->current == child )
+		return; 
+
+#ifdef DEBUG
+	printf( "icontainer_current: (child %p)\n", child );
 	printf( "\tchild: %s \"%s\"\n",
 		G_OBJECT_TYPE_NAME( child ), 
 		NN( IOBJECT( child )->name ) );
@@ -405,17 +445,51 @@ icontainer_child_remove( iContainer *child )
 
 #ifdef DEBUG_SANITY
 	icontainer_sanity( parent );
-	icontainer_sanity( child );
+	if( child )
+		icontainer_sanity( child );
 #endif /*DEBUG_SANITY*/
 
 	g_signal_emit( G_OBJECT( parent ), 
-		icontainer_signals[SIG_CHILD_REMOVE], 0, child );
+		icontainer_signals[SIG_CURRENT], 0, child );
 
 #ifdef DEBUG_SANITY
 	icontainer_sanity( parent );
+	if( child )
+		icontainer_sanity( child );
+#endif /*DEBUG_SANITY*/
+}
+
+void 
+icontainer_reparent( iContainer *parent, iContainer *child, int pos )
+{
+	iContainer *old_parent = child->parent;
+
+	g_assert( parent );
+	g_assert( child );
+
+#ifdef DEBUG_SANITY
+	icontainer_sanity( old_parent );
+	icontainer_sanity( parent );
+	icontainer_sanity( child );
 #endif /*DEBUG_SANITY*/
 
-	return( NULL );
+	/* These must always happen as a pair.
+	 */
+	g_signal_emit( G_OBJECT( old_parent ), 
+		icontainer_signals[SIG_CHILD_DETACH], 0, child );
+	g_signal_emit( G_OBJECT( parent ), 
+		icontainer_signals[SIG_CHILD_ATTACH], 0, child, pos );
+
+        icontainer_pos_renumber( parent );
+	iobject_changed( IOBJECT( parent ) );
+	iobject_changed( IOBJECT( old_parent ) );
+	iobject_changed( IOBJECT( child ) );
+
+#ifdef DEBUG_SANITY
+	icontainer_sanity( old_parent );
+	icontainer_sanity( parent );
+	icontainer_sanity( child );
+#endif /*DEBUG_SANITY*/
 }
 
 static void
@@ -437,6 +511,7 @@ icontainer_dispose( GObject *gobject )
 
 	icontainer_map( icontainer,
 		(icontainer_map_fn) icontainer_child_remove, NULL, NULL );
+	icontainer_child_remove( icontainer );
 
 	G_OBJECT_CLASS( parent_class )->dispose( gobject );
 }
@@ -452,8 +527,6 @@ icontainer_finalize( GObject *gobject )
 	icontainer = ICONTAINER( gobject );
 
 	IM_FREEF( g_hash_table_destroy, icontainer->child_hash );
-
-	FREESID( icontainer->destroy_sid, icontainer );
 
 	G_OBJECT_CLASS( parent_class )->finalize( gobject );
 }
@@ -474,13 +547,31 @@ icontainer_real_pos_changed( iContainer *icontainer )
 }
 
 static void
+icontainer_link( iContainer *parent, iContainer *child, int pos )
+{
+        if( pos >= 0 ) 
+                parent->children = g_slist_insert( parent->children,
+                        child, pos );
+        else
+                parent->children = g_slist_append( parent->children, child );
+        child->parent = parent;
+        child->pos = pos;
+	if( parent->child_hash ) {
+		g_assert( !g_hash_table_lookup( parent->child_hash, 
+			IOBJECT( child )->name ) );
+
+		g_hash_table_insert( parent->child_hash, 
+			IOBJECT( child )->name, child );
+	}
+}
+
+static void
 icontainer_real_child_add( iContainer *parent, iContainer *child, int pos )
 {
 	iContainerClass *icontainer_class = ICONTAINER_GET_CLASS( child );
 
         g_assert( IS_ICONTAINER( parent ) && IS_ICONTAINER( child ) );
         g_assert( child->parent == NULL );
-        g_assert( child->destroy_sid == 0 );
 
 #ifdef DEBUG
 	printf( "icontainer_real_child_add:\n\tparent " );
@@ -490,22 +581,7 @@ icontainer_real_child_add( iContainer *parent, iContainer *child, int pos )
 	printf( "\tpos = %d\n", pos );
 #endif /*DEBUG*/
 
-        if( pos >= 0 ) 
-                parent->children = g_slist_insert( parent->children,
-                        child, pos );
-        else
-                parent->children = g_slist_append( parent->children, child );
-        child->parent = parent;
-        child->pos = pos;
-	child->destroy_sid = g_signal_connect( child, "destroy", 
-		G_CALLBACK( icontainer_child_remove ), NULL );
-	if( parent->child_hash ) {
-		g_assert( !g_hash_table_lookup( parent->child_hash, 
-			IOBJECT( child )->name ) );
-
-		g_hash_table_insert( parent->child_hash, 
-			IOBJECT( child )->name, child );
-	}
+	icontainer_link( parent, child, pos ); 
 
 	g_object_ref( G_OBJECT( child ) );
 	iobject_sink( IOBJECT( child ) );
@@ -525,6 +601,22 @@ icontainer_real_child_add( iContainer *parent, iContainer *child, int pos )
 #endif /*DEBUG_VERBOSE*/
 }
 
+static void
+icontainer_unlink( iContainer *child )
+{
+	iContainer *parent = child->parent;
+
+	parent->children = g_slist_remove( parent->children, child );
+	child->parent = NULL;
+	if( parent->child_hash ) {
+		g_assert( g_hash_table_lookup( parent->child_hash, 
+			IOBJECT( child )->name ) );
+
+		g_hash_table_remove( parent->child_hash, 
+			IOBJECT( child )->name );
+	}
+}
+
 static void 
 icontainer_real_child_remove( iContainer *parent, iContainer *child )
 {
@@ -539,21 +631,15 @@ icontainer_real_child_remove( iContainer *parent, iContainer *child )
 		G_OBJECT_TYPE_NAME( child ), NN( IOBJECT( child )->name ) );
 #endif /*DEBUG*/
 
+	if( parent->current == child )
+		icontainer_current( parent, NULL ); 
+
 	/* We're about to break the link ... trigger the parent_remove() on 
 	 * the child.
 	 */
 	icontainer_child_class->parent_remove( child );
 
-	parent->children = g_slist_remove( parent->children, child );
-	child->parent = NULL;
-	FREESID( child->destroy_sid, child );
-	if( parent->child_hash ) {
-		g_assert( g_hash_table_lookup( parent->child_hash, 
-			IOBJECT( child )->name ) );
-
-		g_hash_table_remove( parent->child_hash, 
-			IOBJECT( child )->name );
-	}
+	icontainer_unlink( child ); 
 
 	UNREF( child );
 
@@ -588,6 +674,59 @@ icontainer_real_parent_remove( iContainer *child )
 #endif /*DEBUG*/
 }
 
+static void 
+icontainer_real_current( iContainer *parent, iContainer *child )
+{
+	iContainer *old_current;
+
+	g_assert( IS_ICONTAINER( parent ) );
+	g_assert( !child || IS_ICONTAINER( child ) );
+	g_assert( !child || ICONTAINER_IS_CHILD( parent, child ) );
+
+#ifdef DEBUG
+	printf( "icontainer_real_current: parent %s \"%s\"; "
+		"child %s \"%s\"\n", 
+		G_OBJECT_TYPE_NAME( parent ), NN( IOBJECT( parent )->name ),
+		child ? G_OBJECT_TYPE_NAME( child ) : "NULL", 
+		child ? NN( IOBJECT( child )->name ) : "NULL" );
+#endif /*DEBUG*/
+
+	old_current = parent->current;
+	parent->current = child;
+
+	if( old_current != child ) {
+		if( old_current )
+			iobject_changed( IOBJECT( old_current ) );
+		if( child )
+			iobject_changed( IOBJECT( child ) );
+		iobject_changed( IOBJECT( parent ) );
+	}
+
+	if( child )
+		model_front( MODEL( child ) );
+}
+
+static void
+icontainer_real_child_detach( iContainer *parent, iContainer *child )
+{
+        g_assert( IS_ICONTAINER( parent ) ); 
+        g_assert( IS_ICONTAINER( child ) );
+        g_assert( child->parent != NULL );
+	g_assert( ICONTAINER_IS_CHILD( parent, child ) );
+
+	icontainer_unlink( child ); 
+}
+
+static void
+icontainer_real_child_attach( iContainer *parent, iContainer *child, int pos )
+{
+        g_assert( IS_ICONTAINER( parent ) ); 
+        g_assert( IS_ICONTAINER( child ) );
+        g_assert( child->parent == NULL );
+
+	icontainer_link( parent, child, pos ); 
+}
+
 static void
 icontainer_class_init( iContainerClass *class )
 {
@@ -606,6 +745,9 @@ icontainer_class_init( iContainerClass *class )
 	class->child_remove = icontainer_real_child_remove;
 	class->parent_add = icontainer_real_parent_add;
 	class->parent_remove = icontainer_real_parent_remove;
+	class->current = icontainer_real_current;
+	class->child_detach = icontainer_real_child_detach;
+	class->child_attach = icontainer_real_child_attach;
 
 	/* Create signals.
 	 */
@@ -616,6 +758,7 @@ icontainer_class_init( iContainerClass *class )
 		NULL, NULL,
 		g_cclosure_marshal_VOID__VOID,
 		G_TYPE_NONE, 0 );
+
 	icontainer_signals[SIG_CHILD_ADD] = g_signal_new( "child_add",
 		G_OBJECT_CLASS_TYPE( gobject_class ),
 		G_SIGNAL_RUN_FIRST,
@@ -624,6 +767,7 @@ icontainer_class_init( iContainerClass *class )
 		nip_VOID__OBJECT_INT,
 		G_TYPE_NONE, 2,
 		TYPE_ICONTAINER, GTK_TYPE_INT );
+
 	icontainer_signals[SIG_CHILD_REMOVE] = g_signal_new( "child_remove",
 		G_OBJECT_CLASS_TYPE( gobject_class ),
 		G_SIGNAL_RUN_LAST,
@@ -631,7 +775,34 @@ icontainer_class_init( iContainerClass *class )
 		NULL, NULL,
 		g_cclosure_marshal_VOID__POINTER,
 		G_TYPE_NONE, 1,
-		G_TYPE_POINTER );
+		TYPE_ICONTAINER );
+
+	icontainer_signals[SIG_CURRENT] = g_signal_new( "current",
+		G_OBJECT_CLASS_TYPE( gobject_class ),
+		G_SIGNAL_RUN_LAST,
+		G_STRUCT_OFFSET( iContainerClass, current ),
+		NULL, NULL,
+		g_cclosure_marshal_VOID__POINTER,
+		G_TYPE_NONE, 1,
+		TYPE_ICONTAINER );
+
+	icontainer_signals[SIG_CHILD_DETACH] = g_signal_new( "child_detach",
+		G_OBJECT_CLASS_TYPE( gobject_class ),
+		G_SIGNAL_RUN_LAST,
+		G_STRUCT_OFFSET( iContainerClass, child_detach ),
+		NULL, NULL,
+		g_cclosure_marshal_VOID__POINTER,
+		G_TYPE_NONE, 1,
+		TYPE_ICONTAINER );
+
+	icontainer_signals[SIG_CHILD_ATTACH] = g_signal_new( "child_attach",
+		G_OBJECT_CLASS_TYPE( gobject_class ),
+		G_SIGNAL_RUN_FIRST,
+		G_STRUCT_OFFSET( iContainerClass, child_attach ),
+		NULL, NULL,
+		nip_VOID__OBJECT_INT,
+		G_TYPE_NONE, 2,
+		TYPE_ICONTAINER, GTK_TYPE_INT );
 
 #ifdef DEBUG_SANITY
 	printf( "*** DEBUG_SANITY is on ... expect slowness\n" );
@@ -646,7 +817,6 @@ icontainer_init( iContainer *icontainer )
 	icontainer->children = NULL;
 	icontainer->pos = -1;
 	icontainer->parent = NULL;
-	icontainer->destroy_sid = 0;
 	icontainer->child_hash = NULL;
 }
 

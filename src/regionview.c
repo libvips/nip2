@@ -784,21 +784,6 @@ regionview_get_model( Regionview *regionview )
 	return( model_area );
 }
 
-/* Are we in a ws in 7.8 compatibility mode? If we are, we need to offset x/y 
- * by image xoffset/yoffset.
- */
-static gboolean
-regionview_get_compatibility( Regionview *regionview )
-{
-	Classmodel *classmodel = regionview->classmodel;
-
-	if( classmodel && HEAPMODEL( classmodel )->row &&
-		HEAPMODEL( classmodel )->row->ws )
-		return( HEAPMODEL( classmodel )->row->ws->compat_78 );
-
-	return( FALSE );
-}
-
 /* Update our_area from the model. Translate to our cods too: we always have
  * x/y in 0 to xsize/ysize.
  */
@@ -815,14 +800,6 @@ regionview_update_from_model( Regionview *regionview )
 
 	regionview->our_area = *model_area;
 
-	if( regionview_get_compatibility( regionview ) ) {
-		Conversion *conv = regionview->ip->id->conv;
-		IMAGE *im = imageinfo_get( FALSE, conv->ii );
-
-		regionview->our_area.left += im->Xoffset;
-		regionview->our_area.top += im->Yoffset;
-	}
-
 #ifdef DEBUG
 	printf( "regionview_update_from_model: set regionview to %dx%d size %dx%d\n",
 		regionview->our_area.left, regionview->our_area.top, 
@@ -836,7 +813,6 @@ static void
 regionview_model_update( Regionview *regionview )
 {
 	Classmodel *classmodel = regionview->classmodel;
-	Imagepresent *ip = regionview->ip;
 	Rect *model_area = regionview_get_model( regionview );
 
 #ifdef DEBUG
@@ -846,14 +822,6 @@ regionview_model_update( Regionview *regionview )
 #endif /*DEBUG*/
 
 	*model_area = regionview->our_area;
-
-	if( regionview_get_compatibility( regionview ) ) {
-		Conversion *conv = ip->id->conv;
-		IMAGE *im = imageinfo_get( FALSE, conv->ii );
-
-		model_area->left -= im->Xoffset;
-		model_area->top -= im->Yoffset;
-	}
 
 	if( classmodel ) {
 		classmodel_update( classmodel );
@@ -940,7 +908,7 @@ regionview_clone_cb( GtkWidget *menu, Regionview *regionview, Imagepresent *ip )
 
         workspace_deselect_all( ws );
         row_select( row );
-        if( !workspace_clone_selected( ws ) )
+        if( !workspace_selected_duplicate( ws ) )
 		iwindow_alert( GTK_WIDGET( regionview ), GTK_MESSAGE_ERROR );
         workspace_deselect_all( ws );
 

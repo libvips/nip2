@@ -172,6 +172,8 @@ iobject_class_init( iObjectClass *class )
 	class->info = iobject_real_info;
 	class->generate_caption = NULL;
 
+	class->user_name = _( "Object" );
+
 	/* Create signals.
 	 */
 	iobject_signals[SIG_DESTROY] = g_signal_new( "destroy",

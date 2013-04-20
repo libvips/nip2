@@ -72,10 +72,12 @@ columnview_clone_cb( GtkWidget *wid, GtkWidget *host, Columnview *cview )
 {
 	Column *col = COLUMN( VOBJECT( cview )->iobject );
 	Workspace *ws = col->ws;
-	char *newname = workspace_column_name_new( ws, NULL );
-        Column *newcol = workspace_column_get( ws, newname );
 
-	IM_FREE( newname );
+	char new_name[MAX_STRSIZE];
+        Column *newcol;
+
+	workspace_column_name_new( ws, new_name );
+        newcol = workspace_column_get( ws, new_name );
         iobject_set( IOBJECT( newcol ), NULL, IOBJECT( col )->caption );
         newcol->x = col->x + 30;
         newcol->y = col->y + 30;
@@ -83,11 +85,58 @@ columnview_clone_cb( GtkWidget *wid, GtkWidget *host, Columnview *cview )
 	workspace_deselect_all( ws );
         column_select_symbols( col );
 	workspace_column_select( ws, newcol );
-        if( !workspace_clone_selected( ws ) )
+        if( !workspace_selected_duplicate( ws ) )
 		iwindow_alert( GTK_WIDGET( cview ), GTK_MESSAGE_ERROR );
 	workspace_deselect_all( ws );
 
         symbol_recalculate_all();
+}
+
+static void
+columnview_merge_sub( iWindow *iwnd, 
+	void *client, iWindowNotifyFn nfn, void *sys )
+{
+	Filesel *filesel = FILESEL( iwnd );
+	Column *col = COLUMN( client );
+	Workspace *ws = col->ws;
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
+
+	char *filename;
+	iWindowResult result;
+
+	result = IWINDOW_YES;
+	progress_begin();
+
+	if( (filename = filesel_get_filename( filesel )) ) {
+		if( !workspacegroup_merge_rows( wsg, filename ) ) 
+			result = IWINDOW_ERROR;
+
+		g_free( filename );
+	}
+
+	symbol_recalculate_all();
+	progress_end();
+
+	nfn( sys, result );
+}
+
+static void
+columnview_merge_cb( GtkWidget *wid, GtkWidget *host, Columnview *cview )
+{
+	Column *col = COLUMN( VOBJECT( cview )->iobject );
+	iWindow *iwnd = IWINDOW( view_get_toplevel( VIEW( cview ) ) );
+	GtkWidget *filesel = filesel_new();
+
+	iwindow_set_title( IWINDOW( filesel ), 
+		_( "Merge Into Column \"%s\"" ), IOBJECT( col )->name );
+	filesel_set_flags( FILESEL( filesel ), FALSE, FALSE );
+	filesel_set_filetype( FILESEL( filesel ), filesel_type_workspace, 0 ); 
+	iwindow_set_parent( IWINDOW( filesel ), GTK_WIDGET( iwnd ) );
+	idialog_set_iobject( IDIALOG( filesel ), IOBJECT( col ) );
+	filesel_set_done( FILESEL( filesel ), columnview_merge_sub, col );
+	iwindow_build( IWINDOW( filesel ) );
+
+	gtk_widget_show( GTK_WIDGET( filesel ) );
 }
 
 /* Callback from save browser.
@@ -205,7 +254,7 @@ columnview_to_menu_done_cb( iWindow *iwnd, void *client,
 	workspace_deselect_all( ws );
 
 	if( !tool_new_dia( toolkit_by_name( ws->kitg, toolkit_text ), 
-			-1, name_text, file_text ) ) {
+		-1, name_text, file_text ) ) {
 		unlinkf( "%s", file_text );
 		nfn( sys, IWINDOW_ERROR );
 		return;
@@ -489,14 +538,13 @@ columnview_left_release( Columnview *cview, GdkEvent *ev )
         case COL_SELECT:
                 cview->state = COL_WAIT;
                 workspace_column_select( ws, col );
-                view_child_front( VIEW( cview ) );
 
                 break;
 
         case COL_DRAG:
                 cview->state = COL_WAIT;
 		workspaceview_scroll_background( wview, 0, 0 );
-		filemodel_set_modified( FILEMODEL( ws ), TRUE );
+		workspace_set_modified( ws, TRUE );
 		workspaceview_set_cursor( wview, IWINDOW_SHAPE_NONE );
 
                 break;
@@ -587,7 +635,8 @@ columnview_destroy_cb( GtkWidget *wid, GtkWidget *host, Columnview *cview )
 {
 	Column *col = COLUMN( VOBJECT( cview )->iobject );
 
-	model_check_destroy( view_get_toplevel( VIEW( cview ) ), MODEL( col ) );
+	model_check_destroy( view_get_toplevel( VIEW( cview ) ), 
+		MODEL( col ), NULL );
 }
 
 /* Delete this column with a click on the 'x' button.
@@ -597,7 +646,8 @@ columnview_destroy2_cb( GtkWidget *wid, Columnview *cview )
 {
 	Column *col = COLUMN( VOBJECT( cview )->iobject );
 
-	model_check_destroy( view_get_toplevel( VIEW( cview ) ), MODEL( col ) );
+	model_check_destroy( view_get_toplevel( VIEW( cview ) ), 
+		MODEL( col ), NULL );
 }
 
 /* Callback for enter in caption edit box.
@@ -615,7 +665,7 @@ columnview_caption_enter_cb( GtkWidget *wid, Columnview *cview )
 	if( strcmp( text, "" ) != 0 ) 
 		iobject_set( IOBJECT( col ), NULL, text );
 
-	filemodel_set_modified( FILEMODEL( ws ), TRUE );
+	workspace_set_modified( ws, TRUE );
 
 	/* The ws view needs to update the jumpto menus.
 	 */
@@ -906,6 +956,8 @@ columnview_class_init( ColumnviewClass *class )
 		POPUP_FUNC( columnview_select_cb ) );
 	popup_add_but( pane, STOCK_DUPLICATE,
 		POPUP_FUNC( columnview_clone_cb ) );
+	popup_add_but( pane, _( "Merge Into Column" ),
+		POPUP_FUNC( columnview_merge_cb ) );
 	popup_add_but( pane, GTK_STOCK_SAVE_AS,
 		POPUP_FUNC( columnview_save_as_cb ) );
 	menu_add_sep( pane );

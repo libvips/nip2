@@ -1,0 +1,117 @@
+workspacegroupview_switch_page_cb: 0 moving tab
+
+view_model_child_remove: child Workspace "test"; parent Workspacegroup "(null)"
+view_model_child_remove: parent_view = view of Workspacegroup "(null)"
+view_viewchild_test_child_model: model Workspace "test"
+view_viewchild_destroy: view Workspacegroupview watching model Workspace
+
+workspacegroupview_switch_page_cb: 0 about to add
+
+view_model_child_add: parent Workspacegroup "tab1"
+view_viewchild_test_child_model: model Workspace "test"
+view_viewchild_new: view "Workspacegroupview" watching Workspace "test"
+view_viewchild_changed: Workspace "test", adding view
+view_real_link: linking Workspaceview to model Workspace "test"
+view_real_child_add: parent Workspacegroupview, child Workspaceview
+view_viewchild_test_child_model: model Workspace "test"
+view_viewchild_test_child_model: model Workspace "test"
+view_viewchild_new: view "Workspaceview" watching Column "B"
+view_viewchild_changed: Column "B", adding view
+view_real_link: linking Columnview to model Column "B"
+view_real_child_add: parent Workspaceview, child Columnview
+view_viewchild_test_child_model: model Column "B"
+view_viewchild_new: view "Columnview" watching Subcolumn "(null)"
+view_viewchild_changed: Subcolumn "(null)", adding view
+view_real_link: linking Subcolumnview to model Subcolumn "(null)"
+view_real_child_add: parent Columnview, child Subcolumnview
+view_viewchild_test_child_model: model Subcolumn "(null)"
+view_viewchild_new: view "Subcolumnview" watching Row "B1"
+view_viewchild_changed: Row "B1", adding view
+view_real_link: linking Rowview to model Row "B1"
+view_real_child_add: parent Subcolumnview, child Rowview
+view_viewchild_test_child_model: model Row "B1"
+view_viewchild_new: view "Rowview" watching Rhs "(null)"
+view_viewchild_changed: Rhs "(null)", adding view
+view_real_link: linking Rhsview to model Rhs "(null)"
+view_real_child_add: parent Rowview, child Rhsview
+view_viewchild_test_child_model: model Rhs "(null)"
+view_viewchild_new: view "Rhsview" watching iImage "Image"
+view_viewchild_changed: iImage "Image", adding view
+view_real_link: linking iImageview to model iImage "Image"
+view_real_child_add: parent Rhsview, child iImageview
+view_viewchild_test_child_model: model iImage "Image"
+view_viewchild_new: view "Rhsview" watching Subcolumn "(null)"
+view_viewchild_changed: Subcolumn "(null)", adding view
+view_real_link: linking Subcolumnview to model Subcolumn "(null)"
+view_real_child_add: parent Rhsview, child Subcolumnview
+view_viewchild_test_child_model: model Subcolumn "(null)"
+view_viewchild_test_child_model: model Subcolumn "(null)"
+view_viewchild_new: view "Rhsview" watching iText "(null)"
+view_viewchild_changed: iText "(null)", adding view
+view_real_link: linking iTextview to model iText "(null)"
+view_real_child_add: parent Rhsview, child iTextview
+view_viewchild_test_child_model: model iText "(null)"
+view_viewchild_test_child_model: model iText "(null)"
+view_viewchild_test_child_model: model iText "(null)"
+view_viewchild_new: view "Workspaceview" watching Column "A"
+view_viewchild_changed: Column "A", adding view
+view_real_link: linking Columnview to model Column "A"
+view_real_child_add: parent Workspaceview, child Columnview
+view_viewchild_test_child_model: model Column "A"
+view_viewchild_test_child_model: model Column "A"
+view_viewchild_new: view "Columnview" watching Subcolumn "(null)"
+view_viewchild_changed: Subcolumn "(null)", adding view
+view_real_link: linking Subcolumnview to model Subcolumn "(null)"
+view_real_child_add: parent Columnview, child Subcolumnview
+view_viewchild_test_child_model: model Subcolumn "(null)"
+view_viewchild_new: view "Subcolumnview" watching Row "A1"
+view_viewchild_changed: Row "A1", adding view
+view_real_link: linking Rowview to model Row "A1"
+view_real_child_add: parent Subcolumnview, child Rowview
+view_viewchild_test_child_model: model Row "A1"
+view_viewchild_new: view "Rowview" watching Rhs "(null)"
+view_viewchild_changed: Rhs "(null)", adding view
+view_real_link: linking Rhsview to model Rhs "(null)"
+view_real_child_add: parent Rowview, child Rhsview
+view_viewchild_test_child_model: model Rhs "(null)"
+view_viewchild_new: view "Rhsview" watching iText "(null)"
+view_viewchild_changed: iText "(null)", adding view
+view_real_link: linking iTextview to model iText "(null)"
+view_real_child_add: parent Rhsview, child iTextview
+view_viewchild_test_child_model: model iText "(null)"
+view_viewchild_new: view "Subcolumnview" watching Row "A2"
+view_viewchild_changed: Row "A2", adding view
+view_real_link: linking Rowview to model Row "A2"
+view_real_child_add: parent Subcolumnview, child Rowview
+view_viewchild_test_child_model: model Row "A2"
+view_viewchild_test_child_model: model Row "A2"
+view_viewchild_new: view "Rowview" watching Rhs "(null)"
+view_viewchild_changed: Rhs "(null)", adding view
+view_real_link: linking Rhsview to model Rhs "(null)"
+view_real_child_add: parent Rowview, child Rhsview
+view_viewchild_test_child_model: model Rhs "(null)"
+view_viewchild_new: view "Rhsview" watching iText "(null)"
+view_viewchild_changed: iText "(null)", adding view
+view_real_link: linking iTextview to model iText "(null)"
+view_real_child_add: parent Rhsview, child iTextview
+view_viewchild_test_child_model: model iText "(null)"
+view_viewchild_new: view "Subcolumnview" watching Row "A3"
+view_viewchild_changed: Row "A3", adding view
+view_real_link: linking Rowview to model Row "A3"
+view_real_child_add: parent Subcolumnview, child Rowview
+view_viewchild_test_child_model: model Row "A3"
+view_viewchild_test_child_model: model Row "A3"
+view_viewchild_test_child_model: model Row "A3"
+view_viewchild_new: view "Rowview" watching Rhs "(null)"
+view_viewchild_changed: Rhs "(null)", adding view
+view_real_link: linking Rhsview to model Rhs "(null)"
+view_real_child_add: parent Rowview, child Rhsview
+view_viewchild_test_child_model: model Rhs "(null)"
+view_viewchild_new: view "Rhsview" watching iText "(null)"
+view_viewchild_changed: iText "(null)", adding view
+view_real_link: linking iTextview to model iText "(null)"
+view_real_child_add: parent Rhsview, child iTextview
+view_viewchild_test_child_model: model iText "(null)"
+workspacegroupview_switch_page_cb: 0 tab move done
+view_model_front: test
+

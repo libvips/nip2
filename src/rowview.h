@@ -45,9 +45,6 @@ struct _Rowview {
 
 	gboolean visible;	/* Currently visible */
         int rnum;		/* Row of tallycolumn we are in */
-        guint set_name_tid;	/* id of set_name delay timer */
-	const char *set_name;	/* Name we last set */
-	const char *to_set_name;/* Name we are waiting to set */
 
         GtkWidget *spin;   	/* Class display open/close widgets */
         GtkWidget *but;   	/* Name button */

@@ -38,7 +38,7 @@
 #define IS_TOOLKITBROWSER_CLASS( klass ) \
 	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_TOOLKITBROWSER ))
 
-typedef struct _Toolkitbrowser {
+struct _Toolkitbrowser {
 	vObject parent_object;
 
 	Toolkitgroup *kitg;
@@ -49,7 +49,7 @@ typedef struct _Toolkitbrowser {
 	GtkWidget *tree;		/* Displayed tree */
 	GtkWidget *entry;		/* Search widget */
 	GtkWidget *top;			/* hbox for top bar */
-} Toolkitbrowser;
+};
 
 typedef struct _ToolkitbrowserClass {
 	vObjectClass parent_class;

@@ -290,9 +290,9 @@ plot_save( Model *model, xmlNode *xnode )
 	if( !(xthis = MODEL_CLASS( parent_class )->save( model, xnode )) )
 		return( NULL );
 
-	if( !set_prop( xthis, "plot_left", "%d", plot->left ) ||
-		!set_prop( xthis, "plot_top", "%d", plot->top ) ||
-		!set_prop( xthis, "plot_mag", "%d", plot->mag ) ||
+	if( !set_iprop( xthis, "plot_left", plot->left ) ||
+		!set_iprop( xthis, "plot_top", plot->top ) ||
+		!set_iprop( xthis, "plot_mag", plot->mag ) ||
 		!set_sprop( xthis, "show_status", 
 			bool_to_char( plot->show_status ) ) )
 		return( NULL );

@@ -72,7 +72,6 @@ toolkitgroup_class_init( ToolkitgroupClass *class )
 
 	/* Init methods.
 	 */
-
 	iobject_class->changed = toolkitgroup_changed;
 
 	model_class->view_new = toolkitgroup_view_new;

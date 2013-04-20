@@ -42,28 +42,6 @@ toolkit_map( Toolkit *kit, tool_map_fn fn, void *a, void *b )
 		(icontainer_map_fn) fn, a, b ) );
 }
 
-static void 
-toolkit_dispose( GObject *gobject )
-{
-	Toolkit *kit;
-
-	g_return_if_fail( gobject != NULL );
-	g_return_if_fail( IS_TOOLKIT( gobject ) );
-
-	kit = TOOLKIT( gobject );
-
-#ifdef DEBUG
-	printf( "toolkit_dispose %s\n", IOBJECT( kit )->name );
-#endif /*DEBUG*/
-
-	/* Kill all the symbols we contain.
-	 */
-	icontainer_map( ICONTAINER( kit ),
-		(icontainer_map_fn) icontainer_child_remove, NULL, NULL );
-
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
-}
-
 static void
 toolkit_changed( iObject *iobject )
 {
@@ -132,7 +110,6 @@ toolkit_load_text( Model *model, Model *parent, iOpenFile *of )
 static void
 toolkit_class_init( ToolkitClass *class )
 {
-	GObjectClass *gobject_class = (GObjectClass *) class;
 	iObjectClass *iobject_class = (iObjectClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 	FilemodelClass *filemodel_class = (FilemodelClass *) class;
@@ -144,8 +121,6 @@ toolkit_class_init( ToolkitClass *class )
 
 	/* Init methods.
 	 */
-	gobject_class->dispose = toolkit_dispose;
-
 	iobject_class->info = toolkit_info;
 	iobject_class->changed = toolkit_changed;
 

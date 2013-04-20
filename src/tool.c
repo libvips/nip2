@@ -825,7 +825,7 @@ tool_new_sym( Toolkit *kit, int pos, Symbol *sym )
 		sym->tool = NULL;
 		tool->sym = NULL;
 
-		iobject_destroy( IOBJECT( tool ) );
+		IDESTROY( tool );
 	}
 
 	tool = TOOL( g_object_new( TYPE_TOOL, NULL ) );

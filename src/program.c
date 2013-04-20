@@ -703,7 +703,7 @@ program_remove_object_cb( GtkWidget *menu, Program *program )
 	Model *model = program_get_selected( program );
 
 	if( model )
-		model_check_destroy( GTK_WIDGET( program ), model );
+		model_check_destroy( GTK_WIDGET( program ), model, NULL );
 }
 
 static void
@@ -1450,7 +1450,7 @@ program_remove_tool_action_cb( GtkAction *action, Program *program )
 	Model *model = program_get_selected( program );
 
 	if( model && IS_TOOL( model ) )
-		model_check_destroy( GTK_WIDGET( program ), model );
+		model_check_destroy( GTK_WIDGET( program ), model, NULL );
 	else {
 		error_top( _( "No tool selected" ) );
 		iwindow_alert( GTK_WIDGET( program ), GTK_MESSAGE_INFO );
@@ -1463,7 +1463,8 @@ program_remove_toolkit_action_cb( GtkAction *action, Program *program )
 	if( !program_check_kit( program ) )
 		return;
 
-	model_check_destroy( GTK_WIDGET( program ), MODEL( program->kit ) );
+	model_check_destroy( GTK_WIDGET( program ), 
+		MODEL( program->kit ), NULL );
 }
 
 static void

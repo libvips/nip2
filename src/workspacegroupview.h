@@ -1,4 +1,4 @@
-/* Workspace-local defs
+/* A view for a Workspacegroup (a set of workspaces) ... display as a notebook.
  */
 
 /*
@@ -27,33 +27,31 @@
 
  */
 
-#define TYPE_WORKSPACEDEFS (workspacedefs_get_type())
-#define WORKSPACEDEFS( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_WORKSPACEDEFS, Workspacedefs ))
-#define WORKSPACEDEFS_CLASS( klass ) \
+#define TYPE_WORKSPACEGROUPVIEW (workspacegroupview_get_type())
+#define WORKSPACEGROUPVIEW( obj ) (GTK_CHECK_CAST( (obj), \
+	TYPE_WORKSPACEGROUPVIEW, Workspacegroupview ))
+#define WORKSPACEGROUPVIEW_CLASS( klass ) \
 	(GTK_CHECK_CLASS_CAST( (klass), \
-		TYPE_WORKSPACEDEFS, WorkspacedefsClass ))
-#define IS_WORKSPACEDEFS( obj ) \
-	(GTK_CHECK_TYPE( (obj), TYPE_WORKSPACEDEFS ))
-#define IS_WORKSPACEDEFS_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_WORKSPACEDEFS ))
+		TYPE_WORKSPACEGROUPVIEW, WorkspacegroupviewClass ))
+#define IS_WORKSPACEGROUPVIEW( obj ) (GTK_CHECK_TYPE( (obj), \
+	TYPE_WORKSPACEGROUPVIEW ))
+#define IS_WORKSPACEGROUPVIEW_CLASS( klass ) \
+	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_WORKSPACEGROUPVIEW ))
 
-struct _Workspacedefs {
-	vObject parent_object;
+struct _Workspacegroupview {
+	View parent_object;
 
-	Workspace *ws;			/* Workspace we explore */
-
-	GtkWidget *text;	
-	gboolean changed;		/* Text has been edited */
-	gboolean errors;		/* Error on last process */
-	guint text_hash;		/* Hash of the last text we set */
-	GtkWidget *status;	
+	GtkWidget *tab_menu;
+	GtkWidget *gutter_menu;
+	GtkWidget *notebook;
 };
 
-typedef struct _WorkspacedefsClass {
-	vObjectClass parent_class;
+typedef struct _WorkspacegroupviewClass {
+	ViewClass parent_class;
 
-} WorkspacedefsClass;
+	/* My methods.
+	 */
+} WorkspacegroupviewClass;
 
-GtkType workspacedefs_get_type( void );
-Workspacedefs *workspacedefs_new();
+GType workspacegroupview_get_type( void );
+View *workspacegroupview_new( void );

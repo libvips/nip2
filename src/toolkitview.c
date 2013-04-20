@@ -52,6 +52,8 @@ toolkitview_destroy( GtkObject *object )
 
 #ifdef DEBUG
 	printf( "toolkitview_destroy: %p\n", object );
+	printf( "toolkitview_destroy: menu = %p\n", kview->menu );
+	printf( "toolkitview_destroy: item = %p\n", kview->item );
 #endif /*DEBUG*/
 
 	DESTROY_GTK( kview->menu );
@@ -75,6 +77,10 @@ toolkitview_finalize( GObject *gobject )
 static void
 toolkitview_destroy_cb( GtkWidget *widget, Toolkitview *kview )
 {
+	/*
+	printf( "toolkitview_destroy_cb: %p\n", kview );
+	 */
+
 	kview->menu = NULL;
 	kview->item = NULL;
 	kview->destroy_sid = 0;
@@ -116,9 +122,6 @@ toolkitview_refresh( vObject *vobject )
 		iWindow *iwnd = IWINDOW( iwindow_get_root( menu ) );
 		char path[256];
 		GtkWidget *item;
-
-		if( !iwnd )
-			printf( "poop:\n" );
 
 		kview->menu = gtk_menu_new();
 		gtk_menu_set_accel_group( GTK_MENU( kview->menu ),

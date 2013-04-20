@@ -46,7 +46,7 @@ typedef enum {
 	SYM_PARAM,		/* A parameter to a user function */
 	SYM_ZOMBIE,		/* A referred to but not defined */
 	SYM_WORKSPACE,		/* A loaded workspace */
-	SYM_WORKSPACEROOT,	/* A collection of workspaces */
+	SYM_WORKSPACEROOT,	/* Base of all workspaces */
 	SYM_ROOT,		/* The root symbol */
 	SYM_EXTERNAL,		/* A reference to an external function */
 	SYM_BUILTIN		/* A reference to a built-in function */
@@ -160,6 +160,7 @@ void *symbol_patch_add( void **pnt, Symbol *sym );
 Symbol *symbol_root_init( void );
 
 Symbol *symbol_new( Compile *compile, const char *name );
+gboolean symbol_rename( Symbol *sym, const char *new_name );
 void symbol_error_redefine( Symbol *sym );
 Symbol *symbol_new_defining( Compile *compile, const char *name );
 Symbol *symbol_new_reference( Compile *compile, const char *name );

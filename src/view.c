@@ -28,8 +28,8 @@
  */
 
 /*
-#define DEBUG_VIEWCHILD
 #define DEBUG
+#define DEBUG_VIEWCHILD
  */
 
 /* Time each refresh
@@ -129,20 +129,21 @@ static void
 view_viewchild_changed( Model *model, ViewChild *viewchild )
 {
 	gboolean display = view_viewchild_display( viewchild );
+	View *child = viewchild->child_view;
 
-	/* Don't write to the viewchild->view_child pointer ... let
-	 * view_real_child_add() and view_real_child_remove() do this.
-	 */
-	if( !display && viewchild->child_view ) {
+	if( !display && child ) {
 #ifdef DEBUG_VIEWCHILD
 		printf( "view_viewchild_changed: %s \"%s\", removing view\n", 
 			G_OBJECT_TYPE_NAME( model ), 
 			NN( IOBJECT( model )->name ) );
+
+		printf( "view_viewchild_changed: %s\n", 
+			G_OBJECT_TYPE_NAME( child ) ); 
 #endif /*DEBUG_VIEWCHILD*/
 
-		gtk_widget_destroy( GTK_WIDGET( viewchild->child_view ) );
+		DESTROY_GTK( child );
 	}
-	else if( display && !viewchild->child_view ) {
+	else if( display && !child ) {
 #ifdef DEBUG_VIEWCHILD
 		printf( "view_viewchild_changed: %s \"%s\", adding view\n", 
 			G_OBJECT_TYPE_NAME( model ), 
@@ -160,7 +161,7 @@ view_viewchild_new( View *parent_view, Model *child_model )
 
 #ifdef DEBUG_VIEWCHILD
 	printf( "view_viewchild_new: view \"%s\" watching %s \"%s\"\n", 
-		G_OBJECT_TYPE_NAME( view ), 
+		G_OBJECT_TYPE_NAME( parent_view ), 
 		G_OBJECT_TYPE_NAME( child_model ), 
 		NN( IOBJECT( child_model )->name ) );
 #endif /*DEBUG_VIEWCHILD*/
@@ -178,10 +179,6 @@ view_viewchild_new( View *parent_view, Model *child_model )
 	parent_view->managed = 
 		g_slist_append( parent_view->managed, viewchild );
 
-	/* Make a view for this child, if we need one.
-	 */
-	view_viewchild_changed( child_model, viewchild );
-
 	return( viewchild );
 }
 
@@ -189,6 +186,7 @@ static void *
 view_viewchild_destroy( ViewChild *viewchild )
 {
 	View *parent_view = viewchild->parent_view;
+	View *child_view = viewchild->child_view;
 
 #ifdef DEBUG_VIEWCHILD
 	printf( "view_viewchild_destroy: view %s watching model %s\n",
@@ -196,7 +194,10 @@ view_viewchild_destroy( ViewChild *viewchild )
 		G_OBJECT_TYPE_NAME( viewchild->child_model ) );
 #endif /*DEBUG_VIEWCHILD*/
 
-	DESTROY_GTK( viewchild->child_view );
+	if( child_view ) { 
+		g_assert( child_view->parent == parent_view );
+		child_view->parent = NULL;
+	}
 	FREESID( viewchild->child_model_changed_sid, viewchild->child_model );
 	parent_view->managed = 
 		g_slist_remove( parent_view->managed, viewchild );
@@ -281,7 +282,8 @@ view_child_front( View *child )
 {
 	View *parent = child->parent;
 
-	VIEW_GET_CLASS( parent )->child_front( parent, child );
+	if( parent )
+		VIEW_GET_CLASS( parent )->child_front( parent, child );
 }
 
 /* Break link to model. 
@@ -297,8 +299,11 @@ view_unlink( View *view )
 	FREESID( view->scrollto_sid, VOBJECT( view )->iobject );
 	FREESID( view->layout_sid, VOBJECT( view )->iobject );
 	FREESID( view->reset_sid, VOBJECT( view )->iobject );
+	FREESID( view->front_sid, VOBJECT( view )->iobject );
 	FREESID( view->child_add_sid, VOBJECT( view )->iobject );
 	FREESID( view->child_remove_sid, VOBJECT( view )->iobject );
+	FREESID( view->child_detach_sid, VOBJECT( view )->iobject );
+	FREESID( view->child_attach_sid, VOBJECT( view )->iobject );
 }
 
 static void
@@ -409,14 +414,31 @@ view_model_reset( Model *model, View *view )
 	view_reset( view );
 }
 
+/* Called for model front signal ... bring view to front.
+ */
+static void
+view_model_front( Model *model, View *view )
+{
+	g_assert( IS_MODEL( model ) );
+	g_assert( IS_VIEW( view ) );
+
+#ifdef DEBUG
+	printf( "view_model_front: model %s \"%s\"\n", 
+		G_OBJECT_TYPE_NAME( model ), NN( IOBJECT( model )->name ) );
+	printf( "\tview %s\n", G_OBJECT_TYPE_NAME( view ) );
+#endif /*DEBUG*/
+
+	view_child_front( view );
+}
+
 /* Called for model child_add signal ... start watching that child.
  */
 static void
 view_model_child_add( Model *parent, Model *child, int pos, View *parent_view )
 {
-#ifdef DEBUG
 	ViewChild *viewchild;
 
+#ifdef DEBUG
 	printf( "view_model_child_add: parent %s \"%s\"\n", 
 		G_OBJECT_TYPE_NAME( parent ), NN( IOBJECT( parent )->name ) );
 #endif /*DEBUG*/
@@ -431,7 +453,8 @@ view_model_child_add( Model *parent, Model *child, int pos, View *parent_view )
 	g_assert( !viewchild );
 #endif /*DEBUG*/
 
-	(void) view_viewchild_new( parent_view, child ); 
+	viewchild = view_viewchild_new( parent_view, child ); 
+	view_viewchild_changed( child, viewchild );
 }
 
 /* Called for model child_remove signal ... stop watching that child. child
@@ -464,10 +487,70 @@ view_model_child_remove( iContainer *parent, iContainer *child,
 	(void) view_viewchild_destroy( viewchild ); 
 }
 
+/* Called for model parent_detach signal ... remove the viewchild for this
+ * child. child_attach will build a new one. 
+ */
+static void
+view_model_child_detach( iContainer *old_parent, iContainer *child, 
+	View *old_parent_view )
+{
+	ViewChild *viewchild;
+
+#ifdef DEBUG
+{
+	printf( "view_model_child_detach: child %s \"%s\"; "
+		"old_parent %s \"%s\"\n", 
+		G_OBJECT_TYPE_NAME( child ), 
+		NN( IOBJECT( child )->name ),
+		G_OBJECT_TYPE_NAME( old_parent ), 
+		NN( IOBJECT( old_parent )->name ) );
+
+	printf( "view_model_child_detach: old_parent_view = "
+			"view of %s \"%s\"\n",
+		G_OBJECT_TYPE_NAME( VOBJECT( old_parent_view )->iobject ), 
+		NN( IOBJECT( VOBJECT( old_parent_view )->iobject )->name ) );
+}
+#endif /*DEBUG*/
+
+	viewchild = slist_map( old_parent_view->managed,
+		(SListMapFn) view_viewchild_test_child_model, child );
+
+	g_assert( viewchild );
+	g_assert( !child->temp_view );
+
+	child->temp_view = viewchild->child_view;
+
+	(void) view_viewchild_destroy( viewchild ); 
+}
+
+/* Called for model child_attach signal ... make a new viewchild on the new
+ * parent view.
+ */
+static void
+view_model_child_attach( iContainer *new_parent, iContainer *child, int pos,
+	View *new_parent_view )
+{
+	ViewChild *viewchild;
+
+	g_assert( !slist_map( new_parent_view->managed,
+		(SListMapFn) view_viewchild_test_child_model, child ) ); 
+
+	viewchild = view_viewchild_new( new_parent_view, MODEL( child ) ); 
+
+	g_assert( child->temp_view && IS_VIEW( child->temp_view ) );
+	viewchild->child_view = child->temp_view;
+	child->temp_view = NULL;
+
+	viewchild->child_view->parent = new_parent_view;
+}
+
 static void *
 view_real_link_sub( Model *child_model, View *parent_view )
 {
-	(void) view_viewchild_new( parent_view, child_model ); 
+	ViewChild *viewchild;
+
+	viewchild = view_viewchild_new( parent_view, child_model ); 
+	view_viewchild_changed( child_model, viewchild );
 
 	return( NULL );
 }
@@ -499,10 +582,16 @@ view_real_link( View *view, Model *model, View *parent_view )
 		G_CALLBACK( view_model_layout ), view );
 	view->reset_sid = g_signal_connect( model, "reset", 
 		G_CALLBACK( view_model_reset ), view );
+	view->front_sid = g_signal_connect( model, "front", 
+		G_CALLBACK( view_model_front ), view );
 	view->child_add_sid = g_signal_connect( model, "child_add", 
 		G_CALLBACK( view_model_child_add ), view );
 	view->child_remove_sid = g_signal_connect( model, "child_remove", 
 		G_CALLBACK( view_model_child_remove ), view );
+	view->child_detach_sid = g_signal_connect( model, "child_detach", 
+		G_CALLBACK( view_model_child_detach ), view );
+	view->child_attach_sid = g_signal_connect( model, "child_attach", 
+		G_CALLBACK( view_model_child_attach ), view );
 
 	icontainer_map( ICONTAINER( model ),
 		(icontainer_map_fn) view_real_link_sub, view, NULL );
@@ -519,8 +608,11 @@ view_real_child_add( View *parent, View *child )
 	g_assert( child->parent == NULL );
 
 #ifdef DEBUG
-	printf( "view_real_child_add: parent %s, child %s\n", 
-		G_OBJECT_TYPE_NAME( parent ), G_OBJECT_TYPE_NAME( child ) );
+	printf( "view_real_child_add: parent %p %s, child %p %s\n", 
+		parent,
+		G_OBJECT_TYPE_NAME( parent ), 
+		child,
+		G_OBJECT_TYPE_NAME( child ) );
 #endif /*DEBUG*/
 
 	viewchild = slist_map( parent->managed,
@@ -643,8 +735,11 @@ view_init( View *view )
 	view->scrollto_sid = 0;
 	view->layout_sid = 0;
 	view->reset_sid = 0;
+	view->front_sid = 0;
 	view->child_add_sid = 0;
 	view->child_remove_sid = 0;
+	view->child_detach_sid = 0;
+	view->child_attach_sid = 0;
 
 	view->parent = NULL;
 

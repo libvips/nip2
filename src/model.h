@@ -55,11 +55,15 @@ typedef struct _ModelLoadState {
 		FIXME ... a linked list? try a hash sometime
 		see model_loadstate_rewrite_name()
 
-		would probably only see a speedup for merging large
+		would probably only see a speedup for merging very large
 		workspaces, not something we do often
 
 	 */
 	GSList *renames;	/* Rename table for this load context */
+
+	/* The column renames we have planned. Don't rewrite exprs with these.
+	 */
+	GSList *column_renames;
 
 	/* Version info we read from this XML file.
 	 */
@@ -96,7 +100,7 @@ typedef struct _ModelLoadState {
 	(G_TYPE_INSTANCE_GET_CLASS( (obj), TYPE_MODEL, ModelClass ))
 
 struct _Model {
-	iContainer parent;
+	iContainer parent_object;
 
 	/* My instance vars.
 	 */
@@ -138,6 +142,10 @@ typedef struct _ModelClass {
 
 		layout 		try to lay child view out
 
+		front		trigger view_child_front() for all views
+
+		display		create and destroy views
+
 	 */
 
 	void (*edit)( GtkWidget *, Model * );
@@ -145,6 +153,8 @@ typedef struct _ModelClass {
 	void (*scrollto)( Model *, ModelScrollPosition );
 	void (*reset)( Model * );
 	void (*layout)( Model * );
+	void (*front)( Model * );
+	void (*display)( Model *, gboolean display );
 
 	/* Load and save methods.
 
@@ -173,8 +183,13 @@ typedef struct _ModelClass {
 
 extern ModelLoadState *model_loadstate;
 
-ModelRename *model_loadstate_rename_new( ModelLoadState *state, 
+gboolean model_loadstate_rename_new( ModelLoadState *state, 
 	const char *old_name, const char *new_name );
+gboolean model_loadstate_taken( ModelLoadState *state, const char *name );
+gboolean model_loadstate_column_rename_new( ModelLoadState *state, 
+	const char *old_name, const char *new_name );
+gboolean model_loadstate_column_taken( ModelLoadState *state, 
+	const char *name );
 ModelLoadState *model_loadstate_new( 
 	const char *filename, const char *filename_user );
 ModelLoadState *model_loadstate_new_openfile( iOpenFile *of );
@@ -191,6 +206,8 @@ void model_layout( Model *model );
 void *model_reset( Model *model );
 void *model_edit( GtkWidget *parent, Model *model );
 void *model_header( GtkWidget *parent, Model *model );
+void model_front( Model *model );
+void model_display( Model *model, gboolean display );
 
 void *model_save( Model *model, xmlNode * );
 gboolean model_save_test( Model *model );
@@ -208,8 +225,6 @@ void model_base_init( void );
 
 View *model_build_display_all( Model *model, View *parent );
 
-void model_check_destroy( GtkWidget *parent, Model *model );
-
-gboolean model_set_display( Model *model, gboolean display );
+void model_check_destroy( GtkWidget *parent, Model *model, iWindowFn done_cb );
 
 void *model_clear_edited( Model *model );

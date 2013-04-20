@@ -35,6 +35,14 @@
 
 static ViewClass *parent_class = NULL;
 
+static void *
+subcolumnview_destroy_sub( Rowview *rview, Subcolumnview *sview )
+{
+	DESTROY_GTK( rview ); 
+
+	return( NULL );
+}
+
 static void
 subcolumnview_destroy( GtkObject *object )
 {
@@ -50,6 +58,13 @@ subcolumnview_destroy( GtkObject *object )
 	sview = SUBCOLUMNVIEW( object );
 
 	UNREF( sview->group );
+
+	/* Destroying us won't automatically destroy our rowviews, since they
+	 * are not true child-widgets. Do it by hand. 
+	 */
+	(void) view_map( VIEW( sview ), 
+		(view_map_fn) subcolumnview_destroy_sub, sview, NULL );
+	DESTROY_GTK( sview->table );
 
 	GTK_OBJECT_CLASS( parent_class )->destroy( object );
 }
@@ -103,7 +118,6 @@ subcolumnview_refresh_sub( Rowview *rview, Subcolumnview *sview )
 
 	return( NULL );
 }
-
 
 static void 
 subcolumnview_refresh( vObject *vobject )

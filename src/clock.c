@@ -97,12 +97,12 @@ clock_edit( GtkWidget *parent, Model *model )
 	/* Expands to eg. "Edit Toggle A1".
 	 */
 	iwindow_set_title( IWINDOW( ss ), _( "Edit %s %s" ),
-		G_OBJECT_TYPE_NAME( model ),
+		IOBJECT_GET_CLASS_NAME( model ),
 		IOBJECT( HEAPMODEL( model )->row )->name );
 	idialog_set_callbacks( IDIALOG( ss ), 
 		iwindow_true_cb, NULL, NULL, clock );
 	idialog_add_ok( IDIALOG( ss ), 
-		clock_done_cb, _( "Set %s" ), G_OBJECT_TYPE_NAME( model ) );
+		clock_done_cb, _( "Set %s" ), IOBJECT_GET_CLASS_NAME( model ) );
 	iwindow_set_parent( IWINDOW( ss ), GTK_WIDGET( parent ) );
 	idialog_set_iobject( IDIALOG( ss ), IOBJECT( model ) );
 	iwindow_build( IWINDOW( ss ) );
@@ -213,6 +213,7 @@ clock_class_init( ClockClass *class )
 	 */
 	gobject_class->dispose = clock_dispose;
 
+	iobject_class->user_name = _( "Clock" );
 	iobject_class->generate_caption = clock_generate_caption;
 
 	model_class->edit = clock_edit;

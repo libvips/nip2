@@ -70,17 +70,12 @@ column_map_symbol( Column *col, symbol_map_fn fn, void *a )
 static void
 column_finalize( GObject *gobject )
 {
-	Column *col;
-
 #ifdef DEBUG
 	printf( "column_finalize\n" );
 #endif /*DEBUG*/
 
 	g_return_if_fail( gobject != NULL );
 	g_return_if_fail( IS_COLUMN( gobject ) );
-
-	col = COLUMN( gobject );
-	IM_FREEF( g_source_remove, col->open_timeout );
 
 	G_OBJECT_CLASS( parent_class )->finalize( gobject );
 }
@@ -118,7 +113,7 @@ column_child_remove( iContainer *parent, iContainer *child )
 {
 	Column *col = COLUMN( parent );
 
-	filemodel_set_modified( FILEMODEL( col->ws ), TRUE );
+	workspace_set_modified( col->ws, TRUE );
 
 	ICONTAINER_CLASS( parent_class )->child_remove( parent, child );
 }
@@ -170,13 +165,13 @@ column_save( Model *model, xmlNode *xnode )
 	/* Save sform for backwards compat with nip 7.8 ... now a workspace
 	 * property.
 	 */
-	if( !set_prop( xthis, "x", "%d", x ) ||
-		!set_prop( xthis, "y", "%d", y ) ||
+	if( !set_iprop( xthis, "x", x ) ||
+		!set_iprop( xthis, "y", y ) ||
 		!set_sprop( xthis, "open", bool_to_char( col->open ) ) ||
 		!set_sprop( xthis, "selected",
 			bool_to_char( col->selected ) ) ||
 		!set_sprop( xthis, "sform", bool_to_char( FALSE ) ) ||
-		!set_prop( xthis, "next", "%d", col->next ) || 
+		!set_iprop( xthis, "next", col->next ) || 
 		!set_sprop( xthis, "name", IOBJECT( col )->name ) )
 		return( NULL );
 
@@ -194,8 +189,9 @@ column_save_test( Model *model )
 {
 	Column *col = COLUMN( model );
 	Workspace *ws = col->ws;
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
-	if( ws->save_type == WORKSPACE_SAVE_SELECTED ) 
+	if( wsg->save_type == WORKSPACEGROUP_SAVE_SELECTED ) 
 		/* Only save columns containing selected rows.
 		 */
 		return( column_map( col, 
@@ -244,6 +240,7 @@ static void
 column_class_init( ColumnClass *class )
 {
 	GObjectClass *gobject_class = (GObjectClass *) class;
+	iObjectClass *iobject_class = (iObjectClass *) class;
 	iContainerClass *icontainer_class = (iContainerClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 	FilemodelClass *filemodel_class = (FilemodelClass *) class;
@@ -257,6 +254,8 @@ column_class_init( ColumnClass *class )
 
 	/* Init methods.
 	 */
+	iobject_class->user_name = _( "Column" );
+
 	icontainer_class->child_add = column_child_add;
 	icontainer_class->child_remove = column_child_remove;
 	icontainer_class->parent_add = column_parent_add;
@@ -437,49 +436,6 @@ column_name_new( Column *col )
 	return( im_strdup( NULL, buf ) );
 }
 
-static Row *
-column_open_find( Row *row, Column *col )
-{
-	if( MODEL( row )->display != col->open )
-		return( row );
-
-	return( NULL );
-}
-
-static gboolean
-column_open_timeout_cb( Column *col )
-{
-	void *(*map_fn)( iContainer *, icontainer_map_fn, void *, void * );
-	Row *row;
-	gboolean again = TRUE;
-
-	if( !col->scol ) {
-		col->open_timeout = 0;
-		return( FALSE );
-	}
-
-	if( col->open ) 
-		map_fn = icontainer_map_rev;
-	else
-		map_fn = icontainer_map;
-
-	while( (row = ROW( map_fn( ICONTAINER( col->scol ),
-		(icontainer_map_fn) column_open_find, col, NULL ) )) ) {
-		model_set_display( MODEL( row ), col->open );
-		col->open_frames += 1;
-
-		if( col->open_frames < column_open_max_frames )
-			break;
-	}
-
-	if( !row ) {
-		col->open_timeout = 0;
-		again = FALSE;
-	}
-
-	return( again );
-}
-
 void 
 column_set_open( Column *col, gboolean open )
 {
@@ -487,13 +443,9 @@ column_set_open( Column *col, gboolean open )
 		Workspace *ws = col->ws;
 
 		col->open = open;
-		filemodel_set_modified( FILEMODEL( ws ), TRUE );
+		workspace_set_modified( ws, TRUE );
 		iobject_changed( IOBJECT( col ) );
 
-		if( !col->open_timeout ) {
-			col->open_frames = 0;
-			col->open_timeout = g_timeout_add( 20, 
-				(GSourceFunc) column_open_timeout_cb, col );
-		}
+		model_display( MODEL( col->scol ), col->open );
 	}
 }

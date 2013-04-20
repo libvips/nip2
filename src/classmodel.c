@@ -152,7 +152,7 @@ classmodel_graphic_save( Classmodel *classmodel, GtkWidget *parent )
 	if( !class->graphic_save ) {
 		error_top( _( "Not implemented." ) );
 		error_sub( _( "_%s() method not implemented for %s." ), 
-			"graphic_save", G_OBJECT_TYPE_NAME( classmodel ) );
+			"graphic_save", IOBJECT_GET_CLASS_NAME( classmodel ) );
 		iwindow_alert( parent, GTK_MESSAGE_ERROR );
 		return;
 	}
@@ -160,7 +160,7 @@ classmodel_graphic_save( Classmodel *classmodel, GtkWidget *parent )
 	filesel = filesel_new();
 	row_qualified_name( HEAPMODEL( classmodel )->row, &buf );
 	iwindow_set_title( IWINDOW( filesel ), _( "Save %s \"%s\"" ), 
-		G_OBJECT_TYPE_NAME( classmodel ), vips_buf_all( &buf ) );
+		IOBJECT_GET_CLASS_NAME( classmodel ), vips_buf_all( &buf ) );
 	filesel_set_flags( FILESEL( filesel ), TRUE, TRUE );
 	filesel_set_filetype( FILESEL( filesel ), 
 		class->filetype, 
@@ -225,7 +225,7 @@ classmodel_graphic_replace( Classmodel *classmodel, GtkWidget *parent )
 		error_top( _( "Not implemented." ) );
 		error_sub( _( "_%s() method not implemented for %s." ), 
 			"graphic_replace",
-			G_OBJECT_TYPE_NAME( classmodel ) );
+			IOBJECT_GET_CLASS_NAME( classmodel ) );
 		iwindow_alert( parent, GTK_MESSAGE_ERROR );
 		return;
 	}
@@ -233,7 +233,7 @@ classmodel_graphic_replace( Classmodel *classmodel, GtkWidget *parent )
 	row_qualified_name( HEAPMODEL( classmodel )->row, &buf );
 	filesel = filesel_new();
 	iwindow_set_title( IWINDOW( filesel ), _( "Replace %s \"%s\"" ), 
-		G_OBJECT_TYPE_NAME( classmodel ), vips_buf_all( &buf ) );
+		IOBJECT_GET_CLASS_NAME( classmodel ), vips_buf_all( &buf ) );
 	filesel_set_flags( FILESEL( filesel ), TRUE, FALSE );
 	filesel_set_filetype( FILESEL( filesel ), 
 		class->filetype, 
@@ -757,7 +757,7 @@ classmodel_edit( GtkWidget *parent, Model *model )
 		/* Expands to eg. "Edit Toggle A1".
 		 */
 		iwindow_set_title( IWINDOW( idlg ), _( "Edit %s %s" ),
-			G_OBJECT_TYPE_NAME( model ),
+			IOBJECT_GET_CLASS_NAME( model ),
 			IOBJECT( HEAPMODEL( model )->row )->name );
 		idialog_set_build( IDIALOG( idlg ), 
 			(iWindowBuildFn) classmodel_buildedit, eds, 
@@ -768,7 +768,7 @@ classmodel_edit( GtkWidget *parent, Model *model )
 		 */
 		idialog_add_ok( IDIALOG( idlg ), 
 			classmodel_done_cb, _( "Set %s" ), 
-			G_OBJECT_TYPE_NAME( classmodel ) );
+			IOBJECT_GET_CLASS_NAME( classmodel ) );
 		iwindow_set_parent( IWINDOW( idlg ), parent );
 		idialog_set_iobject( IDIALOG( idlg ), IOBJECT( classmodel ) );
 		iwindow_build( IWINDOW( idlg ) );
@@ -786,7 +786,7 @@ classmodel_save_member( Classmodel *classmodel,
 	switch( m->type ) {
 	case CLASSMODEL_MEMBER_INT:
 	case CLASSMODEL_MEMBER_ENUM:
-		if( !set_prop( xthis, m->save_name, "%d", 
+		if( !set_iprop( xthis, m->save_name, 
 			G_STRUCT_MEMBER( int, classmodel, m->offset ) ) )
 			return( FALSE );
 		break;
@@ -804,7 +804,7 @@ classmodel_save_member( Classmodel *classmodel,
 		break;
 
 	case CLASSMODEL_MEMBER_STRING:
-		if( !set_prop( xthis, m->save_name, "%s", 
+		if( !set_sprop( xthis, m->save_name, 
 			G_STRUCT_MEMBER( char *, classmodel, m->offset ) ) )
 			return( FALSE );
 		break;
@@ -833,8 +833,8 @@ classmodel_save_member( Classmodel *classmodel,
 		const int n = value->width * value->height;
 
 		if( !set_dlprop( xthis, "value", value->coeff, n ) ||
-			!set_prop( xthis, "width", "%d", value->width ) ||
-			!set_prop( xthis, "height", "%d", value->height ) )
+			!set_iprop( xthis, "width", value->width ) ||
+			!set_iprop( xthis, "height", value->height ) )
 			return( FALSE );
 
 		break;
@@ -1440,7 +1440,7 @@ classmodel_update( Classmodel *classmodel )
 	 */
 	classmodel_set_edited( classmodel, TRUE );
 	expr_dirty( row->expr, link_serial_new() );
-	filemodel_set_modified( FILEMODEL( row->ws ), TRUE );
+	workspace_set_modified( row->ws, TRUE );
 }
 
 /* Make a new classmodel subtype (eg. TYPE_PATHNAME) and link it on.

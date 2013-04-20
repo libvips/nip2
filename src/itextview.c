@@ -196,7 +196,7 @@ itextview_activate_cb( Formula *formula, iTextview *itextview )
 	 */
 	view_scannable_register( VIEW( itextview ) );
 
-	filemodel_set_modified( FILEMODEL( row->ws ), TRUE );
+	workspace_set_modified( row->ws, TRUE );
 
 	symbol_recalculate_all();
 }

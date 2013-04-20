@@ -424,6 +424,7 @@ workspaceview_destroy( GtkObject *object )
 	workspaceview_scroll_stop( wview );
 	IM_FREEF( iwindow_cursor_context_destroy, wview->context );
 	FREESID( wview->watch_changed_sid, main_watchgroup );
+	DESTROY_GTK( wview->popup );
 
 	GTK_OBJECT_CLASS( parent_class )->destroy( object );
 }
@@ -472,41 +473,36 @@ workspaceview_drag_data_received( GtkWidget *widget, GdkDragContext *context,
 			GTK_WIDGET( wview->fixed )->window, x, y ) &&
 		(from_row = row_parse_name( main_workspaceroot->sym, 
 			from_row_path )) ) {
-		char *name;
+		char new_name[MAX_STRSIZE];
 		Column *col;
+		char vips_buf_text[256];
+		VipsBuf buf = VIPS_BUF_STATIC( vips_buf_text );
+		Symbol *sym;
 
-		name = workspace_column_name_new( ws, NULL );
-		if( !(col = column_new( ws, name )) )
+		workspace_column_name_new( ws, new_name );
+		col = column_new( ws, new_name );
+
+		col->x = x;
+		col->y = y;
+		workspace_column_select( ws, col );
+
+		/* Qualify relative to us. We don't want to embed
+		 * workspace names unless we have to.
+		 */
+		row_qualified_name_relative( ws->sym, from_row, &buf );
+
+		if( !(sym = workspace_add_def( ws, vips_buf_all( &buf ) )) ) 
 			iwindow_alert( widget, GTK_MESSAGE_ERROR );
-		IM_FREE( name );
 
-		if( col ) {
-			char vips_buf_text[256];
-			VipsBuf buf = VIPS_BUF_STATIC( vips_buf_text );
-			Symbol *sym;
+		symbol_recalculate_all();
 
-			col->x = x;
-			col->y = y;
-			workspace_column_select( ws, col );
-
-			/* Qualify relative to us. We don't want to embed
-			 * workspace names unless we have to.
-			 */
-			row_qualified_name_relative( ws->sym, 
-				from_row, &buf );
-
-			if( !(sym = workspace_add_def( ws, 
-				vips_buf_all( &buf ) )) ) 
-				iwindow_alert( widget, GTK_MESSAGE_ERROR );
-
-			symbol_recalculate_all();
-
-			/* Usually the drag-from row will be selected, very
-			 * annoying. Select the drag-to row.
-			 */
-			if( sym && sym->expr && sym->expr->row )
-				row_select( sym->expr->row );
-		}
+		/* Usually the drag-from row will be selected, very
+		 * annoying. Select the drag-to row.
+		 */
+		if( sym && 
+			sym->expr && 
+			sym->expr->row )
+			row_select( sym->expr->row );
 	}
 }
 
@@ -533,6 +529,7 @@ workspaceview_child_size_cb( Columnview *cview,
 	GtkAllocation *allocation, Workspaceview *wview )
 {
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
 	int right, bottom;
 
@@ -575,9 +572,34 @@ workspaceview_child_size_cb( Columnview *cview,
 		 * loads and saves.
 		 */
 		ws->area = wview->bounding;
-		filemodel_set_offset( FILEMODEL( ws ), 
+		filemodel_set_offset( FILEMODEL( wsg ), 
 			ws->area.left, ws->area.top );
 	}
+}
+
+/* Pick an xy position for the next column.
+ */
+static void
+workspaceview_pick_xy( Workspaceview *wview, int *x, int *y )
+{
+	/* Position already set? No change.
+	 */
+	if( *x >= 0 )
+		return;
+
+	/* Set this position.
+	 */
+	*x = wview->next_x + wview->vp.left;
+	*y = wview->next_y + wview->vp.top;
+
+	/* And move on.
+	 */
+	wview->next_x += 30;
+	wview->next_y += 30;
+	if( wview->next_x > 300 )
+		wview->next_x = 3;
+	if( wview->next_y > 200 )
+		wview->next_y = 3;
 }
 
 static void
@@ -647,12 +669,32 @@ workspaceview_child_front( View *parent, View *child )
 static void 
 workspaceview_refresh( vObject *vobject )
 {
-#ifdef DEBUG
 	Workspaceview *wview = WORKSPACEVIEW( vobject );
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
 
-	printf( "workspaceview_refresh: %s\n", IOBJECT( ws )->name );
+#ifdef DEBUG
+	printf( "workspaceview_refresh: %p %s\n", ws, IOBJECT( ws )->name );
 #endif /*DEBUG*/
+
+	workspace_jump_update( ws, wview->popup_jump );
+
+	if( ws->rpane_open && !wview->rpane->open )
+		pane_animate_open( wview->rpane );
+	if( !ws->rpane_open && wview->rpane->open )
+		pane_animate_closed( wview->rpane );
+
+	if( ws->lpane_open && !wview->lpane->open )
+		pane_animate_open( wview->lpane );
+	if( !ws->lpane_open && wview->lpane->open )
+		pane_animate_closed( wview->lpane );
+
+	if( wview->label ) {
+		gtk_label_set_text( GTK_LABEL( wview->label ),
+			IOBJECT( ws )->name );
+		if( IOBJECT( ws )->caption )
+			set_tooltip( wview->label, 
+				"%s", IOBJECT( ws )->caption );
+	}
 
 	VOBJECT_CLASS( parent_class )->refresh( vobject );
 }
@@ -739,7 +781,7 @@ workspaceview_layout_set_pos( Columnview *cview, WorkspaceLayout *layout )
 		layout->area.width = GTK_WIDGET( cview )->allocation.width;
 
 	iobject_changed( IOBJECT( column ) );
-	filemodel_set_modified( FILEMODEL( column->ws ), TRUE );
+	workspace_set_modified( column->ws, TRUE );
 
 	return( NULL );
 }
@@ -843,11 +885,14 @@ workspaceview_class_init( WorkspaceviewClass *class )
 /* Can't use main_load(), we want to select wses after load.
  */
 static gboolean
-workspaceview_load( Mainw *mainw, Workspace *ws, const char *filename )
+workspaceview_load( Workspace *ws, const char *filename )
 {
-	Workspace *new_ws;
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
+	Workspaceroot *wsr = wsg->wsr; 
 
-	if( (new_ws = mainw_open_workspace( mainw, filename, TRUE, TRUE )) ) 
+	Workspacegroup *new_wsg;
+
+	if( (new_wsg = mainw_open_workspace( wsr, filename )) ) 
 		return( TRUE );
 
 	error_clear();
@@ -875,19 +920,88 @@ workspaceview_load( Mainw *mainw, Workspace *ws, const char *filename )
 	return( FALSE );
 }
 
+static void
+workspaceview_lpane_changed_cb( Pane *pane, Workspaceview *wview )
+{
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+
+	if( ws->lpane_open != pane->open ||
+		ws->lpane_position != pane->user_position ) {
+		ws->lpane_open = pane->open;
+		ws->lpane_position = pane->user_position;
+
+		iobject_changed( IOBJECT( ws ) );
+	}
+}
+
+static void
+workspaceview_rpane_changed_cb( Pane *pane, Workspaceview *wview )
+{
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+
+	if( ws->rpane_open != pane->open ||
+		ws->rpane_position != pane->user_position ) {
+		ws->rpane_open = pane->open;
+		ws->rpane_position = pane->user_position;
+
+		iobject_changed( IOBJECT( ws ) );
+	}
+}
+
 static gboolean
 workspaceview_filedrop( Workspaceview *wview, const char *filename )
 {
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
-	Mainw *mainw = MAINW( iwindow_get_root( GTK_WIDGET( wview ) ) );
 
 	gboolean result;
 
-	result = workspaceview_load( mainw, ws, filename );
+	result = workspaceview_load( ws, filename );
 	if( result )
 		symbol_recalculate_all();
 
 	return( result );
+}
+
+static void
+workspaceview_column_new_action_cb2( GtkWidget *wid, GtkWidget *host, 
+	Workspaceview *wview )
+{
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+
+	if( !workspace_column_new( ws ) ) 
+		iwindow_alert( GTK_WIDGET( wview ), GTK_MESSAGE_ERROR );
+}
+
+static void
+workspaceview_layout_action_cb2( GtkWidget *wid, GtkWidget *host, 
+	Workspaceview *wview )
+{
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+
+	model_layout( MODEL( ws ) );
+}
+
+static void
+workspaceview_group_action_cb2( GtkWidget *wid, GtkWidget *host, 
+	Workspaceview *wview )
+{
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+
+	workspace_selected_group( ws );
+}
+
+static void
+workspaceview_next_error_action_cb2( GtkWidget *wid, GtkWidget *host, 
+	Workspaceview *wview )
+{
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+
+	if( !workspace_next_error( ws ) ) {
+		error_top( _( "No errors." ) );
+		error_sub( "%s", _( "There are no errors (that I can see) "
+			"in this workspace." ) );
+		iwindow_alert( GTK_WIDGET( wview ), GTK_MESSAGE_INFO );
+	}
 }
 
 static void
@@ -928,6 +1042,20 @@ workspaceview_init( Workspaceview *wview )
 	wview->watch_changed_sid = g_signal_connect( main_watchgroup, 
 		"watch_changed",
 		G_CALLBACK( workspaceview_watch_changed_cb ), wview );
+
+	wview->rpane = pane_new( PANE_HIDE_RIGHT );
+	g_signal_connect( wview->rpane, "changed",
+		G_CALLBACK( workspaceview_rpane_changed_cb ), wview );
+	gtk_box_pack_start( GTK_BOX( wview ), 
+		GTK_WIDGET( wview->rpane ), TRUE, TRUE, 2 );
+	gtk_widget_show( GTK_WIDGET( wview->rpane ) );
+
+	wview->lpane = pane_new( PANE_HIDE_LEFT );
+	g_signal_connect( wview->lpane, "changed",
+		G_CALLBACK( workspaceview_lpane_changed_cb ), wview );
+	gtk_paned_pack1( GTK_PANED( wview->rpane ), 
+		GTK_WIDGET( wview->lpane ), TRUE, FALSE );
+	gtk_widget_show( GTK_WIDGET( wview->lpane ) );
 
 	/* Ask for our own window so we can spot events on the window 
 	 * background.
@@ -971,10 +1099,27 @@ workspaceview_init( Workspaceview *wview )
          * ourselves .. see rowview.c.
          */
 
-	gtk_box_pack_end( GTK_BOX( wview ), wview->window, TRUE, TRUE, 0 );
+	gtk_paned_pack2( GTK_PANED( wview->lpane ), 
+		GTK_WIDGET( wview->window ), TRUE, FALSE );
 
 	filedrop_register( GTK_WIDGET( wview ),
 		(FiledropFunc) workspaceview_filedrop, wview );
+
+	wview->popup = popup_build( _( "Workspace menu" ) );
+
+	popup_add_but( wview->popup, _( "New C_olumn" ),
+		POPUP_FUNC( workspaceview_column_new_action_cb2 ) ); 
+	wview->popup_jump = popup_add_pullright( wview->popup, 
+		_( "Jump to _Column" ) ); 
+	popup_add_but( wview->popup, _( "Align _Columns" ),
+		POPUP_FUNC( workspaceview_layout_action_cb2 ) ); 
+	menu_add_sep( wview->popup );
+	popup_add_but( wview->popup, _( "_Group Selected" ),
+		POPUP_FUNC( workspaceview_group_action_cb2 ) ); 
+	menu_add_sep( wview->popup );
+	popup_add_but( wview->popup, STOCK_NEXT_ERROR,
+		POPUP_FUNC( workspaceview_next_error_action_cb2 ) ); 
+	popup_attach( wview->fixed, wview->popup, wview );
 
 	gtk_widget_show_all( wview->window );
 }
@@ -1010,28 +1155,10 @@ workspaceview_new( void )
 	return( VIEW( wview ) );
 }
 
-/* Pick an xy position for the next column.
- */
 void
-workspaceview_pick_xy( Workspaceview *wview, int *x, int *y )
+workspaceview_set_label( Workspaceview *wview, GtkWidget *label )
 {
-	/* Position already set? No change.
-	 */
-	if( *x >= 0 )
-		return;
+	g_assert( !wview->label );
 
-	/* Set this position.
-	 */
-	*x = wview->next_x + wview->vp.left;
-	*y = wview->next_y + wview->vp.top;
-
-	/* And move on.
-	 */
-	wview->next_x += 30;
-	wview->next_y += 30;
-	if( wview->next_x > 300 )
-		wview->next_x = 3;
-	if( wview->next_y > 200 )
-		wview->next_y = 3;
+	wview->label = label;
 }
-

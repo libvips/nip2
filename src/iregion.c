@@ -233,12 +233,13 @@ iregion_edit( GtkWidget *parent, Model *model )
 	}
 
 	iwindow_set_title( IWINDOW( ss ), _( "Edit %s %s" ),
-		G_OBJECT_TYPE_NAME( model ),
+		IOBJECT_GET_CLASS_NAME( model ),
 		IOBJECT( HEAPMODEL( model )->row )->name );
 	idialog_set_callbacks( IDIALOG( ss ), 
 		iwindow_true_cb, NULL, NULL, classmodel );
 	idialog_add_ok( IDIALOG( ss ), 
-		iregion_done_cb, _( "Set %s" ), G_OBJECT_TYPE_NAME( model ) );
+		iregion_done_cb, _( "Set %s" ), 
+		IOBJECT_GET_CLASS_NAME( model ) );
 	iwindow_set_parent( IWINDOW( ss ), GTK_WIDGET( parent ) );
 	idialog_set_iobject( IDIALOG( ss ), IOBJECT( model ) );
 	idialog_set_pinup( IDIALOG( ss ), TRUE );
@@ -282,10 +283,10 @@ iregion_save( Model *model, xmlNode *xnode )
 	if( instance && CLASSMODEL( model )->edited ) {
 		Rect *area = &instance->area;
 
-		if( !set_prop( xthis, "left", "%d", area->left ) ||
-			!set_prop( xthis, "top", "%d", area->top ) ||
-			!set_prop( xthis, "width", "%d", area->width ) ||
-			!set_prop( xthis, "height", "%d", area->height ) )
+		if( !set_iprop( xthis, "left", area->left ) ||
+			!set_iprop( xthis, "top", area->top ) ||
+			!set_iprop( xthis, "width", area->width ) ||
+			!set_iprop( xthis, "height", area->height ) )
 			return( NULL );
 	}
 
@@ -460,6 +461,7 @@ iregion_class_init( iRegionClass *class )
 	 */
 	gobject_class->finalize = iregion_finalize;
 
+	iobject_class->user_name = _( "Region" );
 	iobject_class->generate_caption = iregion_generate_caption;
 
 	icontainer_class->parent_add = iregion_parent_add;

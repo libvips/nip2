@@ -47,25 +47,10 @@ typedef enum {
 	WORKSPACE_MODE_NOEDIT	/* Shut down all edits */
 } WorkspaceMode;
 
-/* Three sorts of workspace file load.
- */
-typedef enum {
-	WORKSPACE_LOAD_TOP,	/* Load as new workspace */
-	WORKSPACE_LOAD_COLUMNS,	/* Merge columns into current workspace */
-	WORKSPACE_LOAD_ROWS	/* Merge rows into current column */
-} WorkspaceLoadType;
-
-/* Save mode ... controls behaviour of column_save_test() and row_save_test()
- */
-typedef enum {
-	WORKSPACE_SAVE_ALL,	/* Save all rows */
-	WORKSPACE_SAVE_SELECTED	/* Only save selected rows */
-} WorkspaceSaveType;
-
 /* A workspace.
  */
 struct _Workspace {
-	Filemodel parent_object;
+	Model parent_object;
 
 	/* Our rows are part of this symbol.
 	 */
@@ -78,15 +63,9 @@ struct _Workspace {
 	/* State.
 	 */
 	int next;		/* Index for next column name */
-	Column *current;	/* Current column */
 	GSList *selected;	/* Rows selected in this workspace */
 	GSList *errors;		/* Rows with errors */
         WorkspaceMode mode;	/* Display mode */
-
-	/* Compatibility. 7.8.x used different names for Marks and had strange
-	 * position behaviour.
-	 */
-	gboolean compat_78;	/* In 7.8.x compatibility mode */
 
 	/* Some versions (7.10 etc.) need special compat toolkits. 0 here for
 	 * no compat toolkits loaded.
@@ -94,29 +73,18 @@ struct _Workspace {
 	int compat_major;
 	int compat_minor;
 
-	/* Control load/save for this ws.
+	/* The last row we scrolled to on next-error.
 	 */
-	WorkspaceLoadType load_type;
-	WorkspaceSaveType save_type;
+	Row *last_error;
 
 	Rect area;		/* Rect enclosing the set of columns */
 	Rect vp;		/* Viewport hint ... set by views */
-	int window_width;	/* Enclosing window size ... set by views */
-	int window_height;
 	gboolean lpane_open;	/* Pane model */
 	int lpane_position;	
 	gboolean rpane_open;
 	int rpane_position;
 
-	guint auto_save_timeout;/* Timeout for next autosave */
-
 	char *status;		/* Status message */
-
-	/* Toolkit menus associated with this WS need to know where to show
-	 * their error boxes. Our mainws pops their pointers in here to be 
-	 * picked up by them.
-	 */
-	iWindow *iwnd;
 
 	/* Visualisation defaults for this ws.
 	 */
@@ -132,13 +100,15 @@ struct _Workspace {
 };
 
 typedef struct _WorkspaceClass {
-	FilemodelClass parent_class;
+	ModelClass parent_class;
 
 	/* Methods.
 	 */
 } WorkspaceClass;
 
+Workspacegroup *workspace_get_workspacegroup( Workspace *ws );
 Workspaceroot *workspace_get_workspaceroot( Workspace *ws );
+void workspace_set_modified( Workspace *ws, gboolean modified );
 
 void *workspace_map( workspace_map_fn fn, void *a, void *b );
 void *workspace_map_column( Workspace *ws, column_map_fn fn, void *a );
@@ -164,31 +134,24 @@ Column *workspace_is_one_empty( Workspace *ws );
 
 Column *workspace_column_find( Workspace *ws, const char *name );
 Column *workspace_column_get( Workspace *ws, const char *name );
-char *workspace_column_name_new( Workspace *ws, xmlNode *columns );
+void workspace_column_name_new( Workspace *ws, char *name );
 Column *workspace_column_pick( Workspace *ws );
 void workspace_column_select( Workspace *ws, Column *col );
+gboolean workspace_column_new( Workspace *ws );
 
 Symbol *workspace_add_def( Workspace *ws, const char *str );
 Symbol *workspace_add_def_recalc( Workspace *ws, const char *str );
 gboolean workspace_load_file_buf( VipsBuf *buf, const char *filename );
 Symbol *workspace_load_file( Workspace *ws, const char *filename );
 
-gboolean workspace_selected_save( Workspace *ws, const char *filename );
-gboolean workspace_clone_selected( Workspace *ws );
-
-void workspace_retain_clean( void );
-void workspace_auto_recover( Mainw *mainw );
+void workspace_get_version( Workspace *ws, int *major, int *minor );
+int workspace_have_compat( int major, int minor, 
+	int *best_major, int *best_minor );
+gboolean workspace_load_compat( Workspace *ws, int major, int minor );
 
 GType workspace_get_type( void );
-Workspace *workspace_new( Workspaceroot *wsr, const char *name );
-Workspace *workspace_new_from_file( Workspaceroot *wsr, 
-	const char *filename, const char *filename_user );
-Workspace *workspace_new_from_openfile( Workspaceroot *wsr, iOpenFile *of );
-Workspace *workspace_new_blank( Workspaceroot *wsr, const char *name );
-gboolean workspace_merge_file( Workspace *ws, 
-	const char *filename, const char *filename_user );
-gboolean workspace_merge_column_file( Workspace *ws, 
-	const char *filename, const char *filename_user );
+Workspace *workspace_new( Workspacegroup *wsg, const char *name );
+Workspace *workspace_new_blank( Workspacegroup *wsg );
 
 Row *workspace_get_bottom( Workspace *ws );
 
@@ -197,10 +160,12 @@ gboolean workspace_add_action( Workspace *ws,
 
 int workspace_number( void );
 
-Workspace *workspace_clone( Workspace *ws );
 gboolean workspace_selected_recalc( Workspace *ws );
 void workspace_selected_remove_yesno( Workspace *ws, GtkWidget *parent );
 gboolean workspace_selected_ungroup( Workspace *ws );
+gboolean workspace_selected_group( Workspace *ws );
+
+gboolean workspace_next_error( Workspace *ws );
 
 void workspace_set_status( Workspace *ws, const char *fmt, ... )
 	__attribute__((format(printf, 2, 3)));
@@ -209,3 +174,13 @@ void workspace_set_mode( Workspace *ws, WorkspaceMode mode );
 
 gboolean workspace_local_set( Workspace *ws, const char *txt );
 gboolean workspace_local_set_from_file( Workspace *ws, const char *fname );
+
+void workspace_jump_update( Workspace *ws, GtkWidget *menu );
+
+gboolean workspace_merge_file( Workspace *ws, const char *filename );
+gboolean workspace_selected_duplicate( Workspace *ws );
+gboolean workspace_selected_save( Workspace *ws, const char *filename );
+
+gboolean workspace_rename( Workspace *ws, 
+	const char *name, const char *caption );
+gboolean workspace_duplicate( Workspace *ws );

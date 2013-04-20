@@ -169,9 +169,9 @@ iimage_save( Model *model, xmlNode *xnode )
 
 	/* We always rebuild the value from the expr ... don't save.
 	 */
-	if( !set_prop( xthis, "image_left", "%d", iimage->image_left ) ||
-		!set_prop( xthis, "image_top", "%d", iimage->image_top ) ||
-		!set_prop( xthis, "image_mag", "%d", iimage->image_mag ) ||
+	if( !set_iprop( xthis, "image_left", iimage->image_left ) ||
+		!set_iprop( xthis, "image_top", iimage->image_top ) ||
+		!set_iprop( xthis, "image_mag", iimage->image_mag ) ||
 		!set_sprop( xthis, "show_status",
 			bool_to_char( iimage->show_status ) ) ||
 		!set_sprop( xthis, "show_paintbox",
@@ -386,7 +386,7 @@ iimage_replace( iImage *iimage, const char *filename )
 
 	if( itext_set_formula( itext, vips_buf_all( &buf ) ) ) {
 		itext_set_edited( itext, TRUE );
-		filemodel_set_modified( FILEMODEL( row->ws ), TRUE );
+		workspace_set_modified( row->ws, TRUE );
 		(void) expr_dirty( row->expr, link_serial_new() );
 
 		mainw_recent_add( &mainw_recent_image, filename );
@@ -421,6 +421,7 @@ iimage_class_init( iImageClass *class )
 	gobject_class->dispose = iimage_dispose;
 	gobject_class->finalize = iimage_finalize;
 
+	iobject_class->user_name = _( "Image" );
 	iobject_class->generate_caption = iimage_generate_caption;
 	iobject_class->info = iimage_info;
 

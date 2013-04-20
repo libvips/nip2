@@ -145,7 +145,8 @@ watchgroup_save( Watchgroup *watchgroup )
 	Workspace *ws;
 
 	if( (ws = watchgroup_get_workspace( watchgroup )) ) {
-		Filemodel *filemodel = FILEMODEL( ws );
+		Workspacegroup *wsg = workspace_get_workspacegroup( ws );
+		Filemodel *filemodel = FILEMODEL( wsg );
 
 		if( filemodel->modified ) {
 			symbol_recalculate_all();
@@ -153,7 +154,7 @@ watchgroup_save( Watchgroup *watchgroup )
 			/* Ignore error returns ... hmm! Tricky: we can come
 			 * here during shutdown.
 			 */
-			(void) filemodel_save_all( filemodel, 
+			(void) filemodel_top_save( filemodel, 
 				filemodel->filename );
 
 			filemodel_set_modified( filemodel, FALSE );
@@ -179,11 +180,11 @@ watchgroup_dirty( Watchgroup *watchgroup )
 	/* Find the preferences workspace.
 	 */
 	if( (ws = watchgroup_get_workspace( watchgroup )) ) {
-		Filemodel *filemodel = FILEMODEL( ws );
+		Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
 		/* Mark ws dirty, start save timer.
 		 */
-		filemodel_set_modified( filemodel, TRUE );
+		filemodel_set_modified( FILEMODEL( wsg ), TRUE );
 
 		IM_FREEF( g_source_remove, watchgroup->auto_save_timeout );
 		watchgroup->auto_save_timeout = g_timeout_add( 1000, 

@@ -703,7 +703,7 @@ row_load( Model *model,
 	 * is off.
 	 */
 	if( scol->is_top && !scol->top_col->open )
-		model_set_display( MODEL( row ), FALSE );
+		model_display( MODEL( row ), FALSE );
 
 	return( TRUE );
 }
@@ -824,13 +824,15 @@ row_save_test( Model *model )
 {
 	Row *row = ROW( model );
 	Workspace *ws = row->ws;
+	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
+
 	gboolean save;
 
 	if( row == row->top_row ) {
 		/* This is a top-level row ... save unless we're in
 		 * only-save-selected mode.
 		 */
-		if( ws->save_type == WORKSPACE_SAVE_SELECTED )
+		if( wsg->save_type == WORKSPACEGROUP_SAVE_SELECTED )
 			save = row->selected;
 		else
 			save = TRUE;
@@ -846,7 +848,6 @@ row_save_test( Model *model )
 				(icontainer_map_fn) row_calculate_to_save, 
 				NULL );
 		}
-
 	}
 	else 
 		save = row->to_save;
@@ -878,13 +879,13 @@ row_new_heap( Heapmodel *heapmodel, PElement *root )
 		if( is_super( row->sym ) && PEISCLASS( root ) &&
 			*IOBJECT( PEGETCLASSCOMPILE( root )->sym )->name == 
 			'_' )
-			model_set_display( MODEL( row ), FALSE );
+			model_display( MODEL( row ), FALSE );
 		/* Hide top-level rows in closed columns.
 		 */
 		else if( row->scol->is_top && !row->top_col->open )
-			model_set_display( MODEL( row ), FALSE );
+			model_display( MODEL( row ), FALSE );
 		else
-			model_set_display( MODEL( row ), TRUE );
+			model_display( MODEL( row ), TRUE );
 	}
 
 	/* New value ... reset error state.

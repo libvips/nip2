@@ -671,14 +671,10 @@ workspaceview_refresh( vObject *vobject )
 {
 	Workspaceview *wview = WORKSPACEVIEW( vobject );
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
-	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
 #ifdef DEBUG
 	printf( "workspaceview_refresh: %p %s\n", ws, IOBJECT( ws )->name );
 #endif /*DEBUG*/
-
-	filemodel_set_window_hint( FILEMODEL( wsg ), 
-		IWINDOW( iwindow_get_root_noparent( GTK_WIDGET( wview ) ) ) );
 
 	workspace_jump_update( ws, wview->popup_jump );
 

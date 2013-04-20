@@ -129,23 +129,6 @@ workspacegroup_dispose( GObject *gobject )
 	G_OBJECT_CLASS( parent_class )->dispose( gobject );
 }
 
-static void 
-workspacegroup_finalize( GObject *gobject )
-{
-	Workspacegroup *wsg;
-
-	g_return_if_fail( gobject != NULL );
-	g_return_if_fail( IS_WORKSPACEGROUP( gobject ) );
-
-	wsg = WORKSPACEGROUP( gobject );
-
-#ifdef DEBUG
-	printf( "workspacegroup_finalize %s\n", IOBJECT( wsg )->name );
-#endif /*DEBUG*/
-
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
-}
-
 static View *
 workspacegroup_view_new( Model *model, View *parent )
 {
@@ -727,7 +710,6 @@ workspacegroup_class_init( WorkspacegroupClass *class )
 	/* Init methods.
 	 */
 	gobject_class->dispose = workspacegroup_dispose;
-	gobject_class->finalize = workspacegroup_finalize;
 
 	iobject_class->user_name = _( "Workspace" );
 

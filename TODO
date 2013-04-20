@@ -1,9 +1,7 @@
-- workspacegroupview_reorder_tab_cb() is never called?
-
-  when should we update pos from tab order?
-
 - double-click on tab gutter to make new tab, right-buttn menu with new tab
   item
+
+  seems very difficult with gtknotebook in gtk2
 
 - hide tabs if only one tab in window, though we'd need to allow tab drop 
   anywhere in window for that

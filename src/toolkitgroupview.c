@@ -81,7 +81,6 @@ static void
 toolkitgroupview_class_init( ToolkitgroupviewClass *class )
 {
 	GObjectClass *gobject_class = (GObjectClass *) class;
-	GtkObjectClass *object_class = (GtkObjectClass*) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );

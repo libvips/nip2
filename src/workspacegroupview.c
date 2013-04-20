@@ -135,7 +135,6 @@ static void
 workspacegroupview_class_init( WorkspacegroupviewClass *class )
 {
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
-	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
@@ -273,7 +272,6 @@ workspacegroupview_page_reordered_cb( GtkNotebook *notebook,
 	}
 }
 
-#ifdef USE_NOTEBOOK_ACTION
 static void
 workspacegroupview_add_workspace_cb( GtkWidget *wid, 
 	Workspacegroupview *wsgview )
@@ -283,7 +281,13 @@ workspacegroupview_add_workspace_cb( GtkWidget *wid,
 	if( !workspace_new_blank( wsg ) ) 
 		iwindow_alert( GTK_WIDGET( wsgview ), GTK_MESSAGE_ERROR );
 }
-#endif /*USE_NOTEBOOK_ACTION*/
+
+static void                
+workspacegroupview_add_workspace_cb2( GtkWidget *wid, GtkWidget *host, 
+	Workspacegroupview *wsgview )
+{
+	workspacegroupview_add_workspace_cb( wid, wsgview ); 
+}
 
 static void
 workspacegroupview_rename_sub( iWindow *iwnd, void *client, 
@@ -492,6 +496,16 @@ workspacegroupview_init( Workspacegroupview *wsgview )
 	g_signal_connect( wsgview->notebook, "create_window", 
 		G_CALLBACK( workspacegroupview_create_window_cb ), wsgview );
 
+        doubleclick_add( wsgview->notebook, FALSE,
+                NULL, NULL, 
+		DOUBLECLICK_FUNC( workspacegroupview_add_workspace_cb ), 
+			wsgview );
+
+	wsgview->gutter_menu = popup_build( _( "Tab gutter menu" ) );
+	popup_add_but( wsgview->gutter_menu, _( "New Tab" ),
+		POPUP_FUNC( workspacegroupview_add_workspace_cb2 ) ); 
+	popup_attach( wsgview->notebook, wsgview->gutter_menu, wsgview );
+
 #ifdef USE_NOTEBOOK_ACTION
 {
 	GtkWidget *but;
@@ -564,5 +578,3 @@ workspacegroupview_new( void )
 
 	return( VIEW( wsgview ) );
 }
-
-

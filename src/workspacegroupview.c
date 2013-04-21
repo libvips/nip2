@@ -310,8 +310,6 @@ workspacegroupview_rename_sub( iWindow *iwnd, void *client,
 		return;
 	}
 
-	model_front( MODEL( ws ) );
-
 	nfn( sys, IWINDOW_YES );
 }
 

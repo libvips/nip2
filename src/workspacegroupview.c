@@ -251,8 +251,6 @@ workspacegroupview_page_reordered_cb( GtkNotebook *notebook,
 	int i;
 	gboolean changed;
 
-	printf( "page_reordered_cb: %d\n", page_num );
-
 	changed = FALSE;
 
 	for( i = 0; i < gtk_notebook_get_n_pages( notebook ); i++ ) {

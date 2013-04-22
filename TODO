@@ -3,13 +3,7 @@
   load all bm-workspaces files, right-click / duplicate on image breaks due to
   rewriting
 
-- autobackup is not saving all tabs?
-
-- ws background menu should include merge etc. from tab menu
-
 - open the same many-tabs workspacer twice, crash
-
-- version number is 7.32.1??
 
 - get_format (Group [A1]) should return a group of formats?
 

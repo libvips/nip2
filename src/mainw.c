@@ -174,15 +174,44 @@ mainw_dispose( GObject *object )
 	G_OBJECT_CLASS( parent_class )->dispose( object );
 }
 
+static void *
+mainw_configure_event_sub( Workspace *ws, GdkEventConfigure *event )
+{
+	MODEL( ws )->window_x = event->x;
+	MODEL( ws )->window_y = event->y;
+	MODEL( ws )->window_width = event->width;
+	MODEL( ws )->window_height = event->height;
+
+	return( NULL );
+}
+
+static gboolean
+mainw_configure_event( GtkWidget *widget, GdkEventConfigure *event )
+{
+	Mainw *mainw = MAINW( widget );
+
+	/* We have to record on all wses, since we don't know which will be
+	 * first on reload.
+	 */
+	workspacegroup_map( mainw->wsg, 
+		(workspace_map_fn) mainw_configure_event_sub, event, NULL );
+
+	return( GTK_WIDGET_CLASS( parent_class )->
+		configure_event( widget, event ) );
+}
+
 static void
 mainw_class_init( MainwClass *class )
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
 
 	gobject_class->finalize = mainw_finalize;
 	gobject_class->dispose = mainw_dispose;
+
+	widget_class->configure_event = mainw_configure_event;
 }
 
 static void

@@ -1,13 +1,9 @@
-- workspace defs and tk browser seem to have vanished
-
 - rewrite rules are being left lying around?
 
   load all bm-workspaces files, right-click / duplicate on image breaks due to
   rewriting
 
 - autobackup is not saving all tabs?
-
-- on startup, text field in selected column should have focus
 
 - ws background menu should include merge etc. from tab menu
 

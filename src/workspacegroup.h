@@ -87,6 +87,8 @@ typedef struct _WorkspacegroupClass {
 	 */
 } WorkspacegroupClass;
 
+Workspace *workspacegroup_get_workspace( Workspacegroup *wsg );
+
 void workspacegroup_set_load_type( Workspacegroup *wsg, 
 	WorkspacegroupLoadType load_type );
 void workspacegroup_set_save_type( Workspacegroup *wsg, 

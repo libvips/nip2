@@ -448,6 +448,21 @@ workspaceview_realize( GtkWidget *widget )
 	set_symbol_drag_type( widget );
 }
 
+static gboolean
+workspaceview_configure_event( GtkWidget *widget, GdkEventConfigure *event )
+{
+	Workspaceview *wview = WORKSPACEVIEW( widget );
+	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+
+	MODEL( ws )->window_x = event->x;
+	MODEL( ws )->window_y = event->y;
+	MODEL( ws )->window_width = event->width;
+	MODEL( ws )->window_height = event->height;
+
+	return( GTK_WIDGET_CLASS( parent_class )->
+		configure_event( widget, event ) );
+}
+
 static void
 workspaceview_drag_data_received( GtkWidget *widget, GdkDragContext *context,
 	gint x, gint y, GtkSelectionData *selection_data,
@@ -884,6 +899,7 @@ workspaceview_class_init( WorkspaceviewClass *class )
 	object_class->destroy = workspaceview_destroy;
 
 	widget_class->realize = workspaceview_realize;
+	widget_class->configure_event = workspaceview_configure_event;
 	widget_class->drag_data_received = workspaceview_drag_data_received;
 
 	vobject_class->refresh = workspaceview_refresh;

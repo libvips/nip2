@@ -49,13 +49,15 @@ workspacegroup_set_save_type( Workspacegroup *wsg,
 	wsg->save_type = save_type;
 }
 
-static Workspace *
+Workspace *
 workspacegroup_get_workspace( Workspacegroup *wsg )
 {
-	if( !ICONTAINER( wsg )->current )
-		return( NULL );
+	if( ICONTAINER( wsg )->current )
+		return( WORKSPACE( ICONTAINER( wsg )->current ) ); 
+	if( ICONTAINER( wsg )->children )
+		return( WORKSPACE( ICONTAINER( wsg )->children->data ) ); 
 
-	return( WORKSPACE( ICONTAINER( wsg )->current ) ); 
+	return( NULL ); 
 }
 
 static Workspace *

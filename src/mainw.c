@@ -713,7 +713,7 @@ mainw_open_workspace( Workspaceroot *wsr, const char *filename )
 	Workspacegroup *wsg;
 	Mainw *mainw;
 
-	if( !(wsg = workspacegroup_new_from_file( wsr, filename, NULL )) ) 
+	if( !(wsg = workspacegroup_new_from_file( wsr, filename, filename )) ) 
 		return( NULL );
 	mainw = mainw_new( wsg );
 	gtk_widget_show( GTK_WIDGET( mainw ) );
@@ -1078,7 +1078,7 @@ mainw_auto_recover_cb( iWindow *iwnd,
         progress_begin();
 
 	if( !(new_wsg = workspacegroup_new_from_file( main_workspaceroot, 
-		filename, NULL )) ) {
+		filename, filename )) ) {
 		progress_end();
 		nfn( sys, IWINDOW_ERROR );
 	}
@@ -1930,6 +1930,8 @@ mainw_wsg_destroy_cb( Workspacegroup *wsg, Mainw *mainw )
 static void
 mainw_link( Mainw *mainw, Workspacegroup *wsg )
 {
+	Workspace *ws = workspacegroup_get_workspace( wsg );
+
 	/* Take ownership of the wsg.
 	 */
 	mainw->wsg = wsg;
@@ -1944,6 +1946,11 @@ mainw_link( Mainw *mainw, Workspacegroup *wsg )
 	iwindow_set_size_prefs( IWINDOW( mainw ), 
 		"MAINW_WINDOW_WIDTH", "MAINW_WINDOW_HEIGHT" );
 	iwindow_build( IWINDOW( mainw ) );
+
+	if( MODEL( ws )->window_width != - 1 ) 
+		gtk_window_set_default_size( GTK_WINDOW( mainw ), 
+			MODEL( ws )->window_width, 
+			MODEL( ws )->window_height );  
 
 	/* Set start state.
 	 */

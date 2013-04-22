@@ -769,6 +769,7 @@ mainw_open_fn( Filesel *filesel, const char *filename, MainwLoad *load )
 	if( is_file_type( &filesel_wfile_type, filename ) ) {
 		if( !mainw_open_workspace( wsr, filename ) )
 			return( filesel );
+		mainw_recent_add( &mainw_recent_workspace, filename );
 	}
 	else {
 		if( load->nitems ) 
@@ -827,6 +828,10 @@ mainw_open_done_cb( iWindow *iwnd, void *client,
 			return;
 		}
 	}
+
+	/* Wses will need a recalc.
+	 */
+	symbol_recalculate_all();
 
 	nfn( sys, IWINDOW_YES );
 }

@@ -164,6 +164,7 @@ mainw_dispose( GObject *object )
 	FREESID( mainw->end_sid, progress_get() );
 
 	UNREF( mainw->kitgview );
+	UNREF( mainw->wsg );
 
 	mainw_all = g_slist_remove( mainw_all, mainw );
 
@@ -1930,7 +1931,11 @@ mainw_wsg_destroy_cb( Workspacegroup *wsg, Mainw *mainw )
 static void
 mainw_link( Mainw *mainw, Workspacegroup *wsg )
 {
+	/* Take ownership of the wsg.
+	 */
 	mainw->wsg = wsg;
+	g_object_ref( G_OBJECT( mainw->wsg ) );
+	iobject_sink( IOBJECT( mainw->wsg ) );
 
 	wsg->iwnd = IWINDOW( mainw );
 

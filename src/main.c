@@ -435,6 +435,8 @@ main_load( Workspace *ws, const char *filename )
 		mainw = mainw_new( new_wsg );
 		gtk_widget_show( GTK_WIDGET( mainw ) );
 
+		mainw_recent_add( &mainw_recent_workspace, filename );
+
 		return( TRUE );
 	}
 

@@ -1,10 +1,3 @@
-- rewrite rules are being left lying around?
-
-  load all bm-workspaces files, right-click / duplicate on image breaks due to
-  rewriting
-
-- open the same many-tabs workspacer twice, crash
-
 - get_format (Group [A1]) should return a group of formats?
 
 - hide tabs if only one tab in window, though we'd need to allow tab drop 

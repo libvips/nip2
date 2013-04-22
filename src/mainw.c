@@ -908,6 +908,7 @@ mainw_recent_open( Mainw *mainw, const char *filename )
 	if( is_file_type( &filesel_wfile_type, filename ) ) {
 		if( !mainw_open_workspace( wsr, filename ) )
 			return( FALSE );
+		mainw_recent_add( &mainw_recent_workspace, filename );
 	}
 	else {
 		Workspace *ws;

@@ -922,6 +922,7 @@ filemodel_inter_close_registered_cb( iWindow *iwnd, void *client,
 			filemodel_inter_close_registered_cb, 
 			iwnd, client, nfn, sys );
 
+		filemodel_unregister( filemodel );
 		filemodel_inter_savenclose_cb( 
 			filemodel_get_window_hint( filemodel ), filemodel, 
 			iwindow_susp_comp, susp );

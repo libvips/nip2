@@ -1626,10 +1626,12 @@ row_recomp_all( Row *top_row )
 		g_timer_reset( timer );
 #endif /*DEBUG_ROW*/
 
-		if( !row_recomp_row( dirty_row ) ) 
+		if( !row_recomp_row( dirty_row ) ) {
 			/* This will set top_row->err and end the loop.
 			 */
-			expr_error_set( dirty_row->expr );
+			if( dirty_row->expr ) 
+				expr_error_set( dirty_row->expr );
+		}
 		else
 			row_dirty_clear( dirty_row );
 
@@ -1685,6 +1687,11 @@ row_recomp( Row *row )
 	/* Rebuild all dirty rows. This may add some dynamic top links.
 	 */
 	row_recomp_all( top_row );
+
+	/* Our workspace may have been closed in a callback: bail out.
+	 */
+	if( !top_row->sym )
+		return;
 
 	/* Add all static row links. Have to do this after any 
 	 * parsing in row_recomp_all().
@@ -1744,6 +1751,11 @@ row_recomp( Row *row )
 		/* Rebuild all dirty rows in a second pass.
 		 */
 		row_recomp_all( top_row );
+
+		/* Our workspace may have been closed in a callback: bail out.
+		 */
+		if( !top_row->sym )
+			return;
 	}
 
 	IM_FREEF( g_slist_free, top_row->recomp_save );

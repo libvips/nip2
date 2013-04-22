@@ -148,8 +148,8 @@ mainw_dispose( GObject *object )
 	mainw = MAINW( object );
 
 #ifdef DEBUG
-	printf( "mainw_dispose\n" );
 #endif /*DEBUG*/
+	printf( "mainw_dispose\n" );
 
 	IM_FREEF( g_source_remove, mainw->refresh_timeout );
 
@@ -164,7 +164,10 @@ mainw_dispose( GObject *object )
 	FREESID( mainw->end_sid, progress_get() );
 
 	UNREF( mainw->kitgview );
-	UNREF( mainw->wsg );
+
+	/* We don't unref wsg: it's destroyed by mainw_popdown() with
+	 * filemodel_inter_savenclose_cb(). 
+	 */
 
 	mainw_all = g_slist_remove( mainw_all, mainw );
 
@@ -1905,13 +1908,9 @@ mainw_popdown( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys )
 	 * quitting.
 	 */
 
-	if( mainw->wsg ) { 
-		iWindowSusp *susp = iwindow_susp_new( mainw_popdown, 
-			iwnd, client, nfn, sys );
-
+	if( mainw->wsg )  
 		filemodel_inter_savenclose_cb( IWINDOW( mainw ), 
-			FILEMODEL( mainw->wsg ), iwindow_susp_comp, susp );
-	}
+			FILEMODEL( mainw->wsg ), nfn, sys );
 	else
 		nfn( sys, IWINDOW_YES );
 }

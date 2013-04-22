@@ -989,7 +989,12 @@ symbol_recalculate_sub( Symbol *sym )
 		 * mechanism. 
 		 */
 		row_recomp( sym->expr->row );
-		if( sym->expr->row->err )
+
+		/* Stuff may have been removed.
+		 */
+		if( sym->expr &&
+			sym->expr->row &&
+			sym->expr->row->err )
 			result = FALSE;
 	}
 	else if( sym->expr->compile->nparam == 0 ) {
@@ -1072,12 +1077,14 @@ symbol_recalculate_check( Symbol *sym )
 	 */
 	if( !sym->ndirtychildren ) {
 		symbol_dirty_clear( sym );
-		expr_new_value( sym->expr );
+		if( sym->expr ) {
+			expr_new_value( sym->expr );
 
 #ifdef DEBUG_RECALC
-		printf( "\tsuccess: " ); 
-		graph_pointer( &sym->expr->root );
+			printf( "\tsuccess: " ); 
+			graph_pointer( &sym->expr->root );
 #endif /*DEBUG_RECALC*/
+		}
 	}
 #ifdef DEBUG_RECALC
 	else {
@@ -1210,3 +1217,4 @@ symbol_recalculate_all( void )
 	if( mainw_auto_recalc )
 		symbol_recalculate_all_force( FALSE );
 }
+

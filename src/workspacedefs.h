@@ -56,4 +56,4 @@ typedef struct _WorkspacedefsClass {
 } WorkspacedefsClass;
 
 GtkType workspacedefs_get_type( void );
-Workspacedefs *workspacedefs_new();
+Workspacedefs *workspacedefs_new( void );

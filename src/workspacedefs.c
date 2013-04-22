@@ -330,7 +330,7 @@ workspacedefs_get_type( void )
 }
 
 Workspacedefs *
-workspacedefs_new( Mainw *mainw )
+workspacedefs_new( void )
 {
 	Workspacedefs *workspacedefs = gtk_type_new( TYPE_WORKSPACEDEFS );
 

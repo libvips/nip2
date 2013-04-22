@@ -1,3 +1,5 @@
+- workspace defs and tk browser seem to have vanished
+
 - rewrite rules are being left lying around?
 
   load all bm-workspaces files, right-click / duplicate on image breaks due to

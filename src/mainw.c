@@ -148,8 +148,8 @@ mainw_dispose( GObject *object )
 	mainw = MAINW( object );
 
 #ifdef DEBUG
-#endif /*DEBUG*/
 	printf( "mainw_dispose\n" );
+#endif /*DEBUG*/
 
 	IM_FREEF( g_source_remove, mainw->refresh_timeout );
 

@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([nip2], [7.32.1])
+AC_INIT([nip2], [7.33.0])
 AM_INIT_AUTOMAKE([-Wall])
 AC_CONFIG_HEADERS(config.h)
 

@@ -603,6 +603,19 @@ workspaceview_pick_xy( Workspaceview *wview, int *x, int *y )
 }
 
 static void
+workspaceview_link( View *view, Model *model, View *parent )
+{
+	Workspaceview *wview = WORKSPACEVIEW( view );
+	Workspace *ws = WORKSPACE( model );
+
+	VIEW_CLASS( parent_class )->link( view, model, parent );
+
+	vobject_link( VOBJECT( wview->toolkitbrowser ), 
+		IOBJECT( ws->kitg ) );
+	vobject_link( VOBJECT( wview->workspacedefs ), IOBJECT( ws ) );
+}
+
+static void
 workspaceview_child_add( View *parent, View *child )
 {
 	Columnview *cview = COLUMNVIEW( child );
@@ -875,6 +888,7 @@ workspaceview_class_init( WorkspaceviewClass *class )
 
 	vobject_class->refresh = workspaceview_refresh;
 
+	view_class->link = workspaceview_link;
 	view_class->child_add = workspaceview_child_add;
 	view_class->child_remove = workspaceview_child_remove;
 	view_class->child_position = workspaceview_child_position;
@@ -923,29 +937,31 @@ workspaceview_load( Workspace *ws, const char *filename )
 static void
 workspaceview_lpane_changed_cb( Pane *pane, Workspaceview *wview )
 {
-	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+	Workspace *ws;
 
-	if( ws->lpane_open != pane->open ||
-		ws->lpane_position != pane->user_position ) {
-		ws->lpane_open = pane->open;
-		ws->lpane_position = pane->user_position;
+	if( (ws = WORKSPACE( VOBJECT( wview )->iobject )) ) 
+		if( ws->lpane_open != pane->open ||
+			ws->lpane_position != pane->user_position ) {
+			ws->lpane_open = pane->open;
+			ws->lpane_position = pane->user_position;
 
-		iobject_changed( IOBJECT( ws ) );
-	}
+			iobject_changed( IOBJECT( ws ) );
+		}
 }
 
 static void
 workspaceview_rpane_changed_cb( Pane *pane, Workspaceview *wview )
 {
-	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
+	Workspace *ws;
 
-	if( ws->rpane_open != pane->open ||
-		ws->rpane_position != pane->user_position ) {
-		ws->rpane_open = pane->open;
-		ws->rpane_position = pane->user_position;
+	if( (ws = WORKSPACE( VOBJECT( wview )->iobject )) ) 
+		if( ws->rpane_open != pane->open ||
+			ws->rpane_position != pane->user_position ) {
+			ws->rpane_open = pane->open;
+			ws->rpane_position = pane->user_position;
 
-		iobject_changed( IOBJECT( ws ) );
-	}
+			iobject_changed( IOBJECT( ws ) );
+		}
 }
 
 static gboolean
@@ -1009,6 +1025,8 @@ workspaceview_init( Workspaceview *wview )
 {
 	GtkAdjustment *hadj;
 	GtkAdjustment *vadj;
+	Panechild *panechild;
+	GtkWidget *ebox;
 
 	wview->fixed = NULL;
 	wview->window = NULL;
@@ -1101,6 +1119,31 @@ workspaceview_init( Workspaceview *wview )
 
 	gtk_paned_pack2( GTK_PANED( wview->lpane ), 
 		GTK_WIDGET( wview->window ), TRUE, FALSE );
+
+	/* Toolkit Browser pane.
+	 */
+	panechild = panechild_new( wview->rpane, _( "Toolkit Browser" ) );
+
+	/* Have to put toolkitbrowser in an ebox so the search entry gets
+	 * clipped to the pane size.
+	 */
+	ebox = gtk_event_box_new();
+	gtk_container_add( GTK_CONTAINER( panechild ), GTK_WIDGET( ebox ) );
+	gtk_widget_show( ebox );
+
+	wview->toolkitbrowser = toolkitbrowser_new();
+	gtk_container_add( GTK_CONTAINER( ebox ), 
+		GTK_WIDGET( wview->toolkitbrowser ) );
+	gtk_widget_show( GTK_WIDGET( wview->toolkitbrowser ) );
+
+	/* Workspace-local defs pane.
+	 */
+	panechild = panechild_new( wview->lpane, _( "Workspace Definitions" ) );
+
+	wview->workspacedefs = workspacedefs_new();
+	gtk_container_add( GTK_CONTAINER( panechild ), 
+		GTK_WIDGET( wview->workspacedefs ) );
+	gtk_widget_show( GTK_WIDGET( wview->workspacedefs ) );
 
 	filedrop_register( GTK_WIDGET( wview ),
 		(FiledropFunc) workspaceview_filedrop, wview );

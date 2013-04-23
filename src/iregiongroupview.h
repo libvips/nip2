@@ -41,6 +41,10 @@
 typedef struct _iRegiongroupview {
 	View parent_class;
 
+	/* Keep our classmodel here, we need it during destroy.
+	 */
+	Classmodel *classmodel;
+
 } iRegiongroupview;
 
 typedef struct _iRegiongroupviewClass {

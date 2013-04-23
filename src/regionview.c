@@ -587,7 +587,7 @@ regionview_destroy( GtkObject *object )
 	Imagedisplay *id;
 
 #ifdef DEBUG_MAKE
-	printf( "regionview_destroy: %p\n", regionview );
+	printf( "regionview_destroy: %p\n", object );
 #endif /*DEBUG_MAKE*/
 
 	g_return_if_fail( object != NULL );

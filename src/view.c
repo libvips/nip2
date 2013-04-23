@@ -329,14 +329,14 @@ view_destroy( GtkObject *object )
 	if( view->resettable )
 		view_resettable_unregister( view );
 
-	slist_map( view->managed,
-		(SListMapFn) view_viewchild_destroy, NULL );
+	if( VOBJECT( view )->iobject )
+		view_unlink( view );
 
 	if( view->parent )
 		view_child_remove( view );
 
-	if( VOBJECT( view )->iobject )
-		view_unlink( view );
+	slist_map( view->managed,
+		(SListMapFn) view_viewchild_destroy, NULL );
 
 	GTK_OBJECT_CLASS( parent_class )->destroy( object );
 }

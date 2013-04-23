@@ -35,15 +35,31 @@
 
 static ViewClass *parent_class = NULL;
 
+static iRegiongroup *
+iregiongroupview_get_iregiongroup( iRegiongroupview *iregiongroupview )
+{
+	return( IREGIONGROUP( VOBJECT( iregiongroupview )->iobject ) ); 
+}
+
+static Classmodel *
+iregiongroupview_get_classmodel( iRegiongroupview *iregiongroupview )
+{
+	iRegiongroup *iregiongroup;
+
+	if( (iregiongroup = 
+		iregiongroupview_get_iregiongroup( iregiongroupview )) )
+		return( CLASSMODEL( ICONTAINER( iregiongroup )->parent ) );
+
+	return( NULL );
+}
+
 static void
 iregiongroupview_destroy( GtkObject *object )
 {
 	iRegiongroupview *iregiongroupview;
-	iObject *iobject;
-	iContainer *parent;
 
 #ifdef DEBUG
-	printf( "iregiongroupview_destroy\n" );
+	printf( "iregiongroupview_destroy: %p\n", object );
 #endif /*DEBUG*/
 
 	g_return_if_fail( object != NULL );
@@ -53,10 +69,8 @@ iregiongroupview_destroy( GtkObject *object )
 
 	/* Destroy all regionviews we manage.
 	 */
-	if( (iobject = VOBJECT( iregiongroupview )->iobject) &&
-		(parent = ICONTAINER( iobject )->parent) ) 
-		slist_map( CLASSMODEL( parent )->views, 
-			(SListMapFn) object_destroy, NULL );
+	slist_map( iregiongroupview->classmodel->views, 
+		(SListMapFn) object_destroy, NULL );
 
 	GTK_OBJECT_CLASS( parent_class )->destroy( object );
 }
@@ -138,19 +152,27 @@ static void
 iregiongroupview_refresh( vObject *vobject )
 {
 	iRegiongroupview *iregiongroupview = IREGIONGROUPVIEW( vobject );
-	Classmodel *classmodel = CLASSMODEL( vobject->iobject );
 
 	iRegiongroupviewRefreshState irs;
 
 #ifdef DEBUG
 	printf( "iregiongroupview_refresh\n" );
+	printf( "watching model %s %s\n", 
+		G_OBJECT_TYPE_NAME( vobject->iobject ), 
+		NN( IOBJECT( vobject->iobject )->name ) );
 #endif /*DEBUG*/
+
+	iregiongroupview->classmodel = 
+		iregiongroupview_get_classmodel( iregiongroupview );
+
+	iregiongroupview->classmodel = 
+		iregiongroupview_get_classmodel( iregiongroupview );
 
 	/* Make a note of all the displays we have now, loop over the 
 	 * displays we should have, reusing when possible ... remove any 
 	 * unused displays at the end.
 	 */
-	irs.classmodel = CLASSMODEL( ICONTAINER( classmodel )->parent );
+	irs.classmodel = iregiongroupview->classmodel;
 	irs.notused = g_slist_copy( irs.classmodel->views );
 	irs.iregiongroupview = iregiongroupview;
 

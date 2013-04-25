@@ -4,6 +4,8 @@
 `Filemodel'
 Segmentation fault (core dumped)
 
+- load bm-workspace, merge uvlumcalib ws, duplicated uvlumcalib ws, paths get
+  tangled
 
 - get_format (Group [A1]) should return a group of formats?
 

@@ -833,6 +833,14 @@ mainw_open_done_cb( iWindow *iwnd, void *client,
 	 */
 	symbol_recalculate_all();
 
+	/* If we had an empty wsg, perhaps we've just started up,
+	 * kill it. 
+	 */
+	if( workspacegroup_is_empty( mainw->wsg ) ) {
+		filemodel_set_modified( FILEMODEL( mainw->wsg ), FALSE );
+		iwindow_kill( IWINDOW( mainw ) );
+	}
+
 	nfn( sys, IWINDOW_YES );
 }
 
@@ -903,12 +911,19 @@ mainw_open_examples_action_cb( GtkAction *action, Mainw *mainw )
 static gboolean
 mainw_recent_open( Mainw *mainw, const char *filename )
 {
-	Workspaceroot *wsr = mainw->wsg->wsr; 
+	Workspacegroup *wsg = mainw->wsg;
 
 	if( is_file_type( &filesel_wfile_type, filename ) ) {
-		if( !mainw_open_workspace( wsr, filename ) )
+		if( !mainw_open_workspace( wsg->wsr, filename ) )
 			return( FALSE );
-		mainw_recent_add( &mainw_recent_workspace, filename );
+
+		/* If we had an empty wsg, perhaps we've just started up,
+		 * kill it. 
+		 */
+		if( workspacegroup_is_empty( wsg ) ) {
+			filemodel_set_modified( FILEMODEL( wsg ), FALSE );
+			iwindow_kill( IWINDOW( mainw ) );
+		}
 	}
 	else {
 		Workspace *ws;

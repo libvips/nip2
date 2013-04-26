@@ -1,7 +1,4 @@
 
-- load bm-workspace, merge uvlumcalib ws, duplicated uvlumcalib ws, paths get
-  tangled
-
 - get_format (Group [A1]) should return a group of formats?
 
 - hide tabs if only one tab in window, though we'd need to allow tab drop 
@@ -11,7 +8,7 @@
 
 - leaktest
 
-- could lock workspaces?
+- could lock workspaces? might be useful ... another option in the view menu?
 
 - get rid of the invisible top-level window? shows up on gnome-shell
 

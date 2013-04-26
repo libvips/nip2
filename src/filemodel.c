@@ -141,8 +141,14 @@ filemodel_top_save( Filemodel *filemodel, const char *filename )
 {
 	FilemodelClass *filemodel_class = FILEMODEL_GET_CLASS( filemodel );
 
-	if( filemodel_class->top_save ) 
+	if( filemodel_class->top_save ) {
+		/* We must always have the new filename in the save file or
+		 * auto path rewriting will get confused on reload.
+		 */
+		filemodel_set_filename( filemodel, filename );
+
 		return( filemodel_class->top_save( filemodel, filename ) );
+	}
 	else {
 		error_top( _( "Not implemented." ) );
 		error_sub( _( "_%s() not implemented for class \"%s\"." ), 
@@ -670,8 +676,6 @@ filemodel_inter_save_cb( iWindow *iwnd,
 	char *filename;
 
 	if( (filename = filesel_get_filename( filesel )) ) {
-		filemodel_set_filename( filemodel, filename );
-
 		if( filemodel_top_save( filemodel, filename ) ) {
 			filemodel_set_modified( filemodel, FALSE );
 			nfn( sys, IWINDOW_YES );

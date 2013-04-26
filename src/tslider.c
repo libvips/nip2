@@ -344,6 +344,15 @@ tslider_conversion_id( double from, double to, double value )
 	return( value );
 }
 
+static gboolean
+tslider_scroll_cb( GtkWidget *wid, GdkEvent *event, Tslider *tslider )
+{
+	/* Stop any other scroll handlers running. We don't want the scroll 
+	 * wheel to change widgets while we're moving.
+	 */
+	return( TRUE ); 
+}
+
 static void
 tslider_init( Tslider *tslider )
 {
@@ -390,6 +399,8 @@ tslider_init( Tslider *tslider )
         set_tooltip( tslider->slider, _( "Left-drag to set number" ) );
         gtk_signal_connect( GTK_OBJECT( tslider->adj ), "value_changed", 
 		GTK_SIGNAL_FUNC( tslider_value_changed_cb ), tslider );
+	g_signal_connect( tslider->slider, "scroll-event", 
+		G_CALLBACK( tslider_scroll_cb ), tslider );
 	gtk_widget_show( tslider->slider );
 
 	tslider->auto_link = TRUE;

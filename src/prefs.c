@@ -45,7 +45,8 @@ prefs_destroy( GtkObject *object )
 #endif /*DEBUG*/
 
 	if( prefs->ws ) {
-		Filemodel *filemodel = FILEMODEL( prefs->ws );
+		Workspacegroup *wsg = workspace_get_workspacegroup( prefs->ws );
+		Filemodel *filemodel = FILEMODEL( wsg );
 
 		/* Force a recalc, in case we've changed the autorecalc 
 		 * settings. Also does a scan on any widgets.

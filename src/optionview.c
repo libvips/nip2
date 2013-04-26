@@ -117,6 +117,15 @@ optionview_change_cb( GtkWidget *wid, Optionview *optionview )
 	}
 }
 
+static gboolean
+optionview_scroll_cb( GtkWidget *wid, GdkEvent *event, Optionview *optionview )
+{
+	/* Stop any other scroll handlers running. We don't want the scroll 
+	 * wheel to change widgets while we're moving.
+	 */
+	return( TRUE ); 
+}
+
 static void 
 optionview_refresh( vObject *vobject )
 {
@@ -158,6 +167,10 @@ optionview_refresh( vObject *vobject )
 
 		IM_FREEF( slist_free_all, optionview->labels );
 		optionview->labels = lstring_copy( option->labels );
+
+		g_signal_connect( GTK_OBJECT( optionview->options ),
+			"scroll-event", 
+			GTK_SIGNAL_FUNC( optionview_scroll_cb ), optionview );
 	}
 
 	if( optionview->options ) {

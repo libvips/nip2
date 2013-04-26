@@ -1,8 +1,3 @@
-- save region as png, segv
-
-(nip2:12971): GLib-GObject-WARNING **: invalid cast from `Workspace' to
-`Filemodel'
-Segmentation fault (core dumped)
 
 - load bm-workspace, merge uvlumcalib ws, duplicated uvlumcalib ws, paths get
   tangled
@@ -15,6 +10,8 @@ Segmentation fault (core dumped)
 - test file drop on mainw, esp. workspaces
 
 - leaktest
+
+- could lock workspaces?
 
 - get rid of the invisible top-level window? shows up on gnome-shell
 

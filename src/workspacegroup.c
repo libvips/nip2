@@ -112,6 +112,29 @@ workspacegroup_is_empty( Workspacegroup *wsg )
 	return( empty );
 }
 
+static void *
+workspacegroup_get_n_objects_sub( Workspace *ws, int *n_objects )
+{
+	Compile *compile = ws->sym->expr->compile;
+
+	*n_objects += g_slist_length( ICONTAINER( compile )->children );
+
+	return( NULL );
+}
+
+int
+workspacegroup_get_n_objects( Workspacegroup *wsg )
+{
+	int n_objects;
+
+	n_objects = 0;
+	workspacegroup_map( wsg, 
+		(workspace_map_fn) workspacegroup_get_n_objects_sub, 
+			&n_objects, NULL );
+
+	return( n_objects );
+}
+
 static void 
 workspacegroup_dispose( GObject *gobject )
 {

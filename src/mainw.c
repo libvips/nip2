@@ -586,8 +586,6 @@ mainw_space_free_tooltip_generate( GtkWidget *widget, VipsBuf *buf,
 {
 	Heap *heap = reduce_context->heap;
 
-	Workspace *ws;
-
 	mainw_find_disc( buf );
 	/* Expands to (eg.) "14GB free in /pics/tmp" */
         vips_buf_appendf( buf, _( " in \"%s\"" ), PATH_TMP );
@@ -598,11 +596,9 @@ mainw_space_free_tooltip_generate( GtkWidget *widget, VipsBuf *buf,
                 heap->ncells, heap->nfree, heap->max_fn( heap ) );
         vips_buf_appends( buf, ", " );
 
-	if( (ws = mainw_get_workspace( mainw )) ) {
-		Compile *compile = ws->sym->expr->compile;
-
+	if( mainw->wsg ) {
 		vips_buf_appendf( buf, _( "%d objects in workspace" ),
-			g_slist_length( ICONTAINER( compile )->children ) );
+			workspacegroup_get_n_objects( mainw->wsg ) );
 		vips_buf_appends( buf, ", " );
 	}
 

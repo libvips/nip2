@@ -142,12 +142,28 @@ filemodel_top_save( Filemodel *filemodel, const char *filename )
 	FilemodelClass *filemodel_class = FILEMODEL_GET_CLASS( filemodel );
 
 	if( filemodel_class->top_save ) {
+		char *old_filename; 
+		int result;
+
 		/* We must always have the new filename in the save file or
 		 * auto path rewriting will get confused on reload.
+		 *
+		 * Equally, we must not change the filename on the model, in
+		 * case this save is not something initiated by the user, for
+		 * example, an auto-backup of the workspace.
+		 *
+		 * Save and restore the filename. Our caller must set the
+		 * final filename, if required (after save-as, for example).
 		 */
+		old_filename = g_strdup( filemodel->filename ); 
 		filemodel_set_filename( filemodel, filename );
 
-		return( filemodel_class->top_save( filemodel, filename ) );
+		result = filemodel_class->top_save( filemodel, filename );
+
+		filemodel_set_filename( filemodel, old_filename );
+		g_free( old_filename );
+
+		return( result ); 
 	}
 	else {
 		error_top( _( "Not implemented." ) );
@@ -668,7 +684,7 @@ filemodel_load_all_openfile( Filemodel *filemodel, Model *parent,
  */
 
 static void
-filemodel_inter_save_cb( iWindow *iwnd, 
+filemodel_inter_saveas_sub_cb( iWindow *iwnd, 
 	void *client, iWindowNotifyFn nfn, void *sys )
 {
 	Filesel *filesel = FILESEL( iwnd );
@@ -677,6 +693,7 @@ filemodel_inter_save_cb( iWindow *iwnd,
 
 	if( (filename = filesel_get_filename( filesel )) ) {
 		if( filemodel_top_save( filemodel, filename ) ) {
+			filemodel_set_filename( filemodel, filename );
 			filemodel_set_modified( filemodel, FALSE );
 			nfn( sys, IWINDOW_YES );
 		}
@@ -708,7 +725,7 @@ filemodel_inter_saveas_cb( iWindow *iwnd, void *client,
 		class->filetype, 
 		watch_int_get( main_watchgroup, class->filetype_pref, 0 ) );
 	iwindow_set_parent( IWINDOW( filesel ), GTK_WIDGET( iwnd ) );
-	filesel_set_done( filesel, filemodel_inter_save_cb, filemodel );
+	filesel_set_done( filesel, filemodel_inter_saveas_sub_cb, filemodel );
 	idialog_set_notify( IDIALOG( filesel ), nfn, sys );
 	iwindow_build( IWINDOW( filesel ) );
 	if( filemodel->filename )

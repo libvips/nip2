@@ -218,8 +218,12 @@ get_type x
 	// slightly odd ... but our display is always 0-255, so it makes sense for
 	// a plain number to be in the same range
 	= Image_type.sRGB, is_real x
-	= error ("get_type: unable to get type from " ++ print x)
+	= oo_unary_function get_type_op x, is_class x
+	= error (_ "bad arguments to " ++ "get_type")
 {
+	get_type_op = Operator "get_type" get_type 
+		Operator_type.COMPOUND false;
+
 	// get the type from a VIPS image ... but only if it makes sense with
 	// the rest of the image
 
@@ -270,7 +274,12 @@ get_format x
 	= x.format, has_member "format" x
 	= x.image.format, is_Arrow x
 	= get_header "BandFmt" x, is_image x
-	= error ("get_format: unable to get format from " ++ print x);
+	= oo_unary_function get_format_op x, is_class x
+	= error (_ "bad arguments to " ++ "get_format")
+{
+	get_format_op = Operator "get_format" get_format 
+		Operator_type.COMPOUND false;
+}
 
 has_bits x = has_member "bits" x || is_Arrow x || is_image x;
 
@@ -278,7 +287,12 @@ get_bits x
 	= x.bits, has_member "bits" x
 	= x.image.bits, is_Arrow x
 	= get_header "Bbits" x, is_image x
-	= error ("get_bits: unable to get bits from " ++ print x);
+	= oo_unary_function get_bits_op x, is_class x
+	= error (_ "bad arguments to " ++ "get_bits")
+{
+	get_bits_op = Operator "get_bits" get_format 
+		Operator_type.COMPOUND false;
+}
 
 has_bands x = is_image x || has_member "bands" x || is_Arrow x;
 
@@ -288,7 +302,12 @@ get_bands x
 	= get_header "Bands" x, is_image x
 	= 1, is_real x
 	= len x, is_real_list x
-	= error ("get_bands: unable to get bands from " ++ print x);
+	= oo_unary_function get_bands_op x, is_class x
+	= error (_ "bad arguments to " ++ "get_bands")
+{
+	get_bands_op = Operator "get_bands" get_bands 
+		Operator_type.COMPOUND false;
+}
 
 has_coding x = has_member "coding" x || is_Arrow x || is_image x;
 
@@ -297,7 +316,12 @@ get_coding x
 	= x.image.coding, is_Arrow x
 	= get_header "Coding" x, is_image x
 	= Image_coding.NOCODING, is_real x
-	= error ("get_coding: unable to get coding from " ++ print x);
+	= oo_unary_function get_coding_op x, is_class x
+	= error (_ "bad arguments to " ++ "get_coding")
+{
+	get_coding_op = Operator "get_coding" get_coding 
+		Operator_type.COMPOUND false;
+}
 
 has_xres x = has_member "xres" x || is_Arrow x || is_image x;
 
@@ -305,7 +329,12 @@ get_xres x
 	= x.xres, has_member "xres" x
 	= x.image.xres, is_Arrow x
 	= get_header "Xres" x, is_image x
-	= error ("get_xres: unable to get xres from " ++ print x);
+	= oo_unary_function get_xres_op x, is_class x
+	= error (_ "bad arguments to " ++ "get_xres")
+{
+	get_xres_op = Operator "get_xres" get_xres 
+		Operator_type.COMPOUND false;
+}
 
 has_yres x = has_member "yres" x || is_Arrow x || is_image x;
 
@@ -313,7 +342,12 @@ get_yres x
 	= x.yres, has_member "yres" x
 	= x.image.yres, is_Arrow x
 	= get_header "Yres" x, is_image x
-	= error ("get_yres: unable to get yres from " ++ print x);
+	= oo_unary_function get_yres_op x, is_class x
+	= error (_ "bad arguments to " ++ "get_yres")
+{
+	get_yres_op = Operator "get_yres" get_yres 
+		Operator_type.COMPOUND false;
+}
 
 has_xoffset x = has_member "xoffset" x || is_Arrow x || is_image x;
 
@@ -321,7 +355,12 @@ get_xoffset x
 	= x.xoffset, has_member "xoffset" x
 	= x.image.xoffset, is_Arrow x
 	= get_header "Xoffset" x, is_image x
-	= error ("get_xoffset: unable to get xoffset from " ++ print x);
+	= oo_unary_function get_xoffset_op x, is_class x
+	= error (_ "bad arguments to " ++ "get_xoffset")
+{
+	get_xoffset_op = Operator "get_xoffset" get_xoffset 
+		Operator_type.COMPOUND false;
+}
 
 has_yoffset x = has_member "yoffset" x || is_Arrow x || is_image x;
 
@@ -329,7 +368,12 @@ get_yoffset x
 	= x.yoffset, has_member "yoffset" x
 	= x.image.yoffset, is_Arrow x
 	= get_header "Yoffset" x, is_image x
-	= error ("get_yoffset: unable to get yoffset from " ++ print x);
+	= oo_unary_function get_yoffset_op x, is_class x
+	= error (_ "bad arguments to " ++ "get_yoffset")
+{
+	get_yoffset_op = Operator "get_yoffset" get_yoffset 
+		Operator_type.COMPOUND false;
+}
 
 has_value = has_member "value";
 
@@ -341,47 +385,82 @@ get_image x
 	= x.value, is_Image x
 	= x.image.value, is_Arrow x
 	= x, is_image x
-	= error ("get_image: unable to get image from " ++ print x);
+	= oo_unary_function get_image_op x, is_class x
+	= error (_ "bad arguments to " ++ "get_image")
+{
+	get_image_op = Operator "get_image" get_image 
+		Operator_type.COMPOUND false;
+}
 
 has_number x = is_number x || is_Real x;
 
 get_number x
 	= x.value, is_Real x
 	= x, is_number x 
-	= error ("get_number: unable to get number from " ++ print x);
+	= oo_unary_function get_number_op x, is_class x
+	= error (_ "bad arguments to " ++ "get_number")
+{
+	get_number_op = Operator "get_number" get_number 
+		Operator_type.COMPOUND false;
+}
 
 has_real x = is_real x || is_Real x;
 
 get_real x
 	= x.value, is_Real x
 	= x, is_real x
-	= error ("get_real: unable to get real from " ++ print x);
+	= oo_unary_function get_real_op x, is_class x
+	= error (_ "bad arguments to " ++ "get_real")
+{
+	get_real_op = Operator "get_real" get_real 
+		Operator_type.COMPOUND false;
+}
 
 has_width x = has_member "width" x || is_image x;
 
 get_width x
 	= x.width, has_member "width" x
 	= get_header "Xsize" x, is_image x
-	= error ("get_width: unable to get width from " ++ print x);
+	= oo_unary_function get_width_op x, is_class x
+	= error (_ "bad arguments to " ++ "get_width")
+{
+	get_width_op = Operator "get_width" get_width 
+		Operator_type.COMPOUND false;
+}
 
 has_height x = has_member "height" x || is_image x;
 
 get_height x
 	= x.height, has_member "height" x
 	= get_header "Ysize" x, is_image x
-	= error ("get_height: unable to get height from " ++ print x);
+	= oo_unary_function get_height_op x, is_class x
+	= error (_ "bad arguments to " ++ "get_height")
+{
+	get_height_op = Operator "get_height" get_height 
+		Operator_type.COMPOUND false;
+}
 
 has_left x = has_member "left" x;
 
 get_left x
 	= x.left, has_member "left" x
-	= error ("get_left: unable to get left from " ++ print x);
+	= oo_unary_function get_left_op x, is_class x
+	= error (_ "bad arguments to " ++ "get_left")
+{
+	get_left_op = Operator "get_left" get_left 
+		Operator_type.COMPOUND false;
+}
 
 has_top x = has_member "top" x;
 
 get_top x
 	= x.top, has_member "top" x
-	= error ("get_top: unable to get top from " ++ print x);
+	= oo_unary_function get_top_op x, is_class x
+	= error (_ "bad arguments to " ++ "get_top")
+{
+	get_top_op = Operator "get_top" get_top 
+		Operator_type.COMPOUND false;
+}
 
 // like has/get member, but first in a lst of objects
 has_member_list has objects

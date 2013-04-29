@@ -1,4 +1,3 @@
-- merge into workspacegroup destroys filename?
 
 - hide tabs if only one tab in window, though we'd need to allow tab drop 
   anywhere in window for that

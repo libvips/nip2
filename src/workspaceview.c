@@ -785,8 +785,18 @@ workspaceview_layout_set_pos( Columnview *cview, WorkspaceLayout *layout )
 {
 	Column *column = COLUMN( VOBJECT( cview )->iobject );
 
-	column->x = layout->out_x;
-	column->y = layout->out_y;
+	/* If this column is being dragged, put the xy we allocate into the
+	 * shadow instead. 
+	 */
+	if( cview->shadow ) {
+		cview->shadow->lx = layout->out_x;
+		cview->shadow->ly = layout->out_y;
+	}
+	else {
+		column->x = layout->out_x;
+		column->y = layout->out_y;
+	}
+
 	layout->out_y += GTK_WIDGET( cview )->allocation.height +
 		workspaceview_layout_vspacing;
 

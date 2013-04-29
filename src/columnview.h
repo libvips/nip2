@@ -68,6 +68,11 @@ struct _Columnview {
         GtkWidget *textfr;             	/* Enclosing stuff for text entry */
         GtkWidget *capedit;            	/* Shadow text for editing caption */
 
+	/* A shadow for this cview, used during drag to show where this column
+	 * will end up.
+	 */
+	Columnview *shadow;
+
         /* Appearance state info.
          */
         int lx, ly;			/* last pos we set */

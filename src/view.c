@@ -648,9 +648,10 @@ view_real_child_remove( View *parent, View *child )
 		(SListMapFn) view_viewchild_test_child_model, 
 		VOBJECT( child )->iobject );
 
-	if( viewchild ) {
-		g_assert( viewchild->child_view == child );
-
+	/* Can have floating views which are not part of the viewchild system.
+	 */
+	if( viewchild &&
+		viewchild->child_view == child ) { 
 		viewchild->child_view = NULL;
 		g_object_unref( G_OBJECT( child ) );
 	}

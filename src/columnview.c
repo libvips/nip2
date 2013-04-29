@@ -437,10 +437,33 @@ columnview_snap( Column *col )
 		col->x = snap.best->x;
 }
 
+static Columnview *
+columnview_new_floating( Columnview *old_cview )
+{
+	Column *col = COLUMN( VOBJECT( old_cview )->iobject );
+	Workspace *ws = col->ws;
+	Workspaceview *wview = old_cview->wview;
+
+	Columnview *new_cview;
+
+	new_cview = COLUMNVIEW( columnview_new() ); 
+	new_cview->wview = wview; 
+	VIEW( new_cview )->parent = VIEW( wview ); 
+	VOBJECT( new_cview )->iobject = IOBJECT( col ); 
+
+	gtk_fixed_put( GTK_FIXED( wview->fixed ),
+		GTK_WIDGET( new_cview ), col->x, col->y );
+
+	gtk_widget_show( GTK_WIDGET( new_cview ) ); 
+
+	return( new_cview );
+}
+
 static void
 columnview_left_motion( Columnview *cview, GdkEvent *ev )
 {
 	Column *col = COLUMN( VOBJECT( cview )->iobject );
+	Workspace *ws = col->ws;
 	Workspaceview *wview = cview->wview;
 
 	int u, v;
@@ -480,6 +503,9 @@ columnview_left_motion( Columnview *cview, GdkEvent *ev )
                 if( abs( xoff ) > 5 || abs( yoff ) > 5 ) {
                         cview->state = COL_DRAG;
 			workspaceview_set_cursor( wview, IWINDOW_SHAPE_MOVE );
+
+			g_assert( !cview->shadow ); 
+			cview->shadow = columnview_new_floating( cview );
                 }
 
                 break;
@@ -514,6 +540,10 @@ columnview_left_motion( Columnview *cview, GdkEvent *ev )
 
 		workspaceview_scroll_background( wview, u, v );
 
+		/* Move other columns about.
+		 */
+		model_layout( MODEL( ws ) ); 
+
                 break;
 
         default:
@@ -546,6 +576,12 @@ columnview_left_release( Columnview *cview, GdkEvent *ev )
 		workspaceview_scroll_background( wview, 0, 0 );
 		workspace_set_modified( ws, TRUE );
 		workspaceview_set_cursor( wview, IWINDOW_SHAPE_NONE );
+
+		DESTROY_GTK( cview->shadow ); 
+
+		/* Move columns to their final position.
+		 */
+		model_layout( MODEL( ws ) ); 
 
                 break;
 
@@ -761,6 +797,7 @@ static void
 columnview_refresh( vObject *vobject )
 {
 	Columnview *cview = COLUMNVIEW( vobject );
+	Columnview *shadow = cview->shadow;
 	Column *col = COLUMN( VOBJECT( cview )->iobject );
 	gboolean editable = col->ws->mode != WORKSPACE_MODE_NOEDIT;
 
@@ -769,8 +806,14 @@ columnview_refresh( vObject *vobject )
 #endif /*DEBUG*/
 
 	/* Update position.
+	 *
+	 * If this column has a shadow, it's being dragged, and the shadow
+	 * should show the column position.
 	 */
-	if( col->x != cview->lx || col->y != cview->ly ) {
+	if( shadow ) { 
+		view_child_position( VIEW( shadow ) ); 
+	}
+	else if( col->x != cview->lx || col->y != cview->ly ) {
 #ifdef DEBUG
 		printf( "columnview_refresh: move column %s to %d x %d\n",
 			IOBJECT( col )->name, col->x, col->y );

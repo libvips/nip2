@@ -1,3 +1,15 @@
+- experimenting with floating column views
+
+
+
+- experiment with constant auto relayout
+
+  during a drag, tag that column as 'in-drag'
+
+  in-drag columns have space reserved for them by layout, but do not have
+  their position set
+
+  rerun layout on every motion, don't change x/y of things that haven't moved
 
 - hide tabs if only one tab in window, though we'd need to allow tab drop 
   anywhere in window for that

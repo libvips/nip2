@@ -634,19 +634,6 @@ workspaceview_child_add( View *parent, View *child )
 		GTK_WIDGET( cview ), column->x, column->y );
 	cview->lx = column->x;
 	cview->ly = column->y;
-	wview->front = cview;
-}
-
-static void
-workspaceview_child_remove( View *parent, View *child )
-{
-	Columnview *cview = COLUMNVIEW( child );
-	Workspaceview *wview = WORKSPACEVIEW( parent );
-
-	if( wview->front == cview )
-		wview->front = NULL;
-
-	VIEW_CLASS( parent_class )->child_remove( parent, child );
 }
 
 static void
@@ -667,16 +654,12 @@ workspaceview_child_front( View *parent, View *child )
 	Workspaceview *wview = WORKSPACEVIEW( parent );
 	Columnview *cview = COLUMNVIEW( child );
 
-	if( wview->front != cview ) {
 		gtk_widget_ref( GTK_WIDGET( cview ) );
 		gtk_container_remove( GTK_CONTAINER( wview->fixed ),
 			GTK_WIDGET( cview ) );
 		gtk_fixed_put( GTK_FIXED( wview->fixed ),
 			GTK_WIDGET( cview ), cview->lx, cview->ly );
 		gtk_widget_unref( GTK_WIDGET( cview ) );
-
-		wview->front = cview;
-	}
 }
 
 static void 
@@ -785,16 +768,28 @@ workspaceview_layout_set_pos( Columnview *cview, WorkspaceLayout *layout )
 {
 	Column *column = COLUMN( VOBJECT( cview )->iobject );
 
+	gboolean changed;
+
+	changed = FALSE;
+
 	/* If this column is being dragged, put the xy we allocate into the
 	 * shadow instead. 
 	 */
 	if( cview->shadow ) {
-		cview->shadow->lx = layout->out_x;
-		cview->shadow->ly = layout->out_y;
+		if( cview->shadow->lx != layout->out_x ||
+			cview->shadow->ly != layout->out_y ) {
+			cview->shadow->lx = layout->out_x;
+			cview->shadow->ly = layout->out_y;
+			changed = TRUE;
+		}
 	}
 	else {
-		column->x = layout->out_x;
-		column->y = layout->out_y;
+		if( column->x != layout->out_x ||
+			column->y != layout->out_y ) { 
+			column->x = layout->out_x;
+			column->y = layout->out_y;
+			changed = TRUE;
+		}
 	}
 
 	layout->out_y += GTK_WIDGET( cview )->allocation.height +
@@ -803,8 +798,10 @@ workspaceview_layout_set_pos( Columnview *cview, WorkspaceLayout *layout )
 	if( GTK_WIDGET( cview )->allocation.width > layout->area.width )
 		layout->area.width = GTK_WIDGET( cview )->allocation.width;
 
-	iobject_changed( IOBJECT( column ) );
-	workspace_set_modified( column->ws, TRUE );
+	if( changed ) { 
+		iobject_changed( IOBJECT( column ) );
+		workspace_set_modified( column->ws, TRUE );
+	}
 
 	return( NULL );
 }
@@ -900,7 +897,6 @@ workspaceview_class_init( WorkspaceviewClass *class )
 
 	view_class->link = workspaceview_link;
 	view_class->child_add = workspaceview_child_add;
-	view_class->child_remove = workspaceview_child_remove;
 	view_class->child_position = workspaceview_child_position;
 	view_class->child_front = workspaceview_child_front;
 	view_class->layout = workspaceview_layout;
@@ -1062,8 +1058,6 @@ workspaceview_init( Workspaceview *wview )
 
 	wview->next_x = 3;
 	wview->next_y = 3;
-
-	wview->front = NULL;
 
 	wview->context = NULL; 
 

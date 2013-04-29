@@ -437,26 +437,33 @@ columnview_snap( Column *col )
 		col->x = snap.best->x;
 }
 
-static Columnview *
-columnview_new_floating( Columnview *old_cview )
+static void
+columnview_add_shadow( Columnview *old_cview )
 {
 	Column *col = COLUMN( VOBJECT( old_cview )->iobject );
-	Workspace *ws = col->ws;
 	Workspaceview *wview = old_cview->wview;
 
-	Columnview *new_cview;
+	if( !old_cview->shadow ) { 
+		Columnview *new_cview;
 
-	new_cview = COLUMNVIEW( columnview_new() ); 
-	new_cview->wview = wview; 
-	VIEW( new_cview )->parent = VIEW( wview ); 
-	VOBJECT( new_cview )->iobject = IOBJECT( col ); 
+		new_cview = COLUMNVIEW( columnview_new() ); 
+		new_cview->wview = wview; 
+		VIEW( new_cview )->parent = VIEW( wview ); 
+		VOBJECT( new_cview )->iobject = IOBJECT( col ); 
 
-	gtk_fixed_put( GTK_FIXED( wview->fixed ),
-		GTK_WIDGET( new_cview ), col->x, col->y );
+		gtk_fixed_put( GTK_FIXED( wview->fixed ),
+			GTK_WIDGET( new_cview ), col->x, col->y );
 
-	gtk_widget_show( GTK_WIDGET( new_cview ) ); 
+		gtk_widget_show( GTK_WIDGET( new_cview ) ); 
 
-	return( new_cview );
+		old_cview->shadow = new_cview;
+		new_cview->master = old_cview;
+
+		/* The shadow will be on top of the real column and hide it. 
+		 * Put the real column to the front.
+		 */
+		model_front( MODEL( col ) ); 
+	}
 }
 
 static void
@@ -504,8 +511,7 @@ columnview_left_motion( Columnview *cview, GdkEvent *ev )
                         cview->state = COL_DRAG;
 			workspaceview_set_cursor( wview, IWINDOW_SHAPE_MOVE );
 
-			g_assert( !cview->shadow ); 
-			cview->shadow = columnview_new_floating( cview );
+			columnview_add_shadow( cview );
                 }
 
                 break;
@@ -805,15 +811,21 @@ columnview_refresh( vObject *vobject )
 	printf( "columnview_refresh: %s\n", IOBJECT( col )->name );
 #endif /*DEBUG*/
 
-	/* Update position.
-	 *
-	 * If this column has a shadow, it's being dragged, and the shadow
-	 * should show the column position.
+	/* If this column has a shadow, workspaceview will have put a layout
+	 * position into it. See workspaceview_layout_set_pos(). 
 	 */
-	if( shadow ) { 
+	if( shadow )  
 		view_child_position( VIEW( shadow ) ); 
+
+	if( shadow ) {
+		gtk_widget_set_size_request( GTK_WIDGET( shadow->frame ), 
+			GTK_WIDGET( cview->frame )->allocation.width, 
+			GTK_WIDGET( cview->frame )->allocation.height );
 	}
-	else if( col->x != cview->lx || col->y != cview->ly ) {
+
+
+	if( col->x != cview->lx || 
+		col->y != cview->ly ) {
 #ifdef DEBUG
 		printf( "columnview_refresh: move column %s to %d x %d\n",
 			IOBJECT( col )->name, col->x, col->y );
@@ -899,7 +911,10 @@ columnview_refresh( vObject *vobject )
 
         /* Set bottom entry.
          */
-        if( col->selected && col->open && editable ) {
+        if( col->selected && 
+		col->open && 
+		editable &&
+		!cview->master ) {
                 columnview_add_text( cview );
                 gtk_widget_show( cview->textfr );
         }
@@ -908,7 +923,9 @@ columnview_refresh( vObject *vobject )
 
 	/* Set select state.
 	 */
-        if( col->selected && !cview->selected ) {
+        if( cview->master ) 
+                gtk_widget_set_name( cview->title, "shadow_widget" );
+	else if( col->selected && !cview->selected ) {
                 gtk_widget_set_name( cview->title, "selected_widget" );
 		cview->selected = TRUE;
 		if( cview->textfr )

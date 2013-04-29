@@ -70,8 +70,11 @@ struct _Columnview {
 
 	/* A shadow for this cview, used during drag to show where this column
 	 * will end up.
+	 *
+	 * And if we are a shadow, the master cview we are the shadow for.
 	 */
 	Columnview *shadow;
+	Columnview *master;
 
         /* Appearance state info.
          */

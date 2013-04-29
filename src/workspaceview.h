@@ -83,10 +83,6 @@ struct _Workspaceview {
 	int next_x;
 	int next_y;
 
-	/* If set, the columnview we know is on the front of the stack.
-	 */
-	Columnview *front;		
-
 	/* Context we use to change cursor shape.
 	 */
 	iWindowCursorContext *context;

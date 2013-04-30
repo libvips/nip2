@@ -351,7 +351,7 @@ rowview_recalc_cb( GtkWidget *menu, GtkWidget *button, Rowview *rview )
 
 	/* Now ... pick up any errors.
 	 */
-	if( symbol_recalculate_check( row->sym ) )
+	if( !symbol_recalculate_check( row->sym ) )
 		iwindow_alert( button, GTK_MESSAGE_ERROR );
 }
 

@@ -146,3 +146,5 @@ Workspacegroup *mainw_open_workspace( Workspaceroot *wsr,
 Mainw *mainw_new( Workspacegroup *wsg );
 
 void mainw_cull( void );
+
+void mainw_layout( void );

@@ -542,15 +542,14 @@ columnview_left_release( Columnview *cview, GdkEvent *ev )
         case COL_DRAG:
                 cview->state = COL_WAIT;
 		workspaceview_scroll_background( wview, 0, 0 );
-		workspace_set_modified( ws, TRUE );
 		workspaceview_set_cursor( wview, IWINDOW_SHAPE_NONE );
 		gtk_grab_remove( cview->title ); 
-
 		DESTROY_GTK( cview->shadow ); 
 
 		/* Move columns to their final position.
 		 */
 		model_layout( MODEL( ws ) ); 
+		workspace_set_modified( ws, TRUE );
 
                 break;
 

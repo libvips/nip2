@@ -1370,17 +1370,6 @@ mainw_workspacedefs_action_cb( GtkToggleAction *action, Mainw *mainw )
 	}
 }
 
-/* Layout columns.
- */
-void
-mainw_layout_action_cb( GtkAction *action, Mainw *mainw )
-{
-	Workspace *ws;
-
-	if( (ws = mainw_get_workspace( mainw )) ) 
-		model_layout( MODEL( ws ) );
-}
-
 /* Remove selected items.
  */
 static void
@@ -1597,11 +1586,6 @@ static GtkActionEntry mainw_actions[] = {
 		N_( "Recalculate selected items" ), 
 		G_CALLBACK( mainw_force_calc_action_cb ) },
 
-	{ "AlignColumns", 
-		NULL, N_( "Align _Columns" ), NULL,
-		N_( "Align columns to grid" ), 
-		G_CALLBACK( mainw_layout_action_cb ) },
-
 	{ "Find", 
 		GTK_STOCK_FIND, N_( "_Find" ), NULL,
 		N_( "Find in workspace" ), 
@@ -1720,7 +1704,6 @@ static const char *mainw_menubar_ui_description =
 "      <menuitem action='Duplicate'/>"
 "      <menuitem action='Recalculate'/>"
 "      <menuitem action='AutoRecalculate'/>"
-"      <menuitem action='AlignColumns'/>"
 "      <separator/>"
 "      <menuitem action='Find'/>"
 "      <menuitem action='FindNext'/>"
@@ -2038,4 +2021,29 @@ mainw_cull( void )
 {
 	slist_map( mainw_all,
 		(SListMapFn) mainw_cull_sub, NULL );
+}
+
+static void *
+mainw_layout_sub2( Workspace *ws )
+{
+	model_layout( MODEL( ws ) );
+
+	return( NULL ); 
+}
+
+static void *
+mainw_layout_sub( Mainw *mainw )
+{
+	if( mainw->wsg ) 
+		workspacegroup_map( mainw->wsg, 
+			(workspace_map_fn) mainw_layout_sub2, NULL, NULL ); 
+
+	return( NULL );
+}
+
+void
+mainw_layout( void )
+{
+	slist_map( mainw_all,
+		(SListMapFn) mainw_layout_sub, NULL );
 }

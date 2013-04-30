@@ -798,10 +798,8 @@ workspaceview_layout_set_pos( Columnview *cview, WorkspaceLayout *layout )
 	layout->out_y += GTK_WIDGET( cview )->allocation.height +
 		workspaceview_layout_vspacing;
 
-	if( changed ) { 
-		iobject_changed( IOBJECT( column ) );
-		workspace_set_modified( column->ws, TRUE );
-	}
+	if( changed ) 
+		iobject_changed( IOBJECT( column ) ); 
 
 	return( NULL );
 }
@@ -993,15 +991,6 @@ workspaceview_column_new_action_cb2( GtkWidget *wid, GtkWidget *host,
 }
 
 static void
-workspaceview_layout_action_cb2( GtkWidget *wid, GtkWidget *host, 
-	Workspaceview *wview )
-{
-	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
-
-	model_layout( MODEL( ws ) );
-}
-
-static void
 workspaceview_group_action_cb2( GtkWidget *wid, GtkWidget *host, 
 	Workspaceview *wview )
 {
@@ -1156,8 +1145,6 @@ workspaceview_init( Workspaceview *wview )
 		POPUP_FUNC( workspaceview_column_new_action_cb2 ) ); 
 	wview->popup_jump = popup_add_pullright( wview->popup, 
 		_( "Jump to _Column" ) ); 
-	popup_add_but( wview->popup, _( "Align _Columns" ),
-		POPUP_FUNC( workspaceview_layout_action_cb2 ) ); 
 	menu_add_sep( wview->popup );
 	popup_add_but( wview->popup, _( "_Group Selected" ),
 		POPUP_FUNC( workspaceview_group_action_cb2 ) ); 

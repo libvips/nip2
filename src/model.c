@@ -376,12 +376,23 @@ model_scrollto( Model *model, ModelScrollPosition position )
 		model_signals[SIG_SCROLLTO], 0, position );
 }
 
+static gboolean
+model_layout_timeout_cb( Model *model )
+{
+	g_signal_emit( G_OBJECT( model ), model_signals[SIG_LAYOUT], 0 );
+
+	return( FALSE ); 
+}
+
 void
 model_layout( Model *model )
 {
 	g_assert( IS_MODEL( model ) );
 
-	g_signal_emit( G_OBJECT( model ), model_signals[SIG_LAYOUT], 0 );
+	IM_FREEF( g_source_remove, model->layout_timeout );
+
+	model->layout_timeout = g_timeout_add( 100, 
+		(GSourceFunc) model_layout_timeout_cb, model );
 }
 
 void
@@ -533,6 +544,21 @@ model_empty( Model *model )
 }
 
 static void
+model_dispose( GObject *gobject )
+{
+	Model *model;
+
+	g_return_if_fail( gobject != NULL );
+	g_return_if_fail( IS_MODEL( gobject ) );
+
+	model = MODEL( gobject );
+
+	IM_FREEF( g_source_remove, model->layout_timeout );
+
+	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+}
+
+static void
 model_real_scrollto( Model *model, ModelScrollPosition position )
 {
 }
@@ -664,9 +690,12 @@ model_real_empty( Model *model )
 static void
 model_class_init( ModelClass *class )
 {
+	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
 	iObjectClass *object_class = IOBJECT_CLASS( class );
 
 	parent_class = g_type_class_peek_parent( class );
+
+	gobject_class->dispose = model_dispose;
 
 	class->view_new = NULL;
 	class->edit = NULL;

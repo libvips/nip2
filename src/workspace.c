@@ -489,7 +489,7 @@ workspace_add_def_recalc( Workspace *ws, const char *str )
 	if( !(sym = workspace_add_def( ws, str )) )
 		return( NULL );
 
-	if( symbol_recalculate_check( sym ) ) {
+	if( !symbol_recalculate_check( sym ) ) {
 		/* Eval error.
 		 */
 		expr_error_get( sym->expr );
@@ -644,6 +644,8 @@ workspace_current( iContainer *parent, iContainer *child )
 		current->selected = FALSE;
 	if( col )
 		col->selected = TRUE;
+
+	model_layout( MODEL( ws ) ); 
 
 	ICONTAINER_CLASS( parent_class )->current( parent, child );
 }

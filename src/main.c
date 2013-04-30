@@ -221,7 +221,7 @@ main_print_main( Symbol *sym )
 	PElement *root;
 
 	root = &sym->expr->root;
-	if( symbol_recalculate_check( sym ) ||
+	if( !symbol_recalculate_check( sym ) ||
 		!reduce_pelement( reduce_context, reduce_spine_strict, root ) ) 
 		main_error_exit( _( "error calculating \"%s\"" ), 
 			symbol_name_scope( sym ) );

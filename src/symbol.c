@@ -1021,13 +1021,13 @@ static gboolean symbol_running = FALSE;
 
 /* Recalc a symbol ... with error checks.
  */
-void *
-symbol_recalculate_check( Symbol *sym )
+static void *
+symbol_recalculate_leaf_sub( Symbol *sym )
 {
 #ifdef DEBUG_RECALC
-	printf( "symbol_recalculate_check: %s\n", symbol_name_scope( sym ) );
+	printf( "symbol_recalculate_leaf_sub: %s\n", symbol_name_scope( sym ) );
 
-	/* We can symbol_recalculate_check() syms which are not dirty.
+	/* We can symbol_recalculate_leaf_sub() syms which are not dirty.
 	 */
 	g_assert( !sym->dirty || symbol_is_leafable( sym ) );
 
@@ -1124,7 +1124,7 @@ symbol_recalculate_leaf( void )
 
 		/* Found a symbol!
 		 */
-		(void) symbol_recalculate_check( sym );
+		(void) symbol_recalculate_leaf_sub( sym );
 
 		/* Note a pending GC.
 		 */
@@ -1155,19 +1155,18 @@ symbol_recalculate_idle_cb( void )
 	run_again = TRUE;
 
 	if( !symbol_running ) {
-		progress_begin();
-
 		g_timer_reset( timer );
 
 		while( g_timer_elapsed( timer, NULL ) < 0.1 )
 			if( !symbol_recalculate_leaf() ) {
 				symbol_idle_id = 0;
 				run_again = FALSE;
+				progress_end();
 				break;
 			}
-
-		progress_end();
 	}
+
+	mainw_layout();
 
 	return( run_again );
 }
@@ -1198,10 +1197,14 @@ symbol_recalculate_all_force( gboolean now )
 			;
 
 		progress_end();
+
+		mainw_layout();
 	}
-	else if( !symbol_idle_id ) 
+	else if( !symbol_idle_id ) {
+		progress_begin();
 		symbol_idle_id = g_idle_add( 
 			(GSourceFunc) symbol_recalculate_idle_cb, NULL );
+	}
 }
 
 /* Recalculate the symbol table.
@@ -1218,3 +1221,15 @@ symbol_recalculate_all( void )
 		symbol_recalculate_all_force( FALSE );
 }
 
+/* Recalc a symbol ... with error checks.
+ */
+gboolean
+symbol_recalculate_check( Symbol *sym )
+{
+	gboolean result;
+
+	result = symbol_recalculate_leaf_sub( sym ) == NULL;
+	mainw_layout();
+
+	return( result );
+}

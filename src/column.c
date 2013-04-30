@@ -319,9 +319,6 @@ column_get_type( void )
 Column *
 column_new( Workspace *ws, const char *name )
 {
-	static int left = 0;
-	static int top = 0;
-
 	Column *col;
 
 	if( workspace_column_find( ws, name ) ) {
@@ -337,14 +334,10 @@ column_new( Workspace *ws, const char *name )
 
         subcolumn_new( NULL, col );
 
-	/* Pick an initial position for it. 
+	/* Place at top-left of window.
 	 */
-	left += 10;
-	top += 10;
-	if( top > 200 )
-		top = 0;
-	col->x = left + ws->vp.left;
-	col->y = top + ws->vp.top;
+	col->x = ws->vp.left;
+	col->y = ws->vp.top;
 
 	return( col );
 }

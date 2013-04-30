@@ -41,9 +41,9 @@ static ViewClass *parent_class = NULL;
 
 /* Params for "Align Columns" function.
  */
-static const int workspaceview_layout_snap_threshold = 20;
+static const int workspaceview_layout_snap_threshold = 30;
 static const int workspaceview_layout_hspacing = 10;
-static const int workspaceview_layout_vspacing = 30;
+static const int workspaceview_layout_vspacing = 10;
 static const int workspaceview_layout_left = WORKSPACEVIEW_MARGIN_LEFT;
 static const int workspaceview_layout_top = WORKSPACEVIEW_MARGIN_TOP;
 
@@ -748,7 +748,7 @@ workspaceview_layout_find_similar_x( Columnview *cview,
 	WorkspaceLayout *layout )
 {
 	if( ABS( GTK_WIDGET( cview )->allocation.x - layout->area.left ) < 
-		workspaceview_layout_hspacing + layout->area.width / 3 ) {
+		workspaceview_layout_snap_threshold ) { 
 		layout->current_columns = g_slist_prepend(
 			layout->current_columns, cview );
 		layout->area.width = IM_MAX( layout->area.width, 

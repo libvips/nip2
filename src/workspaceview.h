@@ -39,8 +39,8 @@
 
 /* Column margins.
  */
-#define WORKSPACEVIEW_MARGIN_LEFT (3)
-#define WORKSPACEVIEW_MARGIN_TOP (3)
+#define WORKSPACEVIEW_MARGIN_LEFT (5)
+#define WORKSPACEVIEW_MARGIN_TOP (5)
 
 struct _Workspaceview {
 	View view;

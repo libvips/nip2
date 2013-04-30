@@ -549,7 +549,8 @@ workspace_dispose( GObject *gobject )
 	Workspace *ws;
 
 #ifdef DEBUG
-	printf( "workspace_dispose: %s\n", NN( IOBJECT( gobject )->name ) );
+	printf( "workspace_dispose: %p %s\n", 
+		gobject, NN( IOBJECT( gobject )->name ) );
 #endif /*DEBUG*/
 
 	g_return_if_fail( gobject != NULL );

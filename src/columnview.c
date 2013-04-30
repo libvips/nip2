@@ -79,8 +79,8 @@ columnview_clone_cb( GtkWidget *wid, GtkWidget *host, Columnview *cview )
 	workspace_column_name_new( ws, new_name );
         newcol = workspace_column_get( ws, new_name );
         iobject_set( IOBJECT( newcol ), NULL, IOBJECT( col )->caption );
-        newcol->x = col->x + 30;
-        newcol->y = col->y + 30;
+        newcol->x = col->x + 100;
+        newcol->y = col->y;
 
 	workspace_deselect_all( ws );
         column_select_symbols( col );

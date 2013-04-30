@@ -1,10 +1,4 @@
-- doing layout too early still
-
-  broken signal on exit
-
-  duplicate column needs to layout
-
-  rethink merge columns
+- rethink merge columns
 
 
 

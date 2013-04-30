@@ -402,41 +402,6 @@ columnview_left_press( Columnview *cview, GdkEvent *ev )
         }
 }
 
-typedef struct {
-	Column *col;		/* Column we are snapping */
-	Column *best;		/* Closest we've found so far */
-} ColumnviewSnap;
-
-static void *
-columnview_snap_column( Column *col, ColumnviewSnap *snap )
-{
-	if( col != snap->col )
-		if( !snap->best ||
-			IM_ABS( col->x - snap->col->x ) < 
-				IM_ABS( snap->best->x - snap->col->x ) ) 
-			snap->best = col;
-
-	return( NULL );
-}
-
-static void
-columnview_snap( Column *col )
-{
-	const int SNAP_THRESHOLD = 20;
-	Workspace *ws = col->ws;
-	ColumnviewSnap snap;
-	
-	/* Find the column closest to this one.
-	 */
-	snap.col = col;
-	snap.best = NULL;
-	(void) workspace_map_column( ws, 
-		(column_map_fn) columnview_snap_column, &snap );
-
-	if( snap.best && IM_ABS( snap.best->x - col->x ) < SNAP_THRESHOLD ) 
-		col->x = snap.best->x;
-}
-
 static void
 columnview_add_shadow( Columnview *old_cview )
 {
@@ -510,6 +475,7 @@ columnview_left_motion( Columnview *cview, GdkEvent *ev )
                 if( abs( xoff ) > 5 || abs( yoff ) > 5 ) {
                         cview->state = COL_DRAG;
 			workspaceview_set_cursor( wview, IWINDOW_SHAPE_MOVE );
+			gtk_grab_add( cview->title ); 
 
 			columnview_add_shadow( cview );
                 }
@@ -519,10 +485,6 @@ columnview_left_motion( Columnview *cview, GdkEvent *ev )
         case COL_DRAG:
 		col->x = xnew;
 		col->y = ynew;
-
-		/* Snap to other column x positions.
-		 */
-		columnview_snap( col );
 
 		iobject_changed( IOBJECT( col ) );
 
@@ -582,6 +544,7 @@ columnview_left_release( Columnview *cview, GdkEvent *ev )
 		workspaceview_scroll_background( wview, 0, 0 );
 		workspace_set_modified( ws, TRUE );
 		workspaceview_set_cursor( wview, IWINDOW_SHAPE_NONE );
+		gtk_grab_remove( cview->title ); 
 
 		DESTROY_GTK( cview->shadow ); 
 
@@ -658,6 +621,25 @@ columnview_event_cb( GtkWidget *widget, GdkEvent *ev, Columnview *cview )
         }
 
         return( handled );
+}
+
+static void 
+columnview_destroy( GtkObject *object )
+{
+	Columnview *cview;
+
+	g_return_if_fail( object != NULL );
+	g_return_if_fail( IS_COLUMNVIEW( object ) );
+
+	cview = COLUMNVIEW( object );
+
+#ifdef DEBUG
+	printf( "columnview_destroy:\n" );
+#endif /*DEBUG*/
+
+	DESTROY_GTK( cview->shadow );
+
+	GTK_OBJECT_CLASS( parent_class )->destroy( object );
 }
 
 /* Arrow button on title bar.
@@ -821,6 +803,8 @@ columnview_refresh( vObject *vobject )
 		gtk_widget_set_size_request( GTK_WIDGET( shadow->frame ), 
 			GTK_WIDGET( cview->frame )->allocation.width, 
 			GTK_WIDGET( cview->frame )->allocation.height );
+		gtk_frame_set_shadow_type( GTK_FRAME( shadow->frame ),
+			GTK_SHADOW_IN );
 	}
 
 
@@ -991,6 +975,7 @@ columnview_scrollto( View *view, ModelScrollPosition position )
 static void
 columnview_class_init( ColumnviewClass *class )
 {
+	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
 
@@ -1003,6 +988,8 @@ columnview_class_init( ColumnviewClass *class )
 
 	/* Init methods.
 	 */
+	object_class->destroy = columnview_destroy;
+
 	vobject_class->refresh = columnview_refresh;
 
 	view_class->link = columnview_link;

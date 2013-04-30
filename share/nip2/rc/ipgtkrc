@@ -73,6 +73,7 @@ widget "*error_widget*" style "error_style"
 widget "*dirty_widget*" style "dirty_style"
 widget "*caption_widget*" style "caption_style"
 widget "*centre_widget*" style "child_style"
+widget "*shadow_widget*" style "column_style"
 
 # turn this on here ... no one will find this useful thing unless we turn it
 # on by default

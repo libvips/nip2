@@ -714,7 +714,7 @@ typedef struct _WorkspaceLayout {
 	 */
 	int out_x, out_y;
 
-	/* Accumulate areas here.
+	/* Accumulate the size of the current set of columns here.
 	 */
 	Rect area;
 
@@ -748,9 +748,12 @@ workspaceview_layout_find_similar_x( Columnview *cview,
 	WorkspaceLayout *layout )
 {
 	if( ABS( GTK_WIDGET( cview )->allocation.x - layout->area.left ) < 
-		workspaceview_layout_snap_threshold ) 
+		workspaceview_layout_hspacing + layout->area.width / 3 ) {
 		layout->current_columns = g_slist_prepend(
 			layout->current_columns, cview );
+		layout->area.width = IM_MAX( layout->area.width, 
+			GTK_WIDGET( cview )->allocation.width ); 
+	}
 
 	return( NULL );
 }
@@ -795,9 +798,6 @@ workspaceview_layout_set_pos( Columnview *cview, WorkspaceLayout *layout )
 	layout->out_y += GTK_WIDGET( cview )->allocation.height +
 		workspaceview_layout_vspacing;
 
-	if( GTK_WIDGET( cview )->allocation.width > layout->area.width )
-		layout->area.width = GTK_WIDGET( cview )->allocation.width;
-
 	if( changed ) { 
 		iobject_changed( IOBJECT( column ) );
 		workspace_set_modified( column->ws, TRUE );
@@ -824,6 +824,7 @@ workspaceview_layout_loop( WorkspaceLayout *layout )
 		(SListMapFn) workspaceview_layout_find_leftmost, layout );
 
 	layout->current_columns = NULL;
+	layout->area.width = GTK_WIDGET( layout->cview )->allocation.width;
 	slist_map( layout->undone_columns,
 		(SListMapFn) workspaceview_layout_find_similar_x, layout );
 
@@ -831,7 +832,6 @@ workspaceview_layout_loop( WorkspaceLayout *layout )
 		(GCompareFunc) workspaceview_layout_sort_y );
 
 	layout->out_y = workspaceview_layout_top;
-	layout->area.width = 0;
 	slist_map( layout->current_columns,
 		(SListMapFn) workspaceview_layout_set_pos, layout );
 
@@ -840,18 +840,16 @@ workspaceview_layout_loop( WorkspaceLayout *layout )
 	slist_map( layout->current_columns,
 		(SListMapFn) workspaceview_layout_strike, layout );
 
-	g_slist_free( layout->current_columns );
-	layout->current_columns = NULL;
+	IM_FREEF( g_slist_free, layout->current_columns );
 }
 
 /* Autolayout ... try to rearrange columns so they don't overlap. 
 
 	Strategy:
 
-	search for top-left-most column
+	search for left-most column
 
-	search for all columns with a similar X (ie. within a smallish
-	threshold)
+	search for all columns with less than 50% overlap
 
 	lay those columns out vertically with some space between them ... keep
 	the vertical ordering we had before

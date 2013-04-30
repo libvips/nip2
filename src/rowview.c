@@ -547,20 +547,21 @@ rowview_child_remove( View *parent, View *child )
 static void
 rowview_class_init( RowviewClass *class )
 {
-	GtkWidget *pane;
 	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
+	GtkWidget *pane;
 
-	object_class->destroy = rowview_destroy;
+	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
 
 	/* Init methods.
 	 */
+	object_class->destroy = rowview_destroy;
+
 	vobject_class->refresh = rowview_refresh;
 
 	view_class->link = rowview_link;

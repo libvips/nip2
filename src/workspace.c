@@ -1133,7 +1133,7 @@ workspace_new_blank( Workspacegroup *wsg )
 
 /* Get the bottom row from the current column.
  */
-Row *
+static Row *
 workspace_get_bottom( Workspace *ws )
 {
 	return( column_get_bottom( workspace_column_pick( ws ) ) );
@@ -1403,13 +1403,14 @@ gboolean
 workspace_selected_ungroup( Workspace *ws )
 {
 	if( !workspace_selected_any( ws ) ) {
-		/* Nothing selected -- ungroup bottom object.
-		 */
-		Symbol *sym = workspace_get_bottom( ws )->sym;
+		Row *row;
 
-		if( !sym || workspace_ungroup_row( sym->expr->row ) ) 
-			return( FALSE );
-		symbol_recalculate_all();
+		if( (row = workspace_get_bottom( ws )) ) {
+			if( workspace_ungroup_row( row ) ) 
+				return( FALSE );
+
+			symbol_recalculate_all();
+		}
 	}
 	else {
 		/* Ungroup selected symbols.
@@ -1437,9 +1438,8 @@ workspace_selected_group( Workspace *ws )
 	if( !workspace_selected_any( ws ) ) {
 		Row *row;
 
-		if( !(row = workspace_get_bottom( ws )) )
-			return( FALSE );
-		row_select( row );
+		if( (row = workspace_get_bottom( ws )) )
+			row_select( row );
 	}
 
 	vips_buf_appends( &buf, "Group [" );
@@ -1678,10 +1678,8 @@ workspace_selected_duplicate( Workspace *ws )
 	if( !workspace_selected_any( ws ) ) {
 		Row *row;
 
-		if( !(row = workspace_get_bottom( ws )) )
-			return( FALSE );
-
-		row_select( row );
+		if( (row = workspace_get_bottom( ws )) )
+			row_select( row );
 	}
 
 	if( !temp_name( filename, "ws" ) )

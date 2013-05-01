@@ -153,8 +153,6 @@ GType workspace_get_type( void );
 Workspace *workspace_new( Workspacegroup *wsg, const char *name );
 Workspace *workspace_new_blank( Workspacegroup *wsg );
 
-Row *workspace_get_bottom( Workspace *ws );
-
 gboolean workspace_add_action( Workspace *ws, 
 	const char *name, const char *action, int nparam );
 

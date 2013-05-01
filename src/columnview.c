@@ -693,6 +693,8 @@ columnview_caption_enter_cb( GtkWidget *wid, Columnview *cview )
 	/* The ws view needs to update the jumpto menus.
 	 */
 	iobject_changed( IOBJECT( ws ) );
+
+	model_layout( MODEL( ws ) );
 }
 
 /* Detect cancel in a caption field.

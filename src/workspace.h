@@ -97,6 +97,10 @@ struct _Workspace {
 	char *local_defs;
 	Toolkitgroup *local_kitg;
 	Toolkit *local_kit;
+
+	/* Some view inside this ws has changed and this ws needs a relayout.
+	 */
+	gboolean needs_layout;
 };
 
 typedef struct _WorkspaceClass {
@@ -105,6 +109,9 @@ typedef struct _WorkspaceClass {
 	/* Methods.
 	 */
 } WorkspaceClass;
+
+void workspace_set_needs_layout( Workspace *ws, gboolean needs_layout );
+GSList *workspace_get_needs_layout();
 
 Workspacegroup *workspace_get_workspacegroup( Workspace *ws );
 Workspaceroot *workspace_get_workspaceroot( Workspace *ws );

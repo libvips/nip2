@@ -50,6 +50,8 @@ GSList *mainw_recent_matrix = NULL;
  */
 gboolean mainw_auto_recalc = TRUE;
 
+static gint mainw_layout_timeout = 0;
+
 static iWindowClass *parent_class = NULL;
 
 /* All the mainw.
@@ -2024,26 +2026,29 @@ mainw_cull( void )
 }
 
 static void *
-mainw_layout_sub2( Workspace *ws )
+mainw_layout_sub( Workspace *ws )
 {
 	model_layout( MODEL( ws ) );
+	workspace_set_needs_layout( ws, FALSE );
 
 	return( NULL ); 
 }
 
-static void *
-mainw_layout_sub( Mainw *mainw )
+static gboolean
+mainw_layout_timeout_cb( gpointer user_data )
 {
-	if( mainw->wsg ) 
-		workspacegroup_map( mainw->wsg, 
-			(workspace_map_fn) mainw_layout_sub2, NULL, NULL ); 
+	mainw_layout_timeout = 0;
 
-	return( NULL );
+	slist_map( workspace_get_needs_layout(),
+		(SListMapFn) mainw_layout_sub, NULL );
+
+	return( FALSE ); 
 }
 
 void
 mainw_layout( void )
 {
-	slist_map( mainw_all,
-		(SListMapFn) mainw_layout_sub, NULL );
+	IM_FREEF( g_source_remove, mainw_layout_timeout );
+	mainw_layout_timeout = g_timeout_add( 300, 
+		(GSourceFunc) mainw_layout_timeout_cb, NULL );
 }

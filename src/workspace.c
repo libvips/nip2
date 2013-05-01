@@ -37,6 +37,39 @@ static ModelClass *parent_class = NULL;
 
 static GSList *workspace_all = NULL;
 
+static GSList *workspace_needs_layout = NULL;
+
+void
+workspace_set_needs_layout( Workspace *ws, gboolean needs_layout )
+{
+#ifdef DEBUG
+	printf( "workspace_set_needs_layout: %p %s %d\n", 
+		ws, NN( IOBJECT( ws )->name ), needs_layout );
+#endif /*DEBUG*/
+
+	if( !ws->needs_layout && needs_layout ) { 
+		g_assert( !g_slist_find( workspace_needs_layout, ws ) ); 
+
+		ws->needs_layout = TRUE;
+		workspace_needs_layout = g_slist_prepend( 
+			workspace_needs_layout, ws ); 
+	}
+
+	if( ws->needs_layout && !needs_layout ) { 
+		g_assert( g_slist_find( workspace_needs_layout, ws ) ); 
+
+		ws->needs_layout = FALSE;
+		workspace_needs_layout = g_slist_remove( 
+			workspace_needs_layout, ws ); 
+	}
+}
+
+GSList *
+workspace_get_needs_layout()
+{
+	return( workspace_needs_layout );
+}
+
 Workspacegroup *
 workspace_get_workspacegroup( Workspace *ws )
 {
@@ -571,7 +604,8 @@ workspace_finalize( GObject *gobject )
 	Workspace *ws;
 
 #ifdef DEBUG
-	printf( "workspace_finalize: %s\n", NN( IOBJECT( gobject )->name ) );
+	printf( "workspace_finalize: %p %s\n", 
+		gobject, NN( IOBJECT( gobject )->name ) );
 #endif /*DEBUG*/
 
 	g_return_if_fail( gobject != NULL );
@@ -582,6 +616,7 @@ workspace_finalize( GObject *gobject )
 	IM_FREE( ws->status );
 	IM_FREE( ws->local_defs );
 
+	workspace_set_needs_layout( ws, FALSE );
 	workspace_all = g_slist_remove( workspace_all, ws );
 
 	G_OBJECT_CLASS( parent_class )->finalize( gobject );
@@ -645,8 +680,6 @@ workspace_current( iContainer *parent, iContainer *child )
 		current->selected = FALSE;
 	if( col )
 		col->selected = TRUE;
-
-	model_layout( MODEL( ws ) ); 
 
 	ICONTAINER_CLASS( parent_class )->current( parent, child );
 }
@@ -1789,5 +1822,3 @@ workspace_duplicate( Workspace *ws )
 
 	return( TRUE );
 }
-
-

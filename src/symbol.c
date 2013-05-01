@@ -1166,8 +1166,6 @@ symbol_recalculate_idle_cb( void )
 			}
 	}
 
-	mainw_layout();
-
 	return( run_again );
 }
 
@@ -1197,8 +1195,6 @@ symbol_recalculate_all_force( gboolean now )
 			;
 
 		progress_end();
-
-		mainw_layout();
 	}
 	else if( !symbol_idle_id ) {
 		progress_begin();
@@ -1229,7 +1225,6 @@ symbol_recalculate_check( Symbol *sym )
 	gboolean result;
 
 	result = symbol_recalculate_leaf_sub( sym ) == NULL;
-	mainw_layout();
 
 	return( result );
 }

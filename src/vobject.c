@@ -42,7 +42,7 @@ static GtkVBoxClass *parent_class = NULL;
 
 static Queue *vobject_dirty = NULL;
 
-static gint vobject_idle_running = 0;
+static gint vobject_refresh_timeout = 0;
 
 /* Remove from refresh queue.
  */
@@ -63,8 +63,8 @@ vobject_refresh_dequeue( vObject *vobject )
 #ifdef DEBUG_TIME
 /* Refresh all vobjects at once and time them.
  */
-static gint
-vobject_idle_refresh( gpointer user_data )
+static gboolean
+vobject_refresh_timeout_cb( gpointer user_data )
 {
 	static GTimer *refresh_timer = NULL;
 	double last_elapsed;
@@ -72,6 +72,8 @@ vobject_idle_refresh( gpointer user_data )
 	int worst_index = -1;
 	void *data;
 	int n;
+
+	vobject_refresh_timeout = 0;
 
 	if( !refresh_timer )
 		refresh_timer = g_timer_new();
@@ -102,23 +104,27 @@ vobject_idle_refresh( gpointer user_data )
 	printf( "vobject_idle_refresh: worst %gs (refresh %d)\n", 
 		worst_time, worst_index );
 
-	vobject_idle_running = 0;
-
 	return( FALSE );
 }
 #else /*DEBUG_TIME*/
-/* Refresh stuff off the dirty list. Runs as an idle task.
+/* Refresh stuff off the dirty list. 
  */
-static gint
-vobject_idle_refresh( gpointer user_data )
+static gboolean
+vobject_refresh_timeout_cb( gpointer user_data )
 {
 	void *data;
+
+#ifdef DEBUG
+	printf( "vobject_refresh_timeout_cb:\n" ); 
+#endif /*DEBUG*/
+
+	vobject_refresh_timeout = 0;
 
 	while( (data = queue_head( vobject_dirty ) ) ) {
 		vObject *vobject = VOBJECT( data );
 
 #ifdef DEBUG
-		printf( "vobject_idle_refresh: starting \"%s\" (%p)\n", 
+		printf( "vobject_refresh_timeout_cb: starting \"%s\" (%p)\n", 
 			G_OBJECT_TYPE_NAME( vobject ), vobject );
 #endif /*DEBUG*/
 
@@ -130,7 +136,10 @@ vobject_idle_refresh( gpointer user_data )
 		vobject_refresh( vobject );
 	}
 
-	vobject_idle_running = 0;
+	/* We may have changed the size of some objects in some workspaces.
+	 * Relayout if necessary. 
+	 */
+	mainw_layout();
 
 	return( FALSE );
 }
@@ -156,9 +165,9 @@ vobject_refresh_queue( vObject *vobject )
 		vobject->dirty = TRUE;
 		queue_add( vobject_dirty, vobject );
 
-		if( !vobject_idle_running )
-			vobject_idle_running = 
-				gtk_idle_add( vobject_idle_refresh, NULL );
+		IM_FREEF( g_source_remove, vobject_refresh_timeout );
+		vobject_refresh_timeout = g_timeout_add( 20, 
+			(GSourceFunc) vobject_refresh_timeout_cb, NULL );
 	}
 
 	return( NULL );
@@ -246,6 +255,27 @@ vobject_finalize( GObject *gobject )
 static void
 vobject_real_refresh( vObject *vobject )
 {
+	Row *row;
+	Workspace *ws;
+
+#ifdef DEBUG
+	printf( "vobject_real_refresh: %p %s\n", 
+		vobject, G_OBJECT_TYPE_NAME( vobject ) );
+#endif /*DEBUG*/
+
+	/* Widget view refreshes will trigger relayout. Also columnviews.
+	 */
+
+	if( vobject->iobject &&
+		IS_HEAPMODEL( vobject->iobject ) &&
+		(row = HEAPMODEL( vobject->iobject )->row) &&
+		(ws = row->ws) )  
+		workspace_set_needs_layout( ws, TRUE );
+	else if( vobject->iobject &&
+		IS_COLUMN( vobject->iobject ) &&
+		(ws = COLUMN( vobject->iobject )->ws) )  
+		workspace_set_needs_layout( ws, TRUE );
+
 }
 
 static void

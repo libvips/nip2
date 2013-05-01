@@ -436,6 +436,5 @@ column_set_open( Column *col, gboolean open )
 		workspace_set_modified( ws, TRUE );
 		iobject_changed( IOBJECT( col ) );
 		model_display( MODEL( col->scol ), col->open );
-		model_layout( MODEL( ws ) ); 
 	}
 }

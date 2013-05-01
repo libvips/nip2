@@ -111,10 +111,6 @@ struct _Model {
 	 */
 	int window_x, window_y;
 	int window_width, window_height;
-
-	/* Queue up layouts with this.
-	 */
-	guint layout_timeout;
 };
 
 typedef struct _ModelClass {

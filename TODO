@@ -1,3 +1,8 @@
+- vobject_idle_refresh() does a mainw_layout() at the end of processing 
+
+  instead, have the base class of all ws widgets (classmodel? heapmodel?) add
+  the ws to a list of must-be-relayed-out wses
+
 - rethink merge columns? 
 
   at least scrollto the first column of the newly merged stuff

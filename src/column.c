@@ -42,6 +42,8 @@ static int column_top_offset = 0;
 
 static const int column_open_max_frames = 10;	/* Max frames we animate */
 
+static Column *column_last_new = NULL;
+
 /* Map down a column.
  */
 void *
@@ -70,12 +72,19 @@ column_map_symbol( Column *col, symbol_map_fn fn, void *a )
 static void
 column_finalize( GObject *gobject )
 {
+	Column *col;
+
 #ifdef DEBUG
 	printf( "column_finalize\n" );
 #endif /*DEBUG*/
 
 	g_return_if_fail( gobject != NULL );
 	g_return_if_fail( IS_COLUMN( gobject ) );
+
+	col = COLUMN( gobject ); 
+
+	if( col == column_last_new ) 
+		column_last_new = NULL;
 
 	G_OBJECT_CLASS( parent_class )->finalize( gobject );
 }
@@ -200,6 +209,13 @@ column_save_test( Model *model )
 	return( TRUE );
 }
 
+static void
+column_set_last_new( Column *col )
+{
+	if( !column_last_new ) 
+		column_last_new = col;
+}
+
 static gboolean
 column_load( Model *model, 
 	ModelLoadState *state, Model *parent, xmlNode *xnode )
@@ -231,6 +247,8 @@ column_load( Model *model,
 	if( get_sprop( xnode, "name", buf, 256 ) ) {
 		IM_SETSTR( IOBJECT( col )->name, buf );
 	}
+
+	column_set_last_new( col );
 
 	return( MODEL_CLASS( parent_class )->load( model, 
 		state, parent, xnode ) );
@@ -339,7 +357,21 @@ column_new( Workspace *ws, const char *name )
 	col->x = ws->vp.left;
 	col->y = ws->vp.top;
 
+	column_set_last_new( col );
+
 	return( col );
+}
+
+Column *
+column_get_last_new( void )
+{
+	return( column_last_new ); 
+}
+
+void
+column_clear_last_new( void )
+{
+	column_last_new = NULL; 
 }
 
 /* Find the bottom of the column.

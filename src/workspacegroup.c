@@ -916,8 +916,12 @@ workspacegroup_merge_columns( Workspacegroup *wsg, const char *filename )
 	Workspace *ws;
 
 	if( (ws = workspacegroup_get_workspace( wsg )) ) 
+		/* We'll do a layout after load, so just load to a huge x and
+		 * we'll be OK.
+		 */
 		column_set_offset( 
-			IM_RECT_RIGHT( &ws->area ) + WORKSPACEVIEW_MARGIN_LEFT,
+			2 * IM_RECT_RIGHT( &ws->area ) + 
+				WORKSPACEVIEW_MARGIN_LEFT,
 			WORKSPACEVIEW_MARGIN_TOP );
 
 	workspacegroup_set_load_type( wsg, WORKSPACEGROUP_LOAD_COLUMNS );

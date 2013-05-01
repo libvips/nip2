@@ -75,6 +75,9 @@ GtkType column_get_type( void );
 
 Column *column_new( Workspace *ws, const char *name );
 
+Column *column_get_last_new( void );
+void column_clear_last_new( void );
+
 Row *column_get_bottom( Column *col );
 gboolean column_add_n_names( Column *col, 
 	const char *name, VipsBuf *buf, int nparam );

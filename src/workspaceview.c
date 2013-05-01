@@ -847,7 +847,7 @@ workspaceview_layout_loop( WorkspaceLayout *layout )
 
 	search for left-most column
 
-	search for all columns with less than 50% overlap
+	search for all columns with a 'small' overlap
 
 	lay those columns out vertically with some space between them ... keep
 	the vertical ordering we had before

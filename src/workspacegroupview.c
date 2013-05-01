@@ -254,8 +254,11 @@ workspacegroupview_switch_page_cb( GtkNotebook *notebook,
 	 * resize to get everything to init. 
 	 */
 	if( wview &&
-		wview->fixed ) 
+		wview->fixed ) {
 		gtk_container_check_resize( GTK_CONTAINER( wview->fixed ) );
+		workspace_set_needs_layout( ws, TRUE );
+		mainw_layout();
+	}
 }
 
 static void                
@@ -381,11 +384,14 @@ workspacegroupview_merge_sub( iWindow *iwnd,
 	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
 	char *filename;
+	Column *col;
 
 	if( (filename = filesel_get_filename( filesel )) ) {
 		icontainer_current( ICONTAINER( wsg ), ICONTAINER( ws ) );
 
 		progress_begin();
+
+		column_clear_last_new();
 
 		if( !workspace_merge_file( ws, filename ) ) 
 			nfn( sys, IWINDOW_ERROR );
@@ -393,6 +399,9 @@ workspacegroupview_merge_sub( iWindow *iwnd,
 			symbol_recalculate_all();
 			nfn( sys, IWINDOW_YES );
 		}
+
+		if( (col = column_get_last_new()) )
+			model_scrollto( MODEL( col ), MODEL_SCROLL_TOP ); 
 
 		progress_end();
 

@@ -546,8 +546,8 @@ workspaceview_child_size_cb( Columnview *cview,
 		(view_map_fn) workspaceview_child_size_sub, 
 		&wview->bounding, NULL );
 
-	wview->bounding.width += 3;
-	wview->bounding.height += 30;
+	wview->bounding.width += 1000;
+	wview->bounding.height += 1000;
 
 #ifdef DEBUG
 {
@@ -568,6 +568,9 @@ workspaceview_child_size_cb( Columnview *cview,
 	right = IM_RECT_RIGHT( &wview->bounding );
 	bottom = IM_RECT_BOTTOM( &wview->bounding );
 	if( right != wview->width || bottom != wview->height ) {
+		gtk_widget_set_size_request( GTK_WIDGET( wview->fixed ), 
+			right, bottom ); 
+
 		/* Update the model hints ... it uses bounding to position
 		 * loads and saves.
 		 */

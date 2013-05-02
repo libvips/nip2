@@ -318,7 +318,7 @@ imageview_new_arrow4_action_cb( GtkAction *action, Imageview *iv )
 	}
 
 	col = sym->expr->row->top_col;
-	model_scrollto( MODEL( col ), MODEL_SCROLL_BOTTOM );
+	column_scrollto( col, MODEL_SCROLL_BOTTOM );
 }
 
 static void

@@ -401,7 +401,7 @@ workspacegroupview_merge_sub( iWindow *iwnd,
 		}
 
 		if( (col = column_get_last_new()) )
-			model_scrollto( MODEL( col ), MODEL_SCROLL_TOP ); 
+			column_scrollto( col, MODEL_SCROLL_TOP ); 
 
 		progress_end();
 

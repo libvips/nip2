@@ -57,6 +57,11 @@ struct _Column {
 	 */
         int next;		/* Index of next symbol we make */
         Row *last_select;	/* Last row clicked ... for x sel */
+
+	/* A pending scrollto.
+	 */
+	guint scrollto_timeout;
+	ModelScrollPosition pending_position;
 };
 
 typedef struct _ColumnClass {
@@ -88,3 +93,5 @@ void column_set_offset( int x_off, int y_off );
 char *column_name_new( Column *col );
 
 void column_set_open( Column *col, gboolean open );
+
+void column_scrollto( Column *col, ModelScrollPosition position );

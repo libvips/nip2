@@ -535,7 +535,7 @@ workspace_add_def_recalc( Workspace *ws, const char *str )
 
 	/* Jump to column containing object.
 	 */
-	model_scrollto( MODEL( col ), MODEL_SCROLL_BOTTOM );
+	column_scrollto( col, MODEL_SCROLL_BOTTOM );
 
 	return( sym );
 }
@@ -1642,7 +1642,7 @@ workspace_jump_name_compare( iContainer *a, iContainer *b )
 static void
 workspace_jump_column_cb( GtkWidget *item, Column *column )
 {
-	model_scrollto( MODEL( column ), MODEL_SCROLL_TOP );
+	column_scrollto( column, MODEL_SCROLL_TOP );
 }
 
 static void *
@@ -1732,7 +1732,7 @@ workspace_selected_duplicate( Workspace *ws )
 
 	symbol_recalculate_all();
 	workspace_deselect_all( ws );
-	model_scrollto( MODEL( workspace_get_column( ws ) ), MODEL_SCROLL_TOP );
+	column_scrollto( workspace_get_column( ws ), MODEL_SCROLL_TOP );
 
 	progress_end();
 

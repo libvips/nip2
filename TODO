@@ -1,22 +1,7 @@
-- vobject_idle_refresh() does a mainw_layout() at the end of processing 
+- need two shadows: one for the old position, and one for the new
 
-  instead, have the base class of all ws widgets (classmodel? heapmodel?) add
-  the ws to a list of must-be-relayed-out wses
+  
 
-- rethink merge columns? 
-
-  at least scrollto the first column of the newly merged stuff
-
-
-
-- experiment with constant auto relayout
-
-  during a drag, tag that column as 'in-drag'
-
-  in-drag columns have space reserved for them by layout, but do not have
-  their position set
-
-  rerun layout on every motion, don't change x/y of things that haven't moved
 
 - hide tabs if only one tab in window, though we'd need to allow tab drop 
   anywhere in window for that

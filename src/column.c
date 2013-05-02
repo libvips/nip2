@@ -85,6 +85,7 @@ column_finalize( GObject *gobject )
 
 	if( col == column_last_new ) 
 		column_last_new = NULL;
+	IM_FREEF( g_source_remove, col->scrollto_timeout );
 
 	G_OBJECT_CLASS( parent_class )->finalize( gobject );
 }
@@ -469,4 +470,26 @@ column_set_open( Column *col, gboolean open )
 		iobject_changed( IOBJECT( col ) );
 		model_display( MODEL( col->scol ), col->open );
 	}
+}
+
+static gboolean
+column_scrollto_timeout_cb( Column *col )
+{
+	col->scrollto_timeout = 0;
+
+	model_scrollto( MODEL( col ), col->pending_position ); 
+
+	return( FALSE );
+}
+
+void
+column_scrollto( Column *col, ModelScrollPosition position )
+{
+	IM_FREEF( g_source_remove, col->scrollto_timeout );
+	col->pending_position = position; 
+
+	/* We need a longer timeout here than the one in mainw_layout().
+	 */
+	col->scrollto_timeout = g_timeout_add( 400, 
+		(GSourceFunc) column_scrollto_timeout_cb, col );
 }

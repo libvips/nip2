@@ -642,7 +642,7 @@ row_scrollto( Model *model, ModelScrollPosition position )
 	 */
 	if( !col->open ) {
 		column_set_open( col, TRUE );
-		model_scrollto( MODEL( col ), position );
+		column_scrollto( col, position );
 	}
 
 	MODEL_CLASS( parent_class )->scrollto( model, position );

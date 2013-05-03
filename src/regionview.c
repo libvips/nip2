@@ -1169,7 +1169,8 @@ regionview_rect_touches_region( Regionview *regionview, Rect *expose )
 	case REGIONVIEW_VGUIDE:
 		conversion_im_to_disp_rect( conv, 
 			&regionview->area, &canvas_area );
-		im_rect_marginadjust( &canvas_area, 1 );
+		im_rect_marginadjust( &canvas_area, 5 );
+
 		if( regionview_rect_touching( regionview, 
 			&canvas_area, expose ) )
 			return( TRUE );
@@ -1327,15 +1328,9 @@ regionview_find_resize( Regionview *regionview, int x, int y )
 
 		break;
 
-	case REGIONVIEW_HGUIDE:
-		im_rect_marginadjust( &canvas_area, 1 );
-		if( im_rect_includespoint( &canvas_area, x, y ) )
-			return( REGIONVIEW_RESIZE_MOVE );
-
-		break;
-
 	case REGIONVIEW_VGUIDE:
-		im_rect_marginadjust( &canvas_area, 1 );
+	case REGIONVIEW_HGUIDE:
+		im_rect_marginadjust( &canvas_area, 5 );
 		if( im_rect_includespoint( &canvas_area, x, y ) )
 			return( REGIONVIEW_RESIZE_MOVE );
 

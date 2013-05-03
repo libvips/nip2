@@ -1,6 +1,7 @@
 started 7.33.0 14/3/13
 - add tabs
 - get_* work on Groups
+- columns snap to a grid
 
 started 7.32.2 12/3/13
 - add a test for seq mode 

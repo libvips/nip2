@@ -219,6 +219,23 @@ vobject_link( vObject *vobject, iObject *iobject )
 }
 
 static void
+vobject_trigger_layout( vObject *vobject )
+{
+	Row *row;
+	Workspace *ws;
+
+	if( vobject->iobject &&
+		IS_HEAPMODEL( vobject->iobject ) &&
+		(row = HEAPMODEL( vobject->iobject )->row) &&
+		(ws = row->ws) )  
+		workspace_set_needs_layout( ws, TRUE );
+	else if( vobject->iobject &&
+		IS_COLUMN( vobject->iobject ) &&
+		(ws = COLUMN( vobject->iobject )->ws) )  
+		workspace_set_needs_layout( ws, TRUE );
+}
+
+static void
 vobject_destroy( GtkObject *object )
 {
 	vObject *vobject;
@@ -232,6 +249,7 @@ vobject_destroy( GtkObject *object )
 	printf( "vobject_destroy: \"%s\"\n", G_OBJECT_TYPE_NAME( object ) );
 #endif /*DEBUG*/
 
+	vobject_trigger_layout( vobject );
 	if( vobject->iobject ) {
 		FREESID( vobject->changed_sid, vobject->iobject );
 		FREESID( vobject->destroy_sid, vobject->iobject );
@@ -255,27 +273,12 @@ vobject_finalize( GObject *gobject )
 static void
 vobject_real_refresh( vObject *vobject )
 {
-	Row *row;
-	Workspace *ws;
-
 #ifdef DEBUG
 	printf( "vobject_real_refresh: %p %s\n", 
 		vobject, G_OBJECT_TYPE_NAME( vobject ) );
 #endif /*DEBUG*/
 
-	/* Widget view refreshes will trigger relayout. Also columnviews.
-	 */
-
-	if( vobject->iobject &&
-		IS_HEAPMODEL( vobject->iobject ) &&
-		(row = HEAPMODEL( vobject->iobject )->row) &&
-		(ws = row->ws) )  
-		workspace_set_needs_layout( ws, TRUE );
-	else if( vobject->iobject &&
-		IS_COLUMN( vobject->iobject ) &&
-		(ws = COLUMN( vobject->iobject )->ws) )  
-		workspace_set_needs_layout( ws, TRUE );
-
+	vobject_trigger_layout( vobject );
 }
 
 static void

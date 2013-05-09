@@ -126,7 +126,8 @@ iregion_generate_caption_sub( iImage *iimage,
 	 * thing is on a super, it's on the subclass too ... not helpful to
 	 * have it twice.
 	 */
-	if( !is_super( row->sym ) ) {
+	if( row->sym &&
+		!is_super( row->sym ) ) {
 		if( *first )
 			*first = FALSE;
 		else 

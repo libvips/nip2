@@ -173,7 +173,9 @@ rhs_refresh_graphic( Rhs *rhs, PElement *root )
 
 	/* Only for non-parameter class objects.
 	 */
-	if( result && row->sym->type != SYM_PARAM ) {
+	if( result && 
+		row->sym &&
+		row->sym->type != SYM_PARAM ) {
 		for( i = 0; i < IM_NUMBER( rhs_graphic ); i++ ) {
 			const char *name = rhs_graphic[i].name;
 
@@ -224,7 +226,9 @@ rhs_new_heap( Heapmodel *heapmodel, PElement *root )
 	 */
 	if( !heap_is_class( root, &result ) ) 
 		return( rhs );
-	if( result && row->sym->type != SYM_PARAM ) {
+	if( result && 
+		row->sym &&
+		row->sym->type != SYM_PARAM ) {
 		if( !rhs->scol || !IS_SUBCOLUMN( rhs->scol ) ) 
 			subcolumn_new( rhs, NULL );
 	}

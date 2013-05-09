@@ -448,7 +448,9 @@ watch_vset( Watch *watch, const char *fmt, va_list args )
 #endif /*DEBUG*/
 
 			itext_set_edited( itext, TRUE );
-			expr_dirty( watch->row->sym->expr, link_serial_new() );
+			if( watch->row->sym )
+				expr_dirty( watch->row->sym->expr, 
+					link_serial_new() );
 			watchgroup_dirty( 
 				WATCHGROUP( ICONTAINER( watch )->parent ) );
 		}

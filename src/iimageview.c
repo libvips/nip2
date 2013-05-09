@@ -156,8 +156,9 @@ iimageview_drag_data_received( GtkWidget *widget, GdkDragContext *context,
 			/* Qualify relative to us. We don't want to embed
 			 * workspace names unless we have to.
 			 */
-			row_qualified_name_relative( row->top_row->sym, 
-				from_row, &buf );
+			if( row->top_row->sym ) 
+				row_qualified_name_relative( row->top_row->sym, 
+					from_row, &buf );
 
 			if( itext_set_formula( itext, vips_buf_all( &buf ) ) ) {
 				itext_set_edited( itext, TRUE );

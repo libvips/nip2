@@ -312,7 +312,9 @@ classmodel_iimage_expr_model( Model *model, ClassmodelSearch *parms )
 	 * derived from Image, display on the derived class, not on the
 	 * superclass.
 	 */
-	if( IS_IIMAGE( model ) && !is_super( HEAPMODEL( model )->row->sym ) &&
+	if( IS_IIMAGE( model ) && 
+		HEAPMODEL( model )->row->sym &&
+		!is_super( HEAPMODEL( model )->row->sym ) &&
 		!is_this( HEAPMODEL( model )->row->sym ) ) {
 		iImage *iimage = IIMAGE( model );
 

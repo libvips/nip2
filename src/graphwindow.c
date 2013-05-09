@@ -83,8 +83,9 @@ graph_write_row_child( Link *link, VipsBuf *buf )
 static void *
 graph_write_row( Row *row, VipsBuf *buf )
 {
-	slist_map( row->sym->topchildren, 
-		(SListMapFn) graph_write_row_child, buf );
+	if( row->sym )
+		slist_map( row->sym->topchildren, 
+			(SListMapFn) graph_write_row_child, buf );
 
 	return( NULL );
 }

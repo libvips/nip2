@@ -555,7 +555,8 @@ itext_update_model( Heapmodel *heapmodel )
 #ifdef DEBUG
 	printf( "itext_update_model: " );
 	row_name_print( row );
-	if( row->sym && row->sym->dirty )
+	if( row->sym && 
+		row->sym->dirty )
 		printf( " (dirty)" );
 	printf( "\n" );
 #endif /*DEBUG*/
@@ -631,7 +632,8 @@ itext_update_heap( Heapmodel *heapmodel )
 		VipsBuf buf = VIPS_BUF_STATIC( txt );
 		ParseRhsSyntax syntax;
 
-		if( is_super( row->sym ) ) {
+		if( row->sym &&
+			is_super( row->sym ) ) {
 			/* A super member ... special syntax.
 			 */
 			vips_buf_appendf( &buf, "%s", itext->formula );

@@ -580,7 +580,8 @@ expr_dirty( Expr *expr, int serial )
 	printf( "\n" );
 #endif /*DEBUG*/
 
-	if( (row = expr_get_row( expr )) ) {
+	if( (row = expr_get_row( expr )) &&
+		row->top_row->sym ) {
 		Symbol *top_sym = row->top_row->sym;
 
 		row_dirty( row, TRUE );
@@ -595,7 +596,8 @@ expr_dirty( Expr *expr, int serial )
 void *
 expr_dirty_intrans( Expr *expr, int serial )
 {
-	if( expr->row ) {
+	if( expr->row &&
+		expr->row->top_row->sym ) {
 		row_dirty_intrans( expr->row, TRUE );
 		symbol_dirty( expr->row->top_row->sym, serial );
 	}

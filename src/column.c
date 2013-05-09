@@ -415,8 +415,10 @@ column_add_n_names( Column *col, const char *name, VipsBuf *buf, int nparam )
 	for( i = g_slist_nth( children, len - nparam ); i; i = i->next ) {
 		Row *row = ROW( i->data );
 
-		vips_buf_appends( buf, " " );
-		vips_buf_appends( buf, IOBJECT( row->sym )->name );
+		if( row->sym ) { 
+			vips_buf_appends( buf, " " );
+			vips_buf_appends( buf, IOBJECT( row->sym )->name );
+		}
 	}
 
 	return( TRUE );

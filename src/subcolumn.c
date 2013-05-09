@@ -46,13 +46,16 @@ subcolumn_row_pred_none( Row *row )
 static gboolean
 subcolumn_row_pred_members( Row *row )
 {
-	if( is_system( row->sym ) )
+	if( row->sym &&
+		is_system( row->sym ) )
 		return( FALSE );
 
-	if( is_super( row->sym ) )
+	if( row->sym &&
+		is_super( row->sym ) )
 		return( FALSE );
 
-	if( row->sym->type == SYM_PARAM )
+	if( row->sym &&
+		row->sym->type == SYM_PARAM )
 		return( FALSE );
 
 	return( TRUE );
@@ -61,7 +64,8 @@ subcolumn_row_pred_members( Row *row )
 static gboolean
 subcolumn_row_pred_params( Row *row )
 {
-	return( row->sym->type == SYM_PARAM );
+	return( row->sym && 
+		row->sym->type == SYM_PARAM );
 }
 
 /* Everything but empty superclasses.
@@ -69,7 +73,9 @@ subcolumn_row_pred_params( Row *row )
 static gboolean
 subcolumn_row_pred_super( Row *row )
 {
-	if( is_super( row->sym ) && PEISELIST( &row->expr->root ) )
+	if( row->sym &&
+		is_super( row->sym ) && 
+		PEISELIST( &row->expr->root ) )
 		return( FALSE );
 
 	return( TRUE );
@@ -246,7 +252,8 @@ subcolumn_class_new_heap( Subcolumn *scol, PElement *root )
 
 	/* No displays for system rows.
 	 */
-	if( is_system( row->sym ) )
+	if( row->sym &&
+		is_system( row->sym ) )
 		return( TRUE );
 
 	/* If we are the top of a class instance display, get a new serial.

@@ -1978,7 +1978,8 @@ mainw_link( Mainw *mainw, Workspacegroup *wsg )
 		"MAINW_WINDOW_WIDTH", "MAINW_WINDOW_HEIGHT" );
 	iwindow_build( IWINDOW( mainw ) );
 
-	if( MODEL( ws )->window_width != - 1 ) 
+	if( ws &&
+		MODEL( ws )->window_width != - 1 ) 
 		gtk_window_set_default_size( GTK_WINDOW( mainw ), 
 			MODEL( ws )->window_width, 
 			MODEL( ws )->window_height );  

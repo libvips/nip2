@@ -194,16 +194,20 @@ static void
 iimageview_link( View *view, Model *model, View *parent )
 {
 	iImageview *iimageview = IIMAGEVIEW( view );
-	Rowview *rview = ROWVIEW( parent->parent );
-	Row *row = ROW( VOBJECT( rview )->iobject );
+
+	Rowview *rview;
 
 	VIEW_CLASS( parent_class )->link( view, model, parent );
 
-	rowview_menu_attach( rview, GTK_WIDGET( iimageview->id ) );
+	if( (rview = ROWVIEW( parent->parent )) ) { 
+		Row *row = ROW( VOBJECT( rview )->iobject );
 
-	if( row->popup && row->top_row == row ) {
-		row->popup = FALSE;
-		iimageview_edit( GTK_WIDGET( view ), iimageview );
+		rowview_menu_attach( rview, GTK_WIDGET( iimageview->id ) );
+
+		if( row->popup && row->top_row == row ) {
+			row->popup = FALSE;
+			iimageview_edit( GTK_WIDGET( view ), iimageview );
+		}
 	}
 }
 

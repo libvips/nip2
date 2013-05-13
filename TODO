@@ -1,3 +1,10 @@
+- middle-drag large workspace on image thumbnail, then try on ws background
+
+  image thumbnail drag is bad: I guess it's not got motion hints on?
+
+  imagedisplay should request event compression when used to draw a thumbnail
+
+
 
 - rewrite on rename tab? it's very hard at the moment
 

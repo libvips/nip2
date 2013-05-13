@@ -484,9 +484,11 @@ row_info( iObject *iobject, VipsBuf *buf )
 
 	if( row->expr ) 
 		iobject_info( IOBJECT( row->expr ), buf );
-	if( row->child_rhs->itext ) 
+	if( row->child_rhs &&
+		row->child_rhs->itext ) 
 		iobject_info( IOBJECT( row->child_rhs->itext ), buf );
-	if( row->child_rhs->graphic ) 
+	if( row->child_rhs &&
+		row->child_rhs->graphic ) 
 		iobject_info( IOBJECT( row->child_rhs->graphic ), buf );
 	if( row->top_row->sym ) {
 		if( row->top_row->sym->topchildren ) {

@@ -182,6 +182,7 @@ void *symbol_strip( Symbol *sym );
 
 void symbol_state_change( Symbol *sym );
 
+const char *symbol_get_last_calc( void );
 gboolean symbol_recalculate_check( Symbol *sym );
 void symbol_recalculate_all_force( gboolean now );
 void symbol_recalculate_all( void );

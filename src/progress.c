@@ -176,10 +176,11 @@ progress_update_expr( Expr *expr )
 
 	vips_buf_rewind( &progress->feedback );
 	vips_buf_appends( &progress->feedback, _( "Calculating" ) );
-	if( expr ) {
-		vips_buf_appends( &progress->feedback, " " );
+	vips_buf_appends( &progress->feedback, " " );
+	if( expr ) 
 		expr_name( expr, &progress->feedback );
-	}
+	else
+		vips_buf_appends( &progress->feedback, symbol_get_last_calc() );
 	vips_buf_appends( &progress->feedback, " ..." );
 	progress->percent = 0;
 

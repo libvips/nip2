@@ -1013,6 +1013,29 @@ symbol_recalculate_sub( Symbol *sym )
 	return( result );
 }
 
+/* Note the name of the last thing we calced here, for progress to display.
+ */
+static char symbol_last_calc_txt[256];
+static VipsBuf symbol_last_calc_buf = VIPS_BUF_STATIC( symbol_last_calc_txt );
+
+static void
+symbol_note_calc_name( Symbol *sym )
+{
+	Symbol *scope = symbol_get_scope( sym );
+	VipsBuf *buf = &symbol_last_calc_buf;
+
+	vips_buf_rewind( buf );
+	vips_buf_appends( buf, NN( IOBJECT( scope )->name ) );
+	vips_buf_appends( buf, "." );
+	symbol_qualified_name_relative( scope, sym, buf );
+}
+
+const char *
+symbol_get_last_calc( void )
+{
+	return( vips_buf_all( &symbol_last_calc_buf ) ); 
+}
+
 /* We can get called recursively .. eg. we do an im_tiff2vips(), that
  * pops a progress box, that triggers idle, that tries to recalc a
  * leaf again.
@@ -1056,6 +1079,7 @@ symbol_recalculate_leaf_sub( Symbol *sym )
 	reduce_context->heap->filled = FALSE;
 	symbol_running = TRUE;
 	progress_begin();
+	symbol_note_calc_name( sym );
 	if( !symbol_recalculate_sub( sym ) || 
 		reduce_context->heap->filled ) {
 		expr_error_set( sym->expr );

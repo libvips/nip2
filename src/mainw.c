@@ -1901,6 +1901,7 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
         mainw->progress_box = gtk_hbox_new( FALSE, 2 );
 
 	mainw->progress = gtk_progress_bar_new();
+	gtk_widget_set_size_request( GTK_WIDGET( mainw->progress ), 200, -1 );
         gtk_box_pack_end( GTK_BOX( mainw->progress_box ), mainw->progress, 
 		FALSE, TRUE, 0 );
         gtk_widget_show( mainw->progress );

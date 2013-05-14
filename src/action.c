@@ -320,12 +320,14 @@ action_proc_dot_add_link( Expr *expr, Symbol *child )
 }
 
 static char *
-action_proc_dot_tag( PElement *b, char *tag, int n )
+action_proc_dot_tag( Reduce *rc, PElement *b, char *tag, int n )
 {
 	if( PEISTAG( b ) ) 
 		return( PEGETTAG( b ) );
-	else if( heap_get_string( b, tag, n ) )
+	else if( PEISLIST( b ) ) {
+		(void) reduce_get_string( rc, b, tag, n );
 		return( tag );
+	}
 
 	return( NULL );
 }
@@ -342,7 +344,7 @@ action_proc_dot( Reduce *rc, Compile *compile,
 	if( PEISCLASS( a ) ) {
 		PElement c;
 
-		if( (p = action_proc_dot_tag( b, tag, 256 )) ) {
+		if( (p = action_proc_dot_tag( rc, b, tag, 256 )) ) {
 			if( !class_get_member( a, p, NULL, &c ) )
 				action_nomerror( rc, compile, a, b );
 
@@ -372,7 +374,7 @@ action_proc_dot( Reduce *rc, Compile *compile,
 
 		g_assert( sym->expr );
 
-		if( !(p = action_proc_dot_tag( b, tag, 256 )) ) 
+		if( !(p = action_proc_dot_tag( rc, b, tag, 256 )) ) 
 			action_boperror( rc, compile, 
 				_( "Bad right hand side of '.'." ),
 				op, name, a, b );
@@ -402,7 +404,7 @@ action_proc_dot( Reduce *rc, Compile *compile,
 		GValue value = { 0 };
 		GParamSpec *pspec;
 
-		if( !(p = action_proc_dot_tag( b, tag, 256 )) )
+		if( !(p = action_proc_dot_tag( rc, b, tag, 256 )) )
 			action_boperror( rc, compile, 
 				_( "Bad right hand side of '.'." ),
 				op, name, a, b );

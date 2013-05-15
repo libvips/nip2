@@ -324,7 +324,7 @@ action_proc_dot_tag( Reduce *rc, PElement *b, char *tag, int n )
 {
 	if( PEISTAG( b ) ) 
 		return( PEGETTAG( b ) );
-	else if( PEISLIST( b ) ) {
+	else if( reduce_is_string( rc, b ) ) { 
 		(void) reduce_get_string( rc, b, tag, n );
 		return( tag );
 	}

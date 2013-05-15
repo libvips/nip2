@@ -695,9 +695,6 @@ reduce_n_is_string( Reduce *rc, PElement *base, int sz )
 {
 	reduce_spine( rc, base );
 
-	if( !PEISLIST( base ) ) 
-		return( FALSE );
-
 	/* We know managedstrings are strings without needing to expand them.
 	 */
 	if( PEISMANAGEDSTRING( base ) )

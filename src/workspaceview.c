@@ -1073,6 +1073,9 @@ workspaceview_init( Workspaceview *wview )
 	 * background.
 	 */
 	wview->fixed = gtk_fixed_new();
+	gtk_widget_add_events( GTK_WIDGET( wview->fixed ), 
+		GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK |
+		GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK ); 
 	gtk_fixed_set_has_window( GTK_FIXED( wview->fixed ), TRUE );
 	wview->window = gtk_scrolled_window_new( NULL, NULL );
 	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( wview->window ), 

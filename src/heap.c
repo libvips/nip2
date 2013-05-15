@@ -1771,6 +1771,15 @@ heap_copy( Heap *heap, Compile *compile, PElement *out )
 	printf( "\n" );
 #endif /*DEBUG*/
 
+	/* Check for possible C stack overflow ... can't go over 2M on most
+	 * systems if we're using (or any of our libs are using) threads.
+	 */
+	if( (char *) main_c_stack_base - (char *) &heap > 2000000 ) {
+		error_top( _( "Overflow error." ) );
+		error_sub( _( "C stack overflow. Expression too complex." ) );
+			return( FALSE );
+	}
+
 	switch( root->type ) {
 	case ELEMENT_NODE:
 		/* Need a tree copy.

@@ -693,23 +693,28 @@ reduce_test_char( Reduce *rc, PElement *base, int *sz )
 static gboolean
 reduce_n_is_string( Reduce *rc, PElement *base, int sz )
 {
+	void *result;
+
 	reduce_spine( rc, base );
 
 	/* We know managedstrings are strings without needing to expand them.
 	 */
 	if( PEISMANAGEDSTRING( base ) )
 		return( TRUE );
-	else {
-		void *result;
 
-		result = reduce_map_list( rc, base, 
-			(reduce_map_list_fn) reduce_test_char, &sz, NULL );
+	/* reduce_map_list() will throw an exeception if we give it a
+	 * non-list.
+	 */
+	if( !PEISLIST( base ) ) 
+		return( FALSE ); 
 
-		if( result == (void *) -1 )
-			return( FALSE );
+	result = reduce_map_list( rc, base, 
+		(reduce_map_list_fn) reduce_test_char, &sz, NULL );
 
-		return( TRUE );
-	}
+	if( result == (void *) -1 )
+		return( FALSE );
+
+	return( TRUE );
 }
 
 /* Test for object is string. Just test the first few elements, so we

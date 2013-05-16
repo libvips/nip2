@@ -1173,21 +1173,30 @@ symbol_recalculate_idle_cb( void )
 
 	gboolean run_again;
 
+	if( symbol_running ) 
+		return( FALSE ); 
+
 	if( !timer )
 		timer = g_timer_new();
 
+	g_timer_reset( timer );
+
 	run_again = TRUE;
 
-	if( !symbol_running ) {
-		g_timer_reset( timer );
-
+	if( !mainw_auto_recalc ) 
+		/* Auto-calc has been turned off during a recomp.
+		 */
+		run_again = FALSE; 
+	else
 		while( g_timer_elapsed( timer, NULL ) < 0.1 )
 			if( !symbol_recalculate_leaf() ) {
-				symbol_idle_id = 0;
 				run_again = FALSE;
-				progress_end();
 				break;
 			}
+
+	if( !run_again ) {
+		symbol_idle_id = 0;
+		progress_end();
 	}
 
 	return( run_again );
@@ -1212,7 +1221,8 @@ symbol_recalculate_all_force( gboolean now )
 		/* Do nothing.
 		 */
 		;
-	else if( main_option_batch || now ) {
+	else if( main_option_batch || 
+		now ) {
 		progress_begin();
 
 		while( symbol_recalculate_leaf() )

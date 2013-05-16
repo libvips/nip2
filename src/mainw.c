@@ -731,7 +731,7 @@ mainw_force_calc_action_cb( GtkAction *action, Mainw *mainw )
 			iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_ERROR );
 	}
 	else 
-		symbol_recalculate_all_force( FALSE );
+		symbol_recalculate_all_force( TRUE );
 }
 
 Workspacegroup *

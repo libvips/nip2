@@ -1241,7 +1241,7 @@ workspace_selected_recalc( Workspace *ws )
 
 	/* Recalc even if autorecomp is off.
 	 */
-	symbol_recalculate_all_force( FALSE );
+	symbol_recalculate_all_force( TRUE );
 
 	workspace_deselect_all( ws );
 

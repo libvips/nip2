@@ -1,4 +1,7 @@
 
+- save WS with some large widgets in no-edit mode, reload, get row buttons for
+  non-toplevel rows
+
 - rewrite on rename tab? it's very hard at the moment
 
   try renaming a tab on the bm workspaces as a test

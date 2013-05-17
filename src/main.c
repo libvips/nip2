@@ -432,8 +432,10 @@ main_load( Workspace *ws, const char *filename )
 		filename, filename )) ) {
 		Mainw *mainw;
 
-		mainw = mainw_new( new_wsg );
-		gtk_widget_show( GTK_WIDGET( mainw ) );
+		if( !main_option_batch ) {
+			mainw = mainw_new( new_wsg );
+			gtk_widget_show( GTK_WIDGET( mainw ) );
+		}
 
 		mainw_recent_add( &mainw_recent_workspace, filename );
 

@@ -387,15 +387,22 @@ mainw_title_update( Mainw *mainw )
 	Workspace *ws;
 	char txt[512];
 	VipsBuf buf = VIPS_BUF_STATIC( txt );
+	char *filename;
 
 	if( mainw->wsg &&
 		FILEMODEL( mainw->wsg )->modified ) 
 		vips_buf_appendf( &buf, "*" ); 
 
 	if( mainw->wsg &&
-		FILEMODEL( mainw->wsg )->filename )
-		vips_buf_appendf( &buf, "%s", 
-			FILEMODEL( mainw->wsg )->filename );
+		(filename = FILEMODEL( mainw->wsg )->filename) ) {
+		char *base = g_path_get_basename( filename ); 
+		char *dir = g_path_get_dirname( filename ); 
+
+		vips_buf_appendf( &buf, "%s (%s)", base, dir ); 
+
+		g_free( base );
+		g_free( dir );
+	}
 	else 
 		vips_buf_appends( &buf, _( "unsaved workspace" ) );
 
@@ -410,6 +417,8 @@ mainw_title_update( Mainw *mainw )
 				ws->compat_minor ); 
 		}
 	}
+
+	vips_buf_appendf( &buf, " - %s", PACKAGE );
 
 	iwindow_set_title( IWINDOW( mainw ), "%s", vips_buf_all( &buf ) );
 }

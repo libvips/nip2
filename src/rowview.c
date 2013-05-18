@@ -104,6 +104,7 @@ rowview_update_widgets( Rowview *rview )
 	printf( "rowview_refresh: " );
 	row_name_print( row );
 	printf( "\n" );
+	printf( "\teditable == %d\n", editable ); 
 #endif /*DEBUG*/
 
 	/* Attach widgets to parent in new place.
@@ -127,16 +128,6 @@ rowview_update_widgets( Rowview *rview )
 				3, 
 				GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL );
 	}
-
-	/* Update button.
-	 */
-        set_glabel( rview->label, "%s", row_name( row ) );
-	widget_visible( rview->but, rview->visible && editable );
-
-	/* Spin visible only if this is a class. 
-	 */
-	widget_visible( rview->spin, 
-		rview->visible && row->is_class && editable );
 
         /* Set colours.
          */
@@ -176,6 +167,19 @@ rowview_update_widgets( Rowview *rview )
 	}
 	widget_visible( rview->led, 
 		rview->visible && CALC_DISPLAY_LED && editable );
+
+	/* Update button.
+	 */
+        set_glabel( rview->label, "%s", row_name( row ) );
+	widget_visible( rview->but, rview->visible && editable );
+
+	/* Spin visible only if this is a class. 
+	 */
+	widget_visible( rview->spin, 
+		rview->visible && row->is_class && editable );
+
+	if( rview->rhsview )
+		widget_visible( GTK_WIDGET( rview->rhsview ), rview->visible );
 }
 
 static void 
@@ -753,19 +757,18 @@ rowview_get_position( Rowview *rview, int *x, int *y, int *w, int *h )
 
 /* Hide/show a row. We can't use MODEL( row )->display for this, since tables
  * don't like it :-( just _show()/_hide() rather then _create()/_destroy()
+ *
+ * Take account of workspace editable state too.
  */
 void 
 rowview_set_visible( Rowview *rview, gboolean visible )
 {
 	Row *row = ROW( VOBJECT( rview )->iobject );
+	gboolean editable = row->ws->mode != WORKSPACE_MODE_NOEDIT;
 
 	if( rview->visible != visible ) {
-		widget_visible( rview->but, visible );
-		widget_visible( rview->spin, visible && row->is_class );
-		widget_visible( rview->led, visible && CALC_DISPLAY_LED );
-		if( rview->rhsview )
-			widget_visible( GTK_WIDGET( rview->rhsview ), visible );
 		rview->visible = visible;
+		rowview_update_widgets( rview );
 	}
 }
 

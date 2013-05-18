@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=glib&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2013-05-02 12:40+0100\n"
+"POT-Creation-Date: 2013-05-16 17:22+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -123,14 +123,14 @@ msgstr ""
 
 #. Expands to eg. "Edit Toggle A1".
 #.
-#: ../src/matrix.c:191 ../src/iregion.c:235 ../src/colour.c:260
-#: ../src/classmodel.c:759 ../src/clock.c:99
+#: ../src/matrix.c:191 ../src/iregion.c:236 ../src/colour.c:260
+#: ../src/classmodel.c:761 ../src/clock.c:99
 #, c-format
 msgid "Edit %s %s"
 msgstr ""
 
-#: ../src/matrix.c:199 ../src/iregion.c:241 ../src/colour.c:268
-#: ../src/classmodel.c:770 ../src/clock.c:105
+#: ../src/matrix.c:199 ../src/iregion.c:242 ../src/colour.c:268
+#: ../src/classmodel.c:772 ../src/clock.c:105
 #, c-format
 msgid "Set %s"
 msgstr ""
@@ -581,11 +581,11 @@ msgstr ""
 msgid "Make Column Into _Menu Item"
 msgstr ""
 
-#: ../src/columnview.c:1047
+#: ../src/columnview.c:1050
 msgid "Left-drag to move, left-double-click to set title, right-click for menu"
 msgstr ""
 
-#: ../src/columnview.c:1080
+#: ../src/columnview.c:1083
 msgid "Delete the column"
 msgstr ""
 
@@ -639,17 +639,17 @@ msgstr ""
 
 #. Expands to eg. "B1 refers to: B2, B3".
 #.
-#: ../src/row.c:497
+#: ../src/row.c:499
 msgid "refers to"
 msgstr ""
 
 #. Expands to eg. "B1 is referred to by: B2, B3".
 #.
-#: ../src/row.c:508
+#: ../src/row.c:510
 msgid "is referred to by"
 msgstr ""
 
-#: ../src/row.c:521
+#: ../src/row.c:523
 msgid "is blocked on"
 msgstr ""
 
@@ -661,7 +661,7 @@ msgstr ""
 msgid "Enter some text to paint in the entry widget at the top of the window."
 msgstr ""
 
-#: ../src/matrixview.c:155 ../src/classmodel.c:1141 ../src/plot.c:148
+#: ../src/matrixview.c:155 ../src/classmodel.c:1143 ../src/plot.c:148
 #: ../src/plot.c:158 ../src/plot.c:368 ../src/plot.c:387 ../src/plot.c:400
 msgid "Bad value."
 msgstr ""
@@ -683,7 +683,7 @@ msgstr ""
 msgid "_New"
 msgstr ""
 
-#: ../src/iwindow.c:661 ../src/rowview.c:576 ../src/mainw.c:1629
+#: ../src/iwindow.c:661 ../src/rowview.c:577 ../src/mainw.c:1629
 #: ../src/regionview.c:983 ../src/program.c:727
 msgid "_Edit"
 msgstr ""
@@ -752,81 +752,94 @@ msgid ""
 "Preferences."
 msgstr ""
 
-#: ../src/heap.c:1863
+#: ../src/heap.c:1772 ../src/heap.c:1787 ../src/trace.c:130
+#: ../src/workspace.c:1199 ../src/reduce.c:148 ../src/reduce.c:1058
+msgid "Overflow error."
+msgstr ""
+
+#: ../src/heap.c:1773
+msgid "C stack overflow. Circular definition."
+msgstr ""
+
+#: ../src/heap.c:1788 ../src/reduce.c:1059
+msgid "C stack overflow. Expression too complex."
+msgstr ""
+
+#: ../src/heap.c:1881
 msgid "Unimplemented list type."
 msgstr ""
 
-#: ../src/heap.c:1970
+#: ../src/heap.c:1988
 msgid "Unimplemented type."
 msgstr ""
 
-#: ../src/heap.c:1971
+#: ../src/heap.c:1989
 #, c-format
 msgid "Unable to convert %s to a nip type."
 msgstr ""
 
-#: ../src/heap.c:2134
+#: ../src/heap.c:2152
 msgid "circular"
 msgstr ""
 
-#: ../src/heap.c:2139
+#: ../src/heap.c:2157
 #, c-format
 msgid "circular to label %d"
 msgstr ""
 
-#: ../src/heap.c:2149
+#: ../src/heap.c:2167
 #, c-format
 msgid "label %d"
 msgstr ""
 
-#: ../src/heap.c:2166
+#: ../src/heap.c:2184
 msgid "unevaluated"
 msgstr ""
 
-#: ../src/heap.c:2201
+#: ../src/heap.c:2219
 #, c-format
 msgid "class (%p)"
 msgstr ""
 
-#: ../src/heap.c:2212
+#: ../src/heap.c:2230
 msgid "members"
 msgstr ""
 
-#: ../src/heap.c:2223
+#: ../src/heap.c:2241
 msgid "secret"
 msgstr ""
 
-#: ../src/heap.c:2276
+#: ../src/heap.c:2294
 #, c-format
 msgid "no value (type %d)"
 msgstr ""
 
-#: ../src/heap.c:2284
+#: ../src/heap.c:2302
 msgid "NULL pointer"
 msgstr ""
 
-#: ../src/heap.c:2293
+#: ../src/heap.c:2311
 msgid "symbol"
 msgstr ""
 
-#: ../src/heap.c:2301
+#: ../src/heap.c:2319
 msgid "constructor"
 msgstr ""
 
-#: ../src/heap.c:2309
+#: ../src/heap.c:2327
 msgid "symref"
 msgstr ""
 
-#: ../src/heap.c:2317
+#: ../src/heap.c:2335
 msgid "compileref"
 msgstr ""
 
-#: ../src/heap.c:2345
+#: ../src/heap.c:2363
 #, c-format
 msgid "tag \"%s\""
 msgstr ""
 
-#: ../src/heap.c:2360
+#: ../src/heap.c:2378
 #, c-format
 msgid "unknown element tag %d"
 msgstr ""
@@ -1169,11 +1182,6 @@ msgstr ""
 msgid "not uncoded"
 msgstr ""
 
-#: ../src/trace.c:130 ../src/workspace.c:1199 ../src/reduce.c:148
-#: ../src/reduce.c:1056
-msgid "Overflow error."
-msgstr ""
-
 #: ../src/trace.c:131
 msgid "Trace buffer stack overflow."
 msgstr ""
@@ -1315,7 +1323,7 @@ msgid "Member not found."
 msgstr ""
 
 #: ../src/action.c:173 ../src/call.c:249 ../src/class.c:49 ../src/class.c:1027
-#: ../src/builtin.c:1072 ../src/reduce.c:898 ../src/reduce.c:911
+#: ../src/builtin.c:1072 ../src/reduce.c:900 ../src/reduce.c:913
 msgid "Bad argument."
 msgstr ""
 
@@ -1327,31 +1335,31 @@ msgid ""
 "%s"
 msgstr ""
 
-#: ../src/action.c:359 ../src/action.c:377 ../src/action.c:407
+#: ../src/action.c:361 ../src/action.c:379 ../src/action.c:409
 msgid "Bad right hand side of '.'."
 msgstr ""
 
-#: ../src/action.c:369
+#: ../src/action.c:371
 msgid "Symbol on left hand side of '.' is not scope"
 msgstr ""
 
-#: ../src/action.c:411
+#: ../src/action.c:413
 msgid "Property not found."
 msgstr ""
 
-#: ../src/action.c:425
+#: ../src/action.c:427
 msgid "Bad left hand side of '.'."
 msgstr ""
 
-#: ../src/action.c:937
+#: ../src/action.c:939
 msgid "Division by zero."
 msgstr ""
 
-#: ../src/action.c:1313 ../src/action.c:1593
+#: ../src/action.c:1315 ../src/action.c:1595
 msgid "Unimplemented."
 msgstr ""
 
-#: ../src/action.c:1677 ../src/action.c:1713 ../src/action.c:1971
+#: ../src/action.c:1679 ../src/action.c:1715 ../src/action.c:1973
 msgid "invoking method:"
 msgstr ""
 
@@ -1363,7 +1371,7 @@ msgstr ""
 msgid "You can only duplicate top level rows."
 msgstr ""
 
-#: ../src/rowview.c:431 ../src/model.c:424 ../src/model.c:441
+#: ../src/rowview.c:432 ../src/model.c:424 ../src/model.c:441
 #: ../src/model.c:496 ../src/mainw.c:696 ../src/mainw.c:704
 #: ../src/filemodel.c:100 ../src/filemodel.c:169 ../src/filemodel.c:414
 #: ../src/filemodel.c:631 ../src/filemodel.c:670 ../src/builtin.c:422
@@ -1371,37 +1379,37 @@ msgstr ""
 msgid "Not implemented."
 msgstr ""
 
-#: ../src/rowview.c:432
+#: ../src/rowview.c:433
 msgid "Drag between columns not yet implemented."
 msgstr ""
 
 #. Other init.
 #.
-#: ../src/rowview.c:575
+#: ../src/rowview.c:576
 msgid "Row menu"
 msgstr ""
 
-#: ../src/rowview.c:578
+#: ../src/rowview.c:579
 msgid "_Header"
 msgstr ""
 
-#: ../src/rowview.c:582 ../src/mainw.c:1612
+#: ../src/rowview.c:583 ../src/mainw.c:1612
 msgid "U_ngroup"
 msgstr ""
 
-#: ../src/rowview.c:586 ../src/workspacedefs.c:270
+#: ../src/rowview.c:587 ../src/workspacedefs.c:270
 msgid "Replace From _File"
 msgstr ""
 
-#: ../src/rowview.c:588 ../src/mainw.c:1587
+#: ../src/rowview.c:589 ../src/mainw.c:1587
 msgid "_Recalculate"
 msgstr ""
 
-#: ../src/rowview.c:590
+#: ../src/rowview.c:591
 msgid "Re_set"
 msgstr ""
 
-#: ../src/rowview.c:653
+#: ../src/rowview.c:654
 msgid "Click to open or close class"
 msgstr ""
 
@@ -1484,48 +1492,48 @@ msgstr ""
 #.
 #. Used in (eg.) "Mark at (10, 10) on [A1, A2]"
 #.
-#: ../src/iregion.c:156 ../src/iarrow.c:114
+#: ../src/iregion.c:157 ../src/iarrow.c:114
 msgid "on"
 msgstr ""
 
-#: ../src/iregion.c:166
+#: ../src/iregion.c:167
 #, c-format
 msgid "at (%d, %d), size (%d, %d)"
 msgstr ""
 
-#: ../src/iregion.c:181 ../src/iregion.c:223
+#: ../src/iregion.c:182 ../src/iregion.c:224
 msgid "Left"
 msgstr ""
 
-#: ../src/iregion.c:182 ../src/iregion.c:226
+#: ../src/iregion.c:183 ../src/iregion.c:227
 msgid "Top"
 msgstr ""
 
-#: ../src/iregion.c:183 ../src/iregion.c:229
+#: ../src/iregion.c:184 ../src/iregion.c:230
 msgid "Width"
 msgstr ""
 
-#: ../src/iregion.c:184 ../src/iregion.c:232
+#: ../src/iregion.c:185 ../src/iregion.c:233
 msgid "Height"
 msgstr ""
 
-#: ../src/iregion.c:223
+#: ../src/iregion.c:224
 msgid "Left edge of region"
 msgstr ""
 
-#: ../src/iregion.c:226
+#: ../src/iregion.c:227
 msgid "Top edge of region"
 msgstr ""
 
-#: ../src/iregion.c:229
+#: ../src/iregion.c:230
 msgid "Width of region"
 msgstr ""
 
-#: ../src/iregion.c:232
+#: ../src/iregion.c:233
 msgid "Height of region"
 msgstr ""
 
-#: ../src/iregion.c:464
+#: ../src/iregion.c:465
 msgid "Region"
 msgstr ""
 
@@ -1538,40 +1546,40 @@ msgstr ""
 msgid "Error"
 msgstr ""
 
-#: ../src/expr.c:614
+#: ../src/expr.c:616
 msgid "top level"
 msgstr ""
 
-#: ../src/expr.c:619
+#: ../src/expr.c:621
 msgid "class"
 msgstr ""
 
-#: ../src/expr.c:622
+#: ../src/expr.c:624
 msgid "instance"
 msgstr ""
 
-#: ../src/expr.c:626
+#: ../src/expr.c:628
 msgid "definition"
 msgstr ""
 
-#: ../src/expr.c:633
+#: ../src/expr.c:635
 #, c-format
 msgid "parameter \"%s\""
 msgstr ""
 
-#: ../src/expr.c:637
+#: ../src/expr.c:639
 msgid "member"
 msgstr ""
 
-#: ../src/expr.c:642 ../src/dump.c:186
+#: ../src/expr.c:644 ../src/dump.c:186
 msgid "value"
 msgstr ""
 
-#: ../src/expr.c:646 ../src/itext.c:446
+#: ../src/expr.c:648 ../src/itext.c:446
 msgid "function"
 msgstr ""
 
-#: ../src/expr.c:655
+#: ../src/expr.c:657
 msgid "of"
 msgstr ""
 
@@ -2205,7 +2213,7 @@ msgstr ""
 msgid "Open _Recent"
 msgstr ""
 
-#: ../src/mainw.c:1506 ../src/workspaceview.c:1150
+#: ../src/mainw.c:1506 ../src/workspaceview.c:1153
 msgid "Jump to _Column"
 msgstr ""
 
@@ -3177,25 +3185,25 @@ msgstr ""
 
 #. Toolkit Browser pane.
 #.
-#: ../src/workspaceview.c:1119
+#: ../src/workspaceview.c:1122
 msgid "Toolkit Browser"
 msgstr ""
 
 #. Workspace-local defs pane.
 #.
-#: ../src/workspaceview.c:1135
+#: ../src/workspaceview.c:1138
 msgid "Workspace Definitions"
 msgstr ""
 
-#: ../src/workspaceview.c:1145
+#: ../src/workspaceview.c:1148
 msgid "Workspace menu"
 msgstr ""
 
-#: ../src/workspaceview.c:1147
+#: ../src/workspaceview.c:1150
 msgid "New C_olumn"
 msgstr ""
 
-#: ../src/workspaceview.c:1152
+#: ../src/workspaceview.c:1155
 msgid "_Group Selected"
 msgstr ""
 
@@ -3311,28 +3319,28 @@ msgstr ""
 msgid "Replace %s \"%s\""
 msgstr ""
 
-#: ../src/classmodel.c:693
+#: ../src/classmodel.c:695
 msgid "Set boolean value here"
 msgstr ""
 
-#: ../src/classmodel.c:699
+#: ../src/classmodel.c:701
 msgid "Enter a floating point number here"
 msgstr ""
 
-#: ../src/classmodel.c:706
+#: ../src/classmodel.c:708
 msgid "Enter a string here"
 msgstr ""
 
-#: ../src/classmodel.c:1066
+#: ../src/classmodel.c:1068
 msgid "Unknown option."
 msgstr ""
 
-#: ../src/classmodel.c:1067
+#: ../src/classmodel.c:1069
 #, c-format
 msgid "Option \"%s\" not known."
 msgstr ""
 
-#: ../src/classmodel.c:1142
+#: ../src/classmodel.c:1144
 #, c-format
 msgid "%d band value only"
 msgstr ""
@@ -3429,55 +3437,51 @@ msgstr ""
 msgid "Matrix has width %d, height %d."
 msgstr ""
 
-#: ../src/reduce.c:850
+#: ../src/reduce.c:852
 msgid "List length"
 msgstr ""
 
-#: ../src/reduce.c:899
+#: ../src/reduce.c:901
 #, c-format
 msgid "List index must be positive, not %d"
 msgstr ""
 
-#: ../src/reduce.c:907
+#: ../src/reduce.c:909
 msgid "List index"
 msgstr ""
 
-#: ../src/reduce.c:912
+#: ../src/reduce.c:914
 #, c-format
 msgid "List only has %d elements, unable to get element %d."
 msgstr ""
 
-#: ../src/reduce.c:955
+#: ../src/reduce.c:957
 msgid "No arguments allowed."
 msgstr ""
 
-#: ../src/reduce.c:956
+#: ../src/reduce.c:958
 #, c-format
 msgid "Object \"%s\" should have no arguments."
 msgstr ""
 
-#: ../src/reduce.c:1057
-msgid "C stack overflow. Expression too complex."
-msgstr ""
-
-#: ../src/reduce.c:1073
+#: ../src/reduce.c:1075
 msgid "Cancelled."
 msgstr ""
 
-#: ../src/reduce.c:1074
+#: ../src/reduce.c:1076
 msgid "Evaluation cancelled."
 msgstr ""
 
-#: ../src/reduce.c:1169
+#: ../src/reduce.c:1171
 msgid "No value."
 msgstr ""
 
-#: ../src/reduce.c:1170
+#: ../src/reduce.c:1172
 #, c-format
 msgid "Symbol \"%s\" has no value."
 msgstr ""
 
-#: ../src/reduce.c:1645 ../src/reduce.c:1650 ../src/reduce.c:1656
+#: ../src/reduce.c:1647 ../src/reduce.c:1652 ../src/reduce.c:1658
 msgid "List generator"
 msgstr ""
 
@@ -3940,6 +3944,6 @@ msgstr[1] ""
 msgid "Calculating"
 msgstr ""
 
-#: ../src/progress.c:197
+#: ../src/progress.c:198
 msgid "Loading"
 msgstr ""

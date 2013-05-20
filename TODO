@@ -1,6 +1,7 @@
 
-- save WS with some large widgets in no-edit mode, reload, get row buttons for
-  non-toplevel rows
+- doublelick on ws background can sometimes create a new tab instead?
+
+  doublelick just left of text box
 
 - rewrite on rename tab? it's very hard at the moment
 

@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=glib&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2013-05-16 17:22+0100\n"
+"POT-Creation-Date: 2013-05-18 13:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -101,7 +101,7 @@ msgstr ""
 msgid "Object"
 msgstr ""
 
-#: ../src/matrix.c:149 ../src/main.c:685
+#: ../src/matrix.c:149 ../src/main.c:687
 msgid "Text"
 msgstr ""
 
@@ -165,8 +165,8 @@ msgid "Matrix"
 msgstr ""
 
 #: ../src/option.c:65 ../src/slider.c:48 ../src/pathname.c:75
-#: ../src/string.c:67 ../src/number.c:48 ../src/mainw.c:1210
-#: ../src/mainw.c:1259 ../src/toggle.c:48 ../src/program.c:1136
+#: ../src/string.c:67 ../src/number.c:48 ../src/mainw.c:1219
+#: ../src/mainw.c:1268 ../src/toggle.c:48 ../src/program.c:1136
 #: ../src/program.c:1178 ../src/fontname.c:58
 msgid "Caption"
 msgstr ""
@@ -305,7 +305,7 @@ msgid "Draw text"
 msgstr ""
 
 #. IMAGEMODEL_TEXT
-#: ../src/paintboxview.c:259 ../src/main.c:686
+#: ../src/paintboxview.c:259 ../src/main.c:688
 msgid "Smudge"
 msgstr ""
 
@@ -374,12 +374,12 @@ msgid "Temp files in"
 msgstr ""
 
 #. Expands to (eg.) "14GB free in /pics/tmp"
-#: ../src/boxes.c:338 ../src/mainw.c:593
+#: ../src/boxes.c:338 ../src/mainw.c:602
 #, c-format
 msgid " in \"%s\""
 msgstr ""
 
-#: ../src/boxes.c:342 ../src/mainw.c:597
+#: ../src/boxes.c:342 ../src/mainw.c:606
 #, c-format
 msgid "%d cells in heap, %d cells free, %d cells maximum"
 msgstr ""
@@ -394,7 +394,7 @@ msgstr ""
 msgid "%d vips operations cached by libvips"
 msgstr ""
 
-#: ../src/boxes.c:356 ../src/mainw.c:611
+#: ../src/boxes.c:356 ../src/mainw.c:620
 #, c-format
 msgid "using %d threads"
 msgstr ""
@@ -509,7 +509,7 @@ msgid "Save Column \"%s\""
 msgstr ""
 
 #: ../src/columnview.c:229 ../src/columnview.c:290 ../src/row.c:480
-#: ../src/mainw.c:1209 ../src/mainw.c:1257 ../src/defbrowser.c:253
+#: ../src/mainw.c:1218 ../src/mainw.c:1266 ../src/defbrowser.c:253
 #: ../src/program.c:596 ../src/program.c:625 ../src/program.c:1135
 #: ../src/program.c:1176 ../src/program.c:1222 ../src/program.c:1254
 #: ../src/program.c:1580 ../src/program.c:1621
@@ -569,7 +569,7 @@ msgstr ""
 msgid "_Edit Caption"
 msgstr ""
 
-#: ../src/columnview.c:1001 ../src/mainw.c:1577 ../src/program.c:1802
+#: ../src/columnview.c:1001 ../src/mainw.c:1586 ../src/program.c:1802
 msgid "Select _All"
 msgstr ""
 
@@ -683,7 +683,7 @@ msgstr ""
 msgid "_New"
 msgstr ""
 
-#: ../src/iwindow.c:661 ../src/rowview.c:577 ../src/mainw.c:1629
+#: ../src/iwindow.c:661 ../src/rowview.c:581 ../src/mainw.c:1638
 #: ../src/regionview.c:983 ../src/program.c:727
 msgid "_Edit"
 msgstr ""
@@ -1363,53 +1363,53 @@ msgstr ""
 msgid "invoking method:"
 msgstr ""
 
-#: ../src/rowview.c:277 ../src/regionview.c:902
+#: ../src/rowview.c:281 ../src/regionview.c:902
 msgid "Can't duplicate."
 msgstr ""
 
-#: ../src/rowview.c:279
+#: ../src/rowview.c:283
 msgid "You can only duplicate top level rows."
 msgstr ""
 
-#: ../src/rowview.c:432 ../src/model.c:424 ../src/model.c:441
-#: ../src/model.c:496 ../src/mainw.c:696 ../src/mainw.c:704
+#: ../src/rowview.c:436 ../src/model.c:424 ../src/model.c:441
+#: ../src/model.c:496 ../src/mainw.c:705 ../src/mainw.c:713
 #: ../src/filemodel.c:100 ../src/filemodel.c:169 ../src/filemodel.c:414
 #: ../src/filemodel.c:631 ../src/filemodel.c:670 ../src/builtin.c:422
 #: ../src/view.c:916 ../src/classmodel.c:153 ../src/classmodel.c:225
 msgid "Not implemented."
 msgstr ""
 
-#: ../src/rowview.c:433
+#: ../src/rowview.c:437
 msgid "Drag between columns not yet implemented."
 msgstr ""
 
 #. Other init.
 #.
-#: ../src/rowview.c:576
+#: ../src/rowview.c:580
 msgid "Row menu"
 msgstr ""
 
-#: ../src/rowview.c:579
+#: ../src/rowview.c:583
 msgid "_Header"
 msgstr ""
 
-#: ../src/rowview.c:583 ../src/mainw.c:1612
+#: ../src/rowview.c:587 ../src/mainw.c:1621
 msgid "U_ngroup"
 msgstr ""
 
-#: ../src/rowview.c:587 ../src/workspacedefs.c:270
+#: ../src/rowview.c:591 ../src/workspacedefs.c:270
 msgid "Replace From _File"
 msgstr ""
 
-#: ../src/rowview.c:589 ../src/mainw.c:1587
+#: ../src/rowview.c:593 ../src/mainw.c:1596
 msgid "_Recalculate"
 msgstr ""
 
-#: ../src/rowview.c:591
+#: ../src/rowview.c:595
 msgid "Re_set"
 msgstr ""
 
-#: ../src/rowview.c:654
+#: ../src/rowview.c:658
 msgid "Click to open or close class"
 msgstr ""
 
@@ -1439,7 +1439,7 @@ msgstr ""
 msgid "This column only has %d items, but %s needs %d items."
 msgstr ""
 
-#: ../src/model.c:198 ../src/mainw.c:822 ../src/filemodel.c:522
+#: ../src/model.c:198 ../src/mainw.c:831 ../src/filemodel.c:522
 #: ../src/filemodel.c:531
 msgid "Load failed."
 msgstr ""
@@ -1795,119 +1795,119 @@ msgstr ""
 msgid "no \"main\" found"
 msgstr ""
 
-#: ../src/main.c:460 ../src/workspaceview.c:936
+#: ../src/main.c:462 ../src/workspaceview.c:936
 msgid "Unknown file type."
 msgstr ""
 
-#: ../src/main.c:461 ../src/workspaceview.c:937
+#: ../src/main.c:463 ../src/workspaceview.c:937
 #, c-format
 msgid "Unable to load \"%s\"."
 msgstr ""
 
-#: ../src/main.c:472
+#: ../src/main.c:474
 msgid "Unable to load."
 msgstr ""
 
-#: ../src/main.c:473
+#: ../src/main.c:475
 #, c-format
 msgid "Error loading plug-in \"%s\"."
 msgstr ""
 
-#: ../src/main.c:680
+#: ../src/main.c:682
 msgid "Next _Error"
 msgstr ""
 
-#: ../src/main.c:681
+#: ../src/main.c:683
 msgid "Ink dropper"
 msgstr ""
 
-#: ../src/main.c:682
+#: ../src/main.c:684
 msgid "D_uplicate"
 msgstr ""
 
-#: ../src/main.c:683
+#: ../src/main.c:685
 msgid "Pen"
 msgstr ""
 
-#: ../src/main.c:684 ../src/plot.c:98
+#: ../src/main.c:686 ../src/plot.c:98
 msgid "Line"
 msgstr ""
 
-#: ../src/main.c:687
+#: ../src/main.c:689
 msgid "Flood"
 msgstr ""
 
-#: ../src/main.c:688
+#: ../src/main.c:690
 msgid "Flood Blob"
 msgstr ""
 
-#: ../src/main.c:689
+#: ../src/main.c:691
 msgid "Fill Rectangle"
 msgstr ""
 
-#: ../src/main.c:690
+#: ../src/main.c:692
 msgid "Pan"
 msgstr ""
 
-#: ../src/main.c:691
+#: ../src/main.c:693
 msgid "Select"
 msgstr ""
 
 #. And the LEDs we use.
 #.
-#: ../src/main.c:695
+#: ../src/main.c:697
 msgid "Red LED"
 msgstr ""
 
-#: ../src/main.c:696
+#: ../src/main.c:698
 msgid "Green LED"
 msgstr ""
 
-#: ../src/main.c:697
+#: ../src/main.c:699
 msgid "Blue LED"
 msgstr ""
 
-#: ../src/main.c:698
+#: ../src/main.c:700
 msgid "Yellow LED"
 msgstr ""
 
-#: ../src/main.c:699
+#: ../src/main.c:701
 msgid "Cyan LED"
 msgstr ""
 
-#: ../src/main.c:700
+#: ../src/main.c:702
 msgid "Off LED"
 msgstr ""
 
-#: ../src/main.c:879
+#: ../src/main.c:881
 msgid "Empty temp area"
 msgstr ""
 
-#: ../src/main.c:880
+#: ../src/main.c:882
 msgid "Many files in temp area."
 msgstr ""
 
-#: ../src/main.c:881
+#: ../src/main.c:883
 #, c-format
 msgid ""
 "The temp area \"%s\" contains %s of files. Would you like to empty the temp "
 "area? This will delete any workspace backups and cannot be undone."
 msgstr ""
 
-#: ../src/main.c:897
+#: ../src/main.c:899
 #, c-format
 msgid "unable to make %s %s: %s"
 msgstr ""
 
-#: ../src/main.c:975
+#: ../src/main.c:977
 msgid "Unable to find install area."
 msgstr ""
 
-#: ../src/main.c:1115
+#: ../src/main.c:1117
 msgid "- image processing spreadsheet"
 msgstr ""
 
-#: ../src/main.c:1140
+#: ../src/main.c:1142
 #, c-format
 msgid "linked to vips-%s"
 msgstr ""
@@ -1915,34 +1915,34 @@ msgstr ""
 #. -1 means can't-be-set, at least on os x, so don't
 #. * warn.
 #.
-#: ../src/main.c:1192
+#: ../src/main.c:1194
 #, c-format
 msgid ""
 "unable to change max file descriptors\n"
 "max file descriptors still set to %d"
 msgstr ""
 
-#: ../src/main.c:1198
+#: ../src/main.c:1200
 msgid "unable to read max file descriptors"
 msgstr ""
 
-#: ../src/main.c:1458 ../src/main.c:1511
+#: ../src/main.c:1460 ../src/main.c:1513
 #, c-format
 msgid ""
 "Startup error log:\n"
 "%s"
 msgstr ""
 
-#: ../src/main.c:1510
+#: ../src/main.c:1512
 msgid "Startup error."
 msgstr ""
 
-#: ../src/main.c:1521
+#: ../src/main.c:1523
 #, c-format
 msgid "Welcome to %s-%s!"
 msgstr ""
 
-#: ../src/main.c:1526
+#: ../src/main.c:1528
 #, c-format
 msgid ""
 "A new directory has been created to hold startup, data and temporary files:\n"
@@ -2070,95 +2070,95 @@ msgstr ""
 msgid "Selected:"
 msgstr ""
 
-#: ../src/mainw.c:400
+#: ../src/mainw.c:407
 msgid "unsaved workspace"
 msgstr ""
 
-#: ../src/mainw.c:407
+#: ../src/mainw.c:414
 msgid "compatibility mode"
 msgstr ""
 
-#: ../src/mainw.c:602
+#: ../src/mainw.c:611
 #, c-format
 msgid "%d objects in workspace"
 msgstr ""
 
-#: ../src/mainw.c:607
+#: ../src/mainw.c:616
 #, c-format
 msgid "%d vips calls cached"
 msgstr ""
 
-#: ../src/mainw.c:697
+#: ../src/mainw.c:706
 msgid "Find in workspace not implemented yet."
 msgstr ""
 
-#: ../src/mainw.c:705
+#: ../src/mainw.c:714
 msgid "Find again in workspace not implemented yet."
 msgstr ""
 
-#: ../src/mainw.c:716 ../src/workspaceview.c:1012
+#: ../src/mainw.c:725 ../src/workspaceview.c:1012
 msgid "No errors."
 msgstr ""
 
-#: ../src/mainw.c:717 ../src/workspaceview.c:1013
+#: ../src/mainw.c:726 ../src/workspaceview.c:1013
 msgid "There are no errors (that I can see) in this workspace."
 msgstr ""
 
-#: ../src/mainw.c:823
+#: ../src/mainw.c:832
 #, c-format
 msgid ""
 "Unable to execute:\n"
 "   %s"
 msgstr ""
 
-#: ../src/mainw.c:853 ../src/mainw.c:880
+#: ../src/mainw.c:862 ../src/mainw.c:889
 msgid "Open File"
 msgstr ""
 
-#: ../src/mainw.c:1007
+#: ../src/mainw.c:1016
 msgid "Recent Images"
 msgstr ""
 
-#: ../src/mainw.c:1015
+#: ../src/mainw.c:1024
 msgid "Recent Workspaces"
 msgstr ""
 
-#: ../src/mainw.c:1023
+#: ../src/mainw.c:1032
 msgid "Recent Matricies"
 msgstr ""
 
-#: ../src/mainw.c:1032
+#: ../src/mainw.c:1041
 msgid "No recent items"
 msgstr ""
 
-#: ../src/mainw.c:1038
+#: ../src/mainw.c:1047
 msgid "Clear Recent Menu"
 msgstr ""
 
-#: ../src/mainw.c:1097
+#: ../src/mainw.c:1106
 msgid "Merge Workspace from File"
 msgstr ""
 
-#: ../src/mainw.c:1155 ../src/mainw.c:1162
+#: ../src/mainw.c:1164 ../src/mainw.c:1171
 msgid "No backup workspaces found."
 msgstr ""
 
-#: ../src/mainw.c:1157
+#: ../src/mainw.c:1166
 msgid ""
 "You need to enable \"Auto workspace save\" in Preferences before automatic "
 "recovery works."
 msgstr ""
 
-#: ../src/mainw.c:1163
+#: ../src/mainw.c:1172
 #, c-format
 msgid "No suitable workspace save files found in \"%s\""
 msgstr ""
 
-#: ../src/mainw.c:1178
+#: ../src/mainw.c:1187
 msgid "Open workspace backup?"
 msgstr ""
 
-#: ../src/mainw.c:1179
+#: ../src/mainw.c:1188
 #, c-format
 msgid ""
 "Found workspace backup:\n"
@@ -2168,280 +2168,280 @@ msgid ""
 "Do you want to recover this workspace?"
 msgstr ""
 
-#: ../src/mainw.c:1257
+#: ../src/mainw.c:1266
 msgid "Set column name here"
 msgstr ""
 
-#: ../src/mainw.c:1259
+#: ../src/mainw.c:1268
 msgid "Set column caption here"
 msgstr ""
 
-#: ../src/mainw.c:1261
+#: ../src/mainw.c:1270
 msgid "New Column"
 msgstr ""
 
-#: ../src/mainw.c:1265
+#: ../src/mainw.c:1274
 msgid "Create Column"
 msgstr ""
 
-#: ../src/mainw.c:1411
+#: ../src/mainw.c:1420
 msgid "Revert to Defaults"
 msgstr ""
 
-#: ../src/mainw.c:1412
+#: ../src/mainw.c:1421
 msgid "Revert to installation defaults?"
 msgstr ""
 
-#: ../src/mainw.c:1413
+#: ../src/mainw.c:1422
 msgid ""
 "Would you like to reset all preferences to their factory settings? This will "
 "delete any changes you have ever made to your preferences and may take a few "
 "seconds."
 msgstr ""
 
-#: ../src/mainw.c:1430
+#: ../src/mainw.c:1439
 msgid "Preferences"
 msgstr ""
 
-#: ../src/mainw.c:1435
+#: ../src/mainw.c:1444
 msgid "Revert to Defaults ..."
 msgstr ""
 
 #. Menu items.
 #.
-#: ../src/mainw.c:1505
+#: ../src/mainw.c:1514
 msgid "Open _Recent"
 msgstr ""
 
-#: ../src/mainw.c:1506 ../src/workspaceview.c:1153
+#: ../src/mainw.c:1515 ../src/workspaceview.c:1153
 msgid "Jump to _Column"
 msgstr ""
 
-#: ../src/mainw.c:1507
+#: ../src/mainw.c:1516
 msgid "_Toolkits"
 msgstr ""
 
-#: ../src/mainw.c:1517 ../src/mainw.c:1522
+#: ../src/mainw.c:1526 ../src/mainw.c:1531
 msgid "C_olumn"
 msgstr ""
 
-#: ../src/mainw.c:1518
+#: ../src/mainw.c:1527
 msgid "Create a new column"
 msgstr ""
 
-#: ../src/mainw.c:1523
+#: ../src/mainw.c:1532
 msgid "Create a new column with a specified name"
 msgstr ""
 
-#: ../src/mainw.c:1527
+#: ../src/mainw.c:1536
 msgid "_Tab"
 msgstr ""
 
-#: ../src/mainw.c:1528
+#: ../src/mainw.c:1537
 msgid "Create a new tab"
 msgstr ""
 
-#: ../src/mainw.c:1532
+#: ../src/mainw.c:1541
 msgid "_Workspace"
 msgstr ""
 
-#: ../src/mainw.c:1533
+#: ../src/mainw.c:1542
 msgid "Create a new workspace"
 msgstr ""
 
-#: ../src/mainw.c:1537
+#: ../src/mainw.c:1546
 msgid "_Open"
 msgstr ""
 
-#: ../src/mainw.c:1538
+#: ../src/mainw.c:1547
 msgid "Open a file"
 msgstr ""
 
-#: ../src/mainw.c:1542
+#: ../src/mainw.c:1551
 msgid "Open _Examples"
 msgstr ""
 
-#: ../src/mainw.c:1543
+#: ../src/mainw.c:1552
 msgid "Open example workspaces"
 msgstr ""
 
-#: ../src/mainw.c:1547
+#: ../src/mainw.c:1556
 msgid "_Duplicate Workspace"
 msgstr ""
 
-#: ../src/mainw.c:1548
+#: ../src/mainw.c:1557
 msgid "Duplicate workspace"
 msgstr ""
 
-#: ../src/mainw.c:1552
+#: ../src/mainw.c:1561
 msgid "_Merge Into Workspace"
 msgstr ""
 
-#: ../src/mainw.c:1553
+#: ../src/mainw.c:1562
 msgid "Merge workspace into this workspace"
 msgstr ""
 
-#: ../src/mainw.c:1557
+#: ../src/mainw.c:1566
 msgid "_Save Workspace"
 msgstr ""
 
-#: ../src/mainw.c:1558
+#: ../src/mainw.c:1567
 msgid "Save workspace"
 msgstr ""
 
-#: ../src/mainw.c:1562
+#: ../src/mainw.c:1571
 msgid "_Save Workspace As"
 msgstr ""
 
-#: ../src/mainw.c:1563
+#: ../src/mainw.c:1572
 msgid "Save workspace as"
 msgstr ""
 
-#: ../src/mainw.c:1567
+#: ../src/mainw.c:1576
 msgid "Search for Workspace _Backups"
 msgstr ""
 
-#: ../src/mainw.c:1568
+#: ../src/mainw.c:1577
 msgid "Load last automatically backed-up workspace"
 msgstr ""
 
-#: ../src/mainw.c:1572 ../src/program.c:1797
+#: ../src/mainw.c:1581 ../src/program.c:1797
 msgid "_Delete"
 msgstr ""
 
-#: ../src/mainw.c:1573
+#: ../src/mainw.c:1582
 msgid "Delete selected items"
 msgstr ""
 
-#: ../src/mainw.c:1578
+#: ../src/mainw.c:1587
 msgid "Select all items"
 msgstr ""
 
-#: ../src/mainw.c:1582
+#: ../src/mainw.c:1591
 msgid "D_uplicate Selected"
 msgstr ""
 
-#: ../src/mainw.c:1583
+#: ../src/mainw.c:1592
 msgid "Duplicate selected items"
 msgstr ""
 
-#: ../src/mainw.c:1588
+#: ../src/mainw.c:1597
 msgid "Recalculate selected items"
 msgstr ""
 
-#: ../src/mainw.c:1592 ../src/program.c:1822
+#: ../src/mainw.c:1601 ../src/program.c:1822
 msgid "_Find"
 msgstr ""
 
-#: ../src/mainw.c:1593
+#: ../src/mainw.c:1602
 msgid "Find in workspace"
 msgstr ""
 
-#: ../src/mainw.c:1597 ../src/program.c:1827
+#: ../src/mainw.c:1606 ../src/program.c:1827
 msgid "Find _Next"
 msgstr ""
 
-#: ../src/mainw.c:1598
+#: ../src/mainw.c:1607
 msgid "Find again in workspace"
 msgstr ""
 
-#: ../src/mainw.c:1603
+#: ../src/mainw.c:1612
 msgid "Jump to next error"
 msgstr ""
 
-#: ../src/mainw.c:1607
+#: ../src/mainw.c:1616
 msgid "_Group"
 msgstr ""
 
-#: ../src/mainw.c:1608
+#: ../src/mainw.c:1617
 msgid "Group selected items"
 msgstr ""
 
-#: ../src/mainw.c:1613
+#: ../src/mainw.c:1622
 msgid "Ungroup selected items"
 msgstr ""
 
-#: ../src/mainw.c:1617
+#: ../src/mainw.c:1626
 msgid "_Preferences"
 msgstr ""
 
-#: ../src/mainw.c:1618
+#: ../src/mainw.c:1627
 msgid "Edit preferences"
 msgstr ""
 
-#: ../src/mainw.c:1623
+#: ../src/mainw.c:1632
 msgid "Workspace as Grap_h"
 msgstr ""
 
-#: ../src/mainw.c:1624
+#: ../src/mainw.c:1633
 msgid "Show a graph of workspace dependencies"
 msgstr ""
 
-#: ../src/mainw.c:1630
+#: ../src/mainw.c:1639
 msgid "Edit toolkits"
 msgstr ""
 
-#: ../src/mainw.c:1636
+#: ../src/mainw.c:1645
 msgid "Au_to Recalculate"
 msgstr ""
 
-#: ../src/mainw.c:1637
+#: ../src/mainw.c:1646
 msgid "Recalculate automatically on change"
 msgstr ""
 
-#: ../src/mainw.c:1641
+#: ../src/mainw.c:1650
 msgid "_Toolbar"
 msgstr ""
 
-#: ../src/mainw.c:1642
+#: ../src/mainw.c:1651
 msgid "Show window toolbar"
 msgstr ""
 
-#: ../src/mainw.c:1646
+#: ../src/mainw.c:1655
 msgid "_Statusbar"
 msgstr ""
 
-#: ../src/mainw.c:1647
+#: ../src/mainw.c:1656
 msgid "Show window statusbar"
 msgstr ""
 
-#: ../src/mainw.c:1651
+#: ../src/mainw.c:1660
 msgid "Toolkit _Browser"
 msgstr ""
 
-#: ../src/mainw.c:1652
+#: ../src/mainw.c:1661
 msgid "Show toolkit browser"
 msgstr ""
 
-#: ../src/mainw.c:1656
+#: ../src/mainw.c:1665
 msgid "Workspace _Definitions"
 msgstr ""
 
-#: ../src/mainw.c:1657
+#: ../src/mainw.c:1666
 msgid "Show workspace definitions"
 msgstr ""
 
-#: ../src/mainw.c:1663
+#: ../src/mainw.c:1672
 msgid "_Normal"
 msgstr ""
 
-#: ../src/mainw.c:1664
+#: ../src/mainw.c:1673
 msgid "Normal view mode"
 msgstr ""
 
-#: ../src/mainw.c:1668
+#: ../src/mainw.c:1677
 msgid "Show _Formula"
 msgstr ""
 
-#: ../src/mainw.c:1669
+#: ../src/mainw.c:1678
 msgid "Show formula view mode"
 msgstr ""
 
-#: ../src/mainw.c:1673
+#: ../src/mainw.c:1682
 msgid "No _Edits"
 msgstr ""
 
-#: ../src/mainw.c:1674
+#: ../src/mainw.c:1683
 msgid "No edits view mode"
 msgstr ""
 

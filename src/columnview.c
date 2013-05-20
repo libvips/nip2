@@ -565,7 +565,7 @@ columnview_left_release( Columnview *cview, GdkEvent *ev )
 /* Event in columnview title bar.
  */
 static gboolean
-columnview_event_cb( GtkWidget *widget, GdkEvent *ev, Columnview *cview )
+columnview_title_event_cb( GtkWidget *widget, GdkEvent *ev, Columnview *cview )
 {
 	gboolean handled = FALSE;
 
@@ -573,7 +573,7 @@ columnview_event_cb( GtkWidget *widget, GdkEvent *ev, Columnview *cview )
 {
 	Column *col = COLUMN( VOBJECT( cview )->iobject );
 
-	printf( "columnview_event_cb: %s %d\n", 
+	printf( "columnview_title_event_cb: %s %d\n", 
 		IOBJECT( col )->name, 
 		ev->type );
 }
@@ -1014,6 +1014,14 @@ columnview_class_init( ColumnviewClass *class )
 		POPUP_FUNC( columnview_destroy_cb ) );
 }
 
+static gboolean
+columnview_event_cb( GtkWidget *wid, GdkEvent *ev, Columnview *cview )
+{
+	/* Just block events.
+	 */
+	return( TRUE ); 
+}
+
 static void
 columnview_init( Columnview *cview )
 {
@@ -1054,7 +1062,7 @@ columnview_init( Columnview *cview )
         gtk_container_add( GTK_CONTAINER( cview->title ), frame );
         popup_attach( cview->title, columnview_menu, cview );
         gtk_signal_connect( GTK_OBJECT( cview->title ), "event",
-                GTK_SIGNAL_FUNC( columnview_event_cb ), cview );
+                GTK_SIGNAL_FUNC( columnview_title_event_cb ), cview );
 
         /* Layout contents of title bar.
          */
@@ -1112,6 +1120,12 @@ columnview_init( Columnview *cview )
 		cview->frame, TRUE, TRUE, 0 );
 
         gtk_box_pack_start( GTK_BOX( cview ), cview->main, FALSE, FALSE, 0 );
+
+	/* We need to stop our enclosing thing seeing doubeclicks and all
+	 * that.
+	 */
+	gtk_signal_connect( GTK_OBJECT( cview ), "event", 
+		GTK_SIGNAL_FUNC( columnview_event_cb ), cview );
 
         gtk_widget_show_all( GTK_WIDGET( cview ) );
 }

@@ -1,4 +1,5 @@
 test-driver
+po/nip2.pot
 nip2-7.*.tar.gz
 *.o
 .*.swp

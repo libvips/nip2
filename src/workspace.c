@@ -96,13 +96,23 @@ workspace_set_modified( Workspace *ws, gboolean modified )
 		filemodel_set_modified( FILEMODEL( wsg ), modified );
 }
 
+static void *
+workspace_map_sub( Workspacegroup *wsg, workspace_map_fn fn, void *a, void *b )
+{
+	g_assert( IS_WORKSPACEGROUP( wsg ) ); 
+
+	return( icontainer_map( ICONTAINER( wsg ),
+		(icontainer_map_fn) fn, a, b ) );
+}
+
 /* Over all workspaces.
  */
 void *
 workspace_map( workspace_map_fn fn, void *a, void *b )
 {
-	return( icontainer_map( ICONTAINER( main_workspaceroot ), 
-		(icontainer_map_fn) fn, a, b ) );
+	return( icontainer_map3( ICONTAINER( main_workspaceroot ), 
+		(icontainer_map3_fn) workspace_map_sub,
+		fn, a, b ) );
 }
 
 /* Map across the columns in a workspace.

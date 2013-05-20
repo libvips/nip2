@@ -244,8 +244,7 @@ main_print_ws( Workspace *ws, gboolean *found )
 {
 	Symbol *sym;
 
-	if( (sym = compile_lookup( 
-		ws->sym->expr->compile, "main" )) ) {
+	if( (sym = compile_lookup( ws->sym->expr->compile, "main" )) ) {
 		main_print_main( sym );
 		*found = TRUE;
 	}

@@ -337,6 +337,8 @@ main_quit( void )
 		libgoffice_shutdown ();
 #endif /*HAVE_LIBGOFFICE*/
 
+	path_rewrite_free_all();
+
 	/* Should have freed everything now.
 	 */
 

@@ -35,6 +35,7 @@ extern const char *path_tmp_default;
  */
 typedef void *(*path_map_fn)( const char *, void *, void *, void * );
 
+void path_rewrite_free_all( void );
 void path_rewrite_add( const char *old, const char *new, gboolean lock );
 void path_rewrite( char *buf );
 void path_compact( char *path );

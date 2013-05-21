@@ -104,6 +104,26 @@ tool_linkreport_tool( Tool *tool, VipsBuf *buf, gboolean *found )
 		(symbol_map_fn) tool_linkreport_sym, buf, found ) );
 }
 
+static void
+tool_finalize( GObject *gobject )
+{
+	Tool *tool;
+
+#ifdef DEBUG
+	printf( "tool_finalize: %p %s\n", 
+		gobject, NN( IOBJECT( gobject )->name ) );
+#endif /*DEBUG*/
+
+	g_return_if_fail( gobject != NULL );
+	g_return_if_fail( IS_TOOL( gobject ) );
+
+	tool = TOOL( gobject );
+
+	IM_FREE( tool->help );
+
+	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+}
+
 static void *toolitem_free( Toolitem *toolitem );
 
 /* Remove a tool. Also strip the sym, if any.
@@ -251,6 +271,7 @@ tool_class_init( ToolClass *class )
 
 	/* Init methods.
 	 */
+	gobject_class->finalize = tool_finalize;
 	gobject_class->dispose = tool_dispose;
 
 	iobject_class->info = tool_info;

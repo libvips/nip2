@@ -71,6 +71,40 @@ typedef struct _Rewrite {
 
 static GSList *rewrite_list = NULL;
 
+static void
+path_rewrite_free( Rewrite *rewrite )
+{
+	rewrite_list = g_slist_remove( rewrite_list, rewrite );
+
+	IM_FREE( rewrite->old ); 
+	IM_FREE( rewrite->new ); 
+	IM_FREE( rewrite ); 
+}
+
+void
+path_rewrite_free_all( void )
+{
+	while( rewrite_list ) { 
+		Rewrite *rewrite = (Rewrite *) rewrite_list->data; 
+
+		IM_FREEF( path_rewrite_free, rewrite );
+	}
+}
+
+static Rewrite *
+path_rewrite_new( const char *old, const char *new, gboolean lock )
+{
+	Rewrite *rewrite;
+
+	rewrite = g_new( Rewrite, 1 );
+	rewrite->old = g_strdup( old );
+	rewrite->new = g_strdup( new );
+	rewrite->lock = lock;
+	rewrite_list = g_slist_prepend( rewrite_list, rewrite );
+
+	return( rewrite ); 
+}
+
 static gint
 path_rewrite_sort_fn( Rewrite *a, Rewrite *b )
 {
@@ -144,7 +178,7 @@ path_rewrite_add( const char *old, const char *new, gboolean lock )
 			printf( "path_rewrite_add: removing\n" );
 #endif /*DEBUG_REWRITE*/
 
-			rewrite_list = g_slist_remove( rewrite_list, rewrite );
+			IM_FREEF( path_rewrite_free, rewrite );
 		}
 		else if( !rewrite->lock &&
 			new ) {
@@ -166,11 +200,7 @@ path_rewrite_add( const char *old, const char *new, gboolean lock )
 		printf( "path_rewrite_add: adding\n" );
 #endif /*DEBUG_REWRITE*/
 
-		rewrite = g_new( Rewrite, 1 );
-		rewrite->old = g_strdup( old );
-		rewrite->new = g_strdup( new );
-		rewrite->lock = lock;
-		rewrite_list = g_slist_prepend( rewrite_list, rewrite );
+		rewrite = path_rewrite_new( old, new, lock );
 	}
 
 	/* Keep longest old first, in case one old is a prefix of 

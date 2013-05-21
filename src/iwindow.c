@@ -561,7 +561,8 @@ iwindow_destroy( GtkObject *gobject )
 	/* My instance destroy stuff.
 	 */
 	FREESID( iwnd->parent_unmap_sid, iwnd->parent_window );
-	//UNREF( iwnd->action_group ); 
+	UNREF( iwnd->action_group ); 
+	UNREF( iwnd->ui_manager ); 
 
 	/* Now we've destroyed, we must stop popdown from being called, since 
 	 * the view will have junked a lot of stuff.

@@ -50,6 +50,7 @@ toolkitbrowser_destroy( GtkObject *object )
 {
 	Toolkitbrowser *toolkitbrowser = TOOLKITBROWSER( object );
 
+	UNREF( toolkitbrowser->filter );
 	UNREF( toolkitbrowser->store );
 
 	GTK_OBJECT_CLASS( parent_class )->destroy( object );

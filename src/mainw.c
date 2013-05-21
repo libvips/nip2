@@ -115,12 +115,16 @@ mainw_recent_add( GSList **recent, const char *filename )
 }
 
 /* Pick a mainw at random. Used if we need a window for a dialog, and we're
- * not sure which to pick.
+ * not sure which to pick. 
  */
 Mainw *
 mainw_pick_one( void )
 {
-	g_assert( mainw_all );
+	if( !mainw_all )
+		/* Must be a cast here, since iwindow_pick_one() can return
+		 * NULL during shutdown.
+		 */
+		return( (Mainw *) iwindow_pick_one() ); 
 
 	return( MAINW( mainw_all->data ) );
 }

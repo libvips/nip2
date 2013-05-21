@@ -550,13 +550,6 @@ idialog_build( GtkWidget *widget )
 		idlg->destroy_sid = g_signal_connect( idlg->iobject, "destroy", 
 			G_CALLBACK( idialog_iobject_destroy ), idlg );
 
-	/* Set transient hint ... this may not have been set by our iwindow
-	 * superclass if the lock-in-front pref is off.
-	 */
-        if( iwnd->parent_window ) 
-		gtk_window_set_transient_for( GTK_WINDOW( iwnd ),
-			GTK_WINDOW( iwnd->parent_window ) );
-
         gtk_widget_show( idlg->work );
 }
 

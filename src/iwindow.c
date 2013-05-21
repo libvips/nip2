@@ -125,6 +125,18 @@ iwindow_number( void )
 	return( g_slist_length( iwindow_all ) );
 }
 
+/* Pick an iwindow at random. Used if we need a window for a dialog, and we're
+ * not sure which to pick. During shutdown we can have no windows. 
+ */
+iWindow *
+iwindow_pick_one( void )
+{
+	if( !iwindow_all )
+		return( NULL ); 
+
+	return( IWINDOW( iwindow_all->data ) );
+}
+
 /* Over all windows.
  */
 void *
@@ -531,9 +543,9 @@ iwindow_finalize( GObject *gobject )
 	G_OBJECT_CLASS( parent_class )->finalize( gobject );
 
 	/* Last window and we've got through startup? Quit the application.
-	 * Test for 1, since main() makes an invisible iwindow as the root.
 	 */
-	if( iwindow_number() == 1 && !main_starting )
+	if( iwindow_number() == 0 && 
+		!main_starting )
 		main_quit_test();
 }
 
@@ -549,6 +561,7 @@ iwindow_destroy( GtkObject *gobject )
 	/* My instance destroy stuff.
 	 */
 	FREESID( iwnd->parent_unmap_sid, iwnd->parent_window );
+	//UNREF( iwnd->action_group ); 
 
 	/* Now we've destroyed, we must stop popdown from being called, since 
 	 * the view will have junked a lot of stuff.
@@ -746,7 +759,9 @@ iwindow_real_build( GtkWidget *widget )
 	/* Link to parent.
 	 */
         if( iwnd->parent_window ) {
-		if( IWINDOW_GET_CLASS( iwnd )->transient )
+		if( IWINDOW_GET_CLASS( iwnd )->transient &&
+			iwnd->parent_window &&
+			iwnd != iwnd->parent_window )
 			gtk_window_set_transient_for( GTK_WINDOW( iwnd ),
 				GTK_WINDOW( iwnd->parent_window ) );
 

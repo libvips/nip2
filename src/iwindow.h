@@ -205,6 +205,7 @@ typedef struct _iWindowClass {
 } iWindowClass;
 
 int iwindow_number( void );
+iWindow *iwindow_pick_one( void );
 typedef void (*iWindowMapFn)( iWindow *, void * );
 void *iwindow_map_all( iWindowMapFn fn, void *a );
 

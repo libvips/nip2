@@ -407,7 +407,7 @@ main_quit_test( void )
 
 	/* Close registered models.
 	 */
-	filemodel_inter_close_registered_cb( IWINDOW( mainw_pick_one() ), NULL,
+	filemodel_inter_close_registered_cb( iwindow_pick_one(), NULL,
 		main_quit_test_cb, NULL );
 }
 

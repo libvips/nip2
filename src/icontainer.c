@@ -459,6 +459,26 @@ icontainer_current( iContainer *parent, iContainer *child )
 #endif /*DEBUG_SANITY*/
 }
 
+iContainer *
+icontainer_next( iContainer *parent )
+{
+	iContainer *child;
+	int i;
+
+	if( !parent->children ) 
+		return( NULL ); 
+
+	if( !parent->current )
+		i = 0;
+	else
+		i = g_slist_index( parent->children, parent->current ) + 1;
+
+	if( !(child = g_slist_nth_data( parent->children, i )) )
+		child = ICONTAINER( parent->children->data );
+
+	icontainer_current( parent, child );
+}
+
 void 
 icontainer_reparent( iContainer *parent, iContainer *child, int pos )
 {

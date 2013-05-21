@@ -353,6 +353,19 @@ mainw_get_workspace( Mainw *mainw )
 	return( NULL );
 }
 
+Workspace *
+mainw_next_workspace( Mainw *mainw )
+{
+	Workspace *ws;
+
+	if( mainw->wsg &&
+		(ws = WORKSPACE( 
+			icontainer_next( ICONTAINER( mainw->wsg ) ) )) )
+		return( ws );
+
+	return( NULL );
+}
+
 /* Update the space remaining indicator. 
  */
 static void
@@ -721,15 +734,25 @@ mainw_find_again_action_cb( GtkAction *action, Mainw *mainw )
 void
 mainw_next_error_action_cb( GtkAction *action, Mainw *mainw )
 {
+	Workspace *first_ws;
 	Workspace *ws;
 
-	if( (ws = mainw_get_workspace( mainw )) &&
-		!workspace_next_error( ws ) ) {
-		error_top( _( "No errors." ) );
-		error_sub( "%s", _( "There are no errors (that I can see) "
-			"in this workspace." ) );
-		iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
-	}
+	if( !(first_ws = mainw_get_workspace( mainw )) )
+		return;
+
+	do {
+		ws = mainw_get_workspace( mainw );
+
+		if( workspace_next_error( ws ) ) 
+			return;
+
+		ws = mainw_next_workspace( mainw ); 
+	} while( ws != first_ws ); 
+
+	error_top( _( "No errors." ) );
+	error_sub( "%s", _( "There are no errors (that I can see) "
+		"in this workspace." ) );
+	iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );
 }
 
 static void

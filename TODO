@@ -3,8 +3,6 @@
 
   try renaming a tab on the bm workspaces as a test
 
-- next-error should work across tabs
-
 
 - hide tabs if only one tab in window, though we'd need to allow tab drop 
   anywhere in window for that

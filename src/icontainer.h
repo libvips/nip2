@@ -155,6 +155,7 @@ void icontainer_child_add_before( iContainer *parent,
 void icontainer_child_move( iContainer *child, int pos );
 void *icontainer_child_remove( iContainer *child );
 void icontainer_current( iContainer *parent, iContainer *child );
+iContainer *icontainer_next( iContainer *parent );
 void icontainer_reparent( iContainer *parent, iContainer *child, int pos );
 
 GType icontainer_get_type( void );

@@ -133,7 +133,7 @@ filemodel_get_window_hint( Filemodel *filemodel )
 	if( filemodel->window_hint )
 		return( filemodel->window_hint );
 	else
-		return( IWINDOW( main_window_top ) );
+		return( IWINDOW( mainw_pick_one() ) );
 }
 
 gboolean

@@ -120,8 +120,7 @@ mainw_recent_add( GSList **recent, const char *filename )
 Mainw *
 mainw_pick_one( void )
 {
-	if( !mainw_all )
-		return( NULL );
+	g_assert( mainw_all );
 
 	return( MAINW( mainw_all->data ) );
 }

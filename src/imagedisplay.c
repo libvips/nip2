@@ -401,10 +401,23 @@ imagedisplay_real_area_changed( Imagedisplay *id, Rect *dirty )
 static void
 imagedisplay_realize( GtkWidget *widget )
 {
+	Imagedisplay *id = IMAGEDISPLAY( widget );
+
+	GdkColor fg, bg;
+
 	GTK_WIDGET_CLASS( parent_class )->realize( widget );
 
 	gdk_window_set_back_pixmap( widget->window, NULL, FALSE );
 	gtk_widget_set_double_buffered( widget, FALSE );
+
+	id->back_gc = gdk_gc_new( widget->window );
+	fg.red = fg.green = fg.blue = 0x90 << 8;
+	bg.red = bg.green = bg.blue = 0xA0 << 8;
+	gdk_gc_set_rgb_fg_color( id->back_gc, &fg );
+	gdk_gc_set_rgb_bg_color( id->back_gc, &bg );
+
+	id->top_gc = gdk_gc_new( widget->window );
+	id->bottom_gc = gdk_gc_new( widget->window );
 }
 
 /* Init Imagedisplay class.
@@ -437,24 +450,6 @@ imagedisplay_class_init( ImagedisplayClass *class )
 }
 
 static void
-imagedisplay_make_gcs( Imagedisplay *id )
-{
-	GdkColor fg, bg;
-
-	if( id->back_gc )
-		return;
-
-	id->back_gc = gdk_gc_new( main_window_gdk );
-	fg.red = fg.green = fg.blue = 0x90 << 8;
-	bg.red = bg.green = bg.blue = 0xA0 << 8;
-	gdk_gc_set_rgb_fg_color( id->back_gc, &fg );
-	gdk_gc_set_rgb_bg_color( id->back_gc, &bg );
-
-	id->top_gc = gdk_gc_new( main_window_gdk );
-	id->bottom_gc = gdk_gc_new( main_window_gdk );
-}
-
-static void
 imagedisplay_init( Imagedisplay *id )
 {
 	id->conv = NULL;
@@ -465,8 +460,6 @@ imagedisplay_init( Imagedisplay *id )
 	id->back_gc = NULL;
 	id->top_gc = NULL;
 	id->bottom_gc = NULL;
-
-	imagedisplay_make_gcs( id );
 }
 
 GType

@@ -67,9 +67,6 @@
 
 /* General stuff. 
  */
-GdkWindow *main_window_gdk;			/* Top GdkWindow */
-GtkWidget *main_window_top = NULL;		/* Secret top window */
-
 Workspaceroot *main_workspaceroot = NULL;	/* All the workspaces */
 Toolkitgroup *main_toolkitgroup = NULL;		/* All the toolkits */
 Symbol *main_symbol_root = NULL;		/* Root of symtable */
@@ -197,9 +194,13 @@ main_error_exit( const char *fmt, ... )
         va_start( args, fmt );
         (void) vfprintf( stderr, fmt, args );
         va_end( args );
+	fprintf( stderr, "\n" );  
 
-	fprintf( stderr, "\n%s %s\n", 
-		error_get_top(), error_get_sub() );
+	if( strcmp( error_get_top(), "" ) != 0 ) {
+		fprintf( stderr, "%s\n", error_get_top() ); 
+		if( strcmp( error_get_sub(), "" ) != 0 ) 
+			fprintf( stderr, "%s\n", error_get_sub() ); 
+	}
 
 	if( main_option_verbose ) {
 		char txt[MAX_STRSIZE];
@@ -207,7 +208,7 @@ main_error_exit( const char *fmt, ... )
 
 		slist_map( expr_error_all,
 			(SListMapFn) expr_error_print, &buf );
-		fprintf( stderr, "%s\n", vips_buf_all( &buf ) );
+		fprintf( stderr, "%s", vips_buf_all( &buf ) );
 	}
 
 	exit( 1 );
@@ -266,7 +267,8 @@ main_quit( void )
 	printf( "main_quit: cleaning up ...\n" );
 #endif/*DEBUG*/
 
-	if( main_option_print_main || main_option_output ) {
+	if( main_option_print_main || 
+		main_option_output ) {
 		Symbol *sym;
 		gboolean found;
 
@@ -767,9 +769,6 @@ main_x_init( int *argc, char ***argv )
 {
 	char buf[FILENAME_MAX];
 
-	if( main_window_gdk )
-		return;
-
 #ifdef DEBUG
 	printf( "X11 init\n" );
 #endif/*DEBUG*/
@@ -798,13 +797,6 @@ main_x_init( int *argc, char ***argv )
 	 * first window, not when we make this secret window.
 	 */
 	gtk_window_set_auto_startup_notification( FALSE );
-
-        /* Make invisible top level window ... used to get stuff for
-         * build. Realize it, but don't display it.
-         */
-        main_window_top = iwindow_new( GTK_WINDOW_TOPLEVEL );
-        gtk_widget_realize( main_window_top );
-	main_window_gdk = main_window_top->window;
 
 #ifdef DEBUG_UPDATES
 	printf( "*** debug updates is on\n" );

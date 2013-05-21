@@ -27,9 +27,6 @@
 
 */
 
-extern GtkWidget *main_window_top;		/* Secret base window */
-extern GdkWindow *main_window_gdk;		/* gdk base window */
-
 extern Workspaceroot *main_workspaceroot;	/* All the workspaces */
 extern Toolkitgroup *main_toolkitgroup;		/* All the toolkits */
 extern Symbol *main_symbol_root;		/* Root of symtable */

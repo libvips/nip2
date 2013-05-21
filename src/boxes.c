@@ -42,14 +42,8 @@
 static GtkWidget *
 box_pick_parent( GtkWidget *par )
 {
-	if( !par ) {
-		Mainw *mainw;
-
-		if( (mainw = mainw_pick_one()) )
-			return( GTK_WIDGET( mainw ) );
-		else
-			return( main_window_top );
-	}
+	if( !par ) 
+		return( GTK_WIDGET( mainw_pick_one() ) );
 	else 
 		return( par );
 }
@@ -148,7 +142,7 @@ box_alert( GtkWidget *par )
 {
 	char buf[MAX_DIALOG_TEXT];
 
-	if( !main_window_gdk ) {
+	if( !main_option_batch ) {
 		/* No X, just print.
 		 */
 		fprintf( stderr, "%s\n", error_get_top() );

@@ -755,17 +755,11 @@ rowview_get_position( Rowview *rview, int *x, int *y, int *w, int *h )
 #endif /*DEBUG*/
 }
 
-/* Hide/show a row. We can't use MODEL( row )->display for this, since tables
- * don't like it :-( just _show()/_hide() rather then _create()/_destroy()
- *
- * Take account of workspace editable state too.
+/* Hide/show a row. 
  */
 void 
 rowview_set_visible( Rowview *rview, gboolean visible )
 {
-	Row *row = ROW( VOBJECT( rview )->iobject );
-	gboolean editable = row->ws->mode != WORKSPACE_MODE_NOEDIT;
-
 	if( rview->visible != visible ) {
 		rview->visible = visible;
 		rowview_update_widgets( rview );

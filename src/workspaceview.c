@@ -1009,9 +1009,9 @@ workspaceview_next_error_action_cb2( GtkWidget *wid, GtkWidget *host,
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
 
 	if( !workspace_next_error( ws ) ) {
-		error_top( _( "No errors." ) );
+		error_top( _( "No errors in tab." ) );
 		error_sub( "%s", _( "There are no errors (that I can see) "
-			"in this workspace." ) );
+			"in this tab." ) );
 		iwindow_alert( GTK_WIDGET( wview ), GTK_MESSAGE_INFO );
 	}
 }

@@ -749,7 +749,7 @@ mainw_next_error_action_cb( GtkAction *action, Mainw *mainw )
 		ws = mainw_next_workspace( mainw ); 
 	} while( ws != first_ws ); 
 
-	error_top( _( "No errors." ) );
+	error_top( _( "No errors in workspace." ) );
 	error_sub( "%s", _( "There are no errors (that I can see) "
 		"in this workspace." ) );
 	iwindow_alert( GTK_WIDGET( mainw ), GTK_MESSAGE_INFO );

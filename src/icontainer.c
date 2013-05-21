@@ -477,6 +477,8 @@ icontainer_next( iContainer *parent )
 		child = ICONTAINER( parent->children->data );
 
 	icontainer_current( parent, child );
+
+	return( child ); 
 }
 
 void 

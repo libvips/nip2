@@ -1344,8 +1344,7 @@ main( int argc, char *argv[] )
 	 * stuff into.
 	 */
 	if( !wsg ) {
-		wsg = workspacegroup_new_blank( main_workspaceroot, 
-			"untitled" );
+		wsg = workspacegroup_new_blank( main_workspaceroot, NULL ); 
 		ws = WORKSPACE( icontainer_get_nth_child( 
 			ICONTAINER( wsg ), 0 ) ); 
 	}

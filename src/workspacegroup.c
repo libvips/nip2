@@ -797,6 +797,9 @@ workspacegroup_new( Workspaceroot *wsr )
 #endif /*DEBUG*/
 
 	wsg = WORKSPACEGROUP( g_object_new( TYPE_WORKSPACEGROUP, NULL ) );
+	/* Changed later.
+	 */
+	iobject_set( IOBJECT( wsg ), "untitled", _( "Empty workspace" ) );
 	workspacegroup_link( wsg, wsr );
 	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
 
@@ -813,7 +816,7 @@ workspacegroup_new_blank( Workspaceroot *wsr, const char *name )
 
 	if( !(wsg = workspacegroup_new( wsr )) )
 		return( NULL );
-	iobject_set( IOBJECT( wsg ), name, _( "Default empty workspace" ) );
+	iobject_set( IOBJECT( wsg ), name, NULL );
 	(void) workspacegroup_workspace_pick( wsg ); 
 	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
 
@@ -843,7 +846,6 @@ workspacegroup_new_from_file( Workspaceroot *wsr,
 	const char *filename, const char *filename_user )
 {
 	Workspacegroup *wsg;
-	char name[FILENAME_MAX];
 
 	if( !(wsg = workspacegroup_new( wsr )) )
 		return( NULL );
@@ -856,8 +858,14 @@ workspacegroup_new_from_file( Workspaceroot *wsr,
 	filemodel_set_filename( FILEMODEL( wsg ), filename_user );
 	filemodel_set_modified( FILEMODEL( wsg ), FALSE );
 
-	name_from_filename( filename_user, name );
-	iobject_set( IOBJECT( wsg ), name, NULL );
+	if( filename_user ) {
+		char name[FILENAME_MAX];
+
+		name_from_filename( filename_user, name );
+		iobject_set( IOBJECT( wsg ), name, NULL );
+	}
+	else
+		iobject_set( IOBJECT( wsg ), "untitled", NULL );
 
 	return( wsg );
 }

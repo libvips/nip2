@@ -1,7 +1,8 @@
+- paint imagedisplay background in iimageview even if there's no image
 
-- rewrite on rename tab? it's very hard at the moment
+- im_invertlut() is erroring out in bm-workspaces2
 
-  try renaming a tab on the bm workspaces as a test
+
 
 
 - hide tabs if only one tab in window, though we'd need to allow tab drop 

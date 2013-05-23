@@ -440,7 +440,8 @@ row_add_parent_name( Link *link, VipsBuf *buf )
 {
 	Row *row;
 
-	if( link->parent->expr && (row = link->parent->expr->row) ) {
+	if( link->parent->expr && 
+		(row = link->parent->expr->row) ) {
 		row_qualified_name_relative( link->child, row, buf );
 		vips_buf_appends( buf, " " );
 	}
@@ -453,7 +454,8 @@ row_add_child_name( Link *link, VipsBuf *buf )
 {
 	Row *row;
 
-	if( link->child->expr && (row = link->child->expr->row) ) {
+	if( link->child->expr && 
+		(row = link->child->expr->row) ) {
 		row_qualified_name_relative( link->parent, row, buf );
 		vips_buf_appends( buf, " " );
 	}
@@ -465,7 +467,8 @@ static void *
 row_add_dirty_child_name( Link *link, VipsBuf *buf )
 {
 	if( link->child->dirty ) {
-		symbol_qualified_name( link->child, buf );
+		symbol_qualified_name_relative( link->parent, 
+			link->child, buf );
 		vips_buf_appends( buf, " " );
 	}
 
@@ -498,7 +501,7 @@ row_info( iObject *iobject, VipsBuf *buf )
 			 */
 			vips_buf_appends( buf, _( "refers to" ) );
 			vips_buf_appends( buf, ": " );
-			slist_map( row->top_row->sym->topchildren, 
+			slist_map_rev( row->top_row->sym->topchildren, 
 				(SListMapFn) row_add_child_name, buf );
 			vips_buf_appends( buf, "\n" );
 		}
@@ -509,7 +512,7 @@ row_info( iObject *iobject, VipsBuf *buf )
 			 */
 			vips_buf_appends( buf, _( "is referred to by" ) );
 			vips_buf_appends( buf, ": " );
-			slist_map( row->top_row->sym->topparents, 
+			slist_map_rev( row->top_row->sym->topparents, 
 				(SListMapFn) row_add_parent_name, buf );
 			vips_buf_appends( buf, "\n" );
 		}
@@ -522,7 +525,7 @@ row_info( iObject *iobject, VipsBuf *buf )
 			vips_buf_appends( buf, " " );
 			vips_buf_appends( buf, _( "is blocked on" ) );
 			vips_buf_appends( buf, ": " );
-			slist_map( sym->topchildren,
+			slist_map_rev( sym->topchildren,
 				(SListMapFn) row_add_dirty_child_name, buf );
 			vips_buf_appends( buf, "\n" );
 		}

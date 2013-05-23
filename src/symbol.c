@@ -730,6 +730,10 @@ symbol_rename( Symbol *sym, const char *new_name )
 		return( FALSE );
 	}
 
+	/* Everything that depends on us will break.
+	 */
+	symbol_dirty_intrans( sym, link_serial_new() );
+
 	g_object_ref( sym );
 
 	icontainer_child_remove( ICONTAINER( sym ) );

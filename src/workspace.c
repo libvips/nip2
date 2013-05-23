@@ -1799,6 +1799,9 @@ workspace_rename( Workspace *ws, const char *name, const char *caption )
 	if( !symbol_rename( ws->sym, name ) )
 		return( FALSE );
 	iobject_set( IOBJECT( ws ), IOBJECT( ws->sym )->name, caption );
+	workspace_set_modified( ws, TRUE );
+
+	symbol_recalculate_all();
 
 	return( TRUE );
 }

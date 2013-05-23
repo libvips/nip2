@@ -223,6 +223,11 @@ imagedisplay_paint( Imagedisplay *id, Rect *area )
 	int xs, ys;
 	int x, y;
 
+	/* There's no image to paint.
+	 */
+	if( !conv->ireg )
+		return;
+
 	/* Clip non-image parts of the expose.
 	 */
 	im_rect_intersectrect( area, &conv->canvas, &clip );
@@ -262,7 +267,6 @@ static gint
 imagedisplay_expose( GtkWidget *widget, GdkEventExpose *event )
 {
 	Imagedisplay *id = IMAGEDISPLAY( widget );
-	Conversion *conv = id->conv;
 
 	GdkRectangle *rect;
 	int i, n;
@@ -271,8 +275,7 @@ imagedisplay_expose( GtkWidget *widget, GdkEventExpose *event )
 		event->area.width == 0 || 
 		event->area.height == 0 ||
 		!GTK_WIDGET( id )->window ||
-		!GTK_WIDGET_VISIBLE( id ) ||
-		!conv->ireg )
+		!GTK_WIDGET_VISIBLE( id ) )
 		return( FALSE );
 
 	gdk_region_get_rectangles( event->region, &rect, &n );

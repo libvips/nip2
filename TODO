@@ -1,5 +1,3 @@
-- paint imagedisplay background in iimageview even if there's no image
-
 - im_invertlut() is erroring out in bm-workspaces2
 
 

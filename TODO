@@ -1,6 +1,3 @@
-- im_invertlut() is erroring out in bm-workspaces2
-
-
 
 
 - hide tabs if only one tab in window, though we'd need to allow tab drop 

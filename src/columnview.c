@@ -1017,9 +1017,25 @@ columnview_class_init( ColumnviewClass *class )
 static gboolean
 columnview_event_cb( GtkWidget *wid, GdkEvent *ev, Columnview *cview )
 {
-	/* Just block events.
-	 */
-	return( TRUE ); 
+	gboolean handled;
+
+	handled = FALSE;
+
+        switch( ev->type ) {
+        case GDK_BUTTON_PRESS:
+                if( ev->button.button == 1 ) 
+			/* We want to sop our enclosing notebook seeing
+			 * left doubleclicks and creating new tabs. We want to
+			 * not block things like scroll events and
+			 * middle-drag.
+			 */
+                        handled = TRUE;
+
+	default:
+		break;
+	}
+
+	return( handled ); 
 }
 
 static void

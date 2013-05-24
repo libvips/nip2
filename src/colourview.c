@@ -118,6 +118,8 @@ colourview_init( Colourview *colourview )
 #endif /*DEBUG*/
 
         eb = gtk_event_box_new();
+	gtk_widget_add_events( GTK_WIDGET( eb ), 
+		GDK_POINTER_MOTION_HINT_MASK ); 
         gtk_box_pack_start( GTK_BOX( colourview ), eb, FALSE, FALSE, 0 );
 	vbox = gtk_vbox_new( FALSE, 0 );
         gtk_container_add( GTK_CONTAINER( eb ), vbox );

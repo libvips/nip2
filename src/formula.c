@@ -515,6 +515,9 @@ formula_init( Formula *formula )
 
 	formula->entry_frame = NULL;
 
+	gtk_widget_add_events( GTK_WIDGET( formula ), 
+		GDK_POINTER_MOTION_HINT_MASK ); 
+
 	formula->hbox = gtk_hbox_new( FALSE, 12 );
 	gtk_container_add( GTK_CONTAINER( formula ), formula->hbox );
         gtk_widget_show( formula->hbox );

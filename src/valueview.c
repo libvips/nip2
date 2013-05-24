@@ -121,6 +121,8 @@ valueview_init( Valueview *valueview )
 #endif /*DEBUG*/
 
         valueview->eb = gtk_event_box_new();
+	gtk_widget_add_events( GTK_WIDGET( valueview->eb ), 
+		GDK_POINTER_MOTION_HINT_MASK ); 
         gtk_box_pack_start( GTK_BOX( valueview ), 
 		valueview->eb, FALSE, FALSE, 0 );
 	valueview->label = gtk_label_new( "" );

@@ -626,7 +626,6 @@ workspace_finalize( GObject *gobject )
 	IM_FREE( ws->status );
 	IM_FREE( ws->local_defs );
 
-	workspace_set_needs_layout( ws, FALSE );
 	workspace_all = g_slist_remove( workspace_all, ws );
 
 	G_OBJECT_CLASS( parent_class )->finalize( gobject );

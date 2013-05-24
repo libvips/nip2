@@ -641,6 +641,26 @@ columnview_destroy( GtkObject *object )
 	GTK_OBJECT_CLASS( parent_class )->destroy( object );
 }
 
+static void
+columnview_size_allocate( GtkWidget *widget, GtkAllocation *allocation )
+{
+	Columnview *cview = COLUMNVIEW( widget ); 
+
+	if( cview->old_width != allocation->width ||
+		cview->old_height != allocation->height ) { 
+		Column *col = COLUMN( VOBJECT( cview )->iobject );
+		Workspace *ws = col->ws;
+
+		cview->old_width = allocation->width;
+		cview->old_height = allocation->height;
+
+		workspace_set_needs_layout( ws, TRUE ); 
+		mainw_layout();
+	}
+
+	GTK_WIDGET_CLASS( parent_class )->size_allocate( widget, allocation );
+}
+
 /* Arrow button on title bar.
  */
 static void
@@ -975,6 +995,7 @@ static void
 columnview_class_init( ColumnviewClass *class )
 {
 	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
 
@@ -988,6 +1009,8 @@ columnview_class_init( ColumnviewClass *class )
 	/* Init methods.
 	 */
 	object_class->destroy = columnview_destroy;
+
+	widget_class->size_allocate = columnview_size_allocate;
 
 	vobject_class->refresh = columnview_refresh;
 
@@ -1052,8 +1075,10 @@ columnview_init( Columnview *cview )
         cview->ly = -1;
 
 	cview->state = COL_WAIT;
-
 	cview->selected = FALSE;
+
+	cview->old_width = -1;
+	cview->old_height = -1;
 
         /* Make outer vb.
          */

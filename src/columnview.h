@@ -84,6 +84,11 @@ struct _Columnview {
         int rx, ry;                     /* Drag offset */
         int tx, ty;                     /* Tally window pos in root cods */
 	gboolean selected;		/* Last drawn in selected state? */
+
+	/* We watch resize events and trigger a workspace relayout with these.
+	 */
+	int old_width;
+	int old_height;
 };
 
 typedef struct _ColumnviewClass {

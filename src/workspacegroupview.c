@@ -254,11 +254,8 @@ workspacegroupview_switch_page_cb( GtkNotebook *notebook,
 	 * resize to get everything to init. 
 	 */
 	if( wview &&
-		wview->fixed ) {
+		wview->fixed ) 
 		gtk_container_check_resize( GTK_CONTAINER( wview->fixed ) );
-		workspace_set_needs_layout( ws, TRUE );
-		mainw_layout();
-	}
 }
 
 static void                

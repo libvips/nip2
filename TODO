@@ -1,3 +1,4 @@
+- move column, segv on drop
 
 
 - hide tabs if only one tab in window, though we'd need to allow tab drop 

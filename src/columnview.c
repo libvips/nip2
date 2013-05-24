@@ -627,14 +627,12 @@ columnview_destroy( GtkObject *object )
 {
 	Columnview *cview;
 	Column *col;
-	Workspace *ws;
 
 	g_return_if_fail( object != NULL );
 	g_return_if_fail( IS_COLUMNVIEW( object ) );
 
 	cview = COLUMNVIEW( object );
 	col = COLUMN( VOBJECT( cview )->iobject );
-	ws = col->ws;
 
 #ifdef DEBUG
 	printf( "columnview_destroy:\n" );
@@ -644,8 +642,11 @@ columnview_destroy( GtkObject *object )
 
 	/* The column has gone .. relayout.
 	 */
-	workspace_set_needs_layout( ws, TRUE ); 
-	mainw_layout();
+	if( col &&
+		col->ws ) {
+		workspace_set_needs_layout( col->ws, TRUE ); 
+		mainw_layout();
+	}
 
 	GTK_OBJECT_CLASS( parent_class )->destroy( object );
 }

@@ -2,6 +2,11 @@
 
 AC_INIT([nip2], [7.33.0])
 AM_INIT_AUTOMAKE([-Wall])
+
+# foreign stops complaints about a missing README (we use README.md instead)
+# and missing INSTALL (the standard Gnu INSTALL is not very useful)
+AM_INIT_AUTOMAKE([foreign])
+
 AC_CONFIG_HEADERS(config.h)
 
 dnl

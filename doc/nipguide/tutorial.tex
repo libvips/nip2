@@ -12,16 +12,14 @@ exact look might be different on your system).
 
 The menus at the top of the window are very ordinary, except for the
 \ct{Toolkits} menu which contains all of the image processing operations.
-The green thing is the current column (the thing that new objects will get
-added to). Click on the \ct{25 GB free} text and it toggles between showing
-space free on your disc and space free for calculations.
+The main part of the window shows a workspace. Workspaces are split into tabs
+(across the top) and each tab is made of a set of columns. The current column,
+where new objects appear, has a dark green bar across the top. 
 
 Click on \ctr{File}\ct{Open} to get a file dialog and load up an
 image. \nip{} can load most image formats, try it and see.  Check the
-\ct{Pin up} box to have the dialog remain after you press OK. Click on
-\ct{Show thumbnails} and \nip{} will try to display thumbnail images for
-all the files in the directory. You can also drag files from the desktop or
-from your file manager.
+\ct{Pin up} box to have the dialog remain after you press OK. 
+You can also drag files from the desktop or from your file manager.
 
 After you've loaded an image, \nip{} should look like \fref{fg:loadedimage}.
 Double click on the thumbnail to open an image view window. Alternatively,
@@ -96,13 +94,14 @@ window should now look something like \fref{fg:main2regions}.
 \mylabel{fg:main2regions}
 \end{figure}
 
-There are three rows visible here, \ct{A1}, \ct{A2} and \ct{A3}. Each row
+There are three rows visible here, \ct{A1}, \ct{A4} and \ct{A7}. Each row
 has (from left to right) a pair of up/down arrows (these indicate that
 the row contains sub-rows: click on the down arrow several times to
 open the row up and see inside), the name button (left-click to select,
 Shift-left-click to extend-select, Ctrl-left-click to toggle select, click
 on the workspace background to unselect everything, left-drag on the name
-button to reorder items within the column) and the thumbnail image.
+button to reorder items within the column, right-click to get a context menu) 
+and the thumbnail image.
 
 Left-click on the name button of one of these images to select it, and
 then click on \ctr{Toolkits}\ctr{Image}\ctr{Transform}\ctr{Rotate}\ct{Free}
@@ -166,7 +165,7 @@ enter. Try typing \ct{2 + 2} and pressing Return. The syntax is (almost,
 with a few small differences) the same as the C programming language. See
 \pref{sec:operators} for a list of the differences. Try
 multiplying the joined images by a small amount (eg. type something like
-\ct{A5 * 1.2} and press Return). Normally \nip{} will pick names for new
+\ct{A9 * 1.2} and press Return). Normally \nip{} will pick names for new
 objects for you (like \ct{A1}), but you can set a name yourself if you like.
 Try entering \ct{fred = 12}.
 

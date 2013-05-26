@@ -1298,6 +1298,14 @@ main( int argc, char *argv[] )
 	 */
 	main_load_startup();
 
+	/* Recalc to build all classes and gets prefs working. 
+	 *
+	 * We have to do this in batch
+	 * mode since we can find dirties through dynamic lookups. Even though
+	 * you might think we could just follow recomps.
+	 */
+	symbol_recalculate_all_force( TRUE );
+
 #ifdef DEBUG
 	printf( "arg processing\n" );
 #endif/*DEBUG*/
@@ -1356,12 +1364,6 @@ main( int argc, char *argv[] )
 	 */
 	g_signal_connect( main_watchgroup, "watch_changed", 
 		G_CALLBACK( main_watchgroup_changed_cb ), NULL );
-
-	/* Recalc to build all classes. We have to do this in batch
-	 * mode since we can find dirties through dynamic lookups. Even though
-	 * you might think we could just follow recomps.
-	 */
-	symbol_recalculate_all_force( TRUE );
 
 	/* Pass PATH_TMP down to vips via TMPDIR. See im_system(), for
 	 * example. We need to do this after the first recomp so that prefs

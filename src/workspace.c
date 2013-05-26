@@ -47,7 +47,9 @@ workspace_set_needs_layout( Workspace *ws, gboolean needs_layout )
 		ws, NN( IOBJECT( ws )->name ), needs_layout );
 #endif /*DEBUG*/
 
-	if( !ws->needs_layout && needs_layout ) { 
+	if( !ws->needs_layout && 
+		needs_layout &&
+		!ws->in_dispose ) { 
 		g_assert( !g_slist_find( workspace_needs_layout, ws ) ); 
 
 		ws->needs_layout = TRUE;
@@ -601,6 +603,9 @@ workspace_dispose( GObject *gobject )
 
 	ws = WORKSPACE( gobject );
 
+	workspace_set_needs_layout( ws, FALSE );
+	ws->in_dispose = TRUE;
+
 	UNREF( ws->kitg );
 	UNREF( ws->local_kitg );
 	IDESTROY( ws->sym );
@@ -1079,12 +1084,10 @@ workspace_init( Workspace *ws )
 	ws->area.height = 0;
 	ws->vp = ws->area;
 
-	/* Overwritten by mainw.
-	 */
-	ws->lpane_open = WORKSPACE_RPANE_OPEN;
-	ws->lpane_position = WORKSPACE_RPANE_POSITION;
-	ws->rpane_open = WORKSPACE_LPANE_OPEN;
-	ws->rpane_position = WORKSPACE_LPANE_POSITION;
+	ws->lpane_open = WORKSPACE_LPANE_OPEN;
+	ws->lpane_position = WORKSPACE_LPANE_POSITION;
+	ws->rpane_open = WORKSPACE_RPANE_OPEN;
+	ws->rpane_position = WORKSPACE_RPANE_POSITION;
 
 	ws->status = NULL;
 

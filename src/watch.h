@@ -377,11 +377,11 @@ const char *watch_string_get( Watchgroup *,
 #define WORKSPACE_LPANE_OPEN \
 	(watch_bool_get( main_watchgroup, "WORKSPACE_LPANE_OPEN", FALSE ))
 #define WORKSPACE_LPANE_POSITION \
-	(watch_int_get( main_watchgroup, "WORKSPACE_LPANE_POSITION", 400 ))
+	(watch_int_get( main_watchgroup, "WORKSPACE_LPANE_POSITION", 200 ))
 #define WORKSPACE_RPANE_OPEN \
 	(watch_bool_get( main_watchgroup, "WORKSPACE_RPANE_OPEN", FALSE ))
 #define WORKSPACE_RPANE_POSITION \
-	(watch_int_get( main_watchgroup, "WORKSPACE_RPANE_POSITION", 100 ))
+	(watch_int_get( main_watchgroup, "WORKSPACE_RPANE_POSITION", 400 ))
 
 /* Heap size. Big enough to always load prefs, small enough that it doesn't 
  * trash the computer.

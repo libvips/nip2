@@ -179,7 +179,7 @@ watchgroup_dirty( Watchgroup *watchgroup )
 
 	/* Find the preferences workspace.
 	 */
-	if( (ws = watchgroup_get_workspace( watchgroup )) ) {
+	if( (ws = watchgroup_get_workspace( watchgroup )) ) { 
 		Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 
 		/* Mark ws dirty, start save timer.
@@ -434,7 +434,18 @@ watch_relink_all( void )
 void
 watch_vset( Watch *watch, const char *fmt, va_list args )
 {
-	if( watch->row && watch->row->child_rhs && 
+	Watchgroup *watchgroup = WATCHGROUP( ICONTAINER( watch )->parent );
+
+	Workspace *ws;
+
+	/* In case we try to set after prefs has gone.
+	 */
+	if( !(ws = watchgroup_get_workspace( watchgroup )) ||
+		ws->in_dispose )
+		return;
+
+	if( watch->row && 
+		watch->row->child_rhs && 
 		watch->row->child_rhs->itext ) {
 		iText *itext = ITEXT( watch->row->child_rhs->itext );
 		char buf[256];
@@ -677,7 +688,8 @@ watch_int_get( Watchgroup *watchgroup, const char *name, int fallback )
 	Watch *watch;
 	void *value;
 
-	if( !watchgroup || !name )
+	if( !watchgroup || 
+		!name )
 		return( fallback );
 
 	if( !(watch = watch_find( watchgroup, name )) )

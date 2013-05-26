@@ -616,6 +616,11 @@ workspaceview_link( View *view, Model *model, View *parent )
 	vobject_link( VOBJECT( wview->toolkitbrowser ), 
 		IOBJECT( ws->kitg ) );
 	vobject_link( VOBJECT( wview->workspacedefs ), IOBJECT( ws ) );
+
+	toolkitbrowser_set_workspace( wview->toolkitbrowser, ws ); 
+
+	pane_set_state( wview->rpane, ws->rpane_open, ws->rpane_position ); 
+	pane_set_state( wview->lpane, ws->lpane_open, ws->lpane_position ); 
 }
 
 static void
@@ -950,6 +955,11 @@ workspaceview_lpane_changed_cb( Pane *pane, Workspaceview *wview )
 			ws->lpane_open = pane->open;
 			ws->lpane_position = pane->user_position;
 
+			prefs_set( "WORKSPACE_LPANE_OPEN", "%d", 
+				ws->lpane_open ); 
+			prefs_set( "WORKSPACE_LPANE_POSITION", "%d", 
+				ws->lpane_position ); 
+
 			iobject_changed( IOBJECT( ws ) );
 		}
 }
@@ -964,6 +974,11 @@ workspaceview_rpane_changed_cb( Pane *pane, Workspaceview *wview )
 			ws->rpane_position != pane->user_position ) {
 			ws->rpane_open = pane->open;
 			ws->rpane_position = pane->user_position;
+
+			prefs_set( "WORKSPACE_RPANE_OPEN", "%d", 
+				ws->rpane_open ); 
+			prefs_set( "WORKSPACE_RPANE_POSITION", "%d", 
+				ws->rpane_position ); 
 
 			iobject_changed( IOBJECT( ws ) );
 		}

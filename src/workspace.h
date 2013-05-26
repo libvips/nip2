@@ -99,8 +99,10 @@ struct _Workspace {
 	Toolkit *local_kit;
 
 	/* Some view inside this ws has changed and this ws needs a relayout.
+	 * Use in_dispose to stop relayout during ws shutdown.
 	 */
 	gboolean needs_layout;
+	gboolean in_dispose;
 };
 
 typedef struct _WorkspaceClass {

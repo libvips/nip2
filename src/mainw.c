@@ -514,7 +514,7 @@ mainw_refresh_timeout_cb( gpointer user_data )
 
 	if( (ws = mainw_get_workspace( mainw )) ) {
 		action = gtk_action_group_get_action( iwnd->action_group, 
-			"WorkspaceDefs" );
+			"Tabdefs" );
 		gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
 			ws->lpane_open );
 
@@ -1397,7 +1397,7 @@ mainw_toolkitbrowser_action_cb( GtkToggleAction *action, Mainw *mainw )
 /* Expose/hide the workspace defs.
  */
 static void
-mainw_workspacedefs_action_cb( GtkToggleAction *action, Mainw *mainw )
+mainw_tabdefs_action_cb( GtkToggleAction *action, Mainw *mainw )
 {
 	Workspace *ws;
 
@@ -1687,10 +1687,10 @@ static GtkToggleActionEntry mainw_toggle_actions[] = {
 		N_( "Show toolkit browser" ),
 		G_CALLBACK( mainw_toolkitbrowser_action_cb ), FALSE },
 
-	{ "WorkspaceDefs",
-		NULL, N_( "Workspace _Definitions" ), NULL,
-		N_( "Show workspace definitions" ),
-		G_CALLBACK( mainw_workspacedefs_action_cb ), FALSE },
+	{ "Tabdefs",
+		NULL, N_( "Tab _Definitions" ), NULL,
+		N_( "Show tab definitions" ),
+		G_CALLBACK( mainw_tabdefs_action_cb ), FALSE },
 };
 
 static GtkRadioActionEntry mainw_radio_actions[] = {
@@ -1758,7 +1758,7 @@ static const char *mainw_menubar_ui_description =
 "      <menuitem action='Toolbar'/>"
 "      <menuitem action='Statusbar'/>"
 "      <menuitem action='ToolkitBrowser'/>"
-"      <menuitem action='WorkspaceDefs'/>"
+"      <menuitem action='Tabdefs'/>"
 "      <separator/>"
 #ifdef HAVE_LIBGVC
 "      <menuitem action='Graph'/>"

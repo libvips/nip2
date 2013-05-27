@@ -1095,7 +1095,7 @@ workspace_init( Workspace *ws )
 	ws->offset = 0.0;
 
 	ws->local_defs = im_strdupn( _( 
-		"// private definitions for this workspace\n" ) );
+		"// private definitions for this tab\n" ) );
 	ws->local_kitg = NULL;
 	ws->local_kit = NULL;
 

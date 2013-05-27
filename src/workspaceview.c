@@ -1150,7 +1150,7 @@ workspaceview_init( Workspaceview *wview )
 
 	/* Workspace-local defs pane.
 	 */
-	panechild = panechild_new( wview->lpane, _( "Workspace Definitions" ) );
+	panechild = panechild_new( wview->lpane, _( "Tab Definitions" ) );
 
 	wview->workspacedefs = workspacedefs_new();
 	gtk_container_add( GTK_CONTAINER( panechild ), 

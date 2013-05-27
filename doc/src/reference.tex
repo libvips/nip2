@@ -83,25 +83,17 @@ affect paint box actions. A right-button menu on the rulers lets you use a mm
 scale rather than a pixel scale, and controls whether the \ct{Xoffset} and
 \ct{Yoffset} header fields are used.
 
-The \ct{File} menu contains two useful items: select \ct{Replace
-Image} to change the image which is being displayed in the window (you can
-also drag and drop new images in). Select
-\ct{Save Image} to save the image you are viewing to a file. See
-\pref{sec:loadsave} for details on \nip{}'s load and save dialogs. The
-\ct{New} menu is a no-mouse route for creating regions, points, guides
-and arrows.
-
 \mylabel{sec:paintbox} 
 If you select \ctr{View}\ctr{Toolbar}\ct{Paint}, \nip{} adds a paint bar
 to the top of the window. You can use the paint bar to do simple edits to
 the image being displayed. See \fref{fg:paint}.
 
 While the paint bar is very limited, it does have two useful features. First,
-it can paint with any pixel value, even complex. For example you can take the
-fourier transform of an image and paint out the peaks. Secondly, it doesn't
-operate on a memory copy of an image, it operates directly on the file on
-disc. This means that you can paint on images of any size, but it does make
-the paint bar a bit dangerous.
+it can paint with any pixel value, even complex numbers. For example you can 
+take the fourier transform of an image and paint out the peaks. Secondly, it 
+doesn't operate on a memory copy of an image, it operates directly on the 
+file on disc. This means that you can paint very quickly on images of any 
+size, but it does make the paint bar a bit dangerous.
 
 Normally paint actions are live, that is, every time you paint something all
 the objects which depend on the thing you painted will recalculate. This can
@@ -119,6 +111,12 @@ actions. The \ct{Clear} button wipes the undo/redo history (useful if memory
 is getting low). There's an option in the preferences workspace which controls
 the number of undo steps \nip{} tracks.
 
+The slider sets the nib diameter for drawing operations, the black square is
+the current ink colour (you can drag and drop colour, or pixel values, from 
+other parts of \nip2{}), and the text box at the far right is the text that
+will be drawn by the text tool. The paint tools will `snap' to guides, points
+and regions, so you can line things up easily. 
+
 You can mark regions on images by holding down Ctrl and dragging down and
 right with the left mouse button.  You can move the region about by dragging
 on the label with the left mouse button; you can resize it by dragging with
@@ -131,6 +129,14 @@ and just click the left mouse button, you will make a \emph{point}. If you
 drag from a horizontal or vertical ruler, you'll make a \emph{guide}. Guides
 are useful for lining up other things in the view window.
 
+\ctr{View}\ct{Image Header} shows the image metadata and history. Use the
+search box to filter large metadata sets. 
+
+The \ct{File} menu contains two useful items: select \ct{Replace
+Image} to change the image which is being displayed in the window (you can
+also drag and drop new images in). Select
+\ct{Save Image} to save the image you are viewing to a file. See
+\pref{sec:loadsave} for details on \nip{}'s load and save dialogs. 
 Use \ctr{File}\ct{New} to make regions, points, arrows and guides without
 the mouse.
 
@@ -163,20 +169,13 @@ file format is fast and accurate, but sadly not very widely supported
 PBM/PGM/PPM formats. You can usually load in many more formats, it depends
 how your \nip{} has been configured.
 
-\item[Show thumbnails]
-Pressing this button pops up a window which shows thumbnail-sized images
-for all the matching files in the current directory.
+\item[Image info]
+This displays a one-line summary of the selected image, plus a large
+thumbnail. 
 
 \end{description}
 
-The save dialog is a little different, see 
-\fref{fg:save}. 
-
-\begin{figure}
-\figw{2in}{ir6.jpg}
-\caption{Save dialog}
-\mylabel{fg:save}
-\end{figure}
+The save dialog adds one extra feature: \ct{Increment filename}.
 
 If pin up and increment are both selected, then after a save \nip{} will
 attempt to add one to the selected file name. For example, if you save a file
@@ -187,7 +186,7 @@ a series of images.
 \section{Image processing window}
 \mylabel{sec:ipwindow}
 
-\fref{fg:startup} show's \nip{}'s main image processing window. The centre
+\fref{fg:startup} shows \nip{}'s main image processing window. The centre
 area is the workspace, the left-hand area is a pane you can reveal to write
 custom definitions for this workspace (see \ctr{View}\ct{Workspace
 Definitions}), and the right-hand pane is the toolkit browser (see
@@ -206,8 +205,14 @@ If you right-click on the workspace background, a useful menu will appear.
 \begin{description}
 
 \item[Workspace]
-This area displays the objects (images, numbers and so on) which
-are currently loaded into \nip{}. The workspace is divided into columns of
+A workspace is split into a set of separate tabs. Right-click on a tab to get
+a useful menu. Press the add icon at the right to make a new tab. You can drag
+tabs between workspaces, or drag a tab to the desktop to make a new workspace. 
+Use the syntax \ct{tab1.A1} to make references between tabs.
+
+\item[Tab]
+This area displays the current tab.
+Tabs are divided into columns of
 objects which each behave rather like windows: they can be moved around,
 folded away, loaded, saved and deleted. 
 
@@ -242,8 +247,8 @@ This side panel shows all the image processing operations again, but this time
 as a large flat list you can easily browse. Type into the search box at the
 top to filter operations by keyword. Doubleclick on an item to activate it.
 
-\item[Workspace Definitions]
-This side pane shows private definitions for this workspace. Programs you
+\item[Tab Definitions]
+This side pane shows private definitions for this tab. Programs you
 write here are loaded and saved with this workspace. See the Programming
 chapter for details on \nip{}'s programming language.
 

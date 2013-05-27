@@ -176,6 +176,11 @@ Try going back to your original image (the one you loaded from a file),
 open an image view window, and try dragging one of the regions. You can
 change any of the sliders in the rotate or the join rows as well.  
 
+Right-click on a thumbnail for a useful menu. Use \ct{Save As} to save an
+image to a file. Use \ct{Replace From File} to change the image in a row (and
+recalculate the rest of your workspace, very handy). Use \ct{Header} to view
+an image's metadata. 
+
 You can also edit the insides of objects. Click the down button next to
 one of your regions until the \ct{width} and \ct{height} rows appear, click on
 \ct{width} and type \ct{height * 2}. Now open the image window the region is
@@ -188,7 +193,18 @@ Right click on a column title bar to get a useful menu. Click on
 \ctr{File}\ctr{New}\ct{Column} make another column (handy for organising
 a workspace). If you drag from an image thumbnail on to the workspace
 background, \nip{} will make a new column for you. You can drop thumbnails
-on to other thumbnails to make links.  If \nip{} falls over (I do hope
+on to other thumbnails to make links.  
+
+There's a useful right-click menu on the tab name. Duplicating tabs is a
+very easy way to try something out: make a copy of your tab, try changing
+something, if it doesn't work out, just delete your new tab and go back to
+where you were. You can drag tabs between workspaces, and you can drag a
+tab to the desktop to make a new workspace. You can make references between
+tabs with the tab name and a dot, for example {\ct{tab1.A1}}. You can save
+columns, tabs or workspaces to workspace files, then merge them back into
+a colum, as part of a tab, or as a new tab.
+
+If \nip{} falls over (I do hope
 it doesn't), you can usually get your work back by restarting \nip{} and
 clicking on \ctr{File}\ct{Search for Workspace Backups}.  There are a lot
 of preferences (perhaps too many), see \aref{sec:config}.
@@ -221,7 +237,9 @@ the workspace for this example.
 
 If you'd rather make the workspace yourself, click on the file type filter and
 select \ct{All files}. A set of 8 images should appear.  Click on the first
-file, shift-click on the last, and click \ct{Open}. See \fref{fg:loadsamples}.
+file, shift-click on the last, and click \ct{Open}. This will create a group
+of all eight images. Right-click on the row and select \ct{Ungroup} to unpack
+to a set of rows.  See \fref{fg:loadsamples}.
 
 \begin{figure}
 \figw{3in}{snap14.jpg}
@@ -268,16 +286,17 @@ focus in the main window, you will do a left-right mosaic join. Finally, you
 can use the toolkit browser to display a selection of the tools in a pane on
 the right-hand side of the main window. Click on \ctr{View}\ct{Browse
 Toolkits}, then type ``mosaic'' into the search box at the top. The toolkit
-browser will display all items related to mosaicing.
+browser will display all items related to mosaicing. Double-click an item to
+do that action. 
 
 Some systems won't let you edit menu shortcuts by default. For example,
 on GNOME, you need to enable this in \ctr{System}\ctr{Preferences}\ct{Menus
 \& Toolbars}.
 
 Join the rest of the pairs of sample images together
-left-right. \fref{fg:joins} shows how they should fit together. Once you
+left-right. Once you
 have made all the rows, join the rows together in turn to make the complete
-image using \ctr{Mosaic}\ctr{One Point}\ct{}\ct{Top to Bottom}. 
+image using \ctr{Mosaic}\ctr{One Point}\ct{Top to Bottom}. 
 
 When you've built the whole thing you'll see that there are differences
 in brightness between the tiles that make up your composite image. You can
@@ -407,7 +426,9 @@ once to expose the members (just \ct{product}), click again to expose the
 parameters as well (\ct{a} and \ct{b}), and click a third time to expose
 the superclass member (which should be an instance of \ct{Fred}). You can
 also open up the \ct{super} member and see inside the \ct{Fred} that this
-\ct{Jim} is using as its superclass. See \fref{fg:Jim}.
+\ct{Jim} is using as its superclass. 
+\ct{A5} will respond to both \ct{product} and \ct{sum}. 
+See \fref{fg:Jim}.
 
 \begin{figure}
 \figw{3in}{snap11.jpg}
@@ -463,12 +484,14 @@ Click \ctr{File}\ct{Process}. This defines a class \ct{Join} which
 subclasses the \ct{Image} graphic.  
 
 Now select your two regions (click on the first one, shift-click on
-the second) and click on \ctr{Toolkits}\ctr{untitled}\ct{Join}. A
-new \ct{Join} row will appear. Open it up and drag the slider to
+the second) and click on \ctr{Toolkits}\ctr{untitled}\ct{Join}. Alternatively,
+just click \ct{Join} and it'll be given the borrom two items in the column.
+A new \ct{Join} row will appear. Open it up and drag the slider to
 set the spacing between the two joined images. Go back to the image
 viewer for the image file you loaded and try dragging one of the
 regions. \fref{fg:myjoin} shows this class in action. The thing in
-\ctr{Toolkits}\ctr{Image}\ctr{Join}\ct{Left to Right} is just a fancier
+\ctr{Toolkits}\ctr{Image}\ctr{Join}\ct{Left to Right} is just a slightly 
+fancier
 version of this.
 
 \begin{figure}

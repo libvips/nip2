@@ -2,12 +2,12 @@
 
 .PHONY: all
 all: $(PS)
-	cd nipguide; $(MAKE) 
+	cd src; $(MAKE) 
 
 .PHONY: clean
 clean: 
-	cd nipguide; $(MAKE) clean
+	cd src; $(MAKE) clean
 
 .PHONY: install
 install: 
-	cd nipguide; $(MAKE) install
+	cd src; $(MAKE) install

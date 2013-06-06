@@ -15,7 +15,7 @@ echo "ok"
 huge=$tmp/huge.png
 
 echo -n "testing vipsthumbnail ... "
-rm $tmp/x.png
+rm -f $tmp/x.png
 vipsthumbnail $huge -o $tmp/x.png
 if ! header $tmp/x.png &> /dev/null ; then
 	echo "vipsthumbnail failed in basic mode"
@@ -30,7 +30,7 @@ fi
 export TMPDIR=$tmp/readonly
 
 echo -n "testing vipsthumbnail does not make temps ... "
-rm $tmp/x.png
+rm -f $tmp/x.png
 vipsthumbnail $huge -o $tmp/x.png
 if ! header $tmp/x.png &> /dev/null ; then
 	echo "vipsthumbnail made a temp"
@@ -39,7 +39,7 @@ fi
 echo "ok"
 
 echo -n "testing shrink does not make temps ... "
-rm $tmp/x.png
+rm -f $tmp/x.png
 vips shrink $huge $tmp/x.png 230 230 
 if ! header $tmp/x.png &> /dev/null; then
 	echo "shrink made a temp"

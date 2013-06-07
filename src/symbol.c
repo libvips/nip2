@@ -1177,8 +1177,16 @@ symbol_recalculate_idle_cb( void )
 
 	gboolean run_again;
 
+#ifdef DEBUG_RECALC
+	printf( "symbol_recalculate_idle_cb:\n" ); 
+#endif /*DEBUG_RECALC*/
+
 	if( symbol_running ) 
-		return( FALSE ); 
+		/* We've been run from a nested main loop, perhaps from the
+		 * progress bar. Just run again and perhaps next time we'll be
+		 * back in the top-level main loop.
+		 */
+		return( TRUE ); 
 
 	if( !timer )
 		timer = g_timer_new();
@@ -1199,6 +1207,10 @@ symbol_recalculate_idle_cb( void )
 			}
 
 	if( !run_again ) {
+#ifdef DEBUG_RECALC
+		printf( "symbol_recalculate_idle_cb: bg recalc done\n" ); 
+#endif /*DEBUG_RECALC*/
+
 		symbol_idle_id = 0;
 		progress_end();
 	}
@@ -1235,6 +1247,11 @@ symbol_recalculate_all_force( gboolean now )
 		progress_end();
 	}
 	else if( !symbol_idle_id ) {
+#ifdef DEBUG_RECALC
+		printf( "symbol_recalculate_all_force: "
+			"starting bg recalc ...\n" ); 
+#endif /*DEBUG_RECALC*/
+
 		progress_begin();
 		symbol_idle_id = g_idle_add( 
 			(GSourceFunc) symbol_recalculate_idle_cb, NULL );

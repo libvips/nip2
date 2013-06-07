@@ -1423,11 +1423,10 @@ mainw_revert_ok_cb( iWindow *iwnd, void *client,
 	iWindowNotifyFn nfn, void *sys ) 
 {
 	Prefs *prefs = PREFS( client );
+	Workspacegroup *wsg = workspace_get_workspacegroup( prefs->ws );
 
-	if( FILEMODEL( prefs->ws )->filename ) {
-		printf( "mainw_revert_ok_cb: unlinking %s", 
-			FILEMODEL( prefs->ws )->filename ); 
-		(void) unlinkf( "%s", FILEMODEL( prefs->ws )->filename );
+	if( FILEMODEL( wsg )->filename ) {
+		(void) unlinkf( "%s", FILEMODEL( wsg )->filename );
 		main_reload();
 		symbol_recalculate_all();
 	}
@@ -1477,7 +1476,7 @@ mainw_preferences_action_cb( GtkAction *action, Mainw *mainw )
 		Maybe a setting in prefs to suppress the h scrollbar?
 
 	 */
-	gtk_window_set_default_size( GTK_WINDOW( prefs ), 730, 480 );
+	gtk_window_set_default_size( GTK_WINDOW( prefs ), 780, 480 );
 
 	gtk_widget_show( GTK_WIDGET( prefs ) );
 }

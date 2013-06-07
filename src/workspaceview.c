@@ -755,8 +755,24 @@ static void *
 workspaceview_layout_find_similar_x( Columnview *cview, 
 	WorkspaceLayout *layout )
 {
-	if( ABS( GTK_WIDGET( cview )->allocation.x - layout->area.left ) < 
-		workspaceview_layout_snap_threshold ) { 
+	int x = GTK_WIDGET( cview )->allocation.x;
+
+	gboolean snap;
+
+	snap = FALSE;
+
+	/* Special case: a colum at zero makes a new column on the far left.
+	 */
+	if( layout->area.left == 0 && 
+		x == 0 ) 
+		snap = TRUE;
+
+	if( layout->area.left > 0 &&
+		ABS( x - layout->area.left ) < 
+			workspaceview_layout_snap_threshold ) 
+		snap = TRUE;
+	
+	if( snap ) { 
 		layout->current_columns = g_slist_prepend(
 			layout->current_columns, cview );
 		layout->area.width = IM_MAX( layout->area.width, 

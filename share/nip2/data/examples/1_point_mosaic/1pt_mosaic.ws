@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.28.0">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.34.0">
   <Workspace window_x="0" window_y="0" window_width="1046" window_height="748" filename="$HOME/GIT/nip2/share/nip2/data/examples/1_point_mosaic/1pt_mosaic.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="pt_mosaic" caption="">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="9" name="A" caption="source images">
       <Subcolumn vislevel="3">

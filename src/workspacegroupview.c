@@ -241,12 +241,11 @@ workspacegroupview_switch_page_cb( GtkNotebook *notebook,
 
 	if( ws->compat_major ) { 
 		error_top( _( "Compatibility mode." ) );
-		error_sub( _( "This workspace was created by version %d.%d.%d. "
+		error_sub( _( "This workspace was created by version %d.%d. "
 			"A set of compatibility menus have been loaded "
 			"for this window." ),
-			FILEMODEL( wsg )->major,
-			FILEMODEL( wsg )->minor,
-			FILEMODEL( wsg )->micro );
+			ws->compat_major,
+			ws->compat_minor ); 
 		iwindow_alert( GTK_WIDGET( wview ), GTK_MESSAGE_INFO );
 	}
 

@@ -237,6 +237,7 @@ conversionview_init( Conversionview *cv )
 		GTK_WIDGET( cv->scale ), TRUE, TRUE, 0 );
         gtk_signal_connect( GTK_OBJECT( cv->scale ), "changed", 
 		GTK_SIGNAL_FUNC( conversionview_scale_change_cb ), cv );
+	tslider_set_ignore_scroll( cv->scale, FALSE );
 
 	sep = gtk_vseparator_new();
         gtk_box_pack_start( GTK_BOX( hb ), sep, FALSE, FALSE, 0 );
@@ -252,6 +253,7 @@ conversionview_init( Conversionview *cv )
 		GTK_WIDGET( cv->offset ), TRUE, TRUE, 0 );
         gtk_signal_connect( GTK_OBJECT( cv->offset ), "changed", 
 		GTK_SIGNAL_FUNC( conversionview_offset_change_cb ), cv );
+	tslider_set_ignore_scroll( cv->offset, FALSE );
 
 	gtk_widget_show_all( hb );
 }

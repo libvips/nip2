@@ -65,6 +65,11 @@ typedef struct _Tslider {
 	gboolean auto_link;
 	tslider_fn value_to_slider;
 	tslider_fn slider_to_value;
+
+	/* Ignore scroll events. In workspaces, we want the scroll-wheel to
+	 * just scroll the workspace and not adjust sliders. 
+	 */
+	gboolean ignore_scroll;
 } Tslider;
 
 typedef struct _TsliderClass {
@@ -85,3 +90,5 @@ void tslider_set_conversions( Tslider *tslider,
 	tslider_fn value_to_slider, tslider_fn slider_to_value );
 double tslider_log_value_to_slider( double from, double to, double value );
 double tslider_log_slider_to_value( double from, double to, double value );
+
+void tslider_set_ignore_scroll( Tslider *tslider, gboolean ignore_scroll );

@@ -355,6 +355,7 @@ paintboxview_init( Paintboxview *pbv )
 		GTK_WIDGET( pbv->nib ), FALSE, TRUE, 0 );
         gtk_signal_connect( GTK_OBJECT( pbv->nib ), "changed", 
 		GTK_SIGNAL_FUNC( paintboxview_scale_change_cb ), pbv );
+	tslider_set_ignore_scroll( pbv->nib, FALSE );
 
 	pbv->ink = (GtkWidget *) colourdisplay_new( NULL );
         doubleclick_add( GTK_WIDGET( pbv->ink ), FALSE,

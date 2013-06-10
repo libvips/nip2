@@ -347,10 +347,17 @@ tslider_conversion_id( double from, double to, double value )
 static gboolean
 tslider_scroll_cb( GtkWidget *wid, GdkEvent *event, Tslider *tslider )
 {
+	gboolean handled;
+
+	handled = FALSE;
+
 	/* Stop any other scroll handlers running. We don't want the scroll 
 	 * wheel to change widgets while we're moving.
 	 */
-	return( TRUE ); 
+	if( tslider->ignore_scroll )
+		handled = TRUE;
+
+	return( handled ); 
 }
 
 static void
@@ -370,6 +377,7 @@ tslider_init( Tslider *tslider )
 	tslider->last_to = -1;
 	tslider->last_from = -1;
 	tslider->last_svalue = -1;
+	tslider->ignore_scroll = TRUE;
 
         gtk_box_set_spacing( GTK_BOX( tslider ), 2 );
 
@@ -479,4 +487,10 @@ tslider_log_slider_to_value( double from, double to, double value )
 	const double nvalue = pow( value, a );
 
 	return( nvalue );
+}
+
+void
+tslider_set_ignore_scroll( Tslider *tslider, gboolean ignore_scroll )
+{
+	tslider->ignore_scroll = ignore_scroll;
 }

@@ -4,6 +4,7 @@ started 7.34.0 7/6/13
 - fix compat warning text
 - fix prefs revert to default
 - reenable scroll-wheel slider change in paintbox and conversionview
+- insert new columns in alphabetical position
 
 started 7.33.0 14/3/13
 - add tabs

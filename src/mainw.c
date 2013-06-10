@@ -1223,14 +1223,8 @@ mainw_column_new_action_cb( GtkAction *action, Mainw *mainw )
 {
 	Workspace *ws;
 
-	if( (ws = mainw_get_workspace( mainw )) ) { 
-		char new_name[MAX_STRSIZE];
-		Column *col;
-
-		workspace_column_name_new( ws, new_name );
-		col = workspace_column_get( ws, new_name );
-		workspace_column_select( ws, col );
-	}
+	if( (ws = mainw_get_workspace( mainw )) )  
+		workspace_column_new( ws );
 }
 
 /* Done button hit.
@@ -1270,6 +1264,8 @@ mainw_column_new_cb( iWindow *iwnd, void *client,
 		iobject_set( IOBJECT( col ), NULL, caption_text );
 
 	workspace_column_select( ws, col );
+
+	column_scrollto( col, MODEL_SCROLL_TOP );
 
 	nfn( sys, IWINDOW_YES );
 }

@@ -440,6 +440,7 @@ workspace_column_new( Workspace *ws )
 	if( !(col = column_new( ws, new_name )) ) 
 		return( FALSE );
 	workspace_column_select( ws, col );
+	column_scrollto( col, MODEL_SCROLL_TOP );
 
 	return( TRUE );
 }

@@ -335,10 +335,39 @@ column_get_type( void )
 	return( column_type );
 }
 
+static gint
+iobject_name_compare( iObject *a, iObject *b )
+{
+        return( strcasecmp( a->name, b->name ) );
+}
+
+/* Search for the column before this name in alphabetical order.
+ */
+static Column *
+column_find_previous( Column *col )
+{
+	Workspace *ws = col->ws;
+
+	GSList *columns;
+	Column *previous_col;
+	int i;
+
+	columns = icontainer_get_children( ICONTAINER( ws ) );
+	columns = g_slist_sort( columns, (GCompareFunc) iobject_name_compare );
+	i = g_slist_index( columns, col );
+	previous_col = NULL; 
+	if( i > 0 )
+		previous_col = COLUMN( g_slist_nth_data( columns, i - 1 ) );  
+	g_slist_free( columns ); 
+
+	return( previous_col );
+}
+
 Column *
 column_new( Workspace *ws, const char *name )
 {
 	Column *col;
+	Column *previous_col;
 
 	if( workspace_column_find( ws, name ) ) {
 		error_top( _( "Name clash." ) );
@@ -353,10 +382,14 @@ column_new( Workspace *ws, const char *name )
 
         subcolumn_new( NULL, col );
 
-	/* Place at top-left of window.
-	 */
-	col->x = ws->vp.left;
-	col->y = ws->vp.top;
+	if( (previous_col = column_find_previous( col )) ) {
+		col->x = previous_col->x + 50;
+		col->y = previous_col->y;
+	}
+	else {
+		col->x = ws->vp.left;
+		col->y = ws->vp.top;
+	}
 
 	column_set_last_new( col );
 
@@ -477,8 +510,11 @@ column_set_open( Column *col, gboolean open )
 static gboolean
 column_scrollto_timeout_cb( Column *col )
 {
-	col->scrollto_timeout = 0;
+#ifdef DEBUG
+	printf( "column_scrollto_timeout_cb: %p\n", col ); 
+#endif /*DEBUG*/
 
+	col->scrollto_timeout = 0;
 	model_scrollto( MODEL( col ), col->pending_position ); 
 
 	return( FALSE );
@@ -487,6 +523,10 @@ column_scrollto_timeout_cb( Column *col )
 void
 column_scrollto( Column *col, ModelScrollPosition position )
 {
+#ifdef DEBUG
+	printf( "column_scrollto: %p %s\n", col, IOBJECT( col )->name );
+#endif /*DEBUG*/
+
 	IM_FREEF( g_source_remove, col->scrollto_timeout );
 	col->pending_position = position; 
 

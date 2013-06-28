@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([nip2], [7.34.0])
+AC_INIT([nip2], [7.34.1])
 AM_INIT_AUTOMAKE([-Wall])
 
 # foreign stops complaints about a missing README (we use README.md instead)
@@ -17,7 +17,7 @@ dnl
 
 m4_define([nip_major_version], [7])
 m4_define([nip_minor_version], [34])
-m4_define([nip_micro_version], [0])
+m4_define([nip_micro_version], [1])
 m4_define([nip_version],
           [nip_major_version.nip_minor_version.nip_micro_version])
 
@@ -190,6 +190,16 @@ PKG_CHECK_EXISTS(gtk+-2.0 >= 2.20,
 
 if test x"$nip_use_notebook_action" = x"yes"; then
   AC_DEFINE(USE_NOTEBOOK_ACTION,1,[define if you have gtk_notebook_set_action_widget()])
+fi
+
+# notebook group names widgets came in 2.24
+PKG_CHECK_EXISTS(gtk+-2.0 >= 2.24,
+  [nip_use_notebook_group_name=yes],
+  [nip_use_notebook_group_name=no]
+)
+
+if test x"$nip_use_notebook_group_name" = x"yes"; then
+  AC_DEFINE(USE_NOTEBOOK_GROUP_NAME,1,[define if you have gtk_notebook_set_group_name()])
 fi
 
 # GRegex was added in glib-2.14
@@ -382,6 +392,8 @@ use gtkinfobar to show messages:	$nip_use_infobar
   (requires gtk+-2.0 >= 2.18)
 use notebook action widget:  		$nip_use_notebook_action
   (requires gtk+-2.0 >= 2.20)
+use notebook group name:  		$nip_use_notebook_group_name
+  (requires gtk+-2.0 >= 2.24)
 allow regex searches: 			$nip_use_gregex
   (requires glib-2.0 >= 2.14)
 display help files with xdg:		$XDG_OPEN

@@ -498,8 +498,10 @@ workspacegroupview_init( Workspacegroupview *wsgview )
 {
 	wsgview->notebook = gtk_notebook_new();
 	gtk_notebook_set_scrollable( GTK_NOTEBOOK( wsgview->notebook ), TRUE );
+#ifdef USE_NOTEBOOK_GROUP_NAME
 	gtk_notebook_set_group_name( GTK_NOTEBOOK( wsgview->notebook ), 
 		"wsgview" );
+#endif /*USE_NOTEBOOK_GROUP_NAME*/
 	gtk_notebook_set_tab_pos( GTK_NOTEBOOK( wsgview->notebook ), 
 		GTK_POS_TOP );
 	g_signal_connect( wsgview->notebook, "switch_page", 

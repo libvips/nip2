@@ -1,3 +1,6 @@
+started 7.34.1 28/6/13
+- fix build on older gtk, thanks Joe
+
 started 7.34.0 7/6/13
 - version bump
 - drag col to far left to insert

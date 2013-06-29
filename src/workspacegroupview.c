@@ -211,14 +211,36 @@ workspacegroupview_class_init( WorkspacegroupviewClass *class )
 	view_class->child_front = workspacegroupview_child_front;
 }
 
+typedef struct _nip2GtkNotebookPage {
+	  GtkWidget *child;
+
+	  /* A lot of stuff follows in the real struct, which we ignore.
+	   */
+} nip2GtkNotebookPage;
+
+/* gtk+-2.20 and earlier had a bug whereby switch_page would be given a
+ * GtkNotebookPage rather than the actual page widget.
+ */
+static Workspaceview *
+notebookpage_get_workspaceview( GtkWidget *page )
+{
+#ifdef USE_NOTEBOOK_GROUP_NAME
+	return( WORKSPACEVIEW( page ) );
+#else /*!USE_NOTEBOOK_GROUP_NAME*/
+	/* Buggy argh.
+	 */
+	return( WORKSPACEVIEW( ((nip2GtkNotebookPage *) page)->child ) );
+#endif
+}
+
 /* Called for switching the current page, and for page drags between
  * notebooks.
  */
-static void                
+static void
 workspacegroupview_switch_page_cb( GtkNotebook *notebook, 
 	GtkWidget *page, guint page_num, gpointer user_data )
 {
-	Workspaceview *wview = WORKSPACEVIEW( page );
+	Workspaceview *wview = notebookpage_get_workspaceview( page );
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
 	Workspacegroup *old_wsg = WORKSPACEGROUP( ICONTAINER( ws )->parent );
 	Workspacegroupview *wsgview = WORKSPACEGROUPVIEW( user_data );

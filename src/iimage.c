@@ -106,7 +106,7 @@ iimage_info( iObject *iobject, VipsBuf *buf )
 	IMAGE *im;
 
 	if( ii && (im = imageinfo_get( FALSE, ii )) ) {
-		char *filename;
+		const char *filename;
 
 		if( im_header_get_typeof( im, ORIGINAL_FILENAME ) != 0 ) {
 			if( !im_header_string( im, 
@@ -279,7 +279,7 @@ iimage_class_get( Classmodel *classmodel, PElement *root )
 	IM_FREE( classmodel->filename );
         if( ii ) {
 		IMAGE *im;
-		char *filename;
+		const char *filename;
 
 		if( (im = imageinfo_get( FALSE, ii )) &&
 			im_header_get_typeof( im, ORIGINAL_FILENAME ) != 0 ) {

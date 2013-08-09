@@ -16,8 +16,8 @@ dnl of them.
 dnl
 
 m4_define([nip_major_version], [7])
-m4_define([nip_minor_version], [34])
-m4_define([nip_micro_version], [1])
+m4_define([nip_minor_version], [35])
+m4_define([nip_micro_version], [0])
 m4_define([nip_version],
           [nip_major_version.nip_minor_version.nip_micro_version])
 

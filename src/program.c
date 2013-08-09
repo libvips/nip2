@@ -1686,10 +1686,15 @@ program_tool_help_action_cb( GtkAction *action, Program *program )
 		program->kit && program->kit->pseudo ) {
 		switch( program->tool->sym->type ) {
 		case SYM_EXTERNAL:
+			/* With vips7 we displayed the man page. When we go
+			 * properly vips8, display the API docs.
+			 *
 			vips_buf_appendf( &buf, "file://"
 				VIPS_DOCPATH "/man/%s.3.html", 
 				IOBJECT( program->tool->sym )->name );
 			box_url( GTK_WIDGET( program ), vips_buf_all( &buf ) );
+			 *
+			 */
 			break;
 
 		case SYM_BUILTIN:

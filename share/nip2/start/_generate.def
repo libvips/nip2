@@ -33,6 +33,22 @@ image_new w h b fmt coding type pixel xoff yoff
 	im'''' = image_set_origin xoff yoff im''';
 }
 
+mkim options x y b
+    = Image (image_new x y b
+        (opt $format) (opt $coding) (opt $type)
+        (opt $pixel)
+        (opt $xoffset) (opt $yoffset))
+{
+    opt = get_option options [
+        $format => Image_format.UCHAR,
+        $coding => Image_coding.NOCODING,
+        $type => Image_type.sRGB,
+        $pixel => 0,
+        $xoffset => 0,
+        $yoffset => 0
+    ];
+}
+
 /* generate a slice of LAB space size x size pixels for L* == l
  */
 lab_slice size l 

@@ -1,3 +1,13 @@
+/* optional args to functions
+ */
+
+get_option options defaults f
+	= error (_ "unknown parameter " ++ f), hits == []
+	= hits?0
+{
+	hits = [v :: [n, v] <- options ++ defaults; n == f];
+}
+
 /* Various operators as functions.
  */
 
@@ -1060,16 +1070,50 @@ insert_noexpand x y small big
 		(insert_noexpand x y) Operator_type.COMPOUND_REWRAP false;
 }
 
-measure x y w h u v image
-	= oo_unary_function measure_op image, is_class image
-	= im_measure image 
-		(to_real x) (to_real y) (to_real w) (to_real h)
-		(to_real u) (to_real v), 
-			is_image image
-	= error (_ "bad arguments to " ++ "measure")
+measure_draw across down measure image
+    = mark
 {
-	measure_op = Operator "measure" 
-		(measure x y w h u v) Operator_type.COMPOUND_REWRAP false;
+    patch_width = image.width / across;
+    sample_width = patch_width * (measure / 100);
+    left_margin = (patch_width - sample_width) / 2;
+    patch_height = image.height / down;
+    sample_height = patch_height * (measure / 100);
+    top_margin = (patch_height - sample_height) / 2;
+
+    cods = [[x * patch_width + left_margin, y * patch_height + top_margin] ::  
+        y <- [0 .. down - 1]; x <- [0 .. across - 1]];
+    x = map (extract 0) cods;
+    y = map (extract 1) cods;
+
+    outer = mkim [$pixel => 255] sample_width sample_height 1;
+    inner = mkim [] (sample_width - 4) (sample_height - 4) 1;
+    patch = insert 2 2 inner outer;
+
+    bg = mkim [] image.width image.height 1;
+
+    mask = Image (im_insertset bg.value patch.value x y);
+
+    image' = colour_transform_to Image_type.sRGB image;
+
+    mark = if mask then Vector [0, 255, 0] else image';
+}
+
+measure_sample across down measure image
+    = measures
+{
+    patch_width = image.width / across;
+    sample_width = patch_width * (measure / 100);
+    left_margin = (patch_width - sample_width) / 2;
+    patch_height = image.height / down;
+    sample_height = patch_height * (measure / 100);
+    top_margin = (patch_height - sample_height) / 2;
+                
+    cods = [[x * patch_width + left_margin, y * patch_height + top_margin] ::
+        y <- [0 .. down - 1]; x <- [0 .. across - 1]];
+        
+    patches = map (\p extract_area p?0 p?1 sample_width sample_height image) 
+		cods;
+    measures = Matrix (map (map mean) (map bandsplit patches));
 }
 
 extract_bands b n obj 

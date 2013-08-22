@@ -270,11 +270,13 @@ Tasks_capture_item = class
 				"Linear input"
 			] 0;
 
+			measure = Scale (_ "Measure area (%)") 1 100 50; 
+
 			// get max of input image
 			_max_value = Image_format.maxval image.format;
 
 			// measure chart image
-			_camera = measure 0 0 image.width image.height 6 4 image.value;
+			_camera = measure_sample 6 4 (to_real measure) image;
 
 			// load true values
 			_true_Lab = Matrix_file macbeth.value;

@@ -1,5 +1,6 @@
 started 7.35.0 9/8/13
 - removed old thing to show API docs (thanks Benjamin)
+- measure now lets you pick the area to measure, and draws sample patches
 
 started 7.34.1 28/6/13
 - fix build on older gtk, thanks Joe

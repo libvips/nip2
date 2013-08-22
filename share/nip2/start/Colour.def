@@ -588,13 +588,23 @@ Colour_chart_to_matrix_item = class
 
 		pacross = Expression (_ "Patches across chart") 6;
 		pdown = Expression (_ "Patches down chart") 4;
+		measure = Scale (_ "Measure area (%)") 1 100 50; 
+
+        // get a representative image from an arg
+        get_image x
+            = get_image x.value?0, is_Group x
+            = x;
+
+        _im = get_image x; 
+		sample = measure_draw (to_real pacross) (to_real pdown) 
+				(to_real measure) _im;
 
 		_result 
 			= map_unary chart x
 		{
 			chart in
-				= measure 0 0 in.width in.height 
-					(to_real pacross) (to_real pdown) in;
+				= measure_sample (to_real pacross) (to_real pdown) 
+					(to_real measure) in;
 		}
 	}
 }

@@ -1679,9 +1679,6 @@ program_errorreport_action_cb( GtkAction *action, Program *program )
 static void
 program_tool_help_action_cb( GtkAction *action, Program *program )
 {
-	char txt[512];
-	VipsBuf buf = VIPS_BUF_STATIC( txt );
-
 	if( program->tool && program->tool->type == TOOL_SYM && 
 		program->kit && program->kit->pseudo ) {
 		switch( program->tool->sym->type ) {
@@ -1689,6 +1686,9 @@ program_tool_help_action_cb( GtkAction *action, Program *program )
 			/* With vips7 we displayed the man page. When we go
 			 * properly vips8, display the API docs.
 			 *
+	char txt[512];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
+
 			vips_buf_appendf( &buf, "file://"
 				VIPS_DOCPATH "/man/%s.3.html", 
 				IOBJECT( program->tool->sym )->name );

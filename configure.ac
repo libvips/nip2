@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([nip2], [7.34.1])
+AC_INIT([nip2], [7.35.0])
 AM_INIT_AUTOMAKE([-Wall])
 
 # foreign stops complaints about a missing README (we use README.md instead)

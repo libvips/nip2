@@ -428,21 +428,30 @@ workspace_column_pick( Workspace *ws )
 	return( col );
 }
 
-/* Make and select a column.
+/* Make and select a column. Used for "new column" UI actions. 
  */
-gboolean
+Column *
 workspace_column_new( Workspace *ws )
 {
 	char new_name[MAX_STRSIZE];
+	Column *old_col;
 	Column *col;
 
 	workspace_column_name_new( ws, new_name );
 	if( !(col = column_new( ws, new_name )) ) 
-		return( FALSE );
+		return( NULL );
+
+	/* Position just to right of currently selected column.
+	 */
+	if( (old_col = workspace_get_column( ws )) ) {
+		col->x = old_col->x + 50;
+		col->y = old_col->y;
+	}
+
 	workspace_column_select( ws, col );
 	column_scrollto( col, MODEL_SCROLL_TOP );
 
-	return( TRUE );
+	return( col );
 }
 
 /* Make a new symbol, part of the current column.

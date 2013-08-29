@@ -1223,8 +1223,8 @@ mainw_column_new_action_cb( GtkAction *action, Mainw *mainw )
 {
 	Workspace *ws;
 
-	if( (ws = mainw_get_workspace( mainw )) )  
-		workspace_column_new( ws );
+	if( (ws = mainw_get_workspace( mainw )) )
+		(void) workspace_column_new( ws );
 }
 
 /* Done button hit.

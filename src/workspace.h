@@ -146,7 +146,7 @@ Column *workspace_column_get( Workspace *ws, const char *name );
 void workspace_column_name_new( Workspace *ws, char *name );
 Column *workspace_column_pick( Workspace *ws );
 void workspace_column_select( Workspace *ws, Column *col );
-gboolean workspace_column_new( Workspace *ws );
+Column *workspace_column_new( Workspace *ws );
 
 Symbol *workspace_add_def( Workspace *ws, const char *str );
 Symbol *workspace_add_def_recalc( Workspace *ws, const char *str );

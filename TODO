@@ -1,3 +1,5 @@
+- ^U in long column with nothing selected scrolls to top of column
+
 - columns can move about on load in large workspaces
 
 - hide tabs if only one tab in window, though we'd need to allow tab drop 

@@ -1757,7 +1757,7 @@ workspace_selected_duplicate( Workspace *ws )
 
 	symbol_recalculate_all();
 	workspace_deselect_all( ws );
-	column_scrollto( workspace_get_column( ws ), MODEL_SCROLL_TOP );
+	column_scrollto( workspace_get_column( ws ), MODEL_SCROLL_BOTTOM );
 
 	progress_end();
 

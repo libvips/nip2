@@ -156,16 +156,18 @@ plotview_tooltip_generate( GtkWidget *widget, VipsBuf *buf, Plotview *plotview )
 }
 
 static void 
-plotview_doubleclick_one_cb( GtkWidget *widget, Plotview *plotview, int state )
+plotview_doubleclick_one_cb( GtkWidget *widget, GdkEvent *event, 
+	Plotview *plotview )
 {
 	Heapmodel *heapmodel = HEAPMODEL( VOBJECT( plotview )->iobject );
 	Row *row = heapmodel->row;
 
-	row_select_modifier( row, state );
+	row_select_modifier( row, event->button.state );
 }
 
 static void 
-plotview_doubleclick_two_cb( GtkWidget *widget, Plotview *plotview, int state )
+plotview_doubleclick_two_cb( GtkWidget *widget, GdkEvent *event, 
+	Plotview *plotview )
 {
 	Plot *plot = PLOT( VOBJECT( plotview )->iobject );
 

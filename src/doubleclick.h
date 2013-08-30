@@ -27,7 +27,7 @@
 
 */
 
-typedef void (*DoubleclickFunc)( GtkWidget *, void *, guint );
+typedef void (*DoubleclickFunc)( GtkWidget *, GdkEvent *, void * );
 #define DOUBLECLICK_FUNC( fn ) ((DoubleclickFunc) (fn))
 
 void doubleclick_add( GtkWidget *wid, gboolean dsingle,

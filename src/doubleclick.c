@@ -56,7 +56,7 @@ typedef struct doubleclick_info {
 	GtkWidget *wid;		/* Widget we are attached to */
 	guint click;		/* Timer for click determination */
 	gboolean dsingle;	/* Do single click on first click of double */
-	guint state;		/* State from last event */
+	GdkEvent event;		/* Copy of last event for clients */
 
 	DoubleclickFunc single;	/* Callback for single click */
 	void *clients;		/* Client data for single */
@@ -77,7 +77,6 @@ doubleclick_new()
 	click->wid = NULL;
 	click->click = 0;
 	click->dsingle = FALSE;
-	click->state = 0;
 	click->single = NULL;
 	click->dub = NULL;
 
@@ -109,7 +108,7 @@ doubleclick_time_cb( Doubleclick *click )
 #ifdef DEBUG
 		g_message( "doubleclick: timeout - calling single" );
 #endif /*DEBUG*/
-		click->single( click->wid, click->clients, click->state );
+		click->single( click->wid, &click->event, click->clients );
 	}
 
 	/* Stop timer.
@@ -129,9 +128,9 @@ doubleclick_trigger_cb( GtkWidget *wid, GdkEvent *ev, Doubleclick *click )
 	if( ev->type != GDK_BUTTON_PRESS || ev->button.button != 1 )
 		return( handled );
 
-	/* Note modifier status.
+	/* Note event for client.
 	 */
-	click->state = ev->button.state;
+	click->event = *ev;
 
 	if( click->click ) {
 		/* There is a timeout pending - ie. there was a click
@@ -143,8 +142,7 @@ doubleclick_trigger_cb( GtkWidget *wid, GdkEvent *ev, Doubleclick *click )
 #ifdef DEBUG
 			g_message( "doubleclick: seen double" );
 #endif /*DEBUG*/
-			click->dub( click->wid, 
-				click->clientd, click->state );
+			click->dub( click->wid, &click->event, click->clientd ); 
 			handled = TRUE;
 		}
 	}
@@ -166,8 +164,8 @@ doubleclick_trigger_cb( GtkWidget *wid, GdkEvent *ev, Doubleclick *click )
 		 * single-click now.
 		 */
 		if( click->dsingle && click->single ) {
-			click->single( click->wid, 
-				click->clients, click->state );
+			click->single( click->wid, &click->event, 
+				click->clients ); 
 			handled = TRUE;
 		}
 	}

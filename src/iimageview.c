@@ -289,18 +289,18 @@ iimageview_class_init( iImageviewClass *class )
 }
 
 static void 
-iimageview_doubleclick_one_cb( GtkWidget *widget, 
-	iImageview *iimageview, int state )
+iimageview_doubleclick_one_cb( GtkWidget *widget, GdkEvent *event, 
+	iImageview *iimageview )
 {
 	Heapmodel *heapmodel = HEAPMODEL( VOBJECT( iimageview )->iobject );
 	Row *row = heapmodel->row;
 
-	row_select_modifier( row, state );
+	row_select_modifier( row, event->button.state );
 }
 
 static void 
-iimageview_doubleclick_two_cb( GtkWidget *widget, 
-	iImageview *iimageview, int state )
+iimageview_doubleclick_two_cb( GtkWidget *widget, GdkEvent *event, 
+	iImageview *iimageview )
 {
 	iimageview_edit( widget, iimageview );
 }

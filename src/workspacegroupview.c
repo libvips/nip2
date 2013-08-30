@@ -107,7 +107,7 @@ workspacegroupview_rename_cb( GtkWidget *wid, GtkWidget *host,
 }
 
 static void
-workspacegroupview_rename_cb2( GtkWidget *wid, 
+workspacegroupview_rename_cb2( GtkWidget *wid, GdkEvent *event, 
 	Workspaceview *wview )
 {
 	workspacegroupview_rename_cb( wid, NULL, wview );
@@ -356,7 +356,30 @@ workspacegroupview_page_reordered_cb( GtkNotebook *notebook,
 }
 
 static void
-workspacegroupview_add_workspace_cb( GtkWidget *wid, 
+workspacegroupview_tab_double_cb( GtkNotebook *notebook, GdkEvent *event, 
+	Workspacegroupview *wsgview )
+{
+	Workspacegroup *wsg = WORKSPACEGROUP( VOBJECT( wsgview )->iobject );
+
+	int i;
+	GtkWidget *page;
+	GtkWidget *tab;
+
+	/* Doubleclick in a tab row background. This could be the gutter or
+	 * the edge of a label. Get the position of the right-most tab and
+	 * check our click x against that. 
+	 */
+	i = gtk_notebook_get_n_pages( notebook ); 
+	page = gtk_notebook_get_nth_page( notebook, i - 1 ); 
+	tab = gtk_notebook_get_tab_label( notebook, page ); 
+
+	if( event->button.x > tab->allocation.x + tab->allocation.width &&
+		!workspace_new_blank( wsg ) ) 
+		iwindow_alert( GTK_WIDGET( wsgview ), GTK_MESSAGE_ERROR );
+}
+
+static void
+workspacegroupview_add_workspace_cb( GtkWidget *wid, GdkEvent *event, 
 	Workspacegroupview *wsgview )
 {
 	Workspacegroup *wsg = WORKSPACEGROUP( VOBJECT( wsgview )->iobject );
@@ -369,7 +392,7 @@ static void
 workspacegroupview_add_workspace_cb2( GtkWidget *wid, GtkWidget *host, 
 	Workspacegroupview *wsgview )
 {
-	workspacegroupview_add_workspace_cb( wid, wsgview ); 
+	workspacegroupview_add_workspace_cb( wid, NULL, wsgview ); 
 }
 
 static void                
@@ -537,7 +560,7 @@ workspacegroupview_init( Workspacegroupview *wsgview )
 
         doubleclick_add( wsgview->notebook, FALSE,
                 NULL, NULL, 
-		DOUBLECLICK_FUNC( workspacegroupview_add_workspace_cb ), 
+		DOUBLECLICK_FUNC( workspacegroupview_tab_double_cb ), 
 			wsgview );
 
 	wsgview->gutter_menu = popup_build( _( "Tab gutter menu" ) );

@@ -91,18 +91,18 @@ colourview_area_changed_cb( Imagedisplay *id, Rect *area,
 }
 
 static void 
-colourview_doubleclick_one_cb( GtkWidget *widget, 
-	Colourview *colourview, int state )
+colourview_doubleclick_one_cb( GtkWidget *widget, GdkEvent *event, 
+	Colourview *colourview )
 {
 	Heapmodel *heapmodel = HEAPMODEL( VOBJECT( colourview )->iobject );
 	Row *row = heapmodel->row;
 
-	row_select_modifier( row, state );
+	row_select_modifier( row, event->button.state );
 }
 
 static void 
-colourview_doubleclick_two_cb( GtkWidget *widget, 
-	Colourview *colourview, int state )
+colourview_doubleclick_two_cb( GtkWidget *widget, GdkEvent *event, 
+	Colourview *colourview )
 {
 	model_edit( widget, MODEL( VOBJECT( colourview )->iobject ) );
 }

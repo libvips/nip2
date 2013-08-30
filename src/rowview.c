@@ -205,11 +205,11 @@ rowview_refresh( vObject *vobject )
 /* Single click on button callback.
  */
 static void
-rowview_single_cb( GtkWidget *wid, Rowview *rview, guint state )
+rowview_single_cb( GtkWidget *wid, GdkEvent *event, Rowview *rview )
 {
 	Row *row = ROW( VOBJECT( rview )->iobject );
 
-	row_select_modifier( row, state );
+	row_select_modifier( row, event->button.state );
 }
 
 /* Edit our object.
@@ -229,7 +229,7 @@ rowview_edit( Rowview *rview )
 /* Double click on button callback.
  */
 static void
-rowview_double_cb( GtkWidget *button, Rowview *rview )
+rowview_double_cb( GtkWidget *button, GdkEvent *event, Rowview *rview )
 {
 	if( !rowview_edit( rview ) ) 
 		iwindow_alert( button, GTK_MESSAGE_ERROR );

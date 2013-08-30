@@ -259,6 +259,10 @@ Tasks_capture_item = class
 			];
 			_vislevel = 3;
 
+			measure = Scale (_ "Measure area (%)") 1 100 50; 
+
+			sample = measure_draw 6 4 (to_real measure) image;
+
 			// get macbeth data file to use
 			macbeth = Pathname "Pick a Macbeth data file" 
 				"$VIPSHOME/share/$PACKAGE/data/macbeth_lab_d65.mat";
@@ -269,8 +273,6 @@ Tasks_capture_item = class
 				"Linear input, set brightness from chart",
 				"Linear input"
 			] 0;
-
-			measure = Scale (_ "Measure area (%)") 1 100 50; 
 
 			// get max of input image
 			_max_value = Image_format.maxval image.format;

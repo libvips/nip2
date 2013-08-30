@@ -143,8 +143,8 @@ paintboxview_scale_change_cb( Tslider *tslider, Paintboxview *pbv )
 }
 
 static void
-paintboxview_double_cb( GtkWidget *wid, 
-	Paintboxview *pbv, guint state )
+paintboxview_double_cb( GtkWidget *wid, GdkEvent *event, 
+	Paintboxview *pbv )
 {
 	imageinfo_colour_edit( wid, IMAGEDISPLAY( pbv->ink )->conv->ii );
 }

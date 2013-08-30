@@ -215,6 +215,7 @@ extern int statfs();
 #define STOCK_FLOOD_BLOB "nip-floodblob"
 #define STOCK_RECT "nip-rect"
 #define STOCK_MOVE "nip-move"
+#define STOCK_LOCK "nip-lock"
 #define STOCK_SELECT "nip-select"
 #define STOCK_LED_RED "nip-led-red"
 #define STOCK_LED_GREEN "nip-led-green"

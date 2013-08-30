@@ -798,6 +798,8 @@ workspace_load( Model *model,
 	(void) get_dprop( xnode, "scale", &ws->scale );
 	(void) get_dprop( xnode, "offset", &ws->offset );
 
+	(void) get_bprop( xnode, "locked", &ws->locked );
+
 	(void) get_bprop( xnode, "lpane_open", &ws->lpane_open );
 	(void) get_iprop( xnode, "lpane_position", &ws->lpane_position );
 	(void) get_bprop( xnode, "rpane_open", &ws->rpane_open );
@@ -839,6 +841,7 @@ workspace_save( Model *model, xmlNode *xnode )
 	if( !set_sprop( xthis, "view", workspacemode_to_char( ws->mode ) ) ||
 		!set_dprop( xthis, "scale", ws->scale ) ||
 		!set_dprop( xthis, "offset", ws->offset ) ||
+		!set_sprop( xthis, "locked", bool_to_char( ws->locked ) ) ||
 		!set_iprop( xthis, "lpane_position", ws->lpane_position ) ||
 		!set_sprop( xthis, "lpane_open", 
 			bool_to_char( ws->lpane_open ) ) ||
@@ -1816,6 +1819,16 @@ workspace_rename( Workspace *ws, const char *name, const char *caption )
 	symbol_recalculate_all();
 
 	return( TRUE );
+}
+
+void
+workspace_set_locked( Workspace *ws, gboolean locked )
+{
+	if( ws->locked != locked ) { 
+		ws->locked = locked;
+		iobject_changed( IOBJECT( ws ) ); 
+		workspace_set_modified( ws, TRUE );
+	}
 }
 
 gboolean

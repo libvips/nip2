@@ -694,6 +694,7 @@ main_register_icons( void )
 		{ STOCK_RECT, N_( "Fill Rectangle" ), 0, 0, GETTEXT_PACKAGE },
 		{ STOCK_MOVE, N_( "Pan" ), 0, 0, GETTEXT_PACKAGE },
 		{ STOCK_SELECT, N_( "Select" ), 0, 0, GETTEXT_PACKAGE },
+		{ STOCK_LOCK, N_( "Locked" ), 0, 0, GETTEXT_PACKAGE },
 
 		/* And the LEDs we use.
 		 */
@@ -747,6 +748,8 @@ main_register_icons( void )
 		STOCK_MOVE, "stock-tool-move-22.png" );
 	main_file_for_stock( main_icon_factory, 
 		STOCK_SELECT, "stock-tool-select-22.png" );
+	main_file_for_stock( main_icon_factory, 
+		STOCK_LOCK, "stock-padlock-closed-22.png" );
 	main_file_for_stock( main_icon_factory, 
 		STOCK_LED_RED, "stock-led-red-18.png" );
 	main_file_for_stock( main_icon_factory, 

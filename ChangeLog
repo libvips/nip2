@@ -3,6 +3,7 @@ started 7.35.0 9/8/13
 - measure now lets you pick the area to measure, and draws sample patches
 - new column now goes to right of current column, not alphabetically
 - detect doubleclick on ws tab label background
+- tabs can be locked
 
 started 7.34.1 28/6/13
 - fix build on older gtk, thanks Joe

@@ -16,6 +16,7 @@ nipdata_DATA = \
 	stock-tool-bucket-fill-22.png \
 	stock-tool-rect-select-22.png \
 	stock-tool-select-22.png \
+	stock-padlock-closed-22.png \
 	nip-slider-16.png \
 	stock-tool-move-22.png \
 	stock-led-red-18.png \

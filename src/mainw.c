@@ -514,6 +514,11 @@ mainw_refresh_timeout_cb( gpointer user_data )
 
 	if( (ws = mainw_get_workspace( mainw )) ) {
 		action = gtk_action_group_get_action( iwnd->action_group, 
+			"Lock" );
+		gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
+			ws->locked );
+
+		action = gtk_action_group_get_action( iwnd->action_group, 
 			"Tabdefs" );
 		gtk_toggle_action_set_active( GTK_TOGGLE_ACTION( action ),
 			ws->lpane_open );
@@ -1355,6 +1360,18 @@ mainw_autorecalc_action_cb( GtkToggleAction *action, Mainw *mainw )
 		symbol_recalculate_all();
 }
 
+/* Callback from lock toggle.
+ */
+static void
+mainw_lock_action_cb( GtkToggleAction *action, Mainw *mainw )
+{
+	Workspace *ws;
+
+	if( (ws = mainw_get_workspace( mainw )) ) 
+		workspace_set_locked( ws, 
+			gtk_toggle_action_get_active( action ) ); 
+}
+
 /* Callback from show toolbar toggle.
  */
 static void
@@ -1667,6 +1684,11 @@ static GtkToggleActionEntry mainw_toggle_actions[] = {
 		N_( "Recalculate automatically on change" ),
 		G_CALLBACK( mainw_autorecalc_action_cb ), TRUE },
 
+	{ "Lock",
+		NULL, N_( "_Lock tab" ), NULL,
+		N_( "Lock tab" ),
+		G_CALLBACK( mainw_lock_action_cb ), TRUE },
+
 	{ "Toolbar",
 		NULL, N_( "_Toolbar" ), NULL,
 		N_( "Show window toolbar" ),
@@ -1736,6 +1758,7 @@ static const char *mainw_menubar_ui_description =
 "      <menuitem action='Duplicate'/>"
 "      <menuitem action='Recalculate'/>"
 "      <menuitem action='AutoRecalculate'/>"
+"      <menuitem action='Lock'/>"
 "      <separator/>"
 "      <menuitem action='Find'/>"
 "      <menuitem action='FindNext'/>"

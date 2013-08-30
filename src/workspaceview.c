@@ -680,6 +680,8 @@ workspaceview_refresh( vObject *vobject )
 	printf( "workspaceview_refresh: %p %s\n", ws, IOBJECT( ws )->name );
 #endif /*DEBUG*/
 
+	gtk_widget_set_sensitive( GTK_WIDGET( wview ), !ws->locked );
+
 	workspace_jump_update( ws, wview->popup_jump );
 
 	if( ws->rpane_open && !wview->rpane->open )
@@ -695,9 +697,16 @@ workspaceview_refresh( vObject *vobject )
 	if( wview->label ) {
 		gtk_label_set_text( GTK_LABEL( wview->label ),
 			IOBJECT( ws )->name );
+
 		if( IOBJECT( ws )->caption )
 			set_tooltip( wview->label, 
 				"%s", IOBJECT( ws )->caption );
+
+		if( ws->locked ) 
+			gtk_image_set_from_stock( GTK_IMAGE( wview->image ), 
+				STOCK_LOCK, GTK_ICON_SIZE_MENU );
+		else
+			gtk_image_clear( GTK_IMAGE( wview->image ) );  
 	}
 
 	VOBJECT_CLASS( parent_class )->refresh( vobject );
@@ -1225,9 +1234,12 @@ workspaceview_new( void )
 }
 
 void
-workspaceview_set_label( Workspaceview *wview, GtkWidget *label )
+workspaceview_set_label( Workspaceview *wview, 
+	GtkWidget *label, GtkWidget *image )
 {
 	g_assert( !wview->label );
+	g_assert( !wview->image );
 
 	wview->label = label;
+	wview->image = image;
 }

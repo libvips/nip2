@@ -66,6 +66,7 @@ struct _Workspace {
 	GSList *selected;	/* Rows selected in this workspace */
 	GSList *errors;		/* Rows with errors */
         WorkspaceMode mode;	/* Display mode */
+	gboolean locked;	/* WS has been locked */
 
 	/* Some versions (7.10 etc.) need special compat toolkits. 0 here for
 	 * no compat toolkits loaded.
@@ -190,4 +191,5 @@ gboolean workspace_selected_save( Workspace *ws, const char *filename );
 
 gboolean workspace_rename( Workspace *ws, 
 	const char *name, const char *caption );
+void workspace_set_locked( Workspace *ws, gboolean locked );
 gboolean workspace_duplicate( Workspace *ws );

@@ -87,6 +87,9 @@ workspacegroupview_rename_cb( GtkWidget *wid, GtkWidget *host,
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
 	GtkWidget *ss = stringset_new();
 
+	if( ws->locked )
+		return; 
+
 	stringset_child_new( STRINGSET( ss ), 
 		_( "Name" ), IOBJECT( ws )->name, 
 		_( "Set tab name here" ) );
@@ -121,17 +124,30 @@ workspacegroupview_child_add( View *parent, View *child )
 	Workspace *ws = WORKSPACE( VOBJECT( child )->iobject );
 
 	GtkWidget *ebox;
+	GtkWidget *hbox;
 	GtkWidget *label;
+	GtkWidget *image;
 
 	VIEW_CLASS( parent_class )->child_add( parent, child );
 
         ebox = gtk_event_box_new();
 	gtk_widget_add_events( GTK_WIDGET( ebox ), 
 		GDK_BUTTON_PRESS_MASK ); 
+        hbox = gtk_hbox_new( FALSE, 0 );
+        gtk_container_add( GTK_CONTAINER( ebox ), hbox );
+        gtk_widget_show( GTK_WIDGET( hbox ) );
+
+	image = gtk_image_new(); 
+        gtk_box_pack_start( GTK_BOX( hbox ), image, FALSE, FALSE, 0 );
+        gtk_widget_show( GTK_WIDGET( image ) );
+	set_tooltip( image, "%s", _( "unlock from Edit menu" ) ); 
+
 	label = gtk_label_new( NN( IOBJECT( ws->sym )->name ) );
-        gtk_container_add( GTK_CONTAINER( ebox ), label );
+        gtk_box_pack_end( GTK_BOX( hbox ), label, FALSE, FALSE, 0 );
         gtk_widget_show( GTK_WIDGET( label ) );
-	workspaceview_set_label( wview, label );
+
+	workspaceview_set_label( wview, label, image );
+
 	popup_attach( ebox, wsgview->tab_menu, wview );
 
         doubleclick_add( ebox, FALSE,
@@ -401,7 +417,8 @@ workspacegroupview_select_all_cb( GtkWidget *wid, GtkWidget *host,
 {
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
 
-	workspace_select_all( ws );
+	if( !ws->locked )
+		workspace_select_all( ws );
 }
 
 static void                
@@ -459,6 +476,9 @@ workspacegroupview_merge_cb( GtkWidget *wid, GtkWidget *host,
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
 	iWindow *iwnd = IWINDOW( view_get_toplevel( VIEW( wview ) ) );
 	GtkWidget *filesel = filesel_new();
+
+	if( ws->locked )
+		return; 
 
 	iwindow_set_title( IWINDOW( filesel ), 
 		_( "Merge Into Tab \"%s\"" ), IOBJECT( ws )->name );
@@ -534,8 +554,9 @@ workspacegroupview_delete_cb( GtkWidget *wid, GtkWidget *host,
 {
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
 
-	model_check_destroy( view_get_toplevel( VIEW( wview ) ), 
-		MODEL( ws ), workspacegroupview_delete_done_cb );
+	if( !ws->locked )
+		model_check_destroy( view_get_toplevel( VIEW( wview ) ), 
+			MODEL( ws ), workspacegroupview_delete_done_cb );
 }
 
 static void

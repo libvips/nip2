@@ -50,6 +50,7 @@ struct _Workspaceview {
 	Toolkitbrowser *toolkitbrowser;
 	Workspacedefs *workspacedefs;
 	GtkWidget *label;		/* Tab label */
+	GtkWidget *image;		/* And the padlock image */
 
 	/* Left and right panes ... program window and toolkit browser.
 	 */
@@ -111,4 +112,5 @@ void workspaceview_set_cursor( Workspaceview *wview, iWindowShape shape );
 GtkType workspaceview_get_type( void );
 View *workspaceview_new( void );
 
-void workspaceview_set_label( Workspaceview *wview, GtkWidget *label );
+void workspaceview_set_label( Workspaceview *wview, 
+	GtkWidget *label, GtkWidget *image );

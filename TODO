@@ -3,11 +3,6 @@
 - hide tabs if only one tab in window, though we'd need to allow tab drop 
   anywhere in window for that
 
-- test file drop on mainw, esp. workspaces
-
-- could lock workspaces? might be useful ... another option in the view menu?
-
-
 
 
 - Matrix / New / Laplacian

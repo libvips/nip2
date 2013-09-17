@@ -1,4 +1,5 @@
-- ^U in long column with nothing selected scrolls to top of column
+- try toolkits / edit, then view def browser, then type "lindet", then click 
+  on im_lindetect ... syntax error and a toolkit called "untitled" is created
 
 - columns can move about on load in large workspaces
 

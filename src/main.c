@@ -1400,6 +1400,15 @@ main( int argc, char *argv[] )
 	vips_buf_rewind( &buf );
 	vips_buf_appendf( &buf, "argv = [" );
 	for( i = 0; i < argc; i++ ) {
+		/* Ignore "--" args. Consider eg. 
+		 *
+		 * 	./try201.nip2 -o x.v -- -12 ~/pics/shark.jpg 
+		 *
+		 * if we didn't remove --, all scripts would need to. 
+		 */
+		if( strcmp( argv[i], "--" ) == 0 )
+			continue;
+
 		if( i > 0 )
 			vips_buf_appendf( &buf, ", " );
 		vips_buf_appendf( &buf, "\"%s\"", argv[i] );

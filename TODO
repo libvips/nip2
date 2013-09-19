@@ -1,5 +1,3 @@
-- try toolkits / edit, then view def browser, then type "lindet", then click 
-  on im_lindetect ... syntax error and a toolkit called "untitled" is created
 
 - columns can move about on load in large workspaces
 
@@ -25,7 +23,6 @@
 - lambdas don't pattern match?
 
 	(\[a, b] a + b)
-
 
 
 

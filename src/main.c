@@ -751,6 +751,8 @@ main_register_icons( void )
 	main_file_for_stock( main_icon_factory, 
 		STOCK_LOCK, "stock-padlock-closed-22.png" );
 	main_file_for_stock( main_icon_factory, 
+		STOCK_ALERT, "stock-alert-22.png" );
+	main_file_for_stock( main_icon_factory, 
 		STOCK_LED_RED, "stock-led-red-18.png" );
 	main_file_for_stock( main_icon_factory, 
 		STOCK_LED_GREEN, "stock-led-green-18.png" );

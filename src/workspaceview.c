@@ -703,10 +703,10 @@ workspaceview_refresh( vObject *vobject )
 				"%s", IOBJECT( ws )->caption );
 
 		if( ws->locked ) 
-			gtk_image_set_from_stock( GTK_IMAGE( wview->image ), 
+			gtk_image_set_from_stock( GTK_IMAGE( wview->padlock ), 
 				STOCK_LOCK, GTK_ICON_SIZE_MENU );
 		else
-			gtk_image_clear( GTK_IMAGE( wview->image ) );  
+			gtk_image_clear( GTK_IMAGE( wview->padlock ) );  
 	}
 
 	VOBJECT_CLASS( parent_class )->refresh( vobject );
@@ -1235,11 +1235,13 @@ workspaceview_new( void )
 
 void
 workspaceview_set_label( Workspaceview *wview, 
-	GtkWidget *label, GtkWidget *image )
+	GtkWidget *label, GtkWidget *padlock, GtkWidget *alert )
 {
 	g_assert( !wview->label );
-	g_assert( !wview->image );
+	g_assert( !wview->padlock );
+	g_assert( !wview->alert );
 
 	wview->label = label;
-	wview->image = image;
+	wview->padlock = padlock;
+	wview->alert = alert;
 }

@@ -1,3 +1,10 @@
+- if a tab contains an error, display a red alert in the tab name, cf. the
+  padlock symbol
+
+  workspace needs to track number of rows with errors
+
+  workspaceview_refresh() needs to update ->alert, cf. ->padlock
+
 - try toolkits / edit, then view def browser, then type "lindet", then click 
   on im_lindetect ... syntax error and a toolkit called "untitled" is created
 

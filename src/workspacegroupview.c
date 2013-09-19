@@ -126,7 +126,8 @@ workspacegroupview_child_add( View *parent, View *child )
 	GtkWidget *ebox;
 	GtkWidget *hbox;
 	GtkWidget *label;
-	GtkWidget *image;
+	GtkWidget *padlock;
+	GtkWidget *alert;
 
 	VIEW_CLASS( parent_class )->child_add( parent, child );
 
@@ -137,16 +138,21 @@ workspacegroupview_child_add( View *parent, View *child )
         gtk_container_add( GTK_CONTAINER( ebox ), hbox );
         gtk_widget_show( GTK_WIDGET( hbox ) );
 
-	image = gtk_image_new(); 
-        gtk_box_pack_start( GTK_BOX( hbox ), image, FALSE, FALSE, 0 );
-        gtk_widget_show( GTK_WIDGET( image ) );
-	set_tooltip( image, "%s", _( "unlock from Edit menu" ) ); 
+	padlock = gtk_image_new(); 
+        gtk_box_pack_start( GTK_BOX( hbox ), padlock, FALSE, FALSE, 0 );
+        gtk_widget_show( GTK_WIDGET( padlock ) );
+	set_tooltip( padlock, "%s", _( "unlock from Edit menu" ) ); 
+
+	alert = gtk_image_new(); 
+        gtk_box_pack_start( GTK_BOX( hbox ), alert, FALSE, FALSE, 0 );
+        gtk_widget_show( GTK_WIDGET( alert ) );
+	set_tooltip( alert, "%s", _( "errors in tab" ) ); 
 
 	label = gtk_label_new( NN( IOBJECT( ws->sym )->name ) );
         gtk_box_pack_end( GTK_BOX( hbox ), label, FALSE, FALSE, 0 );
         gtk_widget_show( GTK_WIDGET( label ) );
 
-	workspaceview_set_label( wview, label, image );
+	workspaceview_set_label( wview, label, padlock, alert );
 
 	popup_attach( ebox, wsgview->tab_menu, wview );
 

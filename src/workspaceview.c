@@ -707,6 +707,13 @@ workspaceview_refresh( vObject *vobject )
 				STOCK_LOCK, GTK_ICON_SIZE_MENU );
 		else
 			gtk_image_clear( GTK_IMAGE( wview->padlock ) );  
+
+		if( ws->errors ) 
+			gtk_image_set_from_stock( GTK_IMAGE( wview->alert ), 
+				STOCK_ALERT, GTK_ICON_SIZE_MENU );
+		else
+			gtk_image_clear( GTK_IMAGE( wview->alert ) );  
+
 	}
 
 	VOBJECT_CLASS( parent_class )->refresh( vobject );

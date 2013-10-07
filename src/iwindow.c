@@ -435,6 +435,13 @@ iwindow_susp_return( void *sys, iWindowResult result )
         im_free( susp );
 }
 
+void
+iwindow_susp_trigger( iWindowSusp *susp )
+{
+	susp->fn( susp->iwnd, susp->client, susp->nfn, susp->sys );
+	im_free( susp );
+}
+
 /* Compose two iWindowFns ... if this one succeeded, trigger the next in turn.
  * Otherwise bail out.
  */
@@ -443,10 +450,8 @@ iwindow_susp_comp( void *sys, iWindowResult result )
 {
 	iWindowSusp *susp = IWINDOW_SUSP( sys );
 
-	if( result == IWINDOW_YES ) {
-		susp->fn( susp->iwnd, susp->client, susp->nfn, susp->sys );
-		im_free( susp );
-	}
+	if( result == IWINDOW_YES ) 
+		iwindow_susp_trigger( susp ); 
 	else 
 		iwindow_susp_return( sys, result );
 }

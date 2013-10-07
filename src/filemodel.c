@@ -829,7 +829,7 @@ filemodel_inter_close_cb( iWindow *iwnd, void *client,
 {
 	Filemodel *filemodel = FILEMODEL( client );
 
-	IDESTROY( filemodel );
+	iwindow_kill( filemodel_get_window_hint( filemodel ) ); 
 
 	nfn( sys, IWINDOW_YES );
 }
@@ -933,17 +933,35 @@ filemodel_inter_replace( iWindow *parent, Filemodel *filemodel )
 /* Close all registered filemodels.
  */
 
+/* The first registered, modified filemodel the user hasn't said "ok!!! ffs"
+ * to.
+ */
+static Filemodel *
+filemodel_inter_close_get_filemodel( void )
+{
+	GSList *p;
+
+	for( p = filemodel_registered; p; p = p->next ) {
+		Filemodel *filemodel = FILEMODEL( p->data );
+
+		if( filemodel->modified )
+			return( filemodel );
+	}
+
+	return( NULL );
+}
+
 void
 filemodel_inter_close_registered_cb( iWindow *iwnd, void *client, 
 	iWindowNotifyFn nfn, void *sys )
 {
-	if( filemodel_registered ) {
-		Filemodel *filemodel = FILEMODEL( filemodel_registered->data );
+	Filemodel *filemodel; 
+
+	if( (filemodel = filemodel_inter_close_get_filemodel()) ) { 
 		iWindowSusp *susp = iwindow_susp_new( 
 			filemodel_inter_close_registered_cb, 
 			iwnd, client, nfn, sys );
 
-		filemodel_unregister( filemodel );
 		filemodel_inter_savenclose_cb( 
 			filemodel_get_window_hint( filemodel ), filemodel, 
 			iwindow_susp_comp, susp );

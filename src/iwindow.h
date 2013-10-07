@@ -216,6 +216,7 @@ void iwindow_cursor_context_destroy( iWindowCursorContext *cntxt );
 
 iWindowSusp *iwindow_susp_new( iWindowFn, 
 	iWindow *, void *, iWindowNotifyFn, void * );
+void iwindow_susp_trigger( iWindowSusp * ); 
 void iwindow_susp_return( void *, iWindowResult );
 void iwindow_susp_comp( void *, iWindowResult );
 

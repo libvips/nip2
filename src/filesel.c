@@ -1052,11 +1052,12 @@ filesel_refresh( Filesel *filesel )
 {
 	char *dir;
 
-	dir = gtk_file_chooser_get_current_folder( 
-		GTK_FILE_CHOOSER( filesel->chooser ) );
-	gtk_file_chooser_set_current_folder(
-		GTK_FILE_CHOOSER( filesel->chooser ), dir );
-	g_free( dir );
+	if( (dir = gtk_file_chooser_get_current_folder( 
+		GTK_FILE_CHOOSER( filesel->chooser ) )) ) { 
+		gtk_file_chooser_set_current_folder(
+			GTK_FILE_CHOOSER( filesel->chooser ), dir );
+		g_free( dir );
+	}
 
         return( NULL );
 }

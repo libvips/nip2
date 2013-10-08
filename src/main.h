@@ -38,6 +38,7 @@ extern void *main_c_stack_base;			/* Base of C stack */
 extern gboolean main_starting;			/* In startup */
 
 extern gboolean main_option_time_save;		/* Time save image ops */
+extern gboolean main_option_profile;		/* Profile calcualtion */
 extern gboolean main_option_i18n;		/* Output i18n strings */
 extern gboolean main_option_batch;		/* Running in batch mode */
 

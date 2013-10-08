@@ -40,7 +40,6 @@
  */
 
 /* Time row recomp.
-#define DEBUG_TIME
 #define DEBUG_TIME_SORT
  */
 
@@ -1658,18 +1657,12 @@ row_recomp( Row *row )
 {
 	Row *top_row = row->top_row;
 
-#ifdef DEBUG_TIME
 	static GTimer *recomp_timer = NULL;
 
 	if( !recomp_timer )
 		recomp_timer = g_timer_new();
 
 	g_timer_reset( recomp_timer );
-
-	printf( "row_recomp: starting for dirties on " );
-	row_name_print( top_row );
-	printf( "\n" );
-#endif /*DEBUG_TIME*/
 
 	/* Sort dirties into recomp order.
 	 */
@@ -1722,14 +1715,6 @@ row_recomp( Row *row )
 	 */
 	if( top_row->sym->ndirtychildren != 0 ) {
 		IM_FREEF( g_slist_free, top_row->recomp_save );
-
-#ifdef DEBUG_TIME
-		printf( "row_recomp: delaying recomp of " );
-		row_name_print( top_row );
-		printf( "after %gs\n",  
-			g_timer_elapsed( recomp_timer, NULL ) );
-#endif /*DEBUG_TIME*/
-
 		return;
 	}
 
@@ -1777,11 +1762,15 @@ row_recomp( Row *row )
 		(icontainer_map_fn) heapmodel_update_model, NULL ) )
 		expr_error_set( top_row->expr );
 
-#ifdef DEBUG_TIME
-	printf( "row_recomp: done for dirties of " );
-	row_name_print( top_row );
-	printf( "in %gs\n",  g_timer_elapsed( recomp_timer, NULL ) );
-#endif /*DEBUG_TIME*/
+	if( main_option_profile ) { 
+		char txt[100];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
+		Symbol *context = symbol_get_parent( top_row->ws->sym );
+
+		row_qualified_name_relative( context, top_row, &buf );
+		printf( "%s\t%g\n", vips_buf_all( &buf ), 
+			g_timer_elapsed( recomp_timer, NULL ) );
+	}
 
 #ifdef DEBUG
 	printf( "row_recomp: value of " );

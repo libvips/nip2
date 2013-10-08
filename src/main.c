@@ -92,6 +92,7 @@ static char *main_option_output = NULL;
 static char **main_option_set = NULL;
 static gboolean main_option_benchmark = FALSE;
 gboolean main_option_time_save = FALSE;
+gboolean main_option_profile = FALSE;
 gboolean main_option_i18n = FALSE;
 static gboolean main_option_print_main = FALSE;
 static gboolean main_option_version = FALSE;
@@ -131,6 +132,9 @@ static GOptionEntry main_option[] = {
 		NULL },
 	{ "time-save", 't', 0, G_OPTION_ARG_NONE, &main_option_time_save, 
 		N_( "time image save operations" ), 
+		NULL },
+	{ "profile", 'r', 0, G_OPTION_ARG_NONE, &main_option_profile, 
+		N_( "profile workspace calculation" ), 
 		NULL },
 	{ "prefix", 'x', 0, G_OPTION_ARG_FILENAME, &main_option_prefix, 
 		N_( "start as if installed to PREFIX" ), "PREFIX" },

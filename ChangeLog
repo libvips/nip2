@@ -1,5 +1,6 @@
 started 7.36.2 8/10/13
 - add --profile option
+- fix + button on wsgv
 
 started 7.36.1 7/10/13
 - better ^Q behaviour, thanks MvGulik

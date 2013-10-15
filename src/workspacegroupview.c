@@ -401,7 +401,7 @@ workspacegroupview_tab_double_cb( GtkNotebook *notebook, GdkEvent *event,
 }
 
 static void
-workspacegroupview_add_workspace_cb( GtkWidget *wid, GdkEvent *event, 
+workspacegroupview_add_workspace_cb( GtkWidget *wid, 
 	Workspacegroupview *wsgview )
 {
 	Workspacegroup *wsg = WORKSPACEGROUP( VOBJECT( wsgview )->iobject );
@@ -414,7 +414,7 @@ static void
 workspacegroupview_add_workspace_cb2( GtkWidget *wid, GtkWidget *host, 
 	Workspacegroupview *wsgview )
 {
-	workspacegroupview_add_workspace_cb( wid, NULL, wsgview ); 
+	workspacegroupview_add_workspace_cb( wid, wsgview ); 
 }
 
 static void                
@@ -609,9 +609,8 @@ workspacegroupview_init( Workspacegroupview *wsgview )
 	gtk_widget_show( but );
 	gtk_notebook_set_action_widget( GTK_NOTEBOOK( wsgview->notebook ), 
 		but, GTK_PACK_END );
-        gtk_signal_connect( GTK_OBJECT( but ), "clicked",
-                GTK_SIGNAL_FUNC( workspacegroupview_add_workspace_cb ), 
-		wsgview );
+        g_signal_connect( but, "clicked",
+                G_CALLBACK( workspacegroupview_add_workspace_cb ), wsgview );
 }
 #endif /*USE_NOTEBOOK_ACTION*/
 

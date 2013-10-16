@@ -703,12 +703,6 @@ row_load( Model *model,
 		expr_dirty( row->sym->expr, link_serial_new() );
 	}
 
-	/* If we've loaded a toplevel into a closed column, make sure display
-	 * is off.
-	 */
-	if( scol->is_top && !scol->top_col->open )
-		model_display( MODEL( row ), FALSE );
-
 	return( TRUE );
 }
 
@@ -884,12 +878,6 @@ row_new_heap( Heapmodel *heapmodel, PElement *root )
 			*IOBJECT( PEGETCLASSCOMPILE( root )->sym )->name == 
 			'_' )
 			model_display( MODEL( row ), FALSE );
-		/* Hide top-level rows in closed columns.
-		 */
-		else if( row->scol->is_top && !row->top_col->open )
-			model_display( MODEL( row ), FALSE );
-		else
-			model_display( MODEL( row ), TRUE );
 	}
 
 	/* New value ... reset error state.

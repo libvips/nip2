@@ -896,6 +896,7 @@ columnview_refresh( vObject *vobject )
                         GTK_ARROW_RIGHT, GTK_SHADOW_OUT );
                 set_tooltip( cview->updownb, _( "Open the column" ) );
 	}
+	model_display( MODEL( col->scol ), col->open );
 
 	/* Closed columns are hidden in NOEDIT mode.
 	 */

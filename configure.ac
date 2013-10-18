@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([nip2], [7.36.3])
+AC_INIT([nip2], [7.36.4])
 AM_INIT_AUTOMAKE([-Wall])
 
 # foreign stops complaints about a missing README (we use README.md instead)
@@ -8,6 +8,7 @@ AM_INIT_AUTOMAKE([-Wall])
 AM_INIT_AUTOMAKE([foreign])
 
 AC_CONFIG_HEADERS(config.h)
+AC_CONFIG_MACRO_DIR([m4])
 
 dnl
 dnl We do the version number components as m4 macros
@@ -17,7 +18,7 @@ dnl
 
 m4_define([nip_major_version], [7])
 m4_define([nip_minor_version], [36])
-m4_define([nip_micro_version], [3])
+m4_define([nip_micro_version], [4])
 m4_define([nip_version],
           [nip_major_version.nip_minor_version.nip_micro_version])
 
@@ -25,12 +26,11 @@ MAJOR_VERSION=nip_major_version()
 MINOR_VERSION=nip_minor_version()
 MICRO_VERSION=nip_micro_version()
 
-AC_CANONICAL_HOST
-AC_CANONICAL_TARGET
-
 AC_DEFINE_UNQUOTED(MAJOR_VERSION, $MAJOR_VERSION, [Major version number])
 AC_DEFINE_UNQUOTED(MINOR_VERSION, $MINOR_VERSION, [Minor version number])
 AC_DEFINE_UNQUOTED(MICRO_VERSION, $MICRO_VERSION, [Micro version number])
+
+AC_CANONICAL_HOST
 
 AC_MSG_CHECKING([for native Win32])
 case "$host" in

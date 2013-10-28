@@ -1,4 +1,7 @@
 test-driver
+test/test-suite.log
+test/test_all.sh.log
+test/test_all.sh.trs
 po/nip2.pot
 nip2-7.*.tar.gz
 *.o

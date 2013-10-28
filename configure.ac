@@ -234,7 +234,6 @@ AC_STRUCT_TM
 # Checks for library functions.
 AC_FUNC_ALLOCA
 AC_FUNC_FNMATCH
-AC_FUNC_MKDIR
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(geteuid getcwd getpwnam getrlimit getpwent getwd putenv regcomp strcspn strspn strstr)
 

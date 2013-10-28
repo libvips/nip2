@@ -229,23 +229,6 @@ extern int statfs();
  */
 #define MAX_ERROR_FRAG (100)
 
-/* Handle broken mkdirs()
- */
-#if HAVE_MKDIR
-# if MKDIR_TAKES_ONE_ARG
-   /* Mingw32 */
-#  define mkdir(a,b) mkdir(a)
-# endif
-#else
-# ifdef HAVE__MKDIR
-   /* plain Win32 */
-#  include <direct.h>
-#  define mkdir(a,b) _mkdir(a)
-# else
-#  error "Don't know how to create a directory on this system."
-# endif
-#endif
-
 /* win32 adds '_'.
  */
 #ifdef OS_WIN32

@@ -1866,7 +1866,7 @@ mkdirf( const char *name, ... )
 
         va_start( ap, name );
         res = calli_string_filenameva( 
-		(calli_string_fn) mkdir, 
+		(calli_string_fn) g_mkdir, 
 			name, ap, GINT_TO_POINTER( 0755 ), NULL, NULL ) == 0;
         va_end( ap );
 

@@ -134,6 +134,7 @@ void mainw_about_action_cb( GtkAction *action, iWindow *iwnd );
 void mainw_guide_action_cb( GtkAction *action, iWindow *iwnd );
 
 void mainw_column_new_action_cb( GtkAction *action, Mainw *mainw );
+void mainw_workspace_merge( Mainw *mainw );
 void mainw_workspace_merge_action_cb( GtkAction *action, Mainw *mainw );
 void mainw_layout_action_cb( GtkAction *action, Mainw *mainw );
 void mainw_group_action_cb( GtkAction *action, Mainw *mainw );

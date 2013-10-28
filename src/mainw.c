@@ -1128,7 +1128,7 @@ mainw_workspace_merge_done_cb( iWindow *iwnd,
 
 /* Merge ws file into current ws.
  */
-static void
+void
 mainw_workspace_merge( Mainw *mainw )
 {
 	GtkWidget *filesel = filesel_new();

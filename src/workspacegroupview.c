@@ -418,6 +418,15 @@ workspacegroupview_add_workspace_cb2( GtkWidget *wid, GtkWidget *host,
 }
 
 static void                
+workspacegroupview_load_workspace_cb2( GtkWidget *wid, GtkWidget *host, 
+	Workspacegroupview *wsgview )
+{
+	Mainw *mainw = MAINW( iwindow_get_root( GTK_WIDGET( wsgview ) ) );
+
+	mainw_workspace_merge( mainw );
+}
+
+static void                
 workspacegroupview_select_all_cb( GtkWidget *wid, GtkWidget *host, 
 	Workspaceview *wview )
 {
@@ -593,6 +602,8 @@ workspacegroupview_init( Workspacegroupview *wsgview )
 	wsgview->gutter_menu = popup_build( _( "Tab gutter menu" ) );
 	popup_add_but( wsgview->gutter_menu, _( "New Tab" ),
 		POPUP_FUNC( workspacegroupview_add_workspace_cb2 ) ); 
+	popup_add_but( wsgview->gutter_menu, _( "Merge Into Workspace" ),
+		POPUP_FUNC( workspacegroupview_load_workspace_cb2 ) ); 
 	popup_attach( wsgview->notebook, wsgview->gutter_menu, wsgview );
 
 #ifdef USE_NOTEBOOK_ACTION

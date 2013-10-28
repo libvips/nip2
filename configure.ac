@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([nip2], [7.36.4])
+AC_INIT([nip2], [7.37.0])
 AM_INIT_AUTOMAKE([-Wall])
 
 # foreign stops complaints about a missing README (we use README.md instead)
@@ -17,8 +17,8 @@ dnl of them.
 dnl
 
 m4_define([nip_major_version], [7])
-m4_define([nip_minor_version], [36])
-m4_define([nip_micro_version], [4])
+m4_define([nip_minor_version], [37])
+m4_define([nip_micro_version], [0])
 m4_define([nip_version],
           [nip_major_version.nip_minor_version.nip_micro_version])
 

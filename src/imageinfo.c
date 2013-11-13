@@ -709,7 +709,7 @@ imageinfo_proxy_add( Imageinfo *imageinfo )
 {
 	/* Only if we're running interactively.
 	 */
-	if( !main_option_batch )
+	if( main_option_batch )
 		return;
 
 	/* Already being monitored?

@@ -9,7 +9,7 @@ EXTRA_DIST = \
 	bootstrap.sh \
 	doc \
 	proj \
-	acinclude.m4 \
+	m4 \
 	nip2.desktop.in \
 	nip2.xml 
 

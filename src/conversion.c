@@ -467,8 +467,6 @@ im_lintrauc( double a, IMAGE *in, double b, IMAGE *out )
 { 
         LintraInfo *inf;
 
-        /* Check args.
-         */
         if( in->Coding != IM_CODING_NONE ) {
                 im_error( "im_lintrauc", _( "not uncoded" ) );
                 return( -1 );
@@ -479,8 +477,6 @@ im_lintrauc( double a, IMAGE *in, double b, IMAGE *out )
 	out->Bbits = IM_BBITS_BYTE;
 	out->BandFmt = IM_BANDFMT_UCHAR;
 
-        /* Make space for a little buffer.
-         */
         if( !(inf = IM_NEW( out, LintraInfo )) )
                 return( -1 );
 	inf->a = a;
@@ -488,8 +484,6 @@ im_lintrauc( double a, IMAGE *in, double b, IMAGE *out )
 	inf->in = in;
 	inf->out = out;
 
-        /* Generate!
-         */
 	if( im_wrapone( in, out,
 		(im_wrapone_fn) lintrauc_gen, in, inf ) )
 		return( -1 );
@@ -702,8 +696,9 @@ conversion_make_repaint( Conversion *conv, IMAGE *in )
 			(conv->scale != 1.0 || conv->offset != 0.0) ) {
 			IMAGE *t = im_open_local( out, "conv:1", "p" );
 
-			if( !t || im_lintrauc( conv->scale, in, 
-				conv->offset, t ) ) {
+			if( !t || 
+				im_lintrauc( conv->scale, in, 
+					conv->offset, t ) ) {
 				im_close( out );
 				return( NULL );
 			}

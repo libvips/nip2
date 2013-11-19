@@ -142,7 +142,7 @@ box_alert( GtkWidget *par )
 {
 	char buf[MAX_DIALOG_TEXT];
 
-	if( !main_option_batch ) {
+	if( main_option_batch ) {
 		/* No X, just print.
 		 */
 		fprintf( stderr, "%s\n", error_get_top() );

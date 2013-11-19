@@ -432,9 +432,9 @@ plot_graphic_save( Classmodel *classmodel,
 {
 	Plot *plot = PLOT( classmodel );
 	ImageValue *value = &plot->value;
-	char buf[MAX_STRSIZE];
+	char buf[FILENAME_MAX];
 
-	strcpy( buf, filename );
+	expand_variables( filename, buf );
 	filesel_add_mode( buf );
 
 	if( value->ii )

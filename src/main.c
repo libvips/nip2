@@ -1465,7 +1465,7 @@ main( int argc, char *argv[] )
 		}
 	}
 
-	/* Abandon batch mode if there are startup errors.
+	/* In batch mode give up if there are startup errors.
 	 */
 	if( main_option_batch ) {
 		if( !main_log_is_empty() ) {

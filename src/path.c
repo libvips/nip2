@@ -200,7 +200,7 @@ path_rewrite_add( const char *old, const char *new, gboolean lock )
 		printf( "path_rewrite_add: adding\n" );
 #endif /*DEBUG_REWRITE*/
 
-		rewrite = path_rewrite_new( old, new, lock );
+		(void) path_rewrite_new( old, new, lock );
 	}
 
 	/* Keep longest old first, in case one old is a prefix of 

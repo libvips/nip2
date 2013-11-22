@@ -133,7 +133,9 @@ colour_set_colour( Colour *colour,
 	for( i = 0; i < 3; i++ )
 		if( !DEQ( value[i], colour->value[i] ) )
 			break;
-	if( i == 3 && strcmp( colour_space, colour->colour_space ) == 0 )
+	if( i == 3 && 
+		colour_space &&
+		strcmp( colour_space, colour->colour_space ) == 0 )
 		return;
 
 	for( i = 0; i < 3; i++ )
@@ -176,8 +178,11 @@ colour_ii_new( Colour *colour )
 static void
 colour_get_rgb( Colour *colour, double rgb[4] )
 {
+	int i;
 	Imageinfo *imageinfo;
 
+	for( i = 0; i < 4; i++ ) 
+		rgb[i] = 0.0;
 	if( (imageinfo = colour_ii_new( colour )) )
 		imageinfo_to_rgb( imageinfo, rgb );
 }

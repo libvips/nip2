@@ -1169,6 +1169,7 @@ mainw_auto_recover_cb( iWindow *iwnd,
 		filename, filename )) ) {
 		progress_end();
 		nfn( sys, IWINDOW_ERROR );
+		return;  
 	}
 
 	filemodel_set_filename( FILEMODEL( new_wsg ), NULL );

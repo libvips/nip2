@@ -238,11 +238,16 @@ itext_decompile_element( VipsBuf *buf, PElement *base, gboolean top )
 			vips_buf_appends( buf, ")" );
 	}
 	else if( PEISMANAGED( base ) ) {
-		Managed *managed = PEGETMANAGED( base );
+		Managed *managed;
 
-		vips_buf_appendf( buf, "<%s ", G_OBJECT_TYPE_NAME( managed ) );
-		iobject_info( IOBJECT( managed ), buf );
-		vips_buf_appends( buf, ">" );
+		if( !(managed = PEGETMANAGED( base )) ) 
+			vips_buf_appendf( buf, "<NULL managed>" );  
+		else { 
+			vips_buf_appendf( buf, "<%s ", 
+				G_OBJECT_TYPE_NAME( managed ) );
+			iobject_info( IOBJECT( managed ), buf );
+			vips_buf_appends( buf, ">" );
+		}
 	}
 	else if( PEISCLASS( base ) ) {
 		Compile *compile = PEGETCLASSCOMPILE( base );

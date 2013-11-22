@@ -594,7 +594,6 @@ regionview_destroy( GtkObject *object )
 	g_return_if_fail( IS_REGIONVIEW( object ) );
 
 	regionview = REGIONVIEW( object );
-	id = regionview->ip->id;
 
 	if( !regionview->first ) 
 		regionview_queue_draw( regionview ); 
@@ -602,11 +601,14 @@ regionview_destroy( GtkObject *object )
 
 	regionview_detach( regionview );
 
-	FREESID( regionview->expose_sid, id ); 
-	FREESID( regionview->destroy_sid, id ); 
-	FREESID( regionview->event_sid, id ); 
-	FREESID( regionview->changed_sid, id->conv ); 
-	FREESID( regionview->conv_destroy_sid, id->conv ); 
+	if( (id = regionview->ip->id) ) { 
+		FREESID( regionview->expose_sid, id ); 
+		FREESID( regionview->destroy_sid, id ); 
+		FREESID( regionview->event_sid, id ); 
+		FREESID( regionview->changed_sid, id->conv ); 
+		FREESID( regionview->conv_destroy_sid, id->conv ); 
+	}
+
 	FREESID( regionview->model_changed_sid, regionview->classmodel ); 
 	IM_FREEF( g_source_remove, regionview->dash_crawl );
 	IM_FREEF( iwindow_cursor_context_destroy, regionview->cntxt );

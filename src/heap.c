@@ -1252,7 +1252,7 @@ heap_map_list( PElement *base, heap_map_list_fn fn, void *a, void *b )
 		/* Apply user function to the head.
 		 */
 		PEGETHD( &head, &e );
-		if(( res = fn( &head, a, b )) )
+		if( (res = fn( &head, a, b )) )
 			return( res );
 
 		/* Reduce the tail.
@@ -2094,7 +2094,7 @@ lisp_list( VipsBuf *buf, PElement *base,
 /* Print a [char] ... fall back to lisp_list() if we hit a non-char
  * element. base is the RHS of a cons, so it can be a managedstring too.
  */
-static void
+static gboolean
 lisp_string( VipsBuf *buf, PElement *base, 
 	GSList **back, gboolean fn, int indent )
 {
@@ -2113,7 +2113,8 @@ lisp_string( VipsBuf *buf, PElement *base,
 				vips_buf_appendf( buf, "%c", PEGETCHAR( &pe ) );
 
 				PEPOINTRIGHT( hn, &pe );
-				lisp_string( buf, &pe, back, fn, indent );
+				(void) lisp_string( buf, 
+					&pe, back, fn, indent );
 			}
 			else {
 				vips_buf_appends( buf, "\":[" );
@@ -2133,6 +2134,8 @@ lisp_string( VipsBuf *buf, PElement *base,
 		vips_buf_appends( buf, PEGETMANAGEDSTRING( base )->string );
 	else if( !PEISELIST( base ) ) 
 		error = TRUE;
+
+	return( error ); 
 }
 
 /* Print a graph LISP-style.
@@ -2192,7 +2195,7 @@ lisp_node( VipsBuf *buf, HeapNode *hn, GSList **back, gboolean fn, int indent )
 		if( PEISCHAR( &p1 ) ) {
 			vips_buf_appendf( buf, "\"%c", PEGETCHAR( &p1 ) );
 			PEPOINTRIGHT( hn, &p2 );
-			lisp_string( buf, &p2, back, fn, indent );
+			(void) lisp_string( buf, &p2, back, fn, indent );
 			vips_buf_appends( buf, "\"" );
 		}
 		else {

@@ -165,24 +165,23 @@ iregiongroupview_refresh( vObject *vobject )
 	iregiongroupview->classmodel = 
 		iregiongroupview_get_classmodel( iregiongroupview );
 
-	iregiongroupview->classmodel = 
-		iregiongroupview_get_classmodel( iregiongroupview );
+	if( iregiongroupview->classmodel ) { 
+		/* Make a note of all the displays we have now, loop over the 
+		 * displays we should have, reusing when possible ... remove 
+		 * any unused displays at the end.
+		 */
+		irs.classmodel = iregiongroupview->classmodel;
+		irs.notused = g_slist_copy( irs.classmodel->views );
+		irs.iregiongroupview = iregiongroupview;
 
-	/* Make a note of all the displays we have now, loop over the 
-	 * displays we should have, reusing when possible ... remove any 
-	 * unused displays at the end.
-	 */
-	irs.classmodel = iregiongroupview->classmodel;
-	irs.notused = g_slist_copy( irs.classmodel->views );
-	irs.iregiongroupview = iregiongroupview;
+		slist_map( irs.classmodel->iimages,
+			(SListMapFn) iregiongroupview_refresh_iimage, &irs );
 
-	slist_map( irs.classmodel->iimages,
-		(SListMapFn) iregiongroupview_refresh_iimage, &irs );
-
-	/* Remove all the regionviews we've not used. 
-	 */
-	slist_map( irs.notused, (SListMapFn) object_destroy, NULL );
-	IM_FREEF( g_slist_free, irs.notused );
+		/* Remove all the regionviews we've not used. 
+		 */
+		slist_map( irs.notused, (SListMapFn) object_destroy, NULL );
+		IM_FREEF( g_slist_free, irs.notused );
+	}
 
 	VOBJECT_CLASS( parent_class )->refresh( vobject );
 }

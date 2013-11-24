@@ -1,6 +1,7 @@
 started 7.37.0 28/10/13
 - add "merge into ws" item to rmb tab gutter menu
 - oops, progress feedback was accidentally disabled
+- error boxes were accidentally supressed
 
 started 7.36.4 18/10/13
 - fix bootstrap warnings

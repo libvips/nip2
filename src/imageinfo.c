@@ -1157,8 +1157,10 @@ imageinfo_check_paintable( Imageinfo *imageinfo, GtkWidget *parent,
 {
 	IMAGE *im = imageinfo_get( FALSE, imageinfo );
 
-	if( im_isfile( im ) && 
-		!imageinfo->dfile && !imageinfo->ok_to_paint ) {
+	if( im &&
+		im_isfile( im ) && 
+		!imageinfo->dfile && 
+		!imageinfo->ok_to_paint ) {
 		iDialog *idlg;
 
 		idlg = box_yesno( parent,
@@ -1178,7 +1180,9 @@ imageinfo_check_paintable( Imageinfo *imageinfo, GtkWidget *parent,
 
 		return( FALSE );
 	}
-	else if( !im_isfile( im ) && !imageinfo->ok_to_paint ) {
+	else if( im &&
+		!im_isfile( im ) && 
+		!imageinfo->ok_to_paint ) {
 		if( !imageinfo_make_paintable( imageinfo ) ) {
 			nfn( sys, IWINDOW_ERROR );
 			return( FALSE );

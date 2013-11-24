@@ -619,7 +619,7 @@ program_edit_dia( Program *program, Tool *tool )
 {
 	GtkWidget *ss = stringset_new();
 
-	g_assert( tool->type == TOOL_DIA );
+	g_assert( tool && tool->type == TOOL_DIA );
 
 	stringset_child_new( STRINGSET( ss ), 
 		_( "Name" ), IOBJECT( tool )->name, _( "Menu item text" ) );

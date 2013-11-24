@@ -594,7 +594,7 @@ watch_int_update( Watch *watch )
 {
 	WatchInt *watch_int = WATCH_INT( watch );
 	Expr *expr = watch->row->expr;
-	PElement *root = &watch->row->expr->root;
+	PElement *root;
 
 #ifdef DEBUG
 	printf( "watch_int_update: %s\n", NN( IOBJECT( watch )->name ) );

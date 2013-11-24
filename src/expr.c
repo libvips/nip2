@@ -617,7 +617,8 @@ expr_tip_sub( Expr *expr, VipsBuf *buf )
 		vips_buf_appends( buf, " " );
 	}
 
-	if( compile && is_class( compile ) ) {
+	if( compile && 
+		is_class( compile ) ) {
 		vips_buf_appends( buf, _( "class" ) );
 		vips_buf_appends( buf, " " );
 		if( compile->nparam == 0 ) {
@@ -634,7 +635,7 @@ expr_tip_sub( Expr *expr, VipsBuf *buf )
 	else if( expr->sym->type == SYM_PARAM )
 		vips_buf_appendf( buf, _( "parameter \"%s\"" ), 
 			IOBJECT( expr->sym )->name );
-	else {
+	else if( compile ) {
 		if( is_member( expr->sym ) ) {
 			vips_buf_appends( buf, _( "member" ) );
 			vips_buf_appends( buf, " " );

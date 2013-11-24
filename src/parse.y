@@ -1662,7 +1662,8 @@ parse_set_symbol( void )
 			if( !(sym = compile_lookup( compile, ident )) ) 
 				nip2yyerror( _( "'%s' does not exist" ), 
 					ident );
-			if( !sym->expr || !sym->expr->compile )
+			if( !sym->expr || 
+				!sym->expr->compile )
 				nip2yyerror( _( "'%s' has no members" ), 
 					ident );
 			compile = sym->expr->compile;

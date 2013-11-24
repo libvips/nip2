@@ -8,6 +8,7 @@ nip2-7.*.tar.gz
 .*.swp
 TAGS
 Makefile
+scan
 Makefile.in
 config.*
 autom4te.cache

@@ -683,6 +683,8 @@ classmodel_buildedit_member( Classmodel *classmodel,
 {
 	GtkWidget *widget;
 
+	widget = NULL; 
+
 	switch( m->type ) {
 	case CLASSMODEL_MEMBER_INT:
 	case CLASSMODEL_MEMBER_ENUM:

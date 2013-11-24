@@ -516,7 +516,9 @@ row_info( iObject *iobject, VipsBuf *buf )
 			vips_buf_appends( buf, "\n" );
 		}
 	}
-	if( row == row->top_row && row->sym->dirty ) {
+	if( row == row->top_row && 
+		row->sym &&
+		row->sym->dirty ) {
 		Symbol *sym = row->sym;
 
 		if( sym->ndirtychildren ) {
@@ -2017,7 +2019,8 @@ row_set_status( Row *row )
 
 		vips_buf_appends( &buf, " = " );
 
-		if( row->ws->mode != WORKSPACE_MODE_FORMULA )
+		if( row->ws && 
+			row->ws->mode != WORKSPACE_MODE_FORMULA )
 			vips_buf_appends( &buf, NN( itext->formula ) );
 		else 
 			vips_buf_appends( &buf, vips_buf_all( &itext->value ) );

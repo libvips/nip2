@@ -527,7 +527,8 @@ idialog_build( GtkWidget *widget )
 	else {
 		/* If there's just 1 OK, that gets Esc too.
 		 */
-		if( g_slist_length( idlg->ok_but_l ) == 1 )
+		if( idlg->ok_but_l &&
+			g_slist_length( idlg->ok_but_l ) == 1 )
 			gtk_widget_add_accelerator( 
 				GTK_WIDGET( idlg->ok_but_l->data ), "clicked", 
 				iwnd->accel_group, GDK_Escape, 0, 0 );

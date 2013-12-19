@@ -1,4 +1,4 @@
-started 7.37.0 28/10/13
+started 7.36.5 19/12/13
 - add "merge into ws" item to rmb tab gutter menu
 - oops, progress feedback was accidentally disabled
 - error boxes were accidentally supressed

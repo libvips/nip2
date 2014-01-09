@@ -324,7 +324,7 @@ Tasks_capture_item = class
 			// normalise: the 2nd row is what makes Y, so divide by that to
 			// get Y in 0-1.
 			_pinv = (transpose _camera' * _camera') ** -1;
-			_full_M = transpose (_pinv * transpose _camera' * _true_XYZ);
+			_full_M = transpose (_pinv * (transpose _camera' * _true_XYZ));
 			M = _full_M / scale;
 			scale = sum _full_M.value?1;
 

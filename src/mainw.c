@@ -459,12 +459,13 @@ static gboolean
 mainw_refresh_timeout_cb( gpointer user_data )
 {
 	static GtkToolbarStyle styles[] = {
-		99,			/* Overwrite with system default */
+		0,			/* Overwrite with system default */
 		GTK_TOOLBAR_ICONS,
 		GTK_TOOLBAR_TEXT,
 		GTK_TOOLBAR_BOTH,
 		GTK_TOOLBAR_BOTH_HORIZ
 	};
+	static gboolean inited_default_style = FALSE;
 
 	/* Keep in step with the WorkspaceMode enum.
 	 */
@@ -489,9 +490,11 @@ mainw_refresh_timeout_cb( gpointer user_data )
 	mainw_free_update( mainw );
 	mainw_title_update( mainw );
 
-	if( styles[0] == 99 )
+	if( !inited_default_style ) { 
 		styles[0] = 
 			gtk_toolbar_get_style( GTK_TOOLBAR( mainw->toolbar ) );
+		inited_default_style = TRUE;
+	}
 
 	gtk_toolbar_set_style( GTK_TOOLBAR( mainw->toolbar ), styles[pref] );
 

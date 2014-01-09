@@ -243,7 +243,7 @@ call_usage( VipsBuf *buf, im_function *fn )
 static void
 call_error_arg( CallInfo *vi, HeapNode **arg, int argi )
 {
-	char txt[1000];
+	char txt[10000];
 	VipsBuf buf = VIPS_BUF_STATIC( txt );
 
 	error_top( _( "Bad argument." ) );

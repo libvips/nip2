@@ -786,7 +786,7 @@ workspace_load( Model *model,
 	if( get_sprop( xnode, "view", buf, FILENAME_MAX ) ) {
 		WorkspaceMode mode = char_to_workspacemode( buf );
 
-		if( mode >= 0 )
+		if( (int) mode >= 0 )
 			/* Could call workspace_set_mode(), but this is only a
 			 * load, so so what.
 			 */

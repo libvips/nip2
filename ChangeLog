@@ -1,3 +1,6 @@
+started 7.38.0 18/1/14
+- version bump
+
 started 7.36.6 9/1/14
 - fix some clang warnings
 - add some brackets to find_colour-calib, seems to help clang builds with

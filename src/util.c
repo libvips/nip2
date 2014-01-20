@@ -1278,7 +1278,7 @@ static const int nbandfmt_names = IM_NUMBER( bandfmt_names );
 const char *
 decode_bandfmt( int f )
 {
-	if( f > nbandfmt_names || f < 0 )
+	if( f > nbandfmt_names - 1 || f < 0 )
 		return( _( "<unknown format>" ) );
 	else
 		return( _( bandfmt_names[f] ) );
@@ -1314,14 +1314,15 @@ static const char *type_names[] = {
 	"Fourier",		/* IM_TYPE_FOURIER	24 */
 	"RGB16",		/* IM_TYPE_RGB16	25 */
 	"GREY16",		/* IM_TYPE_GREY16	26 */
-	"Array"			/* VIPS_INTERPRETATION_ARRAY = 27 */
+	"Array",		/* VIPS_INTERPRETATION_ARRAY = 27 */
+	"scRGB"			/* VIPS_INTERPRETATION_scRGB = 28 */
 };
 static const int ntype_names = IM_NUMBER( type_names );
 
 const char *
 decode_type( int t )
 {
-	if( t > ntype_names || t < 0 )
+	if( t > ntype_names - 1 || t < 0 )
 		return( _( "<unknown type>" ) );
 	else
 		return( type_names[t] );

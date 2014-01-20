@@ -610,6 +610,7 @@ conversion_make_repaint( Conversion *conv, IMAGE *in )
 		(in->Type == IM_TYPE_LCH ||
 		in->Type == IM_TYPE_YXY ||
 		in->Type == IM_TYPE_UCS ||
+		in->Type == VIPS_INTERPRETATION_scRGB ||
 		in->Type == IM_TYPE_LAB ||
 		in->Type == IM_TYPE_XYZ) ) {
 		IMAGE *t[2];
@@ -639,6 +640,18 @@ conversion_make_repaint( Conversion *conv, IMAGE *in )
 			}
 
 			in = t[1];
+		}
+
+		if( in->Type == VIPS_INTERPRETATION_scRGB ) {
+			VipsImage *x;
+
+			if( vips_scRGB2sRGB( in, &x, NULL ) ) {
+				im_close( out );
+				return( NULL );
+			}
+			vips_object_local( out, x ); 
+
+			in = x;
 		}
 
 		if( in->Type == IM_TYPE_YXY ) {

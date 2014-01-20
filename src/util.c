@@ -1315,7 +1315,7 @@ static const char *type_names[] = {
 	"RGB16",		/* IM_TYPE_RGB16	25 */
 	"GREY16",		/* IM_TYPE_GREY16	26 */
 	"Array",		/* VIPS_INTERPRETATION_ARRAY = 27 */
-	"scRGB"			/* VIPS_INTERPRETATION_scRGB 28 */
+	"scRGB"			/* VIPS_INTERPRETATION_scRGB = 28 */
 };
 static const int ntype_names = IM_NUMBER( type_names );
 

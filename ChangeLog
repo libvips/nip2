@@ -1,10 +1,8 @@
-<<<<<<< HEAD
-started 7.38.1 18/1/14
-- add scRGB to list of known Types
-=======
+started 7.38.2 21/1/14
+- fix a tiny mem leak
+
 started 7.38.1 20/1/14
 - fix scRGB display
->>>>>>> 2bb3de9e64a99361e6363219f301761e4b2aa7d6
 
 started 7.38.0 18/1/14
 - version bump

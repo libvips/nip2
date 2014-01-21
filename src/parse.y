@@ -1594,7 +1594,7 @@ free_lex( int yychar )
 }
 
 /* Do we have a string of the form "IDENT = .."? Use the lexer to look along
- * the string checking components, return the IDENT if we do. 
+ * the string checking components, return the IDENT if we do, NULL otherwise.  
  */
 char *
 parse_test_define( void )
@@ -1609,18 +1609,22 @@ parse_test_define( void )
 		/* Here for yyerror in lex. 
 		 */
 		IM_FREE( ident );
+
 		return( NULL ); 
 	}
 
 	if( (yychar = yylex()) != TK_IDENT ) {
 		free_lex( yychar );
-		yyerror( _( "no leading identifier" ) );
+
+		return( NULL ); 
 	}
 	ident = yylval.yy_name;
 
 	if( (yychar = yylex()) != '=' ) {
 		free_lex( yychar );
-		yyerror( _( "'=' missing" ) );
+		IM_FREE( ident ); 
+
+		return( NULL ); 
 	}
 
 	return( ident );

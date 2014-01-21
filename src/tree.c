@@ -34,7 +34,7 @@
 void
 tree_const_destroy( ParseConst *pc )
 {
-	if( pc->type == PARSE_CONST_STR )
+	if( pc->type == PARSE_CONST_STR ) 
 		IM_FREE( pc->val.str );
 	pc->type = PARSE_CONST_NONE;
 }

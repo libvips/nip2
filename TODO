@@ -1,3 +1,19 @@
+- use
+
+gboolean gog_graph_export_image( GogGraph *graph, GOImageFormat format,
+  GsfOutput *output, double x_dpi, double y_dpi);
+
+  in plot to save chart
+
+  saver must be in plotview.c?
+
+  file menu on plotwindow
+ 
+  need to access from snip as well ... a method to get a VipsImage from a Plot
+  object?
+
+
+
 - columns can move about on load in large workspaces
 
 - hide tabs if only one tab in window, though we'd need to allow tab drop 

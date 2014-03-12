@@ -162,6 +162,106 @@ plotwindow_show_status_action_cb( GtkToggleAction *action,
 		gtk_toggle_action_get_active( action ) );
 }
 
+/* Map filenames to GO formats.
+ *
+ * Possible GO formats:
+ *
+GO_IMAGE_FORMAT_SVG,
+GO_IMAGE_FORMAT_PNG,
+GO_IMAGE_FORMAT_JPG,
+GO_IMAGE_FORMAT_PDF,
+GO_IMAGE_FORMAT_PS,
+GO_IMAGE_FORMAT_EMF,
+GO_IMAGE_FORMAT_WMF,
+GO_IMAGE_FORMAT_EPS,
+ *
+ */
+
+typedef struct { 
+	const char *prefix;
+	GOImageFormat format;
+} PrefixFormat;
+
+static PrefixFormat plotwindow_pf_map[] = {
+	{ "PNG", GO_IMAGE_FORMAT_PNG },
+	{ "JPEG", GO_IMAGE_FORMAT_JPG },
+};
+
+static GOImageFormat
+plotwindow_guess_format( const char *filename )
+{
+	FileselFileType **p;
+	int i;
+
+	for( p = filesel_type_image; *p; p++ ) 
+		if( is_file_type( *p, filename ) ) 
+			break;
+	if( !*p )
+		return( GO_IMAGE_FORMAT_UNKNOWN ); 
+
+	for( i = 0; i < IM_NUMBER( plotwindow_pf_map ); i++ ) 
+		if( is_prefix( plotwindow_pf_map[i].prefix, (*p)->name ) )
+			return( plotwindow_pf_map[i].format ); 
+
+	return( GO_IMAGE_FORMAT_UNKNOWN ); 
+}
+
+static void
+plotwindow_saveas_done_cb( iWindow *iwnd, 
+	void *client, iWindowNotifyFn nfn, void *sys )
+{
+	Filesel *filesel = FILESEL( iwnd );
+	Plotwindow *plotwindow = (Plotwindow *) client;
+	Plotpresent *plotpresent = plotwindow->plotpresent;
+	GogGraph *ggraph = plotpresent->ggraph;
+
+	char *filename; 
+	GOImageFormat format;
+	GsfOutput *output;
+	GError *err = NULL;
+	gboolean result;
+
+	if( !(filename = filesel_get_filename( filesel )) ) {
+		nfn( sys, IWINDOW_ERROR );
+		return;
+	}
+
+	if( !(output = gsf_output_stdio_new( filename, &err )) ) {
+		error_top( _( "Unable to write." ) );
+		if( err )
+			error_sub( "%s", err->message );
+		IM_FREEF( g_error_free, err );
+		g_free( filename ); 
+		nfn( sys, IWINDOW_ERROR );
+		return;
+	}
+	g_free( filename ); 
+
+	format = plotwindow_guess_format( filename ); 
+
+	result = gog_graph_export_image( ggraph, format, output, 72, 72 );
+
+	UNREF( output );
+
+	nfn( sys, result ? IWINDOW_YES : IWINDOW_ERROR );
+}
+
+static void
+plotwindow_save_action_cb( GtkAction *action, Plotwindow *plotwindow )
+{
+	Filesel *filesel = FILESEL( filesel_new() );
+
+	iwindow_set_title( IWINDOW( filesel ), 
+		"%s", _( "Save Plot To File As" ) ); 
+	filesel_set_flags( filesel, TRUE, TRUE );
+	filesel_set_filetype( filesel, filesel_type_image, IMAGE_FILE_TYPE ); 
+	iwindow_set_parent( IWINDOW( filesel ), GTK_WIDGET( plotwindow ) );
+	filesel_set_done( filesel, plotwindow_saveas_done_cb, plotwindow );
+	iwindow_build( IWINDOW( filesel ) );
+
+	gtk_widget_show( GTK_WIDGET( filesel ) );
+}
+
 static GtkToggleActionEntry plotwindow_toggle_actions[] = {
 	{ "Status",
 		NULL, N_( "_Status" ), NULL,
@@ -169,10 +269,19 @@ static GtkToggleActionEntry plotwindow_toggle_actions[] = {
 		G_CALLBACK( plotwindow_show_status_action_cb ), TRUE }
 };
 
+static GtkActionEntry plotwindow_actions[] = {
+	{ "SaveAs", 
+		GTK_STOCK_SAVE_AS, N_( "Save As Image" ), NULL,
+		N_( "Save plot to file as an image" ), 
+		G_CALLBACK( plotwindow_save_action_cb ) }
+};
+
 static const char *plotwindow_menubar_ui_description =
 "<ui>"
 "  <menubar name='PlotwindowMenubar'>"
 "    <menu action='FileMenu'>"
+"      <menuitem action='SaveAs'/>"
+"      <separator/>"
 "      <menuitem action='Close'/>"
 "      <menuitem action='Quit'/>"
 "    </menu>"
@@ -210,6 +319,9 @@ plotwindow_build( Plotwindow *plotwindow, GtkWidget *vbox, Plot *plot )
 
         /* Make main menu bar
          */
+	gtk_action_group_add_actions( iwnd->action_group, 
+		plotwindow_actions, G_N_ELEMENTS( plotwindow_actions ), 
+		GTK_WINDOW( plotwindow ) );
 	gtk_action_group_add_toggle_actions( iwnd->action_group,
 		plotwindow_toggle_actions, 
 			G_N_ELEMENTS( plotwindow_toggle_actions ), 

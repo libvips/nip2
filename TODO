@@ -12,6 +12,10 @@ gboolean gog_graph_export_image( GogGraph *graph, GOImageFormat format,
   need to access from snip as well ... a method to get a VipsImage from a Plot
   object?
 
+  add a plot_get_image (Plot) width height built-in
+
+  add a Plot member to run it
+
 
 
 - columns can move about on load in large workspaces

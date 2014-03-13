@@ -98,8 +98,7 @@ static BuiltinTypeSpot gobject_spot = { "GObject", pe_is_gobject };
 /* Args for "_".
  */
 static BuiltinTypeSpot *underscore_args[] = {
-        &string_spot,
-        &any_spot
+        &string_spot
 };
 
 /* Do a _ call. Args already spotted.
@@ -343,6 +342,76 @@ apply_read_call( Reduce *rc,
 
 	if( !heap_file_new( rc->heap, buf, out ) )
 		reduce_throw( rc );
+}
+
+/* Args for "graph_export_image". 
+ */
+static BuiltinTypeSpot *graph_export_image_args[] = { 
+	&real_spot,
+	&any_spot 
+};
+
+/* Init the Plot from the heap instance.
+ */
+static gboolean
+apply_graph_export_plot_init( Plot *plot, PElement *root )
+{
+	Classmodel *classmodel = CLASSMODEL( plot );
+	ClassmodelClass *class = CLASSMODEL_GET_CLASS( classmodel );
+
+	int i;
+
+	for( i = 0; i < class->n_members; i++ ) 
+		if( !classmodel_update_model_member( classmodel,
+			&class->members[i], root ) )
+			return( FALSE );
+
+	if( class->class_get &&
+		!class->class_get( classmodel, root ) )
+		return( FALSE );
+
+	return( TRUE );
+}
+
+/* Do a graph_export_image call.
+ */
+static void
+apply_graph_export_image_call( Reduce *rc, 
+	const char *name, HeapNode **arg, PElement *out )
+{
+	PElement rhs;
+	double dpi;
+	Plot *plot;
+
+	PEPOINTRIGHT( arg[1], &rhs );
+	dpi = PEGETREAL( &rhs );
+
+	PEPOINTRIGHT( arg[0], &rhs );
+	if( !reduce_is_instanceof( rc, CLASS_PLOT, &rhs ) ) {
+		char txt[100];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
+
+		itext_value_ev( rc, &buf, &rhs );
+		error_top( _( "Bad argument." ) );
+		error_sub( _( "Argument 2 to \"%s\" should "
+			"be instance of \"%s\", you passed:\n  %s" ),
+			name, CLASS_PLOT,
+			vips_buf_all( &buf ) );
+		reduce_throw( rc );
+	}
+
+	plot = g_object_new( TYPE_PLOT, NULL );
+
+	if( !apply_graph_export_plot_init( plot, &rhs ) ) {
+		UNREF( plot );
+		reduce_throw( rc );
+	}
+
+//GogPlot *plot_new_gplot( Plot *plot );
+
+	UNREF( plot );
+
+	PEPUTP( out, ELEMENT_BOOL, TRUE );
 }
 
 /* Args for "math". 
@@ -836,21 +905,29 @@ static BuiltinInfo builtin_table[] = {
 	/* Other.
 	 */
 	{ "dir", N_( "return list of names of members" ),
-		FALSE, 1, &dir_args[0], &apply_dir_call },
+		FALSE, IM_NUMBER( dir_args ),
+		&dir_args[0], &apply_dir_call },
 	{ "search", N_( "search for file" ),
-		FALSE, 1, &search_args[0], &apply_search_call },
+		FALSE, IM_NUMBER( search_args ),
+		&search_args[0], &apply_search_call },
 	{ "error", N_( "raise error" ),
-		FALSE, 1, &error_args[0], &apply_error_call },
+		FALSE, IM_NUMBER( error_args ),
+		&error_args[0], &apply_error_call },
 	{ "print", N_( "convert to [char]" ),
-		FALSE, 1, &print_args[0], &apply_print_call },
+		FALSE, IM_NUMBER( print_args ),
+		&print_args[0], &apply_print_call },
 	{ "expand", N_( "expand environment variables" ),
-		FALSE, 1, &expand_args[0], &apply_expand_call },
+		FALSE, IM_NUMBER( expand_args ),
+		&expand_args[0], &apply_expand_call },
 	{ "name2gtype", N_( "convert [char] to GType" ),
-		FALSE, 1, &name2gtype_args[0], &apply_name2gtype_call },
+		FALSE, IM_NUMBER( name2gtype_args ),
+		&name2gtype_args[0], &apply_name2gtype_call },
 	{ "gtype2name", N_( "convert GType to [char]" ),
-		FALSE, 1, &gtype2name_args[0], &apply_gtype2name_call },
+		FALSE, IM_NUMBER( gtype2name_args ),
+		&gtype2name_args[0], &apply_gtype2name_call },
 	{ "_", N_( "look up localised string" ),
-		FALSE, 1, &underscore_args[0], &apply_underscore_call },
+		FALSE, IM_NUMBER( underscore_args ), 
+		&underscore_args[0], &apply_underscore_call },
 
 	/* vips8 wrapper.
 	 */
@@ -959,6 +1036,10 @@ static BuiltinInfo builtin_table[] = {
 	{ "read", N_( "load text file" ),
 		FALSE, IM_NUMBER( read_args ), 
 		&read_args[0], apply_read_call },
+	{ "graph_export_image", N_( "generate image from Plot object" ),
+		FALSE, IM_NUMBER( graph_export_image_args ), 
+		&graph_export_image_args[0], apply_graph_export_image_call },
+
 };
 
 #ifdef HAVE_GSL

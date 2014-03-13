@@ -1227,11 +1227,29 @@ classmodel_update_model_member( Classmodel *classmodel,
 	return( TRUE );
 }
 
+gboolean 
+classmodel_update_members( Classmodel *classmodel, PElement *root )
+{
+	ClassmodelClass *class = CLASSMODEL_GET_CLASS( classmodel );
+
+	int i;
+
+	for( i = 0; i < class->n_members; i++ ) 
+		if( !classmodel_update_model_member( classmodel,
+			&class->members[i], root ) )
+			return( FALSE );
+
+	if( class->class_get &&
+		!class->class_get( classmodel, root ) )
+		return( FALSE );
+
+	return( TRUE );
+}
+
 static void *
 classmodel_update_model( Heapmodel *heapmodel )
 {
 	Classmodel *classmodel = CLASSMODEL( heapmodel );
-	ClassmodelClass *class = CLASSMODEL_GET_CLASS( classmodel );
 
 #ifdef DEBUG
 	printf( "classmodel_update_model: " );
@@ -1244,22 +1262,14 @@ classmodel_update_model( Heapmodel *heapmodel )
 	if( class->reset )
 		class->reset( classmodel );
 
-	if( heapmodel->row && heapmodel->row->expr ) {
+	if( heapmodel->row && 
+		heapmodel->row->expr ) {
 		Expr *expr = heapmodel->row->expr;
 
-		if( !heapmodel->modified ) {
-			int i;
-
-			for( i = 0; i < class->n_members; i++ ) 
-				if( !classmodel_update_model_member( 
-					classmodel, &class->members[i], 
-					&expr->root ) )
-					return( classmodel );
-
-			if( class->class_get &&
-				!class->class_get( classmodel, &expr->root ) )
+		if( !heapmodel->modified ) 
+			if( !classmodel_update_members( classmodel,
+				&expr->root ) )
 				return( classmodel );
-		}
 	}
 
 	return( HEAPMODEL_CLASS( parent_class )->update_model( heapmodel ) );

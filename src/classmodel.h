@@ -144,6 +144,8 @@ void classmodel_graphic_replace( Classmodel *classmodel, GtkWidget *parent );
 void *classmodel_iimage_unlink( Classmodel *classmodel, iImage *iimage );
 void classmodel_iimage_update( Classmodel *classmodel, Imageinfo *ii );
 
+gboolean classmodel_update_members( Classmodel *classmodel, PElement *root );
+
 GType classmodel_get_type( void );
 
 void classmodel_update( Classmodel *classmodel );

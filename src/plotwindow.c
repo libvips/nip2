@@ -162,6 +162,8 @@ plotwindow_show_status_action_cb( GtkToggleAction *action,
 		gtk_toggle_action_get_active( action ) );
 }
 
+#ifdef HAVE_LIBGOFFICE
+
 /* Map filenames to GO formats.
  *
  * Possible GO formats:
@@ -206,16 +208,21 @@ plotwindow_guess_format( const char *filename )
 	return( GO_IMAGE_FORMAT_UNKNOWN ); 
 }
 
+#endif /*HAVE_LIBGOFFICE*/
+
 static void
 plotwindow_saveas_done_cb( iWindow *iwnd, 
 	void *client, iWindowNotifyFn nfn, void *sys )
 {
+#ifdef HAVE_LIBGOFFICE
+#ifdef HAVE_LIBGSF
 	Filesel *filesel = FILESEL( iwnd );
 	Plotwindow *plotwindow = (Plotwindow *) client;
 	Plotpresent *plotpresent = plotwindow->plotpresent;
 	GogGraph *ggraph = plotpresent->ggraph;
 
 	char *filename; 
+	char buf[FILENAME_MAX];
 	GOImageFormat format;
 	GsfOutput *output;
 	GError *err = NULL;
@@ -226,7 +233,8 @@ plotwindow_saveas_done_cb( iWindow *iwnd,
 		return;
 	}
 
-	if( !(output = gsf_output_stdio_new( filename, &err )) ) {
+	expand_variables( filename, buf );
+	if( !(output = gsf_output_stdio_new( buf, &err )) ) {
 		error_top( _( "Unable to write." ) );
 		if( err )
 			error_sub( "%s", err->message );
@@ -235,15 +243,18 @@ plotwindow_saveas_done_cb( iWindow *iwnd,
 		nfn( sys, IWINDOW_ERROR );
 		return;
 	}
-	g_free( filename ); 
 
 	format = plotwindow_guess_format( filename ); 
+
+	g_free( filename ); 
 
 	result = gog_graph_export_image( ggraph, format, output, 72, 72 );
 
 	UNREF( output );
 
 	nfn( sys, result ? IWINDOW_YES : IWINDOW_ERROR );
+#endif /*HAVE_LIBGSF*/
+#endif /*HAVE_LIBGOFFICE*/
 }
 
 static void

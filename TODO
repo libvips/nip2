@@ -1,3 +1,5 @@
+- test build without libgsf
+
 - use
 
 gboolean gog_graph_export_image( GogGraph *graph, GOImageFormat format,

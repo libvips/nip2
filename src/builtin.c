@@ -843,7 +843,7 @@ static BuiltinInfo builtin_table[] = {
 		FALSE, 1, &error_args[0], &apply_error_call },
 	{ "print", N_( "convert to [char]" ),
 		FALSE, 1, &print_args[0], &apply_print_call },
-	{ "expand", N_( "filexpand environment variables" ),
+	{ "expand", N_( "expand environment variables" ),
 		FALSE, 1, &expand_args[0], &apply_expand_call },
 	{ "name2gtype", N_( "convert [char] to GType" ),
 		FALSE, 1, &name2gtype_args[0], &apply_name2gtype_call },

@@ -271,6 +271,21 @@ if test "x$with_libgoffice" != "xno"; then
   IP_LIBS="$LIBGOFFICE_LIBS $IP_LIBS"
 fi
 
+# use libgsf to save goffice plots to files
+AC_ARG_WITH([libgsf], AS_HELP_STRING([--without-libgsf], [build without libgsf (default: test)]))
+
+if test "x$with_libgsf" != "xno"; then
+  PKG_CHECK_MODULES(LIBGSF, libgsf-1,
+    [AC_DEFINE(HAVE_LIBGSF,1,[define if you have libgsf installed.])
+     with_libgsf=yes
+    ],
+    [AC_MSG_WARN([libgsf not found; disabling save plot to file])
+     with_libgsf=no
+    ])
+  IP_CFLAGS="$LIBGSF_CFLAGS $IP_CFLAGS"
+  IP_LIBS="$LIBGSF_LIBS $IP_LIBS"
+fi
+
 # optional ... use libgvc to draw graphs of workspace dependencies
 AC_ARG_WITH([libgvc], AS_HELP_STRING([--without-libgvc], [build without libgvc (default: test)]))
 
@@ -385,6 +400,7 @@ debug: 					$enable_debug
 use fftw3 for FFT: 			$with_fftw3
 use gsl for numeric functions:		$with_gsl
 use libgoffice to show plots:		$with_libgoffice
+use libgsf to save plots to files:	$with_libgsf
 use libgvc to show ws dep graphs:	$with_libgvc
   (requires gvc < 2.30)
 use gtkinfobar to show messages:	$nip_use_infobar

@@ -104,5 +104,7 @@ char *plot_s2c( PlotStyle style );
 
 #ifdef HAVE_LIBGOFFICE
 GogPlot *plot_new_gplot( Plot *plot );
+void plot_style_main( Plot *plot, GogChart *gchart );
+void plot_style_thumbnail( Plot *plot, GogChart *gchart );
 #endif /*HAVE_LIBGOFFICE*/
 

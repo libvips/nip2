@@ -68,8 +68,6 @@ plotpresent_destroy( GtkObject *object )
 
 	/* My instance destroy stuff.
 	 */
-	GOG_UNREF( plotpresent->glegend );
-	GOG_UNREF( plotpresent->gplot );
 	UNREF( plotpresent->grend );
 
 	GTK_OBJECT_CLASS( parent_class )->destroy( object );
@@ -192,9 +190,6 @@ plotpresent_init( Plotpresent *plotpresent )
 #endif /*DEBUG*/
 
 	plotpresent->gplot = NULL;
-	plotpresent->glegend = NULL;
-	plotpresent->x_ggl = NULL;
-	plotpresent->y_ggl = NULL;
 
 	plotpresent->canvas = go_graph_widget_new( NULL );
         gtk_container_add( GTK_CONTAINER( plotpresent ), plotpresent->canvas );
@@ -239,66 +234,23 @@ plotpresent_get_type( void )
 	return( type );
 }
 
-static GogGridLine *
-plotpresent_add_grid( GogAxis *axis )
-{
-	GogGridLine *ggl;
-
-	ggl = g_object_new( GOG_TYPE_GRID_LINE, "is-minor", FALSE, NULL );
-	gog_object_add_by_name( GOG_OBJECT( axis ), 
-		"MajorGrid", GOG_OBJECT( ggl ) );
-	ggl = g_object_new( GOG_TYPE_GRID_LINE, "is-minor", TRUE, NULL );
-	gog_object_add_by_name( GOG_OBJECT( axis ), 
-		"MinorGrid", GOG_OBJECT( ggl ) );
-
-	return( ggl );
-}
-
 static void
 plotpresent_build_plot( Plotpresent *plotpresent )
 {
 	Plotmodel *plotmodel = plotpresent->plotmodel;
 	Plot *plot = plotmodel->plot;
 
-	GSList *axes;
-	GogAxis *axis;
-
 #ifdef DEBUG
 	printf( "plotpresent_build_plot: %p\n", plotpresent );
 #endif /*DEBUG*/
 
 	GOG_UNREF( plotpresent->gplot );
-	GOG_UNREF( plotpresent->glegend );
 
 	plotpresent->gplot = plot_new_gplot( plot );
 	gog_object_add_by_name( GOG_OBJECT( plotpresent->gchart ), 
 		"Plot", GOG_OBJECT( plotpresent->gplot ) );
 
-	if( plot->columns > 1 ) {
-		plotpresent->glegend = g_object_new( GOG_TYPE_LEGEND, NULL );
-		gog_object_add_by_name( GOG_OBJECT( plotpresent->gchart ), 
-			"Legend", GOG_OBJECT( plotpresent->glegend ) );
-	}
-
-	axes = gog_chart_get_axes( plotpresent->gchart, GOG_AXIS_X );
-	axis = GOG_AXIS( axes->data );
-	g_slist_free( axes );
-
-	gog_axis_set_bounds( axis, plot->xmin, plot->xmax );
-	if( !plotpresent->x_ggl ) {
-		plotpresent->x_ggl = plotpresent_add_grid( axis );
-		g_object_set( axis, "pos", GOG_AXIS_CROSS, NULL );
-	}
-
-	axes = gog_chart_get_axes( plotpresent->gchart, GOG_AXIS_Y );
-	axis = GOG_AXIS( axes->data );
-	g_slist_free( axes );
-
-	gog_axis_set_bounds( axis, plot->ymin, plot->ymax );
-	if( !plotpresent->y_ggl ) {
-		plotpresent->y_ggl = plotpresent_add_grid( axis );
-		g_object_set( axis, "pos", GOG_AXIS_CROSS, NULL );
-	}
+	plot_style_main( plot, plotpresent->gchart ); 
 }
 
 static void
@@ -312,7 +264,8 @@ plotpresent_changed_cb( Plotmodel *plotmodel, Plotpresent *plotpresent )
 
 	/* Can refresh before model build.
 	 */
-	if( plot->rows == 0 || plot->columns == 0 )
+	if( plot->rows == 0 || 
+		plot->columns == 0 )
 		return;
 
 	/* Rebuild plot and data.

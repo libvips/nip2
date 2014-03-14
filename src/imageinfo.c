@@ -804,7 +804,8 @@ imageinfo_new_temp( Imageinfogroup *imageinfogroup,
 	char tname[FILENAME_MAX];
 	Imageinfo *imageinfo;
 
-	if( !temp_name( tname, "v" ) || !(im = im_open( tname, mode )) )
+	if( !temp_name( tname, "v" ) || 
+		!(im = im_open( tname, mode )) )
 		return( NULL );
 	if( !(imageinfo = imageinfo_new( imageinfogroup, heap, im, name )) ) {
 		im_close( im );
@@ -893,6 +894,43 @@ imageinfo_open_image_input( const char *filename, ImageinfoOpen *open )
 		return( NULL );
 
 	return( imageinfo );
+}
+
+Imageinfo *
+imageinfo_new_from_pixbuf( Imageinfogroup *imageinfogroup, 
+	Heap *heap, GdkPixbuf *pixbuf ) 
+{
+	int width;
+	int height;
+	int bands;
+	guchar *bytes;
+	guint length;
+	size_t vips_length;
+	Imageinfo *ii;
+
+	width = gdk_pixbuf_get_width( pixbuf ); 
+	height = gdk_pixbuf_get_height( pixbuf ); 
+	bands = gdk_pixbuf_get_n_channels( pixbuf );
+	bytes = gdk_pixbuf_get_pixels_with_length( pixbuf, &length ); 
+
+	if( !(ii = imageinfo_new_temp( imageinfogroup, heap, NULL, "t" )) )
+		return( NULL );
+
+	im_initdesc( ii->im, width, height, bands, 
+		IM_BBITS_BYTE, IM_BANDFMT_UCHAR, IM_CODING_NONE, 
+		IM_TYPE_sRGB, 1.0, 1.0, 0, 0 );
+	vips_length = VIPS_IMAGE_SIZEOF_LINE( ii->im ) * height;
+	if( vips_length != length ) {
+		error_top( _( "Unable to create image." ) );
+		error_sub( _( "vips expected %zd bytes, gdkpixbuf made %d" ),
+			vips_length, length ); 
+		return( NULL );
+	}
+	if( im_setupout( ii->im ) ) 
+		return( NULL );
+	memcpy( ii->im->data, bytes, length );
+
+	return( ii ); 
 }
 
 /* Was this ii loaded from a file (ie. ->name contains a filename the user

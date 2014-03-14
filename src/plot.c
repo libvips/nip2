@@ -650,4 +650,92 @@ plot_new_gplot( Plot *plot )
 	return( gplot );
 }
 
+static void
+plot_grid_add( GogAxis *axis )
+{
+	GogGridLine *ggl;
+
+	if( !gog_object_get_child_by_name( GOG_OBJECT( axis ), "MajorGrid" ) ) {
+		ggl = g_object_new( GOG_TYPE_GRID_LINE, 
+			"is-minor", FALSE, NULL );
+		gog_object_add_by_name( GOG_OBJECT( axis ), 
+			"MajorGrid", GOG_OBJECT( ggl ) );
+	}
+
+	if( !gog_object_get_child_by_name( GOG_OBJECT( axis ), "MinorGrid" ) ) {
+		ggl = g_object_new( GOG_TYPE_GRID_LINE, 
+			"is-minor", TRUE, NULL );
+		gog_object_add_by_name( GOG_OBJECT( axis ), 
+			"MinorGrid", GOG_OBJECT( ggl ) );
+	}
+
+	g_object_set( axis, "pos", GOG_AXIS_CROSS, NULL );
+}
+
+void
+plot_style_main( Plot *plot, GogChart *gchart )
+{
+	GSList *axes;
+	GogAxis *axis;
+	GogObject *legend;
+
+	axes = gog_chart_get_axes( gchart, GOG_AXIS_X );
+	axis = GOG_AXIS( axes->data );
+	g_slist_free( axes );
+
+	gog_axis_set_bounds( axis, plot->xmin, plot->xmax );
+
+	plot_grid_add( axis ); 
+
+	axes = gog_chart_get_axes( gchart, GOG_AXIS_Y );
+	axis = GOG_AXIS( axes->data );
+	g_slist_free( axes );
+
+	gog_axis_set_bounds( axis, plot->ymin, plot->ymax );
+
+	plot_grid_add( axis ); 
+
+	legend = gog_object_get_child_by_name( GOG_OBJECT( gchart ), "Legend" );
+	if( plot->columns > 1 &&
+		!legend ) {
+		legend = g_object_new( GOG_TYPE_LEGEND, NULL );
+		gog_object_add_by_name( GOG_OBJECT( gchart ), 
+			"Legend", GOG_OBJECT( legend ) );
+	}
+	else if( plot->columns == 1 &&
+		legend ) {
+		gog_object_clear_parent( legend );
+		UNREF( legend ); 
+	}
+}
+
+void
+plot_style_thumbnail( Plot *plot, GogChart *gchart )
+{
+	GSList *axes;
+	GogAxis *axis;
+
+	axes = gog_chart_get_axes( gchart, GOG_AXIS_X );
+	axis = GOG_AXIS( axes->data );
+	g_slist_free( axes );
+
+	g_object_set( axis, 
+		"major-tick-labeled", FALSE, 
+		"major-tick-size-pts", 0,
+		"pos", GOG_AXIS_CROSS,
+		NULL );
+	gog_axis_set_bounds( axis, plot->xmin, plot->xmax );
+
+	axes = gog_chart_get_axes( gchart, GOG_AXIS_Y );
+	axis = GOG_AXIS( axes->data );
+	g_slist_free( axes );
+
+	g_object_set( axis, 
+		"major-tick-labeled", FALSE, 
+		"major-tick-size-pts", 0,
+		"pos", GOG_AXIS_CROSS,
+		NULL );
+	gog_axis_set_bounds( axis, plot->ymin, plot->ymax );
+}
+
 #endif /*HAVE_LIBGOFFICE*/

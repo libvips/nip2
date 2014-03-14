@@ -52,9 +52,6 @@ struct _Plotpresent {
 	GogChart *gchart;
 	GogGraph *ggraph;
         GogPlot *gplot;
-	GogLegend *glegend;
-	GogGridLine *x_ggl;
-	GogGridLine *y_ggl;
 #endif /*HAVE_LIBGOFFICE*/
 };
 

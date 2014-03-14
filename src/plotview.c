@@ -63,8 +63,6 @@ plotview_refresh( vObject *vobject )
     	Plotview *plotview = PLOTVIEW( vobject );
     	Plot *plot = PLOT( VOBJECT( plotview )->iobject );
 
-	GSList *axes;
-	GogAxis *axis;
 
 #ifdef DEBUG
     	printf( "plotview_refresh\n" );
@@ -72,7 +70,8 @@ plotview_refresh( vObject *vobject )
 
 	/* Can't refresh before model build.
 	 */
-	if( plot->rows == 0 || plot->columns == 0 )
+	if( plot->rows == 0 || 
+		plot->columns == 0 )
 		return;
 
 	set_gcaption( plotview->label, "%s", NN( IOBJECT( plot )->caption ) );
@@ -83,27 +82,7 @@ plotview_refresh( vObject *vobject )
 	gog_object_add_by_name( GOG_OBJECT( plotview->gchart ), 
 		"Plot", GOG_OBJECT( plotview->gplot ) );
 
-	axes = gog_chart_get_axes( plotview->gchart, GOG_AXIS_X );
-	axis = GOG_AXIS( axes->data );
-	g_slist_free( axes );
-
-	g_object_set( axis, 
-		"major-tick-labeled", FALSE, 
-		"major-tick-size-pts", 0,
-		"pos", GOG_AXIS_CROSS,
-		NULL );
-	gog_axis_set_bounds( axis, plot->xmin, plot->xmax );
-
-	axes = gog_chart_get_axes( plotview->gchart, GOG_AXIS_Y );
-	axis = GOG_AXIS( axes->data );
-	g_slist_free( axes );
-
-	g_object_set( axis, 
-		"major-tick-labeled", FALSE, 
-		"major-tick-size-pts", 0,
-		"pos", GOG_AXIS_CROSS,
-		NULL );
-	gog_axis_set_bounds( axis, plot->ymin, plot->ymax );
+	plot_style_thumbnail( plot, plotview->gchart ); 
 
 	gtk_widget_show_all( plotview->canvas );
 

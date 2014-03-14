@@ -1,22 +1,10 @@
+- leak-check new plot creator
+
+- add a .get_image member to Plot
+
 - test build without libgsf
 
-- use
-
-gboolean gog_graph_export_image( GogGraph *graph, GOImageFormat format,
-  GsfOutput *output, double x_dpi, double y_dpi);
-
-  in plot to save chart
-
-  saver must be in plotview.c?
-
-  file menu on plotwindow
- 
-  need to access from snip as well ... a method to get a VipsImage from a Plot
-  object?
-
-  add a plot_get_image (Plot) width height built-in
-
-  add a Plot member to run it
+- test build without libgoffice
 
 
 

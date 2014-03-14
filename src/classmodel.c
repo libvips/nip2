@@ -1227,6 +1227,8 @@ classmodel_update_model_member( Classmodel *classmodel,
 	return( TRUE );
 }
 
+/* Update all members from the heap. Also used from graph_export_image.
+ */
 gboolean 
 classmodel_update_members( Classmodel *classmodel, PElement *root )
 {
@@ -1250,6 +1252,7 @@ static void *
 classmodel_update_model( Heapmodel *heapmodel )
 {
 	Classmodel *classmodel = CLASSMODEL( heapmodel );
+	ClassmodelClass *class = CLASSMODEL_GET_CLASS( classmodel );
 
 #ifdef DEBUG
 	printf( "classmodel_update_model: " );

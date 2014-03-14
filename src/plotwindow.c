@@ -162,54 +162,6 @@ plotwindow_show_status_action_cb( GtkToggleAction *action,
 		gtk_toggle_action_get_active( action ) );
 }
 
-#ifdef HAVE_LIBGOFFICE
-
-/* Map filenames to GO formats.
- *
- * Possible GO formats:
- *
-GO_IMAGE_FORMAT_SVG,
-GO_IMAGE_FORMAT_PNG,
-GO_IMAGE_FORMAT_JPG,
-GO_IMAGE_FORMAT_PDF,
-GO_IMAGE_FORMAT_PS,
-GO_IMAGE_FORMAT_EMF,
-GO_IMAGE_FORMAT_WMF,
-GO_IMAGE_FORMAT_EPS,
- *
- */
-
-typedef struct { 
-	const char *prefix;
-	GOImageFormat format;
-} PrefixFormat;
-
-static PrefixFormat plotwindow_pf_map[] = {
-	{ "PNG", GO_IMAGE_FORMAT_PNG },
-	{ "JPEG", GO_IMAGE_FORMAT_JPG },
-};
-
-static GOImageFormat
-plotwindow_guess_format( const char *filename )
-{
-	FileselFileType **p;
-	int i;
-
-	for( p = filesel_type_image; *p; p++ ) 
-		if( is_file_type( *p, filename ) ) 
-			break;
-	if( !*p )
-		return( GO_IMAGE_FORMAT_UNKNOWN ); 
-
-	for( i = 0; i < IM_NUMBER( plotwindow_pf_map ); i++ ) 
-		if( is_prefix( plotwindow_pf_map[i].prefix, (*p)->name ) )
-			return( plotwindow_pf_map[i].format ); 
-
-	return( GO_IMAGE_FORMAT_UNKNOWN ); 
-}
-
-#endif /*HAVE_LIBGOFFICE*/
-
 static void
 plotwindow_saveas_done_cb( iWindow *iwnd, 
 	void *client, iWindowNotifyFn nfn, void *sys )
@@ -244,7 +196,7 @@ plotwindow_saveas_done_cb( iWindow *iwnd,
 		return;
 	}
 
-	format = plotwindow_guess_format( filename ); 
+	format = go_image_get_format_from_name( filename ); 
 
 	g_free( filename ); 
 

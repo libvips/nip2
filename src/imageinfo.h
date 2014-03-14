@@ -195,6 +195,8 @@ Imageinfo *imageinfo_new( Imageinfogroup *imageinfogroup,
 	Heap *heap, IMAGE *im, const char *name );
 Imageinfo *imageinfo_new_temp( Imageinfogroup *imageinfogroup, 
 	Heap *heap, const char *name, const char *mode );
+Imageinfo *imageinfo_new_from_pixbuf( Imageinfogroup *imageinfogroup, 
+	Heap *heap, GdkPixbuf *pixbuf );
 void imageinfo_set_underlying( Imageinfo *top_imageinfo, Imageinfo *imageinfo );
 gboolean imageinfo_is_from_file( Imageinfo *imageinfo );
 Imageinfo *imageinfo_new_input( Imageinfogroup *imageinfogroup, 

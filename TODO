@@ -1,7 +1,5 @@
 - leak-check new plot creator
 
-- add a .get_image member to Plot
-
 - test build without libgsf
 
 - test build without libgoffice

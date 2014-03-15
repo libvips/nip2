@@ -363,6 +363,7 @@ static void
 apply_graph_export_image_call( Reduce *rc, 
 	const char *name, HeapNode **arg, PElement *out )
 {
+#ifdef HAVE_LIBGOFFICE
 	PElement rhs;
 	double dpi;
 	Plot *plot;
@@ -437,6 +438,9 @@ apply_graph_export_image_call( Reduce *rc,
 	UNREF( plot );
 
 	PEPUTP( out, ELEMENT_MANAGED, ii );
+#else /*!HAVE_LIBGOFFICE*/
+	PEPUTP( out, ELEMENT_BOOL, TRUE );
+#endif /*HAVE_LIBGOFFICE*/
 }
 
 /* Args for "math". 

@@ -1205,7 +1205,7 @@ Plot_type = class {
 Plot options value = class 
 	scope.Image value {
 	Image value = this.Plot options value;
-	to_image dpi = scope.Image (graph_export_image (to_real dpi) this);
+	to_image dpi = graph_export_image (to_real dpi) this;
 }
 
 Plot_matrix options value = class 

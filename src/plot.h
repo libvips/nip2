@@ -106,5 +106,6 @@ char *plot_s2c( PlotStyle style );
 GogPlot *plot_new_gplot( Plot *plot );
 void plot_style_main( Plot *plot, GogChart *gchart );
 void plot_style_thumbnail( Plot *plot, GogChart *gchart );
+Imageinfo *plot_to_image( Plot *plot, Reduce *rc, double dpi );
 #endif /*HAVE_LIBGOFFICE*/
 

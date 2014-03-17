@@ -367,12 +367,6 @@ apply_graph_export_image_call( Reduce *rc,
 	PElement rhs;
 	double dpi;
 	Plot *plot;
-	GogGraph *ggraph;
-	GogChart *gchart;
-	GogPlot *gplot;
-	GogRenderer *renderer;
-	GdkPixbuf *pixbuf;
-	double width_in_pts, height_in_pts;
 	Imageinfo *ii;
 
 	PEPOINTRIGHT( arg[1], &rhs );
@@ -399,42 +393,10 @@ apply_graph_export_image_call( Reduce *rc,
 		reduce_throw( rc );
 	}
 
-	ggraph = g_object_new( GOG_TYPE_GRAPH, NULL );
-
-	gchart = g_object_new( GOG_TYPE_CHART, NULL );
-	gog_object_add_by_name( GOG_OBJECT( ggraph ), 
-		"Chart", GOG_OBJECT( gchart ) );
-
-	gplot = plot_new_gplot( plot );
-	gog_object_add_by_name( GOG_OBJECT( gchart ), 
-		"Plot", GOG_OBJECT( gplot ) );
-
-	plot_style_main( plot, gchart ); 
-
-	renderer = gog_renderer_new( ggraph );
-
-	gog_graph_force_update( ggraph );
-
-	gog_graph_get_size( ggraph, &width_in_pts, &height_in_pts);
-
-	gog_renderer_update( renderer, 
-		width_in_pts * dpi / 72.0, height_in_pts * dpi / 72.0 );
-
-	pixbuf = gog_renderer_get_pixbuf( renderer );
-
-	if( !(ii = imageinfo_new_from_pixbuf( main_imageinfogroup, rc->heap, 
-		pixbuf )) ) { 
-		UNREF( renderer );
-		UNREF( ggraph );
+	if( !(ii = plot_to_image( plot, rc, dpi )) ) {
 		UNREF( plot );
 		reduce_throw( rc );
 	}
-
-	/* Don't unref the pixbuf, we don't own it.
-	 */
-
-	UNREF( renderer );
-	UNREF( ggraph );
 	UNREF( plot );
 
 	PEPUTP( out, ELEMENT_MANAGED, ii );

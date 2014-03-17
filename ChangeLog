@@ -1,6 +1,6 @@
 started 7.39.0 28/1/14
 - add optional libgsf dependency
-- added save-to-file to plotwindow
+- added export-to-file to plotwindow
 - added graph_export_image
 - added .to_image to Plot
 

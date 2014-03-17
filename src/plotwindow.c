@@ -163,7 +163,7 @@ plotwindow_show_status_action_cb( GtkToggleAction *action,
 }
 
 static void
-plotwindow_saveas_done_cb( iWindow *iwnd, 
+plotwindow_export_done_cb( iWindow *iwnd, 
 	void *client, iWindowNotifyFn nfn, void *sys )
 {
 #ifdef HAVE_LIBGOFFICE
@@ -175,6 +175,7 @@ plotwindow_saveas_done_cb( iWindow *iwnd,
 
 	char *filename; 
 	char buf[FILENAME_MAX];
+	char *extension;
 	GOImageFormat format;
 	GsfOutput *output;
 	GError *err = NULL;
@@ -196,7 +197,11 @@ plotwindow_saveas_done_cb( iWindow *iwnd,
 		return;
 	}
 
-	format = go_image_get_format_from_name( filename ); 
+	if( (extension = strrchr( buf, '.' )) )
+		extension += 1;
+	else	
+		extension = buf;
+	format = go_image_get_format_from_name( extension ); 
 
 	g_free( filename ); 
 
@@ -210,16 +215,16 @@ plotwindow_saveas_done_cb( iWindow *iwnd,
 }
 
 static void
-plotwindow_save_action_cb( GtkAction *action, Plotwindow *plotwindow )
+plotwindow_export_action_cb( GtkAction *action, Plotwindow *plotwindow )
 {
 	Filesel *filesel = FILESEL( filesel_new() );
 
 	iwindow_set_title( IWINDOW( filesel ), 
-		"%s", _( "Save Plot To File As" ) ); 
+		"%s", _( "Export Plot As" ) ); 
 	filesel_set_flags( filesel, TRUE, TRUE );
 	filesel_set_filetype( filesel, filesel_type_image, IMAGE_FILE_TYPE ); 
 	iwindow_set_parent( IWINDOW( filesel ), GTK_WIDGET( plotwindow ) );
-	filesel_set_done( filesel, plotwindow_saveas_done_cb, plotwindow );
+	filesel_set_done( filesel, plotwindow_export_done_cb, plotwindow );
 	iwindow_build( IWINDOW( filesel ) );
 
 	gtk_widget_show( GTK_WIDGET( filesel ) );
@@ -233,17 +238,17 @@ static GtkToggleActionEntry plotwindow_toggle_actions[] = {
 };
 
 static GtkActionEntry plotwindow_actions[] = {
-	{ "SaveAs", 
-		GTK_STOCK_SAVE_AS, N_( "Save As Image" ), NULL,
-		N_( "Save plot to file as an image" ), 
-		G_CALLBACK( plotwindow_save_action_cb ) }
+	{ "Export", 
+		GTK_STOCK_SAVE_AS, N_( "Export Plot" ), NULL,
+		N_( "Export plot to file" ), 
+		G_CALLBACK( plotwindow_export_action_cb ) }
 };
 
 static const char *plotwindow_menubar_ui_description =
 "<ui>"
 "  <menubar name='PlotwindowMenubar'>"
 "    <menu action='FileMenu'>"
-"      <menuitem action='SaveAs'/>"
+"      <menuitem action='Export'/>"
 "      <separator/>"
 "      <menuitem action='Close'/>"
 "      <menuitem action='Quit'/>"

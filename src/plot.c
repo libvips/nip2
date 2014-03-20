@@ -337,7 +337,17 @@ static ClassmodelMember plot_options[] = {
 		G_STRUCT_OFFSET( Plot, ymin ) },
 	{ CLASSMODEL_MEMBER_DOUBLE, NULL, 0,
 		"ymax", "ymax", N_( "Ymax" ),
-		G_STRUCT_OFFSET( Plot, ymax ) }
+		G_STRUCT_OFFSET( Plot, ymax ) },
+	{ CLASSMODEL_MEMBER_STRING, NULL, 0,
+		MEMBER_CAPTION, "caption", N_( "Caption" ),
+		G_STRUCT_OFFSET( Plot, caption ) },
+	{ CLASSMODEL_MEMBER_STRING, NULL, 0,
+		MEMBER_XCAPTION, "xcaption", N_( "X Axis Caption" ),
+		G_STRUCT_OFFSET( Plot, xcaption ) },
+	{ CLASSMODEL_MEMBER_STRING, NULL, 0,
+		MEMBER_YCAPTION, "ycaption", N_( "Y Axis Caption" ),
+		G_STRUCT_OFFSET( Plot, ycaption ) }
+
 };
 
 static ClassmodelMember plot_members[] = {
@@ -672,6 +682,29 @@ plot_grid_add( GogAxis *axis )
 	g_object_set( axis, "pos", GOG_AXIS_CROSS, NULL );
 }
 
+static void
+plot_set_title( GogObject *thing, const char *role, const char *text )
+{
+	GogObject *title;
+
+	title = gog_object_get_child_by_name( thing, role );
+	if( text && !title ) {
+		title = g_object_new( GOG_TYPE_LABEL, NULL );
+		gog_object_add_by_name( thing, role, title );
+	}
+	else if( !text && title ) {
+		gog_object_clear_parent( title );
+		UNREF( title ); 
+	}
+
+	if( text && title ) {
+		GOData *data;
+
+		data = go_data_scalar_str_new( text, FALSE );
+		gog_dataset_set_dim( GOG_DATASET( title ), 0, data, NULL );
+	}
+}
+
 void
 plot_style_main( Plot *plot, GogChart *gchart )
 {
@@ -684,7 +717,7 @@ plot_style_main( Plot *plot, GogChart *gchart )
 	g_slist_free( axes );
 
 	gog_axis_set_bounds( axis, plot->xmin, plot->xmax );
-
+	plot_set_title( GOG_OBJECT( axis ), "Label", plot->xcaption ); 
 	plot_grid_add( axis ); 
 
 	axes = gog_chart_get_axes( gchart, GOG_AXIS_Y );
@@ -692,7 +725,7 @@ plot_style_main( Plot *plot, GogChart *gchart )
 	g_slist_free( axes );
 
 	gog_axis_set_bounds( axis, plot->ymin, plot->ymax );
-
+	plot_set_title( GOG_OBJECT( axis ), "Label", plot->ycaption ); 
 	plot_grid_add( axis ); 
 
 	legend = gog_object_get_child_by_name( GOG_OBJECT( gchart ), "Legend" );
@@ -707,6 +740,8 @@ plot_style_main( Plot *plot, GogChart *gchart )
 		gog_object_clear_parent( legend );
 		UNREF( legend ); 
 	}
+
+	plot_set_title( GOG_OBJECT( gchart ), "Title", plot->caption ); 
 }
 
 void

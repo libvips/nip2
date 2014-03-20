@@ -66,6 +66,9 @@ struct _Plot {
 	ImageValue value;
 	PlotFormat format;
 	PlotStyle style;
+	char *caption; 
+	char *xcaption; 
+	char *ycaption; 
 	double xmin;
 	double xmax;
 	double ymin;

@@ -1,4 +1,12 @@
+- try:
 
+	Plot [$caption => "hello"] thing
+
+  now edit to be:
+
+	Plot [] thing
+
+  open viewer, still has the caption set
 
 - columns can move about on load in large workspaces
 

@@ -791,12 +791,6 @@ main_x_init( int *argc, char ***argv )
 			"ipgtkrc", NULL, NULL, NULL );
 	gtk_init( argc, argv );
 
-#ifdef HAVE_LIBGOFFICE
-        libgoffice_init();
-	go_plugins_init( NULL, NULL, NULL, NULL, TRUE, 
-		GO_TYPE_PLUGIN_LOADER_MODULE );
-#endif /*HAVE_LIBGOFFICE*/
-
 	/* Set the default icon. 
 	 */
 	im_strncpy( buf, 
@@ -1300,6 +1294,12 @@ main( int argc, char *argv[] )
 	 */
 	if( !main_option_batch )
 		main_x_init( &argc, &argv );
+
+#ifdef HAVE_LIBGOFFICE
+        libgoffice_init();
+	go_plugins_init( NULL, NULL, NULL, NULL, TRUE, 
+		GO_TYPE_PLUGIN_LOADER_MODULE );
+#endif /*HAVE_LIBGOFFICE*/
 
 	/* Load start-up stuff. Builtins, plugins, externals etc. We need to
 	 * do this before we load any user code so we can prevent redefinition

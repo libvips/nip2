@@ -265,6 +265,7 @@ Hist_plot_item = class
 		_result {
 		_vislevel = 3;
 
+		caption = Expression "Chart caption" "none";
 		format = Option_enum "Format" Plot_format.names "YYYY";
 		style = Option_enum "Style" Plot_style.names "Line";
 
@@ -273,16 +274,35 @@ Hist_plot_item = class
 		xmax = Expression "X range maximum" 1;
 		ymin = Expression "Y range minimum" 0;
 		ymax = Expression "Y range maximum" 1;
+		xcaption = Expression "X axis caption" "none";
+		ycaption = Expression "Y axis caption" "none";
 
 		_result
 			= Plot options (image x)
 		{
 			options
-				= [$style => style.value, $format => format.value] ++ range;
+				= [$style => style.value, $format => format.value] ++ 
+					range ++ captions;
 			range
 				= [], auto
 				= [$xmin => xmin.expr, $xmax => xmax.expr, 
 					$ymin => ymin.expr, $ymax => ymax.expr]; 
+
+			captions 
+				= concat (map test caption_options)
+			{
+				caption_options = [
+					$caption => caption.expr,
+					$xcaption => xcaption.expr,
+					$ycaption => ycaption.expr
+				];
+				test x
+					= [], value == "none"
+					= [option_name => value]
+				{
+					[option_name, value] = x;
+				}
+			}
 
 			image x
 				= image (extract_arrow 0 0 1 x), is_Arrow x

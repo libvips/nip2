@@ -1,3 +1,5 @@
+- wire up $series_captions
+
 - try:
 
 	Plot [$caption => "hello"] thing

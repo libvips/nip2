@@ -346,7 +346,10 @@ static ClassmodelMember plot_options[] = {
 		G_STRUCT_OFFSET( Plot, xcaption ) },
 	{ CLASSMODEL_MEMBER_STRING, NULL, 0,
 		MEMBER_YCAPTION, "ycaption", N_( "Y Axis Caption" ),
-		G_STRUCT_OFFSET( Plot, ycaption ) }
+		G_STRUCT_OFFSET( Plot, ycaption ) },
+	{ CLASSMODEL_MEMBER_STRING_LIST, NULL, 0,
+		MEMBER_YCAPTION, "series_captions", N_( "Series Captions" ),
+		G_STRUCT_OFFSET( Plot, series_captions ) }
 
 };
 

@@ -69,6 +69,7 @@ struct _Plot {
 	char *caption; 
 	char *xcaption; 
 	char *ycaption; 
+	GSList *series_captions;
 	double xmin;
 	double xmax;
 	double ymin;

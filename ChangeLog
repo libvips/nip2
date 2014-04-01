@@ -5,6 +5,7 @@ started 7.39.0 28/1/14
 - added .to_image to Plot
 - added .caption / .xcaption / .ycaption options to Plot
 - added caption / xcaption / ycaption options to Plot_object
+- added series_captions option to Plot_object
 
 started 7.38.2 21/1/14
 - fix a tiny mem leak

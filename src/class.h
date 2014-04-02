@@ -33,6 +33,7 @@
 #define MEMBER_CAPTION "caption"
 #define MEMBER_XCAPTION "xcaption"
 #define MEMBER_YCAPTION "ycaption"
+#define MEMBER_SERIES_CAPTIONS "series_captions"
 #define MEMBER_DISPLAY "display"
 #define MEMBER_CHECK "check"
 #define MEMBER_FILENAME "filename"

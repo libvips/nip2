@@ -348,7 +348,8 @@ static ClassmodelMember plot_options[] = {
 		MEMBER_YCAPTION, "ycaption", N_( "Y Axis Caption" ),
 		G_STRUCT_OFFSET( Plot, ycaption ) },
 	{ CLASSMODEL_MEMBER_STRING_LIST, NULL, 0,
-		MEMBER_YCAPTION, "series_captions", N_( "Series Captions" ),
+		MEMBER_SERIES_CAPTIONS, "series_captions", 
+			N_( "Series Captions" ),
 		G_STRUCT_OFFSET( Plot, series_captions ) }
 
 };
@@ -437,6 +438,10 @@ plot_reset( Classmodel *classmodel )
 	plot->xmax = PLOT_RANGE_UNSET;
 	plot->ymin = PLOT_RANGE_UNSET;
 	plot->ymax = PLOT_RANGE_UNSET;
+	IM_SETSTR( plot->caption, NULL ); 
+	IM_SETSTR( plot->xcaption, NULL ); 
+	IM_SETSTR( plot->ycaption, NULL ); 
+	IM_FREEF( slist_free_all, plot->series_captions );
 }
 
 static gboolean
@@ -628,6 +633,7 @@ plot_new_gplot( Plot *plot )
 		GogSeries *series;
 		GOData *data;
 		GError *error;
+		char *caption;
 
                 series = gog_plot_new_series( gplot );
 		data = go_data_vector_val_new( plot->xcolumn[i], plot->rows, 
@@ -636,6 +642,14 @@ plot_new_gplot( Plot *plot )
 		data = go_data_vector_val_new( plot->ycolumn[i], plot->rows, 
 			NULL );
 		gog_series_set_dim( series, 1, data, &error );
+
+		if( (caption = (char *) 
+			g_slist_nth( plot->series_captions, i )) ) 
+			caption = g_strdup( caption );
+		else 
+			caption = g_strdup_printf( "Band %d", i ); 
+		data = go_data_scalar_str_new( caption, TRUE );
+		gog_series_set_name( series, (GODataScalar *) data, &error );
 
 		if( i < IM_NUMBER( default_colour ) ) {
 			GOStyle *style;

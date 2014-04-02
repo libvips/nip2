@@ -1,6 +1,7 @@
-- wire up $series_captions
+- $series_captions doesn't work, passing a nonsense string? see
+  plot_new_gplot()
 
-- try:
+- test:
 
 	Plot [$caption => "hello"] thing
 

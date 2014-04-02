@@ -1,15 +1,3 @@
-- $series_captions doesn't work, passing a nonsense string? see
-  plot_new_gplot()
-
-- test:
-
-	Plot [$caption => "hello"] thing
-
-  now edit to be:
-
-	Plot [] thing
-
-  open viewer, still has the caption set
 
 - columns can move about on load in large workspaces
 

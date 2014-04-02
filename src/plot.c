@@ -644,7 +644,7 @@ plot_new_gplot( Plot *plot )
 		gog_series_set_dim( series, 1, data, &error );
 
 		if( (caption = (char *) 
-			g_slist_nth( plot->series_captions, i )) ) 
+			g_slist_nth_data( plot->series_captions, i )) ) 
 			caption = g_strdup( caption );
 		else 
 			caption = g_strdup_printf( "Band %d", i ); 

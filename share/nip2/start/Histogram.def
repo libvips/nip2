@@ -276,6 +276,7 @@ Hist_plot_item = class
 		ymax = Expression "Y range maximum" 1;
 		xcaption = Expression "X axis caption" "none";
 		ycaption = Expression "Y axis caption" "none";
+		series_captions = Expression "Series captions" ["Band 0"];
 
 		_result
 			= Plot options (image x)
@@ -289,7 +290,8 @@ Hist_plot_item = class
 					$ymin => ymin.expr, $ymax => ymax.expr]; 
 
 			captions 
-				= concat (map test caption_options)
+				= concat (map test caption_options) ++ 
+				  [$series_captions => series_captions.expr]
 			{
 				caption_options = [
 					$caption => caption.expr,

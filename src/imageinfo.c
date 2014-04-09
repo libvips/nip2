@@ -904,31 +904,40 @@ imageinfo_new_from_pixbuf( Imageinfogroup *imageinfogroup,
 	int height;
 	int bands;
 	guchar *bytes;
-	guint length;
-	size_t vips_length;
 	Imageinfo *ii;
+	size_t vips_length;
 
 	width = gdk_pixbuf_get_width( pixbuf ); 
 	height = gdk_pixbuf_get_height( pixbuf ); 
 	bands = gdk_pixbuf_get_n_channels( pixbuf );
+
+	/* 2.26 and later have gdk_pixbuf_get_pixels_with_length()
+	 * which would let us check the size, but we can't reslly use it yet.
+	 * Another time!
+
+	guint length;
+
 	bytes = gdk_pixbuf_get_pixels_with_length( pixbuf, &length ); 
-
-	if( !(ii = imageinfo_new_temp( imageinfogroup, heap, NULL, "t" )) )
-		return( NULL );
-
-	im_initdesc( ii->im, width, height, bands, 
-		IM_BBITS_BYTE, IM_BANDFMT_UCHAR, IM_CODING_NONE, 
-		IM_TYPE_sRGB, 1.0, 1.0, 0, 0 );
-	vips_length = VIPS_IMAGE_SIZEOF_LINE( ii->im ) * height;
 	if( vips_length != length ) {
 		error_top( _( "Unable to create image." ) );
 		error_sub( _( "vips expected %zd bytes, gdkpixbuf made %d" ),
 			vips_length, length ); 
 		return( NULL );
 	}
+
+	 */
+
+	bytes = gdk_pixbuf_get_pixels( pixbuf ); 
+
+	if( !(ii = imageinfo_new_temp( imageinfogroup, heap, NULL, "t" )) )
+		return( NULL );
+	im_initdesc( ii->im, width, height, bands, 
+		IM_BBITS_BYTE, IM_BANDFMT_UCHAR, IM_CODING_NONE, 
+		IM_TYPE_sRGB, 1.0, 1.0, 0, 0 );
 	if( im_setupout( ii->im ) ) 
 		return( NULL );
-	memcpy( ii->im->data, bytes, length );
+	vips_length = VIPS_IMAGE_SIZEOF_LINE( ii->im ) * height;
+	memcpy( ii->im->data, bytes, vips_length );
 
 	return( ii ); 
 }

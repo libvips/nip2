@@ -423,6 +423,7 @@ gboolean heap_is_elist( PElement *base, gboolean *out );
 gboolean heap_is_list( PElement *base, gboolean *out );
 gboolean heap_is_string( PElement *base, gboolean *out );
 gboolean heap_is_realvec( PElement *base, gboolean *out );
+gboolean heap_is_imagevec( PElement *base, gboolean *out );
 gboolean heap_is_matrix( PElement *base, gboolean *out );
 gboolean heap_is_class( PElement *base, gboolean *out );
 gboolean heap_is_instanceof_exact( const char *name, PElement *klass, 

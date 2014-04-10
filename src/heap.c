@@ -1461,7 +1461,7 @@ heap_get_realvec( PElement *base, double *buf, int n )
 	return( l );
 }
 
-/* Get an element as a realvec. Return -1 on error, or length of vector.
+/* Get an element as a imagevec. Return -1 on error, or length of vector.
  */
 int
 heap_get_imagevec( PElement *base, Imageinfo **buf, int n )
@@ -1552,6 +1552,18 @@ heap_is_realvec( PElement *base, gboolean *out )
 
 	REDUCE_CATCH_START( FALSE );
 	*out = reduce_is_realvec( rc, base );
+	REDUCE_CATCH_STOP; 
+
+	return( TRUE );
+}
+
+gboolean 
+heap_is_imagevec( PElement *base, gboolean *out ) 
+{
+	Reduce *rc = reduce_context;
+
+	REDUCE_CATCH_START( FALSE );
+	*out = reduce_is_imagevec( rc, base );
 	REDUCE_CATCH_STOP; 
 
 	return( TRUE );
@@ -1862,9 +1874,8 @@ heap_ip_to_gvalue( PElement *in, GValue *out )
 	else if( PEISLIST( in ) ) {
 		gboolean result;
 
-		if( !heap_is_string( in, &result ) )
-			return( FALSE );
-		if( result ) {
+		if( heap_is_string( in, &result ) &&
+			result ) {
 			char name[256];
 
 			if( !heap_get_string( in, name, 256 ) )
@@ -1876,6 +1887,20 @@ heap_ip_to_gvalue( PElement *in, GValue *out )
 			 */
 			g_value_init( out, IM_TYPE_REF_STRING );
 			im_ref_string_set( out, name );
+		}
+		else if( heap_is_imagevec( in, &result ) &&
+			result ) { 
+			Imageinfo *iivec[100];
+			VipsImage *ivec[100];
+			int n;
+			int i;
+
+			if( (n = heap_get_imagevec( in, iivec, 100 )) < 0 ) 
+				return( FALSE );
+			for( i = 0; i < n; i++ )
+				ivec[i] = imageinfo_get( FALSE, iivec[i] );
+
+			vips_value_set_array_image( out, ivec, n ); 
 		}
 		else {
 			error_top( _( "Unimplemented list type." ) );

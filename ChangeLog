@@ -7,6 +7,7 @@ started 7.39.0 28/1/14
 - added caption / xcaption / ycaption options to Plot_object
 - added snibgo's much better ImageMagick menu items
 - added series_captions option to Plot_object
+- support imagevec as a vips_call argument
 
 started 7.38.2 21/1/14
 - fix a tiny mem leak

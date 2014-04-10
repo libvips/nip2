@@ -1,4 +1,13 @@
 
+- try:
+
+	vips_call "system" "ls" []
+
+  no error msg?
+
+
+
+
 - columns can move about on load in large workspaces
 
 - hide tabs if only one tab in window, though we'd need to allow tab drop 

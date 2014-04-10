@@ -752,6 +752,40 @@ reduce_is_realvec( Reduce *rc, PElement *base )
 	return( TRUE );
 }
 
+/* Test for 1st sz elements are reals. Init sz < 0 for unlimited test.
+ */
+static void *
+reduce_test_image( Reduce *rc, PElement *base, int *sz )
+{
+	/* Tested enough?
+	 */
+	if( *sz == 0 ) 
+		return( NULL );
+
+	(void) reduce_get_image( rc, base );
+	(*sz)--;
+
+	return( NULL );
+}
+
+/* Test for list is imagevec.
+ */
+gboolean
+reduce_is_imagevec( Reduce *rc, PElement *base )
+{
+	int sz = 4;
+
+	reduce_spine( rc, base );
+	if( !PEISLIST( base ) ) 
+		return( FALSE );
+
+	if( reduce_map_list( rc, base, 
+		(reduce_map_list_fn) reduce_test_image, &sz, NULL ) )
+		return( FALSE );
+
+	return( TRUE );
+}
+
 /* Sub-fn of below ... test another line of the matrix.
  */
 static void *

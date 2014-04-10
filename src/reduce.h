@@ -200,6 +200,7 @@ gboolean reduce_is_list( Reduce *rc, PElement *base );
 gboolean reduce_is_string( Reduce *rc, PElement *base );
 gboolean reduce_is_finitestring( Reduce *rc, PElement *base );
 gboolean reduce_is_realvec( Reduce *rc, PElement *base );
+gboolean reduce_is_imagevec( Reduce *rc, PElement *base );
 gboolean reduce_is_matrix( Reduce *rc, PElement *base );
 gboolean reduce_is_class( Reduce *rc, PElement *klass );
 int reduce_list_length( Reduce *rc, PElement *base );

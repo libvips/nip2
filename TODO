@@ -1,10 +1,4 @@
 
-- try:
-
-	vips_call "system" "ls" []
-
-  no error msg?
-
 
 
 

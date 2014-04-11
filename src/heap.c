@@ -1912,8 +1912,16 @@ heap_ip_to_gvalue( PElement *in, GValue *out )
 		g_value_set_object( out, 
 			MANAGEDGOBJECT( PEGETMANAGED( in ) )->object );
 	}
-	else
+	else {
+		char txt[100];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
+
+		error_top( _( "Unimplemented argument type." ) );
+		(void) itext_value( rc, &buf, in );
+		error_sub( _( "Cannot convert %s to GValue." ), 
+			vips_buf_all( &buf ) );
 		return( FALSE );
+	}
 
 	return( TRUE );
 }

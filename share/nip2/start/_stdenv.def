@@ -2415,27 +2415,7 @@ point a b
 		= error "bad position format";
 }
 
-/* Generate an ImageMagick (or GraphicsMagick) command suitable for 
- * im_system_image. Use convert.exe in $VIPSHOME/bin, if it exists, otherwise
- * assume it's on the path somewhere.
- */
-magick_command switch 
-	= join_sep " " [convert, "\"%s\"", switch, "\"%s\""]
-{
-	prefs = Workspaces.Preferences;
-	use_gm = prefs.USE_GRAPHICSMAGICK;
-	name = if use_gm then "gm" else "convert";
-	exe = concat [name, expand "$EXEEXT"];
-	vipsexe = path_absolute [expand "$VIPSHOME", "bin", exe];
-	final_exe 
-		= vipsexe, search vipsexe != []
-		= exe;
-	convert	
-		= join_sep " " [final_exe, "convert"], use_gm
-		= final_exe;
-}
-
-/* Run a command on an image. See magick_command, for example.
+/* One image in, one out. 
  */
 system_image command x
 	= oo_unary_function system_image_op x, is_class x
@@ -2452,3 +2432,39 @@ system_image command x
 			im_system_image (get_image im) "%s.tif" "%s.tif" command;
 	}
 }
+
+/* Two images in, one out. 
+ */
+system_image2 command x1 x2
+	= oo_binary_function system_image2_op x1 x2, is_class x1
+	= oo_binary'_function system_image2_op x1 x2, is_class x2
+	= system x1 x2, is_image x1 && is_image x2
+	= error (_ "bad arguments to " ++ "system_image2")
+{
+	system_image2_op = Operator "system_image2" 
+		(system_image2 command) Operator_type.COMPOUND_REWRAP false;
+
+	system x1 x2
+		= image_out
+	{
+		[image_out] = vips_call "system" [command] [
+			$in => [x1, x2], 
+			$out => true,
+			$out_format => "%s.tif", 
+			$in_format => "%s.tif"
+		];
+	}
+}
+
+/* Zero images in, one out. 
+ */
+system_image0 command 
+	= Image image_out
+{
+	[image_out] = vips_call "system" [command] [
+		$out => true,
+		$out_format => "%s.tif" 
+	];
+}
+
+

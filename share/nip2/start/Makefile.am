@@ -3,6 +3,7 @@ startdir = $(pkgdatadir)/start
 start_DATA = \
 	Math.def \
 	Image.def \
+	Magick.def \
 	Colour.def \
 	Tasks.def \
 	Object.def \
@@ -19,6 +20,7 @@ start_DATA = \
 	_predicate.def \
 	_stdenv.def \
 	_Object.def \
+	_magick.def \
 	_types.def 
 
 EXTRA_DIST = $(start_DATA)

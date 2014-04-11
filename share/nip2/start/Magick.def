@@ -1687,13 +1687,14 @@ Magick_thresholdMenu_item = class
 
 			// FIXME: use + or - before offset
 
-			command = Magick.command (concat [
-					channels._flag,
-					" -random-threshold \"",
-					print low.value, "x",
-					print high.value,
-					if isPc then "%%" else "",
-					"\""]);
+			command = Magick.command [
+				"\"%s\"",
+				channels._flag,
+				"-random-threshold", 
+				"\"" ++ print low.value ++ "x" ++ print high.value ++
+					(if isPc then "%%" else "") ++ "\"",
+				"\"%s\""
+			];
 
 			_result = Magick.system command x; 
 		}
@@ -1711,9 +1712,15 @@ Magick_tint_item = class
 		foreground = Magick.foreground_widget;
 		amount = Scale "amount (percent)" 0 100 50;
 
-		command = Magick.command (intensity._flag ++ " " ++ 
-				foreground._flag ++ " -tint " ++ print amount.value);
-		// snibgo note: although the amount is a percentage, it doesn't need "%" character.
+		command = Magick.command [
+			"\"%s\"",
+			intensity._flag,
+			foreground._flag,
+			"-tint",
+			// snibgo note: although the amount is a percentage, it doesn't need "%" character.
+			print amount.value,
+			"\"%s\""
+		];
 
 		_result = Magick.system command x; 
 	}
@@ -1725,7 +1732,11 @@ Magick_flip_item = class
 		_result {
 		_vislevel = 3;
 
-		command = Magick.command ("-flip");
+		command = Magick.command [
+			"\"%s\"",
+			"-flip",
+			"\"%s\""
+		];
 
 		_result = Magick.system command x; 
 	}
@@ -1737,7 +1748,11 @@ Magick_flop_item = class
 		_result {
 		_vislevel = 3;
 
-		command = Magick.command ("-flop");
+		command = Magick.command [
+			"\"%s\"",
+			"-flop",
+			"\"%s\""
+		];
 
 		_result = Magick.system command x; 
 	}
@@ -1749,7 +1764,11 @@ Magick_transpose_item = class
 		_result {
 		_vislevel = 3;
 
-		command = Magick.command ("-transpose");
+		command = Magick.command [
+			"\"%s\"",
+			"-transpose",
+			"\"%s\""
+		];
 
 		_result = Magick.system command x; 
 	}
@@ -1761,7 +1780,11 @@ Magick_transverse_item = class
 		_result {
 		_vislevel = 3;
 
-		command = Magick.command ("-transverse");
+		command = Magick.command [
+			"\"%s\"",
+			"-transverse",
+			"\"%s\""
+		];
 
 		_result = Magick.system command x; 
 	}
@@ -1774,7 +1797,14 @@ Magick_trim_item = class
 		_vislevel = 3;
 
 		fuzz = Magick.fuzz_widget;
-		command = Magick.command ("-fuzz \"" ++ print fuzz.value ++ "%%\" -trim");
+
+		command = Magick.command [
+			"\"%s\"",
+			"-fuzz",
+			"\"" ++ print fuzz.value ++ "%%\"",
+			"-trim",
+			"\"%s\""
+		];
 
 		_result = Magick.system command x; 
 	}
@@ -1786,7 +1816,11 @@ Magick_uniqueCols_item = class
 		_result {
 		_vislevel = 3;
 
-		command = Magick.command ("-unique-colors");
+		command = Magick.command [
+			"\"%s\"",
+			"-unique-colors",
+			"\"%s\""
+		];
 
 		_result = Magick.system command x; 
 	}
@@ -1804,16 +1838,15 @@ Magick_vignette_item = class
 		ry = Scale "Rolloff y (percent)" 0 100 10;
 		channels = Magick.channels_widget; // FIXME ??
 
-		command = Magick.command (concat [
-					channels._flag,
-					" -vignette ",
-					print radius.value, "x",
-					print sigma.value,
-					if rx.value >= 0 then "+" else "",
-					print rx.value,
-					if ry.value >= 0 then "+" else "",
-					print ry.value
-					]);
+		command = Magick.command [
+			"\"%s\"",
+			channels._flag,
+			"-vignette",
+			print radius.value ++ "x" ++ print sigma.value ++
+				(if rx.value >= 0 then "+" else "") ++ print rx.value ++
+				(if ry.value >= 0 then "+" else "") ++ print ry.value,
+			"\"%s\""
+		];
 
 		_result = Magick.system command x; 
 	}
@@ -1829,12 +1862,13 @@ Magick_wave_item = class
 		wavelength = Scale "Wavelength (pixels)" 0 100 10;
 		channels = Magick.channels_widget; // FIXME ??
 
-		command = Magick.command (concat [
-					channels._flag,
-					" -wave ",
-					print amplitude.value, "x",
-					print wavelength.value
-					]);
+		command = Magick.command [
+			"\"%s\"",
+			channels._flag,
+			"-wave",
+			print amplitude.value ++ "x" ++ print wavelength.value,
+			"\"%s\""
+		];
 
 		_result = Magick.system command x; 
 	}
@@ -1844,37 +1878,43 @@ sep3 = Menuseparator;
 
 Magick_composite_item = class
 	Menuaction "_Composite" "composite two images (without mask)" {
-	action x = class
+	action x y = class
 		_result {
 		_vislevel = 3;
 
 		compose = Magick.compose_widget;
-		pathname = Pathname "Read file" "x.png";
-		// FIXME: also geometry and gravity
-		command = Magick.command (pathname.value ++ " " ++ compose._flag ++ " -composite");
 
-		_result = Magick.system command x; 
+		command = Magick.command [
+			"\"%s\"",
+			"\"%s\"",
+			compose._flag,
+			"-composite",
+			"\"%s\""
+		];
+
+		_result = Magick.system2 command x y; 
 	}
 }
 
 Magick_compositeMask_item = class
 	Menuaction "_Composite masked" "composite two images (with mask)" {
-	action x = class
+	action x y z = class
 		_result {
 		_vislevel = 3;
 
 		gravity = Magick.gravity_widget; 
 		compose = Magick.compose_widget;
-		pathname = Pathname "Read file" "x.png";
-		maskname = Pathname "Read mask file" "x.png";
-		// FIXME: also geometry
-		command = Magick.command (join_sep " " [
-				pathname.value, 
-				maskname.value, 
-				compose._flag, 
-				"-composite"]);
 
-		_result = Magick.system command x; 
+		command = Magick.command [
+			"\"%s\"",
+			"\"%s\"",
+			"\"%s\"",
+			compose._flag, 
+			"-composite",
+			"\"%s\""
+		];
+
+		_result = Magick.system3 command x y z; 
 	}
 }
 

@@ -2456,6 +2456,29 @@ system_image2 command x1 x2
 	}
 }
 
+/* Three images in, one out. 
+ */
+system_image3 command x1 x2 x3
+	= oo_binary_function system_image2_op x2 x3, is_class x2
+	= oo_binary'_function system_image2_op x2 x3, is_class x3
+	= system x1 x2 x3, is_image x1 && is_image x2 && is_image x3
+	= error (_ "bad arguments to " ++ "system_image3")
+{
+	system_image2_op = Operator "system_image2" 
+		(system_image3 command x1) Operator_type.COMPOUND_REWRAP false;
+
+	system x1 x2 x3
+		= image_out
+	{
+		[image_out] = vips_call "system" [command] [
+			$in => [x1, x2, x3], 
+			$out => true,
+			$out_format => "%s.tif", 
+			$in_format => "%s.tif"
+		];
+	}
+}
+
 /* Zero images in, one out. 
  */
 system_image0 command 

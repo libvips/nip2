@@ -48,7 +48,8 @@ Magick = class {
 
 	system0 cmd = system_image0 cmd;
 	system cmd x = map_unary (system_image cmd) x;
-	system2 cmd a b = map_binary (system_image2 cmd) a b;
+	system2 cmd x y = map_binary (system_image2 cmd) x y;
+	system3 cmd x y z = map_trinary (system_image3 cmd) x y z;
 
 	radius_widget = Scale "Radius" 1 100 10;
 	sigma_widget = Scale "Sigma" 0.1 10 1;

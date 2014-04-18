@@ -15,8 +15,12 @@
      Split to separate _magick.def
 	 Add 0-ary and 2-ary system
 	 Put utility funcs into a Magick class
+   11-Apr-2014 snibgo
+     Added VirtualPixelBack for cases where background is only relevant when VP=Background
+   17-Apr-2014 snibgo
+     Many small changes.
 
-  Last update: 11-Apr-2014.
+   Last update: 17-Apr-2014.
 
    For details of ImageMagick operations, see http://www.imagemagick.org/script/command-line-options.php etc.
 
@@ -51,7 +55,7 @@ Magick = class {
 	system2 cmd x y = map_binary (system_image2 cmd) x y;
 	system3 cmd x y z = map_trinary (system_image3 cmd) x y z;
 
-	radius_widget = Scale "Radius" 1 100 10;
+	radius_widget = Scale "Radius" 0 100 10;
 	sigma_widget = Scale "Sigma" 0.1 10 1;
 	angle_widget = Scale "Angle (degrees)" (-360) 360 0;
 	text_widget = String "Text to draw" "AaBbCcDdEe";
@@ -95,7 +99,9 @@ Magick = class {
 	Background triple = class
 		Colour "sRGB" triple {
 
-		_flag = "-background " ++ print_colour triple;
+		isNone = Toggle "None (transparent black)" false;
+
+		_flag = "-background " ++ if isNone then "None" else print_colour triple;
 
 		Colour_edit space triple = this.Background triple;
 	}
@@ -118,6 +124,27 @@ Magick = class {
 		Colour_edit space triple = this.Mattecol triple;
 	}
 	mattecol_widget = Mattecol [189, 189, 189];
+
+	// FIXME: Undercolour, like many others, can have alpha channel.
+	// How does user input this? With a slider?
+	Undercol triple = class
+		Colour "sRGB" triple {
+
+		isNone = Toggle "None (transparent black)" true;
+
+		_flag = if isNone then "" else ("-undercolor " ++ print_colour triple);
+
+		Colour_edit space triple = this.Undercol triple;
+	}
+	undercol_widget = Undercol [0, 0, 0];
+
+	changeCol_widget = class {
+		_vislevel = 3;
+
+		colour = GeneralCol [0, 0, 0];
+		fuzz = fuzz_widget;
+		nonMatch = Toggle "change non-matching colours" false;
+	}
 
 	Alpha alpha = class
 		Option_string "Alpha" [
@@ -166,63 +193,6 @@ Magick = class {
 	}
 	builtin_widget = Builtin "rose:";
 
-	ChA value = class
-		Toggle "ChA" value {
-
-		_flag
-			= "IsA", value
-			= "NotA";
-
-		Toggle_edit caption value = this.ChA value;
-	}
-	cha_widget = ChA true;
-
-	ChB value = class
-		Toggle "ChB" value {
-
-		_flag
-			= "IsB", value
-			= "NotB";
-
-		Toggle_edit caption value = this.ChB value;
-	}
-	chb_widget = ChB true;
-
-	ChC value = class
-		Toggle "ChC" value {
-
-		_flag
-			= "IsC", value
-			= "NotC";
-
-		Toggle_edit caption value = this.ChC value;
-	}
-	chc_widget = ChC true;
-
-	chabc_widget = class {
-		_vislevel = 3;
-
-		//isA = Toggle "IsA" true;
-		//isB = Toggle "IsB" false;
-		//isC = Toggle "IsC" false;
-		isS = Toggle "IsS" false;
-
-		isA = cha_widget;
-		isB = chb_widget;
-		isC = chc_widget;
-
-		_abc = concat [
-			isA._flag,
-			isB._flag,
-			isC._flag
-			];
-		_flag = concat [
-			_abc,
-			if isS then "IsS" else "NotS"
-			];
-	}
-
-	//chabc_widget = ChAbc;
 
 	channels_widget = class {
 		// FIXME? Can we grey-out alpha when we have no alpha channel,
@@ -430,6 +400,44 @@ Magick = class {
 		Option_edit caption labels value = this.Compose labels?value;
 	}
 	compose_widget = Compose "Over";
+	// FIXME: Some compose mehods (Displace, Distort, Mathematics) need a string.
+
+	// FIXME: we could use a class that does both -compose and -intensity, for methods LightenIntensity, DarkenIntensity, CopyOpacity, CopyBlack
+
+	coordinate_widget = class {
+		_vislevel = 3;
+
+		x = Expression "X" 0;
+		y = Expression "Y" 0;
+
+		_flag = concat [print x.expr, ",", print y.expr];
+	};
+
+	Distort distort = class
+		Option_string "Distort" [
+			"Affine",
+			"AffineProjection",
+			"ScaleRotateTranslate",
+			"SRT",
+			"Perspective",
+			"PerspectiveProjection",
+			"BilinearForward",
+			"BilinearReverse",
+			"Polynomial",
+			"Arc",
+			"Polar",
+			"DePolar",
+			"Barrel",
+			"BarrelInverse",
+			"Shepards",
+			"Resize"
+		] distort {
+
+		_flag = distort;
+
+		Option_edit caption labels value = this.Distort labels?value;
+	}
+	distort_widget = Distort "SRT";
 
 	Dither dither = class
 		Option_string "Dither" [
@@ -829,6 +837,17 @@ Magick = class {
 	}
 	ResizeType_widget = ResizeType "resize";
 
+	Size_widget = class {
+		_vislevel = 3;
+
+		width = Expression "Width (pixels)" 64;
+		height = Expression "Height (pixels)" 64;
+
+		_flag = "-size " ++
+			print width.expr ++ "x" ++ print height.expr;
+
+	};
+
 	StatType statt = class
 		Option_string "Statistic type" [
 			"Gradient", 
@@ -875,6 +894,13 @@ Magick = class {
 	}
 	VirtualPixel_widget = VirtualPixel "Edge";
 
+	VirtualPixelBack_widget = class {
+		virtpix = Magick.VirtualPixel_widget;
+		background = Magick.background_widget;
+		_flag = (if virtpix._isBackground then (background._flag ++ " ") else "")
+			++ virtpix._flag;
+	}
+
 	Geometry_widget = class {
 		_vislevel = 3;
 
@@ -913,6 +939,21 @@ Magick = class {
 		}
 	};
 
+	OffsetGeometry_widget = class {
+		_vislevel = 3;
+
+		hoffset = Expression "Horizontal offset" 0;
+		voffset = Expression "Vertical offset" 0;
+
+		_flag = concat [format hoffset, format voffset]
+		{
+			// print an offset ... we want '+' in front of +ve strings
+			format offset 
+				= concat ["+", print offset.expr], offset.expr >= 0
+				= print offset.expr;
+		}
+	};
+
 	WhxyGeometry_widget = class {
 		_vislevel = 3;
 
@@ -937,12 +978,12 @@ Magick = class {
 
 		x = Expression "Width" 0;
 		y = Expression "Height" 0;
-		hoffset = Expression "Outer width" 0;
-		voffset = Expression "Outer height" 0;
+		outbev = Expression "Outer bevel thickness" 0;
+		inbev = Expression "Inner bevel thickness" 0;
 
 		_flag 
 			= concat [print x.expr, "x", print y.expr, 
-				format hoffset, format voffset]
+				format outbev, format inbev]
 		{
 			// print an offset ... we want '+' in front of +ve strings
 			format offset 
@@ -1008,3 +1049,4 @@ Magick = class {
 				"-stretch", stretch.item];
 	}
 }
+

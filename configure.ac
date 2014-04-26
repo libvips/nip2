@@ -1,11 +1,9 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_INIT([nip2], [7.38.2])
-AM_INIT_AUTOMAKE([-Wall])
-
 # foreign stops complaints about a missing README (we use README.md instead)
 # and missing INSTALL (the standard Gnu INSTALL is not very useful)
-AM_INIT_AUTOMAKE([foreign])
+AM_INIT_AUTOMAKE([-Wall foreign])
 
 AC_CONFIG_HEADERS(config.h)
 AC_CONFIG_MACRO_DIR([m4])

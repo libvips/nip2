@@ -486,6 +486,8 @@ mainw_refresh_timeout_cb( gpointer user_data )
 	printf( "mainw_refresh_timeout_cb: %p\n", mainw );
 #endif /*DEBUG*/
 
+	mainw->refresh_timeout = 0;
+
 	mainw_status_update( mainw );
 	mainw_free_update( mainw );
 	mainw_title_update( mainw );

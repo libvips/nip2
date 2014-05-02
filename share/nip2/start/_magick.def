@@ -19,6 +19,8 @@
      Added VirtualPixelBack for cases where background is only relevant when VP=Background
    17-Apr-2014 snibgo
      Many small changes.
+   2-May-2014 jcupitt
+     Added Magick.version
 
    Last update: 17-Apr-2014.
 
@@ -48,6 +50,19 @@ Magick = class {
 		final_exe
 			= vipsexe, search vipsexe != []
 			= exe;
+	}
+
+	/* We add and remove some features depending on the ImageMagick version.
+	 * 
+	 * This runs "convert --version" and returns the version number as a
+	 * four-element list, eg. [6, 7, 7, 10] for IM-6.6.7-10.
+	 */
+	version
+		= map parse_int (split (member ".-") version_string)
+	{
+		output = vips_call "system" 
+			[Magick.command ["--version"]] [$log=>true];
+		version_string = (split (equal ' ') output?0)?2;
 	}
 
 	system0 cmd = system_image0 cmd;
@@ -617,7 +632,9 @@ Magick = class {
 			"RMS"
 		] intensity {
 
-		_flag = "-intensity " ++ intensity;
+		_flag 
+			= "-intensity " ++ intensity, version?0 > 6 || version?1 > 7
+			= "";
 
 		Option_edit caption labels value = this.Intensity labels?value;
 	}

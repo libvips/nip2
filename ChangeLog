@@ -10,6 +10,7 @@ started 7.39.0 28/1/14
 - added series_captions option to Plot_object
 - support imagevec as a vips_call argument
 - added system2 and system3
+- added Magick.version detector
 
 started 7.38.2 21/1/14
 - fix a tiny mem leak

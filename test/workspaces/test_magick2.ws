@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.39.0">
-  <Workspace window_x="0" window_y="28" window_width="1920" window_height="1172" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" locked="false" lpane_position="100" lpane_open="false" rpane_position="400" rpane_open="false" local_defs="// private definitions for this tab&#10;" name="tab1" caption="Default empty tab" filename="$HOME/GIT/nip2/test/workspaces/test_magick2.ws">
-    <Column x="0" y="0" open="true" selected="false" sform="false" next="8" name="A" caption="make some images">
+  <Workspace window_x="0" window_y="28" window_width="1920" window_height="1052" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" locked="false" lpane_position="100" lpane_open="false" rpane_position="400" rpane_open="false" local_defs="// private definitions for this tab&#10;" name="tab2" caption="Default empty tab" filename="$HOME/GIT/nip2/test/workspaces/test_magick2.ws">
+    <Column x="0" y="0" open="true" selected="false" sform="false" next="9" name="A" caption="make some images">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
           <Rhs vislevel="3" flags="7">
@@ -38,9 +38,38 @@
         </Row>
         <Row popup="false" name="A2">
           <Rhs vislevel="3" flags="7">
-            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
-            <Subcolumn vislevel="1"/>
+            <iImage window_x="0" window_y="28" window_width="494" window_height="679" image_left="232" image_top="276" image_mag="1" show_status="true" show_paintbox="false" show_convert="true" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="1">
+              <Row name="super">
+                <Rhs vislevel="0" flags="4">
+                  <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="builtin">
+                <Rhs vislevel="1" flags="1">
+                  <Option caption="Builtin" labelsn="5" labels0="rose:" labels1="logo:" labels2="wizard:" labels3="granite:" labels4="netscape:" value="2"/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="command">
+                <Rhs vislevel="1" flags="4">
+                  <iText/>
+                </Rhs>
+              </Row>
+            </Subcolumn>
             <iText formula="Magick_NewImageMenu_item.Magick_builtin_item.action"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="A8">
+          <Rhs vislevel="1" flags="1">
+            <iRegion image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true" left="78" top="135" width="128" height="128">
+              <iRegiongroup/>
+            </iRegion>
+            <Subcolumn vislevel="0"/>
+            <iText formula="Region A2 132 187 237 201"/>
           </Rhs>
         </Row>
         <Row popup="false" name="A3">
@@ -150,9 +179,11 @@
       <Subcolumn vislevel="3">
         <Row popup="false" name="B1">
           <Rhs vislevel="2" flags="5">
-            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="A2"/>
+            <iText formula="A8"/>
+            <iRegion image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true">
+              <iRegiongroup/>
+            </iRegion>
           </Rhs>
         </Row>
         <Row popup="false" name="B2">
@@ -307,13 +338,22 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1266" y="0" open="true" selected="false" sform="false" next="14" name="C" caption="All the B operations">
+    <Column x="1266" y="0" open="true" selected="false" sform="false" next="17" name="C" caption="All the B operations">
       <Subcolumn vislevel="3">
         <Row popup="false" name="C1">
           <Rhs vislevel="2" flags="5">
-            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="A2"/>
+            <iText formula="A8"/>
+            <iRegion image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true">
+              <iRegiongroup/>
+            </iRegion>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="C14">
+          <Rhs vislevel="3" flags="7">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="1"/>
+            <iText formula="Magick_blurSharpMenu_item.Magick_adaptive_blur_item.action C1"/>
           </Rhs>
         </Row>
         <Row popup="false" name="C3">
@@ -476,6 +516,20 @@
             <iText formula="Magick_blurSharpMenu_item.Magick_rotationalBlur_item.action C1"/>
           </Rhs>
         </Row>
+        <Row popup="false" name="C15">
+          <Rhs vislevel="3" flags="7">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="1"/>
+            <iText formula="Magick_blurSharpMenu_item.Magick_selectiveBlur_item.action C1"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="C16">
+          <Rhs vislevel="3" flags="7">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="1"/>
+            <iText formula="Magick_blurSharpMenu_item.Magick_adaptive_sharpen_item.action C1"/>
+          </Rhs>
+        </Row>
         <Row popup="false" name="C10">
           <Rhs vislevel="3" flags="7">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
@@ -494,7 +548,7 @@
               </Row>
               <Row name="radius">
                 <Rhs vislevel="1" flags="1">
-                  <Slider caption="Radius (0=auto)" from="0" to="100" value="10"/>
+                  <Slider caption="Radius (0=auto)" from="0" to="100" value="20"/>
                   <Subcolumn vislevel="0"/>
                   <iText/>
                 </Rhs>
@@ -685,13 +739,22 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1980" y="0" open="true" selected="true" sform="false" next="12" name="D" caption="All the C operations">
+    <Column x="1980" y="0" open="true" selected="false" sform="false" next="16" name="D" caption="All the C operations">
       <Subcolumn vislevel="3">
         <Row popup="false" name="D1">
           <Rhs vislevel="2" flags="5">
-            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="A2"/>
+            <iText formula="A8"/>
+            <iRegion image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true">
+              <iRegiongroup/>
+            </iRegion>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="D13">
+          <Rhs vislevel="3" flags="7">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="1"/>
+            <iText formula="Magick_charcoal_item.action D1"/>
           </Rhs>
         </Row>
         <Row popup="false" name="D4">
@@ -912,6 +975,13 @@
             <iText formula="Magick_colorspace_item.action D1"/>
           </Rhs>
         </Row>
+        <Row popup="false" name="D14">
+          <Rhs vislevel="3" flags="7">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="1"/>
+            <iText formula="Magick_colorspaceGray_item.action D1"/>
+          </Rhs>
+        </Row>
         <Row popup="false" name="D9">
           <Rhs vislevel="3" flags="7">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
@@ -942,6 +1012,58 @@
               </Row>
             </Subcolumn>
             <iText formula="Magick_contrast_item.action D1"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="D15">
+          <Rhs vislevel="3" flags="7">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="1">
+              <Row name="x">
+                <Rhs vislevel="3" flags="4">
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="super">
+                <Rhs vislevel="0" flags="4">
+                  <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="intensity">
+                <Rhs vislevel="1" flags="1">
+                  <Option/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="channels">
+                <Rhs vislevel="1" flags="4">
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="blk">
+                <Rhs vislevel="1" flags="1">
+                  <Slider caption="percent to make black" from="0" to="100" value="10"/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="wht">
+                <Rhs vislevel="1" flags="1">
+                  <Slider caption="percent to make white" from="0" to="100" value="10"/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="command">
+                <Rhs vislevel="1" flags="4">
+                  <iText/>
+                </Rhs>
+              </Row>
+            </Subcolumn>
+            <iText formula="Magick_contrastStretch_item.action D1"/>
           </Rhs>
         </Row>
         <Row popup="false" name="D11">
@@ -980,6 +1102,249 @@
               </Row>
             </Subcolumn>
             <iText formula="Magick_crop_item.action D9"/>
+          </Rhs>
+        </Row>
+      </Subcolumn>
+    </Column>
+    <Column x="2686" y="0" open="true" selected="false" sform="false" next="6" name="E" caption="All the D operations">
+      <Subcolumn vislevel="3">
+        <Row popup="false" name="E1">
+          <Rhs vislevel="2" flags="5">
+            <Subcolumn vislevel="0"/>
+            <iText formula="A8"/>
+            <iRegion image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true">
+              <iRegiongroup/>
+            </iRegion>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="E2">
+          <Rhs vislevel="3" flags="7">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="1">
+              <Row name="x">
+                <Rhs vislevel="3" flags="4">
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="super">
+                <Rhs vislevel="0" flags="4">
+                  <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="threshold">
+                <Rhs vislevel="1" flags="1">
+                  <Slider caption="Threshold (percent)" from="0" to="100" value="50"/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="command">
+                <Rhs vislevel="1" flags="4">
+                  <iText/>
+                </Rhs>
+              </Row>
+            </Subcolumn>
+            <iText formula="Magick_deskew_item.action E1"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="E3">
+          <Rhs vislevel="3" flags="7">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="1"/>
+            <iText formula="Magick_despeckle_item.action E1"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="E4">
+          <Rhs vislevel="3" flags="7">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="1">
+              <Row name="x">
+                <Rhs vislevel="3" flags="4">
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="super">
+                <Rhs vislevel="0" flags="4">
+                  <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="virtpixback">
+                <Rhs vislevel="1" flags="4">
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="distort">
+                <Rhs vislevel="1" flags="1">
+                  <Option caption="Distort" labelsn="16" labels0="Affine" labels1="AffineProjection" labels2="ScaleRotateTranslate" labels3="SRT" labels4="Perspective" labels5="PerspectiveProjection" labels6="BilinearForward" labels7="BilinearReverse" labels8="Polynomial" labels9="Arc" labels10="Polar" labels11="DePolar" labels12="Barrel" labels13="BarrelInverse" labels14="Shepards" labels15="Resize" value="3"/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="args">
+                <Rhs vislevel="1" flags="1">
+                  <String/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="isPlus">
+                <Rhs vislevel="1" flags="1">
+                  <Toggle/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="command">
+                <Rhs vislevel="1" flags="4">
+                  <iText/>
+                </Rhs>
+              </Row>
+            </Subcolumn>
+            <iText formula="Magick_distort_item.action E1"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="E5">
+          <Rhs vislevel="3" flags="7">
+            <iImage window_x="0" window_y="28" window_width="417" window_height="182" image_left="48" image_top="8" image_mag="4" show_status="true" show_paintbox="false" show_convert="true" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="1">
+              <Row name="x">
+                <Rhs vislevel="3" flags="4">
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="super">
+                <Rhs vislevel="0" flags="4">
+                  <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="foreground">
+                <Rhs vislevel="1" flags="1">
+                  <Colour colour_space="sRGB" value0="182" value1="76" value2="149"/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="args">
+                <Rhs vislevel="1" flags="1">
+                  <String/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="command">
+                <Rhs vislevel="1" flags="4">
+                  <iText/>
+                </Rhs>
+              </Row>
+            </Subcolumn>
+            <iText formula="Magick_draw_item.action E1"/>
+          </Rhs>
+        </Row>
+      </Subcolumn>
+    </Column>
+    <Column x="3371" y="0" open="true" selected="true" sform="false" next="8" name="F" caption="All the E operations">
+      <Subcolumn vislevel="3">
+        <Row popup="false" name="F1">
+          <Rhs vislevel="2" flags="5">
+            <iRegion image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true">
+              <iRegiongroup/>
+            </iRegion>
+            <Subcolumn vislevel="0"/>
+            <iText formula="A8"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="F2">
+          <Rhs vislevel="3" flags="7">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="1"/>
+            <iText formula="Magick_edge_item.action F1"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="F3">
+          <Rhs vislevel="3" flags="7">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="1"/>
+            <iText formula="Magick_emboss_item.action F1"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="F4">
+          <Rhs vislevel="3" flags="7">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="1"/>
+            <iText formula="Magick_enhance_item.action F1"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="F5">
+          <Rhs vislevel="3" flags="7">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="1"/>
+            <iText formula="Magick_equalize_item.action F1"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="F6">
+          <Rhs vislevel="3" flags="7">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="1"/>
+            <iText formula="Magick_evaluate_item.action F1"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="F7">
+          <Rhs vislevel="3" flags="7">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="1">
+              <Row name="x">
+                <Rhs vislevel="0" flags="4">
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="super">
+                <Rhs vislevel="0" flags="4">
+                  <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="background">
+                <Rhs vislevel="1" flags="1">
+                  <Colour colour_space="sRGB" value0="202" value1="74" value2="74"/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="compose">
+                <Rhs vislevel="1" flags="1">
+                  <Option/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="gravity">
+                <Rhs vislevel="1" flags="1">
+                  <Option/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="geometry">
+                <Rhs vislevel="3" flags="6">
+                  <Subcolumn vislevel="2"/>
+                  <iText/>
+                </Rhs>
+              </Row>
+              <Row name="command">
+                <Rhs vislevel="1" flags="4">
+                  <iText/>
+                </Rhs>
+              </Row>
+            </Subcolumn>
+            <iText formula="Magick_extent_item.action F1"/>
           </Rhs>
         </Row>
       </Subcolumn>

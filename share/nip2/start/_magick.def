@@ -21,9 +21,6 @@
      Many small changes.
    2-May-2014 jcupitt
      Added Magick.version
-   3-May-2014
-     get rid of print_colour_nq, we must always have quotes if the arg
-	 contains a hash character, it means comment on unix
 
    Last update: 3-May-2014.
 
@@ -84,11 +81,16 @@ Magick = class {
 	fuzz_widget = Scale "Fuzz (percent)" 0 100 0;
 	blur_rad_widget = Scale "Radius (0=auto)" 0 100 0;
 
-	print_colour triple
-		= concat ["\"#", concat (map fmt triple), "\""]
+	// a colour with no enclosing quotes ... use this if we know there are
+	// some quotes at an outer level
+	print_colour_nq triple
+		= concat ["#", concat (map fmt triple)]
 	{
 		fmt x = reverse (take 2 (reverse (print_base 16 (x + 256))));
 	}
+
+	// we need the quotes because # is the comment character in *nix
+	print_colour triple = "\"" ++ print_colour_nq triple ++ "\"";
 
 	Foreground triple = class
 		Colour "sRGB" triple {
@@ -102,7 +104,7 @@ Magick = class {
 	GeneralCol triple = class
 		Colour "sRGB" triple {
 
-		_flag = print_colour triple;
+		_flag = print_colour_nq triple;
 
 		Colour_edit space triple = this.GeneralCol triple;
 	}

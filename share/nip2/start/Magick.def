@@ -80,7 +80,7 @@ Magick_NewImageMenu_item = class
 			colour = Magick.generalcol_widget;
 			command = Magick.command [
 				size._flag,
-				"canvas:" ++ colour._flag, 
+				"\"canvas:" ++ colour._flag ++ "\"", 
 				"\"%s\""
 			];
 
@@ -116,7 +116,8 @@ Magick_NewImageMenu_item = class
 
 			command = Magick.command [
 				size._flag,
-				concat ["gradient:", topColour._flag, "-", bottomColour._flag],
+				concat ["\"gradient:", 
+					topColour._flag, "-", bottomColour._flag, "\""],
 				"\"%s\""
 			];
 
@@ -179,7 +180,8 @@ Magick_NewImageMenu_item = class
 	}
 
 	Magick_radialgradient_item = class
-		Menuaction "_Radial gradient" "make a radial gradient between two colours" {
+		Menuaction "_Radial gradient" 
+			"make a radial gradient between two colours" {
 		action = class
 			_result {
 			_vislevel = 3;
@@ -190,7 +192,8 @@ Magick_NewImageMenu_item = class
 
 			command = Magick.command [
 				size._flag,
-				concat ["radial-gradient:", innerColour._flag, "-", outerColour._flag],
+				concat ["\"radial-gradient:", 
+					innerColour._flag, "-", outerColour._flag, "\""],
 				"\"%s\""
 			];
 
@@ -1399,7 +1402,8 @@ Magick_gradient_item = class
 }
 
 Magick_gradientCorn_item = class
-	Menuaction "_Gradient corners" "apply a bilinear gradient between the corners" {
+	Menuaction "_Gradient corners" 
+		"apply a bilinear gradient between the corners" {
 	action x = class
 		_result {
 		_vislevel = 3;
@@ -1504,7 +1508,7 @@ Magick_levelCols_item = class
 			"\"%s\"",
 			channels._flag,
 			(if isInv then "+" else "-") ++ "level-colors",
-			colour_black._flag ++ "," ++ colour_white._flag,
+			"\"" ++ colour_black._flag ++ "," ++ colour_white._flag ++ "\"",
 			"\"%s\""
 		];
 
@@ -1718,7 +1722,7 @@ Magick_opaque_item = class
 			"-fuzz",
 			"\"" ++ print changeColour.fuzz.value ++ "%%\"",
 			(if changeColour.nonMatch then "+" else "-") ++ "opaque",
-			changeColour.colour._flag,
+			"\"" ++ changeColour.colour._flag ++ "\"",
 			"\"%s\""
 		];
 
@@ -1933,7 +1937,7 @@ Magick_shadow_item = class
 		command = Magick.command [
 			"\"%s\"",
 			"\"(\" +clone",
-			"-background", shadowCol._flag,
+			"-background", "\"" ++ shadowCol._flag ++ "\"",
 			"-shadow",
 			concat [
 				"\"",
@@ -2326,7 +2330,7 @@ Magick_transparent_item = class
 			"-fuzz",
 			"\"" ++ print changeColour.fuzz.value ++ "%%\"",
 			(if changeColour.nonMatch then "+" else "-") ++ "transparent",
-			changeColour.colour._flag,
+			"\"" ++ changeColour.colour._flag ++ "\"",
 			"\"%s\""
 		];
 

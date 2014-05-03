@@ -21,8 +21,11 @@
      Many small changes.
    2-May-2014 jcupitt
      Added Magick.version
+   3-May-2014
+     get rid of print_colour_nq, we must always have quotes if the arg
+	 contains a hash character, it means comment on unix
 
-   Last update: 17-Apr-2014.
+   Last update: 3-May-2014.
 
    For details of ImageMagick operations, see http://www.imagemagick.org/script/command-line-options.php etc.
 
@@ -87,12 +90,6 @@ Magick = class {
 		fmt x = reverse (take 2 (reverse (print_base 16 (x + 256))));
 	}
 
-	print_colour_nq triple
-		= concat ["#", concat (map fmt triple)]
-	{
-		fmt x = reverse (take 2 (reverse (print_base 16 (x + 256))));
-	}
-
 	Foreground triple = class
 		Colour "sRGB" triple {
 
@@ -105,7 +102,7 @@ Magick = class {
 	GeneralCol triple = class
 		Colour "sRGB" triple {
 
-		_flag = print_colour_nq triple;
+		_flag = print_colour triple;
 
 		Colour_edit space triple = this.GeneralCol triple;
 	}

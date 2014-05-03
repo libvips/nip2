@@ -19,6 +19,9 @@
      Many small changes.
      A few new menu options.
      Created sub-menu for multi-input operations.
+   3-May-2014 jcupitt
+     Put quotes around ( in shadow to help unix
+
    Last update: 17-Apr-2014.
 
    For details of ImageMagick operations, see http://www.imagemagick.org/script/command-line-options.php etc.
@@ -1929,7 +1932,7 @@ Magick_shadow_item = class
 		// So we take this futher, compositing with source.
 		command = Magick.command [
 			"\"%s\"",
-			"( +clone",
+			"\"(\" +clone",
 			"-background", shadowCol._flag,
 			"-shadow",
 			concat [
@@ -1940,7 +1943,7 @@ Magick_shadow_item = class
 				(if arePc then "%%" else ""),
 				"\""
 			],
-			") +swap -background None -layers merge",
+			"\")\" +swap -background None -layers merge",
 			"+repage",
 			"\"%s\""
 		];

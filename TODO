@@ -1,4 +1,13 @@
 
+- -magnify not in my magick
+
+- fix up menu tear-off, again
+
+
+- better error msg from vips_call "system"
+
+  should display error output?
+
 - columns can move about on load in large workspaces
 
 - hide tabs if only one tab in window, though we'd need to allow tab drop 

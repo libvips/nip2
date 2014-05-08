@@ -1,0 +1,482 @@
+/* any l: or all the elements of list l together
+ *
+ * any (map (equal 0) list) == true, if any element of list is zero.
+ * any :: [bool] -> bool
+ */
+any = foldr logical_or false;
+
+/* all l: and all the elements of list l together
+ *
+ * all (map (==0) list) == true, if every element of list is zero.
+ * all :: [bool] -> bool
+ */
+all = foldr logical_and true;
+
+/* concat l: join a list of lists together
+ *
+ * concat ["abc","def"] == "abcdef".
+ * concat :: [[*]] -> [*]
+ */
+concat l = foldr join [] l;
+
+/* delete eq x l: delete the first x from l
+ *
+ * delete equal 'b' "abcdb" == "acdb"
+ * delete :: (* -> bool) -> * -> [*] -> [*]
+ */
+delete eq a l
+	= [], l == []
+	= y, eq a b
+	= b : delete eq a y
+{
+	b:y = l;
+}
+
+/* difference eq a b: delete b from a
+ *
+ * difference equal "asdf" "ad" == "sf"
+ * difference :: (* -> bool) -> [*] -> [*] -> [*]
+ */
+difference = foldl @ converse @ delete;
+
+/* drop n l: drop the first n elements from list l
+ *
+ * drop 3 "abcd" == "d"
+ * drop :: num -> [*] -> [*]
+ */
+drop n l 
+	= l, n <= 0 || l == []
+	= drop (n - 1) (tl l);
+
+/* dropwhile fn l: drop while fn is true
+ *
+ * dropwhile is_digit "1234pigs" == "pigs"
+ * dropwhile :: (* -> bool) -> [*] -> [*]
+ */
+dropwhile fn l
+	= [], l == []
+	= dropwhile fn x, fn a
+	= l
+{
+	a:x = l;
+}
+
+/* extract n l: extract element at index n from list l
+ */
+extract = converse subscript;
+
+/* filter fn l: return all elements of l for which predicate fn holds
+ *
+ * filter is_digit "1one2two3three" = "123"
+ * filter :: (* -> bool) -> [*] -> [*]
+ */
+filter fn l
+	= foldr addif [] l
+{
+	addif x l
+		= x : l, fn x;
+		= l;
+}
+
+/* flatten x: flatten a list of lists of things into a simple list
+ *
+ * flatten :: [[*]] -> [*]
+ */
+flatten x
+	= foldr flat [] x, is_list x
+	= x
+{
+	flat x sofar
+		= foldr flat sofar x, is_list x
+		= x : sofar;
+}
+
+/* foldl fn st l: fold list l from the left with function fn and start st
+ *
+ * Start from the left hand end of the list (unlike foldr, see below). 
+ * foldl is less useful (and much slower).
+ *
+ * foldl fn start [a,b .. z] = ((((st fn a) fn b) ..) fn z)
+ * foldl :: (* -> ** -> *) -> * -> [**] -> * 
+ */
+foldl fn st l
+	= st, l == []
+	= foldl fn (fn st x) xs
+{
+	x:xs = l;
+}
+
+/* foldl1 fn l: like foldl, but use the 1st element as the start value
+ *
+ * foldl1 fn [1,2,3] == ((1 fn 2) fn 3)
+ * foldl1 :: (* -> * -> *) -> [*] -> *
+ */
+foldl1 fn l
+	= [], l == []
+	= foldl fn x xs
+{
+	x:xs = l;
+}
+
+/* foldr fn st l: fold list l from the right with function fn and start st
+ *
+ * foldr fn st [a,b..z] = (a fn (b fn (.. (z fn st))))
+ * foldr :: (* -> ** -> **) -> ** -> [*] -> **
+ */
+foldr fn st l
+	= st, l == []
+	= fn x (foldr fn st xs)
+{
+	x:xs = l;
+}
+
+/* foldr1 fn l: like foldr, but use the last element as the start value
+ *
+ * foldr1 fn [1,2,3,4] == (1 fn (2 fn (3 fn 4)))
+ * foldr1 :: (* -> * -> *) -> [*] -> *
+ */
+foldr1 fn l
+	= [], l == []
+	= x, xs == []
+	= fn x (foldr1 fn xs)
+{
+	x:xs = l;
+}
+
+/* Search a list for an element, returning its index (or -1)
+ *
+ * index (equal 12) [13,12,11] == 1
+ * index :: (* -> bool) -> [*] -> real
+ */
+index fn list
+	= search list 0
+{
+	search l n
+		= -1, l == []
+		= n, fn x
+		= search xs (n + 1)
+		{
+			x:xs = l;
+		}
+}
+
+/* init l: remove last element of list l
+ *
+ * The dual of tl.
+ * init [1,2,3] == [1,2]
+ * init :: [*] -> [*]
+ */
+init l
+	= error "init of []", l == [];
+	= [], tl l == [];
+	= x : init xs
+{
+	x:xs = l;
+}
+
+/* iterate f x: repeatedly apply f to x
+ *
+ * return the infinite list [x, f x, f (f x), ..].
+ * iterate (multiply 2) 1 == [1, 2, 4, 8, 16, 32, 64 ... ]
+ * iterate :: (* -> *) -> * -> [*]
+ */
+iterate f x = x : iterate f (f x);
+
+/* join_sep sep l: join a list with a separator
+ *
+ * join_sep ", " (map print [1 .. 4]) == "1, 2, 3, 4"
+ * join_sep :: [*] -> [[*]] -> [*]
+ */
+join_sep sep l
+	= foldl1 fn l
+{
+	fn a b = a ++ sep ++ b;
+}
+
+/* last l: return the last element of list l
+ *
+ * The dual of hd. last [1,2,3] == 3
+ * last :: [*] -> [*]
+ */
+last l
+	= error "last of []", l == []
+	= x, xs == []
+	= last xs
+{
+	x:xs = l;
+}
+
+/* len l: length of list l
+ * (see also is_list_len and friends in predicate.def)
+ *
+ * len :: [*] -> num
+ */
+len l
+	= 0, l == []
+	= 1 + len (tl l);
+
+/* limit l: return the first element of l which is equal to its predecessor
+ *
+ * useful for checking for convergence
+ * limit :: [*] -> *
+ */
+limit l
+	= error "incorrect use of limit", 
+		l == [] || tl l == [] || tl (tl l) == []
+	= a, a == b
+	= limit (b : x)
+{
+	a:b:x = l;
+}
+
+/* Turn a function of n args into a function which takes a single arg of an 
+ * n-element list.
+ */
+list_1ary fn x = fn x?0;
+list_2ary fn x = fn x?0 x?1;
+list_3ary fn x = fn x?0 x?1 x?2;
+list_4ary fn x = fn x?0 x?1 x?2 x?3;
+list_5ary fn x = fn x?0 x?1 x?2 x?3 x?4;
+list_6ary fn x = fn x?0 x?1 x?2 x?3 x?4 x?5;
+list_7ary fn x = fn x?0 x?1 x?2 x?3 x?4 x?5 x?6;
+
+/* map fn l: map function fn over list l
+ *
+ * map :: (* -> **) -> [*] -> [**]
+ */
+map f l
+	= [], l == [];
+	= f (hd l) : map f (tl l);
+
+/* map2 fn l1 l2: map two lists together with fn 
+ *
+ * map2 :: (* -> ** -> ***) -> [*] -> [**] -> [***]
+ */
+map2 fn l1 l2 = map (list_2ary fn) (zip2 l1 l2);
+
+/* map3 fn l1 l2 l3: map three lists together with fn 
+ *
+ * map3 :: (* -> ** -> *** -> ****) -> [*] -> [**] -> [***] -> [****]
+ */
+map3 fn l1 l2 l3 = map (list_3ary fn) (zip3 l1 l2 l3);
+
+/* member l x: true if x is a member of list l
+ *
+ * is_digit == member "0123456789"
+ * member :: [*] -> * -> bool
+ */
+member l x = any (map (equal x) l);
+
+/* merge b l r: merge two lists based on a bool list
+ *
+ * merge :: [bool] -> [*] -> [*] -> [*]
+ */
+merge p l r
+	= [], p == [] || l == [] || r == []
+	= a : merge z x y, c
+	= b : merge z x y
+{
+	a:x = l;
+	b:y = r;
+	c:z = p;
+}
+
+/* mkset eq l: remove duplicates from list l using equality function
+ *
+ * mkset :: (* -> bool) -> [*] -> [*]
+ */
+mkset eq l
+	= [], l == []
+	= a : filter (not @ eq a) (mkset eq x)
+{
+	a:x = l;
+}
+
+/* postfix l r: add r to the end of list l
+ *
+ * The dual of ':'.
+ * postfix :: [*] -> ** -> [*,**]
+ */
+postfix l r = l ++ [r];
+
+/* repeat x: make an infinite list of xes
+ *
+ * repeat :: * -> [*]
+ */
+repeat x = map (const x) [1..];
+
+/* replicate n x: make n copies of x in a list
+ *
+ * replicate :: num -> * -> [*]
+ */
+replicate n x = take n (repeat x);
+
+/* reverse l: reverse list l
+ *
+ * reverse :: [*] -> [*]
+ */
+reverse l = foldl (converse cons) [] l;
+
+/* scanl fn st l: apply (foldl fn r) to every initial segment of a list
+ *
+ * scanl add 0 [1,2,3] == [1,3,6]
+ * scanl :: (* -> ** -> *) -> * -> [**] -> [*]
+ */
+scanl fn st l
+	= st, l == []
+	= st' : scanl fn st' xs
+{
+	x:xs = l;
+	st' = fn st x;
+}
+
+/* sort l: sort list l into ascending order
+ *
+ * sort :: [*] -> [*]
+ */
+sort l = sortc less_equal l;
+
+/* sortc comp l: sort list l into order using a comparision function
+ *
+ * Uses merge sort (n log n behaviour)
+ * sortc :: (* -> * -> bool) -> [*] -> [*]
+ */
+sortc comp l
+	= l, n <= 1
+	= merge (sortc comp (take n2 l)) (sortc comp (drop n2 l))
+{
+	n = len l;
+	n2 = (int) (n / 2);
+
+	/* merge l1 l2: merge sorted lists l1 and l2 to make a single 
+	 * sorted list
+	 */
+	merge l1 l2
+		= l2, l1 == []
+		= l1, l2 == []
+		= a : merge x (b : y), comp a b
+		= b : merge (a : x) y
+	{
+		a:x = l1;
+		b:y = l2;
+	}
+}
+
+/* sortpl pl l: sort by a list of predicates
+ *
+ * sortpl :: (* -> bool) -> [*] -> [*]
+ */
+sortpl pl l
+	= sortc (test pl) l
+{
+	/* Comparision function ... put true before false, if equal move on to
+	 * the next predicate.
+	 */
+	test pl a b
+		= true, pl == []
+		= ta, ta != tb
+		= test (tl pl) a b
+	{
+		ta = pl?0 a;
+		tb = pl?0 b;
+	}
+}
+
+/* sortr l: sort list l into descending order
+ *
+ * sortr :: [*] -> [*]
+ */
+sortr l = sortc more l;
+
+/* split fn l: break a list into sections separated by many fn
+ *
+ * split is_space "  hello world " == ["hello", "world"]
+ * split is_space "  " == []
+ * split :: (* -> bool) -> [*] -> [[*]]
+ */
+split fn l
+        = [], l == [] || l' == []
+        = head : split fn tail
+{ 
+        nfn = not @ fn;
+
+        l' = dropwhile fn l;
+        head = takewhile nfn l';
+        tail = dropwhile nfn l';
+}   
+
+/* splits fn l: break a list into sections separated by a single fn
+ *
+ * split (equal ',') ",,1" == ["", "", "1"]
+ * split :: (* -> bool) -> [*] -> [[*]]
+ */
+splits fn l
+        = [], l == [] 
+        = head : splits fn tail
+{ 
+        fn' = not @ fn;
+	dropif x 
+		= [], x == []
+		= tl x;
+
+        head = takewhile fn' l;
+        tail = dropif (dropwhile fn' l);
+}   
+
+/* splitpl fnl l: split a list up with a list of predicates
+ *
+ * splitpl [is_digit, is_letter, is_digit] "123cat" == ["123", "cat", []]
+ * splitpl :: [* -> bool] -> [*] -> [[*]]
+ */
+splitpl fnl l 
+        = l, fnl == []
+        = head : splitpl (tl fnl) tail
+{
+        head = takewhile (hd fnl) l;
+        tail = dropwhile (hd fnl) l;
+}
+
+/* split_lines n l: split a list into equal length lines
+ *
+ * split_lines 4 "1234567" == ["1234", "567"]
+ * splitl :: int -> [*] -> [[*]]
+ */
+split_lines n l
+        = [], l == []
+        = take n l : split_lines n (drop n l);
+
+/* take n l: take the first n elements from list l
+ * take :: num -> [*] -> [*]
+ */
+take n l 
+	= [], n <= 0
+	= [], l == []
+	= hd l : take (n-1) (tl l);
+
+/* takewhile fn l: take from the front of a list while predicate fn holds
+ *
+ * takewhile is_digit "123onetwothree" == "123"
+ * takewhile :: (* -> bool) -> [*] -> [*]
+ */
+takewhile fn l
+	= [], l == []
+	= hd l : takewhile fn (tl l), fn (hd l)
+	= [];
+
+/* zip2 l1 l2: zip two lists together 
+ *
+ * zip2 [1,2] ['a', 'b', 'c'] == [[1,'a'],[2,'b']]
+ * zip2 :: [*] -> [**] -> [[*,**]]
+ */
+zip2 l1 l2
+	= [], l1 == [] || l2 == []
+	= [hd l1, hd l2] : zip2 (tl l1) (tl l2);
+
+/* zip3 l1 l2 l3: zip three lists together
+ *
+ * zip3 [1,2] ['a', 'b', 'c'] [true] == [[1,'a',true]]
+ * zip3 :: [*] -> [**] ->[***] -> [[*,**,***]]
+ */
+zip3 l1 l2 l3
+	= [], l1 == [] || l2 == [] || l3 == []
+	= [hd l1, hd l2, hd l3] : zip3 (tl l1) (tl l2) (tl l3);

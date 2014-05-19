@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.28.0">
-  <Workspace window_x="0" window_y="0" window_width="1280" window_height="772" filename="workspaces/test_math.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_math" caption="Default empty workspace">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.39.0">
+  <Workspace window_x="737" window_y="125" window_width="1280" window_height="772" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" locked="false" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_math" caption="Default empty workspace" filename="$HOME/GIT/nip2/test/workspaces/test_math.ws">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="17" name="B" caption="Colour / Colourspace">
       <Subcolumn vislevel="3">
         <Row popup="false" name="B1">
@@ -368,14 +368,14 @@
           <Rhs vislevel="1" flags="1">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Math_boolean_item.Band_or_item.action MB2"/>
+            <iText formula="Math_boolean_item.Bandor_item.action MB2"/>
           </Rhs>
         </Row>
         <Row popup="false" name="MB16">
           <Rhs vislevel="1" flags="1">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Math_boolean_item.Band_and_item.action MB2"/>
+            <iText formula="Math_boolean_item.Bandand_item.action MB2"/>
           </Rhs>
         </Row>
         <Row popup="false" name="MB18">
@@ -691,7 +691,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="6101" y="0" open="true" selected="false" sform="false" next="8" name="SB" caption="Math / Base">
+    <Column x="6055" y="0" open="true" selected="false" sform="false" next="8" name="SB" caption="Math / Base">
       <Subcolumn vislevel="3">
         <Row popup="false" name="SB1">
           <Rhs vislevel="1" flags="4">
@@ -715,7 +715,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="6286" y="0" open="true" selected="false" sform="false" next="5" name="C" caption="Math / Cluster">
+    <Column x="6240" y="0" open="true" selected="false" sform="false" next="5" name="C" caption="Math / Cluster">
       <Subcolumn vislevel="3">
         <Row popup="false" name="C1">
           <Rhs vislevel="1" flags="4">
@@ -730,7 +730,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3164" y="916" open="true" selected="false" sform="false" next="7" name="A" caption="test results of relational">
+    <Column x="3164" y="896" open="true" selected="false" sform="false" next="7" name="A" caption="test results of relational">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A4">
           <Rhs vislevel="2" flags="4">
@@ -874,7 +874,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3756" y="804" open="true" selected="false" sform="false" next="5" name="F" caption="test results of relational constant">
+    <Column x="3756" y="784" open="true" selected="false" sform="false" next="5" name="F" caption="test results of relational constant">
       <Subcolumn vislevel="3">
         <Row popup="false" name="F4">
           <Rhs vislevel="2" flags="4">
@@ -958,7 +958,7 @@
         </Row>
         <Row popup="false" name="G11">
           <Rhs vislevel="1" flags="4">
-            <iText formula="if G10 &gt; 0.0001 then error &quot;argh&quot; else &quot;ok!&quot;"/>
+            <iText formula="if G10 &gt; 0.0001 then error (&quot;argh &quot; ++ print G10) else &quot;ok!&quot;"/>
           </Rhs>
         </Row>
       </Subcolumn>

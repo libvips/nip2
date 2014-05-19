@@ -72,20 +72,24 @@ void
 call_check_all_destroyed( void )
 {
 #ifdef DEBUG_LEAK
-	if( call_info_all != NULL ) {
-		GSList *p;
+	int n_leaks;
+	GSList *p;
 
-		printf( "** %d CallInfo leaked!\n", 
-			g_slist_length( call_info_all ) );
-		printf( "(ignore operations which do not take "
-			"image arguments)\n" );
-
-		for( p = call_info_all; p; p = p->next ) {
-			CallInfo *vi = (CallInfo *) p->data;
-
+	n_leaks = 0;
+	for( p = call_info_all; p; p = p->next ) {
+		CallInfo *vi = (CallInfo *) p->data;
+	
+		/* Operations which don't take an image as either an input or 
+		 * output will stay in the cache. Don't report them.
+		 */
+		if( vi->ninii || vi->noutii ) {
+			n_leaks += 1;
 			printf( "\t%s\n", vi->name );
 		}
 	}
+
+	if( n_leaks ) 
+		printf( "** %d CallInfo leaked!\n", n_leaks ); 
 #endif /*DEBUG_LEAK*/
 }
 

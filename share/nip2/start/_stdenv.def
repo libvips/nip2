@@ -1070,6 +1070,20 @@ insert_noexpand x y small big
 		(insert_noexpand x y) Operator_type.COMPOUND_REWRAP false;
 }
 
+decode im
+	= oo_unary_function decode_op im, is_class im
+	= decode_im im, is_image im
+	= error (_ "bad arguments to " ++ "decode")
+{
+	decode_op = Operator "decode" 
+		decode Operator_type.COMPOUND_REWRAP false;
+
+	decode_im im
+		= im_LabQ2Lab im, get_coding im == Image_coding.LABPACK
+		= im_rad2float im, get_coding im == Image_coding.RAD
+		= im;
+}
+
 measure_draw across down measure image
     = mark
 {
@@ -1110,8 +1124,9 @@ measure_sample across down measure image
                 
     cods = [[x * patch_width + left_margin, y * patch_height + top_margin] ::
         y <- [0 .. down - 1]; x <- [0 .. across - 1]];
-        
-    patches = map (\p extract_area p?0 p?1 sample_width sample_height image) 
+
+	image' = decode image;
+    patches = map (\p extract_area p?0 p?1 sample_width sample_height image') 
 		cods;
     measures = Matrix (map (map mean) (map bandsplit patches));
 }

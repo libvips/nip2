@@ -1620,6 +1620,12 @@ row_recomp_all( Row *top_row )
 		g_timer_reset( timer );
 #endif /*DEBUG_ROW*/
 
+#ifdef DEBUG_ROW
+		printf( "row_recomp_all: starting " );
+		row_name_print( dirty_row );
+		printf( "\n" ); 
+#endif /*DEBUG_ROW*/
+
 		if( !row_recomp_row( dirty_row ) ) {
 			/* This will set top_row->err and end the loop.
 			 */
@@ -1630,9 +1636,7 @@ row_recomp_all( Row *top_row )
 			row_dirty_clear( dirty_row );
 
 #ifdef DEBUG_ROW
-		printf( "row_recomp_all: done row " );
-		row_name_print( dirty_row );
-		printf( " - %gs\n", g_timer_elapsed( timer, NULL ) );
+		printf( "\t%gs\n", g_timer_elapsed( timer, NULL ) );
 #endif /*DEBUG_ROW*/
 
 #ifdef DEBUG

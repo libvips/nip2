@@ -11,15 +11,20 @@ EXTRA_DIST = \
 	proj \
 	m4 \
 	nip2.desktop.in \
-	nip2.xml 
+	nip2.xml \
+	nip2.appdata.xml
 
 nip2appdir = $(datadir)/applications
 
-nip2app_DATA = nip2.desktop
-
 nip2mimedir = $(datadir)/mime/packages
 
+nip2appdatadir = $(datadir)/appdata
+
+nip2app_DATA = nip2.desktop
+
 nip2mime_DATA = nip2.xml
+
+nip2appdata_DATA = nip2.appdata.xml
 
 install-exec-hook:
 	-rm -rf ${DESTDIR}$(datadir)/doc/nip2 

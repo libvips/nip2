@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 - error on these ops:
 
 	a = form complex
@@ -15,6 +16,10 @@
 
 
 
+=======
+- RMB on thumbnail, menu says "Header" ... RMB on image window, menu says
+  "Image Header"
+>>>>>>> Stashed changes
 
 - columns can move about on load in large workspaces
 

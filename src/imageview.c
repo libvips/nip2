@@ -492,7 +492,7 @@ static GtkActionEntry imageview_actions[] = {
 		G_CALLBACK( imageview_recalc_action_cb ) },
 
 	{ "Header", 
-		NULL, N_( "Image _Header" ), NULL,
+		NULL, N_( "_Header" ), NULL,
 		N_( "View image header" ), 
 		G_CALLBACK( imageview_header_action_cb ) },
 

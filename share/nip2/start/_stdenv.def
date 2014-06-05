@@ -2505,4 +2505,40 @@ system_image0 command
 	];
 }
 
+hough_line w h x 
+	= oo_unary_function hough_line_op x, is_class x
+	= hline (to_real w) (to_real h) x, is_image x 
+	= error (_ "bad arguments to " ++ "hough_line")
+{
+	hough_line_op = Operator "hough_line" 
+		(hough_line w h) Operator_type.COMPOUND_REWRAP false;
+
+	hline w h x
+		= pspace
+	{
+		[pspace] = vips_call "hough_line" [x] [
+			$width => w, 
+			$height=>h
+		];
+	}
+}
+
+hough_circle s mn mx x 
+	= oo_unary_function hough_circle_op x, is_class x
+	= hcircle (to_real s) (to_real mn) (to_real mx) x, is_image x 
+	= error (_ "bad arguments to " ++ "hough_circle")
+{
+	hough_circle_op = Operator "hough_circle" 
+		(hough_circle s mn mx) Operator_type.COMPOUND_REWRAP false;
+
+	hcircle s mn mx x
+		= pspace
+	{
+		[pspace] = vips_call "hough_circle" [x] [
+			$scale => s, 
+			$min_radius => mn, 
+			$max_radius=>mx
+		];
+	}
+}
 

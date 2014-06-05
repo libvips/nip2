@@ -666,6 +666,48 @@ Filter_correlate_item = class
 	}
 }
 
+Filter_hough_item = class
+	Menupullright "_Hough Transform" "transform to parameter space" {
+	Line_item = class
+		Menuaction "_Line" "find straight line Hough transform" {
+		action a = class
+			_result {
+			_vislevel = 3;
+
+			pspace_width = Expression "Parameter space width" 64;
+			pspace_height = Expression "Parameter space height" 64;
+
+			_result 
+				= map_unary line a 
+			{
+				line a 
+					= hough_line 
+						(to_real pspace_width) (to_real pspace_height) a;
+			}
+		}
+	}
+
+	Circle_item = class
+		Menuaction "_Circle" "find circle Hough transform" {
+		action a = class
+			_result {
+			_vislevel = 3;
+
+			scale = Expression "Scale down parameter space by" 10;
+			min_radius = Expression "Minimum radius" 10;
+			max_radius = Expression "Maximum radius" 30;
+
+			_result 
+				= map_unary circle a 
+			{
+				circle a 
+					= hough_circle (to_real scale) (to_real min_radius)
+						(to_real max_radius) a;
+			}
+		}
+	}
+}
+
 Filter_greyc_item = class 
 	Menupullright "_GREYCstoration" "noise-removing filter" {
 	Denoise_item = class 

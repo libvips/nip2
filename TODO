@@ -1,15 +1,13 @@
 
 - fix up menu tear-off, again
 
-- add menu items for hough transforms
+- hough_circle etc. don't get cached ... they use the vips8 API and the vips
+  cache only works for vips7
+
+  we can't turn on the vips8 cache since it does not know about invalidate
 
 
 
-
-=======
-- RMB on thumbnail, menu says "Header" ... RMB on image window, menu says
-  "Image Header"
->>>>>>> Stashed changes
 
 - columns can move about on load in large workspaces
 

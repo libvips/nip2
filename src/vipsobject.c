@@ -248,7 +248,8 @@ vo_object_new( Reduce *rc, const char *name,
 	 */
 	if( vips_object_build( vo->object ) ) {
 		error_top( _( "VIPS library error." ) );
-		error_sub( _( "Unable to build object." ) );
+		error_sub( "%s", im_error_buffer() );
+		im_error_clear();
 		vo_free( vo );
 		reduce_throw( rc );
 	}
@@ -380,7 +381,8 @@ vo_call( Reduce *rc, const char *name,
 	 */
 	if( vips_cache_operation_buildp( (VipsOperation **) &vo->object ) ) {
 		error_top( _( "VIPS library error." ) );
-		error_sub( _( "Unable to build object." ) );
+		error_sub( "%s", im_error_buffer() );
+		im_error_clear();
 		vips_object_unref_outputs( vo->object );
 		vo_free( vo );
 		reduce_throw( rc );

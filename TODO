@@ -1,16 +1,7 @@
-- error on these ops:
-
-	a = form complex
-	get real
-	get imag
-	form complex
-	to polar
-	to rectangular
-	conjugate
-	b = conjugate
-	max(a-b)
 
 - fix up menu tear-off, again
+
+- add menu items for hough transforms
 
 
 

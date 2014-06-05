@@ -176,18 +176,12 @@ toolview_refresh_sub( Toolview *tview,
 		 */
 		if( toolitem->is_pullright ) {
 			GtkWidget *submenu = gtk_menu_new();
-			GtkWidget *item2;
 			GSList *p;
 
 			gtk_menu_set_accel_group( GTK_MENU( submenu ), 
 				IWINDOW( mainw )->accel_group );
 			gtk_menu_set_accel_path( GTK_MENU( submenu ), 
 				toolitem->path );
-
-			item2 = gtk_tearoff_menu_item_new();
-			gtk_menu_shell_append( GTK_MENU_SHELL( submenu ), 
-				item2 );
-			gtk_widget_show( item2 );
 
 			for( p = toolitem->children; p; p = p->next ) {
 				Toolitem *child = p->data;

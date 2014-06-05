@@ -1,20 +1,22 @@
 
 - fix up menu tear-off, again
 
+  bug in gtk and won't be fixed, tear-off menus are deprecated
+
+  https://bugzilla.gnome.org/show_bug.cgi?id=627511
+
+  oh argh, might as well remove all tear-off code and direct people to the tk
+  browser instead
+
 - hough_circle etc. don't get cached ... they use the vips8 API and the vips
   cache only works for vips7
 
   we can't turn on the vips8 cache since it does not know about invalidate
 
-
-
-
 - columns can move about on load in large workspaces
 
 - hide tabs if only one tab in window, though we'd need to allow tab drop 
   anywhere in window for that
-
-
 
 - Matrix / New / Laplacian
 
@@ -84,8 +86,6 @@ VipsExtractArea (extract_area), extract an area from an image - extract_area
 - quite a few hist operations have no GUI ... histspec, for example? 
 
 - nip2 should use zooming support, if possible
-
-- "save as bitmap" would be handy in chart view, see gnumeric
 
 - the windows setup .exe install a bazillion .png icons we will never use,
   then installs them all again as .svg, which we will certainly never use

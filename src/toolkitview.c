@@ -121,7 +121,6 @@ toolkitview_refresh( vObject *vobject )
 	if( !kview->menu ) {
 		iWindow *iwnd = IWINDOW( iwindow_get_root( menu ) );
 		char path[256];
-		GtkWidget *item;
 
 		kview->menu = gtk_menu_new();
 		gtk_menu_set_accel_group( GTK_MENU( kview->menu ),
@@ -129,10 +128,6 @@ toolkitview_refresh( vObject *vobject )
 		im_snprintf( path, 256, 
 			"<mainw>/Toolkits/%s", IOBJECT( kit )->name );
 		gtk_menu_set_accel_path( GTK_MENU( kview->menu ), path );
-
-		item = gtk_tearoff_menu_item_new();
-		gtk_menu_shell_prepend( GTK_MENU_SHELL( kview->menu ), item );
-		gtk_widget_show( item );
 
 		changed = TRUE;
 	}

@@ -1,3 +1,4 @@
+- hough_circle should have optional param array
 
 - fix up menu tear-off, again
 

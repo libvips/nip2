@@ -2518,7 +2518,7 @@ hough_line w h x
 	{
 		[pspace] = vips_call "hough_line" [x] [
 			$width => w, 
-			$height=>h
+			$height => h
 		];
 	}
 }
@@ -2537,7 +2537,7 @@ hough_circle s mn mx x
 		[pspace] = vips_call "hough_circle" [x] [
 			$scale => s, 
 			$min_radius => mn, 
-			$max_radius=>mx
+			$max_radius => mx
 		];
 	}
 }

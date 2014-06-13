@@ -1087,8 +1087,6 @@ main( int argc, char *argv[] )
 	if( im_init_world( main_argv0 ) )
 		error_exit( "unable to start VIPS" );
 
-	//vips_cache_set_max( 0 );
-
 	/* Init i18n ... get catalogues from $VIPSHOME/share/locale so we're
 	 * relocatable.
 	 */

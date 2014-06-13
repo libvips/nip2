@@ -1,3 +1,13 @@
+- big_and_small_disks ... look at R2 and R1
+
+  R2 has three blobs in
+  R1 segments R2 and looks completely different
+  it's picked up AB2, the result of segmenting AB1 
+  edit R1 and get a double-free error
+
+  read vips_segment() and check cache behaviour
+
+
 - fix up menu tear-off, again
 
   bug in gtk and won't be fixed, tear-off menus are deprecated

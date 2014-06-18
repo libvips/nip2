@@ -33,14 +33,28 @@ test_difference() {
 	fi
 }
 
-echo -n "testing bicubic bilinear nohalo lbb $(basename $image) ... "
+test_rotate() {
+	im=$1
+	inter=$2
 
-# 90 degree clockwise rotate 
-vips im_affinei_all $image $tmp/t1.v bicubic 0 1 1 0 0 0
-vips im_affinei_all $tmp/t1.v $tmp/t2.v bilinear 0 1 1 0 0 0
-vips im_affinei_all $tmp/t2.v $tmp/t1.v nohalo 0 1 1 0 0 0
-vips im_affinei_all $tmp/t1.v $tmp/t2.v lbb 0 1 1 0 0 0
+	echo -n "testing $inter ... "
 
-test_difference $image $tmp/t2.v 1
+	# 90 degree clockwise rotate 
+	trn="0 1 1 0"
 
-echo "ok"
+	vips im_affinei_all $im $tmp/t1.v $inter $trn 0 0
+	vips im_affinei_all $tmp/t1.v $tmp/t2.v $inter $trn 0 0
+	vips im_affinei_all $tmp/t2.v $tmp/t1.v $inter $trn 0 0
+	vips im_affinei_all $tmp/t1.v $tmp/t2.v $inter $trn 0 0
+
+	test_difference $im $tmp/t2.v 1
+
+	echo "ok"
+}
+
+# vsqbs is non-interpolatory, don't test this way
+
+echo "testing with $(basename $image)"
+for i in nearest bicubic bilinear nohalo lbb; do
+	test_rotate $image $i
+done

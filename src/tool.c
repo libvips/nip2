@@ -412,18 +412,20 @@ toolitem_set_name( Toolitem *toolitem, PElement *root )
 		result ) {
 		if( class_get_member_string( root, 
 			MEMBER_LABEL, value, MAX_NAME ) ) {
+			char *p, *q;
+
 			/* Save the i18n-ed version.
 			 */
 			IM_SETSTR( toolitem->label, _( value ) );
 
 			/* Strip underscores (they mark mnemonics). Can't use
-			 * strrcpy(), we have overlapping blocks.
+			 * strrcpy() or memccpy(), we have overlapping blocks.
 			 */
 			im_strncpy( value, toolitem->label, MAX_NAME );
-			for( i = 0; value[i]; i++ )
-				if( value[i] == '_' )
-					memccpy( value + i, value + i + 1,
-						0, MAX_NAME - i );
+			for( p = q = value; *p; p++ )
+				if( *p != '_' )
+					*q++ = *p;
+			*q = '\0';
 			IM_SETSTR( toolitem->name, value );
 		}
 

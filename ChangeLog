@@ -1,3 +1,6 @@
+started 7.40.0 23/6/14
+- version bump
+
 started 7.39.0 28/1/14
 - add optional libgsf dependency
 - added export-to-file to plotwindow

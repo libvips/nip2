@@ -35,7 +35,7 @@
 
 /* Max amount of text in a info/error/question dialog.
  */
-#define MAX_DIALOG_TEXT (1000)
+#define MAX_DIALOG_TEXT (2000)
 
 /* Find a window to use as dialog parent.
  */

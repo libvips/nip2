@@ -1,3 +1,8 @@
+started 7.40.1 24/6/14
+- update copyright date
+- larger max size for dialog text
+- fix popen()pclose() warnings on win
+
 started 7.40.0 23/6/14
 - version bump
 

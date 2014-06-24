@@ -200,7 +200,7 @@ extern int statfs();
 				/* XML namespace ... note, not nip2! */
 #define MAX_LINELENGTH (120)	/* Max chars we display of value */
 #define MAX_RECENT (10)		/* Number of recent items in file menu */
-#define NIP_COPYRIGHT "%s: &#0169;2013 Imperial College, London"
+#define NIP_COPYRIGHT "%s: &#0169;2014 Imperial College, London"
 
 /* Our stock_ids.
  */
@@ -229,11 +229,15 @@ extern int statfs();
  */
 #define MAX_ERROR_FRAG (100)
 
-/* win32 adds '_'.
+/* win32 adds '_', sometimes. 
  */
 #ifdef OS_WIN32
+#ifndef popen
 #define popen(b,m) _popen(b,m)
+#endif /*popen*/
+#ifndef pclose
 #define pclose(f) _pclose(f)
+#endif /*pclose*/
 #define mktemp(f) _mktemp(f)
 #endif /*OS_WIN32*/
 

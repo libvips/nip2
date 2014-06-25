@@ -1,3 +1,4 @@
+- can we call affine from nip2 vips_call? do we need a double array?
 
 - fix up menu tear-off, again
 

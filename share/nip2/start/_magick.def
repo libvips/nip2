@@ -21,6 +21,8 @@
      Many small changes.
    2-May-2014 jcupitt
      Added Magick.version
+   30-June-2014
+   	 Put single-quotes around command exe to help win
 
    Last update: 3-May-2014.
 
@@ -37,10 +39,12 @@ Magick = class {
 	 * 
  	 * Use convert.exe in $VIPSHOME/bin, if it exists, otherwise assume it's 
 	 * on the path somewhere.
+	 *
+	 * We have to quote the exe name, since system assumes a unix style command
+	 * and will get very confused by any Windows backslashes in path names. 
    	 */
 	command cmd
-		= join_sep " " ([final_exe, "convert"] ++ cmd), use_gm
-		= join_sep " " ([final_exe] ++ cmd)
+		= join_sep " " (base ++ cmd)
 	{
 		prefs = Workspaces.Preferences;
 		use_gm = prefs.USE_GRAPHICSMAGICK;
@@ -50,6 +54,10 @@ Magick = class {
 		final_exe
 			= vipsexe, search vipsexe != []
 			= exe;
+		quoted_exe = "'" ++ final_exe ++ "'";
+		base  
+			= [quoted_exe, "convert"], use_gm
+			= [quoted_exe];
 	}
 
 	/* We add and remove some features depending on the ImageMagick version.

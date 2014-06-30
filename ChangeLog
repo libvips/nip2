@@ -1,3 +1,6 @@
+started 7.40.2 30/6/14
+- fix quoting in magick commands
+
 started 7.40.1 24/6/14
 - update copyright date
 - larger max size for dialog text

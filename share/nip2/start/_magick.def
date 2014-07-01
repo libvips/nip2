@@ -34,6 +34,55 @@
  */
 
 Magick = class {
+	/* Search for the Magick command we run. We search:
+	 * - the convert command in $VIPSHOME/bin
+	 * - convert on the main search path
+	 * - gm on the main search path
+	 * "" for nothing found. 
+	 */
+	search_for_command
+		= "'" ++ vips_convert ++ "'", vips_convert != ""
+		= "'" ++ convert_path ++ "'", !use_gm && convert_path != ""
+		= "'" ++ gm_path ++ "' convert", gm_path != ""
+		= ""
+	{
+		// the convert we ship with the vips binary on some platforms
+		vips_convert 
+			= search (path_absolute convert)
+		{
+			vipshome = path_parse (expand "$VIPSHOME");
+			convert = vipshome ++ ["convert" ++ expand "$EXEEXT"];
+		}
+
+		// turn $PATH into [["comp1", "comp2"], ["comp1", "comp2"] ..]
+		system_search_path
+			= map path_parse (split (equal path_sep) (expand "$PATH"))
+		{
+			path_sep
+				= ':', expand "$SEP" == "/"
+				= ';';
+		}
+
+		// look for eg. "gm" on $PATH 
+		search_for name
+			= hits?0, hits != []
+			= ""
+		{
+			exe_name = name ++ expand "$EXEEXT";
+			form_path p = path_absolute (p ++ [exe_name]);
+			paths = map form_path system_search_path;
+			hits = dropwhile (equal []) (map search paths);
+		}
+
+		// first convert on $PATH, or ""
+		convert_path = search_for "convert";
+
+		// first gm on path, or ""
+		gm_path = search_for "gm";
+
+		use_gm = Workspaces.Preferences.USE_GRAPHICSMAGICK;
+	}
+
 	/* Build a Magick command. cmd is a list of arguments we join up with
 	 * spaces.
 	 * 
@@ -43,22 +92,7 @@ Magick = class {
 	 * We have to quote the exe name, since system assumes a unix style command
 	 * and will get very confused by any Windows backslashes in path names. 
    	 */
-	command cmd
-		= join_sep " " (base ++ cmd)
-	{
-		prefs = Workspaces.Preferences;
-		use_gm = prefs.USE_GRAPHICSMAGICK;
-		name = if use_gm then "gm" else "convert";
-		exe = concat [name, expand "$EXEEXT"];
-		vipsexe = path_absolute [expand "$VIPSHOME", "bin", exe];
-		final_exe
-			= vipsexe, search vipsexe != []
-			= exe;
-		quoted_exe = "'" ++ final_exe ++ "'";
-		base  
-			= [quoted_exe, "convert"], use_gm
-			= [quoted_exe];
-	}
+	command cmd = join_sep " " (search_for_command ++ cmd);
 
 	/* We add and remove some features depending on the ImageMagick version.
 	 * 

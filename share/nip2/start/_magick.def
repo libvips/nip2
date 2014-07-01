@@ -23,6 +23,9 @@
      Added Magick.version
    30-June-2014
    	 Put single-quotes around command exe to help win
+   1-July-2014
+     Automatically fall back to gm if we can't find convert
+
 
    Last update: 3-May-2014.
 
@@ -85,14 +88,8 @@ Magick = class {
 
 	/* Build a Magick command. cmd is a list of arguments we join up with
 	 * spaces.
-	 * 
- 	 * Use convert.exe in $VIPSHOME/bin, if it exists, otherwise assume it's 
-	 * on the path somewhere.
-	 *
-	 * We have to quote the exe name, since system assumes a unix style command
-	 * and will get very confused by any Windows backslashes in path names. 
    	 */
-	command cmd = join_sep " " (search_for_command ++ cmd);
+	command cmd = join_sep " " ([search_for_command] ++ cmd);
 
 	/* We add and remove some features depending on the ImageMagick version.
 	 * 

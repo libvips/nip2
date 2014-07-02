@@ -27,16 +27,16 @@ for tile in 10 64 128 512; do
 		vips im_subtract $tmp/t5.v $tmp/t7.v $tmp/t8.v
 		vips im_abs $tmp/t8.v $tmp/t9.v
 		max=`vips im_max $tmp/t9.v`
-		if [[ $max > 0 ]]; then
+		if [ $max -gt 0 ]; then
 			break
 		fi
 	done
-	if [[ $max > 0 ]]; then
+	if [ $max -gt 0 ]; then
 		break
 	fi
 done
 
-if [[ $max > 0 ]]; then
+if [ $max -gt 0 ]; then
 	echo error, max == $max
 	exit 1
 else

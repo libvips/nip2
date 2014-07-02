@@ -428,54 +428,6 @@ get_node( xmlNode *base, const char *name )
 	return( NULL );
 }
 
-static void
-prettify_tree_sub( xmlNode *xnode, int indent )
-{
-	xmlNode *txt;
-	xmlNode *next;
-
-	for(;;) {
-		next = xnode->next;
-
-		/* According to memprof, this leaks :-( If you cut it out into
-		 * a separate prog though, it's OK
-
-		 	FIXME ... how odd
-
-		 */
-		txt = xmlNewText( (xmlChar *) "\n" );
-		xmlAddPrevSibling( xnode, txt );
-		txt = xmlNewText( (xmlChar *) spc( indent ) );
-		xmlAddPrevSibling( xnode, txt );
-
-		if( xnode->children )
-			prettify_tree_sub( xnode->children, indent + 2 );
-
-		if( !next )
-			break;
-		
-		xnode = next;
-	}
-
-	txt = xmlNewText( (xmlChar *) spc( indent - 2 ) );
-	xmlAddNextSibling( xnode, txt );
-	txt = xmlNewText( (xmlChar *) "\n" );
-	xmlAddNextSibling( xnode, txt );
-}
-
-/* Walk an XML document, adding extra blank text elements so that it's easier
- * to read. Don't call me twice!
- */
-void
-prettify_tree( xmlDoc *xdoc )
-{
-#ifdef DEBUG_SAVEFILE
-	xmlNode *xnode = xmlDocGetRootElement( xdoc );
-
-	prettify_tree_sub( xnode, 0 );
-#endif /*DEBUG_SAVEFILE*/
-}
-
 static int rect_n_rects = 0;
 
 /* Allocate and free rects.

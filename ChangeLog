@@ -1,6 +1,7 @@
 started 7.40.2 30/6/14
 - fix quoting in magick commands
 - auto-fallback to gm if no convert found
+- use libxml2 pretty-printer
 
 started 7.40.1 24/6/14
 - update copyright date

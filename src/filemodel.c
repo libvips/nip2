@@ -315,6 +315,12 @@ filemodel_real_set_modified( Filemodel *filemodel, gboolean modified )
 	}
 }
 
+static int
+filemodel_xml_save_format_file( const char *filename, xmlDoc *doc )
+{
+	return( xmlSaveFormatFile( filename, doc, 1 ) == -1 ); 
+}
+
 /* Save to filemodel->filename.
  */
 static gboolean
@@ -351,19 +357,17 @@ filemodel_top_save_xml( Filemodel *filemodel, const char *filename )
 		return( FALSE );
 	}
 
-	prettify_tree( xdoc );
-
 	if( calli_string_filename( 
-		(calli_string_fn) xmlSaveFile, 
-			filename, xdoc, NULL, NULL ) == -1 ) {
+		(calli_string_fn) filemodel_xml_save_format_file, 
+			filename, xdoc, NULL, NULL ) ) {
 		error_top( _( "Save failed." ) );
 		error_sub( _( "Save of %s \"%s\" to file \"%s\" failed.\n%s" ),
 			IOBJECT_GET_CLASS_NAME( filemodel ), 
 			NN( IOBJECT( filemodel )->name ),
 			NN( filename ),
 			g_strerror( errno ) );
-
 		xmlFreeDoc( xdoc );
+
 		return( FALSE );
 	}
 

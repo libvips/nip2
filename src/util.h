@@ -92,8 +92,6 @@ gboolean get_bprop( xmlNode *xnode, const char *name, gboolean *out );
 gboolean get_slprop( xmlNode *xnode, const char *name, GSList **out );
 gboolean get_dlprop( xmlNode *xnode, const char *name, double **out );
 
-void prettify_tree( xmlDoc *doc );
-
 xmlNode *get_node( xmlNode *base, const char *name );
 
 Rect *rect_dup( Rect *init );

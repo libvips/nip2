@@ -614,6 +614,8 @@ conversion_make_repaint( Conversion *conv, IMAGE *in )
 		in->Type == IM_TYPE_YXY ||
 		in->Type == IM_TYPE_UCS ||
 #if VIPS_VERSION_MAJOR > 7 || VIPS_VERSION_MINOR > 32
+		/* scRGB colourspace added in 7.32.
+		 */
 		in->Type == VIPS_INTERPRETATION_scRGB ||
 #endif
 		in->Type == IM_TYPE_LAB ||

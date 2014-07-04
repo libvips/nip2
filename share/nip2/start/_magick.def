@@ -54,7 +54,7 @@ Magick = class {
 			= search (path_absolute convert)
 		{
 			vipshome = path_parse (expand "$VIPSHOME");
-			convert = vipshome ++ ["convert" ++ expand "$EXEEXT"];
+			convert = vipshome ++ ["bin", "convert" ++ expand "$EXEEXT"];
 		}
 
 		// turn $PATH into [["comp1", "comp2"], ["comp1", "comp2"] ..]

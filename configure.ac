@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([nip2], [7.40.2])
+AC_INIT([nip2], [7.40.3])
 
 # foreign stops complaints about a missing README (we use README.md instead)
 # and missing INSTALL (the standard Gnu INSTALL is not very useful)
@@ -17,7 +17,7 @@ dnl
 
 m4_define([nip_major_version], [7])
 m4_define([nip_minor_version], [40])
-m4_define([nip_micro_version], [2])
+m4_define([nip_micro_version], [3])
 m4_define([nip_version],
           [nip_major_version.nip_minor_version.nip_micro_version])
 
@@ -156,8 +156,9 @@ rm -f conftest.l $LEX_OUTPUT_ROOT.c
 
 # get packages we need
 # gtk before 2.4.9 crashes with the way we use combobox :-(
+# vips before 7.30 used "vips-x.y" as the pkg name
 PKG_CHECK_MODULES(REQUIRED_PACKAGES, 
-  gthread-2.0 gtk+-2.0 >= 2.4.9 libxml-2.0 vips)
+  gthread-2.0 gtk+-2.0 >= 2.4.9 libxml-2.0 vips >= 7.30)
 IP_CFLAGS="$REQUIRED_PACKAGES_CFLAGS $IP_CFLAGS"
 IP_LIBS="$REQUIRED_PACKAGES_LIBS $IP_LIBS"
 

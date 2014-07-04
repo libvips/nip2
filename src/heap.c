@@ -1888,6 +1888,9 @@ heap_ip_to_gvalue( PElement *in, GValue *out )
 			g_value_init( out, IM_TYPE_REF_STRING );
 			im_ref_string_set( out, name );
 		}
+#if VIPS_VERSION_MAJOR > 7 || VIPS_VERSION_MINOR > 39
+		/* vips_value_set_array_image() is a 7.40 feature.
+		 */
 		else if( heap_is_imagevec( in, &result ) &&
 			result ) { 
 			Imageinfo *iivec[100];
@@ -1902,6 +1905,7 @@ heap_ip_to_gvalue( PElement *in, GValue *out )
 
 			vips_value_set_array_image( out, ivec, n ); 
 		}
+#endif
 		else {
 			error_top( _( "Unimplemented list type." ) );
 			return( FALSE );

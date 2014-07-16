@@ -1,7 +1,5 @@
 
 EXTRA_DIST = \
-	convert.sed \
-	README \
 	workspaces \
 	scripts \
 	images \

@@ -293,7 +293,7 @@ AC_ARG_WITH([libgvc], AS_HELP_STRING([--without-libgvc], [build without libgvc (
 # http://lists.research.att.com/pipermail/graphviz-devel/2012/001544.html
 
 if test "x$with_libgvc" != "xno"; then
-  PKG_CHECK_MODULES(LIBGVC, libgvc < 2.30,
+  PKG_CHECK_MODULES(LIBGVC, libgvc > 2.30,
     [AC_DEFINE(HAVE_LIBGVC,1,[define if you have libgvc installed.])
      with_libgvc=yes
     ],

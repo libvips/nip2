@@ -1,6 +1,7 @@
 started 7.40.3 4/7/14
 - fix compile with older libvipes, now goes back to at least 7.30 
 - fix more bash-isms to help freebsd
+- get graph display working again with latest libgvc
 
 started 7.40.2 30/6/14
 - fix quoting in magick commands

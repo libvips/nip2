@@ -234,7 +234,8 @@ graphwindow_refresh_title( Graphwindow *graphwindow )
 #endif /*DEBUG*/
 
 	vips_buf_init_static( &buf, txt, 512 );
-	symbol_qualified_name( ws->sym, &buf );
+	if( ws->sym )
+		symbol_qualified_name( ws->sym, &buf );
 	iwindow_set_title( IWINDOW( graphwindow ), "%s", vips_buf_all( &buf ) );
 }
 
@@ -261,7 +262,7 @@ graphwindow_build_graph( Graphwindow *graphwindow )
 
 	IM_FREEF( agclose, graphwindow->graph );
 
-	graphwindow->graph = agread( of->fp );
+	graphwindow->graph = agread( of->fp, NULL );
 
 	ifile_close( of );
 	unlinkf( "%s", tname );

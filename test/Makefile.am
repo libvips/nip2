@@ -1,13 +1,9 @@
 
 EXTRA_DIST = \
-	convert.sed \
-	README \
 	workspaces \
+	extras \
 	scripts \
-	images \
-	test-5x5.v \
-	test_transform.ws \
-	test.ws
+	images 
 
 TESTS = \
 	test_all.sh 

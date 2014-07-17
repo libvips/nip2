@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.9.6">
-  <Workspace filename="test.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="838" window_height="871" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test" caption="Default empty workspace">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.40.3">
+  <Workspace window_x="3" window_y="84" window_width="838" window_height="871" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" locked="false" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test" caption="Default empty workspace" filename="$HOME/GIT/nip2/test/extras/test.ws" major="7" minor="9">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="21" name="D" caption="untitled">
       <Subcolumn vislevel="3">
         <Row popup="false" name="D10">
@@ -35,9 +35,9 @@
         </Row>
         <Row popup="false" name="D3">
           <Rhs vislevel="1" flags="1">
-            <iImage window_x="220" window_y="176" window_width="1133" window_height="876" image_left="1245" image_top="712" image_mag="1" show_status="false" show_paintbox="false" show_convert="true" show_rulers="false" scale="0.54513" offset="0" falsecolour="false" type="true"/>
+            <iImage window_x="220" window_y="175" window_width="1133" window_height="876" image_left="6" image_top="5" image_mag="80" show_status="false" show_paintbox="false" show_convert="true" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
-            <iText formula="Image_file &quot;$VIPSHOME/share/nip2/data/examples/1_point_mosiac/cd1.1.jpg&quot;"/>
+            <iText formula="Image_file &quot;$HOME/GIT/nip2/test/extras/test-5x5.v&quot;"/>
           </Rhs>
         </Row>
         <Row popup="false" name="D6">
@@ -47,7 +47,7 @@
         </Row>
         <Row popup="false" name="D7">
           <Rhs vislevel="3" flags="7">
-            <iImage window_x="0" window_y="0" window_width="1085" window_height="957" image_left="525" image_top="447" image_mag="1" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
+            <iImage window_x="0" window_y="0" window_width="1085" window_height="957" image_left="2" image_top="2" image_mag="184" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="1">
               <Row name="super">
                 <Rhs vislevel="0" flags="4">
@@ -116,6 +116,3 @@
     </Column>
   </Workspace>
 </root>
-
-
-

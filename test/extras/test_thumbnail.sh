@@ -28,8 +28,7 @@ break_threshold() {
 	return $(echo "$diff > $threshold" | bc -l)
 }
 
-#for interp in nearest bilinear bicubic lbb nohalo vsqbs; do
-for interp in nohalo; do
+for interp in nearest bilinear bicubic lbb nohalo vsqbs; do
   for size in {500..1000}; do
     echo -n "testing $interp, size to $size ... "
     vipsthumbnail $tmp/t1.v -o $tmp/t2.v --size $size --interpolator $interp

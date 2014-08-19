@@ -1,3 +1,6 @@
+started 7.40.4 19/8/14
+- swap the HP printer profile for a freer one
+
 started 7.40.3 4/7/14
 - fix compile with older libvipes, now goes back to at least 7.30 
 - fix more bash-isms to help freebsd

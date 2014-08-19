@@ -1,3 +1,6 @@
+- redo scale along the new vipsthumbnail lines
+
+  need to be able to get window_size from an interp
 
 - can we call affine from nip2 vips_call? do we need a double array?
 

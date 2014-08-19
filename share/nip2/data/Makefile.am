@@ -8,7 +8,7 @@ nipdata_DATA = \
 	macbeth_lab_d50.mat \
 	vips-128.png \
 	nip2-icon.ico \
-	HP5000_UVDuraImageGlossMaxQ.icc \
+	Allgemeines_CMYK_Profil.icm \
 	stock-tool-ink-22.png \
 	stock-tool-path-22.png \
 	stock-tool-text-22.png \

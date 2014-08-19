@@ -28,25 +28,30 @@ break_threshold() {
 	return $(echo "$diff > $threshold" | bc -l)
 }
 
-#for interp in nearest bilinear bicubic lbb nohalo vsqbs; do
-for interp in nohalo; do
+for interp in nearest bilinear bicubic lbb nohalo vsqbs; do
   for size in {500..1000}; do
     echo -n "testing $interp, size to $size ... "
     vipsthumbnail $tmp/t1.v -o $tmp/t2.v --size $size --interpolator $interp
+    if [ $(vipsheader -f width $tmp/t2.v) -ne $size ]; then
+      echo failed -- bad size
+      exit
+    fi
+    if [ $(vipsheader -f height $tmp/t2.v) -ne $size ]; then
+      echo failed -- bad size
+      exit
+    fi
     vips project $tmp/t2.v $tmp/cols.v $tmp/rows.v
 
     min=$(vips min $tmp/cols.v)
     if break_threshold $min 0; then
-      echo failed
-      echo vipsthumbnail 1kx1k.v --size $size --interpolator $interp
-      echo has a black column
+      echo failed -- has a black column
+      exit
     fi
         
     min=$(vips min $tmp/rows.v)
     if break_threshold $min 0; then
-      echo failed
-      echo vipsthumbnail 1kx1k.v --size $size --interpolator $interp
-      echo has a black row
+      echo failed -- has a black row
+      exit
     fi
 
     echo ok

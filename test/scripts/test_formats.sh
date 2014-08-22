@@ -8,8 +8,8 @@ test_images=$top_srcdir/test/images
 image=$test_images/slanted_oval_vase2.jpg
 
 # the matlab image and reference image
-matlab=$test_images/lena.mat
-matlab_ref=$test_images/lena.tif
+matlab=$test_images/sample.mat
+matlab_ref=$test_images/sample.png
 
 # make a mono image
 vips im_extract_band $image $tmp/mono.v 1

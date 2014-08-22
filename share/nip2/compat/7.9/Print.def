@@ -109,7 +109,7 @@ Morph_for_print in
 #separator
 
 _sample_print_profile = 
-	"$VIPSHOME/share/$PACKAGE/data/Allgemeines_CMYK_Profil.icm";
+	"$VIPSHOME/share/$PACKAGE/data/SC_paper_bas.ICC";
 _sample_monitor_profile = 
 	"$VIPSHOME/share/$PACKAGE/data/sRGB.icm";
 _render_intents = Option "Render intent" [

@@ -298,7 +298,7 @@ Colour_temperature_item = class
 Colour_icc_item = class
 	Menupullright (_ "_ICC") (_ "transform with ICC profiles") {
 	print_profile = 
-		"$VIPSHOME/share/$PACKAGE/data/Allgemeines_CMYK_Profil.icm";
+		"$VIPSHOME/share/$PACKAGE/data/SC_paper_bas.ICC";
 	monitor_profile = 
 		"$VIPSHOME/share/$PACKAGE/data/sRGB.icm";
 	guess_profile image

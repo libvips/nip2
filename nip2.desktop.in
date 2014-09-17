@@ -7,7 +7,5 @@ Icon=nip2
 Terminal=false
 Type=Application
 Categories=Graphics;RasterGraphics;
-X-GNOME-Bugzilla-Bugzilla=GNOME
-X-GNOME-Bugzilla-Product=NIP2
 StartupNotify=true
 MimeType=image/x-vips;

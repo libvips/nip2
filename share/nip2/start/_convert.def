@@ -469,7 +469,7 @@ _colour_conversion_table = [
 
 	[LCH, B_W, im_sRGB2mono @ im_Lab2sRGB @ im_LCh2Lab @ im_clip2f],
 	[LCH, XYZ, im_Lab2XYZ @ im_LCh2Lab @ im_clip2f],
-	[LCH, YXY, im_XYZ2Yxy @ im_Lab2sRGB @ im_LCh2Lab @ im_clip2f],
+	[LCH, YXY, im_XYZ2Yxy @ im_Lab2XYZ @ im_LCh2Lab @ im_clip2f],
 	[LCH, LAB, im_LCh2Lab @ im_clip2f],
 	[LCH, LCH, image_set_type LCH],
 	[LCH, UCS, im_LCh2UCS @ im_clip2f],

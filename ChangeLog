@@ -1,3 +1,6 @@
+started 7.41.0 8/10/14
+- remove greyc stuff
+
 started 7.40.5 17/9/14
 - improve .desktop file
 - fix Lch -> Yxy conversion

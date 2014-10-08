@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.39.0">
-  <Workspace filename="test_filter.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" window_width="1022" window_height="605" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_filter" caption="Default empty workspace">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.38.1">
+  <Workspace window_x="6" window_y="56" window_width="1022" window_height="605" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" locked="false" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_filter" caption="Default empty workspace" filename="$HOME/GIT/nip2/test/workspaces/test_filter.ws">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="17" name="B" caption="Colour / Colourspace">
       <Subcolumn vislevel="3">
         <Row popup="false" name="B1">
@@ -12,7 +12,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="641" y="0" open="true" selected="false" sform="false" next="18" name="H" caption="Filter / Convolution">
+    <Column x="682" y="0" open="true" selected="false" sform="false" next="18" name="H" caption="Filter / Convolution">
       <Subcolumn vislevel="3">
         <Row popup="false" name="H1">
           <Rhs vislevel="0" flags="4">
@@ -176,6 +176,13 @@
                   <iText/>
                 </Rhs>
               </Row>
+              <Row name="layers">
+                <Rhs vislevel="1" flags="1">
+                  <Slider/>
+                  <Subcolumn vislevel="0"/>
+                  <iText/>
+                </Rhs>
+              </Row>
             </Subcolumn>
             <iText formula="Filter_conv_item.Custom_blur_item.action H1"/>
           </Rhs>
@@ -189,7 +196,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1170" y="0" open="true" selected="false" sform="false" next="6" name="K" caption="Filter / Rank">
+    <Column x="1190" y="0" open="true" selected="false" sform="false" next="6" name="K" caption="Filter / Rank">
       <Subcolumn vislevel="3">
         <Row popup="false" name="K1">
           <Rhs vislevel="0" flags="4">
@@ -228,7 +235,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1955" y="0" open="true" selected="false" sform="false" next="12" name="M" caption="Filter / Morphology">
+    <Column x="1950" y="0" open="true" selected="false" sform="false" next="12" name="M" caption="Filter / Morphology">
       <Subcolumn vislevel="3">
         <Row popup="false" name="M1">
           <Rhs vislevel="0" flags="4">
@@ -309,7 +316,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="2422" y="0" open="true" selected="false" sform="false" next="6" name="N" caption="Filter / Fourier / Ideal">
+    <Column x="2417" y="0" open="true" selected="false" sform="false" next="6" name="N" caption="Filter / Fourier / Ideal">
       <Subcolumn vislevel="3">
         <Row popup="false" name="N1">
           <Rhs vislevel="0" flags="4">
@@ -432,7 +439,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3084" y="0" open="true" selected="false" sform="false" next="9" name="O" caption="Filter / Fourier / Gaussian">
+    <Column x="2983" y="0" open="true" selected="false" sform="false" next="9" name="O" caption="Filter / Fourier / Gaussian">
       <Subcolumn vislevel="3">
         <Row popup="false" name="O1">
           <Rhs vislevel="0" flags="4">
@@ -514,7 +521,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3647" y="0" open="true" selected="false" sform="false" next="9" name="P" caption="Filter / Fourier / Butterworth">
+    <Column x="3547" y="0" open="true" selected="false" sform="false" next="9" name="P" caption="Filter / Fourier / Butterworth">
       <Subcolumn vislevel="3">
         <Row popup="false" name="P1">
           <Rhs vislevel="0" flags="4">
@@ -603,7 +610,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="4184" y="0" open="true" selected="false" sform="false" next="7" name="Q" caption="Filter / Enhance">
+    <Column x="4109" y="0" open="true" selected="false" sform="false" next="7" name="Q" caption="Filter / Enhance">
       <Subcolumn vislevel="3">
         <Row popup="false" name="Q1">
           <Rhs vislevel="0" flags="4">
@@ -649,7 +656,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="5559" y="0" open="true" selected="false" sform="false" next="7" name="R" caption="Filter / Tilt Brightness">
+    <Column x="4974" y="0" open="true" selected="false" sform="false" next="7" name="R" caption="Filter / Tilt Brightness">
       <Subcolumn vislevel="3">
         <Row popup="false" name="R1">
           <Rhs vislevel="0" flags="4">
@@ -823,7 +830,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="5972" y="0" open="true" selected="false" sform="false" next="15" name="S" caption="Filter / Blend">
+    <Column x="5414" y="0" open="true" selected="false" sform="false" next="15" name="S" caption="Filter / Blend">
       <Subcolumn vislevel="3">
         <Row popup="false" name="S1">
           <Rhs vislevel="0" flags="4">
@@ -1080,7 +1087,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="6634" y="0" open="true" selected="false" sform="false" next="5" name="T" caption="Filter / Overlay">
+    <Column x="5978" y="0" open="true" selected="false" sform="false" next="5" name="T" caption="Filter / Overlay">
       <Subcolumn vislevel="3">
         <Row popup="false" name="T1">
           <Rhs vislevel="0" flags="4">
@@ -1137,7 +1144,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="7035" y="0" open="true" selected="false" sform="false" next="5" name="U" caption="Filter / Colorize">
+    <Column x="6391" y="0" open="true" selected="false" sform="false" next="5" name="U" caption="Filter / Colorize">
       <Subcolumn vislevel="3">
         <Row popup="false" name="U1">
           <Rhs vislevel="0" flags="4">
@@ -1169,7 +1176,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="7472" y="0" open="true" selected="false" sform="false" next="4" name="V" caption="Filter / Browse">
+    <Column x="6833" y="0" open="true" selected="false" sform="false" next="4" name="V" caption="Filter / Browse">
       <Subcolumn vislevel="3">
         <Row popup="false" name="V1">
           <Rhs vislevel="0" flags="4">
@@ -1241,7 +1248,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="7901" y="0" open="true" selected="true" sform="false" next="9" name="W" caption="Filter / Photographic">
+    <Column x="7290" y="0" open="true" selected="true" sform="false" next="9" name="W" caption="Filter / Photographic">
       <Subcolumn vislevel="3">
         <Row popup="false" name="W1">
           <Rhs vislevel="0" flags="4">
@@ -1449,7 +1456,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="4671" y="0" open="true" selected="false" sform="false" next="8" name="A" caption="Spatial Correlation">
+    <Column x="4609" y="0" open="true" selected="false" sform="false" next="8" name="A" caption="Spatial Correlation">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
           <Rhs vislevel="0" flags="4">
@@ -1486,31 +1493,6 @@
             <iImage window_x="867" window_y="355" window_width="510" window_height="727" image_left="239" image_top="299" image_mag="1" show_status="true" show_paintbox="false" show_convert="true" show_rulers="false" scale="3.0430978191621576e-06" offset="-0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
             <iText formula="Filter_correlate_item.Correlate_fast_item.action A4 A5"/>
-          </Rhs>
-        </Row>
-      </Subcolumn>
-    </Column>
-    <Column x="5050" y="0" open="true" selected="false" sform="false" next="4" name="C" caption="GREYCstoration">
-      <Subcolumn vislevel="3">
-        <Row popup="false" name="C1">
-          <Rhs vislevel="0" flags="4">
-            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
-            <Subcolumn vislevel="0"/>
-            <iText formula="B1"/>
-          </Rhs>
-        </Row>
-        <Row popup="false" name="C2">
-          <Rhs vislevel="3" flags="7">
-            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
-            <Subcolumn vislevel="1"/>
-            <iText formula="Filter_greyc_item.Denoise_item.action C1"/>
-          </Rhs>
-        </Row>
-        <Row popup="false" name="C3">
-          <Rhs vislevel="3" flags="7">
-            <iImage window_x="1166" window_y="440" window_width="750" window_height="750" image_left="359" image_top="560" image_mag="1" show_status="true" show_paintbox="false" show_convert="true" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
-            <Subcolumn vislevel="1"/>
-            <iText formula="Filter_greyc_item.Enlarge_item.action C1"/>
           </Rhs>
         </Row>
       </Subcolumn>

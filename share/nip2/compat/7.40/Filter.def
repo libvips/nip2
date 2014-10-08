@@ -708,6 +708,68 @@ Filter_hough_item = class
 	}
 }
 
+Filter_greyc_item = class 
+	Menupullright "_GREYCstoration" "noise-removing filter" {
+	Denoise_item = class 
+		Menuaction "Denoise" "Noise-removing filter" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			iterations = Scale "Iterations" 1 5 1;
+			amplitude = Scale "Amplitude" 1 100 40;
+			sharpness = Scale "Sharpness" 0 3 0.9;
+			anisotropy = Scale "Anisotropy" 0 1 0.15;
+			alpha = Scale "Noise scale" 0 5 0.6;
+			sigma = Scale "Geometry regularity" 0 2 1.1;
+			dl = Scale "Spatial integration step" 0 1 0.8;
+			da = Scale "Angular integration step" 0 90 30;
+			gauss_prec = Scale "Precision" 1 10 2;
+			interpolation = Option "Interpolation" 
+				["Nearest-neighbour", "Bilinear", "Runge-Kutta"] 0;
+			fast_approx = Toggle "Fast approximation" true;
+
+			_result = greyc 
+				(to_real iterations) (to_real amplitude) (to_real sharpness)
+				(to_real anisotropy) (to_real alpha) (to_real sigma) 
+				(to_real dl) (to_real da) 
+				(to_real gauss_prec) (to_real interpolation) 
+				(to_real fast_approx) x;
+		}
+	}
+
+	Enlarge_item = class
+		Menuaction "Enlarge" "Enlarge image" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			scale = Scale "Enlarge" 1 10 3;
+			iterations = Scale "Iterations" 1 5 3;
+			amplitude = Scale "Amplitude" 1 100 20;
+			sharpness = Scale "Sharpness" 0 3 0.2;
+			anisotropy = Scale "Anisotropy" 0 1 0.9;
+			alpha = Scale "Noise scale" 0 5 0.1;
+			sigma = Scale "Geometry regularity" 0 2 1.5;
+			dl = Scale "Spatial integration step" 0 1 0.8;
+			da = Scale "Angular integration step" 0 90 30;
+			gauss_prec = Scale "Precision" 1 10 2;
+			interpolation = Option "Interpolation" 
+				["Nearest-neighbour", "Bilinear", "Runge-Kutta"] 0;
+			fast_approx = Toggle "Fast approximation" true;
+
+			_result = greyc 
+				(to_real iterations) (to_real amplitude) (to_real sharpness)
+				(to_real anisotropy) (to_real alpha) (to_real sigma) 
+				(to_real dl) (to_real da) 
+				(to_real gauss_prec) (to_real interpolation) 
+				(to_real fast_approx) 
+					(resize Interpolate_bilinear
+						(to_real scale) (to_real scale) x);
+		}
+	}
+}
+
 #separator
 
 Filter_tilt_item = class

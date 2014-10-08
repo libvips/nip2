@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.39.0">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.41.0">
   <Workspace window_x="737" window_y="125" window_width="1280" window_height="772" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" locked="false" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_math" caption="Default empty workspace" filename="$HOME/GIT/nip2/test/workspaces/test_math.ws">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="17" name="B" caption="Colour / Colourspace">
       <Subcolumn vislevel="3">

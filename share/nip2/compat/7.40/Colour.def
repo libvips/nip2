@@ -1,0 +1,676 @@
+
+Colour_new_item = class 
+	Menupullright (_ "_New") (_ "make a patch of colour") {
+	Widget_colour_item = class 
+		Menuaction (_ "_Colour") (_ "make a patch of colour") {
+		action = Colour_picker "Lab" [50,0,0];
+	}
+
+	LAB_colour = class
+		Menuaction (_ "CIE Lab _Picker") (_ "pick colour in CIE Lab space") {
+		action = widget "Lab" [50, 0, 0];
+
+		// ab_slice size
+		size = 512;
+
+		// range of values ... +/- 128 for ab
+		range = 256;
+
+		// map xy in slice image to ab and back
+		xy2ab x = x / (size / range) - 128;
+		ab2xy a = (a + 128) * (size / range);
+
+		widget space default_value = class
+			Colour space _result {
+			_vislevel = 3;
+
+			[_L, _a, _b] = default_value;
+			L = Scale "Lightness" 0 100 _L;
+			ab_slice = Image (lab_slice size L.value);
+			point = Mark ab_slice (ab2xy _a) (ab2xy _b);
+
+			_result = [L.value, xy2ab point.left, xy2ab point.top];
+
+			Colour_edit colour_space value = widget colour_space value;
+		}
+	}
+
+	CCT_colour = class
+		Menuaction (_ "Colour from CCT") (_ "pick colour by CCT") {
+		action = widget 6500;
+
+		widget x = class
+			_result {
+			_vislevel = 3;
+
+			T = Scale "CCT" 1800 25000 x;
+
+			_result = colour_from_temp (to_real T);
+
+			Colour_edit space value 
+				= widget (temp_from_colour (Colour space value));
+		}
+	}
+}
+
+Colour_to_colour_item = class
+	Menuaction (_ "Con_vert to Colour") (_ "convert anything to a colour") {
+	action x = to_colour x;
+}
+
+#separator
+
+Colour_convert_item = class
+	Menupullright (_ "_Colourspace") (_ "convert to various colour spaces") {
+	spaces = Image_type.image_colour_spaces;
+
+	conv dest x = class
+		_result {
+		_vislevel = 3;
+
+		to = Option_enum (_ "Convert to") spaces (spaces.get_name dest);
+
+		_result = map_unary (colour_transform_to to.value_thing) x;
+	}
+
+	Mono_item = class
+		Menuaction (_ "_Monochrome") (_ "convert to mono colourspace") {
+		action x = conv Image_type.B_W x;
+	}
+
+	sRGB_item = class
+		Menuaction (_ "_sRGB") (_ "convert to sRGB colourspace") {
+		action x = conv Image_type.sRGB x;
+	}
+
+	GREY16_item = class
+		Menuaction (_ "_GREY16") (_ "convert to GREY16 colourspace") {
+		action x = conv Image_type.GREY16 x;
+	}
+
+	RGB16_item = class
+		Menuaction (_ "_RGB16") (_ "convert to RGB16 colourspace") {
+		action x = conv Image_type.RGB16 x;
+	}
+
+	Lab_item = class
+		Menuaction (_ "_Lab") (_ "convert to Lab colourspace (float Lab)") {
+		action x = conv Image_type.LAB x;
+	}
+
+	LabQ_item = class
+		Menuaction (_ "Lab_Q") (_ "convert to LabQ colourspace (32-bit Lab)") {
+		action x = conv Image_type.LABQ x;
+	}
+
+	LabS_item = class
+		Menuaction (_ "Lab_S") (_ "convert to LabS colourspace (48-bit Lab)") {
+		action x = conv Image_type.LABS x;
+	}
+
+	LCh_item = class
+		Menuaction (_ "L_Ch") (_ "convert to LCh colourspace") {
+		action x = conv Image_type.LCH x;
+	}
+
+	XYZ_item = class
+		Menuaction (_ "_XYZ") (_ "convert to XYZ colourspace") {
+		action x = conv Image_type.XYZ x;
+	}
+
+	Yxy_item = class
+		Menuaction (_ "_Yxy") (_ "convert to Yxy colourspace") {
+		action x = conv Image_type.YXY x;
+	}
+
+	UCS_item = class
+		Menuaction (_ "_UCS") (_ "convert to UCS colourspace") {
+		action x = conv Image_type.UCS x;
+	}
+}
+
+/* mark objects as being in various colourspaces
+ */
+Colour_tag_item = class
+	Menupullright (_ "_Tag As") 
+		(_ "tag object as being in various colour spaces") {
+	spaces = Image_type.image_colour_spaces;
+
+	tag dest x = class
+		_result {
+		_vislevel = 3;
+
+		to = Option_enum (_ "Tag as") spaces (spaces.get_name dest);
+
+		_result = map_unary (image_set_type to.value_thing) x;
+	}
+
+	Mono_item = class
+		Menuaction (_ "_Monochrome") (_ "tag as being in mono colourspace") {
+		action x = tag Image_type.B_W x;
+	}
+
+	sRGB_item = class
+		Menuaction (_ "_sRGB") (_ "tag as being in sRGB colourspace") {
+		action x = tag Image_type.sRGB x;
+	}
+
+	RGB16_item = class
+		Menuaction (_ "_RGB16") (_ "tag as being in RGB16 colourspace") {
+		action x = tag Image_type.RGB16 x;
+	}
+
+	GREY16_item = class
+		Menuaction (_ "_GREY16") (_ "tag as being in GREY16 colourspace") {
+		action x = tag Image_type.GREY16 x;
+	}
+
+	Lab_item = class
+		Menuaction (_ "_Lab") 
+			(_ "tag as being in Lab colourspace (float Lab)") {
+		action x = tag Image_type.LAB x;
+	}
+
+	LabQ_item = class
+		Menuaction (_ "Lab_Q") 
+			(_ "tag as being in LabQ colourspace (32-bit Lab)") {
+		action x = tag Image_type.LABQ x;
+	}
+
+	LabS_item = class
+		Menuaction (_ "Lab_S") 
+			(_ "tag as being in LabS colourspace (48-bit Lab)") {
+		action x = tag Image_type.LABS x;
+	}
+
+	LCh_item = class
+		Menuaction (_ "L_Ch") (_ "tag as being in LCh colourspace") {
+		action x = tag Image_type.LCH x;
+	}
+
+	XYZ_item = class
+		Menuaction (_ "_XYZ") (_ "tag as being in XYZ colourspace") {
+		action x = tag Image_type.XYZ x;
+	}
+
+	Yxy_item = class
+		Menuaction (_ "_Yxy") (_ "tag as being in Yxy colourspace") {
+		action x = tag Image_type.YXY x;
+	}
+
+	UCS_item = class
+		Menuaction (_ "_UCS") (_ "tag as being in UCS colourspace") {
+		action x = tag Image_type.UCS x;
+	}
+}
+
+Colour_temperature_item = class
+	Menupullright (_ "Te_mperature") 
+		(_ "colour temperature conversions") {
+	Whitepoint_item = class
+		Menuaction (_ "_Move Whitepoint") (_ "change whitepoint") {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			old_white = Option_enum (_ "Old whitepoint") Whitepoints "D65";
+			new_white = Option_enum (_ "New whitepoint") Whitepoints "D50";
+
+			_result
+				= map_unary process x
+			{
+				process im
+					= im'''
+				{
+					im' = colour_transform_to Image_type.XYZ im;
+					im'' = im' * 
+						(new_white.value_thing / old_white.value_thing);
+					im''' = colour_transform_to (get_type im) im'';
+				}
+			}
+		}
+	}
+
+	D65_to_D50_item = class 
+		Menupullright (_ "D_65 to D50") (_ "complex conversion") {
+		XYZ_minimal_item = class
+			Menuaction (_ "_Minimal") 
+				(_ "D65 to D50 using the minimal 3x3 matrix in XYZ") {
+			action x 
+				= map_unary process x
+			{
+				process im
+					= im'''
+				{
+					im' = colour_transform_to Image_type.XYZ im;
+					im'' = recomb D652D50_direct im';
+					im''' = colour_transform_to (get_type im) im'';
+				}
+			}
+		}
+
+		Bradford_item = class
+			Menuaction (_ "_Bradford") (_ "D65 to D50 in Bradford cone space") {
+			action x 
+				= map_unary process x
+			{
+				process im
+					= im'''
+				{
+					im' = colour_transform_to Image_type.XYZ im;
+					im'' = im_D652D50 im';
+					im''' = colour_transform_to (get_type im) im'';
+				}
+			}
+		}
+	}
+
+	D50_to_D65_item = class 
+		Menupullright (_ "D_50 to D65") (_ "complex conversion") {
+		XYZ_minimal_item = class
+			Menuaction (_ "_Minimal") 
+				(_ "D50 to D65 using the minimal 3x3 matrix in XYZ") {
+			action x 
+				= map_unary process x
+			{
+				process im
+					= im'''
+				{
+					im' = colour_transform_to Image_type.XYZ im;
+					im'' = recomb D502D65_direct im';
+					im''' = colour_transform_to (get_type im) im'';
+				}
+			}
+		}
+
+		Bradford_item = class
+			Menuaction (_ "_Bradford") (_ "D60 to D65 in Bradford cone space") {
+			action x 
+				= map_unary process x
+			{
+				process im
+					= im'''
+				{
+					im' = colour_transform_to Image_type.XYZ im;
+					im'' = im_D502D65 im';
+					im''' = colour_transform_to (get_type im) im'';
+				}
+			}
+		}
+	}
+
+	Lab_to_D50XYZ_item = class
+		Menuaction (_ "_Lab to D50 XYZ") 
+			(_ "Lab to XYZ with a D50 whitepoint") {
+		action x = map_unary (colour_unary im_D50Lab2XYZ) x;
+	}
+
+	D50XYZ_to_Lab_item = class
+		Menuaction (_ "D50 _XYZ to Lab") 
+			(_ "XYZ to Lab with a D50 whitepoint") {
+		action x = map_unary (colour_unary im_D50XYZ2Lab) x;
+	}
+
+	sep1 = Menuseparator;
+
+	CCT_item = class
+		Menuaction (_ "Calculate temperature")
+			(_ "estimate CCT using the McCamy approximation") {
+		action z = map_unary temp_from_colour z;
+	}
+
+	Colour_item = Colour_new_item.CCT_colour;
+}
+
+Colour_icc_item = class
+	Menupullright (_ "_ICC") (_ "transform with ICC profiles") {
+	print_profile = 
+		"$VIPSHOME/share/$PACKAGE/data/cmyk.icm";
+	monitor_profile = 
+		"$VIPSHOME/share/$PACKAGE/data/sRGB.icm";
+	guess_profile image
+		= monitor_profile, has_bands image && get_bands image == 3
+		= print_profile;
+	render_intents = Option_enum (_ "Render intent") Render_intent.names
+		(_ "Absolute");
+
+	Export_item = class
+		Menuaction (_ "_Export") (_ "export from PCS to device space") {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			profile = Pathname (_ "Output profile") print_profile;
+			intent = render_intents;
+			depth = Option (_ "Output depth") [_ "8 bit", _ "16 bit"] 0;
+
+			_result 
+				= map_unary process x
+			{
+				process image
+					= icc_export [8, 16]?depth profile.value 
+						intent.value_thing lab
+				{
+					lab = colour_transform_to Image_type.LABQ image;
+				}
+			}
+		}
+	}
+
+	Import_item = class
+		Menuaction (_ "_Import") (_ "import from device space to PCS") {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			embedded = Toggle (_ "Use embedded profile if possible") false;
+			profile = Pathname (_ "Default input profile") (guess_profile x);
+			intent = render_intents;
+
+			_result 
+				= map_unary process x
+			{
+				process image
+					= icc_import_embedded intent.value_thing image,
+						get_header_type "icc-profile-data" image != 0 &&
+						embedded
+					= icc_import profile.value intent.value_thing image;
+			}
+		}
+	}
+
+	Transform_item = class
+		Menuaction (_ "_Transform") (_ "transform between two device spaces") {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			in_profile = Pathname (_ "Input profile") (guess_profile x);
+			out_profile = Pathname (_ "Output profile") print_profile;
+			intent = render_intents;
+
+			_result
+				= map_unary process x
+			{
+				process image
+					= icc_transform in_profile.value out_profile.value 
+						intent.value_thing image;
+			}
+		}
+	}
+
+	AC2RC_item = class
+		Menuaction (_ "_Absolute to Relative") 
+			(_ "absolute to relative colorimetry using device profile") {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			profile = Pathname (_ "Pick a profile") (guess_profile x);
+
+			_result 
+				= map_unary process x
+			{
+				process image
+					= icc_ac2rc profile.value lab
+				{
+					lab = colour_transform_to Image_type.LAB image;
+				}
+			}
+		}
+	}
+}
+
+Colour_rad_item = class
+	Menupullright (_ "_Radiance") (_ "convert to and from Radiance packed format") {
+	Unpack_item = class
+		Menuaction (_ "Unpack") 
+			(_ "unpack Radiance format to float") {
+		action x = map_unary rad2float x;
+	}
+
+	Pack_item = class
+		Menuaction (_ "Pack") 
+			(_ "pack 3-band float to Radiance format") {
+		action x = map_unary float2rad x;
+	}
+}
+
+#separator
+
+Colour_dE_item = class
+	Menupullright (_ "_Difference") (_ "calculate colour difference") {
+	/* Apply a converter to an object ... convert image or colour (since
+	 * we can guess the colour space we're converting from), don't convert
+	 * matrix or vector (since we can't tell ... assume it's in the right
+	 * space already).
+	 */
+	apply_cvt cvt x
+		= cvt x, 
+			is_Image x || is_Colour x || is_image x
+		= x;
+
+	diff cvt in1 in2 = abs_vec (apply_cvt cvt in1 - apply_cvt cvt in2);
+
+	/* Converter to LAB.
+	 */
+	lab_cvt = colour_transform_to Image_type.LAB;
+
+	/* Converter to UCS ... plain UCS is Ch form, so we go LAB again after
+	 * to make sure we get a rectangular coord system.
+	 */
+	ucs_cvt = colour_transform Image_type.LCH Image_type.LAB @
+		colour_transform_to Image_type.UCS;
+
+	CIEdE76_item = class
+		Menuaction (_ "CIE dE _76") 
+			(_ "calculate CIE dE 1976 for two objects") {
+		action a b = map_binary (diff lab_cvt) a b;
+	}
+
+	CIEdE00_item = class
+		Menuaction (_ "CIE dE _00") 
+			(_ "calculate CIE dE 2000 for two objects") {
+		action a b = map_binary 
+			(colour_binary (_ "im_dE00_fromLab") im_dE00_fromLab) a b;
+	}
+
+	UCS_item = class
+		Menuaction (_ "_CMC(l:l)") (_ "calculate CMC(l:l) for two objects") {
+		action a b = map_binary (diff ucs_cvt) a b;
+	}
+}
+
+Colour_adjust_item = class
+	Menupullright (_ "_Adjust") (_ "alter colours in various ways") {
+	Recombination_item = class
+		Menuaction (_ "_Recombination") 
+			(_ "recombine colour with an editable matrix") {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			matrix 
+				= Matrix_rec (identity_matrix (bands x))
+			{
+				// try to guess a sensible value for the size of the 
+				// matrix
+				bands x
+					= x.bands, is_Image x || is_Colour x
+					= x.width, is_Matrix x 
+					= bands x.value?0, is_Group x
+					= x.bands, has_member "bands" x
+					= 3;
+			}
+
+			_result = map_unary (recomb matrix) x;
+		}
+	}
+
+	Cast_item = class
+		Menuaction (_ "_Cast") (_ "displace neutral axis in CIE Lab") {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			gr = Scale "Green-red" (-20) 20 0;
+			by = Scale "Blue-yellow" (-20) 20 0;
+
+			_result 
+				= map_unary adjust_cast x
+			{
+				adjust_cast in
+					= colour_transform_to (get_type in) in''
+				{
+					in' = colour_transform_to Image_type.LAB in;
+					in'' = in' + 
+						Vector [0, gr.value, by.value];
+				}
+			}
+		}
+	}
+
+	HSB_item = class
+		Menuaction (_ "_HSB") (_ "adjust hue-saturation-brightness in LCh") {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			h = Scale "Hue" 0 360 0;
+			s = Scale "Saturation" 0.01 5 1;
+			b = Scale "Brightness" 0.01 5 1;
+
+			_result 
+				= map_unary adjust_hsb x
+			{
+				adjust_hsb in
+					= colour_transform_to (get_type in) in''
+				{
+					in' = colour_transform_to Image_type.LCH in;
+					in'' = in' * Vector [b.value, s.value, 1] + 
+						Vector [0, 0, h.value];
+				}
+			}
+		}
+	}
+}
+
+Colour_similar_item = class
+	Menuaction (_ "_Similar Colour") (_ "find pixels with a similar colour") {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		target_colour = Colour_picker "Lab" [50, 0, 0];
+		t = Scale "dE threshold" 0 100 10;
+
+		_result
+			= map_unary match x
+		{
+			match in 
+				= abs_vec (in' - target) < t
+			{
+				target = colour_transform_to Image_type.LAB target_colour;
+				in' = colour_transform_to Image_type.LAB in;
+			}
+		}
+	}
+}
+
+#separator
+
+Colour_chart_to_matrix_item = class
+	Menuaction (_ "_Measure Colour Chart") 
+		(_ "measure average pixel values for a colour chart image") {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		pacross = Expression (_ "Patches across chart") 6;
+		pdown = Expression (_ "Patches down chart") 4;
+		measure = Scale (_ "Measure area (%)") 1 100 50; 
+
+        // get a representative image from an arg
+        get_image x
+            = get_image x.value?0, is_Group x
+            = x;
+
+        _im = get_image x; 
+		sample = measure_draw (to_real pacross) (to_real pdown) 
+				(to_real measure) _im;
+
+		_result 
+			= map_unary chart x
+		{
+			chart in
+				= measure_sample (to_real pacross) (to_real pdown) 
+					(to_real measure) in;
+		}
+	}
+}
+
+Colour_matrix_to_chart_item = class
+	Menuaction (_ "Make Synth_etic Colour Chart") 
+		(_ "make a colour chart image from a matrix of measurements") {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		pacross = Expression (_ "Patches across chart") 6;
+		pdown = Expression (_ "Patches down chart") 4;
+		pwidth = Expression (_ "Patch width in pixels") 50;
+		pheight = Expression (_ "Patch height in pixels") 50;
+		bwidth = Expression (_ "Border between patches") 0;
+
+		_result 
+			= map_unary build_chart x
+		{
+			build_chart in
+				= Image (imagearray_assemble 
+					(to_real bwidth) (to_real bwidth) patch_table)
+			{
+				// patch numbers for row starts
+				rowstart = map (multiply (to_real pacross)) 
+					[0 .. to_real pdown - 1];
+
+				// assemble patches ... each one a pixel value
+				patches = map (take (to_real pacross)) 
+					(map (converse drop in.value) rowstart);
+
+				// make an n-band constant image from eg. [1,2,3]
+				// we don't know the format .. use sRGB (well, why not?)
+				patch v = image_new (to_real pwidth) (to_real pheight) (len v) 
+					Image_format.FLOAT Image_coding.NOCODING 
+					Image_type.sRGB (Vector v) 0 0;
+
+				// make an image for each patch
+				patch_table = map (map patch) patches;
+			}
+		}
+	}
+}
+
+Colour_plot_ab_scatter_item = class
+	Menuaction (_ "_Plot ab Scatter") (_ "plot an ab scatter histogram") {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		bins = Expression (_ "Number of bins on each axis") 8;
+
+		_result
+			= map_unary plot_scatter x
+		{
+			plot_scatter in 
+				= Image (bg * (((90 / mx) * hist) ++ blk))
+			{
+				lab = colour_transform_to Image_type.LAB in.value;
+				ab = (unsigned char) ((lab?1 ++ lab?2) + 128);
+				hist = hist_find_nD bins.expr ab;
+				mx = max hist;
+				bg = lab_slice bins.expr 1;
+				blk = 1 + im_black (to_real bins) (to_real bins) 2;
+			}
+		}
+	}
+}

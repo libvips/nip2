@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.39.0">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.41.0">
   <Workspace window_x="0" window_y="0" window_width="928" window_height="743" filename="test_stats.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="100" lpane_open="false" rpane_position="400" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_stats" caption="Default empty workspace">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="30" name="A" caption="make test image">
       <Subcolumn vislevel="3">

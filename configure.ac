@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([nip2], [7.40.5])
+AC_INIT([nip2], [7.41.0])
 
 # foreign stops complaints about a missing README (we use README.md instead)
 # and missing INSTALL (the standard Gnu INSTALL is not very useful)
@@ -16,8 +16,8 @@ dnl of them.
 dnl
 
 m4_define([nip_major_version], [7])
-m4_define([nip_minor_version], [40])
-m4_define([nip_micro_version], [5])
+m4_define([nip_minor_version], [41])
+m4_define([nip_micro_version], [0])
 m4_define([nip_version],
           [nip_major_version.nip_minor_version.nip_micro_version])
 
@@ -379,6 +379,7 @@ AC_OUTPUT([
 	share/nip2/compat/7.26/Makefile
 	share/nip2/compat/7.28/Makefile
 	share/nip2/compat/7.38/Makefile
+	share/nip2/compat/7.40/Makefile
 	src/BITMAPS/Makefile 
 	src/Makefile
 	test/Makefile

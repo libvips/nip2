@@ -640,10 +640,11 @@ operations, or operations on large images, this mode can be very useful.
 
 The \ct{--set} option (which can be abbreviated to \ct{-=}) lets you make
 changes to a workspace after loading it.  Suppose the workspace \ct{test.ws}
-has a row called \ct{A1} with the value 12.  Then entering:
+has a tab called \ct{tab2} with a row called \ct{A1} with the value 12.  
+Then entering:
 
 \begin{verbatim}
-nip2 test.ws --set Workspaces.test.A1=45
+nip2 test.ws --set Workspaces.tab2.A1=45
 \end{verbatim}
 
 \noindent
@@ -656,13 +657,14 @@ use \ct{--set} to create new symbols as well.
 A set of sub-options let you mix up other modes yourself. For example, it's
 common to want to run a workspace on many files.
 
-Suppose the workspace \ct{process.ws} loads an image in \ct{A1}, performs some
-processing and produces a result image \ct{A10}. If you run \nip{} with:
+Suppose the workspace \ct{process.ws} has a tab called \ct{tab2}, loads
+an image in \ct{A1}, performs some processing and produces a result image
+\ct{A10}. If you run \nip{} with:
 
 \begin{verbatim}
 nip2 -bp \
-  -= 'Workspaces.process.A1=Image_file "fred.jpg"' \
-  -= main=Workspaces.process.A10 \
+  -= 'Workspaces.tab2.A1=Image_file "fred.jpg"' \
+  -= main=Workspaces.tab2.A10 \
   -o fred.jpg process.ws
 \end{verbatim}
 

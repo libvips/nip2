@@ -1,6 +1,7 @@
 started 7.40.5 17/9/14
 - improve .desktop file
 - fix Lch -> Yxy conversion
+- doc fix, thanks Ruven
 
 started 7.40.4 19/8/14
 - swap the HP printer profile for a freer one

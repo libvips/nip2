@@ -68,27 +68,9 @@ test_examples() {
 	done
 }
 
-# run all the test scripts in scripts/, passing in @TOP_SRCDIR@ so they can
-# find stuff
-
-# these scripts put temp files here, we remove the dir on exit
-test_scripts() {
-	mkdir -p tmp
-
-	for i in @TOP_SRCDIR@/test/scripts/*.sh; do
-		base=$(basename $i)
-		echo "running $base:"
-		$i @TOP_SRCDIR@ 
-		test_result $?
-	done
-
-	rm -rf tmp
-}
-
 test_workspaces
 test_defs
 test_examples
-test_scripts
 
 echo "repeating tests with the vectorising system disabled"
 
@@ -96,6 +78,5 @@ export IM_NOVECTOR=1
 test_workspaces
 test_defs
 test_examples
-test_scripts
 
 exit $main_result

@@ -2,7 +2,6 @@
 EXTRA_DIST = \
 	workspaces \
 	extras \
-	scripts \
 	images 
 
 TESTS = \

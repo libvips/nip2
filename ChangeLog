@@ -1,4 +1,5 @@
 started 7.42.0 started 4/11/14
+- removed the non-nip2 bits of the test suite, they are in vips now
 
 started 7.41.0 8/10/14
 - remove greyc stuff

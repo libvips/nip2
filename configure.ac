@@ -238,8 +238,6 @@ AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(geteuid getcwd getpwnam getrlimit getpwent getwd putenv regcomp strcspn strspn strstr)
 
 # need fftw so we load and unload wisdom on startup/shutdown
-# no need to add to libs (pkg-config will do this for us when we ask for vips)
-# we do need to add to CFLAGS though
 AC_ARG_WITH([fftw3], AS_HELP_STRING([--without-fftw3], [build without fftw3 (default: test)]))
 
 if test "x$with_fftw3" != "xno"; then
@@ -250,7 +248,8 @@ if test "x$with_fftw3" != "xno"; then
     [AC_MSG_WARN([fftw3 not found; disabling fftw support])
      with_fftw3=no
     ])
-  IP_CFLAGS="$FFTW_INCLUDES $FFTW3_CFLAGS $IP_CFLAGS"
+  IP_CFLAGS="$FFTW3_INCLUDES $FFTW3_CFLAGS $IP_CFLAGS"
+  IP_LIBS="$FFTW3_LIBS $IP_LIBS"
 fi
 
 # optional ... use libgoffice to draw plots
@@ -267,7 +266,7 @@ if test "x$with_libgoffice" != "xno"; then
     [AC_MSG_WARN([libgoffice not found; disabling plot display])
      with_libgoffice=no
     ])
-  IP_CFLAGS="$LIBGOFFICE_CFLAGS $IP_CFLAGS"
+  IP_CFLAGS="$LIBGOFFICE_CFLAGS $LIBGOFFICE_INCLUDES $IP_CFLAGS"
   IP_LIBS="$LIBGOFFICE_LIBS $IP_LIBS"
 fi
 
@@ -282,7 +281,7 @@ if test "x$with_libgsf" != "xno"; then
     [AC_MSG_WARN([libgsf not found; disabling save plot to file])
      with_libgsf=no
     ])
-  IP_CFLAGS="$LIBGSF_CFLAGS $IP_CFLAGS"
+  IP_CFLAGS="$LIBGSF_CFLAGS $LIBGSF_INCLUDES $IP_CFLAGS"
   IP_LIBS="$LIBGSF_LIBS $IP_LIBS"
 fi
 
@@ -300,7 +299,7 @@ if test "x$with_libgvc" != "xno"; then
     [AC_MSG_WARN([libgvc not found; disabling workspace dep graph display])
      with_libgvc=no
     ])
-  IP_CFLAGS="$LIBGVC_CFLAGS $IP_CFLAGS"
+  IP_CFLAGS="$LIBGVC_CFLAGS $LIBGVC_INCLUDES $IP_CFLAGS"
   IP_LIBS="$LIBGVC_LIBS $IP_LIBS"
 fi
 
@@ -315,7 +314,7 @@ if test "x$with_gsl" != "xno"; then
     [AC_MSG_WARN([gsl not found; disabling extra numerical functions])
      with_gsl=no
     ])
-  IP_CFLAGS="$GSL_CFLAGS $IP_CFLAGS"
+  IP_CFLAGS="$GSL_CFLAGS $GSL_INCLUDES $IP_CFLAGS"
   IP_LIBS="$GSL_LIBS $IP_LIBS"
 fi
 

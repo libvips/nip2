@@ -403,7 +403,7 @@ use gsl for numeric functions:		$with_gsl
 use libgoffice to show plots:		$with_libgoffice
 use libgsf to save plots to files:	$with_libgsf
 use libgvc to show ws dep graphs:	$with_libgvc
-  (requires gvc < 2.30)
+  (requires gvc > 2.30)
 use gtkinfobar to show messages:	$nip_use_infobar
   (requires gtk+-2.0 >= 2.18)
 use notebook action widget:  		$nip_use_notebook_action

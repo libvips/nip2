@@ -1,3 +1,7 @@
+started 7.42.1 started 30/12/14
+- add fftw3 configure
+- fix gvc configure
+
 started 7.42.0 started 4/11/14
 - removed the non-nip2 bits of the test suite, they are in vips now
 

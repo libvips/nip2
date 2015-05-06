@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([nip2], [7.42.1])
+AC_INIT([nip2], [8.0])
 
 # foreign stops complaints about a missing README (we use README.md instead)
 # and missing INSTALL (the standard Gnu INSTALL is not very useful)
@@ -15,9 +15,9 @@ dnl so that we can base configure --help output off
 dnl of them.
 dnl
 
-m4_define([nip_major_version], [7])
-m4_define([nip_minor_version], [42])
-m4_define([nip_micro_version], [1])
+m4_define([nip_major_version], [8])
+m4_define([nip_minor_version], [0])
+m4_define([nip_micro_version], [0])
 m4_define([nip_version],
           [nip_major_version.nip_minor_version.nip_micro_version])
 

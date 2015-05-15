@@ -1,3 +1,9 @@
+- try 
+
+	#<Return>
+
+  in the column formula box ... locks up!
+
 - redo scale along the new vipsthumbnail lines
 
   need to be able to get window_size from an interp
@@ -14,7 +20,7 @@
   browser instead
 
 - hough_circle etc. don't get cached ... they use the vips8 API and the vips
-  cache only works for vips7
+  cache only works for vips8
 
   we can't turn on the vips8 cache since it does not know about invalidate
 

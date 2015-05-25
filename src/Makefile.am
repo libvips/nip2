@@ -321,7 +321,7 @@ endif
 .y.c:
 	$(BISON) --defines=$*.h -o $*.c $<
 
-model.o: parse.c
+nip2-model.o model.o: model.c parse.c
 
 AM_CPPFLAGS = @IP_CFLAGS@ 
 LDADD = @IP_CFLAGS@ @IP_LIBS@

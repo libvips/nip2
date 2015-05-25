@@ -1,7 +1,5 @@
 SUBDIRS = BITMAPS
 
-bin_SCRIPTS = run-nip2.sh
-
 # need this to keep autoconf quiet, but we don't actually use it ... see the
 # bison rule below
 YACC = bison
@@ -334,6 +332,6 @@ dist-hook:
 
 CLEANFILES = parse.c parse.h lex.c tags
 
-EXTRA_DIST = makehelpindex.pl helpindex.h run-nip2.sh \
+EXTRA_DIST = makehelpindex.pl helpindex.h \
 	nipmarshal.h nipmarshal.c nipmarshal.list \
 	$(CLI_DIST)

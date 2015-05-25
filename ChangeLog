@@ -1,5 +1,7 @@
 started 8.0 on 3/5/15
 - version bump for vips-8.0 release
+- fix a race in Makefile.am, thanks nieder 
+- get rid of run-nip2.sh, mostly useless, thanks nieder 
 
 started 7.42.1 started 30/12/14
 - add fftw3 configure

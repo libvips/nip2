@@ -127,28 +127,7 @@ fontnameview_init( Fontnameview *fontnameview )
         gtk_widget_show_all( GTK_WIDGET( hbox ) );
 }
 
-GtkType
-fontnameview_get_type( void )
-{
-	static GtkType fontnameview_type = 0;
-
-	if( !fontnameview_type ) {
-		static const GtkTypeInfo info = {
-			"Fontnameview",
-			sizeof( Fontnameview ),
-			sizeof( FontnameviewClass ),
-			(GtkClassInitFunc) fontnameview_class_init,
-			(GtkObjectInitFunc) fontnameview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		fontnameview_type = gtk_type_unique( TYPE_GRAPHICVIEW, &info );
-	}
-
-	return( fontnameview_type );
-}
+G_DEFINE_TYPE( fontnameview, Fontnameview, TYPE_GRAPHICVIEW ); 
 
 View *
 fontnameview_new( void )

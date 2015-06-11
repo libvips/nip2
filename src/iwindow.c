@@ -74,7 +74,7 @@
 #include "BITMAPS/watch_8.xbm"
 #include "BITMAPS/watch_msk.xbm"
 
-static GtkWindowClass *parent_class = NULL;
+G_DEFINE_TYPE( iwindow, iWindow, GTK_TYPE_WINDOW ); 
 
 /* List of all iwindows.
  */
@@ -545,7 +545,7 @@ iwindow_finalize( GObject *gobject )
 	iwindow_all = g_slist_remove( iwindow_all, iwnd );
 	IM_FREE( iwnd->title );
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( iwindow_parent_class )->finalize( gobject );
 
 	/* Last window and we've got through startup? Quit the application.
 	 */
@@ -574,7 +574,7 @@ iwindow_destroy( GtkObject *gobject )
 	 */
 	iwnd->destroy = TRUE;
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( gobject );
+	GTK_OBJECT_CLASS( iwindow_parent_class )->destroy( gobject );
 }
 
 static void
@@ -651,7 +651,7 @@ iwindow_configure_event( GtkWidget *widget, GdkEventConfigure *event )
 		prefs_set( iwnd->height_pref, "%d", event->height );
 	}
 
-	return( GTK_WIDGET_CLASS( parent_class )->
+	return( GTK_WIDGET_CLASS( iwindow_parent_class )->
 		configure_event( widget, event ) );
 }
 
@@ -803,8 +803,6 @@ iwindow_class_init( iWindowClass *class )
 	GtkObjectClass *gobject_class = (GtkObjectClass *) class;
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	/* Init methods.
 	 */
 	object_class->finalize = iwindow_finalize;
@@ -869,29 +867,6 @@ iwindow_init( iWindow *iwnd )
 	iwnd->height_pref = NULL;
 
 	iwindow_all = g_slist_prepend( iwindow_all, iwnd );
-}
-
-GtkType
-iwindow_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type ) {
-		static const GtkTypeInfo info = {
-			"iWindow",
-			sizeof( iWindow ),
-			sizeof( iWindowClass ),
-			(GtkClassInitFunc) iwindow_class_init,
-			(GtkObjectInitFunc) iwindow_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( GTK_TYPE_WINDOW, &info );
-	}
-
-	return( type );
 }
 
 GtkWidget *

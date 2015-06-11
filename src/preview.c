@@ -37,7 +37,7 @@
  */
 #define NUM_COLUMNS (4)
 
-static ImagedisplayClass *parent_class = NULL;
+G_DEFINE_TYPE( preview, Preview, TYPE_IMAGEDISPLAY ); 
 
 static void
 preview_destroy( GtkObject *object )
@@ -52,7 +52,7 @@ preview_destroy( GtkObject *object )
 	UNREF( preview->conv );
 	IM_FREE( preview->filename );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( preview_parent_class )->destroy( object );
 }
 
 static void
@@ -63,8 +63,6 @@ preview_class_init( PreviewClass *class )
 	object_class = (GtkObjectClass *) class;
 
 	object_class->destroy = preview_destroy;
-
-	parent_class = g_type_class_peek_parent( class );
 }
 
 static void
@@ -81,29 +79,6 @@ preview_init( Preview *preview )
 	imagedisplay_set_conversion( IMAGEDISPLAY( preview ), preview->conv );
 	imagedisplay_set_shrink_to_fit( IMAGEDISPLAY( preview ), TRUE );
 	g_object_ref( G_OBJECT( preview->conv ) );
-}
-
-GtkType
-preview_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type)  {
-		static const GtkTypeInfo info = {
-			"Preview",
-			sizeof( Preview ),
-			sizeof( PreviewClass ),
-			(GtkClassInitFunc) preview_class_init,
-			(GtkObjectInitFunc) preview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( TYPE_IMAGEDISPLAY, &info );
-	}
-
-	return( type );
 }
 
 Preview *

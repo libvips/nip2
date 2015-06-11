@@ -258,29 +258,7 @@ conversionview_init( Conversionview *cv )
 	gtk_widget_show_all( hb );
 }
 
-GtkType
-conversionview_get_type( void )
-{
-	static GtkType conversionview_type = 0;
-
-	if( !conversionview_type ) {
-		static const GtkTypeInfo sinfo = {
-			"Conversionview",
-			sizeof( Conversionview ),
-			sizeof( ConversionviewClass ),
-			(GtkClassInitFunc) conversionview_class_init,
-			(GtkObjectInitFunc) conversionview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		conversionview_type = 
-			gtk_type_unique( GTK_TYPE_FRAME, &sinfo );
-	}
-
-	return( conversionview_type );
-}
+G_DEFINE_TYPE( conversionview, Conversionview, GTK_TYPE_FRAME ); 
 
 /* Our conversion has changed ... update.
  */

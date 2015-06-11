@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ClassmodelClass *parent_class = NULL;
+G_DEFINE_TYPE( plot, Plot, TYPE_CLASSMODEL ); 
 
 static void
 plot_free_columns( Plot *plot )
@@ -70,7 +70,7 @@ plot_finalize( GObject *gobject )
 	plot_free_columns( plot );
 	vips_buf_destroy( &plot->caption_buffer );
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( plot_parent_class )->finalize( gobject );
 }
 
 char *
@@ -287,7 +287,7 @@ plot_save( Model *model, xmlNode *xnode )
         Plot *plot = PLOT( model );
 	xmlNode *xthis;
 
-	if( !(xthis = MODEL_CLASS( parent_class )->save( model, xnode )) )
+	if( !(xthis = MODEL_CLASS( plot_parent_class )->save( model, xnode )) )
 		return( NULL );
 
 	if( !set_iprop( xthis, "plot_left", plot->left ) ||
@@ -313,7 +313,7 @@ plot_load( Model *model,
 	(void) get_iprop( xnode, "plot_mag", &plot->mag );
 	(void) get_bprop( xnode, "show_status", &plot->show_status );
 
-	return( MODEL_CLASS( parent_class )->load( model, 
+	return( MODEL_CLASS( plot_parent_class )->load( model, 
 		state, parent, xnode ) );
 }
 
@@ -472,8 +472,6 @@ plot_class_init( PlotClass *class )
 	ModelClass *model_class = (ModelClass *) class;
 	ClassmodelClass *classmodel_class = (ClassmodelClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	/* Create signals.
 	 */
 
@@ -528,31 +526,6 @@ plot_init( Plot *plot )
 	iobject_set( IOBJECT( plot ), CLASS_PLOT, NULL );
 
 	plot_reset( CLASSMODEL( plot ) );
-}
-
-GtkType
-plot_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( PlotClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) plot_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Plot ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) plot_init,
-		};
-
-		type = g_type_register_static( TYPE_CLASSMODEL, 
-			"Plot", &info, 0 );
-	}
-
-	return( type );
 }
 
 #ifdef HAVE_LIBGOFFICE

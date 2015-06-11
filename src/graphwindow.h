@@ -72,6 +72,6 @@ typedef struct _GraphwindowClass {
 
 void graph_write( Workspace *ws );
 
-GtkType graphwindow_get_type( void );
+GType graphwindow_get_type( void );
 Graphwindow *graphwindow_new( Workspace *ws, GtkWidget *parent );
 

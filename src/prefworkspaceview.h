@@ -54,7 +54,7 @@ typedef struct _PrefworkspaceviewClass {
 	 */
 } PrefworkspaceviewClass;
 
-GtkType prefworkspaceview_get_type( void );
+GType prefworkspaceview_get_type( void );
 View *prefworkspaceview_new( void );
 
 void prefworkspaceview_set_caption_filter( Prefworkspaceview *pwview, 

@@ -51,5 +51,5 @@ typedef struct _PanechildClass {
 
 } PanechildClass;
 
-GtkType panechild_get_type( void );
+GType panechild_get_type( void );
 Panechild *panechild_new( Pane *pane, const char *title );

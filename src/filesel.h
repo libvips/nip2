@@ -125,7 +125,7 @@ typedef void *(*FileselMapFn)( Filesel *, const char *, void *, void * );
 
 void filesel_add_mode( char *filename );
 
-GtkType filesel_get_type( void );
+GType filesel_get_type( void );
 GtkWidget *filesel_new( void );
 
 gboolean filesel_set_filename( Filesel *filesel, const char *name );

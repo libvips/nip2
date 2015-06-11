@@ -76,7 +76,7 @@ void *column_map_symbol( Column *col, symbol_map_fn fn, void *a );
 
 void *column_select_symbols( Column *col );
 
-GtkType column_get_type( void );
+GType column_get_type( void );
 
 Column *column_new( Workspace *ws, const char *name );
 

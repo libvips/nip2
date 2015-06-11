@@ -33,14 +33,14 @@
 
 #include "ip.h"
 
-static GraphicviewClass *parent_class = NULL;
+G_DEFINE_TYPE( pathnameview, Pathnameview, TYPE_GRAPHICVIEW ); 
 
 static void
 pathnameview_link( View *view, Model *model, View *parent )
 {
 	Pathnameview *pathnameview = PATHNAMEVIEW( view );
 
-	VIEW_CLASS( parent_class )->link( view, model, parent );
+	VIEW_CLASS( pathnameview_parent_class )->link( view, model, parent );
 
 	if( GRAPHICVIEW( view )->sview )
 		gtk_size_group_add_widget( GRAPHICVIEW( view )->sview->group,   
@@ -66,7 +66,7 @@ pathnameview_refresh( vObject *vobject )
 		gtk_button_set_label( GTK_BUTTON( pathnameview->button ), 
 			im_skip_dir( pathname->value ) );
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( pathnameview_parent_class )->refresh( vobject );
 }
 
 static void
@@ -74,8 +74,6 @@ pathnameview_class_init( PathnameviewClass *class )
 {
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -153,29 +151,6 @@ pathnameview_init( Pathnameview *pathnameview )
         set_tooltip( pathnameview->button, _( "Select a new file name" ) );
 
         gtk_widget_show_all( GTK_WIDGET( hbox ) );
-}
-
-GtkType
-pathnameview_get_type( void )
-{
-	static GtkType pathnameview_type = 0;
-
-	if( !pathnameview_type ) {
-		static const GtkTypeInfo info = {
-			"Pathnameview",
-			sizeof( Pathnameview ),
-			sizeof( PathnameviewClass ),
-			(GtkClassInitFunc) pathnameview_class_init,
-			(GtkObjectInitFunc) pathnameview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		pathnameview_type = gtk_type_unique( TYPE_GRAPHICVIEW, &info );
-	}
-
-	return( pathnameview_type );
 }
 
 View *

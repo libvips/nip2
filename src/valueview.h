@@ -50,5 +50,5 @@ typedef struct _ValueviewClass {
 	 */
 } ValueviewClass;
 
-GtkType valueview_get_type( void );
+GType valueview_get_type( void );
 View *valueview_new( void );

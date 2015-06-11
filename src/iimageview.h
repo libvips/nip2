@@ -53,5 +53,5 @@ typedef struct _iImageviewClass {
 } iImageviewClass;
 
 GtkWidget *iimageview_drag_window_new( int width, int height );
-GtkType iimageview_get_type( void );
+GType iimageview_get_type( void );
 View *iimageview_new( void );

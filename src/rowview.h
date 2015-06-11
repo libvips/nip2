@@ -63,7 +63,7 @@ typedef struct _RowviewClass {
 
 guint rowview_menu_attach( Rowview *rview, GtkWidget *widget );
 
-GtkType rowview_get_type( void );
+GType rowview_get_type( void );
 View *rowview_new( void );
 
 void rowview_get_position( Rowview *rview, int *x, int *y, int *w, int *h );

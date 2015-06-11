@@ -33,7 +33,7 @@
 #define DEBUG
  */
 
-static iWindowClass *parent_class = NULL;
+G_DEFINE_TYPE( idialog, iDialog, TYPE_IWINDOW ); 
 
 /* An OK button: label (can be a stock) plus a callback.
  */
@@ -314,7 +314,7 @@ idialog_destroy( GtkObject *object )
 	IM_FREEF( g_slist_free, idlg->ok_disp_l );
 	IM_FREEF( g_slist_free, idlg->ok_but_l );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( idialog_parent_class )->destroy( object );
 }
 
 static void
@@ -326,7 +326,7 @@ idialog_realize( GtkWidget *widget )
 	printf( "idialog_realize: %s\n", IWINDOW( idlg )->title );
 #endif /*DEBUG*/
 
-	GTK_WIDGET_CLASS( parent_class )->realize( widget );
+	GTK_WIDGET_CLASS( idialog_parent_class )->realize( widget );
 
 	if( idlg->entry )
 		gtk_widget_grab_focus( GTK_WIDGET( idlg->entry ) );
@@ -400,8 +400,8 @@ idialog_build( GtkWidget *widget )
 
 	/* Call all builds in superclasses.
 	 */
-	if( IWINDOW_CLASS( parent_class )->build )
-		(*IWINDOW_CLASS( parent_class )->build)( widget );
+	if( IWINDOW_CLASS( idialog_parent_class )->build )
+		(*IWINDOW_CLASS( idialog_parent_class )->build)( widget );
 
 	/* delete_event and destroy handled by our superclass.
 	 */
@@ -561,8 +561,6 @@ idialog_class_init( iDialogClass *class )
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	iWindowClass *iwindow_class = (iWindowClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	object_class->destroy = idialog_destroy;
 
 	widget_class->realize = idialog_realize;
@@ -622,29 +620,6 @@ idialog_init( iDialog *idlg )
 
 	gtk_window_set_position( GTK_WINDOW( idlg ),
 		GTK_WIN_POS_CENTER_ON_PARENT );
-}
-
-GtkType
-idialog_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type ) {
-		static const GtkTypeInfo info = {
-			"iDialog",
-			sizeof( iDialog ),
-			sizeof( iDialogClass ),
-			(GtkClassInitFunc) idialog_class_init,
-			(GtkObjectInitFunc) idialog_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( TYPE_IWINDOW, &info );
-	}
-
-	return( type );
 }
 
 GtkWidget *

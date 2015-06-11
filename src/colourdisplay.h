@@ -54,5 +54,5 @@ typedef struct _ColourdisplayClass {
 	 */
 } ColourdisplayClass;
 
-GtkType colourdisplay_get_type( void );
+GType colourdisplay_get_type( void );
 Colourdisplay *colourdisplay_new( Conversion *conv );

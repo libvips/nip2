@@ -114,7 +114,7 @@ typedef struct _WatchClass {
 } WatchClass;
 
 Watch *watch_find( Watchgroup *watchgroup, const char *name );
-GtkType watch_get_type( void );
+GType watch_get_type( void );
 void watch_relink_all( void );
 void watch_vset( Watch *watch, const char *fmt, va_list args );
 void watch_set( Watch *watch, const char *fmt, ... )
@@ -148,7 +148,7 @@ typedef struct _WatchIntClass {
 
 } WatchIntClass;
 
-GtkType watch_int_get_type( void );
+GType watch_int_get_type( void );
 int watch_int_get( Watchgroup *, const char *name, int fallback );
 
 /* A watch that watches something with a double value.
@@ -180,7 +180,7 @@ typedef struct _WatchDoubleClass {
 
 } WatchDoubleClass;
 
-GtkType watch_double_get_type( void );
+GType watch_double_get_type( void );
 double watch_double_get( Watchgroup *, const char *name, double fallback );
 
 /* A watch that watches a path.
@@ -211,7 +211,7 @@ typedef struct _WatchPathClass {
 
 } WatchPathClass;
 
-GtkType watch_path_get_type( void );
+GType watch_path_get_type( void );
 GSList *watch_path_get( Watchgroup *, const char *name, GSList *fallback );
 
 typedef struct _WatchBool WatchBool;
@@ -239,7 +239,7 @@ typedef struct _WatchBoolClass {
 
 } WatchBoolClass;
 
-GtkType watch_bool_get_type( void );
+GType watch_bool_get_type( void );
 gboolean watch_bool_get( Watchgroup *, const char *name, gboolean fallback );
 
 typedef struct _WatchString WatchString;
@@ -268,7 +268,7 @@ typedef struct _WatchStringClass {
 
 } WatchStringClass;
 
-GtkType watch_string_get_type( void );
+GType watch_string_get_type( void );
 const char *watch_string_get( Watchgroup *, 
 	const char *name, const char *fallback );
 

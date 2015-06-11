@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ViewClass *parent_class = NULL;
+G_DEFINE_TYPE( subcolumview, Subcolumview, TYPE_VIEW ); 
 
 static void *
 subcolumnview_destroy_sub( Rowview *rview, Subcolumnview *sview )
@@ -66,7 +66,7 @@ subcolumnview_destroy( GtkObject *object )
 		(view_map_fn) subcolumnview_destroy_sub, sview, NULL );
 	DESTROY_GTK( sview->table );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( subcolumnview_parent_class )->destroy( object );
 }
 
 static void
@@ -84,7 +84,7 @@ subcolumnview_link( View *view, Model *model, View *parent )
 	printf( "\n" );
 #endif /*DEBUG*/
 
-	VIEW_CLASS( parent_class )->link( view, model, parent );
+	VIEW_CLASS( subcolumnview_parent_class )->link( view, model, parent );
 
 	/* Add to enclosing column, if there is one. Attached to enclosing row
 	 * by rowview_refresh() if we're a subcolumn.
@@ -179,7 +179,7 @@ subcolumnview_refresh( vObject *vobject )
 		iobject_changed( IOBJECT( scol->top_col ) );
 	}
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( subcolumnview_parent_class )->refresh( vobject );
 }
 
 static void
@@ -188,8 +188,6 @@ subcolumnview_class_init( SubcolumnviewClass *class )
 	GtkObjectClass *object_class = (GtkObjectClass*) class;
 	vObjectClass *vobject_class = (vObjectClass*) class;
 	ViewClass *view_class = (ViewClass*) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	object_class->destroy = subcolumnview_destroy;
 
@@ -220,29 +218,6 @@ subcolumnview_init( Subcolumnview *sview )
         gtk_widget_show_all( sview->align );
 
 	sview->group = gtk_size_group_new( GTK_SIZE_GROUP_HORIZONTAL );
-}
-
-GtkType
-subcolumnview_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type ) {
-		static const GtkTypeInfo info = {
-			"Subcolumnview",
-			sizeof( Subcolumnview ),
-			sizeof( SubcolumnviewClass ),
-			(GtkClassInitFunc) subcolumnview_class_init,
-			(GtkObjectInitFunc) subcolumnview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( TYPE_VIEW, &info );
-	}
-
-	return( type );
 }
 
 View *

@@ -139,7 +139,7 @@ typedef struct _RegionviewClass {
 
 void regionview_attach( Regionview *regionview, int x, int y );
 
-GtkType regionview_get_type( void );
+GType regionview_get_type( void );
 Regionview *regionview_new( Classmodel *classmodel, 
 	Rect *model_area, Imagepresent *ip );
 

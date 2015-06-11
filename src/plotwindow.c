@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static FloatwindowClass *parent_class = NULL;
+G_DEFINE_TYPE( plotwindow, Plotwindow, TYPE_FLOATWINDOW ); 
 
 static void
 plotwindow_destroy( GtkObject *object )
@@ -53,15 +53,13 @@ plotwindow_destroy( GtkObject *object )
 	 */
 	UNREF( plotwindow->plotmodel );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( plotwindow_parent_class )->destroy( object );
 }
 
 static void
 plotwindow_class_init( PlotwindowClass *class )
 {
 	GtkObjectClass *object_class = (GtkObjectClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	object_class->destroy = plotwindow_destroy;
 
@@ -80,29 +78,6 @@ plotwindow_init( Plotwindow *plotwindow )
 #endif /*DEBUG*/
 
 	plotwindow->plotmodel = NULL;
-}
-
-GtkType
-plotwindow_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type ) {
-		static const GtkTypeInfo info = {
-			"Plotwindow",
-			sizeof( Plotwindow ),
-			sizeof( PlotwindowClass ),
-			(GtkClassInitFunc) plotwindow_class_init,
-			(GtkObjectInitFunc) plotwindow_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( TYPE_FLOATWINDOW, &info );
-	}
-
-	return( type );
 }
 
 static void

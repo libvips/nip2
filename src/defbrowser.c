@@ -276,28 +276,7 @@ defbrowser_init( Defbrowser *defbrowser )
 	gtk_widget_show_all( swin );
 }
 
-GtkType
-defbrowser_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type ) {
-		static const GtkTypeInfo info = {
-			"Defbrowser",
-			sizeof( Defbrowser ),
-			sizeof( DefbrowserClass ),
-			(GtkClassInitFunc) defbrowser_class_init,
-			(GtkObjectInitFunc) defbrowser_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( TYPE_VOBJECT, &info );
-	}
-
-	return( type );
-}
+G_DEFINE_TYPE( defbrowser, Defbrowser, TYPE_VOBJECT ); 
 
 void
 defbrowser_set_program( Defbrowser *defbrowser, Program *program )

@@ -55,5 +55,5 @@ typedef struct _PlotwindowClass {
 	 */
 } PlotwindowClass;
 
-GtkType plotwindow_get_type( void );
+GType plotwindow_get_type( void );
 Plotwindow *plotwindow_new( Plot *plot, GtkWidget *parent );

@@ -66,5 +66,5 @@ typedef struct _PaintboxviewClass {
 	 */
 } PaintboxviewClass;
 
-GtkType paintboxview_get_type( void );
+GType paintboxview_get_type( void );
 Paintboxview *paintboxview_new( Imagemodel *imagemodel );

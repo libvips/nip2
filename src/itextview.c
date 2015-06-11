@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ViewClass *parent_class = NULL;
+G_DEFINE_TYPE( itextview, iTextview, TYPE_VIEW ); 
 
 static void 
 itextview_refresh( vObject *vobject )
@@ -86,7 +86,7 @@ itextview_refresh( vObject *vobject )
 		formula_set_value_expr( itextview->formula,
 			display, itext->formula );
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( itextview_parent_class )->refresh( vobject );
 }
 
 static void
@@ -102,7 +102,7 @@ itextview_link( View *view, Model *model, View *parent )
 	printf( "\n" );
 #endif /*DEBUG*/
 
-	VIEW_CLASS( parent_class )->link( view, model, parent );
+	VIEW_CLASS( itextview_parent_class )->link( view, model, parent );
 
 	/* Edit mode defaults to edit mode for workspace.
 	 */
@@ -128,7 +128,7 @@ itextview_reset( View *view )
 	formula_set_edit( ITEXTVIEW( view )->formula, 
 		row->ws->mode == WORKSPACE_MODE_FORMULA );
 
-	VIEW_CLASS( parent_class )->reset( view );
+	VIEW_CLASS( itextview_parent_class )->reset( view );
 }
 
 /* Re-read the text in a tally entry. 
@@ -151,7 +151,7 @@ itextview_scan( View *view )
 		itext_set_formula( itext, itextview->formula->expr ) )
 		itext_set_edited( itext, TRUE );
 
-	return( VIEW_CLASS( parent_class )->scan( view ) );
+	return( VIEW_CLASS( itextview_parent_class )->scan( view ) );
 }
 
 static void
@@ -159,8 +159,6 @@ itextview_class_init( iTextviewClass *class )
 {
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -239,29 +237,6 @@ itextview_init( iTextview *itextview )
         gtk_box_pack_start( GTK_BOX( itextview ), 
 		GTK_WIDGET( itextview->formula ), TRUE, FALSE, 0 );
         gtk_widget_show( GTK_WIDGET( itextview->formula ) );
-}
-
-GtkType
-itextview_get_type( void )
-{
-	static GtkType itextview_type = 0;
-
-	if( !itextview_type ) {
-		static const GtkTypeInfo itextview_info = {
-			"iTextview",
-			sizeof( iTextview ),
-			sizeof( iTextviewClass ),
-			(GtkClassInitFunc) itextview_class_init,
-			(GtkObjectInitFunc) itextview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		itextview_type = gtk_type_unique( TYPE_VIEW, &itextview_info );
-	}
-
-	return( itextview_type );
 }
 
 View *

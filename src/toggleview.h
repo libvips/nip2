@@ -50,5 +50,5 @@ typedef struct _ToggleviewClass {
 	 */
 } ToggleviewClass;
 
-GtkType toggleview_get_type( void );
+GType toggleview_get_type( void );
 View *toggleview_new( void );

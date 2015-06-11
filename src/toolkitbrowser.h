@@ -56,7 +56,7 @@ typedef struct _ToolkitbrowserClass {
 
 } ToolkitbrowserClass;
 
-GtkType toolkitbrowser_get_type( void );
+GType toolkitbrowser_get_type( void );
 void toolkitbrowser_set_mainw( Toolkitbrowser *toolkitbrowser, Mainw *mainw );
 Toolkitbrowser *toolkitbrowser_new( void );
 int toolkitbrowser_get_width( Toolkitbrowser *toolkitbrowser );

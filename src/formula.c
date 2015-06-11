@@ -537,29 +537,7 @@ formula_init( Formula *formula )
         gtk_widget_show( formula->right_label );
 }
 
-GtkType
-formula_get_type( void )
-{
-	static GtkType formula_type = 0;
-
-	if( !formula_type ) {
-		static const GtkTypeInfo formula_info = {
-			"Formula",
-			sizeof( Formula ),
-			sizeof( FormulaClass ),
-			(GtkClassInitFunc) formula_class_init,
-			(GtkObjectInitFunc) formula_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		formula_type = gtk_type_unique( GTK_TYPE_EVENT_BOX, 
-			&formula_info );
-	}
-
-	return( formula_type );
-}
+G_DEFINE_TYPE( formula, Formula, GTK_TYPE_EVENT_BOX ); 
 
 Formula *
 formula_new( void )

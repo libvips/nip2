@@ -70,7 +70,7 @@ VipsBuf *trace_current( void );
 void trace_pop_to( int n );
 int trace_get_mark( void );
 
-GtkType trace_get_type( void );
+GType trace_get_type( void );
 Trace *trace_new( void );
 
 void trace_text( TraceFlags flags, const char *fmt, ... )

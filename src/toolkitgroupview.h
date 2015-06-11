@@ -52,7 +52,7 @@ typedef struct _ToolkitgroupviewClass {
 	 */
 } ToolkitgroupviewClass;
 
-GtkType toolkitgroupview_get_type( void );
+GType toolkitgroupview_get_type( void );
 View *toolkitgroupview_new( void );
 void toolkitgroupview_set_mainw( Toolkitgroupview *kitgview, Mainw *mainw );
 

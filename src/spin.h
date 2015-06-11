@@ -50,5 +50,5 @@ typedef struct _SpinClass {
 	void (*down_click)( Spin * );
 } SpinClass;
 
-GtkType spin_get_type( void );
+GType spin_get_type( void );
 GtkWidget *spin_new( void );

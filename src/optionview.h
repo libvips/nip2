@@ -55,5 +55,5 @@ typedef struct _OptionviewClass {
 	 */
 } OptionviewClass;
 
-GtkType optionview_get_type( void );
+GType optionview_get_type( void );
 View *optionview_new( void );

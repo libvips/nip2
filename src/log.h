@@ -57,7 +57,7 @@ typedef struct _LogClass {
 	const char *menu_bar_name;
 } LogClass;
 
-GtkType log_get_type( void );
+GType log_get_type( void );
 
 void log_clear_action_cb( GtkAction *action, Log *log );
 void log_text( Log *log, const char *buf );

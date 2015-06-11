@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static GraphicviewClass *parent_class = NULL;
+G_DEFINE_TYPE( optionview, Optionview, TYPE_GRAPHICVIEW ); 
 
 /* Copy a gslist of strings.
  */
@@ -83,7 +83,7 @@ optionview_destroy( GtkObject *object )
 	 */
 	IM_FREEF( slist_free_all, optionview->labels );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( optionview_parent_class )->destroy( object );
 }
 
 static void
@@ -91,7 +91,7 @@ optionview_link( View *view, Model *model, View *parent )
 {
 	Optionview *optionview = OPTIONVIEW( view );
 
-	VIEW_CLASS( parent_class )->link( view, model, parent );
+	VIEW_CLASS( optionview_parent_class )->link( view, model, parent );
 
 	if( GRAPHICVIEW( view )->sview )
 		gtk_size_group_add_widget( GRAPHICVIEW( view )->sview->group,   
@@ -184,7 +184,7 @@ optionview_refresh( vObject *vobject )
 
 	set_glabel( optionview->label, _( "%s:" ), IOBJECT( option )->caption );
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( optionview_parent_class )->refresh( vobject );
 }
 
 static void
@@ -193,8 +193,6 @@ optionview_class_init( OptionviewClass *class )
 	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	object_class->destroy = optionview_destroy;
 
@@ -225,29 +223,6 @@ optionview_init( Optionview *optionview )
 	optionview->labels = NULL;
 
         gtk_widget_show_all( optionview->hbox );
-}
-
-GtkType
-optionview_get_type( void )
-{
-	static GtkType optionview_type = 0;
-
-	if( !optionview_type ) {
-		static const GtkTypeInfo sinfo = {
-			"Optionview",
-			sizeof( Optionview ),
-			sizeof( OptionviewClass ),
-			(GtkClassInitFunc) optionview_class_init,
-			(GtkObjectInitFunc) optionview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		optionview_type = gtk_type_unique( TYPE_GRAPHICVIEW, &sinfo );
-	}
-
-	return( optionview_type );
 }
 
 View *

@@ -59,5 +59,5 @@ typedef struct _SubcolumnviewClass {
 	 */
 } SubcolumnviewClass;
 
-GtkType subcolumnview_get_type( void );
+GType subcolumnview_get_type( void );
 View *subcolumnview_new( void );

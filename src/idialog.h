@@ -117,7 +117,7 @@ void idialog_free_client( iDialog *idlg, void *client );
 
 void idialog_set_ok_button_state( iDialog *idlg, gboolean state );
 
-GtkType idialog_get_type( void );
+GType idialog_get_type( void );
 GtkWidget *idialog_new( void );
 
 void idialog_set_iobject( iDialog *idlg, iObject *iobject );

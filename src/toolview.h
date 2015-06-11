@@ -52,5 +52,5 @@ typedef struct _ToolviewClass {
 	 */
 } ToolviewClass;
 
-GtkType toolview_get_type( void );
+GType toolview_get_type( void );
 View *toolview_new( void );

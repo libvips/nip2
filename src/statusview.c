@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static GtkFrameClass *parent_class = NULL;
+G_DEFINE_TYPE( statusview, Statusview, GTK_TYPE_FRAME ); 
 
 /* The popup menu.
  */
@@ -76,7 +76,7 @@ statusview_destroy( GtkObject *object )
 
 	statusviewband_destroy( sv );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( statusview_parent_class )->destroy( object );
 }
 
 /* Hide this statusview.
@@ -94,8 +94,6 @@ statusview_class_init( StatusviewClass *class )
 	GtkObjectClass *object_class = (GtkObjectClass *) class;
 
 	GtkWidget *pane;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	object_class->destroy = statusview_destroy;
 
@@ -151,30 +149,6 @@ statusview_init( Statusview *sv )
         gtk_box_pack_end( GTK_BOX( hb ), sv->mag, FALSE, FALSE, 0 );
 
 	gtk_widget_show_all( eb );
-}
-
-GtkType
-statusview_get_type( void )
-{
-	static GtkType statusview_type = 0;
-
-	if( !statusview_type ) {
-		static const GtkTypeInfo sinfo = {
-			"Statusview",
-			sizeof( Statusview ),
-			sizeof( StatusviewClass ),
-			(GtkClassInitFunc) statusview_class_init,
-			(GtkObjectInitFunc) statusview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		statusview_type = 
-			gtk_type_unique( GTK_TYPE_FRAME, &sinfo );
-	}
-
-	return( statusview_type );
 }
 
 /* Our model has changed ... update.

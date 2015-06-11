@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ModelClass *parent_class = NULL;
+G_DEFINE_TYPE( rowview, Rowview, TYPE_VIEW ); 
 
 enum {
 	ROWVIEW_TARGET_STRING,
@@ -73,7 +73,7 @@ rowview_destroy( GtkObject *object )
 	DESTROY_GTK( rview->spin );
 	DESTROY_GTK( rview->led );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( rowview_parent_class )->destroy( object );
 }
 
 static void
@@ -189,7 +189,7 @@ rowview_reset( View *view )
 
 	rowview_update_widgets( rview );
 
-	VIEW_CLASS( parent_class )->reset( view );
+	VIEW_CLASS( rowview_parent_class )->reset( view );
 }
 
 static void 
@@ -199,7 +199,7 @@ rowview_refresh( vObject *vobject )
 
 	rowview_update_widgets( rview );
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( rowview_parent_class )->refresh( vobject );
 }
 
 /* Single click on button callback.
@@ -499,7 +499,7 @@ rowview_link( View *view, Model *model, View *parent )
 	Rowview *rview = ROWVIEW( view );
 	Subcolumnview *sview = SUBCOLUMNVIEW( parent );
 
-	VIEW_CLASS( parent_class )->link( view, model, parent );
+	VIEW_CLASS( rowview_parent_class )->link( view, model, parent );
 
 	rview->sview = sview;
 
@@ -533,7 +533,7 @@ rowview_child_add( View *parent, View *child )
 
 	rowview->rhsview = RHSVIEW( child );
 
-	VIEW_CLASS( parent_class )->child_add( parent, child );
+	VIEW_CLASS( rowview_parent_class )->child_add( parent, child );
 }
 
 static void
@@ -546,7 +546,7 @@ rowview_child_remove( View *parent, View *child )
 
 	rowview->rhsview = NULL;
 
-	VIEW_CLASS( parent_class )->child_remove( parent, child );
+	VIEW_CLASS( rowview_parent_class )->child_remove( parent, child );
 }
 
 static void
@@ -557,8 +557,6 @@ rowview_class_init( RowviewClass *class )
 	ViewClass *view_class = (ViewClass *) class;
 
 	GtkWidget *pane;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -677,29 +675,6 @@ rowview_init( Rowview *rview )
                 GTK_SIGNAL_FUNC( rowview_focus_cb ), rview );
 	set_tooltip_generate( rview->but, 
 		(TooltipGenerateFn) rowview_tooltip_generate, rview, NULL );
-}
-
-GtkType
-rowview_get_type( void )
-{
-	static GtkType rowview_type = 0;
-
-	if( !rowview_type ) {
-		static const GtkTypeInfo rview_info = {
-			"Rowview",
-			sizeof( Rowview ),
-			sizeof( RowviewClass ),
-			(GtkClassInitFunc) rowview_class_init,
-			(GtkObjectInitFunc) rowview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		rowview_type = gtk_type_unique( TYPE_VIEW, &rview_info );
-	}
-
-	return( rowview_type );
 }
 
 View *

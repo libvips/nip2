@@ -56,7 +56,7 @@ typedef struct _ImageviewClass {
 	 */
 } ImageviewClass;
 
-GtkType imageview_get_type( void );
+GType imageview_get_type( void );
 void imageview_set_paint( Imageview *iv, gboolean paint );
 Imageview *imageview_new( iImage *iimage, GtkWidget *parent );
 Imageview *imageview_new_area( iImage *iimage, Rect *area, GtkWidget *parent );

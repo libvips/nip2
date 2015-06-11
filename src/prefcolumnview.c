@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ViewClass *parent_class = NULL;
+G_DEFINE_TYPE( prefcolumnview, Prefcolumnview, TYPE_VIEW ); 
 
 static void 
 prefcolumnview_refresh( vObject *vobject )
@@ -51,7 +51,7 @@ prefcolumnview_refresh( vObject *vobject )
 	 */
 	widget_visible( GTK_WIDGET( pcview ), col->open );
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( prefcolumnview_parent_class )->refresh( vobject );
 }
 
 static void
@@ -60,7 +60,7 @@ prefcolumnview_child_add( View *parent, View *child )
 	Prefcolumnview *pcview = PREFCOLUMNVIEW( parent );
 	Subcolumnview *sview = SUBCOLUMNVIEW( child );
 
-	VIEW_CLASS( parent_class )->child_add( parent, child );
+	VIEW_CLASS( prefcolumnview_parent_class )->child_add( parent, child );
 
 	gtk_box_pack_end( GTK_BOX( pcview ), GTK_WIDGET( sview ), 
 		FALSE, FALSE, 0 );
@@ -71,8 +71,6 @@ prefcolumnview_class_init( PrefcolumnviewClass *class )
 {
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -93,29 +91,6 @@ prefcolumnview_init( Prefcolumnview *pcview )
 	gtk_misc_set_alignment( GTK_MISC( pcview->lab ), 0, 0.5 );
 
         gtk_widget_show_all( GTK_WIDGET( pcview ) );
-}
-
-GtkType
-prefcolumnview_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type ) {
-		static const GtkTypeInfo info = {
-			"Prefcolumnview",
-			sizeof( Prefcolumnview ),
-			sizeof( PrefcolumnviewClass ),
-			(GtkClassInitFunc) prefcolumnview_class_init,
-			(GtkObjectInitFunc) prefcolumnview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( TYPE_VIEW, &info );
-	}
-
-	return( type );
 }
 
 View *

@@ -51,5 +51,5 @@ typedef struct _SliderviewClass {
 	 */
 } SliderviewClass;
 
-GtkType sliderview_get_type( void );
+GType sliderview_get_type( void );
 View *sliderview_new( void );

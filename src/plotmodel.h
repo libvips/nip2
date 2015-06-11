@@ -63,7 +63,7 @@ typedef struct _PlotmodelClass {
 	 */
 } PlotmodelClass;
 
-GtkType plotmodel_get_type( void );
+GType plotmodel_get_type( void );
 Plotmodel *plotmodel_new( Plot *plot );
 void plotmodel_set_mag( Plotmodel *plotmodel, int mag );
 void plotmodel_set_status( Plotmodel *plotmodel, gboolean show_status );

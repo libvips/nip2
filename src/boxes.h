@@ -85,7 +85,7 @@ typedef struct _StringsetClass {
 void *stringset_child_destroy( StringsetChild *ssc );
 StringsetChild *stringset_child_new( Stringset *ss,
 	const char *label, const char *text, const char *tooltip );
-GtkType stringset_get_type( void );
+GType stringset_get_type( void );
 GtkWidget *stringset_new( void );
 StringsetChild *stringset_child_get( Stringset *, const char *label );
 
@@ -106,9 +106,7 @@ typedef struct _Find {
 	/* My instance vars.
 	 */
 	GtkWidget *search;
-#ifdef HAVE_GREGEX
 	GtkWidget *regexp;
-#endif /*HAVE_GREGEX*/
 	GtkWidget *csens;
 	GtkWidget *fromtop;
 } Find;
@@ -120,7 +118,7 @@ typedef struct _FindClass {
 	 */
 } FindClass;
 
-GtkType find_get_type( void );
+GType find_get_type( void );
 GtkWidget *find_new( void );
 
 void box_url( GtkWidget *par, const char *url );
@@ -149,7 +147,7 @@ typedef struct _FontchooserClass {
 	 */
 } FontchooserClass;
 
-GtkType fontchooser_get_type( void );
+GType fontchooser_get_type( void );
 Fontchooser *fontchooser_new( void );
 gboolean fontchooser_set_font_name( Fontchooser *fontchooser, 
 	const char *font_name );
@@ -180,7 +178,7 @@ typedef struct _FontbuttonClass {
 	void (*changed)( Fontbutton * );
 } FontbuttonClass;
 
-GtkType fontbutton_get_type( void );
+GType fontbutton_get_type( void );
 Fontbutton *fontbutton_new( void );
 void fontbutton_set_font_name( Fontbutton *fontbutton, const char *font_name );
 const char *fontbutton_get_font_name( Fontbutton * );
@@ -216,7 +214,7 @@ typedef struct _InfobarClass {
 
 } InfobarClass;
 
-GtkType infobar_get_type( void );
+GType infobar_get_type( void );
 Infobar *infobar_new( void );
 void infobar_vset( Infobar *infobar, GtkMessageType type, 
 	const char *top, const char *sub, va_list ap );

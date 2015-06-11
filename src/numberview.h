@@ -47,5 +47,5 @@ typedef struct _NumberviewClass {
 	 */
 } NumberviewClass;
 
-GtkType numberview_get_type( void );
+GType numberview_get_type( void );
 View *numberview_new( void );

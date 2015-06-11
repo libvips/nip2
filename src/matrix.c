@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ClassmodelClass *parent_class = NULL;
+G_DEFINE_TYPE( matrix, Matrix, TYPE_CLASSMODEL ); 
 
 static void
 matrix_finalize( GObject *gobject )
@@ -53,7 +53,7 @@ matrix_finalize( GObject *gobject )
 	 */
 	IM_FREE( matrix->value.coeff );
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( matrix_parent_class )->finalize( gobject );
 }
 
 /* Rearrange our model for a new width/height.
@@ -297,8 +297,6 @@ matrix_class_init( MatrixClass *class )
 	ModelClass *model_class = (ModelClass *) class;
 	ClassmodelClass *classmodel_class = (ClassmodelClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	/* Create signals.
 	 */
 
@@ -341,31 +339,6 @@ matrix_init( Matrix *matrix )
 	matrix->selected = FALSE;
 
 	iobject_set( IOBJECT( matrix ), CLASS_MATRIX, NULL );
-}
-
-GtkType
-matrix_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( MatrixClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) matrix_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Matrix ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) matrix_init,
-		};
-
-		type = g_type_register_static( TYPE_CLASSMODEL, 
-			"Matrix", &info, 0 );
-	}
-
-	return( type );
 }
 
 void

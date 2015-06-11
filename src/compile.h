@@ -95,7 +95,7 @@ Symbol *compile_lookup( Compile *compile, const char *name );
 void compile_link_make( Compile *compile, Symbol *child );
 void *compile_link_break( Compile *compile, Symbol *child );
 
-GtkType compile_get_type( void );
+GType compile_get_type( void );
 
 void *compile_expr_link_break( Compile *compile, Expr *expr );
 void *compile_expr_link_break_rev( Expr *expr, Compile *compile );

@@ -33,11 +33,11 @@
 
 #include "ip.h"
 
-static GtkFrameClass *parent_class = NULL;
-
 /* The popup menu.
  */
 static GtkWidget *plotstatus_menu = NULL;
+
+G_DEFINE_TYPE( plotstatus, Plotstatus, GTK_TYPE_FRAME ); 
 
 static void
 plotstatus_columns_destroy( Plotstatus *plotstatus )
@@ -68,7 +68,7 @@ plotstatus_destroy( GtkObject *object )
 
 	plotstatus_columns_destroy( plotstatus );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( plotstatus_parent_class )->destroy( object );
 }
 
 /* Hide this plotstatus.
@@ -85,8 +85,6 @@ plotstatus_class_init( PlotstatusClass *class )
 	GtkObjectClass *object_class = (GtkObjectClass *) class;
 
 	GtkWidget *pane;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	object_class->destroy = plotstatus_destroy;
 
@@ -141,29 +139,6 @@ plotstatus_init( Plotstatus *plotstatus )
         gtk_box_pack_end( GTK_BOX( hb ), plotstatus->mag, FALSE, FALSE, 0 );
 
 	gtk_widget_show_all( eb );
-}
-
-GtkType
-plotstatus_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type ) {
-		static const GtkTypeInfo info = {
-			"Plotstatus",
-			sizeof( Plotstatus ),
-			sizeof( PlotstatusClass ),
-			(GtkClassInitFunc) plotstatus_class_init,
-			(GtkObjectInitFunc) plotstatus_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( GTK_TYPE_FRAME, &info );
-	}
-
-	return( type );
 }
 
 /* Model has changed: rebuild everything.

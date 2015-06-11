@@ -59,6 +59,8 @@
 # endif
 #endif
 
+G_DEFINE_TYPE( symbol, Symbol, TYPE_FILEMODEL ); 
+
 /* Our signals. 
  */
 enum {
@@ -76,8 +78,6 @@ Symbol *symbol_root = NULL;
  * errors. Used to generate next-to-recalc.
  */
 static GSList *symbol_leaf_set = NULL;
-
-static FilemodelClass *parent_class = NULL;
 
 /* Apply a function to a symbol ... and any locals.
  */
@@ -595,7 +595,7 @@ symbol_dispose( GObject *gobject )
 	IM_FREEF( g_slist_free, sym->patch );
 	IM_FREEF( g_slist_free, sym->parents );
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( symbol_parent_class )->dispose( gobject );
 }
 
 static void
@@ -608,7 +608,7 @@ symbol_changed( iObject *iobject )
 	if( sym->tool )
 		iobject_changed( IOBJECT( sym->tool ) );
 
-	IOBJECT_CLASS( parent_class )->changed( iobject );
+	IOBJECT_CLASS( symbol_parent_class )->changed( iobject );
 }
 
 static void
@@ -621,8 +621,6 @@ symbol_class_init( SymbolClass *class )
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
 	iObjectClass *iobject_class = (iObjectClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	gobject_class->dispose = symbol_dispose;
 
@@ -647,31 +645,6 @@ symbol_init( Symbol *sym )
 #ifdef DEBUG_MAKE
 	printf( "symbol_init: (%p)\n", sym );
 #endif /*DEBUG_MAKE*/
-}
-
-GtkType
-symbol_get_type( void )
-{
-	static GtkType symbol_type = 0;
-
-	if( !symbol_type ) {
-		static const GTypeInfo info = {
-			sizeof( SymbolClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) symbol_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Symbol ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) symbol_init,
-		};
-
-		symbol_type = g_type_register_static( TYPE_FILEMODEL, 
-			"Symbol", &info, 0 );
-	}
-
-	return( symbol_type );
 }
 
 /* Make a new symbol on an expr. If it's already there and a ZOMBIE, just 

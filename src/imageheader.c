@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static iDialogClass *imageheader_parent_class = NULL;
+G_DEFINE_TYPE( imageheader, Imageheader, TYPE_IDIALOG ); 
 
 /* Our columns.
  */
@@ -280,8 +280,6 @@ imageheader_class_init( ImageheaderClass *class )
 
 	object_class->destroy = imageheader_destroy;
 	iwindow_class->build = imageheader_build;
-
-	imageheader_parent_class = g_type_class_peek_parent( class );
 }
 
 static void
@@ -292,29 +290,6 @@ imageheader_init( Imageheader *imageheader )
 #endif /*DEBUG*/
 
 	imageheader->iimage = NULL;
-}
-
-GtkType
-imageheader_get_type( void )
-{
-	static GtkType imageheader_type = 0;
-
-	if( !imageheader_type ) {
-		static const GtkTypeInfo info = {
-			"Imageheader",
-			sizeof( Imageheader ),
-			sizeof( ImageheaderClass ),
-			(GtkClassInitFunc) imageheader_class_init,
-			(GtkObjectInitFunc) imageheader_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		imageheader_type = gtk_type_unique( TYPE_IDIALOG, &info );
-	}
-
-	return( imageheader_type );
 }
 
 /* Conversion has changed signal.

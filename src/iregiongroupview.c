@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ViewClass *parent_class = NULL;
+G_DEFINE_TYPE( iregiongroupview, iRegiongroupview, TYPE_VIEW ); 
 
 static iRegiongroup *
 iregiongroupview_get_iregiongroup( iRegiongroupview *iregiongroupview )
@@ -72,7 +72,7 @@ iregiongroupview_destroy( GtkObject *object )
 	slist_map( iregiongroupview->classmodel->views, 
 		(SListMapFn) object_destroy, NULL );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( iregiongroupview_parent_class )->destroy( object );
 }
 
 /* What we track during a refresh.
@@ -183,7 +183,7 @@ iregiongroupview_refresh( vObject *vobject )
 		IM_FREEF( g_slist_free, irs.notused );
 	}
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( iregiongroupview_parent_class )->refresh( vobject );
 }
 
 static void
@@ -191,8 +191,6 @@ iregiongroupview_class_init( iRegiongroupviewClass *class )
 {
 	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	object_class->destroy = iregiongroupview_destroy;
 
@@ -210,29 +208,6 @@ iregiongroupview_init( iRegiongroupview *iregiongroupview )
 #ifdef DEBUG
 	printf( "iregiongroupview_init\n" );
 #endif /*DEBUG*/
-}
-
-GtkType
-iregiongroupview_get_type( void )
-{
-	static GtkType iregiongroupview_type = 0;
-
-	if( !iregiongroupview_type ) {
-		static const GtkTypeInfo info = {
-			"iRegiongroupview",
-			sizeof( iRegiongroupview ),
-			sizeof( iRegiongroupviewClass ),
-			(GtkClassInitFunc) iregiongroupview_class_init,
-			(GtkObjectInitFunc) iregiongroupview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		iregiongroupview_type = gtk_type_unique( TYPE_VIEW, &info );
-	}
-
-	return( iregiongroupview_type );
 }
 
 View *

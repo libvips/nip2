@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static GraphicviewClass *parent_class = NULL;
+G_DEFINE_TYPE( sliderview, Sliderview, TYPE_GRAPHICVIEW ); 
 
 static void 
 sliderview_refresh( vObject *vobject )
@@ -82,7 +82,7 @@ sliderview_refresh( vObject *vobject )
 
 	tslider_changed( tslider );
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( sliderview_parent_class )->refresh( vobject );
 }
 
 static void *
@@ -105,7 +105,7 @@ sliderview_scan( View *view )
 		classmodel_update( classmodel );
 	}
 
-	return( VIEW_CLASS( parent_class )->scan( view ) );
+	return( VIEW_CLASS( sliderview_parent_class )->scan( view ) );
 }
 
 static void
@@ -113,7 +113,7 @@ sliderview_link( View *view, Model *model, View *parent )
 {
 	Sliderview *sliderview = SLIDERVIEW( view );
 
-	VIEW_CLASS( parent_class )->link( view, model, parent );
+	VIEW_CLASS( sliderview_parent_class )->link( view, model, parent );
 
 	if( GRAPHICVIEW( view )->sview )
 		gtk_size_group_add_widget( GRAPHICVIEW( view )->sview->group,   
@@ -125,8 +125,6 @@ sliderview_class_init( SliderviewClass *class )
 {
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -190,29 +188,6 @@ sliderview_init( Sliderview *sliderview )
 		GTK_SIGNAL_FUNC( sliderview_change_cb ), sliderview );
 
         gtk_widget_show_all( GTK_WIDGET( sliderview ) );
-}
-
-GtkType
-sliderview_get_type( void )
-{
-	static GtkType sliderview_type = 0;
-
-	if( !sliderview_type ) {
-		static const GtkTypeInfo sinfo = {
-			"Sliderview",
-			sizeof( Sliderview ),
-			sizeof( SliderviewClass ),
-			(GtkClassInitFunc) sliderview_class_init,
-			(GtkObjectInitFunc) sliderview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		sliderview_type = gtk_type_unique( TYPE_GRAPHICVIEW, &sinfo );
-	}
-
-	return( sliderview_type );
 }
 
 View *

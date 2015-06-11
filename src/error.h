@@ -48,6 +48,6 @@ typedef struct _iErrorClass {
 	 */
 } iErrorClass;
 
-GtkType ierror_get_type( void );
+GType ierror_get_type( void );
 iError *ierror_new( Toolkitgroup *kitg );
 

@@ -50,5 +50,5 @@ typedef struct _FontnameviewClass {
 	 */
 } FontnameviewClass;
 
-GtkType fontnameview_get_type( void );
+GType fontnameview_get_type( void );
 View *fontnameview_new( void );

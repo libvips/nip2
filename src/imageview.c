@@ -37,7 +37,7 @@
 
 #include "ip.h"
 
-static FloatwindowClass *parent_class = NULL;
+G_DEFINE_TYPE( imageview, Imageview, TYPE_FLOATWINDOW ); 
 
 /* All the magnification menus we have.
  */
@@ -76,15 +76,13 @@ imageview_destroy( GtkObject *object )
 	 */
 	UNREF( iv->imagemodel );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( imageview_parent_class )->destroy( object );
 }
 
 static void
 imageview_class_init( ImageviewClass *class )
 {
 	GtkObjectClass *object_class = (GtkObjectClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	object_class->destroy = imageview_destroy;
 
@@ -99,29 +97,6 @@ static void
 imageview_init( Imageview *iv )
 {
 	iv->imagemodel = NULL;
-}
-
-GtkType
-imageview_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type ) {
-		static const GtkTypeInfo info = {
-			"Imageview",
-			sizeof( Imageview ),
-			sizeof( ImageviewClass ),
-			(GtkClassInitFunc) imageview_class_init,
-			(GtkObjectInitFunc) imageview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( TYPE_FLOATWINDOW, &info );
-	}
-
-	return( type );
 }
 
 static void

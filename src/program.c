@@ -43,7 +43,7 @@ enum {
 	N_COLUMNS
 };
 
-static iWindowClass *parent_class = NULL;
+G_DEFINE_TYPE( program, Program, TYPE_IWINDOW ); 
 
 static GSList *program_all = NULL;
 
@@ -456,7 +456,6 @@ program_find_note( Program *program, Symbol *sym, int start, int end )
 static gboolean
 program_find_pos( Program *program, const char *text, int *start, int *end )
 {
-#ifdef HAVE_GREGEX
 	if( program->regexp ) {
 		GMatchInfo *match;
 
@@ -467,9 +466,7 @@ program_find_pos( Program *program, const char *text, int *start, int *end )
 		}
 		g_match_info_free( match );
 	}
-	else 
-#endif /*HAVE_GREGEX*/
-	if( program->csens ) {
+	else if( program->csens ) {
 		char *p;
 
 		if( (p = strstr( text, program->search )) ) {
@@ -574,9 +571,7 @@ program_destroy( GtkObject *object )
 	FREESID( program->kitgroup_destroy_sid, program->kitg );
 
 	IM_FREEF( g_free, program->search );
-#ifdef HAVE_GREGEX
 	IM_FREEF( g_regex_unref, program->comp );
-#endif /*HAVE_GREGEX*/
 
 	program_find_reset( program );
 
@@ -584,7 +579,7 @@ program_destroy( GtkObject *object )
 
 	program_all = g_slist_remove( program_all, program );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( program_parent_class )->destroy( object );
 }
 
 static void
@@ -713,8 +708,6 @@ program_class_init( ProgramClass *class )
 
 	GtkWidget *pane;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	object_class->destroy = program_destroy;
 
 	/* Create signals.
@@ -790,33 +783,8 @@ program_init( Program *program )
 	program->search = NULL;
 	program->csens = FALSE;
 	program->fromtop = TRUE;
-#ifdef HAVE_GREGEX
 	program->regexp = FALSE;
 	program->comp = NULL;
-#endif /*HAVE_GREGEX*/
-}
-
-GtkType
-program_get_type( void )
-{
-	static GtkType program_type = 0;
-
-	if( !program_type ) {
-		static const GtkTypeInfo info = {
-			"Program",
-			sizeof( Program ),
-			sizeof( ProgramClass ),
-			(GtkClassInitFunc) program_class_init,
-			(GtkObjectInitFunc) program_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		program_type = gtk_type_unique( TYPE_IWINDOW, &info );
-	}
-
-	return( program_type );
 }
 
 /* The kit we have selected has been destroyed.
@@ -1481,7 +1449,6 @@ program_find_done_cb( iWindow *iwnd, void *client,
 	program->csens = GTK_TOGGLE_BUTTON( find->csens )->active;
 	program->fromtop = GTK_TOGGLE_BUTTON( find->fromtop )->active;
 
-#ifdef HAVE_GREGEX
 	program->regexp = GTK_TOGGLE_BUTTON( find->regexp )->active;
 
 	if( program->regexp ) {
@@ -1501,7 +1468,6 @@ program_find_done_cb( iWindow *iwnd, void *client,
 			return;
 		}
 	}
-#endif /*HAVE_GREGEX*/
 
 	if( program->fromtop )
 		program_find_reset( program );
@@ -1541,10 +1507,8 @@ program_find_action_cb( GtkAction *action, Program *program )
 	set_tooltip( FIND( find )->search, _( "Enter search string here" ) );
         gtk_toggle_button_set_active( 
 		GTK_TOGGLE_BUTTON( FIND( find )->csens ), program->csens );
-#ifdef HAVE_GREGEX
         gtk_toggle_button_set_active( 
 		GTK_TOGGLE_BUTTON( FIND( find )->regexp ), program->regexp );
-#endif /*HAVE_GREGEX*/
         gtk_toggle_button_set_active( 
 		GTK_TOGGLE_BUTTON( FIND( find )->fromtop ), program->fromtop );
 

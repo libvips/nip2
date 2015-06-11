@@ -49,6 +49,6 @@ typedef struct _PopupbuttonClass {
 
 } PopupbuttonClass;
 
-GtkType popupbutton_get_type( void );
+GType popupbutton_get_type( void );
 Popupbutton *popupbutton_new( void );
 void popupbutton_set_menu( Popupbutton *Popupbutton, GtkWidget *menu );

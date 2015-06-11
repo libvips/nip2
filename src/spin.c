@@ -38,7 +38,7 @@
 
 #include "ip.h"
 
-static ViewClass *parent_class = NULL;
+G_DEFINE_TYPE( spin, Spin, TYPE_VIEW ); 
 
 /* Our signals. Up and down click.
  */
@@ -72,8 +72,6 @@ static void
 spin_class_init( SpinClass *class )
 {
 	GObjectClass *gobject_class = (GObjectClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
          */
@@ -215,29 +213,6 @@ spin_init( Spin *spin )
         gtk_box_pack_end( GTK_BOX( vbox ), spin->down, FALSE, FALSE, 0 );
 	gtk_widget_show( spin->up );
         gtk_widget_show( spin->down );
-}
-
-GtkType
-spin_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type ) {
-		static const GtkTypeInfo info = {
-			"Spin",
-			sizeof( Spin ),
-			sizeof( SpinClass ),
-			(GtkClassInitFunc) spin_class_init,
-			(GtkObjectInitFunc) spin_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( TYPE_VIEW, &info );
-	}
-
-	return( type );
 }
 
 GtkWidget *

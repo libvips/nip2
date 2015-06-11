@@ -51,5 +51,5 @@ typedef struct _FloatwindowClass {
 	 */
 } FloatwindowClass;
 
-GtkType floatwindow_get_type( void );
+GType floatwindow_get_type( void );
 void floatwindow_link( Floatwindow *floatwindow, Model *model );

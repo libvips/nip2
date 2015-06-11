@@ -126,7 +126,7 @@ void view_reset_all( void );
 gboolean view_hasmodel( View *view );
 void *view_model_test( View *child, Model *model );
 
-GtkType view_get_type( void );
+GType view_get_type( void );
 
 void view_link( View *view, Model *model, View *parent );
 void view_unlink( View *view );

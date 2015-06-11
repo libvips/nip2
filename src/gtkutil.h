@@ -51,22 +51,21 @@ void adjustments_set_value( GtkAdjustment *hadj, GtkAdjustment *vadj,
 
 void *object_destroy( void *obj );
 void *null_g_free( void *obj );
-const char *object_type_name( GtkObject *obj );
 
 void widget_visible( GtkWidget *widget, gboolean visible );
 
 /* Make widgets.
  */
-GtkWidget *build_button( const char *name, GtkSignalFunc cb, gpointer user );
+GtkWidget *build_button( const char *name, GCallback cb, gpointer user );
 void get_geo( GtkWidget *widget, const char *text, Rect *geo );
 void set_fixed( GtkWidget *widget, int nchars );
 GtkWidget *build_entry( int nchars );
 
 GtkWidget *menu_build( const char *name );
 GtkWidget *menu_add_but( GtkWidget *menu, 
-	const char *name, GtkSignalFunc cb, void *user );
+	const char *name, GCallback cb, void *user );
 GtkWidget *menu_add_tog( GtkWidget *menu, 
-	const char *name, GtkSignalFunc cb, void *user );
+	const char *name, GCallback cb, void *user );
 GtkWidget *menu_add_sep( GtkWidget *menu );
 GtkWidget *menu_add_pullright( GtkWidget *popup, const char *name );
 
@@ -120,7 +119,7 @@ GtkWidget *build_glabeltext4( GtkWidget *box, GtkSizeGroup *group,
 GtkWidget *build_gtoggle( GtkWidget *box, const char *caption );
 GtkWidget *build_goption( GtkWidget *box, GtkSizeGroup *group, 
 	const char *name, const char *item_names[], int nitem,
-	GtkSignalFunc fn, void *value );
+	GCallback fn, void *value );
 
 typedef gboolean (*FiledropFunc)( void *client, const char *file );
 void filedrop_register( GtkWidget *widget, FiledropFunc fn, void *client );

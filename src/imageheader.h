@@ -54,5 +54,5 @@ typedef struct _ImageheaderClass {
 	 */
 } ImageheaderClass;
 
-GtkType imageheader_get_type( void );
+GType imageheader_get_type( void );
 GtkWidget *imageheader_new( iImage *iimage );

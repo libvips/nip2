@@ -200,29 +200,7 @@ expressionview_init( Expressionview *expressionview )
         gtk_widget_show( GTK_WIDGET( expressionview->formula ) );
 }
 
-GtkType
-expressionview_get_type( void )
-{
-	static GtkType expressionview_type = 0;
-
-	if( !expressionview_type ) {
-		static const GtkTypeInfo expressionview_info = {
-			"Expressionview",
-			sizeof( Expressionview ),
-			sizeof( ExpressionviewClass ),
-			(GtkClassInitFunc) expressionview_class_init,
-			(GtkObjectInitFunc) expressionview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		expressionview_type = gtk_type_unique( TYPE_GRAPHICVIEW, 
-			&expressionview_info );
-	}
-
-	return( expressionview_type );
-}
+G_DEFINE_TYPE( expressionview, Expressionview, TYPE_GRAPHICVIEW ); 
 
 View *
 expressionview_new( void )

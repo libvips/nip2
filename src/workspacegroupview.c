@@ -246,13 +246,7 @@ typedef struct _nip2GtkNotebookPage {
 static Workspaceview *
 notebookpage_get_workspaceview( GtkWidget *page )
 {
-#ifdef USE_NOTEBOOK_GROUP_NAME
 	return( WORKSPACEVIEW( page ) );
-#else /*!USE_NOTEBOOK_GROUP_NAME*/
-	/* Buggy argh.
-	 */
-	return( WORKSPACEVIEW( ((nip2GtkNotebookPage *) page)->child ) );
-#endif
 }
 
 /* Called for switching the current page, and for page drags between
@@ -579,10 +573,8 @@ workspacegroupview_init( Workspacegroupview *wsgview )
 {
 	wsgview->notebook = gtk_notebook_new();
 	gtk_notebook_set_scrollable( GTK_NOTEBOOK( wsgview->notebook ), TRUE );
-#ifdef USE_NOTEBOOK_GROUP_NAME
 	gtk_notebook_set_group_name( GTK_NOTEBOOK( wsgview->notebook ), 
 		"wsgview" );
-#endif /*USE_NOTEBOOK_GROUP_NAME*/
 	gtk_notebook_set_tab_pos( GTK_NOTEBOOK( wsgview->notebook ), 
 		GTK_POS_TOP );
 	g_signal_connect( wsgview->notebook, "switch_page", 
@@ -606,7 +598,6 @@ workspacegroupview_init( Workspacegroupview *wsgview )
 		POPUP_FUNC( workspacegroupview_load_workspace_cb2 ) ); 
 	popup_attach( wsgview->notebook, wsgview->gutter_menu, wsgview );
 
-#ifdef USE_NOTEBOOK_ACTION
 {
 	GtkWidget *but;
 	GtkWidget *icon;
@@ -623,7 +614,6 @@ workspacegroupview_init( Workspacegroupview *wsgview )
         g_signal_connect( but, "clicked",
                 G_CALLBACK( workspacegroupview_add_workspace_cb ), wsgview );
 }
-#endif /*USE_NOTEBOOK_ACTION*/
 
 	gtk_box_pack_start( GTK_BOX( wsgview ), 
 		wsgview->notebook, TRUE, TRUE, 0 );

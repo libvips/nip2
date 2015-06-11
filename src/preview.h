@@ -50,6 +50,6 @@ typedef struct _PreviewClass {
 	 */
 } PreviewClass;
 
-GtkType preview_get_type( void );
+GType preview_get_type( void );
 Preview *preview_new( void );
 void preview_set_filename( Preview *preview, char *filename );

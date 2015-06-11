@@ -53,6 +53,8 @@
 
 #include "ip.h"
 
+G_DEFINE_TYPE( regionview, Regionview, TYPE_VIEW ); 
+
 typedef void *(*regionview_rect_fn)( Regionview *, Rect *, void * );
 typedef void (*regionview_paint_fn)( Regionview * );
 
@@ -91,8 +93,6 @@ static const int regionview_crosshair_centre = 8;
 /* How close you need to get to switch the type.
  */
 static const int regionview_morph_threshold = 20;
-
-static ViewClass *parent_class = NULL;
 
 /* Just one popup for all regions.
  */
@@ -631,7 +631,7 @@ regionview_destroy( GtkObject *object )
 		regionview->classmodel = NULL;
 	}
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( regionview_parent_class )->destroy( object );
 }
 
 /* Compute the label geometry.
@@ -885,7 +885,7 @@ regionview_refresh( vObject *vobject )
 	 */
 	regionview_queue_draw( regionview ); 
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( regionview_parent_class )->refresh( vobject );
 }
 
 static void
@@ -968,8 +968,6 @@ regionview_class_init( RegionviewClass *class )
 
 	GtkWidget *pane;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	object_class->destroy = regionview_destroy;
 
 	/* Create signals.
@@ -1036,29 +1034,6 @@ regionview_init( Regionview *regionview )
 	vips_buf_init_dynamic( &regionview->caption, REGIONVIEW_LABEL_MAX );
 
 	gtk_widget_set_name( GTK_WIDGET( regionview ), "regionview_widget" );
-}
-
-GtkType
-regionview_get_type( void )
-{
-	static GtkType regionview_type = 0;
-
-	if( !regionview_type ) {
-		static const GtkTypeInfo info = {
-			"Regionview",
-			sizeof( Regionview ),
-			sizeof( RegionviewClass ),
-			(GtkClassInitFunc) regionview_class_init,
-			(GtkObjectInitFunc) regionview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		regionview_type = gtk_type_unique( TYPE_VIEW, &info );
-	}
-
-	return( regionview_type );
 }
 
 /* Test for rect touches rect (non-empty intersection).

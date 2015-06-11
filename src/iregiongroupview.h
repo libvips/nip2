@@ -54,5 +54,5 @@ typedef struct _iRegiongroupviewClass {
 	 */
 } iRegiongroupviewClass;
 
-GtkType iregiongroupview_get_type( void );
+GType iregiongroupview_get_type( void );
 View *iregiongroupview_new( void );

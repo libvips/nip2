@@ -83,7 +83,7 @@ typedef struct _TsliderClass {
 
 void tslider_changed( Tslider * );
 
-GtkType tslider_get_type( void );
+GType tslider_get_type( void );
 Tslider *tslider_new( void );
 
 void tslider_set_conversions( Tslider *tslider, 

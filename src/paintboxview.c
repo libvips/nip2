@@ -33,11 +33,11 @@
 
 #include "ip.h"
 
-static GtkFrameClass *parent_class = NULL;
-
 /* The popup menu.
  */
 static GtkWidget *paintboxview_menu = NULL;
+
+G_DEFINE_TYPE( paintboxview, Paintboxview, GTK_TYPE_FRAME ); 
 
 static void
 paintboxview_destroy( GtkObject *object )
@@ -58,7 +58,7 @@ paintboxview_destroy( GtkObject *object )
 	FREESID( pbv->ii_undo_changed_sid, pbv->ii );
 	FREESID( pbv->ii_destroy_sid, pbv->ii );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( paintboxview_parent_class )->destroy( object );
 }
 
 static void
@@ -76,7 +76,7 @@ paintboxview_realize( GtkWidget *widget )
 	gtk_widget_add_accelerator( GTK_WIDGET( pbv->redo ), "clicked",
 		iwnd->accel_group, key, mods, 0 );
 
-	GTK_WIDGET_CLASS( parent_class )->realize( widget );
+	GTK_WIDGET_CLASS( paintboxview_parent_class )->realize( widget );
 }
 
 /* Hide this paintboxview.
@@ -94,8 +94,6 @@ paintboxview_class_init( PaintboxviewClass *class )
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
 	GtkWidget *pane;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	object_class->destroy = paintboxview_destroy;
 	widget_class->realize = paintboxview_realize;
@@ -377,30 +375,6 @@ paintboxview_init( Paintboxview *pbv )
 	set_tooltip( pbv->text, _( "Enter text for text tool" ) );
 
 	gtk_widget_show_all( eb );
-}
-
-GtkType
-paintboxview_get_type( void )
-{
-	static GtkType paintboxview_type = 0;
-
-	if( !paintboxview_type ) {
-		static const GtkTypeInfo sinfo = {
-			"Paintboxview",
-			sizeof( Paintboxview ),
-			sizeof( PaintboxviewClass ),
-			(GtkClassInitFunc) paintboxview_class_init,
-			(GtkObjectInitFunc) paintboxview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		paintboxview_type = 
-			gtk_type_unique( GTK_TYPE_FRAME, &sinfo );
-	}
-
-	return( paintboxview_type );
 }
 
 static void

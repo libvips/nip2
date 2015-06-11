@@ -584,7 +584,7 @@ static void *
 model_new_xml_sub( ModelClass *model_class, 
 	ModelLoadState *state, Model *parent, xmlNode *xnode )
 {
-	GtkType type = GTK_CLASS_TYPE( model_class );
+	GType type = GTK_CLASS_TYPE( model_class );
 	const char *tname = gtk_type_name( type );
 
 	if( strcasecmp( (char *) xnode->name, tname ) == 0 ) {

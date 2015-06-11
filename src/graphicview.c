@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ViewClass *parent_class = NULL;
+G_DEFINE_TYPE( graphicview, Graphicview, TYPE_VIEW ); 
 
 static void
 graphicview_link( View *view, Model *model, View *parent )
@@ -41,7 +41,7 @@ graphicview_link( View *view, Model *model, View *parent )
 	Graphicview *graphicview = GRAPHICVIEW( view );
 	View *v;
 
-	VIEW_CLASS( parent_class )->link( view, model, parent );
+	VIEW_CLASS( graphicview_parent_class )->link( view, model, parent );
 
 	/* Find the enclosing subcolumnview.
 	 */
@@ -56,8 +56,6 @@ graphicview_class_init( GraphicviewClass *class )
 {
 	ViewClass *view_class = (ViewClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	view_class->link = graphicview_link;
 }
 
@@ -67,25 +65,3 @@ graphicview_init( Graphicview *graphicview )
 	graphicview->sview = NULL;
 }
 
-GtkType
-graphicview_get_type( void )
-{
-	static GtkType graphicview_type = 0;
-
-	if( !graphicview_type ) {
-		static const GtkTypeInfo sinfo = {
-			"Graphicview",
-			sizeof( Graphicview ),
-			sizeof( GraphicviewClass ),
-			(GtkClassInitFunc) graphicview_class_init,
-			(GtkObjectInitFunc) graphicview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		graphicview_type = gtk_type_unique( TYPE_VIEW, &sinfo );
-	}
-
-	return( graphicview_type );
-}

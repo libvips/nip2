@@ -37,7 +37,7 @@
 
 #include "ip.h"
 
-static ViewClass *parent_class = NULL;
+G_DEFINE_TYPE( prefworkspaceview, Prefworkspaceview, TYPE_VIEW ); 
 
 static void
 prefworkspaceview_destroy( GtkObject *object )
@@ -57,7 +57,7 @@ prefworkspaceview_destroy( GtkObject *object )
 	 */
 	IM_FREE( pwview->caption_filter );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( prefworkspaceview_parent_class )->destroy( object );
 }
 
 static void
@@ -65,7 +65,7 @@ prefworkspaceview_child_add( View *parent, View *child )
 {
 	Prefworkspaceview *pwview = PREFWORKSPACEVIEW( parent );
 
-	VIEW_CLASS( parent_class )->child_add( parent, child );
+	VIEW_CLASS( prefworkspaceview_parent_class )->child_add( parent, child );
 
 	gtk_box_pack_end( GTK_BOX( pwview ),
 		GTK_WIDGET( child ), FALSE, FALSE, 0 );
@@ -92,8 +92,6 @@ prefworkspaceview_class_init( PrefworkspaceviewClass *class )
 	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	object_class->destroy = prefworkspaceview_destroy;
 
 	view_class->child_add = prefworkspaceview_child_add;
@@ -104,29 +102,6 @@ static void
 prefworkspaceview_init( Prefworkspaceview *pwview )
 {
 	pwview->caption_filter = NULL; 
-}
-
-GtkType
-prefworkspaceview_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type ) {
-		static const GtkTypeInfo info = {
-			"Prefworkspaceview",
-			sizeof( Prefworkspaceview ),
-			sizeof( PrefworkspaceviewClass ),
-			(GtkClassInitFunc) prefworkspaceview_class_init,
-			(GtkObjectInitFunc) prefworkspaceview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( TYPE_VIEW, &info );
-	}
-
-	return( type );
 }
 
 View *

@@ -51,6 +51,6 @@ typedef struct _EditviewClass {
 	 */
 } EditviewClass;
 
-GtkType editview_get_type( void );
+GType editview_get_type( void );
 void editview_set_entry( Editview *editview, const char *fmt, ... )
 	__attribute__((format(printf, 2, 3)));

@@ -54,5 +54,5 @@ typedef struct _ConversionviewClass {
 	 */
 } ConversionviewClass;
 
-GtkType conversionview_get_type( void );
+GType conversionview_get_type( void );
 Conversionview *conversionview_new( Imagemodel *imagemodel );

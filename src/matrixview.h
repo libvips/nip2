@@ -66,5 +66,5 @@ typedef struct _MatrixviewClass {
 	 */
 } MatrixviewClass;
 
-GtkType matrixview_get_type( void );
+GType matrixview_get_type( void );
 View *matrixview_new( void );

@@ -101,5 +101,5 @@ typedef struct _ColumnviewClass {
 void columnview_get_position( Columnview *cview, 
 	int *x, int *y, int *w, int *h );
 
-GtkType columnview_get_type( void );
+GType columnview_get_type( void );
 View *columnview_new( void );

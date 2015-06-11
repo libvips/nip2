@@ -87,10 +87,8 @@ struct _Program {
 	char *search;
 	gboolean csens;		/* Case sensitive */
 	gboolean fromtop;	/* Start search from beginning again */
-#ifdef HAVE_GREGEX
 	gboolean regexp;	/* Interpret as regexp */
 	GRegex *comp;		/* Compiled pattern */
-#endif /*HAVE_GREGEX*/
 
 	/* Current search position.
 	 */
@@ -107,7 +105,7 @@ typedef struct _ProgramClass {
 	 */
 } ProgramClass;
 
-GtkType program_get_type( void );
+GType program_get_type( void );
 GtkWidget *program_text_new( void );
 Program *program_new( Toolkitgroup *kitg );
 

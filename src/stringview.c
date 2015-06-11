@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static EditviewClass *parent_class = NULL;
+G_DEFINE_TYPE( stringview, Stringview, TYPE_EDITVIEW ); 
 
 /* Re-read the text in a tally entry. 
  */
@@ -68,7 +68,7 @@ stringview_scan( View *view )
 		classmodel_update( CLASSMODEL( string ) ) ;
 	}
 
-	return( VIEW_CLASS( parent_class )->scan( view ) );
+	return( VIEW_CLASS( stringview_parent_class )->scan( view ) );
 }
 
 static void 
@@ -94,7 +94,7 @@ stringview_refresh( vObject *vobject )
 			"%s", vips_buf_all( &buf ) );
 	}
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( stringview_parent_class )->refresh( vobject );
 }
 
 static void
@@ -102,8 +102,6 @@ stringview_class_init( StringviewClass *class )
 {
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -118,29 +116,6 @@ stringview_class_init( StringviewClass *class )
 static void
 stringview_init( Stringview *stringview )
 {
-}
-
-GtkType
-stringview_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type ) {
-		static const GtkTypeInfo info = {
-			"Stringview",
-			sizeof( Stringview ),
-			sizeof( StringviewClass ),
-			(GtkClassInitFunc) stringview_class_init,
-			(GtkObjectInitFunc) stringview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( TYPE_EDITVIEW, &info );
-	}
-
-	return( type );
 }
 
 View *

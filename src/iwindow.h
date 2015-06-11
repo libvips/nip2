@@ -228,7 +228,7 @@ void iwindow_true_cb( iWindow *, void *, iWindowNotifyFn nfn, void *sys );
 void iwindow_false_cb( iWindow *, void *, iWindowNotifyFn nfn, void *sys );
 void iwindow_notify_null( void *client, iWindowResult result );
 
-GtkType iwindow_get_type( void );
+GType iwindow_get_type( void );
 
 GtkWidget *iwindow_new( GtkWindowType );
 void iwindow_set_title( iWindow *, const char *, ... )

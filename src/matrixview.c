@@ -55,7 +55,7 @@ static const int matrixview_column_width = 70;
  */
 static const int matrixview_max_cells = 100;
 
-static GraphicviewClass *parent_class = NULL;
+G_DEFINE_TYPE( matrixview, Matrixview, TYPE_GRAPHICVIEW ); 
 
 static void
 matrixview_destroy( GtkObject *object )
@@ -75,7 +75,7 @@ matrixview_destroy( GtkObject *object )
     	 */
     	IM_FREEF( g_slist_free, matrixview->items );
 
-    	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+    	GTK_OBJECT_CLASS( matrixview_parent_class )->destroy( object );
 }
 
 static gboolean
@@ -190,7 +190,7 @@ matrixview_scan( View *view )
     	if( changed ) 
     		classmodel_update( CLASSMODEL( matrix ) ) ;
 
-    	return( VIEW_CLASS( parent_class )->scan( view ) );
+    	return( VIEW_CLASS( matrixview_parent_class )->scan( view ) );
 }
 
 /* Change to a toggle widget. 
@@ -877,7 +877,7 @@ matrixview_refresh( vObject *vobject )
     		view_resize( VIEW( matrixview ) );
     	}
 
-    	VOBJECT_CLASS( parent_class )->refresh( vobject );
+    	VOBJECT_CLASS( matrixview_parent_class )->refresh( vobject );
 }
 
 static void
@@ -886,8 +886,6 @@ matrixview_class_init( MatrixviewClass *class )
     	GtkObjectClass *object_class = (GtkObjectClass *) class;
     	vObjectClass *vobject_class = (vObjectClass *) class;
     	ViewClass *view_class = (ViewClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
     	object_class->destroy = matrixview_destroy;
 
@@ -924,29 +922,6 @@ matrixview_init( Matrixview *matrixview )
     	matrixview->cbox = NULL;
     	matrixview->scale = NULL;
     	matrixview->offset = NULL;
-}
-
-GtkType
-matrixview_get_type( void )
-{
-    	static GtkType matrixview_type = 0;
-
-    	if( !matrixview_type ) {
-    		static const GtkTypeInfo info = {
-    			"Matrixview",
-    			sizeof( Matrixview ),
-    			sizeof( MatrixviewClass ),
-    			(GtkClassInitFunc) matrixview_class_init,
-    			(GtkObjectInitFunc) matrixview_init,
-    			/* reserved_1 */ NULL,
-    			/* reserved_2 */ NULL,
-    			(GtkClassInitFunc) NULL,
-    		};
-
-    		matrixview_type = gtk_type_unique( TYPE_GRAPHICVIEW, &info );
-    	}
-
-    	return( matrixview_type );
 }
 
 View *

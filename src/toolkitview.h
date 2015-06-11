@@ -53,5 +53,5 @@ typedef struct _ToolkitviewClass {
 	 */
 } ToolkitviewClass;
 
-GtkType toolkitview_get_type( void );
+GType toolkitview_get_type( void );
 View *toolkitview_new( void );

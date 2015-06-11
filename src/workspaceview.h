@@ -110,7 +110,7 @@ void workspaceview_scroll_background( Workspaceview *wview, int u, int v );
 
 void workspaceview_set_cursor( Workspaceview *wview, iWindowShape shape );
 
-GtkType workspaceview_get_type( void );
+GType workspaceview_get_type( void );
 View *workspaceview_new( void );
 
 void workspaceview_set_label( Workspaceview *wview, 

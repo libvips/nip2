@@ -1182,28 +1182,7 @@ columnview_init( Columnview *cview )
         gtk_widget_show_all( GTK_WIDGET( cview ) );
 }
 
-GtkType
-columnview_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type ) {
-		static const GtkTypeInfo info = {
-			"Columnview",
-			sizeof( Columnview ),
-			sizeof( ColumnviewClass ),
-			(GtkClassInitFunc) columnview_class_init,
-			(GtkObjectInitFunc) columnview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( TYPE_VIEW, &info );
-	}
-
-	return( type );
-}
+G_DEFINE_TYPE( columnview, Columnview, TYPE_VIEW ); 
 
 View *
 columnview_new( void )

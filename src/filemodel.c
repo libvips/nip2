@@ -473,30 +473,7 @@ filemodel_init( Filemodel *filemodel )
 	filemodel->window_hint = NULL;
 }
 
-GtkType
-filemodel_get_type( void )
-{
-	static GtkType filemodel_type = 0;
-
-	if( !filemodel_type ) {
-		static const GTypeInfo info = {
-			sizeof( FilemodelClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) filemodel_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Filemodel ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) filemodel_init,
-		};
-
-		filemodel_type = g_type_register_static( TYPE_MODEL, 
-			"Filemodel", &info, 0 );
-	}
-
-	return( filemodel_type );
-}
+G_DEFINE_TYPE( filemodel, Filemodel, TYPE_MODEL ); 
 
 void
 filemodel_set_offset( Filemodel *filemodel, int x_off, int y_off )

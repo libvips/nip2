@@ -50,5 +50,5 @@ typedef struct _PathnameviewClass {
 	 */
 } PathnameviewClass;
 
-GtkType pathnameview_get_type( void );
+GType pathnameview_get_type( void );
 View *pathnameview_new( void );

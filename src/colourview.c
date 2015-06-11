@@ -150,28 +150,7 @@ colourview_init( Colourview *colourview )
         gtk_widget_show( eb );
 }
 
-GtkType
-colourview_get_type( void )
-{
-	static GtkType colourview_type = 0;
-
-	if( !colourview_type ) {
-		static const GtkTypeInfo info = {
-			"Colourview",
-			sizeof( Colourview ),
-			sizeof( ColourviewClass ),
-			(GtkClassInitFunc) colourview_class_init,
-			(GtkObjectInitFunc) colourview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		colourview_type = gtk_type_unique( TYPE_GRAPHICVIEW, &info );
-	}
-
-	return( colourview_type );
-}
+G_DEFINE_TYPE( colourview, Colourview, TYPE_GRAPHICVIEW ); 
 
 View *
 colourview_new( void )

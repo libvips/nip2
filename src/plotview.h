@@ -53,5 +53,5 @@ typedef struct _PlotviewClass {
 	 */
 } PlotviewClass;
 
-GtkType plotview_get_type( void );
+GType plotview_get_type( void );
 View *plotview_new( void );

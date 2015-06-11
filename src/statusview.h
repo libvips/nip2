@@ -65,7 +65,7 @@ typedef struct _StatusviewClass {
 	 */
 } StatusviewClass;
 
-GtkType statusview_get_type( void );
+GType statusview_get_type( void );
 Statusview *statusview_new( Imagemodel *imagemodel );
 
 void statusview_mouse( Statusview *sv, int x, int y );

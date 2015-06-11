@@ -52,5 +52,5 @@ typedef struct _PrefcolumnviewClass {
 	 */
 } PrefcolumnviewClass;
 
-GtkType prefcolumnview_get_type( void );
+GType prefcolumnview_get_type( void );
 View *prefcolumnview_new( void );

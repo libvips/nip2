@@ -66,6 +66,6 @@ typedef struct _PlotpresentClass {
 	void (*mouse_move)( Plotpresent *, double, double );
 } PlotpresentClass;
 
-GtkType plotpresent_get_type( void );
+GType plotpresent_get_type( void );
 Plotpresent *plotpresent_new( Plotmodel *plotmodel );
 

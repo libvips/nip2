@@ -154,64 +154,9 @@ AC_COMPILE_IFELSE([AC_LANG_DEFINES_PROVIDED [`cat $LEX_OUTPUT_ROOT.c`]], [
 ])
 rm -f conftest.l $LEX_OUTPUT_ROOT.c
 
-# get packages we need
-# gtk before 2.4.9 crashes with the way we use combobox :-(
-# vips before 7.30 used "vips-x.y" as the pkg name
-PKG_CHECK_MODULES(REQUIRED_PACKAGES, 
-  gthread-2.0 gtk+-2.0 >= 2.4.9 libxml-2.0 vips >= 7.30)
+PKG_CHECK_MODULES(REQUIRED_PACKAGES, gtk+-3.0 libxml-2.0 vips >= 7.30)
 IP_CFLAGS="$REQUIRED_PACKAGES_CFLAGS $IP_CFLAGS"
 IP_LIBS="$REQUIRED_PACKAGES_LIBS $IP_LIBS"
-
-# gdk_window_set_opacity() was added in gtk 2.12
-PKG_CHECK_EXISTS(gtk+-2.0 >= 2.12,
-  [nip_set_opacity=yes],
-  [nip_set_opacity=no]
-)
-
-if test x"$nip_set_opacity" = x"yes"; then
-  AC_DEFINE(HAVE_SET_OPACITY,1,[define if you have gdk_window_set_opacity()])
-fi
-
-# GtkInfoBar was added in gtk 2.18
-PKG_CHECK_EXISTS(gtk+-2.0 >= 2.18,
-  [nip_use_infobar=yes],
-  [nip_use_infobar=no]
-)
-
-if test x"$nip_use_infobar" = x"yes"; then
-  AC_DEFINE(USE_INFOBAR,1,[define if you have GtkInfoBar])
-fi
-
-# notebook action widgets came in 2.20
-PKG_CHECK_EXISTS(gtk+-2.0 >= 2.20,
-  [nip_use_notebook_action=yes],
-  [nip_use_notebook_action=no]
-)
-
-if test x"$nip_use_notebook_action" = x"yes"; then
-  AC_DEFINE(USE_NOTEBOOK_ACTION,1,[define if you have gtk_notebook_set_action_widget()])
-fi
-
-# notebook group names widgets came in 2.24
-PKG_CHECK_EXISTS(gtk+-2.0 >= 2.24,
-  [nip_use_notebook_group_name=yes],
-  [nip_use_notebook_group_name=no]
-)
-
-if test x"$nip_use_notebook_group_name" = x"yes"; then
-  AC_DEFINE(USE_NOTEBOOK_GROUP_NAME,1,[define if you have gtk_notebook_set_group_name()])
-fi
-
-# GRegex was added in glib-2.14
-# we need it for regex searching in the program window
-PKG_CHECK_EXISTS(glib-2.0 >= 2.14,
-  [nip_use_gregex=yes],
-  [nip_use_gregex=no]
-)
-
-if test x"$nip_use_gregex" = x"yes"; then
-  AC_DEFINE(HAVE_GREGEX,1,[define if you have GRegex])
-fi
 
 # Check for the function strccpy in libgen
 AC_CHECK_HEADER(libgen.h, 
@@ -255,11 +200,10 @@ fi
 # optional ... use libgoffice to draw plots
 # pretty basic functionality, really, but we need to be able to build without
 # it for testing
-# libgoffice 0.6.x is too buggy, build 0.7.x to get the 0.8 package
 AC_ARG_WITH([libgoffice], AS_HELP_STRING([--without-libgoffice], [build without libgoffice (default: test)]))
 
 if test "x$with_libgoffice" != "xno"; then
-  PKG_CHECK_MODULES(LIBGOFFICE, libgoffice-0.8,
+  PKG_CHECK_MODULES(LIBGOFFICE, libgoffice-0.10,
     [AC_DEFINE(HAVE_LIBGOFFICE,1,[define if you have libgoffice installed.])
      with_libgoffice=yes
     ],
@@ -404,13 +348,5 @@ use libgoffice to show plots:		$with_libgoffice
 use libgsf to save plots to files:	$with_libgsf
 use libgvc to show ws dep graphs:	$with_libgvc
   (requires gvc > 2.30)
-use gtkinfobar to show messages:	$nip_use_infobar
-  (requires gtk+-2.0 >= 2.18)
-use notebook action widget:  		$nip_use_notebook_action
-  (requires gtk+-2.0 >= 2.20)
-use notebook group name:  		$nip_use_notebook_group_name
-  (requires gtk+-2.0 >= 2.24)
-allow regex searches: 			$nip_use_gregex
-  (requires glib-2.0 >= 2.14)
 display help files with xdg:		$XDG_OPEN
 ])

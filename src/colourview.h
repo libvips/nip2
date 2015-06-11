@@ -50,5 +50,5 @@ typedef struct _ColourviewClass {
 	 */
 } ColourviewClass;
 
-GtkType colourview_get_type( void );
+GType colourview_get_type( void );
 View *colourview_new( void );

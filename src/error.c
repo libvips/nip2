@@ -168,28 +168,7 @@ ierror_init( iError *ierror )
 {
 }
 
-GtkType
-ierror_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type ) {
-		static const GtkTypeInfo info = {
-			"iError",
-			sizeof( iError ),
-			sizeof( iErrorClass ),
-			(GtkClassInitFunc) ierror_class_init,
-			(GtkObjectInitFunc) ierror_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( TYPE_LOG, &info );
-	}
-
-	return( type );
-}
+G_DEFINE_TYPE( ierror, iError, TYPE_LOG ); 
 
 static void
 ierror_link( iError *ierror, Toolkitgroup *kitg )

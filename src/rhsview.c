@@ -34,7 +34,7 @@
 
 #include "ip.h"
 
-static ViewClass *parent_class = NULL;
+G_DEFINE_TYPE( rhsview, Rhsview, TYPE_VIEW ); 
 
 /* Get this if ws->mode changes.
  */
@@ -49,7 +49,7 @@ rhsview_reset( View *view )
 		row->ws->mode == WORKSPACE_MODE_FORMULA || 
 		rhs->flags & RHS_ITEXT );
 
-	VIEW_CLASS( parent_class )->reset( view );
+	VIEW_CLASS( rhsview_parent_class )->reset( view );
 }
 
 static void 
@@ -105,7 +105,7 @@ rhsview_refresh( vObject *vobject )
 		g_assert( 0 );
 	}
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( rhsview_parent_class )->refresh( vobject );
 }
 
 static void
@@ -120,7 +120,7 @@ rhsview_link( View *view, Model *model, View *parent )
 	printf( "\n" );
 #endif /*DEBUG*/
 
-	VIEW_CLASS( parent_class )->link( view, model, parent );
+	VIEW_CLASS( rhsview_parent_class )->link( view, model, parent );
 
 	rhsview->rview = rview;
 }
@@ -147,7 +147,7 @@ rhsview_child_add( View *parent, View *child )
 		g_assert( IS_GRAPHICVIEW( child ) );
 	}
 
-	VIEW_CLASS( parent_class )->child_add( parent, child );
+	VIEW_CLASS( rhsview_parent_class )->child_add( parent, child );
 }
 
 static void
@@ -162,7 +162,7 @@ rhsview_child_remove( View *parent, View *child )
 	else 
 		rhsview->graphic = NULL;
 
-	VIEW_CLASS( parent_class )->child_remove( parent, child );
+	VIEW_CLASS( rhsview_parent_class )->child_remove( parent, child );
 }
 
 static void
@@ -170,8 +170,6 @@ rhsview_class_init( RhsviewClass *class )
 {
 	vObjectClass *vobject_class = (vObjectClass*) class;
 	ViewClass *view_class = (ViewClass*) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -204,29 +202,6 @@ rhsview_init( Rhsview *rhsview )
 	rhsview->flags = 0;
 
         gtk_widget_show( GTK_WIDGET( rhsview ) );
-}
-
-GtkType
-rhsview_get_type( void )
-{
-	static GtkType rhsview_type = 0;
-
-	if( !rhsview_type ) {
-		static const GtkTypeInfo rhsview_info = {
-			"Rhsview",
-			sizeof( Rhsview ),
-			sizeof( RhsviewClass ),
-			(GtkClassInitFunc) rhsview_class_init,
-			(GtkObjectInitFunc) rhsview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		rhsview_type = gtk_type_unique( TYPE_VIEW, &rhsview_info );
-	}
-
-	return( rhsview_type );
 }
 
 View *

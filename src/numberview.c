@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static EditviewClass *parent_class = NULL;
+G_DEFINE_TYPE( numberview, Numberview, TYPE_EDITVIEW ); 
 
 /* Re-read the text in a tally entry. 
  */
@@ -65,7 +65,7 @@ numberview_scan( View *view )
 		classmodel_update( CLASSMODEL( number ) ) ;
 	}
 
-	return( VIEW_CLASS( parent_class )->scan( view ) );
+	return( VIEW_CLASS( numberview_parent_class )->scan( view ) );
 }
 
 static void 
@@ -85,7 +85,7 @@ numberview_refresh( vObject *vobject )
 	editview_set_entry( EDITVIEW( numberview ), 
 		"%g", number->value );
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( numberview_parent_class )->refresh( vobject );
 }
 
 static void
@@ -93,8 +93,6 @@ numberview_class_init( NumberviewClass *class )
 {
 	ViewClass *view_class = (ViewClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -109,29 +107,6 @@ numberview_class_init( NumberviewClass *class )
 static void
 numberview_init( Numberview *numberview )
 {
-}
-
-GtkType
-numberview_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type ) {
-		static const GtkTypeInfo info = {
-			"Numberview",
-			sizeof( Numberview ),
-			sizeof( NumberviewClass ),
-			(GtkClassInitFunc) numberview_class_init,
-			(GtkObjectInitFunc) numberview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( TYPE_EDITVIEW, &info );
-	}
-
-	return( type );
 }
 
 View *

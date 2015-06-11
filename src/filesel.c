@@ -1107,28 +1107,7 @@ filesel_init( Filesel *filesel )
 	filesel_all = g_slist_prepend( filesel_all, filesel );
 }
 
-GtkType
-filesel_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type ) {
-		static const GtkTypeInfo info = {
-			"Filesel",
-			sizeof( Filesel ),
-			sizeof( FileselClass ),
-			(GtkClassInitFunc) filesel_class_init,
-			(GtkObjectInitFunc) filesel_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( TYPE_IDIALOG, &info );
-	}
-
-	return( type );
-}
+G_DEFINE_TYPE( filesel, Filesel, TYPE_IDIALOG ); 
 
 GtkWidget *
 filesel_new( void )

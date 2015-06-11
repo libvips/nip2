@@ -71,7 +71,7 @@ typedef struct _vObjectClass {
 
 void *vobject_refresh_queue( vObject *vobject );
 
-GtkType vobject_get_type( void );
+GType vobject_get_type( void );
 void vobject_base_init( void );
 
 void vobject_link( vObject *vobject, iObject *iobject );

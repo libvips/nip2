@@ -50,5 +50,5 @@ typedef struct _ExpressionviewClass {
 	 */
 } ExpressionviewClass;
 
-GtkType expressionview_get_type( void );
+GType expressionview_get_type( void );
 View *expressionview_new( void );

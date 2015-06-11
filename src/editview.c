@@ -145,28 +145,7 @@ editview_init( Editview *editview )
         gtk_widget_show_all( hbox );
 }
 
-GtkType
-editview_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type ) {
-		static const GtkTypeInfo info = {
-			"Editview",
-			sizeof( Editview ),
-			sizeof( EditviewClass ),
-			(GtkClassInitFunc) editview_class_init,
-			(GtkObjectInitFunc) editview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( TYPE_GRAPHICVIEW, &info );
-	}
-
-	return( type );
-}
+G_DEFINE_TYPE( editview, Editview, TYPE_GRAPHICVIEW ); 
 
 void
 editview_set_entry( Editview *editview, const char *fmt, ... )

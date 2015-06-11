@@ -50,5 +50,5 @@ typedef struct _iTextviewClass {
 	 */
 } iTextviewClass;
 
-GtkType itextview_get_type( void );
+GType itextview_get_type( void );
 View *itextview_new( void );

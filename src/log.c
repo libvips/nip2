@@ -37,7 +37,7 @@
 
 #include "ip.h"
 
-static iWindowClass *parent_class = NULL;
+G_DEFINE_TYPE( log, Log, TYPE_IWINDOW ); 
 
 static void
 log_build( GtkWidget *widget ) 
@@ -52,7 +52,7 @@ log_build( GtkWidget *widget )
 	GtkWidget *swin;
 	PangoFontDescription *font_desc;
 
-	IWINDOW_CLASS( parent_class )->build( widget );
+	IWINDOW_CLASS( log_parent_class )->build( widget );
 
 	gtk_action_group_add_actions( iwnd->action_group, 
 		log_class->actions, log_class->n_actions, 
@@ -96,8 +96,6 @@ log_class_init( LogClass *class )
 {
 	iWindowClass *iwindow_class = (iWindowClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	iwindow_class->build = log_build;
 
 	class->actions = NULL;
@@ -112,29 +110,6 @@ log_class_init( LogClass *class )
 static void
 log_init( Log *log )
 {
-}
-
-GtkType
-log_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type ) {
-		static const GtkTypeInfo info = {
-			"Log",
-			sizeof( Log ),
-			sizeof( LogClass ),
-			(GtkClassInitFunc) log_class_init,
-			(GtkObjectInitFunc) log_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( TYPE_IWINDOW, &info );
-	}
-
-	return( type );
 }
 
 void

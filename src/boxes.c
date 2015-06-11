@@ -549,28 +549,7 @@ stringset_init( Stringset *ss )
 	ss->children = NULL;
 }
 
-GtkType
-stringset_get_type( void )
-{
-	static GtkType stringset_type = 0;
-
-	if( !stringset_type ) {
-		static const GtkTypeInfo info = {
-			"Stringset",
-			sizeof( Stringset ),
-			sizeof( StringsetClass ),
-			(GtkClassInitFunc) stringset_class_init,
-			(GtkObjectInitFunc) stringset_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		stringset_type = gtk_type_unique( TYPE_IDIALOG, &info );
-	}
-
-	return( stringset_type );
-}
+G_DEFINE_TYPE( stringset, Stringset, TYPE_IDIALOG ); 
 
 GtkWidget *
 stringset_new( void )
@@ -617,9 +596,7 @@ find_build( GtkWidget *widget )
 
 	find->search = build_glabeltext4( idlg->work, NULL, _( "Search for" ) );
 	find->csens = build_gtoggle( idlg->work, _( "Case sensitive" ) );
-#ifdef HAVE_GREGEX
 	find->regexp = build_gtoggle( idlg->work, _( "Regular expression" ) );
-#endif /*HAVE_GREGEX*/
 	find->fromtop = build_gtoggle( idlg->work, _( "Search from start" ) );
 	idialog_set_default_entry( idlg, GTK_ENTRY( find->search ) );
 	gtk_widget_show_all( idlg->work );
@@ -645,28 +622,7 @@ find_init( Find *find )
 	idialog_set_pinup( IDIALOG( find ), TRUE );
 }
 
-GtkType
-find_get_type( void )
-{
-	static GtkType find_type = 0;
-
-	if( !find_type ) {
-		static const GtkTypeInfo info = {
-			"Find",
-			sizeof( Find ),
-			sizeof( FindClass ),
-			(GtkClassInitFunc) find_class_init,
-			(GtkObjectInitFunc) find_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		find_type = gtk_type_unique( TYPE_IDIALOG, &info );
-	}
-
-	return( find_type );
-}
+G_DEFINE_TYPE( find, Find, TYPE_IDIALOG ); 
 
 GtkWidget *
 find_new( void )
@@ -793,28 +749,7 @@ fontchooser_init( Fontchooser *fontchooser )
 {
 }
 
-GtkType
-fontchooser_get_type( void )
-{
-	static GtkType fontchooser_type = 0;
-
-	if( !fontchooser_type ) {
-		static const GtkTypeInfo info = {
-			"Fontchooser",
-			sizeof( Fontchooser ),
-			sizeof( FontchooserClass ),
-			(GtkClassInitFunc) fontchooser_class_init,
-			(GtkObjectInitFunc) fontchooser_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		fontchooser_type = gtk_type_unique( TYPE_IDIALOG, &info );
-	}
-
-	return( fontchooser_type );
-}
+G_DEFINE_TYPE( fontchooser, Fontchooser, TYPE_IDIALOG ); 
 
 Fontchooser *
 fontchooser_new( void )
@@ -964,28 +899,7 @@ fontbutton_init( Fontbutton *fontbutton )
 	set_tooltip( GTK_WIDGET( fontbutton ), _( "Click to select font" ) );
 }
 
-GtkType
-fontbutton_get_type( void )
-{
-	static GtkType fontbutton_type = 0;
-
-	if( !fontbutton_type ) {
-		static const GtkTypeInfo info = {
-			"Fontbutton",
-			sizeof( Fontbutton ),
-			sizeof( FontbuttonClass ),
-			(GtkClassInitFunc) fontbutton_class_init,
-			(GtkObjectInitFunc) fontbutton_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		fontbutton_type = gtk_type_unique( GTK_TYPE_BUTTON, &info );
-	}
-
-	return( fontbutton_type );
-}
+G_DEFINE_TYPE( fontbutton, Fontbutton, GTK_TYPE_BUTTON ); 
 
 Fontbutton *
 fontbutton_new( void )
@@ -1031,10 +945,6 @@ fontbutton_get_font_name( Fontbutton *fontbutton )
 {
 	return( fontbutton->font_name );
 }
-
-/* Infobar. Optional: it's only in quite recent gtk.
- */
-#ifdef USE_INFOBAR
 
 static GtkInfoBarClass *infobar_parent_class = NULL;
 
@@ -1227,23 +1137,12 @@ infobar_new( void )
 	return( infobar );
 }
 
-#else /*!USE_INFOBAR*/
-
-Infobar *
-infobar_new( void )
-{
-	return( NULL );
-}
-
-#endif /*USE_INFOBAR*/
-
 /* Set the label on an infobar to some marked-up text.
  */
 void
 infobar_vset( Infobar *infobar, GtkMessageType type, 
 	const char *top, const char *sub, va_list ap )
 {
-#ifdef USE_INFOBAR
 	char buf1[MAX_DIALOG_TEXT];
 	char buf2[MAX_DIALOG_TEXT];
 	char *p;
@@ -1265,7 +1164,6 @@ infobar_vset( Infobar *infobar, GtkMessageType type,
 	gtk_info_bar_set_message_type( GTK_INFO_BAR( infobar ), type );
 
 	infobar_show( infobar );
-#endif /*USE_INFOBAR*/
 }
 
 /* Set the label on an infobar to some marked-up text.

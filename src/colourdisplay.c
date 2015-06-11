@@ -295,28 +295,7 @@ colourdisplay_init( Colourdisplay *colourdisplay )
 			NULL, NULL );
 }
 
-GtkType
-colourdisplay_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type ) {
-		static const GtkTypeInfo info = {
-			"Colourdisplay",
-			sizeof( Colourdisplay ),
-			sizeof( ColourdisplayClass ),
-			(GtkClassInitFunc) colourdisplay_class_init,
-			(GtkObjectInitFunc) colourdisplay_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( TYPE_IMAGEDISPLAY, &info );
-	}
-
-	return( type );
-}
+G_DEFINE_TYPE( colourdisplay, Colourdisplay, TYPE_IMAGEDISPLAY ); 
 
 Colourdisplay *
 colourdisplay_new( Conversion *conv )

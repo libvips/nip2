@@ -100,13 +100,13 @@ widget_visible( GtkWidget *widget, gboolean visible )
 /* Make a button widget.
  */
 GtkWidget *
-build_button( const char *stock_id, GtkSignalFunc cb, gpointer user )
+build_button( const char *stock_id, GCallback cb, gpointer user )
 {
 	GtkWidget *but;
 
 	but = gtk_button_new_from_stock( stock_id );
 	GTK_WIDGET_SET_FLAGS( but, GTK_CAN_DEFAULT );
-	gtk_signal_connect( GTK_OBJECT( but ), "clicked", cb, user );
+	g_signal_connect( but, "clicked", cb, user );
 
 	return( but );
 }
@@ -173,7 +173,7 @@ menu_build( const char *name )
  */
 GtkWidget *
 menu_add_but( GtkWidget *menu, 
-	const char *stock_id, GtkSignalFunc cb, void *user )
+	const char *stock_id, GCallback cb, void *user )
 {
 	GtkWidget *but;
 
@@ -182,7 +182,7 @@ menu_add_but( GtkWidget *menu,
 	but = gtk_image_menu_item_new_from_stock( stock_id, NULL );
 	gtk_menu_shell_append( GTK_MENU_SHELL( menu ), but );
 	gtk_widget_show( but );
-	gtk_signal_connect( GTK_OBJECT( but ), "activate", cb, user );
+	g_signal_connect( but, "activate", cb, user );
 
 	return( but );
 }
@@ -190,14 +190,14 @@ menu_add_but( GtkWidget *menu,
 /* Add a toggle item.
  */
 GtkWidget *
-menu_add_tog( GtkWidget *menu, const char *name, GtkSignalFunc cb, void *user )
+menu_add_tog( GtkWidget *menu, const char *name, GCallback cb, void *user )
 {
 	GtkWidget *tog;
 
 	tog = gtk_check_menu_item_new_with_mnemonic( name );
 	gtk_menu_shell_append( GTK_MENU_SHELL( menu ), tog );
 	gtk_widget_show( tog );
-	gtk_signal_connect( GTK_OBJECT( tog ), "toggled", cb, user );
+	g_signal_connect( tog, "toggled", cb, user );
 
 	return( tog );
 }
@@ -282,7 +282,7 @@ GtkWidget *
 popup_add_but( GtkWidget *popup, const char *name, PopupFunc cb )
 {
 	GtkWidget *but = menu_add_but( popup, name, 
-		GTK_SIGNAL_FUNC( popup_activate_cb ), (void *) cb );
+		G_CALLBACK( popup_activate_cb ), (void *) cb );
 
 	gtk_object_set_data_by_id( GTK_OBJECT( but ), quark_main, popup );
 
@@ -295,7 +295,7 @@ GtkWidget *
 popup_add_tog( GtkWidget *popup, const char *name, PopupFunc cb )
 {
 	GtkWidget *tog = menu_add_tog( popup, name, 
-		GTK_SIGNAL_FUNC( popup_activate_cb ), (void *) cb );
+		G_CALLBACK( popup_activate_cb ), (void *) cb );
 
 	gtk_object_set_data_by_id( GTK_OBJECT( tog ), quark_main, popup );
 
@@ -369,8 +369,8 @@ popup_attach( GtkWidget *host, GtkWidget *popup, void *data )
 	 * attach a menu to a single widget. We want to be able to attach a
 	 * single menu to meny widgets.
 	 */
-        sid = gtk_signal_connect( GTK_OBJECT( host ), "event",
-                GTK_SIGNAL_FUNC( popup_handle_event ), NULL );
+        sid = g_signal_connect( host, "event",
+                G_CALLBACK( popup_handle_event ), NULL );
 
 	return( sid );
 }
@@ -412,8 +412,8 @@ set_tooltip( GtkWidget *wid, const char *fmt, ... )
 	gtk_tooltips_set_tip( our_tooltips, wid, txt, NULL );
 
 	if( !GTK_WIDGET_REALIZED( wid ) )
-		gtk_signal_connect( GTK_OBJECT( wid ), "realize",
-			GTK_SIGNAL_FUNC( set_tooltip_events ), NULL );
+		g_signal_connect( wid, "realize",
+			G_CALLBACK( set_tooltip_events ), NULL );
 	else
 		set_tooltip_events( wid );
 
@@ -838,7 +838,7 @@ build_gtoggle( GtkWidget *box, const char *caption )
 GtkWidget *
 build_goption( GtkWidget *box, GtkSizeGroup *group, 
 	const char *name, const char *item_names[], int nitem,
-	GtkSignalFunc fn, void *value )
+	GCallback fn, void *value )
 {
 	GtkWidget *hb;
 	GtkWidget *label;
@@ -861,7 +861,7 @@ build_goption( GtkWidget *box, GtkSizeGroup *group,
 		gtk_combo_box_append_text( GTK_COMBO_BOX( om ),
 			 _( item_names[i] ) );
 	if( fn ) 
-		gtk_signal_connect( GTK_OBJECT( om ), "changed", fn, value );
+		g_signal_connect( om, "changed", fn, value );
         gtk_box_pack_start( GTK_BOX( box ), hb, FALSE, TRUE, 0 );
         gtk_widget_show_all( hb );
 
@@ -962,8 +962,8 @@ filedrop_register( GtkWidget *widget, FiledropFunc fn, void *client )
 	fdi->widget = widget;
 	fdi->fn = fn;
 	fdi->client = client;
-	gtk_signal_connect( GTK_OBJECT( widget ), "destroy",
-                GTK_SIGNAL_FUNC( filedrop_destroy ), fdi );
+	g_signal_connect( widget, "destroy",
+                G_CALLBACK( filedrop_destroy ), fdi );
 
 	gtk_drag_dest_set( GTK_WIDGET( widget ),
 		GTK_DEST_DEFAULT_ALL,
@@ -973,8 +973,8 @@ filedrop_register( GtkWidget *widget, FiledropFunc fn, void *client )
 		 * win32, but KDE needs these other flags too, apparently.
 		 */
 		GDK_ACTION_MOVE | GDK_ACTION_LINK | GDK_ACTION_ASK );
-	gtk_signal_connect( GTK_OBJECT( widget ), "drag_data_received",
-		GTK_SIGNAL_FUNC( filedrop_drag_data_received ), fdi );
+	g_signal_connect( widget, "drag_data_received",
+		G_CALLBACK( filedrop_drag_data_received ), fdi );
 }
 
 /* Add symbol drag to the target list.

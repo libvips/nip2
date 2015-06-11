@@ -36,7 +36,7 @@
 
 #ifdef HAVE_LIBGOFFICE
 
-static GraphicviewClass *parent_class = NULL;
+G_DEFINE_TYPE( plotview, Plotview, TYPE_GRAPHICVIEW ); 
 
 static void
 plotview_destroy( GtkObject *object )
@@ -54,7 +54,7 @@ plotview_destroy( GtkObject *object )
 
 	GOG_UNREF( plotview->gplot );
 
-    	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+    	GTK_OBJECT_CLASS( plotview_parent_class )->destroy( object );
 }
 
 static void
@@ -86,7 +86,7 @@ plotview_refresh( vObject *vobject )
 
 	gtk_widget_show_all( plotview->canvas );
 
-    	VOBJECT_CLASS( parent_class )->refresh( vobject );
+    	VOBJECT_CLASS( plotview_parent_class )->refresh( vobject );
 }
 
 static void
@@ -95,7 +95,7 @@ plotview_link( View *view, Model *model, View *parent )
 	Plotview *plotview = PLOTVIEW( view );
 	Rowview *rview = ROWVIEW( parent->parent );
 
-	VIEW_CLASS( parent_class )->link( view, model, parent );
+	VIEW_CLASS( plotview_parent_class )->link( view, model, parent );
 
 	rowview_menu_attach( rview, GTK_WIDGET( plotview->box ) );
 }
@@ -106,8 +106,6 @@ plotview_class_init( PlotviewClass *class )
     	GtkObjectClass *object_class = (GtkObjectClass *) class;
     	vObjectClass *vobject_class = (vObjectClass *) class;
     	ViewClass *view_class = (ViewClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
     	object_class->destroy = plotview_destroy;
 
@@ -193,29 +191,6 @@ plotview_init( Plotview *plotview )
         gtk_box_pack_end( GTK_BOX( plotview->box ), 
 		GTK_WIDGET( plotview->label ), FALSE, FALSE, 0 );
 	gtk_widget_show( GTK_WIDGET( plotview->label ) );
-}
-
-GtkType
-plotview_get_type( void )
-{
-    	static GtkType type = 0;
-
-    	if( !type ) {
-    		static const GtkTypeInfo info = {
-    			"Plotview",
-    			sizeof( Plotview ),
-    			sizeof( PlotviewClass ),
-    			(GtkClassInitFunc) plotview_class_init,
-    			(GtkObjectInitFunc) plotview_init,
-    			/* reserved_1 */ NULL,
-    			/* reserved_2 */ NULL,
-    			(GtkClassInitFunc) NULL,
-    		};
-
-    		type = gtk_type_unique( TYPE_GRAPHICVIEW, &info );
-    	}
-
-    	return( type );
 }
 
 View *

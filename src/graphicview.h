@@ -52,4 +52,4 @@ typedef struct _GraphicviewClass {
 	 */
 } GraphicviewClass;
 
-GtkType graphicview_get_type( void );
+GType graphicview_get_type( void );

@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ViewClass *parent_class = NULL;
+G_DEFINE_TYPE( panechild, Panechild, TYPE_VOBJECT ); 
 
 static void
 panechild_finalize( GObject *gobject )
@@ -48,7 +48,7 @@ panechild_finalize( GObject *gobject )
 	 */
 	IM_FREE( panechild->title );
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( panechild_parent_class )->finalize( gobject );
 }
 
 static void
@@ -62,7 +62,7 @@ panechild_refresh( vObject *vobject )
 
 	set_glabel( panechild->label, "%s", panechild->title );
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( panechild_parent_class )->refresh( vobject );
 }
 
 static void
@@ -70,8 +70,6 @@ panechild_class_init( PanechildClass *class )
 {
 	GObjectClass *gobject_class = (GObjectClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	gobject_class->finalize = panechild_finalize;
 
@@ -116,31 +114,6 @@ panechild_init( Panechild *panechild )
         gtk_box_pack_start( GTK_BOX( hbox ), panechild->label, TRUE, TRUE, 2 );
 
 	gtk_widget_show_all( hbox );
-}
-
-GtkType
-panechild_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( PanechildClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) panechild_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Panechild ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) panechild_init,
-		};
-
-		type = g_type_register_static( TYPE_VOBJECT,
-			"Panechild", &info, 0 );
-	}
-
-	return( type );
 }
 
 Panechild *

@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ClassmodelClass *parent_class = NULL;
+G_DEFINE_TYPE( iimage, iImage, TYPE_CLASSMODEL ); 
 
 static void
 iimage_dispose( GObject *gobject )
@@ -53,7 +53,7 @@ iimage_dispose( GObject *gobject )
 		(SListMapFn) classmodel_iimage_unlink, iimage );
 	g_assert( !iimage->classmodels );
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( iimage_parent_class )->dispose( gobject );
 }
 
 static void
@@ -74,7 +74,7 @@ iimage_finalize( GObject *gobject )
 	IM_FREEF( g_slist_free, iimage->views );
 	vips_buf_destroy( &iimage->caption_buffer );
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( iimage_parent_class )->finalize( gobject );
 }
 
 /* Return the main caption. 
@@ -164,7 +164,7 @@ iimage_save( Model *model, xmlNode *xnode )
 	iImage *iimage = IIMAGE( model );
 	xmlNode *xthis;
 
-	if( !(xthis = MODEL_CLASS( parent_class )->save( model, xnode )) )
+	if( !(xthis = MODEL_CLASS( iimage_parent_class )->save( model, xnode )) )
 		return( NULL );
 
 	/* We always rebuild the value from the expr ... don't save.
@@ -210,7 +210,7 @@ iimage_load( Model *model,
 	(void) get_bprop( xnode, "falsecolour", &iimage->falsecolour );
 	(void) get_bprop( xnode, "type", &iimage->type );
 
-	return( MODEL_CLASS( parent_class )->load( model, 
+	return( MODEL_CLASS( iimage_parent_class )->load( model, 
 		state, parent, xnode ) );
 }
 
@@ -250,7 +250,7 @@ iimage_update_heap( Heapmodel *heapmodel )
 	/* Classmodel _update_heap() will do _instance_new() from the fixed up
 	 * model.
 	 */
-	return( HEAPMODEL_CLASS( parent_class )->update_heap( heapmodel ) );
+	return( HEAPMODEL_CLASS( iimage_parent_class )->update_heap( heapmodel ) );
 }
 
 /* Update iImage from heap.
@@ -295,7 +295,7 @@ iimage_class_get( Classmodel *classmodel, PElement *root )
 		IM_SETSTR( classmodel->filename, filename ); 
 	}
 
-	return( CLASSMODEL_CLASS( parent_class )->class_get( 
+	return( CLASSMODEL_CLASS( iimage_parent_class )->class_get( 
 		classmodel, root ) );
 }
 
@@ -411,8 +411,6 @@ iimage_class_init( iImageClass *class )
 	HeapmodelClass *heapmodel_class = (HeapmodelClass *) class;
 	ClassmodelClass *classmodel_class = (ClassmodelClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	/* Create signals.
 	 */
 
@@ -475,27 +473,3 @@ iimage_init( iImage *iimage )
 	iobject_set( IOBJECT( iimage ), CLASS_IMAGE, NULL );
 }
 
-GtkType
-iimage_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( iImageClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) iimage_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( iImage ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) iimage_init,
-		};
-
-		type = g_type_register_static( TYPE_CLASSMODEL, 
-			"iImage", &info, 0 );
-	}
-
-	return( type );
-}

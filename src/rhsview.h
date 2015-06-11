@@ -56,5 +56,5 @@ typedef struct _RhsviewClass {
 	 */
 } RhsviewClass;
 
-GtkType rhsview_get_type( void );
+GType rhsview_get_type( void );
 View *rhsview_new( void );

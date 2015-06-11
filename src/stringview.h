@@ -47,5 +47,5 @@ typedef struct _StringviewClass {
 	 */
 } StringviewClass;
 
-GtkType stringview_get_type( void );
+GType stringview_get_type( void );
 View *stringview_new( void );

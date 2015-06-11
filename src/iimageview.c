@@ -33,12 +33,12 @@
 
 #include "ip.h"
 
-static GraphicviewClass *parent_class = NULL;
+G_DEFINE_TYPE( iimageview, iImageview, TYPE_GRAPHICVIEW ); 
 
 static void
 iimageview_realize( GtkWidget *widget )
 {
-	GTK_WIDGET_CLASS( parent_class )->realize( widget );
+	GTK_WIDGET_CLASS( iimageview_parent_class )->realize( widget );
 
 	/* Mark us as a symbol drag-to widget. 
 	 */
@@ -54,9 +54,7 @@ iimageview_drag_window_new( int width, int height )
 	gtk_widget_set_app_paintable( GTK_WIDGET( window ), TRUE );
 	gtk_widget_set_size_request( window, width, height );
 	gtk_widget_realize( window );
-#ifdef HAVE_SET_OPACITY
 	gdk_window_set_opacity( window->window, 0.5 );
-#endif /*HAVE_SET_OPACITY*/
 
 	return( window );
 }
@@ -197,7 +195,7 @@ iimageview_link( View *view, Model *model, View *parent )
 
 	Rowview *rview;
 
-	VIEW_CLASS( parent_class )->link( view, model, parent );
+	VIEW_CLASS( iimageview_parent_class )->link( view, model, parent );
 
 	if( (rview = ROWVIEW( parent->parent )) ) { 
 		Row *row = ROW( VOBJECT( rview )->iobject );
@@ -260,7 +258,7 @@ iimageview_refresh( vObject *vobject )
 	conversion_set_params( iimageview->conv, 
 		enabled, scale, offset, falsecolour, type );
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( iimageview_parent_class )->refresh( vobject );
 }
 
 static void
@@ -269,8 +267,6 @@ iimageview_class_init( iImageviewClass *class )
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -388,29 +384,6 @@ iimageview_init( iImageview *iimageview )
 
 	gtk_widget_set_name( eb, "caption_widget" );
         gtk_widget_show( GTK_WIDGET( eb ) );
-}
-
-GtkType
-iimageview_get_type( void )
-{
-	static GtkType iimageview_type = 0;
-
-	if( !iimageview_type ) {
-		static const GtkTypeInfo info = {
-			"iImageview",
-			sizeof( iImageview ),
-			sizeof( iImageviewClass ),
-			(GtkClassInitFunc) iimageview_class_init,
-			(GtkObjectInitFunc) iimageview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		iimageview_type = gtk_type_unique( TYPE_GRAPHICVIEW, &info );
-	}
-
-	return( iimageview_type );
 }
 
 View *

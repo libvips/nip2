@@ -33,13 +33,11 @@
 
 #include "ip.h"
 
-static iImageviewClass *parent_class = NULL;
+G_DEFINE_TYPE( iregionview, iregionview, TYPE_IIMAGEVIEW ); 
 
 static void
 iregionview_class_init( iRegionviewClass *class )
 {
-	parent_class = g_type_class_peek_parent( class );
-
 	/* Create signals.
 	 */
 
@@ -53,29 +51,6 @@ iregionview_init( iRegionview *iregionview )
 #ifdef DEBUG
 	printf( "iregionview_init\n" );
 #endif /*DEBUG*/
-}
-
-GtkType
-iregionview_get_type( void )
-{
-	static GtkType iregionview_type = 0;
-
-	if( !iregionview_type ) {
-		static const GtkTypeInfo info = {
-			"iRegionview",
-			sizeof( iRegionview ),
-			sizeof( iRegionviewClass ),
-			(GtkClassInitFunc) iregionview_class_init,
-			(GtkObjectInitFunc) iregionview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		iregionview_type = gtk_type_unique( TYPE_IIMAGEVIEW, &info );
-	}
-
-	return( iregionview_type );
 }
 
 View *

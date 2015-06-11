@@ -56,6 +56,6 @@ typedef struct _PlotstatusClass {
 	 */
 } PlotstatusClass;
 
-GtkType plotstatus_get_type( void );
+GType plotstatus_get_type( void );
 Plotstatus *plotstatus_new( Plotmodel *plotmodel );
 void plotstatus_mouse( Plotstatus *plotstatus, double x, double y );

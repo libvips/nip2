@@ -33,14 +33,14 @@
 
 #include "ip.h"
 
-static GraphicviewClass *parent_class = NULL;
+G_DEFINE_TYPE( editview, Editview, TYPE_GRAPHICVIEW ); 
 
 static void
 editview_link( View *view, Model *model, View *parent )
 {
 	Editview *editview = EDITVIEW( view );
 
-	VIEW_CLASS( parent_class )->link( view, model, parent );
+	VIEW_CLASS( editview_parent_class )->link( view, model, parent );
 
 	if( GRAPHICVIEW( view )->sview )
 		gtk_size_group_add_widget( GRAPHICVIEW( view )->sview->group,   
@@ -60,7 +60,7 @@ editview_refresh( vObject *vobject )
 		set_glabel( editview->label, _( "%s:" ), 
 			vobject->iobject->caption );
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( editview_parent_class )->refresh( vobject );
 }
 
 static void
@@ -68,8 +68,6 @@ editview_class_init( EditviewClass *class )
 {
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -135,17 +133,15 @@ editview_init( Editview *editview )
 	gtk_box_pack_start( GTK_BOX( hbox ), editview->text, TRUE, TRUE, 0 );
         set_tooltip( editview->text, _( "Escape to cancel edit, "
                 "press Return to accept edit and recalculate" ) );
-        gtk_signal_connect_object( GTK_OBJECT( editview->text ), "changed",
-                GTK_SIGNAL_FUNC( view_changed_cb ), GTK_OBJECT( editview ) );
-        gtk_signal_connect( GTK_OBJECT( editview->text ), "activate",
-                GTK_SIGNAL_FUNC( editview_activate_cb ), editview );
-        gtk_signal_connect( GTK_OBJECT( editview->text ), "event",
-                GTK_SIGNAL_FUNC( editview_event_cb ), editview );
+        g_signal_connect_object( editview->text, "changed",
+                G_CALLBACK( view_changed_cb ), GTK_OBJECT( editview ) );
+        g_signal_connect( editview->text ), "activate",
+                G_CALLBACK( editview_activate_cb ), editview );
+        g_signal_connect( editview->text ), "event",
+                G_CALLBACK( editview_event_cb ), editview );
 
         gtk_widget_show_all( hbox );
 }
-
-G_DEFINE_TYPE( editview, Editview, TYPE_GRAPHICVIEW ); 
 
 void
 editview_set_entry( Editview *editview, const char *fmt, ... )

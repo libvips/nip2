@@ -33,6 +33,8 @@
 #define DEBUG
  */
 
+G_DEFINE_TYPE( filesel, Filesel, TYPE_IDIALOG ); 
+
 /* TIFF save possibilities. Needs to be kept in sync with the Option in
  * preferences.
  */
@@ -64,8 +66,6 @@ typedef enum {
  * new file.
  */
 static GSList *filesel_all = NULL;
-
-static iDialogClass *parent_class = NULL;
 
 /* For filesels which don't have a suggested filename, track the last dir we
  * went to and use that as the start dir next time.
@@ -486,7 +486,7 @@ filesel_destroy( GtkObject *object )
 	filesel_all = g_slist_remove( filesel_all, filesel );
 	IM_FREEF( g_free, filesel->current_dir );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( filesel_parent_class )->destroy( object );
 }
 
 /* Update `space free' label.
@@ -916,8 +916,8 @@ filesel_build( GtkWidget *widget )
 
 	/* Call all builds in superclasses.
 	 */
-	if( IWINDOW_CLASS( parent_class )->build )
-		IWINDOW_CLASS( parent_class )->build( widget );
+	if( IWINDOW_CLASS( filesel_parent_class )->build )
+		IWINDOW_CLASS( filesel_parent_class )->build( widget );
 
 	filesel->chooser = gtk_file_chooser_widget_new( filesel->save ? 
 			GTK_FILE_CHOOSER_ACTION_SAVE :
@@ -941,15 +941,12 @@ filesel_build( GtkWidget *widget )
 
         /* Spot changes.
          */
-        gtk_signal_connect( GTK_OBJECT( filesel->chooser ), 
-		"current-folder-changed",
-                GTK_SIGNAL_FUNC( filesel_current_folder_changed_cb ), filesel );
-        gtk_signal_connect( GTK_OBJECT( filesel->chooser ), 
-		"selection-changed",
-                GTK_SIGNAL_FUNC( filesel_selection_changed_cb ), filesel );
-        gtk_signal_connect( GTK_OBJECT( filesel->chooser ), 
-		"file-activated",
-                GTK_SIGNAL_FUNC( filesel_file_activated_cb ), filesel );
+        g_signal_connect( filesel->chooser, "current-folder-changed",
+                G_CALLBACK( filesel_current_folder_changed_cb ), filesel );
+        g_signal_connect( filesel->chooser, "selection-changed",
+                G_CALLBACK( filesel_selection_changed_cb ), filesel );
+        g_signal_connect( filesel->chooser, "file-activated",
+                G_CALLBACK( filesel_file_activated_cb ), filesel );
 
 	/* Pack extra widgets.
 	 */
@@ -983,8 +980,8 @@ filesel_build( GtkWidget *widget )
 	if( filesel->save ) {
 		tog = gtk_check_button_new_with_label( 
 			_( "Increment filename" ) );
-		gtk_signal_connect( GTK_OBJECT( tog ), "toggled",
-			GTK_SIGNAL_FUNC( filesel_auto_incr_cb ), filesel );
+		g_signal_connect( tog, "toggled",
+			G_CALLBACK( filesel_auto_incr_cb ), filesel );
 		gtk_box_pack_start( GTK_BOX( vb ), tog, FALSE, FALSE, 0 );
 		gtk_widget_show( tog );
 		set_tooltip( tog, 
@@ -997,9 +994,8 @@ filesel_build( GtkWidget *widget )
 		gtk_file_chooser_set_preview_widget(
 			GTK_FILE_CHOOSER( filesel->chooser ), 
 			GTK_WIDGET( filesel->preview ) );
-		gtk_signal_connect( GTK_OBJECT( filesel->chooser ), 
-			"update-preview",
-			GTK_SIGNAL_FUNC( filesel_update_preview_cb ), filesel );
+		g_signal_connect( filesel->chooser, "update-preview",
+			G_CALLBACK( filesel_update_preview_cb ), filesel );
 		gtk_widget_show( GTK_WIDGET( filesel->preview ) );
 		gtk_file_chooser_set_preview_widget_active(
 			GTK_FILE_CHOOSER( filesel->chooser ), TRUE );
@@ -1025,8 +1021,6 @@ filesel_class_init( FileselClass *class )
 	object_class->destroy = filesel_destroy;
 
 	iwindow_class->build = filesel_build;
-
-	parent_class = g_type_class_peek_parent( class );
 }
 
 /* Increment filename. If there's no number there now, assume zero.
@@ -1106,8 +1100,6 @@ filesel_init( Filesel *filesel )
 
 	filesel_all = g_slist_prepend( filesel_all, filesel );
 }
-
-G_DEFINE_TYPE( filesel, Filesel, TYPE_IDIALOG ); 
 
 GtkWidget *
 filesel_new( void )

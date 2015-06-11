@@ -33,7 +33,7 @@
 #define DEBUG
  */
 
-static ViewClass *parent_class = NULL;
+G_DEFINE_TYPE( workspacegroupview, Workspacegroupview, TYPE_VIEW ); 
 
 static void
 workspacegroupview_realize( GtkWidget *widget )
@@ -47,7 +47,7 @@ workspacegroupview_realize( GtkWidget *widget )
 }
 #endif /*DEBUG*/
 
-	GTK_WIDGET_CLASS( parent_class )->realize( widget );
+	GTK_WIDGET_CLASS( workspacegroupview_parent_class )->realize( widget );
 
 	/* Mark us as a symbol drag-to widget. 
 	 */
@@ -129,7 +129,7 @@ workspacegroupview_child_add( View *parent, View *child )
 	GtkWidget *padlock;
 	GtkWidget *alert;
 
-	VIEW_CLASS( parent_class )->child_add( parent, child );
+	VIEW_CLASS( workspacegroupview_parent_class )->child_add( parent, child );
 
         ebox = gtk_event_box_new();
 	gtk_widget_add_events( GTK_WIDGET( ebox ), 
@@ -178,7 +178,7 @@ workspacegroupview_child_remove( View *parent, View *child )
 
 	 */
 
-	VIEW_CLASS( parent_class )->child_remove( parent, child );
+	VIEW_CLASS( workspacegroupview_parent_class )->child_remove( parent, child );
 }
 
 static void
@@ -190,7 +190,7 @@ workspacegroupview_child_position( View *parent, View *child )
 	gtk_notebook_reorder_child( GTK_NOTEBOOK( wsgview->notebook ),
 		GTK_WIDGET( wview ), ICONTAINER( wview )->pos );
 
-	VIEW_CLASS( parent_class )->child_position( parent, child );
+	VIEW_CLASS( workspacegroupview_parent_class )->child_position( parent, child );
 }
 
 static void
@@ -222,8 +222,6 @@ workspacegroupview_class_init( WorkspacegroupviewClass *class )
 {
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	widget_class->realize = workspacegroupview_realize;
 
@@ -633,31 +631,6 @@ workspacegroupview_init( Workspacegroupview *wsgview )
 	menu_add_sep( wsgview->tab_menu );
 	popup_add_but( wsgview->tab_menu, GTK_STOCK_DELETE,
 		POPUP_FUNC( workspacegroupview_delete_cb ) ); 
-}
-
-GtkType
-workspacegroupview_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( WorkspacegroupviewClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) workspacegroupview_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Workspacegroupview ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) workspacegroupview_init,
-		};
-
-		type = g_type_register_static( TYPE_VIEW, 
-			"Workspacegroupview", &info, 0 );
-	}
-
-	return( type );
 }
 
 View *

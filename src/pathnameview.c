@@ -146,8 +146,8 @@ pathnameview_init( Pathnameview *pathnameview )
 	pathnameview->button = gtk_button_new_with_label( "" );
         gtk_box_pack_start( GTK_BOX( hbox ), pathnameview->button, 
 		TRUE, TRUE, 0 );
-        gtk_signal_connect( GTK_OBJECT( pathnameview->button ), "clicked",
-                GTK_SIGNAL_FUNC( pathnameview_clicked_cb ), pathnameview );
+        g_signal_connect( pathnameview->button, "clicked",
+                G_CALLBACK( pathnameview_clicked_cb ), pathnameview );
         set_tooltip( pathnameview->button, _( "Select a new file name" ) );
 
         gtk_widget_show_all( GTK_WIDGET( hbox ) );

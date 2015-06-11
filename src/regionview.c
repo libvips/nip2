@@ -2000,20 +2000,20 @@ regionview_setup( Regionview *regionview,
 	}
 
 	regionview->expose_sid = g_signal_connect_after( 
-		GTK_OBJECT( ip->id ), "expose_event", 
-		GTK_SIGNAL_FUNC( regionview_expose_cb ), regionview );
-	regionview->destroy_sid = gtk_signal_connect_object( 
-		GTK_OBJECT( ip->id ), "destroy", 
-		GTK_SIGNAL_FUNC( gtk_widget_destroy ), 
+		ip->id, "expose_event", 
+		G_CALLBACK( regionview_expose_cb ), regionview );
+	regionview->destroy_sid = g_signal_connect_object( 
+		ip->id, "destroy", 
+		G_CALLBACK( gtk_widget_destroy ), 
 		GTK_OBJECT( regionview ) );
-	regionview->event_sid = gtk_signal_connect( 
-		GTK_OBJECT( ip->id ), "event",
-		GTK_SIGNAL_FUNC( regionview_event_cb ), regionview );
+	regionview->event_sid = g_signal_connect( 
+		ip->id, "event",
+		G_CALLBACK( regionview_event_cb ), regionview );
 	regionview->changed_sid = g_signal_connect( 
-		G_OBJECT( ip->id->conv ), "changed",
+		ip->id->conv, "changed",
 		G_CALLBACK( regionview_changed_cb ), regionview );
 	regionview->conv_destroy_sid = g_signal_connect( 
-		G_OBJECT( ip->id->conv ), "destroy",
+		ip->id->conv, "destroy",
 		G_CALLBACK( regionview_conv_destroy_cb ), regionview );
 
 	iwnd = IWINDOW( gtk_widget_get_toplevel( GTK_WIDGET( ip ) ) );	

@@ -38,7 +38,7 @@
  */
 #define TOOLKITVIEW_MENU_OFFSET 3
 
-static ViewClass *parent_class = NULL;
+G_DEFINE_TYPE( toolkitview, Toolkitview, TYPE_VIEW ); 
 
 static void 
 toolkitview_destroy( GtkObject *object )
@@ -59,7 +59,7 @@ toolkitview_destroy( GtkObject *object )
 	DESTROY_GTK( kview->menu );
 	DESTROY_GTK( kview->item );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( toolkitview_parent_class )->destroy( object );
 }
 
 static void
@@ -69,7 +69,7 @@ toolkitview_finalize( GObject *gobject )
 	printf( "toolkitview_finalize: %p\n", gobject );
 #endif /*DEBUG*/
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( toolkitview_parent_class )->finalize( gobject );
 }
 
 /* Our widgets have been killed ... kill us in turn.
@@ -138,7 +138,7 @@ toolkitview_refresh( vObject *vobject )
 
 	widget_visible( kview->item, ICONTAINER( kit )->children != NULL );
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( toolkitview_parent_class )->refresh( vobject );
 }
 
 static void
@@ -149,7 +149,7 @@ toolkitview_link( View *view, Model *model, View *parent )
 
 	kview->kitgview = kitgview;
 
-	VIEW_CLASS( parent_class )->link( view, model, parent );
+	VIEW_CLASS( toolkitview_parent_class )->link( view, model, parent );
 
 #ifdef DEBUG
 	printf( "toolkitview_link: " );
@@ -164,8 +164,6 @@ toolkitview_class_init( ToolkitviewClass *class )
 	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	gobject_class->finalize = toolkitview_finalize;
 	object_class->destroy = toolkitview_destroy;
@@ -186,29 +184,6 @@ toolkitview_init( Toolkitview *kview )
         kview->item = NULL;
         kview->menu = NULL;
         kview->destroy_sid = 0;
-}
-
-GtkType
-toolkitview_get_type( void )
-{
-	static GtkType kview_type = 0;
-
-	if( !kview_type ) {
-		static const GtkTypeInfo kview_info = {
-			"Toolkitview",
-			sizeof( Toolkitview ),
-			sizeof( ToolkitviewClass ),
-			(GtkClassInitFunc) toolkitview_class_init,
-			(GtkObjectInitFunc) toolkitview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		kview_type = gtk_type_unique( TYPE_VIEW, &kview_info );
-	}
-
-	return( kview_type );
 }
 
 View *

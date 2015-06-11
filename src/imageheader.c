@@ -198,9 +198,8 @@ imageheader_build( GtkWidget *widget )
         gtk_box_pack_start( GTK_BOX( vbox ), top, FALSE, FALSE, 2 );
 
 	imageheader->entry = gtk_entry_new();
-        gtk_signal_connect( GTK_OBJECT( imageheader->entry ), "changed", 
-		GTK_SIGNAL_FUNC( imageheader_entry_changed_cb ), 
-		imageheader );
+        g_signal_connect( imageheader->entry, "changed", 
+		G_CALLBACK( imageheader_entry_changed_cb ), imageheader );
 	gtk_box_pack_end( GTK_BOX( top ), 
 		imageheader->entry, FALSE, FALSE, 2 );
 

@@ -1,16 +1,4 @@
-- all files with GtkType in need to be moved to G_DEFINE_TYPE
-
-  - remove parent_class, now x_parent_class
-  - remove GtkType _get_type() func
-  - move G_DEFINE_TYPE to top
-
-
-  - done 45, 17 to go?
-
-- all G_DEFINE_TYPE uses should be at top of file
-
-
-
+- finish changing gtk_signal_conn
 
 - redo scale along the new vipsthumbnail lines
 

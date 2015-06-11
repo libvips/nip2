@@ -2229,8 +2229,8 @@ program_build( Program *program, GtkWidget *vbox )
         item = gtk_ui_manager_get_widget( iwnd->ui_manager,
 		"/ProgramMenubar/EditMenu/Cut" );
 	item = gtk_widget_get_parent( GTK_WIDGET( item ) );
-        gtk_signal_connect( GTK_OBJECT( item ), "map",
-                GTK_SIGNAL_FUNC( program_edit_map_cb ), program );
+        g_signal_connect( item, "map",
+                G_CALLBACK( program_edit_map_cb ), program );
 
 	/* This will set to NULL if we don't have infobar support.
 	 */
@@ -2290,11 +2290,10 @@ program_build( Program *program, GtkWidget *vbox )
 	gtk_tree_view_set_reorderable( GTK_TREE_VIEW( program->tree ), TRUE );
 	select = gtk_tree_view_get_selection( GTK_TREE_VIEW( program->tree ) );
 	gtk_tree_selection_set_mode( select, GTK_SELECTION_SINGLE );
-	program->select_changed_sid = g_signal_connect( 
-		G_OBJECT( select ), "changed",
+	program->select_changed_sid = g_signal_connect( select, "changed",
 		G_CALLBACK( program_selection_changed_cb ), program );
-	gtk_signal_connect( GTK_OBJECT( program->tree ), "event",
-		GTK_SIGNAL_FUNC( program_tree_event_cb ), program );
+	g_signal_connect( program->tree, "event",
+		G_CALLBACK( program_tree_event_cb ), program );
 	gtk_widget_show( program->tree );
 
 	/* Toolkit Browser pane.

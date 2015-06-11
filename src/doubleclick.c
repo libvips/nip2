@@ -220,10 +220,10 @@ doubleclick_add( GtkWidget *wid, gboolean dsingle,
 
 	/* Add callbacks.
 	 */
-	gtk_signal_connect( GTK_OBJECT( wid ), "destroy", 
-		GTK_SIGNAL_FUNC( doubleclick_destroy_cb ), click );
-	gtk_signal_connect( GTK_OBJECT( wid ), "event", 
-		GTK_SIGNAL_FUNC( doubleclick_trigger_cb ), click );
-	gtk_signal_connect( GTK_OBJECT( wid ), "realize", 
-		GTK_SIGNAL_FUNC( doubleclick_realize_cb ), NULL );
+	g_signal_connect( wid, "destroy", 
+		G_CALLBACK( doubleclick_destroy_cb ), click );
+	g_signal_connect( wid, "event", 
+		G_CALLBACK( doubleclick_trigger_cb ), click );
+	g_signal_connect( wid, "realize", 
+		G_CALLBACK( doubleclick_realize_cb ), NULL );
 }

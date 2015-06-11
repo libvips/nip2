@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static GraphicviewClass *parent_class = NULL;
+G_DEFINE_TYPE( valueview, Valueview, TYPE_GRAPHICVIEW ); 
 
 static void 
 valueview_refresh( vObject *vobject )
@@ -49,7 +49,7 @@ valueview_refresh( vObject *vobject )
 
 	set_gcaption( valueview->label, "%s", NN( IOBJECT( model )->caption ) );
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( valueview_parent_class )->refresh( vobject );
 }
 
 static void
@@ -58,7 +58,7 @@ valueview_link( View *view, Model *model, View *parent )
 	Valueview *valueview = VALUEVIEW( view );
 	Rowview *rview = ROWVIEW( parent->parent );
 
-	VIEW_CLASS( parent_class )->link( view, model, parent );
+	VIEW_CLASS( valueview_parent_class )->link( view, model, parent );
 
 	(void) rowview_menu_attach( rview, valueview->eb );
 }
@@ -68,8 +68,6 @@ valueview_class_init( ValueviewClass *class )
 {
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -134,29 +132,6 @@ valueview_init( Valueview *valueview )
                 GTK_SIGNAL_FUNC( valueview_event_cb ), valueview );
 
         gtk_widget_show_all( GTK_WIDGET( valueview->eb ) );
-}
-
-GtkType
-valueview_get_type( void )
-{
-	static GtkType valueview_type = 0;
-
-	if( !valueview_type ) {
-		static const GtkTypeInfo info = {
-			"Valueview",
-			sizeof( Valueview ),
-			sizeof( ValueviewClass ),
-			(GtkClassInitFunc) valueview_class_init,
-			(GtkObjectInitFunc) valueview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		valueview_type = gtk_type_unique( TYPE_GRAPHICVIEW, &info );
-	}
-
-	return( valueview_type );
 }
 
 View *

@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static LogClass *parent_class = NULL;
+G_DEFINE_TYPE( ierror, iError, TYPE_LOG ); 
 
 static void *
 ierror_print( Expr *expr, iError *ierror, gboolean *found )
@@ -154,8 +154,6 @@ ierror_class_init( iErrorClass *class )
 {
 	LogClass *log_class = (LogClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	log_class->actions = ierror_actions;
 	log_class->n_actions = IM_NUMBER( ierror_actions );
 	log_class->action_name = "iErrorActions";
@@ -167,8 +165,6 @@ static void
 ierror_init( iError *ierror )
 {
 }
-
-G_DEFINE_TYPE( ierror, iError, TYPE_LOG ); 
 
 static void
 ierror_link( iError *ierror, Toolkitgroup *kitg )

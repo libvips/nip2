@@ -509,15 +509,15 @@ rowview_link( View *view, Model *model, View *parent )
 		gtk_drag_source_set( rview->but, GDK_BUTTON1_MASK, 
 			rowview_target_table, IM_NUMBER( rowview_target_table ),
 			GDK_ACTION_COPY );
-		gtk_signal_connect( GTK_OBJECT( rview->but ), "drag_data_get",
-			GTK_SIGNAL_FUNC( rowview_drag_data_get ), rview );
+		g_signal_connect( rview->but, "drag_data_get",
+			G_CALLBACK( rowview_drag_data_get ), rview );
 
 		gtk_drag_dest_set( rview->but, GTK_DEST_DEFAULT_ALL,
 			rowview_target_table, IM_NUMBER( rowview_target_table ),
 			GDK_ACTION_COPY );
-		gtk_signal_connect( GTK_OBJECT( rview->but ), 
+		g_signal_connect( rview->but, 
 			"drag_data_received",
-			GTK_SIGNAL_FUNC( rowview_drag_data_received ), rview );
+			G_CALLBACK( rowview_drag_data_received ), rview );
 	}
 
 	rowview_menu_attach( rview, rview->but );
@@ -648,10 +648,10 @@ rowview_init( Rowview *rview )
         /* Make fold/unfold button.
          */
 	rview->spin = spin_new();
-        gtk_signal_connect( GTK_OBJECT( rview->spin ), "up_click",
-                GTK_SIGNAL_FUNC( rowview_spin_up_cb ), rview );
-        gtk_signal_connect( GTK_OBJECT( rview->spin ), "down_click",
-                GTK_SIGNAL_FUNC( rowview_spin_down_cb ), rview );
+        g_signal_connect( rview->spin, "up_click",
+                G_CALLBACK( rowview_spin_up_cb ), rview );
+        g_signal_connect( rview->spin, "down_click",
+                G_CALLBACK( rowview_spin_down_cb ), rview );
         gtk_widget_show( rview->spin );
 	set_tooltip( rview->spin, _( "Click to open or close class" ) );
 
@@ -667,12 +667,12 @@ rowview_init( Rowview *rview )
         gtk_misc_set_padding( GTK_MISC( rview->label ), 2, 0 );
         gtk_container_add( GTK_CONTAINER( rview->but ), rview->label );
         gtk_widget_show( rview->label );
-        gtk_signal_connect( GTK_OBJECT( rview->but ), "enter",
-                GTK_SIGNAL_FUNC( rowview_enter_cb ), rview );
-        gtk_signal_connect( GTK_OBJECT( rview->but ), "leave",
-                GTK_SIGNAL_FUNC( rowview_leave_cb ), rview );
-        gtk_signal_connect( GTK_OBJECT( rview->but ), "focus",
-                GTK_SIGNAL_FUNC( rowview_focus_cb ), rview );
+        g_signal_connect( rview->but, "enter",
+                G_CALLBACK( rowview_enter_cb ), rview );
+        g_signal_connect( rview->but, "leave",
+                G_CALLBACK( rowview_leave_cb ), rview );
+        g_signal_connect( rview->but, "focus",
+                G_CALLBACK( rowview_focus_cb ), rview );
 	set_tooltip_generate( rview->but, 
 		(TooltipGenerateFn) rowview_tooltip_generate, rview, NULL );
 }

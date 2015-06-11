@@ -40,7 +40,7 @@ enum {
 	TARGET_TEXT
 };
 
-static ImagedisplayClass *parent_class = NULL;
+G_DEFINE_TYPE( colourdisplay, Colourdisplay, TYPE_IMAGEDISPLAY ); 
 
 /* Prefer x-color drags for 3 band non-complex imageinfos, and for LABQ
  */
@@ -89,7 +89,7 @@ colourdisplay_realize( GtkWidget *widget )
 {
 	Colourdisplay *colourdisplay = COLOURDISPLAY( widget );
 
-	GTK_WIDGET_CLASS( parent_class )->realize( widget );
+	GTK_WIDGET_CLASS( colourdisplay_parent_class )->realize( widget );
 
 	colourdisplay_set_drag_type( colourdisplay );
 }
@@ -253,7 +253,7 @@ colourdisplay_conversion_changed( Imagedisplay *id )
 {
 	Colourdisplay *colourdisplay = COLOURDISPLAY( id );
 
-	IMAGEDISPLAY_CLASS( parent_class )->conversion_changed( id );
+	IMAGEDISPLAY_CLASS( colourdisplay_parent_class )->conversion_changed( id );
 
 	if( id->conv )
 		conversion_set_mag( id->conv, 5000 );
@@ -266,8 +266,6 @@ colourdisplay_class_init( ColourdisplayClass *class )
 {
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	ImagedisplayClass *imagedisplay_class = (ImagedisplayClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	widget_class->realize = colourdisplay_realize;
 	widget_class->drag_begin = colourdisplay_drag_begin;
@@ -294,8 +292,6 @@ colourdisplay_init( Colourdisplay *colourdisplay )
 		(TooltipGenerateFn) colourdisplay_generate_tooltip, 
 			NULL, NULL );
 }
-
-G_DEFINE_TYPE( colourdisplay, Colourdisplay, TYPE_IMAGEDISPLAY ); 
 
 Colourdisplay *
 colourdisplay_new( Conversion *conv )

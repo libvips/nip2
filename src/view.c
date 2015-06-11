@@ -38,7 +38,7 @@
 
 #include "ip.h"
 
-static vObjectClass *parent_class = NULL;
+G_DEFINE_TYPE( view, View, TYPE_VOBJECT ); 
 
 static GSList *view_scannable = NULL;
 
@@ -338,7 +338,7 @@ view_destroy( GtkObject *object )
 	slist_map( view->managed,
 		(SListMapFn) view_viewchild_destroy, NULL );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( view_parent_class )->destroy( object );
 }
 
 static void 
@@ -348,7 +348,7 @@ view_finalize( GObject *gobject )
 	printf( "view_finalize: \"%s\"\n", G_OBJECT_TYPE_NAME( gobject ) );
 #endif /*DEBUG*/
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( view_parent_class )->finalize( gobject );
 }
 
 /* Called for model pos_changed signal ... queue a refresh. 
@@ -703,8 +703,6 @@ view_class_init( ViewClass *class )
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
 	GtkObjectClass *object_class = (GtkObjectClass*) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	gobject_class->finalize = view_finalize;
 
 	object_class->destroy = view_destroy;
@@ -746,29 +744,6 @@ view_init( View *view )
 
 	view->scannable = FALSE;
 	view->resettable = FALSE;
-}
-
-GtkType
-view_get_type( void )
-{
-	static GtkType view_type = 0;
-
-	if( !view_type ) {
-		static const GtkTypeInfo view_info = {
-			"View",
-			sizeof( View ),
-			sizeof( ViewClass ),
-			(GtkClassInitFunc) view_class_init,
-			(GtkObjectInitFunc) view_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		view_type = gtk_type_unique( TYPE_VOBJECT, &view_info );
-	}
-
-	return( view_type );
 }
 
 /* Trigger the reset method for a view.

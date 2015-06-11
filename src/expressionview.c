@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static GraphicviewClass *parent_class = NULL;
+G_DEFINE_TYPE( expressionview, Expressionview, TYPE_GRAPHICVIEW ); 
 
 /* Re-read the text in a tally entry. 
  */
@@ -66,7 +66,7 @@ expressionview_scan( View *view )
 			link_serial_new() );
 	}
 
-	return( VIEW_CLASS( parent_class )->scan( view ) );
+	return( VIEW_CLASS( expressionview_parent_class )->scan( view ) );
 }
 
 void
@@ -114,7 +114,7 @@ expressionview_refresh( vObject *vobject )
 		formula_set_caption( expressionview->formula,
 			vobject->iobject->caption );
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( expressionview_parent_class )->refresh( vobject );
 }
 
 static void 
@@ -139,7 +139,7 @@ expressionview_link( View *view, Model *model, View *parent )
 	printf( "\n" );
 #endif /*DEBUG*/
 
-	VIEW_CLASS( parent_class )->link( view, model, parent );
+	VIEW_CLASS( expressionview_parent_class )->link( view, model, parent );
 
 	if( GRAPHICVIEW( view )->sview )
 		gtk_size_group_add_widget( GRAPHICVIEW( view )->sview->group,   
@@ -171,8 +171,6 @@ expressionview_class_init( ExpressionviewClass *class )
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	/* Create signals.
 	 */
 
@@ -189,18 +187,14 @@ static void
 expressionview_init( Expressionview *expressionview )
 {
 	expressionview->formula = formula_new();
-        gtk_signal_connect_object( GTK_OBJECT( expressionview->formula ), 
-		"changed", 
-		GTK_SIGNAL_FUNC( view_changed_cb ), 
-		GTK_OBJECT( expressionview ) );
-        gtk_signal_connect( GTK_OBJECT( expressionview->formula ), "activate",
-                GTK_SIGNAL_FUNC( expressionview_activate_cb ), expressionview );
+        g_signal_connect_object( expressionview->formula, "changed", 
+		G_CALLBACK( view_changed_cb ), GTK_OBJECT( expressionview ) );
+        g_signal_connect( expressionview->formula, "activate",
+                G_CALLBACK( expressionview_activate_cb ), expressionview );
         gtk_box_pack_start( GTK_BOX( expressionview ), 
 		GTK_WIDGET( expressionview->formula ), TRUE, FALSE, 0 );
         gtk_widget_show( GTK_WIDGET( expressionview->formula ) );
 }
-
-G_DEFINE_TYPE( expressionview, Expressionview, TYPE_GRAPHICVIEW ); 
 
 View *
 expressionview_new( void )

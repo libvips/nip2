@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ViewClass *parent_class = NULL;
+G_DEFINE_TYPE( toolkitgroupview, Toolkitgroupview, TYPE_VIEW ); 
 
 static void *
 toolkitgroupview_dispose_sub( View *view, void *a, void *b )
@@ -56,7 +56,7 @@ toolkitgroupview_dispose( GObject *gobject )
 	view_map( VIEW( gobject ), 
 		toolkitgroupview_dispose_sub, NULL, NULL ); 
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( toolkitgroupview_parent_class )->dispose( gobject );
 }
 
 static void 
@@ -74,7 +74,7 @@ toolkitgroupview_refresh( vObject *vobject )
 	printf( "toolkitgroup changed\n" );
 #endif /*DEBUG*/
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( toolkitgroupview_parent_class )->refresh( vobject );
 }
 
 static void
@@ -82,8 +82,6 @@ toolkitgroupview_class_init( ToolkitgroupviewClass *class )
 {
 	GObjectClass *gobject_class = (GObjectClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	gobject_class->dispose = toolkitgroupview_dispose;
 
@@ -98,29 +96,6 @@ toolkitgroupview_class_init( ToolkitgroupviewClass *class )
 static void
 toolkitgroupview_init( Toolkitgroupview *kitgview )
 {
-}
-
-GtkType
-toolkitgroupview_get_type( void )
-{
-	static GtkType toolkitgroupview_type = 0;
-
-	if( !toolkitgroupview_type ) {
-		static const GtkTypeInfo info = {
-			"Toolkitgroupview",
-			sizeof( Toolkitgroupview ),
-			sizeof( ToolkitgroupviewClass ),
-			(GtkClassInitFunc) toolkitgroupview_class_init,
-			(GtkObjectInitFunc) toolkitgroupview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		toolkitgroupview_type = gtk_type_unique( TYPE_VIEW, &info );
-	}
-
-	return( toolkitgroupview_type );
 }
 
 View *

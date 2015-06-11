@@ -790,8 +790,8 @@ imageview_build( Imageview *iv, GtkWidget *vbox, iImage *iimage )
 	iv->ip = imagepresent_new( iv->imagemodel );
 	gtk_container_add( GTK_CONTAINER( frame ), GTK_WIDGET( iv->ip ) );
 	gtk_widget_show( GTK_WIDGET( iv->ip ) );
-	gtk_signal_connect_after( GTK_OBJECT( iv->ip->id ), "event",
-		GTK_SIGNAL_FUNC( imageview_event ), iv );
+	g_signal_connect_after( iv->ip->id, "event",
+		G_CALLBACK( imageview_event ), iv );
 
 	/* Position and size to restore?
 	 */

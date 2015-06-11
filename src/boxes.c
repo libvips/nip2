@@ -430,7 +430,7 @@ box_help( GtkWidget *par, const char *name )
 /* Name + caption dialog ... for new workspace / new column.
  */
 
-static iDialogClass *stringset_parent_class = NULL;
+G_DEFINE_TYPE( stringset, Stringset, TYPE_IDIALOG ); 
 
 void *
 stringset_child_destroy( StringsetChild *ssc )
@@ -535,8 +535,6 @@ stringset_class_init( StringsetClass *class )
 
 	object_class->destroy = stringset_destroy;
 	iwindow_class->build = stringset_build;
-
-	stringset_parent_class = g_type_class_peek_parent( class );
 }
 
 static void
@@ -548,8 +546,6 @@ stringset_init( Stringset *ss )
 
 	ss->children = NULL;
 }
-
-G_DEFINE_TYPE( stringset, Stringset, TYPE_IDIALOG ); 
 
 GtkWidget *
 stringset_new( void )
@@ -577,7 +573,7 @@ stringset_child_get( Stringset *ss, const char *label )
 /* Find dialog.
  */
 
-static iDialogClass *find_parent_class = NULL;
+G_DEFINE_TYPE( find, Find, TYPE_IDIALOG ); 
 
 static void
 find_build( GtkWidget *widget )
@@ -608,8 +604,6 @@ find_class_init( FindClass *class )
 	iWindowClass *iwindow_class = (iWindowClass *) class;
 
 	iwindow_class->build = find_build;
-
-	find_parent_class = g_type_class_peek_parent( class );
 }
 
 static void
@@ -621,8 +615,6 @@ find_init( Find *find )
 
 	idialog_set_pinup( IDIALOG( find ), TRUE );
 }
-
-G_DEFINE_TYPE( find, Find, TYPE_IDIALOG ); 
 
 GtkWidget *
 find_new( void )
@@ -706,7 +698,7 @@ box_url( GtkWidget *par, const char *url )
 /* Fontchooser dialog.
  */
 
-static iDialogClass *fontchooser_parent_class = NULL;
+G_DEFINE_TYPE( fontchooser, Fontchooser, TYPE_IDIALOG ); 
 
 static void
 fontchooser_build( GtkWidget *widget )
@@ -737,8 +729,6 @@ fontchooser_class_init( FontchooserClass *class )
 {
 	iWindowClass *iwindow_class;
 
-	fontchooser_parent_class = g_type_class_peek_parent( class );
-
 	iwindow_class = (iWindowClass *) class;
 
 	iwindow_class->build = fontchooser_build;
@@ -748,8 +738,6 @@ static void
 fontchooser_init( Fontchooser *fontchooser )
 {
 }
-
-G_DEFINE_TYPE( fontchooser, Fontchooser, TYPE_IDIALOG ); 
 
 Fontchooser *
 fontchooser_new( void )
@@ -783,14 +771,14 @@ fontchooser_get_font_name( Fontchooser *fontchooser )
 /* Fontbutton.
  */
 
+G_DEFINE_TYPE( fontbutton, Fontbutton, GTK_TYPE_BUTTON ); 
+
 /* Our signals. 
  */
 enum {
 	SIG_CHANGED,	/* New font selected */
 	SIG_LAST
 };
-
-static GtkButtonClass *fontbutton_parent_class = NULL;
 
 static guint fontbutton_signals[SIG_LAST] = { 0 };
 
@@ -873,8 +861,6 @@ fontbutton_class_init( FontbuttonClass *class )
 	GObjectClass *gobject_class = (GObjectClass *) class;
 	GtkButtonClass *bobject_class = (GtkButtonClass *) class;
 
-	fontbutton_parent_class = g_type_class_peek_parent( class );
-
 	gobject_class->finalize = fontbutton_finalize;
 
 	bobject_class->clicked = fontbutton_clicked;
@@ -898,8 +884,6 @@ fontbutton_init( Fontbutton *fontbutton )
 
 	set_tooltip( GTK_WIDGET( fontbutton ), _( "Click to select font" ) );
 }
-
-G_DEFINE_TYPE( fontbutton, Fontbutton, GTK_TYPE_BUTTON ); 
 
 Fontbutton *
 fontbutton_new( void )

@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ViewClass *parent_class = NULL;
+G_DEFINE_TYPE( toolkitbrowser, Toolkitbrowser, TYPE_VOBJECT ); 
 
 /* Our columns.
  */
@@ -53,7 +53,7 @@ toolkitbrowser_destroy( GtkObject *object )
 	UNREF( toolkitbrowser->filter );
 	UNREF( toolkitbrowser->store );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( toolkitbrowser_parent_class )->destroy( object );
 }
 
 static void *
@@ -131,7 +131,7 @@ toolkitbrowser_refresh( vObject *vobject )
 		(toolkit_map_fn) toolkitbrowser_rebuild_item, 
 		toolkitbrowser, NULL );
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( toolkitbrowser_parent_class )->refresh( vobject );
 }
 
 static void
@@ -144,7 +144,7 @@ toolkitbrowser_link( vObject *vobject, iObject *iobject )
 
 	toolkitbrowser->kitg = kitg;
 
-	VOBJECT_CLASS( parent_class )->link( vobject, iobject );
+	VOBJECT_CLASS( toolkitbrowser_parent_class )->link( vobject, iobject );
 }
 
 static void
@@ -152,8 +152,6 @@ toolkitbrowser_class_init( ToolkitbrowserClass *class )
 {
 	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	object_class->destroy = toolkitbrowser_destroy;
 
@@ -313,29 +311,6 @@ toolkitbrowser_init( Toolkitbrowser *toolkitbrowser )
 
         gtk_box_pack_start( GTK_BOX( toolkitbrowser ), swin, TRUE, TRUE, 2 );
 	gtk_widget_show_all( swin );
-}
-
-GtkType
-toolkitbrowser_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type ) {
-		static const GtkTypeInfo info = {
-			"Toolkitbrowser",
-			sizeof( Toolkitbrowser ),
-			sizeof( ToolkitbrowserClass ),
-			(GtkClassInitFunc) toolkitbrowser_class_init,
-			(GtkObjectInitFunc) toolkitbrowser_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( TYPE_VOBJECT, &info );
-	}
-
-	return( type );
 }
 
 Toolkitbrowser *

@@ -34,6 +34,8 @@
 
 #include "ip.h"
 
+G_DEFINE_TYPE( formula, Formula, GTK_TYPE_EVENT_BOX ); 
+
 /* Our signals. 
  */
 enum {
@@ -44,8 +46,6 @@ enum {
 	LEAVE,	
 	LAST_SIGNAL
 };
-
-static GtkEventBoxClass *parent_class = NULL;
 
 static guint formula_signals[LAST_SIGNAL] = { 0 };
 
@@ -142,13 +142,12 @@ formula_add_edit( Formula *formula )
         formula->entry = gtk_entry_new();
         set_tooltip( formula->entry, _( "Press Escape to cancel edit, "
                 "press Return to accept edit and recalculate" ) );
-        gtk_signal_connect( GTK_OBJECT( formula->entry ), "key_press_event", 
-		GTK_SIGNAL_FUNC( formula_key_press_event_cb ), 
-		GTK_OBJECT( formula ) );
-        gtk_signal_connect_object( GTK_OBJECT( formula->entry ), "changed", 
-		GTK_SIGNAL_FUNC( formula_changed ), GTK_OBJECT( formula ) );
-        gtk_signal_connect( GTK_OBJECT( formula->entry ), "activate",
-                GTK_SIGNAL_FUNC( formula_activate_cb ), formula );
+        g_signal_connect( formula->entry, "key_press_event", 
+		G_CALLBACK( formula_key_press_event_cb ), G_OBJECT( formula ) );
+        g_signal_connect_object( formula->entry, "changed", 
+		G_CALLBACK( formula_changed ), G_OBJECT( formula ) );
+        g_signal_connect( formula->entry, "activate",
+                G_CALLBACK( formula_activate_cb ), formula );
 	gtk_container_add( GTK_CONTAINER( formula->entry_frame ), 
 		formula->entry );
 	gtk_widget_show( formula->entry );
@@ -265,7 +264,7 @@ formula_destroy( GtkObject *object )
 	IM_FREE( formula->value );
 	IM_FREE( formula->expr );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( formula_parent_class )->destroy( object );
 }
 
 /* Change edit mode.
@@ -433,8 +432,6 @@ formula_class_init( FormulaClass *class )
 	GtkObjectClass *gobject_class = (GtkObjectClass *) class;
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	gobject_class->destroy = formula_destroy;
 
 	widget_class->enter_notify_event = formula_enter_notify_event;
@@ -536,8 +533,6 @@ formula_init( Formula *formula )
 		formula->right_label, TRUE, TRUE, 0 );
         gtk_widget_show( formula->right_label );
 }
-
-G_DEFINE_TYPE( formula, Formula, GTK_TYPE_EVENT_BOX ); 
 
 Formula *
 formula_new( void )

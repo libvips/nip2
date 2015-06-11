@@ -223,16 +223,16 @@ itextview_init( iTextview *itextview )
 {
 	itextview->formula = formula_new();
 
-        gtk_signal_connect( GTK_OBJECT( itextview->formula ), "edit", 
-		GTK_SIGNAL_FUNC( itextview_edit_cb ), itextview );
-        gtk_signal_connect_object( GTK_OBJECT( itextview->formula ), "changed", 
-		GTK_SIGNAL_FUNC( view_changed_cb ), itextview );
-        gtk_signal_connect( GTK_OBJECT( itextview->formula ), "activate",
-                GTK_SIGNAL_FUNC( itextview_activate_cb ), itextview );
-        gtk_signal_connect( GTK_OBJECT( itextview->formula ), "enter", 
-		GTK_SIGNAL_FUNC( itextview_enter_cb ), itextview );
-        gtk_signal_connect( GTK_OBJECT( itextview->formula ), "leave", 
-		GTK_SIGNAL_FUNC( itextview_leave_cb ), itextview );
+        g_signal_connect( itextview->formula, "edit", 
+		G_CALLBACK( itextview_edit_cb ), itextview );
+        g_signal_connect_object( itextview->formula, "changed", 
+		G_CALLBACK( view_changed_cb ), itextview );
+        g_signal_connect( itextview->formula, "activate",
+                G_CALLBACK( itextview_activate_cb ), itextview );
+        g_signal_connect( itextview->formula, "enter", 
+		G_CALLBACK( itextview_enter_cb ), itextview );
+        g_signal_connect( itextview->formula, "leave", 
+		G_CALLBACK( itextview_leave_cb ), itextview );
 
         gtk_box_pack_start( GTK_BOX( itextview ), 
 		GTK_WIDGET( itextview->formula ), TRUE, FALSE, 0 );

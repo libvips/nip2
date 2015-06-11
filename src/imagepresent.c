@@ -1515,8 +1515,8 @@ imagepresent_init( Imagepresent *ip )
 	 */
 	ip->id = imagedisplay_new( NULL );
 	GTK_WIDGET_SET_FLAGS( ip, GTK_CAN_FOCUS );
-	gtk_signal_connect( GTK_OBJECT( ip->id ), "realize",
-		GTK_SIGNAL_FUNC( imagepresent_realize_id_cb ), NULL );
+	g_signal_connect( ip->id, "realize",
+		G_CALLBACK( imagepresent_realize_id_cb ), NULL );
 
 	/* Press/release/motion-notify stuff.
 	 */
@@ -1525,10 +1525,10 @@ imagepresent_init( Imagepresent *ip )
 		GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK |
 		GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK |
 		GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK ); 
-	gtk_signal_connect_after( GTK_OBJECT( ip->id ), "event",
-		GTK_SIGNAL_FUNC( imagepresent_event_cb ), ip );
-	gtk_signal_connect( GTK_OBJECT( ip ), "key_press_event",
-		GTK_SIGNAL_FUNC( imagepresent_key_press_event_cb ), ip );
+	g_signal_connect_after( ip->id, "event",
+		G_CALLBACK( imagepresent_event_cb ), ip );
+	g_signal_connect( ip, "key_press_event",
+		G_CALLBACK( imagepresent_key_press_event_cb ), ip );
 
 	ip->swin = GTK_SCROLLED_WINDOW( gtk_scrolled_window_new( NULL, NULL ) );
 	gtk_scrolled_window_add_with_viewport( ip->swin, GTK_WIDGET( ip->id ) );
@@ -1536,19 +1536,19 @@ imagepresent_init( Imagepresent *ip )
 		GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
 	ip->hadj = gtk_scrolled_window_get_hadjustment( ip->swin );
 	ip->vadj = gtk_scrolled_window_get_vadjustment( ip->swin );
-	gtk_signal_connect( GTK_OBJECT( ip->swin ), "scroll_event",
-		GTK_SIGNAL_FUNC( imagepresent_scroll_event_cb ), ip );
+	g_signal_connect( ip->swin, "scroll_event",
+		G_CALLBACK( imagepresent_scroll_event_cb ), ip );
 
 	port = gtk_bin_get_child( GTK_BIN( ip->swin ) );
 	g_assert( GTK_IS_VIEWPORT( port ) );
-	gtk_signal_connect( GTK_OBJECT( ip->hadj ), "changed",
-		GTK_SIGNAL_FUNC( imagepresent_hadj_changed_cb ), ip );
-	gtk_signal_connect( GTK_OBJECT( ip->hadj ), "value_changed",
-		GTK_SIGNAL_FUNC( imagepresent_hadj_changed_cb ), ip );
-	gtk_signal_connect( GTK_OBJECT( ip->vadj ), "changed",
-		GTK_SIGNAL_FUNC( imagepresent_vadj_changed_cb ), ip );
-	gtk_signal_connect( GTK_OBJECT( ip->vadj ), "value_changed",
-		GTK_SIGNAL_FUNC( imagepresent_vadj_changed_cb ), ip );
+	g_signal_connect( ip->hadj, "changed",
+		G_CALLBACK( imagepresent_hadj_changed_cb ), ip );
+	g_signal_connect( ip->hadj, "value_changed",
+		G_CALLBACK( imagepresent_hadj_changed_cb ), ip );
+	g_signal_connect( ip->vadj, "changed",
+		G_CALLBACK( imagepresent_vadj_changed_cb ), ip );
+	g_signal_connect( ip->vadj, "value_changed",
+		G_CALLBACK( imagepresent_vadj_changed_cb ), ip );
 
 	bar = ip->swin->hscrollbar;
 	g_assert( GTK_IS_SCROLLBAR( bar ) );
@@ -1584,14 +1584,14 @@ imagepresent_init( Imagepresent *ip )
 
 	ip->heb = GTK_EVENT_BOX( gtk_event_box_new() );
         gtk_container_add( GTK_CONTAINER( ip->heb ), GTK_WIDGET( ip->hrule ) );
-        gtk_signal_connect( GTK_OBJECT( ip->heb ), "event",
-		GTK_SIGNAL_FUNC( imagepresent_hruler_event ), ip );
+        g_signal_connect( ip->heb, "event",
+		G_CALLBACK( imagepresent_hruler_event ), ip );
         popup_attach( GTK_WIDGET( ip->heb ), ip->ruler_menu, ip );
 
 	ip->veb = GTK_EVENT_BOX( gtk_event_box_new() );
         gtk_container_add( GTK_CONTAINER( ip->veb ), GTK_WIDGET( ip->vrule ) );
-        gtk_signal_connect( GTK_OBJECT( ip->veb ), "event",
-		GTK_SIGNAL_FUNC( imagepresent_vruler_event ), ip );
+        g_signal_connect( ip->veb, "event",
+		G_CALLBACK( imagepresent_vruler_event ), ip );
         popup_attach( GTK_WIDGET( ip->veb ), ip->ruler_menu, ip );
 
 	/* Attach all widgets to table.

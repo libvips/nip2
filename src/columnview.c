@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ViewClass *parent_class = NULL;
+G_DEFINE_TYPE( columnview, Columnview, TYPE_VIEW ); 
 
 /* The columnview popup menu.
  */
@@ -648,7 +648,7 @@ columnview_destroy( GtkObject *object )
 		mainw_layout();
 	}
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( columnview_parent_class )->destroy( object );
 }
 
 static void
@@ -668,7 +668,7 @@ columnview_size_allocate( GtkWidget *widget, GtkAllocation *allocation )
 		mainw_layout();
 	}
 
-	GTK_WIDGET_CLASS( parent_class )->size_allocate( widget, allocation );
+	GTK_WIDGET_CLASS( columnview_parent_class )->size_allocate( widget, allocation );
 }
 
 /* Arrow button on title bar.
@@ -757,10 +757,10 @@ columnview_add_caption( Columnview *cview )
         set_tooltip( cview->capedit, _( "Edit caption, press enter to "
                 "accept changes, press escape to cancel" ) );
 
-        gtk_signal_connect( GTK_OBJECT( cview->capedit ), "activate",
-                GTK_SIGNAL_FUNC( columnview_caption_enter_cb ), cview );
-        gtk_signal_connect( GTK_OBJECT( cview->capedit ), "event",
-                GTK_SIGNAL_FUNC( columnview_caption_cancel_cb ), cview );
+        g_signal_connect( cview->capedit, "activate",
+                G_CALLBACK( columnview_caption_enter_cb ), cview );
+        g_signal_connect( cview->capedit, "event",
+                G_CALLBACK( columnview_caption_cancel_cb ), cview );
 }
 
 /* Callback for enter in new def widget.
@@ -804,8 +804,8 @@ columnview_add_text( Columnview *cview )
         cview->text = gtk_entry_new();
         gtk_box_pack_start( GTK_BOX( cview->textfr ), 
 		cview->text, TRUE, TRUE, 0 );
-        gtk_signal_connect( GTK_OBJECT( cview->text ), "activate",
-                GTK_SIGNAL_FUNC( columnview_text_enter_cb ), cview );
+        g_signal_connect( cview->text, "activate",
+                G_CALLBACK( columnview_text_enter_cb ), cview );
         gtk_widget_show( cview->text );
         set_tooltip( cview->text, _( "Enter expressions here" ) );
 }
@@ -953,7 +953,7 @@ columnview_refresh( vObject *vobject )
 		cview->selected = FALSE;
 	}
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( columnview_parent_class )->refresh( vobject );
 }
 
 static void
@@ -962,7 +962,7 @@ columnview_link( View *view, Model *model, View *parent )
 	Columnview *cview = COLUMNVIEW( view );
 	Workspaceview *wview = WORKSPACEVIEW( parent );
 
-	VIEW_CLASS( parent_class )->link( view, model, parent );
+	VIEW_CLASS( columnview_parent_class )->link( view, model, parent );
 
 	cview->wview = wview;
 }
@@ -973,7 +973,7 @@ columnview_child_add( View *parent, View *child )
 	Columnview *cview = COLUMNVIEW( parent );
 	Subcolumnview *sview = SUBCOLUMNVIEW( child );
 
-	VIEW_CLASS( parent_class )->child_add( parent, child );
+	VIEW_CLASS( columnview_parent_class )->child_add( parent, child );
 
 	gtk_container_add( GTK_CONTAINER( cview->frame ), GTK_WIDGET( sview ) );
 }
@@ -1011,8 +1011,6 @@ columnview_class_init( ColumnviewClass *class )
 	ViewClass *view_class = (ViewClass *) class;
 
 	GtkWidget *pane;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -1113,8 +1111,8 @@ columnview_init( Columnview *cview )
         gtk_frame_set_shadow_type( GTK_FRAME( frame ), GTK_SHADOW_NONE );
         gtk_container_add( GTK_CONTAINER( cview->title ), frame );
         popup_attach( cview->title, columnview_menu, cview );
-        gtk_signal_connect( GTK_OBJECT( cview->title ), "event",
-                GTK_SIGNAL_FUNC( columnview_title_event_cb ), cview );
+        g_signal_connect( cview->title, "event",
+                G_CALLBACK( columnview_title_event_cb ), cview );
 
         /* Layout contents of title bar.
          */
@@ -1130,8 +1128,8 @@ columnview_init( Columnview *cview )
                 cview->updownb, FALSE, FALSE, 0 );
         cview->updown = gtk_arrow_new( GTK_ARROW_DOWN, GTK_SHADOW_OUT );
         gtk_container_add( GTK_CONTAINER( cview->updownb ), cview->updown );
-        gtk_signal_connect( GTK_OBJECT( cview->updownb ), "clicked",
-                GTK_SIGNAL_FUNC( columnview_updown_cb ), cview );
+        g_signal_connect( cview->updownb, "clicked",
+                G_CALLBACK( columnview_updown_cb ), cview );
 
         /* Remove columnview button.
          */
@@ -1143,8 +1141,8 @@ columnview_init( Columnview *cview )
         set_tooltip( but, _( "Delete the column" ) );
 	icon = gtk_image_new_from_stock( GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU );
         gtk_container_add( GTK_CONTAINER( but ), icon );
-        gtk_signal_connect( GTK_OBJECT( but ), "clicked",
-                GTK_SIGNAL_FUNC( columnview_destroy2_cb ), cview );
+        g_signal_connect( but, "clicked",
+                G_CALLBACK( columnview_destroy2_cb ), cview );
 
         /* Columnview name.
          */
@@ -1176,13 +1174,11 @@ columnview_init( Columnview *cview )
 	/* We need to stop our enclosing thing seeing doubeclicks and all
 	 * that.
 	 */
-	gtk_signal_connect( GTK_OBJECT( cview ), "event", 
-		GTK_SIGNAL_FUNC( columnview_event_cb ), cview );
+	g_signal_connect( cview, "event", 
+		G_CALLBACK( columnview_event_cb ), cview );
 
         gtk_widget_show_all( GTK_WIDGET( cview ) );
 }
-
-G_DEFINE_TYPE( columnview, Columnview, TYPE_VIEW ); 
 
 View *
 columnview_new( void )

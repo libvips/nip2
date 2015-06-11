@@ -43,7 +43,7 @@ enum {
 	LAST_SIGNAL
 };
 
-static GtkHBoxClass *parent_class = NULL;
+G_DEFINE_TYPE( tslider, Tslider, GTK_TYPE_HBOX ); 
 
 static guint tslider_signals[LAST_SIGNAL] = { 0 };
 
@@ -74,7 +74,7 @@ tslider_destroy( GtkObject *object )
 		tslider->adj = NULL;
 	}
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( tslider_parent_class )->destroy( object );
 }
 
 /* Map a value to a slider position.
@@ -186,8 +186,6 @@ tslider_class_init( TsliderClass *class )
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
 	GtkObjectClass *object_class = (GtkObjectClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	object_class->destroy = tslider_destroy;
 
@@ -414,29 +412,6 @@ tslider_init( Tslider *tslider )
 	tslider->auto_link = TRUE;
 	tslider->slider_to_value = tslider_conversion_id;
 	tslider->value_to_slider = tslider_conversion_id;
-}
-
-GtkType
-tslider_get_type( void )
-{
-	static GtkType tslider_type = 0;
-
-	if( !tslider_type ) {
-		static const GtkTypeInfo sinfo = {
-			"Tslider",
-			sizeof( Tslider ),
-			sizeof( TsliderClass ),
-			(GtkClassInitFunc) tslider_class_init,
-			(GtkObjectInitFunc) tslider_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		tslider_type = gtk_type_unique( GTK_TYPE_HBOX, &sinfo );
-	}
-
-	return( tslider_type );
 }
 
 Tslider *

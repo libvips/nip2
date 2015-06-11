@@ -106,8 +106,8 @@ panechild_init( Panechild *panechild )
         set_tooltip( but, _( "Close the pane" ) );
 	icon = gtk_image_new_from_stock( GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU );
         gtk_container_add( GTK_CONTAINER( but ), icon );
-        gtk_signal_connect( GTK_OBJECT( but ), "clicked",
-                GTK_SIGNAL_FUNC( panechild_hide_cb ), panechild );
+        g_signal_connect( but, "clicked",
+                G_CALLBACK( panechild_hide_cb ), panechild );
 
         panechild->label = gtk_label_new( "" );
 	gtk_misc_set_alignment( GTK_MISC( panechild->label ), 0.0, 0.5 );

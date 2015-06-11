@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ViewClass *parent_class = NULL;
+G_DEFINE_TYPE( workspacedefs, Workspacedefs, TYPE_VOBJECT ); 
 
 static void
 workspacedefs_text_changed( GtkTextBuffer *buffer, 
@@ -108,7 +108,7 @@ workspacedefs_refresh( vObject *vobject )
 	}
 	set_glabel( workspacedefs->status, "%s", vips_buf_all( &buf ) );
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( workspacedefs_parent_class )->refresh( vobject );
 }
 
 static void
@@ -121,15 +121,13 @@ workspacedefs_link( vObject *vobject, iObject *iobject )
 
 	workspacedefs->ws = ws;
 
-	VOBJECT_CLASS( parent_class )->link( vobject, iobject );
+	VOBJECT_CLASS( workspacedefs_parent_class )->link( vobject, iobject );
 }
 
 static void
 workspacedefs_class_init( WorkspacedefsClass *class )
 {
 	vObjectClass *vobject_class = (vObjectClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	vobject_class->refresh = workspacedefs_refresh;
 	vobject_class->link = workspacedefs_link;
@@ -304,29 +302,6 @@ workspacedefs_init( Workspacedefs *workspacedefs )
                 G_CALLBACK( workspacedefs_text_changed ), workspacedefs );
 	gtk_container_add( GTK_CONTAINER( swin ), workspacedefs->text );
 	gtk_widget_show( workspacedefs->text );
-}
-
-GtkType
-workspacedefs_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type ) {
-		static const GtkTypeInfo info = {
-			"Workspacedefs",
-			sizeof( Workspacedefs ),
-			sizeof( WorkspacedefsClass ),
-			(GtkClassInitFunc) workspacedefs_class_init,
-			(GtkObjectInitFunc) workspacedefs_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( TYPE_VOBJECT, &info );
-	}
-
-	return( type );
 }
 
 Workspacedefs *

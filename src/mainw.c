@@ -1016,8 +1016,8 @@ mainw_recent_build( GtkWidget *menu, GSList *recent )
 		g_free( utf8 );
 		gtk_menu_append( GTK_MENU( menu ), item );
 		gtk_widget_show( item );
-		gtk_signal_connect( GTK_OBJECT( item ), "activate",
-			GTK_SIGNAL_FUNC( mainw_recent_open_cb ), 
+		g_signal_connect( item, "activate",
+			G_CALLBACK( mainw_recent_open_cb ), 
 			(char *) filename );
 	}
 }
@@ -1083,8 +1083,8 @@ mainw_recent_map_cb( GtkWidget *widget, Mainw *mainw )
 		item = gtk_menu_item_new_with_label( _( "Clear Recent Menu" ) );
 		gtk_menu_append( GTK_MENU( menu ), item );
 		gtk_widget_show( item );
-		gtk_signal_connect( GTK_OBJECT( item ), "activate",
-			GTK_SIGNAL_FUNC( mainw_recent_clear_cb ), NULL );
+		g_signal_connect( item, "activate",
+			G_CALLBACK( mainw_recent_clear_cb ), NULL );
 	}
 }
 
@@ -1879,8 +1879,8 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
         item = gtk_ui_manager_get_widget( iwnd->ui_manager,
 		"/MainwMenubar/FileMenu/RecentMenu/Stub" );
 	mainw->recent_menu = gtk_widget_get_parent( GTK_WIDGET( item ) );
-        gtk_signal_connect( GTK_OBJECT( mainw->recent_menu ), "map",
-                GTK_SIGNAL_FUNC( mainw_recent_map_cb ), mainw );
+        g_signal_connect( mainw->recent_menu, "map",
+                G_CALLBACK( mainw_recent_map_cb ), mainw );
 
 	/* Same for the column jump menu.
 	 */
@@ -1930,8 +1930,8 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	mainw->space_free = gtk_label_new( "space_free" );
 	gtk_misc_set_padding( GTK_MISC( mainw->space_free ), 2, 2 );
         gtk_container_add( GTK_CONTAINER( frame ), mainw->space_free );
-        gtk_signal_connect( GTK_OBJECT( mainw->space_free_eb ), "event",
-                GTK_SIGNAL_FUNC( mainw_space_free_event ), mainw );
+        g_signal_connect( mainw->space_free_eb, "event",
+                G_CALLBACK( mainw_space_free_event ), mainw );
 	set_tooltip_generate( mainw->space_free_eb,
 		(TooltipGenerateFn) mainw_space_free_tooltip_generate, 
 		mainw, NULL );

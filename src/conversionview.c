@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static GtkEventBoxClass *parent_class = NULL;
+G_DEFINE_TYPE( conversionview, Conversionview, GTK_TYPE_FRAME ); 
 
 /* Find max and min of visible area of image.
  */
@@ -147,8 +147,6 @@ conversionview_hide_cb( GtkWidget *wid, Conversionview *cv )
 static void
 conversionview_class_init( ConversionviewClass *class )
 {
-	parent_class = g_type_class_peek_parent( class );
-
 	/* Create signals.
 	 */
 
@@ -235,8 +233,8 @@ conversionview_init( Conversionview *cv )
 	tslider_changed( cv->scale );
         gtk_box_pack_start( GTK_BOX( hb ), 
 		GTK_WIDGET( cv->scale ), TRUE, TRUE, 0 );
-        gtk_signal_connect( GTK_OBJECT( cv->scale ), "changed", 
-		GTK_SIGNAL_FUNC( conversionview_scale_change_cb ), cv );
+        g_signal_connect( cv->scale, "changed", 
+		G_CALLBACK( conversionview_scale_change_cb ), cv );
 	tslider_set_ignore_scroll( cv->scale, FALSE );
 
 	sep = gtk_vseparator_new();
@@ -251,14 +249,12 @@ conversionview_init( Conversionview *cv )
 	tslider_changed( cv->offset );
         gtk_box_pack_start( GTK_BOX( hb ), 
 		GTK_WIDGET( cv->offset ), TRUE, TRUE, 0 );
-        gtk_signal_connect( GTK_OBJECT( cv->offset ), "changed", 
-		GTK_SIGNAL_FUNC( conversionview_offset_change_cb ), cv );
+        g_signal_connect( cv->offset, "changed", 
+		G_CALLBACK( conversionview_offset_change_cb ), cv );
 	tslider_set_ignore_scroll( cv->offset, FALSE );
 
 	gtk_widget_show_all( hb );
 }
-
-G_DEFINE_TYPE( conversionview, Conversionview, GTK_TYPE_FRAME ); 
 
 /* Our conversion has changed ... update.
  */

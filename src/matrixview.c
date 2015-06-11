@@ -260,8 +260,8 @@ matrixview_toggle_build( Matrixview *matrixview )
     			GtkWidget *but;
 
     			but = gtk_button_new_with_label( "0" );
-    			gtk_signal_connect( GTK_OBJECT( but ), "clicked", 
-    				GTK_SIGNAL_FUNC( matrixview_toggle_change_cb ),
+    			g_signal_connect( but, "clicked", 
+    				G_CALLBACK( matrixview_toggle_change_cb ),
     				matrixview );
     			if( x == cx && y == cy )
     				gtk_widget_set_name( but, "centre_widget" );
@@ -325,17 +325,15 @@ matrixview_slider_build( Matrixview *matrixview )
     			tslider->to = 2;
     			tslider->digits = 3;
 
-    			gtk_signal_connect_object( GTK_OBJECT( tslider ), 
-    				"text_changed",
-    				GTK_SIGNAL_FUNC( view_changed_cb ), 
+    			g_signal_connect_object( tslider, "text_changed",
+    				G_CALLBACK( view_changed_cb ), 
     				GTK_OBJECT( matrixview ) );
-    			gtk_signal_connect_object( GTK_OBJECT( tslider ), 
-    				"activate", 
-    				GTK_SIGNAL_FUNC( view_activate_cb ), 
+    			g_signal_connect_object( tslider, "activate", 
+    				G_CALLBACK( view_activate_cb ), 
     				GTK_OBJECT( matrixview ) );
-    			gtk_signal_connect( GTK_OBJECT( tslider ), 
+    			g_signal_connect( tslider, 
     				"slider_changed", 
-    				GTK_SIGNAL_FUNC( matrixview_slider_change_cb ),
+    				G_CALLBACK( matrixview_slider_change_cb ),
     				matrixview );
 
     			gtk_container_set_border_width( 
@@ -368,19 +366,17 @@ matrixview_text_focus_out( GtkWidget *entry, GdkEvent *event, void *data )
 static void
 matrixview_text_connect( Matrixview *matrixview, GtkWidget *txt )
 {
-    	gtk_signal_connect_object( GTK_OBJECT( txt ), "changed",
-    		GTK_SIGNAL_FUNC( view_changed_cb ), 
-    		GTK_OBJECT( matrixview ) );
-    	gtk_signal_connect_object( GTK_OBJECT( txt ), "activate",
-    		GTK_SIGNAL_FUNC( view_activate_cb ), 
-    		GTK_OBJECT( matrixview ) );
+    	g_signal_connect_object( txt, "changed",
+    		G_CALLBACK( view_changed_cb ), G_OBJECT( matrixview ) );
+    	g_signal_connect_object( txt, "activate",
+    		G_CALLBACK( view_activate_cb ), G_OBJECT( matrixview ) );
 
     	/* Select text on focus-in, deselect on focus out.
     	 */
-    	gtk_signal_connect( GTK_OBJECT( txt ), "focus_in_event",
-    		GTK_SIGNAL_FUNC( matrixview_text_focus_in ), NULL );
-    	gtk_signal_connect( GTK_OBJECT( txt ), "focus_out_event",
-    		GTK_SIGNAL_FUNC( matrixview_text_focus_out ), NULL );
+    	g_signal_connect( txt, "focus_in_event",
+    		G_CALLBACK( matrixview_text_focus_in ), NULL );
+    	g_signal_connect( txt, "focus_out_event",
+    		G_CALLBACK( matrixview_text_focus_out ), NULL );
 }
 
 static void

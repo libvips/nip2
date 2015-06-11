@@ -284,8 +284,8 @@ paintboxview_init( Paintboxview *pbv )
 	hb2 = gtk_hbox_new( FALSE, 0 );
 	for( i = 0; i < 4; i++ ) {
 		pbv->tool[i] = gtk_toggle_button_new();
-		gtk_signal_connect( GTK_OBJECT( pbv->tool[i] ), "toggled", 
-			GTK_SIGNAL_FUNC( paintboxview_tool_toggled_cb ), pbv );
+		g_signal_connect( pbv->tool[i], "toggled", 
+			G_CALLBACK( paintboxview_tool_toggled_cb ), pbv );
 		image = gtk_image_new_from_stock( tool_names[i],
 			GTK_ICON_SIZE_BUTTON );
 		set_tooltip( pbv->tool[i], "%s", tool_tooltips[i] );
@@ -302,8 +302,8 @@ paintboxview_init( Paintboxview *pbv )
 	image = gtk_image_new_from_stock( GTK_STOCK_UNDO, 
 		GTK_ICON_SIZE_BUTTON );
 	gtk_container_add( GTK_CONTAINER( pbv->undo ), image );
-	gtk_signal_connect( GTK_OBJECT( pbv->undo ), "clicked", 
-		GTK_SIGNAL_FUNC( paintboxview_undo_cb ), pbv );
+	g_signal_connect( pbv->undo, "clicked", 
+		G_CALLBACK( paintboxview_undo_cb ), pbv );
 	set_tooltip( pbv->undo, _( "Undo last paint action" ) );
         gtk_box_pack_start( GTK_BOX( hb2 ), pbv->undo, FALSE, FALSE, 0 );
 
@@ -311,8 +311,8 @@ paintboxview_init( Paintboxview *pbv )
 	image = gtk_image_new_from_stock( GTK_STOCK_REDO, 
 		GTK_ICON_SIZE_BUTTON );
 	gtk_container_add( GTK_CONTAINER( pbv->redo ), image );
-	gtk_signal_connect( GTK_OBJECT( pbv->redo ), "clicked", 
-		GTK_SIGNAL_FUNC( paintboxview_redo_cb ), pbv );
+	g_signal_connect( pbv->redo, "clicked", 
+		G_CALLBACK( paintboxview_redo_cb ), pbv );
 	set_tooltip( pbv->redo, _( "Redo last paint action" ) );
         gtk_box_pack_start( GTK_BOX( hb2 ), pbv->redo, FALSE, FALSE, 0 );
 
@@ -320,8 +320,8 @@ paintboxview_init( Paintboxview *pbv )
 	image = gtk_image_new_from_stock( GTK_STOCK_CLEAR, 
 		GTK_ICON_SIZE_BUTTON );
 	gtk_container_add( GTK_CONTAINER( pbv->clear ), image );
-	gtk_signal_connect( GTK_OBJECT( pbv->clear ), "clicked", 
-		GTK_SIGNAL_FUNC( paintboxview_clear_cb ), pbv );
+	g_signal_connect( pbv->clear, "clicked", 
+		G_CALLBACK( paintboxview_clear_cb ), pbv );
 	set_tooltip( pbv->clear, _( "Clear all undo and redo buffers" ) );
         gtk_box_pack_start( GTK_BOX( hb2 ), pbv->clear, FALSE, FALSE, 0 );
 
@@ -330,8 +330,8 @@ paintboxview_init( Paintboxview *pbv )
 	hb2 = gtk_hbox_new( FALSE, 0 );
 	for( i = 4; i < IM_NUMBER( tool_names ); i++ ) {
 		pbv->tool[i] = gtk_toggle_button_new();
-		gtk_signal_connect( GTK_OBJECT( pbv->tool[i] ), "toggled", 
-			GTK_SIGNAL_FUNC( paintboxview_tool_toggled_cb ), pbv );
+		g_signal_connect( pbv->tool[i], "toggled", 
+			G_CALLBACK( paintboxview_tool_toggled_cb ), pbv );
 		image = gtk_image_new_from_stock( tool_names[i],
 			GTK_ICON_SIZE_BUTTON );
 		set_tooltip( pbv->tool[i], "%s", tool_tooltips[i] );
@@ -351,8 +351,8 @@ paintboxview_init( Paintboxview *pbv )
 	tslider_changed( pbv->nib );
         gtk_box_pack_start( GTK_BOX( hb ), 
 		GTK_WIDGET( pbv->nib ), FALSE, TRUE, 0 );
-        gtk_signal_connect( GTK_OBJECT( pbv->nib ), "changed", 
-		GTK_SIGNAL_FUNC( paintboxview_scale_change_cb ), pbv );
+        g_signal_connect( pbv->nib, "changed", 
+		G_CALLBACK( paintboxview_scale_change_cb ), pbv );
 	tslider_set_ignore_scroll( pbv->nib, FALSE );
 
 	pbv->ink = (GtkWidget *) colourdisplay_new( NULL );
@@ -365,13 +365,13 @@ paintboxview_init( Paintboxview *pbv )
 
 	pbv->font = GTK_WIDGET( fontbutton_new() );
         gtk_box_pack_start( GTK_BOX( hb ), pbv->font, FALSE, TRUE, 0 );
-	gtk_signal_connect( GTK_OBJECT( pbv->font ), "changed", 
-		GTK_SIGNAL_FUNC( paintboxview_font_changed_cb ), pbv );
+	g_signal_connect( pbv->font, "changed", 
+		G_CALLBACK( paintboxview_font_changed_cb ), pbv );
 
 	pbv->text = gtk_entry_new();
         gtk_box_pack_start( GTK_BOX( hb ), pbv->text, TRUE, TRUE, 0 );
-	gtk_signal_connect( GTK_OBJECT( pbv->text ), "changed", 
-		GTK_SIGNAL_FUNC( paintboxview_text_changed_cb ), pbv );
+	g_signal_connect( pbv->text, "changed", 
+		G_CALLBACK( paintboxview_text_changed_cb ), pbv );
 	set_tooltip( pbv->text, _( "Enter text for text tool" ) );
 
 	gtk_widget_show_all( eb );

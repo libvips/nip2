@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ViewClass *parent_class = NULL;
+G_DEFINE_TYPE( toolview, Toolview, TYPE_VIEW ); 
 
 /* Link menu items to toolview with this.
  */
@@ -88,7 +88,7 @@ toolview_destroy( GtkObject *object )
 
 	DESTROY_GTK( tview->item );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( toolview_parent_class )->destroy( object );
 }
 
 static void
@@ -98,7 +98,7 @@ toolview_finalize( GObject *gobject )
 	printf( "toolview_finalize: %p\n", gobject );
 #endif /*DEBUG*/
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( toolview_parent_class )->finalize( gobject );
 }
 
 static void
@@ -251,7 +251,7 @@ toolview_refresh( vObject *vobject )
 		gtk_signal_connect( GTK_OBJECT( tview->item ), "destroy",
 			GTK_SIGNAL_FUNC( toolview_destroy_cb ), tview );
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( toolview_parent_class )->refresh( vobject );
 }
 
 static void
@@ -260,7 +260,7 @@ toolview_link( View *view, Model *model, View *parent )
 	Toolview *tview = TOOLVIEW( view );
 	Toolkitview *kview = TOOLKITVIEW( parent );
 
-	VIEW_CLASS( parent_class )->link( view, model, parent );
+	VIEW_CLASS( toolview_parent_class )->link( view, model, parent );
 
 #ifdef DEBUG
 	printf( "toolview_link: " );
@@ -277,8 +277,6 @@ toolview_class_init( ToolviewClass *class )
 	GObjectClass *gobject_class = (GObjectClass*) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	object_class->destroy = toolview_destroy;
 	gobject_class->finalize = toolview_finalize;
@@ -297,29 +295,6 @@ static void
 toolview_init( Toolview *toolview )
 {
         toolview->item = NULL;
-}
-
-GtkType
-toolview_get_type( void )
-{
-	static GtkType toolview_type = 0;
-
-	if( !toolview_type ) {
-		static const GtkTypeInfo toolview_info = {
-			"Toolview",
-			sizeof( Toolview ),
-			sizeof( ToolviewClass ),
-			(GtkClassInitFunc) toolview_class_init,
-			(GtkObjectInitFunc) toolview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		toolview_type = gtk_type_unique( TYPE_VIEW, &toolview_info );
-	}
-
-	return( toolview_type );
 }
 
 View *

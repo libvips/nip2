@@ -37,7 +37,7 @@
 
 #include "ip.h"
 
-static ViewClass *parent_class = NULL;
+G_DEFINE_TYPE( workspaceview, Workspaceview, TYPE_VIEW ); 
 
 /* Params for "Align Columns" function.
  */
@@ -426,7 +426,7 @@ workspaceview_destroy( GtkObject *object )
 	FREESID( wview->watch_changed_sid, main_watchgroup );
 	DESTROY_GTK( wview->popup );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( workspaceview_parent_class )->destroy( object );
 }
 
 static void
@@ -441,7 +441,7 @@ workspaceview_realize( GtkWidget *widget )
 }
 #endif /*DEBUG*/
 
-	GTK_WIDGET_CLASS( parent_class )->realize( widget );
+	GTK_WIDGET_CLASS( workspaceview_parent_class )->realize( widget );
 
 	/* Mark us as a symbol drag-to widget. 
 	 */
@@ -611,7 +611,7 @@ workspaceview_link( View *view, Model *model, View *parent )
 	Workspaceview *wview = WORKSPACEVIEW( view );
 	Workspace *ws = WORKSPACE( model );
 
-	VIEW_CLASS( parent_class )->link( view, model, parent );
+	VIEW_CLASS( workspaceview_parent_class )->link( view, model, parent );
 
 	vobject_link( VOBJECT( wview->toolkitbrowser ), 
 		IOBJECT( ws->kitg ) );
@@ -633,7 +633,7 @@ workspaceview_child_add( View *parent, View *child )
 	gtk_signal_connect( GTK_OBJECT( child ), "size_allocate", 
 		GTK_SIGNAL_FUNC( workspaceview_child_size_cb ), parent );
 
-	VIEW_CLASS( parent_class )->child_add( parent, child );
+	VIEW_CLASS( workspaceview_parent_class )->child_add( parent, child );
 
 	/* Pick start xy pos. 
 	 */
@@ -653,7 +653,7 @@ workspaceview_child_position( View *parent, View *child )
 	gtk_fixed_move( GTK_FIXED( wview->fixed ),
 		GTK_WIDGET( cview ), cview->lx, cview->ly );
 
-	VIEW_CLASS( parent_class )->child_position( parent, child );
+	VIEW_CLASS( workspaceview_parent_class )->child_position( parent, child );
 }
 
 static void
@@ -716,7 +716,7 @@ workspaceview_refresh( vObject *vobject )
 
 	}
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( workspaceview_parent_class )->refresh( vobject );
 }
 
 /* What we track during a layout.
@@ -921,8 +921,6 @@ workspaceview_class_init( WorkspaceviewClass *class )
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	object_class->destroy = workspaceview_destroy;
 
@@ -1207,29 +1205,6 @@ workspaceview_init( Workspaceview *wview )
 	popup_attach( wview->fixed, wview->popup, wview );
 
 	gtk_widget_show_all( wview->window );
-}
-
-GtkType
-workspaceview_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type ) {
-		static const GtkTypeInfo info = {
-			"Workspaceview",
-			sizeof( Workspaceview ),
-			sizeof( WorkspaceviewClass ),
-			(GtkClassInitFunc) workspaceview_class_init,
-			(GtkObjectInitFunc) workspaceview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( TYPE_VIEW, &info );
-	}
-
-	return( type );
 }
 
 View *

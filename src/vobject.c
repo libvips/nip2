@@ -38,7 +38,7 @@
 
 #include "ip.h"
 
-static GtkVBoxClass *parent_class = NULL;
+G_DEFINE_TYPE( vobject, vObject, GTK_TYPE_VBOX ); 
 
 static Queue *vobject_dirty = NULL;
 
@@ -234,7 +234,7 @@ vobject_destroy( GtkObject *object )
 	}
 	vobject_refresh_dequeue( vobject );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( vobject_parent_class )->destroy( object );
 }
 
 static void 
@@ -244,7 +244,7 @@ vobject_finalize( GObject *gobject )
 	printf( "vobject_finalize: \"%s\"\n", G_OBJECT_TYPE_NAME( gobject ) );
 #endif /*DEBUG*/
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( vobject_parent_class )->finalize( gobject );
 }
 
 static void
@@ -272,8 +272,6 @@ vobject_class_init( vObjectClass *class )
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
 	GtkObjectClass *object_class = (GtkObjectClass*) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	gobject_class->finalize = vobject_finalize;
 
@@ -306,29 +304,6 @@ vobject_init( vObject *vobject )
 	/* All new vobjects will need refreshing.
 	 */
 	vobject_refresh_queue( vobject );
-}
-
-GtkType
-vobject_get_type( void )
-{
-	static GtkType vobject_type = 0;
-
-	if( !vobject_type ) {
-		static const GtkTypeInfo vobject_info = {
-			"vObject",
-			sizeof( vObject ),
-			sizeof( vObjectClass ),
-			(GtkClassInitFunc) vobject_class_init,
-			(GtkObjectInitFunc) vobject_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		vobject_type = gtk_type_unique( GTK_TYPE_VBOX, &vobject_info );
-	}
-
-	return( vobject_type );
 }
 
 /* Trigger the refresh method for a vobject immediately ... we usually queue

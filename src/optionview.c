@@ -160,17 +160,15 @@ optionview_refresh( vObject *vobject )
 		gtk_box_pack_start( GTK_BOX( optionview->hbox ), 
 			optionview->options, TRUE, TRUE, 0 );
 
-		gtk_signal_connect( GTK_OBJECT( optionview->options ), 
-			"changed", 
-			GTK_SIGNAL_FUNC( optionview_change_cb ), optionview );
+		g_signal_connect( optionview->options, "changed", 
+			G_CALLBACK( optionview_change_cb ), optionview );
 		gtk_widget_show( optionview->options );
 
 		IM_FREEF( slist_free_all, optionview->labels );
 		optionview->labels = lstring_copy( option->labels );
 
-		g_signal_connect( GTK_OBJECT( optionview->options ),
-			"scroll-event", 
-			GTK_SIGNAL_FUNC( optionview_scroll_cb ), optionview );
+		g_signal_connect( optionview->options, "scroll-event", 
+			G_CALLBACK( optionview_scroll_cb ), optionview );
 	}
 
 	if( optionview->options ) {

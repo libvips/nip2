@@ -775,10 +775,9 @@ iwindow_real_build( GtkWidget *widget )
 		 * we use gtk_widget_unmap() to hide killed windows during
 		 * popdown (see iwindow_popdown_notify()).
 		 */
-		iwnd->parent_unmap_sid = gtk_signal_connect( 
-			GTK_OBJECT( iwnd->parent_window ), 
+		iwnd->parent_unmap_sid = g_signal_connect( iwnd->parent_window, 
 			"unmap",
-			GTK_SIGNAL_FUNC( iwindow_parent_unmap_cb ), iwnd );
+			G_CALLBACK( iwindow_parent_unmap_cb ), iwnd );
 
 		/* Show the parent. For example, if this is the ^Q
 		 * save-or-quit dialog and the parent is a mainw, we want to

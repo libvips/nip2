@@ -42,7 +42,7 @@
 
 #include "ip.h"
 
-static ModelClass *parent_class = NULL;
+G_DEFINE_TYPE( filemodel, Filemodel, TYPE_MODEL ); 
 
 static GSList *filemodel_registered = NULL;
 
@@ -180,7 +180,7 @@ filemodel_info( iObject *iobject, VipsBuf *buf )
 {
 	Filemodel *filemodel = FILEMODEL( iobject );
 
-	IOBJECT_CLASS( parent_class )->info( iobject, buf );
+	IOBJECT_CLASS( filemodel_parent_class )->info( iobject, buf );
 
 	vips_buf_appendf( buf, "filename = \"%s\"\n", 
 		NN( filemodel->filename ) );
@@ -233,7 +233,7 @@ filemodel_finalize( GObject *gobject )
 
 	IM_FREE( filemodel->filename );
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( filemodel_parent_class )->finalize( gobject );
 }
 
 static void
@@ -255,7 +255,7 @@ filemodel_dispose( GObject *gobject )
 
 	filemodel_unregister( filemodel );
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( filemodel_parent_class )->dispose( gobject );
 }
 
 static xmlNode *
@@ -264,7 +264,7 @@ filemodel_save( Model *model, xmlNode *xnode )
 	Filemodel *filemodel = FILEMODEL( model );
 	xmlNode *xthis;
 
-	if( !(xthis = MODEL_CLASS( parent_class )->save( model, xnode )) )
+	if( !(xthis = MODEL_CLASS( filemodel_parent_class )->save( model, xnode )) )
 		return( NULL );
 
 	if( !set_sprop( xthis, "filename", filemodel->filename ) )
@@ -284,7 +284,7 @@ filemodel_load( Model *model,
 	if( get_sprop( xnode, "filename", buf, MAX_STRSIZE ) )
 		filemodel_set_filename( filemodel, buf );
 
-	if( !MODEL_CLASS( parent_class )->load( model, state, parent, xnode ) )
+	if( !MODEL_CLASS( filemodel_parent_class )->load( model, state, parent, xnode ) )
 		return( FALSE );
 
 	return( TRUE );
@@ -430,8 +430,6 @@ filemodel_class_init( FilemodelClass *class )
 	iObjectClass *iobject_class = IOBJECT_CLASS( class );
 	ModelClass *model_class = (ModelClass*) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	gobject_class->finalize = filemodel_finalize;
 	gobject_class->dispose = filemodel_dispose;
 
@@ -472,8 +470,6 @@ filemodel_init( Filemodel *filemodel )
 
 	filemodel->window_hint = NULL;
 }
-
-G_DEFINE_TYPE( filemodel, Filemodel, TYPE_MODEL ); 
 
 void
 filemodel_set_offset( Filemodel *filemodel, int x_off, int y_off )

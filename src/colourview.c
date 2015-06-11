@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static GraphicviewClass *parent_class = NULL;
+G_DEFINE_TYPE( colourview, Colourview, TYPE_GRAPHICVIEW ); 
 
 static void
 colourview_link( View *view, Model *model, View *parent )
@@ -41,7 +41,7 @@ colourview_link( View *view, Model *model, View *parent )
 	Colourview *colourview = COLOURVIEW( view );
 	Rowview *rview = ROWVIEW( parent->parent );
 
-	VIEW_CLASS( parent_class )->link( view, model, parent );
+	VIEW_CLASS( colourview_parent_class )->link( view, model, parent );
 
 	rowview_menu_attach( rview, GTK_WIDGET( colourview->colourdisplay ) );
 }
@@ -57,9 +57,10 @@ colourview_refresh( vObject *vobject )
 #endif /*DEBUG*/
 
 	conversion_set_image( colourview->conv, colour_ii_new( colour ) );
-	set_gcaption( colourview->label, "%s", vips_buf_all( &colour->caption ) );
+	set_gcaption( colourview->label, 
+		"%s", vips_buf_all( &colour->caption ) );
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( colourview_parent_class )->refresh( vobject );
 }
 
 static void
@@ -67,8 +68,6 @@ colourview_class_init( ColourviewClass *class )
 {
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -149,8 +148,6 @@ colourview_init( Colourview *colourview )
 	gtk_widget_set_name( eb, "caption_widget" );
         gtk_widget_show( eb );
 }
-
-G_DEFINE_TYPE( colourview, Colourview, TYPE_GRAPHICVIEW ); 
 
 View *
 colourview_new( void )

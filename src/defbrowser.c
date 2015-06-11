@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ViewClass *parent_class = NULL;
+G_DEFINE_TYPE( defbrowser, Defbrowser, TYPE_VOBJECT ); 
 
 /* Our columns.
  */
@@ -52,7 +52,7 @@ defbrowser_destroy( GtkObject *object )
 
 	UNREF( defbrowser->store );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( defbrowser_parent_class )->destroy( object );
 }
 
 static void 
@@ -111,7 +111,7 @@ defbrowser_refresh( vObject *vobject )
 		(toolkit_map_fn) defbrowser_rebuild_item, 
 		defbrowser, NULL );
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( defbrowser_parent_class )->refresh( vobject );
 }
 
 static void
@@ -119,8 +119,6 @@ defbrowser_class_init( DefbrowserClass *class )
 {
 	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	object_class->destroy = defbrowser_destroy;
 
@@ -218,8 +216,8 @@ defbrowser_init( Defbrowser *defbrowser )
 
 	defbrowser->top = gtk_hbox_new( FALSE, 12 );
 	defbrowser->entry = gtk_entry_new();
-        gtk_signal_connect( GTK_OBJECT( defbrowser->entry ), "changed", 
-		GTK_SIGNAL_FUNC( defbrowser_entry_changed_cb ), 
+        g_signal_connect( defbrowser->entry, "changed", 
+		G_CALLBACK( defbrowser_entry_changed_cb ), 
 		defbrowser );
 	gtk_box_pack_end( GTK_BOX( defbrowser->top ), 
 		defbrowser->entry, FALSE, FALSE, 2 );
@@ -275,8 +273,6 @@ defbrowser_init( Defbrowser *defbrowser )
         gtk_box_pack_start( GTK_BOX( defbrowser ), swin, TRUE, TRUE, 2 );
 	gtk_widget_show_all( swin );
 }
-
-G_DEFINE_TYPE( defbrowser, Defbrowser, TYPE_VOBJECT ); 
 
 void
 defbrowser_set_program( Defbrowser *defbrowser, Program *program )

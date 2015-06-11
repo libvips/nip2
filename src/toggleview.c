@@ -33,7 +33,7 @@
 #define DEBUG
  */
 
-static GraphicviewClass *parent_class = NULL;
+G_DEFINE_TYPE( toggleview, Toggleview, TYPE_GRAPHICVIEW ); 
 
 /* Toggleview callback.
  */
@@ -62,15 +62,13 @@ toggleview_refresh( vObject *vobject )
 	set_glabel( GTK_BIN( togview->toggle )->child, "%s", 
 		IOBJECT( tog )->caption );
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( toggleview_parent_class )->refresh( vobject );
 }
 
 static void
 toggleview_class_init( ToggleviewClass *class )
 {
 	vObjectClass *vobject_class = (vObjectClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -89,29 +87,6 @@ toggleview_init( Toggleview *togview )
 		GTK_SIGNAL_FUNC( toggleview_change_cb ), togview );
 
         gtk_widget_show_all( GTK_WIDGET( togview ) );
-}
-
-GtkType
-toggleview_get_type( void )
-{
-	static GtkType toggleview_type = 0;
-
-	if( !toggleview_type ) {
-		static const GtkTypeInfo info = {
-			"Toggleview",
-			sizeof( Toggleview ),
-			sizeof( ToggleviewClass ),
-			(GtkClassInitFunc) toggleview_class_init,
-			(GtkObjectInitFunc) toggleview_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		toggleview_type = gtk_type_unique( TYPE_GRAPHICVIEW, &info );
-	}
-
-	return( toggleview_type );
 }
 
 View *

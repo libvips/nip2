@@ -33,14 +33,14 @@
 
 #include "ip.h"
 
-static GraphicviewClass *parent_class = NULL;
+G_DEFINE_TYPE( fontnameview, Fontnameview, TYPE_GRAPHICVIEW ); 
 
 static void
 fontnameview_link( View *view, Model *model, View *parent )
 {
 	Fontnameview *fontnameview = FONTNAMEVIEW( view );
 
-	VIEW_CLASS( parent_class )->link( view, model, parent );
+	VIEW_CLASS( fontnameview_parent_class )->link( view, model, parent );
 
 	if( GRAPHICVIEW( view )->sview )
 		gtk_size_group_add_widget( GRAPHICVIEW( view )->sview->group,   
@@ -66,7 +66,7 @@ fontnameview_refresh( vObject *vobject )
 		fontbutton_set_font_name( fontnameview->fontbutton, 
 			fontname->value );
 
-	VOBJECT_CLASS( parent_class )->refresh( vobject );
+	VOBJECT_CLASS( fontnameview_parent_class )->refresh( vobject );
 }
 
 static void
@@ -74,8 +74,6 @@ fontnameview_class_init( FontnameviewClass *class )
 {
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -126,8 +124,6 @@ fontnameview_init( Fontnameview *fontnameview )
 
         gtk_widget_show_all( GTK_WIDGET( hbox ) );
 }
-
-G_DEFINE_TYPE( fontnameview, Fontnameview, TYPE_GRAPHICVIEW ); 
 
 View *
 fontnameview_new( void )

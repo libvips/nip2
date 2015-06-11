@@ -33,11 +33,11 @@
 
 #include "ip.h"
 
+G_DEFINE_TYPE( trace, Trace, TYPE_LOG ); 
+
 /* OR of the flags in all the trace windows.
  */
 TraceFlags trace_flags = (TraceFlags) 0;
-
-static LogClass *parent_class = NULL;
 
 /* All trace windows.
  */
@@ -209,7 +209,7 @@ trace_destroy( GtkObject *object )
 
 	trace_all = g_slist_remove( trace_all, trace );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_OBJECT_CLASS( trace_parent_class )->destroy( object );
 
 	trace_global_rethink();
 }
@@ -287,8 +287,6 @@ trace_class_init( TraceClass *class )
 	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	LogClass *log_class = (LogClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	object_class->destroy = trace_destroy;
 
 	log_class->actions = trace_actions;
@@ -304,29 +302,6 @@ static void
 trace_init( Trace *trace )
 {
 	trace->flags = 0;
-}
-
-GtkType
-trace_get_type( void )
-{
-	static GtkType type = 0;
-
-	if( !type ) {
-		static const GtkTypeInfo info = {
-			"Trace",
-			sizeof( Trace ),
-			sizeof( TraceClass ),
-			(GtkClassInitFunc) trace_class_init,
-			(GtkObjectInitFunc) trace_init,
-			/* reserved_1 */ NULL,
-			/* reserved_2 */ NULL,
-			(GtkClassInitFunc) NULL,
-		};
-
-		type = gtk_type_unique( TYPE_LOG, &info );
-	}
-
-	return( type );
 }
 
 static void

@@ -175,17 +175,17 @@ sliderview_init( Sliderview *sliderview )
         gtk_box_pack_start( GTK_BOX( hbox ), 
 		GTK_WIDGET( sliderview->tslider ), TRUE, TRUE, 6 );
 
-        gtk_signal_connect_object( GTK_OBJECT( sliderview->tslider ), 
+        g_signal_connect_object( sliderview->tslider, 
 		"text_changed",
-                GTK_SIGNAL_FUNC( view_changed_cb ), 
+                G_CALLBACK( view_changed_cb ), 
 		GTK_OBJECT( sliderview ) );
-        gtk_signal_connect_object( GTK_OBJECT( sliderview->tslider ), 
+        g_signal_connect_object( sliderview->tslider, 
 		"activate",
-                GTK_SIGNAL_FUNC( view_activate_cb ), 
-		GTK_OBJECT( sliderview ) );
-        gtk_signal_connect( GTK_OBJECT( sliderview->tslider ), 
+                G_CALLBACK( view_activate_cb ), 
+		G_OBJECT( sliderview ) );
+        g_signal_connect( sliderview->tslider, 
 		"slider_changed", 
-		GTK_SIGNAL_FUNC( sliderview_change_cb ), sliderview );
+		G_CALLBACK( sliderview_change_cb ), sliderview );
 
         gtk_widget_show_all( GTK_WIDGET( sliderview ) );
 }

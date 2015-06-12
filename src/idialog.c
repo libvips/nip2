@@ -354,7 +354,7 @@ idialog_build_ok( OKButton *ok, iDialog *idlg )
 	GtkWidget *but;
 
 	but = build_button( ok->label, 
-		GTK_SIGNAL_FUNC( idialog_done_cb ), idlg );
+		G_CALLBACK( idialog_done_cb ), idlg );
 	idlg->ok_disp_l = g_slist_prepend( idlg->ok_disp_l, ok );
 	idlg->ok_but_l = g_slist_prepend( idlg->ok_but_l, but );
 	gtk_box_pack_start( GTK_BOX( idlg->bb ), but, TRUE, TRUE, 0 );
@@ -367,7 +367,7 @@ static void *
 idialog_build_cancel( iDialog *idlg )
 {
 	idlg->but_cancel = build_button( idlg->cancel_text,
-		GTK_SIGNAL_FUNC( idialog_cancel_cb ), idlg );
+		G_CALLBACK( idialog_cancel_cb ), idlg );
 	gtk_box_pack_start( GTK_BOX( idlg->bb ),
 		idlg->but_cancel, TRUE, TRUE, 0 );
 	gtk_widget_show( idlg->but_cancel );
@@ -472,7 +472,7 @@ idialog_build( GtkWidget *widget )
 
         if( idlg->help_tag ) {
                 idlg->but_help = build_button( GTK_STOCK_HELP,
-			GTK_SIGNAL_FUNC( idialog_help_cb ), idlg );
+			G_CALLBACK( idialog_help_cb ), idlg );
                 gtk_widget_show( idlg->but_help );
         }
 
@@ -480,7 +480,7 @@ idialog_build( GtkWidget *widget )
 
         if( idlg->help_tag ) {
                 idlg->but_help = build_button( GTK_STOCK_HELP,
-			GTK_SIGNAL_FUNC( idialog_help_cb ), idlg );
+			G_CALLBACK( idialog_help_cb ), idlg );
                 gtk_box_pack_end( GTK_BOX( idlg->bb ),
                         idlg->but_help, TRUE, TRUE, 0 );
 		gtk_button_box_set_child_secondary( GTK_BUTTON_BOX( idlg->bb ),

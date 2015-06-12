@@ -161,16 +161,16 @@ toolview_refresh_sub( Toolview *tview,
 				image_new_from_file( toolitem->icon ) );
 
 		if( !toolitem->is_pullright ) 
-			gtk_signal_connect( GTK_OBJECT( item ), "activate", 
-				GTK_SIGNAL_FUNC( toolview_activate_cb ), 
+			g_signal_connect( item, "activate", 
+				G_CALLBACK( toolview_activate_cb ), 
 				toolitem );
 
 		if( toolitem->help && 
 			!toolitem->is_pullright )
 			set_tooltip( item, "%s", toolitem->help );
 
-		gtk_signal_connect( GTK_OBJECT( item ), "select", 
-			GTK_SIGNAL_FUNC( toolview_select_cb ), toolitem );
+		g_signal_connect( item, "select", 
+			G_CALLBACK( toolview_select_cb ), toolitem );
 
 		/* Make a pullright and recurse if necessary
 		 */
@@ -248,8 +248,8 @@ toolview_refresh( vObject *vobject )
 			ws, kview->menu );
 
 	if( tview->item )
-		gtk_signal_connect( GTK_OBJECT( tview->item ), "destroy",
-			GTK_SIGNAL_FUNC( toolview_destroy_cb ), tview );
+		g_signal_connect( tview->item, "destroy",
+			G_CALLBACK( toolview_destroy_cb ), tview );
 
 	VOBJECT_CLASS( toolview_parent_class )->refresh( vobject );
 }

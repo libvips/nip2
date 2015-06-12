@@ -247,8 +247,8 @@ toolkitbrowser_init( Toolkitbrowser *toolkitbrowser )
 
 	toolkitbrowser->top = gtk_hbox_new( FALSE, 12 );
 	toolkitbrowser->entry = gtk_entry_new();
-        gtk_signal_connect( GTK_OBJECT( toolkitbrowser->entry ), "changed", 
-		GTK_SIGNAL_FUNC( toolkitbrowser_entry_changed_cb ), 
+        g_signal_connect( toolkitbrowser->entry, "changed", 
+		G_CALLBACK( toolkitbrowser_entry_changed_cb ), 
 		toolkitbrowser );
 	gtk_box_pack_end( GTK_BOX( toolkitbrowser->top ), 
 		toolkitbrowser->entry, FALSE, FALSE, 2 );

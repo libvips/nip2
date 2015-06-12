@@ -53,11 +53,6 @@ struct _Imagedisplay {
 	guint area_changed_sid; 
 	gboolean shrink_to_fit; 	/* Auto-shrink mode */
 
-	/* GCs also used by region paint.
-	 */
-	GdkGC *back_gc;
-	GdkGC *top_gc;
-	GdkGC *bottom_gc;
 };
 
 /* Class structure.

@@ -384,10 +384,10 @@ tslider_init( Tslider *tslider )
         set_tooltip( tslider->entry, _( "Slider value ... edit!" ) );
         gtk_box_pack_start( GTK_BOX( tslider ), 
 		tslider->entry, FALSE, FALSE, 0 );
-        gtk_signal_connect( GTK_OBJECT( tslider->entry ), "activate",
-                GTK_SIGNAL_FUNC( tslider_value_activate_cb ), tslider );
-        gtk_signal_connect( GTK_OBJECT( tslider->entry ), "changed",
-                GTK_SIGNAL_FUNC( tslider_text_changed_cb ), tslider );
+        g_signal_connect( tslider->entry, "activate",
+                G_CALLBACK( tslider_value_activate_cb ), tslider );
+        g_signal_connect( tslider->entry, "changed",
+                G_CALLBACK( tslider_text_changed_cb ), tslider );
 	gtk_widget_show( tslider->entry );
 
         tslider->slider = gtk_hscale_new( NULL );
@@ -403,8 +403,8 @@ tslider_init( Tslider *tslider )
         gtk_box_pack_start( GTK_BOX( tslider ), 
 		tslider->slider, TRUE, TRUE, 0 );
         set_tooltip( tslider->slider, _( "Left-drag to set number" ) );
-        gtk_signal_connect( GTK_OBJECT( tslider->adj ), "value_changed", 
-		GTK_SIGNAL_FUNC( tslider_value_changed_cb ), tslider );
+        g_signal_connect( tslider->adj, "value_changed", 
+		G_CALLBACK( tslider_value_changed_cb ), tslider );
 	g_signal_connect( tslider->slider, "scroll-event", 
 		G_CALLBACK( tslider_scroll_cb ), tslider );
 	gtk_widget_show( tslider->slider );

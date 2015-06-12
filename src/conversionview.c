@@ -204,18 +204,18 @@ conversionview_init( Conversionview *cv )
          */
 	pane = menu_build( _( "Convert menu" ) );
 	menu_add_but( pane, _( "_Scale" ), 
-		GTK_SIGNAL_FUNC( conversionview_scale_cb ), cv );
+		G_CALLBACK( conversionview_scale_cb ), cv );
 	cv->falsecolour = menu_add_tog( pane, _( "_False Color" ), 
-		GTK_SIGNAL_FUNC( conversionview_falsecolour_cb ), cv );
+		G_CALLBACK( conversionview_falsecolour_cb ), cv );
 	cv->type = menu_add_tog( pane, _( "_Interpret" ), 
-		GTK_SIGNAL_FUNC( conversionview_interpret_cb ), cv );
+		G_CALLBACK( conversionview_interpret_cb ), cv );
 	menu_add_but( pane, _( "_Reset" ), 
-		GTK_SIGNAL_FUNC( conversionview_reset_cb ), cv );
+		G_CALLBACK( conversionview_reset_cb ), cv );
 	menu_add_but( pane, _( "Set As Workspace _Default" ), 
-		GTK_SIGNAL_FUNC( conversionview_set_default_cb ), cv );
+		G_CALLBACK( conversionview_set_default_cb ), cv );
 	menu_add_sep( pane );
 	menu_add_but( pane, GTK_STOCK_CLOSE,
-		GTK_SIGNAL_FUNC( conversionview_hide_cb ), cv );
+		G_CALLBACK( conversionview_hide_cb ), cv );
 
 	popupbutton = popupbutton_new();
 	popupbutton_set_menu( popupbutton, pane );

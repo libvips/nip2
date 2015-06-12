@@ -56,8 +56,10 @@ struct _Imagepresent {
 	GtkScrolledWindow *swin;
 	GtkAdjustment *hadj;
 	GtkAdjustment *vadj;
-	GtkHRuler *hrule;		/* Rulers */
+	/*
+	GtkHRuler *hrule;
 	GtkVRuler *vrule;
+	 */
 	GtkEventBox *heb;		/* EventBoxes holding rulers */
 	GtkEventBox *veb;
 	iWindowCursorContext *cntxt;

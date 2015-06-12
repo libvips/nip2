@@ -1,4 +1,15 @@
-- finish changing gtk_signal_conn
+- rename
+
+	s/GTK_CHECK_CAST/G_TYPE_CHECK_INSTANCE_CAST/g
+	s/GTK_CHECK_CLASS_CAST/G_TYPE_CHECK_CLASS_CAST/g
+	s/GTK_CHECK_TYPE/G_TYPE_CHECK_INSTANCE_TYPE/g
+	s/GTK_CHECK_CLASS_TYPE/G_TYPE_CHECK_CLASS_TYPE/g
+
+
+	sed -f script.sed -i $1
+
+
+
 
 - redo scale along the new vipsthumbnail lines
 

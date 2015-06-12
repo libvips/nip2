@@ -83,8 +83,8 @@ toggleview_init( Toggleview *togview )
 {
         togview->toggle = build_gtoggle( GTK_WIDGET( togview ), "" );
         set_tooltip( togview->toggle, _( "Left-click to change value" ) );
-        gtk_signal_connect( GTK_OBJECT( togview->toggle ), "clicked",
-		GTK_SIGNAL_FUNC( toggleview_change_cb ), togview );
+        g_signal_connect( togview->toggle, "clicked",
+		G_CALLBACK( toggleview_change_cb ), togview );
 
         gtk_widget_show_all( GTK_WIDGET( togview ) );
 }

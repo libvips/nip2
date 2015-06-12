@@ -630,8 +630,8 @@ workspaceview_child_add( View *parent, View *child )
 	Column *column = COLUMN( VOBJECT( cview )->iobject );
 	Workspaceview *wview = WORKSPACEVIEW( parent );
 
-	gtk_signal_connect( GTK_OBJECT( child ), "size_allocate", 
-		GTK_SIGNAL_FUNC( workspaceview_child_size_cb ), parent );
+	g_signal_connect( child, "size_allocate", 
+		G_CALLBACK( workspaceview_child_size_cb ), parent );
 
 	VIEW_CLASS( workspaceview_parent_class )->child_add( parent, child );
 
@@ -1130,12 +1130,12 @@ workspaceview_init( Workspaceview *wview )
 	gtk_viewport_set_shadow_type( 
 		GTK_VIEWPORT( GTK_BIN( wview->window )->child ), 
 		GTK_SHADOW_NONE );
-	gtk_signal_connect( GTK_OBJECT( wview->window ), "scroll_event",
-		GTK_SIGNAL_FUNC( workspaceview_scroll_event_cb ), wview );
-	gtk_signal_connect( GTK_OBJECT( wview->fixed ), "realize", 
-		GTK_SIGNAL_FUNC( workspaceview_realize_cb ), wview );
-        gtk_signal_connect( GTK_OBJECT( wview->fixed ), "event",
-                GTK_SIGNAL_FUNC( workspaceview_fixed_event_cb ), wview );
+	g_signal_connect( wview->window, "scroll_event",
+		G_CALLBACK( workspaceview_scroll_event_cb ), wview );
+	g_signal_connect( wview->fixed, "realize", 
+		G_CALLBACK( workspaceview_realize_cb ), wview );
+        g_signal_connect( wview->fixed, "event",
+                G_CALLBACK( workspaceview_fixed_event_cb ), wview );
 	gtk_widget_add_events( GTK_WIDGET( wview->fixed ), 
 		GDK_BUTTON_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK |
 		GDK_BUTTON_RELEASE_MASK ); 
@@ -1144,14 +1144,14 @@ workspaceview_init( Workspaceview *wview )
 		GTK_SCROLLED_WINDOW( wview->window ) );
 	vadj = gtk_scrolled_window_get_vadjustment( 
 		GTK_SCROLLED_WINDOW( wview->window ) );
-	gtk_signal_connect( GTK_OBJECT( hadj ), "value_changed", 
-		GTK_SIGNAL_FUNC( workspaceview_scroll_adjustment_cb ), wview );
-	gtk_signal_connect( GTK_OBJECT( hadj ), "changed", 
-		GTK_SIGNAL_FUNC( workspaceview_scroll_adjustment_cb ), wview );
-	gtk_signal_connect( GTK_OBJECT( vadj ), "value_changed", 
-		GTK_SIGNAL_FUNC( workspaceview_scroll_adjustment_cb ), wview );
-	gtk_signal_connect( GTK_OBJECT( vadj ), "changed", 
-		GTK_SIGNAL_FUNC( workspaceview_scroll_adjustment_cb ), wview );
+	g_signal_connect( hadj, "value_changed", 
+		G_CALLBACK( workspaceview_scroll_adjustment_cb ), wview );
+	g_signal_connect( hadj, "changed", 
+		G_CALLBACK( workspaceview_scroll_adjustment_cb ), wview );
+	g_signal_connect( vadj, "value_changed", 
+		G_CALLBACK( workspaceview_scroll_adjustment_cb ), wview );
+	g_signal_connect( vadj, "changed", 
+		G_CALLBACK( workspaceview_scroll_adjustment_cb ), wview );
 
         /* We can't use gtk_container_set_focus_hadjustment() etc. since our
          * workspace contains a lot of nested structures, and hadjustment()

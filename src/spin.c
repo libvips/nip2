@@ -194,12 +194,12 @@ spin_init( Spin *spin )
 	ebox = gtk_event_box_new();
 	set_tooltip( ebox, _( "Expand or collapse row" ) );
 	gtk_event_box_set_visible_window( GTK_EVENT_BOX( ebox ), FALSE );
-        gtk_signal_connect( GTK_OBJECT( ebox ), "button_press_event",
-                GTK_SIGNAL_FUNC( spin_button_press_event_cb ), spin );
-        gtk_signal_connect( GTK_OBJECT( ebox ), "enter_notify_event",
-                GTK_SIGNAL_FUNC( spin_button_enter_notify_event_cb ), spin );
-        gtk_signal_connect( GTK_OBJECT( ebox ), "leave_notify_event",
-                GTK_SIGNAL_FUNC( spin_button_leave_notify_event_cb ), spin );
+        g_signal_connect( ebox, "button_press_event",
+                G_CALLBACK( spin_button_press_event_cb ), spin );
+        g_signal_connect( ebox, "enter_notify_event",
+                G_CALLBACK( spin_button_enter_notify_event_cb ), spin );
+        g_signal_connect( ebox, "leave_notify_event",
+                G_CALLBACK( spin_button_leave_notify_event_cb ), spin );
         gtk_box_pack_start( GTK_BOX( spin ), ebox, FALSE, FALSE, 0 );
 	gtk_widget_show( ebox );
 

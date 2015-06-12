@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( rowview, Rowview, TYPE_VIEW ); 
+G_DEFINE_TYPE( Rowview, rowview, TYPE_VIEW ); 
 
 enum {
 	ROWVIEW_TARGET_STRING,

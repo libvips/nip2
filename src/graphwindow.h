@@ -29,12 +29,12 @@
 
 #define TYPE_GRAPHWINDOW (graphwindow_get_type())
 #define GRAPHWINDOW( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_GRAPHWINDOW, Graphwindow ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_GRAPHWINDOW, Graphwindow ))
 #define GRAPHWINDOW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_GRAPHWINDOW, GraphwindowClass ))
-#define IS_GRAPHWINDOW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_GRAPHWINDOW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_GRAPHWINDOW, GraphwindowClass ))
+#define IS_GRAPHWINDOW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_GRAPHWINDOW ))
 #define IS_GRAPHWINDOW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_GRAPHWINDOW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_GRAPHWINDOW ))
 
 struct _Graphwindow {
 	Floatwindow parent_class;

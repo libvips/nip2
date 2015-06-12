@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( statusview, Statusview, GTK_TYPE_FRAME ); 
+G_DEFINE_TYPE( Statusview, statusview, GTK_TYPE_FRAME ); 
 
 /* The popup menu.
  */

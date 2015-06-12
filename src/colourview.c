@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( colourview, Colourview, TYPE_GRAPHICVIEW ); 
+G_DEFINE_TYPE( Colourview, colourview, TYPE_GRAPHICVIEW ); 
 
 static void
 colourview_link( View *view, Model *model, View *parent )

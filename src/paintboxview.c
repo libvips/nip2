@@ -37,7 +37,7 @@
  */
 static GtkWidget *paintboxview_menu = NULL;
 
-G_DEFINE_TYPE( paintboxview, Paintboxview, GTK_TYPE_FRAME ); 
+G_DEFINE_TYPE( Paintboxview, paintboxview, GTK_TYPE_FRAME ); 
 
 static void
 paintboxview_destroy( GtkObject *object )

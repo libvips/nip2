@@ -28,12 +28,12 @@
  */
 
 #define TYPE_PLOTSTATUS (plotstatus_get_type())
-#define PLOTSTATUS( obj ) (GTK_CHECK_CAST( (obj), TYPE_PLOTSTATUS, Plotstatus ))
+#define PLOTSTATUS( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_PLOTSTATUS, Plotstatus ))
 #define PLOTSTATUS_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_PLOTSTATUS, PlotstatusClass ))
-#define IS_PLOTSTATUS( obj ) (GTK_CHECK_TYPE( (obj), TYPE_PLOTSTATUS ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_PLOTSTATUS, PlotstatusClass ))
+#define IS_PLOTSTATUS( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_PLOTSTATUS ))
 #define IS_PLOTSTATUS_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_PLOTSTATUS ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_PLOTSTATUS ))
 
 struct _Plotstatus {
 	GtkFrame parent_class;

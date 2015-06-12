@@ -29,14 +29,14 @@
 
 #define TYPE_WORKSPACEDEFS (workspacedefs_get_type())
 #define WORKSPACEDEFS( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_WORKSPACEDEFS, Workspacedefs ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_WORKSPACEDEFS, Workspacedefs ))
 #define WORKSPACEDEFS_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), \
+	(G_TYPE_CHECK_CLASS_CAST( (klass), \
 		TYPE_WORKSPACEDEFS, WorkspacedefsClass ))
 #define IS_WORKSPACEDEFS( obj ) \
-	(GTK_CHECK_TYPE( (obj), TYPE_WORKSPACEDEFS ))
+	(G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_WORKSPACEDEFS ))
 #define IS_WORKSPACEDEFS_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_WORKSPACEDEFS ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_WORKSPACEDEFS ))
 
 struct _Workspacedefs {
 	vObject parent_object;

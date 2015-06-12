@@ -50,12 +50,12 @@ void box_help( GtkWidget *par, const char *name );
  */
 #define TYPE_STRINGSET (stringset_get_type())
 #define STRINGSET( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_STRINGSET, Stringset ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_STRINGSET, Stringset ))
 #define STRINGSET_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_STRINGSET, StringsetClass ))
-#define IS_STRINGSET( obj ) (GTK_CHECK_TYPE( (obj), TYPE_STRINGSET ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_STRINGSET, StringsetClass ))
+#define IS_STRINGSET( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_STRINGSET ))
 #define IS_STRINGSET_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_STRINGSET ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_STRINGSET ))
 
 /* A Stringset is a bunch of these.
  */
@@ -93,12 +93,12 @@ StringsetChild *stringset_child_get( Stringset *, const char *label );
  */
 #define TYPE_FIND (find_get_type())
 #define FIND( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_FIND, Find ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_FIND, Find ))
 #define FIND_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_FIND, FindClass ))
-#define IS_FIND( obj ) (GTK_CHECK_TYPE( (obj), TYPE_FIND ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_FIND, FindClass ))
+#define IS_FIND( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_FIND ))
 #define IS_FIND_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_FIND ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_FIND ))
 
 typedef struct _Find {
 	iDialog parent;
@@ -127,12 +127,12 @@ void box_url( GtkWidget *par, const char *url );
  */
 #define TYPE_FONTCHOOSER (fontchooser_get_type())
 #define FONTCHOOSER( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_FONTCHOOSER, Fontchooser ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_FONTCHOOSER, Fontchooser ))
 #define FONTCHOOSER_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_FONTCHOOSER, FontchooserClass ))
-#define IS_FONTCHOOSER( obj ) (GTK_CHECK_TYPE( (obj), TYPE_FONTCHOOSER ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_FONTCHOOSER, FontchooserClass ))
+#define IS_FONTCHOOSER( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_FONTCHOOSER ))
 #define IS_FONTCHOOSER_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_FONTCHOOSER ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_FONTCHOOSER ))
 
 typedef struct _Fontchooser {
 	iDialog parent_object;
@@ -157,12 +157,12 @@ char *fontchooser_get_font_name( Fontchooser * );
  */
 #define TYPE_FONTBUTTON (fontbutton_get_type())
 #define FONTBUTTON( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_FONTBUTTON, Fontbutton ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_FONTBUTTON, Fontbutton ))
 #define FONTBUTTON_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_FONTBUTTON, FontbuttonClass ))
-#define IS_FONTBUTTON( obj ) (GTK_CHECK_TYPE( (obj), TYPE_FONTBUTTON ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_FONTBUTTON, FontbuttonClass ))
+#define IS_FONTBUTTON( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_FONTBUTTON ))
 #define IS_FONTBUTTON_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_FONTBUTTON ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_FONTBUTTON ))
 
 typedef struct _Fontbutton {
 	GtkButton parent_object;
@@ -187,12 +187,12 @@ const char *fontbutton_get_font_name( Fontbutton * );
  */
 #define TYPE_INFOBAR (infobar_get_type())
 #define INFOBAR( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_INFOBAR, Infobar ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_INFOBAR, Infobar ))
 #define INFOBAR_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_INFOBAR, InfobarClass ))
-#define IS_INFOBAR( obj ) (GTK_CHECK_TYPE( (obj), TYPE_INFOBAR ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_INFOBAR, InfobarClass ))
+#define IS_INFOBAR( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_INFOBAR ))
 #define IS_INFOBAR_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_INFOBAR ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_INFOBAR ))
 
 struct _Infobar {
 #ifdef USE_INFOBAR

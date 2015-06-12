@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( fontnameview, Fontnameview, TYPE_GRAPHICVIEW ); 
+G_DEFINE_TYPE( Fontnameview, fontnameview, TYPE_GRAPHICVIEW ); 
 
 static void
 fontnameview_link( View *view, Model *model, View *parent )

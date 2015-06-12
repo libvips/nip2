@@ -37,7 +37,7 @@
  */
 static GtkWidget *plotstatus_menu = NULL;
 
-G_DEFINE_TYPE( plotstatus, Plotstatus, GTK_TYPE_FRAME ); 
+G_DEFINE_TYPE( Plotstatus, plotstatus, GTK_TYPE_FRAME ); 
 
 static void
 plotstatus_columns_destroy( Plotstatus *plotstatus )

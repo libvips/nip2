@@ -28,12 +28,12 @@
  */
 
 #define TYPE_REAL (real_get_type())
-#define REAL( obj ) (GTK_CHECK_CAST( (obj), TYPE_REAL, Real ))
+#define REAL( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_REAL, Real ))
 #define REAL_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_REAL, RealClass ))
-#define IS_REAL( obj ) (GTK_CHECK_TYPE( (obj), TYPE_REAL ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_REAL, RealClass ))
+#define IS_REAL( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_REAL ))
 #define IS_REAL_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_REAL ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_REAL ))
 
 typedef struct _Real {
 	Value parent_object;

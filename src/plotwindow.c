@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( plotwindow, Plotwindow, TYPE_FLOATWINDOW ); 
+G_DEFINE_TYPE( Plotwindow, plotwindow, TYPE_FLOATWINDOW ); 
 
 static void
 plotwindow_destroy( GtkObject *object )

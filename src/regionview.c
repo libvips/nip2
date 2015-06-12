@@ -53,7 +53,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( regionview, Regionview, TYPE_VIEW ); 
+G_DEFINE_TYPE( Regionview, regionview, TYPE_VIEW ); 
 
 typedef void *(*regionview_rect_fn)( Regionview *, Rect *, void * );
 typedef void (*regionview_paint_fn)( Regionview * );

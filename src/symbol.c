@@ -59,7 +59,7 @@
 # endif
 #endif
 
-G_DEFINE_TYPE( symbol, Symbol, TYPE_FILEMODEL ); 
+G_DEFINE_TYPE( Symbol, symbol, TYPE_FILEMODEL ); 
 
 /* Our signals. 
  */

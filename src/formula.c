@@ -34,7 +34,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( formula, Formula, GTK_TYPE_EVENT_BOX ); 
+G_DEFINE_TYPE( Formula, formula, GTK_TYPE_EVENT_BOX ); 
 
 /* Our signals. 
  */

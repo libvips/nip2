@@ -29,12 +29,12 @@
 
 #define TYPE_IMAGEHEADER (imageheader_get_type())
 #define IMAGEHEADER( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_IMAGEHEADER, Imageheader ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_IMAGEHEADER, Imageheader ))
 #define IMAGEHEADER_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_IMAGEHEADER, ImageheaderClass ))
-#define IS_IMAGEHEADER( obj ) (GTK_CHECK_TYPE( (obj), TYPE_IMAGEHEADER ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_IMAGEHEADER, ImageheaderClass ))
+#define IS_IMAGEHEADER( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_IMAGEHEADER ))
 #define IS_IMAGEHEADER_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_IMAGEHEADER ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_IMAGEHEADER ))
 
 typedef struct _Imageheader {
 	iDialog parent;

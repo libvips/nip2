@@ -37,7 +37,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( prefworkspaceview, Prefworkspaceview, TYPE_VIEW ); 
+G_DEFINE_TYPE( Prefworkspaceview, prefworkspaceview, TYPE_VIEW ); 
 
 static void
 prefworkspaceview_destroy( GtkObject *object )

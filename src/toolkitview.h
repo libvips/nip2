@@ -29,12 +29,12 @@
 
 #define TYPE_TOOLKITVIEW (toolkitview_get_type())
 #define TOOLKITVIEW( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_TOOLKITVIEW, Toolkitview ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_TOOLKITVIEW, Toolkitview ))
 #define TOOLKITVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_TOOLKITVIEW, ToolkitviewClass ))
-#define IS_TOOLKITVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_TOOLKITVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_TOOLKITVIEW, ToolkitviewClass ))
+#define IS_TOOLKITVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_TOOLKITVIEW ))
 #define IS_TOOLKITVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_TOOLKITVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_TOOLKITVIEW ))
 
 struct _Toolkitview {
 	View parent_class;

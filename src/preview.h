@@ -29,12 +29,12 @@
 
 #define TYPE_PREVIEW (preview_get_type())
 #define PREVIEW( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_PREVIEW, Preview ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_PREVIEW, Preview ))
 #define PREVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_PREVIEW, PreviewClass ))
-#define IS_PREVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_PREVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_PREVIEW, PreviewClass ))
+#define IS_PREVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_PREVIEW ))
 #define IS_PREVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_PREVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_PREVIEW ))
 
 struct _Preview {
 	Imagedisplay parent;

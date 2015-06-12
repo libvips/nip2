@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( editview, Editview, TYPE_GRAPHICVIEW ); 
+G_DEFINE_TYPE( Editview, editview, TYPE_GRAPHICVIEW ); 
 
 static void
 editview_link( View *view, Model *model, View *parent )

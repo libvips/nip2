@@ -29,12 +29,12 @@
  */
 
 #define TYPE_RHSVIEW (rhsview_get_type())
-#define RHSVIEW( obj ) (GTK_CHECK_CAST( (obj), TYPE_RHSVIEW, Rhsview ))
+#define RHSVIEW( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_RHSVIEW, Rhsview ))
 #define RHSVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_RHSVIEW, RhsviewClass ))
-#define IS_RHSVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_RHSVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_RHSVIEW, RhsviewClass ))
+#define IS_RHSVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_RHSVIEW ))
 #define IS_RHSVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_RHSVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_RHSVIEW ))
 
 struct _Rhsview {
 	View item;

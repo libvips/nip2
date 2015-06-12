@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( panechild, Panechild, TYPE_VOBJECT ); 
+G_DEFINE_TYPE( Panechild, panechild, TYPE_VOBJECT ); 
 
 static void
 panechild_finalize( GObject *gobject )

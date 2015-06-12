@@ -28,12 +28,12 @@
 */
 
 #define TYPE_PLOTWINDOW (plotwindow_get_type())
-#define PLOTWINDOW( obj ) (GTK_CHECK_CAST( (obj), TYPE_PLOTWINDOW, Plotwindow ))
+#define PLOTWINDOW( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_PLOTWINDOW, Plotwindow ))
 #define PLOTWINDOW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_PLOTWINDOW, PlotwindowClass ))
-#define IS_PLOTWINDOW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_PLOTWINDOW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_PLOTWINDOW, PlotwindowClass ))
+#define IS_PLOTWINDOW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_PLOTWINDOW ))
 #define IS_PLOTWINDOW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_PLOTWINDOW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_PLOTWINDOW ))
 
 struct _Plotwindow {
 	Floatwindow parent_class;

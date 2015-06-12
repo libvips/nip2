@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( plot, Plot, TYPE_CLASSMODEL ); 
+G_DEFINE_TYPE( Plot, plot, TYPE_CLASSMODEL ); 
 
 static void
 plot_free_columns( Plot *plot )

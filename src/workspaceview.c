@@ -37,7 +37,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( workspaceview, Workspaceview, TYPE_VIEW ); 
+G_DEFINE_TYPE( Workspaceview, workspaceview, TYPE_VIEW ); 
 
 /* Params for "Align Columns" function.
  */

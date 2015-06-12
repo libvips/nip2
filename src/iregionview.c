@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( iregionview, iregionview, TYPE_IIMAGEVIEW ); 
+G_DEFINE_TYPE( iRegionview, iregionview, TYPE_IIMAGEVIEW ); 
 
 static void
 iregionview_class_init( iRegionviewClass *class )

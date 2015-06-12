@@ -43,7 +43,7 @@ enum {
 	N_COLUMNS
 };
 
-G_DEFINE_TYPE( program, Program, TYPE_IWINDOW ); 
+G_DEFINE_TYPE( Program, program, TYPE_IWINDOW ); 
 
 static GSList *program_all = NULL;
 

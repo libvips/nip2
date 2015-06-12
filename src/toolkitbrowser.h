@@ -29,14 +29,14 @@
 
 #define TYPE_TOOLKITBROWSER (toolkitbrowser_get_type())
 #define TOOLKITBROWSER( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_TOOLKITBROWSER, Toolkitbrowser ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_TOOLKITBROWSER, Toolkitbrowser ))
 #define TOOLKITBROWSER_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), \
+	(G_TYPE_CHECK_CLASS_CAST( (klass), \
 		TYPE_TOOLKITBROWSER, ToolkitbrowserClass ))
 #define IS_TOOLKITBROWSER( obj ) \
-	(GTK_CHECK_TYPE( (obj), TYPE_TOOLKITBROWSER ))
+	(G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_TOOLKITBROWSER ))
 #define IS_TOOLKITBROWSER_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_TOOLKITBROWSER ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_TOOLKITBROWSER ))
 
 struct _Toolkitbrowser {
 	vObject parent_object;

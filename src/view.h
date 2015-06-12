@@ -28,12 +28,12 @@
  */
 
 #define TYPE_VIEW (view_get_type())
-#define VIEW( obj ) (GTK_CHECK_CAST( (obj), TYPE_VIEW, View ))
+#define VIEW( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_VIEW, View ))
 #define VIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_VIEW, ViewClass ))
-#define IS_VIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_VIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_VIEW, ViewClass ))
+#define IS_VIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_VIEW ))
 #define IS_VIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_VIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_VIEW ))
 #define VIEW_GET_CLASS( obj ) \
 	(GTK_CHECK_GET_CLASS( (obj), TYPE_VIEW, ViewClass ))
 

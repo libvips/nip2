@@ -28,12 +28,12 @@
  */
 
 #define TYPE_PROGRAM (program_get_type())
-#define PROGRAM( obj ) (GTK_CHECK_CAST( (obj), TYPE_PROGRAM, Program ))
+#define PROGRAM( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_PROGRAM, Program ))
 #define PROGRAM_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_PROGRAM, ProgramClass ))
-#define IS_PROGRAM( obj ) (GTK_CHECK_TYPE( (obj), TYPE_PROGRAM ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_PROGRAM, ProgramClass ))
+#define IS_PROGRAM( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_PROGRAM ))
 #define IS_PROGRAM_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_PROGRAM ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_PROGRAM ))
 
 struct _Program {
 	iWindow parent_class;

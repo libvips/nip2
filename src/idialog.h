@@ -35,12 +35,12 @@ extern "C" {
 #endif /* __cplusplus */
 
 #define TYPE_IDIALOG (idialog_get_type())
-#define IDIALOG( obj ) (GTK_CHECK_CAST( (obj), TYPE_IDIALOG, iDialog ))
+#define IDIALOG( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_IDIALOG, iDialog ))
 #define IDIALOG_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_IDIALOG, iDialogClass ))
-#define IS_IDIALOG( obj ) (GTK_CHECK_TYPE( (obj), TYPE_IDIALOG ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_IDIALOG, iDialogClass ))
+#define IS_IDIALOG( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_IDIALOG ))
 #define IS_IDIALOG_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_IDIALOG ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_IDIALOG ))
 
 typedef struct _iDialog iDialog;
 

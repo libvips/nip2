@@ -28,12 +28,12 @@
 */
 
 #define TYPE_OPTIONVIEW (optionview_get_type())
-#define OPTIONVIEW( obj ) (GTK_CHECK_CAST( (obj), TYPE_OPTIONVIEW, Optionview ))
+#define OPTIONVIEW( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_OPTIONVIEW, Optionview ))
 #define OPTIONVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_OPTIONVIEW, OptionviewClass ))
-#define IS_OPTIONVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_OPTIONVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_OPTIONVIEW, OptionviewClass ))
+#define IS_OPTIONVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_OPTIONVIEW ))
 #define IS_OPTIONVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_OPTIONVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_OPTIONVIEW ))
 
 typedef struct _Optionview {
 	Graphicview parent_object;

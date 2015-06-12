@@ -33,7 +33,7 @@
 #define DEBUG
  */
 
-G_DEFINE_TYPE( workspacegroupview, Workspacegroupview, TYPE_VIEW ); 
+G_DEFINE_TYPE( Workspacegroupview, workspacegroupview, TYPE_VIEW ); 
 
 static void
 workspacegroupview_realize( GtkWidget *widget )

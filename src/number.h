@@ -28,12 +28,12 @@
  */
 
 #define TYPE_NUMBER (number_get_type())
-#define NUMBER( obj ) (GTK_CHECK_CAST( (obj), TYPE_NUMBER, Number ))
+#define NUMBER( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_NUMBER, Number ))
 #define NUMBER_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_NUMBER, NumberClass ))
-#define IS_NUMBER( obj ) (GTK_CHECK_TYPE( (obj), TYPE_NUMBER ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_NUMBER, NumberClass ))
+#define IS_NUMBER( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_NUMBER ))
 #define IS_NUMBER_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_NUMBER ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_NUMBER ))
 
 struct _Number {
 	Classmodel parent_class;

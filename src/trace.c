@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( trace, Trace, TYPE_LOG ); 
+G_DEFINE_TYPE( Trace, trace, TYPE_LOG ); 
 
 /* OR of the flags in all the trace windows.
  */

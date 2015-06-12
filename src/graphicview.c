@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( graphicview, Graphicview, TYPE_VIEW ); 
+G_DEFINE_TYPE( Graphicview, graphicview, TYPE_VIEW ); 
 
 static void
 graphicview_link( View *view, Model *model, View *parent )

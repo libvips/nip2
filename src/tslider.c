@@ -43,7 +43,7 @@ enum {
 	LAST_SIGNAL
 };
 
-G_DEFINE_TYPE( tslider, Tslider, GTK_TYPE_HBOX ); 
+G_DEFINE_TYPE( Tslider, tslider, GTK_TYPE_HBOX ); 
 
 static guint tslider_signals[LAST_SIGNAL] = { 0 };
 

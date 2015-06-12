@@ -33,7 +33,7 @@
 #define DEBUG
  */
 
-G_DEFINE_TYPE( filesel, Filesel, TYPE_IDIALOG ); 
+G_DEFINE_TYPE( Filesel, filesel, TYPE_IDIALOG ); 
 
 /* TIFF save possibilities. Needs to be kept in sync with the Option in
  * preferences.

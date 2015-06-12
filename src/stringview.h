@@ -28,12 +28,12 @@
 */
 
 #define TYPE_STRINGVIEW (stringview_get_type())
-#define STRINGVIEW( obj ) (GTK_CHECK_CAST( (obj), TYPE_STRINGVIEW, Stringview ))
+#define STRINGVIEW( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_STRINGVIEW, Stringview ))
 #define STRINGVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_STRINGVIEW, StringviewClass ))
-#define IS_STRINGVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_STRINGVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_STRINGVIEW, StringviewClass ))
+#define IS_STRINGVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_STRINGVIEW ))
 #define IS_STRINGVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_STRINGVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_STRINGVIEW ))
 
 typedef struct _Stringview {
 	Editview parent_object;

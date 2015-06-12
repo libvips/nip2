@@ -74,7 +74,7 @@
 #include "BITMAPS/watch_8.xbm"
 #include "BITMAPS/watch_msk.xbm"
 
-G_DEFINE_TYPE( iwindow, iWindow, GTK_TYPE_WINDOW ); 
+G_DEFINE_TYPE( iWindow, iwindow, GTK_TYPE_WINDOW ); 
 
 /* List of all iwindows.
  */

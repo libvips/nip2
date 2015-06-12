@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( iimageview, iImageview, TYPE_GRAPHICVIEW ); 
+G_DEFINE_TYPE( iImageview, iimageview, TYPE_GRAPHICVIEW ); 
 
 static void
 iimageview_realize( GtkWidget *widget )

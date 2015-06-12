@@ -30,12 +30,12 @@
 
 #define TYPE_GRAPHICVIEW (graphicview_get_type())
 #define GRAPHICVIEW( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_GRAPHICVIEW, Graphicview ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_GRAPHICVIEW, Graphicview ))
 #define GRAPHICVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_GRAPHICVIEW, GraphicviewClass ))
-#define IS_GRAPHICVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_GRAPHICVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_GRAPHICVIEW, GraphicviewClass ))
+#define IS_GRAPHICVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_GRAPHICVIEW ))
 #define IS_GRAPHICVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_GRAPHICVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_GRAPHICVIEW ))
 
 typedef struct _Graphicview {
 	View view;

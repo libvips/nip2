@@ -28,14 +28,14 @@
 */
 
 #define TYPE_FORMULA (formula_get_type())
-#define FORMULA( obj ) (GTK_CHECK_CAST( (obj), \
+#define FORMULA( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), \
 	TYPE_FORMULA, Formula ))
 #define FORMULA_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), \
+	(G_TYPE_CHECK_CLASS_CAST( (klass), \
 		TYPE_FORMULA, FormulaClass ))
-#define IS_FORMULA( obj ) (GTK_CHECK_TYPE( (obj), TYPE_FORMULA ))
+#define IS_FORMULA( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_FORMULA ))
 #define IS_FORMULA_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_FORMULA ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_FORMULA ))
 
 typedef struct _Formula {
 	GtkEventBox parent_object;

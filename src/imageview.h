@@ -28,12 +28,12 @@
 */
 
 #define TYPE_IMAGEVIEW (imageview_get_type())
-#define IMAGEVIEW( obj ) (GTK_CHECK_CAST( (obj), TYPE_IMAGEVIEW, Imageview ))
+#define IMAGEVIEW( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_IMAGEVIEW, Imageview ))
 #define IMAGEVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_IMAGEVIEW, ImageviewClass ))
-#define IS_IMAGEVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_IMAGEVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_IMAGEVIEW, ImageviewClass ))
+#define IS_IMAGEVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_IMAGEVIEW ))
 #define IS_IMAGEVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_IMAGEVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_IMAGEVIEW ))
 
 typedef struct _Imageview {
 	Floatwindow parent_class;

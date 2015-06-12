@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( toolkitbrowser, Toolkitbrowser, TYPE_VOBJECT ); 
+G_DEFINE_TYPE( Toolkitbrowser, toolkitbrowser, TYPE_VOBJECT ); 
 
 /* Our columns.
  */

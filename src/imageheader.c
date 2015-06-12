@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( imageheader, Imageheader, TYPE_IDIALOG ); 
+G_DEFINE_TYPE( Imageheader, imageheader, TYPE_IDIALOG ); 
 
 /* Our columns.
  */

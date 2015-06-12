@@ -28,12 +28,12 @@
  */
 
 #define TYPE_CONVERSIONVIEW (conversionview_get_type())
-#define CONVERSIONVIEW( obj ) (GTK_CHECK_CAST( (obj), TYPE_CONVERSIONVIEW, Conversionview ))
+#define CONVERSIONVIEW( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_CONVERSIONVIEW, Conversionview ))
 #define CONVERSIONVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_CONVERSIONVIEW, ConversionviewClass ))
-#define IS_CONVERSIONVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_CONVERSIONVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_CONVERSIONVIEW, ConversionviewClass ))
+#define IS_CONVERSIONVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_CONVERSIONVIEW ))
 #define IS_CONVERSIONVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_CONVERSIONVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_CONVERSIONVIEW ))
 
 struct _Conversionview {
 	GtkFrame parent_class;

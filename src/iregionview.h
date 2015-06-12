@@ -29,12 +29,12 @@
 
 #define TYPE_IREGIONVIEW (iregionview_get_type())
 #define IREGIONVIEW( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_IREGIONVIEW, iRegionview ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_IREGIONVIEW, iRegionview ))
 #define IREGIONVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_IREGIONVIEW, iRegionviewClass ))
-#define IS_IREGIONVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_IREGIONVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_IREGIONVIEW, iRegionviewClass ))
+#define IS_IREGIONVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_IREGIONVIEW ))
 #define IS_IREGIONVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_IREGIONVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_IREGIONVIEW ))
 
 typedef struct _iRegionview {
 	iImageview parent_class;

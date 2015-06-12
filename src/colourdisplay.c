@@ -40,7 +40,7 @@ enum {
 	TARGET_TEXT
 };
 
-G_DEFINE_TYPE( colourdisplay, Colourdisplay, TYPE_IMAGEDISPLAY ); 
+G_DEFINE_TYPE( Colourdisplay, colourdisplay, TYPE_IMAGEDISPLAY ); 
 
 /* Prefer x-color drags for 3 band non-complex imageinfos, and for LABQ
  */

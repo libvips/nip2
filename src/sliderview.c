@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( sliderview, Sliderview, TYPE_GRAPHICVIEW ); 
+G_DEFINE_TYPE( Sliderview, sliderview, TYPE_GRAPHICVIEW ); 
 
 static void 
 sliderview_refresh( vObject *vobject )

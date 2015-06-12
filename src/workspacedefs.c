@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( workspacedefs, Workspacedefs, TYPE_VOBJECT ); 
+G_DEFINE_TYPE( Workspacedefs, workspacedefs, TYPE_VOBJECT ); 
 
 static void
 workspacedefs_text_changed( GtkTextBuffer *buffer, 

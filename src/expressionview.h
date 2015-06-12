@@ -28,14 +28,14 @@
 */
 
 #define TYPE_EXPRESSIONVIEW (expressionview_get_type())
-#define EXPRESSIONVIEW( obj ) (GTK_CHECK_CAST( (obj), \
+#define EXPRESSIONVIEW( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), \
 	TYPE_EXPRESSIONVIEW, Expressionview ))
 #define EXPRESSIONVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), \
+	(G_TYPE_CHECK_CLASS_CAST( (klass), \
 		TYPE_EXPRESSIONVIEW, ExpressionviewClass ))
-#define IS_EXPRESSIONVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_EXPRESSIONVIEW ))
+#define IS_EXPRESSIONVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_EXPRESSIONVIEW ))
 #define IS_EXPRESSIONVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_EXPRESSIONVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_EXPRESSIONVIEW ))
 
 typedef struct _Expressionview {
 	Graphicview parent_object;

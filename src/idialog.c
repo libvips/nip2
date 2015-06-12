@@ -33,7 +33,7 @@
 #define DEBUG
  */
 
-G_DEFINE_TYPE( idialog, iDialog, TYPE_IWINDOW ); 
+G_DEFINE_TYPE( iDialog, idialog, TYPE_IWINDOW ); 
 
 /* An OK button: label (can be a stock) plus a callback.
  */

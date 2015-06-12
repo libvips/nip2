@@ -29,13 +29,13 @@
 
 #define TYPE_PANECHILD (panechild_get_type())
 #define PANECHILD( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_PANECHILD, Panechild ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_PANECHILD, Panechild ))
 #define PANECHILD_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_PANECHILD, PanechildClass ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_PANECHILD, PanechildClass ))
 #define IS_PANECHILD( obj ) \
-	(GTK_CHECK_TYPE( (obj), TYPE_PANECHILD ))
+	(G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_PANECHILD ))
 #define IS_PANECHILD_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_PANECHILD ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_PANECHILD ))
 
 struct _Panechild {
 	vObject parent_object;

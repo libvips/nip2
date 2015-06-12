@@ -37,7 +37,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( imageview, Imageview, TYPE_FLOATWINDOW ); 
+G_DEFINE_TYPE( Imageview, imageview, TYPE_FLOATWINDOW ); 
 
 /* All the magnification menus we have.
  */

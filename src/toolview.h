@@ -28,12 +28,12 @@
 */
 
 #define TYPE_TOOLVIEW (toolview_get_type())
-#define TOOLVIEW( obj ) (GTK_CHECK_CAST( (obj), TYPE_TOOLVIEW, Toolview ))
+#define TOOLVIEW( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_TOOLVIEW, Toolview ))
 #define TOOLVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_TOOLVIEW, ToolviewClass ))
-#define IS_TOOLVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_TOOLVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_TOOLVIEW, ToolviewClass ))
+#define IS_TOOLVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_TOOLVIEW ))
 #define IS_TOOLVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_TOOLVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_TOOLVIEW ))
 
 /* One of these for each top-level menu.
  */

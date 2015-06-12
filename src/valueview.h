@@ -29,12 +29,12 @@
 
 #define TYPE_VALUEVIEW (valueview_get_type())
 #define VALUEVIEW( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_VALUEVIEW, Valueview ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_VALUEVIEW, Valueview ))
 #define VALUEVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_VALUEVIEW, ValueviewClass ))
-#define IS_VALUEVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_VALUEVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_VALUEVIEW, ValueviewClass ))
+#define IS_VALUEVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_VALUEVIEW ))
 #define IS_VALUEVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_VALUEVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_VALUEVIEW ))
 
 typedef struct _Valueview {
 	Graphicview parent_object;

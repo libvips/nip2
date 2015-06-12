@@ -29,14 +29,14 @@
 
 #define TYPE_IREGIONGROUPVIEW (iregiongroupview_get_type())
 #define IREGIONGROUPVIEW( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_IREGIONGROUPVIEW, iRegiongroupview ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_IREGIONGROUPVIEW, iRegiongroupview ))
 #define IREGIONGROUPVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_IREGIONGROUPVIEW, \
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_IREGIONGROUPVIEW, \
 		iRegiongroupviewClass ))
 #define IS_IREGIONGROUPVIEW( obj ) \
-	(GTK_CHECK_TYPE( (obj), TYPE_IREGIONGROUPVIEW ))
+	(G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_IREGIONGROUPVIEW ))
 #define IS_IREGIONGROUPVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_IREGIONGROUPVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_IREGIONGROUPVIEW ))
 
 typedef struct _iRegiongroupview {
 	View parent_class;

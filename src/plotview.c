@@ -36,7 +36,7 @@
 
 #ifdef HAVE_LIBGOFFICE
 
-G_DEFINE_TYPE( plotview, Plotview, TYPE_GRAPHICVIEW ); 
+G_DEFINE_TYPE( Plotview, plotview, TYPE_GRAPHICVIEW ); 
 
 static void
 plotview_destroy( GtkObject *object )

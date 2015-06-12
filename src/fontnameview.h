@@ -29,12 +29,12 @@
 
 #define TYPE_FONTNAMEVIEW (fontnameview_get_type())
 #define FONTNAMEVIEW( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_FONTNAMEVIEW, Fontnameview ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_FONTNAMEVIEW, Fontnameview ))
 #define FONTNAMEVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_FONTNAMEVIEW, FontnameviewClass ))
-#define IS_FONTNAMEVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_FONTNAMEVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_FONTNAMEVIEW, FontnameviewClass ))
+#define IS_FONTNAMEVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_FONTNAMEVIEW ))
 #define IS_FONTNAMEVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_FONTNAMEVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_FONTNAMEVIEW ))
 
 typedef struct _Fontnameview {
 	Graphicview parent_object;

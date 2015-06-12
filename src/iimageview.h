@@ -28,12 +28,12 @@
 */
 
 #define TYPE_IIMAGEVIEW (iimageview_get_type())
-#define IIMAGEVIEW( obj ) (GTK_CHECK_CAST( (obj), TYPE_IIMAGEVIEW, iImageview ))
+#define IIMAGEVIEW( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_IIMAGEVIEW, iImageview ))
 #define IIMAGEVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_IIMAGEVIEW, iImageviewClass ))
-#define IS_IIMAGEVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_IIMAGEVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_IIMAGEVIEW, iImageviewClass ))
+#define IS_IIMAGEVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_IIMAGEVIEW ))
 #define IS_IIMAGEVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_IIMAGEVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_IIMAGEVIEW ))
 
 typedef struct _iImageview {
 	Graphicview parent_object;

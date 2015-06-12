@@ -38,7 +38,7 @@
  */
 #define TOOLKITVIEW_MENU_OFFSET 3
 
-G_DEFINE_TYPE( toolkitview, Toolkitview, TYPE_VIEW ); 
+G_DEFINE_TYPE( Toolkitview, toolkitview, TYPE_VIEW ); 
 
 static void 
 toolkitview_destroy( GtkObject *object )

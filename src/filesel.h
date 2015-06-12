@@ -66,12 +66,12 @@ extern FileselFileType **filesel_type_any;
  */
 #define TYPE_FILESEL (filesel_get_type())
 #define FILESEL( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_FILESEL, Filesel ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_FILESEL, Filesel ))
 #define FILESEL_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_FILESEL, FileselClass ))
-#define IS_FILESEL( obj ) (GTK_CHECK_TYPE( (obj), TYPE_FILESEL ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_FILESEL, FileselClass ))
+#define IS_FILESEL( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_FILESEL ))
 #define IS_FILESEL_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_FILESEL ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_FILESEL ))
 
 /* Must be enough. 
  */

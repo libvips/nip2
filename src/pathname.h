@@ -28,12 +28,12 @@
  */
 
 #define TYPE_PATHNAME (pathname_get_type())
-#define PATHNAME( obj ) (GTK_CHECK_CAST( (obj), TYPE_PATHNAME, Pathname ))
+#define PATHNAME( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_PATHNAME, Pathname ))
 #define PATHNAME_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_PATHNAME, PathnameClass ))
-#define IS_PATHNAME( obj ) (GTK_CHECK_TYPE( (obj), TYPE_PATHNAME ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_PATHNAME, PathnameClass ))
+#define IS_PATHNAME( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_PATHNAME ))
 #define IS_PATHNAME_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_PATHNAME ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_PATHNAME ))
 
 typedef struct _Pathname {
 	Classmodel model;

@@ -28,12 +28,12 @@
  */
 
 #define TYPE_PREFS (prefs_get_type())
-#define PREFS( obj ) (GTK_CHECK_CAST( (obj), TYPE_PREFS, Prefs ))
+#define PREFS( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_PREFS, Prefs ))
 #define PREFS_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_PREFS, PrefsClass ))
-#define IS_PREFS( obj ) (GTK_CHECK_TYPE( (obj), TYPE_PREFS ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_PREFS, PrefsClass ))
+#define IS_PREFS( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_PREFS ))
 #define IS_PREFS_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_PREFS ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_PREFS ))
 
 typedef struct _Prefs {
 	iDialog parent_object;

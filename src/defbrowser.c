@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( defbrowser, Defbrowser, TYPE_VOBJECT ); 
+G_DEFINE_TYPE( Defbrowser, defbrowser, TYPE_VOBJECT ); 
 
 /* Our columns.
  */

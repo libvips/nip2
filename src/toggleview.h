@@ -28,12 +28,12 @@
 */
 
 #define TYPE_TOGGLEVIEW (toggleview_get_type())
-#define TOGGLEVIEW( obj ) (GTK_CHECK_CAST( (obj), TYPE_TOGGLEVIEW, Toggleview ))
+#define TOGGLEVIEW( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_TOGGLEVIEW, Toggleview ))
 #define TOGGLEVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_TOGGLEVIEW, ToggleviewClass ))
-#define IS_TOGGLEVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_TOGGLEVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_TOGGLEVIEW, ToggleviewClass ))
+#define IS_TOGGLEVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_TOGGLEVIEW ))
 #define IS_TOGGLEVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_TOGGLEVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_TOGGLEVIEW ))
 
 typedef struct _Toggleview {
 	Graphicview parent_object;

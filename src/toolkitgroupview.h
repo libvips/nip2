@@ -29,14 +29,14 @@
 
 #define TYPE_TOOLKITGROUPVIEW (toolkitgroupview_get_type())
 #define TOOLKITGROUPVIEW( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_TOOLKITGROUPVIEW, Toolkitgroupview ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_TOOLKITGROUPVIEW, Toolkitgroupview ))
 #define TOOLKITGROUPVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_TOOLKITGROUPVIEW, \
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_TOOLKITGROUPVIEW, \
 	ToolkitgroupviewClass ))
 #define IS_TOOLKITGROUPVIEW( obj ) \
-	(GTK_CHECK_TYPE( (obj), TYPE_TOOLKITGROUPVIEW ))
+	(G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_TOOLKITGROUPVIEW ))
 #define IS_TOOLKITGROUPVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_TOOLKITGROUPVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_TOOLKITGROUPVIEW ))
 
 struct _Toolkitgroupview {
 	View parent_class;

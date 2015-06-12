@@ -1,12 +1,38 @@
-- rename
+- swap 
 
+	gtk_hbox_new for gtk_box_new
+	gtk_vbox_new for gtk_box_new
+
+  check proto
+
+- swap
+
+	gtk_image_new_from_stock for gtk_image_new_from_icon_name
+
+  all of stock deprecated, read up on replacement
+
+- remove gtk_misc, red up on replacement
+
+- swap gtk_type_new for g_object_new
+
+- remove ‘gtk_object_destroy’, read up oon replacement
+
+- swap GTK_OBJECT for G_OBJECT
+
+
+
+
+
+- bulk rename
+
+	cat >script.sed <<EOF
 	s/GTK_CHECK_CAST/G_TYPE_CHECK_INSTANCE_CAST/g
 	s/GTK_CHECK_CLASS_CAST/G_TYPE_CHECK_CLASS_CAST/g
 	s/GTK_CHECK_TYPE/G_TYPE_CHECK_INSTANCE_TYPE/g
 	s/GTK_CHECK_CLASS_TYPE/G_TYPE_CHECK_CLASS_TYPE/g
+	EOF
 
-
-	sed -f script.sed -i $1
+	sed -f script.sed -i *.h
 
 
 

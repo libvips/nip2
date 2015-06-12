@@ -29,13 +29,13 @@
 
 #define TYPE_WORKSPACEVIEW (workspaceview_get_type())
 #define WORKSPACEVIEW( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_WORKSPACEVIEW, Workspaceview ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_WORKSPACEVIEW, Workspaceview ))
 #define WORKSPACEVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), \
+	(G_TYPE_CHECK_CLASS_CAST( (klass), \
 		TYPE_WORKSPACEVIEW, WorkspaceviewClass ))
-#define IS_WORKSPACEVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_WORKSPACEVIEW ))
+#define IS_WORKSPACEVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_WORKSPACEVIEW ))
 #define IS_WORKSPACEVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_WORKSPACEVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_WORKSPACEVIEW ))
 
 /* Column margins.
  */

@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( expressionview, Expressionview, TYPE_GRAPHICVIEW ); 
+G_DEFINE_TYPE( Expressionview, expressionview, TYPE_GRAPHICVIEW ); 
 
 /* Re-read the text in a tally entry. 
  */

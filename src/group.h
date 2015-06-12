@@ -28,12 +28,12 @@
  */
 
 #define TYPE_GROUP (group_get_type())
-#define GROUP( obj ) (GTK_CHECK_CAST( (obj), TYPE_GROUP, Group ))
+#define GROUP( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_GROUP, Group ))
 #define GROUP_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_GROUP, GroupClass ))
-#define IS_GROUP( obj ) (GTK_CHECK_TYPE( (obj), TYPE_GROUP ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_GROUP, GroupClass ))
+#define IS_GROUP( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_GROUP ))
 #define IS_GROUP_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_GROUP ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_GROUP ))
 
 typedef struct _Group {
 	Value parent_object;

@@ -28,12 +28,12 @@
  */
 
 #define TYPE_TRACE (trace_get_type())
-#define TRACE( obj ) (GTK_CHECK_CAST( (obj), TYPE_TRACE, Trace ))
+#define TRACE( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_TRACE, Trace ))
 #define TRACE_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_TRACE, TraceClass ))
-#define IS_TRACE( obj ) (GTK_CHECK_TYPE( (obj), TYPE_TRACE ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_TRACE, TraceClass ))
+#define IS_TRACE( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_TRACE ))
 #define IS_TRACE_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_TRACE ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_TRACE ))
 
 /* The various things we can trace.
  */

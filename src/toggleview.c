@@ -33,7 +33,7 @@
 #define DEBUG
  */
 
-G_DEFINE_TYPE( toggleview, Toggleview, TYPE_GRAPHICVIEW ); 
+G_DEFINE_TYPE( Toggleview, toggleview, TYPE_GRAPHICVIEW ); 
 
 /* Toggleview callback.
  */

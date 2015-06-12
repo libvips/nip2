@@ -29,12 +29,12 @@
 
 #define TYPE_PATHNAMEVIEW (pathnameview_get_type())
 #define PATHNAMEVIEW( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_PATHNAMEVIEW, Pathnameview ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_PATHNAMEVIEW, Pathnameview ))
 #define PATHNAMEVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_PATHNAMEVIEW, PathnameviewClass ))
-#define IS_PATHNAMEVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_PATHNAMEVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_PATHNAMEVIEW, PathnameviewClass ))
+#define IS_PATHNAMEVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_PATHNAMEVIEW ))
 #define IS_PATHNAMEVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_PATHNAMEVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_PATHNAMEVIEW ))
 
 typedef struct _Pathnameview {
 	Graphicview parent_object;

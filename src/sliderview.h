@@ -28,12 +28,12 @@
 */
 
 #define TYPE_SLIDERVIEW (sliderview_get_type())
-#define SLIDERVIEW( obj ) (GTK_CHECK_CAST( (obj), TYPE_SLIDERVIEW, Sliderview ))
+#define SLIDERVIEW( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_SLIDERVIEW, Sliderview ))
 #define SLIDERVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_SLIDERVIEW, SliderviewClass ))
-#define IS_SLIDERVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_SLIDERVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_SLIDERVIEW, SliderviewClass ))
+#define IS_SLIDERVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_SLIDERVIEW ))
 #define IS_SLIDERVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_SLIDERVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_SLIDERVIEW ))
 
 typedef struct _Sliderview {
 	Graphicview parent_object;

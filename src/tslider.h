@@ -28,12 +28,12 @@
  */
 
 #define TYPE_TSLIDER (tslider_get_type())
-#define TSLIDER( obj ) (GTK_CHECK_CAST( (obj), TYPE_TSLIDER, Tslider ))
+#define TSLIDER( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_TSLIDER, Tslider ))
 #define TSLIDER_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_TSLIDER, TsliderClass ))
-#define IS_TSLIDER( obj ) (GTK_CHECK_TYPE( (obj), TYPE_TSLIDER ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_TSLIDER, TsliderClass ))
+#define IS_TSLIDER( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_TSLIDER ))
 #define IS_TSLIDER_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_TSLIDER ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_TSLIDER ))
 
 typedef double (*tslider_fn)( double from, double to, double value );
 

@@ -28,12 +28,12 @@
  */
 
 #define TYPE_IERROR (ierror_get_type())
-#define IERROR( obj ) (GTK_CHECK_CAST( (obj), TYPE_IERROR, iError ))
+#define IERROR( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_IERROR, iError ))
 #define IERROR_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_IERROR, iErrorClass ))
-#define IS_IERROR( obj ) (GTK_CHECK_TYPE( (obj), TYPE_IERROR ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_IERROR, iErrorClass ))
+#define IS_IERROR( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_IERROR ))
 #define IS_IERROR_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_IERROR ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_IERROR ))
 
 struct _iError {
 	Log parent_class;

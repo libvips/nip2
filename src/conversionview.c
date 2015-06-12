@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( conversionview, Conversionview, GTK_TYPE_FRAME ); 
+G_DEFINE_TYPE( Conversionview, conversionview, GTK_TYPE_FRAME ); 
 
 /* Find max and min of visible area of image.
  */

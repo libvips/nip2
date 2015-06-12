@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( pathnameview, Pathnameview, TYPE_GRAPHICVIEW ); 
+G_DEFINE_TYPE( Pathnameview, pathnameview, TYPE_GRAPHICVIEW ); 
 
 static void
 pathnameview_link( View *view, Model *model, View *parent )

@@ -29,12 +29,12 @@
 
 #define TYPE_ROWVIEW (rowview_get_type())
 #define ROWVIEW( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_ROWVIEW, Rowview ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_ROWVIEW, Rowview ))
 #define ROWVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_ROWVIEW, RowviewClass ))
-#define IS_ROWVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_ROWVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_ROWVIEW, RowviewClass ))
+#define IS_ROWVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_ROWVIEW ))
 #define IS_ROWVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_ROWVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_ROWVIEW ))
 
 struct _Rowview {
 	View view;

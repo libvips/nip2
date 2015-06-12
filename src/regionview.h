@@ -28,12 +28,12 @@
  */
 
 #define TYPE_REGIONVIEW (regionview_get_type())
-#define REGIONVIEW( obj ) (GTK_CHECK_CAST( (obj), TYPE_REGIONVIEW, Regionview ))
+#define REGIONVIEW( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_REGIONVIEW, Regionview ))
 #define REGIONVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_REGIONVIEW, RegionviewClass ))
-#define IS_REGIONVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_REGIONVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_REGIONVIEW, RegionviewClass ))
+#define IS_REGIONVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_REGIONVIEW ))
 #define IS_REGIONVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_REGIONVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_REGIONVIEW ))
 
 #define REGIONVIEW_LABEL_MAX (256)
 

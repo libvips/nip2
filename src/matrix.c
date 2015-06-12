@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( matrix, Matrix, TYPE_CLASSMODEL ); 
+G_DEFINE_TYPE( Matrix, matrix, TYPE_CLASSMODEL ); 
 
 static void
 matrix_finalize( GObject *gobject )

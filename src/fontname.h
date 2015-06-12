@@ -28,12 +28,12 @@
  */
 
 #define TYPE_FONTNAME (fontname_get_type())
-#define FONTNAME( obj ) (GTK_CHECK_CAST( (obj), TYPE_FONTNAME, Fontname ))
+#define FONTNAME( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_FONTNAME, Fontname ))
 #define FONTNAME_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_FONTNAME, FontnameClass ))
-#define IS_FONTNAME( obj ) (GTK_CHECK_TYPE( (obj), TYPE_FONTNAME ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_FONTNAME, FontnameClass ))
+#define IS_FONTNAME( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_FONTNAME ))
 #define IS_FONTNAME_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_FONTNAME ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_FONTNAME ))
 
 typedef struct _Fontname {
 	Classmodel model;

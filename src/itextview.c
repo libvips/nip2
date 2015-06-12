@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( itextview, iTextview, TYPE_VIEW ); 
+G_DEFINE_TYPE( iTextview, itextview, TYPE_VIEW ); 
 
 static void 
 itextview_refresh( vObject *vobject )

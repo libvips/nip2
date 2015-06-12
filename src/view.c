@@ -38,7 +38,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( view, View, TYPE_VOBJECT ); 
+G_DEFINE_TYPE( View, view, TYPE_VOBJECT ); 
 
 static GSList *view_scannable = NULL;
 

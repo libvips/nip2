@@ -29,14 +29,14 @@
 
 #define TYPE_PREFWORKSPACEVIEW (prefworkspaceview_get_type())
 #define PREFWORKSPACEVIEW( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_PREFWORKSPACEVIEW, Prefworkspaceview ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_PREFWORKSPACEVIEW, Prefworkspaceview ))
 #define PREFWORKSPACEVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), \
+	(G_TYPE_CHECK_CLASS_CAST( (klass), \
 		TYPE_PREFWORKSPACEVIEW, PrefworkspaceviewClass ))
 #define IS_PREFWORKSPACEVIEW( obj ) \
-	(GTK_CHECK_TYPE( (obj), TYPE_PREFWORKSPACEVIEW ))
+	(G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_PREFWORKSPACEVIEW ))
 #define IS_PREFWORKSPACEVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_PREFWORKSPACEVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_PREFWORKSPACEVIEW ))
 
 struct _Prefworkspaceview {
 	View view;

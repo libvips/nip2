@@ -55,7 +55,7 @@ static const int matrixview_column_width = 70;
  */
 static const int matrixview_max_cells = 100;
 
-G_DEFINE_TYPE( matrixview, Matrixview, TYPE_GRAPHICVIEW ); 
+G_DEFINE_TYPE( Matrixview, matrixview, TYPE_GRAPHICVIEW ); 
 
 static void
 matrixview_destroy( GtkObject *object )

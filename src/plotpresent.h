@@ -29,12 +29,12 @@
 
 #define TYPE_PLOTPRESENT (plotpresent_get_type())
 #define PLOTPRESENT( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_PLOTPRESENT, Plotpresent ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_PLOTPRESENT, Plotpresent ))
 #define PLOTPRESENT_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_PLOTPRESENT, PlotpresentClass ))
-#define IS_PLOTPRESENT( obj ) (GTK_CHECK_TYPE( (obj), TYPE_PLOTPRESENT ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_PLOTPRESENT, PlotpresentClass ))
+#define IS_PLOTPRESENT( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_PLOTPRESENT ))
 #define IS_PLOTPRESENT_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_PLOTPRESENT ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_PLOTPRESENT ))
 
 struct _Plotpresent {
 	GtkBin parent_class;

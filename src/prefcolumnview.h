@@ -29,13 +29,13 @@
 
 #define TYPE_PREFCOLUMNVIEW (prefcolumnview_get_type())
 #define PREFCOLUMNVIEW( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_PREFCOLUMNVIEW, Prefcolumnview ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_PREFCOLUMNVIEW, Prefcolumnview ))
 #define PREFCOLUMNVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), \
+	(G_TYPE_CHECK_CLASS_CAST( (klass), \
 		TYPE_PREFCOLUMNVIEW, PrefcolumnviewClass ))
-#define IS_PREFCOLUMNVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_PREFCOLUMNVIEW ))
+#define IS_PREFCOLUMNVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_PREFCOLUMNVIEW ))
 #define IS_PREFCOLUMNVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_PREFCOLUMNVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_PREFCOLUMNVIEW ))
 
 struct _Prefcolumnview {
 	View view;

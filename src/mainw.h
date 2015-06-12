@@ -28,12 +28,12 @@
  */
 
 #define TYPE_MAINW (mainw_get_type())
-#define MAINW( obj ) (GTK_CHECK_CAST( (obj), TYPE_MAINW, Mainw ))
+#define MAINW( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_MAINW, Mainw ))
 #define MAINW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_MAINW, MainwClass ))
-#define IS_MAINW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_MAINW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_MAINW, MainwClass ))
+#define IS_MAINW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_MAINW ))
 #define IS_MAINW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_MAINW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_MAINW ))
 
 /* Get a widget's enclosing Mainw.
  */

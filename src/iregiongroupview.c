@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( iregiongroupview, iRegiongroupview, TYPE_VIEW ); 
+G_DEFINE_TYPE( iRegiongroupview, iregiongroupview, TYPE_VIEW ); 
 
 static iRegiongroup *
 iregiongroupview_get_iregiongroup( iRegiongroupview *iregiongroupview )

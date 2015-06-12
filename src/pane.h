@@ -28,12 +28,12 @@
  */
 
 #define TYPE_PANE (pane_get_type())
-#define PANE( obj ) (GTK_CHECK_CAST( (obj), TYPE_PANE, Pane ))
+#define PANE( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_PANE, Pane ))
 #define PANE_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_PANE, PaneClass ))
-#define IS_PANE( obj ) (GTK_CHECK_TYPE( (obj), TYPE_PANE ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_PANE, PaneClass ))
+#define IS_PANE( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_PANE ))
 #define IS_PANE_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_PANE ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_PANE ))
 
 /* Can hide on the left or the right hand side of a window.
  */

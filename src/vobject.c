@@ -38,7 +38,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( vobject, vObject, GTK_TYPE_VBOX ); 
+G_DEFINE_TYPE( vObject, vobject, GTK_TYPE_VBOX ); 
 
 static Queue *vobject_dirty = NULL;
 

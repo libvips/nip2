@@ -29,14 +29,14 @@
 
 #define TYPE_DEFBROWSER (defbrowser_get_type())
 #define DEFBROWSER( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_DEFBROWSER, Defbrowser ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_DEFBROWSER, Defbrowser ))
 #define DEFBROWSER_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), \
+	(G_TYPE_CHECK_CLASS_CAST( (klass), \
 		TYPE_DEFBROWSER, DefbrowserClass ))
 #define IS_DEFBROWSER( obj ) \
-	(GTK_CHECK_TYPE( (obj), TYPE_DEFBROWSER ))
+	(G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_DEFBROWSER ))
 #define IS_DEFBROWSER_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_DEFBROWSER ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_DEFBROWSER ))
 
 typedef struct _Defbrowser {
 	vObject parent_object;

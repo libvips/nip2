@@ -29,12 +29,12 @@
 
 #define TYPE_SUBCOLUMNVIEW (subcolumnview_get_type())
 #define SUBCOLUMNVIEW( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_SUBCOLUMNVIEW, Subcolumnview ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_SUBCOLUMNVIEW, Subcolumnview ))
 #define SUBCOLUMNVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_SUBCOLUMNVIEW, SubcolumnviewClass ))
-#define IS_SUBCOLUMNVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_SUBCOLUMNVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_SUBCOLUMNVIEW, SubcolumnviewClass ))
+#define IS_SUBCOLUMNVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_SUBCOLUMNVIEW ))
 #define IS_SUBCOLUMNVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_SUBCOLUMNVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_SUBCOLUMNVIEW ))
 
 struct _Subcolumnview {
 	View view;

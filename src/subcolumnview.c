@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( subcolumview, Subcolumview, TYPE_VIEW ); 
+G_DEFINE_TYPE( Subcolumview, subcolumview, TYPE_VIEW ); 
 
 static void *
 subcolumnview_destroy_sub( Rowview *rview, Subcolumnview *sview )

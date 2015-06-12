@@ -28,12 +28,12 @@
  */
 
 #define TYPE_VECTOR (vector_get_type())
-#define VECTOR( obj ) (GTK_CHECK_CAST( (obj), TYPE_VECTOR, Vector ))
+#define VECTOR( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_VECTOR, Vector ))
 #define VECTOR_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_VECTOR, VectorClass ))
-#define IS_VECTOR( obj ) (GTK_CHECK_TYPE( (obj), TYPE_VECTOR ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_VECTOR, VectorClass ))
+#define IS_VECTOR( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_VECTOR ))
 #define IS_VECTOR_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_VECTOR ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_VECTOR ))
 
 typedef struct _Vector {
 	Value parent_object;

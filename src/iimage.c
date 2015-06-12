@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( iimage, iImage, TYPE_CLASSMODEL ); 
+G_DEFINE_TYPE( iImage, iimage, TYPE_CLASSMODEL ); 
 
 static void
 iimage_dispose( GObject *gobject )

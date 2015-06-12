@@ -28,12 +28,12 @@
 */
 
 #define TYPE_PLOTVIEW (plotview_get_type())
-#define PLOTVIEW( obj ) (GTK_CHECK_CAST( (obj), TYPE_PLOTVIEW, Plotview ))
+#define PLOTVIEW( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_PLOTVIEW, Plotview ))
 #define PLOTVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_PLOTVIEW, PlotviewClass ))
-#define IS_PLOTVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_PLOTVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_PLOTVIEW, PlotviewClass ))
+#define IS_PLOTVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_PLOTVIEW ))
 #define IS_PLOTVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_PLOTVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_PLOTVIEW ))
 
 typedef struct _Plotview {
 	Graphicview parent_object;

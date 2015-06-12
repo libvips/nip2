@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( ierror, iError, TYPE_LOG ); 
+G_DEFINE_TYPE( iError, ierror, TYPE_LOG ); 
 
 static void *
 ierror_print( Expr *expr, iError *ierror, gboolean *found )

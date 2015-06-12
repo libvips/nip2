@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( optionview, Optionview, TYPE_GRAPHICVIEW ); 
+G_DEFINE_TYPE( Optionview, optionview, TYPE_GRAPHICVIEW ); 
 
 /* Copy a gslist of strings.
  */

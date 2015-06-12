@@ -29,12 +29,12 @@
 
 #define TYPE_FLOATWINDOW (floatwindow_get_type())
 #define FLOATWINDOW( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_FLOATWINDOW, Floatwindow ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_FLOATWINDOW, Floatwindow ))
 #define FLOATWINDOW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_FLOATWINDOW, FloatwindowClass ))
-#define IS_FLOATWINDOW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_FLOATWINDOW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_FLOATWINDOW, FloatwindowClass ))
+#define IS_FLOATWINDOW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_FLOATWINDOW ))
 #define IS_FLOATWINDOW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_FLOATWINDOW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_FLOATWINDOW ))
 
 typedef struct _Floatwindow {
 	iWindow parent_class;

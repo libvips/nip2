@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( valueview, Valueview, TYPE_GRAPHICVIEW ); 
+G_DEFINE_TYPE( Valueview, valueview, TYPE_GRAPHICVIEW ); 
 
 static void 
 valueview_refresh( vObject *vobject )

@@ -28,12 +28,12 @@
 */
 
 #define TYPE_ITEXTVIEW (itextview_get_type())
-#define ITEXTVIEW( obj ) (GTK_CHECK_CAST( (obj), TYPE_ITEXTVIEW, iTextview ))
+#define ITEXTVIEW( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_ITEXTVIEW, iTextview ))
 #define ITEXTVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_ITEXTVIEW, iTextviewClass ))
-#define IS_ITEXTVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_ITEXTVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_ITEXTVIEW, iTextviewClass ))
+#define IS_ITEXTVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_ITEXTVIEW ))
 #define IS_ITEXTVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_ITEXTVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_ITEXTVIEW ))
 
 typedef struct _iTextview {
 	View view;

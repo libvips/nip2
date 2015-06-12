@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( columnview, Columnview, TYPE_VIEW ); 
+G_DEFINE_TYPE( Columnview, columnview, TYPE_VIEW ); 
 
 /* The columnview popup menu.
  */

@@ -31,12 +31,12 @@
 
 #define TYPE_POPUPBUTTON (popupbutton_get_type())
 #define POPUPBUTTON( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_POPUPBUTTON, Popupbutton ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_POPUPBUTTON, Popupbutton ))
 #define POPUPBUTTON_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_POPUPBUTTON, PopupbuttonClass ))
-#define IS_POPUPBUTTON( obj ) (GTK_CHECK_TYPE( (obj), TYPE_POPUPBUTTON ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_POPUPBUTTON, PopupbuttonClass ))
+#define IS_POPUPBUTTON( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_POPUPBUTTON ))
 #define IS_POPUPBUTTON_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_POPUPBUTTON ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_POPUPBUTTON ))
 
 typedef struct _Popupbutton {
 	GtkToggleButton parent_object;

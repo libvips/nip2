@@ -28,11 +28,11 @@
 */
 
 #define TYPE_SPIN (spin_get_type())
-#define SPIN( obj ) (GTK_CHECK_CAST( (obj), TYPE_SPIN, Spin ))
+#define SPIN( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_SPIN, Spin ))
 #define SPIN_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_SPIN, SpinClass ))
-#define IS_SPIN( obj ) (GTK_CHECK_TYPE( (obj), TYPE_SPIN ))
-#define IS_SPIN_CLASS( klass ) (GTK_CHECK_CLASS_TYPE( (klass), TYPE_SPIN ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_SPIN, SpinClass ))
+#define IS_SPIN( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_SPIN ))
+#define IS_SPIN_CLASS( klass ) (G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_SPIN ))
 
 typedef struct _Spin {
 	View view;

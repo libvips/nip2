@@ -28,12 +28,12 @@
 */
 
 #define TYPE_MATRIXVIEW (matrixview_get_type())
-#define MATRIXVIEW( obj ) (GTK_CHECK_CAST( (obj), TYPE_MATRIXVIEW, Matrixview ))
+#define MATRIXVIEW( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_MATRIXVIEW, Matrixview ))
 #define MATRIXVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_MATRIXVIEW, MatrixviewClass ))
-#define IS_MATRIXVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_MATRIXVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_MATRIXVIEW, MatrixviewClass ))
+#define IS_MATRIXVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_MATRIXVIEW ))
 #define IS_MATRIXVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_MATRIXVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_MATRIXVIEW ))
 
 typedef struct _Matrixview {
 	Graphicview parent_object;

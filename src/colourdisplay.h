@@ -30,13 +30,13 @@
 
 #define TYPE_COLOURDISPLAY (colourdisplay_get_type())
 #define COLOURDISPLAY( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_COLOURDISPLAY, Colourdisplay ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_COLOURDISPLAY, Colourdisplay ))
 #define COLOURDISPLAY_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), \
+	(G_TYPE_CHECK_CLASS_CAST( (klass), \
 		TYPE_COLOURDISPLAY, ColourdisplayClass ))
-#define IS_COLOURDISPLAY( obj ) (GTK_CHECK_TYPE( (obj), TYPE_COLOURDISPLAY ))
+#define IS_COLOURDISPLAY( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_COLOURDISPLAY ))
 #define IS_COLOURDISPLAY_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_COLOURDISPLAY ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_COLOURDISPLAY ))
 
 typedef struct _Colourdisplay {
 	Imagedisplay parent_class;

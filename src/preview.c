@@ -37,7 +37,7 @@
  */
 #define NUM_COLUMNS (4)
 
-G_DEFINE_TYPE( preview, Preview, TYPE_IMAGEDISPLAY ); 
+G_DEFINE_TYPE( Preview, preview, TYPE_IMAGEDISPLAY ); 
 
 static void
 preview_destroy( GtkObject *object )

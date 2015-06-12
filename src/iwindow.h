@@ -35,12 +35,12 @@ extern "C" {
 #endif /* __cplusplus */
 
 #define TYPE_IWINDOW (iwindow_get_type())
-#define IWINDOW( obj ) (GTK_CHECK_CAST( (obj), TYPE_IWINDOW, iWindow ))
+#define IWINDOW( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_IWINDOW, iWindow ))
 #define IWINDOW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_IWINDOW, iWindowClass ))
-#define IS_IWINDOW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_IWINDOW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_IWINDOW, iWindowClass ))
+#define IS_IWINDOW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_IWINDOW ))
 #define IS_IWINDOW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_IWINDOW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_IWINDOW ))
 #define IWINDOW_GET_CLASS( obj ) \
 	(GTK_CHECK_GET_CLASS( (obj), TYPE_IWINDOW, iWindowClass ))
 

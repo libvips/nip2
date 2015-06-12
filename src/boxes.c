@@ -430,7 +430,7 @@ box_help( GtkWidget *par, const char *name )
 /* Name + caption dialog ... for new workspace / new column.
  */
 
-G_DEFINE_TYPE( stringset, Stringset, TYPE_IDIALOG ); 
+G_DEFINE_TYPE( Stringset, stringset, TYPE_IDIALOG ); 
 
 void *
 stringset_child_destroy( StringsetChild *ssc )

@@ -34,7 +34,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( rhsview, Rhsview, TYPE_VIEW ); 
+G_DEFINE_TYPE( Rhsview, rhsview, TYPE_VIEW ); 
 
 /* Get this if ws->mode changes.
  */

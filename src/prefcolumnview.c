@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( prefcolumnview, Prefcolumnview, TYPE_VIEW ); 
+G_DEFINE_TYPE( Prefcolumnview, prefcolumnview, TYPE_VIEW ); 
 
 static void 
 prefcolumnview_refresh( vObject *vobject )

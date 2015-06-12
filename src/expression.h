@@ -28,12 +28,12 @@
  */
 
 #define TYPE_EXPRESSION (expression_get_type())
-#define EXPRESSION( obj ) (GTK_CHECK_CAST( (obj), TYPE_EXPRESSION, Expression ))
+#define EXPRESSION( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_EXPRESSION, Expression ))
 #define EXPRESSION_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_EXPRESSION, ExpressionClass ))
-#define IS_EXPRESSION( obj ) (GTK_CHECK_TYPE( (obj), TYPE_EXPRESSION ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_EXPRESSION, ExpressionClass ))
+#define IS_EXPRESSION( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_EXPRESSION ))
 #define IS_EXPRESSION_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_EXPRESSION ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_EXPRESSION ))
 
 struct _Expression {
 	Classmodel parent_class;

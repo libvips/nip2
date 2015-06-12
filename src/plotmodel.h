@@ -29,12 +29,12 @@
 
 #define TYPE_PLOTMODEL (plotmodel_get_type())
 #define PLOTMODEL( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_PLOTMODEL, Plotmodel ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_PLOTMODEL, Plotmodel ))
 #define PLOTMODEL_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_PLOTMODEL, PlotmodelClass ))
-#define IS_PLOTMODEL( obj ) (GTK_CHECK_TYPE( (obj), TYPE_PLOTMODEL ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_PLOTMODEL, PlotmodelClass ))
+#define IS_PLOTMODEL( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_PLOTMODEL ))
 #define IS_PLOTMODEL_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_PLOTMODEL ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_PLOTMODEL ))
 
 struct _Plotmodel {
 	iObject parent_class;

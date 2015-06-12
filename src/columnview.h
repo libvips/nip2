@@ -29,12 +29,12 @@
 
 #define TYPE_COLUMNVIEW (columnview_get_type())
 #define COLUMNVIEW( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_COLUMNVIEW, Columnview ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_COLUMNVIEW, Columnview ))
 #define COLUMNVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_COLUMNVIEW, ColumnviewClass ))
-#define IS_COLUMNVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_COLUMNVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_COLUMNVIEW, ColumnviewClass ))
+#define IS_COLUMNVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_COLUMNVIEW ))
 #define IS_COLUMNVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_COLUMNVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_COLUMNVIEW ))
 
 /* State ... for mouse titlebar interactions.
  */

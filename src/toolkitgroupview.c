@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( toolkitgroupview, Toolkitgroupview, TYPE_VIEW ); 
+G_DEFINE_TYPE( Toolkitgroupview, toolkitgroupview, TYPE_VIEW ); 
 
 static void *
 toolkitgroupview_dispose_sub( View *view, void *a, void *b )

@@ -28,12 +28,12 @@
  */
 
 #define TYPE_STATUSVIEW (statusview_get_type())
-#define STATUSVIEW( obj ) (GTK_CHECK_CAST( (obj), TYPE_STATUSVIEW, Statusview ))
+#define STATUSVIEW( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_STATUSVIEW, Statusview ))
 #define STATUSVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_STATUSVIEW, StatusviewClass ))
-#define IS_STATUSVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_STATUSVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_STATUSVIEW, StatusviewClass ))
+#define IS_STATUSVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_STATUSVIEW ))
 #define IS_STATUSVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_STATUSVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_STATUSVIEW ))
 
 /* A band element display in the status bar.
  */

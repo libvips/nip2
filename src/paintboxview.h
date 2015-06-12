@@ -31,12 +31,12 @@ extern iWindowShape paintboxview_shape[];
 
 #define TYPE_PAINTBOXVIEW (paintboxview_get_type())
 #define PAINTBOXVIEW( obj ) \
-	(GTK_CHECK_CAST( (obj), TYPE_PAINTBOXVIEW, Paintboxview ))
+	(G_TYPE_CHECK_INSTANCE_CAST( (obj), TYPE_PAINTBOXVIEW, Paintboxview ))
 #define PAINTBOXVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), TYPE_PAINTBOXVIEW, PaintboxviewClass ))
-#define IS_PAINTBOXVIEW( obj ) (GTK_CHECK_TYPE( (obj), TYPE_PAINTBOXVIEW ))
+	(G_TYPE_CHECK_CLASS_CAST( (klass), TYPE_PAINTBOXVIEW, PaintboxviewClass ))
+#define IS_PAINTBOXVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), TYPE_PAINTBOXVIEW ))
 #define IS_PAINTBOXVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_PAINTBOXVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_PAINTBOXVIEW ))
 
 struct _Paintboxview {
 	GtkFrame parent_class;

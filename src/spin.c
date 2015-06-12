@@ -38,7 +38,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( spin, Spin, TYPE_VIEW ); 
+G_DEFINE_TYPE( Spin, spin, TYPE_VIEW ); 
 
 /* Our signals. Up and down click.
  */

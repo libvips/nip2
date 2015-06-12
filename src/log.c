@@ -37,7 +37,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( log, Log, TYPE_IWINDOW ); 
+G_DEFINE_TYPE( Log, log, TYPE_IWINDOW ); 
 
 static void
 log_build( GtkWidget *widget ) 

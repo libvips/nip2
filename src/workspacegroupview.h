@@ -28,15 +28,15 @@
  */
 
 #define TYPE_WORKSPACEGROUPVIEW (workspacegroupview_get_type())
-#define WORKSPACEGROUPVIEW( obj ) (GTK_CHECK_CAST( (obj), \
+#define WORKSPACEGROUPVIEW( obj ) (G_TYPE_CHECK_INSTANCE_CAST( (obj), \
 	TYPE_WORKSPACEGROUPVIEW, Workspacegroupview ))
 #define WORKSPACEGROUPVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_CAST( (klass), \
+	(G_TYPE_CHECK_CLASS_CAST( (klass), \
 		TYPE_WORKSPACEGROUPVIEW, WorkspacegroupviewClass ))
-#define IS_WORKSPACEGROUPVIEW( obj ) (GTK_CHECK_TYPE( (obj), \
+#define IS_WORKSPACEGROUPVIEW( obj ) (G_TYPE_CHECK_INSTANCE_TYPE( (obj), \
 	TYPE_WORKSPACEGROUPVIEW ))
 #define IS_WORKSPACEGROUPVIEW_CLASS( klass ) \
-	(GTK_CHECK_CLASS_TYPE( (klass), TYPE_WORKSPACEGROUPVIEW ))
+	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_WORKSPACEGROUPVIEW ))
 
 struct _Workspacegroupview {
 	View parent_object;

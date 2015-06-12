@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( toolview, Toolview, TYPE_VIEW ); 
+G_DEFINE_TYPE( Toolview, toolview, TYPE_VIEW ); 
 
 /* Link menu items to toolview with this.
  */

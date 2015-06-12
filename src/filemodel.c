@@ -42,7 +42,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( filemodel, Filemodel, TYPE_MODEL ); 
+G_DEFINE_TYPE( Filemodel, filemodel, TYPE_MODEL ); 
 
 static GSList *filemodel_registered = NULL;
 

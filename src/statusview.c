@@ -125,27 +125,24 @@ statusview_init( Statusview *sv )
         gtk_container_add( GTK_CONTAINER( sv ), eb );
         popup_attach( eb, statusview_menu, sv );
 
-	vb = gtk_vbox_new( FALSE, 0 );
+	vb = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0 );
         gtk_container_set_border_width( GTK_CONTAINER( vb ), 1 );
         gtk_container_add( GTK_CONTAINER( eb ), vb );
 
 	sv->top = gtk_label_new( "" );
-        gtk_misc_set_alignment( GTK_MISC( sv->top ), 0.0, 0.5 );
         gtk_box_pack_start( GTK_BOX( vb ), sv->top, TRUE, TRUE, 0 );
 
-	hb = gtk_hbox_new( FALSE, 5 );
+	hb = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 5 );
         gtk_box_pack_start( GTK_BOX( vb ), hb, TRUE, TRUE, 0 );
 
 	sv->pos = gtk_label_new( "" );
 	set_fixed( sv->pos, strlen( "(888888,888888)" ) );
-        gtk_misc_set_alignment( GTK_MISC( sv->pos ), 0.0, 0.5 );
         gtk_box_pack_start( GTK_BOX( hb ), sv->pos, FALSE, FALSE, 0 );
 
-	sv->hb = gtk_hbox_new( FALSE, 5 );
+	sv->hb = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 5 );
         gtk_box_pack_start( GTK_BOX( hb ), sv->hb, TRUE, TRUE, 0 );
 
 	sv->mag = gtk_label_new( "" );
-        gtk_misc_set_alignment( GTK_MISC( sv->mag ), 0.0, 0.5 );
         gtk_box_pack_end( GTK_BOX( hb ), sv->mag, FALSE, FALSE, 0 );
 
 	gtk_widget_show_all( eb );
@@ -241,8 +238,6 @@ statusview_changed_cb( Imagemodel *imagemodel, Statusview *sv )
 			band->sv = sv;
 			band->bandno = i;
 			band->val = gtk_label_new( "" );
-			gtk_misc_set_alignment( GTK_MISC( band->val ), 
-				0.0, 0.5 );
 			set_fixed( band->val, width );
 			gtk_box_pack_start( GTK_BOX( sv->hb ), 
 				band->val, FALSE, FALSE, 0 );
@@ -264,7 +259,7 @@ statusview_link( Statusview *sv, Imagemodel *imagemodel )
 Statusview *
 statusview_new( Imagemodel *imagemodel )
 {
-	Statusview *sv = gtk_type_new( TYPE_STATUSVIEW );
+	Statusview *sv = g_object_new( TYPE_STATUSVIEW, NULL );
 
 	statusview_link( sv, imagemodel );
 

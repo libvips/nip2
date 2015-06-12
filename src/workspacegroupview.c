@@ -134,7 +134,7 @@ workspacegroupview_child_add( View *parent, View *child )
         ebox = gtk_event_box_new();
 	gtk_widget_add_events( GTK_WIDGET( ebox ), 
 		GDK_BUTTON_PRESS_MASK ); 
-        hbox = gtk_hbox_new( FALSE, 0 );
+        hbox = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
         gtk_container_add( GTK_CONTAINER( ebox ), hbox );
         gtk_widget_show( GTK_WIDGET( hbox ) );
 
@@ -603,7 +603,7 @@ workspacegroupview_init( Workspacegroupview *wsgview )
         but = gtk_button_new();
         gtk_button_set_relief( GTK_BUTTON( but ), GTK_RELIEF_NONE );
         set_tooltip( but, _( "Add a workspace" ) );
-	icon = gtk_image_new_from_stock( GTK_STOCK_ADD, GTK_ICON_SIZE_MENU );
+	icon = gtk_image_new_from_icon_name( GTK_STOCK_ADD, GTK_ICON_SIZE_MENU );
         gtk_container_add( GTK_CONTAINER( but ), icon );
 	gtk_widget_show( icon );
 	gtk_widget_show( but );
@@ -636,7 +636,8 @@ workspacegroupview_init( Workspacegroupview *wsgview )
 View *
 workspacegroupview_new( void )
 {
-	Workspacegroupview *wsgview = gtk_type_new( TYPE_WORKSPACEGROUPVIEW );
+	Workspacegroupview *wsgview = 
+		g_object_new( TYPE_WORKSPACEGROUPVIEW, NULL );
 
 	return( VIEW( wsgview ) );
 }

@@ -107,12 +107,10 @@ fontnameview_init( Fontnameview *fontnameview )
 	printf( "fontnameview_init\n" );
 #endif /*DEBUG*/
 
-	hbox = gtk_hbox_new( FALSE, 12 );
+	hbox = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 12 );
         gtk_box_pack_start( GTK_BOX( fontnameview ), hbox, TRUE, FALSE, 0 );
 
         fontnameview->label = gtk_label_new( "" );
-        gtk_misc_set_alignment( GTK_MISC( fontnameview->label ), 0, 0.5 );
-        gtk_misc_set_padding( GTK_MISC( fontnameview->label ), 2, 7 );
 	gtk_box_pack_start( GTK_BOX( hbox ), GTK_WIDGET( fontnameview->label ), 
 		FALSE, FALSE, 2 );
 
@@ -128,7 +126,7 @@ fontnameview_init( Fontnameview *fontnameview )
 View *
 fontnameview_new( void )
 {
-	Fontnameview *fontnameview = gtk_type_new( TYPE_FONTNAMEVIEW );
+	Fontnameview *fontnameview = g_object_new( TYPE_FONTNAMEVIEW, NULL );
 
 	return( VIEW( fontnameview ) );
 }

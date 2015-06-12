@@ -115,27 +115,24 @@ plotstatus_init( Plotstatus *plotstatus )
         gtk_container_add( GTK_CONTAINER( plotstatus ), eb );
         popup_attach( eb, plotstatus_menu, plotstatus );
 
-	vb = gtk_vbox_new( FALSE, 0 );
+	vb = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0 );
         gtk_container_set_border_width( GTK_CONTAINER( vb ), 1 );
         gtk_container_add( GTK_CONTAINER( eb ), vb );
 
 	plotstatus->top = gtk_label_new( "" );
-        gtk_misc_set_alignment( GTK_MISC( plotstatus->top ), 0.0, 0.5 );
         gtk_box_pack_start( GTK_BOX( vb ), plotstatus->top, TRUE, TRUE, 0 );
 
-	hb = gtk_hbox_new( FALSE, 5 );
+	hb = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 5 );
         gtk_box_pack_start( GTK_BOX( vb ), hb, TRUE, TRUE, 0 );
 
 	plotstatus->pos = gtk_label_new( "" );
 	set_fixed( plotstatus->pos, strlen( "(8888888,8888888)" ) );
-        gtk_misc_set_alignment( GTK_MISC( plotstatus->pos ), 0.0, 0.5 );
         gtk_box_pack_start( GTK_BOX( hb ), plotstatus->pos, FALSE, FALSE, 0 );
 
-	plotstatus->hb = gtk_hbox_new( FALSE, 5 );
+	plotstatus->hb = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 5 );
         gtk_box_pack_start( GTK_BOX( hb ), plotstatus->hb, TRUE, TRUE, 0 );
 
 	plotstatus->mag = gtk_label_new( "" );
-        gtk_misc_set_alignment( GTK_MISC( plotstatus->mag ), 0.0, 0.5 );
         gtk_box_pack_end( GTK_BOX( hb ), plotstatus->mag, FALSE, FALSE, 0 );
 
 	gtk_widget_show_all( eb );
@@ -191,8 +188,6 @@ plotstatus_refresh( Plotstatus *plotstatus )
 			GtkWidget *label;
 
 			plotstatus->label[i] = label = gtk_label_new( "" );
-			gtk_misc_set_alignment( GTK_MISC( label ), 
-				0.0, 0.5 );
 			set_fixed( label, 8 );
 			gtk_box_pack_start( GTK_BOX( plotstatus->hb ), 
 				label, FALSE, FALSE, 0 );
@@ -210,7 +205,7 @@ plotstatus_changed_cb( Plotmodel *plotmodel, Plotstatus *plotstatus )
 Plotstatus *
 plotstatus_new( Plotmodel *plotmodel )
 {
-	Plotstatus *plotstatus = gtk_type_new( TYPE_PLOTSTATUS );
+	Plotstatus *plotstatus = g_object_new( TYPE_PLOTSTATUS, NULL );
 
 	plotstatus->plotmodel = plotmodel;
 	g_signal_connect( G_OBJECT( plotmodel ), "changed", 

@@ -160,7 +160,7 @@ popupbutton_new( void )
 
 	popupbutton = g_object_new( TYPE_POPUPBUTTON, NULL );
 
-	image = gtk_image_new_from_stock( GTK_STOCK_EXECUTE, 
+	image = gtk_image_new_from_icon_name( GTK_STOCK_EXECUTE, 
 		GTK_ICON_SIZE_MENU );
 	gtk_container_add( GTK_CONTAINER( popupbutton ), image );
 	gtk_widget_show( image );

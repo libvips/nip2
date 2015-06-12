@@ -186,11 +186,11 @@ formula_refresh( Formula *formula )
 		/* Make sure we don't trigger "changed" when we zap in new
 		 * text.
 		 */
-		gtk_signal_handler_block_by_data( 
-			GTK_OBJECT( formula->entry ), formula );
+		g_signal_handler_block_by_data( 
+			G_OBJECT( formula->entry ), formula );
 		set_gentry( formula->entry, "%s", formula->expr );
-		gtk_signal_handler_unblock_by_data( 
-			GTK_OBJECT( formula->entry ), formula );
+		g_signal_handler_unblock_by_data( 
+			G_OBJECT( formula->entry ), formula );
 	}
 
 	if( formula->caption ) {
@@ -244,7 +244,7 @@ formula_refresh_queue( Formula *formula )
 }
 
 static void
-formula_destroy( GtkObject *object )
+formula_destroy( GtkWidget *widget )
 {
 	Formula *formula;
 
@@ -252,19 +252,19 @@ formula_destroy( GtkObject *object )
 	printf( "formula_destroy\n" );
 #endif /*DEBUG*/
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_FORMULA( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_FORMULA( widget ) );
 
 	/* My instance destroy stuff.
 	 */
-	formula = FORMULA( object );
+	formula = FORMULA( widget );
 
 	formula_refresh_unqueue( formula );
 	IM_FREE( formula->caption );
 	IM_FREE( formula->value );
 	IM_FREE( formula->expr );
 
-	GTK_OBJECT_CLASS( formula_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( formula_parent_class )->destroy( widget );
 }
 
 /* Change edit mode.
@@ -429,11 +429,9 @@ formula_real_changed( Formula *formula )
 static void
 formula_class_init( FormulaClass *class )
 {
-	GtkObjectClass *gobject_class = (GtkObjectClass *) class;
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
-	gobject_class->destroy = formula_destroy;
-
+	widget_class->destroy = formula_destroy;
 	widget_class->enter_notify_event = formula_enter_notify_event;
 	widget_class->leave_notify_event = formula_leave_notify_event;
 	widget_class->button_press_event = formula_button_press_event;
@@ -515,20 +513,16 @@ formula_init( Formula *formula )
 	gtk_widget_add_events( GTK_WIDGET( formula ), 
 		GDK_POINTER_MOTION_HINT_MASK ); 
 
-	formula->hbox = gtk_hbox_new( FALSE, 12 );
+	formula->hbox = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 12 );
 	gtk_container_add( GTK_CONTAINER( formula ), formula->hbox );
         gtk_widget_show( formula->hbox );
 
         formula->left_label = gtk_label_new( "" );
-        gtk_misc_set_alignment( GTK_MISC( formula->left_label ), 0, 0.5 );
-        gtk_misc_set_padding( GTK_MISC( formula->left_label ), 2, vpadding );
 	gtk_box_pack_start( GTK_BOX( formula->hbox ), 
 		formula->left_label, FALSE, FALSE, 2 );
         gtk_widget_show( formula->left_label );
 
         formula->right_label = gtk_label_new( "" );
-        gtk_misc_set_alignment( GTK_MISC( formula->right_label ), 0, 0.5 );
-        gtk_misc_set_padding( GTK_MISC( formula->right_label ), 7, vpadding );
 	gtk_box_pack_start( GTK_BOX( formula->hbox ), 
 		formula->right_label, TRUE, TRUE, 0 );
         gtk_widget_show( formula->right_label );
@@ -537,7 +531,7 @@ formula_init( Formula *formula )
 Formula *
 formula_new( void )
 {
-	Formula *formula = gtk_type_new( TYPE_FORMULA );
+	Formula *formula = g_object_new( TYPE_FORMULA, NULL );
 
 	return( formula );
 }

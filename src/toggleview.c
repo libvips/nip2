@@ -92,7 +92,7 @@ toggleview_init( Toggleview *togview )
 View *
 toggleview_new( void )
 {
-	Toggleview *togview = gtk_type_new( TYPE_TOGGLEVIEW );
+	Toggleview *togview = g_object_new( TYPE_TOGGLEVIEW, NULL );
 
 	return( VIEW( togview ) );
 }

@@ -640,10 +640,8 @@ rowview_init( Rowview *rview )
 
 	/* Make leds.
 	 */
-	rview->led = gtk_image_new_from_stock( STOCK_LED_OFF, 
+	rview->led = gtk_image_new_from_icon_name( STOCK_LED_OFF, 
 		GTK_ICON_SIZE_MENU );
-	gtk_misc_set_alignment( GTK_MISC( rview->led ), 0.5, 0.0 );
-	gtk_misc_set_padding( GTK_MISC( rview->led ), 2, 2 );
 
         /* Make fold/unfold button.
          */
@@ -663,8 +661,6 @@ rowview_init( Rowview *rview )
                 DOUBLECLICK_FUNC( rowview_single_cb ), rview, 
 		DOUBLECLICK_FUNC( rowview_double_cb ), rview );
         rview->label = gtk_label_new( "" );
-        gtk_misc_set_alignment( GTK_MISC( rview->label ), 1, 0 );
-        gtk_misc_set_padding( GTK_MISC( rview->label ), 2, 0 );
         gtk_container_add( GTK_CONTAINER( rview->but ), rview->label );
         gtk_widget_show( rview->label );
         g_signal_connect( rview->but, "enter",
@@ -680,7 +676,7 @@ rowview_init( Rowview *rview )
 View *
 rowview_new( void )
 {
-	Rowview *rview = gtk_type_new( TYPE_ROWVIEW );
+	Rowview *rview = g_object_new( TYPE_ROWVIEW, NULL );
 
 	return( VIEW( rview ) );
 }

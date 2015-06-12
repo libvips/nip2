@@ -286,7 +286,7 @@ plotpresent_link( Plotpresent *plotpresent, Plotmodel *plotmodel )
 Plotpresent *
 plotpresent_new( Plotmodel *plotmodel )
 {
-	Plotpresent *plotpresent = gtk_type_new( TYPE_PLOTPRESENT );
+	Plotpresent *plotpresent = g_object_new( TYPE_PLOTPRESENT, NULL );
 
 	plotpresent_link( plotpresent, plotmodel );
 

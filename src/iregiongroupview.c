@@ -70,7 +70,7 @@ iregiongroupview_destroy( GtkObject *object )
 	/* Destroy all regionviews we manage.
 	 */
 	slist_map( iregiongroupview->classmodel->views, 
-		(SListMapFn) object_destroy, NULL );
+		(SListMapFn) widget_destroy, NULL );
 
 	GTK_OBJECT_CLASS( iregiongroupview_parent_class )->destroy( object );
 }
@@ -179,7 +179,7 @@ iregiongroupview_refresh( vObject *vobject )
 
 		/* Remove all the regionviews we've not used. 
 		 */
-		slist_map( irs.notused, (SListMapFn) object_destroy, NULL );
+		slist_map( irs.notused, (SListMapFn) widget_destroy, NULL );
 		IM_FREEF( g_slist_free, irs.notused );
 	}
 
@@ -214,7 +214,7 @@ View *
 iregiongroupview_new( void )
 {
 	iRegiongroupview *iregiongroupview = 
-		gtk_type_new( TYPE_IREGIONGROUPVIEW );
+		g_object_new( TYPE_IREGIONGROUPVIEW, NULL );
 
 #ifdef DEBUG
 	printf( "iregiongroupview_new\n" );

@@ -320,7 +320,7 @@ trace_link( Trace *trace )
 Trace *
 trace_new( void )
 {
-	Trace *trace = gtk_type_new( TYPE_TRACE );
+	Trace *trace = g_object_new( TYPE_TRACE, NULL );
 
 	trace_link( trace );
 

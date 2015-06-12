@@ -134,12 +134,10 @@ pathnameview_init( Pathnameview *pathnameview )
 	printf( "pathnameview_init\n" );
 #endif /*DEBUG*/
 
-	hbox = gtk_hbox_new( FALSE, 12 );
+	hbox = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 12 );
         gtk_box_pack_start( GTK_BOX( pathnameview ), hbox, TRUE, FALSE, 0 );
 
         pathnameview->label = gtk_label_new( "" );
-        gtk_misc_set_alignment( GTK_MISC( pathnameview->label ), 0, 0.5 );
-        gtk_misc_set_padding( GTK_MISC( pathnameview->label ), 2, 7 );
 	gtk_box_pack_start( GTK_BOX( hbox ), 
 		pathnameview->label, FALSE, FALSE, 2 );
 
@@ -156,7 +154,7 @@ pathnameview_init( Pathnameview *pathnameview )
 View *
 pathnameview_new( void )
 {
-	Pathnameview *pathnameview = gtk_type_new( TYPE_PATHNAMEVIEW );
+	Pathnameview *pathnameview = g_object_new( TYPE_PATHNAMEVIEW, NULL );
 
 	return( VIEW( pathnameview ) );
 }

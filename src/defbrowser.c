@@ -46,13 +46,13 @@ enum {
 };
 
 static void
-defbrowser_destroy( GtkObject *object )
+defbrowser_destroy( GtkWidget *widget )
 {
-	Defbrowser *defbrowser = DEFBROWSER( object );
+	Defbrowser *defbrowser = DEFBROWSER( widget );
 
 	UNREF( defbrowser->store );
 
-	GTK_OBJECT_CLASS( defbrowser_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( defbrowser_parent_class )->destroy( widget );
 }
 
 static void 
@@ -117,10 +117,10 @@ defbrowser_refresh( vObject *vobject )
 static void
 defbrowser_class_init( DefbrowserClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 
-	object_class->destroy = defbrowser_destroy;
+	widget_class->destroy = defbrowser_destroy;
 
 	vobject_class->refresh = defbrowser_refresh;
 }
@@ -214,14 +214,14 @@ defbrowser_init( Defbrowser *defbrowser )
 	GtkWidget *swin;
 	GtkTreeSelection *select;
 
-	defbrowser->top = gtk_hbox_new( FALSE, 12 );
+	defbrowser->top = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 12 );
 	defbrowser->entry = gtk_entry_new();
         g_signal_connect( defbrowser->entry, "changed", 
 		G_CALLBACK( defbrowser_entry_changed_cb ), 
 		defbrowser );
 	gtk_box_pack_end( GTK_BOX( defbrowser->top ), 
 		defbrowser->entry, FALSE, FALSE, 2 );
-	label = gtk_image_new_from_stock( GTK_STOCK_FIND, GTK_ICON_SIZE_MENU );
+	label = gtk_image_new_from_icon_name( GTK_STOCK_FIND, GTK_ICON_SIZE_MENU );
 	gtk_box_pack_end( GTK_BOX( defbrowser->top ), 
 		label, FALSE, FALSE, 0 );
         gtk_box_pack_start( GTK_BOX( defbrowser ), 
@@ -289,7 +289,7 @@ defbrowser_set_program( Defbrowser *defbrowser, Program *program )
 Defbrowser *
 defbrowser_new( void )
 {
-	Defbrowser *defbrowser = gtk_type_new( TYPE_DEFBROWSER );
+	Defbrowser *defbrowser = g_object_new( TYPE_DEFBROWSER, NULL );
 
 	return( defbrowser );
 }

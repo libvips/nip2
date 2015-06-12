@@ -41,7 +41,7 @@
 
 #define DESTROY_GTK( X ) { \
 	if( X ) { \
-		gtk_object_destroy( GTK_OBJECT( X ) ); \
+		gtk_widget_destroy( GTK_WIDGET( X ) ); \
 		(X) = NULL; \
 	} \
 }
@@ -49,7 +49,7 @@
 void adjustments_set_value( GtkAdjustment *hadj, GtkAdjustment *vadj,
         float hval, float vval );
 
-void *object_destroy( void *obj );
+void *widget_destroy( void *wid );
 void *null_g_free( void *obj );
 
 void widget_visible( GtkWidget *widget, gboolean visible );

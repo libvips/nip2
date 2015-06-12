@@ -121,7 +121,7 @@ stringview_init( Stringview *stringview )
 View *
 stringview_new( void )
 {
-	Stringview *stringview = gtk_type_new( TYPE_STRINGVIEW );
+	Stringview *stringview = g_object_new( TYPE_STRINGVIEW, NULL );
 
 	return( VIEW( stringview ) );
 }

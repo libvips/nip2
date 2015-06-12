@@ -245,14 +245,14 @@ toolkitbrowser_init( Toolkitbrowser *toolkitbrowser )
 	GtkWidget *label;
 	GtkWidget *swin;
 
-	toolkitbrowser->top = gtk_hbox_new( FALSE, 12 );
+	toolkitbrowser->top = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 12 );
 	toolkitbrowser->entry = gtk_entry_new();
         g_signal_connect( toolkitbrowser->entry, "changed", 
 		G_CALLBACK( toolkitbrowser_entry_changed_cb ), 
 		toolkitbrowser );
 	gtk_box_pack_end( GTK_BOX( toolkitbrowser->top ), 
 		toolkitbrowser->entry, FALSE, FALSE, 2 );
-	label = gtk_image_new_from_stock( GTK_STOCK_FIND, GTK_ICON_SIZE_MENU );
+	label = gtk_image_new_from_icon_name( GTK_STOCK_FIND, GTK_ICON_SIZE_MENU );
 	gtk_box_pack_end( GTK_BOX( toolkitbrowser->top ), 
 		label, FALSE, FALSE, 0 );
         gtk_box_pack_start( GTK_BOX( toolkitbrowser ), 
@@ -316,7 +316,8 @@ toolkitbrowser_init( Toolkitbrowser *toolkitbrowser )
 Toolkitbrowser *
 toolkitbrowser_new( void )
 {
-	Toolkitbrowser *toolkitbrowser = gtk_type_new( TYPE_TOOLKITBROWSER );
+	Toolkitbrowser *toolkitbrowser = 
+		g_object_new( TYPE_TOOLKITBROWSER, NULL );
 
 	return( toolkitbrowser );
 }

@@ -171,7 +171,7 @@ plotview_init( Plotview *plotview )
 		DOUBLECLICK_FUNC( plotview_doubleclick_one_cb ), plotview,
 		DOUBLECLICK_FUNC( plotview_doubleclick_two_cb ), plotview );
 
-	plotview->box = gtk_vbox_new( FALSE, 0 );
+	plotview->box = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0 );
         gtk_container_add( GTK_CONTAINER( eb ), plotview->box );
         gtk_widget_show( plotview->box );
 
@@ -186,8 +186,6 @@ plotview_init( Plotview *plotview )
 	plotview->gplot = NULL;
 
 	plotview->label = gtk_label_new( "" );
-        gtk_misc_set_alignment( GTK_MISC( plotview->label ), 0, 0.5 );
-        gtk_misc_set_padding( GTK_MISC( plotview->label ), 2, 0 );
         gtk_box_pack_end( GTK_BOX( plotview->box ), 
 		GTK_WIDGET( plotview->label ), FALSE, FALSE, 0 );
 	gtk_widget_show( GTK_WIDGET( plotview->label ) );
@@ -196,7 +194,7 @@ plotview_init( Plotview *plotview )
 View *
 plotview_new( void )
 {
-    	Plotview *plotview = gtk_type_new( TYPE_PLOTVIEW );
+    	Plotview *plotview = g_object_new( TYPE_PLOTVIEW, NULL );
 
     	return( VIEW( plotview ) );
 }

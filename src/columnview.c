@@ -623,15 +623,15 @@ columnview_title_event_cb( GtkWidget *widget, GdkEvent *ev, Columnview *cview )
 }
 
 static void 
-columnview_destroy( GtkObject *object )
+columnview_destroy( GtkWidget *widget )
 {
 	Columnview *cview;
 	Column *col;
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_COLUMNVIEW( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_COLUMNVIEW( widget ) );
 
-	cview = COLUMNVIEW( object );
+	cview = COLUMNVIEW( widget );
 	col = COLUMN( VOBJECT( cview )->iobject );
 
 #ifdef DEBUG
@@ -648,7 +648,7 @@ columnview_destroy( GtkObject *object )
 		mainw_layout();
 	}
 
-	GTK_OBJECT_CLASS( columnview_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( columnview_parent_class )->destroy( widget );
 }
 
 static void
@@ -795,7 +795,7 @@ columnview_add_text( Columnview *cview )
         if( cview->textfr )
                 return;
 
-        cview->textfr = gtk_hbox_new( FALSE, 0 );
+        cview->textfr = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
         gtk_box_pack_end( GTK_BOX( cview->vbox ), 
 		cview->textfr, FALSE, FALSE, 0 );
         inv = gtk_label_new( "" );
@@ -868,7 +868,6 @@ columnview_refresh( vObject *vobject )
 		escape_markup( IOBJECT( col )->caption, buf2, 256 );
 		im_snprintf( buf, 256, "<b>%s</b>", buf2 );
 		gtk_label_set_markup( GTK_LABEL( label ), buf );
-		gtk_misc_set_padding( GTK_MISC( label ), 2, 6 );
 	}
 
 	/* Update names.
@@ -1005,7 +1004,6 @@ columnview_scrollto( View *view, ModelScrollPosition position )
 static void
 columnview_class_init( ColumnviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
@@ -1017,8 +1015,7 @@ columnview_class_init( ColumnviewClass *class )
 
 	/* Init methods.
 	 */
-	object_class->destroy = columnview_destroy;
-
+	widget_class->destroy = columnview_destroy;
 	widget_class->size_allocate = columnview_size_allocate;
 
 	vobject_class->refresh = columnview_refresh;
@@ -1094,7 +1091,7 @@ columnview_init( Columnview *cview )
         cview->main = gtk_event_box_new();
 	gtk_widget_add_events( GTK_WIDGET( cview->main ), 
 		GDK_BUTTON_PRESS_MASK ); 
-        cview->vbox = gtk_vbox_new( FALSE, 0 );
+        cview->vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0 );
         gtk_container_add( GTK_CONTAINER( cview->main ), cview->vbox );
 
         /* Frame for whole title bar. Need an event_box to catch clicks.
@@ -1116,7 +1113,7 @@ columnview_init( Columnview *cview )
 
         /* Layout contents of title bar.
          */
-        cview->titlehb = gtk_hbox_new( FALSE, 0 );
+        cview->titlehb = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
         gtk_container_add( GTK_CONTAINER( frame ), cview->titlehb );
 
         /* Up/down button.
@@ -1133,13 +1130,13 @@ columnview_init( Columnview *cview )
 
         /* Remove columnview button.
          */
-        sb = gtk_vbox_new( FALSE, 0 );
+        sb = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0 );
         gtk_box_pack_end( GTK_BOX( cview->titlehb ), sb, FALSE, FALSE, 1 );
         but = gtk_button_new();
         gtk_button_set_relief( GTK_BUTTON( but ), GTK_RELIEF_NONE );
         gtk_box_pack_start( GTK_BOX( sb ), but, TRUE, FALSE, 0 );
         set_tooltip( but, _( "Delete the column" ) );
-	icon = gtk_image_new_from_stock( GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU );
+	icon = gtk_image_new_from_icon_name( GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU );
         gtk_container_add( GTK_CONTAINER( but ), icon );
         g_signal_connect( but, "clicked",
                 G_CALLBACK( columnview_destroy2_cb ), cview );
@@ -1183,7 +1180,7 @@ columnview_init( Columnview *cview )
 View *
 columnview_new( void )
 {
-	Columnview *cview = gtk_type_new( TYPE_COLUMNVIEW );
+	Columnview *cview = g_object_new( TYPE_COLUMNVIEW, NULL );
 
 	return( VIEW( cview ) );
 }

@@ -124,8 +124,6 @@ valueview_init( Valueview *valueview )
         gtk_box_pack_start( GTK_BOX( valueview ), 
 		valueview->eb, FALSE, FALSE, 0 );
 	valueview->label = gtk_label_new( "" );
-        gtk_misc_set_alignment( GTK_MISC( valueview->label ), 0, 0.5 );
-        gtk_misc_set_padding( GTK_MISC( valueview->label ), 2, 0 );
         gtk_container_add( GTK_CONTAINER( valueview->eb ), valueview->label );
 	gtk_widget_set_name( valueview->eb, "caption_widget" );
         g_signal_connect( valueview->eb, "event",
@@ -137,7 +135,7 @@ valueview_init( Valueview *valueview )
 View *
 valueview_new( void )
 {
-	Valueview *valueview = gtk_type_new( TYPE_VALUEVIEW );
+	Valueview *valueview = g_object_new( TYPE_VALUEVIEW, NULL );
 
 	return( VIEW( valueview ) );
 }

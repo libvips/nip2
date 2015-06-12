@@ -189,7 +189,7 @@ toolkitview_init( Toolkitview *kview )
 View *
 toolkitview_new( void )
 {
-	Toolkitview *kview = gtk_type_new( TYPE_TOOLKITVIEW );
+	Toolkitview *kview = g_object_new( TYPE_TOOLKITVIEW, NULL );
 
 	return( VIEW( kview ) );
 }

@@ -300,7 +300,7 @@ toolview_init( Toolview *toolview )
 View *
 toolview_new( void )
 {
-	Toolview *tview = gtk_type_new( TYPE_TOOLVIEW );
+	Toolview *tview = g_object_new( TYPE_TOOLVIEW, NULL );
 
 #ifdef DEBUG
 	printf( "toolview_new: %p\n", tview );

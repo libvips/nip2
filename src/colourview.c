@@ -120,7 +120,7 @@ colourview_init( Colourview *colourview )
 	gtk_widget_add_events( GTK_WIDGET( eb ), 
 		GDK_POINTER_MOTION_HINT_MASK ); 
         gtk_box_pack_start( GTK_BOX( colourview ), eb, FALSE, FALSE, 0 );
-	vbox = gtk_vbox_new( FALSE, 0 );
+	vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0 );
         gtk_container_add( GTK_CONTAINER( eb ), vbox );
         gtk_widget_show( vbox );
 
@@ -135,8 +135,12 @@ colourview_init( Colourview *colourview )
         gtk_widget_show( GTK_WIDGET( colourview->colourdisplay ) );
 
 	colourview->label = gtk_label_new( "" );
-        gtk_misc_set_alignment( GTK_MISC( colourview->label ), 0, 0.5 );
-        gtk_misc_set_padding( GTK_MISC( colourview->label ), 2, 0 );
+	gtk_widget_set_halign( GTK_WIDGET( colourview->label ), 
+		GTK_ALIGN_START );
+	gtk_widget_set_valign( GTK_WIDGET( colourview->label ), 
+		GTK_ALIGN_CENTER );
+        gtk_widget_set_margin_left( GTK_WIDGET( colourview->label ), 2 );
+        gtk_widget_set_margin_right( GTK_WIDGET( colourview->label ), 2 );
         gtk_box_pack_start( GTK_BOX( vbox ), 
 		GTK_WIDGET( colourview->label ), FALSE, FALSE, 0 );
         gtk_widget_show( GTK_WIDGET( colourview->label ) );
@@ -152,7 +156,7 @@ colourview_init( Colourview *colourview )
 View *
 colourview_new( void )
 {
-	Colourview *colourview = gtk_type_new( TYPE_COLOURVIEW );
+	Colourview *colourview = g_object_new( TYPE_COLOURVIEW, NULL );
 
 	return( VIEW( colourview ) );
 }

@@ -339,9 +339,9 @@ imagedisplay_configure_event( GtkWidget *widget, GdkEventConfigure *event )
 }
 
 static void
-imagedisplay_destroy( GtkObject *object )
+imagedisplay_destroy( GtkWidget *widget )
 {
-	Imagedisplay *id = IMAGEDISPLAY( object );
+	Imagedisplay *id = IMAGEDISPLAY( widget );
 
 #ifdef DEBUG
 	g_print( "imagedisplay_destroy: " );
@@ -356,7 +356,7 @@ imagedisplay_destroy( GtkObject *object )
 	UNREF( id->top_gc );
 	UNREF( id->bottom_gc );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( parent_class )->destroy( widget );
 }
 
 /* Conversion has changed ... resize to fit.
@@ -428,13 +428,11 @@ imagedisplay_realize( GtkWidget *widget )
 static void
 imagedisplay_class_init( ImagedisplayClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
         GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
 	parent_class = g_type_class_peek_parent( class );
 
-        object_class->destroy = imagedisplay_destroy;
-
+        widget_class->destroy = imagedisplay_destroy;
 	widget_class->expose_event = imagedisplay_expose;
 	widget_class->configure_event = imagedisplay_configure_event;
 	widget_class->realize = imagedisplay_realize;

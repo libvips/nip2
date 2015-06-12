@@ -69,9 +69,9 @@ adjustments_set_value( GtkAdjustment *hadj, GtkAdjustment *vadj,
 }
 
 void *
-object_destroy( void *obj )
+widget_destroy( void *wid )
 {
-	gtk_object_destroy( GTK_OBJECT( obj ) );
+	gtk_widget_destroy( GTK_WIDGET( wid ) );
 
 	return( NULL );
 }
@@ -266,12 +266,12 @@ popup_build( const char *name )
 static void
 popup_activate_cb( GtkWidget *item, PopupFunc cb )
 {
-	GtkWidget *qmain = gtk_object_get_data_by_id( 
-		GTK_OBJECT( item ), quark_main );
-	GtkWidget *qhost = gtk_object_get_data_by_id( 
-		GTK_OBJECT( qmain ), quark_host );
-	void *qdata = gtk_object_get_data_by_id( 
-		GTK_OBJECT( qhost ), quark_data );
+	GtkWidget *qmain = g_object_get_data_by_id( G_OBJECT( item ), 
+		quark_main );
+	GtkWidget *qhost = g_object_get_data_by_id( G_OBJECT( qmain ), 
+		quark_host );
+	void *qdata = g_object_get_data_by_id( G_OBJECT( qhost ), 
+		quark_data );
 
 	(*cb)( item, qhost, qdata );
 }
@@ -284,7 +284,7 @@ popup_add_but( GtkWidget *popup, const char *name, PopupFunc cb )
 	GtkWidget *but = menu_add_but( popup, name, 
 		G_CALLBACK( popup_activate_cb ), (void *) cb );
 
-	gtk_object_set_data_by_id( GTK_OBJECT( but ), quark_main, popup );
+	g_object_set_data_by_id( G_OBJECT( but ), quark_main, popup );
 
 	return( but );
 }
@@ -297,7 +297,7 @@ popup_add_tog( GtkWidget *popup, const char *name, PopupFunc cb )
 	GtkWidget *tog = menu_add_tog( popup, name, 
 		G_CALLBACK( popup_activate_cb ), (void *) cb );
 
-	gtk_object_set_data_by_id( GTK_OBJECT( tog ), quark_main, popup );
+	g_object_set_data_by_id( G_OBJECT( tog ), quark_main, popup );
 
 	return( tog );
 }
@@ -309,7 +309,7 @@ popup_add_pullright( GtkWidget *popup, const char *name )
 {
 	GtkWidget *pullright = menu_add_pullright( popup, name );
 
-	gtk_object_set_data_by_id( GTK_OBJECT( pullright ), quark_main, popup );
+	g_object_set_data_by_id( G_OBJECT( pullright ), quark_main, popup );
 
 	return( pullright );
 }
@@ -320,9 +320,9 @@ void
 popup_show( GtkWidget *host, GdkEvent *ev )
 {
 	GtkWidget *popup = gtk_object_get_data_by_id( 
-		GTK_OBJECT( host ), quark_popup );
+		G_OBJECT( host ), quark_popup );
 
-	gtk_object_set_data_by_id( GTK_OBJECT( popup ), quark_host, host );
+	g_object_set_data_by_id( G_OBJECT( popup ), quark_host, host );
 	gtk_menu_popup( GTK_MENU( popup ), NULL, NULL,
 		(GtkMenuPositionFunc) NULL, NULL, 3, ev->button.time );
 }
@@ -352,8 +352,8 @@ popup_handle_event( GtkWidget *host, GdkEvent *ev, gpointer dummy )
 void
 popup_link( GtkWidget *host, GtkWidget *popup, void *data )
 {
-	gtk_object_set_data_by_id( GTK_OBJECT( host ), quark_popup, popup );
-	gtk_object_set_data_by_id( GTK_OBJECT( host ), quark_data, data );
+	g_object_set_data_by_id( G_OBJECT( host ), quark_popup, popup );
+	g_object_set_data_by_id( G_OBJECT( host ), quark_data, data );
 }
 
 /* Add a callback to show a popup.
@@ -378,7 +378,7 @@ popup_attach( GtkWidget *host, GtkWidget *popup, void *data )
 void
 popup_detach( GtkWidget *host, guint sid )
 {
-	gtk_signal_disconnect( GTK_OBJECT( host ), sid );
+	g_signal_disconnect( G_OBJECT( host ), sid );
 }
 
 static void
@@ -505,7 +505,7 @@ void
 junk_tooltips( void )
 {
 	if( our_tooltips )
-		g_object_ref_sink( GTK_OBJECT( our_tooltips ) );
+		g_object_ref_sink( G_OBJECT( our_tooltips ) );
 }
 
 /* Set a GtkEditable.
@@ -752,15 +752,14 @@ build_glabelframe2( GtkWidget *widget, const char *name )
 	GtkWidget *inv;
 	char buf[1000];
 
-        hb = gtk_hbox_new( FALSE, 2 );
+        hb = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 2 );
         inv = gtk_label_new( "" );
         gtk_box_pack_start( GTK_BOX( hb ), inv, FALSE, FALSE, 15 );
         gtk_box_pack_start( GTK_BOX( hb ), widget, TRUE, TRUE, 0 );
 
-        vb = gtk_vbox_new( FALSE, 2 );
+        vb = gtk_box_new( GTK_ORIENTATION_VERTICAL, 2 );
 	im_snprintf( buf, 1000, _( "%s:" ), name );
 	lab = gtk_label_new( buf );
-	gtk_misc_set_alignment( GTK_MISC( lab ), 0.0, 0.5 );
         gtk_box_pack_start( GTK_BOX( vb ), lab, FALSE, FALSE, 0 );
         gtk_box_pack_start( GTK_BOX( vb ), hb, TRUE, TRUE, 0 );
 
@@ -792,10 +791,9 @@ build_glabeltext4( GtkWidget *box, GtkSizeGroup *group, const char *text )
 	GtkWidget *entry;
 	char buf[256];
 
-	hbox = gtk_hbox_new( FALSE, 12 );
+	hbox = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 12 );
 	im_snprintf( buf, 256, _( "%s:" ), text );
 	label = gtk_label_new( buf );
-	gtk_misc_set_alignment( GTK_MISC( label ), 0.0, 0.5 );
 	if( group )
 		gtk_size_group_add_widget( group, label );  
 	gtk_box_pack_start( GTK_BOX( hbox ), label, FALSE, FALSE, 0 );
@@ -822,7 +820,7 @@ build_gtoggle( GtkWidget *box, const char *caption )
 	/* Indent left a bit.
 	 */
         inv = gtk_label_new( "" );
-        hb = gtk_hbox_new( FALSE, 0 );
+        hb = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
         gtk_box_pack_start( GTK_BOX( hb ), inv, FALSE, FALSE, 2 );
         toggle = gtk_check_button_new_with_label( caption );
 	gtk_container_set_border_width( GTK_CONTAINER( toggle ), 4 );
@@ -846,7 +844,7 @@ build_goption( GtkWidget *box, GtkSizeGroup *group,
 	int i;
 	char buf[1000];
 
-        hb = gtk_hbox_new( FALSE, 12 );
+        hb = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 12 );
 	im_snprintf( buf, 1000, _( "%s:" ), name );
         label = gtk_label_new( buf );
 	if( group )

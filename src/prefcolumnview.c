@@ -87,8 +87,6 @@ prefcolumnview_init( Prefcolumnview *pcview )
 {
         pcview->lab = gtk_label_new( "" );
         gtk_box_pack_start( GTK_BOX( pcview ), pcview->lab, FALSE, FALSE, 2 );
-	gtk_misc_set_padding( GTK_MISC( pcview->lab ), 2, 6 );
-	gtk_misc_set_alignment( GTK_MISC( pcview->lab ), 0, 0.5 );
 
         gtk_widget_show_all( GTK_WIDGET( pcview ) );
 }
@@ -96,7 +94,7 @@ prefcolumnview_init( Prefcolumnview *pcview )
 View *
 prefcolumnview_new( void )
 {
-	Prefcolumnview *pcview = gtk_type_new( TYPE_PREFCOLUMNVIEW );
+	Prefcolumnview *pcview = g_object_new( TYPE_PREFCOLUMNVIEW, NULL );
 
 	return( VIEW( pcview ) );
 }

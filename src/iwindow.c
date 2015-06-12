@@ -722,7 +722,7 @@ iwindow_real_build( GtkWidget *widget )
 
         gtk_container_set_border_width( GTK_CONTAINER( iwnd ), 0 );
 
-        iwnd->work = gtk_vbox_new( FALSE, 0 );
+        iwnd->work = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0 );
         gtk_container_add( GTK_CONTAINER( iwnd ), iwnd->work );
 
 	/* Use the type name (eg. "Imageview") for the name of the
@@ -871,7 +871,7 @@ iwindow_init( iWindow *iwnd )
 GtkWidget *
 iwindow_new( GtkWindowType type )
 {
-	iWindow *iwnd = gtk_type_new( TYPE_IWINDOW );
+	iWindow *iwnd = g_object_new( TYPE_IWINDOW, NULL );
 	GtkWindow *gwnd = GTK_WINDOW( iwnd );
 
 	/* Init superclass.

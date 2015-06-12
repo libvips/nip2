@@ -273,7 +273,7 @@ paintboxview_init( Paintboxview *pbv )
         gtk_container_add( GTK_CONTAINER( pbv ), eb );
         popup_attach( eb, paintboxview_menu, pbv );
 
-	hb = gtk_hbox_new( FALSE, 4 );
+	hb = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 4 );
         gtk_container_set_border_width( GTK_CONTAINER( hb ), 1 );
         gtk_container_add( GTK_CONTAINER( eb ), hb );
 
@@ -281,12 +281,12 @@ paintboxview_init( Paintboxview *pbv )
 	 * and not linked to the paint actions .. so have them first on their
 	 * own.
 	 */
-	hb2 = gtk_hbox_new( FALSE, 0 );
+	hb2 = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
 	for( i = 0; i < 4; i++ ) {
 		pbv->tool[i] = gtk_toggle_button_new();
 		g_signal_connect( pbv->tool[i], "toggled", 
 			G_CALLBACK( paintboxview_tool_toggled_cb ), pbv );
-		image = gtk_image_new_from_stock( tool_names[i],
+		image = gtk_image_new_from_icon_name( tool_names[i],
 			GTK_ICON_SIZE_BUTTON );
 		set_tooltip( pbv->tool[i], "%s", tool_tooltips[i] );
 		gtk_container_add( GTK_CONTAINER( pbv->tool[i] ), image );
@@ -296,10 +296,10 @@ paintboxview_init( Paintboxview *pbv )
 	}
 	gtk_box_pack_start( GTK_BOX( hb ), hb2, FALSE, FALSE, 0 );
 
-	hb2 = gtk_hbox_new( FALSE, 0 );
+	hb2 = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
 
 	pbv->undo = gtk_button_new();
-	image = gtk_image_new_from_stock( GTK_STOCK_UNDO, 
+	image = gtk_image_new_from_icon_name( GTK_STOCK_UNDO, 
 		GTK_ICON_SIZE_BUTTON );
 	gtk_container_add( GTK_CONTAINER( pbv->undo ), image );
 	g_signal_connect( pbv->undo, "clicked", 
@@ -308,7 +308,7 @@ paintboxview_init( Paintboxview *pbv )
         gtk_box_pack_start( GTK_BOX( hb2 ), pbv->undo, FALSE, FALSE, 0 );
 
 	pbv->redo = gtk_button_new();
-	image = gtk_image_new_from_stock( GTK_STOCK_REDO, 
+	image = gtk_image_new_from_icon_name( GTK_STOCK_REDO, 
 		GTK_ICON_SIZE_BUTTON );
 	gtk_container_add( GTK_CONTAINER( pbv->redo ), image );
 	g_signal_connect( pbv->redo, "clicked", 
@@ -317,7 +317,7 @@ paintboxview_init( Paintboxview *pbv )
         gtk_box_pack_start( GTK_BOX( hb2 ), pbv->redo, FALSE, FALSE, 0 );
 
 	pbv->clear = gtk_button_new();
-	image = gtk_image_new_from_stock( GTK_STOCK_CLEAR, 
+	image = gtk_image_new_from_icon_name( GTK_STOCK_CLEAR, 
 		GTK_ICON_SIZE_BUTTON );
 	gtk_container_add( GTK_CONTAINER( pbv->clear ), image );
 	g_signal_connect( pbv->clear, "clicked", 
@@ -327,12 +327,12 @@ paintboxview_init( Paintboxview *pbv )
 
 	gtk_box_pack_start( GTK_BOX( hb ), hb2, FALSE, FALSE, 0 );
 
-	hb2 = gtk_hbox_new( FALSE, 0 );
+	hb2 = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
 	for( i = 4; i < IM_NUMBER( tool_names ); i++ ) {
 		pbv->tool[i] = gtk_toggle_button_new();
 		g_signal_connect( pbv->tool[i], "toggled", 
 			G_CALLBACK( paintboxview_tool_toggled_cb ), pbv );
-		image = gtk_image_new_from_stock( tool_names[i],
+		image = gtk_image_new_from_icon_name( tool_names[i],
 			GTK_ICON_SIZE_BUTTON );
 		set_tooltip( pbv->tool[i], "%s", tool_tooltips[i] );
 		gtk_container_add( GTK_CONTAINER( pbv->tool[i] ), image );
@@ -463,7 +463,7 @@ paintboxview_link( Paintboxview *pbv, Imagemodel *imagemodel )
 Paintboxview *
 paintboxview_new( Imagemodel *imagemodel )
 {
-	Paintboxview *pbv = gtk_type_new( TYPE_PAINTBOXVIEW );
+	Paintboxview *pbv = g_object_new( TYPE_PAINTBOXVIEW, NULL );
 
 	paintboxview_link( pbv, imagemodel );
 

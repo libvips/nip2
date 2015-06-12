@@ -44,21 +44,20 @@ enum {
 };
 
 static void
-imageheader_destroy( GtkObject *object )
+imageheader_destroy( GtkWidget *widget )
 {
 	Imageheader *imageheader;
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_IMAGEHEADER( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_IMAGEHEADER( widget ) );
 
-	imageheader = IMAGEHEADER( object );
+	imageheader = IMAGEHEADER( widget );
 
 	/* My instance destroy stuff.
 	 */
 	UNREF( imageheader->store );
 
-	if( GTK_OBJECT_CLASS( imageheader_parent_class )->destroy )
-		GTK_OBJECT_CLASS( imageheader_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( imageheader_parent_class )->destroy( widget );
 }
 
 static void *
@@ -191,10 +190,10 @@ imageheader_build( GtkWidget *widget )
 	pane = gtk_vpaned_new();
         gtk_box_pack_start( GTK_BOX( idlg->work ), pane, TRUE, TRUE, 2 );
 
-	vbox = gtk_vbox_new( FALSE, 2 );
+	vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 2 );
 	gtk_paned_pack1( GTK_PANED( pane ), vbox, TRUE, FALSE );
 
-	top = gtk_hbox_new( FALSE, 12 );
+	top = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 12 );
         gtk_box_pack_start( GTK_BOX( vbox ), top, FALSE, FALSE, 2 );
 
 	imageheader->entry = gtk_entry_new();
@@ -203,7 +202,7 @@ imageheader_build( GtkWidget *widget )
 	gtk_box_pack_end( GTK_BOX( top ), 
 		imageheader->entry, FALSE, FALSE, 2 );
 
-	label = gtk_image_new_from_stock( GTK_STOCK_FIND, GTK_ICON_SIZE_MENU );
+	label = gtk_image_new_from_icon_name( GTK_STOCK_FIND, GTK_ICON_SIZE_MENU );
 	gtk_box_pack_end( GTK_BOX( top ), label, FALSE, FALSE, 0 );
 
 	swin = gtk_scrolled_window_new( NULL, NULL );
@@ -241,10 +240,9 @@ imageheader_build( GtkWidget *widget )
 	gtk_tree_view_append_column( GTK_TREE_VIEW( imageheader->tree ), 
 		column );
 
-	vbox = gtk_vbox_new( FALSE, 2 );
+	vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 2 );
 	gtk_paned_pack2( GTK_PANED( pane ), vbox, TRUE, FALSE );
 	label = gtk_label_new( _( "Image history" ) );
-	gtk_misc_set_alignment( GTK_MISC( label ), 0.0, 0.5 );
         gtk_box_pack_start( GTK_BOX( vbox ), label, FALSE, FALSE, 2 );
 	swin = gtk_scrolled_window_new( NULL, NULL );
 	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( swin ),
@@ -271,13 +269,11 @@ imageheader_build( GtkWidget *widget )
 static void
 imageheader_class_init( ImageheaderClass *class )
 {
-	GtkObjectClass *object_class;
-	iWindowClass *iwindow_class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
+	iWindowClass *iwindow_class = (iWindowClass *) class;
 
-	object_class = (GtkObjectClass *) class;
-	iwindow_class = (iWindowClass *) class;
+	widget_class->destroy = imageheader_destroy;
 
-	object_class->destroy = imageheader_destroy;
 	iwindow_class->build = imageheader_build;
 }
 
@@ -314,7 +310,7 @@ imageheader_link( Imageheader *imageheader, iImage *iimage )
 GtkWidget *
 imageheader_new( iImage *iimage )
 {
-	Imageheader *imageheader = gtk_type_new( TYPE_IMAGEHEADER );
+	Imageheader *imageheader = g_object_new( TYPE_IMAGEHEADER, NULL );
 
 	imageheader_link( imageheader, iimage );
 

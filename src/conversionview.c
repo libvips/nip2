@@ -194,7 +194,7 @@ conversionview_init( Conversionview *cv )
 
         gtk_frame_set_shadow_type( GTK_FRAME( cv ), GTK_SHADOW_OUT );
 
-	hb = gtk_hbox_new( FALSE, 2 );
+	hb = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 2 );
         gtk_container_set_border_width( GTK_CONTAINER( hb ), 2 );
         gtk_container_add( GTK_CONTAINER( cv ), hb );
 
@@ -299,7 +299,7 @@ conversionview_link( Conversionview *cv, Imagemodel *imagemodel )
 Conversionview *
 conversionview_new( Imagemodel *imagemodel )
 {
-	Conversionview *cv = gtk_type_new( TYPE_CONVERSIONVIEW );
+	Conversionview *cv = g_object_new( TYPE_CONVERSIONVIEW, NULL );
 
 	conversionview_link( cv, imagemodel );
 

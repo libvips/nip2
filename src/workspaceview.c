@@ -1210,7 +1210,7 @@ workspaceview_init( Workspaceview *wview )
 View *
 workspaceview_new( void )
 {
-	Workspaceview *wview = gtk_type_new( TYPE_WORKSPACEVIEW );
+	Workspaceview *wview = g_object_new( TYPE_WORKSPACEVIEW, NULL );
 
 	return( VIEW( wview ) );
 }

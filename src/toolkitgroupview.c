@@ -101,7 +101,8 @@ toolkitgroupview_init( Toolkitgroupview *kitgview )
 View *
 toolkitgroupview_new( void )
 {
-	Toolkitgroupview *kitgview = gtk_type_new( TYPE_TOOLKITGROUPVIEW );
+	Toolkitgroupview *kitgview = 
+		g_object_new( TYPE_TOOLKITGROUPVIEW, NULL );
 
 	return( VIEW( kitgview ) );
 }

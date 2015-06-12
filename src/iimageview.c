@@ -73,9 +73,9 @@ iimageview_drag_begin( GtkWidget *widget, GdkDragContext *context )
 
 	window = iimageview_drag_window_new( 
 		conv->canvas.width, conv->canvas.height );
-	gtk_object_set_data_full( GTK_OBJECT( widget ),
+	g_object_set_data_full( G_OBJECT( widget ),
 		"nip2-drag-window", window,
-		(GtkDestroyNotify) gtk_widget_destroy );
+		(GDestroyNotify) gtk_widget_destroy );
 	id = imagedisplay_new( conv );
 	gtk_container_add( GTK_CONTAINER( window ), GTK_WIDGET( id ) );
 	gtk_widget_show( GTK_WIDGET( id ) );
@@ -89,7 +89,7 @@ iimageview_drag_end( GtkWidget *widget, GdkDragContext *context )
 	printf( "iimageview_drag_end:\n" );
 #endif /*DEBUG*/
 
-	gtk_object_set_data( GTK_OBJECT( widget ), 
+	g_object_set_data( G_OBJECT( widget ), 
 		"nip2-drag-window", NULL );
 }
 
@@ -344,7 +344,7 @@ iimageview_init( iImageview *iimageview )
 
         eb = gtk_event_box_new();
         gtk_box_pack_start( GTK_BOX( iimageview ), eb, FALSE, FALSE, 0 );
-	vbox = gtk_vbox_new( FALSE, 0 );
+	vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0 );
         gtk_container_add( GTK_CONTAINER( eb ), vbox );
         gtk_widget_show( vbox );
 
@@ -363,8 +363,6 @@ iimageview_init( iImageview *iimageview )
 		GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK ); 
 
 	iimageview->label = gtk_label_new( "" );
-        gtk_misc_set_alignment( GTK_MISC( iimageview->label ), 0, 0.5 );
-        gtk_misc_set_padding( GTK_MISC( iimageview->label ), 2, 0 );
         gtk_box_pack_start( GTK_BOX( vbox ), 
 		GTK_WIDGET( iimageview->label ), FALSE, FALSE, 0 );
 	gtk_widget_show( GTK_WIDGET( iimageview->label ) );
@@ -389,7 +387,7 @@ iimageview_init( iImageview *iimageview )
 View *
 iimageview_new( void )
 {
-	iImageview *iimageview = gtk_type_new( TYPE_IIMAGEVIEW );
+	iImageview *iimageview = g_object_new( TYPE_IIMAGEVIEW, NULL );
 
 	return( VIEW( iimageview ) );
 }

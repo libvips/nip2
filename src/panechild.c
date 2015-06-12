@@ -97,20 +97,19 @@ panechild_init( Panechild *panechild )
 	panechild->title = NULL;
 	panechild->label = NULL;
 
-	hbox = gtk_hbox_new( FALSE, 7 );
+	hbox = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 7 );
 	gtk_box_pack_start( GTK_BOX( panechild ), hbox, FALSE, FALSE, 0 );
 
         but = gtk_button_new();
         gtk_button_set_relief( GTK_BUTTON( but ), GTK_RELIEF_NONE );
         gtk_box_pack_end( GTK_BOX( hbox ), but, FALSE, FALSE, 0 );
         set_tooltip( but, _( "Close the pane" ) );
-	icon = gtk_image_new_from_stock( GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU );
+	icon = gtk_image_new_from_icon_name( GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU );
         gtk_container_add( GTK_CONTAINER( but ), icon );
         g_signal_connect( but, "clicked",
                 G_CALLBACK( panechild_hide_cb ), panechild );
 
         panechild->label = gtk_label_new( "" );
-	gtk_misc_set_alignment( GTK_MISC( panechild->label ), 0.0, 0.5 );
         gtk_box_pack_start( GTK_BOX( hbox ), panechild->label, TRUE, TRUE, 2 );
 
 	gtk_widget_show_all( hbox );
@@ -119,7 +118,7 @@ panechild_init( Panechild *panechild )
 Panechild *
 panechild_new( Pane *pane, const char *title )
 {
-	Panechild *panechild = gtk_type_new( TYPE_PANECHILD );
+	Panechild *panechild = g_object_new( TYPE_PANECHILD, NULL );
 
 	IM_SETSTR( panechild->title, title );
 

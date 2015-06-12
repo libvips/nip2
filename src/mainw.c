@@ -1912,7 +1912,7 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 
 	/* hbox for status bar etc.
 	 */
-        mainw->statusbar_main = gtk_hbox_new( FALSE, 2 );
+        mainw->statusbar_main = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 2 );
         gtk_box_pack_end( GTK_BOX( vbox ), 
 		mainw->statusbar_main, FALSE, FALSE, 2 );
         widget_visible( mainw->statusbar_main, MAINW_STATUSBAR );
@@ -1928,7 +1928,6 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	gtk_container_add( GTK_CONTAINER( mainw->space_free_eb ), frame );
 	gtk_widget_show( frame );
 	mainw->space_free = gtk_label_new( "space_free" );
-	gtk_misc_set_padding( GTK_MISC( mainw->space_free ), 2, 2 );
         gtk_container_add( GTK_CONTAINER( frame ), mainw->space_free );
         g_signal_connect( mainw->space_free_eb, "event",
                 G_CALLBACK( mainw_space_free_event ), mainw );
@@ -1951,13 +1950,11 @@ mainw_build( iWindow *iwnd, GtkWidget *vbox )
 	/* 6 is enough to stop the statusbar changing height when the progress
 	 * indicator changes visibility.
 	 */
-	gtk_misc_set_padding( GTK_MISC( mainw->statusbar ), 2, 6 );
-	gtk_misc_set_alignment( GTK_MISC( mainw->statusbar ), 0.0, 0.5 );
         gtk_box_pack_start( GTK_BOX( mainw->statusbar_main ), 
 		mainw->statusbar, TRUE, TRUE, 0 );
         gtk_widget_show( mainw->statusbar );
 
-        mainw->progress_box = gtk_hbox_new( FALSE, 2 );
+        mainw->progress_box = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 2 );
 
 	mainw->progress = gtk_progress_bar_new();
 	gtk_widget_set_size_request( GTK_WIDGET( mainw->progress ), 200, -1 );

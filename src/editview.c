@@ -122,11 +122,14 @@ editview_init( Editview *editview )
 
 	gtk_container_set_border_width( GTK_CONTAINER( editview ), 2 );
 
-	hbox = gtk_hbox_new( FALSE, 12 );
+	hbox = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 12 );
         gtk_box_pack_start( GTK_BOX( editview ), hbox, TRUE, FALSE, 0 );
 
         editview->label = gtk_label_new( "" );
-        gtk_misc_set_alignment( GTK_MISC( editview->label ), 0, 0.5 );
+	gtk_widget_set_halign( GTK_WIDGET( editview->label ), 
+		GTK_ALIGN_START );
+	gtk_widget_set_valign( GTK_WIDGET( editview->label ), 
+		GTK_ALIGN_CENTER );
 	gtk_box_pack_start( GTK_BOX( hbox ), editview->label, FALSE, FALSE, 2 );
 
         editview->text = gtk_entry_new();
@@ -134,7 +137,7 @@ editview_init( Editview *editview )
         set_tooltip( editview->text, _( "Escape to cancel edit, "
                 "press Return to accept edit and recalculate" ) );
         g_signal_connect_object( editview->text, "changed",
-                G_CALLBACK( view_changed_cb ), GTK_OBJECT( editview ) );
+                G_CALLBACK( view_changed_cb ), G_OBJECT( editview ) );
         g_signal_connect( editview->text ), "activate",
                 G_CALLBACK( editview_activate_cb ), editview );
         g_signal_connect( editview->text ), "event",
@@ -156,9 +159,9 @@ editview_set_entry( Editview *editview, const char *fmt, ... )
 	/* Make sure we don't trigger "changed" when we zap in the
 	 * text.
 	 */
-	gtk_signal_handler_block_by_data( 
-		GTK_OBJECT( editview->text ), editview );
+	g_signal_handler_block_by_data( G_OBJECT( editview->text ), 
+		editview );
 	set_gentry( editview->text, "%s", buf );
-	gtk_signal_handler_unblock_by_data( 
-		GTK_OBJECT( editview->text ), editview );
+	g_signal_handler_unblock_by_data( G_OBJECT( editview->text ), 
+		editview );
 }

@@ -84,7 +84,7 @@ preview_init( Preview *preview )
 Preview *
 preview_new( void )
 {
-	Preview *preview = (Preview *) gtk_type_new( TYPE_PREVIEW );
+	Preview *preview = g_object_new( TYPE_PREVIEW, NULL );
 
 	return( preview );
 }

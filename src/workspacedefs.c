@@ -270,7 +270,7 @@ workspacedefs_init( Workspacedefs *workspacedefs )
 	menu_add_but( pane, GTK_STOCK_SAVE_AS,
 		G_CALLBACK( workspacedefs_save_as_cb ), workspacedefs );
 
-	hbox = gtk_hbox_new( FALSE, 7 );
+	hbox = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 7 );
 	gtk_box_pack_start( GTK_BOX( workspacedefs ), hbox, FALSE, FALSE, 0 );
 	gtk_widget_show( hbox );
 
@@ -286,7 +286,6 @@ workspacedefs_init( Workspacedefs *workspacedefs )
 	gtk_box_pack_start( GTK_BOX( hbox ), but, FALSE, FALSE, 0 );
 	gtk_widget_show( but );
 	workspacedefs->status = gtk_label_new( NULL );
-	gtk_misc_set_alignment( GTK_MISC( workspacedefs->status ), 0, 0.5 );
 	gtk_box_pack_start( GTK_BOX( hbox ), 
 		workspacedefs->status, TRUE, TRUE, 0 );
 	gtk_widget_show( workspacedefs->status );
@@ -307,7 +306,7 @@ workspacedefs_init( Workspacedefs *workspacedefs )
 Workspacedefs *
 workspacedefs_new( void )
 {
-	Workspacedefs *workspacedefs = gtk_type_new( TYPE_WORKSPACEDEFS );
+	Workspacedefs *workspacedefs = g_object_new( TYPE_WORKSPACEDEFS, NULL );
 
 	return( workspacedefs );
 }

@@ -242,7 +242,7 @@ itextview_init( iTextview *itextview )
 View *
 itextview_new( void )
 {
-	iTextview *itextview = gtk_type_new( TYPE_ITEXTVIEW );
+	iTextview *itextview = g_object_new( TYPE_ITEXTVIEW, NULL );
 
 	return( VIEW( itextview ) );
 }

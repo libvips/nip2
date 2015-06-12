@@ -64,7 +64,7 @@
 
 #ifdef HAVE_LIBGVC
 
-static FloatwindowClass *parent_class = NULL;
+G_DEFINE_TYPE( Graphwindow, graphwindow, TYPE_FLOATWINDOW );
 
 static int graph_write_cluster_index = 0;
 
@@ -138,14 +138,14 @@ graph_write( Workspace *ws )
 }
 
 static void
-graphwindow_destroy( GtkObject *object )
+graphwindow_destroy( GtkWidget *widget )
 {
 	Graphwindow *graphwindow;
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_GRAPHWINDOW( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_GRAPHWINDOW( widget ) );
 
-	graphwindow = GRAPHWINDOW( object );
+	graphwindow = GRAPHWINDOW( widget );
 
 #ifdef DEBUG
 	printf( "graphwindow_destroy: %p\n", graphwindow );
@@ -164,17 +164,15 @@ graphwindow_destroy( GtkObject *object )
 	FREESID( graphwindow->workspace_changed_sid, 
 		FLOATWINDOW( graphwindow )->model );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( graphwindow_parent_class )->destroy( widget );
 }
 
 static void
 graphwindow_class_init( GraphwindowClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
-	object_class->destroy = graphwindow_destroy;
+	widget_class->destroy = graphwindow_destroy;
 
 	/* Create signals.
 	 */
@@ -194,31 +192,6 @@ graphwindow_init( Graphwindow *graphwindow )
 	graphwindow->layout_timeout = 0;
 
 	graphwindow->gvc = gvContext();
-}
-
-GType
-graphwindow_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( GraphwindowClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) graphwindow_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Graphwindow ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) graphwindow_init,
-		};
-
-		type = g_type_register_static( TYPE_FLOATWINDOW, 
-			"Graphwindow", &info, 0 );
-	}
-
-	return( type );
 }
 
 static void
@@ -453,7 +426,7 @@ graphwindow_link( Graphwindow *graphwindow, Workspace *ws, GtkWidget *parent )
 Graphwindow *
 graphwindow_new( Workspace *ws, GtkWidget *parent )
 {
-	Graphwindow *graphwindow = gtk_type_new( TYPE_GRAPHWINDOW );
+	Graphwindow *graphwindow = g_object_new( TYPE_GRAPHWINDOW, NULL );
 
 	graphwindow_link( graphwindow, ws, parent );
 

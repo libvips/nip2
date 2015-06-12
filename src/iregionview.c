@@ -56,7 +56,7 @@ iregionview_init( iRegionview *iregionview )
 View *
 iregionview_new( void )
 {
-	iRegionview *iregionview = gtk_type_new( TYPE_IREGIONVIEW );
+	iRegionview *iregionview = g_object_new( TYPE_IREGIONVIEW, NULL );
 
 #ifdef DEBUG
 	printf( "iregionview_new\n" );

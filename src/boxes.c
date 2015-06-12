@@ -58,13 +58,14 @@ box_build( iDialog *idlg,
 	GtkWidget *hb;
 	GtkWidget *lab;
 
-	hb = gtk_hbox_new( FALSE, 12 );
+	hb = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 12 );
 	gtk_container_border_width( GTK_CONTAINER( hb ), 0 );
 	gtk_container_add( GTK_CONTAINER( work ), hb );
 	gtk_widget_show( hb );
 
-	icon = gtk_image_new_from_stock( stock_id, GTK_ICON_SIZE_DIALOG );
-	gtk_misc_set_alignment( GTK_MISC( icon ), 0.0, 0.0 );
+	icon = gtk_image_new_from_icon_name( stock_id, GTK_ICON_SIZE_DIALOG );
+	gtk_widget_set_halign( GTK_WIDGET( icon ), GTK_ALIGN_START );
+	gtk_widget_set_valign( GTK_WIDGET( icon ), GTK_ALIGN_START );
         gtk_box_pack_start( GTK_BOX( hb ), icon, FALSE, FALSE, 0 );
 	gtk_widget_show( icon );
 
@@ -362,7 +363,7 @@ about_build( iDialog *idlg, GtkWidget *work )
         vips_buf_appendf( &buf, _( " of ram highwater mark" ) ); 
         vips_buf_appends( &buf, "\n" );
 
-	hb = gtk_hbox_new( FALSE, 0 );
+	hb = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
 	gtk_container_border_width( GTK_CONTAINER( hb ), 10 );
 	gtk_container_add( GTK_CONTAINER( work ), hb );
 	gtk_widget_show( hb );
@@ -462,21 +463,20 @@ stringset_child_new( Stringset *ss,
 }
 
 static void
-stringset_destroy( GtkObject *object )
+stringset_destroy( GtkWidget *widget )
 {
 	Stringset *ss;
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_STRINGSET( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_STRINGSET( widget ) );
 
-	ss = STRINGSET( object );
+	ss = STRINGSET( widget );
 
 	slist_map( ss->children,
 		(SListMapFn) stringset_child_destroy, NULL );
 	UNREF( ss->group );
 
-	if( GTK_OBJECT_CLASS( stringset_parent_class )->destroy )
-		GTK_OBJECT_CLASS( stringset_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( stringset_parent_class )->destroy( widget );
 }
 
 static void *
@@ -527,13 +527,11 @@ stringset_build( GtkWidget *widget )
 static void
 stringset_class_init( StringsetClass *class )
 {
-	GtkObjectClass *object_class;
-	iWindowClass *iwindow_class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
+	iWindowClass *iwindow_class = (iWindowClass *) class;
 
-	object_class = (GtkObjectClass *) class;
-	iwindow_class = (iWindowClass *) class;
+	widget_class->destroy = stringset_destroy;
 
-	object_class->destroy = stringset_destroy;
 	iwindow_class->build = stringset_build;
 }
 
@@ -550,7 +548,7 @@ stringset_init( Stringset *ss )
 GtkWidget *
 stringset_new( void )
 {
-	Stringset *ss = gtk_type_new( TYPE_STRINGSET );
+	Stringset *ss = g_object_new( TYPE_STRINGSET, NULL );
 
 	return( GTK_WIDGET( ss ) );
 }
@@ -619,7 +617,7 @@ find_init( Find *find )
 GtkWidget *
 find_new( void )
 {
-	Find *find = gtk_type_new( TYPE_FIND );
+	Find *find = g_object_new( TYPE_FIND, NULL );
 
 	return( GTK_WIDGET( find ) );
 }
@@ -742,7 +740,7 @@ fontchooser_init( Fontchooser *fontchooser )
 Fontchooser *
 fontchooser_new( void )
 {
-	Fontchooser *fontchooser = gtk_type_new( TYPE_FONTCHOOSER );
+	Fontchooser *fontchooser = g_object_new( TYPE_FONTCHOOSER, NULL );
 
 	return( fontchooser );
 }
@@ -945,17 +943,17 @@ infobar_destroy( GtkObject *object )
 	IM_FREEF( g_source_remove, infobar->close_timeout );
 	IM_FREEF( g_source_remove, infobar->close_animation_timeout );
 
-	GTK_OBJECT_CLASS( infobar_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( infobar_parent_class )->destroy( object );
 }
 
 static void
 infobar_class_init( InfobarClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
 	infobar_parent_class = g_type_class_peek_parent( class );
 
-	object_class->destroy = infobar_destroy;
+	widget_class->destroy = infobar_destroy;
 }
 
 static void
@@ -1079,7 +1077,7 @@ infobar_new( void )
 
 	infobar = g_object_new( TYPE_INFOBAR, NULL );
 
-	vbox = gtk_vbox_new( FALSE, 10 );
+	vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 10 );
 	content_area = gtk_info_bar_get_content_area( GTK_INFO_BAR( infobar ) );
 	gtk_container_add( GTK_CONTAINER( content_area ), vbox );
 	gtk_widget_show( vbox );
@@ -1101,7 +1099,7 @@ infobar_new( void )
 	 * horizontally.
 	 */
 
-	hbox = gtk_hbox_new( FALSE, 2 );
+	hbox = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 2 );
 	action_area = gtk_info_bar_get_action_area( GTK_INFO_BAR( infobar ) );
 	gtk_container_add( GTK_CONTAINER( action_area ), hbox );
 	gtk_widget_show( hbox );

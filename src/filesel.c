@@ -474,19 +474,19 @@ filesel_get_filter( const char *filename )
 }
 
 static void
-filesel_destroy( GtkObject *object )
+filesel_destroy( GtkWidget *widget )
 {
 	Filesel *filesel;
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_FILESEL( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_FILESEL( widget ) );
 
-	filesel = FILESEL( object );
+	filesel = FILESEL( widget );
 
 	filesel_all = g_slist_remove( filesel_all, filesel );
 	IM_FREEF( g_free, filesel->current_dir );
 
-	GTK_OBJECT_CLASS( filesel_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( filesel_parent_class )->destroy( widget );
 }
 
 /* Update `space free' label.
@@ -950,7 +950,7 @@ filesel_build( GtkWidget *widget )
 
 	/* Pack extra widgets.
 	 */
-        vb = gtk_vbox_new( FALSE, 6 );
+        vb = gtk_box_new( GTK_ORIENTATION_VERTICAL, 6 );
 	gtk_file_chooser_set_extra_widget(
 		GTK_FILE_CHOOSER( filesel->chooser ), vb );
 	gtk_widget_show( vb );
@@ -959,7 +959,6 @@ filesel_build( GtkWidget *widget )
          */
 	if( filesel->save ) {
 		filesel->space = gtk_label_new( "" );
-		gtk_misc_set_alignment( GTK_MISC( filesel->space ), 0, 0.5 );
 		gtk_box_pack_start( GTK_BOX( vb ), 
 			filesel->space, FALSE, FALSE, 0 );
 		gtk_widget_show( filesel->space );
@@ -969,7 +968,6 @@ filesel_build( GtkWidget *widget )
          */
 	if( !filesel->save ) {
 		filesel->info = gtk_label_new( "" );
-		gtk_misc_set_alignment( GTK_MISC( filesel->info ), 0, 0.5 );
 		gtk_box_pack_start( GTK_BOX( vb ), 
 			filesel->info, FALSE, FALSE, 0 );
 		gtk_widget_show( filesel->info );
@@ -1015,10 +1013,10 @@ filesel_build( GtkWidget *widget )
 static void
 filesel_class_init( FileselClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	iWindowClass *iwindow_class = (iWindowClass *) class;
 
-	object_class->destroy = filesel_destroy;
+	widget_class->destroy = filesel_destroy;
 
 	iwindow_class->build = filesel_build;
 }
@@ -1104,7 +1102,7 @@ filesel_init( Filesel *filesel )
 GtkWidget *
 filesel_new( void )
 {
-	Filesel *filesel = (Filesel *) gtk_type_new( TYPE_FILESEL );
+	Filesel *filesel = g_object_new( TYPE_FILESEL, NULL );
 
 	iwindow_set_size_prefs( IWINDOW( filesel ), 
 		"FILESEL_WINDOW_WIDTH", "FILESEL_WINDOW_HEIGHT" );

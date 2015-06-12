@@ -417,7 +417,7 @@ tslider_init( Tslider *tslider )
 Tslider *
 tslider_new()
 {
-	Tslider *tslider = gtk_type_new( TYPE_TSLIDER );
+	Tslider *tslider = g_object_new( TYPE_TSLIDER, NULL );
 
 	return( tslider );
 }

@@ -207,7 +207,7 @@ rhsview_init( Rhsview *rhsview )
 View *
 rhsview_new( void )
 {
-	Rhsview *rhsview = gtk_type_new( TYPE_RHSVIEW );
+	Rhsview *rhsview = g_object_new( TYPE_RHSVIEW, NULL );
 
 	return( VIEW( rhsview ) );
 }

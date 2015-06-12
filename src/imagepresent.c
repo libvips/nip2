@@ -37,6 +37,8 @@
 #define EVENT
  */
 
+G_DEFINE_TYPE( imagepresent, Imagepresent, GTK_TYPE_BIN ); 
+
 /* Snap if closer than this.
  */
 const int imagepresent_snap_threshold = 10;
@@ -77,14 +79,10 @@ static ImagepresentKeymap imagepresent_keymap[] = {
 	{ GDK_9, 9 }
 };
 
-/* Parent class.
- */
-static GtkBinClass *parent_class = NULL;
-
 static void
-imagepresent_destroy( GtkObject *object )
+imagepresent_destroy( GtkWidget *widget )
 {
-	Imagepresent *ip = IMAGEPRESENT( object );
+	Imagepresent *ip = IMAGEPRESENT( widget );
 
 #ifdef DEBUG
 	printf( "imagepresent_destroy\n" );
@@ -102,7 +100,7 @@ imagepresent_destroy( GtkObject *object )
 		UNREF( ip->imagemodel );
 	}
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( imagepresent_parent_class )->destroy( widget );
 
 	/* Child views should all have removed themselves.
 	 */
@@ -185,7 +183,7 @@ imagepresent_expose_event( GtkWidget *widget, GdkEventExpose *event )
 				x, y, width, height );
 		}
 
-		GTK_WIDGET_CLASS( parent_class )->expose_event( widget, event );
+		GTK_WIDGET_CLASS( imagepresent_parent_class )->expose_event( widget, event );
 	}
 
 	return( FALSE );
@@ -209,21 +207,15 @@ imagepresent_realize( GtkWidget *widget )
 	iwindow_cursor_context_set_cursor( ip->cntxt, 
 		imagepresent_cursors[ip->imagemodel->state] );
 
-	GTK_WIDGET_CLASS( parent_class )->realize( widget );
+	GTK_WIDGET_CLASS( imagepresent_parent_class )->realize( widget );
 }
 
 static void
 imagepresent_class_init( ImagepresentClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
-	/* Init parent class.
-	 */
-	parent_class = g_type_class_peek_parent( class );
-
-        object_class->destroy = imagepresent_destroy;
-
+        widget_class->destroy = imagepresent_destroy;
         widget_class->size_request = imagepresent_size_request;
         widget_class->size_allocate = imagepresent_size_allocate;
         widget_class->expose_event = imagepresent_expose_event;
@@ -1616,31 +1608,6 @@ imagepresent_init( Imagepresent *ip )
 
 	/* Set initial ruler visibility on first refresh from imagemodel.
 	 */
-}
-
-GType
-imagepresent_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( ImagepresentClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) imagepresent_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Imagepresent ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) imagepresent_init,
-		};
-
-		type = g_type_register_static( GTK_TYPE_BIN, 
-			"Imagepresent", &info, 0 );
-	}
-
-	return( type );
 }
 
 /* The model has changed ... update!

@@ -188,7 +188,7 @@ expressionview_init( Expressionview *expressionview )
 {
 	expressionview->formula = formula_new();
         g_signal_connect_object( expressionview->formula, "changed", 
-		G_CALLBACK( view_changed_cb ), GTK_OBJECT( expressionview ) );
+		G_CALLBACK( view_changed_cb ), G_OBJECT( expressionview ) );
         g_signal_connect( expressionview->formula, "activate",
                 G_CALLBACK( expressionview_activate_cb ), expressionview );
         gtk_box_pack_start( GTK_BOX( expressionview ), 
@@ -199,7 +199,8 @@ expressionview_init( Expressionview *expressionview )
 View *
 expressionview_new( void )
 {
-	Expressionview *expressionview = gtk_type_new( TYPE_EXPRESSIONVIEW );
+	Expressionview *expressionview = 
+		g_object_new( TYPE_EXPRESSIONVIEW, NULL );
 
 	return( VIEW( expressionview ) );
 }

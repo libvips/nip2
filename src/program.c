@@ -2379,7 +2379,7 @@ program_link( Program *program, Toolkitgroup *kitg )
 Program *
 program_new( Toolkitgroup *kitg )
 {
-	Program *program = gtk_type_new( TYPE_PROGRAM );
+	Program *program = g_object_new( TYPE_PROGRAM, NULL );
 
 	program_link( program, kitg );
 

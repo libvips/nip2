@@ -356,7 +356,7 @@ plotwindow_link( Plotwindow *plotwindow, Plot *plot, GtkWidget *parent )
 Plotwindow *
 plotwindow_new( Plot *plot, GtkWidget *parent )
 {
-	Plotwindow *plotwindow = gtk_type_new( TYPE_PLOTWINDOW );
+	Plotwindow *plotwindow = g_object_new( TYPE_PLOTWINDOW, NULL );
 
 	plotwindow_link( plotwindow, plot, parent );
 

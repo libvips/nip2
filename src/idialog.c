@@ -283,7 +283,7 @@ idialog_help_cb( GtkWidget *w, iDialog *idlg )
 }
 
 static void
-idialog_destroy( GtkObject *object )
+idialog_destroy( GtkWidget *widget )
 {
 	iDialog *idlg;
 
@@ -291,10 +291,10 @@ idialog_destroy( GtkObject *object )
 	printf( "idialog_destroy\n" );
 #endif /*DEBUG*/
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_IDIALOG( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_IDIALOG( widget ) );
 
-	idlg = IDIALOG( object );
+	idlg = IDIALOG( widget );
 
 #ifdef DEBUG
 	printf( "... %s\n", IWINDOW( idlg )->title );
@@ -314,7 +314,7 @@ idialog_destroy( GtkObject *object )
 	IM_FREEF( g_slist_free, idlg->ok_disp_l );
 	IM_FREEF( g_slist_free, idlg->ok_but_l );
 
-	GTK_OBJECT_CLASS( idialog_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( idialog_parent_class )->destroy( widget );
 }
 
 static void
@@ -409,7 +409,7 @@ idialog_build( GtkWidget *widget )
 
         gtk_window_set_modal( GTK_WINDOW( idlg ), idlg->modal );
 
-        idlg->work = gtk_vbox_new( FALSE, 6 );
+        idlg->work = gtk_box_new( GTK_ORIENTATION_VERTICAL, 6 );
         gtk_container_set_border_width( GTK_CONTAINER( idlg->work ), 12 );
         gtk_box_pack_start( GTK_BOX( iwnd->work ), idlg->work, TRUE, TRUE, 0 );
 
@@ -422,7 +422,7 @@ idialog_build( GtkWidget *widget )
 		gtk_widget_show( sep );
 	}
 
-	idlg->hb = gtk_hbox_new( FALSE, 6 );
+	idlg->hb = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 6 );
         gtk_container_set_border_width( GTK_CONTAINER( idlg->hb ), 12 );
         gtk_box_pack_start( GTK_BOX( iwnd->work ), idlg->hb, FALSE, FALSE, 0 );
         gtk_widget_show( idlg->hb );
@@ -557,12 +557,10 @@ idialog_build( GtkWidget *widget )
 static void
 idialog_class_init( iDialogClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	iWindowClass *iwindow_class = (iWindowClass *) class;
 
-	object_class->destroy = idialog_destroy;
-
+	widget_class->destroy = idialog_destroy;
 	widget_class->realize = idialog_realize;
 
 	iwindow_class->build = idialog_build;
@@ -625,7 +623,7 @@ idialog_init( iDialog *idlg )
 GtkWidget *
 idialog_new()
 {
-	iDialog *idlg = gtk_type_new( TYPE_IDIALOG );
+	iDialog *idlg = g_object_new( TYPE_IDIALOG, NULL );
 	GtkWindow *gwnd = GTK_WINDOW( idlg );
 
 	/* Init gtk base class.

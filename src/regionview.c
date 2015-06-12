@@ -2029,7 +2029,7 @@ regionview_setup( Regionview *regionview,
 Regionview *
 regionview_new( Classmodel *classmodel, Rect *model_area, Imagepresent *ip )
 {
-	Regionview *regionview = gtk_type_new( TYPE_REGIONVIEW );
+	Regionview *regionview = g_object_new( TYPE_REGIONVIEW, NULL );
 
 	regionview_setup( regionview, classmodel, model_area, ip );
 

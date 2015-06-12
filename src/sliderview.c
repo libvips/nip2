@@ -161,12 +161,10 @@ sliderview_init( Sliderview *sliderview )
 {
 	GtkWidget *hbox;
 
-	hbox = gtk_hbox_new( FALSE, 12 );
+	hbox = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 12 );
         gtk_box_pack_start( GTK_BOX( sliderview ), hbox, TRUE, FALSE, 0 );
 
         sliderview->label = gtk_label_new( "" );
-        gtk_misc_set_alignment( GTK_MISC( sliderview->label ), 0, 0.5 );
-        gtk_misc_set_padding( GTK_MISC( sliderview->label ), 2, 1 );
 	gtk_box_pack_start( GTK_BOX( hbox ), sliderview->label, 
 		FALSE, FALSE, 0 );
 
@@ -193,7 +191,7 @@ sliderview_init( Sliderview *sliderview )
 View *
 sliderview_new( void )
 {
-	Sliderview *sliderview = gtk_type_new( TYPE_SLIDERVIEW );
+	Sliderview *sliderview = g_object_new( TYPE_SLIDERVIEW, NULL );
 
 	return( VIEW( sliderview ) );
 }

@@ -936,7 +936,7 @@ imageview_link( Imageview *iv, iImage *iimage, GtkWidget *parent )
 Imageview *
 imageview_new( iImage *iimage, GtkWidget *parent )
 {
-	Imageview *iv = gtk_type_new( TYPE_IMAGEVIEW );
+	Imageview *iv = g_object_new( TYPE_IMAGEVIEW, NULL );
 
 	imageview_link( iv, iimage, parent );
 

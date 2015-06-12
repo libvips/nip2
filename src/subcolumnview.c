@@ -223,7 +223,7 @@ subcolumnview_init( Subcolumnview *sview )
 View *
 subcolumnview_new( void )
 {
-	Subcolumnview *sview = gtk_type_new( TYPE_SUBCOLUMNVIEW );
+	Subcolumnview *sview = g_object_new( TYPE_SUBCOLUMNVIEW, NULL );
 
 	return( VIEW( sview ) );
 }

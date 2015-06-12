@@ -112,7 +112,7 @@ numberview_init( Numberview *numberview )
 View *
 numberview_new( void )
 {
-	Numberview *numberview = gtk_type_new( TYPE_NUMBERVIEW );
+	Numberview *numberview = g_object_new( TYPE_NUMBERVIEW, NULL );
 
 	return( VIEW( numberview ) );
 }

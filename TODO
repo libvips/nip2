@@ -1,3 +1,12 @@
+- swap GTK_OBJECT for G_OBJECT or GTK_WIDGET
+
+:wq
+
+
+
+
+
+
 - swap 
 
 	gtk_hbox_new for gtk_box_new
@@ -11,13 +20,15 @@
 
   all of stock deprecated, read up on replacement
 
-- remove gtk_misc, red up on replacement
+  gtk_image_new_from_icon_name() picks an icon from the current icon theme -- 
+  we need to add our custom icons to the current theme, I guess
+
+- remove gtk_misc, read up on replacement
 
 - swap gtk_type_new for g_object_new
 
 - remove ‘gtk_object_destroy’, read up oon replacement
 
-- swap GTK_OBJECT for G_OBJECT
 
 
 

@@ -207,12 +207,11 @@ optionview_class_init( OptionviewClass *class )
 static void
 optionview_init( Optionview *optionview )
 {
-        optionview->hbox = gtk_hbox_new( FALSE, 12 );
+        optionview->hbox = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 12 );
         gtk_box_pack_start( GTK_BOX( optionview ), 
 		optionview->hbox, TRUE, FALSE, 0 );
 
         optionview->label = gtk_label_new( "" );
-        gtk_misc_set_alignment( GTK_MISC( optionview->label ), 0, 0.5 );
 	gtk_box_pack_start( GTK_BOX( optionview->hbox ), 
 		optionview->label, FALSE, FALSE, 2 );
 
@@ -226,7 +225,7 @@ optionview_init( Optionview *optionview )
 View *
 optionview_new( void )
 {
-	Optionview *optionview = gtk_type_new( TYPE_OPTIONVIEW );
+	Optionview *optionview = g_object_new( TYPE_OPTIONVIEW, NULL );
 
 	return( VIEW( optionview ) );
 }

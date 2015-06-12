@@ -184,7 +184,7 @@ ierror_link( iError *ierror, Toolkitgroup *kitg )
 iError *
 ierror_new( Toolkitgroup *kitg )
 {
-	iError *ierror = gtk_type_new( TYPE_IERROR );
+	iError *ierror = g_object_new( TYPE_IERROR, NULL );
 
 	ierror_link( ierror, kitg );
 	ierror_show_all( ierror );

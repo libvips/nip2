@@ -203,7 +203,7 @@ spin_init( Spin *spin )
         gtk_box_pack_start( GTK_BOX( spin ), ebox, FALSE, FALSE, 0 );
 	gtk_widget_show( ebox );
 
-	vbox = gtk_vbox_new( 0, FALSE );
+	vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, FALSE );
 	gtk_container_add( GTK_CONTAINER( ebox ), vbox );
 	gtk_widget_show( vbox );
 
@@ -218,7 +218,7 @@ spin_init( Spin *spin )
 GtkWidget *
 spin_new( void )
 {
-	Spin *spin = (Spin *) gtk_type_new( TYPE_SPIN );
+	Spin *spin = g_object_new( TYPE_SPIN, NULL );
 
 	return( GTK_WIDGET( spin ) );
 }

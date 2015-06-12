@@ -107,7 +107,8 @@ prefworkspaceview_init( Prefworkspaceview *pwview )
 View *
 prefworkspaceview_new( void )
 {
-	Prefworkspaceview *pwview = gtk_type_new( TYPE_PREFWORKSPACEVIEW );
+	Prefworkspaceview *pwview = 
+		g_object_new( TYPE_PREFWORKSPACEVIEW, NULL );
 
 	return( VIEW( pwview ) );
 }

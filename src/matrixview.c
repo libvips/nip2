@@ -384,7 +384,7 @@ matrixview_text_build_scale_offset( Matrixview *matrixview )
 {
 	GtkSizeGroup *group;
 
-    	matrixview->cbox = gtk_vbox_new( FALSE, 2 );
+    	matrixview->cbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 2 );
         gtk_box_pack_end( GTK_BOX( matrixview->box ), 
     		GTK_WIDGET( matrixview->cbox ), FALSE, FALSE, 0 );
 
@@ -902,7 +902,7 @@ matrixview_init( Matrixview *matrixview )
     	printf( "matrixview_init\n" );
 #endif /*DEBUG*/
 
-    	matrixview->box = gtk_hbox_new( FALSE, 12 );
+    	matrixview->box = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 12 );
         gtk_box_pack_start( GTK_BOX( matrixview ), 
     		GTK_WIDGET( matrixview->box ), FALSE, FALSE, 0 );
 
@@ -923,7 +923,7 @@ matrixview_init( Matrixview *matrixview )
 View *
 matrixview_new( void )
 {
-    	Matrixview *matrixview = gtk_type_new( TYPE_MATRIXVIEW );
+    	Matrixview *matrixview = g_object_new( TYPE_MATRIXVIEW, NULL );
 
     	return( VIEW( matrixview ) );
 }

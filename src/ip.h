@@ -171,6 +171,10 @@ extern int statfs();
 #  endif
 #endif
 
+/* We use the gimp ruler widget.
+ */
+#include "gimpruler.h"
+
 /* Our general widgets.
  */
 #include "formula.h"

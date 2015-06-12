@@ -19,6 +19,8 @@ CLI_DIST = nip2-cli.c
 endif
 
 nip2_SOURCES = \
+	gimpruler.c \
+	gimpruler.h \
 	vipsobject.c \
 	vipsobject.h \
 	plotmodel.c \

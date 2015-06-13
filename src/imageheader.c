@@ -176,7 +176,6 @@ imageheader_build( GtkWidget *widget )
 	GtkWidget *swin;
 	GtkWidget *pane;
 	GtkWidget *vbox;
-	PangoFontDescription *font_desc;
 
 #ifdef DEBUG
 	printf( "imageheader_build: %s\n", IWINDOW( imageheader )->title );
@@ -187,7 +186,7 @@ imageheader_build( GtkWidget *widget )
 	if( IWINDOW_CLASS( imageheader_parent_class )->build )
 		(*IWINDOW_CLASS( imageheader_parent_class )->build)( widget );
 
-	pane = gtk_vpaned_new();
+	pane = gtk_paned_new( GTK_ORIENTATION_VERTICAL );
         gtk_box_pack_start( GTK_BOX( idlg->work ), pane, TRUE, TRUE, 2 );
 
 	vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 2 );
@@ -202,7 +201,7 @@ imageheader_build( GtkWidget *widget )
 	gtk_box_pack_end( GTK_BOX( top ), 
 		imageheader->entry, FALSE, FALSE, 2 );
 
-	label = gtk_image_new_from_icon_name( GTK_STOCK_FIND, GTK_ICON_SIZE_MENU );
+	label = gtk_image_new_from_icon_name( "find", GTK_ICON_SIZE_MENU );
 	gtk_box_pack_end( GTK_BOX( top ), label, FALSE, FALSE, 0 );
 
 	swin = gtk_scrolled_window_new( NULL, NULL );
@@ -222,8 +221,6 @@ imageheader_build( GtkWidget *widget )
 
 	imageheader->tree = gtk_tree_view_new_with_model( 
 		GTK_TREE_MODEL( imageheader->filter ) );
-	gtk_tree_view_set_rules_hint( GTK_TREE_VIEW( imageheader->tree ),
-		TRUE );
 	gtk_container_add( GTK_CONTAINER( swin ), imageheader->tree );
 
 	renderer = gtk_cell_renderer_text_new();
@@ -253,9 +250,6 @@ imageheader_build( GtkWidget *widget )
 		FALSE );
 	gtk_text_view_set_cursor_visible( GTK_TEXT_VIEW( imageheader->history ),
 		FALSE );
-	font_desc = pango_font_description_from_string( "Monospace" );
-	gtk_widget_modify_font( imageheader->history, font_desc );
-	pango_font_description_free( font_desc );
 	gtk_container_add( GTK_CONTAINER( swin ), imageheader->history );
 
 	imageheader_refresh( imageheader );

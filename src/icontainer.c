@@ -786,7 +786,7 @@ icontainer_class_init( iContainerClass *class )
 		NULL, NULL,
 		nip_VOID__OBJECT_INT,
 		G_TYPE_NONE, 2,
-		TYPE_ICONTAINER, GTK_TYPE_INT );
+		TYPE_ICONTAINER, G_TYPE_INT );
 
 	icontainer_signals[SIG_CHILD_REMOVE] = g_signal_new( "child_remove",
 		G_OBJECT_CLASS_TYPE( gobject_class ),
@@ -822,7 +822,7 @@ icontainer_class_init( iContainerClass *class )
 		NULL, NULL,
 		nip_VOID__OBJECT_INT,
 		G_TYPE_NONE, 2,
-		TYPE_ICONTAINER, GTK_TYPE_INT );
+		TYPE_ICONTAINER, G_TYPE_INT );
 
 #ifdef DEBUG_SANITY
 	printf( "*** DEBUG_SANITY is on ... expect slowness\n" );

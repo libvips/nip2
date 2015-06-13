@@ -1,7 +1,3 @@
-- doing:
-
-	boxes.c:62:2: warning: implicit declaration of function ‘gtk_container_border_width’ [-Wimplicit-function-declaration]
-
 
 - swap
 

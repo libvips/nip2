@@ -52,11 +52,13 @@ static void
 popupbutton_position_func( GtkMenu *menu, 
 	gint *x, gint *y, gboolean *push_in, GtkWidget *button )
 {
-	GtkRequisition menu_req;
+	GtkRequisition minimum_size;
+	GtkRequisition natural_size;
 	GtkTextDirection direction;
 	GtkAllocation allocation;
 
-	gtk_widget_size_request( GTK_WIDGET( menu ), &menu_req );
+	gtk_widget_get_preferred_size( GTK_WIDGET( menu ), 
+		&minimum_size, &natural_size );
 
 	direction = gtk_widget_get_direction( button );
 
@@ -66,9 +68,9 @@ popupbutton_position_func( GtkMenu *menu,
 	*y += allocation.y;
 
 	if( direction == GTK_TEXT_DIR_LTR )
-		*x += VIPS_MAX( allocation.width - menu_req.width, 0 );
-	else if( menu_req.width > allocation.width )
-		*x -= menu_req.width - allocation.width;
+		*x += VIPS_MAX( allocation.width - natural_size.width, 0 );
+	else if( natural_size.width > allocation.width )
+		*x -= natural_size.width - allocation.width;
 
 	*y += allocation.height;
 
@@ -134,7 +136,7 @@ popupbutton_new( void )
 
 	popupbutton = g_object_new( TYPE_POPUPBUTTON, NULL );
 
-	image = gtk_image_new_from_icon_name( GTK_STOCK_EXECUTE, 
+	image = gtk_image_new_from_icon_name( "execute", 
 		GTK_ICON_SIZE_MENU );
 	gtk_container_add( GTK_CONTAINER( popupbutton ), image );
 	gtk_widget_show( image );

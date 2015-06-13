@@ -58,7 +58,7 @@ preview_destroy( GtkWidget *widget )
 static void
 preview_class_init( PreviewClass *class )
 {
-	GtkWidgetClass *object_class = (GtkWidgetClass *) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
 	widget_class->destroy = preview_destroy;
 }

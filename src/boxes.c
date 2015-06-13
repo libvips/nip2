@@ -59,7 +59,6 @@ box_build( iDialog *idlg,
 	GtkWidget *lab;
 
 	hb = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 12 );
-	gtk_container_border_width( GTK_CONTAINER( hb ), 0 );
 	gtk_container_add( GTK_CONTAINER( work ), hb );
 	gtk_widget_show( hb );
 
@@ -94,9 +93,9 @@ box_error( GtkWidget *par, const char *fmt, ... )
 
 	idlg = idialog_new();
 	idialog_set_build( IDIALOG( idlg ), 
-		(iWindowBuildFn) box_build, buf, GTK_STOCK_DIALOG_ERROR, NULL );
+		(iWindowBuildFn) box_build, buf, "dialog-error", NULL );
 	idialog_set_callbacks( IDIALOG( idlg ), NULL, NULL, NULL, NULL );
-	idialog_add_ok( IDIALOG( idlg ), iwindow_true_cb, GTK_STOCK_OK );
+	idialog_add_ok( IDIALOG( idlg ), iwindow_true_cb, _( "OK" ) );
 	iwindow_set_parent( IWINDOW( idlg ), box_pick_parent( par ) );
 	iwindow_build( IWINDOW( idlg ) );
 
@@ -167,10 +166,9 @@ box_vinfo( GtkWidget *par, const char *top, const char *sub, va_list ap )
 
 	idlg = idialog_new();
 	idialog_set_build( IDIALOG( idlg ), 
-		(iWindowBuildFn) box_build, 
-			buf, GTK_STOCK_DIALOG_INFO, NULL );
+		(iWindowBuildFn) box_build, buf, "dialog-info", NULL );
 	idialog_set_callbacks( IDIALOG( idlg ), NULL, NULL, NULL, NULL );
-	idialog_add_ok( IDIALOG( idlg ), iwindow_true_cb, GTK_STOCK_OK );
+	idialog_add_ok( IDIALOG( idlg ), iwindow_true_cb, _( "OK" ) );
 	iwindow_set_parent( IWINDOW( idlg ), box_pick_parent( par ) );
 	iwindow_build( IWINDOW( idlg ) );
 
@@ -208,8 +206,7 @@ box_yesno( GtkWidget *par,
 
 	idlg = idialog_new();
 	idialog_set_build( IDIALOG( idlg ), 
-		(iWindowBuildFn) box_build, 
-			buf, GTK_STOCK_DIALOG_QUESTION, NULL );
+		(iWindowBuildFn) box_build, buf, "dialog-question", NULL );
 	idialog_set_callbacks( IDIALOG( idlg ), cancelcb, NULL, NULL, client );
 	idialog_add_ok( IDIALOG( idlg ), okcb, "%s", yes_label );
 	idialog_set_notify( IDIALOG( idlg ), nfn, sys );
@@ -239,12 +236,11 @@ box_savenosave( GtkWidget *par,
 
 	idlg = idialog_new();
 	idialog_set_build( IDIALOG( idlg ), 
-		(iWindowBuildFn) box_build, 
-			buf, GTK_STOCK_DIALOG_QUESTION, NULL );
+		(iWindowBuildFn) box_build, buf, "dialog-question", NULL );
 	idialog_set_callbacks( IDIALOG( idlg ), 
 		iwindow_true_cb, NULL, NULL, client );
 	idialog_add_ok( IDIALOG( idlg ), nosave, _( "Close _without Saving" ) );
-	idialog_add_ok( IDIALOG( idlg ), save, GTK_STOCK_SAVE );
+	idialog_add_ok( IDIALOG( idlg ), save, _( "Save" ) );
 	idialog_set_notify( IDIALOG( idlg ), nfn, sys );
 	iwindow_set_parent( IWINDOW( idlg ), box_pick_parent( par ) );
 	iwindow_build( IWINDOW( idlg ) );
@@ -364,7 +360,6 @@ about_build( iDialog *idlg, GtkWidget *work )
         vips_buf_appends( &buf, "\n" );
 
 	hb = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
-	gtk_container_border_width( GTK_CONTAINER( hb ), 10 );
 	gtk_container_add( GTK_CONTAINER( work ), hb );
 	gtk_widget_show( hb );
 
@@ -392,7 +387,7 @@ box_about( GtkWidget *par )
 	idlg = idialog_new();
 	idialog_set_build( IDIALOG( idlg ), 
 		(iWindowBuildFn) about_build, NULL, NULL, NULL );
-	idialog_add_ok( IDIALOG( idlg ), iwindow_true_cb, GTK_STOCK_OK );
+	idialog_add_ok( IDIALOG( idlg ), iwindow_true_cb, _( "OK" ) );
 	iwindow_set_parent( IWINDOW( idlg ), box_pick_parent( par ) );
 	iwindow_build( IWINDOW( idlg ) );
 
@@ -571,7 +566,7 @@ stringset_child_get( Stringset *ss, const char *label )
 /* Find dialog.
  */
 
-G_DEFINE_TYPE( find, Find, TYPE_IDIALOG ); 
+G_DEFINE_TYPE( Find, find, TYPE_IDIALOG ); 
 
 static void
 find_build( GtkWidget *widget )
@@ -696,7 +691,7 @@ box_url( GtkWidget *par, const char *url )
 /* Fontchooser dialog.
  */
 
-G_DEFINE_TYPE( fontchooser, Fontchooser, TYPE_IDIALOG ); 
+G_DEFINE_TYPE( Fontchooser, fontchooser, TYPE_IDIALOG ); 
 
 static void
 fontchooser_build( GtkWidget *widget )
@@ -713,7 +708,7 @@ fontchooser_build( GtkWidget *widget )
 	if( IWINDOW_CLASS( fontchooser_parent_class )->build )
 		(*IWINDOW_CLASS( fontchooser_parent_class )->build)( widget );
 
-	fontchooser->fontchooser = gtk_font_selection_new();
+	fontchooser->fontchooser = gtk_font_chooser_widget_new();
         gtk_box_pack_start( GTK_BOX( idlg->work ), 
 		fontchooser->fontchooser, TRUE, TRUE, 2 );
 
@@ -748,13 +743,8 @@ fontchooser_new( void )
 gboolean 
 fontchooser_set_font_name( Fontchooser *fontchooser, const char *font_name )
 {
-	if( !gtk_font_selection_set_font_name( 
-		GTK_FONT_SELECTION( fontchooser->fontchooser ), font_name ) ) {
-		error_top( _( "Font not found." ) );
-		error_sub( _( "Font \"%s\" not found on system." ),
-			font_name );
-		return( FALSE );
-	}
+	gtk_font_chooser_set_font( 
+		GTK_FONT_CHOOSER( fontchooser->fontchooser ), font_name );
 
 	return( TRUE );
 }
@@ -762,14 +752,14 @@ fontchooser_set_font_name( Fontchooser *fontchooser, const char *font_name )
 char *
 fontchooser_get_font_name( Fontchooser *fontchooser )
 {
-	return( gtk_font_selection_get_font_name( 
-		GTK_FONT_SELECTION( fontchooser->fontchooser ) ) );
+	return( gtk_font_chooser_get_font( 
+		GTK_FONT_CHOOSER( fontchooser->fontchooser ) ) );
 }
 
 /* Fontbutton.
  */
 
-G_DEFINE_TYPE( fontbutton, Fontbutton, GTK_TYPE_BUTTON ); 
+G_DEFINE_TYPE( Fontbutton, fontbutton, GTK_TYPE_BUTTON ); 
 
 /* Our signals. 
  */
@@ -931,19 +921,19 @@ fontbutton_get_font_name( Fontbutton *fontbutton )
 G_DEFINE_TYPE( Infobar, infobar, GTK_TYPE_INFO_BAR ); 
 
 static void
-infobar_destroy( GtkObject *object )
+infobar_destroy( GtkWidget *widget )
 {
 	Infobar *infobar;
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_INFOBAR( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_INFOBAR( widget ) );
 
-	infobar = INFOBAR( object );
+	infobar = INFOBAR( widget );
 
 	IM_FREEF( g_source_remove, infobar->close_timeout );
 	IM_FREEF( g_source_remove, infobar->close_animation_timeout );
 
-	GTK_WIDGET_CLASS( infobar_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( infobar_parent_class )->destroy( widget );
 }
 
 static void
@@ -1000,7 +990,8 @@ infobar_start_close( Infobar *infobar )
 {
 	infobar_cancel_close( infobar );
 
-	infobar->height = GTK_WIDGET( infobar )->allocation.height;
+	infobar->height = 
+		gtk_widget_get_allocated_height( GTK_WIDGET( infobar ) ); 
 	infobar->close_animation_timeout = g_timeout_add( 50, 
 		(GSourceFunc) infobar_close_animation_timeout, infobar );
 }
@@ -1077,13 +1068,13 @@ infobar_new( void )
 	gtk_container_add( GTK_CONTAINER( action_area ), hbox );
 	gtk_widget_show( hbox );
 
-	button = gtk_button_new_from_stock( GTK_STOCK_CLOSE );
+	button = gtk_button_new_with_label( "close" );
         gtk_box_pack_end( GTK_BOX( hbox ), button, TRUE, TRUE, 2 );
 	g_signal_connect( button, "clicked",
 		G_CALLBACK( infobar_close_cb ), infobar );
 	gtk_widget_show( button );
 
-	infobar->info = gtk_button_new_from_stock( GTK_STOCK_INFO );
+	infobar->info = gtk_button_new_with_label( "info" );
         gtk_box_pack_end( GTK_BOX( hbox ), infobar->info, TRUE, TRUE, 2 );
 	g_signal_connect( infobar->info, "clicked",
 		G_CALLBACK( infobar_info_cb ), infobar );

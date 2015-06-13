@@ -33,10 +33,9 @@
 
 #include "ip.h"
 
-static ValueClass *parent_class = NULL;
+G_DEFINE_TYPE( Group, group, TYPE_VALUE ); 
 
-static gboolean
-group_save_list( PElement *list, char *filename );
+static gboolean group_save_list( PElement *list, char *filename );
 
 /* Exported, since main.c uses this to save 'main' to a file. @filename is
  * incremented. 
@@ -160,8 +159,6 @@ group_class_init( GroupClass *class )
 {
 	ClassmodelClass *classmodel_class = (ClassmodelClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	/* Create signals.
 	 */
 
@@ -174,29 +171,4 @@ static void
 group_init( Group *group )
 {
 	iobject_set( IOBJECT( group ), CLASS_GROUP, NULL );
-}
-
-GType
-group_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( GroupClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) group_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Group ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) group_init,
-		};
-
-		type = g_type_register_static( TYPE_VALUE, 
-			"Group", &info, 0 );
-	}
-
-	return( type );
 }

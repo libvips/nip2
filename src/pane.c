@@ -33,14 +33,14 @@
 #define DEBUG
  */
 
+G_DEFINE_TYPE( Pane, pane, GTK_TYPE_HPANED );
+
 /* Our signals. 
  */
 enum {
 	SIG_CHANGED,	/* Change to position or openness */
 	SIG_LAST
 };
-
-static GtkHPanedClass *parent_class = NULL;
 
 static guint pane_signals[SIG_LAST] = { 0 };
 
@@ -97,14 +97,14 @@ pane_open_position( Pane *pane )
 }
 
 static void
-pane_destroy( GtkObject *object )
+pane_destroy( GtkWidget *widget )
 {
 	Pane *pane;
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_PANE( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_PANE( widget ) );
 
-	pane = PANE( object );
+	pane = PANE( widget );
 
 #ifdef DEBUG
 	printf( "pane_destroy: %p %s\n",
@@ -115,17 +115,15 @@ pane_destroy( GtkObject *object )
 	 */
 	IM_FREEF( g_source_remove, pane->animate_timeout );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( pane_parent_class )->destroy( widget );
 }
 
 static void
 pane_class_init( PaneClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
-	object_class->destroy = pane_destroy;
+	widget_class->destroy = pane_destroy;
 
 	class->changed = NULL;
 
@@ -204,31 +202,6 @@ pane_init( Pane *pane )
 
 	g_signal_connect( pane, "notify::position", 
 		G_CALLBACK( pane_notify_position_cb ), NULL );
-}
-
-GType
-pane_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( PaneClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) pane_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Pane ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) pane_init,
-		};
-
-		type = g_type_register_static( GTK_TYPE_HPANED, 
-			"Pane", &info, 0 );
-	}
-
-	return( type );
 }
 
 /* Operations on the model.

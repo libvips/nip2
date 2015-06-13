@@ -928,7 +928,7 @@ fontbutton_get_font_name( Fontbutton *fontbutton )
 	return( fontbutton->font_name );
 }
 
-static GtkInfoBarClass *infobar_parent_class = NULL;
+G_DEFINE_TYPE( Infobar, infobar, GTK_TYPE_INFO_BAR ); 
 
 static void
 infobar_destroy( GtkObject *object )
@@ -951,8 +951,6 @@ infobar_class_init( InfobarClass *class )
 {
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
-	infobar_parent_class = g_type_class_peek_parent( class );
-
 	widget_class->destroy = infobar_destroy;
 }
 
@@ -964,31 +962,6 @@ infobar_init( Infobar *infobar )
 	infobar->close_timeout = 0;
 	infobar->close_animation_timeout = 0;
 	infobar->height = 0;
-}
-
-GType
-infobar_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( InfobarClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) infobar_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Infobar ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) infobar_init,
-		};
-
-		type = g_type_register_static( GTK_TYPE_INFO_BAR, 
-			"Infobar", &info, 0 );
-	}
-
-	return( type );
 }
 
 static void

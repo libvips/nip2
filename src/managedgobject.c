@@ -33,7 +33,7 @@
 #define DEBUG
  */
 
-static ManagedClass *parent_class = NULL;
+G_DEFINE_TYPE( Managedgobject, managedgobject, TYPE_MANAGED ); 
 
 static void
 managedgobject_dispose( GObject *gobject )
@@ -47,7 +47,7 @@ managedgobject_dispose( GObject *gobject )
 
 	IM_FREEF( g_object_unref, managedgobject->object );
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( managedgobject_parent_class )->dispose( gobject );
 }
 
 static void
@@ -59,7 +59,8 @@ managedgobject_info( iObject *iobject, VipsBuf *buf )
 		vips_object_summary( VIPS_OBJECT( managedgobject->object ), 
 			buf ); 
 	else
-		IOBJECT_CLASS( parent_class )->info( iobject, buf );
+		IOBJECT_CLASS( managedgobject_parent_class )->
+			info( iobject, buf );
 }
 
 
@@ -68,8 +69,6 @@ managedgobject_class_init( ManagedgobjectClass *class )
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
 	iObjectClass *iobject_class = IOBJECT_CLASS( class );
-
-	parent_class = g_type_class_peek_parent( class );
 
 	gobject_class->dispose = managedgobject_dispose;
 
@@ -84,31 +83,6 @@ managedgobject_init( Managedgobject *managedgobject )
 #endif /*DEBUG*/
 
 	managedgobject->object = NULL;
-}
-
-GType
-managedgobject_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( ManagedgobjectClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) managedgobject_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Managedgobject ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) managedgobject_init,
-		};
-
-		type = g_type_register_static( TYPE_MANAGED, 
-			"Managedgobject", &info, 0 );
-	}
-
-	return( type );
 }
 
 Managedgobject *

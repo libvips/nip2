@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ClassmodelClass *parent_class = NULL;
+G_DEFINE_TYPE( String, string, TYPE_CLASSMODEL ); 
 
 static void
 string_finalize( GObject *gobject )
@@ -51,7 +51,7 @@ string_finalize( GObject *gobject )
 
 	IM_FREE( string->value );
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( string_parent_class )->finalize( gobject );
 }
 
 static View *
@@ -78,8 +78,6 @@ string_class_init( StringClass *class )
 	ModelClass *model_class = (ModelClass *) class;
 	ClassmodelClass *classmodel_class = (ClassmodelClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	/* Init methods.
 	 */
 	gobject_class->finalize = string_finalize;
@@ -101,29 +99,4 @@ string_init( String *string )
 	IM_SETSTR( string->value, "" );
 
 	iobject_set( IOBJECT( string ), CLASS_STRING, NULL );
-}
-
-GType
-string_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( StringClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) string_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( String ),
-			32,             /* n_pstringlocs */
-			(GInstanceInitFunc) string_init,
-		};
-
-		type = g_type_register_static( TYPE_CLASSMODEL, 
-			"String", &info, 0 );
-	}
-
-	return( type );
 }

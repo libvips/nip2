@@ -550,14 +550,14 @@ program_find( Program *program )
 }
 
 static void
-program_destroy( GtkObject *object )
+program_destroy( GtkWidget *widget )
 {
 	Program *program;
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_PROGRAM( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_PROGRAM( widget ) );
 
-	program = PROGRAM( object );
+	program = PROGRAM( widget );
 
 #ifdef DEBUG
 	printf( "program_destroy\n" );
@@ -579,7 +579,7 @@ program_destroy( GtkObject *object )
 
 	program_all = g_slist_remove( program_all, program );
 
-	GTK_OBJECT_CLASS( program_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( program_parent_class )->destroy( widget );
 }
 
 static void
@@ -704,11 +704,11 @@ program_remove_object_cb( GtkWidget *menu, Program *program )
 static void
 program_class_init( ProgramClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
 	GtkWidget *pane;
 
-	object_class->destroy = program_destroy;
+	widget_class->destroy = program_destroy;
 
 	/* Create signals.
 	 */

@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ClassmodelClass *parent_class = NULL;
+G_DEFINE_TYPE( iArrow, iarrow, TYPE_CLASSMODEL ); 
 
 static void
 iarrow_finalize( GObject *gobject )
@@ -54,7 +54,7 @@ iarrow_finalize( GObject *gobject )
 	iregion_instance_destroy( &iarrow->instance );
 	vips_buf_destroy( &iarrow->caption_buffer );
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( iarrow_parent_class )->finalize( gobject );
 }
 
 static void *
@@ -175,7 +175,7 @@ iarrow_update_model( Heapmodel *heapmodel )
 {
 	/* Parent first ... this will update our instance vars.
 	 */
-	if( HEAPMODEL_CLASS( parent_class )->update_model( heapmodel ) )
+	if( HEAPMODEL_CLASS( iarrow_parent_class )->update_model( heapmodel ) )
 		return( heapmodel );
 
 	if( heapmodel->row->expr ) {
@@ -217,8 +217,6 @@ iarrow_class_init( iArrowClass *class )
 	 */
 	(void) iregion_get_type();
 
-	parent_class = g_type_class_peek_parent( class );
-
 	/* Create signals.
 	 */
 
@@ -254,29 +252,4 @@ iarrow_init( iArrow *iarrow )
 	vips_buf_init_dynamic( &iarrow->caption_buffer, MAX_LINELENGTH );
 
 	iobject_set( IOBJECT( iarrow ), CLASS_ARROW, NULL );
-}
-
-GType
-iarrow_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( iArrowClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) iarrow_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( iArrow ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) iarrow_init,
-		};
-
-		type = g_type_register_static( TYPE_CLASSMODEL, 
-			"iArrow", &info, 0 );
-	}
-
-	return( type );
 }

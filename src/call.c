@@ -44,6 +44,8 @@
 #undef DEBUG_LEAK
  */
 
+G_DEFINE_TYPE( CallInfo, call_info, TYPE_IOBJECT ); 
+
 /* CALL argument types we support. Keep order in sync with CallArgumentType.
  */
 static im_arg_type call_supported[] = {
@@ -61,7 +63,6 @@ static im_arg_type call_supported[] = {
 	IM_TYPE_INTERPOLATE
 };
 
-static iObjectClass *parent_class = NULL;
 
 /* All the CallInfo we make ... for leak and sanity testing. Build this file 
  * with DEBUG_LEAK to enable add/remove to this list.
@@ -854,7 +855,7 @@ call_info_dispose( GObject *gobject )
 	 */
 	call_drop_refs( vi );
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( call_info_parent_class )->dispose( gobject );
 }
 
 /* Junk stuff we may have attached to vargv.
@@ -944,7 +945,7 @@ call_info_finalize( GObject *gobject )
 		IM_FREE( vi->vargv );
 	}
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( call_info_parent_class )->finalize( gobject );
 }
 
 static void
@@ -961,8 +962,6 @@ call_info_class_init( CallInfoClass *class )
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
 	iObjectClass *iobject_class = IOBJECT_CLASS( class );
-
-	parent_class = g_type_class_peek_parent( class );
 
 	gobject_class->dispose = call_info_dispose;
 	gobject_class->finalize = call_info_finalize;
@@ -998,31 +997,6 @@ call_info_init( CallInfo *vi )
 		vi->inii_destroy_sid[i] = 0;
 		vi->inii_invalidate_sid[i] = 0;
 	}
-}
-
-GType
-call_info_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( CallInfoClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) call_info_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( CallInfo ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) call_info_init,
-		};
-
-		type = g_type_register_static( TYPE_IOBJECT, 
-			"CallInfo", &info, 0 );
-	}
-
-	return( type );
 }
 
 static CallInfo *

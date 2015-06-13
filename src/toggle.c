@@ -33,7 +33,7 @@
 #define DEBUG
  */
 
-static ClassmodelClass *parent_class = NULL;
+G_DEFINE_TYPE( Toggle, toggle, TYPE_CLASSMODEL ); 
 
 static View *
 toggle_view_new( Model *model, View *parent )
@@ -58,8 +58,6 @@ toggle_class_init( ToggleClass *class )
 	ModelClass *model_class = (ModelClass *) class;
 	ClassmodelClass *classmodel_class = (ClassmodelClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	/* Create signals.
 	 */
 
@@ -81,29 +79,4 @@ toggle_init( Toggle *toggle )
         toggle->value = FALSE;
 
 	iobject_set( IOBJECT( toggle ), CLASS_TOGGLE, NULL );
-}
-
-GType
-toggle_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( ToggleClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) toggle_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Toggle ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) toggle_init,
-		};
-
-		type = g_type_register_static( TYPE_CLASSMODEL, 
-			"Toggle", &info, 0 );
-	}
-
-	return( type );
 }

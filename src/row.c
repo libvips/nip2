@@ -62,7 +62,7 @@
 
 #include "ip.h"
 
-static HeapmodelClass *parent_class = NULL;
+G_DEFINE_TYPE( Row, row, TYPE_HEAPMODEL ); 
 
 static void *
 row_map_all_sub( Model *model, row_map_fn fn, void *a, void *b, void *c )
@@ -431,7 +431,7 @@ row_dispose( GObject *gobject )
 	if( row == row->top_row ) 
 		IDESTROY( row->sym );
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( row_parent_class )->dispose( gobject );
 }
 
 static void *
@@ -546,7 +546,7 @@ row_child_add( iContainer *parent, iContainer *child, int pos )
 {
 	Row *row = ROW( parent );
 
-	ICONTAINER_CLASS( parent_class )->child_add( parent, child, pos );
+	ICONTAINER_CLASS( row_parent_class )->child_add( parent, child, pos );
 
 	/* Update our context.
 	 */
@@ -602,7 +602,7 @@ row_parent_add( iContainer *child )
 
 	g_assert( IS_SUBCOLUMN( child->parent ) );
 
-	ICONTAINER_CLASS( parent_class )->parent_add( child );
+	ICONTAINER_CLASS( row_parent_class )->parent_add( child );
 
 	/* Update our context.
 	 */
@@ -626,7 +626,7 @@ row_parent_remove( iContainer *child )
 	 * row_dispose() for that.
 	 */
 
-	ICONTAINER_CLASS( parent_class )->parent_remove( child );
+	ICONTAINER_CLASS( row_parent_class )->parent_remove( child );
 }
 
 static View *
@@ -651,7 +651,7 @@ row_scrollto( Model *model, ModelScrollPosition position )
 		column_scrollto( col, position );
 	}
 
-	MODEL_CLASS( parent_class )->scrollto( model, position );
+	MODEL_CLASS( row_parent_class )->scrollto( model, position );
 }
 
 static gboolean
@@ -694,7 +694,8 @@ row_load( Model *model,
 		 */
 	}
 
-	if( !MODEL_CLASS( parent_class )->load( model, state, parent, xnode ) )
+	if( !MODEL_CLASS( row_parent_class )->
+		load( model, state, parent, xnode ) )
 		return( FALSE );
 
 	/* If we've loaded a complete row system, mark this row plus any 
@@ -751,7 +752,7 @@ row_save( Model *model, xmlNode *xnode )
 			return( (xmlNode *) -1 );
 	}
 
-	if( !(xthis = MODEL_CLASS( parent_class )->save( model, xnode )) )
+	if( !(xthis = MODEL_CLASS( row_parent_class )->save( model, xnode )) )
 		return( NULL );
 
 	/* Top-level only.
@@ -922,7 +923,8 @@ row_new_heap( Heapmodel *heapmodel, PElement *root )
 			rhs_set_vislevel( row->child_rhs, 0 );
 	}
 
-	return( HEAPMODEL_CLASS( parent_class )->new_heap( heapmodel, root ) ); }
+	return( HEAPMODEL_CLASS( row_parent_class )->
+		new_heap( heapmodel, root ) ); }
 
 static void *
 row_update_model( Heapmodel *heapmodel )
@@ -932,7 +934,8 @@ row_update_model( Heapmodel *heapmodel )
 	if( row->expr )
 		expr_new_value( row->expr );
 
-	return( HEAPMODEL_CLASS( parent_class )->update_model( heapmodel ) );
+	return( HEAPMODEL_CLASS( row_parent_class )->
+		update_model( heapmodel ) );
 }
 
 static void
@@ -943,8 +946,6 @@ row_class_init( RowClass *class )
 	iContainerClass *icontainer_class = (iContainerClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 	HeapmodelClass *heapmodel_class = (HeapmodelClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -1007,31 +1008,6 @@ row_init( Row *row )
 	row->depend = FALSE;
 
 	row->show = ROW_SHOW_NONE;
-}
-
-GType
-row_get_type( void )
-{
-	static GType row_type = 0;
-
-	if( !row_type ) {
-		static const GTypeInfo info = {
-			sizeof( RowClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) row_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Row ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) row_init,
-		};
-
-		row_type = g_type_register_static( TYPE_HEAPMODEL, 
-			"Row", &info, 0 );
-	}
-
-	return( row_type );
 }
 
 /* After making a row and adding it to model tree ... attach the symbol and

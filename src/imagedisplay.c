@@ -42,12 +42,12 @@
 
 #include "ip.h"
 
+G_DEFINE_TYPE( Imagedisplay, imagedisplay, GTK_TYPE_DRAWING_AREA ); 
+
 enum {
 	SIG_AREA_CHANGED,	/* xywh area changed, canvas cods */
 	SIG_LAST
 };
-
-static GtkDrawingAreaClass *parent_class = NULL;
 
 static guint imagedisplay_signals[SIG_LAST] = { 0 };
 
@@ -356,7 +356,7 @@ imagedisplay_destroy( GtkWidget *widget )
 	UNREF( id->top_gc );
 	UNREF( id->bottom_gc );
 
-	GTK_WIDGET_CLASS( parent_class )->destroy( widget );
+	GTK_WIDGET_CLASS( imagedisplay_parent_class )->destroy( widget );
 }
 
 /* Conversion has changed ... resize to fit.
@@ -408,7 +408,7 @@ imagedisplay_realize( GtkWidget *widget )
 
 	GdkColor fg, bg;
 
-	GTK_WIDGET_CLASS( parent_class )->realize( widget );
+	GTK_WIDGET_CLASS( imagedisplay_parent_class )->realize( widget );
 
 	gdk_window_set_back_pixmap( widget->window, NULL, FALSE );
 	gtk_widget_set_double_buffered( widget, FALSE );
@@ -429,8 +429,6 @@ static void
 imagedisplay_class_init( ImagedisplayClass *class )
 {
         GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
         widget_class->destroy = imagedisplay_destroy;
 	widget_class->expose_event = imagedisplay_expose;
@@ -461,31 +459,6 @@ imagedisplay_init( Imagedisplay *id )
 	id->back_gc = NULL;
 	id->top_gc = NULL;
 	id->bottom_gc = NULL;
-}
-
-GType
-imagedisplay_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( ImagedisplayClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) imagedisplay_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Imagedisplay ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) imagedisplay_init,
-		};
-
-		type = g_type_register_static( GTK_TYPE_DRAWING_AREA, 
-			"Imagedisplay", &info, 0 );
-	}
-
-	return( type );
 }
 
 /* Conversion has changed ... repaint everything.

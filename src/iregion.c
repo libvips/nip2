@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static iImageClass *parent_class = NULL;
+G_DEFINE_TYPE( iRegion, iregion, TYPE_IIMAGE ); 
 
 void
 iregion_instance_destroy( iRegionInstance *instance )
@@ -111,7 +111,7 @@ iregion_finalize( GObject *gobject )
 	 */
 	iregion_instance_destroy( &iregion->instance );
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( iregion_parent_class )->finalize( gobject );
 }
 
 static void *
@@ -365,7 +365,7 @@ iregion_update_model( Heapmodel *heapmodel )
 {
 	iRegion *iregion = IREGION( heapmodel );
 
-	if( HEAPMODEL_CLASS( parent_class )->update_model( heapmodel ) )
+	if( HEAPMODEL_CLASS( iregion_parent_class )->update_model( heapmodel ) )
 		return( heapmodel );
 
 	/* Update who-has-displays-on-what stuff.
@@ -453,8 +453,6 @@ iregion_class_init( iRegionClass *class )
 	HeapmodelClass *heapmodel_class = (HeapmodelClass *) class;
 	ClassmodelClass *classmodel_class = (ClassmodelClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	/* Create signals.
 	 */
 
@@ -492,27 +490,3 @@ iregion_init( iRegion *iregion )
 	iobject_set( IOBJECT( iregion ), CLASS_REGION, NULL );
 }
 
-GType
-iregion_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( iRegionClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) iregion_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( iRegion ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) iregion_init,
-		};
-
-		type = g_type_register_static( TYPE_IIMAGE, 
-			"iRegion", &info, 0 );
-	}
-
-	return( type );
-}

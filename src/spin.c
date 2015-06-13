@@ -124,10 +124,10 @@ spin_button_press_event_test( GtkWidget *widget, gpointer data )
 			sev->handled = TRUE;
 
 			if( GTK_ARROW( widget )->arrow_type == GTK_ARROW_UP )
-				g_signal_emit( GTK_OBJECT( sev->spin ), 
+				g_signal_emit( G_OBJECT( sev->spin ), 
 					spin_signals[UP_CLICK], 0 );
 			else
-				g_signal_emit( GTK_OBJECT( sev->spin ), 
+				g_signal_emit( G_OBJECT( sev->spin ), 
 					spin_signals[DOWN_CLICK], 0 );
 		}
 	}

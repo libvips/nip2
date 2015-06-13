@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ClassmodelClass *parent_class = NULL;
+G_DEFINE_TYPE( Expression, expression, TYPE_CLASSMODEL ); 
 
 /* Sub fn. of below.
  */
@@ -92,7 +92,7 @@ expression_save( Model *model, xmlNode *xnode )
 {
 	xmlNode *xthis;
 
-	if( !(xthis = MODEL_CLASS( parent_class )->save( model, xnode )) )
+	if( !(xthis = MODEL_CLASS( expression_parent_class )->save( model, xnode )) )
 		return( NULL );
 
 	if( !set_sprop( xthis, "caption", IOBJECT( model )->caption ) )
@@ -112,7 +112,7 @@ expression_load( Model *model,
 	if( get_sprop( xnode, "caption", caption, MAX_STRSIZE ) ) 
 		iobject_set( IOBJECT( model ), NULL, caption );
 
-	return( MODEL_CLASS( parent_class )->load( model, 
+	return( MODEL_CLASS( expression_parent_class )->load( model, 
 		state, parent, xnode ) );
 }
 
@@ -143,8 +143,6 @@ expression_class_init( ExpressionClass *class )
 	ModelClass *model_class = (ModelClass *) class;
 	ClassmodelClass *classmodel_class = (ClassmodelClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	/* Create signals.
 	 */
 
@@ -165,29 +163,4 @@ static void
 expression_init( Expression *expression )
 {
 	iobject_set( IOBJECT( expression ), CLASS_EXPRESSION, NULL );
-}
-
-GType
-expression_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( ExpressionClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) expression_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Expression ),
-			32,             /* n_pexpressionlocs */
-			(GInstanceInitFunc) expression_init,
-		};
-
-		type = g_type_register_static( TYPE_CLASSMODEL, 
-			"Expression", &info, 0 );
-	}
-
-	return( type );
 }

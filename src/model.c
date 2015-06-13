@@ -34,6 +34,8 @@
 
 #include "ip.h"
 
+G_DEFINE_TYPE( Model, model, TYPE_ICONTAINER );  
+
 /* Stuff from bison ... needed as we call the lexer directly to rewrite
  * expressions.
  */
@@ -49,8 +51,6 @@ enum {
 	SIG_DISPLAY,	/* Display on/off */
 	SIG_LAST
 };
-
-static iContainerClass *parent_class = NULL;
 
 static guint model_signals[SIG_LAST] = { 0 };
 
@@ -666,8 +666,6 @@ model_class_init( ModelClass *class )
 {
 	iObjectClass *object_class = IOBJECT_CLASS( class );
 
-	parent_class = g_type_class_peek_parent( class );
-
 	class->view_new = NULL;
 	class->edit = NULL;
 	class->scrollto = model_real_scrollto;
@@ -735,31 +733,6 @@ model_init( Model *model )
 	model->window_y = 0;
 	model->window_width = -1;	
 	model->window_height = 0;
-}
-
-GType
-model_get_type( void )
-{
-	static GType model_type = 0;
-
-	if( !model_type ) {
-		static const GTypeInfo info = {
-			sizeof( ModelClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) model_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Model ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) model_init,
-		};
-
-		model_type = g_type_register_static( TYPE_ICONTAINER, 
-			"Model", &info, 0 );
-	}
-
-	return( model_type );
 }
 
 void

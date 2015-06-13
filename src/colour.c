@@ -33,6 +33,8 @@
 
 #include "ip.h"
 
+G_DEFINE_TYPE( Colour, colour, TYPE_CLASSMODEL ); 
+
 /* Set of allowed colour_space strings. Do a case-insensitive match.
  */
 static const char *colour_colour_space[] = {
@@ -61,8 +63,6 @@ static const int colour_type[] = {
 	IM_TYPE_GREY16
 };
 
-static ClassmodelClass *parent_class = NULL;
-
 static void
 colour_finalize( GObject *gobject )
 {
@@ -71,7 +71,7 @@ colour_finalize( GObject *gobject )
 	IM_FREE( colour->colour_space );
 	vips_buf_destroy( &colour->caption );
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( colour_parent_class )->finalize( gobject );
 }
 
 /* Widgets for colour edit.
@@ -291,7 +291,7 @@ colour_update_model( Heapmodel *heapmodel )
 {
 	Colour *colour = COLOUR( heapmodel );
 
-	if( HEAPMODEL_CLASS( parent_class )->update_model( heapmodel ) )
+	if( HEAPMODEL_CLASS( colour_parent_class )->update_model( heapmodel ) )
 		return( heapmodel );
 
 	colour_refresh( colour );
@@ -317,8 +317,6 @@ colour_class_init( ColourClass *class )
 	ModelClass *model_class = (ModelClass *) class;
 	HeapmodelClass *heapmodel_class = (HeapmodelClass *) class;
 	ClassmodelClass *classmodel_class = (ClassmodelClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -352,27 +350,3 @@ colour_init( Colour *colour )
 	iobject_set( IOBJECT( colour ), CLASS_COLOUR, NULL );
 }
 
-GType
-colour_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( ColourClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) colour_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Colour ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) colour_init,
-		};
-
-		type = g_type_register_static( TYPE_CLASSMODEL, 
-			"Colour", &info, 0 );
-	}
-
-	return( type );
-}

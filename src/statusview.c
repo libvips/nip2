@@ -61,14 +61,14 @@ statusviewband_destroy( Statusview *sv )
 }
 
 static void
-statusview_destroy( GtkObject *object )
+statusview_destroy( GtkWidget *widget )
 {
 	Statusview *sv;
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_STATUSVIEW( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_STATUSVIEW( widget ) );
 
-	sv = STATUSVIEW( object );
+	sv = STATUSVIEW( widget );
 
 #ifdef DEBUG
 	printf( "statusview_destroy\n" );
@@ -76,7 +76,7 @@ statusview_destroy( GtkObject *object )
 
 	statusviewband_destroy( sv );
 
-	GTK_OBJECT_CLASS( statusview_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( statusview_parent_class )->destroy( widget );
 }
 
 /* Hide this statusview.
@@ -91,11 +91,11 @@ statusview_hide_cb( GtkWidget *menu, GtkWidget *host, Statusview *sv )
 static void
 statusview_class_init( StatusviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
 	GtkWidget *pane;
 
-	object_class->destroy = statusview_destroy;
+	widget_class->destroy = statusview_destroy;
 
 	/* Create signals.
 	 */

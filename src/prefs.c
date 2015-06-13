@@ -33,12 +33,12 @@
 #define DEBUG
  */
 
-static iDialogClass *parent_class = NULL;
+G_DEFINE_TYPE( Prefs, prefs, TYPE_IDIALOG ); 
 
 static void
-prefs_destroy( GtkObject *object )
+prefs_destroy( GtkWidget *widget )
 {
-	Prefs *prefs = PREFS( object );
+	Prefs *prefs = PREFS( widget );
 
 #ifdef DEBUG
 	printf( "prefs_destroy\n" );
@@ -64,7 +64,7 @@ prefs_destroy( GtkObject *object )
 	IM_FREE( prefs->caption_filter );
 	prefs->ws = NULL;
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( prefs_parent_class )->destroy( widget );
 }
 
 static void
@@ -79,7 +79,7 @@ prefs_build( GtkWidget *widget )
 
 	/* Call all builds in superclasses.
 	 */
-	IWINDOW_CLASS( parent_class )->build( widget );
+	IWINDOW_CLASS( prefs_parent_class )->build( widget );
 
 	work = IDIALOG( prefs )->work;
 
@@ -120,12 +120,10 @@ prefs_build( GtkWidget *widget )
 static void
 prefs_class_init( PrefsClass *class )
 {
-	GtkObjectClass *gobject_class = (GtkObjectClass *) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	iWindowClass *iwindow_class = (iWindowClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
-	gobject_class->destroy = prefs_destroy;
+	widget_class->destroy = prefs_destroy;
 
 	iwindow_class->build = prefs_build;
 
@@ -141,31 +139,6 @@ prefs_init( Prefs *prefs )
 {
 	prefs->ws = NULL;
 	prefs->destroy_sid = 0;
-}
-
-GType
-prefs_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( PrefsClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) prefs_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Prefs ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) prefs_init,
-		};
-
-		type = g_type_register_static( TYPE_IDIALOG, 
-			"Prefs", &info, 0 );
-	}
-
-	return( type );
 }
 
 static void

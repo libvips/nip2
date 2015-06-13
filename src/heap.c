@@ -46,7 +46,7 @@
 
 #include "ip.h"
 
-static iObjectClass *parent_class = NULL;
+G_DEFINE_TYPE( Heap, heap, TYPE_IOBJECT ); 
 
 static GSList *heap_all = NULL;
 
@@ -250,7 +250,7 @@ heap_dispose( GObject *gobject )
 
 	IM_FREEF( g_source_remove, heap->gc_tid );
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( heap_parent_class )->dispose( gobject );
 }
 
 static void
@@ -269,7 +269,7 @@ heap_finalize( GObject *gobject )
 
 	heap_all = g_slist_remove( heap_all, heap );
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( heap_parent_class )->finalize( gobject );
 }
 
 static void
@@ -299,7 +299,7 @@ heap_info( iObject *iobject, VipsBuf *buf )
 	vips_buf_appendf( buf, "mtable (Managed blocks) = %d pointers\n", 
 		g_hash_table_size( heap->mtable ) );
 
-	IOBJECT_CLASS( parent_class )->info( iobject, buf );
+	IOBJECT_CLASS( heap_parent_class )->info( iobject, buf );
 }
 
 /* Empty a heap block.
@@ -371,8 +371,6 @@ heap_class_init( HeapClass *class )
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
 	iObjectClass *iobject_class = IOBJECT_CLASS( class );
 
-	parent_class = g_type_class_peek_parent( class );
-
 	gobject_class->dispose = heap_dispose;
 	gobject_class->finalize = heap_finalize;
 
@@ -405,31 +403,6 @@ heap_init( Heap *heap )
 	heap->flush = FALSE;
 
 	heap_all = g_slist_prepend( heap_all, heap );
-}
-
-GType
-heap_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( HeapClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) heap_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Heap ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) heap_init,
-		};
-
-		type = g_type_register_static( TYPE_IOBJECT, 
-			"Heap", &info, 0 );
-	}
-
-	return( type );
 }
 
 static void

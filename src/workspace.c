@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ModelClass *parent_class = NULL;
+G_DEFINE_TYPE( Workspace, workspace, TYPE_MODEL ); 
 
 static GSList *workspace_all = NULL;
 
@@ -620,7 +620,7 @@ workspace_dispose( GObject *gobject )
 	UNREF( ws->local_kitg );
 	IDESTROY( ws->sym );
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( workspace_parent_class )->dispose( gobject );
 }
 
 static void
@@ -643,7 +643,7 @@ workspace_finalize( GObject *gobject )
 
 	workspace_all = g_slist_remove( workspace_all, ws );
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( workspace_parent_class )->finalize( gobject );
 }
 
 static void
@@ -668,7 +668,7 @@ workspace_changed( iObject *iobject )
 		ICONTAINER( wsg )->current == ICONTAINER( iobject ) )
 		iobject_changed( IOBJECT( wsg ) );
 
-	IOBJECT_CLASS( parent_class )->changed( iobject );
+	IOBJECT_CLASS( workspace_parent_class )->changed( iobject );
 }
 
 static void
@@ -677,7 +677,8 @@ workspace_child_add( iContainer *parent, iContainer *child, int pos )
 	Workspace *ws = WORKSPACE( parent );
 	Column *col = COLUMN( child );
 
-	ICONTAINER_CLASS( parent_class )->child_add( parent, child, pos );
+	ICONTAINER_CLASS( workspace_parent_class )->
+		child_add( parent, child, pos );
 
 	if( col->selected )
 		workspace_column_select( ws, col );
@@ -690,7 +691,8 @@ workspace_child_remove( iContainer *parent, iContainer *child )
 
 	workspace_set_modified( ws, TRUE );
 
-	ICONTAINER_CLASS( parent_class )->child_remove( parent, child );
+	ICONTAINER_CLASS( workspace_parent_class )->
+		child_remove( parent, child );
 }
 
 static void
@@ -705,7 +707,7 @@ workspace_current( iContainer *parent, iContainer *child )
 	if( col )
 		col->selected = TRUE;
 
-	ICONTAINER_CLASS( parent_class )->current( parent, child );
+	ICONTAINER_CLASS( workspace_parent_class )->current( parent, child );
 }
 
 static void
@@ -822,7 +824,8 @@ workspace_load( Model *model,
 	(void) get_iprop( xnode, "major", &ws->compat_major );
 	(void) get_iprop( xnode, "minor", &ws->compat_minor );
 
-	if( !MODEL_CLASS( parent_class )->load( model, state, parent, xnode ) )
+	if( !MODEL_CLASS( workspace_parent_class )->
+		load( model, state, parent, xnode ) )
 		return( FALSE );
 
 	return( TRUE );
@@ -835,7 +838,8 @@ workspace_save( Model *model, xmlNode *xnode )
 	Workspacegroup *wsg = workspace_get_workspacegroup( ws );
 	xmlNode *xthis;
 
-	if( !(xthis = MODEL_CLASS( parent_class )->save( model, xnode )) )
+	if( !(xthis = MODEL_CLASS( workspace_parent_class )->
+		save( model, xnode )) )
 		return( NULL );
 
 	if( !set_sprop( xthis, "view", workspacemode_to_char( ws->mode ) ) ||
@@ -880,7 +884,7 @@ workspace_empty( Model *model )
 	ws->area.width = 0;
 	ws->area.height = 0;
 
-	MODEL_CLASS( parent_class )->empty( model );
+	MODEL_CLASS( workspace_parent_class )->empty( model );
 }
 
 static void *
@@ -1045,8 +1049,6 @@ workspace_class_init( WorkspaceClass *class )
 	iContainerClass *icontainer_class = (iContainerClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	/* Create signals.
 	 */
 
@@ -1113,31 +1115,6 @@ workspace_init( Workspace *ws )
 	ws->local_kit = NULL;
 
 	workspace_all = g_slist_prepend( workspace_all, ws );
-}
-
-GType
-workspace_get_type( void )
-{
-	static GType workspace_type = 0;
-
-	if( !workspace_type ) {
-		static const GTypeInfo info = {
-			sizeof( WorkspaceClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) workspace_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Workspace ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) workspace_init,
-		};
-
-		workspace_type = g_type_register_static( TYPE_MODEL, 
-			"Workspace", &info, 0 );
-	}
-
-	return( workspace_type );
 }
 
 Workspace *

@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ValueClass *parent_class = NULL;
+G_DEFINE_TYPE( Clock, clock, TYPE_VALUE ); 
 
 static void
 clock_dispose( GObject *gobject )
@@ -47,7 +47,7 @@ clock_dispose( GObject *gobject )
 	IM_FREEF( g_source_remove, clock->recalc_timeout );
 	IM_FREEF( g_timer_destroy, clock->elapsed_timer );
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( clock_parent_class )->dispose( gobject );
 }
 
 static void
@@ -145,7 +145,7 @@ clock_update_model( Heapmodel *heapmodel )
 	printf( " interval=%g, value=%g\n", clock->interval, clock->value );
 #endif /*DEBUG*/
 
-	if( HEAPMODEL_CLASS( parent_class )->update_model( heapmodel ) )
+	if( HEAPMODEL_CLASS( clock_parent_class )->update_model( heapmodel ) )
 		return( heapmodel );
 
 	/* Milliseconds for the update timeout ... don't let it go under 100,
@@ -204,8 +204,6 @@ clock_class_init( ClockClass *class )
 	HeapmodelClass *heapmodel_class = (HeapmodelClass *) class;
 	ClassmodelClass *classmodel_class = (ClassmodelClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	/* Create signals.
 	 */
 
@@ -248,29 +246,4 @@ clock_init( Clock *clock )
         clock->recalc_timeout = 0;
 
 	iobject_set( IOBJECT( clock ), CLASS_CLOCK, NULL );
-}
-
-GType
-clock_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( ClockClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) clock_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Clock ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) clock_init,
-		};
-
-		type = g_type_register_static( TYPE_VALUE, 
-			"Clock", &info, 0 );
-	}
-
-	return( type );
 }

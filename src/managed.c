@@ -36,7 +36,7 @@
 #define DEBUG
  */
 
-static iContainerClass *parent_class = NULL;
+G_DEFINE_TYPE( Managed, managed, TYPE_ICONTAINER ); 
 
 #ifdef DEBUG_LEAK
 static GSList *managed_all = NULL;
@@ -128,7 +128,7 @@ managed_dispose( GObject *gobject )
 		(SListMapFn) managed_sub_remove, managed );
 	g_assert( !managed->sub );
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( managed_parent_class )->dispose( gobject );
 }
 
 /* Final death!
@@ -147,7 +147,7 @@ managed_finalize( GObject *gobject )
 	managed_all = g_slist_remove( managed_all, gobject );
 #endif /*DEBUG_LEAK*/
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( managed_parent_class )->finalize( gobject );
 }
 
 /* _info() is used by itext.c to display managed objects. Don't chain
@@ -172,8 +172,6 @@ managed_class_init( ManagedClass *class )
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
 	iObjectClass *iobject_class = IOBJECT_CLASS( class );
-
-	parent_class = g_type_class_peek_parent( class );
 
 	gobject_class->dispose = managed_dispose;
 	gobject_class->finalize = managed_finalize;
@@ -213,31 +211,6 @@ managed_init( Managed *managed )
 #ifdef DEBUG_LEAK
 	managed_all = g_slist_prepend( managed_all, managed );
 #endif /*DEBUG_LEAK*/
-}
-
-GType
-managed_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( ManagedClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) managed_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Managed ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) managed_init,
-		};
-
-		type = g_type_register_static( TYPE_ICONTAINER, 
-			"Managed", &info, 0 );
-	}
-
-	return( type );
 }
 
 /* From heap_gc() ... no heap pointers left, delete if there are no

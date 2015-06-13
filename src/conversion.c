@@ -33,6 +33,8 @@
 
 #include "ip.h"
 
+G_DEFINE_TYPE( Conversion, conversion, TYPE_MODEL );  
+
 /* Our signals. 
  */
 enum {
@@ -42,8 +44,6 @@ enum {
 };
 
 static guint conversion_signals[SIG_LAST] = { 0 };
-
-static ModelClass *parent_class = NULL;
 
 /* All active conversions.
  */
@@ -88,7 +88,7 @@ conversion_dispose( GObject *gobject )
 	FREESID( conv->changed_sid, conv->ii );
 	FREESID( conv->area_changed_sid, conv->ii );
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( conversion_parent_class )->dispose( gobject );
 }
 
 static void
@@ -117,7 +117,7 @@ conversion_finalize( GObject *gobject )
 	MANAGED_UNREF( conv->visual_ii );
 	MANAGED_UNREF( conv->ii );
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( conversion_parent_class )->finalize( gobject );
 }
 
 /* Make the visualisation image ... eg. we im_histplot histograms, and we
@@ -1013,7 +1013,7 @@ conversion_changed( iObject *iobject )
 	else if( rebuild_repaint )
 		conversion_rebuild_repaint( conv );
 
-	IOBJECT_CLASS( parent_class )->changed( iobject );
+	IOBJECT_CLASS( conversion_parent_class )->changed( iobject );
 }
 
 static void
@@ -1021,8 +1021,6 @@ conversion_class_init( ConversionClass *class )
 {
 	GObjectClass *gobject_class = (GObjectClass *) class;
 	iObjectClass *iobject_class = (iObjectClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	gobject_class->dispose = conversion_dispose;
 	gobject_class->finalize = conversion_finalize;
@@ -1091,31 +1089,6 @@ conversion_init( Conversion *conv )
 	conv->type = TRUE;
 
 	conversion_all = g_slist_prepend( conversion_all, conv );
-}
-
-GType
-conversion_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( ConversionClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) conversion_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Conversion ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) conversion_init,
-		};
-
-		type = g_type_register_static( TYPE_MODEL, 
-			"Conversion", &info, 0 );
-	}
-
-	return( type );
 }
 
 static void

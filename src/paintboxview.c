@@ -40,14 +40,14 @@ static GtkWidget *paintboxview_menu = NULL;
 G_DEFINE_TYPE( Paintboxview, paintboxview, GTK_TYPE_FRAME ); 
 
 static void
-paintboxview_destroy( GtkObject *object )
+paintboxview_destroy( GtkWidget *widget )
 {
 	Paintboxview *pbv;
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_PAINTBOXVIEW( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_PAINTBOXVIEW( widget ) );
 
-	pbv = PAINTBOXVIEW( object );
+	pbv = PAINTBOXVIEW( widget );
 
 #ifdef DEBUG
 	printf( "paintboxview_destroy: %p\n", pbv );
@@ -58,7 +58,7 @@ paintboxview_destroy( GtkObject *object )
 	FREESID( pbv->ii_undo_changed_sid, pbv->ii );
 	FREESID( pbv->ii_destroy_sid, pbv->ii );
 
-	GTK_OBJECT_CLASS( paintboxview_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( paintboxview_parent_class )->destroy( widget );
 }
 
 static void
@@ -90,12 +90,11 @@ paintboxview_hide_cb( GtkWidget *menu, GtkWidget *host, Paintboxview *pbv )
 static void
 paintboxview_class_init( PaintboxviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
 	GtkWidget *pane;
 
-	object_class->destroy = paintboxview_destroy;
+	widget_class->destroy = paintboxview_destroy;
 	widget_class->realize = paintboxview_realize;
 
 	/* Create signals.

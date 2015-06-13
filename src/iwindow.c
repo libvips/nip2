@@ -555,9 +555,9 @@ iwindow_finalize( GObject *gobject )
 }
 
 static void
-iwindow_destroy( GtkObject *gobject )
+iwindow_destroy( GtkWidget *widget )
 {
-	iWindow *iwnd = IWINDOW( gobject );
+	iWindow *iwnd = IWINDOW( widget );
 
 #ifdef DEBUG
 	printf( "iwindow_destroy: %s\n", iwnd->title );
@@ -574,7 +574,7 @@ iwindow_destroy( GtkObject *gobject )
 	 */
 	iwnd->destroy = TRUE;
 
-	GTK_OBJECT_CLASS( iwindow_parent_class )->destroy( gobject );
+	GTK_WIDGET_CLASS( iwindow_parent_class )->destroy( widget );
 }
 
 static void
@@ -799,15 +799,13 @@ static void
 iwindow_class_init( iWindowClass *class )
 {
 	GObjectClass *object_class = (GObjectClass *) class;
-	GtkObjectClass *gobject_class = (GtkObjectClass *) class;
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
 	/* Init methods.
 	 */
 	object_class->finalize = iwindow_finalize;
 
-	gobject_class->destroy = iwindow_destroy;
-
+	widget_class->destroy = iwindow_destroy;
 	widget_class->delete_event = iwindow_delete_event;
 	widget_class->configure_event = iwindow_configure_event;
 

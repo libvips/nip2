@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ClassmodelClass *parent_class = NULL;
+G_DEFINE_TYPE( Pathname, pathname, TYPE_CLASSMODEL ); 
 
 static void
 pathname_dispose( GObject *gobject )
@@ -46,7 +46,7 @@ pathname_dispose( GObject *gobject )
 
 	IM_FREE( pathname->value );
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( pathname_parent_class )->dispose( gobject );
 }
 
 static View *
@@ -62,7 +62,8 @@ pathname_update_model( Heapmodel *heapmodel )
 	printf( "pathname_update_model\n" );
 #endif /*DEBUG*/
 
-	if( HEAPMODEL_CLASS( parent_class )->update_model( heapmodel ) )
+	if( HEAPMODEL_CLASS( pathname_parent_class )->
+		update_model( heapmodel ) )
 		return( heapmodel );
 
 	return( NULL );
@@ -86,8 +87,6 @@ pathname_class_init( PathnameClass *class )
 	ModelClass *model_class = (ModelClass *) class;
 	HeapmodelClass *heapmodel_class = (HeapmodelClass *) class;
 	ClassmodelClass *classmodel_class = (ClassmodelClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -117,29 +116,4 @@ pathname_init( Pathname *pathname )
 	IM_SETSTR( pathname->value, "no-file" );
 
 	iobject_set( IOBJECT( pathname ), CLASS_PATHNAME, NULL );
-}
-
-GType
-pathname_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( PathnameClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) pathname_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Pathname ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) pathname_init,
-		};
-
-		type = g_type_register_static( TYPE_CLASSMODEL, 
-			"Pathname", &info, 0 );
-	}
-
-	return( type );
 }

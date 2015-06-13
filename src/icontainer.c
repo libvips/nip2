@@ -35,6 +35,8 @@
 
 #include "ip.h"
 
+G_DEFINE_TYPE( iContainer, icontainer, TYPE_IOBJECT ); 
+
 /* Our signals. 
  */
 enum {
@@ -46,8 +48,6 @@ enum {
 	SIG_CHILD_ATTACH,
 	SIG_LAST
 };
-
-static iObjectClass *parent_class = NULL;
 
 static guint icontainer_signals[SIG_LAST] = { 0 };
 
@@ -535,7 +535,7 @@ icontainer_dispose( GObject *gobject )
 		(icontainer_map_fn) icontainer_child_remove, NULL, NULL );
 	icontainer_child_remove( icontainer );
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( icontainer_parent_class )->dispose( gobject );
 }
 
 static void
@@ -550,7 +550,7 @@ icontainer_finalize( GObject *gobject )
 
 	IM_FREEF( g_hash_table_destroy, icontainer->child_hash );
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( icontainer_parent_class )->finalize( gobject );
 }
 
 static void
@@ -560,7 +560,7 @@ icontainer_info( iObject *iobject, VipsBuf *buf )
 
 	vips_buf_appendf( buf, "pos = \"%d\"\n", icontainer->pos );
 
-	IOBJECT_CLASS( parent_class )->info( iobject, buf );
+	IOBJECT_CLASS( icontainer_parent_class )->info( iobject, buf );
 }
 
 static void
@@ -755,8 +755,6 @@ icontainer_class_init( iContainerClass *class )
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
 	iObjectClass *iobject_class = IOBJECT_CLASS( class );
 
-	parent_class = g_type_class_peek_parent( class );
-
 	gobject_class->dispose = icontainer_dispose;
 	gobject_class->finalize = icontainer_finalize;
 
@@ -840,31 +838,6 @@ icontainer_init( iContainer *icontainer )
 	icontainer->pos = -1;
 	icontainer->parent = NULL;
 	icontainer->child_hash = NULL;
-}
-
-GType
-icontainer_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( iContainerClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) icontainer_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( iContainer ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) icontainer_init,
-		};
-
-		type = g_type_register_static( TYPE_IOBJECT, 
-			"iContainer", &info, 0 );
-	}
-
-	return( type );
 }
 
 /* Put the container into lookup-by-child-name mode.

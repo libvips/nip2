@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ClassmodelClass *parent_class = NULL;
+G_DEFINE_TYPE( Fontname, fontname, TYPE_CLASSMODEL ); 
 
 static void
 fontname_finalize( GObject *gobject )
@@ -42,7 +42,7 @@ fontname_finalize( GObject *gobject )
 
 	IM_FREE( fontname->value );
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( fontname_parent_class )->finalize( gobject );
 }
 
 static View *
@@ -69,8 +69,6 @@ fontname_class_init( FontnameClass *class )
 	ModelClass *model_class = (ModelClass *) class;
 	ClassmodelClass *classmodel_class = (ClassmodelClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	gobject_class->finalize = fontname_finalize;
 
 	model_class->view_new = fontname_view_new;
@@ -92,29 +90,4 @@ fontname_init( Fontname *fontname )
 	IM_SETSTR( fontname->value, "Sans" );
 
 	iobject_set( IOBJECT( fontname ), CLASS_FONTNAME, NULL );
-}
-
-GType
-fontname_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( FontnameClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) fontname_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Fontname ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) fontname_init,
-		};
-
-		type = g_type_register_static( TYPE_CLASSMODEL, 
-			"Fontname", &info, 0 );
-	}
-
-	return( type );
 }

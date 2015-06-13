@@ -40,7 +40,7 @@
 G_DEFINE_TYPE( Prefworkspaceview, prefworkspaceview, TYPE_VIEW ); 
 
 static void
-prefworkspaceview_destroy( GtkObject *object )
+prefworkspaceview_destroy( GtkWidget *widget )
 {
 	Prefworkspaceview *pwview;
 
@@ -48,16 +48,16 @@ prefworkspaceview_destroy( GtkObject *object )
 	printf( "prefworkspaceview_destroy\n" );
 #endif /*DEBUG*/
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_PREFWORKSPACEVIEW( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_PREFWORKSPACEVIEW( widget ) );
 
-	pwview = PREFWORKSPACEVIEW( object );
+	pwview = PREFWORKSPACEVIEW( widget );
 
 	/* Instance destroy.
 	 */
 	IM_FREE( pwview->caption_filter );
 
-	GTK_OBJECT_CLASS( prefworkspaceview_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( prefworkspaceview_parent_class )->destroy( widget );
 }
 
 static void
@@ -89,10 +89,10 @@ prefworkspaceview_display( View *parent, Model *child )
 static void
 prefworkspaceview_class_init( PrefworkspaceviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	GtkWidgetClass *Widget_class = (GtkWidgetClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
 
-	object_class->destroy = prefworkspaceview_destroy;
+	widget_class->destroy = prefworkspaceview_destroy;
 
 	view_class->child_add = prefworkspaceview_child_add;
 	view_class->display = prefworkspaceview_display;

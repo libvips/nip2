@@ -35,43 +35,17 @@
 
 #include "ip.h"
 
-static GtkToggleButtonClass *popupbutton_parent_class = NULL;
+G_DEFINE_TYPE( Popupbutton, popupbutton, GTK_TYPE_TOGGLE_BUTTON ); 
 
 static void
 popupbutton_class_init( PopupbuttonClass *class )
 {
-	popupbutton_parent_class = g_type_class_peek_parent( class );
 }
 
 static void
 popupbutton_init( Popupbutton *popupbutton )
 {
 	popupbutton->menu = NULL;
-}
-
-GType
-popupbutton_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( PopupbuttonClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) popupbutton_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Popupbutton ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) popupbutton_init,
-		};
-
-		type = g_type_register_static( GTK_TYPE_TOGGLE_BUTTON, 
-			"Popupbutton", &info, 0 );
-	}
-
-	return( type );
 }
 
 static void

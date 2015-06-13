@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ClassmodelClass *parent_class = NULL;
+G_DEFINE_TYPE( iRegiongroup, iregiongroup, TYPE_CLASSMODEL ); 
 
 static void *
 iregiongroup_update_model( Heapmodel *heapmodel )
@@ -44,7 +44,8 @@ iregiongroup_update_model( Heapmodel *heapmodel )
 	printf( "\n" );
 #endif /*DEBUG*/
 
-	if( HEAPMODEL_CLASS( parent_class )->update_model( heapmodel ) )
+	if( HEAPMODEL_CLASS( iregiongroup_parent_class )->
+		update_model( heapmodel ) )
 		return( heapmodel );
 
 	/* Only display most-derived classes. Don't display "this".
@@ -69,8 +70,6 @@ iregiongroup_class_init( iRegiongroupClass *class )
 	ModelClass *model_class = (ModelClass *) class;
 	HeapmodelClass *heapmodel_class = (HeapmodelClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	/* Create signals.
 	 */
 
@@ -87,31 +86,6 @@ iregiongroup_init( iRegiongroup *iregiongroup )
 	/* Display turned on in _update_model() above.
 	 */
 	MODEL( iregiongroup )->display = FALSE;
-}
-
-GType
-iregiongroup_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( iRegiongroupClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) iregiongroup_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( iRegiongroup ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) iregiongroup_init,
-		};
-
-		type = g_type_register_static( TYPE_CLASSMODEL, 
-			"iRegiongroup", &info, 0 );
-	}
-
-	return( type );
 }
 
 iRegiongroup *

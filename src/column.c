@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static FilemodelClass *parent_class = NULL;
+G_DEFINE_TYPE( Column, column, TYPE_FILEMODEL ); 
 
 /* Offset for this column load/save.
  */
@@ -90,7 +90,7 @@ column_finalize( GObject *gobject )
 		column_last_new = NULL;
 	IM_FREEF( g_source_remove, col->scrollto_timeout );
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( column_parent_class )->finalize( gobject );
 }
 
 /* Select all things in a column.
@@ -114,7 +114,7 @@ column_child_add( iContainer *parent, iContainer *child, int pos )
 {
 	Column *col = COLUMN( parent );
 
-	ICONTAINER_CLASS( parent_class )->child_add( parent, child, pos );
+	ICONTAINER_CLASS( column_parent_class )->child_add( parent, child, pos );
 
 	/* Update our context.
 	 */
@@ -128,7 +128,7 @@ column_child_remove( iContainer *parent, iContainer *child )
 
 	workspace_set_modified( col->ws, TRUE );
 
-	ICONTAINER_CLASS( parent_class )->child_remove( parent, child );
+	ICONTAINER_CLASS( column_parent_class )->child_remove( parent, child );
 }
 
 static Workspace *
@@ -144,7 +144,7 @@ column_parent_add( iContainer *child )
 
 	g_assert( IS_WORKSPACE( child->parent ) );
 
-	ICONTAINER_CLASS( parent_class )->parent_add( child );
+	ICONTAINER_CLASS( column_parent_class )->parent_add( child );
 
 	g_assert( IS_WORKSPACE( child->parent ) );
 
@@ -172,7 +172,7 @@ column_save( Model *model, xmlNode *xnode )
 
 	xmlNode *xthis;
 
-	if( !(xthis = MODEL_CLASS( parent_class )->save( model, xnode )) )
+	if( !(xthis = MODEL_CLASS( column_parent_class )->save( model, xnode )) )
 		return( NULL );
 
 	/* Save sform for backwards compat with nip 7.8 ... now a workspace
@@ -254,7 +254,7 @@ column_load( Model *model,
 
 	column_set_last_new( col );
 
-	return( MODEL_CLASS( parent_class )->load( model, 
+	return( MODEL_CLASS( column_parent_class )->load( model, 
 		state, parent, xnode ) );
 }
 
@@ -266,8 +266,6 @@ column_class_init( ColumnClass *class )
 	iContainerClass *icontainer_class = (iContainerClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 	FilemodelClass *filemodel_class = (FilemodelClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	gobject_class->finalize = column_finalize;
 
@@ -311,31 +309,6 @@ column_init( Column *col )
 
         col->next = 1;
         col->last_select = NULL;
-}
-
-GType
-column_get_type( void )
-{
-	static GType column_type = 0;
-
-	if( !column_type ) {
-		static const GTypeInfo info = {
-			sizeof( ColumnClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) column_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Column ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) column_init,
-		};
-
-		column_type = g_type_register_static( TYPE_FILEMODEL, 
-			"Column", &info, 0 );
-	}
-
-	return( column_type );
 }
 
 static gint

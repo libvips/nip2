@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static HeapmodelClass *parent_class = NULL;
+G_DEFINE_TYPE( Subcolumn, subcolumn, TYPE_HEAPMODEL ); 
 
 static gboolean
 subcolumn_row_pred_none( Row *row )
@@ -127,7 +127,7 @@ subcolumn_dispose( GObject *gobject )
 	scol->this = NULL;
 	scol->super = NULL;
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( subcolumn_parent_class )->dispose( gobject );
 }
 
 /* Stuff we track during class instance display update.
@@ -378,7 +378,8 @@ subcolumn_new_heap( Heapmodel *heapmodel, PElement *root )
 	if( !scol->is_top && !subcolumn_class_new_heap( scol, root ) )
 		return( scol );
 
-	return( HEAPMODEL_CLASS( parent_class )->new_heap( heapmodel, root ) );
+	return( HEAPMODEL_CLASS( subcolumn_parent_class )->
+		new_heap( heapmodel, root ) );
 }
 
 static void
@@ -401,7 +402,8 @@ subcolumn_child_add( iContainer *parent, iContainer *child, int pos )
 	if( strcmp( name, MEMBER_SUPER ) == 0 ) 
 		scol->super = row;
 
-	ICONTAINER_CLASS( parent_class )->child_add( parent, child, pos );
+	ICONTAINER_CLASS( subcolumn_parent_class )->
+		child_add( parent, child, pos );
 }
 
 static void
@@ -410,7 +412,8 @@ subcolumn_child_remove( iContainer *parent, iContainer *child )
 	Subcolumn *scol = SUBCOLUMN( parent );
 	Row *row = ROW( child );
 
-	ICONTAINER_CLASS( parent_class )->child_remove( parent, child );
+	ICONTAINER_CLASS( subcolumn_parent_class )->
+		child_remove( parent, child );
 
 	if( scol->this == row )
 		scol->this = NULL;
@@ -481,7 +484,7 @@ subcolumn_parent_add( iContainer *child )
 {
 	Subcolumn *scol = SUBCOLUMN( child );
 
-	ICONTAINER_CLASS( parent_class )->parent_add( child );
+	ICONTAINER_CLASS( subcolumn_parent_class )->parent_add( child );
 
 	g_assert( IS_COLUMN( child->parent ) || IS_RHS( child->parent ) );
 	g_assert( !IS_COLUMN( child->parent ) || 
@@ -529,7 +532,7 @@ subcolumn_display( Model *model, gboolean display )
 	printf( " %d\n", display ); 
 	 */
 
-	MODEL_CLASS( parent_class )->display( model, display );
+	MODEL_CLASS( subcolumn_parent_class )->display( model, display );
 }
 
 static gboolean
@@ -543,7 +546,8 @@ subcolumn_load( Model *model,
 	if( !get_iprop( xnode, "vislevel", &scol->vislevel ) )
 		return( FALSE );
 
-	if( !MODEL_CLASS( parent_class )->load( model, state, parent, xnode ) )
+	if( !MODEL_CLASS( subcolumn_parent_class )->
+		load( model, state, parent, xnode ) )
 		return( FALSE );
 
 	return( TRUE );
@@ -556,7 +560,8 @@ subcolumn_save( Model *model, xmlNode *xnode )
 
 	xmlNode *xthis;
 
-	if( !(xthis = MODEL_CLASS( parent_class )->save( model, xnode )) )
+	if( !(xthis = MODEL_CLASS( subcolumn_parent_class )->
+		save( model, xnode )) )
 		return( NULL );
 
 	if( !set_iprop( xthis, "vislevel", scol->vislevel ) )
@@ -572,8 +577,6 @@ subcolumn_class_init( SubcolumnClass *class )
 	iContainerClass *icontainer_class = (iContainerClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 	HeapmodelClass *heapmodel_class = (HeapmodelClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -618,31 +621,6 @@ subcolumn_init( Subcolumn *scol )
 
 	scol->this = NULL;
 	scol->super = NULL;
-}
-
-GType
-subcolumn_get_type( void )
-{
-	static GType subcolumn_type = 0;
-
-	if( !subcolumn_type ) {
-		static const GTypeInfo info = {
-			sizeof( SubcolumnClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) subcolumn_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Subcolumn ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) subcolumn_init,
-		};
-
-		subcolumn_type = g_type_register_static( TYPE_HEAPMODEL, 
-			"Subcolumn", &info, 0 );
-	}
-
-	return( subcolumn_type );
 }
 
 static void

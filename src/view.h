@@ -35,7 +35,7 @@
 #define IS_VIEW_CLASS( klass ) \
 	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_VIEW ))
 #define VIEW_GET_CLASS( obj ) \
-	(GTK_CHECK_GET_CLASS( (obj), TYPE_VIEW, ViewClass ))
+	(G_TYPE_INSTANCE_GET_CLASS( (obj), TYPE_VIEW, ViewClass ))
 
 /* We track all of the children of our model, listening to "changed", so we
  * can lazily add or remove child views of us as the model requests.

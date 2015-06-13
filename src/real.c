@@ -33,13 +33,11 @@
 
 #include "ip.h"
 
-static ValueClass *parent_class = NULL;
+G_DEFINE_TYPE( Real, real, TYPE_VALUE ); 
 
 static void
 real_class_init( RealClass *class )
 {
-	parent_class = g_type_class_peek_parent( class );
-
 	/* Create signals.
 	 */
 
@@ -50,29 +48,4 @@ static void
 real_init( Real *real )
 {
 	iobject_set( IOBJECT( real ), CLASS_REAL, NULL );
-}
-
-GType
-real_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( RealClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) real_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Real ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) real_init,
-		};
-
-		type = g_type_register_static( TYPE_VALUE, 
-			"Real", &info, 0 );
-	}
-
-	return( type );
 }

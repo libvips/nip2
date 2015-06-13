@@ -40,29 +40,27 @@
 G_DEFINE_TYPE( Preview, preview, TYPE_IMAGEDISPLAY ); 
 
 static void
-preview_destroy( GtkObject *object )
+preview_destroy( GtkWidget *widget )
 {
 	Preview *preview;
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_PREVIEW( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_PREVIEW( widget ) );
 
-	preview = PREVIEW( object );
+	preview = PREVIEW( widget );
 
 	UNREF( preview->conv );
 	IM_FREE( preview->filename );
 
-	GTK_OBJECT_CLASS( preview_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( preview_parent_class )->destroy( widget );
 }
 
 static void
 preview_class_init( PreviewClass *class )
 {
-	GtkObjectClass *object_class;
+	GtkWidgetClass *object_class = (GtkWidgetClass *) class;
 
-	object_class = (GtkObjectClass *) class;
-
-	object_class->destroy = preview_destroy;
+	widget_class->destroy = preview_destroy;
 }
 
 static void

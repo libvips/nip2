@@ -49,12 +49,12 @@ static GtkTargetEntry rowview_target_table[] = {
 static GtkWidget *rowview_popup_menu = NULL;
 
 static void 
-rowview_destroy( GtkObject *object )
+rowview_destroy( GtkWidget *widget )
 {
 	Rowview *rview;
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_ROWVIEW( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_ROWVIEW( widget ) );
 
 	rview = ROWVIEW( object );
 
@@ -73,7 +73,7 @@ rowview_destroy( GtkObject *object )
 	DESTROY_GTK( rview->spin );
 	DESTROY_GTK( rview->led );
 
-	GTK_OBJECT_CLASS( rowview_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( rowview_parent_class )->destroy( widget );
 }
 
 static void
@@ -552,7 +552,7 @@ rowview_child_remove( View *parent, View *child )
 static void
 rowview_class_init( RowviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
 
@@ -563,7 +563,7 @@ rowview_class_init( RowviewClass *class )
 
 	/* Init methods.
 	 */
-	object_class->destroy = rowview_destroy;
+	widget_class->destroy = rowview_destroy;
 
 	vobject_class->refresh = rowview_refresh;
 

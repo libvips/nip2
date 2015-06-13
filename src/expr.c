@@ -41,14 +41,14 @@
 
 #include "ip.h"
 
+G_DEFINE_TYPE( Expr, expr, TYPE_ICONTAINER );  
+
 /* Our signals. 
  */
 enum {
 	SIG_NEW_VALUE,		/* new value for root */
 	SIG_LAST
 };
-
-static iContainerClass *parent_class = NULL;
 
 static guint expr_signals[SIG_LAST] = { 0 };
 
@@ -335,7 +335,7 @@ expr_dispose( GObject *gobject )
 		}
 	}
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( expr_parent_class )->dispose( gobject );
 }
 
 static void
@@ -371,8 +371,6 @@ expr_class_init( ExprClass *class )
 {
 	GObjectClass *gobject_class = (GObjectClass *) class;
 	iObjectClass *iobject_class = (iObjectClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -411,31 +409,6 @@ expr_init( Expr *expr )
 	expr->err = FALSE;
 	expr->error_top = NULL;
 	expr->error_sub = NULL;
-}
-
-GType
-expr_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( ExprClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) expr_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Expr ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) expr_init,
-		};
-
-		type = g_type_register_static( TYPE_ICONTAINER, 
-			"Expr", &info, 0 );
-	}
-
-	return( type );
 }
 
 Expr *

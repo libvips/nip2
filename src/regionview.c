@@ -581,19 +581,19 @@ regionview_detach( Regionview *regionview )
 }
 
 static void
-regionview_destroy( GtkObject *object )
+regionview_destroy( GtkWidget *widget )
 {
 	Regionview *regionview;
 	Imagedisplay *id;
 
 #ifdef DEBUG_MAKE
-	printf( "regionview_destroy: %p\n", object );
+	printf( "regionview_destroy: %p\n", widget );
 #endif /*DEBUG_MAKE*/
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_REGIONVIEW( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_REGIONVIEW( widget ) );
 
-	regionview = REGIONVIEW( object );
+	regionview = REGIONVIEW( widget );
 
 	if( !regionview->first ) 
 		regionview_queue_draw( regionview ); 
@@ -631,7 +631,7 @@ regionview_destroy( GtkObject *object )
 		regionview->classmodel = NULL;
 	}
 
-	GTK_OBJECT_CLASS( regionview_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( regionview_parent_class )->destroy( widget );
 }
 
 /* Compute the label geometry.
@@ -963,12 +963,12 @@ regionview_remove_cb( GtkWidget *menu,
 static void
 regionview_class_init( RegionviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 
 	GtkWidget *pane;
 
-	object_class->destroy = regionview_destroy;
+	widget_class->destroy = regionview_destroy;
 
 	/* Create signals.
 	 */
@@ -2005,7 +2005,7 @@ regionview_setup( Regionview *regionview,
 	regionview->destroy_sid = g_signal_connect_object( 
 		ip->id, "destroy", 
 		G_CALLBACK( gtk_widget_destroy ), 
-		GTK_OBJECT( regionview ) );
+		G_OBJECT( regionview ) );
 	regionview->event_sid = g_signal_connect( 
 		ip->id, "event",
 		G_CALLBACK( regionview_event_cb ), regionview );

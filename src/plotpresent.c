@@ -36,7 +36,7 @@
 
 #ifdef HAVE_LIBGOFFICE
 
-static GtkBinClass *parent_class = NULL;
+G_DEFINE_TYPE( Plotpresent, plotpresent, GTK_TYPE_BIN ); 
 
 enum {
 	SIG_MOUSE_MOVE,		/* mose drag, axies cods */
@@ -53,14 +53,14 @@ plotpresent_mouse_move( Plotpresent *plotpresent, double x, double y )
 }
 
 static void
-plotpresent_destroy( GtkObject *object )
+plotpresent_destroy( GtkWidget *widget )
 {
 	Plotpresent *plotpresent;
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_PLOTPRESENT( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_PLOTPRESENT( widget ) );
 
-	plotpresent = PLOTPRESENT( object );
+	plotpresent = PLOTPRESENT( widget );
 
 #ifdef DEBUG
 	printf( "plotpresent_destroy: %p\n", plotpresent );
@@ -70,7 +70,7 @@ plotpresent_destroy( GtkObject *object )
 	 */
 	UNREF( plotpresent->grend );
 
-	GTK_OBJECT_CLASS( parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( plotpresent_parent_class )->destroy( widget );
 }
 
 static void
@@ -155,13 +155,9 @@ plotpresent_motion_notify_event( GtkWidget *widget, GdkEventMotion *event )
 static void
 plotpresent_class_init( PlotpresentClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
-	object_class->destroy = plotpresent_destroy;
-
+	widget_class->destroy = plotpresent_destroy;
         widget_class->size_request = plotpresent_size_request;
 	widget_class->size_allocate = plotpresent_size_allocate;
 
@@ -207,31 +203,6 @@ plotpresent_init( Plotpresent *plotpresent )
 	 */
 
 	plotpresent->grend = gog_renderer_new( plotpresent->ggraph );
-}
-
-GType
-plotpresent_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( PlotpresentClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) plotpresent_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Plotpresent ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) plotpresent_init,
-		};
-
-		type = g_type_register_static( GTK_TYPE_BIN, 
-			"Plotpresent", &info, 0 );
-	}
-
-	return( type );
 }
 
 static void

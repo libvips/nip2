@@ -406,18 +406,18 @@ workspaceview_scroll_background( Workspaceview *wview, int u, int v )
 }
 
 static void
-workspaceview_destroy( GtkObject *object )
+workspaceview_destroy( GtkWidget *widget )
 {
 	Workspaceview *wview;
 
 #ifdef DEBUG
-	printf( "workspaceview_destroy: %p\n", object );
+	printf( "workspaceview_destroy: %p\n", widget );
 #endif /*DEBUG*/
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_WORKSPACEVIEW( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_WORKSPACEVIEW( widget ) );
 
-	wview = WORKSPACEVIEW( object );
+	wview = WORKSPACEVIEW( widget );
 
 	/* Instance destroy.
 	 */
@@ -426,7 +426,7 @@ workspaceview_destroy( GtkObject *object )
 	FREESID( wview->watch_changed_sid, main_watchgroup );
 	DESTROY_GTK( wview->popup );
 
-	GTK_OBJECT_CLASS( workspaceview_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( workspaceview_parent_class )->destroy( widget );
 }
 
 static void
@@ -917,13 +917,11 @@ workspaceview_layout( View *view )
 static void
 workspaceview_class_init( WorkspaceviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
 
-	object_class->destroy = workspaceview_destroy;
-
+	widget_class->destroy = workspaceview_destroy;
 	widget_class->realize = workspaceview_realize;
 	widget_class->drag_data_received = workspaceview_drag_data_received;
 

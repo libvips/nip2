@@ -33,7 +33,7 @@
 #define DEBUG
  */
 
-static ManagedClass *parent_class = NULL;
+G_DEFINE_TYPE( Managedstring, managedstring, TYPE_MANAGED ); 
 
 /* Track all instances here. 
  */
@@ -72,7 +72,7 @@ managedstring_finalize( GObject *gobject )
 	g_hash_table_remove( managedstring_all, managedstring );
 	IM_FREE( managedstring->string );
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( managedstring_parent_class )->finalize( gobject );
 }
 
 static void
@@ -83,7 +83,7 @@ managedstring_info( iObject *iobject, VipsBuf *buf )
 	vips_buf_appendf( buf, "managedstring->string = \"%s\"\n", 
 		managedstring->string );
 
-	IOBJECT_CLASS( parent_class )->info( iobject, buf );
+	IOBJECT_CLASS( managedstring_parent_class )->info( iobject, buf );
 }
 
 /* Hash and equality for a managed string: we need the string and the heap to
@@ -118,8 +118,6 @@ managedstring_class_init( ManagedstringClass *class )
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
 	iObjectClass *iobject_class = IOBJECT_CLASS( class );
 
-	parent_class = g_type_class_peek_parent( class );
-
 	gobject_class->finalize = managedstring_finalize;
 
 	iobject_class->info = managedstring_info;
@@ -141,30 +139,6 @@ managedstring_init( Managedstring *managedstring )
 	managedstring->string = NULL;
 	managedstring->e.type = ELEMENT_NOVAL;
 	managedstring->e.ele = NULL;
-}
-
-GType
-managedstring_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( ManagedstringClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) managedstring_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Managedstring ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) managedstring_init,
-		}; 
-		type = g_type_register_static( TYPE_MANAGED, 
-			"Managedstring", &info, 0 );
-	}
-
-	return( type );
 }
 
 static Managedstring *

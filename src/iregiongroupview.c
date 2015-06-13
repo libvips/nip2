@@ -54,25 +54,25 @@ iregiongroupview_get_classmodel( iRegiongroupview *iregiongroupview )
 }
 
 static void
-iregiongroupview_destroy( GtkObject *object )
+iregiongroupview_destroy( GtkWidget *widget )
 {
 	iRegiongroupview *iregiongroupview;
 
 #ifdef DEBUG
-	printf( "iregiongroupview_destroy: %p\n", object );
+	printf( "iregiongroupview_destroy: %p\n", widget );
 #endif /*DEBUG*/
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_IREGIONGROUPVIEW( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_IREGIONGROUPVIEW( widget ) );
 
-	iregiongroupview = IREGIONGROUPVIEW( object );
+	iregiongroupview = IREGIONGROUPVIEW( widget );
 
 	/* Destroy all regionviews we manage.
 	 */
 	slist_map( iregiongroupview->classmodel->views, 
 		(SListMapFn) widget_destroy, NULL );
 
-	GTK_OBJECT_CLASS( iregiongroupview_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( iregiongroupview_parent_class )->destroy( widget );
 }
 
 /* What we track during a refresh.
@@ -189,10 +189,10 @@ iregiongroupview_refresh( vObject *vobject )
 static void
 iregiongroupview_class_init( iRegiongroupviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 
-	object_class->destroy = iregiongroupview_destroy;
+	widget_class->destroy = iregiongroupview_destroy;
 
 	/* Create signals.
 	 */

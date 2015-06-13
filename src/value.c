@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ClassmodelClass *parent_class = NULL;
+G_DEFINE_TYPE( Value, value, TYPE_CLASSMODEL ); 
 
 static void
 value_finalize( GObject *gobject )
@@ -53,7 +53,7 @@ value_finalize( GObject *gobject )
 	 */
 	vips_buf_destroy( &value->caption_buffer );
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( value_parent_class )->finalize( gobject );
 }
 
 /* Default caption: just "class-name class.value".
@@ -87,8 +87,6 @@ value_class_init( ValueClass *class )
 	iObjectClass *iobject_class = (iObjectClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	/* Create signals.
 	 */
 
@@ -103,29 +101,4 @@ static void
 value_init( Value *value )
 {
 	vips_buf_init_dynamic( &value->caption_buffer, MAX_LINELENGTH );
-}
-
-GType
-value_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( ValueClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) value_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Value ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) value_init,
-		};
-
-		type = g_type_register_static( TYPE_CLASSMODEL, 
-			"Value", &info, 0 );
-	}
-
-	return( type );
 }

@@ -38,7 +38,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( vObject, vobject, GTK_TYPE_VBOX ); 
+G_DEFINE_TYPE( vObject, vobject, GTK_TYPE_BOX ); 
 
 static Queue *vobject_dirty = NULL;
 
@@ -214,17 +214,17 @@ vobject_link( vObject *vobject, iObject *iobject )
 }
 
 static void
-vobject_destroy( GtkObject *object )
+vobject_destroy( GtkWidget *widget )
 {
 	vObject *vobject;
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_VOBJECT( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_VOBJECT( widget ) );
 
-	vobject = VOBJECT( object );
+	vobject = VOBJECT( widget );
 
 #ifdef DEBUG
-	printf( "vobject_destroy: \"%s\"\n", G_OBJECT_TYPE_NAME( object ) );
+	printf( "vobject_destroy: \"%s\"\n", G_OBJECT_TYPE_NAME( widget ) );
 #endif /*DEBUG*/
 
 	if( vobject->iobject ) {
@@ -234,7 +234,7 @@ vobject_destroy( GtkObject *object )
 	}
 	vobject_refresh_dequeue( vobject );
 
-	GTK_OBJECT_CLASS( vobject_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( vobject_parent_class )->destroy( widget );
 }
 
 static void 
@@ -271,11 +271,11 @@ static void
 vobject_class_init( vObjectClass *class )
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
-	GtkObjectClass *object_class = (GtkObjectClass*) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass*) class;
 
 	gobject_class->finalize = vobject_finalize;
 
-	object_class->destroy = vobject_destroy;
+	widget_class->destroy = vobject_destroy;
 
 	/* Create signals.
 	 */

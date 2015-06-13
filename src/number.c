@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ClassmodelClass *parent_class = NULL;
+G_DEFINE_TYPE( Number, number, TYPE_CLASSMODEL ); 
 
 static View *
 number_view_new( Model *model, View *parent )
@@ -59,8 +59,6 @@ number_class_init( NumberClass *class )
 	ModelClass *model_class = (ModelClass *) class;
 	ClassmodelClass *classmodel_class = (ClassmodelClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	/* Init methods.
 	 */
 	iobject_class->user_name = _( "Number" );
@@ -81,29 +79,4 @@ number_init( Number *number )
 	number->value = 0.0;
 
 	iobject_set( IOBJECT( number ), CLASS_NUMBER, NULL );
-}
-
-GType
-number_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( NumberClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) number_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Number ),
-			32,             /* n_pnumberlocs */
-			(GInstanceInitFunc) number_init,
-		};
-
-		type = g_type_register_static( TYPE_CLASSMODEL, 
-			"Number", &info, 0 );
-	}
-
-	return( type );
 }

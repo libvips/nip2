@@ -33,7 +33,7 @@
 #define DEBUG
  */
 
-static ManagedClass *parent_class = NULL;
+G_DEFINE_TYPE( Managedfile, managedfile, TYPE_MANAGED ); 
 
 static void
 managedfile_dispose( GObject *gobject )
@@ -47,7 +47,7 @@ managedfile_dispose( GObject *gobject )
 
 	IM_FREEF( ifile_close, managedfile->file );
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( managedfile_parent_class )->dispose( gobject );
 }
 
 static void
@@ -55,13 +55,14 @@ managedfile_info( iObject *iobject, VipsBuf *buf )
 {
 	Managedfile *managedfile = MANAGEDFILE( iobject );
 
-	vips_buf_appendf( buf, "managedfile->fp = %p\n", managedfile->file->fp );
+	vips_buf_appendf( buf, "managedfile->fp = %p\n", 
+		managedfile->file->fp );
 	vips_buf_appendf( buf, "managedfile->file->filename = %s\n", 
 		managedfile->file->fname );
 	vips_buf_appendf( buf, "managedfile->file->last_errno = %d\n", 
 		managedfile->file->last_errno );
 
-	IOBJECT_CLASS( parent_class )->info( iobject, buf );
+	IOBJECT_CLASS( managedfile_parent_class )->info( iobject, buf );
 }
 
 static void
@@ -69,8 +70,6 @@ managedfile_class_init( ManagedfileClass *class )
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
 	iObjectClass *iobject_class = IOBJECT_CLASS( class );
-
-	parent_class = g_type_class_peek_parent( class );
 
 	gobject_class->dispose = managedfile_dispose;
 
@@ -85,31 +84,6 @@ managedfile_init( Managedfile *managedfile )
 #endif /*DEBUG*/
 
 	managedfile->file = NULL;
-}
-
-GType
-managedfile_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( ManagedfileClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) managedfile_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Managedfile ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) managedfile_init,
-		};
-
-		type = g_type_register_static( TYPE_MANAGED, 
-			"Managedfile", &info, 0 );
-	}
-
-	return( type );
 }
 
 Managedfile *

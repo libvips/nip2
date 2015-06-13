@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static FilemodelClass *parent_class = NULL;
+G_DEFINE_TYPE( Workspacegroup, workspacegroup, TYPE_FILEMODEL ); 
 
 void
 workspacegroup_set_load_type( Workspacegroup *wsg, 
@@ -151,7 +151,7 @@ workspacegroup_dispose( GObject *gobject )
 
 	IM_FREEF( g_source_remove, wsg->autosave_timeout );
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( workspacegroup_parent_class )->dispose( gobject );
 }
 
 static View *
@@ -181,7 +181,8 @@ workspacegroup_save( Model *model, xmlNode *xnode )
 {
 	/* We normally chain up like this:
 	 *
-	 * 	xthis = MODEL_CLASS( parent_class )->save( model, xnode )
+	 * 	xthis = MODEL_CLASS( workspacegroup_parent_class )->
+	 * 		save( model, xnode )
 	 *
 	 * but that will make a workspacegroup holding our workspaces. Instead 
 	 * we want to save all our workspaces directly to xnode with nothing 
@@ -546,8 +547,8 @@ workspacegroup_top_load( Filemodel *filemodel,
 		g_assert( FALSE );
 	}
 
-	return( FILEMODEL_CLASS( parent_class )->top_load( filemodel, 
-		state, parent, xnode ) );
+	return( FILEMODEL_CLASS( workspacegroup_parent_class )->
+		top_load( filemodel, state, parent, xnode ) );
 }
 
 static gboolean
@@ -560,7 +561,7 @@ workspacegroup_top_save( Filemodel *filemodel, const char *filename )
 		NN( IOBJECT( filemodel )->name ), filename );
 #endif /*DEBUG*/
 
-	if( (result = FILEMODEL_CLASS( parent_class )->
+	if( (result = FILEMODEL_CLASS( workspacegroup_parent_class )->
 		top_save( filemodel, filename )) )
 		/* This will add save-as files to recent too. Don't note
 		 * auto_load on recent, since it won't have been loaded by the
@@ -716,7 +717,8 @@ workspacegroup_set_modified( Filemodel *filemodel, gboolean modified )
 
 	workspacegroup_checkmark( wsg );
 
-	FILEMODEL_CLASS( parent_class )->set_modified( filemodel, modified );
+	FILEMODEL_CLASS( workspacegroup_parent_class )->
+		set_modified( filemodel, modified );
 }
 
 static void
@@ -726,8 +728,6 @@ workspacegroup_class_init( WorkspacegroupClass *class )
 	iObjectClass *iobject_class = (iObjectClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 	FilemodelClass *filemodel_class = (FilemodelClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -752,31 +752,6 @@ workspacegroup_class_init( WorkspacegroupClass *class )
 static void
 workspacegroup_init( Workspacegroup *wsg )
 {
-}
-
-GType
-workspacegroup_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( WorkspacegroupClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) workspacegroup_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Workspacegroup ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) workspacegroup_init,
-		};
-
-		type = g_type_register_static( TYPE_FILEMODEL, 
-			"Workspacegroup", &info, 0 );
-	}
-
-	return( type );
 }
 
 static void

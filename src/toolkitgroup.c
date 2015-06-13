@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ModelClass *parent_class = NULL;
+G_DEFINE_TYPE( Toolkitgroup, toolkitgroup, TYPE_MODEL ); 
 
 Toolkit *
 toolkitgroup_map( Toolkitgroup *kitg, toolkit_map_fn fn, void *a, void *b )
@@ -50,7 +50,7 @@ toolkitgroup_changed( iObject *iobject )
 	iobject_print( iobject );
 #endif /*DEBUG*/
 
-	IOBJECT_CLASS( parent_class )->changed( iobject );
+	IOBJECT_CLASS( toolkitgroup_parent_class )->changed( iobject );
 }
 
 static View *
@@ -65,8 +65,6 @@ toolkitgroup_class_init( ToolkitgroupClass *class )
 	iObjectClass *iobject_class = (iObjectClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	/* Create signals.
 	 */
 
@@ -80,31 +78,6 @@ toolkitgroup_class_init( ToolkitgroupClass *class )
 static void
 toolkitgroup_init( Toolkitgroup *kitg )
 {
-}
-
-GType
-toolkitgroup_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( ToolkitgroupClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) toolkitgroup_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Toolkitgroup ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) toolkitgroup_init,
-		};
-
-		type = g_type_register_static( TYPE_MODEL, 
-			"Toolkitgroup", &info, 0 );
-	}
-
-	return( type );
 }
 
 static void

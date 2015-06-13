@@ -44,7 +44,7 @@ subcolumnview_destroy_sub( Rowview *rview, Subcolumnview *sview )
 }
 
 static void
-subcolumnview_destroy( GtkObject *object )
+subcolumnview_destroy( GtkWidget *widget )
 {
 	Subcolumnview *sview;
 
@@ -52,10 +52,10 @@ subcolumnview_destroy( GtkObject *object )
 	printf( "subcolumnview_destroy\n" );
 #endif /*DEBUG*/
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_SUBCOLUMNVIEW( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_SUBCOLUMNVIEW( widget ) );
 
-	sview = SUBCOLUMNVIEW( object );
+	sview = SUBCOLUMNVIEW( widget );
 
 	UNREF( sview->group );
 
@@ -66,7 +66,7 @@ subcolumnview_destroy( GtkObject *object )
 		(view_map_fn) subcolumnview_destroy_sub, sview, NULL );
 	DESTROY_GTK( sview->table );
 
-	GTK_OBJECT_CLASS( subcolumnview_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( subcolumnview_parent_class )->destroy( widget );
 }
 
 static void
@@ -185,11 +185,11 @@ subcolumnview_refresh( vObject *vobject )
 static void
 subcolumnview_class_init( SubcolumnviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass*) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass*) class;
 	vObjectClass *vobject_class = (vObjectClass*) class;
 	ViewClass *view_class = (ViewClass*) class;
 
-	object_class->destroy = subcolumnview_destroy;
+	widget_class->destroy = subcolumnview_destroy;
 
 	/* Create signals.
 	 */

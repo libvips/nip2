@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static HeapmodelClass *parent_class = NULL;
+G_DEFINE_TYPE( iText, itext, TYPE_HEAPMODEL );
 
 static void
 itext_finalize( GObject *gobject )
@@ -56,7 +56,7 @@ itext_finalize( GObject *gobject )
 	vips_buf_destroy( &itext->value );
 	vips_buf_destroy( &itext->decompile );
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( itext_parent_class )->finalize( gobject );
 }
 
 static void
@@ -599,7 +599,8 @@ itext_update_model( Heapmodel *heapmodel )
 		IM_SETSTR( itext->formula, itext->formula_default );
 	}
 
-	return( HEAPMODEL_CLASS( parent_class )->update_model( heapmodel ) );
+	return( HEAPMODEL_CLASS( itext_parent_class )->
+		update_model( heapmodel ) );
 }
 
 /* Build param lists.
@@ -671,7 +672,8 @@ itext_update_heap( Heapmodel *heapmodel )
 	 */
 	(void) expr_dirty( expr, link_serial_new() );
 
-	return( HEAPMODEL_CLASS( parent_class )->update_heap( heapmodel ) );
+	return( HEAPMODEL_CLASS( itext_parent_class )->
+		update_heap( heapmodel ) );
 }
 
 static void *
@@ -708,7 +710,8 @@ itext_clear_edited( Heapmodel *heapmodel )
 		 */
 	}
 
-	return( HEAPMODEL_CLASS( parent_class )->clear_edited( heapmodel ) );
+	return( HEAPMODEL_CLASS( itext_parent_class )->
+		clear_edited( heapmodel ) );
 }
 
 static void
@@ -719,7 +722,7 @@ itext_parent_add( iContainer *child )
 
 	g_assert( IS_RHS( child->parent ) );
 
-	ICONTAINER_CLASS( parent_class )->parent_add( child );
+	ICONTAINER_CLASS( itext_parent_class )->parent_add( child );
 
 	row = HEAPMODEL( itext )->row;
 
@@ -752,7 +755,7 @@ itext_load( Model *model,
 		itext_set_edited( itext, TRUE );
 	}
 
-	return( MODEL_CLASS( parent_class )->load( model, 
+	return( MODEL_CLASS( itext_parent_class )->load( model, 
 		state, parent, xnode ) );
 }
 
@@ -770,7 +773,7 @@ itext_save( Model *model, xmlNode *xnode )
 
 	xmlNode *xthis;
 
-	if( !(xthis = MODEL_CLASS( parent_class )->save( model, xnode )) )
+	if( !(xthis = MODEL_CLASS( itext_parent_class )->save( model, xnode )) )
 		return( NULL );
 
 	if( itext->edited || row->top_row == row )
@@ -788,8 +791,6 @@ itext_class_init( iTextClass *class )
 	iContainerClass *icontainer_class = (iContainerClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 	HeapmodelClass *heapmodel_class = (HeapmodelClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -832,31 +833,6 @@ itext_init( iText *itext )
 
 	/* Some defaults changed in _parent_add() above.
 	 */
-}
-
-GType
-itext_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( iTextClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) itext_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( iText ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) itext_init,
-		};
-
-		type = g_type_register_static( TYPE_HEAPMODEL, 
-			"iText", &info, 0 );
-	}
-
-	return( type );
 }
 
 iText *

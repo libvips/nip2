@@ -33,14 +33,14 @@
 
 #include "ip.h"
 
+G_DEFINE_TYPE( Imagemodel, imagemodel, TYPE_IOBJECT );
+
 /* Our signals. 
  */
 enum {
 	SIG_IMAGEINFO_CHANGED,	/* Imageinfo we hold has been replaced */
 	SIG_LAST
 };
-
-static iObjectClass *parent_class = NULL;
 
 static guint imagemodel_signals[SIG_LAST] = { 0 };
 
@@ -134,7 +134,7 @@ imagemodel_dispose( GObject *gobject )
 	MANAGED_UNREF( imagemodel->text_mask );
 	MANAGED_UNREF( imagemodel->nib );
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( imagemodel_parent_class )->dispose( gobject );
 }
 
 static void
@@ -169,7 +169,7 @@ imagemodel_changed( iObject *iobject )
 	conversion_set_synchronous( imagemodel->conv, 
 		imagemodel->show_paintbox );
 
-	IOBJECT_CLASS( parent_class )->changed( iobject );
+	IOBJECT_CLASS( imagemodel_parent_class )->changed( iobject );
 }
 
 static void
@@ -177,8 +177,6 @@ imagemodel_class_init( ImagemodelClass *class )
 {
 	GObjectClass *gobject_class = (GObjectClass *) class;
 	iObjectClass *iobject_class = (iObjectClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	gobject_class->dispose = imagemodel_dispose;
 
@@ -285,31 +283,6 @@ imagemodel_init( Imagemodel *imagemodel )
 	imagemodel->offset = 0.0;
 	imagemodel->falsecolour = FALSE;
 	imagemodel->type = TRUE;
-}
-
-GType
-imagemodel_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( ImagemodelClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) imagemodel_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Imagemodel ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) imagemodel_init,
-		};
-
-		type = g_type_register_static( TYPE_IOBJECT, 
-			"Imagemodel", &info, 0 );
-	}
-
-	return( type );
 }
 
 static void

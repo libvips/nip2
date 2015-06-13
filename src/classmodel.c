@@ -33,7 +33,7 @@
 #define DEBUG
  */
 
-static HeapmodelClass *parent_class = NULL;
+G_DEFINE_TYPE( Classmodel, classmodel, TYPE_HEAPMODEL );
 
 void
 image_value_init( ImageValue *image, Classmodel *classmodel )
@@ -574,7 +574,7 @@ classmodel_dispose( GObject *gobject )
 		(SListMapFn) classmodel_iimage_unlink_rev, classmodel );
 	IM_FREE( classmodel->filename );
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( classmodel_parent_class )->dispose( gobject );
 }
 
 /* We don't want subclases like Group to have an _info() method, since it
@@ -592,7 +592,7 @@ classmodel_parent_add( iContainer *child )
 {
 	g_assert( IS_CLASSMODEL( child ) );
 
-	ICONTAINER_CLASS( parent_class )->parent_add( child );
+	ICONTAINER_CLASS( classmodel_parent_class )->parent_add( child );
 }
 
 /* How many widgets we allow for member automation edit.
@@ -880,7 +880,7 @@ classmodel_save( Model *model, xmlNode *xnode )
 	printf( "\n" );
 #endif /*DEBUG*/
 
-	if( !(xthis = MODEL_CLASS( parent_class )->save( model, xnode )) )
+	if( !(xthis = MODEL_CLASS( classmodel_parent_class )->save( model, xnode )) )
 		return( NULL );
 
 	if( classmodel->edited ) 
@@ -1047,7 +1047,7 @@ classmodel_load( Model *model,
 			classmodel_set_edited( CLASSMODEL( model ), TRUE );
 	}
 
-	return( MODEL_CLASS( parent_class )->load( model, 
+	return( MODEL_CLASS( classmodel_parent_class )->load( model, 
 		state, parent, xthis ) );
 }
 
@@ -1275,7 +1275,7 @@ classmodel_update_model( Heapmodel *heapmodel )
 				return( classmodel );
 	}
 
-	return( HEAPMODEL_CLASS( parent_class )->update_model( heapmodel ) );
+	return( HEAPMODEL_CLASS( classmodel_parent_class )->update_model( heapmodel ) );
 }
 
 static void *
@@ -1301,7 +1301,7 @@ classmodel_update_heap( Heapmodel *heapmodel )
 		return( heapmodel );
 	}
 
-	if( HEAPMODEL_CLASS( parent_class )->update_heap( heapmodel ) ) {
+	if( HEAPMODEL_CLASS( classmodel_parent_class )->update_heap( heapmodel ) ) {
 		g_object_unref( G_OBJECT( heapmodel ) );
 		return( heapmodel );
 	}
@@ -1318,7 +1318,7 @@ classmodel_clear_edited( Heapmodel *heapmodel )
 
 	classmodel_set_edited( classmodel, FALSE );
 
-	return( HEAPMODEL_CLASS( parent_class )->clear_edited( heapmodel ) );
+	return( HEAPMODEL_CLASS( classmodel_parent_class )->clear_edited( heapmodel ) );
 }
 
 static gboolean
@@ -1336,8 +1336,6 @@ classmodel_class_init( ClassmodelClass *class )
 	ModelClass *model_class = (ModelClass *) class;
 	HeapmodelClass *heapmodel_class = (HeapmodelClass *) class;
 	ClassmodelClass *classmodel_class = (ClassmodelClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Init methods.
 	 */
@@ -1383,31 +1381,6 @@ classmodel_init( Classmodel *classmodel )
         classmodel->views = NULL;
 
         classmodel->filename = NULL;
-}
-
-GType
-classmodel_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( ClassmodelClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) classmodel_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Classmodel ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) classmodel_init,
-		};
-
-		type = g_type_register_static( TYPE_HEAPMODEL, 
-			"Classmodel", &info, 0 );
-	}
-
-	return( type );
 }
 
 void

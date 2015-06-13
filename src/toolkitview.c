@@ -41,14 +41,14 @@
 G_DEFINE_TYPE( Toolkitview, toolkitview, TYPE_VIEW ); 
 
 static void 
-toolkitview_destroy( GtkObject *object )
+toolkitview_destroy( GtkWidget *widget )
 {	
 	Toolkitview *kview;
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_TOOLKITVIEW( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_TOOLKITVIEW( widget ) );
 
-	kview = TOOLKITVIEW( object );
+	kview = TOOLKITVIEW( widget );
 
 #ifdef DEBUG
 	printf( "toolkitview_destroy: %p\n", object );
@@ -59,7 +59,7 @@ toolkitview_destroy( GtkObject *object )
 	DESTROY_GTK( kview->menu );
 	DESTROY_GTK( kview->item );
 
-	GTK_OBJECT_CLASS( toolkitview_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( toolkitview_parent_class )->destroy( widget );
 }
 
 static void
@@ -161,12 +161,13 @@ static void
 toolkitview_class_init( ToolkitviewClass *class )
 {
 	GObjectClass *gobject_class = (GObjectClass *) class;
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
 
 	gobject_class->finalize = toolkitview_finalize;
-	object_class->destroy = toolkitview_destroy;
+
+	widget_class->destroy = toolkitview_destroy;
 
 	/* Create signals.
 	 */

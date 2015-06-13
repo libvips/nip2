@@ -307,17 +307,17 @@ view_unlink( View *view )
 }
 
 static void
-view_destroy( GtkObject *object )
+view_destroy( GtkWidget *widget )
 {
 	View *view;
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_VIEW( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_VIEW( widget ) );
 
-	view = VIEW( object );
+	view = VIEW( widget );
 
 #ifdef DEBUG
-	printf( "view_destroy: \"%s\"\n", G_OBJECT_TYPE_NAME( object ) );
+	printf( "view_destroy: \"%s\"\n", G_OBJECT_TYPE_NAME( widget ) );
 #endif /*DEBUG*/
 
 	/* We're probably changing the size of our enclosing column.
@@ -338,7 +338,7 @@ view_destroy( GtkObject *object )
 	slist_map( view->managed,
 		(SListMapFn) view_viewchild_destroy, NULL );
 
-	GTK_OBJECT_CLASS( view_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( view_parent_class )->destroy( widget );
 }
 
 static void 
@@ -630,8 +630,8 @@ view_real_child_add( View *parent, View *child )
 	 */
 	child->parent = parent;
 	viewchild->child_view = child;
-	g_object_ref( GTK_OBJECT( child ) );
-	gtk_object_sink( GTK_OBJECT( child ) );
+	g_object_ref( child );
+	g_object_sink( child );
 }
 
 static void
@@ -701,11 +701,11 @@ static void
 view_class_init( ViewClass *class )
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
-	GtkObjectClass *object_class = (GtkObjectClass*) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass*) class;
 
 	gobject_class->finalize = view_finalize;
 
-	object_class->destroy = view_destroy;
+	widget_class->destroy = view_destroy;
 
 	/* Create signals.
 	 */

@@ -53,14 +53,14 @@ plotstatus_columns_destroy( Plotstatus *plotstatus )
 }
 
 static void
-plotstatus_destroy( GtkObject *object )
+plotstatus_destroy( GtkWidget *widget )
 {
 	Plotstatus *plotstatus;
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_PLOTSTATUS( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_PLOTSTATUS( widget ) );
 
-	plotstatus = PLOTSTATUS( object );
+	plotstatus = PLOTSTATUS( widget );
 
 #ifdef DEBUG
 	printf( "plotstatus_destroy\n" );
@@ -68,7 +68,7 @@ plotstatus_destroy( GtkObject *object )
 
 	plotstatus_columns_destroy( plotstatus );
 
-	GTK_OBJECT_CLASS( plotstatus_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( plotstatus_parent_class )->destroy( widget );
 }
 
 /* Hide this plotstatus.
@@ -82,11 +82,11 @@ plotstatus_hide_cb( GtkWidget *menu, GtkWidget *host, Plotstatus *plotstatus )
 static void
 plotstatus_class_init( PlotstatusClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
 	GtkWidget *pane;
 
-	object_class->destroy = plotstatus_destroy;
+	widget_class->destroy = plotstatus_destroy;
 
 	/* Create signals.
 	 */
@@ -95,7 +95,7 @@ plotstatus_class_init( PlotstatusClass *class )
 	 */
 
 	pane = plotstatus_menu = popup_build( _( "Status bar menu" ) );
-	popup_add_but( pane, GTK_STOCK_CLOSE, 
+	popup_add_but( pane, "window-close", 
 		POPUP_FUNC( plotstatus_hide_cb ) );
 }
 

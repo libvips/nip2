@@ -58,24 +58,24 @@ static const int matrixview_max_cells = 100;
 G_DEFINE_TYPE( Matrixview, matrixview, TYPE_GRAPHICVIEW ); 
 
 static void
-matrixview_destroy( GtkObject *object )
+matrixview_destroy( GtkWidget *widget )
 {
     	Matrixview *matrixview;
 
-    	g_return_if_fail( object != NULL );
-    	g_return_if_fail( IS_MATRIXVIEW( object ) );
+    	g_return_if_fail( widget != NULL );
+    	g_return_if_fail( IS_MATRIXVIEW( widget ) );
 
 #ifdef DEBUG
     	printf( "matrixview_destroy\n" );
 #endif /*DEBUG*/
 
-    	matrixview = MATRIXVIEW( object );
+    	matrixview = MATRIXVIEW( widget );
 
     	/* My instance destroy stuff.
     	 */
     	IM_FREEF( g_slist_free, matrixview->items );
 
-    	GTK_OBJECT_CLASS( matrixview_parent_class )->destroy( object );
+    	GTK_WIDGET_CLASS( matrixview_parent_class )->destroy( widget );
 }
 
 static gboolean
@@ -327,10 +327,10 @@ matrixview_slider_build( Matrixview *matrixview )
 
     			g_signal_connect_object( tslider, "text_changed",
     				G_CALLBACK( view_changed_cb ), 
-    				GTK_OBJECT( matrixview ) );
+    				G_OBJECT( matrixview ) );
     			g_signal_connect_object( tslider, "activate", 
     				G_CALLBACK( view_activate_cb ), 
-    				GTK_OBJECT( matrixview ) );
+    				G_OBJECT( matrixview ) );
     			g_signal_connect( tslider, 
     				"slider_changed", 
     				G_CALLBACK( matrixview_slider_change_cb ),
@@ -668,10 +668,10 @@ matrixview_text_set( Matrixview *matrixview, GtkWidget *txt, double val )
 {
     	if( txt ) {
     		gtk_signal_handler_block_by_data( 
-    			GTK_OBJECT( txt ), matrixview );
+    			G_OBJECT( txt ), matrixview );
     		set_gentry( txt, "%g", val ); 
     		gtk_signal_handler_unblock_by_data( 
-    			GTK_OBJECT( txt ), matrixview );
+    			G_OBJECT( txt ), matrixview );
     	}
 }
 
@@ -879,11 +879,11 @@ matrixview_refresh( vObject *vobject )
 static void
 matrixview_class_init( MatrixviewClass *class )
 {
-    	GtkObjectClass *object_class = (GtkObjectClass *) class;
+    	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
     	vObjectClass *vobject_class = (vObjectClass *) class;
     	ViewClass *view_class = (ViewClass *) class;
 
-    	object_class->destroy = matrixview_destroy;
+    	widget_class->destroy = matrixview_destroy;
 
     	/* Create signals.
     	 */

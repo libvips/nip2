@@ -70,20 +70,20 @@ lstring_equal( GSList *a, GSList *b )
 }
 
 static void
-optionview_destroy( GtkObject *object )
+optionview_destroy( GtkWidget *widget )
 {
 	Optionview *optionview;
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_OPTIONVIEW( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_OPTIONVIEW( widget ) );
 
-	optionview = OPTIONVIEW( object );
+	optionview = OPTIONVIEW( widget );
 
 	/* My instance destroy stuff.
 	 */
 	IM_FREEF( slist_free_all, optionview->labels );
 
-	GTK_OBJECT_CLASS( optionview_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( optionview_parent_class )->destroy( widget );
 }
 
 static void
@@ -172,12 +172,12 @@ optionview_refresh( vObject *vobject )
 	}
 
 	if( optionview->options ) {
-		gtk_signal_handler_block_by_data( 
-			GTK_OBJECT( optionview->options ), optionview );
+		g_signal_handler_block_by_data( 
+			G_OBJECT( optionview->options ), optionview );
 		gtk_combo_box_set_active( GTK_COMBO_BOX( optionview->options ), 
 			option->value );
-		gtk_signal_handler_unblock_by_data( 
-			GTK_OBJECT( optionview->options ), optionview );
+		g_signal_handler_unblock_by_data( 
+			G_OBJECT( optionview->options ), optionview );
 	}
 
 	set_glabel( optionview->label, _( "%s:" ), IOBJECT( option )->caption );
@@ -188,11 +188,11 @@ optionview_refresh( vObject *vobject )
 static void
 optionview_class_init( OptionviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
 
-	object_class->destroy = optionview_destroy;
+	widget_class->destroy = optionview_destroy;
 
 	/* Create signals.
 	 */

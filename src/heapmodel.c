@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ModelClass *parent_class = NULL;
+G_DEFINE_TYPE( Heapmodel, heapmodel, TYPE_MODEL ); 
 
 void *
 heapmodel_new_heap( Heapmodel *heapmodel, PElement *root )
@@ -137,7 +137,7 @@ heapmodel_parent_add( iContainer *child )
 	g_assert( IS_HEAPMODEL( child->parent ) || 
 		IS_FILEMODEL( child->parent ) ); 
 
-	ICONTAINER_CLASS( parent_class )->parent_add( child );
+	ICONTAINER_CLASS( heapmodel_parent_class )->parent_add( child );
 
 	/* Update our context.
 	 */
@@ -183,8 +183,6 @@ heapmodel_class_init( HeapmodelClass *class )
 	HeapmodelClass *heapmodel_class = (HeapmodelClass *) class;
 	iContainerClass *icontainer_class = (iContainerClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	/* Init methods.
 	 */
 	icontainer_class->parent_add = heapmodel_parent_add;
@@ -202,31 +200,6 @@ heapmodel_init( Heapmodel *heapmodel )
         heapmodel->rhs = NULL;
 
 	heapmodel->modified = FALSE;
-}
-
-GType
-heapmodel_get_type( void )
-{
-	static GType heapmodel_type = 0;
-
-	if( !heapmodel_type ) {
-		static const GTypeInfo info = {
-			sizeof( HeapmodelClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) heapmodel_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Heapmodel ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) heapmodel_init,
-		};
-
-		heapmodel_type = g_type_register_static( TYPE_MODEL, 
-			"Heapmodel", &info, 0 );
-	}
-
-	return( heapmodel_type );
 }
 
 void

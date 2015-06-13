@@ -53,14 +53,14 @@ static guint tslider_signals[LAST_SIGNAL] = { 0 };
 #define DEQ( A, B ) (ABS((A) - (B)) < 0.0001)
 
 static void
-tslider_destroy( GtkObject *object )
+tslider_destroy( GtkWidget *widget )
 {
 	Tslider *tslider;
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_TSLIDER( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_TSLIDER( widget ) );
 
-	tslider = TSLIDER( object );
+	tslider = TSLIDER( widget );
 
 #ifdef DEBUG
 	printf( "tslider_destroy: %p\n", tslider );
@@ -69,12 +69,12 @@ tslider_destroy( GtkObject *object )
 	/* My instance destroy stuff.
 	 */
 	if( tslider->adj ) {
-		gtk_signal_disconnect_by_data( GTK_OBJECT( tslider->adj ),
+		g_signal_disconnect_by_data( G_OBJECT( tslider->adj ),
 			(gpointer) tslider );
 		tslider->adj = NULL;
 	}
 
-	GTK_OBJECT_CLASS( tslider_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( tslider_parent_class )->destroy( widget );
 }
 
 /* Map a value to a slider position.
@@ -144,8 +144,8 @@ tslider_real_changed( Tslider *tslider )
 		tslider->svalue = tslider_value_to_slider( tslider, 
 			tslider->value );
 
-	gtk_signal_handler_block_by_data( GTK_OBJECT( adj ), tslider );
-	gtk_signal_handler_block_by_data( GTK_OBJECT( entry ), tslider );
+	g_signal_handler_block_by_data( G_OBJECT( adj ), tslider );
+	g_signal_handler_block_by_data( G_OBJECT( entry ), tslider );
 
 	/* Some libc's hate out-of-bounds precision, so clip, just in case.
 	 */
@@ -177,17 +177,17 @@ tslider_real_changed( Tslider *tslider )
 		gtk_adjustment_value_changed( adj );
 	}
 
-	gtk_signal_handler_unblock_by_data( GTK_OBJECT( adj ), tslider );
-	gtk_signal_handler_unblock_by_data( GTK_OBJECT( entry ), tslider );
+	g_signal_handler_unblock_by_data( G_OBJECT( adj ), tslider );
+	g_signal_handler_unblock_by_data( G_OBJECT( entry ), tslider );
 }
 
 static void
 tslider_class_init( TsliderClass *class )
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
-	object_class->destroy = tslider_destroy;
+	widget_class->destroy = tslider_destroy;
 
 	class->changed = tslider_real_changed;
 	class->slider_changed = NULL;

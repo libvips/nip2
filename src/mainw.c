@@ -33,6 +33,8 @@
 #define DEBUG
  */
 
+G_DEFINE_TYPE( Mainw, mainw, TYPE_IWINDOW );  
+
 /* Load and save recent items here.
  */
 #define RECENT_WORKSPACE "recent_workspace"
@@ -51,8 +53,6 @@ GSList *mainw_recent_matrix = NULL;
 gboolean mainw_auto_recalc = TRUE;
 
 static gint mainw_layout_timeout = 0;
-
-static iWindowClass *parent_class = NULL;
 
 /* All the mainw.
  */
@@ -139,7 +139,7 @@ mainw_finalize( GObject *gobject )
 	g_return_if_fail( gobject != NULL );
 	g_return_if_fail( IS_MAINW( gobject ) );
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( mainw_parent_class )->finalize( gobject );
 }
 
 static void
@@ -176,7 +176,7 @@ mainw_dispose( GObject *object )
 
 	mainw_all = g_slist_remove( mainw_all, mainw );
 
-	G_OBJECT_CLASS( parent_class )->dispose( object );
+	G_OBJECT_CLASS( mainw_parent_class )->dispose( object );
 }
 
 static void *
@@ -201,7 +201,7 @@ mainw_configure_event( GtkWidget *widget, GdkEventConfigure *event )
 	workspacegroup_map( mainw->wsg, 
 		(workspace_map_fn) mainw_configure_event_sub, event, NULL );
 
-	return( GTK_WIDGET_CLASS( parent_class )->
+	return( GTK_WIDGET_CLASS( mainw_parent_class )->
 		configure_event( widget, event ) );
 }
 
@@ -210,8 +210,6 @@ mainw_class_init( MainwClass *class )
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	gobject_class->finalize = mainw_finalize;
 	gobject_class->dispose = mainw_dispose;
@@ -280,31 +278,6 @@ mainw_init( Mainw *mainw )
 	mainw->progress = NULL;
 
 	mainw_all = g_slist_prepend( mainw_all, mainw );
-}
-
-GType
-mainw_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( MainwClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) mainw_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Mainw ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) mainw_init,
-		};
-
-		type = g_type_register_static( TYPE_IWINDOW, 
-			"Mainw", &info, 0 );
-	}
-
-	return( type );
 }
 
 static void
@@ -546,7 +519,7 @@ mainw_refresh_timeout_cb( gpointer user_data )
 			mainw->kitgview = TOOLKITGROUPVIEW( 
 				model_view_new( MODEL( ws->kitg ), NULL ) );
 			g_object_ref( G_OBJECT( mainw->kitgview ) );
-			gtk_object_sink( GTK_OBJECT( mainw->kitgview ) );
+			g_object_sink( G_OBJECT( mainw->kitgview ) );
 			toolkitgroupview_set_mainw( mainw->kitgview, mainw );
 			gtk_menu_set_accel_group( 
 				GTK_MENU( mainw->kitgview->menu ),

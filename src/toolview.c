@@ -65,7 +65,7 @@ item_get_workspace( GtkWidget *item )
 {
 	Toolview *tview;
 
-	if( !(tview = gtk_object_get_data_by_id( GTK_OBJECT( item ), 
+	if( !(tview = g_object_get_data_by_id( G_OBJECT( item ), 
 		toolview_quark )) )
 		return( NULL );
 
@@ -73,22 +73,22 @@ item_get_workspace( GtkWidget *item )
 }
 
 static void 
-toolview_destroy( GtkObject *object )
+toolview_destroy( GtkWidget *widget )
 {	
 	Toolview *tview;
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_TOOLVIEW( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_TOOLVIEW( widget ) );
 
-	tview = TOOLVIEW( object );
+	tview = TOOLVIEW( widget );
 
 #ifdef DEBUG
-	printf( "toolview_destroy: %p\n", object );
+	printf( "toolview_destroy: %p\n", widget );
 #endif /*DEBUG*/
 
 	DESTROY_GTK( tview->item );
 
-	GTK_OBJECT_CLASS( toolview_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( toolview_parent_class )->destroy( widget );
 }
 
 static void
@@ -152,7 +152,7 @@ toolview_refresh_sub( Toolview *tview,
 	else {
 		item = gtk_image_menu_item_new_with_mnemonic( toolitem->label );
 
-		gtk_object_set_data_by_id( GTK_OBJECT( item ),
+		g_object_set_data_by_id( G_OBJECT( item ),
 			toolview_quark, tview );
 
 		if( toolitem->icon )
@@ -273,19 +273,15 @@ toolview_link( View *view, Model *model, View *parent )
 static void
 toolview_class_init( ToolviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass*) class;
 	GObjectClass *gobject_class = (GObjectClass*) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass*) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
 
-	object_class->destroy = toolview_destroy;
 	gobject_class->finalize = toolview_finalize;
 
-	/* Create signals.
-	 */
+	widget_class->destroy = toolview_destroy;
 
-	/* Init methods.
-	 */
 	vobject_class->refresh = toolview_refresh;
 
 	view_class->link = toolview_link;

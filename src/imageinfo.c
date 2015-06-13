@@ -89,7 +89,7 @@ most of the jobs above are pushed down into vips8 now ... except for
 #define DEBUG_CHECK
  */
 
-static iContainerClass *imageinfogroup_parent_class = NULL;
+G_DEFINE_TYPE( Imageinfogroup, imageinfogroup, TYPE_ICONTAINER );
 
 static void
 imageinfogroup_finalize( GObject *gobject )
@@ -127,8 +127,8 @@ imageinfogroup_child_remove( iContainer *parent, iContainer *child )
 	const char *name = IOBJECT( imageinfo )->name;
 	GSList *hits;
 
-	hits = (GSList *) g_hash_table_lookup( imageinfogroup->filename_hash,
-		name );
+	hits = (GSList *) 
+		g_hash_table_lookup( imageinfogroup->filename_hash, name );
 	g_assert( hits );
 	hits = g_slist_remove( hits, imageinfo );
 
@@ -156,8 +156,6 @@ imageinfogroup_class_init( ImageinfogroupClass *class )
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
 	iContainerClass *icontainer_class = ICONTAINER_CLASS( class );
 
-	imageinfogroup_parent_class = g_type_class_peek_parent( class );
-
 	gobject_class->finalize = imageinfogroup_finalize;
 
 	icontainer_class->child_add = imageinfogroup_child_add;
@@ -173,31 +171,6 @@ imageinfogroup_init( Imageinfogroup *imageinfogroup )
 
 	imageinfogroup->filename_hash = 
 		g_hash_table_new( g_str_hash, g_str_equal );
-}
-
-GType
-imageinfogroup_get_type( void )
-{
-	static GType imageinfogroup_type = 0;
-
-	if( !imageinfogroup_type ) {
-		static const GTypeInfo info = {
-			sizeof( ImageinfogroupClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) imageinfogroup_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Imageinfogroup ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) imageinfogroup_init,
-		};
-
-		imageinfogroup_type = g_type_register_static( TYPE_ICONTAINER, 
-			"Imageinfogroup", &info, 0 );
-	}
-
-	return( imageinfogroup_type );
 }
 
 Imageinfogroup *
@@ -239,6 +212,8 @@ imageinfogroup_lookup( Imageinfogroup *imageinfogroup, const char *filename )
 	return( NULL );
 }
 
+G_DEFINE_TYPE( Imageinfo, imageinfo, TYPE_MANAGED );  
+
 /* Our signals. 
  */
 enum {
@@ -249,8 +224,6 @@ enum {
 	SIG_INVALIDATE,		/* IMAGE* has been invalidated */
 	SIG_LAST
 };
-
-static ManagedClass *parent_class = NULL;
 
 static guint imageinfo_signals[SIG_LAST] = { 0 };
 
@@ -461,7 +434,7 @@ imageinfo_dispose( GObject *gobject )
 
 	IM_FREEF( g_source_remove, imageinfo->check_tid );
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( imageinfo_parent_class )->dispose( gobject );
 }
 
 /* Final death!
@@ -501,7 +474,7 @@ imageinfo_finalize( GObject *gobject )
 
 	imageinfo_undo_free( imageinfo );
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( imageinfo_parent_class )->finalize( gobject );
 }
 
 /* Make an info string about an imageinfo.
@@ -553,8 +526,6 @@ imageinfo_class_init( ImageinfoClass *class )
 	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
 	iObjectClass *iobject_class = IOBJECT_CLASS( class );
 	ManagedClass *managed_class = MANAGED_CLASS( class );
-
-	parent_class = g_type_class_peek_parent( class );
 
 	gobject_class->dispose = imageinfo_dispose;
 	gobject_class->finalize = imageinfo_finalize;
@@ -638,31 +609,6 @@ imageinfo_init( Imageinfo *imageinfo )
 
 	imageinfo->check_mtime = 0;
 	imageinfo->check_tid = 0;
-}
-
-GType
-imageinfo_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( ImageinfoClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) imageinfo_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Imageinfo ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) imageinfo_init,
-		};
-
-		type = g_type_register_static( TYPE_MANAGED, 
-			"Imageinfo", &info, 0 );
-	}
-
-	return( type );
 }
 
 static int

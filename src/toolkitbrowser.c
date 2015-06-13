@@ -46,14 +46,14 @@ enum {
 };
 
 static void
-toolkitbrowser_destroy( GtkObject *object )
+toolkitbrowser_destroy( GtkWidget *widget )
 {
-	Toolkitbrowser *toolkitbrowser = TOOLKITBROWSER( object );
+	Toolkitbrowser *toolkitbrowser = TOOLKITBROWSER( widget );
 
 	UNREF( toolkitbrowser->filter );
 	UNREF( toolkitbrowser->store );
 
-	GTK_OBJECT_CLASS( toolkitbrowser_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( toolkitbrowser_parent_class )->destroy( widget );
 }
 
 static void *
@@ -150,10 +150,10 @@ toolkitbrowser_link( vObject *vobject, iObject *iobject )
 static void
 toolkitbrowser_class_init( ToolkitbrowserClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	vObjectClass *vobject_class = (vObjectClass *) class;
 
-	object_class->destroy = toolkitbrowser_destroy;
+	widget_class->destroy = toolkitbrowser_destroy;
 
 	vobject_class->refresh = toolkitbrowser_refresh;
 	vobject_class->link = toolkitbrowser_link;

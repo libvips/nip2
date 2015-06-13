@@ -36,14 +36,14 @@
 G_DEFINE_TYPE( Plotwindow, plotwindow, TYPE_FLOATWINDOW ); 
 
 static void
-plotwindow_destroy( GtkObject *object )
+plotwindow_destroy( GtkWidget *widget )
 {
 	Plotwindow *plotwindow;
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_PLOTWINDOW( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_PLOTWINDOW( widget ) );
 
-	plotwindow = PLOTWINDOW( object );
+	plotwindow = PLOTWINDOW( widget );
 
 #ifdef DEBUG
 	printf( "plotwindow_destroy: %p\n", plotwindow );
@@ -53,15 +53,15 @@ plotwindow_destroy( GtkObject *object )
 	 */
 	UNREF( plotwindow->plotmodel );
 
-	GTK_OBJECT_CLASS( plotwindow_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( plotwindow_parent_class )->destroy( widget );
 }
 
 static void
 plotwindow_class_init( PlotwindowClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
-	object_class->destroy = plotwindow_destroy;
+	widget_class->destroy = plotwindow_destroy;
 
 	/* Create signals.
 	 */

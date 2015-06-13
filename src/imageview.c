@@ -59,14 +59,14 @@ static const ImageviewMagmenu imageview_mags[] = {
 };
 
 static void
-imageview_destroy( GtkObject *object )
+imageview_destroy( GtkWidget *widget )
 {
 	Imageview *iv;
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_IMAGEVIEW( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_IMAGEVIEW( widget ) );
 
-	iv = IMAGEVIEW( object );
+	iv = IMAGEVIEW( widget );
 
 #ifdef DEBUG
 	printf( "imageview_destroy\n" );
@@ -76,15 +76,15 @@ imageview_destroy( GtkObject *object )
 	 */
 	UNREF( iv->imagemodel );
 
-	GTK_OBJECT_CLASS( imageview_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( imageview_parent_class )->destroy( widget );
 }
 
 static void
 imageview_class_init( ImageviewClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	GtkWidgetClass *widget_class = (GtkObjectClass *) class;
 
-	object_class->destroy = imageview_destroy;
+	widget_class->destroy = imageview_destroy;
 
 	/* Create signals.
 	 */

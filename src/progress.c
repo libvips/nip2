@@ -34,7 +34,7 @@
 
 #include "ip.h"
 
-static iContainerClass *progress_parent_class = NULL;
+G_DEFINE_TYPE( Progress, progress, TYPE_IOBJECT ); 
 
 /* Our signals. 
  */
@@ -245,8 +245,6 @@ progress_end( void )
 static void
 progress_class_init( ProgressClass *class )
 {
-	progress_parent_class = g_type_class_peek_parent( class );
-
 	progress_signals[SIG_BEGIN] = g_signal_new( "begin",
 		G_OBJECT_CLASS_TYPE( class ),
 		G_SIGNAL_RUN_FIRST,
@@ -287,31 +285,6 @@ progress_init( Progress *progress )
 	progress->busy = FALSE;
 	vips_buf_init_static( &progress->feedback, 
 		progress->buf, PROGRESS_FEEDBACK_SIZE );
-}
-
-GType
-progress_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( ProgressClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) progress_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Progress ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) progress_init,
-		};
-
-		type = g_type_register_static( TYPE_IOBJECT, 
-			"Progress", &info, 0 );
-	}
-
-	return( type );
 }
 
 static Progress *

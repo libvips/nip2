@@ -36,7 +36,7 @@
 
 #include "ip.h"
 
-static FilemodelClass *parent_class = NULL;
+G_DEFINE_TYPE( Tool, tool, TYPE_FILEMODEL ); 
 
 /* Largest string we let the user set for name/tip/etc.
  */
@@ -121,7 +121,7 @@ tool_finalize( GObject *gobject )
 
 	IM_FREE( tool->help );
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( tool_parent_class )->finalize( gobject );
 }
 
 static void *toolitem_free( Toolitem *toolitem );
@@ -167,7 +167,7 @@ tool_dispose( GObject *gobject )
 
 	IM_FREEF( toolitem_free, tool->toolitem );
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( tool_parent_class )->dispose( gobject );
 }
 
 static View *
@@ -232,9 +232,10 @@ tool_info( iObject *iobject, VipsBuf *buf )
 {
 	Tool *tool = TOOL( iobject );
 
-	IOBJECT_CLASS( parent_class )->info( iobject, buf );
+	IOBJECT_CLASS( tool_parent_class )->info( iobject, buf );
 
-	vips_buf_appendf( buf, "type = \"%s\"\n", tool_type_to_char( tool->type ) );
+	vips_buf_appendf( buf, "type = \"%s\"\n", 
+		tool_type_to_char( tool->type ) );
 	if( tool->type == TOOL_SYM )
 		vips_buf_appendf( buf, "symbol = \"%s\"\n", 
 			IOBJECT( tool->sym )->name );
@@ -253,7 +254,7 @@ tool_parent_add( iContainer *child )
 
         tool->kit = kit;
 
-        ICONTAINER_CLASS( parent_class )->parent_add( child );
+        ICONTAINER_CLASS( tool_parent_class )->parent_add( child );
 }
 
 static void
@@ -263,8 +264,6 @@ tool_class_init( ToolClass *class )
 	iObjectClass *iobject_class = (iObjectClass *) class;
 	iContainerClass *icontainer_class = (iContainerClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -289,31 +288,6 @@ tool_init( Tool *tool )
         tool->sym = NULL;
         tool->kit = NULL;
         tool->lineno = -1;
-}
-
-GType
-tool_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( ToolClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) tool_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Tool ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) tool_init,
-		};
-
-		type = g_type_register_static( TYPE_FILEMODEL, 
-			"Tool", &info, 0 );
-	}
-
-	return( type );
 }
 
 /* Add a tool to a toolkit.

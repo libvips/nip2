@@ -104,7 +104,7 @@ panechild_init( Panechild *panechild )
         gtk_button_set_relief( GTK_BUTTON( but ), GTK_RELIEF_NONE );
         gtk_box_pack_end( GTK_BOX( hbox ), but, FALSE, FALSE, 0 );
         set_tooltip( but, _( "Close the pane" ) );
-	icon = gtk_image_new_from_icon_name( GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU );
+	icon = gtk_image_new_from_icon_name( "window-close", GTK_ICON_SIZE_MENU );
         gtk_container_add( GTK_CONTAINER( but ), icon );
         g_signal_connect( but, "clicked",
                 G_CALLBACK( panechild_hide_cb ), panechild );

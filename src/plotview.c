@@ -39,22 +39,22 @@
 G_DEFINE_TYPE( Plotview, plotview, TYPE_GRAPHICVIEW ); 
 
 static void
-plotview_destroy( GtkObject *object )
+plotview_destroy( GtkWidget *widget )
 {
     	Plotview *plotview;
 
-    	g_return_if_fail( object != NULL );
-    	g_return_if_fail( IS_PLOTVIEW( object ) );
+    	g_return_if_fail( widget != NULL );
+    	g_return_if_fail( IS_PLOTVIEW( widget ) );
 
 #ifdef DEBUG
     	printf( "plotview_destroy\n" );
 #endif /*DEBUG*/
 
-    	plotview = PLOTVIEW( object );
+    	plotview = PLOTVIEW( widget );
 
 	GOG_UNREF( plotview->gplot );
 
-    	GTK_OBJECT_CLASS( plotview_parent_class )->destroy( object );
+    	GTK_WIDGET_CLASS( plotview_parent_class )->destroy( widget );
 }
 
 static void
@@ -103,11 +103,11 @@ plotview_link( View *view, Model *model, View *parent )
 static void
 plotview_class_init( PlotviewClass *class )
 {
-    	GtkObjectClass *object_class = (GtkObjectClass *) class;
+    	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
     	vObjectClass *vobject_class = (vObjectClass *) class;
     	ViewClass *view_class = (ViewClass *) class;
 
-    	object_class->destroy = plotview_destroy;
+    	widget_class->destroy = plotview_destroy;
 
     	vobject_class->refresh = plotview_refresh;
 

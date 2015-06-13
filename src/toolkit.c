@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static FilemodelClass *parent_class = NULL;
+G_DEFINE_TYPE( Toolkit, toolkit, TYPE_FILEMODEL ); 
 
 Tool *
 toolkit_map( Toolkit *kit, tool_map_fn fn, void *a, void *b )
@@ -59,7 +59,7 @@ toolkit_info( iObject *iobject, VipsBuf *buf )
 {
 	Toolkit *kit = TOOLKIT( iobject );
 
-	IOBJECT_CLASS( parent_class )->info( iobject, buf );
+	IOBJECT_CLASS( toolkit_parent_class )->info( iobject, buf );
 
 	vips_buf_appendf( buf, "group = \"%s\"\n", IOBJECT( kit->kitg )->name );
 }
@@ -114,8 +114,6 @@ toolkit_class_init( ToolkitClass *class )
 	ModelClass *model_class = (ModelClass *) class;
 	FilemodelClass *filemodel_class = (FilemodelClass *) class;
 
-	parent_class = g_type_class_peek_parent( class );
-
 	/* Create signals.
 	 */
 
@@ -136,31 +134,6 @@ toolkit_init( Toolkit *kit )
 {
 	kit->kitg = NULL;
 	kit->pseudo = FALSE;
-}
-
-GType
-toolkit_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( ToolkitClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) toolkit_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Toolkit ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) toolkit_init,
-		};
-
-		type = g_type_register_static( TYPE_FILEMODEL, 
-			"Toolkit", &info, 0 );
-	}
-
-	return( type );
 }
 
 static void

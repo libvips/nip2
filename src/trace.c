@@ -195,21 +195,21 @@ trace_global_rethink( void )
 }
 
 static void
-trace_destroy( GtkObject *object )
+trace_destroy( GtkWidget *widget )
 {
 	Trace *trace;
 
-	g_return_if_fail( object != NULL );
-	g_return_if_fail( IS_TRACE( object ) );
+	g_return_if_fail( widget != NULL );
+	g_return_if_fail( IS_TRACE( widget ) );
 
-	trace = TRACE( object );
+	trace = TRACE( widget );
 
 	/* My instance destroy stuff.
 	 */
 
 	trace_all = g_slist_remove( trace_all, trace );
 
-	GTK_OBJECT_CLASS( trace_parent_class )->destroy( object );
+	GTK_WIDGET_CLASS( trace_parent_class )->destroy( widget );
 
 	trace_global_rethink();
 }
@@ -284,10 +284,10 @@ static const char *trace_menubar_ui_description =
 static void
 trace_class_init( TraceClass *class )
 {
-	GtkObjectClass *object_class = (GtkObjectClass *) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	LogClass *log_class = (LogClass *) class;
 
-	object_class->destroy = trace_destroy;
+	widget_class->destroy = trace_destroy;
 
 	log_class->actions = trace_actions;
 	log_class->n_actions = IM_NUMBER( trace_actions );

@@ -176,7 +176,7 @@ sliderview_init( Sliderview *sliderview )
         g_signal_connect_object( sliderview->tslider, 
 		"text_changed",
                 G_CALLBACK( view_changed_cb ), 
-		GTK_OBJECT( sliderview ) );
+		G_OBJECT( sliderview ) );
         g_signal_connect_object( sliderview->tslider, 
 		"activate",
                 G_CALLBACK( view_activate_cb ), 

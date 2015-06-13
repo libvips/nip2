@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static ModelClass *parent_class = NULL;
+G_DEFINE_TYPE( Workspaceroot, workspaceroot, TYPE_MODEL ); 
 
 static void
 workspaceroot_dispose( GObject *gobject )
@@ -51,13 +51,14 @@ workspaceroot_dispose( GObject *gobject )
 
 	wsr->sym = NULL;
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( workspaceroot_parent_class )->dispose( gobject );
 }
 
 static void
 workspaceroot_child_add( iContainer *parent, iContainer *child, int pos )
 {
-	ICONTAINER_CLASS( parent_class )->child_add( parent, child, pos );
+	ICONTAINER_CLASS( workspaceroot_parent_class )->
+		child_add( parent, child, pos );
 
 #ifdef DEBUG
 	printf( "workspaceroot_child_add: added %s\n",
@@ -68,7 +69,8 @@ workspaceroot_child_add( iContainer *parent, iContainer *child, int pos )
 static void
 workspaceroot_child_remove( iContainer *parent, iContainer *child )
 {
-	ICONTAINER_CLASS( parent_class )->child_remove( parent, child );
+	ICONTAINER_CLASS( workspaceroot_parent_class )->
+		child_remove( parent, child );
 }
 
 static void
@@ -76,8 +78,6 @@ workspaceroot_class_init( WorkspacerootClass *class )
 {
 	GObjectClass *gobject_class = (GObjectClass *) class;
 	iContainerClass *icontainer_class = (iContainerClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -94,31 +94,6 @@ static void
 workspaceroot_init( Workspaceroot *wsr )
 {
 	wsr->sym = NULL;
-}
-
-GType
-workspaceroot_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( WorkspacerootClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) workspaceroot_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Workspaceroot ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) workspaceroot_init,
-		};
-
-		type = g_type_register_static( TYPE_MODEL, 
-			"Workspaceroot", &info, 0 );
-	}
-
-	return( type );
 }
 
 static void

@@ -1,18 +1,7 @@
-- swap GTK_OBJECT for G_OBJECT or GTK_WIDGET
+- doing:
 
-:wq
+	boxes.c:62:2: warning: implicit declaration of function ‘gtk_container_border_width’ [-Wimplicit-function-declaration]
 
-
-
-
-
-
-- swap 
-
-	gtk_hbox_new for gtk_box_new
-	gtk_vbox_new for gtk_box_new
-
-  check proto
 
 - swap
 

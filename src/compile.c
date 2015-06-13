@@ -58,7 +58,7 @@
 
 #include "ip.h"
 
-static iContainerClass *parent_class = NULL;
+G_DEFINE_TYPE( Compile, compile, TYPE_ICONTAINER ); 
 
 Compile *
 compile_get_parent( Compile *compile )
@@ -303,15 +303,13 @@ compile_finalize( GObject *gobject )
 	 */
 	g_assert( !compile->exprs );
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( compile_parent_class )->finalize( gobject );
 }
 
 static void
 compile_class_init( CompileClass *class )
 {
 	GObjectClass *gobject_class = (GObjectClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	gobject_class->finalize = compile_finalize;
 
@@ -353,31 +351,6 @@ compile_init( Compile *compile )
 	compile->base.type = ELEMENT_NOVAL;
 	compile->heap = NULL;
 	compile->statics = NULL;
-}
-
-GType
-compile_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( CompileClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) compile_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Compile ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) compile_init,
-		};
-
-		type = g_type_register_static( TYPE_ICONTAINER, 
-			"Compile", &info, 0 );
-	}
-
-	return( type );
 }
 
 /* Make a compile linked to an expr.

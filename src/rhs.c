@@ -34,7 +34,7 @@
 #define DEBUG
  */
 
-static HeapmodelClass *parent_class = NULL;
+G_DEFINE_TYPE( Rhs, rhs, TYPE_HEAPMODEL );
 
 /* child is about to be added ... update our graphic/scol/text shortcuts.
  */
@@ -56,7 +56,7 @@ rhs_child_add( iContainer *parent, iContainer *child, int pos )
 		rhs->graphic = MODEL( child );
 	}
 
-	ICONTAINER_CLASS( parent_class )->child_add( parent, child, pos );
+	ICONTAINER_CLASS( rhs_parent_class )->child_add( parent, child, pos );
 }
 
 static void
@@ -71,7 +71,7 @@ rhs_child_remove( iContainer *parent, iContainer *child )
 	else if( (void *) child == (void *) rhs->itext )
 		rhs->itext = NULL;
 
-	ICONTAINER_CLASS( parent_class )->child_remove( parent, child );
+	ICONTAINER_CLASS( rhs_parent_class )->child_remove( parent, child );
 }
 
 static void
@@ -79,7 +79,7 @@ rhs_parent_add( iContainer *child )
 {
 	g_assert( IS_ROW( child->parent ) );
 
-	ICONTAINER_CLASS( parent_class )->parent_add( child );
+	ICONTAINER_CLASS( rhs_parent_class )->parent_add( child );
 }
 
 static View *
@@ -104,7 +104,8 @@ rhs_load( Model *model,
 		!get_iprop( xnode, "flags", (int *) &rhs->flags ) )
 		return( FALSE );
 
-	if( !MODEL_CLASS( parent_class )->load( model, state, parent, xnode ) )
+	if( !MODEL_CLASS( rhs_parent_class )->
+		load( model, state, parent, xnode ) )
 		return( FALSE );
 
 	return( TRUE );
@@ -117,7 +118,7 @@ rhs_save( Model *model, xmlNode *xnode )
 
 	xmlNode *xthis;
 
-	if( !(xthis = MODEL_CLASS( parent_class )->save( model, xnode )) )
+	if( !(xthis = MODEL_CLASS( rhs_parent_class )->save( model, xnode )) )
 		return( NULL );
 
 	if( !set_iprop( xthis, "vislevel", rhs->vislevel ) ||
@@ -256,7 +257,7 @@ rhs_new_heap( Heapmodel *heapmodel, PElement *root )
 		if( heapmodel_new_heap( HEAPMODEL( rhs->itext ), root ) )
 			return( rhs );
 
-	return( HEAPMODEL_CLASS( parent_class )->new_heap( heapmodel, root ) );
+	return( HEAPMODEL_CLASS( rhs_parent_class )->new_heap( heapmodel, root ) );
 }
 
 /* Rethink child visibility.
@@ -342,7 +343,7 @@ rhs_update_model( Heapmodel *heapmodel )
 	 */
 	rhs_set_vislevel( rhs, rhs->vislevel );
 
-	return( HEAPMODEL_CLASS( parent_class )->update_model( heapmodel ) );
+	return( HEAPMODEL_CLASS( rhs_parent_class )->update_model( heapmodel ) );
 }
 
 static void
@@ -351,8 +352,6 @@ rhs_class_init( RhsClass *class )
 	iContainerClass *icontainer_class = (iContainerClass *) class;
 	ModelClass *model_class = (ModelClass *) class;
 	HeapmodelClass *heapmodel_class = (HeapmodelClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	/* Create signals.
 	 */
@@ -390,31 +389,6 @@ rhs_init( Rhs *rhs )
         rhs->graphic = NULL;
         rhs->scol = NULL;
         rhs->itext = NULL;
-}
-
-GType
-rhs_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( RhsClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) rhs_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Rhs ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) rhs_init,
-		};
-
-		type = g_type_register_static( TYPE_HEAPMODEL, 
-			"Rhs", &info, 0 );
-	}
-
-	return( type );
 }
 
 Rhs *

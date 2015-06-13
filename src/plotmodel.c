@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static iObjectClass *parent_class = NULL;
+G_DEFINE_TYPE( Plotmodel, plotmodel, TYPE_IOBJECT ); 
 
 static void
 plotmodel_dispose( GObject *gobject )
@@ -55,7 +55,7 @@ plotmodel_dispose( GObject *gobject )
 	FREESID( plotmodel->changed_sid, plotmodel->plot );
 	FREESID( plotmodel->destroy_sid, plotmodel->plot );
 
-	G_OBJECT_CLASS( parent_class )->dispose( gobject );
+	G_OBJECT_CLASS( plotmodel_parent_class )->dispose( gobject );
 }
 
 static void
@@ -67,7 +67,7 @@ plotmodel_finalize( GObject *gobject )
 	printf( "plotmodel_finalize: %p\n", plotmodel );
 #endif /*DEBUG*/
 
-	G_OBJECT_CLASS( parent_class )->finalize( gobject );
+	G_OBJECT_CLASS( plotmodel_parent_class )->finalize( gobject );
 }
 
 static void
@@ -82,7 +82,7 @@ plotmodel_changed( iObject *iobject )
 	prefs_set( "DISPLAY_STATUS", 
 		"%s", bool_to_char( plotmodel->show_status ) );
 
-	IOBJECT_CLASS( parent_class )->changed( iobject );
+	IOBJECT_CLASS( plotmodel_parent_class )->changed( iobject );
 }
 
 static void
@@ -90,8 +90,6 @@ plotmodel_class_init( PlotmodelClass *class )
 {
 	GObjectClass *gobject_class = (GObjectClass *) class;
 	iObjectClass *iobject_class = (iObjectClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	gobject_class->dispose = plotmodel_dispose;
 	gobject_class->finalize = plotmodel_finalize;
@@ -118,31 +116,6 @@ plotmodel_init( Plotmodel *plotmodel )
 	plotmodel->height = -1;
 	plotmodel->mag = 100;
 	plotmodel->show_status = DISPLAY_STATUS;
-}
-
-GType
-plotmodel_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( PlotmodelClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) plotmodel_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Plotmodel ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) plotmodel_init,
-		};
-
-		type = g_type_register_static( TYPE_IOBJECT, 
-			"Plotmodel", &info, 0 );
-	}
-
-	return( type );
 }
 
 static void

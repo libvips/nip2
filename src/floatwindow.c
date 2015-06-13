@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static iWindowClass *parent_class = NULL;
+G_DEFINE_TYPE( Floatwindow, floatwindow, TYPE_IWINDOW ); 
 
 static void
 floatwindow_popdown( GtkWidget *widget )
@@ -52,14 +52,15 @@ floatwindow_popdown( GtkWidget *widget )
 	/* Note position/size for later reuse.
 	 */
 	model->window_width = 
-		GTK_WIDGET( floatwindow )->allocation.width;
+		gtk_widget_get_allocated_width( GTK_WIDGET( floatwindow ) ); 
 	model->window_height = 
-		GTK_WIDGET( floatwindow )->allocation.height;
+		gtk_widget_get_allocated_height( GTK_WIDGET( floatwindow ) ); 
 	gdk_window_get_root_origin( 
-		gtk_widget_get_toplevel( GTK_WIDGET( floatwindow ) )->window, 
+		gtk_widget_get_window( 
+			gtk_widget_get_toplevel( GTK_WIDGET( floatwindow ) ) ), 
 		&model->window_x, &model->window_y );
 
-	IWINDOW_CLASS( parent_class )->popdown( widget );
+	IWINDOW_CLASS( floatwindow_parent_class )->popdown( widget );
 }
 
 static void
@@ -68,7 +69,7 @@ floatwindow_build( GtkWidget *widget )
 	Floatwindow *floatwindow = FLOATWINDOW( widget );
 	Model *model = floatwindow->model;
 
-	IWINDOW_CLASS( parent_class )->build( widget );
+	IWINDOW_CLASS( floatwindow_parent_class )->build( widget );
 
 	/* Must be set with floatmodel_link before build.
 	 */
@@ -102,7 +103,7 @@ floatwindow_build( GtkWidget *widget )
 		int window_height = IM_MIN( model->window_height,
 			screen_height );
 
-		gtk_widget_set_uposition( GTK_WIDGET( floatwindow ), 
+		gtk_window_move( GTK_WINDOW( floatwindow ), 
 			window_x, window_y );
 		gtk_window_set_default_size( GTK_WINDOW( floatwindow ),
 			window_width, window_height );
@@ -113,8 +114,6 @@ static void
 floatwindow_class_init( FloatwindowClass *class )
 {
 	iWindowClass *iwindow_class = (iWindowClass *) class;
-
-	parent_class = g_type_class_peek_parent( class );
 
 	iwindow_class->build = floatwindow_build;
 	iwindow_class->popdown = floatwindow_popdown;
@@ -138,31 +137,6 @@ static void
 floatwindow_init( Floatwindow *floatwindow )
 {
 	floatwindow->model = NULL;
-}
-
-GType
-floatwindow_get_type( void )
-{
-	static GType type = 0;
-
-	if( !type ) {
-		static const GTypeInfo info = {
-			sizeof( FloatwindowClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) floatwindow_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Floatwindow ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) floatwindow_init,
-		};
-
-		type = g_type_register_static( TYPE_IWINDOW, 
-			"Floatwindow", &info, 0 );
-	}
-
-	return( type );
 }
 
 void

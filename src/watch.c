@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-static iContainerClass *watchgroup_parent_class = NULL;
+G_DEFINE_TYPE( Watchgroup, watchgroup, TYPE_ICONTAINER ); 
 
 /* Our signals. 
  */
@@ -54,8 +54,6 @@ watchgroup_changed( Watchgroup *watchgroup, Watch *watch )
 static void
 watchgroup_class_init( WatchgroupClass *class )
 {
-	watchgroup_parent_class = g_type_class_peek_parent( class );
-
 	watchgroup_signals[SIG_WATCH_CHANGED] = g_signal_new( "watch_changed",
 		G_OBJECT_CLASS_TYPE( class ),
 		G_SIGNAL_RUN_FIRST,
@@ -74,31 +72,6 @@ watchgroup_init( Watchgroup *watchgroup )
 #endif /*DEBUG*/
 
 	watchgroup->auto_save_timeout = 0;
-}
-
-GType
-watchgroup_get_type( void )
-{
-	static GType watchgroup_type = 0;
-
-	if( !watchgroup_type ) {
-		static const GTypeInfo info = {
-			sizeof( WatchgroupClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) watchgroup_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Watchgroup ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) watchgroup_init,
-		};
-
-		watchgroup_type = g_type_register_static( TYPE_ICONTAINER, 
-			"Watchgroup", &info, 0 );
-	}
-
-	return( watchgroup_type );
 }
 
 Watchgroup *
@@ -204,7 +177,8 @@ watchgroup_flush( Watchgroup *watchgroup )
 	}
 }
 
-static iContainerClass *watch_parent_class = NULL;
+G_DEFINE_TYPE( Watch, watch, TYPE_ICONTAINER ); 
+
 static GSList *watch_all = NULL;
 
 static void
@@ -272,8 +246,6 @@ watch_class_init( WatchClass *class )
 	iObjectClass *iobject_class = (iObjectClass *) class;
 	WatchClass *watch_class = (WatchClass *) class;
 
-	watch_parent_class = g_type_class_peek_parent( class );
-
 	gobject_class->finalize = watch_finalize;
 	gobject_class->dispose = watch_dispose;
 
@@ -292,31 +264,6 @@ watch_init( Watch *watch )
 	watch->changed_sid = 0;
 
 	watch_all = g_slist_prepend( watch_all, watch );
-}
-
-GType
-watch_get_type( void )
-{
-	static GType watch_type = 0;
-
-	if( !watch_type ) {
-		static const GTypeInfo info = {
-			sizeof( WatchClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) watch_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( Watch ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) watch_init,
-		};
-
-		watch_type = g_type_register_static( TYPE_ICONTAINER, 
-			"Watch", &info, 0 );
-	}
-
-	return( watch_type );
 }
 
 static void
@@ -478,7 +425,7 @@ watch_set( Watch *watch, const char *fmt, ... )
 	va_end( args );
 }
 
-static WatchClass *watch_double_parent_class = NULL;
+G_DEFINE_TYPE( WatchDouble, watch_double, TYPE_WATCH ); 
 
 static gboolean
 watch_double_update( Watch *watch )
@@ -515,8 +462,6 @@ watch_double_class_init( WatchDoubleClass *class )
 {
 	WatchClass *watch_class = (WatchClass *) class;
 
-	watch_double_parent_class = g_type_class_peek_parent( class );
-
 	watch_class->update = watch_double_update;
 	watch_class->get_value = watch_double_get_value;
 }
@@ -529,31 +474,6 @@ watch_double_init( WatchDouble *watch_double )
 #endif /*DEBUG*/
 
 	watch_double->value = -1.0;
-}
-
-GType
-watch_double_get_type( void )
-{
-	static GType watch_double_type = 0;
-
-	if( !watch_double_type ) {
-		static const GTypeInfo info = {
-			sizeof( WatchDoubleClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) watch_double_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( WatchDouble ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) watch_double_init,
-		};
-
-		watch_double_type = g_type_register_static( TYPE_WATCH, 
-			"WatchDouble", &info, 0 );
-	}
-
-	return( watch_double_type );
 }
 
 static Watch *
@@ -587,7 +507,7 @@ watch_double_get( Watchgroup *watchgroup, const char *name, double fallback )
 	return( *((double *) value) );
 }
 
-static WatchClass *watch_int_parent_class = NULL;
+G_DEFINE_TYPE( WatchInt, watch_int, TYPE_WATCH ); 
 
 static gboolean
 watch_int_update( Watch *watch )
@@ -631,8 +551,6 @@ watch_int_class_init( WatchIntClass *class )
 {
 	WatchClass *watch_class = (WatchClass *) class;
 
-	watch_int_parent_class = g_type_class_peek_parent( class );
-
 	watch_class->update = watch_int_update;
 	watch_class->get_value = watch_int_get_value;
 }
@@ -645,31 +563,6 @@ watch_int_init( WatchInt *watch_int )
 #endif /*DEBUG*/
 
 	watch_int->value = -1;
-}
-
-GType
-watch_int_get_type( void )
-{
-	static GType watch_int_type = 0;
-
-	if( !watch_int_type ) {
-		static const GTypeInfo info = {
-			sizeof( WatchIntClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) watch_int_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( WatchInt ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) watch_int_init,
-		};
-
-		watch_int_type = g_type_register_static( TYPE_WATCH, 
-			"WatchInt", &info, 0 );
-	}
-
-	return( watch_int_type );
 }
 
 static Watch *
@@ -703,7 +596,7 @@ watch_int_get( Watchgroup *watchgroup, const char *name, int fallback )
 	return( *((int *) value) );
 }
 
-static WatchClass *watch_path_parent_class = NULL;
+G_DEFINE_TYPE( WatchPath, watch_path, TYPE_WATCH ); 
 
 static void
 watch_path_finalize( GObject *gobject )
@@ -760,8 +653,6 @@ watch_path_class_init( WatchPathClass *class )
 	GObjectClass *gobject_class = (GObjectClass *) class;
 	WatchClass *watch_class = (WatchClass *) class;
 
-	watch_path_parent_class = g_type_class_peek_parent( class );
-
 	gobject_class->finalize = watch_path_finalize;
 
 	watch_class->update = watch_path_update;
@@ -776,31 +667,6 @@ watch_path_init( WatchPath *watch_path )
 #endif /*DEBUG*/
 
 	watch_path->value = NULL;
-}
-
-GType
-watch_path_get_type( void )
-{
-	static GType watch_path_type = 0;
-
-	if( !watch_path_type ) {
-		static const GTypeInfo info = {
-			sizeof( WatchPathClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) watch_path_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( WatchPath ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) watch_path_init,
-		};
-
-		watch_path_type = g_type_register_static( TYPE_WATCH, 
-			"WatchPath", &info, 0 );
-	}
-
-	return( watch_path_type );
 }
 
 static Watch *
@@ -834,7 +700,7 @@ watch_path_get( Watchgroup *watchgroup, const char *name, GSList *fallback )
 	return( *((GSList **) value) );
 }
 
-static WatchClass *watch_bool_parent_class = NULL;
+G_DEFINE_TYPE( WatchBool, watch_bool, TYPE_WATCH ); 
 
 static gboolean
 watch_bool_update( Watch *watch )
@@ -871,8 +737,6 @@ watch_bool_class_init( WatchBoolClass *class )
 {
 	WatchClass *watch_class = (WatchClass *) class;
 
-	watch_bool_parent_class = g_type_class_peek_parent( class );
-
 	watch_class->update = watch_bool_update;
 	watch_class->get_value = watch_bool_get_value;
 }
@@ -885,31 +749,6 @@ watch_bool_init( WatchBool *watch_bool )
 #endif /*DEBUG*/
 
 	watch_bool->value = FALSE;
-}
-
-GType
-watch_bool_get_type( void )
-{
-	static GType watch_bool_type = 0;
-
-	if( !watch_bool_type ) {
-		static const GTypeInfo info = {
-			sizeof( WatchBoolClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) watch_bool_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( WatchBool ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) watch_bool_init,
-		};
-
-		watch_bool_type = g_type_register_static( TYPE_WATCH, 
-			"WatchBool", &info, 0 );
-	}
-
-	return( watch_bool_type );
 }
 
 static Watch *
@@ -943,7 +782,7 @@ watch_bool_get( Watchgroup *watchgroup, const char *name, gboolean fallback )
 	return( *((gboolean *) value) );
 }
 
-static WatchClass *watch_string_parent_class = NULL;
+G_DEFINE_TYPE( WatchString, watch_string, TYPE_WATCH ); 
 
 static void
 watch_string_finalize( GObject *gobject )
@@ -999,8 +838,6 @@ watch_string_class_init( WatchStringClass *class )
 	GObjectClass *gobject_class = (GObjectClass *) class;
 	WatchClass *watch_class = (WatchClass *) class;
 
-	watch_string_parent_class = g_type_class_peek_parent( class );
-
 	gobject_class->finalize = watch_string_finalize;
 
 	watch_class->update = watch_string_update;
@@ -1015,31 +852,6 @@ watch_string_init( WatchString *watch_string )
 #endif /*DEBUG*/
 
 	watch_string->value = NULL;
-}
-
-GType
-watch_string_get_type( void )
-{
-	static GType watch_string_type = 0;
-
-	if( !watch_string_type ) {
-		static const GTypeInfo info = {
-			sizeof( WatchStringClass ),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) watch_string_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
-			sizeof( WatchString ),
-			32,             /* n_preallocs */
-			(GInstanceInitFunc) watch_string_init,
-		};
-
-		watch_string_type = g_type_register_static( TYPE_WATCH, 
-			"WatchString", &info, 0 );
-	}
-
-	return( watch_string_type );
 }
 
 static Watch *

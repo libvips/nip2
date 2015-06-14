@@ -312,9 +312,12 @@ void
 columnview_get_position( Columnview *cview, int *x, int *y, int *w, int *h )
 {
 	Column *col = COLUMN( VOBJECT( cview )->iobject );
+	GtkAllocation allocation;
 
-        if( GTK_WIDGET( cview )->allocation.x < 2 || 
-		GTK_WIDGET( cview )->allocation.y < 2 ) {
+	gtk_widget_get_allocation( GTK_WIDGET( cview ), &allocation ); 
+
+        if( allocation.x < 2 || 
+		allocation.y < 2 ) {
                 /* Nothing there yet, guess.
                  */
 		*x = col->x; 
@@ -323,10 +326,10 @@ columnview_get_position( Columnview *cview, int *x, int *y, int *w, int *h )
                 *h = 50;
         }
         else {
-                *x = GTK_WIDGET( cview )->allocation.x;
-                *y = GTK_WIDGET( cview )->allocation.y;
-                *w = GTK_WIDGET( cview )->allocation.width;
-                *h = GTK_WIDGET( cview )->allocation.height;
+                *x = allocation.x;
+                *y = allocation.y;
+                *w = allocation.width;
+                *h = allocation.height;
 
 #ifdef DEBUG
 		printf( "columnview_get_position: %s, "
@@ -731,7 +734,8 @@ static gboolean
 columnview_caption_cancel_cb( GtkWidget *widget, 
 	GdkEvent *ev, Columnview *cview )
 {
-        if( ev->type != GDK_KEY_PRESS || ev->key.keyval != GDK_Escape )
+        if( ev->type != GDK_KEY_PRESS || 
+		ev->key.keyval != GDK_KEY_Escape )
                 return( FALSE );
 
         /* Turn off edit.
@@ -829,9 +833,12 @@ columnview_refresh( vObject *vobject )
 		view_child_position( VIEW( shadow ) ); 
 
 	if( shadow ) {
+		GtkAllocation allocation;
+
+		gtk_widget_get_allocation( GTK_WIDGET( cview->frame ), 
+			&allocation ); 
 		gtk_widget_set_size_request( GTK_WIDGET( shadow->frame ), 
-			GTK_WIDGET( cview->frame )->allocation.width, 
-			GTK_WIDGET( cview->frame )->allocation.height );
+			allocation.width, allocation.height );
 		gtk_frame_set_shadow_type( GTK_FRAME( shadow->frame ),
 			GTK_SHADOW_IN );
 	}
@@ -886,13 +893,13 @@ columnview_refresh( vObject *vobject )
 	/* Set open/closed.
 	 */
 	if( col->open ) {
-                gtk_arrow_set( GTK_ARROW( cview->updown ),
-                        GTK_ARROW_DOWN, GTK_SHADOW_OUT );
+		gtk_image_set_from_icon_name( GTK_IMAGE( cview->updown ),
+                        "arrow-down", GTK_ICON_SIZE_MENU );
                 set_tooltip( cview->updownb, _( "Fold the column away" ) );
 	}
 	else {
-                gtk_arrow_set( GTK_ARROW( cview->updown ),
-                        GTK_ARROW_RIGHT, GTK_SHADOW_OUT );
+		gtk_image_set_from_icon_name( GTK_IMAGE( cview->updown ),
+                        "arrow-right", GTK_ICON_SIZE_MENU );
                 set_tooltip( cview->updownb, _( "Open the column" ) );
 	}
 	model_display( MODEL( col->scol ), col->open );
@@ -987,9 +994,12 @@ columnview_scrollto( View *view, ModelScrollPosition position )
 {
 	Columnview *cview = COLUMNVIEW( view );
 	Workspaceview *wview = cview->wview;
+
 	int x, y, w, h;
+	GtkAllocation allocation;
 
 	columnview_get_position( cview, &x, &y, &w, &h );
+	gtk_widget_get_allocation( GTK_WIDGET( cview->title ), &allocation ); 
 
 	if( position == MODEL_SCROLL_BOTTOM )
 		/* 35 is supposed to be enough to ensure the whole of the edit
@@ -997,8 +1007,7 @@ columnview_scrollto( View *view, ModelScrollPosition position )
 		 */
 		workspaceview_scroll( wview, x, y + h, w, 35 );
 	else
-		workspaceview_scroll( wview, 
-			x, y, w, cview->title->allocation.height );
+		workspaceview_scroll( wview, x, y, w, allocation.height );
 }
 
 static void
@@ -1033,13 +1042,13 @@ columnview_class_init( ColumnviewClass *class )
 		POPUP_FUNC( columnview_clone_cb ) );
 	popup_add_but( pane, _( "Merge Into Column" ),
 		POPUP_FUNC( columnview_merge_cb ) );
-	popup_add_but( pane, GTK_STOCK_SAVE_AS,
+	popup_add_but( pane, "save-as",
 		POPUP_FUNC( columnview_save_as_cb ) );
 	menu_add_sep( pane );
 	popup_add_but( pane, _( "Make Column Into _Menu Item" ),
 		POPUP_FUNC( columnview_to_menu_cb ) );
 	menu_add_sep( pane );
-	popup_add_but( pane, GTK_STOCK_DELETE,
+	popup_add_but( pane, "delete",
 		POPUP_FUNC( columnview_destroy_cb ) );
 }
 
@@ -1123,7 +1132,8 @@ columnview_init( Columnview *cview )
         gtk_container_set_border_width( GTK_CONTAINER( cview->updownb ), 0 );
         gtk_box_pack_start( GTK_BOX( cview->titlehb ),
                 cview->updownb, FALSE, FALSE, 0 );
-        cview->updown = gtk_arrow_new( GTK_ARROW_DOWN, GTK_SHADOW_OUT );
+        cview->updown = gtk_image_new_from_icon_name( 
+		"arrow-down", GTK_ICON_SIZE_MENU );
         gtk_container_add( GTK_CONTAINER( cview->updownb ), cview->updown );
         g_signal_connect( cview->updownb, "clicked",
                 G_CALLBACK( columnview_updown_cb ), cview );
@@ -1136,7 +1146,7 @@ columnview_init( Columnview *cview )
         gtk_button_set_relief( GTK_BUTTON( but ), GTK_RELIEF_NONE );
         gtk_box_pack_start( GTK_BOX( sb ), but, TRUE, FALSE, 0 );
         set_tooltip( but, _( "Delete the column" ) );
-	icon = gtk_image_new_from_icon_name( GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU );
+	icon = gtk_image_new_from_icon_name( "close", GTK_ICON_SIZE_MENU );
         gtk_container_add( GTK_CONTAINER( but ), icon );
         g_signal_connect( but, "clicked",
                 G_CALLBACK( columnview_destroy2_cb ), cview );

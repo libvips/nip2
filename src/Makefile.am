@@ -95,8 +95,6 @@ nip2_SOURCES = \
 	fontnameview.h \
 	filesel.c \
 	filesel.h \
-	graphwindow.c \
-	graphwindow.h \
 	graphicview.c \
 	graphicview.h \
 	gtkutil.c \
@@ -118,12 +116,8 @@ nip2_SOURCES = \
 	idialog.h \
 	iimage.c \
 	iimage.h \
-	iimageview.c \
-	iimageview.h \
 	imagedisplay.c \
 	imagedisplay.h \
-	log.c \
-	log.h \
 	error.c \
 	error.h \
 	managed.c \
@@ -172,8 +166,6 @@ nip2_SOURCES = \
 	link.h \
 	main.c \
 	main.h \
-	mainw.c \
-	mainw.h \
 	matrix.c \
 	matrix.h \
 	matrixview.c \
@@ -182,8 +174,6 @@ nip2_SOURCES = \
 	plot.h \
 	plotview.c \
 	plotview.h \
-	plotwindow.c \
-	plotwindow.h \
 	model.c \
 	model.h \
 	nip2-icon.rc \
@@ -199,8 +189,6 @@ nip2_SOURCES = \
 	path.h \
 	predicate.c \
 	predicate.h \
-	program.c \
-	program.h \
 	string.c \
 	istring.h \
 	number.c \
@@ -296,7 +284,20 @@ nip2_SOURCES = \
 	workspaceroot.c \
 	workspaceroot.h \
 	workspaceview.c \
-	workspaceview.h 
+	workspaceview.h \
+	\
+	graphwindow.c \
+	graphwindow.h \
+	iimageview.c \
+	iimageview.h \
+	log.c \
+	log.h \
+	mainw.c \
+	mainw.h \
+	plotwindow.c \
+	plotwindow.h \
+	program.c \
+	program.h 
 
 helpindex.h: 
 	./makehelpindex.pl $(prefix) > helpindex.h

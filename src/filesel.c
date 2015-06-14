@@ -839,7 +839,8 @@ filesel_file_activated_cb( GtkWidget *widget, gpointer data )
 static void
 filesel_auto_incr_cb( GtkWidget *tog, Filesel *filesel )
 {
-        filesel->incr = GTK_TOGGLE_BUTTON( tog )->active;
+        filesel->incr = 
+		gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( tog ) ); 
 
 	if( filesel->incr )
 		idialog_set_pinup( IDIALOG( filesel ), TRUE );
@@ -1206,7 +1207,7 @@ filesel_prefs( Filesel *filesel, iWindow *iwnd,
 	iwindow_set_parent( IWINDOW( prefs ), GTK_WIDGET( iwnd ) );
 	idialog_set_callbacks( IDIALOG( prefs ), 
 		iwindow_true_cb, NULL, NULL, filesel );
-	idialog_add_ok( IDIALOG( prefs ), filesel_prefs_ok_cb, GTK_STOCK_SAVE );
+	idialog_add_ok( IDIALOG( prefs ), filesel_prefs_ok_cb, "save" );
 	idialog_set_notify( IDIALOG( prefs ), nfn, sys );
 	iwindow_build( IWINDOW( prefs ) );
 
@@ -1284,7 +1285,7 @@ filesel_set_flags( Filesel *filesel, gboolean imls, gboolean save )
 	filesel->save = save;
 
 	idialog_add_ok( IDIALOG( filesel ), filesel_done_cb, 
-		save ? GTK_STOCK_SAVE : GTK_STOCK_OPEN );
+		save ? "save" : "open" );
 }
 
 void 

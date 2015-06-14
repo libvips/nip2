@@ -61,7 +61,8 @@ colourdisplay_set_drag_type( Colourdisplay *colourdisplay )
 	IMAGE *im = imageinfo_get( FALSE, imageinfo );
 	const GtkTargetEntry *targets;
 
-	if( !GTK_WIDGET_REALIZED( GTK_WIDGET( colourdisplay ) ) || !im ) 
+	if( !gtk_widget_get_realized( GTK_WIDGET( colourdisplay ) ) || 
+		!im ) 
 		return;
 
 	if( im->Bands == 3 && !vips_bandfmt_iscomplex( im->BandFmt ) )
@@ -113,7 +114,7 @@ colourdisplay_drag_begin( GtkWidget *widget, GdkDragContext *context )
 	bg.red = 0xffff * colours[0];
 	bg.green = 0xffff * colours[1];
 	bg.blue = 0xffff * colours[2];
-	gtk_widget_modify_bg( window, GTK_STATE_NORMAL, &bg );
+	//gtk_widget_modify_bg( window, GTK_STATE_NORMAL, &bg );
 
 	gtk_drag_set_icon_widget( context, window, -2, -2 );
 }
@@ -186,20 +187,21 @@ colourdisplay_drag_data_received( GtkWidget *widget, GdkDragContext *context,
 	gdouble old_rgb[4];
 	gdouble rgb[4];
 
-	if( selection_data->length < 0 ) 
+	if( gtk_selection_data_get_length( selection_data ) < 0 ) 
 		return;
 
 	switch( info ) {
 	case TARGET_COLOUR: 
-		if( selection_data->format != 16 || 
-			selection_data->length != 8 )
+		if( gtk_selection_data_get_format( selection_data ) != 16 || 
+			gtk_selection_data_get_length( selection_data ) != 8 )
 			return;
 
 #ifdef DEBUG
 		printf( "colourdisplay_drag_data_received: seen x-color\n" );
 #endif /*DEBUG*/
 
-		vals = (guint16 *)selection_data->data;
+		vals = (guint16 *) 
+			gtk_selection_data_get_data( selection_data ); 
 		rgb[0] = (double) vals[0] / 0xffff;
 		rgb[1] = (double) vals[1] / 0xffff;
 		rgb[2] = (double) vals[2] / 0xffff;
@@ -217,7 +219,7 @@ colourdisplay_drag_data_received( GtkWidget *widget, GdkDragContext *context,
 		break;
 
 	case TARGET_TEXT:
-		if( selection_data->format != 8 )
+		if( gtk_selection_data_get_format( selection_data ) != 8 )
 			return;
 
 #ifdef DEBUG
@@ -225,7 +227,8 @@ colourdisplay_drag_data_received( GtkWidget *widget, GdkDragContext *context,
 #endif /*DEBUG*/
 
 		if( !imageinfo_from_text( imageinfo, 
-			(char *) selection_data->data ) )
+			(char *) gtk_selection_data_get_data( 
+				selection_data ) ) )
 			iwindow_alert( widget, GTK_MESSAGE_ERROR );
 		break;
 
@@ -286,7 +289,7 @@ colourdisplay_init( Colourdisplay *colourdisplay )
 
 	/* Who wants to focus one of these :/
 	 */
-	GTK_WIDGET_UNSET_FLAGS( GTK_WIDGET( colourdisplay ), GTK_CAN_FOCUS );
+	g_object_set( colourdisplay, "can-focus", FALSE, NULL ); 
 
 	set_tooltip_generate( GTK_WIDGET( colourdisplay ), 
 		(TooltipGenerateFn) colourdisplay_generate_tooltip, 

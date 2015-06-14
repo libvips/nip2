@@ -147,6 +147,11 @@ doubleclick_trigger_cb( GtkWidget *wid, GdkEvent *ev, Doubleclick *click )
 		}
 	}
 	else {
+		int double_click_time;
+
+		g_object_get( gtk_settings_get_default(), 
+			"gtk-double-click-time", &double_click_time, NULL );
+
 #ifdef DEBUG
 		g_message( "doubleclick: starting timer" );
 #endif /*DEBUG*/
@@ -157,7 +162,7 @@ doubleclick_trigger_cb( GtkWidget *wid, GdkEvent *ev, Doubleclick *click )
 		 * there's no access method, I think.
 		 */
 		click->click = g_timeout_add( 
-			gtk_widget_get_display( wid )->double_click_time, 
+			double_click_time, 
 			(GSourceFunc) doubleclick_time_cb, click );
 
 		/* If do-single-on-double is set, we can trigger a

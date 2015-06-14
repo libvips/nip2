@@ -139,8 +139,6 @@ colourview_init( Colourview *colourview )
 		GTK_ALIGN_START );
 	gtk_widget_set_valign( GTK_WIDGET( colourview->label ), 
 		GTK_ALIGN_CENTER );
-        gtk_widget_set_margin_left( GTK_WIDGET( colourview->label ), 2 );
-        gtk_widget_set_margin_right( GTK_WIDGET( colourview->label ), 2 );
         gtk_box_pack_start( GTK_BOX( vbox ), 
 		GTK_WIDGET( colourview->label ), FALSE, FALSE, 0 );
         gtk_widget_show( GTK_WIDGET( colourview->label ) );

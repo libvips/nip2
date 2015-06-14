@@ -33,7 +33,7 @@
 #define DEBUG
  */
 
-G_DEFINE_TYPE( Pane, pane, GTK_TYPE_HPANED );
+G_DEFINE_TYPE( Pane, pane, GTK_TYPE_PANED );
 
 /* Our signals. 
  */
@@ -128,7 +128,7 @@ pane_class_init( PaneClass *class )
 	class->changed = NULL;
 
 	pane_signals[SIG_CHANGED] = g_signal_new( "changed",
-		G_OBJECT_CLASS_TYPE( object_class ),
+		G_OBJECT_CLASS_TYPE( widget_class ),
 		G_SIGNAL_RUN_FIRST,
 		G_STRUCT_OFFSET( PaneClass, changed ),
 		NULL, NULL,
@@ -431,7 +431,8 @@ pane_new( PaneHandedness handedness )
 {
 	Pane *pane;
 
-	pane = PANE( g_object_new( TYPE_PANE, NULL ) );
+	pane = PANE( g_object_new( TYPE_PANE, 
+		"orientation", GTK_ORIENTATION_VERTICAL, NULL ) );
 	pane_link( pane, handedness );
 
 	return( pane );

@@ -614,6 +614,7 @@ classmodel_done_member( Classmodel *classmodel,
 	ClassmodelMember *m, GtkWidget *widget )
 {
 	char txt[256];
+	gboolean b;
 
 	switch( m->type ) {
 	case CLASSMODEL_MEMBER_INT:
@@ -621,8 +622,8 @@ classmodel_done_member( Classmodel *classmodel,
 		break;
 
 	case CLASSMODEL_MEMBER_BOOLEAN:
-		G_STRUCT_MEMBER( gboolean, classmodel, m->offset ) =
-			GTK_TOGGLE_BUTTON( widget )->active;
+		b = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( widget ) );
+		G_STRUCT_MEMBER( gboolean, classmodel, m->offset ) = b;
 		break;
 
 	case CLASSMODEL_MEMBER_DOUBLE:

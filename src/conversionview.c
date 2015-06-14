@@ -88,7 +88,7 @@ conversionview_falsecolour_cb( GtkWidget *wid, Conversionview *cv )
 	Imagemodel *imagemodel = cv->imagemodel;
 	GtkCheckMenuItem *item = GTK_CHECK_MENU_ITEM( wid );
 
-	imagemodel->falsecolour = item->active;
+	imagemodel->falsecolour = gtk_check_menu_item_get_active( item );
 	iobject_changed( IOBJECT( imagemodel ) );
 }
 
@@ -98,7 +98,7 @@ conversionview_interpret_cb( GtkWidget *wid, Conversionview *cv )
 	Imagemodel *imagemodel = cv->imagemodel;
 	GtkCheckMenuItem *item = GTK_CHECK_MENU_ITEM( wid );
 
-	imagemodel->type = item->active;
+	imagemodel->type = gtk_check_menu_item_get_active( item );
 	iobject_changed( IOBJECT( imagemodel ) );
 }
 
@@ -214,8 +214,7 @@ conversionview_init( Conversionview *cv )
 	menu_add_but( pane, _( "Set As Workspace _Default" ), 
 		G_CALLBACK( conversionview_set_default_cb ), cv );
 	menu_add_sep( pane );
-	menu_add_but( pane, GTK_STOCK_CLOSE,
-		G_CALLBACK( conversionview_hide_cb ), cv );
+	menu_add_but( pane, "close", G_CALLBACK( conversionview_hide_cb ), cv );
 
 	popupbutton = popupbutton_new();
 	popupbutton_set_menu( popupbutton, pane );
@@ -237,7 +236,7 @@ conversionview_init( Conversionview *cv )
 		G_CALLBACK( conversionview_scale_change_cb ), cv );
 	tslider_set_ignore_scroll( cv->scale, FALSE );
 
-	sep = gtk_vseparator_new();
+	sep = gtk_separator_new( GTK_ORIENTATION_VERTICAL );
         gtk_box_pack_start( GTK_BOX( hb ), sep, FALSE, FALSE, 0 );
 
 	cv->offset = tslider_new();
@@ -278,11 +277,11 @@ conversionview_changed_cb( Imagemodel *imagemodel, Conversionview *cv )
 	}
 
 	item = GTK_CHECK_MENU_ITEM( cv->falsecolour );
-	if( item->active != imagemodel->falsecolour ) 
+	if( gtk_check_menu_item_get_active( item ) != imagemodel->falsecolour ) 
 		gtk_check_menu_item_set_active( item, imagemodel->falsecolour );
 
 	item = GTK_CHECK_MENU_ITEM( cv->type );
-	if( item->active != imagemodel->type ) 
+	if( gtk_check_menu_item_get_active( item ) != imagemodel->type ) 
 		gtk_check_menu_item_set_active( item, imagemodel->type );
 }
 

@@ -222,12 +222,15 @@ colour_done_cb( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys )
 {
 	ColourEdit *eds = (ColourEdit *) client;
 	Colour *colour = eds->colour;
-	double rgb[4];
+	GdkRGBA rgba;
+	double value[3];
 
-	gtk_color_selection_get_color( 
-		GTK_COLOR_SELECTION( eds->colour_widget ), rgb );
-
-	colour_set_rgb( colour, rgb );
+	gtk_color_chooser_get_rgba( 
+		GTK_COLOR_CHOOSER( eds->colour_widget ), &rgba );
+	value[0] = rgba.red;
+	value[1] = rgba.green;
+	value[2] = rgba.blue;
+	colour_set_rgb( colour, value );
 
 	nfn( sys, IWINDOW_YES );
 }
@@ -238,14 +241,19 @@ static void
 colour_buildedit( iDialog *idlg, GtkWidget *work, ColourEdit *eds )
 {
 	Colour *colour = eds->colour;
-	double rgb[4];
+	GdkRGBA rgba;
+	double value[4];
 
-	eds->colour_widget = gtk_color_selection_new();
-	gtk_color_selection_set_has_opacity_control( 
-		GTK_COLOR_SELECTION( eds->colour_widget ), FALSE );
-	colour_get_rgb( colour, rgb );
-	gtk_color_selection_set_color( 
-		GTK_COLOR_SELECTION( eds->colour_widget ), rgb );
+	eds->colour_widget = gtk_color_chooser_widget_new();
+	gtk_color_chooser_set_use_alpha( 
+		GTK_COLOR_CHOOSER( eds->colour_widget ), FALSE );
+	colour_get_rgb( colour, value );
+	rgba.red = value[0];
+	rgba.green = value[1];
+	rgba.blue = value[2];
+	rgba.alpha = value[3];
+	gtk_color_chooser_set_rgba( 
+		GTK_COLOR_CHOOSER( eds->colour_widget ), &rgba );
         gtk_box_pack_start( GTK_BOX( work ), 
 		eds->colour_widget, TRUE, TRUE, 2 );
 

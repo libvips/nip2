@@ -1278,11 +1278,6 @@ imagepresent_event_cb( GtkWidget *widget, GdkEvent *ev, Imagepresent *ip )
 		break;
 
 	case GDK_MOTION_NOTIFY:
-		/* We're using motion hints, so we need to read the pointer to
-		 * get the next one.
-		 */
-		widget_update_pointer( GTK_WIDGET( ip ), ev );
-
 		ip->last_x = ev->motion.x;
 		ip->last_y = ev->motion.y;
 

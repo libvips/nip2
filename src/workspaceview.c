@@ -331,10 +331,6 @@ workspaceview_fixed_event_cb( GtkWidget *widget,
 
         case GDK_MOTION_NOTIFY:
                 if( wview->dragging && ev->motion.state & GDK_BUTTON2_MASK ) {
-			/* We're using hints.
-			 */
-			widget_update_pointer( GTK_WIDGET( wview ), ev );
-
 			workspaceview_scroll_to( wview, 
 				wview->drag_x - ev->motion.x_root,
 				wview->drag_y - ev->motion.y_root );

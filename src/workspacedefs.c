@@ -264,7 +264,7 @@ workspacedefs_init( Workspacedefs *workspacedefs )
 	workspacedefs->errors = FALSE;
 	workspacedefs->text_hash = 0;
 
-	pane = menu_build( _( "Workspace definitions" ) );
+	pane = gtk_menu_new();
 	menu_add_but( pane, _( "Replace From _File" ),
 		G_CALLBACK( workspacedefs_replace_cb ), workspacedefs );
 	menu_add_but( pane, GTK_STOCK_SAVE_AS,

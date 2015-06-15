@@ -61,7 +61,6 @@ void get_geo( GtkWidget *widget, const char *text, Rect *geo );
 void set_fixed( GtkWidget *widget, int nchars );
 GtkWidget *build_entry( int nchars );
 
-GtkWidget *menu_build( const char *name );
 GtkWidget *menu_add_but( GtkWidget *menu, 
 	const char *name, GCallback cb, void *user );
 GtkWidget *menu_add_tog( GtkWidget *menu, 
@@ -85,7 +84,6 @@ void popup_detach( GtkWidget *host, guint sid );
 
 void set_tooltip( GtkWidget *wid, const char *fmt, ... )
 	__attribute__((format(printf, 2, 3)));
-void junk_tooltips( void );
 
 typedef void (*TooltipGenerateFn)( GtkWidget *, VipsBuf *, void *a, void *b );
 void set_tooltip_generate( GtkWidget *widget, 
@@ -135,8 +133,6 @@ void set_symbol_drag_type( GtkWidget *widget );
 
 void listen_add( GObject *gobject, GObject **zap, 
 	const char *name, GCallback gcallback );
-
-void widget_update_pointer( GtkWidget *widget, GdkEvent *ev );
 
 void *gobject_print( GObject *gobject );
 

@@ -202,7 +202,7 @@ conversionview_init( Conversionview *cv )
 	 * etc. toggles. Could just have one, and modify pre-popup, but this
 	 * is easier.
          */
-	pane = menu_build( _( "Convert menu" ) );
+	pane = gtk_menu_new();
 	menu_add_but( pane, _( "_Scale" ), 
 		G_CALLBACK( conversionview_scale_cb ), cv );
 	cv->falsecolour = menu_add_tog( pane, _( "_False Color" ), 

@@ -384,7 +384,7 @@ idialog_set_default( iDialog *idlg, GtkWidget *widget )
 	if( idlg->button_focus ) 
 		gtk_widget_grab_focus( widget );
 
-	GTK_WIDGET_SET_FLAGS( widget, GTK_CAN_DEFAULT );
+	gtk_widget_set_can_default( widget, TRUE );
 	gtk_window_set_default( GTK_WINDOW( idlg ), widget );
 }
 
@@ -416,7 +416,7 @@ idialog_build( GtkWidget *widget )
 	if( !idlg->nosep ) {
 		GtkWidget *sep;
 
-		sep = gtk_hseparator_new();
+		sep = gtk_separator_new( GTK_ORIENTATION_HORIZONTAL );
 		gtk_box_pack_start( GTK_BOX( iwnd->work ), 
 			sep, FALSE, FALSE, 2 );
 		gtk_widget_show( sep );
@@ -437,7 +437,7 @@ idialog_build( GtkWidget *widget )
 		gtk_widget_show( idlg->tog_pin );
 	}
 
-        idlg->bb = gtk_hbutton_box_new();
+        idlg->bb = gtk_button_box_new( GTK_ORIENTATION_HORIZONTAL );
         gtk_button_box_set_layout( GTK_BUTTON_BOX( idlg->bb ), 
 		GTK_BUTTONBOX_END );
 	gtk_box_set_spacing( GTK_BOX( idlg->bb ), 6 );
@@ -479,7 +479,7 @@ idialog_build( GtkWidget *widget )
 #else /*!OS_WIN32*/
 
         if( idlg->help_tag ) {
-                idlg->but_help = build_button( GTK_STOCK_HELP,
+                idlg->but_help = build_button( "help",
 			G_CALLBACK( idialog_help_cb ), idlg );
                 gtk_box_pack_end( GTK_BOX( idlg->bb ),
                         idlg->but_help, TRUE, TRUE, 0 );
@@ -523,7 +523,7 @@ idialog_build( GtkWidget *widget )
 	 */
 	if( idlg->cancel_cb )
 		gtk_widget_add_accelerator( idlg->but_cancel,
-			"clicked", iwnd->accel_group, GDK_Escape, 0, 0 );
+			"clicked", iwnd->accel_group, GDK_KEY_Escape, 0, 0 );
 	else {
 		/* If there's just 1 OK, that gets Esc too.
 		 */
@@ -531,7 +531,7 @@ idialog_build( GtkWidget *widget )
 			g_slist_length( idlg->ok_but_l ) == 1 )
 			gtk_widget_add_accelerator( 
 				GTK_WIDGET( idlg->ok_but_l->data ), "clicked", 
-				iwnd->accel_group, GDK_Escape, 0, 0 );
+				iwnd->accel_group, GDK_KEY_Escape, 0, 0 );
 	}
 
 	/* F1 triggers help.
@@ -539,7 +539,7 @@ idialog_build( GtkWidget *widget )
 	if( idlg->but_help ) 
 		gtk_widget_add_accelerator( 
 			idlg->but_help,
-			"clicked", iwnd->accel_group, GDK_F1, 0, 0 );
+			"clicked", iwnd->accel_group, GDK_KEY_F1, 0, 0 );
 
 	/* Build user dialog contents.
 	 */
@@ -604,7 +604,7 @@ idialog_init( iDialog *idlg )
 
 	idlg->help_tag = NULL;
 
-	idlg->cancel_text = GTK_STOCK_CANCEL;
+	idlg->cancel_text = "cancel";
 
 	idlg->cancel_cb = NULL;
 	idlg->popdown_cb = NULL;
@@ -626,9 +626,7 @@ idialog_new()
 	iDialog *idlg = g_object_new( TYPE_IDIALOG, NULL );
 	GtkWindow *gwnd = GTK_WINDOW( idlg );
 
-	/* Init gtk base class.
-	 */
-	gwnd->type = GTK_WINDOW_TOPLEVEL;
+	g_object_set( gwnd, "type", GTK_WINDOW_TOPLEVEL, NULL ); 
 
 	return( GTK_WIDGET( idlg ) );
 }

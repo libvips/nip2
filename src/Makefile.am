@@ -116,8 +116,6 @@ nip2_SOURCES = \
 	idialog.h \
 	iimage.c \
 	iimage.h \
-	imagedisplay.c \
-	imagedisplay.h \
 	error.c \
 	error.h \
 	managed.c \
@@ -286,6 +284,8 @@ nip2_SOURCES = \
 	workspaceview.c \
 	workspaceview.h \
 	\
+	imagedisplay.c \
+	imagedisplay.h \
 	graphwindow.c \
 	graphwindow.h \
 	iimageview.c \

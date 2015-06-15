@@ -33,10 +33,6 @@
 #define DEBUG
  */
 
-/* All our tooltips.
- */
-static GtkTooltips *our_tooltips = NULL;
-
 /* Set two adjustments together.
  */
 void
@@ -46,12 +42,12 @@ adjustments_set_value( GtkAdjustment *hadj, GtkAdjustment *vadj,
         gboolean hchanged = FALSE;
         gboolean vchanged = FALSE;
 
-        if( hval != hadj->value ) {
-                hadj->value = hval;
+        if( hval != gtk_adjustment_get_value( hadj ) ) {
+                gtk_adjustment_set_value( hadj, hval );
                 hchanged = TRUE;
         }
-        if( vval != vadj->value ) {
-                vadj->value = vval;
+        if( vval != gtk_adjustment_get_value( vadj ) ) {
+                gtk_adjustment_set_value( vadj, vval ); 
                 vchanged = TRUE;
         }
 
@@ -104,8 +100,8 @@ build_button( const char *stock_id, GCallback cb, gpointer user )
 {
 	GtkWidget *but;
 
-	but = gtk_button_new_from_stock( stock_id );
-	GTK_WIDGET_SET_FLAGS( but, GTK_CAN_DEFAULT );
+	but = gtk_button_new_from_icon_name( stock_id, GTK_ICON_SIZE_BUTTON );
+	gtk_widget_set_can_default( but, TRUE );
 	g_signal_connect( but, "clicked", cb, user );
 
 	return( but );
@@ -156,19 +152,6 @@ build_entry( int nchars )
 	return( entry );
 }
 
-/* Build a new menu.
- */
-GtkWidget *
-menu_build( const char *name )
-{
-	GtkWidget *menu;
-
-	menu = gtk_menu_new();
-	gtk_menu_set_title( GTK_MENU( menu ), name );
-
-	return( menu );
-}
-
 /* Add a menu item.
  */
 GtkWidget *
@@ -179,7 +162,7 @@ menu_add_but( GtkWidget *menu,
 
 	/* We don't provide an accel group for popup menus.
 	 */
-	but = gtk_image_menu_item_new_from_stock( stock_id, NULL );
+	but = gtk_menu_item_new_with_mnemonic( stock_id );
 	gtk_menu_shell_append( GTK_MENU_SHELL( menu ), but );
 	gtk_widget_show( but );
 	g_signal_connect( but, "activate", cb, user );
@@ -226,7 +209,7 @@ menu_add_pullright( GtkWidget *menu, const char *stock_id )
 	GtkWidget *subpane;
 
 	subpane = gtk_menu_new();
-	pullright = gtk_image_menu_item_new_from_stock( stock_id, NULL );
+	pullright = gtk_menu_item_new_with_mnemonic( stock_id );
 	gtk_menu_item_set_submenu( GTK_MENU_ITEM( pullright ), subpane );
 	gtk_menu_shell_append( GTK_MENU_SHELL( menu ), pullright );
 	gtk_widget_show( pullright );
@@ -258,7 +241,7 @@ popup_build( const char *name )
 		quark_popup = g_quark_from_static_string( "quark_popup" );
 	}
 
-	return( menu_build( name ) );
+	return( gtk_menu_new() );
 }
 
 /* Activate function for a popup menu item.
@@ -266,12 +249,9 @@ popup_build( const char *name )
 static void
 popup_activate_cb( GtkWidget *item, PopupFunc cb )
 {
-	GtkWidget *qmain = g_object_get_data_by_id( G_OBJECT( item ), 
-		quark_main );
-	GtkWidget *qhost = g_object_get_data_by_id( G_OBJECT( qmain ), 
-		quark_host );
-	void *qdata = g_object_get_data_by_id( G_OBJECT( qhost ), 
-		quark_data );
+	GtkWidget *qmain = g_object_get_qdata( G_OBJECT( item ), quark_main );
+	GtkWidget *qhost = g_object_get_qdata( G_OBJECT( qmain ), quark_host );
+	void *qdata = g_object_get_qdata( G_OBJECT( qhost ), quark_data );
 
 	(*cb)( item, qhost, qdata );
 }
@@ -284,7 +264,7 @@ popup_add_but( GtkWidget *popup, const char *name, PopupFunc cb )
 	GtkWidget *but = menu_add_but( popup, name, 
 		G_CALLBACK( popup_activate_cb ), (void *) cb );
 
-	g_object_set_data_by_id( G_OBJECT( but ), quark_main, popup );
+	g_object_set_qdata( G_OBJECT( but ), quark_main, popup );
 
 	return( but );
 }
@@ -297,7 +277,7 @@ popup_add_tog( GtkWidget *popup, const char *name, PopupFunc cb )
 	GtkWidget *tog = menu_add_tog( popup, name, 
 		G_CALLBACK( popup_activate_cb ), (void *) cb );
 
-	g_object_set_data_by_id( G_OBJECT( tog ), quark_main, popup );
+	g_object_set_qdata( G_OBJECT( tog ), quark_main, popup );
 
 	return( tog );
 }
@@ -309,7 +289,7 @@ popup_add_pullright( GtkWidget *popup, const char *name )
 {
 	GtkWidget *pullright = menu_add_pullright( popup, name );
 
-	g_object_set_data_by_id( G_OBJECT( pullright ), quark_main, popup );
+	g_object_set_qdata( G_OBJECT( pullright ), quark_main, popup );
 
 	return( pullright );
 }
@@ -319,10 +299,9 @@ popup_add_pullright( GtkWidget *popup, const char *name )
 void
 popup_show( GtkWidget *host, GdkEvent *ev )
 {
-	GtkWidget *popup = gtk_object_get_data_by_id( 
-		G_OBJECT( host ), quark_popup );
+	GtkWidget *popup = g_object_get_qdata( G_OBJECT( host ), quark_popup );
 
-	g_object_set_data_by_id( G_OBJECT( popup ), quark_host, host );
+	g_object_set_qdata( G_OBJECT( popup ), quark_host, host );
 	gtk_menu_popup( GTK_MENU( popup ), NULL, NULL,
 		(GtkMenuPositionFunc) NULL, NULL, 3, ev->button.time );
 }
@@ -334,11 +313,13 @@ popup_handle_event( GtkWidget *host, GdkEvent *ev, gpointer dummy )
 {
 	gboolean handled = FALSE;
 
-        if( ev->type == GDK_BUTTON_PRESS && ev->button.button == 3 ) {
+        if( ev->type == GDK_BUTTON_PRESS && 
+		ev->button.button == 3 ) {
 		popup_show( host, ev );
 		handled = TRUE;
 	}
-	else if( ev->type == GDK_KEY_PRESS && ev->key.keyval == GDK_F10 && 
+	else if( ev->type == GDK_KEY_PRESS && 
+		ev->key.keyval == GDK_KEY_F10 && 
 		ev->key.state & GDK_SHIFT_MASK ) {
 		popup_show( host, ev );
 		handled = TRUE;
@@ -352,8 +333,8 @@ popup_handle_event( GtkWidget *host, GdkEvent *ev, gpointer dummy )
 void
 popup_link( GtkWidget *host, GtkWidget *popup, void *data )
 {
-	g_object_set_data_by_id( G_OBJECT( host ), quark_popup, popup );
-	g_object_set_data_by_id( G_OBJECT( host ), quark_data, data );
+	g_object_set_qdata( G_OBJECT( host ), quark_popup, popup );
+	g_object_set_qdata( G_OBJECT( host ), quark_data, data );
 }
 
 /* Add a callback to show a popup.
@@ -378,14 +359,7 @@ popup_attach( GtkWidget *host, GtkWidget *popup, void *data )
 void
 popup_detach( GtkWidget *host, guint sid )
 {
-	g_signal_disconnect( G_OBJECT( host ), sid );
-}
-
-static void
-set_tooltip_events( GtkWidget *wid )
-{
-	gtk_widget_add_events( wid, 
-		GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK );
+	g_signal_handler_disconnect( G_OBJECT( host ), sid );
 }
 
 /* Set the tooltip on a widget.
@@ -406,18 +380,9 @@ set_tooltip( GtkWidget *wid, const char *fmt, ... )
 	txt = g_strdup_vprintf( fmt, ap );
 	va_end( ap );
 
-	if( !our_tooltips ) 
-		our_tooltips = gtk_tooltips_new();
+	gtk_widget_set_tooltip_text( wid, txt ); 
 
-	gtk_tooltips_set_tip( our_tooltips, wid, txt, NULL );
-
-	if( !GTK_WIDGET_REALIZED( wid ) )
-		g_signal_connect( wid, "realize",
-			G_CALLBACK( set_tooltip_events ), NULL );
-	else
-		set_tooltip_events( wid );
-
-	g_free( txt );
+	g_free( txt ); 
 }
 
 /* Track tooltips we generate with one of these.
@@ -492,20 +457,11 @@ set_tooltip_generate( GtkWidget *widget,
 	g_signal_connect( widget, "destroy", 
 		G_CALLBACK( tooltip_generate_free ), gen );
 
-	if( !GTK_WIDGET_REALIZED( widget ) )
+	if( !gtk_widget_get_realized( widget ) )
 		g_signal_connect( widget, "realize",
 			G_CALLBACK( tooltip_generate_attach ), gen );
 	else
 		tooltip_generate_attach( widget, gen );
-}
-
-/* Junk all tooltips, helps trim valgrind noise.
- */
-void
-junk_tooltips( void )
-{
-	if( our_tooltips )
-		g_object_ref_sink( G_OBJECT( our_tooltips ) );
 }
 
 /* Set a GtkEditable.
@@ -851,13 +807,13 @@ build_goption( GtkWidget *box, GtkSizeGroup *group,
 		gtk_size_group_add_widget( group, label );  
         gtk_box_pack_start( GTK_BOX( hb ), label, FALSE, TRUE, 0 );
 
-	om = gtk_combo_box_new_text();
+	om = gtk_combo_box_text_new();
         gtk_box_pack_start( GTK_BOX( hb ), om, FALSE, TRUE, 0 );
         set_tooltip( om, _( "Left-click to change value" ) );
 
 	for( i = 0; i < nitem; i++ ) 
-		gtk_combo_box_append_text( GTK_COMBO_BOX( om ),
-			 _( item_names[i] ) );
+		gtk_combo_box_text_append( GTK_COMBO_BOX_TEXT( om ),
+			 NULL, _( item_names[i] ) );
 	if( fn ) 
 		g_signal_connect( om, "changed", fn, value );
         gtk_box_pack_start( GTK_BOX( box ), hb, FALSE, TRUE, 0 );
@@ -897,7 +853,8 @@ filedrop_drag_data_received( GtkWidget *widget,
 	gchar *pFrom, *pTo; 
 	gboolean result;
 
-        pFrom = strstr( (char *) data->data, "file:" );
+        pFrom = strstr( 
+		(char *) gtk_selection_data_get_data( data ), "file:" );
 
         while( pFrom ) {
 #if !GLIB_CHECK_VERSION (2,0,0)
@@ -986,7 +943,7 @@ set_symbol_drag_type( GtkWidget *widget )
 
 	GtkTargetList *target_list;
 
-	if( !GTK_WIDGET_REALIZED( widget ) ) 
+	if( !gtk_widget_get_realized( widget ) )
 		return;
 
 	/* We can't always set the dest types, since we're probably already a
@@ -1075,21 +1032,6 @@ listen_add( GObject *gobject, GObject **zap,
 		G_CALLBACK( listen_source_destroy_cb ), listen );
 	listen->gobject_destroy_sid = g_signal_connect( gobject, "destroy",
 		G_CALLBACK( listen_gobject_destroy_cb ), listen );
-}
-
-void
-widget_update_pointer( GtkWidget *widget, GdkEvent *ev )
-{
-	if( ev->type == GDK_MOTION_NOTIFY && ev->motion.is_hint ) {
-		GdkDisplay *display = gtk_widget_get_display( widget );
-		GdkScreen *screen;
-		int x_root, y_root;
-
-		gdk_display_get_pointer( display, 
-			&screen, &x_root, &y_root, NULL );
-		ev->motion.x_root = x_root;
-		ev->motion.y_root = y_root; 
-	}
 }
 
 void *

@@ -74,21 +74,40 @@ plotpresent_destroy( GtkWidget *widget )
 }
 
 static void
-plotpresent_size_request( GtkWidget *widget, GtkRequisition *requisition )
+plotpresent_get_preferred_width( GtkWidget *widget, 
+	gint *minimal_width, gint *natural_width )
 {
 	GtkBin *bin = GTK_BIN( widget );
+	GtkWidget *child = gtk_bin_get_child( bin );
 
-	if( bin->child && GTK_WIDGET_VISIBLE( bin->child ) ) 
-		gtk_widget_size_request( bin->child, requisition );
+	if( child && 
+		gtk_widget_get_visible( child ) ) 
+		gtk_widget_get_preferred_width( child,
+			minimal_width, natural_width );
+}
+
+static void
+plotpresent_get_preferred_height( GtkWidget *widget, 
+	gint *minimal_height, gint *natural_height )
+{
+	GtkBin *bin = GTK_BIN( widget );
+	GtkWidget *child = gtk_bin_get_child( bin );
+
+	if( child && 
+		gtk_widget_get_visible( child ) ) 
+		gtk_widget_get_preferred_height( child,
+			minimal_height, natural_height );
 }
 
 static void
 plotpresent_size_allocate( GtkWidget *widget, GtkAllocation *allocation )
 {
 	GtkBin *bin = GTK_BIN( widget );
+	GtkWidget *child = gtk_bin_get_child( bin );
 
-	if( bin->child && GTK_WIDGET_VISIBLE( bin->child ) ) 
-		gtk_widget_size_allocate( bin->child, allocation );
+	if( child && 
+		gtk_widget_get_visible( child ) ) 
+		gtk_widget_size_allocate( child, allocation );
 }
 
 /* Spot mouse motion events, to update status bar.
@@ -97,9 +116,8 @@ static gboolean
 plotpresent_motion_notify_event( GtkWidget *widget, GdkEventMotion *event ) 
 {
 	Plotpresent *plotpresent = PLOTPRESENT( widget );
-	GtkAllocation *allocation = 
-		&GTK_WIDGET( plotpresent->canvas )->allocation;
 
+	GtkAllocation allocation;
 	GogView *view;
 	GSList *axes;
 	GogAxis *x_axis;
@@ -111,8 +129,11 @@ plotpresent_motion_notify_event( GtkWidget *widget, GdkEventMotion *event )
 	printf( "event->x = %g, event->y = %g\n", event->x, event->y );
 #endif /*DEBUG_EVENT*/
 
+	gtk_widget_get_allocation( GTK_WIDGET( plotpresent->canvas ), 
+		&allocation ); 
+
 	gog_renderer_update( plotpresent->grend, 
-		allocation->width, allocation->height );
+		allocation.width, allocation.height );
 
 	g_object_get( G_OBJECT( plotpresent->grend ), "view", &view, NULL );
 	view = gog_view_find_child_view( view, 
@@ -158,7 +179,8 @@ plotpresent_class_init( PlotpresentClass *class )
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
 	widget_class->destroy = plotpresent_destroy;
-        widget_class->size_request = plotpresent_size_request;
+        widget_class->get_preferred_width = plotpresent_get_preferred_width;
+        widget_class->get_preferred_height = plotpresent_get_preferred_height;
 	widget_class->size_allocate = plotpresent_size_allocate;
 
 	widget_class->motion_notify_event = plotpresent_motion_notify_event;

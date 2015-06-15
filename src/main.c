@@ -332,7 +332,6 @@ main_quit( void )
 	 */
 	if( main_icon_factory )
 		gtk_icon_factory_remove_default( main_icon_factory );
-	junk_tooltips();
 
 #ifdef HAVE_LIBGOFFICE
 	/* Not quite sure what this does, but don't do it in batch mode.

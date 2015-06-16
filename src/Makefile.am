@@ -132,10 +132,6 @@ nip2_SOURCES = \
 	imageinfo.h \
 	imagemodel.c \
 	imagemodel.h \
-	imagepresent.c \
-	imagepresent.h \
-	imageview.c \
-	imageview.h \
 	ip.h \
 	iregion.c \
 	iregion.h \
@@ -282,8 +278,13 @@ nip2_SOURCES = \
 	workspaceroot.c \
 	workspaceroot.h \
 	workspaceview.c \
-	workspaceview.h \
-	\
+	workspaceview.h 
+
+need_rewrite = \
+	imageview.c \
+	imageview.h \
+	imagepresent.c \
+	imagepresent.h \
 	imagedisplay.c \
 	imagedisplay.h \
 	graphwindow.c \

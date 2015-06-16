@@ -226,7 +226,7 @@ itextview_init( iTextview *itextview )
         g_signal_connect( itextview->formula, "edit", 
 		G_CALLBACK( itextview_edit_cb ), itextview );
         g_signal_connect_object( itextview->formula, "changed", 
-		G_CALLBACK( view_changed_cb ), itextview );
+		G_CALLBACK( view_changed_cb ), itextview, 0 );
         g_signal_connect( itextview->formula, "activate",
                 G_CALLBACK( itextview_activate_cb ), itextview );
         g_signal_connect( itextview->formula, "enter", 

@@ -254,6 +254,12 @@ iregion_edit( GtkWidget *parent, Model *model )
 void
 iregion_parent_add( iContainer *child )
 {
+	/* Get our parent class. We can't just use the global parent_class, 
+	 * since due to our lame MI scheme, this method may be called for 
+	 * iarrow/ipoint etc. as well as iregion ... look up dynamically.
+	 */
+	gpointer parent_class = PARENT_CLASS_DYNAMIC( child );
+
 	ICONTAINER_CLASS( parent_class )->parent_add( child );
 
 	/* Now we're all linked up, make a child model to handle client 

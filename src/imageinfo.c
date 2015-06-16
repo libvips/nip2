@@ -2312,12 +2312,16 @@ imageinfo_colour_done_cb( iWindow *iwnd, void *client,
 	ColourEdit *eds = (ColourEdit *) client;
 	Imageinfo *imageinfo = eds->imageinfo;
 	double rgb[4];
+	GdkRGBA rgba;
 
-	gtk_color_selection_get_color( 
-		GTK_COLOR_SELECTION( eds->colour_widget ), rgb );
+	gtk_color_chooser_get_rgba( 
+		GTK_COLOR_CHOOSER( eds->colour_widget ), &rgba );
 
 	/* This will emit "area_painted" on our imageinfo.
 	 */
+	rgb[0] = rgba.red;
+	rgb[1] = rgba.green;
+	rgb[2] = rgba.blue;
 	imageinfo_from_rgb( imageinfo, rgb );
 
 	nfn( sys, IWINDOW_YES );
@@ -2329,14 +2333,19 @@ static void
 imageinfo_colour_buildedit( iDialog *idlg, GtkWidget *work, ColourEdit *eds )
 {
 	Imageinfo *imageinfo = eds->imageinfo;
-	double rgb[4];
+	double rgb[3];
+	GdkRGBA rgba;
 
-	eds->colour_widget = gtk_color_selection_new();
-	gtk_color_selection_set_has_opacity_control( 
-		GTK_COLOR_SELECTION( eds->colour_widget ), FALSE );
+	eds->colour_widget = gtk_color_chooser_widget_new();
+	gtk_color_chooser_set_use_alpha( 
+		GTK_COLOR_CHOOSER( eds->colour_widget ), FALSE );
 	imageinfo_to_rgb( imageinfo, rgb );
-	gtk_color_selection_set_color( 
-		GTK_COLOR_SELECTION( eds->colour_widget ), rgb );
+	rgba.red = rgb[0];
+	rgba.green = rgb[1];
+	rgba.blue = rgb[2];
+	rgba.alpha = 1.0;
+	gtk_color_chooser_set_rgba( 
+		GTK_COLOR_CHOOSER( eds->colour_widget ), &rgba );
         gtk_box_pack_start( GTK_BOX( work ), 
 		eds->colour_widget, TRUE, TRUE, 2 );
 

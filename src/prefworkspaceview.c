@@ -89,7 +89,7 @@ prefworkspaceview_display( View *parent, Model *child )
 static void
 prefworkspaceview_class_init( PrefworkspaceviewClass *class )
 {
-	GtkWidgetClass *Widget_class = (GtkWidgetClass *) class;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 	ViewClass *view_class = (ViewClass *) class;
 
 	widget_class->destroy = prefworkspaceview_destroy;

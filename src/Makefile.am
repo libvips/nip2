@@ -145,8 +145,6 @@ nip2_SOURCES = \
 	itext.h \
 	itextview.c \
 	itextview.h \
-	iwindow.c \
-	iwindow.h \
 	parse.y \
 	parser.h \
 	prefs.c \
@@ -281,6 +279,8 @@ nip2_SOURCES = \
 	workspaceview.h 
 
 need_rewrite = \
+	iwindow.c \
+	iwindow.h \
 	imageview.c \
 	imageview.h \
 	imagepresent.c \

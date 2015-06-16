@@ -103,12 +103,9 @@ prefs_build( GtkWidget *widget )
 		window = gtk_scrolled_window_new( NULL, NULL );
 		gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( window ), 
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
-		gtk_scrolled_window_add_with_viewport( 
-			GTK_SCROLLED_WINDOW( window ), 
+		gtk_container_add( 
+			GTK_CONTAINER( window ), 
 			GTK_WIDGET( prefs->pwview ) );
-		gtk_viewport_set_shadow_type( 
-			GTK_VIEWPORT( GTK_BIN( window )->child ), 
-			GTK_SHADOW_NONE );
 		gtk_box_pack_start( GTK_BOX( work ), 
 			GTK_WIDGET( window ), TRUE, TRUE, 0 );
 

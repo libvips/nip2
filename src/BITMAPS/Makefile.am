@@ -1,46 +1,43 @@
 EXTRA_DIST = \
 	ant.xbm \
-	automatic.xbm \
-	automatic.xpm \
 	automatic1.xbm \
 	automatic1.xpm \
 	automatic2.xbm \
 	automatic2.xpm \
 	automatic3.xbm \
 	automatic3.xpm \
+	automatic.xbm \
+	automatic.xpm \
+	book_closed.xpm \
+	book_open.xpm \
 	change.xbm \
+	col.xpm \
 	convol.xbm \
 	dropper.xpm \
-	dropper_msk.xbm \
-	dropper_src.xbm \
+	floppy.xpm \
 	image.xbm \
 	kill.xbm \
-	mag_msk.xbm \
-	magin.xpm \
 	magin_src.xbm \
-	magout.xpm \
+	magin.xpm \
+	mag_msk.xbm \
 	magout_src.xbm \
+	magout.xpm \
+	mini_page.xpm \
 	morph.xbm \
-	pan.xpm \
 	paint.xpm \
+	pan.xpm \
 	program.xbm \
 	select.xpm \
-	slider.xbm \
-	watch_1.xbm \
-	watch_2.xbm \
-	watch_3.xbm \
-	watch_4.xbm \
-	watch_5.xbm \
-	watch_6.xbm \
-	watch_7.xbm \
-	watch_8.xbm \
-	watch_msk.xbm \
-	book_open.xpm \
-	book_closed.xpm \
-	toolbox_open.xpm \
-	toolbox_closed.xpm \
-	tools.xpm \
-	col.xpm \
 	separator.xpm \
-	floppy.xpm \
-	mini_page.xpm 
+	slider.xbm \
+	toolbox_closed.xpm \
+	toolbox_open.xpm \
+	tools.xpm \
+	watch_1.xpm \
+	watch_2.xpm \
+	watch_3.xpm \
+	watch_4.xpm \
+	watch_5.xpm \
+	watch_6.xpm \
+	watch_7.xpm \
+	watch_8.xpm 

@@ -59,20 +59,17 @@
 
 /* Cursor bitmaps.
  */
-#include "BITMAPS/dropper_src.xbm"
-#include "BITMAPS/dropper_msk.xbm"
-#include "BITMAPS/magin_src.xbm"
-#include "BITMAPS/magout_src.xbm"
-#include "BITMAPS/mag_msk.xbm"
-#include "BITMAPS/watch_1.xbm"
-#include "BITMAPS/watch_2.xbm"
-#include "BITMAPS/watch_3.xbm"
-#include "BITMAPS/watch_4.xbm"
-#include "BITMAPS/watch_5.xbm"
-#include "BITMAPS/watch_6.xbm"
-#include "BITMAPS/watch_7.xbm"
-#include "BITMAPS/watch_8.xbm"
-#include "BITMAPS/watch_msk.xbm"
+#include "BITMAPS/dropper.xpm"
+#include "BITMAPS/magin.xpm"
+#include "BITMAPS/magout.xpm"
+#include "BITMAPS/watch_1.xpm"
+#include "BITMAPS/watch_2.xpm"
+#include "BITMAPS/watch_3.xpm"
+#include "BITMAPS/watch_4.xpm"
+#include "BITMAPS/watch_5.xpm"
+#include "BITMAPS/watch_6.xpm"
+#include "BITMAPS/watch_7.xpm"
+#include "BITMAPS/watch_8.xpm"
 
 G_DEFINE_TYPE( iWindow, iwindow, GTK_TYPE_WINDOW ); 
 
@@ -148,22 +145,16 @@ iwindow_map_all( iWindowMapFn fn, void *a )
 /* Make a custom cursor ... source, mask, width, height and hot spot position.
  */
 static GdkCursor *
-iwindow_make_cursor_data( guchar *src_bits, guchar *msk_bits, 
-	int w, int h, int x, int y )
+iwindow_make_cursor_data( char *xpm[], int x, int y )
 {
-	GdkPixmap *src;
-	GdkPixmap *msk;
-	GdkCursor *cursor;
-	GdkColor fg = { 0, 255 << 8, 255 << 8, 255 << 8 };
-	GdkColor bg = { 0, 0, 0, 0 };
+	GdkDisplay *display = gdk_display_get_default();
 
-	src = gdk_bitmap_create_from_data( NULL, 
-		(const char *) src_bits, w, h );
-	msk = gdk_bitmap_create_from_data( NULL, 
-		(const char *) msk_bits, w, h );
-	cursor = gdk_cursor_new_from_pixmap( src, msk, &fg, &bg, x, y );
-	gdk_pixmap_unref( src );
-	gdk_pixmap_unref( msk );
+	GdkPixbuf *pixbuf;
+	GdkCursor *cursor;
+
+	pixbuf = gdk_pixbuf_new_from_xpm_data( (const char **) xpm );
+	cursor = gdk_cursor_new_from_pixbuf( display, pixbuf, x, y );
+	g_object_unref( pixbuf );
 
 	return( cursor );
 }
@@ -197,19 +188,6 @@ iwindow_make_cursors( void )
 		GDK_BOTTOM_LEFT_CORNER,	/* IWINDOW_SHAPE_BOTTOMLEFT */
 	};
 
-	/* All the bits for the rotating cursor.
-	 */
-	static guchar *watch_bits[] = {
-		watch_1_bits,
-		watch_2_bits,
-		watch_3_bits,
-		watch_4_bits,
-		watch_5_bits,
-		watch_6_bits,
-		watch_7_bits,
-		watch_8_bits,
-	};
-
 	int i;
 
 	if( iwindow_cursor[0] )
@@ -223,23 +201,28 @@ iwindow_make_cursors( void )
 
 	/* Custom cursors.
 	 */
-	iwindow_cursor[IWINDOW_SHAPE_DROPPER] = iwindow_make_cursor_data( 
-		dropper_src_bits, dropper_msk_bits,
-		dropper_src_width, dropper_src_height, 0, 15 );
-	iwindow_cursor[IWINDOW_SHAPE_MAGIN] = iwindow_make_cursor_data( 
-		magin_src_bits, mag_msk_bits, 
-		mag_msk_width, mag_msk_height, 6, 6 );
-	iwindow_cursor[IWINDOW_SHAPE_MAGOUT] = iwindow_make_cursor_data( 
-		magout_src_bits, mag_msk_bits,
-		mag_msk_width, mag_msk_height, 6, 6 );
-
-	/* The hglasses.
-	 */
-	for( i = 0; i < IM_NUMBER( watch_bits ); i++ )
-		iwindow_cursor[IWINDOW_SHAPE_HGLASS1 + i] = 
-			iwindow_make_cursor_data( 
-				watch_bits[i], watch_msk_bits,
-				watch_1_width, watch_1_height, 7, 7 );
+	iwindow_cursor[IWINDOW_SHAPE_DROPPER] = 
+		iwindow_make_cursor_data( dropper, 0, 15 );
+	iwindow_cursor[IWINDOW_SHAPE_MAGIN] = 
+		iwindow_make_cursor_data( magin_xpm,  6, 6 );
+	iwindow_cursor[IWINDOW_SHAPE_MAGOUT] = 
+		iwindow_make_cursor_data( magout_xpm, 6, 6 );
+	iwindow_cursor[IWINDOW_SHAPE_HGLASS1] = 
+		iwindow_make_cursor_data( watch_1, 6, 6 );
+	iwindow_cursor[IWINDOW_SHAPE_HGLASS2] = 
+		iwindow_make_cursor_data( watch_2, 6, 6 );
+	iwindow_cursor[IWINDOW_SHAPE_HGLASS3] = 
+		iwindow_make_cursor_data( watch_3, 6, 6 );
+	iwindow_cursor[IWINDOW_SHAPE_HGLASS4] = 
+		iwindow_make_cursor_data( watch_4, 6, 6 );
+	iwindow_cursor[IWINDOW_SHAPE_HGLASS5] = 
+		iwindow_make_cursor_data( watch_5, 6, 6 );
+	iwindow_cursor[IWINDOW_SHAPE_HGLASS6] = 
+		iwindow_make_cursor_data( watch_6, 6, 6 );
+	iwindow_cursor[IWINDOW_SHAPE_HGLASS7] = 
+		iwindow_make_cursor_data( watch_7, 6, 6 );
+	iwindow_cursor[IWINDOW_SHAPE_HGLASS8] = 
+		iwindow_make_cursor_data( watch_8, 6, 6 );
 }
 
 /* Get the work window.
@@ -250,7 +233,7 @@ iwindow_get_work_window( iWindow *iwnd )
 	if( iwnd->work_window )
 		return( iwnd->work_window );
 	else
-		return( GTK_WIDGET( iwnd )->window );
+		return( gtk_widget_get_window( GTK_WIDGET( iwnd ) ) ); 
 }
 
 /* Update the cursor for a window.
@@ -258,7 +241,8 @@ iwindow_get_work_window( iWindow *iwnd )
 static void *
 iwindow_cursor_update( iWindow *iwnd )
 {
-	if( GTK_WIDGET_REALIZED( GTK_WIDGET( iwnd ) ) ) {
+	if( gtk_widget_get_realized( GTK_WIDGET( iwnd ) ) ) {
+		GdkWindow *window = gtk_widget_get_window( GTK_WIDGET( iwnd ) );
 		GSList *p;
 		iWindowShape best_shape;
 		int best_priority;
@@ -266,7 +250,7 @@ iwindow_cursor_update( iWindow *iwnd )
 		/* Global shape set? Use that for the whole window.
 		 */
 		if( iwnd->shape != IWINDOW_SHAPE_NONE ) {
-			gdk_window_set_cursor( GTK_WIDGET( iwnd )->window, 
+			gdk_window_set_cursor( window, 
 				iwindow_cursor[iwnd->shape] );
 			gdk_window_set_cursor( iwindow_get_work_window( iwnd ),
 				iwindow_cursor[iwnd->shape] );
@@ -278,7 +262,7 @@ iwindow_cursor_update( iWindow *iwnd )
 		/* No global shape ... make sure there's no global cursor on
 		 * this window.
 		 */
-		gdk_window_set_cursor( GTK_WIDGET( iwnd )->window, NULL );
+		gdk_window_set_cursor( window, NULL );
 		gdk_window_set_cursor( iwindow_get_work_window( iwnd ), NULL );
 
 		/* And set the work area to the highest priority non-NONE 

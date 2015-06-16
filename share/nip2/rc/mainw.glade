@@ -171,7 +171,10 @@
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <child>
-              <placeholder/>
+              <object class="GtkDrawingArea" id="drawingarea1">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+              </object>
             </child>
             <child type="tab">
               <object class="GtkLabel" id="label1">

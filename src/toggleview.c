@@ -43,8 +43,10 @@ toggleview_change_cb( GtkWidget *widget, Toggleview *togview )
 	Toggle *tog = TOGGLE( VOBJECT( togview )->iobject );
 	Classmodel *classmodel = CLASSMODEL( tog );
 
-	if( tog->value != GTK_TOGGLE_BUTTON( widget )->active ) {
-		tog->value = GTK_TOGGLE_BUTTON( widget )->active;
+	if( tog->value != 
+		gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( widget ) ) ) {
+		tog->value = gtk_toggle_button_get_active( 
+			GTK_TOGGLE_BUTTON( widget ) );  
 
 		classmodel_update( classmodel );
 		symbol_recalculate_all();
@@ -59,7 +61,7 @@ toggleview_refresh( vObject *vobject )
 
         gtk_toggle_button_set_active( 
 		GTK_TOGGLE_BUTTON( togview->toggle ), tog->value );
-	set_glabel( GTK_BIN( togview->toggle )->child, "%s", 
+	set_glabel( gtk_bin_get_child( GTK_BIN( togview->toggle ) ), "%s", 
 		IOBJECT( tog )->caption );
 
 	VOBJECT_CLASS( toggleview_parent_class )->refresh( vobject );

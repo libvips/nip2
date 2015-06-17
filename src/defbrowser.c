@@ -221,7 +221,7 @@ defbrowser_init( Defbrowser *defbrowser )
 		defbrowser );
 	gtk_box_pack_end( GTK_BOX( defbrowser->top ), 
 		defbrowser->entry, FALSE, FALSE, 2 );
-	label = gtk_image_new_from_icon_name( GTK_STOCK_FIND, GTK_ICON_SIZE_MENU );
+	label = gtk_image_new_from_icon_name( "find", GTK_ICON_SIZE_MENU );
 	gtk_box_pack_end( GTK_BOX( defbrowser->top ), 
 		label, FALSE, FALSE, 0 );
         gtk_box_pack_start( GTK_BOX( defbrowser ), 
@@ -242,8 +242,6 @@ defbrowser_init( Defbrowser *defbrowser )
 
 	defbrowser->tree = gtk_tree_view_new_with_model( 
 		GTK_TREE_MODEL( defbrowser->filter ) );
-	gtk_tree_view_set_rules_hint( GTK_TREE_VIEW( defbrowser->tree ),
-		TRUE );
 	gtk_tree_view_set_headers_visible( GTK_TREE_VIEW( defbrowser->tree ), 
 		FALSE );
 
@@ -299,8 +297,15 @@ defbrowser_new( void )
 int 
 defbrowser_get_width( Defbrowser *defbrowser )
 {
-	if( defbrowser->top )
-		return( defbrowser->top->requisition.width );
+	if( defbrowser->top ) {
+		GtkRequisition minimum_size;
+		GtkRequisition natural_size;
+
+		gtk_widget_get_preferred_size( defbrowser->top, 
+			&minimum_size, &natural_size );
+
+		return( natural_size.width );
+	}
 	else
 		return( 200 );
 }

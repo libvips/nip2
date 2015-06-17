@@ -104,8 +104,7 @@ statusview_class_init( StatusviewClass *class )
 	 */
 
 	pane = statusview_menu = popup_build( _( "Status bar menu" ) );
-	popup_add_but( pane, GTK_STOCK_CLOSE, 
-		POPUP_FUNC( statusview_hide_cb ) );
+	popup_add_but( pane, "close", POPUP_FUNC( statusview_hide_cb ) );
 }
 
 static void

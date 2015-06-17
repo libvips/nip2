@@ -33,7 +33,7 @@
 
 #include "ip.h"
 
-G_DEFINE_TYPE( Subcolumview, subcolumview, TYPE_VIEW ); 
+G_DEFINE_TYPE( Subcolumnview, subcolumnview, TYPE_VIEW ); 
 
 static void *
 subcolumnview_destroy_sub( Rowview *rview, Subcolumnview *sview )
@@ -124,7 +124,6 @@ subcolumnview_refresh( vObject *vobject )
 {
 	Subcolumnview *sview = SUBCOLUMNVIEW( vobject );
 	Subcolumn *scol = SUBCOLUMN( VOBJECT( sview )->iobject );
-	int model_rows = icontainer_get_n_children( ICONTAINER( scol ) );
 	int old_nvis = sview->nvis;
 	gboolean editable = scol->top_col->ws->mode != WORKSPACE_MODE_NOEDIT;
 
@@ -135,27 +134,21 @@ subcolumnview_refresh( vObject *vobject )
 	/* Top-level subcolumns look different in no-edit mode.
 	 */
 	if( scol->is_top && editable ) {
-		gtk_alignment_set_padding( GTK_ALIGNMENT( sview->align ), 
-			0, 0, 0, 0 );
 		gtk_grid_set_row_spacing( GTK_GRID( sview->grid ), 0 );
-		gtk_grid_set_col_spacing( GTK_GRID( sview->grid ), 0 );
+		gtk_grid_set_column_spacing( GTK_GRID( sview->grid ), 0 );
 	}
 	else if( scol->is_top && !editable ) {
-		gtk_alignment_set_padding( GTK_ALIGNMENT( sview->align ), 
-			5, 5, 5, 5 );
 		gtk_grid_set_row_spacing( GTK_GRID( sview->grid ), 5 );
-		gtk_grid_set_col_spacing( GTK_GRID( sview->grid ), 5 );
+		gtk_grid_set_column_spacing( GTK_GRID( sview->grid ), 5 );
 	}
 
 	/* Nested subcols: we just change the left indent.
 	 */
 	if( !scol->is_top && editable ) {
-		gtk_alignment_set_padding( GTK_ALIGNMENT( sview->align ), 
-			0, 0, 0, 0 );
+		printf( "subcolumnview_refresh: set indent\n" ); 
 	}
 	else if( !scol->is_top && !editable ) {
-		gtk_alignment_set_padding( GTK_ALIGNMENT( sview->align ), 
-			0, 0, 15, 0 );
+		printf( "subcolumnview_refresh: set indent\n" ); 
 	}
 
 	sview->nvis = 0;
@@ -197,13 +190,11 @@ subcolumnview_init( Subcolumnview *sview )
         sview->rows = 0;
         sview->nvis = 0;
 
-        sview->align = gtk_alignment_new( 0, 0, 1, 1 );
-        gtk_box_pack_start( GTK_BOX( sview ), sview->align, FALSE, FALSE, 0 );
 
         sview->grid = gtk_grid_new();
-        gtk_container_add( GTK_CONTAINER( sview->align ), sview->grid );
+        gtk_box_pack_start( GTK_BOX( sview ), sview->grid, FALSE, FALSE, 0 );
 
-        gtk_widget_show_all( sview->align );
+        gtk_widget_show_all( sview->grid );
 
 	sview->group = gtk_size_group_new( GTK_SIZE_GROUP_HORIZONTAL );
 }

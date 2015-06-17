@@ -45,7 +45,6 @@ struct _Subcolumnview {
 
 	/* My instance vars.
 	 */
-        GtkWidget *align; 	/* Alignment widget */
         GtkWidget *grid; 	/* Central tally area for column */
         int rows;               /* Number of rows atm */
 	int nvis;		/* Number of children currently visible */

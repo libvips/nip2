@@ -252,7 +252,7 @@ toolkitbrowser_init( Toolkitbrowser *toolkitbrowser )
 		toolkitbrowser );
 	gtk_box_pack_end( GTK_BOX( toolkitbrowser->top ), 
 		toolkitbrowser->entry, FALSE, FALSE, 2 );
-	label = gtk_image_new_from_icon_name( GTK_STOCK_FIND, GTK_ICON_SIZE_MENU );
+	label = gtk_image_new_from_icon_name( "find", GTK_ICON_SIZE_MENU );
 	gtk_box_pack_end( GTK_BOX( toolkitbrowser->top ), 
 		label, FALSE, FALSE, 0 );
         gtk_box_pack_start( GTK_BOX( toolkitbrowser ), 
@@ -273,8 +273,6 @@ toolkitbrowser_init( Toolkitbrowser *toolkitbrowser )
 
 	toolkitbrowser->tree = gtk_tree_view_new_with_model( 
 		GTK_TREE_MODEL( toolkitbrowser->filter ) );
-	gtk_tree_view_set_rules_hint( GTK_TREE_VIEW( toolkitbrowser->tree ),
-		TRUE );
 
 	renderer = gtk_cell_renderer_text_new();
 	column = gtk_tree_view_column_new_with_attributes( _( "Action" ),
@@ -327,8 +325,16 @@ toolkitbrowser_new( void )
 int 
 toolkitbrowser_get_width( Toolkitbrowser *toolkitbrowser )
 {
-	if( toolkitbrowser->top )
-		return( toolkitbrowser->top->requisition.width );
+	if( toolkitbrowser->top ) {
+		GtkRequisition minimum_size;
+		GtkRequisition natural_size;
+
+		gtk_widget_get_preferred_size( 
+			GTK_WIDGET( toolkitbrowser->top ), 
+			&minimum_size, &natural_size );
+
+		return( natural_size.width );
+	}
 	else
 		return( 200 );
 }

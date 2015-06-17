@@ -81,18 +81,18 @@ workspaceview_scroll( Workspaceview *wview, int x, int y, int w, int h )
 		GTK_SCROLLED_WINDOW( wview->window ) );
 	GtkAdjustment *vadj = gtk_scrolled_window_get_vadjustment( 
 		GTK_SCROLLED_WINDOW( wview->window ) );
-        Rect *vp = &wview->vp;
+        VipsRect *vp = &wview->vp;
         int nx, ny;
 
-        nx = hadj->value;
-        if( x + w > IM_RECT_RIGHT( vp ) )
-                nx = IM_MAX( 0, (x + w) - vp->width );
+        nx = gtk_adjustment_get_value( hadj ); 
+        if( x + w > VIPS_RECT_RIGHT( vp ) )
+                nx = VIPS_MAX( 0, (x + w) - vp->width );
         if( x < nx )
                 nx = x;
 
-        ny = vadj->value;
-        if( y + h > IM_RECT_BOTTOM( vp ) )
-                ny = IM_MAX( 0, (y + h) - vp->height );
+        ny = gtk_adjustment_get_value( vadj ); 
+        if( y + h > VIPS_RECT_BOTTOM( vp ) )
+                ny = VIPS_MAX( 0, (y + h) - vp->height );
         if( y < ny )
                 ny = y;
 

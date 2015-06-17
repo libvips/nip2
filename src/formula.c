@@ -352,6 +352,8 @@ formula_enter_notify_event( GtkWidget *widget, GdkEventCrossing *event )
 	event_widget = gtk_get_event_widget( (GdkEvent *) event );
 
 	if( event_widget == widget && event->detail != GDK_NOTIFY_INFERIOR ) {
+		gtk_widget_set_state_flags( widget, GTK_STATE_PRELIGHT, FALSE );
+
 		/* Tell people about our highlight change ... used to (eg.) set 
 		 * flash help.
 		 */
@@ -369,6 +371,8 @@ formula_leave_notify_event( GtkWidget *widget, GdkEventCrossing *event )
 	event_widget = gtk_get_event_widget( (GdkEvent *) event );
 
 	if( event_widget == widget && event->detail != GDK_NOTIFY_INFERIOR ) {
+		gtk_widget_set_state_flags( widget, GTK_STATE_NORMAL, TRUE );
+
 		/* Tell people about our highlight change ... used to (eg.) set 
 		 * flash help.
 		 */

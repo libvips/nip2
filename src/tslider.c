@@ -43,7 +43,7 @@ enum {
 	LAST_SIGNAL
 };
 
-G_DEFINE_TYPE( Tslider, tslider, GTK_TYPE_HBOX ); 
+G_DEFINE_TYPE( Tslider, tslider, GTK_TYPE_BOX ); 
 
 static guint tslider_signals[LAST_SIGNAL] = { 0 };
 
@@ -69,8 +69,7 @@ tslider_destroy( GtkWidget *widget )
 	/* My instance destroy stuff.
 	 */
 	if( tslider->adj ) {
-		g_signal_disconnect_by_data( G_OBJECT( tslider->adj ),
-			(gpointer) tslider );
+		g_signal_handlers_disconnect_by_data( tslider->adj, tslider );
 		tslider->adj = NULL;
 	}
 
@@ -144,8 +143,10 @@ tslider_real_changed( Tslider *tslider )
 		tslider->svalue = tslider_value_to_slider( tslider, 
 			tslider->value );
 
-	g_signal_handler_block_by_data( G_OBJECT( adj ), tslider );
-	g_signal_handler_block_by_data( G_OBJECT( entry ), tslider );
+	g_signal_handlers_block_matched( G_OBJECT( adj ), 
+		G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, tslider );
+	g_signal_handlers_block_matched( G_OBJECT( entry ), 
+		G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, tslider );
 
 	/* Some libc's hate out-of-bounds precision, so clip, just in case.
 	 */
@@ -157,12 +158,12 @@ tslider_real_changed( Tslider *tslider )
 		!DEQ( tslider->to, tslider->last_to ) ) {
 		double range = tslider->to - tslider->from;
 
-		adj->step_increment = range / 100;
-		adj->page_increment = range / 10;
-		adj->page_size = range / 10;
-
-		adj->lower = tslider->from;
-		adj->upper = tslider->to + adj->page_size;
+		gtk_adjustment_set_step_increment( adj, range / 100 ); 
+		gtk_adjustment_set_page_increment( adj, range / 10 ); 
+		gtk_adjustment_set_page_size( adj, range / 10 ); 
+		gtk_adjustment_set_lower( adj, tslider->from ); 
+		gtk_adjustment_set_upper( adj, 
+			tslider->to + gtk_adjustment_get_page_size( adj ) ); 
 
 		tslider->last_to = tslider->to;
 		tslider->last_from = tslider->from;
@@ -171,14 +172,15 @@ tslider_real_changed( Tslider *tslider )
 	}
 
 	if( !DEQ( tslider->svalue, tslider->last_svalue ) ) {
-		adj->value = tslider->svalue;
-		tslider->last_svalue = tslider->svalue;
+		gtk_adjustment_set_value( adj, tslider->svalue ); 
 
 		gtk_adjustment_value_changed( adj );
 	}
 
-	g_signal_handler_unblock_by_data( G_OBJECT( adj ), tslider );
-	g_signal_handler_unblock_by_data( G_OBJECT( entry ), tslider );
+	g_signal_handlers_unblock_matched( G_OBJECT( adj ), 
+		G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, tslider );
+	g_signal_handlers_unblock_matched( G_OBJECT( entry ), 
+		G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, tslider );
 }
 
 static void
@@ -308,12 +310,12 @@ tslider_value_changed_cb( GtkAdjustment *adj, Tslider *tslider )
 	printf( "tslider_value_changed_cb\n" );
 #endif /*DEBUG*/
 
-	if( tslider->svalue != adj->value ) {
-		tslider->svalue = adj->value;
+	if( tslider->svalue != gtk_adjustment_get_value( adj ) ) {
+		tslider->svalue = gtk_adjustment_get_value( adj );
 
 		if( tslider->auto_link ) {
-			tslider->value = 
-				tslider_slider_to_value( tslider, adj->value );
+			tslider->value = tslider_slider_to_value( 
+				tslider, tslider->svalue ); 
 
 			tslider_changed( tslider );
 		}
@@ -390,14 +392,8 @@ tslider_init( Tslider *tslider )
                 G_CALLBACK( tslider_text_changed_cb ), tslider );
 	gtk_widget_show( tslider->entry );
 
-        tslider->slider = gtk_hscale_new( NULL );
+        tslider->slider = gtk_scale_new( GTK_ORIENTATION_HORIZONTAL, NULL );
 	tslider->adj = gtk_range_get_adjustment( GTK_RANGE( tslider->slider ) );
-        gtk_range_set_update_policy( GTK_RANGE( tslider->slider ),
-		GTK_UPDATE_CONTINUOUS );
-#ifdef DEBUG
-        gtk_range_set_update_policy( GTK_RANGE( tslider->slider ),
-		GTK_UPDATE_DISCONTINUOUS );
-#endif /*DEBUG*/
         gtk_scale_set_draw_value( GTK_SCALE( tslider->slider ), FALSE );
 	gtk_widget_set_size_request( GTK_WIDGET( tslider->slider ), 100, -1 );
         gtk_box_pack_start( GTK_BOX( tslider ), 

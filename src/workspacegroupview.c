@@ -378,6 +378,7 @@ workspacegroupview_tab_double_cb( GtkNotebook *notebook, GdkEvent *event,
 	int i;
 	GtkWidget *page;
 	GtkWidget *tab;
+	GtkAllocation allocation;
 
 	/* Doubleclick in a tab row background. This could be the gutter or
 	 * the edge of a label. Get the position of the right-most tab and
@@ -387,7 +388,8 @@ workspacegroupview_tab_double_cb( GtkNotebook *notebook, GdkEvent *event,
 	page = gtk_notebook_get_nth_page( notebook, i - 1 ); 
 	tab = gtk_notebook_get_tab_label( notebook, page ); 
 
-	if( event->button.x > tab->allocation.x + tab->allocation.width &&
+	gtk_widget_get_allocation( tab, &allocation ); 
+	if( event->button.x > allocation.x + allocation.width &&
 		!workspace_new_blank( wsg ) ) 
 		iwindow_alert( GTK_WIDGET( wsgview ), GTK_MESSAGE_ERROR );
 }
@@ -603,7 +605,7 @@ workspacegroupview_init( Workspacegroupview *wsgview )
         but = gtk_button_new();
         gtk_button_set_relief( GTK_BUTTON( but ), GTK_RELIEF_NONE );
         set_tooltip( but, _( "Add a workspace" ) );
-	icon = gtk_image_new_from_icon_name( GTK_STOCK_ADD, GTK_ICON_SIZE_MENU );
+	icon = gtk_image_new_from_icon_name( "add", GTK_ICON_SIZE_MENU );
         gtk_container_add( GTK_CONTAINER( but ), icon );
 	gtk_widget_show( icon );
 	gtk_widget_show( but );
@@ -622,14 +624,14 @@ workspacegroupview_init( Workspacegroupview *wsgview )
 		POPUP_FUNC( workspacegroupview_rename_cb ) ); 
 	popup_add_but( wsgview->tab_menu, _( "Select All" ),
 		POPUP_FUNC( workspacegroupview_select_all_cb ) ); 
-	popup_add_but( wsgview->tab_menu, STOCK_DUPLICATE,
+	popup_add_but( wsgview->tab_menu, "duplicate",
 		POPUP_FUNC( workspacegroupview_duplicate_cb ) ); 
 	popup_add_but( wsgview->tab_menu, _( "Merge Into Tab" ),
 		POPUP_FUNC( workspacegroupview_merge_cb ) ); 
-	popup_add_but( wsgview->tab_menu, GTK_STOCK_SAVE_AS,
+	popup_add_but( wsgview->tab_menu, "save-as",
 		POPUP_FUNC( workspacegroupview_save_as_cb ) ); 
 	menu_add_sep( wsgview->tab_menu );
-	popup_add_but( wsgview->tab_menu, GTK_STOCK_DELETE,
+	popup_add_but( wsgview->tab_menu, "delete",
 		POPUP_FUNC( workspacegroupview_delete_cb ) ); 
 }
 

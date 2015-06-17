@@ -630,8 +630,7 @@ view_real_child_add( View *parent, View *child )
 	 */
 	child->parent = parent;
 	viewchild->child_view = child;
-	g_object_ref( child );
-	g_object_sink( child );
+	g_object_ref_sink( child );
 }
 
 static void

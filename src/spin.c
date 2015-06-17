@@ -101,7 +101,7 @@ typedef struct {
 } SpinEvent;
 
 static void
-allocation2rect( GtkAllocation *from, Rect *to )
+allocation2rect( GtkAllocation *from, VipsRect *to )
 {
         to->left = from->x;
         to->top = from->y;
@@ -113,17 +113,26 @@ static void
 spin_button_press_event_test( GtkWidget *widget, gpointer data )
 {
 	SpinEvent *sev = (SpinEvent *) data;
-	Rect pos;
+
+	VipsRect pos;
+	GtkAllocation allocation;
 
 	if( sev->handled )
 		return;
 
-	allocation2rect( &widget->allocation, &pos );
-	if( im_rect_includespoint( &pos, sev->x, sev->y ) ) {
-		if( GTK_IS_ARROW( widget ) ) {
-			sev->handled = TRUE;
+	gtk_widget_get_allocation( widget, &allocation ); 
+	allocation2rect( &allocation, &pos );
+	if( vips_rect_includespoint( &pos, sev->x, sev->y ) ) {
 
-			if( GTK_ARROW( widget )->arrow_type == GTK_ARROW_UP )
+		if( GTK_IS_IMAGE( widget ) ) {
+			const gchar *icon_name;
+
+			sev->handled = TRUE;
+			gtk_image_get_icon_name( GTK_IMAGE( widget ), 
+				&icon_name, NULL ); 
+
+			if( icon_name &&
+				strcmp( icon_name, "arrow-up" ) == 0 )
 				g_signal_emit( G_OBJECT( sev->spin ), 
 					spin_signals[UP_CLICK], 0 );
 			else
@@ -145,11 +154,16 @@ spin_button_press_event_cb( GtkWidget *widget, GdkEventButton *event,
 		SpinEvent sev;
 
 		if( event->button == 1 ) {
+			GtkAllocation allocation;
+
 			sev.spin = spin;
+
 			/* Find button x/y relative to top LH corner of spin.
 			 */
-			sev.x = event->x + GTK_WIDGET( spin )->allocation.x;
-			sev.y = event->y + GTK_WIDGET( spin )->allocation.y;
+			gtk_widget_get_allocation( GTK_WIDGET( spin ), 
+				&allocation ); 
+			sev.x = event->x + allocation.x;
+			sev.y = event->y + allocation.y;
 			sev.handled = FALSE;
 			spin_button_press_event_test( spin->up, &sev );
 			spin_button_press_event_test( spin->down, &sev );
@@ -168,7 +182,7 @@ spin_button_enter_notify_event_cb( GtkWidget *widget, GdkEventCrossing *event,
 	gboolean handled = FALSE;
 
 	if( event->detail != GDK_NOTIFY_INFERIOR ) 
-		gtk_widget_set_state( widget, GTK_STATE_PRELIGHT );
+		gtk_widget_set_state_flags( widget, GTK_STATE_PRELIGHT, FALSE );
 
 	return( handled );
 }
@@ -180,7 +194,7 @@ spin_button_leave_notify_event_cb( GtkWidget *widget, GdkEventCrossing *event,
 	gboolean handled = FALSE;
 
 	if( event->detail != GDK_NOTIFY_INFERIOR ) 
-		gtk_widget_set_state( widget, GTK_STATE_NORMAL );
+		gtk_widget_set_state_flags( widget, GTK_STATE_NORMAL, FALSE );
 
 	return( handled );
 }
@@ -207,8 +221,10 @@ spin_init( Spin *spin )
 	gtk_container_add( GTK_CONTAINER( ebox ), vbox );
 	gtk_widget_show( vbox );
 
-	spin->up = gtk_arrow_new( GTK_ARROW_UP, GTK_SHADOW_OUT );
-        spin->down = gtk_arrow_new( GTK_ARROW_DOWN, GTK_SHADOW_OUT );
+	spin->up = gtk_image_new_from_icon_name( "arrow-up", 
+		GTK_ICON_SIZE_MENU );
+        spin->down = gtk_image_new_from_icon_name( "arrow-down", 
+		GTK_ICON_SIZE_MENU ); 
         gtk_box_pack_start( GTK_BOX( vbox ), spin->up, FALSE, FALSE, 0 );
         gtk_box_pack_end( GTK_BOX( vbox ), spin->down, FALSE, FALSE, 0 );
 	gtk_widget_show( spin->up );

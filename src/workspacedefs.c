@@ -267,7 +267,7 @@ workspacedefs_init( Workspacedefs *workspacedefs )
 	pane = gtk_menu_new();
 	menu_add_but( pane, _( "Replace From _File" ),
 		G_CALLBACK( workspacedefs_replace_cb ), workspacedefs );
-	menu_add_but( pane, GTK_STOCK_SAVE_AS,
+	menu_add_but( pane, "save-as",
 		G_CALLBACK( workspacedefs_save_as_cb ), workspacedefs );
 
 	hbox = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 7 );

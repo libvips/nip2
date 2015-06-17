@@ -65,8 +65,7 @@ item_get_workspace( GtkWidget *item )
 {
 	Toolview *tview;
 
-	if( !(tview = g_object_get_data_by_id( G_OBJECT( item ), 
-		toolview_quark )) )
+	if( !(tview = g_object_get_qdata( G_OBJECT( item ), toolview_quark )) )
 		return( NULL );
 
 	return( toolview_get_workspace( tview ) );

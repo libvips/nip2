@@ -1,3 +1,8 @@
+- make gtkdisp3, a tiny gtk3 app for displaying images
+
+  use this to update imagedisplay and to fix up main.c
+
+
 - vips_call
 
 	vips_call "embed" [A1.value, 10, 10, 1000, 1000] [$extend => "copy"]

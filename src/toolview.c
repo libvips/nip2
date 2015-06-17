@@ -149,15 +149,10 @@ toolview_refresh_sub( Toolview *tview,
 	if( toolitem->is_separator ) 
 		item = gtk_menu_item_new();
 	else {
-		item = gtk_image_menu_item_new_with_mnemonic( toolitem->label );
+		item = gtk_menu_item_new_with_mnemonic( toolitem->label );
 
-		g_object_set_data_by_id( G_OBJECT( item ),
+		g_object_set_qdata( G_OBJECT( item ),
 			toolview_quark, tview );
-
-		if( toolitem->icon )
-			gtk_image_menu_item_set_image( 
-				GTK_IMAGE_MENU_ITEM( item ),
-				image_new_from_file( toolitem->icon ) );
 
 		if( !toolitem->is_pullright ) 
 			g_signal_connect( item, "activate", 

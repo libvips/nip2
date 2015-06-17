@@ -115,13 +115,13 @@ workspaceview_scroll_update( Workspaceview *wview )
 	GtkAdjustment *vadj = gtk_scrolled_window_get_vadjustment( 
 		GTK_SCROLLED_WINDOW( wview->window ) );
 
-        wview->vp.left = hadj->value;
-        wview->vp.top = vadj->value;
-        wview->vp.width = hadj->page_size;
-        wview->vp.height = vadj->page_size;
+        wview->vp.left = gtk_adjustment_get_value( hadj ); 
+        wview->vp.top = gtk_adjustment_get_value( vadj ); 
+        wview->vp.width = gtk_adjustment_get_page_size( hadj ); 
+        wview->vp.height = gtk_adjustment_get_page_size( vadj ); 
 
-        wview->width = hadj->upper;
-        wview->height = vadj->upper;
+        wview->width = gtk_adjustment_get_upper( hadj ); 
+        wview->height = gtk_adjustment_get_upper( vadj ); 
 
 	/* Update vp hint in model too.
 	 */
@@ -203,7 +203,7 @@ workspaceview_scroll_event_cb( GtkWidget *widget,
 static void
 workspaceview_realize_cb( GtkWidget *wid, Workspaceview *wview )
 {
-	g_assert( wid->window );
+	g_assert( gtk_widget_get_window( wid ) ); 
 
 	gtk_widget_add_events( wid, GDK_BUTTON_PRESS_MASK );
 }
@@ -277,7 +277,7 @@ workspaceview_is_background( Workspaceview *wview,
 	 * sub-GdkWindow (eg. an image thumbnail), so can't be a background
 	 * click.
 	 */
-	if( window != wview->fixed->window )
+	if( window != gtk_widget_get_window( wview->fixed ) )
 		return( FALSE );
 
 	/* Could be a click in a non-window widget (eg. a label); search
@@ -451,7 +451,8 @@ workspaceview_drag_data_received( GtkWidget *widget, GdkDragContext *context,
 {
 	Workspaceview *wview = WORKSPACEVIEW( widget );
 	Workspace *ws = WORKSPACE( VOBJECT( wview )->iobject );
-	const char *from_row_path = (const char *) selection_data->data;
+	const char *from_row_path = 
+		(const char *) gtk_selection_data_get_data( selection_data ); 
 	Row *from_row;
 
 #ifdef DEBUG
@@ -463,10 +464,12 @@ workspaceview_drag_data_received( GtkWidget *widget, GdkDragContext *context,
 	x += wview->vp.left;
 	y += wview->vp.top;
 
-	if( info == TARGET_SYMBOL && selection_data->length > 0 && 
-		selection_data->format == 8 &&
+	if( info == TARGET_SYMBOL && 
+		gtk_selection_data_get_length( selection_data ) > 0 && 
+		gtk_selection_data_get_format( selection_data ) == 8 &&
 		workspaceview_is_background( wview, 
-			GTK_WIDGET( wview->fixed )->window, x, y ) &&
+			gtk_widget_get_window( GTK_WIDGET( wview->fixed ) ),
+			x, y ) &&
 		(from_row = row_parse_name( main_workspaceroot->sym, 
 			from_row_path )) ) {
 		char new_name[MAX_STRSIZE];
@@ -658,12 +661,12 @@ workspaceview_child_front( View *parent, View *child )
 	Workspaceview *wview = WORKSPACEVIEW( parent );
 	Columnview *cview = COLUMNVIEW( child );
 
-		gtk_widget_ref( GTK_WIDGET( cview ) );
+		g_object_ref( GTK_WIDGET( cview ) );
 		gtk_container_remove( GTK_CONTAINER( wview->fixed ),
 			GTK_WIDGET( cview ) );
 		gtk_fixed_put( GTK_FIXED( wview->fixed ),
 			GTK_WIDGET( cview ), cview->lx, cview->ly );
-		gtk_widget_unref( GTK_WIDGET( cview ) );
+		g_object_unref( GTK_WIDGET( cview ) );
 }
 
 static void 
@@ -699,14 +702,16 @@ workspaceview_refresh( vObject *vobject )
 				"%s", IOBJECT( ws )->caption );
 
 		if( ws->locked ) 
-			gtk_image_set_from_stock( GTK_IMAGE( wview->padlock ), 
-				STOCK_LOCK, GTK_ICON_SIZE_MENU );
+			gtk_image_set_from_icon_name( 
+				GTK_IMAGE( wview->padlock ), 
+				"lock", GTK_ICON_SIZE_MENU );
 		else
 			gtk_image_clear( GTK_IMAGE( wview->padlock ) );  
 
 		if( ws->errors ) 
-			gtk_image_set_from_stock( GTK_IMAGE( wview->alert ), 
-				STOCK_ALERT, GTK_ICON_SIZE_MENU );
+			gtk_image_set_from_icon_name( 
+				GTK_IMAGE( wview->alert ), 
+				"alert", GTK_ICON_SIZE_MENU );
 		else
 			gtk_image_clear( GTK_IMAGE( wview->alert ) );  
 
@@ -755,8 +760,11 @@ workspaceview_layout_add( View *view, WorkspaceLayout *layout )
 static void *
 workspaceview_layout_find_leftmost( Columnview *cview, WorkspaceLayout *layout )
 {
-	if( GTK_WIDGET( cview )->allocation.x < layout->area.left ) {
-		layout->area.left = GTK_WIDGET( cview )->allocation.x;
+	GtkAllocation allocation;
+
+	gtk_widget_get_allocation( GTK_WIDGET( cview ), &allocation );
+	if( allocation.x < layout->area.left ) {
+		layout->area.left = allocation.x;
 		layout->cview = cview;
 	}
 
@@ -767,28 +775,28 @@ static void *
 workspaceview_layout_find_similar_x( Columnview *cview, 
 	WorkspaceLayout *layout )
 {
-	int x = GTK_WIDGET( cview )->allocation.x;
-
+	GtkAllocation allocation;
 	gboolean snap;
 
+	gtk_widget_get_allocation( GTK_WIDGET( cview ), &allocation );
 	snap = FALSE;
 
 	/* Special case: a colum at zero makes a new column on the far left.
 	 */
 	if( layout->area.left == 0 && 
-		x == 0 ) 
+		allocation.x == 0 ) 
 		snap = TRUE;
 
 	if( layout->area.left > 0 &&
-		ABS( x - layout->area.left ) < 
+		ABS( allocation.x - layout->area.left ) < 
 			workspaceview_layout_snap_threshold ) 
 		snap = TRUE;
 	
 	if( snap ) { 
-		layout->current_columns = g_slist_prepend(
-			layout->current_columns, cview );
-		layout->area.width = IM_MAX( layout->area.width, 
-			GTK_WIDGET( cview )->allocation.width ); 
+		layout->current_columns = 
+			g_slist_prepend( layout->current_columns, cview );
+		layout->area.width = 
+			VIPS_MAX( layout->area.width, allocation.width ); 
 	}
 
 	return( NULL );
@@ -799,13 +807,20 @@ workspaceview_layout_find_similar_x( Columnview *cview,
 static int
 workspaceview_layout_sort_y( Columnview *a, Columnview *b )
 {
-	return( GTK_WIDGET( a )->allocation.y - GTK_WIDGET( b )->allocation.y );
+	GtkAllocation a_allocation;
+	GtkAllocation b_allocation;
+
+	gtk_widget_get_allocation( GTK_WIDGET( a ), &a_allocation );
+	gtk_widget_get_allocation( GTK_WIDGET( b ), &b_allocation );
+
+	return( a_allocation.y - b_allocation.y );
 }
 
 static void *
 workspaceview_layout_set_pos( Columnview *cview, WorkspaceLayout *layout )
 {
 	Column *column = COLUMN( VOBJECT( cview )->iobject );
+	GtkAllocation allocation;
 
 	gboolean changed;
 
@@ -831,8 +846,8 @@ workspaceview_layout_set_pos( Columnview *cview, WorkspaceLayout *layout )
 		}
 	}
 
-	layout->out_y += GTK_WIDGET( cview )->allocation.height +
-		workspaceview_layout_vspacing;
+	gtk_widget_get_allocation( GTK_WIDGET( cview ), &allocation );
+	layout->out_y += allocation.height + workspaceview_layout_vspacing;
 
 	if( changed ) 
 		iobject_changed( IOBJECT( column ) ); 
@@ -852,13 +867,16 @@ workspaceview_layout_strike( Columnview *cview, WorkspaceLayout *layout )
 static void
 workspaceview_layout_loop( WorkspaceLayout *layout )
 {
+	GtkAllocation allocation;
+
 	layout->cview = NULL;
 	layout->area.left = INT_MAX;
 	slist_map( layout->undone_columns,
 		(SListMapFn) workspaceview_layout_find_leftmost, layout );
 
 	layout->current_columns = NULL;
-	layout->area.width = GTK_WIDGET( layout->cview )->allocation.width;
+	gtk_widget_get_allocation( GTK_WIDGET( layout->cview ), &allocation );
+	layout->area.width = allocation.width;
 	slist_map( layout->undone_columns,
 		(SListMapFn) workspaceview_layout_find_similar_x, layout );
 
@@ -1115,14 +1133,12 @@ workspaceview_init( Workspaceview *wview )
 	gtk_widget_add_events( GTK_WIDGET( wview->fixed ), 
 		GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK |
 		GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK ); 
-	gtk_fixed_set_has_window( GTK_FIXED( wview->fixed ), TRUE );
 	wview->window = gtk_scrolled_window_new( NULL, NULL );
 	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( wview->window ), 
 		GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
-	gtk_scrolled_window_add_with_viewport( 
-		GTK_SCROLLED_WINDOW( wview->window ), wview->fixed );
+	gtk_container_add( GTK_CONTAINER( wview->window ), wview->fixed );
 	gtk_viewport_set_shadow_type( 
-		GTK_VIEWPORT( GTK_BIN( wview->window )->child ), 
+		GTK_VIEWPORT( gtk_bin_get_child( GTK_BIN( wview->window ) ) ), 
 		GTK_SHADOW_NONE );
 	g_signal_connect( wview->window, "scroll_event",
 		G_CALLBACK( workspaceview_scroll_event_cb ), wview );

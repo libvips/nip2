@@ -56,7 +56,6 @@ typedef struct _Formula {
 	GtkWidget *hbox;		/* Container for our stuff */
         GtkWidget *left_label;		/* Caption label */
         GtkWidget *right_label;		/* Display value here */
-        GtkWidget *entry_frame;		/* Frame edit text with this */
         GtkWidget *entry;		/* Edit formula here */
 } Formula;
 

@@ -51,7 +51,7 @@ sliderview_refresh( vObject *vobject )
 #endif /*DEBUG*/
 
 	/* Compatibility ... we used to not have a caption. Don't display
-	 * anything if there's o caption.
+	 * anything if there's no caption.
 	 */
 	if( caption ) {
 		if( strcmp( caption, "" ) != 0 )
@@ -65,20 +65,7 @@ sliderview_refresh( vObject *vobject )
 	tslider->to = slider->to;
 	tslider->svalue = slider->value;
 	tslider->value = slider->value;
-
-	tslider->digits = IM_MAX( 0, ceil( 2 - lrange ) );
-
-	if( CALC_RECOMP_SLIDER )
-		gtk_range_set_update_policy( GTK_RANGE( tslider->slider ), 
-			GTK_UPDATE_CONTINUOUS );
-	else
-		gtk_range_set_update_policy( GTK_RANGE( tslider->slider ),
-			GTK_UPDATE_DISCONTINUOUS );
-
-#ifdef DEBUG
-	gtk_range_set_update_policy( GTK_RANGE( tslider->slider ),
-		GTK_UPDATE_DISCONTINUOUS );
-#endif /*DEBUG*/
+	tslider->digits = VIPS_MAX( 0, ceil( 2 - lrange ) );
 
 	tslider_changed( tslider );
 
@@ -175,12 +162,10 @@ sliderview_init( Sliderview *sliderview )
 
         g_signal_connect_object( sliderview->tslider, 
 		"text_changed",
-                G_CALLBACK( view_changed_cb ), 
-		G_OBJECT( sliderview ) );
+                G_CALLBACK( view_changed_cb ), G_OBJECT( sliderview ), 0 );
         g_signal_connect_object( sliderview->tslider, 
 		"activate",
-                G_CALLBACK( view_activate_cb ), 
-		G_OBJECT( sliderview ) );
+                G_CALLBACK( view_activate_cb ), G_OBJECT( sliderview ), 0 );
         g_signal_connect( sliderview->tslider, 
 		"slider_changed", 
 		G_CALLBACK( sliderview_change_cb ), sliderview );

@@ -239,8 +239,7 @@ matrixview_toggle_build( Matrixview *matrixview )
     	int x, y;
     	int cx, cy;
 
-    	matrixview->table = gtk_table_new( 
-		matrixview->height, matrixview->width, TRUE );
+    	matrixview->table = gtk_grid_new();
     	gtk_box_pack_start( GTK_BOX( matrixview->box ), 
     		matrixview->table, FALSE, FALSE, 0 );
 
@@ -273,8 +272,8 @@ matrixview_toggle_build( Matrixview *matrixview )
     			set_fixed( GTK_BIN( but )->child, 1 );
 			 */
 
-    			gtk_table_attach( GTK_TABLE( matrixview->table ), but,
-    				x, x + 1, y, y + 1, GTK_FILL, GTK_FILL, 2, 2 );
+    			gtk_grid_attach( GTK_GRID( matrixview->table ), but,
+    				x, x + 1, y, y + 1 ); 
     			matrixview->items = 
     				g_slist_append( matrixview->items, but );
     		}
@@ -311,8 +310,7 @@ matrixview_slider_build( Matrixview *matrixview )
 {
     	int x, y;
 
-    	matrixview->table = gtk_table_new( matrixview->height, 
-		matrixview->width, TRUE );
+    	matrixview->table = gtk_grid_new();
     	gtk_box_pack_start( GTK_BOX( matrixview->box ), 
     		matrixview->table, TRUE, TRUE, 0 );
 
@@ -327,10 +325,10 @@ matrixview_slider_build( Matrixview *matrixview )
 
     			g_signal_connect_object( tslider, "text_changed",
     				G_CALLBACK( view_changed_cb ), 
-    				G_OBJECT( matrixview ) );
+    				G_OBJECT( matrixview ), 0 );
     			g_signal_connect_object( tslider, "activate", 
     				G_CALLBACK( view_activate_cb ), 
-    				G_OBJECT( matrixview ) );
+    				G_OBJECT( matrixview ), 0 );
     			g_signal_connect( tslider, 
     				"slider_changed", 
     				G_CALLBACK( matrixview_slider_change_cb ),
@@ -338,8 +336,8 @@ matrixview_slider_build( Matrixview *matrixview )
 
     			gtk_container_set_border_width( 
     				GTK_CONTAINER( tslider ), 2 );
-    			gtk_table_attach_defaults( 
-    				GTK_TABLE( matrixview->table ), 
+    			gtk_grid_attach( 
+    				GTK_GRID( matrixview->table ), 
     				GTK_WIDGET( tslider ),
     				x, x + 1, y, y + 1 );
     			matrixview->items = g_slist_append( matrixview->items, 
@@ -367,9 +365,9 @@ static void
 matrixview_text_connect( Matrixview *matrixview, GtkWidget *txt )
 {
     	g_signal_connect_object( txt, "changed",
-    		G_CALLBACK( view_changed_cb ), G_OBJECT( matrixview ) );
+    		G_CALLBACK( view_changed_cb ), G_OBJECT( matrixview ), 0 );
     	g_signal_connect_object( txt, "activate",
-    		G_CALLBACK( view_activate_cb ), G_OBJECT( matrixview ) );
+    		G_CALLBACK( view_activate_cb ), G_OBJECT( matrixview ), 0 );
 
     	/* Select text on focus-in, deselect on focus out.
     	 */
@@ -534,7 +532,8 @@ matrixview_text_build( Matrixview *matrixview )
 
 	if( matrix->value.width > matrixview_max_width || 
 		matrix->value.height > matrixview_max_height ) {
-		GtkRequisition requisition;
+		GtkRequisition minimum_size;
+		GtkRequisition natural_size;
 		gint spacing;
 		int border;
 		int width, height;
@@ -554,14 +553,14 @@ matrixview_text_build( Matrixview *matrixview )
 		/* Calculate how big we should make the scrolled window. We
 		 * need to leave space for the scrollbars.
 		 */
-		gtk_widget_size_request( 
+		gtk_widget_get_preferred_size( 
 			gtk_scrolled_window_get_hscrollbar( 
 				GTK_SCROLLED_WINDOW( matrixview->swin ) ),
-			&requisition );
+			&minimum_size, &natural_size );
 		gtk_widget_style_get( GTK_WIDGET( matrixview->swin ),
 			"scrollbar-spacing", &spacing,
 			NULL );
-		border = requisition.height + spacing;
+		border = natural_size.height + spacing;
 
 		/* Subarea of matrix we show, in cells.
 		 */
@@ -602,7 +601,7 @@ matrixview_text_build( Matrixview *matrixview )
 static void
 matrixview_toggle_set_label( GtkWidget *button, double v )
 {
-    	GtkWidget *label = GTK_BIN( button )->child;
+    	GtkWidget *label = gtk_bin_get_child( GTK_BIN( button ) ); 
 
     	g_return_if_fail( GTK_IS_LABEL( label ) );
 
@@ -667,11 +666,11 @@ static void
 matrixview_text_set( Matrixview *matrixview, GtkWidget *txt, double val )
 {
     	if( txt ) {
-    		gtk_signal_handler_block_by_data( 
-    			G_OBJECT( txt ), matrixview );
+		g_signal_handlers_block_matched( G_OBJECT( txt ), 
+			G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, matrixview );
     		set_gentry( txt, "%g", val ); 
-    		gtk_signal_handler_unblock_by_data( 
-    			G_OBJECT( txt ), matrixview );
+		g_signal_handlers_unblock_matched( G_OBJECT( txt ), 
+			G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, matrixview );
     	}
 }
 
@@ -812,36 +811,28 @@ matrixview_refresh( vObject *vobject )
 		}
 
 		if( hclip ) {
-			gtk_table_resize( GTK_TABLE( matrixview->table ), 
-				matrixview->height, matrixview->width + 1 );
-
 			for( i = 0; i < matrixview->height; i++ ) {
 				GtkWidget *lab;
 
 				lab = gtk_label_new( "---" );
-				gtk_table_attach( 
-					GTK_TABLE( matrixview->table ), lab,
+				gtk_grid_attach( 
+					GTK_GRID( matrixview->table ), lab,
 					matrixview->width, 
 					matrixview->width + 1, 
-					i, i + 1, 
-					GTK_FILL, GTK_FILL, 2, 2 );
+					i, i + 1 );  
 			}
 		}
 
 		if( vclip ) {
-			gtk_table_resize( GTK_TABLE( matrixview->table ), 
-				matrixview->height + 1, matrixview->width );
-
 			for( i = 0; i < matrixview->width; i++ ) {
 				GtkWidget *lab;
 
 				lab = gtk_label_new( "|" );
-				gtk_table_attach( 
-					GTK_TABLE( matrixview->table ), lab,
+				gtk_grid_attach( 
+					GTK_GRID( matrixview->table ), lab,
 					i, i + 1, 
 					matrixview->height, 
-					matrixview->height + 1, 
-					GTK_FILL, GTK_FILL, 2, 2 );
+					matrixview->height + 1 );  
 			}
 		}
 

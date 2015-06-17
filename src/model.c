@@ -584,8 +584,8 @@ static void *
 model_new_xml_sub( ModelClass *model_class, 
 	ModelLoadState *state, Model *parent, xmlNode *xnode )
 {
-	GType type = GTK_CLASS_TYPE( model_class );
-	const char *tname = gtk_type_name( type );
+	GType type = G_OBJECT_CLASS_TYPE( model_class );
+	const char *tname = g_type_name( type );
 
 	if( strcasecmp( (char *) xnode->name, tname ) == 0 ) {
 		Model *model = MODEL( g_object_new( type, NULL ) );
@@ -846,7 +846,7 @@ model_check_destroy( GtkWidget *parent, Model *model, iWindowFn done_cb )
 	mcd->idlg = box_yesno( parent,
 		model_check_destroy_sub, iwindow_true_cb, mcd, 
 		model_check_destroy_finished, mcd,
-		GTK_STOCK_DELETE, 
+		"delete", 
 		_( "Delete?" ),
 		_( "Are you sure you want to delete %s \"%s\"?" ), 
 		IOBJECT_GET_CLASS_NAME( model ), name );

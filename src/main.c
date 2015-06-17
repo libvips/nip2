@@ -79,7 +79,6 @@ gboolean main_starting = TRUE;			/* In startup */
 
 static const char *main_argv0 = NULL;		/* argv[0] */
 static iOpenFile *main_stdin = NULL;		/* stdin as an iOpenFile */
-static GtkIconFactory *main_icon_factory = NULL;/* Add stocks to this */
 
 static char *main_option_script = NULL;
 static char *main_option_expression = NULL;
@@ -328,11 +327,6 @@ main_quit( void )
 	reduce_destroy( reduce_context );
 
 #ifdef DEBUG_LEAK
-	/* Free other GTK stuff.
-	 */
-	if( main_icon_factory )
-		gtk_icon_factory_remove_default( main_icon_factory );
-
 #ifdef HAVE_LIBGOFFICE
 	/* Not quite sure what this does, but don't do it in batch mode.
  	 */
@@ -651,127 +645,6 @@ main_reload( void )
 	progress_end();
 }
 
-/* Use a file to paint a named stock item.
- */
-static void
-main_file_for_stock( GtkIconFactory *icon_factory,
-	const char *stock, const char *file )
-{
-	GtkIconSource *icon_source;
-	GtkIconSet *icon_set;
-	char buf[FILENAME_MAX];
-
-	im_snprintf( buf, FILENAME_MAX, 
-		"$VIPSHOME/share/$PACKAGE/data/%s", file );
-	path_expand( buf );
-	icon_source = gtk_icon_source_new(); 
-	gtk_icon_source_set_filename( icon_source, buf );
-	icon_set = gtk_icon_set_new();
-	gtk_icon_set_add_source( icon_set, icon_source );
-	gtk_icon_source_free( icon_source );
-	gtk_icon_factory_add( icon_factory, stock, icon_set );
-	gtk_icon_set_unref( icon_set );
-}
-
-/* Make our custom icon sets.
- */
-static void
-main_register_icons( void )
-{
-	static const GtkStockItem stock_item[] = {
-/* Can be (eg.) 
- *
- *   { GTK_STOCK_COPY, N_("_Copy"), GDK_CONTROL_MASK, 'c', GETTEXT_PACKAGE },
- *
- */
-		{ STOCK_NEXT_ERROR, 
-			N_( "Next _Error" ), 0, 0, GETTEXT_PACKAGE },
-		{ STOCK_DROPPER, N_( "Ink dropper" ), 0, 0, GETTEXT_PACKAGE },
-		{ STOCK_DUPLICATE, N_( "D_uplicate" ), 0, 0, GETTEXT_PACKAGE },
-		{ STOCK_PAINTBRUSH, N_( "Pen" ), 0, 0, GETTEXT_PACKAGE },
-		{ STOCK_LINE, N_( "Line" ), 0, 0, GETTEXT_PACKAGE },
-		{ STOCK_TEXT, N_( "Text" ), 0, 0, GETTEXT_PACKAGE },
-		{ STOCK_SMUDGE, N_( "Smudge" ), 0, 0, GETTEXT_PACKAGE },
-		{ STOCK_FLOOD, N_( "Flood" ), 0, 0, GETTEXT_PACKAGE },
-		{ STOCK_FLOOD_BLOB, N_( "Flood Blob" ), 0, 0, GETTEXT_PACKAGE },
-		{ STOCK_RECT, N_( "Fill Rectangle" ), 0, 0, GETTEXT_PACKAGE },
-		{ STOCK_MOVE, N_( "Pan" ), 0, 0, GETTEXT_PACKAGE },
-		{ STOCK_SELECT, N_( "Select" ), 0, 0, GETTEXT_PACKAGE },
-		{ STOCK_LOCK, N_( "Locked" ), 0, 0, GETTEXT_PACKAGE },
-
-		/* And the LEDs we use.
-		 */
-		{ STOCK_LED_RED, N_( "Red LED" ), 0, 0, GETTEXT_PACKAGE },
-		{ STOCK_LED_GREEN, N_( "Green LED" ), 0, 0, GETTEXT_PACKAGE },
-		{ STOCK_LED_BLUE, N_( "Blue LED" ), 0, 0, GETTEXT_PACKAGE },
-		{ STOCK_LED_YELLOW, N_( "Yellow LED" ), 0, 0, GETTEXT_PACKAGE },
-		{ STOCK_LED_CYAN, N_( "Cyan LED" ), 0, 0, GETTEXT_PACKAGE },
-		{ STOCK_LED_OFF, N_( "Off LED" ), 0, 0, GETTEXT_PACKAGE }
-	};
-
-	GtkIconSet *icon_set;
-
-	gtk_stock_add_static( stock_item, IM_NUMBER( stock_item ) );
-	main_icon_factory = gtk_icon_factory_new();
-
-	/* Make a colour picker stock ... take the stock icon and add our own
-	 * text (gtk defines no text for the standard version of this stock
-	 * icon).
-	 */
-	icon_set = gtk_icon_factory_lookup_default( GTK_STOCK_COLOR_PICKER );
-	gtk_icon_factory_add( main_icon_factory, STOCK_DROPPER, icon_set );
-
-	/* For Next Error, use JUMP_TO.
-	 */
-	icon_set = gtk_icon_factory_lookup_default( GTK_STOCK_JUMP_TO );
-	gtk_icon_factory_add( main_icon_factory, STOCK_NEXT_ERROR, icon_set );
-
-	/* For clone, use the DND_MULTIPLE icon (close enough).
-	 */
-	icon_set = gtk_icon_factory_lookup_default( GTK_STOCK_DND_MULTIPLE );
-	gtk_icon_factory_add( main_icon_factory, STOCK_DUPLICATE, icon_set );
-
-	/* Link to our stock .pngs.
-	 */
-	main_file_for_stock( main_icon_factory, 
-		STOCK_PAINTBRUSH, "stock-tool-ink-22.png" );
-	main_file_for_stock( main_icon_factory, 
-		STOCK_LINE, "stock-tool-path-22.png" );
-	main_file_for_stock( main_icon_factory, 
-		STOCK_TEXT, "stock-tool-text-22.png" );
-	main_file_for_stock( main_icon_factory, 
-		STOCK_SMUDGE, "stock-tool-smudge-22.png" );
-	main_file_for_stock( main_icon_factory, 
-		STOCK_FLOOD, "stock-tool-bucket-fill-22.png" );
-	main_file_for_stock( main_icon_factory, 
-		STOCK_FLOOD_BLOB, "stock-tool-bucket-fill-22.png" );
-	main_file_for_stock( main_icon_factory, 
-		STOCK_RECT, "stock-tool-rect-select-22.png" );
-	main_file_for_stock( main_icon_factory, 
-		STOCK_MOVE, "stock-tool-move-22.png" );
-	main_file_for_stock( main_icon_factory, 
-		STOCK_SELECT, "stock-tool-select-22.png" );
-	main_file_for_stock( main_icon_factory, 
-		STOCK_LOCK, "stock-padlock-closed-22.png" );
-	main_file_for_stock( main_icon_factory, 
-		STOCK_ALERT, "stock-alert-22.png" );
-	main_file_for_stock( main_icon_factory, 
-		STOCK_LED_RED, "stock-led-red-18.png" );
-	main_file_for_stock( main_icon_factory, 
-		STOCK_LED_GREEN, "stock-led-green-18.png" );
-	main_file_for_stock( main_icon_factory, 
-		STOCK_LED_BLUE, "stock-led-blue-18.png" );
-	main_file_for_stock( main_icon_factory, 
-		STOCK_LED_YELLOW, "stock-led-yellow-18.png" );
-	main_file_for_stock( main_icon_factory, 
-		STOCK_LED_CYAN, "stock-led-cyan-18.png" );
-	main_file_for_stock( main_icon_factory, 
-		STOCK_LED_OFF, "stock-led-off-18.png" );
-
-	gtk_icon_factory_add_default( main_icon_factory );
-	g_object_unref( main_icon_factory );
-}
-
 /* Init the display connection stuff.
  */
 static void
@@ -783,11 +656,6 @@ main_x_init( int *argc, char ***argv )
 	printf( "X11 init\n" );
 #endif/*DEBUG*/
 
-	(void) calli_string_filename( 
-		(calli_string_fn) gtk_rc_add_default_file, 
-			"$VIPSHOME" G_DIR_SEPARATOR_S "share" G_DIR_SEPARATOR_S 
-			PACKAGE G_DIR_SEPARATOR_S "rc" G_DIR_SEPARATOR_S 
-			"ipgtkrc", NULL, NULL, NULL );
 	gtk_init( argc, argv );
 
 	/* Set the default icon. 
@@ -806,8 +674,6 @@ main_x_init( int *argc, char ***argv )
 	printf( "*** debug updates is on\n" );
 	gdk_window_set_debug_updates( TRUE );
 #endif /*DEBUG_UPDATES*/
-
-	main_register_icons();
 
 	/* Next window we make is end of startup.
 	 */

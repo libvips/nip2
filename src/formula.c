@@ -82,7 +82,7 @@ formula_key_press_event_cb( GtkWidget *widget, GdkEventKey *ev,
 
 	handled = FALSE;
 
-        if( ev->keyval == GDK_Escape ) {
+        if( ev->keyval == GDK_KEY_Escape ) {
 		set_gentry( formula->entry, "%s", formula->expr );
 
 		/*
@@ -127,17 +127,7 @@ formula_changed( Formula *formula )
 static void
 formula_add_edit( Formula *formula )
 {
-        if( formula->entry_frame )
-                return;
-
-	/* We need to use an alignment since if the left label is hidden we'll
- 	 * have nothing to hold us to the right height.
-	 */
-        formula->entry_frame = gtk_alignment_new( 0.5, 0.5, 1, 1 );
-	gtk_alignment_set_padding( GTK_ALIGNMENT( formula->entry_frame ),
-		3, 3, 2, 2 );
-	gtk_box_pack_start( GTK_BOX( formula->hbox ), 
-		formula->entry_frame, TRUE, TRUE, 0 );
+        if( formula->entry )
 
         formula->entry = gtk_entry_new();
         set_tooltip( formula->entry, _( "Press Escape to cancel edit, "
@@ -145,11 +135,11 @@ formula_add_edit( Formula *formula )
         g_signal_connect( formula->entry, "key_press_event", 
 		G_CALLBACK( formula_key_press_event_cb ), G_OBJECT( formula ) );
         g_signal_connect_object( formula->entry, "changed", 
-		G_CALLBACK( formula_changed ), G_OBJECT( formula ) );
+		G_CALLBACK( formula_changed ), G_OBJECT( formula ), 0 );
         g_signal_connect( formula->entry, "activate",
                 G_CALLBACK( formula_activate_cb ), formula );
-	gtk_container_add( GTK_CONTAINER( formula->entry_frame ), 
-		formula->entry );
+	gtk_box_pack_start( GTK_BOX( formula->hbox ), 
+		formula->entry, TRUE, TRUE, 0 );
 	gtk_widget_show( formula->entry );
 
 	/* Tell everyone we are in edit mode ... used to add to resettable,
@@ -169,14 +159,13 @@ formula_refresh( Formula *formula )
 	 */
 	if( formula->edit ) {
 		formula_add_edit( formula );
-                gtk_widget_show( formula->entry_frame );
+                gtk_widget_show( formula->entry );
                 gtk_widget_hide( formula->right_label );
 		formula->changed = FALSE;
 	}
 	else {
                 gtk_widget_show( formula->right_label );
                 IM_FREEF( gtk_widget_destroy, formula->entry );
-                IM_FREEF( gtk_widget_destroy, formula->entry_frame );
 	}
 
 	/* Don't update the formula display if the user has edited the text ...
@@ -186,11 +175,11 @@ formula_refresh( Formula *formula )
 		/* Make sure we don't trigger "changed" when we zap in new
 		 * text.
 		 */
-		g_signal_handler_block_by_data( 
-			G_OBJECT( formula->entry ), formula );
+		g_signal_handlers_block_matched( G_OBJECT( formula->entry ), 
+			G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, formula );
 		set_gentry( formula->entry, "%s", formula->expr );
-		g_signal_handler_unblock_by_data( 
-			G_OBJECT( formula->entry ), formula );
+		g_signal_handlers_unblock_matched( G_OBJECT( formula->entry ), 
+			G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, formula );
 	}
 
 	if( formula->caption ) {
@@ -337,7 +326,7 @@ formula_scan( Formula *formula )
 	 */
 	if( formula->edit && 
 		formula->entry && 
-		GTK_WIDGET_VISIBLE( formula->entry ) ) {
+		gtk_widget_get_visible( formula->entry ) ) {
 		const char *expr;
 
 		/* There should be some edited text.
@@ -363,8 +352,6 @@ formula_enter_notify_event( GtkWidget *widget, GdkEventCrossing *event )
 	event_widget = gtk_get_event_widget( (GdkEvent *) event );
 
 	if( event_widget == widget && event->detail != GDK_NOTIFY_INFERIOR ) {
-		gtk_widget_set_state( widget, GTK_STATE_PRELIGHT );
-
 		/* Tell people about our highlight change ... used to (eg.) set 
 		 * flash help.
 		 */
@@ -382,8 +369,6 @@ formula_leave_notify_event( GtkWidget *widget, GdkEventCrossing *event )
 	event_widget = gtk_get_event_widget( (GdkEvent *) event );
 
 	if( event_widget == widget && event->detail != GDK_NOTIFY_INFERIOR ) {
-		gtk_widget_set_state( widget, GTK_STATE_NORMAL );
-
 		/* Tell people about our highlight change ... used to (eg.) set 
 		 * flash help.
 		 */
@@ -429,6 +414,7 @@ formula_real_changed( Formula *formula )
 static void
 formula_class_init( FormulaClass *class )
 {
+	GObjectClass *gobject_class = (GObjectClass *) class;
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
 
 	widget_class->destroy = formula_destroy;
@@ -482,23 +468,6 @@ formula_class_init( FormulaClass *class )
 static void
 formula_init( Formula *formula )
 {
-	/* How annoying! To avoid vertical resizes on edit/view toggles we
-	 * need to add differing amounts of padding to the label depending on
-	 * the theme.
-
-	  	FIXME ... get this from the style somehow
-
-	 */
-#ifdef OS_WIN32
-	/* with either wimp theme or gtk default.
-	 */
-	const int vpadding = 7;
-#else /*!OS_WIN32*/
-	/* clearlooks
-	 */
-	const int vpadding = 8;
-#endif /*OS_WIN32*/
-
 	formula->caption = NULL;
 	formula->value = NULL;
 	formula->expr = NULL;
@@ -508,7 +477,7 @@ formula_init( Formula *formula )
 	formula->refresh_queued = FALSE;
 	formula->needs_focus = FALSE;
 
-	formula->entry_frame = NULL;
+	formula->entry = NULL;
 
 	gtk_widget_add_events( GTK_WIDGET( formula ), 
 		GDK_POINTER_MOTION_HINT_MASK ); 

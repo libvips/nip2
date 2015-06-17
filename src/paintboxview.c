@@ -104,7 +104,7 @@ paintboxview_class_init( PaintboxviewClass *class )
 	 */
 
 	pane = paintboxview_menu = popup_build( _( "Paintbox bar menu" ) );
-	popup_add_but( pane, GTK_STOCK_CLOSE,
+	popup_add_but( pane, "close",
 		POPUP_FUNC( paintboxview_hide_cb ) );
 }
 
@@ -203,7 +203,7 @@ paintboxview_clear_cb( GtkWidget *widget, Paintboxview *pbv )
 	box_yesno( GTK_WIDGET( widget ),
 		paintboxview_clear_cb2, iwindow_true_cb, pbv,
 		iwindow_notify_null, NULL,
-		GTK_STOCK_CLEAR,
+		"clear",
 		_( "Clear undo history?" ), 
 		_( "Are you sure you want to clear all undo and redo? "
 		"This will free up memory, but you will no longer be "
@@ -225,18 +225,18 @@ paintboxview_init( Paintboxview *pbv )
 	/* Order important! Keep in sync with ImagemodelState.
 	 */
 	static const char *tool_names[IMAGEMODEL_LAST] = {
-		STOCK_SELECT, 		/* IMAGEMODEL_SELECT */
-		STOCK_MOVE, 		/* IMAGEMODEL_PAN */
-		GTK_STOCK_ZOOM_IN, 	/* IMAGEMODEL_MAGIN */
-		GTK_STOCK_ZOOM_OUT,	/* IMAGEMODEL_MAGOUT*/
-		STOCK_DROPPER,		/* IMAGEMODEL_DROPPER */
-		STOCK_PAINTBRUSH,	/* IMAGEMODEL_PEN */
-		STOCK_LINE,		/* IMAGEMODEL_LINE */
-		STOCK_RECT,		/* IMAGEMODEL_RECT */
-		STOCK_FLOOD,		/* IMAGEMODEL_FLOOD */
-		STOCK_FLOOD_BLOB,	/* IMAGEMODEL_BLOB */
-		STOCK_TEXT,		/* IMAGEMODEL_TEXT */
-		STOCK_SMUDGE 		/* IMAGEMODEL_SMUDGE */
+		"select", 		/* IMAGEMODEL_SELECT */
+		"move", 		/* IMAGEMODEL_PAN */
+		"magin", 		/* IMAGEMODEL_MAGIN */
+		"magout",		/* IMAGEMODEL_MAGOUT*/
+		"dropper",		/* IMAGEMODEL_DROPPER */
+		"paintbrush",		/* IMAGEMODEL_PEN */
+		"line",			/* IMAGEMODEL_LINE */
+		"rect",			/* IMAGEMODEL_RECT */
+		"flood",		/* IMAGEMODEL_FLOOD */
+		"flood_blob",		/* IMAGEMODEL_BLOB */
+		"text",			/* IMAGEMODEL_TEXT */
+		"smudge" 		/* IMAGEMODEL_SMUDGE */
 	};
 
 	static const char *tool_tooltips[] = {
@@ -298,8 +298,7 @@ paintboxview_init( Paintboxview *pbv )
 	hb2 = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
 
 	pbv->undo = gtk_button_new();
-	image = gtk_image_new_from_icon_name( GTK_STOCK_UNDO, 
-		GTK_ICON_SIZE_BUTTON );
+	image = gtk_image_new_from_icon_name( "undo", GTK_ICON_SIZE_BUTTON );
 	gtk_container_add( GTK_CONTAINER( pbv->undo ), image );
 	g_signal_connect( pbv->undo, "clicked", 
 		G_CALLBACK( paintboxview_undo_cb ), pbv );
@@ -307,8 +306,7 @@ paintboxview_init( Paintboxview *pbv )
         gtk_box_pack_start( GTK_BOX( hb2 ), pbv->undo, FALSE, FALSE, 0 );
 
 	pbv->redo = gtk_button_new();
-	image = gtk_image_new_from_icon_name( GTK_STOCK_REDO, 
-		GTK_ICON_SIZE_BUTTON );
+	image = gtk_image_new_from_icon_name( "redo", GTK_ICON_SIZE_BUTTON );
 	gtk_container_add( GTK_CONTAINER( pbv->redo ), image );
 	g_signal_connect( pbv->redo, "clicked", 
 		G_CALLBACK( paintboxview_redo_cb ), pbv );
@@ -316,8 +314,7 @@ paintboxview_init( Paintboxview *pbv )
         gtk_box_pack_start( GTK_BOX( hb2 ), pbv->redo, FALSE, FALSE, 0 );
 
 	pbv->clear = gtk_button_new();
-	image = gtk_image_new_from_icon_name( GTK_STOCK_CLEAR, 
-		GTK_ICON_SIZE_BUTTON );
+	image = gtk_image_new_from_icon_name( "clear", GTK_ICON_SIZE_BUTTON );
 	gtk_container_add( GTK_CONTAINER( pbv->clear ), image );
 	g_signal_connect( pbv->clear, "clicked", 
 		G_CALLBACK( paintboxview_clear_cb ), pbv );

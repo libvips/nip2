@@ -64,7 +64,7 @@ subcolumnview_destroy( GtkWidget *widget )
 	 */
 	(void) view_map( VIEW( sview ), 
 		(view_map_fn) subcolumnview_destroy_sub, sview, NULL );
-	DESTROY_GTK( sview->table );
+	DESTROY_GTK( sview->grid );
 
 	GTK_WIDGET_CLASS( subcolumnview_parent_class )->destroy( widget );
 }
@@ -132,31 +132,19 @@ subcolumnview_refresh( vObject *vobject )
 	printf( "subcolumnview_refresh\n" );
 #endif /*DEBUG*/
 
-	if( sview->rows != model_rows ) {
-		sview->rows = model_rows;
-		if( sview->rows )
-			gtk_table_resize( GTK_TABLE( sview->table ), 
-				sview->rows, 4 );
-
-#ifdef DEBUG
-		printf( "subcolumnview_refresh: resize to %d rows\n",
-			sview->rows );
-#endif /*DEBUG*/
-	}
-
 	/* Top-level subcolumns look different in no-edit mode.
 	 */
 	if( scol->is_top && editable ) {
 		gtk_alignment_set_padding( GTK_ALIGNMENT( sview->align ), 
 			0, 0, 0, 0 );
-		gtk_table_set_row_spacings( GTK_TABLE( sview->table ), 0 );
-		gtk_table_set_col_spacings( GTK_TABLE( sview->table ), 0 );
+		gtk_grid_set_row_spacing( GTK_GRID( sview->grid ), 0 );
+		gtk_grid_set_col_spacing( GTK_GRID( sview->grid ), 0 );
 	}
 	else if( scol->is_top && !editable ) {
 		gtk_alignment_set_padding( GTK_ALIGNMENT( sview->align ), 
 			5, 5, 5, 5 );
-		gtk_table_set_row_spacings( GTK_TABLE( sview->table ), 5 );
-		gtk_table_set_col_spacings( GTK_TABLE( sview->table ), 5 );
+		gtk_grid_set_row_spacing( GTK_GRID( sview->grid ), 5 );
+		gtk_grid_set_col_spacing( GTK_GRID( sview->grid ), 5 );
 	}
 
 	/* Nested subcols: we just change the left indent.
@@ -212,8 +200,8 @@ subcolumnview_init( Subcolumnview *sview )
         sview->align = gtk_alignment_new( 0, 0, 1, 1 );
         gtk_box_pack_start( GTK_BOX( sview ), sview->align, FALSE, FALSE, 0 );
 
-        sview->table = gtk_table_new( sview->rows, 4, FALSE );
-        gtk_container_add( GTK_CONTAINER( sview->align ), sview->table );
+        sview->grid = gtk_grid_new();
+        gtk_container_add( GTK_CONTAINER( sview->align ), sview->grid );
 
         gtk_widget_show_all( sview->align );
 

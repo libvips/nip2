@@ -152,11 +152,11 @@ optionview_refresh( vObject *vobject )
 				GTK_COMBO_BOX( optionview->options ) );
 		IM_FREEF( gtk_widget_destroy, optionview->options );
 
-		optionview->options = gtk_combo_box_new_text();
+		optionview->options = gtk_combo_box_text_new();
 		for( p = option->labels, i = 0; p; p = p->next, i++ ) 
-			gtk_combo_box_append_text( 
-				GTK_COMBO_BOX( optionview->options ),
-				(const char *) p->data );
+			gtk_combo_box_text_append( 
+				GTK_COMBO_BOX_TEXT( optionview->options ),
+				NULL, (const char *) p->data );
 		gtk_box_pack_start( GTK_BOX( optionview->hbox ), 
 			optionview->options, TRUE, TRUE, 0 );
 
@@ -172,12 +172,14 @@ optionview_refresh( vObject *vobject )
 	}
 
 	if( optionview->options ) {
-		g_signal_handler_block_by_data( 
-			G_OBJECT( optionview->options ), optionview );
+		g_signal_handlers_block_matched( 
+			G_OBJECT( optionview->options ), 
+			G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, optionview );
 		gtk_combo_box_set_active( GTK_COMBO_BOX( optionview->options ), 
 			option->value );
-		g_signal_handler_unblock_by_data( 
-			G_OBJECT( optionview->options ), optionview );
+		g_signal_handlers_unblock_matched( 
+			G_OBJECT( optionview->options ), 
+			G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, optionview );
 	}
 
 	set_glabel( optionview->label, _( "%s:" ), IOBJECT( option )->caption );

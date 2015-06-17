@@ -56,7 +56,7 @@ rowview_destroy( GtkWidget *widget )
 	g_return_if_fail( widget != NULL );
 	g_return_if_fail( IS_ROWVIEW( widget ) );
 
-	rview = ROWVIEW( object );
+	rview = ROWVIEW( widget );
 
 #ifdef DEBUG
 	printf( "rowview_destroy: " );
@@ -82,15 +82,14 @@ rowview_attach( Rowview *rview, GtkWidget *child, int x,
 {
 	Subcolumnview *sview = rview->sview;
 
-	gtk_widget_ref( child );
+	g_object_ref( child );
 
-	if( child->parent )
-		gtk_container_remove( GTK_CONTAINER( sview->table ), child );
-	gtk_table_attach( GTK_TABLE( sview->table ), child,
-		x, x + 1, rview->rnum, rview->rnum + 1, 
-		xoptions, yoptions, 0, 0 );
+	if( gtk_widget_get_parent( child ) )
+		gtk_container_remove( GTK_CONTAINER( sview->grid ), child );
+	gtk_grid_attach( GTK_GRID( sview->grid ), child,
+		x, x + 1, rview->rnum, rview->rnum + 1 );  
 
-	gtk_widget_unref( child );
+	g_object_unref( child );
 }
 
 static void
@@ -132,22 +131,22 @@ rowview_update_widgets( Rowview *rview )
         /* Set colours.
          */
 	if( CALC_DISPLAY_LED ) {
-		char *stock_id;
+		char *icon_name;
 
-		stock_id = STOCK_LED_OFF;
+		icon_name = STOCK_LED_OFF;
 		if( row->selected )
-			stock_id = STOCK_LED_GREEN;
+			icon_name = STOCK_LED_GREEN;
 		else if( row->show == ROW_SHOW_PARENT )
-			stock_id = STOCK_LED_CYAN;
+			icon_name = STOCK_LED_CYAN;
 		else if( row->show == ROW_SHOW_CHILD )
-			stock_id = STOCK_LED_BLUE;
+			icon_name = STOCK_LED_BLUE;
 		else if( row->err )
-			stock_id = STOCK_LED_RED;
+			icon_name = STOCK_LED_RED;
 		else if( row->dirty )
-			stock_id = STOCK_LED_YELLOW;
+			icon_name = STOCK_LED_YELLOW;
 
-		gtk_image_set_from_stock( GTK_IMAGE( rview->led ), 
-			stock_id, GTK_ICON_SIZE_MENU );
+		gtk_image_set_from_icon_name( GTK_IMAGE( rview->led ), 
+			icon_name, GTK_ICON_SIZE_MENU );
 	}
 	else {
 		gchar *name = "";
@@ -460,7 +459,7 @@ rowview_drag_data_get( GtkWidget *but,
 		/* Send a pointer to us.
  		 */
 		gtk_selection_data_set( selection_data,
-			selection_data->target,
+			gtk_selection_data_get_target( selection_data ),
 			8, (const guchar *) &rview, sizeof( Rowview * ) );
 	}
 }
@@ -470,9 +469,11 @@ rowview_drag_data_received( GtkWidget *but,
 	GdkDragContext *context, gint x, gint y,
 	GtkSelectionData *data, guint info, guint time, Rowview *rview_to )
 {
-	if( data->length == sizeof( Rowview * ) && data->format == 8 && 
+	if( gtk_selection_data_get_length( data ) == sizeof( Rowview * ) && 
+		gtk_selection_data_get_format( data ) == 8 && 
 		info == ROWVIEW_TARGET_STRING ) {
-		Rowview *rview_from = *((Rowview **) data->data);
+		Rowview *rview_from = 
+			*((Rowview **) gtk_selection_data_get_data( data ));
 
 		if( IS_ROWVIEW( rview_from ) ) {
 			rowview_drag( rview_from, rview_to );
@@ -580,11 +581,11 @@ rowview_class_init( RowviewClass *class )
 		POPUP_FUNC( rowview_edit_cb ) );
 	popup_add_but( pane, _( "_Header" ), 
 		POPUP_FUNC( rowview_header_cb ) );
-	popup_add_but( pane, STOCK_DUPLICATE,
+	popup_add_but( pane, "duplicate",
 		POPUP_FUNC( rowview_clone_cb ) );
 	popup_add_but( pane, _( "U_ngroup" ), 
 		POPUP_FUNC( rowview_ungroup_cb ) );
-	popup_add_but( pane, GTK_STOCK_SAVE_AS,
+	popup_add_but( pane, "save-as",
 		POPUP_FUNC( rowview_save_cb ) );
 	popup_add_but( pane, _( "Replace From _File" ), 
 		POPUP_FUNC( rowview_replace_cb ) );
@@ -593,7 +594,7 @@ rowview_class_init( RowviewClass *class )
 	popup_add_but( pane, _( "Re_set" ), 
 		POPUP_FUNC( rowview_clear_edited_cb ) );
 	menu_add_sep( pane );
-	popup_add_but( pane, GTK_STOCK_DELETE,
+	popup_add_but( pane, "delete",
 		POPUP_FUNC( rowview_remove_cb ) );
 }
 
@@ -688,36 +689,45 @@ rowview_get_position( Rowview *rview, int *x, int *y, int *w, int *h )
 {
         Columnview *cview = view_get_columnview( VIEW( rview ) );
 
-        if( GTK_WIDGET_VISIBLE( rview->spin ) ) {
-                *x = rview->spin->allocation.x;
-                *y = rview->spin->allocation.y;
-                *w = rview->spin->allocation.width;
-                *h = rview->spin->allocation.height;
+	GtkAllocation allocation;
+
+        if( gtk_widget_get_visible( rview->spin ) ) {
+		gtk_widget_get_allocation( rview->spin, &allocation ); 
+                *x = allocation.x;
+                *y = allocation.y;
+                *w = allocation.width;
+                *h = allocation.height;
         }
         else {
-                *x = rview->but->allocation.x;
-                *y = rview->but->allocation.y;
+		gtk_widget_get_allocation( rview->but, &allocation ); 
+                *x = allocation.x;
+                *y = allocation.y;
                 *w = 0;
                 *h = 0;
         }
 
-        *w += rview->but->allocation.width;
-        *h = IM_MAX( rview->but->allocation.height, *h );
+	gtk_widget_get_allocation( rview->but, &allocation ); 
+        *w += allocation.width;
+        *h = VIPS_MAX( allocation.height, *h );
 
-        if( GTK_WIDGET_VISIBLE( rview->led ) ) {
-                *w += rview->led->allocation.width;
-                *h = IM_MAX( rview->led->allocation.height, *h );
+        if( gtk_widget_get_visible( rview->led ) ) {
+		gtk_widget_get_allocation( rview->led, &allocation ); 
+                *w += allocation.width;
+                *h = VIPS_MAX( allocation.height, *h );
         }
 
-        *w += GTK_WIDGET( rview->rhsview )->allocation.width;
-        *h = IM_MAX( GTK_WIDGET( rview->rhsview )->allocation.height, *h );
+	gtk_widget_get_allocation( GTK_WIDGET( rview->rhsview ), &allocation ); 
+        *w += allocation.width;
+        *h = VIPS_MAX( allocation.height, *h );
 
         /* Title bar, plus separator.
          */
-        *y += cview->title->allocation.height + 2;
+	gtk_widget_get_allocation( cview->title, &allocation ); 
+        *y += allocation.height + 2;
 
-        *x += cview->main->allocation.x;
-        *y += cview->main->allocation.y;
+	gtk_widget_get_allocation( cview->main, &allocation ); 
+        *x += allocation.x;
+        *y += allocation.y;
 
 #ifdef DEBUG
         printf( "rowview_get_position: " );

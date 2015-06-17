@@ -88,7 +88,7 @@ editview_event_cb( GtkWidget *widget, GdkEvent *ev, Editview *editview )
 
 	handled = FALSE;
 
-        if( ev->key.keyval == GDK_Escape ) {
+        if( ev->key.keyval == GDK_KEY_Escape ) {
 		handled = TRUE;
 
 		/* Zap model value back into edit box.
@@ -137,10 +137,10 @@ editview_init( Editview *editview )
         set_tooltip( editview->text, _( "Escape to cancel edit, "
                 "press Return to accept edit and recalculate" ) );
         g_signal_connect_object( editview->text, "changed",
-                G_CALLBACK( view_changed_cb ), G_OBJECT( editview ) );
-        g_signal_connect( editview->text ), "activate",
+                G_CALLBACK( view_changed_cb ), G_OBJECT( editview ), 0 );
+        g_signal_connect( editview->text, "activate",
                 G_CALLBACK( editview_activate_cb ), editview );
-        g_signal_connect( editview->text ), "event",
+        g_signal_connect( editview->text, "event",
                 G_CALLBACK( editview_event_cb ), editview );
 
         gtk_widget_show_all( hbox );
@@ -159,9 +159,9 @@ editview_set_entry( Editview *editview, const char *fmt, ... )
 	/* Make sure we don't trigger "changed" when we zap in the
 	 * text.
 	 */
-	g_signal_handler_block_by_data( G_OBJECT( editview->text ), 
-		editview );
+	g_signal_handlers_block_matched( G_OBJECT( editview->text ), 
+		G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, editview );
 	set_gentry( editview->text, "%s", buf );
-	g_signal_handler_unblock_by_data( G_OBJECT( editview->text ), 
-		editview );
+	g_signal_handlers_unblock_matched( G_OBJECT( editview->text ), 
+		G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, editview );
 }

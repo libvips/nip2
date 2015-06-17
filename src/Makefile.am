@@ -201,8 +201,6 @@ nip2_SOURCES = \
 	vector.h \
 	reduce.c \
 	reduce.h \
-	regionview.c \
-	regionview.h \
 	rhs.c \
 	rhs.h \
 	rhsview.c \
@@ -279,6 +277,8 @@ nip2_SOURCES = \
 	workspaceview.h 
 
 need_rewrite = \
+	regionview.c \
+	regionview.h \
 	iwindow.c \
 	iwindow.h \
 	imageview.c \

@@ -131,17 +131,17 @@ rhsview_child_add( View *parent, View *child )
 	Rhsview *rhsview = RHSVIEW( parent );
 
 	if( IS_SUBCOLUMNVIEW( child ) ) {
-		gtk_table_attach_defaults( GTK_TABLE( rhsview->table ),
+		gtk_grid_attach( GTK_GRID( rhsview->table ),
 			GTK_WIDGET( child ), 0, 1, 1, 2 );
 		rhsview->scol = child;
 	}
 	else if( IS_ITEXTVIEW( child ) ) {
-		gtk_table_attach_defaults( GTK_TABLE( rhsview->table ),
+		gtk_grid_attach( GTK_GRID( rhsview->table ),
 			GTK_WIDGET( child ), 0, 1, 2, 3 );
 		rhsview->itext = child;
 	}
 	else {
-		gtk_table_attach_defaults( GTK_TABLE( rhsview->table ),
+		gtk_grid_attach( GTK_GRID( rhsview->table ),
 			GTK_WIDGET( child ), 0, 1, 0, 1 );
 		rhsview->graphic = child;
 		g_assert( IS_GRAPHICVIEW( child ) );
@@ -195,7 +195,7 @@ rhsview_init( Rhsview *rhsview )
 	rhsview->scol = NULL;
 	rhsview->itext = NULL;
 
-	rhsview->table = gtk_table_new( 3, 1, FALSE );
+	rhsview->table = gtk_grid_new();
         gtk_box_pack_start( GTK_BOX( rhsview ), 
 		rhsview->table, TRUE, FALSE, 0 );
         gtk_widget_show( rhsview->table );

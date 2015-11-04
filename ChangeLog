@@ -1,3 +1,7 @@
+started 8.2 on 4/11/15
+- version bump to match vips
+- fix icc_import with RGBA images
+
 started 8.0 on 3/5/15
 - version bump for vips-8.0 release
 - fix a race in Makefile.am, thanks nieder 

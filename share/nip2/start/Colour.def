@@ -329,8 +329,12 @@ Colour_icc_item = class
 	monitor_profile = 
 		"$VIPSHOME/share/$PACKAGE/data/sRGB.icm";
 	guess_profile image
-		= monitor_profile, has_bands image && get_bands image == 3
-		= print_profile;
+		= print_profile, 
+			has_type image && 
+			get_type image == Image_type.CMYK &&
+			has_bands image && 
+			get_bands image >= 4
+		= monitor_profile;
 	render_intents = Option_enum (_ "Render intent") Render_intent.names
 		(_ "Absolute");
 

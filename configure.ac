@@ -349,6 +349,9 @@ else
   AM_CONDITIONAL(UPDATE_DESKTOP, false)
 fi
 
+# we always need -lm
+IP_LIBS="$IP_LIBS -lm"
+
 AC_SUBST(IP_CFLAGS)
 AC_SUBST(IP_LIBS)
 

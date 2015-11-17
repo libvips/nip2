@@ -2509,3 +2509,19 @@ hough_circle s mn mx x
 	}
 }
 
+mapim ind in
+	= oo_binary_function mapim_op ind in, is_class ind
+	= oo_binary'_function mapim_op ind in, is_class in
+	= mapim_fn ind in, is_image ind && is_image in
+	= error (_ "bad arguments to " ++ "mapim")
+{
+	mapim_op = Operator "mapim" 
+		mapim Operator_type.COMPOUND_REWRAP false;
+
+	mapim_fn ind im
+		= out
+	{
+		[out] = vips_call "mapim" [im, ind] [];
+	}
+}
+

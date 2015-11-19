@@ -799,6 +799,41 @@ Image_transform_item = class
 		}
 	}
 
+	Image_map_item = class
+		Menuaction "_Map" "map an image through a 2D transform image" {
+		action a b = class
+			_result {
+			_vislevel = 3;
+
+			interp = Interpolate_picker Interpolate_type.BILINEAR;
+
+			_result
+				= map_binary trans a b
+			{
+				trans a b
+					= mapim interp.value in index
+				{
+					// get the index image first
+					[index, in] = sortc (const is_twocomponent) [a, b];
+
+					// is a two-component image, ie. one band complex, or
+					// two-band non-complex
+					is_twocomponent x
+						= is_nonc x || is_c x;
+					is_nonc x
+						= has_bands x && get_bands x == 2 && 
+							has_format x && !is_complex_format (get_format x);
+					is_c x
+						= has_bands x && get_bands x == 1 && 
+							has_format x && is_complex_format (get_format x);
+					is_complex_format f
+						= f == Image_format.COMPLEX || 
+							f == Image_format.DPCOMPLEX;
+				}
+			}
+		}
+	}
+
 	Image_perspective_item = Perspective_item;
 
 	Image_rubber_item = class 

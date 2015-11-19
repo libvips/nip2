@@ -708,6 +708,75 @@ Filter_hough_item = class
 	}
 }
 
+Filter_coordinate_item = class
+	Menupullright "_Coordinate Transform" "various coordinate transforms" {
+	// run a function which wants a complex arg on a non-complex two-band
+	// image
+	run_cmplx fn x
+		= re x' ++ im x'
+	{
+		x' = fn (x?0, x?1);
+	}
+
+	Polar_item = class
+		Menuaction "_Polar" "transform to polar coordinates" {
+		action a = class
+			_result {
+			_vislevel = 3;
+
+			interp = Interpolate_picker Interpolate_type.BILINEAR;
+
+			_result 
+				= map_unary to_polar a 
+			{
+				to_polar im 
+					= mapim interp.value map' im
+				{
+					// xy image, centre in the centre, scaled to fit image to
+					// a circle
+					xy = make_xy im.width im.height;
+					xy' = xy - Vector [im.width / 2, im.height / 2];
+					scale = min [im.width, im.height] / im.width;
+					xy'' = 2 * xy' / scale;
+
+					// to polar, and scale vertical axis to 360 degrees
+					map = run_cmplx polar xy'';
+					map' = map * Vector [1, im.height / 360];
+				}
+			}
+		}
+	}
+
+	Rectangular_item = class
+		Menuaction "_Rectangular" "transform to rectangular coordinates" {
+		action a = class
+			_result {
+			_vislevel = 3;
+
+			interp = Interpolate_picker Interpolate_type.BILINEAR;
+
+			_result 
+				= map_unary to_rect a 
+			{
+				to_rect im 
+					= mapim interp.value map'' im
+				{
+					// xy image, vertical scaled to 360 degrees
+					xy = make_xy im.width im.height;
+					xy' = xy * Vector [1, 360 / im.height];
+
+					// to rect, scale to fit to image rect
+					map = run_cmplx rectangular xy';
+					scale = min [im.width, im.height] / im.width;
+					map' = map * scale / 2;
+
+					map'' = map' + Vector [im.width / 2, im.height / 2];
+				}
+			}
+		}
+	}
+}
+
 #separator
 
 Filter_tilt_item = class

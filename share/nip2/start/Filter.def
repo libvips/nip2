@@ -732,14 +732,14 @@ Filter_coordinate_item = class
 				to_polar im 
 					= mapim interp.value map' im
 				{
-					// xy image, centre in the centre, scaled to fit image to
+					// xy image, origin in the centre, scaled to fit image to
 					// a circle
 					xy = make_xy im.width im.height;
 					xy' = xy - Vector [im.width / 2, im.height / 2];
 					scale = min [im.width, im.height] / im.width;
 					xy'' = 2 * xy' / scale;
 
-					// to polar, and scale vertical axis to 360 degrees
+					// to polar, scale vertical axis to 360 degrees
 					map = run_cmplx polar xy'';
 					map' = map * Vector [1, im.height / 360];
 				}
@@ -765,7 +765,7 @@ Filter_coordinate_item = class
 					xy = make_xy im.width im.height;
 					xy' = xy * Vector [1, 360 / im.height];
 
-					// to rect, scale to fit to image rect
+					// to rect, scale to image rect
 					map = run_cmplx rectangular xy';
 					scale = min [im.width, im.height] / im.width;
 					map' = map * scale / 2;

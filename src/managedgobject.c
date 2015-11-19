@@ -121,5 +121,7 @@ managedgobject_new( Heap *heap, GObject *object )
 	managedgobject->object = object;
 	g_object_ref( object );
 
+	MANAGED( managedgobject )->hash = GPOINTER_TO_UINT( object ); 
+
 	return( managedgobject );
 }

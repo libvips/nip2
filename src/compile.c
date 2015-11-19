@@ -1181,9 +1181,7 @@ compile_share_scan_element( CompileShare *share, PElement *e )
 		break;
 
 	case ELEMENT_MANAGED:
-		if( PEISMANAGEDSTRING( e ) )
-			hash = INT_TO_HASH( g_str_hash( 
-				PEGETMANAGEDSTRING( e )->string ) );
+		hash = INT_TO_HASH( PEGETMANAGED( e )->hash );
 		break;
 
 	case ELEMENT_NOVAL:

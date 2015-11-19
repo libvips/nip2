@@ -40,8 +40,6 @@ static FilemodelClass *parent_class = NULL;
 static int column_left_offset = 0;
 static int column_top_offset = 0;
 
-static const int column_open_max_frames = 10;	/* Max frames we animate */
-
 /* When we merge workspaces we need to scroll to position the last new column
  * in view.
  */

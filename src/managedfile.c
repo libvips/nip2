@@ -129,6 +129,8 @@ managedfile_new( Heap *heap, const char *filename )
 	managed_link_heap( MANAGED( managedfile ), heap );
 	managedfile->file = file;
 
+	MANAGED( managedfile )->hash = g_str_hash( filename );
+
 	return( managedfile );
 }
 

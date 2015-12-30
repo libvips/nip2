@@ -7,6 +7,7 @@ nip2-*.tar.gz
 *.o
 .*.swp
 TAGS
+tags
 Makefile
 scan
 Makefile.in

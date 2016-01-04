@@ -228,36 +228,32 @@ conversion_render_idle_cb( gpointer data )
 	/* Must be a valid conversion, must be for the image that that 
 	 * conversion is still using for display.
 	 */
-	if( !g_slist_find( conversion_all, conv ) ||
-		imageinfo_get( FALSE, conv->display_ii ) != update->im ) {
+	if( g_slist_find( conversion_all, conv ) &&
+		imageinfo_get( FALSE, conv->display_ii ) == update->im ) {
 #ifdef DEBUG
+		g_print( "conversion_update_dispatch: left = %d, top = %d, "
+			"width = %d, height = %d\n",
+			update->area.left, update->area.top, 
+			update->area.width, update->area.height );
+#endif /*DEBUG*/
+
+		/* We need to invalid the main image too, since those 
+		 * regions will have black in from the failed first calc.
+		 *
+		 * im_render() can't do this invalidate for us, 
+		 * it needs to be done from the main loop.
+		 *
+		 * commented out, vips_sink_screen() now does this for us. 
+		 *
+		im_invalidate( conv->mask ); im_invalidate( imageinfo_get( FALSE, conv->display_ii ) );
+		 */
+
+		conversion_area_changed( conv, &update->area );
+	}
+#ifdef DEBUG
+	else
 		g_print( "conversion_render_idle_cb: skipping dead update\n" );
 #endif /*DEBUG*/
-		g_free( update );
-
-		return( FALSE );
-	}
-
-#ifdef DEBUG
-	g_print( "conversion_update_dispatch: left = %d, top = %d, "
-		"width = %d, height = %d\n",
-		update->area.left, update->area.top, 
-		update->area.width, update->area.height );
-#endif /*DEBUG*/
-
-	/* We need to invalid the main image too, since those regions will
-	 * have black in from the failed first calc.
-	 *
-	 * im_render() can't do this invalidate for us, it needs to be done
-	 * from the main loop.
-	 *
-	 * commented out, vips_sink_screen() now does this for us. 
-	 *
-	im_invalidate( conv->mask );
-	im_invalidate( imageinfo_get( FALSE, conv->display_ii ) );
-	 */
-
-	conversion_area_changed( conv, &update->area );
 
 	g_free( update );
 

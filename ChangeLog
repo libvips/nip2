@@ -1,5 +1,6 @@
 started 8.2.1 on 4/12/16
 - tiny improvement to idle handling
+- added R2 to linreg and linregw
 
 started 8.2 on 4/11/15
 - version bump to match vips

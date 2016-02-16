@@ -2194,34 +2194,40 @@ buildlut x
 
 /* Linear regression. Return a class with the stuff we need in.
  * from s15.2, p 665 NR in C
+ * 
+ * Also calculate R2, see eg.:
+ * https://en.wikipedia.org/wiki/Coefficient_of_determination 
  */
 linreg xes yes
     = obj
 {
     obj = class {
-        // in case we ever get shown in the workspace
-        _vislevel = 2;
+		// in case we ever get shown in the workspace
+		_vislevel = 2;
 
-        slope = sum [t * y :: [t, y] <- zip2 tes yes] / st2;
-        intercept = (sy - sx * slope) / ss;
+		slope = sum [t * y :: [t, y] <- zip2 tes yes] / st2;
+		intercept = (sy - sx * slope) / ss;
 
-        chi2 = sum [(y - intercept - slope * x) ** 2 :: [x, y] <- zip2 xes yes];
+		chi2 = sum [(y - intercept - slope * x) ** 2 :: [x, y] <- zip2 xes yes];
 
-        siga = (chi2 / (ss - 2)) ** 0.5 *
-            ((1 + sx ** 2 / (ss * st2)) / ss) ** 0.5;
-        sigb = (chi2 / (ss - 2)) ** 0.5 * (1 / st2) ** 0.5;
+		siga = (chi2 / (ss - 2)) ** 0.5 *
+			((1 + sx ** 2 / (ss * st2)) / ss) ** 0.5;
+		sigb = (chi2 / (ss - 2)) ** 0.5 * (1 / st2) ** 0.5;
 
-        // for compat with linregw, see below
-        q = 1.0;
-    }
+		// for compat with linregw, see below
+		q = 1.0;
 
-    ss = len xes;
-    sx = sum xes;
-    sy = sum yes;
-    sxoss = sx / ss;
+		R2 = 1 - chi2 / sum [(y - my) ** 2 :: y <- yes];
+	}
 
-    tes = [x - sxoss :: x <- xes];
-    st2 = sum [t ** 2 :: t <- tes];
+	ss = len xes;
+	sx = sum xes;
+	sy = sum yes;
+	my = sy / ss;
+	sxoss = sx / ss;
+
+	tes = [x - sxoss :: x <- xes];
+	st2 = sum [t ** 2 :: t <- tes];
 }
 
 /* Weighted linear regression. Xes, yes and a list of deviations.
@@ -2243,6 +2249,8 @@ linregw xes yes devs
 		sigb = (1 / st2) ** 0.5;
 
 		q = gammq (0.5 * (len xes - 2)) (0.5 * chi2);
+
+		R2 = 1 - chi2 / sum [(y - my) ** 2 :: y <- yes];
 	}
 
 	wt = [sd ** -0.5 :: sd <- devs];
@@ -2250,6 +2258,7 @@ linregw xes yes devs
 	ss = sum wt;
 	sx = sum [x * w :: [x, w] <- zip2 xes wt];
 	sy = sum [y * w :: [y, w] <- zip2 yes wt];
+	my = sy / len xes;
 	sxoss = sx / ss;
 
 	tes = [(x - sxoss) / sd :: [x, sd] <- zip2 xes devs];

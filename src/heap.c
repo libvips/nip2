@@ -1888,22 +1888,23 @@ heap_ip_to_gvalue( PElement *in, GValue *out )
 			g_value_init( out, IM_TYPE_REF_STRING );
 			im_ref_string_set( out, name );
 		}
-#if VIPS_VERSION_MAJOR > 7 || VIPS_VERSION_MINOR > 39
+#if VIPS_MAJOR_VERSION > 7 || VIPS_MINOR_VERSION > 39
 		/* vips_value_set_array_image() is a 7.40 feature.
 		 */
 		else if( heap_is_imagevec( in, &result ) &&
 			result ) { 
 			Imageinfo *iivec[100];
-			VipsImage *ivec[100];
+			VipsImage **ivec;
 			int n;
 			int i;
 
 			if( (n = heap_get_imagevec( in, iivec, 100 )) < 0 ) 
 				return( FALSE );
+			g_value_init( out, VIPS_TYPE_ARRAY_IMAGE );
+			vips_value_set_array_image( out, n ); 
+			ivec = vips_value_get_array_image( out, NULL );
 			for( i = 0; i < n; i++ )
 				ivec[i] = imageinfo_get( FALSE, iivec[i] );
-
-			vips_value_set_array_image( out, ivec, n ); 
 		}
 #endif
 		else {

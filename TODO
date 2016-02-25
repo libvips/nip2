@@ -1,3 +1,11 @@
+- fix up autotrace
+
+  remove .svg files from tmp
+
+  need to allow [args] on system output_format
+
+- sharpen should use new interface?
+
 - redo scale along the new vipsthumbnail lines
 
   need to be able to get window_size from an interp

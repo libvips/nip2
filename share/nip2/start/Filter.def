@@ -77,11 +77,11 @@ Kirk
 				"51 pixels"
 			] 0;
 	
-			st = Scale "Smoothness threshold" 0 5 1.5;
+			st = Scale "Smoothness threshold" 0 5 2;
 			bm = Scale "Brighten by at most" 1 50 10;
-			dm = Scale "Darken by at most" 1 50 50;
-			fs = Scale "Sharpen flat areas by" (-2) 5 1;
-			js = Scale "Sharpen jaggy areas by" (-2) 5 2;
+			dm = Scale "Darken by at most" 1 50 20;
+			fs = Scale "Sharpen flat areas by" 0 5 0.5;
+			js = Scale "Sharpen jaggy areas by" 0 5 1;
 	
 			_result
 				= map_unary process x

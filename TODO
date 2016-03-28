@@ -2,13 +2,17 @@
 
   remove .svg files from tmp
 
-  need to allow [args] on system output_format
+  falsecolour output, drag sliders, occasional segv
+
+- need a compat folder for 8.2
 
 - sharpen should use new interface?
 
 - redo scale along the new vipsthumbnail lines
 
   need to be able to get window_size from an interp
+
+  just call vips_resize()?
 
 - can we call affine from nip2 vips_call? do we need a double array?
 

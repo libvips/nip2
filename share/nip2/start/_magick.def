@@ -40,26 +40,6 @@
 
 Magick = class {
 
-	// turn $PATH into [["comp1", "comp2"], ["comp1", "comp2"] ..]
-	system_search_path
-		= map path_parse (split (equal path_sep) (expand "$PATH"))
-	{
-		path_sep
-			= ':', expand "$SEP" == "/"
-			= ';';
-	}
-
-	// the first name[.exe] on $PATH, or ""
-	search_for name
-		= hits?0, hits != []
-		= ""
-	{
-		exe_name = name ++ expand "$EXEEXT";
-		form_path p = path_absolute (p ++ [exe_name]);
-		paths = map form_path system_search_path;
-		hits = dropwhile (equal []) (map search paths);
-	}
-
 	// first gm on path, or ""
 	gm_path = search_for "gm";
 

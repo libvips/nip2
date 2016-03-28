@@ -1,3 +1,6 @@
+started 8.3.0 on 28/3/16
+- move path search stuff into _convert from _magick
+
 started 8.2.1 on 4/12/16
 - tiny improvement to idle handling
 - added R2 to linreg and linregw

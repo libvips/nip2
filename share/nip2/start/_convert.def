@@ -520,6 +520,7 @@ _colour_conversion_table = [
 	[RGB16, sRGB, image_set_type sRGB @ im_1628],
 	[RGB16, RGB16, image_set_type RGB16],
 	[RGB16, GREY16, im_RGB162GREY16],
+	[RGB16, LABS, im_LabQ2LabS @ im_Lab2LabQ @ im_sRGB2Lab],
 
 	[GREY16, B_W, image_set_type B_W @ im_1628],
 	[GREY16, RGB, im_mono2sRGB @ im_1628],
@@ -612,4 +613,42 @@ path_absolute l
  */
 path_parse str
 	= split (equal path_separator?0) str;
+
+/* Return $PATH, reformatted as [["comp1", "comp2"], ["comp1", "comp2"] ..]
+ */
+system_search_path
+	= vipsbin ++
+		map path_parse (split (equal path_sep) (expand "$PATH"))
+{
+	/* On some platforms we ship vips with a few extra progs. Search
+ 	 * $VIPSHOME/bin first.
+	 */
+	vipsbin = path_parse (expand "$VIPSHOME") ++ ["bin"];
+
+	path_sep
+		= ':', expand "$SEP" == "/"
+		= ';';
+}
+
+/* Search $PATH for the first occurence of name, or "". 
+ */
+search_for name
+	= hits?0, hits != []
+	= ""
+{
+	exe_name = name ++ expand "$EXEEXT";
+	form_path p = path_absolute (p ++ [exe_name]);
+	paths = map form_path system_search_path;
+	hits = dropwhile (equal []) (map search paths);
+}
+
+/* Search $PATH for the first occurence of name, error on failure. 
+ */
+search_for_error name
+	= path, path != ""
+	= error (exe_name ++ " not found on your search path. " ++
+		"Check you have installed the program and it is on your PATH.")
+{
+	path = search_for name;
+}
 

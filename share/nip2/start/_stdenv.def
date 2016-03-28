@@ -2533,4 +2533,3 @@ mapim interp ind in
 		[out] = vips_call "mapim" [im, ind] [$interpolate => interp];
 	}
 }
-

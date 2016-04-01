@@ -617,11 +617,35 @@ mainw_space_free_event( GtkWidget *widget, GdkEvent *ev, Mainw *mainw )
 	return( FALSE );
 }
 
+/* Count number and sizes of all image objects.
+ */
+
+static void *
+mainw_count_images( VipsObject *object, int *n )
+{
+	if( VIPS_IS_IMAGE( object ) )
+		*n += 1;
+
+	return( NULL ); 
+}
+
+static void *
+mainw_size_images( VipsObject *object, size_t *size )
+{
+	if( VIPS_IS_IMAGE( object ) )
+		*size += VIPS_IMAGE_SIZEOF_IMAGE( VIPS_IMAGE( object ) ); 
+
+	return( NULL ); 
+}
+
 static void
 mainw_space_free_tooltip_generate( GtkWidget *widget, VipsBuf *buf, 
 	Mainw *mainw )
 {
 	Heap *heap = reduce_context->heap;
+
+	size_t size;
+	int n;
 
 	mainw_find_disc( buf );
 	/* Expands to (eg.) "14GB free in /pics/tmp" */
@@ -644,6 +668,15 @@ mainw_space_free_tooltip_generate( GtkWidget *widget, VipsBuf *buf,
         vips_buf_appends( buf, ", " );
 
         vips_buf_appendf( buf, _( "using %d threads" ), im_concurrency_get() );
+        vips_buf_appends( buf, ", " );
+
+	size = 0;
+	vips_object_map( (VipsSListMap2Fn) mainw_size_images, &size, NULL );
+	n = 0;
+	vips_object_map( (VipsSListMap2Fn) mainw_count_images, &n, NULL );
+
+	vips_buf_append_size( buf, size );
+        vips_buf_appendf( buf, _( " in %d images" ), n );
 }
 
 static void

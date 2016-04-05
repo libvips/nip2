@@ -1,10 +1,9 @@
 - fix up autotrace
 
-  remove .svg files from tmp
+  falsecolour output, drag sliders, occasional segv ... unreffing a region in
+  maplut_stop on an image that's already been freed? ouch
 
-  falsecolour output, drag sliders, occasional segv
-
-- need a compat folder for 8.2
+- need a compat folder for 8.2?
 
 - sharpen should use new interface?
 

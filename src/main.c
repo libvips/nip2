@@ -846,6 +846,13 @@ main_toobig_done( iWindow *iwnd,
 	path_map_dir( PATH_TMP, "*.tif",
 		(path_map_fn) main_toobig_done_sub, NULL );
 
+	/* autotrace can make some others.
+	 */
+	path_map_dir( PATH_TMP, "*.ppm",
+		(path_map_fn) main_toobig_done_sub, NULL );
+	path_map_dir( PATH_TMP, "*.svg",
+		(path_map_fn) main_toobig_done_sub, NULL );
+
 	/* Tell space-free indicators to update.
 	 */
 	if( main_imageinfogroup )

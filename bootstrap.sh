@@ -13,7 +13,7 @@ rm -f src/*.o src/nip2 src/Makefile src/Makefile.in
 ACDIR=`aclocal --print-ac-dir`
 
 # OS X with brew sets ACDIR to
-# /usr/local/Cellar/automake/1.13.1/share/aclocal, the staging area, which is
+# /usr/local/Cellar/automake/x.y.z/share/aclocal, the staging area, which is
 # totally wrong argh
 if [ ! -d $ACDIR ]; then
 	ACDIR=/usr/local/share/aclocal
@@ -24,12 +24,11 @@ cp $ACDIR/codeset.m4 m4
 cp $ACDIR/gettext.m4 m4
 cp $ACDIR/glibc21.m4 m4
 cp $ACDIR/iconv.m4 m4
-cp $ACDIR/isc-posix.m4 m4
 cp $ACDIR/lcmessage.m4 m4
 cp $ACDIR/progtest.m4 m4
 
 # some systems need libtoolize, some glibtoolize ... how annoying
-echo testing for glibtoolize ...
+echo -n "testing for glibtoolize ... "
 if glibtoolize --version >/dev/null 2>&1; then 
   LIBTOOLIZE=glibtoolize
   echo using glibtoolize 
@@ -39,7 +38,9 @@ else
 fi
 
 aclocal 
-glib-gettextize --force --copy
+# this produces a lot of benign but misleading output ... hide it and hope for
+# the best
+glib-gettextize --force --copy > /dev/null
 test -r aclocal.m4 && chmod u+w aclocal.m4
 autoconf
 autoheader

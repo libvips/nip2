@@ -617,7 +617,7 @@ path_parse str
 /* Return $PATH, reformatted as [["comp1", "comp2"], ["comp1", "comp2"] ..]
  */
 system_search_path
-	= vipsbin ++
+	= [vipsbin] ++
 		map path_parse (split (equal path_sep) (expand "$PATH"))
 {
 	/* On some platforms we ship vips with a few extra progs. Search

@@ -3,6 +3,8 @@
   falsecolour output, drag sliders, occasional segv ... unreffing a region in
   maplut_stop on an image that's already been freed? ouch
 
+  is system_search_path working now?
+
 - need a compat folder for 8.2?
 
 - sharpen should use new interface?

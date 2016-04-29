@@ -1,7 +1,6 @@
-- expose kernel option in vips_resize(), then use that in nip2 resize ... will
-  need to be 8.4
+- wrap vips_reduce(), use it from resize
 
-  need to be able to set enums to vips8 calls, maybe set as strings?
+  need to add a new kernel selector thing
 
 - sharpen should use new interface?
 

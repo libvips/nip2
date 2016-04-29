@@ -3,9 +3,47 @@
   falsecolour output, drag sliders, occasional segv ... unreffing a region in
   maplut_stop on an image that's already been freed? ouch
 
-  is system_search_path working now?
+  try:
 
-- need a compat folder for 8.2?
+	- load image
+	- extract green
+	- size down to 128x128
+	- save as x.v
+	- restart nip2
+	- load x.v
+	- click trace
+	- ^Q
+
+  see:
+
+(nip2:29365): GLib-GObject-WARNING **: instance of invalid non-instantiatable type '(null)'
+(nip2:29365): GLib-GObject-CRITICAL **: g_signal_handler_is_connected: assertion 'G_TYPE_CHECK_INSTANCE (instance)' failed
+(nip2:29365): GLib-GObject-CRITICAL **: g_object_unref: assertion 'G_IS_OBJECT (object)' failed
+(nip2:29365): GLib-GObject-CRITICAL **: g_object_unref: assertion 'G_IS_OBJECT (object)' failed
+(nip2:29365): GLib-GObject-CRITICAL **: g_object_unref: assertion 'G_IS_OBJECT (object)' failed
+
+  try:
+
+	$ valgrind vips system "autotrace %s -output-format svg -output-file %s
+-despeckle-level 9 -line-threshold 1" --in x.v --out x2.v --in-format %s.ppm
+--out-format %s.svg[scale=2]
+
+  runs cleanly, so the error is probably in vips_call
+
+  try:
+
+	- load x.v
+	- vips_call "system" ["autotrace %s -output-format svg -output-file %s"] [$in => [A1.value], $in_format => "%s.ppm", $out => true, $out_format => "%s.svg"]
+
+  see:
+
+(nip2:30392): GLib-GObject-CRITICAL **: g_object_unref: assertion 'G_IS_OBJECT
+(object)' failed
+
+- expose kernel option in vips_resize(), then use that in nip2 resize ... will
+  need to be 8.4
+
+  need to be able to set enums to vips8 calls, maybe set as strings?
 
 - sharpen should use new interface?
 

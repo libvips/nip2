@@ -1,0 +1,1127 @@
+/* 
+
+   ImageMagick operations edited by Alan Gibson (aka "snibgo"; snibgo at earthling dot net).
+
+   1-Apr-2014
+     Minor corrections to Geometry_widget and Alpha.
+     Added loads of widgets and Menuactions.
+     Not fully tested.
+   5-Apr-2014
+     Many more menu actions.
+     Reorganised Magick menu.
+   10-Apr-2014
+     Many more menu actions.
+   11-Apr-2014 jcupitt
+     Split to separate _magick.def
+	 Add 0-ary and 2-ary system
+	 Put utility funcs into a Magick class
+   11-Apr-2014 snibgo
+     Added VirtualPixelBack for cases where background is only relevant when VP=Background
+   17-Apr-2014 snibgo
+     Many small changes.
+   2-May-2014 jcupitt
+     Added Magick.version
+   30-June-2014
+   	 Put single-quotes around command exe to help win
+   1-July-2014
+     Automatically fall back to gm if we can't find convert
+   17-July-2014
+     better GM support
+
+
+   Last update: 17-July-2014.
+
+   For details of ImageMagick operations, see http://www.imagemagick.org/script/command-line-options.php etc.
+
+*/
+
+/* Put these in a class to avoid filling the main namespace with IM stuff.
+ */
+
+Magick = class {
+
+	// turn $PATH into [["comp1", "comp2"], ["comp1", "comp2"] ..]
+	system_search_path
+		= map path_parse (split (equal path_sep) (expand "$PATH"))
+	{
+		path_sep
+			= ':', expand "$SEP" == "/"
+			= ';';
+	}
+
+	// the first name[.exe] on $PATH, or ""
+	search_for name
+		= hits?0, hits != []
+		= ""
+	{
+		exe_name = name ++ expand "$EXEEXT";
+		form_path p = path_absolute (p ++ [exe_name]);
+		paths = map form_path system_search_path;
+		hits = dropwhile (equal []) (map search paths);
+	}
+
+	// first gm on path, or ""
+	gm_path = search_for "gm";
+
+	// first convert on $PATH, or ""
+	// we check for the convert we ship first
+	convert_path 
+		= vips_convert, vips_convert != ""
+		= search_for "convert"
+	{
+		// the convert we ship with the vips binary on some platforms, or ""
+		vips_convert 
+			= search (path_absolute convert)
+		{
+			vipshome = path_parse (expand "$VIPSHOME");
+			convert = vipshome ++ ["bin", "convert" ++ expand "$EXEEXT"];
+		}
+	}
+
+	use_gm_pref = Workspaces.Preferences.USE_GRAPHICSMAGICK;
+
+	// Are we in GM or IM mode? 
+	use_gm 
+		= true, use_gm_pref && gm_path != ""
+		= false, !use_gm_pref && convert_path != ""
+		= false, convert_path != ""
+		= true, gm_path != ""
+		= error "neither IM nor GM executable found";
+
+	command_path
+		= gm_path, use_gm
+		= convert_path;
+
+	// try to get the version as eg. [6, 7, 7, 10]
+	// GM versions are smaller, typically [1, 3, 18]
+	version
+		= map parse_int (split (member ".-") version_string)
+	{
+		[output] = vips_call "system" 
+			["'" ++ command_path ++ "' -version"] [$log=>true];
+		version_string 
+			= (split (equal ' ') output)?1, use_gm
+			= (split (equal ' ') output)?2;
+	}
+
+	// make a command-line ... args is a [str] we join with spaces
+	command args 
+		= "'" ++ command_path ++ "' " ++ join_sep " " args'
+	{
+		args'
+			= ["convert"] ++ args, use_gm
+			= args;
+	}
+
+	// capabilities ... different versions support different features, we 
+	// turn features on and off based on these
+
+	// would probably be better to test for caps somehow
+	has_intensity
+			= false, use_gm
+			= version?0 > 6 || version?1 > 7;
+	has_channel
+			= false, use_gm
+			= version?0 > 6 || version?1 > 7;
+
+	system0 cmd = system_image0 cmd;
+	system cmd x = map_unary (system_image cmd) x;
+	system2 cmd x y = map_binary (system_image2 cmd) x y;
+	system3 cmd x y z = map_trinary (system_image3 cmd) x y z;
+
+	radius_widget = Scale "Radius" 0 100 10;
+	sigma_widget = Scale "Sigma" 0.1 10 1;
+	angle_widget = Scale "Angle (degrees)" (-360) 360 0;
+	text_widget = String "Text to draw" "AaBbCcDdEe";
+
+	gamma_widget = Scale "Gamma" 0 10 1;
+	colors_widget = Scale "Colors" 1 10 3;
+	resize_widget = Scale "Resize (percent)" 0 500 100;
+	fuzz_widget = Scale "Fuzz (percent)" 0 100 0;
+	blur_rad_widget = Scale "Radius (0=auto)" 0 100 0;
+
+	// a colour with no enclosing quotes ... use this if we know there are
+	// some quotes at an outer level
+	print_colour_nq triple
+		= concat ["#", concat (map fmt triple)]
+	{
+		fmt x = reverse (take 2 (reverse (print_base 16 (x + 256))));
+	}
+
+	// we need the quotes because # is the comment character in *nix
+	print_colour triple = "\"" ++ print_colour_nq triple ++ "\"";
+
+	Foreground triple = class
+		Colour "sRGB" triple {
+
+		_flag = "-fill " ++ print_colour triple;
+
+		Colour_edit space triple = this.Foreground triple;
+	}
+	foreground_widget = Foreground [0, 0, 0];
+
+	GeneralCol triple = class
+		Colour "sRGB" triple {
+
+		_flag = print_colour_nq triple;
+
+		Colour_edit space triple = this.GeneralCol triple;
+	}
+	generalcol_widget = GeneralCol [0, 0, 0];
+
+	Background triple = class
+		Colour "sRGB" triple {
+
+		isNone = Toggle "None (transparent black)" false;
+
+		_flag = "-background " ++ if isNone then "None" else print_colour triple;
+
+		Colour_edit space triple = this.Background triple;
+	}
+	background_widget = Background [255, 255, 255];
+
+	Bordercol triple = class
+		Colour "sRGB" triple {
+
+		_flag = "-bordercolor " ++ print_colour triple;
+
+		Colour_edit space triple = this.Bordercol triple;
+	}
+	bordercol_widget = Bordercol [0, 0, 0];
+
+	Mattecol triple = class
+		Colour "sRGB" triple {
+
+		_flag = "-mattecolor " ++ print_colour triple;
+
+		Colour_edit space triple = this.Mattecol triple;
+	}
+	mattecol_widget = Mattecol [189, 189, 189];
+
+	// FIXME: Undercolour, like many others, can have alpha channel.
+	// How does user input this? With a slider?
+	Undercol triple = class
+		Colour "sRGB" triple {
+
+		isNone = Toggle "None (transparent black)" true;
+
+		_flag = if isNone then "" else ("-undercolor " ++ print_colour triple);
+
+		Colour_edit space triple = this.Undercol triple;
+	}
+	undercol_widget = Undercol [0, 0, 0];
+
+	changeCol_widget = class {
+		_vislevel = 3;
+
+		colour = GeneralCol [0, 0, 0];
+		fuzz = fuzz_widget;
+		nonMatch = Toggle "change non-matching colours" false;
+	}
+
+	Alpha alpha = class
+		Option_string "Alpha" [
+			"On", 
+			"Off", 
+			"Set", 
+			"Opaque", 
+			"Transparent", 
+			"Extract", 
+			"Copy", 
+			"Shape", 
+			"Remove", 
+			"Background"
+		] alpha {
+
+		_flag = "-alpha " ++ alpha;
+
+		Option_edit caption labels value = this.Alpha labels?value;
+	}
+	alpha_widget = Alpha "On";
+
+	Antialias value = class
+		Toggle "Antialias" value {
+
+		_flag
+			= "-antialias", value
+			= "+antialias";
+
+		Toggle_edit caption value = this.Antialias value;
+	}
+	antialias_widget = Antialias true;
+
+	Builtin builtin = class
+		Option_string "Builtin" [
+			// See http://www.imagemagick.org/script/formats.php
+			"rose:",
+			"logo:",
+			"wizard:",
+			"granite:",
+			"netscape:"
+		] builtin {
+
+		_flag = builtin;
+
+		Option_edit caption labels value = this.Builtin labels?value;
+	}
+	builtin_widget = Builtin "rose:";
+
+
+	channels_widget = class {
+		// FIXME? Can we grey-out alpha when we have no alpha channel,
+		//        show CMY(K) instead of RGB(K) etc?
+		// Yes, perhaps we can create different widgets for RGB, RGBA, CMY, CMYK, CMYA, CMYKA.
+		ChanR valueR = class
+			Toggle "Red" valueR {
+
+			_flag
+				= "R", valueR
+				= "";
+
+			Toggle_edit caption valueR = this.ChanR valueR;
+		}
+		channelR = ChanR true;
+
+		ChanG valueG = class
+			Toggle "Green" valueG {
+
+			_flag
+				= "G", valueG
+				= "";
+
+			Toggle_edit caption valueG = this.ChanG valueG;
+		}
+		channelG = ChanG true;
+
+		ChanB valueB = class
+			Toggle "Blue" valueB {
+
+			_flag
+				= "B", valueB
+				= "";
+
+			Toggle_edit caption valueB = this.ChanB valueB;
+		}
+		channelB = ChanB true;
+
+		ChanK valueK = class
+			Toggle "Black" valueK {
+
+			_flag
+				= "K", valueK
+				= "";
+
+			Toggle_edit caption valueK = this.ChanK valueK;
+		}
+		channelK = ChanK true;
+
+		ChanA valueA = class
+			Toggle "Alpha" valueA {
+
+			_flag
+				= "A", valueA
+				= "";
+
+			Toggle_edit caption valueA = this.ChanA valueA;
+		}
+		channelA = ChanA false;
+
+		ChanSy valueSy = class
+			Toggle "Sync" valueSy {
+
+			_flag
+				= ",sync", valueSy
+				= "";
+
+			Toggle_edit caption valueSy = this.ChanSy valueSy;
+		}
+		channelSy = ChanSy true;
+
+		_rgbka = concat [channelR._flag,
+				channelG._flag,
+				channelB._flag,
+				channelK._flag,
+				channelA._flag
+			];
+
+		_flag
+			= "", _rgbka == "" || !has_channel
+			= concat [ "-channel ",
+				_rgbka,
+				channelSy._flag 
+				];
+	}
+
+	ch_widget = channels_widget;
+
+	Colorspace colsp = class
+		Option_string "Colorspace" [
+			"CIELab",
+			"CMY",
+			"CMYK",
+			"Gray",
+			"HCL",
+			"HCLp",
+			"HSB",
+			"HSI",
+			"HSL",
+			"HSV",
+			"HWB",
+			"Lab",
+			"LCH",
+			"LCHab",
+			"LCHuv",
+			"LMS",
+			"Log",
+			"Luv",
+			"OHTA",
+			"Rec601Luma",
+			"Rec601YCbCr",
+			"Rec709Luma",
+			"Rec709YCbCr",
+			"RGB",
+			"scRGB",
+			"sRGB",
+			"Transparent",
+			"XYZ",
+			"YCbCr",
+			"YDbDr",
+			"YCC",
+			"YIQ",
+			"YPbPr",
+			"YUV"
+		] colsp {
+
+		_flag = colsp;
+
+		Option_edit caption labels value = this.Colorspace labels?value;
+	}
+	colorspace_widget = Colorspace "sRGB";
+
+	Compose comp = class
+		Option_string "Compose method" [
+			"Atop", 
+			"Blend", 
+			"Blur", 
+			"Bumpmap", 
+			"ChangeMask", 
+			"Clear", 
+			"ColorBurn", 
+			"ColorDodge", 
+			"Colorize", 
+			"CopyBlack", 
+			"CopyBlue", 
+			"CopyCyan", 
+			"CopyGreen", 
+			"Copy", 
+			"CopyMagenta", 
+			"CopyOpacity", 
+			"CopyRed", 
+			"CopyYellow", 
+			"Darken", 
+			"DarkenIntensity", 
+			"DivideDst", 
+			"DivideSrc", 
+			"Dst", 
+			"Difference", 
+			"Displace", 
+			"Dissolve", 
+			"Distort", 
+			"DstAtop", 
+			"DstIn", 
+			"DstOut", 
+			"DstOver", 
+			"Exclusion", 
+			"HardLight", 
+			"Hue", 
+			"In", 
+			"Lighten", 
+			"LightenIntensity", 
+			"LinearBurn", 
+			"LinearDodge", 
+			"LinearLight", 
+			"Luminize", 
+			"Mathematics", 
+			"MinusDst", 
+			"MinusSrc", 
+			"Modulate", 
+			"ModulusAdd", 
+			"ModulusSubtract", 
+			"Multiply", 
+			"None", 
+			"Out", 
+			"Overlay", 
+			"Over", 
+			"PegtopLight", 
+			"PinLight", 
+			"Plus", 
+			"Replace", 
+			"Saturate", 
+			"Screen", 
+			"SoftLight", 
+			"Src", 
+			"SrcAtop", 
+			"SrcIn", 
+			"SrcOut", 
+			"SrcOver", 
+			"VividLight", 
+			"Xor"
+		] comp {
+
+		_flag = "-compose " ++ comp;
+
+		Option_edit caption labels value = this.Compose labels?value;
+	}
+	compose_widget = Compose "Over";
+	// FIXME: Some compose mehods (Displace, Distort, Mathematics) need a string.
+
+	// FIXME: we could use a class that does both -compose and -intensity, for methods LightenIntensity, DarkenIntensity, CopyOpacity, CopyBlack
+
+	coordinate_widget = class {
+		_vislevel = 3;
+
+		x = Expression "X" 0;
+		y = Expression "Y" 0;
+
+		_flag = concat [print x.expr, ",", print y.expr];
+	};
+
+	Distort distort = class
+		Option_string "Distort" [
+			"Affine",
+			"AffineProjection",
+			"ScaleRotateTranslate",
+			"SRT",
+			"Perspective",
+			"PerspectiveProjection",
+			"BilinearForward",
+			"BilinearReverse",
+			"Polynomial",
+			"Arc",
+			"Polar",
+			"DePolar",
+			"Barrel",
+			"BarrelInverse",
+			"Shepards",
+			"Resize"
+		] distort {
+
+		_flag = distort;
+
+		Option_edit caption labels value = this.Distort labels?value;
+	}
+	distort_widget = Distort "SRT";
+
+	Dither dither = class
+		Option_string "Dither" [
+			"None",
+			"FloydSteinberg",
+			"Riemersma"
+		] dither {
+
+		_flag = "-dither " ++ dither;
+
+		Option_edit caption labels value = this.Dither labels?value;
+	}
+	dither_widget = Dither "FloydSteinberg";
+
+	Evaluate eval = class
+		Option_string "Evaluate operation" [
+			"Abs",
+			"Add",
+			"AddModulus",
+			"And",
+			"Cos",
+			"Cosine",
+			"Divide",
+			"Exp",
+			"Exponential",
+			"GaussianNoise",
+			"ImpulseNoise",
+			"LaplacianNoise",
+			"LeftShift",
+			"Log",
+			"Max",
+			"Mean",
+			"Median",
+			"Min",
+			"MultiplicativeNoise",
+			"Multiply",
+			"Or",
+			"PoissonNoise",
+			"Pow",
+			"RightShift",
+			"Set",
+			"Sin",
+			"Sine",
+			"Subtract",
+			"Sum",
+			"Threshold",
+			"ThresholdBlack",
+			"ThresholdWhite",
+			"UniformNoise",
+			"Xor"
+		] eval {
+
+		_flag = "-evaluate " ++ eval;
+
+		Option_edit caption labels value = this.Evaluate labels?value;
+	}
+	evaluate_widget = Evaluate "Add";
+
+	Filter filt = class
+		Option_string "Filter" [
+			"default",
+			"Bartlett",
+			"Blackman",
+			"Bohman",
+			"Box",
+			"Catrom",
+			"Cosine",
+			"Cubic",
+			"Gaussian",
+			"Hamming",
+			"Hann",
+			"Hermite",
+			"Jinc",
+			"Kaiser",
+			"Lagrange",
+			"Lanczos",
+			"Lanczos2",
+			"Lanczos2Sharp",
+			"LanczosRadius",
+			"LanczosSharp",
+			"Mitchell",
+			"Parzen",
+			"Point",
+			"Quadratic",
+			"Robidoux",
+			"RobidouxSharp",
+			"Sinc",
+			"SincFast",
+			"Spline",
+			"Triangle",
+			"Welch"
+		] filt {
+
+		_flag = if filt == "default" then "" else "-filter " ++ filt;
+
+		Option_edit caption labels value = this.Filter labels?value;
+	}
+	filter_widget = Filter "default";
+
+	Function func = class
+		Option_string "Function" [
+			"Polynomial",
+			"Sinusoid",
+			"Arcsin",
+			"Arctan"
+		] func {
+
+		_flag = func;
+
+		Option_edit caption labels value = this.Function labels?value;
+	}
+	function_widget = Function "Polynomial";
+
+//  "Polynomial (a[n], a[n-1], ... a[1], a[0])",
+//  "Sinusoid (freq, phase, amp, bias)",
+//  "Arcsin (width, centre, range, bias)",
+//  "Arctan (slope, centre, range, bias)"
+
+	Gravity gravity = class
+		Option_string "Gravity" [
+			"None",
+			"Center",
+			"East",
+			"Forget",
+			"NorthEast",
+			"North",
+			"NorthWest",
+			"SouthEast",
+			"South",
+			"SouthWest",
+			"West",
+			"Static"
+		] gravity {
+
+		_flag = "-gravity " ++ gravity;
+
+		Option_edit caption labels value = this.Gravity labels?value;
+	}
+	gravity_widget = Gravity "Center";
+
+	ImageType imagetype = class
+		Option_string "Image type" [
+			"Bilevel",
+			"ColorSeparation",
+			"ColorSeparationAlpha",
+			"ColorSeparationMatte",
+			"Grayscale",
+			"GrayscaleAlpha",
+			"GrayscaleMatte",
+			"Optimize",
+			"Palette",
+			"PaletteBilevelAlpha",
+			"PaletteBilevelMatte",
+			"PaletteAlpha",
+			"PaletteMatte",
+			"TrueColorAlpha",
+			"TrueColorMatte",
+			"TrueColor"
+		] imagetype {
+
+		_flag = "-type " ++ imagetype;
+
+		Option_edit caption labels value = this.ImageType labels?value;
+	}
+	imagetype_widget = ImageType "TrueColor";
+
+	Intensity intensity = class
+		Option_string "Intensity (gray conversion)" [
+			"Average",
+			"Brightness",
+			"Lightness",
+			"MS",
+			"Rec601Luma",
+			"Rec601Luminance",
+			"Rec709Luma",
+			"Rec709Luminance",
+			"RMS"
+		] intensity {
+
+		_flag 
+			= "-intensity " ++ intensity, has_intensity
+			= "";
+
+		Option_edit caption labels value = this.Intensity labels?value;
+	}
+	intensity_widget = Intensity "Rec709Luminance";
+
+	Interpolate interp = class
+		Option_string "Interpolate" [
+			"default",
+			"Average",
+			"Average4",
+			"Average9",
+			"Average16",
+			"Background",
+			"Bilinear",
+			"Blend",
+			"Integer",
+			"Mesh",
+			"Nearest",
+			"NearestNeighbor",
+			"Spline"
+		] interp {
+
+		_flag = if interp == "default" then "" else "-interpolate " ++ interp;
+
+		Option_edit caption labels value = this.Interpolate labels?value;
+	}
+	interpolate_widget = Interpolate "default";
+
+	Kernel kernel = class
+		Option_string "Kernel" [
+			"Unity",
+			"Gaussian",
+			"DoG",
+			"LoG",
+			"Blur",
+			"Comet",
+			"Binomial",
+			"Laplacian",
+			"Sobel",
+			"FreiChen",
+			"Roberts",
+			"Prewitt",
+			"Compass",
+			"Kirsch",
+			"Diamond",
+			"Square",
+			"Rectangle",
+			"Disk",
+			"Octagon",
+			"Plus",
+			"Cross",
+			"Ring",
+			"Peaks",
+			"Edges",
+			"Corners",
+			"Diagonals",
+			"LineEnds",
+			"LineJunctions",
+			"Ridges",
+			"ConvexHull",
+			"ThinSe",
+			"Skeleton",
+			"Chebyshev",
+			"Manhattan",
+			"Octagonal",
+			"Euclidean"
+			// FIXME: custom kernel
+		] kernel {
+
+		_flag = kernel;
+
+		Option_edit caption labels value = this.Kernel labels?value;
+	}
+	kernel_widget = Kernel "Unity";
+
+	ModColSp msp = class
+		Option_string "modulate colorspace" [
+			"HCL", 
+			"HCLp", 
+			"HSB", 
+			"HSI", 
+			"HSL", 
+			"HSV", 
+			"HWB", 
+			"LCH"
+		] msp {
+
+		_flag = "-set option:modulate:colorspace " ++ msp;
+
+		Option_edit caption labels value = this.ModColSp labels?value;
+	}
+	ModColSp_widget = ModColSp "HSL";
+
+	MorphMeth morph = class
+		Option_string "Method" [
+			"Correlate",
+			"Convolve",
+			"Dilate",
+			"Erode",
+			"Close",
+			"Open",
+			"DilateIntensity",
+			"ErodeIntensity",
+			"CloseIntensity",
+			"OpenIntensity",
+			"Smooth",
+			"EdgeOut",
+			"EdgeIn",
+			"Edge",
+			"TopHat",
+			"BottomHat",
+			"HitAndMiss",
+			"Thinning",
+			"Thicken",
+			"Distance",
+			"IterativeDistance"
+		] morph {
+
+		_flag = morph;
+
+		Option_edit caption labels value = this.MorphMeth labels?value;
+	}
+	morphmeth_widget = MorphMeth "Dilate";
+
+	Noise noise = class
+		Option_string "Noise" [
+			"Gaussian",
+			"Impulse",
+			"Laplacian",
+			"Multiplicative",
+			"Poisson",
+			"Random",
+			"Uniform"
+		] noise {
+
+		_flag = "+noise " ++ noise;
+
+		Option_edit caption labels value = this.Noise labels?value;
+	}
+	noise_widget = Noise "Gaussian";
+
+	Pattern pattern = class
+		Option_string "Noise" [
+			// See http://www.imagemagick.org/script/formats.php
+			"bricks",
+			"checkerboard",
+			"circles",
+			"crosshatch",
+			"crosshatch30",
+			"crosshatch45",
+			"gray0",
+			"gray5",
+			"gray10",
+			"gray15",
+			"gray20",
+			"gray25",
+			"gray30",
+			"gray35",
+			"gray40",
+			"gray45",
+			"gray50",
+			"gray55",
+			"gray60",
+			"gray65",
+			"gray70",
+			"gray75",
+			"gray80",
+			"gray85",
+			"gray90",
+			"gray95",
+			"gray100",
+			"hexagons",
+			"horizontal",
+			"horizontal2",
+			"horizontal3",
+			"horizontalsaw",
+			"hs_bdiagonal",
+			"hs_cross",
+			"hs_diagcross",
+			"hs_fdiagonal",
+			"hs_horizontal",
+			"hs_vertical",
+			"left30",
+			"left45",
+			"leftshingle",
+			"octagons",
+			"right30",
+			"right45",
+			"rightshingle",
+			"smallfishscales",
+			"vertical",
+			"vertical2",
+			"vertical3",
+			"verticalbricks",
+			"verticalleftshingle",
+			"verticalrightshingle",
+			"verticalsaw"
+		] pattern {
+
+		_flag = "pattern:" ++ pattern;
+
+		Option_edit caption labels value = this.Pattern labels?value;
+	}
+	pattern_widget = Pattern "bricks";
+
+	ResizeType resizet = class
+		Option_string "Resize type" [
+			"resize", 
+			"scale",
+			"sample",
+			"adaptive-resize"
+		] resizet {
+
+		_flag = resizet;
+
+		Option_edit caption labels value = this.ResizeType labels?value;
+	}
+	ResizeType_widget = ResizeType "resize";
+
+	Size_widget = class {
+		_vislevel = 3;
+
+		width = Expression "Width (pixels)" 64;
+		height = Expression "Height (pixels)" 64;
+
+		_flag = "-size " ++
+			print width.expr ++ "x" ++ print height.expr;
+
+	};
+
+	StatType statt = class
+		Option_string "Statistic type" [
+			"Gradient", 
+			"Maximum", 
+			"Mean", 
+			"Median", 
+			"Minimum", 
+			"Mode", 
+			"Nonpeak", 
+			"StandardDeviation"
+		] statt {
+
+		_flag = statt;
+
+		Option_edit caption labels value = this.StatType labels?value;
+	}
+	StatType_widget = StatType "Mean";
+
+	VirtualPixel vp = class
+		Option_string "Virtual pixel" [
+			"Background", 
+			"Black", 
+			"CheckerTile", 
+			"Dither", 
+			"Edge", 
+			"Gray", 
+			"HorizontalTile", 
+			"HorizontalTileEdge", 
+			"Mirror", 
+			"None",
+			"Random",
+			"Tile",
+			"Transparent",
+			"VerticalTile",
+			"VerticalTileEdge",
+			"White"
+		] vp {
+
+		_flag = "-virtual-pixel " ++ vp;
+
+		_isBackground = (vp == "Background");
+
+		Option_edit caption labels value = this.VirtualPixel labels?value;
+	}
+	VirtualPixel_widget = VirtualPixel "Edge";
+
+	VirtualPixelBack_widget = class {
+		virtpix = Magick.VirtualPixel_widget;
+		background = Magick.background_widget;
+		_flag = (if virtpix._isBackground then (background._flag ++ " ") else "")
+			++ virtpix._flag;
+	}
+
+	Geometry_widget = class {
+		_vislevel = 3;
+
+		x = Expression "X" 0;
+		y = Expression "Y" 0;
+		hoffset = Expression "Horizontal offset" 0;
+		voffset = Expression "Vertical offset" 0;
+
+		_flag 
+			= concat [print x.expr, "x", print y.expr, 
+				format hoffset, format voffset]
+		{
+			// print an offset ... we want '+' in front of +ve strings
+			format offset 
+				= concat ["+", print offset.expr], offset.expr >= 0
+				= print offset.expr;
+		}
+	};
+
+	AnnotGeometry_widget = class {
+		_vislevel = 3;
+
+		shearX = Expression "shear X (degrees)" 0;
+		shearY = Expression "shear Y (degrees)" 0;
+		hoffset = Expression "Horizontal offset" 0;
+		voffset = Expression "Vertical offset" 0;
+
+		_flag 
+			= concat [print shearX.expr, "x", print shearY.expr, 
+				format hoffset, format voffset]
+		{
+			// print an offset ... we want '+' in front of +ve strings
+			format offset 
+				= concat ["+", print offset.expr], offset.expr >= 0
+				= print offset.expr;
+		}
+	};
+
+	OffsetGeometry_widget = class {
+		_vislevel = 3;
+
+		hoffset = Expression "Horizontal offset" 0;
+		voffset = Expression "Vertical offset" 0;
+
+		_flag = concat [format hoffset, format voffset]
+		{
+			// print an offset ... we want '+' in front of +ve strings
+			format offset 
+				= concat ["+", print offset.expr], offset.expr >= 0
+				= print offset.expr;
+		}
+	};
+
+	WhxyGeometry_widget = class {
+		_vislevel = 3;
+
+		x = Expression "Width" 0;
+		y = Expression "Height" 0;
+		hoffset = Expression "Horizontal offset" 0;
+		voffset = Expression "Vertical offset" 0;
+
+		_flag 
+			= concat [print x.expr, "x", print y.expr, 
+				format hoffset, format voffset]
+		{
+			// print an offset ... we want '+' in front of +ve strings
+			format offset 
+				= concat ["+", print offset.expr], offset.expr >= 0
+				= print offset.expr;
+		}
+	};
+
+	FrameGeometry_widget = class {
+		_vislevel = 3;
+
+		x = Expression "Width" 0;
+		y = Expression "Height" 0;
+		outbev = Expression "Outer bevel thickness" 0;
+		inbev = Expression "Inner bevel thickness" 0;
+
+		_flag 
+			= concat [print x.expr, "x", print y.expr, 
+				format outbev, format inbev]
+		{
+			// print an offset ... we want '+' in front of +ve strings
+			format offset 
+				= concat ["+", print offset.expr], offset.expr >= 0
+				= print offset.expr;
+		}
+	};
+
+	Font_widget = class {
+		_vislevel = 3;
+
+		family = Option_string "Family" [
+			"Arial",
+			"ArialBlack",
+			"AvantGarde",
+			"BitstreamCharter",
+			"Bookman",
+			"CenturySchoolbook",
+			"ComicSansMS",
+			"Courier",
+			"CourierNew",
+			"DejaVuSans",
+			"DejaVuSansMono",
+			"DejaVuSerif",
+			"Dingbats",
+			"FreeMono",
+			"FreeSans",
+			"FreeSerif",
+			"Garuda",
+			"Georgia",
+			"Helvetica",
+			"HelveticaNarrow",
+			"Impact",
+			"LiberationMono",
+			"LiberationSans",
+			"LiberationSerif",
+			"NewCenturySchlbk",
+			"Palatino",
+			"Purisa",
+			"Symbol",
+			"Times",
+			"TimesNewRoman",
+			"Ubuntu",
+			"Verdana",
+			"Webdings"
+		] "Arial";
+		style = Option_string "Style" [
+			"Any", "Italic", "Normal", "Oblique"
+		] "Normal";
+		weight = Scale "Weight" 1 800 400;
+		size = Scale "Point size" 1 100 12;
+		stretch = Option_string "Stretch" [
+			"Any", "Condensed", "Expanded", "ExtraCondensed", "ExtraExpanded", 
+			"Normal", "SemiCondensed", "SemiExpanded", "UltraCondensed", 
+			"UltraExpanded"
+		] "Normal";
+
+		_flag = join_sep " " [
+				"-family", family.item,
+				"-weight", print weight.value,
+				"-pointsize", print size.value,
+				"-style", style.item,
+				"-stretch", stretch.item];
+	}
+}
+

@@ -1903,8 +1903,14 @@ heap_ip_to_gvalue( PElement *in, GValue *out )
 			g_value_init( out, VIPS_TYPE_ARRAY_IMAGE );
 			vips_value_set_array_image( out, n ); 
 			ivec = vips_value_get_array_image( out, NULL );
-			for( i = 0; i < n; i++ )
+			for( i = 0; i < n; i++ ) {
 				ivec[i] = imageinfo_get( FALSE, iivec[i] );
+
+				/* g_value_unset() on out will unref every
+				 * array element, so we need to ref.
+				 */
+				g_object_ref( ivec[i] ); 
+			}
 		}
 #endif
 		else {

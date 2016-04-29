@@ -1,45 +1,3 @@
-- fix up autotrace
-
-  falsecolour output, drag sliders, occasional segv ... unreffing a region in
-  maplut_stop on an image that's already been freed? ouch
-
-  try:
-
-	- load image
-	- extract green
-	- size down to 128x128
-	- save as x.v
-	- restart nip2
-	- load x.v
-	- click trace
-	- ^Q
-
-  see:
-
-(nip2:29365): GLib-GObject-WARNING **: instance of invalid non-instantiatable type '(null)'
-(nip2:29365): GLib-GObject-CRITICAL **: g_signal_handler_is_connected: assertion 'G_TYPE_CHECK_INSTANCE (instance)' failed
-(nip2:29365): GLib-GObject-CRITICAL **: g_object_unref: assertion 'G_IS_OBJECT (object)' failed
-(nip2:29365): GLib-GObject-CRITICAL **: g_object_unref: assertion 'G_IS_OBJECT (object)' failed
-(nip2:29365): GLib-GObject-CRITICAL **: g_object_unref: assertion 'G_IS_OBJECT (object)' failed
-
-  try:
-
-	$ valgrind vips system "autotrace %s -output-format svg -output-file %s
--despeckle-level 9 -line-threshold 1" --in x.v --out x2.v --in-format %s.ppm
---out-format %s.svg[scale=2]
-
-  runs cleanly, so the error is probably in vips_call
-
-  try:
-
-	- load x.v
-	- vips_call "system" ["autotrace %s -output-format svg -output-file %s"] [$in => [A1.value], $in_format => "%s.ppm", $out => true, $out_format => "%s.svg"]
-
-  see:
-
-(nip2:30392): GLib-GObject-CRITICAL **: g_object_unref: assertion 'G_IS_OBJECT
-(object)' failed
-
 - expose kernel option in vips_resize(), then use that in nip2 resize ... will
   need to be 8.4
 
@@ -47,22 +5,7 @@
 
 - sharpen should use new interface?
 
-- redo scale along the new vipsthumbnail lines
-
-  need to be able to get window_size from an interp
-
-  just call vips_resize()?
-
 - can we call affine from nip2 vips_call? do we need a double array?
-
-- fix up menu tear-off, again
-
-  bug in gtk and won't be fixed, tear-off menus are deprecated
-
-  https://bugzilla.gnome.org/show_bug.cgi?id=627511
-
-  oh argh, might as well remove all tear-off code and direct people to the tk
-  browser instead
 
 - hough_circle etc. don't get cached ... they use the vips8 API and the vips
   cache only works for vips8

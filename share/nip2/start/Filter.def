@@ -1651,3 +1651,41 @@ Filter_paint_text_item = class
 		}
 	}
 }
+
+Autotrace_item = class 
+	Menuaction "_Trace" "convert a bitmap to an SVG file" {
+	action x = class 
+		_result {
+		_vislevel = 3;
+
+		despeckle = Scale "Despeckle level" 1 20 1;
+		line = Scale "Line threshold" 1 20 1;
+		center = Toggle "Trace centreline" false;
+		scale = Scale "SVG scale" 0.1 10 1;
+
+		command 
+			= "autotrace %s " ++ join_sep " " 
+				[ofmt, ofile, desp, lint, cent]
+		{
+			prog = search_for_error "autotrace"; 
+			ofmt = "-output-format svg";
+			ofile = "-output-file %s";
+			desp = "-despeckle-level " ++ print despeckle.value;
+			lint = "-line-threshold " ++ print line.value;
+			cent = if center then "-centerline " else "";
+		}
+
+		_result 
+			= Image output
+		{
+			[output] = vips_call "system" 
+				[command] 
+				[$in => [x.value],
+				 $in_format => "%s.ppm", 
+				 $out => true,
+				 $out_format => "%s.svg[scale=" ++ print scale.value ++ "]"
+				];
+		}
+	}
+}
+

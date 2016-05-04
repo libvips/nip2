@@ -336,20 +336,20 @@ typedef struct _HeapClass {
  * pointer in node to heap sym pointer.
  */
 #ifdef DEBUG_HEAP
-#define EXTRACTNODE(H,A) \
-	(heap_sanity(H),(A)=(H)->free,(H)->free=GETLEFT(A),0)
+#define EXTRACTNODE( H, A ) \
+	(heap_sanity( H ), (A) = (H)->free, (H)->free = GETLEFT( A ), 0)
 #else /*!DEBUG_HEAP*/
-#define EXTRACTNODE(H,A) \
-	((A)=(H)->free,(H)->free=GETLEFT(A),0)
+#define EXTRACTNODE( H, A ) \
+	((A) = (H)->free, (H)->free = GETLEFT( A ), 0)
 #endif /*DEBUG_HEAP*/
 
 /* Allocate a new node from heap H, pop the pointer into A, return non-zero if
  * alloc failed. Node is uninitialised!
  */
-#define NEWNODE(H,A) ( \
-	(H)->free ?\
-		EXTRACTNODE(H,A):\
-		(((A)=heap_getmem(H)) ? 0 : -1)\
+#define NEWNODE( H, A ) ( \
+	(H)->free ? \
+		EXTRACTNODE( H, A ): \
+		(((A) = heap_getmem( H )) ? 0 : -1) \
 	)
 
 typedef void *(*heap_safe_pointer_fn)( Heap *heap, PElement *, 

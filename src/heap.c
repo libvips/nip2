@@ -778,7 +778,7 @@ heap_getmem( Heap *heap )
 	 * it here as well just in case.
 	 */
 	if( heap->free ) {
-		EXTRACTNODE( heap, hn );
+		(void) EXTRACTNODE( heap, hn );
 		return( hn );
 	}
 
@@ -830,7 +830,7 @@ heap_getmem( Heap *heap )
 		return( NULL );
 	}
 
-	EXTRACTNODE( heap, hn );
+	(void) EXTRACTNODE( heap, hn );
 
 	return( hn );
 }

@@ -494,6 +494,10 @@ matrixview_text_build( Matrixview *matrixview )
 	gtk_tree_view_set_headers_visible( GTK_TREE_VIEW( matrixview->sheet ),
 		FALSE );
 
+	/* Stops a harmless compiler warning.
+	 */
+	column = NULL;
+
 	for( i = 0; i < matrix->value.width; i++ ) {
 		GtkCellRenderer *renderer;
 		char buf[256];

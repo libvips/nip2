@@ -1,6 +1,8 @@
 started 8.3.0 on 28/3/16
 - move path search stuff into _convert from _magick
 - added autotrace menu item
+- resize now uses vips_resize() behind the scenes
+- added Kernel type for picking interpolators
 
 started 8.2.1 on 4/12/16
 - tiny improvement to idle handling

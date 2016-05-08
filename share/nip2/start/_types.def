@@ -1078,6 +1078,52 @@ Mark_relative image u v
 		(image.width * u)
 		(image.height * v);
 
+Kernel_type = class {
+	NEAREST_NEIGHBOUR = 0;
+	LINEAR = 1;
+	CUBIC = 2;
+	LANCZOS2 = 3;
+	LANCZOS3 = 4;
+
+	// Should introspect to get the list of interpolators :-(
+	// We can "dir" on VipsInterpolate to get a list of them, but we
+	// can't get i18n'd descriptions until we have more
+	// introspection stuff in nip2.
+
+	/* Table to map kernel numbers to descriptive strings
+	 */
+	descriptions = [
+		_ "Nearest neighbour",
+		_ "Linear", 
+		_ "Cubic",
+		_ "Lanczos, two lobes",
+		_ "Lanczos, three lobes"
+	];
+
+	/* And to vips enum nicknames.
+	 */
+	types = [
+		"nearest", 
+		"linear", 
+		"cubic", 
+		"lanczos2", 
+		"lanczos3"
+	];
+}
+
+Kernel type = class {
+	value = Kernel_type.types?type;
+}
+
+Kernel_linear = Kernel Kernel_type.LINEAR;
+
+Kernel_picker default = class 
+	Kernel kernel.value {
+	_vislevel = 2;
+
+	kernel = Option "Kernel" Kernel_type.descriptions default;
+}
+
 Interpolate_type = class {
 	NEAREST_NEIGHBOUR = 0;
 	BILINEAR = 1;
@@ -1087,9 +1133,9 @@ Interpolate_type = class {
 	VSQBS = 5;
 
 	// Should introspect to get the list of interpolators :-(
-        // We can "dir" on VipsInterpolate to get a list of them, but we
-        // can't get i18n'd descriptions until we have more
-        // introspection stuff in nip2.
+	// We can "dir" on VipsInterpolate to get a list of them, but we
+	// can't get i18n'd descriptions until we have more
+	// introspection stuff in nip2.
 
 	/* Table to map interpol numbers to descriptive strings
 	 */

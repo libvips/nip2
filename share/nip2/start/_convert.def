@@ -649,6 +649,7 @@ search_for_error name
 	= error (exe_name ++ " not found on your search path. " ++
 		"Check you have installed the program and it is on your PATH.")
 {
+	exe_name = name ++ expand "$EXEEXT";
 	path = search_for name;
 }
 

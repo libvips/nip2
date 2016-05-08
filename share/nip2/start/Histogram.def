@@ -236,7 +236,7 @@ Hist_graph_item = class
 					displace.value vdisplace.value width.value arrow;
 
 				// squish vertically to get an average
-				area' = resize Interpolate_bilinear 1 (1 / width.value) area;
+				area' = resize Kernel_linear 1 (1 / width.value) area;
 			}
 		}
 	}

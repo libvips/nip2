@@ -631,13 +631,13 @@ Image_transform_item = class
 
 				xfactor = Expression "Horizontal scale factor" 1;
 				yfactor = Expression "Vertical scale factor" 1;
-				interp = Interpolate_picker Interpolate_type.BILINEAR;
+				kernel = Kernel_picker Kernel_type.LINEAR;
 
 				_result 
 					= map_unary process x
 				{
 					process image 
-						= resize interp xfactor yfactor image;
+						= resize kernel xfactor yfactor image;
 				}
 			}
 		}
@@ -656,14 +656,14 @@ Image_transform_item = class
 				] 0;
 				size = Expression "Resize to (pixels)" 128;
 				aspect = Toggle "Break aspect ratio" false;
-				interp = Interpolate_picker Interpolate_type.BILINEAR;
+				kernel = Kernel_picker Kernel_type.LINEAR;
 
 				_result
 					= map_unary process x
 				{
 					process image
-						= resize interp h v image, aspect
-						= resize interp fac fac image
+						= resize kernel h v image, aspect
+						= resize kernel fac fac image
 					{
 						xfac = to_real size / image.width;
 						yfac = to_real size / image.height;
@@ -708,7 +708,7 @@ Image_transform_item = class
 			    size = Option "Page size" [
 					"Full page", "Half page", "Quarter page" 
 				] 0;
-				interp = Interpolate_picker Interpolate_type.BILINEAR;
+				kernel = Kernel_picker Kernel_type.LINEAR;
 
 			 	_result
 				 	= map_unary process x
@@ -721,7 +721,7 @@ Image_transform_item = class
 					[width, height] = allrect?within;
 
 					process x
-						= resize interp fac fac x, fac < 1
+						= resize kernel fac fac x, fac < 1
 						= x
 					{
 						xfac = (width / xdiv) / x.width;

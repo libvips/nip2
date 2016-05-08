@@ -1592,7 +1592,41 @@ zerox d x
 		(zerox d) Operator_type.COMPOUND_REWRAP false;
 }
 
-resize interp xfac yfac image
+reduce kernel xshr yshr image
+	= oo_unary_function reduce_op image, is_class image
+	= reduce_im image, is_image image
+	= error (_ "bad arguments to " ++ "reduce")
+{
+	reduce_op = Operator "reduce" 
+		reduce_im Operator_type.COMPOUND_REWRAP false;
+
+	reduce_im im 
+		= out
+	{
+		[out] = vips_call "reduce" [im, xshr, yshr] [$kernel => kernel.value];
+	}
+}
+
+similarity interpolate scale angle image
+	= oo_unary_function similarity_op image, is_class image
+	= similarity_im image, is_image image
+	= error (_ "bad arguments to " ++ "similarity")
+{
+	similarity_op = Operator "similarity" 
+		similarity_im Operator_type.COMPOUND_REWRAP false;
+
+	similarity_im im 
+		= out
+	{
+		[out] = vips_call "similarity" [im] [
+			$interpolate => interpolate.value,
+			$scale => scale,
+			$angle => angle
+		];
+	}
+}
+
+resize kernel xfac yfac image
 	= oo_unary_function resize_op image, is_class image
 	= resize_im image, is_image image
 	= error (_ "bad arguments to " ++ "resize")
@@ -1606,92 +1640,30 @@ resize interp xfac yfac image
 	rxfac' = 1 / xfac';
 	ryfac' = 1 / yfac';
 
-	// is this interpolation nearest-neighbour?
-	is_nn x = x.type == Interpolate_type.NEAREST_NEIGHBOUR;
+	is_nn = kernel.type == Kernel_type.NEAREST_NEIGHBOUR;
 
 	resize_im im
 		// upscale by integer factor, nearest neighbour
 		= im_zoom im xfac' yfac', 
 			is_int xfac' && is_int yfac' && 
 			xfac' >= 1 && yfac' >= 1 &&
-			is_nn interp
+			is_nn 
 
 		// downscale by integer factor, nearest neighbour
 		= im_subsample im rxfac' ryfac', 
 			is_int rxfac' && is_int ryfac' && 
 			rxfac' >= 1 && ryfac' >= 1 &&
-			is_nn interp
+			is_nn 
 
-		// upscale by any factor, nearest neighbour 
-		// upscale by integer part, then affine to exact size
-		= scale xg?1 yg?1 (im_zoom im xg?0 yg?0),
-			xfac' >= 1 && yfac' >= 1 &&
-			is_nn interp
-
-		// downscale by any factor, nearest neighbour 
-		// downscale by integer part, then affine to exact size
-		= scale xs?1 ys?1 (im_subsample im xs?0 ys?0),
-			rxfac' >= 1 && ryfac' >= 1 &&
-			is_nn interp
-
-		// upscale by any factor with affine
-		= scale xfac' yfac' im,
-			xfac' >= 1 && yfac' >= 1 
-
-		// downscale by any factor, bilinear
-		// block shrink by integer factor, then resample to 
-		// exact with affine
-		= scale xs?1 ys?1 (im_shrink im xs?0 ys?0),
-			rxfac' >= 1 && ryfac' >= 1 
-
-		= error ("resize: unimplemented argument combination:\n" ++ 
-			"  xfac = " ++ print xfac' ++ "\n" ++
-			"  yfac = " ++ print yfac' ++ "\n" ++
-			"  interp = " ++ print interp ++ " (" ++
-				Interpolate_type.descriptions?interp.type ++ ")")
+		// everything else ... we just pass on to vips_resize()
+		= vips_resize kernel xfac' yfac' im
 	{
-		// convert a float scale to integer plus fraction
-		// eg. scale by 2.5 becomes [2, 1.25] (x * 2.5 == x * 2 * 1.25)
-		break f = [floor f, f / floor f];
-
-		// same, but for downsizing ... turn a float scale which is less than
-		// 1 into an int shrink and a float scale
-
-		// complicated: the int shrink may round the size down (eg. imagine
-		// subsampling a 11 pixel wide image by 3, we'd get a 3 pixel wide
-		// image, not a 3.666 pixel wide image), so pass in the size of image
-		// we are operating on and adjust for any rounding
-		
-		// so ... x is (eg.) 467, f is (eg. 128/467, about 0.274)
-		rbreak x f 
-			= [int_shrink, float_resample]
+		vips_resize kernel hscale vscale im 
+			= out
 		{
-			// the size of image we are aiming for after the combined int and
-			// float resample
-			x' = x * f;
-
-			// int part
-			int_shrink = floor (1 / f);
-
-			// size after int shrink
-			x'' = floor (x / int_shrink);
-
-			// therefore what we need for the float part
-			float_resample = x' / x'';
+			[out] = vips_call "resize" [im, hscale] 
+				[$vscale => vscale, $kernel => kernel.value];
 		}
-
-		width = get_width im;
-		height = get_height im;
-
-		// grow and shrink factors
-		xg = break xfac';
-		yg = break yfac';
-		xs = rbreak width xfac';
-		ys = rbreak height yfac';
-
-		// resize
-		scale xfac yfac im
-			= im_affinei_all im interp.value xfac 0 0 yfac 0 0;
 	}
 }
 

@@ -420,11 +420,15 @@ symbol_ndirty( Symbol *sym )
 void *
 symbol_fix_counts( Symbol *sym )
 {
+#ifdef DEBUG
 	int old_count = sym->ndirtychildren;
+#endif /*DEBUG*/
 
 	sym->ndirtychildren = symbol_ndirty( sym );
 
+#ifdef DEBUG
 	g_assert( sym->ndirtychildren == old_count );
+#endif /*DEBUG*/
 
 	symbol_state_change( sym );
 

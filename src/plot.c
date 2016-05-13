@@ -164,6 +164,7 @@ plot_unpack( Plot *plot, DOUBLEMASK *mask )
 		break;
 
 	default:
+		columns = 1;
 		g_assert( 0 );
 	}
 

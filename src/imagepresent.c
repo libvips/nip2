@@ -1483,7 +1483,6 @@ imagepresent_ruler_hide_cb( GtkWidget *wid, GtkWidget *host, Imagepresent *ip )
 static void
 imagepresent_init( Imagepresent *ip )
 {
-	GtkWidget *port;
 	GtkWidget *bar;
 	GtkWidget *table;
 
@@ -1539,8 +1538,6 @@ imagepresent_init( Imagepresent *ip )
 	gtk_signal_connect( GTK_OBJECT( ip->swin ), "scroll_event",
 		GTK_SIGNAL_FUNC( imagepresent_scroll_event_cb ), ip );
 
-	port = gtk_bin_get_child( GTK_BIN( ip->swin ) );
-	g_assert( GTK_IS_VIEWPORT( port ) );
 	gtk_signal_connect( GTK_OBJECT( ip->hadj ), "changed",
 		GTK_SIGNAL_FUNC( imagepresent_hadj_changed_cb ), ip );
 	gtk_signal_connect( GTK_OBJECT( ip->hadj ), "value_changed",

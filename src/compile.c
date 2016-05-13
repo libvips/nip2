@@ -1186,6 +1186,7 @@ compile_share_scan_element( CompileShare *share, PElement *e )
 
 	case ELEMENT_NOVAL:
 	default:
+		hash = 0; 
 		g_assert( 0 );
 	}
 

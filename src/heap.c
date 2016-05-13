@@ -122,6 +122,7 @@ heap_map( HeapNode *hn, heap_map_fn fn, void *a, void *b )
 	}
 }
 
+#ifdef DEBUG_HEAP_GC
 /* Debugging ... check that all nodes on the free list are TAG_FREE, and that
  * all other nodes are not TAG_FREE.
  */
@@ -164,6 +165,7 @@ heap_check_free( Heap *heap )
 		}
 	}
 }
+#endif /*DEBUG_HEAP_GC*/
 
 #ifdef DEBUG_HEAP_GC
 static void
@@ -180,9 +182,9 @@ heap_check_managed( void *key, void *value, Heap *heap )
 int
 heap_sanity( Heap *heap )
 {
+#ifdef DEBUG_HEAP_GC
 	heap_check_free( heap );
 
-#ifdef DEBUG_HEAP_GC
 	heap_gc( heap );
 	heap_check_free( heap );
 	g_hash_table_foreach( heap->mtable, (GHFunc) heap_check_managed, heap );

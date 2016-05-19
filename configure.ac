@@ -17,7 +17,7 @@ dnl
 
 m4_define([nip_major_version], [8])
 m4_define([nip_minor_version], [3])
-m4_define([nip_micro_version], [0])
+m4_define([nip_micro_version], [1])
 m4_define([nip_version],
           [nip_major_version.nip_minor_version.nip_micro_version])
 
@@ -66,14 +66,10 @@ if test x"$nip_os_darwin" = "xyes"; then
   AC_DEFINE(OS_DARWIN,1,[native Mac OS X])
 fi
 
-# disable debugging by default for production releases
-m4_define([debug_default],
-  m4_if(m4_eval(nip_minor_version() % 2), [1], [yes], [no]))
-
 AC_ARG_ENABLE(debug,
   AC_HELP_STRING([--enable-debug=@<:@no/minimum/yes@:>@],
     [turn on debugging @<:@default=debug_default()@:>@]),,
-  enable_debug=debug_default())
+  enable_debug=no)
 
 if test "x$enable_debug" = "xyes"; then
   NIP_DEBUG_FLAGS="-DDEBUG_FATAL -DDEBUG_LEAK"

@@ -1,7 +1,3 @@
-- wrap vips_reduce(), use it from resize
-
-  need to add a new kernel selector thing
-
 - sharpen should use new interface?
 
 - can we call affine from nip2 vips_call? do we need a double array?

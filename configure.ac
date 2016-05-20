@@ -154,7 +154,7 @@ rm -f conftest.l $LEX_OUTPUT_ROOT.c
 # gtk before 2.4.9 crashes with the way we use combobox :-(
 # vips before 7.30 used "vips-x.y" as the pkg name
 PKG_CHECK_MODULES(REQUIRED_PACKAGES, 
-  gthread-2.0 gtk+-2.0 >= 2.4.9 libxml-2.0 vips >= 7.30)
+  gmodule-2.0 gthread-2.0 gtk+-2.0 >= 2.4.9 libxml-2.0 vips >= 7.30)
 IP_CFLAGS="$REQUIRED_PACKAGES_CFLAGS $IP_CFLAGS"
 IP_LIBS="$REQUIRED_PACKAGES_LIBS $IP_LIBS"
 
@@ -248,25 +248,7 @@ if test "x$with_fftw3" != "xno"; then
   IP_LIBS="$FFTW3_LIBS $IP_LIBS"
 fi
 
-# optional ... use libgoffice to draw plots
-# pretty basic functionality, really, but we need to be able to build without
-# it for testing
-# libgoffice 0.6.x is too buggy, build 0.7.x to get the 0.8 package
-AC_ARG_WITH([libgoffice], AS_HELP_STRING([--without-libgoffice], [build without libgoffice (default: test)]))
-
-if test "x$with_libgoffice" != "xno"; then
-  PKG_CHECK_MODULES(LIBGOFFICE, libgoffice-0.8,
-    [AC_DEFINE(HAVE_LIBGOFFICE,1,[define if you have libgoffice installed.])
-     with_libgoffice=yes
-    ],
-    [AC_MSG_WARN([libgoffice not found; disabling plot display])
-     with_libgoffice=no
-    ])
-  IP_CFLAGS="$LIBGOFFICE_CFLAGS $LIBGOFFICE_INCLUDES $IP_CFLAGS"
-  IP_LIBS="$LIBGOFFICE_LIBS $IP_LIBS"
-fi
-
-# use libgsf to save goffice plots to files
+# goffice needs libgsf to save plots to files
 AC_ARG_WITH([libgsf], AS_HELP_STRING([--without-libgsf], [build without libgsf (default: test)]))
 
 if test "x$with_libgsf" != "xno"; then
@@ -279,6 +261,23 @@ if test "x$with_libgsf" != "xno"; then
     ])
   IP_CFLAGS="$LIBGSF_CFLAGS $LIBGSF_INCLUDES $IP_CFLAGS"
   IP_LIBS="$LIBGSF_LIBS $IP_LIBS"
+fi
+
+# optional ... use libgoffice to draw plots
+# pretty basic functionality, really, but we need to be able to build without
+# it for testing
+AC_ARG_WITH([libgoffice], AS_HELP_STRING([--without-libgoffice], [build without libgoffice (default: test)]))
+
+if test "x$with_libgoffice" != "xno"; then
+  PKG_CHECK_MODULES(LIBGOFFICE, libgoffice-0.8,
+    [AC_DEFINE(HAVE_LIBGOFFICE,1,[define if you have libgoffice installed.])
+     with_libgoffice=yes
+    ],
+    [AC_MSG_WARN([libgoffice not found; disabling plot display])
+     with_libgoffice=no
+    ])
+  IP_CFLAGS="$LIBGOFFICE_CFLAGS $LIBGOFFICE_INCLUDES $IP_CFLAGS"
+  IP_LIBS="$LIBGOFFICE_LIBS $IP_LIBS"
 fi
 
 # optional ... use libgvc to draw graphs of workspace dependencies

@@ -1521,9 +1521,12 @@ imagepresent_init( Imagepresent *ip )
 	 */
 	gtk_widget_add_events( GTK_WIDGET( ip->id ), 
 		GDK_KEY_PRESS_MASK | 
-		GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK |
-		GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK |
-		GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK ); 
+		GDK_POINTER_MOTION_MASK | 
+		GDK_POINTER_MOTION_HINT_MASK |
+		GDK_ENTER_NOTIFY_MASK | 
+		GDK_LEAVE_NOTIFY_MASK |
+		GDK_BUTTON_PRESS_MASK | 
+		GDK_BUTTON_RELEASE_MASK ); 
 	gtk_signal_connect_after( GTK_OBJECT( ip->id ), "event",
 		GTK_SIGNAL_FUNC( imagepresent_event_cb ), ip );
 	gtk_signal_connect( GTK_OBJECT( ip ), "key_press_event",

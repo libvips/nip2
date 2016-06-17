@@ -363,8 +363,10 @@ iimageview_init( iImageview *iimageview )
 	/* Need these events in the enclosing workspaceview.
 	 */
 	gtk_widget_add_events( GTK_WIDGET( iimageview->id ), 
-		GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK |
-		GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK ); 
+		GDK_POINTER_MOTION_MASK | 
+		GDK_POINTER_MOTION_HINT_MASK |
+		GDK_BUTTON_PRESS_MASK | 
+		GDK_BUTTON_RELEASE_MASK ); 
 
 	iimageview->label = gtk_label_new( "" );
         gtk_misc_set_alignment( GTK_MISC( iimageview->label ), 0, 0.5 );

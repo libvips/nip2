@@ -1103,8 +1103,10 @@ columnview_init( Columnview *cview )
          */
         cview->title = gtk_event_box_new();
 	gtk_widget_add_events( GTK_WIDGET( cview->title ), 
-		GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK |
-		GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK ); 
+		GDK_POINTER_MOTION_MASK | 
+		GDK_POINTER_MOTION_HINT_MASK |
+		GDK_BUTTON_PRESS_MASK | 
+		GDK_BUTTON_RELEASE_MASK ); 
         gtk_box_pack_start( GTK_BOX( cview->vbox ), 
 		cview->title, FALSE, FALSE, 0 );
         set_tooltip( cview->title, _( "Left-drag to move, left-double-click to "

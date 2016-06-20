@@ -147,7 +147,6 @@ extern int statfs();
 #include <goffice/graph/gog-legend.h>
 #include <goffice/graph/gog-chart-map.h>
 
-#include <goffice/gtk/go-graph-widget.h>
 
 #include <goffice/utils/go-color.h>
 #include <goffice/utils/go-marker.h>

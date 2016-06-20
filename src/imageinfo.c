@@ -492,10 +492,14 @@ imageinfo_finalize( GObject *gobject )
 	IM_FREEF( im_close, imageinfo->mapped_im );
 	IM_FREEF( im_close, imageinfo->identity_lut );
 
-	if( imageinfo->dfile && isfile ) {
-		unlinkf( "%s", name );
+	if( imageinfo->dfile && 
+		imageinfo->delete_name &&
+		isfile ) {
+		unlinkf( "%s", imageinfo->delete_name );
 		iobject_changed( IOBJECT( main_imageinfogroup ) );
 	}
+
+	VIPS_FREE( imageinfo->delete_name );
 
 	MANAGED_UNREF( imageinfo->underlying );
 
@@ -626,6 +630,7 @@ imageinfo_init( Imageinfo *imageinfo )
 	imageinfo->proxy = NULL;
 
 	imageinfo->dfile = FALSE;
+	imageinfo->delete_name = NULL;
 	imageinfo->from_file = FALSE;
 	imageinfo->mtime = 0;
 	imageinfo->exprs = NULL;
@@ -812,6 +817,7 @@ imageinfo_new_temp( Imageinfogroup *imageinfogroup,
 		return( NULL );
 	}
 	imageinfo->dfile = TRUE;
+	VIPS_SETSTR( imageinfo->delete_name, tname );
 
 	return( imageinfo );
 }

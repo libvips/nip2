@@ -470,33 +470,29 @@ static void
 imageinfo_finalize( GObject *gobject )
 {
 	Imageinfo *imageinfo = IMAGEINFO( gobject );
-	gboolean isfile = imageinfo->im ? im_isfile( imageinfo->im ) : FALSE;
-	char name[FILENAME_MAX];
+	gboolean isfile = imageinfo->im && im_isfile( imageinfo->im );
 
 #ifdef DEBUG_MAKE
 	printf( "imageinfo_finalize:" ); 
 	imageinfo_print( imageinfo );
 #endif /*DEBUG_MAKE*/
 
-	if( imageinfo->dfile && isfile ) {
-		/* We must close before we delete ... save the filename.
-		 */
-		im_strncpy( name, imageinfo->im->filename, FILENAME_MAX - 5 );
-
-#ifdef DEBUG_OPEN
-		printf( "imageinfo_destroy: unlinking \"%s\"\n", name );
-#endif /*DEBUG_OPEN*/
-	}
-
 	IM_FREEF( im_close, imageinfo->im );
 	IM_FREEF( im_close, imageinfo->mapped_im );
 	IM_FREEF( im_close, imageinfo->identity_lut );
 
-	if( imageinfo->dfile && isfile ) {
-		unlinkf( "%s", name );
+	if( imageinfo->dfile && 
+		imageinfo->delete_filename &&
+		isfile ) {
+#ifdef DEBUG_OPEN
+		printf( "imageinfo_destroy: unlinking \"%s\"\n", name );
+#endif /*DEBUG_OPEN*/
+
+		unlinkf( "%s", imageinfo->delete_filename );
 		iobject_changed( IOBJECT( main_imageinfogroup ) );
 	}
 
+	VIPS_FREE( imageinfo->delete_filename ); 
 	MANAGED_UNREF( imageinfo->underlying );
 
 	imageinfo_undo_free( imageinfo );
@@ -626,6 +622,7 @@ imageinfo_init( Imageinfo *imageinfo )
 	imageinfo->proxy = NULL;
 
 	imageinfo->dfile = FALSE;
+	imageinfo->delete_filename = NULL; 
 	imageinfo->from_file = FALSE;
 	imageinfo->mtime = 0;
 	imageinfo->exprs = NULL;
@@ -812,6 +809,7 @@ imageinfo_new_temp( Imageinfogroup *imageinfogroup,
 		return( NULL );
 	}
 	imageinfo->dfile = TRUE;
+	VIPS_SETSTR( imageinfo->delete_filename, tname ); 
 
 	return( imageinfo );
 }

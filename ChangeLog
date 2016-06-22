@@ -3,6 +3,7 @@ started 8.3.1 on 19/5/16
 - configure changes to help win64
 - fix middle-drag in ws and image view
 - be more careful about the name of the image file we remove on close
+- simpler system for positioning new columns
 
 started 8.3.0 on 28/3/16
 - move path search stuff into _convert from _magick

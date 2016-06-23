@@ -293,7 +293,7 @@ workspaceview_fixed_event_cb( GtkWidget *widget,
 	gboolean handled = FALSE;
 
 #ifdef EVENT
-	printf( "workspaceview_fixed_event_cb %d\n", ev->type );
+	printf( "workspaceview_fixed_event_cb: %d\n", ev->type );
 #endif /*EVENT*/
 
         switch( ev->type ) {
@@ -309,6 +309,10 @@ workspaceview_fixed_event_cb( GtkWidget *widget,
 			}
                 }
 		else if( ev->button.button == 2 ) {
+#ifdef EVENT
+			printf( "workspaceview_fixed_event_cb: start drag\n" ); 
+#endif /*EVENT*/
+
 			wview->drag_x = ev->button.x_root + wview->vp.left;
 			wview->drag_y = ev->button.y_root + wview->vp.top;
 			workspaceview_set_cursor( wview, IWINDOW_SHAPE_MOVE );
@@ -321,6 +325,10 @@ workspaceview_fixed_event_cb( GtkWidget *widget,
 
         case GDK_BUTTON_RELEASE:
                 if( ev->button.button == 2 ) {
+#ifdef EVENT
+			printf( "workspaceview_fixed_event_cb: stop drag\n" ); 
+#endif /*EVENT*/
+
 			workspaceview_set_cursor( wview, IWINDOW_SHAPE_NONE );
 			wview->dragging = FALSE;
 
@@ -331,6 +339,10 @@ workspaceview_fixed_event_cb( GtkWidget *widget,
 
         case GDK_MOTION_NOTIFY:
                 if( wview->dragging && ev->motion.state & GDK_BUTTON2_MASK ) {
+#ifdef EVENT
+			printf( "workspaceview_fixed_event_cb: motion\n" ); 
+#endif /*EVENT*/
+
 			/* We're using hints.
 			 */
 			widget_update_pointer( GTK_WIDGET( wview ), ev );

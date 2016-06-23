@@ -1,10 +1,3 @@
-- ^N in ws should always put the new column just to the left of the leftmost
-  complete column in the viewport
-
-  or just to the right of the current column?
-
-  current behaviour is to insert alphabetically and scroll, which is awful
-
 - sharpen should use new interface?
 
 - can we call affine from nip2 vips_call? do we need a double array?

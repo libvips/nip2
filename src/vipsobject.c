@@ -77,7 +77,7 @@ vo_free( Vo *vo )
 static Vo *
 vo_new( Reduce *rc, const char *name )
 {
-	VipsObjectClass *class;
+	const VipsObjectClass *class;
 	Vo *vo;
 
 	if( !(class = vips_class_find( "VipsObject", name )) )

@@ -25,7 +25,7 @@ X](http://www.vips.ecs.soton.ac.uk/index.php?title=Build_on_OS_X).
 
 If you downloaded from GIT you'll need:
 
-	$ ./bootstrap.sh
+	$ ./autogen
 
 first to build the configure system. 
 

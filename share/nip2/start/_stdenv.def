@@ -2505,3 +2505,19 @@ mapim interp ind in
 		[out] = vips_call "mapim" [im, ind] [$interpolate => interp];
 	}
 }
+
+perlin cell width height
+	= Image im
+{
+	[im] = vips_call "perlin" [to_real width, to_real height] [
+		$cell_size => to_real cell 
+	];
+}
+
+worley cell width height
+	= Image im
+{
+	[im] = vips_call "worley" [to_real width, to_real height] [
+		$cell_size => to_real cell 
+	];
+}

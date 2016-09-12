@@ -1644,33 +1644,73 @@ Pattern_images_item = class
 		}
 	}
 
-	Gaussian_item = class 
-		Menuaction "Gaussian _Noise" "make an image of gaussian noise" {
-		action = class
-			_result {
-			_vislevel = 3;
+	Noise_item = class
+		Menupullright "_Noise" "various noise generators" {
+		Gaussian_item = class 
+			Menuaction "_Gaussian" "make an image of gaussian noise" {
+			action = class
+				_result {
+				_vislevel = 3;
 
-			nwidth = Expression "Image width (pixels)" 64;
-			nheight = Expression "Image height (pixels)" 64;
-			mean = Scale "Mean" 0 255 128;
-			deviation = Scale "Deviation" 0 128 50;
+				nwidth = Expression "Image width (pixels)" 64;
+				nheight = Expression "Image height (pixels)" 64;
+				mean = Scale "Mean" 0 255 128;
+				deviation = Scale "Deviation" 0 128 50;
 
-			_result = Image (im_gaussnoise (to_real nwidth) (to_real nheight) 
-				mean.value deviation.value);
+				_result = Image (im_gaussnoise 
+					(to_real nwidth) (to_real nheight) 
+					mean.value deviation.value);
+			}
 		}
-	}
 
-	Fractal_item = class 
-		Menuaction "_Fractal" "make a fractal image" {
-		action = class
-			_result {
-			_vislevel = 3;
+		Fractal_item = class 
+			Menuaction "_Fractal" "make a fractal noise image" {
+			action = class
+				_result {
+				_vislevel = 3;
 
-			nsize = Expression "Image size (pixels)" 64;
-			dimension = Scale "Dimension" 2.001 2.999 2.001;
+				nsize = Expression "Image size (pixels)" 64;
+				dimension = Scale "Dimension" 2.001 2.999 2.001;
 
-			_result = Image (im_fractsurf (to_real nsize) dimension.value); 
+				_result = Image (im_fractsurf (to_real nsize) dimension.value); 
+			}
 		}
+
+		Perlin_item = class 
+			Menuaction "_Perlin" "Perlin noise image" {
+			action = class
+				_result {
+				_vislevel = 3;
+
+				nwidth = Expression "Image width (pixels)" 64;
+				nheight = Expression "Image height (pixels)" 64;
+				cell_size = Expression "Cell size (pixels)" 8;
+				eight = Toggle "Eight bit output" true;
+
+				_result 
+					= 128 * im + 128, eight
+					= im
+				{
+					im = perlin cell_size nwidth nheight;
+				}
+			}
+		}
+
+		Worley_item = class 
+			Menuaction "_Worley" "Worley noise image" {
+			action = class
+				_result {
+				_vislevel = 3;
+
+				nwidth = Expression "Image width (pixels)" 512;
+				nheight = Expression "Image height (pixels)" 512;
+				cell_size = Expression "Cell size (pixels)" 256;
+
+				_result 
+					= worley cell_size nwidth nheight;
+			}
+		}
+
 	}
 
 	Checkerboard_item = class 

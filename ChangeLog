@@ -1,3 +1,6 @@
+started 8.4
+- added Perlin and Worley menu items
+
 started 8.3.1 on 19/5/16
 - disable debug by default, thanks Benjamin
 - configure changes to help win64

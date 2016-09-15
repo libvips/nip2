@@ -47,3 +47,4 @@ autoheader
 $LIBTOOLIZE --copy --force --automake
 automake --add-missing --copy
 
+./configure $*

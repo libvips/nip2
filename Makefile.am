@@ -6,7 +6,7 @@ SUBDIRS = \
 	po 
 
 EXTRA_DIST = \
-	bootstrap.sh \
+	autogen.sh \
 	doc \
 	proj \
 	m4 \

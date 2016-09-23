@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.41.0">
-  <Workspace window_x="0" window_y="0" window_width="788" window_height="1166" filename="test_conv.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="100" lpane_open="false" rpane_position="400" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_conv" caption="Default empty workspace">
-    <Column x="0" y="345" open="true" selected="false" sform="false" next="5" name="A" caption="medium test matrix">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/8.4.0">
+  <Workspace window_x="50" window_y="30" window_width="788" window_height="1050" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" locked="false" lpane_position="100" lpane_open="false" rpane_position="400" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_conv" caption="Default empty workspace" filename="$HOME/GIT/nip2/test/workspaces/test_conv.ws">
+    <Column x="0" y="297" open="true" selected="false" sform="false" next="5" name="A" caption="medium test matrix">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
           <Rhs vislevel="3" flags="7">
@@ -71,7 +71,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="843" y="0" open="true" selected="false" sform="false" next="4" name="C" caption="convolve with vips">
+    <Column x="689" y="0" open="true" selected="false" sform="false" next="4" name="C" caption="convolve with vips">
       <Subcolumn vislevel="3">
         <Row popup="false" name="C1">
           <Rhs vislevel="2" flags="5">
@@ -96,7 +96,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1222" y="603" open="true" selected="false" sform="false" next="20" name="D" caption="convolve by hand">
+    <Column x="1051" y="642" open="true" selected="false" sform="false" next="20" name="D" caption="convolve by hand">
       <Subcolumn vislevel="3">
         <Row popup="false" name="D19">
           <Rhs vislevel="0" flags="4">
@@ -147,7 +147,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1937" y="0" open="true" selected="false" sform="false" next="20" name="E" caption="check result">
+    <Column x="1603" y="0" open="true" selected="true" sform="false" next="21" name="E" caption="check result">
       <Subcolumn vislevel="3">
         <Row popup="false" name="E16">
           <Rhs vislevel="0" flags="4">
@@ -218,6 +218,11 @@
             <iText formula="&quot; &quot;"/>
           </Rhs>
         </Row>
+        <Row popup="false" name="E20">
+          <Rhs vislevel="1" flags="4">
+            <iText formula="&quot;don't test for an exact match: the uint8 vector path may miss slightly&quot;"/>
+          </Rhs>
+        </Row>
         <Row popup="false" name="E15">
           <Rhs vislevel="1" flags="4">
             <iText formula="if E13 != E17 then error &quot;match failed&quot; else &quot;ok&quot;"/>
@@ -225,7 +230,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="975" open="true" selected="false" sform="false" next="5" name="F" caption="large test matrix">
+    <Column x="0" y="892" open="true" selected="false" sform="false" next="5" name="F" caption="large test matrix">
       <Subcolumn vislevel="3">
         <Row popup="false" name="F1">
           <Rhs vislevel="3" flags="7">
@@ -284,7 +289,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="144" open="true" selected="true" sform="false" next="7" name="G" caption="small test matrix">
+    <Column x="0" y="124" open="true" selected="false" sform="false" next="7" name="G" caption="small test matrix">
       <Subcolumn vislevel="3">
         <Row popup="false" name="G6">
           <Rhs vislevel="1" flags="4">
@@ -300,7 +305,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1222" y="0" open="true" selected="false" sform="false" next="8" name="H" caption="convolve by hand">
+    <Column x="1051" y="0" open="true" selected="false" sform="false" next="8" name="H" caption="convolve by hand">
       <Subcolumn vislevel="3">
         <Row popup="false" name="H1">
           <Rhs vislevel="0" flags="4">
@@ -351,7 +356,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1222" y="1306" open="true" selected="false" sform="false" next="8" name="I" caption="convolve by hand">
+    <Column x="1051" y="1408" open="true" selected="false" sform="false" next="8" name="I" caption="convolve by hand">
       <Subcolumn vislevel="3">
         <Row popup="false" name="I1">
           <Rhs vislevel="0" flags="4">
@@ -402,7 +407,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1937" y="537" open="true" selected="false" sform="false" next="13" name="N" caption="check result">
+    <Column x="1603" y="637" open="true" selected="false" sform="false" next="13" name="N" caption="check result">
       <Subcolumn vislevel="3">
         <Row popup="false" name="N1">
           <Rhs vislevel="0" flags="4">
@@ -419,7 +424,7 @@
           </Rhs>
         </Row>
         <Row popup="false" name="N3">
-          <Rhs vislevel="0" flags="4">
+          <Rhs vislevel="2" flags="5">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
             <iText formula="C2"/>
@@ -440,7 +445,7 @@
           </Rhs>
         </Row>
         <Row popup="false" name="N6">
-          <Rhs vislevel="0" flags="4">
+          <Rhs vislevel="2" flags="5">
             <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
             <iText formula="N5?1"/>
@@ -475,12 +480,12 @@
         </Row>
         <Row popup="false" name="N12">
           <Rhs vislevel="1" flags="4">
-            <iText formula="if N10 != N2 then error &quot;match failed&quot; else &quot;ok&quot;"/>
+            <iText formula="if abs (N10 - N2) &gt; 2 then error &quot;match failed&quot; else &quot;ok&quot;"/>
           </Rhs>
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1937" y="1124" open="true" selected="false" sform="false" next="13" name="O" caption="check result">
+    <Column x="1603" y="1428" open="true" selected="false" sform="false" next="13" name="O" caption="check result">
       <Subcolumn vislevel="3">
         <Row popup="false" name="O1">
           <Rhs vislevel="0" flags="4">
@@ -560,6 +565,3 @@
     </Column>
   </Workspace>
 </root>
-
-
-

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/8.3.0">
-  <Workspace window_x="0" window_y="0" window_width="1020" window_height="735" filename="$HOME/GIT/nip2/share/nip2/data/examples/logo/logo2.ws" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="logo5" caption="Default empty workspace">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/8.4.0">
+  <Workspace window_x="50" window_y="80" window_width="1261" window_height="842" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" locked="false" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="logo5" caption="Default empty workspace" filename="$HOME/GIT/nip2/share/nip2/data/examples/logo/logo2.ws">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="12" name="A" caption="render text">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
@@ -203,7 +203,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="555" y="0" open="true" selected="false" sform="false" next="15" name="B" caption="add texture">
+    <Column x="563" y="0" open="true" selected="false" sform="false" next="15" name="B" caption="add texture">
       <Subcolumn vislevel="3">
         <Row popup="false" name="B11">
           <Rhs vislevel="1" flags="1">
@@ -233,12 +233,29 @@
               <Row name="nsize">
                 <Rhs vislevel="1" flags="1">
                   <Expression caption="Image size (pixels)"/>
-                  <Subcolumn vislevel="0"/>
+                  <Subcolumn vislevel="0">
+                    <Row name="caption">
+                      <Rhs vislevel="0" flags="4">
+                        <iText/>
+                      </Rhs>
+                    </Row>
+                    <Row name="expr">
+                      <Rhs vislevel="0" flags="4">
+                        <iText formula="256"/>
+                      </Rhs>
+                    </Row>
+                    <Row name="super">
+                      <Rhs vislevel="1" flags="4">
+                        <Subcolumn vislevel="0"/>
+                        <iText/>
+                      </Rhs>
+                    </Row>
+                  </Subcolumn>
                   <iText/>
                 </Rhs>
               </Row>
             </Subcolumn>
-            <iText formula="Pattern_images_item.Fractal_item.action"/>
+            <iText formula="Pattern_images_item.Noise_item.Fractal_item.action"/>
           </Rhs>
         </Row>
         <Row popup="false" name="B12">
@@ -479,6 +496,11 @@
                   <iText/>
                 </Rhs>
               </Row>
+              <Row name="geo">
+                <Rhs vislevel="0" flags="4">
+                  <iText/>
+                </Rhs>
+              </Row>
             </Subcolumn>
             <iText formula="Image_crop_item.action B3"/>
           </Rhs>
@@ -492,7 +514,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1060" y="0" open="true" selected="false" sform="false" next="27" name="C" caption="make shadow">
+    <Column x="1048" y="0" open="true" selected="false" sform="false" next="27" name="C" caption="make shadow">
       <Subcolumn vislevel="3">
         <Row popup="false" name="C7">
           <Rhs vislevel="0" flags="4">
@@ -893,9 +915,9 @@
                   <iText/>
                 </Rhs>
               </Row>
-              <Row name="interp">
-                <Rhs vislevel="1" flags="4">
-                  <Subcolumn vislevel="0"/>
+              <Row name="kernel">
+                <Rhs vislevel="2" flags="6">
+                  <Subcolumn vislevel="1"/>
                   <iText/>
                 </Rhs>
               </Row>
@@ -1008,7 +1030,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1734" y="0" open="true" selected="false" sform="false" next="19" name="D" caption="position and blend layers">
+    <Column x="1729" y="0" open="true" selected="false" sform="false" next="19" name="D" caption="position and blend layers">
       <Subcolumn vislevel="3">
         <Row popup="false" name="D10">
           <Rhs vislevel="0" flags="4">
@@ -1230,7 +1252,7 @@
         </Row>
         <Row popup="false" name="D16">
           <Rhs vislevel="1" flags="1">
-            <iImage window_x="602" window_y="662" window_width="985" window_height="382" image_left="485" image_top="155" image_mag="1" show_status="true" show_paintbox="false" show_convert="false" show_rulers="false" scale="1.44462" offset="-128" falsecolour="false" type="true"/>
+            <iImage window_x="602" window_y="662" window_width="985" window_height="382" image_left="486" image_top="151" image_mag="1" show_status="true" show_paintbox="false" show_convert="false" show_rulers="false" scale="1.44462" offset="-128" falsecolour="false" type="true"/>
             <Subcolumn vislevel="0"/>
             <iText formula="Filter_blend_item.Image_blend_item.action D14 D15 D8"/>
           </Rhs>
@@ -1239,6 +1261,3 @@
     </Column>
   </Workspace>
 </root>
-
-
-

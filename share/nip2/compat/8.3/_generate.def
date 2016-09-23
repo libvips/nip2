@@ -1,0 +1,155 @@
+
+/* make an image of size x by y whose pixels are their coordinates.
+ */
+make_xy x y = im_make_xy (to_real x) (to_real y);
+
+/* make an image with the specified properties ... pixel is (eg.) 
+ * Vector [0, 0, 0], or 12. If coding == labq, we ignore bands, format and
+ * type, generate a 3 band float image, and lab2labq it before handing it
+ * back.
+ */
+image_new w h b fmt coding type pixel xoff yoff
+	= embed 1 0 0 w h im''''
+{
+	b'
+		= 3, coding == Image_coding.LABPACK
+		= b;
+	fmt'
+		= Image_format.FLOAT, coding == Image_coding.LABPACK
+		= fmt;
+	type'
+		= Image_type.LAB, coding == Image_coding.LABPACK
+		= type;
+
+	im = im_black 1 1 (to_real b') + pixel;
+
+	im' = clip2fmt fmt' im;
+
+	im'' 
+		= im_Lab2LabQ im', coding == Image_coding.LABPACK;
+		= im';
+
+	im''' = image_set_type type' im'';
+	im'''' = image_set_origin xoff yoff im''';
+}
+
+mkim options x y b
+    = Image (image_new x y b
+        (opt $format) (opt $coding) (opt $type)
+        (opt $pixel)
+        (opt $xoffset) (opt $yoffset))
+{
+    opt = get_option options [
+        $format => Image_format.UCHAR,
+        $coding => Image_coding.NOCODING,
+        $type => Image_type.sRGB,
+        $pixel => 0,
+        $xoffset => 0,
+        $yoffset => 0
+    ];
+}
+
+/* generate a slice of LAB space size x size pixels for L* == l
+ */
+lab_slice size l 
+	= image_set_type Image_type.LAB im
+{
+    L = image_new size size 1
+		Image_format.FLOAT Image_coding.NOCODING Image_type.B_W l 0 0;
+	A1 = im_fgrey (to_real size) (to_real size);
+
+	/* im_fgrey always makes 0-1, so these ranges can be wired in.
+	 */
+	A2 = A1 * 256 - 128;
+
+	A4 = im_rot90 A2;
+	im = image_set_origin (size / 2) (size / 2) (L ++ A2 ++ A4);
+}
+
+/* Look at Image, try to make a Colour (failing that, a Vector) which is white
+ * for that image type.
+ */
+image_white im
+	= colour_transform_to type white_lab,
+		bands == 3 && coding == Image_coding.NOCODING &&
+		colour_spaces.present 1 type
+	= white_lab,
+		coding == Image_coding.LABPACK
+	= Vector (replicate bands (max_value.lookup 1 0 format))
+{
+	bands = im.bands;
+	type = im.type;
+	format = im.format;
+	coding = im.coding;
+	colour_spaces = Image_type.colour_spaces;
+
+	// white as LAB
+	white_lab = Colour "Lab" [100, 0, 0];
+
+	// maximum value for this numeric type
+	max_value = Table [
+		[255, Image_format.DPCOMPLEX],
+		[255, Image_format.DOUBLE],
+		[255, Image_format.COMPLEX],
+		[255, Image_format.FLOAT],
+		[2 ** 31 - 1, Image_format.INT],
+		[2 ** 32 - 1, Image_format.UINT],
+		[2 ** 15 - 1, Image_format.SHORT],
+		[2 ** 16 - 1, Image_format.USHORT],
+		[2 ** 7 - 1, Image_format.CHAR],
+		[2 ** 8 - 1, Image_format.UCHAR]
+	];
+}
+
+/* Make a seperable gaussian mask.
+ */
+matrix_gaussian_blur radius
+        = im_gauss_imask_sep (radius / 3) 0.2;
+
+/* Make a seperable square mask.
+ */
+matrix_blur radius
+        = Matrix_con (sum mask_sq_line) 0 [mask_sq_line]
+{
+        mask_sq_line = replicate (2 * radius - 1) 1; 
+}
+
+/* Make a colour from a temperature.
+ */
+colour_from_temp T
+	= error (_ "T out of range"), T < 1667 || T > 25000
+	= Colour "Yxy" [50, x, y]
+{
+	// Kim et all approximation
+	// see eg. http://en.wikipedia.org/wiki/Planckian_locus#Approximation
+	x
+		= -0.2661239 * 10 ** 9 / T ** 3 - 0.2343580 * 10 ** 6 / T ** 2 +
+			0.8776956 * 10 ** 3 / T + 0.179910, T < 4000
+		= -3.0258469 * 10 ** 9 / T ** 3 + 2.1070379 * 10 ** 6 / T ** 2 +
+			0.2226347 * 10 ** 3 / T + 0.240390;
+
+	y 
+		= -1.1063814 * x ** 3 - 1.34811020 * x ** 2 + 
+			2.18555832 * x - 0.20219638, T < 2222
+		= -0.9549476 * x ** 3 - 1.37418593 * x ** 2 + 
+			2.09137015 * x - 0.16748867, T < 4000
+		=  3.0817580 * x ** 3 - 5.87338670 * x ** 2 +
+			3.75112997 * x - 0.37001483;
+}
+
+temp_from_colour z
+	= T
+{
+	c = colour_transform_to Image_type.YXY (to_colour z);
+	x = c.value?1;
+	y = c.value?2;
+
+	// McCamy's approximation, see eg. 
+	// http://en.wikipedia.org/wiki/Color_temperature#Approximation
+
+	xe = 0.332;
+	ye = 0.1858;
+	n = (x - xe) / (y - ye);
+	T = -449 * n ** 3 + 3525 * n ** 2 - 6823.3 * n + 5520.33;
+}
+

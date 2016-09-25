@@ -40,7 +40,6 @@ src/parse.c
 src/managedgvalue.c
 src/conversion.c
 src/trace.c
-src/dummy.c
 src/gtkutil.c
 src/slider.c
 src/action.c

@@ -184,7 +184,6 @@ nip2_SOURCES = \
 	plotwindow.h \
 	model.c \
 	model.h \
-	nip2-icon.rc \
 	option.c \
 	option.h \
 	optionview.c \
@@ -296,6 +295,11 @@ nip2_SOURCES = \
 	workspaceview.c \
 	workspaceview.h 
 
+if OS_WIN32
+nip2_SOURCES += \
+	nip2-icon.rc
+endif
+
 helpindex.h: 
 	./makehelpindex.pl $(prefix) > helpindex.h
 nipmarshal.h:
@@ -304,17 +308,9 @@ nipmarshal.c:
 	echo "#include \"nipmarshal.h\"" > nipmarshal.c 
 	glib-genmarshal --prefix=nip --body nipmarshal.list >> nipmarshal.c
 
-nip2-icon.rc:
-	echo 1 ICON \"nip2-icon.ico\" > nip2-icon.rc
-
 .rc.o:
-if OS_WIN32 
 	cp ${top_srcdir}/share/nip2/data/nip2-icon.ico .
 	${WINDRES} $< -o $@ 
-else
-	echo "int poop () {}" >dummy.c 
-	$(CC) -c dummy.c -o $@
-endif
 
 # we have to replace the standard .y.c rule: we are a bison-only GLR parser,
 # so we can't use autoconf's preferred -y yacc-compatibility stuff

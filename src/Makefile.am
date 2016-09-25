@@ -304,9 +304,6 @@ nipmarshal.c:
 	echo "#include \"nipmarshal.h\"" > nipmarshal.c 
 	glib-genmarshal --prefix=nip --body nipmarshal.list >> nipmarshal.c
 
-nip2-icon.rc:
-	echo 1 ICON \"nip2-icon.ico\" > nip2-icon.rc
-
 .rc.o:
 if OS_WIN32 
 	cp ${top_srcdir}/share/nip2/data/nip2-icon.ico .

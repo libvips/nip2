@@ -30,7 +30,6 @@ po/POTFILES
 fred
 po/Makefile.in.in
 src/.deps/
-src/dummy.c
 src/gtksheet-marshal.c
 src/gtksheettypebuiltins.c
 src/lex.c

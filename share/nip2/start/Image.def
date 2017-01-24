@@ -1657,8 +1657,7 @@ Pattern_images_item = class
 				mean = Scale "Mean" 0 255 128;
 				deviation = Scale "Deviation" 0 128 50;
 
-				_result = Image (im_gaussnoise 
-					(to_real nwidth) (to_real nheight) 
+				_result = Image (gaussnoise nwidth nheight 
 					mean.value deviation.value);
 			}
 		}

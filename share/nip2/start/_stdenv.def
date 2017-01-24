@@ -1537,18 +1537,16 @@ hist_match in ref
 
 hist_equalize x = hist_map ((hist_norm @ hist_cum @ hist_find) x) x;
 
-hist_equalize_local w h image
+hist_equalize_local w h l image
 	= oo_unary_function hist_equalize_local_op image, is_class image
-	= lhisteq image, is_image image
+	= out, is_image image
 	= error (_ "bad arguments to " ++ "hist_equalize_local")
 {
 	hist_equalize_local_op = Operator "hist_equalize_local" 
-		(hist_equalize_local w h) Operator_type.COMPOUND_REWRAP false;
+		(hist_equalize_local w h l) Operator_type.COMPOUND_REWRAP false;
 
-	// loop over bands, if necessary
-	lhisteq im
-		= im_lhisteq im (to_real w) (to_real h), get_bands im == 1
-		= (foldl1 join @ map lhisteq @ bandsplit) im;
+	[out] = vips_call "hist_local" 
+		[image, to_real w, to_real h] [$max_slope => to_real l];
 }
 
 // find the threshold below which are percent of the image (percent in [0,1])
@@ -2519,5 +2517,14 @@ worley cell width height
 {
 	[im] = vips_call "worley" [to_real width, to_real height] [
 		$cell_size => to_real cell 
+	];
+}
+
+gaussnoise width height mean sigma
+	= im
+{
+	[im] = vips_call "gaussnoise" [to_real width, to_real height] [
+		$mean => to_real mean,
+		$sigma => to_real sigma
 	];
 }

@@ -36,7 +36,7 @@ so_balance ref_meanmax im1 im2 mask gauss
          im2_cor = im2_cor_a, gauss == false
            = clip2fmt im2_cor_a.format gauss_im
        {gauss_im =
-           im_gaussnoise im2_cor_a.width im2_cor_a.height ref_meanmax?0
+           gaussnoise im2_cor_a.width im2_cor_a.height ref_meanmax?0
 (deviation im2_cor_a);}
                            result = im_blend (get_image mask) (get_image
 im2_cor) (get_image im1);

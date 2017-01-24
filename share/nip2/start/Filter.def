@@ -625,13 +625,16 @@ Filter_enhance_item = class
 	
 				window_width = Expression "Window width" 20;
 				window_height = Expression "Window height" 20;
+				max_slope = Scale "Maxium slope" 0 10 0;
 	
 				_result 
 					= map_unary process x
 				{
 					process in 
 						= hist_equalize_local 
-							window_width.expr window_height.expr in;
+							window_width 
+							window_height 
+							max_slope in;
 				}
 			}
 		}

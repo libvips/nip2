@@ -1527,16 +1527,26 @@ Image_join_item = class
 			bg_colour = Expression "Background colour" 0;
 			halign = Option "Horizontal alignment" valign_names 1;
 			valign = Option "Vertical alignment" halign_names 1;
+			snake = Toggle "Reverse the order of every other row" false; 
 
 			_l 
 				= split_lines ncol.value x.value, is_Group x
 				= split_lines ncol.value x;
 
+			_l'
+				= map2 reverse_if_odd [0..] _l, snake
+				= _l
+			{
+				reverse_if_odd n x
+					= reverse x, n % 2 == 1
+					= x;
+			}
+
 			_result
 				= (image_set_origin 0 0 @
 					foldl1 (join_tb vshim.value bg_colour.expr halign.value) @
 					map (foldl1 (join_lr hshim.value
-						bg_colour.expr valign.value))) (to_list (to_list _l));
+						bg_colour.expr valign.value))) (to_list (to_list _l'));
 		}
 	}
 }

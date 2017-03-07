@@ -1,3 +1,9 @@
+- should parse_float / _int etc. allow leading and trailing spaces?
+
+    (split is_space x)?0
+
+- add entropy menu item
+
 - sharpen should use new interface?
 
 - can we call affine from nip2 vips_call? do we need a double array?

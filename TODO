@@ -4,6 +4,16 @@
 
 - add entropy menu item
 
+- how about adding
+
+	zip2 10 [1..5] == [[10, 1], [10, 2], [10, 3], ..
+
+  should be harmless, and quite useful
+
+  same for zip3 etc. as well
+
+  check zip use, we probably have this code there already, in various places
+
 - sharpen should use new interface?
 
 - can we call affine from nip2 vips_call? do we need a double array?

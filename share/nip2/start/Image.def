@@ -1321,8 +1321,8 @@ Image_draw_item = class
 			_result {
 			_vislevel = 3;
 
-			sx = Expression "Start x" 100;
-			sy = Expression "Start y" 100;
+			sx = Expression "Start x" 0;
+			sy = Expression "Start y" 0;
 
 			e = Option "Flood while" [
 				"Not equal to ink",

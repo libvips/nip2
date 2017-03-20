@@ -2578,3 +2578,20 @@ unpremultiply x
 	}
 }
 
+hist_entropy x 
+	= oo_unary_function hist_entropy_op x, is_class x
+	= entropy x, is_image x 
+	= error (_ "bad arguments to " ++ "hist_entropy")
+{
+	hist_entropy_op = Operator "hist_entropy" 
+		hist_entropy Operator_type.COMPOUND_REWRAP false;
+
+	entropy x
+		= out
+	{
+		[out] = vips_call "hist_entropy" [x] [
+		];
+	}
+}
+
+

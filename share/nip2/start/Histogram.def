@@ -162,6 +162,10 @@ Hist_zerox_item = class
 	}
 }
 
+Hist_entropy_item = class Menuaction "Entropy" "calculate histogram entropy" {
+	action x = hist_entropy x;
+}
+
 #separator
 
 Hist_profile_item = class 

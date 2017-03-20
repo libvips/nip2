@@ -2,8 +2,6 @@
 
     (split is_space x)?0
 
-- add entropy menu item
-
 - how about adding
 
 	zip2 10 [1..5] == [[10, 1], [10, 2], [10, 3], ..

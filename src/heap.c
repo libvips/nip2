@@ -1891,7 +1891,7 @@ heap_ip_to_gvalue( PElement *in, GValue *out )
 			im_ref_string_set( out, name );
 		}
 #if VIPS_MAJOR_VERSION > 7 || VIPS_MINOR_VERSION > 39
-		/* vips_value_set_array_image() is a 7.40 feature.
+		/* vips_value_set_array_*() is a 7.40 feature.
 		 */
 		else if( heap_is_imagevec( in, &result ) &&
 			result ) { 
@@ -1913,6 +1913,16 @@ heap_ip_to_gvalue( PElement *in, GValue *out )
 				 */
 				g_object_ref( ivec[i] ); 
 			}
+		}
+		else if( heap_is_realvec( in, &result ) &&
+			result ) { 
+			double realvec[100];
+			int n;
+
+			if( (n = heap_get_realvec( in, realvec, 100 )) < 0 ) 
+				return( FALSE );
+			g_value_init( out, VIPS_TYPE_ARRAY_DOUBLE );
+			vips_value_set_array_double( out, realvec, n );
 		}
 #endif
 		else {

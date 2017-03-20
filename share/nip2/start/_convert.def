@@ -21,6 +21,36 @@ to_matrix x
 		= error (_ "not image");
 }
 
+/* Try to make a Vector ... works for Vector/Image/Real, plus image/real
+ */
+to_vector x
+	= to_vector x.expr, is_Expression x
+	= x, is_Vector x
+	= oo_unary_function to_vector_op x, is_class x
+	= tov x
+{
+	to_vector_op = Operator "to_vector" tov Operator_type.COMPOUND false;
+
+	tov x
+		= Vector (itov x), is_image x
+		= Vector [x], is_real x
+		= Vector x, is_real_list x
+		= Vector x?0, is_matrix x && len x == 1
+		= Vector (transpose x)?0, is_matrix x && len x?0 == 1
+		= error (_ "bad arguments to " ++ "to_vector");
+
+	itov i
+		= v, is_image i 
+		= error (_ "not image")
+	{
+		m = im_vips2mask ((double) i);
+		v 
+			= m.value?0, m.height == 1
+			= (transpose m.value)?0, m.width == 1
+			= error (_ "image is not 1xN or Nx1");
+	}
+}
+
 /* Try to make an Image ... works for Vector/Matrix/Real, plus image/real
  * Special case for Colour ... pull out the colour_space and set Type in the
  * image.

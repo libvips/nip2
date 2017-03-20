@@ -3,6 +3,8 @@ started 8.5 24/1/17
 - gaussnoise goes via vips8 now
 - add snake option to array join [Joe Padfield]
 - parse_float was broken for numbers starting "0."
+- add alpha section to Image / Band menu ... Flatten, Premultiply,
+  Unpremultiply, Blend
 
 started 8.4.1 25/9/16
 - simplify nip2-icon.rc build, bgilbert

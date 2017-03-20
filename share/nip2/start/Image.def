@@ -1062,6 +1062,30 @@ Image_band_item = class
 
     sep1 = Menuseparator;
 
+	Flatten_item = class Menuaction "_Flatten" "flatten alpha out of image" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			bg = Expression "Background" 0;
+
+			_result = map_unary (flattenimage bg) x;
+		}
+	}
+
+	Premultiply_item = class Menuaction "_Premultiply" "premultiply alpha" {
+		action x = premultiply x;
+	}
+
+	Unpremultiply_item = class 
+		Menuaction "_Unpremultiply" "unpremultiply alpha" {
+		action x = unpremultiply x; 
+	}
+
+	Blend_alpha_item = Filter_blend_item.Blend_alpha_item;
+
+    sep1a = Menuseparator;
+
 	Bandand_item = class
 		Menuaction "Bitwise Band AND" "bitwise AND of image bands" {
 		action x = bandand x;

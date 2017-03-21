@@ -1,5 +1,9 @@
 - seeing occasional "rewind image with active regions" message
 
+- should parse_float / _int etc. allow leading and trailing spaces?
+
+    (split is_space x)?0
+
 - how about adding
 
 	zip2 10 [1..5] == [[10, 1], [10, 2], [10, 3], ..

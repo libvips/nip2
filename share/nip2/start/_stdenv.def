@@ -2528,3 +2528,70 @@ gaussnoise width height mean sigma
 		$sigma => to_real sigma
 	];
 }
+
+flattenimage bg x 
+	= oo_unary_function flatten_op x, is_class x
+	= flt (to_vector bg) x, is_image x 
+	= error (_ "bad arguments to " ++ "flattenimage")
+{
+	flatten_op = Operator "flatten" 
+		(flattenimage bg) Operator_type.COMPOUND_REWRAP false;
+
+	flt bg x
+		= out
+	{
+		[out] = vips_call "flatten" [x] [
+			$background => bg.value 
+		];
+	}
+}
+
+premultiply x 
+	= oo_unary_function premultiply_op x, is_class x
+	= prem x, is_image x 
+	= error (_ "bad arguments to " ++ "premultiply")
+{
+	premultiply_op = Operator "premultiply" 
+		premultiply Operator_type.COMPOUND_REWRAP false;
+
+	prem x
+		= out
+	{
+		[out] = vips_call "premultiply" [x] [
+		];
+	}
+}
+
+unpremultiply x 
+	= oo_unary_function unpremultiply_op x, is_class x
+	= unprem x, is_image x 
+	= error (_ "bad arguments to " ++ "unpremultiply")
+{
+	unpremultiply_op = Operator "unpremultiply" 
+		unpremultiply Operator_type.COMPOUND_REWRAP false;
+
+	unprem x
+		= out
+	{
+		[out] = vips_call "unpremultiply" [x] [
+		];
+	}
+}
+
+hist_entropy x 
+	= oo_unary_function hist_entropy_op x, is_class x
+	= entropy x, is_image x 
+	= error (_ "bad arguments to " ++ "hist_entropy")
+{
+	hist_entropy_op = Operator "hist_entropy" 
+		hist_entropy Operator_type.COMPOUND_REWRAP false;
+
+	entropy x
+		= out
+	{
+		[out] = vips_call "hist_entropy" [x] [
+		];
+	}
+}
+
+

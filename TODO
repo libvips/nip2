@@ -1,3 +1,5 @@
+- seeing occasional "rewind image with active regions" message
+
 - how about adding
 
 	zip2 10 [1..5] == [[10, 1], [10, 2], [10, 3], ..

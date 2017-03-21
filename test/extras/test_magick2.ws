@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.39.0">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/8.5.0">
   <Workspace window_x="0" window_y="28" window_width="1920" window_height="1052" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" locked="false" lpane_position="100" lpane_open="false" rpane_position="400" rpane_open="false" local_defs="// private definitions for this tab&#10;" name="tab2" caption="Default empty tab" filename="$HOME/GIT/nip2/test/workspaces/test_magick2.ws">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="9" name="A" caption="make some images">
       <Subcolumn vislevel="3">

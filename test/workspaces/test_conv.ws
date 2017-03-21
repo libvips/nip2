@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/8.4.0">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/8.5.0">
   <Workspace window_x="50" window_y="30" window_width="788" window_height="1050" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" locked="false" lpane_position="100" lpane_open="false" rpane_position="400" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_conv" caption="Default empty workspace" filename="$HOME/GIT/nip2/test/workspaces/test_conv.ws">
     <Column x="0" y="297" open="true" selected="false" sform="false" next="5" name="A" caption="medium test matrix">
       <Subcolumn vislevel="3">

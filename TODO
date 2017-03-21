@@ -1,3 +1,5 @@
+- add tests for new stuff
+
 - seeing occasional "rewind image with active regions" message
 
 - should parse_float / _int etc. allow leading and trailing spaces?

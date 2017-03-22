@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <root xmlns="http://www.vips.ecs.soton.ac.uk/nip/8.5.0">
-  <Workspace window_x="50" window_y="80" window_width="1258" window_height="799" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" locked="false" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_image" caption="Default empty workspace" filename="$HOME/GIT/nip2/test/workspaces/test_image.ws">
+  <Workspace window_x="36" window_y="64" window_width="1258" window_height="1134" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" locked="false" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_image" caption="Default empty workspace" filename="$HOME/GIT/nip2/test/workspaces/test_image.ws">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="17" name="B" caption="Colour / Colourspace">
       <Subcolumn vislevel="3">
         <Row popup="false" name="B1">
@@ -12,7 +12,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="455" y="0" open="true" selected="false" sform="false" next="10" name="AB" caption="Image / New">
+    <Column x="517" y="0" open="true" selected="false" sform="false" next="10" name="AB" caption="Image / New">
       <Subcolumn vislevel="3">
         <Row popup="false" name="AB1">
           <Rhs vislevel="3" flags="7">
@@ -154,7 +154,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1152" y="0" open="true" selected="false" sform="false" next="49" name="BB" caption="Image / Format">
+    <Column x="1301" y="0" open="true" selected="false" sform="false" next="49" name="BB" caption="Image / Format">
       <Subcolumn vislevel="3">
         <Row popup="false" name="BB1">
           <Rhs vislevel="0" flags="4">
@@ -240,7 +240,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="4875" y="0" open="true" selected="true" sform="false" next="11" name="CB" caption="Image / Join">
+    <Column x="5933" y="0" open="true" selected="false" sform="false" next="11" name="CB" caption="Image / Join">
       <Subcolumn vislevel="3">
         <Row popup="false" name="CB1">
           <Rhs vislevel="0" flags="4">
@@ -496,7 +496,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="5505" y="0" open="true" selected="false" sform="false" next="5" name="DB" caption="Image / Tile">
+    <Column x="6636" y="0" open="true" selected="false" sform="false" next="5" name="DB" caption="Image / Tile">
       <Subcolumn vislevel="3">
         <Row popup="false" name="DB1">
           <Rhs vislevel="0" flags="4">
@@ -615,7 +615,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="2136" y="0" open="true" selected="false" sform="false" next="6" name="EB" caption="Image / Levels">
+    <Column x="2391" y="0" open="true" selected="false" sform="false" next="6" name="EB" caption="Image / Levels">
       <Subcolumn vislevel="3">
         <Row popup="false" name="EB1">
           <Rhs vislevel="0" flags="4">
@@ -789,7 +789,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="2834" y="0" open="true" selected="false" sform="false" next="20" name="FB" caption="Image / Transform">
+    <Column x="3191" y="0" open="true" selected="false" sform="false" next="20" name="FB" caption="Image / Transform">
       <Subcolumn vislevel="3">
         <Row popup="false" name="FB1">
           <Rhs vislevel="0" flags="4">
@@ -1176,7 +1176,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="6240" y="0" open="true" selected="false" sform="false" next="18" name="GB" caption="Image / Patterns">
+    <Column x="7490" y="0" open="true" selected="false" sform="false" next="18" name="GB" caption="Image / Patterns">
       <Subcolumn vislevel="3">
         <Row popup="false" name="GB1">
           <Rhs vislevel="3" flags="7">
@@ -1299,7 +1299,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="6770" y="0" open="true" selected="false" sform="false" next="8" name="HB" caption="Image / Test">
+    <Column x="8081" y="0" open="true" selected="false" sform="false" next="8" name="HB" caption="Image / Test">
       <Subcolumn vislevel="3">
         <Row popup="false" name="HB1">
           <Rhs vislevel="3" flags="7">
@@ -1352,7 +1352,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="3586" y="0" open="true" selected="false" sform="false" next="23" name="A" caption="Image / Band">
+    <Column x="4021" y="0" open="true" selected="false" sform="false" next="23" name="A" caption="Image / Band">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
           <Rhs vislevel="0" flags="4">
@@ -1587,7 +1587,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1561" y="0" open="true" selected="false" sform="false" next="9" name="C" caption="Image / Header">
+    <Column x="1771" y="0" open="true" selected="false" sform="false" next="9" name="C" caption="Image / Header">
       <Subcolumn vislevel="3">
         <Row popup="false" name="C1">
           <Rhs vislevel="0" flags="4">
@@ -1711,7 +1711,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="4123" y="0" open="true" selected="false" sform="false" next="20" name="D" caption="Image / Select">
+    <Column x="5075" y="0" open="true" selected="false" sform="false" next="20" name="D" caption="Image / Select">
       <Subcolumn vislevel="3">
         <Row popup="false" name="D17">
           <Rhs vislevel="0" flags="4">
@@ -1927,6 +1927,86 @@
               </Row>
             </Subcolumn>
             <iText formula="Image_select_item.Threshold_percent_item.action D17"/>
+          </Rhs>
+        </Row>
+      </Subcolumn>
+    </Column>
+    <Column x="4635" y="0" open="true" selected="true" sform="false" next="14" name="F" caption="Image / Alpha">
+      <Subcolumn vislevel="3">
+        <Row popup="false" name="F1">
+          <Rhs vislevel="0" flags="4">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+            <iText formula="B1"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="F2">
+          <Rhs vislevel="3" flags="7">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="1"/>
+            <iText formula="Image_alpha_item.Add_item.action F1"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="F3">
+          <Rhs vislevel="3" flags="7">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="1"/>
+            <iText formula="Image_alpha_item.Flatten_item.action F2"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="F4">
+          <Rhs vislevel="2" flags="4">
+            <iText formula="if min (F3 == F1) == 255 then &quot;ok!&quot; else error &quot;erp&quot;"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="F5">
+          <Rhs vislevel="2" flags="5">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+            <iText formula="Image_alpha_item.Extract_item.action F2"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="F6">
+          <Rhs vislevel="1" flags="4">
+            <iText formula="if min (F5 == 255) == 255 then &quot;ok!&quot; else error &quot;erp!&quot;"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="F7">
+          <Rhs vislevel="2" flags="5">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+            <iText formula="Image_alpha_item.Drop_item.action F2"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="F8">
+          <Rhs vislevel="1" flags="4">
+            <iText formula="if min (F7 == F1) == 255 then &quot;ok!&quot; else error &quot;erp&quot;"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="F9">
+          <Rhs vislevel="2" flags="5">
+            <iImage window_x="72" window_y="72" window_width="570" window_height="727" image_left="272" image_top="326" image_mag="1" show_status="true" show_paintbox="false" show_convert="false" show_rulers="false" scale="1" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+            <iText formula="Image_alpha_item.Premultiply_item.action F2"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="F11">
+          <Rhs vislevel="2" flags="5">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+            <iText formula="Image_alpha_item.Unpremultiply_item.action F9"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="F12">
+          <Rhs vislevel="2" flags="5">
+            <iImage image_left="0" image_top="0" image_mag="0" show_status="false" show_paintbox="false" show_convert="false" show_rulers="false" scale="0" offset="0" falsecolour="false" type="true"/>
+            <Subcolumn vislevel="0"/>
+            <iText formula="Image_alpha_item.Drop_item.action F11"/>
+          </Rhs>
+        </Row>
+        <Row popup="false" name="F13">
+          <Rhs vislevel="1" flags="4">
+            <iText formula="if min (F12 == F1) == 255 then &quot;ok!&quot; else error &quot;erp&quot;"/>
           </Rhs>
         </Row>
       </Subcolumn>

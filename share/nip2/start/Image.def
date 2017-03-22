@@ -1060,30 +1060,6 @@ Image_band_item = class
 
 	Bandwise_item = Image_join_item.Bandwise_item;
 
-    sep1 = Menuseparator;
-
-	Flatten_item = class Menuaction "_Flatten" "flatten alpha out of image" {
-		action x = class
-			_result {
-			_vislevel = 3;
-
-			bg = Expression "Background" 0;
-
-			_result = map_unary (flattenimage bg) x;
-		}
-	}
-
-	Premultiply_item = class Menuaction "_Premultiply" "premultiply alpha" {
-		action x = premultiply x;
-	}
-
-	Unpremultiply_item = class 
-		Menuaction "_Unpremultiply" "unpremultiply alpha" {
-		action x = unpremultiply x; 
-	}
-
-	Blend_alpha_item = Filter_blend_item.Blend_alpha_item;
-
     sep1a = Menuseparator;
 
 	Bandand_item = class
@@ -1145,6 +1121,64 @@ Image_band_item = class
 			}
 		}
 	}
+}
+
+Image_alpha_item = class 
+	Menupullright "_Alpha" "manipulate image alpha" {
+
+	Add_item = class Menuaction "_Add" "add alpha" {
+		action x = class
+			_result { 
+			_vislevel = 3;
+
+			opacity = Expression "Opacity (255 == solid)" 255;
+			
+			_result = x ++ to_real opacity;
+		}
+	}
+
+	Flatten_item = class Menuaction "_Flatten" "flatten alpha out of image" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			bg = Expression "Background" 0;
+
+			_result = map_unary (flattenimage bg) x;
+		}
+	}
+
+	Extract_item = class Menuaction "_Extract" "extract alpha" {
+		action x 
+			= map_unary exb x
+		{
+			exb x = extract_bands (x.bands - 1) 1 x;
+		}
+	}
+
+	Drop_item = class Menuaction "_Drop" "drop alpha" {
+		action x 
+			= map_unary exb x
+		{
+			exb x = extract_bands 0 (x.bands - 1) x;
+		}
+	}
+
+    sep1 = Menuseparator;
+
+	Premultiply_item = class Menuaction "_Premultiply" "premultiply alpha" {
+		action x = premultiply x;
+	}
+
+	Unpremultiply_item = class 
+		Menuaction "_Unpremultiply" "unpremultiply alpha" {
+		action x = unpremultiply x; 
+	}
+
+    sep2 = Menuseparator;
+
+	Blend_alpha_item = Filter_blend_item.Blend_alpha_item;
+
 }
 
 Image_crop_item = class 

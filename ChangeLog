@@ -1,3 +1,7 @@
+started 8.5.1 22/1/17
+- fix a crash bug
+- make separate Image / Alpha menu, add Add, Extract, Drop
+
 started 8.5 24/1/17
 - add max_slope to lhist
 - gaussnoise goes via vips8 now

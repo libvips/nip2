@@ -1,9 +1,14 @@
 # nip2 - a user interface for the VIPS image processing library
 
 nip2 is a GUI for the [VIPS image processing 
-library](http://www.vips.ecs.soton.ac.uk). It's a little like a spreadsheet:
+library](https://jcupitt.github.io/libvips). It's a little like a spreadsheet:
 you create a set of formula connecting your objects together, and on a change
 nip2 recalculates.
+
+You can probably install nip2 via your package manager. For
+Windows and OS X, you can download a binary from the [nip2 releases
+area](https://github.com/jcupitt/nip2/releases). Only read on if you want to
+compile yourself from source.
 
 # Building nip2 from source
 
@@ -17,11 +22,6 @@ By default this will install files to `/usr/local`.
 
 See the Dependencies section below for a list of the things that
 nip2 needs in order to be able to build.
-
-We have detailed guides on the wiki for [building on
-Windows](http://www.vips.ecs.soton.ac.uk/index.php?title=Build_on_windows)
-and [building on OS
-X](http://www.vips.ecs.soton.ac.uk/index.php?title=Build_on_OS_X).
 
 If you downloaded from GIT you'll need:
 

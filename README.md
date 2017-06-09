@@ -75,3 +75,16 @@ Disclaimer: No guarantees of performance accompany this software, nor is any
 responsibility assumed on the part of the authors. Please read the licence
 agreement.
 
+## snapcraft
+
+to try out
+
+	cd snap
+	snapcraft prime
+	sudo snap try --devmode prime
+
+see also
+
+	https://github.com/8none1/gedit310/blob/master/snapcraft.yaml
+	https://tutorials.ubuntu.com/tutorial/create-first-snap
+	https://build.snapcraft.io/

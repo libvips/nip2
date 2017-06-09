@@ -1,0 +1,52 @@
+name: nip2 # you probably want to 'snapcraft register <name>'
+version: '8.5.1' 
+summary: An image-processing spreadsheet.
+description: |
+  nip2 is half-way between a spreadsheet and a paint program. 
+  It's terrible for retouching photographs, but very handy for automating image 
+  processing tasks. 
+
+  It can process multi-gigabyte images efficiently. It has good support for 
+  scientific image formats. It's much faster and more flexible than tools like 
+  ImageJ. 
+
+grade: devel # must be 'stable' to release into candidate/stable channels
+confinement: devmode # use 'strict' once you have the right plugs and slots
+
+apps:
+  nip2:
+    command:  desktop-launch nip2
+    plugs: [x11, home, gsettings]
+
+parts:
+  vips-part:
+    source: https://github.com/jcupitt/libvips
+    source-branch: master
+    source-type: git
+    plugin: autotools
+    build-packages:
+        -    gobject-introspection
+        -    intltool
+        -    libgirepository1.0-dev
+        -    libglib2.0-dev
+
+  nip2-part:
+    source: https://github.com/jcupitt/nip2
+    source-branch: master
+    source-type: git
+    plugin: autotools
+    build-packages:
+        -    gobject-introspection
+        -    intltool
+        -    libgirepository1.0-dev
+        -    libglib2.0-dev
+        -    libgtk-2-dev
+        -    libx11-dev
+        -    libxml2-dev
+        -    flex
+        -    bison
+        -    libfftw3-dev
+        -    libgoffice-0.8-dev
+        -    libgsl-dev
+        -    libgvc6
+

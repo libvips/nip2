@@ -1,3 +1,7 @@
+nip2_*.snap
+snap/parts
+snap/prime
+snap/stage
 INSTALL
 test-driver
 test/test-suite.log

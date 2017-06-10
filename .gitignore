@@ -1,4 +1,4 @@
-nip2_*.snap
+*.snap
 snap/parts
 snap/prime
 snap/stage

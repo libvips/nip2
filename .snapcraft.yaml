@@ -1,4 +1,5 @@
 name: vips-nip2 
+icon: share/nip2/data/vips-128.png
 version: 'master'
 summary: An image-processing spreadsheet.
 description: |
@@ -18,6 +19,7 @@ confinement: strict
 apps:
   nip2:
     command:  desktop-launch nip2
+    desktop: nip2.desktop
     plugs: [x11, home, gsettings]
 
 parts:

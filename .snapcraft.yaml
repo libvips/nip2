@@ -29,6 +29,7 @@ parts:
     source-type: git
     plugin: autotools
     build-packages:
+        -    gtk-doc-tools
         -    gobject-introspection
         -    intltool
         -    libgirepository1.0-dev
@@ -45,11 +46,16 @@ parts:
         -    libgif-dev
         -    libpoppler-dev
         -    librsvg2-dev
-        -    libmagickcore-dev
+        -    libmagickcore-6.q16-dev
         -    libexif-dev
         -    libgsf-1-dev
         -    liblcms2-dev
-        -    libpng16-dev
+        -    libpng12-dev
+        -    libfontconfig1-dev
+        -    libgdk-pixbuf2.0-dev
+        -    libfreetype6-dev
+        -    libxft-dev
+        -    libcairo2-dev
         -    libpango1.0-dev
         -    liborc-0.4-dev
         -    libwebp-dev

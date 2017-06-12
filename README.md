@@ -75,3 +75,10 @@ Disclaimer: No guarantees of performance accompany this software, nor is any
 responsibility assumed on the part of the authors. Please read the licence
 agreement.
 
+# snapcraft
+
+Rebuild snap with:
+
+	snapcraft cleanbuild 
+
+Though it's done automatically on a push.

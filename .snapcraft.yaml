@@ -19,7 +19,7 @@ confinement: strict
 apps:
   nip2:
     command:  desktop-launch nip2
-    desktop: nip2.desktop
+    desktop: share/applications/nip2.desktop
     plugs: [x11, home, gsettings]
 
 parts:

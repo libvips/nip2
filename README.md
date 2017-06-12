@@ -1,5 +1,8 @@
 # nip2 - a user interface for the VIPS image processing library
 
+[![Snap
+Status](https://build.snapcraft.io/badge/jcupitt/nip2.svg)](https://build.snapcraft.io/user/jcupitt/nip2)
+
 nip2 is a GUI for the [VIPS image processing 
 library](https://jcupitt.github.io/libvips). It's a little like a spreadsheet:
 you create a set of formula connecting your objects together, and on a change

@@ -6,7 +6,7 @@ nipdata_DATA = \
 	sRGB.icm \
 	macbeth_lab_d65.mat \
 	macbeth_lab_d50.mat \
-	vips-128.png \
+	nip2.png \
 	nip2-icon.ico \
 	cmyk.icm \
 	stock-tool-ink-22.png \

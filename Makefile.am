@@ -37,6 +37,8 @@ if UPDATE_DESKTOP
 install-data-hook:
 	-$(UPDATE_MIME_DATABASE) ${DESTDIR}$(datadir)/mime
 	-$(UPDATE_DESKTOP_DATABASE) ${DESTDIR}$(datadir)/applications
+	$(mkinstalldirs) ${DESTDIR}$(datadir)/icons/hicolor/128x128/apps
+	-cp share/nip2/data/nip2.png ${DESTDIR}$(datadir)/icons/hicolor/128x128/apps
 endif
 
 dist-hook:

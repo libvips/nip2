@@ -367,8 +367,7 @@ about_build( iDialog *idlg, GtkWidget *work )
 	gtk_container_add( GTK_CONTAINER( work ), hb );
 	gtk_widget_show( hb );
 
-	image = image_new_from_file( 
-		"$VIPSHOME/share/$PACKAGE/data/vips-128.png" );
+	image = image_new_from_file( "$VIPSHOME/share/$PACKAGE/data/nip2.png" );
         gtk_box_pack_start( GTK_BOX( hb ), image, FALSE, FALSE, 2 );
 	gtk_widget_show( image );
 

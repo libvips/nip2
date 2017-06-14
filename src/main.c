@@ -794,7 +794,7 @@ main_x_init( int *argc, char ***argv )
 	/* Set the default icon. 
 	 */
 	im_strncpy( buf, 
-		"$VIPSHOME/share/$PACKAGE/data/vips-128.png", FILENAME_MAX );
+		"$VIPSHOME/share/$PACKAGE/data/nip2.png", FILENAME_MAX );
 	path_expand( buf );
 	gtk_window_set_default_icon_from_file( buf, NULL );
 

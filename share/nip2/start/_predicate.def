@@ -232,6 +232,7 @@ get_type x
 
 	get_type_im im
 		= Image_type.LABQ, coding == Image_coding.LABPACK
+		= Image_type.scRGB, coding == Image_coding.RAD
 		= Image_type.GREY16, type == Image_type.GREY16 && is_bands 1
 		= Image_type.HISTOGRAM, type == Image_type.HISTOGRAM && 
 			(width == 1 || height == 1)
@@ -252,6 +253,7 @@ get_type x
 		// Colour/Convert To menu can make, excluding mono.
 		ok_types = [
 			Image_type.sRGB, 
+			Image_type.scRGB, 
 			Image_type.RGB16, 
 			Image_type.LAB, 
 			Image_type.LABQ, 

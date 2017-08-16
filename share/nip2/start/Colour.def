@@ -83,6 +83,11 @@ Colour_convert_item = class
 		action x = conv Image_type.sRGB x;
 	}
 
+	scRGB_item = class
+		Menuaction (_ "_scRGB") (_ "convert to scRGB colourspace") {
+		action x = conv Image_type.scRGB x;
+	}
+
 	GREY16_item = class
 		Menuaction (_ "_GREY16") (_ "convert to GREY16 colourspace") {
 		action x = conv Image_type.GREY16 x;
@@ -153,6 +158,11 @@ Colour_tag_item = class
 	sRGB_item = class
 		Menuaction (_ "_sRGB") (_ "tag as being in sRGB colourspace") {
 		action x = tag Image_type.sRGB x;
+	}
+
+	scRGB_item = class
+		Menuaction (_ "_scRGB") (_ "tag as being in scRGB colourspace") {
+		action x = tag Image_type.scRGB x;
 	}
 
 	RGB16_item = class

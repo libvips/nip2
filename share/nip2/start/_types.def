@@ -816,6 +816,7 @@ Image_type = class {
 	RGB16 = 25;
 	GREY16 = 26;
 	ARRAY = 27;
+	scRGB = 28;
 
 	/* Table to get names <-> numbers.
 	 */
@@ -836,15 +837,17 @@ Image_type = class {
 		$FOURIER => FOURIER,
 		$RGB16 => RGB16,
 		$GREY16 => GREY16,
-		$ARRAY => ARRAY
+		$ARRAY => ARRAY,
+		$scRGB => scRGB
 	];
 
 	/* Table relating nip's colour space names and VIPS's Type numbers.
-	 * Options generated from this, so match the order to the order in the
-	 * Colour menu.
+	 * Options are generated from this, so match the order to the order in 
+	 * the Colour menu.
 	 */
 	colour_spaces = Enum [
 		$sRGB => sRGB,
+		$scRGB => scRGB,
 		$Lab => LAB,
 		$LCh => LCH,
 		$XYZ => XYZ,
@@ -858,6 +861,7 @@ Image_type = class {
 	image_colour_spaces = Enum [
 		$Mono => B_W,
 		$sRGB => sRGB,
+		$scRGB => scRGB,
 		$RGB16 => RGB16,
 		$GREY16 => GREY16,
 		$Lab => LAB,

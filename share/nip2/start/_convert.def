@@ -373,6 +373,33 @@ im_RGB162GREY16 in
 im_GREY162RGB16 in 
 	= image_set_type Image_type.RGB16 (in ++ in ++ in);
 
+/* The vips8 scRGB functions.
+ */
+
+im_sRGB2scRGB in
+	= out
+{
+	[out] = vips_call "sRGB2scRGB" [in] [];
+}
+
+im_scRGB2sRGB in
+	= out
+{
+	[out] = vips_call "scRGB2sRGB" [in] [];
+}
+
+im_scRGB2XYZ in
+	= out
+{
+	[out] = vips_call "scRGB2XYZ" [in] [];
+}
+
+im_XYZ2scRGB in
+	= out
+{
+	[out] = vips_call "XYZ2scRGB" [in] [];
+}
+
 /* apply a func to an image ... make it 1 or 3 bands, and reapply other bands
  * on the way out. Except if it's LABPACK.
  */
@@ -457,6 +484,7 @@ _colour_conversion_table = [
 	[B_W, UCS, im_XYZ2UCS @ im_sRGB2XYZ @ im_mono2sRGB @ im_clip],
 	[B_W, RGB, im_XYZ2disp @ im_sRGB2XYZ @ im_mono2sRGB @ im_clip],
 	[B_W, sRGB, im_mono2sRGB @ im_clip],
+	[B_W, scRGB, im_sRGB2scRGB @ im_mono2sRGB @ im_clip],
 	[B_W, RGB16, image_set_type RGB16 @ im_8216 @ im_mono2sRGB],
 	[B_W, GREY16, image_set_type GREY16 @ im_8216],
 	[B_W, LABQ, im_Lab2LabQ @ im_sRGB2Lab @ im_mono2sRGB @ im_clip],
@@ -471,6 +499,7 @@ _colour_conversion_table = [
 	[XYZ, UCS, im_XYZ2UCS @ im_clip2f],
 	[XYZ, RGB, im_XYZ2disp @ im_clip2f],
 	[XYZ, sRGB, im_XYZ2sRGB @ im_clip2f],
+	[XYZ, scRGB, im_XYZ2scRGB @ im_clip2f],
 	[XYZ, LABQ, im_Lab2LabQ @ im_XYZ2Lab @ im_clip2f],
 	[XYZ, LABS, im_LabQ2LabS @ im_Lab2LabQ @ im_XYZ2Lab @ im_clip2f],
 
@@ -482,6 +511,7 @@ _colour_conversion_table = [
 	[YXY, UCS, im_XYZ2UCS @ im_Yxy2XYZ @ im_clip2f],
 	[YXY, RGB, im_XYZ2disp @ im_Yxy2XYZ @ im_clip2f],
 	[YXY, sRGB, im_XYZ2sRGB @ im_Yxy2XYZ @ im_clip2f],
+	[YXY, scRGB, im_XYZ2scRGB @ im_Yxy2XYZ @ im_clip2f],
 	[YXY, LABQ, im_Lab2LabQ @ im_XYZ2Lab @ im_Yxy2XYZ @ im_clip2f],
 	[YXY, LABS, im_LabQ2LabS @ im_Lab2LabQ @ im_XYZ2Lab @ im_Yxy2XYZ @
 		im_clip2f],
@@ -494,6 +524,7 @@ _colour_conversion_table = [
 	[LAB, UCS, im_Lab2UCS @ im_clip2f],
 	[LAB, RGB, im_Lab2disp @ im_clip2f],
 	[LAB, sRGB, im_Lab2sRGB @ im_clip2f],
+	[LAB, scRGB, im_XYZ2scRGB @ im_Lab2XYZ @ im_clip2f],
 	[LAB, LABQ, im_Lab2LabQ @ im_clip2f],
 	[LAB, LABS, im_Lab2LabS @ im_clip2f],
 
@@ -505,6 +536,7 @@ _colour_conversion_table = [
 	[LCH, UCS, im_LCh2UCS @ im_clip2f],
 	[LCH, RGB, im_Lab2disp @ im_LCh2Lab @ im_clip2f],
 	[LCH, sRGB, im_Lab2sRGB @ im_LCh2Lab @ im_clip2f],
+	[LCH, scRGB, im_XYZ2scRGB @ im_Lab2XYZ @ im_LCh2Lab @ im_clip2f],
 	[LCH, LABQ, im_Lab2LabQ @ im_LCh2Lab @ im_clip2f],
 	[LCH, LABS, im_LabQ2LabS @ im_Lab2LabQ @ im_LCh2Lab @ im_clip2f],
 
@@ -516,6 +548,7 @@ _colour_conversion_table = [
 	[UCS, UCS, image_set_type UCS],
 	[UCS, RGB, im_Lab2disp @ im_UCS2Lab @ im_clip2f],
 	[UCS, sRGB, im_Lab2sRGB @ im_UCS2Lab @ im_clip2f],
+	[UCS, scRGB, im_XYZ2scRGB @ im_Lab2XYZ @ im_UCS2Lab @ im_clip2f],
 	[UCS, LABQ, im_Lab2LabQ @ im_UCS2Lab @ im_clip2f],
 	[UCS, LABS, im_LabQ2LabS @ im_Lab2LabQ @ im_UCS2Lab @ im_clip2f],
 
@@ -527,6 +560,7 @@ _colour_conversion_table = [
 	[RGB, UCS, im_Lab2UCS @ im_disp2Lab @ im_clip],
 	[RGB, RGB, image_set_type RGB],
 	[RGB, sRGB, im_XYZ2sRGB @ im_disp2XYZ @ im_clip],
+	[RGB, scRGB, im_XYZ2scRGB @ im_disp2XYZ @ im_clip],
 	[RGB, RGB16, image_set_type RGB16 @ im_8216],
 	[RGB, GREY16, image_set_type GREY16 @ im_8216 @ im_sRGB2mono],
 	[RGB, LABQ, im_Lab2LabQ @ im_disp2Lab @ im_clip],
@@ -540,14 +574,31 @@ _colour_conversion_table = [
 	[sRGB, UCS, im_XYZ2UCS @ im_sRGB2XYZ @ im_clip],
 	[sRGB, RGB, im_XYZ2disp @ im_sRGB2XYZ @ im_clip],
 	[sRGB, sRGB, image_set_type sRGB],
+	[sRGB, scRGB, im_sRGB2scRGB @ im_clip],
 	[sRGB, RGB16, image_set_type RGB16 @ im_8216],
 	[sRGB, GREY16, image_set_type GREY16 @ im_8216 @ im_sRGB2mono],
 	[sRGB, LABQ, im_Lab2LabQ @ im_sRGB2Lab @ im_clip],
-	[sRGB, LABS, im_LabQ2LabS @ im_Lab2LabQ @ im_sRGB2Lab @ im_clip],
+	[sRGB, LABS, im_Lab2LabS @ im_sRGB2Lab @ im_clip],
+
+	[scRGB, B_W, im_sRGB2mono @ im_scRGB2sRGB],
+	[scRGB, XYZ, im_scRGB2XYZ],
+	[scRGB, YXY, im_XYZ2Yxy @ im_scRGB2XYZ],
+	[scRGB, LAB, im_XYZ2Lab @ im_scRGB2XYZ],
+	[scRGB, LCH, im_Lab2LCh @ im_XYZ2Lab @ im_scRGB2XYZ],
+	[scRGB, UCS, im_XYZ2UCS @ im_scRGB2XYZ],
+	[scRGB, RGB, im_XYZ2disp @ im_scRGB2XYZ],
+	[scRGB, sRGB, im_scRGB2sRGB],
+	[scRGB, scRGB, image_set_type scRGB],
+	[scRGB, RGB16, image_set_type RGB16 @ im_8216 @ im_scRGB2sRGB],
+	[scRGB, GREY16, image_set_type GREY16 @ im_8216 @ im_sRGB2mono @ 
+		im_scRGB2sRGB],
+	[scRGB, LABQ, im_Lab2LabQ @ im_XYZ2Lab @ im_scRGB2XYZ],
+	[scRGB, LABS, im_Lab2LabS @ im_XYZ2Lab @ im_scRGB2XYZ],
 
 	[RGB16, B_W, im_1628 @ im_sRGB2mono],
 	[RGB16, RGB, image_set_type RGB @ im_1628],
 	[RGB16, sRGB, image_set_type sRGB @ im_1628],
+	[RGB16, scRGB, im_sRGB2scRGB],
 	[RGB16, RGB16, image_set_type RGB16],
 	[RGB16, GREY16, im_RGB162GREY16],
 	[RGB16, LABS, im_LabQ2LabS @ im_Lab2LabQ @ im_sRGB2Lab],
@@ -555,6 +606,7 @@ _colour_conversion_table = [
 	[GREY16, B_W, image_set_type B_W @ im_1628],
 	[GREY16, RGB, im_mono2sRGB @ im_1628],
 	[GREY16, sRGB, im_mono2sRGB @ im_1628],
+	[GREY16, scRGB, im_sRGB2scRGB @ im_mono2sRGB],
 	[GREY16, RGB16, im_GREY162RGB16],
 	[GREY16, GREY16, image_set_type GREY16],
 
@@ -566,6 +618,7 @@ _colour_conversion_table = [
 	[LABQ, UCS, im_Lab2UCS @ im_LabQ2Lab],
 	[LABQ, RGB, im_LabQ2disp],
 	[LABQ, sRGB, im_Lab2sRGB @ im_LabQ2Lab],
+	[LABQ, scRGB, im_XYZ2scRGB @ im_Lab2XYZ @ im_LabQ2Lab],
 	[LABQ, LABQ, image_set_type LABQ],
 	[LABQ, LABS, im_LabQ2LabS],
 
@@ -578,8 +631,8 @@ _colour_conversion_table = [
 	[LABS, LCH, im_Lab2LCh @ im_LabQ2Lab @ im_LabS2LabQ @ im_clip2s],
 	[LABS, UCS, im_Lab2UCS @ im_LabQ2Lab @ im_LabS2LabQ @ im_clip2s],
 	[LABS, RGB, im_LabQ2disp @ im_LabS2LabQ @ im_clip2s],
-	[LABS, sRGB, im_XYZ2sRGB @ 
-		im_Lab2XYZ @ im_LabQ2Lab @ im_LabS2LabQ @ im_clip2s],
+	[LABS, sRGB, im_XYZ2sRGB @ im_Lab2XYZ @ im_LabS2Lab @ im_clip2s],
+	[LABS, scRGB, im_XYZ2scRGB @ im_Lab2XYZ @ im_LabS2Lab @ im_clip2s],
 	[LABS, LABQ, im_LabS2LabQ @ im_clip2s],
 	[LABS, LABS, image_set_type LABS]
 ]
@@ -595,6 +648,7 @@ _colour_conversion_table = [
 	UCS = 18;
 	RGB = 17;
 	sRGB = 22;
+	scRGB = 28;
 	RGB16 = 25;
 	GREY16 = 26;
 	LABQ = 16;

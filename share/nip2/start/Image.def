@@ -1177,8 +1177,65 @@ Image_alpha_item = class
 
     sep2 = Menuseparator;
 
-	Blend_alpha_item = Filter_blend_item.Blend_alpha_item;
+	Composite2_item = class 
+		Menuaction "_Composite two" "composite a pair of images" {
+		action x y = class 
+			_result {
+			_vislevel = 3;
 
+			blend = Option_enum (_ "Blend mode") modes "over"
+			{
+				modes = Blend_type.types;
+			}
+			compositing_space = Option_enum (_ "Compositing space") spaces "sRGB"
+			{
+				spaces = Image_type.image_colour_spaces;
+			}
+			premultiplied = Toggle (_ "Premultiplied") false;
+
+			_result 
+				= Image output
+			{
+				[output] = vips_call "composite" 
+					[[y.value, x.value], blend.value] 
+					[$compositing_space => compositing_space.value_thing,
+					 $premultiplied => premultiplied.value
+					];
+			}
+		}
+	}
+
+	Composite3_item = class 
+		Menuaction "_Composite three" "composite three images" {
+		action x y z = class 
+			_result {
+			_vislevel = 3;
+
+			blend1 = Option_enum (_ "Blend mode") modes "over"
+			{
+				modes = Blend_type.types;
+			}
+			blend2 = Option_enum (_ "Blend mode") modes "over"
+			{
+				modes = Blend_type.types;
+			}
+			compositing_space = Option_enum (_ "Compositing space") spaces "sRGB"
+			{
+				spaces = Image_type.image_colour_spaces;
+			}
+			premultiplied = Toggle (_ "Premultiplied") false;
+
+			_result 
+				= Image output
+			{
+				[output] = vips_call "composite" 
+					[[z.value, y.value, x.value], [blend1.value, blend2.value]] 
+					[$compositing_space => compositing_space.value_thing,
+					 $premultiplied => premultiplied.value
+					];
+			}
+		}
+	}
 }
 
 Image_crop_item = class 

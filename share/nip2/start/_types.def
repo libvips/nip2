@@ -1287,3 +1287,105 @@ NULL = class
 			op.op_name == "not_equal"]
 	] ++ super.oo_binary_table op x;
 }
+
+Blend_type = class {
+	CLEAR = 0;
+	SOURCE = 1;
+	OVER = 2;
+	IN = 3;
+	OUT = 4;
+	ATOP = 5;
+	DEST = 6;
+	DEST_OVER = 7;
+	DEST_IN = 8;
+	DEST_OUT = 9;
+	DEST_ATOP = 10;
+	XOR = 11;
+	ADD = 12;
+	SATURATE = 13;
+	MULTIPLY = 14;
+	SCREEN = 15;
+	OVERLAY = 16;
+	DARKEN = 17;
+	LIGHTEN = 18;
+	COLOUR_DODGE = 19;
+	COLOUR_BURN = 20;
+	HARD_LIGHT = 21;
+	SOFT_LIGHT = 22;
+	DIFFERENCE = 23;
+	EXCLUSION = 24;
+
+	/* Table to map blend numbers to descriptive strings
+	 */
+	descriptions = [
+		_ "Clear",
+		_ "Source",
+		_ "Over",
+		_ "In",
+		_ "Out",
+		_ "Atop",
+		_ "Dest",
+		_ "Dest over",
+		_ "Dest in",
+		_ "Dest out",
+		_ "Dest atop",
+		_ "Xor",
+		_ "Add",
+		_ "Saturate",
+		_ "Multiply",
+		_ "Screen",
+		_ "Overlay",
+		_ "Darken",
+		_ "Lighten",
+		_ "Colour dodge",
+		_ "Colour burn",
+		_ "Hard light",
+		_ "Soft light",
+		_ "Difference",
+		_ "Exclusion"
+	];
+
+	/* And to vips enum nicknames.
+	 */
+	types = Enum [
+		$clear => "clear",
+		$source => "source",
+		$over => "over",
+		$in => "in",
+		$out => "out",
+		$atop => "atop",
+		$dest => "dest",
+		$dest_over => "dest_over",
+		$dest_in => "dest_in",
+		$dest_out => "dest_out",
+		$dest_atop => "dest_atop",
+		$xor => "xor",
+		$add => "add",
+		$saturate => "saturate",
+		$multiply => "multiply",
+		$screen => "screen",
+		$overlay => "overlay",
+		$darken => "darken",
+		$lighten => "lighten",
+		$colour_dodge => "colour_dodge",
+		$colour_burn => "colour_burn",
+		$hard_light => "hard_light",
+		$soft_light => "soft_light",
+		$difference => "difference",
+		$exclusion => "exclusion"
+	];
+}
+
+Blend type = class {
+	value = Blend_type.types?type;
+}
+
+Blend_over = Blend Blend_type.OVER;
+
+Blend_picker default = class 
+	Blend blend.value {
+	_vislevel = 2;
+
+	blend = Option "Blend" Blend_type.descriptions default;
+}
+

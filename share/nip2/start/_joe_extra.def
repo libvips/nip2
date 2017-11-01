@@ -362,6 +362,41 @@ Select_item = class
 		}
 	}
 
+	Fill_item = class
+		Menuaction "_Fill" "fill zero pixels with the nearest non-zero" {
+		action x = class 
+			Image _result {
+			_vislevel = 3;
+
+			distance = Image _distance;
+
+			[_result, _distance] = vips_call "fill_nearest" [x.value] [
+				"distance" => true
+			];
+		}
+	}
+
+fill_nearest x 
+	= oo_unary_function nearest_op x, is_class x
+	= near x, is_image x 
+	= error (_ "bad arguments to " ++ "fill_nearest")
+{
+	nearest_op = Operator "fill_nearest" 
+		fill_nearest Operator_type.COMPOUND_REWRAP false;
+
+	near x
+		= [out, distance]
+	{
+		[out, distance] = vips_call "fill_nearest" [x] [
+			"distance" => true
+		];
+	}
+}
+
+
+
+
+
 	};
 
 ////////////////////////////////////////////////////////////////////////////////////

@@ -1434,15 +1434,39 @@ hist_find_nD bins image
 		(hist_find_nD bins) Operator_type.COMPOUND_REWRAP false;
 }
 
-hist_find_indexed index value
+hist_find_indexed mode index value
 	= oo_binary_function hist_find_indexed_op index value, is_class index
 	= oo_binary'_function hist_find_indexed_op index value, is_class value
-	= im_hist_indexed index value, is_image index && is_image value
+	= indexed index value, is_image index && is_image value
 	= error (_ "bad arguments to " ++ "hist_find_indexed")
 {
 	hist_find_indexed_op = Operator "hist_find_indexed" 
-		(compose (compose Plot_histogram) hist_find_indexed) 
+		(compose (compose Plot_histogram) (hist_find_indexed mode)) 
 			Operator_type.COMPOUND false;
+
+	indexed index value
+		= out
+	{
+		[out] = vips_call "hist_find_indexed" [value, index] [
+			"combine" => mode
+		];
+	}
+}
+
+hist_entropy x 
+	= oo_unary_function hist_entropy_op x, is_class x
+	= entropy x, is_image x 
+	= error (_ "bad arguments to " ++ "hist_entropy")
+{
+	hist_entropy_op = Operator "hist_entropy" 
+		hist_entropy Operator_type.COMPOUND_REWRAP false;
+
+	entropy x
+		= out
+	{
+		[out] = vips_call "hist_entropy" [x] [
+		];
+	}
 }
 
 hist_map hist image

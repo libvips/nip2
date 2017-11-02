@@ -3,6 +3,7 @@ started 8.6.0 16/8/17
 - improve radiance support
 - add composite to alpha menu
 - add Image / Select / Fill 
+- add combine mode to indexed histogram
 
 started 8.5.1 22/1/17
 - fix a crash bug

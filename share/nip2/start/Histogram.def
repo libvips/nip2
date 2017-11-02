@@ -80,21 +80,28 @@ Hist_find_item = class
 	Indexed_item = class
 		Menuaction "_Indexed" 
 			"use a 1-band index image to pick bins for an n-band image" {
-		action x y 
-			= map_binary map x y
-		{
-			map a b
-				= hist_find_indexed index im
-			{
-				[im, index] = sortc (const is_index) [a, b];
+		action x y  = class
+			_result {
+			_vislevel = 3;
 
-				is_index x
-					= has_image x && b == 1 && 
-						(f == Image_format.UCHAR || f == Image_format.USHORT)
+			combine = Combine_picker Combine_type.SUM;
+
+			_result
+				= map_binary map x y
+			{
+				map a b
+					= hist_find_indexed combine.value index im
 				{
-					im = get_image x;
-					b = get_bands x;
-					f = get_format x;
+					[im, index] = sortc (const is_index) [a, b];
+
+					is_index x
+						= has_image x && b == 1 && 
+							(f == Image_format.UCHAR || f == Image_format.USHORT)
+					{
+						im = get_image x;
+						b = get_bands x;
+						f = get_format x;
+					}
 				}
 			}
 		}

@@ -1389,3 +1389,22 @@ Blend_picker default = class
 	blend = Option "Blend" Blend_type.descriptions default;
 }
 
+Combine_type = class {
+	MAX = 0;
+	SUM = 1;
+	MIN = 2;
+
+	enum = Enum [
+		_ "Maximum" => MAX,
+		_ "Sum" => SUM,
+		_ "Minimum" => MIN
+	];
+}
+
+Combine type = class {
+	value = Combine_type.enum.names?type;
+}
+
+Combine_sum = Combine Combine_type.SUM;
+
+Combine_picker default = Option "Combine" Combine_type.enum.names default;

@@ -68,8 +68,16 @@ struct _Workspace {
         WorkspaceMode mode;	/* Display mode */
 	gboolean locked;	/* WS has been locked */
 
-	/* Some versions (7.10 etc.) need special compat toolkits. 0 here for
-	 * no compat toolkits loaded.
+	/* The nip2 version that made this workspace.
+	 */
+	int major;
+	int minor;
+
+	/* We may load some compat definitions to support this workspace, if it
+	 * was written by an older version.
+	 *
+	 * The version number of the compat stuff we loaded. Zero for no compat
+	 * stuff loaded.
 	 */
 	int compat_major;
 	int compat_minor;

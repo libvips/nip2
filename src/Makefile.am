@@ -320,7 +320,7 @@ nipmarshal.c:
 nip2-model.o model.o: model.c parse.c
 
 AM_CPPFLAGS = @IP_CFLAGS@ 
-LDADD = @IP_CFLAGS@ @IP_LIBS@ -lfl
+LDADD = @IP_CFLAGS@ @IP_LIBS@ 
 AM_LDFLAGS = @LDFLAGS@
 
 dist-hook:

@@ -1,3 +1,6 @@
+started 8.6.1 1/5/18
+- better enum display in header
+
 started 8.6.0 16/8/17
 - add scRGB support
 - improve radiance support

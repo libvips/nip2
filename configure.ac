@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([nip2], [8.6.0], [vipsip@jiscmail.ac.uk])
+AC_INIT([nip2], [8.6.1], [vipsip@jiscmail.ac.uk])
 
 # foreign stops complaints about a missing README (we use README.md instead)
 # and missing INSTALL (the standard Gnu INSTALL is not very useful)
@@ -17,7 +17,7 @@ dnl
 
 m4_define([nip_major_version], [8])
 m4_define([nip_minor_version], [6])
-m4_define([nip_micro_version], [0])
+m4_define([nip_micro_version], [1])
 m4_define([nip_version],
           [nip_major_version.nip_minor_version.nip_micro_version])
 

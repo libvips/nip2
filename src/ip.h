@@ -157,6 +157,7 @@ extern int statfs();
 #endif /*HAVE_LIBGVC*/
 
 #include <vips/vips.h>
+#include <vips/vips7compat.h>
 #include <vips/debug.h>
 
 #include <libxml/tree.h>

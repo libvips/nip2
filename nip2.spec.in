@@ -5,8 +5,8 @@ Summary:	Interactive tool for working with large images
 
 Group:		Applications/Multimedia
 License:	GPLv2+
-URL:		http://www.vips.ecs.soton.ac.uk/
-Source0:	http://www.vips.ecs.soton.ac.uk/supported/7.14/%{name}-%{version}.tar.gz
+URL:		https://github.com/jcupitt/nip2
+Source0:	https://github.com/jcupitt/nip2/releases
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -32,9 +32,6 @@ GIMP should be used instead.
 
 %prep
 %setup -q
-
-# CVS dirs
-find . -name CVS -type d -print0 | xargs -0 rm -rf
 
 
 %build
@@ -120,6 +117,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sat Jun 10 2008 John Cupitt <jcupitt@gmail.com> - 8.7.0
+- Update URLs
+
 * Sat Jul 19 2008 Jesper Friis <jesper.friis(at)sintef.no> - 7.15.0-1
 - Added this spec file from the Fedora source rpm
 

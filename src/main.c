@@ -94,9 +94,9 @@ static gboolean main_option_benchmark = FALSE;
 gboolean main_option_time_save = FALSE;
 gboolean main_option_profile = FALSE;
 gboolean main_option_i18n = FALSE;
+gboolean main_option_verbose = FALSE;
 static gboolean main_option_print_main = FALSE;
 static gboolean main_option_version = FALSE;
-static gboolean main_option_verbose = FALSE;
 static gboolean main_option_test = FALSE;
 static char *main_option_prefix = NULL;
 
@@ -908,10 +908,6 @@ main_set( const char *str )
 {
 	Symbol *sym;
 
-#ifdef DEBUG
-	printf( "main_set: %s\n", str );
-#endif /*DEBUG*/
-
 	attach_input_string( str );
 	if( !(sym = parse_set_symbol()) ) 
 		return( FALSE );
@@ -1485,9 +1481,14 @@ main( int argc, char *argv[] )
 	if( main_option_set ) {
 		int i;
 
-		for( i = 0; main_option_set[i]; i++ ) 
+		for( i = 0; main_option_set[i]; i++ ) {
+			if( main_option_verbose ) 
+				printf( "main_set: %s\n", main_option_set[i] );
+
 			if( !main_set( main_option_set[i] ) )
-				main_log_add( "%s\n", error_get_sub() );
+				main_log_add( "%s\n%s", 
+					error_get_top(), error_get_sub() );
+		}
 	}
 
 	/* Make sure our start ws doesn't have modified set. We may have

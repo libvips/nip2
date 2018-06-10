@@ -1,5 +1,6 @@
 started 8.7.0 22/5/18
 - added vips7compat.h include for libvips 8.7
+- more output for -V to help debugging CLI mode
 
 started 8.6.1 1/5/18
 - better enum display in header

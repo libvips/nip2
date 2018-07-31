@@ -2617,3 +2617,38 @@ hist_entropy x
 		];
 	}
 }
+
+canny sigma precision x 
+	= oo_unary_function canny_op x, is_class x
+	= canny_im (to_real sigma) (to_int precision) x, is_image x 
+	= error (_ "bad arguments to " ++ "canny")
+{
+	canny_op = Operator "canny" 
+		(canny sigma precision) Operator_type.COMPOUND_REWRAP false;
+
+	canny_im sigma precision x
+		= out
+	{
+		[out] = vips_call "canny" [x] [
+			$sigma => sigma,
+			$precision => precision
+		];
+	}
+
+}
+
+sobel x 
+	= oo_unary_function sobel_op x, is_class x
+	= sobel_im x, is_image x 
+	= error (_ "bad arguments to " ++ "sobel")
+{
+	sobel_op = Operator "sobel" 
+		sobel Operator_type.COMPOUND_REWRAP false;
+
+	sobel_im x
+		= out
+	{
+		[out] = vips_call "sobel" [x] [
+		];
+	}
+}

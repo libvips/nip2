@@ -20,48 +20,6 @@ Filter_conv_item = class
 		action x = map_unary (conv filter_sharp) x;
 	}
 
-	Emboss_item = class
-		Menuaction "_Emboss" "1 pixel displace emboss" {
-		action x = map_unary (conv filter_emboss) x;
-	}
-
-	Laplacian_item = class
-		Menuaction "_Laplacian" "3x3 laplacian edge detect" {
-		action x = map_unary (conv filter_laplacian) x;
-	}
-
-	Sobel_item = class
-		Menuaction "So_bel" "3x3 Sobel edge detect" {
-		action x 
-			= map_unary sobel x
-		{
-			sobel im
-				= abs (a - 128) + abs (b - 128)
-			{
-				a = conv filter_sobel im;
-				b = conv (rot270 filter_sobel) im;
-			}
-		}
-	}
-
-/* 3x3 line detect of image
-diagonals should be scaled down by root(2) I guess
-Kirk 
-*/
-	Linedet_item = class
-		Menuaction "Li_ne Detect" "3x3 line detect" {
-		action x 
-			= map_unary lindet x
-		{
-			lindet im
-				= foldr1 max_pair images
-			{
-				masks = take 4 (iterate rot45 filter_lindet);
-				images = map (converse conv im) masks;
-			}
-		}
-	}
-
 	Usharp_item = class
 		Menuaction "_Unsharp Mask" "cored sharpen of L only in LAB image" {
 		action x = class
@@ -93,6 +51,57 @@ Kirk
 					in'' = sharpen [3, 5, 7, 9, 11, 51]?size st bm dm fs js in';
 					in''' = colour_transform_to (get_type in) in'';
 				}
+			}
+		}
+	}
+
+	Emboss_item = class
+		Menuaction "_Emboss" "1 pixel displace emboss" {
+		action x = map_unary (conv filter_emboss) x;
+	}
+
+	Laplacian_item = class
+		Menuaction "_Laplacian" "3x3 laplacian edge detect" {
+		action x = map_unary (conv filter_laplacian) x;
+	}
+
+	Sobel_item = class
+		Menuaction "So_bel" "3x3 Sobel edge detect" {
+		action x = map_unary sobel x;
+	}
+
+/* 3x3 line detect of image
+diagonals should be scaled down by root(2) I guess
+Kirk 
+*/
+	Linedet_item = class
+		Menuaction "Li_ne Detect" "3x3 line detect" {
+		action x 
+			= map_unary lindet x
+		{
+			lindet im
+				= foldr1 max_pair images
+			{
+				masks = take 4 (iterate rot45 filter_lindet);
+				images = map (converse conv im) masks;
+			}
+		}
+	}
+
+	Canny_item = class
+		Menuaction "Canny" "Canny edge detector" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			sigma = Scale "Sigma" 0.1 10 2;
+			prec = Option "Precision" ["Int", "Float", "Approximate"] 1;
+
+			_result 
+				= map_unary process x
+			{
+				process in
+					= canny sigma prec.value in;
 			}
 		}
 	}

@@ -1902,16 +1902,38 @@ Pattern_images_item = class
 
 			text = String "Text to paint" "<i>Hello</i> world!";
 			font = Fontname "Use font" Workspaces.Preferences.PAINTBOX_FONT;
-			wrap = Expression "Wrap text at" 500;
+			fontfile = Pathname "Font file" "";
+			width = Expression "Text width" 500;
+			height = Expression "Text height" 0;
 			align = Option "Alignment" [
 				"Left",
 				"Centre", 
 				"Right" 
 			] 0;
 			dpi = Expression "DPI" 300;
+			spacing = Expression "Line spacing" 1.1;
 
-			_result = Image (im_text text.value font.value 
-				(to_real wrap) align.value (to_real dpi));
+			_result 
+				= Image out
+			{
+				[out] = vips_call "text" [text.value] 
+					(base_options ++ fontfile_options);
+
+				base_options = [
+					$font => font.value,
+					$width => to_real width,
+					$height => to_real height,
+					$align => align.value,
+					$dpi => to_real dpi,
+					$spacing => to_real spacing
+				];
+			
+				fontfile_options
+					= [$fontfile => fontfile.value],
+						fontfile.value != ""
+					= [];
+			}
+
 		}
 	}
 

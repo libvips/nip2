@@ -1086,9 +1086,8 @@ Kernel_type = class {
 	NEAREST_NEIGHBOUR = 0;
 	LINEAR = 1;
 	CUBIC = 2;
-	MITCHELL = 3;
-	LANCZOS2 = 4;
-	LANCZOS3 = 5;
+	LANCZOS2 = 3;
+	LANCZOS3 = 4;
 
 	// Should introspect to get the list of interpolators :-(
 	// We can "dir" on VipsInterpolate to get a list of them, but we
@@ -1101,7 +1100,6 @@ Kernel_type = class {
 		_ "Nearest neighbour",
 		_ "Linear", 
 		_ "Cubic",
-		_ "Mitchell",
 		_ "Lanczos, two lobes",
 		_ "Lanczos, three lobes"
 	];
@@ -1112,7 +1110,6 @@ Kernel_type = class {
 		"nearest", 
 		"linear", 
 		"cubic", 
-		"mitchell", 
 		"lanczos2", 
 		"lanczos3"
 	];

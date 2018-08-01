@@ -1,0 +1,341 @@
+Hist_new_item = class
+	Menupullright "_New" "new histogram" {
+	Hist_item = class
+		Menuaction "_Identity" "make an identity histogram" {
+		action = class 
+			_result {
+			_vislevel = 3;
+
+			d = Option "Depth" ["8 bit", "16 bit"] 0;
+			_result = Plot [] ([im_identity 1, im_identity_ushort 1 65536]?d);
+		}
+	}
+
+	Hist_new_from_matrix = Matrix_buildlut_item; 
+
+	Hist_from_image_item = class
+		Menuaction "Ta_g Image As Histogram" "set image Type to Histogram" {
+		action x = hist_tag x;
+	}
+
+	Tone_item = class 
+		Menuaction "_Tone Curve" "make a new tone mapping curve" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			d = Option "Depth" ["8 bit", "16 bit"] 0;
+			b = Scale "Black point"  0 100 0;
+			w = Scale "White point"  0 100 100;
+
+			sp = Scale "Shadow point" 0.1 0.3 0.2;
+			mp = Scale "Mid-tone point" 0.4 0.6 0.5;
+			hp = Scale "Highlight point" 0.7 0.9 0.8;
+
+			sa = Scale "Shadow adjust" (-15) 15 0;
+			ma = Scale "Mid-tone adjust" (-30) 30 0;
+			ha = Scale "Highlight adjust" (-15) 15 0;
+
+			_result 
+				= tone_build fmt b w sp mp hp sa ma ha
+			{
+				fmt = [Image_format.UCHAR, Image_format.USHORT]?d;
+			}
+		}
+	}
+}
+
+Hist_convert_to_hist_item = class 
+	Menuaction "Con_vert to Histogram" "convert anything to a histogram" {
+	action x = hist_tag (to_image x);
+}
+
+Hist_find_item = class 
+	Menupullright "_Find" "find a histogram" {
+	Oned_item = class 
+		Menuaction "_One Dimension" 
+			"for a n-band image, make an n-band 1D histogram" {
+		action x = map_unary hist_find x;
+	}
+
+	Nd_item = class 
+		Menuaction "_Many Dimensions" 
+			"for a n-band image, make an n-dimensional histogram" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			// default to something small-ish
+			bins = Expression "Number of bins in each dimension" 8;
+
+			_result 
+				= map_unary process x
+			{
+				process in
+					= hist_find_nD bins in;
+			}
+		}
+	}
+
+	Indexed_item = class
+		Menuaction "_Indexed" 
+			"use a 1-band index image to pick bins for an n-band image" {
+		action x y  = class
+			_result {
+			_vislevel = 3;
+
+			combine = Combine_picker Combine_type.SUM;
+
+			_result
+				= map_binary map x y
+			{
+				map a b
+					= hist_find_indexed combine.value index im
+				{
+					[im, index] = sortc (const is_index) [a, b];
+
+					is_index x
+						= has_image x && b == 1 && 
+							(f == Image_format.UCHAR || f == Image_format.USHORT)
+					{
+						im = get_image x;
+						b = get_bands x;
+						f = get_format x;
+					}
+				}
+			}
+		}
+	}
+}
+
+Hist_map_item = class 
+	Menuaction "_Map" "map an image through a histogram" {
+	action x y
+		= map_binary map x y
+	{
+		map a b
+			= hist_map hist im
+		{
+			[im, hist] = sortc (const is_hist) [a, b];
+		}
+	}
+}
+
+Hist_eq_item = Filter_enhance_item.Hist_equal_item;
+
+#separator
+
+Hist_cum_item = class 
+	Menuaction "_Integrate" 
+		"form cumulative histogram" {
+	action x = map_unary hist_cum x;
+}
+
+Hist_diff_item = class 
+	Menuaction "_Differentiate" 
+		"find point-to-point differences (inverse of Integrate)" {
+	action x = map_unary hist_diff x;
+}
+
+Hist_norm_item = class 
+	Menuaction "N_ormalise" "normalise a histogram" {
+	action x = map_unary hist_norm x;
+}
+
+Hist_inv_item = class 
+	Menuaction "In_vert" "invert a histogram" {
+	action x = map_unary hist_inv x;
+}
+
+Hist_match_item = class 
+	Menuaction "Ma_tch" 
+		"find LUT which will match first histogram to second" {
+	action in ref = map_binary hist_match in ref;
+}
+
+Hist_zerox_item = class 
+	Menuaction "_Zero Crossings" "find zero crossings" {
+	action x = class 
+		_result {
+		_vislevel = 3;
+
+		edge = Option "Direction" [
+			"Positive-going", 
+			"Negative-going"
+		] 0;
+
+		_result 
+			= map_unary (zerox (if edge == 0 then -1 else 1)) x;
+	}
+}
+
+Hist_entropy_item = class Menuaction "Entropy" "calculate histogram entropy" {
+	action x = hist_entropy x;
+}
+
+#separator
+
+Hist_profile_item = class 
+	Menuaction "Find _Profile" 
+		"search from image edges for non-zero pixels" {
+	action x = class  
+		_result {
+		_vislevel = 3;
+
+		edge = Option "Search from" [
+			"Top edge down", 
+			"Left edge to right",
+			"Bottom edge up",
+			"Right edge to left"
+		] 2;
+
+		_result 
+			= map_unary profile x
+		{
+			profile image
+				= (Plot_histogram @ hist_tag) [
+					profilemb 0 image.value,
+					profilemb 1 image.value,
+					profilemb 0 (fliptb image.value),
+					profilemb 1 (fliplr image.value)
+				]?edge;
+
+			// im_profile only does 1 band images :-(
+			profilemb d = bandjoin @ map (converse im_profile d) @ bandsplit;
+		}
+	}
+}
+
+Hist_project_item = class 
+	Menuaction "Find Pro_jections" 
+		"find horizontal and vertical projections" {
+	action x = class {
+		_vislevel = 2;
+
+		_result = map_unary project x;
+
+		// extract the result ... could be a group
+		extr n
+			= Plot_histogram _result?n, is_list _result
+			= Group (map (Plot_histogram @ converse subscript n) _result.value);
+
+		horizontal = extr 0;
+		vertical = extr 1;
+		centre = (gravity horizontal, gravity vertical);
+	}
+}
+
+#separator
+
+Hist_graph_item = class 
+	Menuaction "P_lot Slice" "plot a slice along a guide or arrow" {
+	action x = class 
+		_value {
+		_vislevel = 3;
+
+		width = Scale "Width" 1 40 1;
+		displace = Scale "Horizontal displace" (-50) 50 0; 
+		vdisplace = Scale "Vertical displace" (-50) 50 0; 
+
+		_value
+			= map_unary graph x
+		{
+			graph arrow
+				= hist_tag area'
+			{
+				area = extract_arrow 
+					displace.value vdisplace.value width.value arrow;
+
+				// squish vertically to get an average
+				area' = resize Kernel_linear 1 (1 / width.value) area;
+			}
+		}
+	}
+}
+
+Extract_arrow_item = class 
+	Menuaction "Extract _Arrow" "extract the area around an arrow" {
+	action x = class 
+		_value {
+		_vislevel = 3;
+
+		width = Scale "Width" 1 40 1;
+		displace = Scale "Horizontal displace" (-50) 50 0; 
+		vdisplace = Scale "Vertical displace" (-50) 50 0; 
+
+		_value
+			= map_unary (extract_arrow 
+				displace.value vdisplace.value width.value) x;
+	}
+}
+
+Hist_plot_item = class
+	Menuaction "Plot _Object" 
+		"plot an object as a bar, point or line graph" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		caption = Expression "Chart caption" "none";
+		format = Option_enum "Format" Plot_format.names "YYYY";
+		style = Option_enum "Style" Plot_style.names "Line";
+
+		auto = Toggle "Auto Range" true;
+		xmin = Expression "X range minimum" 0;
+		xmax = Expression "X range maximum" 1;
+		ymin = Expression "Y range minimum" 0;
+		ymax = Expression "Y range maximum" 1;
+		xcaption = Expression "X axis caption" "none";
+		ycaption = Expression "Y axis caption" "none";
+		series_captions = Expression "Series captions" ["Band 0"];
+
+		_result
+			= Plot options (image x)
+		{
+			options
+				= [$style => style.value, $format => format.value] ++ 
+					range ++ captions;
+			range
+				= [], auto
+				= [$xmin => xmin.expr, $xmax => xmax.expr, 
+					$ymin => ymin.expr, $ymax => ymax.expr]; 
+
+			captions 
+				= concat (map test caption_options) ++ 
+				  [$series_captions => series_captions.expr]
+			{
+				caption_options = [
+					$caption => caption.expr,
+					$xcaption => xcaption.expr,
+					$ycaption => ycaption.expr
+				];
+				test x
+					= [], value == "none"
+					= [option_name => value]
+				{
+					[option_name, value] = x;
+				}
+			}
+
+			image x
+				= image (extract_arrow 0 0 1 x), is_Arrow x
+				= get_image x, has_image x
+				= x2b im, b == 1
+				= im
+			{
+				im = get_image (to_image x);
+				w = get_width im;
+				h = get_height im;
+				b = get_bands im;
+
+				// matrix to image makes a 1-band mxn image
+				// we need to put columns into bands
+				x2b im 
+					= bandjoin (map extract_col [0 .. w - 1])
+				{
+						extract_col x = extract_area x 0 1 h im;
+				}
+			}
+		}
+	}
+}

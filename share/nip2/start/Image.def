@@ -1903,7 +1903,7 @@ Pattern_images_item = class
 			text = String "Text to paint" "<i>Hello</i> world!";
 			font = Fontname "Use font" Workspaces.Preferences.PAINTBOX_FONT;
 			fontfile = Pathname "Font file" "";
-			width = Expression "Text width" 500;
+			width = Expression "Text width" 0;
 			height = Expression "Text height" 0;
 			align = Option "Alignment" [
 				"Left",
@@ -1911,29 +1911,31 @@ Pattern_images_item = class
 				"Right" 
 			] 0;
 			dpi = Expression "DPI" 300;
-			spacing = Expression "Line spacing" 1.1;
+			fit = Toggle "Fit text to box" false;
+			spacing = Expression "Line spacing" 0;
 
 			_result 
 				= Image out
 			{
-				[out] = vips_call "text" [text.value] 
-					(base_options ++ fontfile_options);
-
 				base_options = [
 					$font => font.value,
-					$width => to_real width,
-					$height => to_real height,
-					$align => align.value,
-					$dpi => to_real dpi,
-					$spacing => to_real spacing
+					$align => align.value
 				];
-			
-				fontfile_options
-					= [$fontfile => fontfile.value],
-						fontfile.value != ""
-					= [];
-			}
 
+				set_option name default value
+					= [name => value], value != default
+					= [];
+
+				options = base_options ++ concat [
+					set_option $width 0 (to_real width),
+					set_option $height 0 (to_real height),
+					set_option $fontfile "" fontfile.value,
+					if !fit then set_option $dpi 72 (to_real dpi) else [],
+					set_option $spacing 0 (to_real spacing)
+				];
+
+				[out] = vips_call "text" [text.value] options;
+			}
 		}
 	}
 
@@ -1977,7 +1979,7 @@ Pattern_images_item = class
 				_result 
 					= build param (to_real nsize)
 				{
-						param f = f sense.value fc.value 0 0 0 0;
+					param f = f sense.value fc.value 0 0 0 0;
 				}
 			}
 		}
@@ -1998,7 +2000,7 @@ Pattern_images_item = class
 				_result 
 					= build param (to_real nsize)
 				{
-						param f = f (sense.value + 6) fc.value rw.value 0 0 0;
+					param f = f (sense.value + 6) fc.value rw.value 0 0 0;
 				}
 			}
 		}
@@ -2020,7 +2022,7 @@ Pattern_images_item = class
 				_result 
 					= build param (to_real nsize)
 				{
-						param f = f (sense.value + 12) fcx.value fcy.value
+					param f = f (sense.value + 12) fcx.value fcy.value
 							r.value 0 0;
 				}
 			}
@@ -2046,7 +2048,7 @@ Pattern_images_item = class
 				_result 
 					= build param (to_real nsize)
 				{
-						param f = f (sense.value + 4) fc.value ac.value 0 0 0;
+					param f = f (sense.value + 4) fc.value ac.value 0 0 0;
 				}
 			}
 		}
@@ -2068,7 +2070,7 @@ Pattern_images_item = class
 				_result 
 					= build param (to_real nsize)
 				{
-						param f = f (sense.value + 10) fc.value rw.value 
+					param f = f (sense.value + 10) fc.value rw.value 
 							ac.value 0 0;
 				}
 			}
@@ -2092,7 +2094,7 @@ Pattern_images_item = class
 				_result 
 					= build param (to_real nsize)
 				{
-						param f = f (sense.value + 16) fcx.value fcy.value
+					param f = f (sense.value + 16) fcx.value fcy.value
 							r.value ac.value 0;
 				}
 			}
@@ -2119,7 +2121,7 @@ Pattern_images_item = class
 				_result 
 					= build param (to_real nsize)
 				{
-						param f = f (sense.value + 2) order.value fc.value 
+					param f = f (sense.value + 2) order.value fc.value 
 							ac.value 0 0;
 				}
 			}
@@ -2143,8 +2145,8 @@ Pattern_images_item = class
 				_result 
 					= build param (to_real nsize)
 				{
-						param f = f (sense.value + 8) order.value fc.value 
-							rw.value ac.value 0;
+					param f = f (sense.value + 8) order.value fc.value 
+						rw.value ac.value 0;
 				}
 			}
 		}
@@ -2168,8 +2170,8 @@ Pattern_images_item = class
 				_result 
 					= build param (to_real nsize)
 				{
-						param f = f (sense.value + 14) order.value fcx.value
-							fcy.value r.value ac.value;
+					param f = f (sense.value + 14) order.value fcx.value
+						fcy.value r.value ac.value;
 				}
 			}
 		}

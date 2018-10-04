@@ -22,8 +22,8 @@
   </p>
  </description>
  <screenshots>
-   <screenshot type="default" width="739" height="534">https://raw.githubusercontent.com/jcupitt/nip2/master/doc/src/figs/snap1.jpg</screenshot>
+   <screenshot type="default" width="739" height="534">https://raw.githubusercontent.com/libvips/nip2/master/doc/src/figs/snap1.jpg</screenshot>
  </screenshots>
- <url type="homepage">https://jcupitt.github.io/libvips</url>
- <updatecontact>https://github.com/jcupitt/nip2</updatecontact>
+ <url type="homepage">https://libvips.github.io/libvips</url>
+ <updatecontact>https://github.com/libvips/nip2</updatecontact>
 </application>

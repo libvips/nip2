@@ -4,13 +4,13 @@
 Status](https://build.snapcraft.io/badge/jcupitt/nip2.svg)](https://build.snapcraft.io/user/jcupitt/nip2)
 
 nip2 is a GUI for the [VIPS image processing 
-library](https://jcupitt.github.io/libvips). It's a little like a spreadsheet:
+library](https://libvips.github.io/libvips). It's a little like a spreadsheet:
 you create a set of formula connecting your objects together, and on a change
 nip2 recalculates.
 
 You can probably install nip2 via your package manager. For
 Windows and OS X, you can download a binary from the [nip2 releases
-area](https://github.com/jcupitt/nip2/releases). Only read on if you want to
+area](https://github.com/libvips/nip2/releases). Only read on if you want to
 compile yourself from source.
 
 # Building nip2 from source

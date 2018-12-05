@@ -13,6 +13,11 @@ Windows and OS X, you can download a binary from the [nip2 releases
 area](https://github.com/libvips/nip2/releases). Only read on if you want to
 compile yourself from source.
 
+# Documentation
+
+nip2 comes with a 50-page manual --- press F1 or Help / Contents in the
+program to view it.
+
 # Building nip2 from source
 
 In the nip2 directory you should just be able to do:

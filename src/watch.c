@@ -61,9 +61,9 @@ watchgroup_class_init( WatchgroupClass *class )
 		G_SIGNAL_RUN_FIRST,
 		G_STRUCT_OFFSET( WatchgroupClass, watch_changed ),
 		NULL, NULL,
-		g_cclosure_marshal_VOID__POINTER,
+		g_cclosure_marshal_VOID__OBJECT,
 		G_TYPE_NONE, 1,
-		G_TYPE_POINTER );
+		TYPE_WATCH );
 }
 
 static void

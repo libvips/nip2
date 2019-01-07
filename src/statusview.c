@@ -402,7 +402,7 @@ statusview_mouse_band( StatusviewBand *svb, void *e )
 			break;
 			
 		case IM_BANDFMT_UINT:
-			set_glabel( svb->val, "%d", 
+			set_glabel( svb->val, "%u", 
 				((unsigned int *)e)[svb->bandno] );
 			break;
 			

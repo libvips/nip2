@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/8.5.0">
-  <Workspace window_x="50" window_y="30" window_width="788" window_height="1050" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" locked="false" lpane_position="100" lpane_open="false" rpane_position="400" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_conv" caption="Default empty workspace" filename="$HOME/GIT/nip2/test/workspaces/test_conv.ws">
-    <Column x="0" y="297" open="true" selected="false" sform="false" next="5" name="A" caption="medium test matrix">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/8.7.1">
+  <Workspace window_x="0" window_y="28" window_width="1920" window_height="1172" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" locked="false" lpane_position="100" lpane_open="false" rpane_position="400" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_conv" caption="Default empty workspace" filename="$HOME/GIT/nip2/test/workspaces/test_conv.ws" major="8" minor="7">
+    <Column x="0" y="279" open="true" selected="false" sform="false" next="5" name="A" caption="medium test matrix">
       <Subcolumn vislevel="3">
         <Row popup="false" name="A1">
           <Rhs vislevel="3" flags="7">
@@ -96,7 +96,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1051" y="642" open="true" selected="false" sform="false" next="20" name="D" caption="convolve by hand">
+    <Column x="1018" y="586" open="true" selected="false" sform="false" next="20" name="D" caption="convolve by hand">
       <Subcolumn vislevel="3">
         <Row popup="false" name="D19">
           <Rhs vislevel="0" flags="4">
@@ -147,7 +147,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1603" y="0" open="true" selected="true" sform="false" next="21" name="E" caption="check result">
+    <Column x="1570" y="0" open="true" selected="false" sform="false" next="21" name="E" caption="check result">
       <Subcolumn vislevel="3">
         <Row popup="false" name="E16">
           <Rhs vislevel="0" flags="4">
@@ -230,7 +230,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="892" open="true" selected="false" sform="false" next="5" name="F" caption="large test matrix">
+    <Column x="0" y="806" open="true" selected="false" sform="false" next="5" name="F" caption="large test matrix">
       <Subcolumn vislevel="3">
         <Row popup="false" name="F1">
           <Rhs vislevel="3" flags="7">
@@ -289,7 +289,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="0" y="124" open="true" selected="false" sform="false" next="7" name="G" caption="small test matrix">
+    <Column x="0" y="122" open="true" selected="false" sform="false" next="7" name="G" caption="small test matrix">
       <Subcolumn vislevel="3">
         <Row popup="false" name="G6">
           <Rhs vislevel="1" flags="4">
@@ -305,7 +305,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1051" y="0" open="true" selected="false" sform="false" next="8" name="H" caption="convolve by hand">
+    <Column x="1018" y="0" open="true" selected="false" sform="false" next="8" name="H" caption="convolve by hand">
       <Subcolumn vislevel="3">
         <Row popup="false" name="H1">
           <Rhs vislevel="0" flags="4">
@@ -356,7 +356,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1051" y="1408" open="true" selected="false" sform="false" next="8" name="I" caption="convolve by hand">
+    <Column x="1018" y="1280" open="true" selected="false" sform="false" next="8" name="I" caption="convolve by hand">
       <Subcolumn vislevel="3">
         <Row popup="false" name="I1">
           <Rhs vislevel="0" flags="4">
@@ -407,7 +407,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1603" y="637" open="true" selected="false" sform="false" next="13" name="N" caption="check result">
+    <Column x="1570" y="541" open="true" selected="false" sform="false" next="13" name="N" caption="check result">
       <Subcolumn vislevel="3">
         <Row popup="false" name="N1">
           <Rhs vislevel="0" flags="4">
@@ -485,7 +485,7 @@
         </Row>
       </Subcolumn>
     </Column>
-    <Column x="1603" y="1428" open="true" selected="false" sform="false" next="13" name="O" caption="check result">
+    <Column x="1570" y="1260" open="true" selected="true" sform="false" next="14" name="O" caption="check result">
       <Subcolumn vislevel="3">
         <Row popup="false" name="O1">
           <Rhs vislevel="0" flags="4">
@@ -556,9 +556,14 @@
             <iText formula="&quot; &quot;"/>
           </Rhs>
         </Row>
+        <Row popup="false" name="O13">
+          <Rhs vislevel="1" flags="4">
+            <iText formula="&quot;allow it to differ slightly because of rounding in vector conv&quot;"/>
+          </Rhs>
+        </Row>
         <Row popup="false" name="O12">
           <Rhs vislevel="1" flags="4">
-            <iText formula="if O10 != O2 then error &quot;match failed&quot; else &quot;ok&quot;"/>
+            <iText formula="if abs (O10 - O2) &gt; 1 then error &quot;match failed&quot; else &quot;ok&quot;"/>
           </Rhs>
         </Row>
       </Subcolumn>

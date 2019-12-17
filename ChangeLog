@@ -1,5 +1,6 @@
 started 8.7.1 13/11/18
 - fix uint status bar pixels >2**31 [Rob Erdmann]
+- fix crash on redhat [bgilbert]
 
 started 8.7.0 22/5/18
 - added vips7compat.h include for libvips 8.7

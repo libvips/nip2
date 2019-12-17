@@ -821,7 +821,8 @@ Name & Description \\
 \ct{map3 fn l1 l2 l3} 	& map 3-ary function \ct{fn} over lists \ct{l1},
 		 	  \ct{l2} and \ct{l3} \\
 \ct{member l x}		& true if \ct{x} is a member of list \ct{l} \\
-\ct{mkset l} 		& remove duplicates from list \ct{l} \\
+\ct{mkset eq l} 	& remove duplicates from list \ct{l} with equality 
+			  function \ct{eq} \\
 \ct{postfix l r} 	& add element \ct{r} to the end of list \ct{l} \\
 \ct{product l} 		& product of list l \\
 \ct{repeat x} 		& make an infinite list of \ct{x}es \\
@@ -1510,7 +1511,7 @@ Class & Description \\
 \subsection{The \ct{Image} class}
 \mylabel{sec:Image}.
 
-say supports mioxed ops with real, vector and complex constants 
+say supports mixed ops with real, vector and complex constants 
 
 \subsection{The \ct{Colour} class}
 \mylabel{sec:colour}

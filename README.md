@@ -1,4 +1,4 @@
-# nip2 - a user interface for the VIPS image processing library
+# nip2 --- a user interface for libvips
 
 [![Snap
 Status](https://build.snapcraft.io/badge/jcupitt/nip2.svg)](https://build.snapcraft.io/user/jcupitt/nip2)

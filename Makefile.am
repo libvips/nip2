@@ -10,6 +10,7 @@ EXTRA_DIST = \
 	doc \
 	proj \
 	m4 \
+	screenshot.png \
 	nip2.desktop.in \
 	nip2.xml \
 	nip2.appdata.xml

@@ -1895,12 +1895,13 @@ heap_ip_to_gvalue( PElement *in, GValue *out )
 		 */
 		else if( heap_is_imagevec( in, &result ) &&
 			result ) { 
-			Imageinfo *iivec[100];
+			Imageinfo *iivec[MAX_VEC];
 			VipsImage **ivec;
 			int n;
 			int i;
 
-			if( (n = heap_get_imagevec( in, iivec, 100 )) < 0 ) 
+			if( (n = heap_get_imagevec( in, 
+				iivec, MAX_VEC )) < 0 ) 
 				return( FALSE );
 			g_value_init( out, VIPS_TYPE_ARRAY_IMAGE );
 			vips_value_set_array_image( out, n ); 
@@ -1916,10 +1917,11 @@ heap_ip_to_gvalue( PElement *in, GValue *out )
 		}
 		else if( heap_is_realvec( in, &result ) &&
 			result ) { 
-			double realvec[100];
+			double realvec[MAX_VEC];
 			int n;
 
-			if( (n = heap_get_realvec( in, realvec, 100 )) < 0 ) 
+			if( (n = heap_get_realvec( in, 
+				realvec, MAX_VEC )) < 0 ) 
 				return( FALSE );
 			g_value_init( out, VIPS_TYPE_ARRAY_DOUBLE );
 			vips_value_set_array_double( out, realvec, n );

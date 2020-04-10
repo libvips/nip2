@@ -1286,6 +1286,29 @@ Image_crop_item = class
 	}
 }
 
+Trim_item = class Menuaction "_Trim" "crop away edges" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		thresh = Scale "threshold" 0 100 10;
+		background = Expression "Background" default_background
+		{
+			default_background 
+				= map mean (bandsplit (extract_area 0 0 1 1 x));
+		}
+
+		_result
+			= Region x l t w h
+		{
+			[l, t, w, h] = vips_call "find_trim" [x.value] [
+				$threshold => thresh.value,
+				$background => background.expr
+			];
+		}
+	}
+}
+
 Image_insert_item = class
 	Menuaction "_Insert" "insert a small image into a large image" {
 	action a b 

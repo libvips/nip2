@@ -1,3 +1,6 @@
+started 8.9.0 10/4/20
+- add find_trim
+
 started 8.7.1 13/11/18
 - fix uint status bar pixels >2**31 [Rob Erdmann]
 - fix crash on redhat [bgilbert]

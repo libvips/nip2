@@ -359,8 +359,10 @@ iimageview_init( iImageview *iimageview )
 	/* Need these events in the enclosing workspaceview.
 	 */
 	gtk_widget_add_events( GTK_WIDGET( iimageview->id ), 
-		GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK |
-		GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK ); 
+		GDK_POINTER_MOTION_MASK | 
+		GDK_POINTER_MOTION_HINT_MASK |
+		GDK_BUTTON_PRESS_MASK | 
+		GDK_BUTTON_RELEASE_MASK ); 
 
 	iimageview->label = gtk_label_new( "" );
         gtk_box_pack_start( GTK_BOX( vbox ), 

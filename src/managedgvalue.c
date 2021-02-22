@@ -100,5 +100,9 @@ managedgvalue_new( Heap *heap, GValue *value )
 	managed_link_heap( MANAGED( managedgvalue ), heap );
 	managedgvalue_set_value( managedgvalue, value );
 
+	/* Not a very good hash.
+	 */
+	MANAGED( managedgvalue )->hash = (guint) G_VALUE_TYPE( value );
+
 	return( managedgvalue );
 }

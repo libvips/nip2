@@ -1,3 +1,75 @@
+started 8.9.0 10/4/20
+- add find_trim
+
+started 8.7.1 13/11/18
+- fix uint status bar pixels >2**31 [Rob Erdmann]
+- fix crash on redhat [bgilbert]
+
+started 8.7.0 22/5/18
+- added vips7compat.h include for libvips 8.7
+- more output for -V to help debugging CLI mode
+- revised Text widget
+- added Canny
+- Sobel uses the new vips_sobel() operator
+- add mitchell kernel
+- add 8.6 compat 
+
+started 8.6.1 1/5/18
+- better enum display in header
+
+started 8.6.0 16/8/17
+- add scRGB support
+- improve radiance support
+- add composite to alpha menu
+- add Image / Select / Fill 
+- add combine mode to indexed histogram
+- better compat handling
+
+started 8.5.1 22/1/17
+- fix a crash bug
+- make separate Image / Alpha menu, add Add, Extract, Drop
+
+started 8.5 24/1/17
+- add max_slope to lhist
+- gaussnoise goes via vips8 now
+- add snake option to array join [Joe Padfield]
+- parse_float was broken for numbers starting "0."
+- add alpha section to Image / Band menu ... Flatten, Premultiply,
+  Unpremultiply, Blend
+- add Entropy to hist menu
+
+started 8.4.1 25/9/16
+- simplify nip2-icon.rc build, bgilbert
+
+started 8.4
+- added Perlin and Worley menu items
+
+started 8.3.1 on 19/5/16
+- disable debug by default, thanks Benjamin
+- configure changes to help win64
+- improve middle-drag in ws and image view
+- be more careful about the name of the image file we remove on close
+- simpler system for positioning new columns
+- rename boostrap.sh as autogen to help snapcraft
+
+started 8.3.0 on 28/3/16
+- move path search stuff into _convert from _magick
+- added autotrace menu item
+- resize now uses vips_resize() behind the scenes
+- added Kernel type for picking interpolators
+
+started 8.2.1 on 4/12/16
+- tiny improvement to idle handling
+- added R2 to linreg and linregw
+- fixed vips_call for image array args
+- changed default unsharp settings to be less brutal and to ban -ve sharpness
+
+started 8.2 on 4/11/15
+- version bump to match vips
+- fix icc_import with RGBA images
+- added mapim and Image / Transform / Map
+- added Filter / Coordinate Transform ... polar and rect in there
+
 started 8.0 on 3/5/15
 - version bump for vips-8.0 release
 - fix a race in Makefile.am, thanks nieder 

@@ -293,7 +293,7 @@ workspaceview_fixed_event_cb( GtkWidget *widget,
 	gboolean handled = FALSE;
 
 #ifdef EVENT
-	printf( "workspaceview_fixed_event_cb %d\n", ev->type );
+	printf( "workspaceview_fixed_event_cb: %d\n", ev->type );
 #endif /*EVENT*/
 
         switch( ev->type ) {
@@ -309,6 +309,10 @@ workspaceview_fixed_event_cb( GtkWidget *widget,
 			}
                 }
 		else if( ev->button.button == 2 ) {
+#ifdef EVENT
+			printf( "workspaceview_fixed_event_cb: start drag\n" ); 
+#endif /*EVENT*/
+
 			wview->drag_x = ev->button.x_root + wview->vp.left;
 			wview->drag_y = ev->button.y_root + wview->vp.top;
 			workspaceview_set_cursor( wview, IWINDOW_SHAPE_MOVE );
@@ -321,6 +325,10 @@ workspaceview_fixed_event_cb( GtkWidget *widget,
 
         case GDK_BUTTON_RELEASE:
                 if( ev->button.button == 2 ) {
+#ifdef EVENT
+			printf( "workspaceview_fixed_event_cb: stop drag\n" ); 
+#endif /*EVENT*/
+
 			workspaceview_set_cursor( wview, IWINDOW_SHAPE_NONE );
 			wview->dragging = FALSE;
 
@@ -331,6 +339,10 @@ workspaceview_fixed_event_cb( GtkWidget *widget,
 
         case GDK_MOTION_NOTIFY:
                 if( wview->dragging && ev->motion.state & GDK_BUTTON2_MASK ) {
+#ifdef EVENT
+			printf( "workspaceview_fixed_event_cb: motion\n" ); 
+#endif /*EVENT*/
+
 			workspaceview_scroll_to( wview, 
 				wview->drag_x - ev->motion.x_root,
 				wview->drag_y - ev->motion.y_root );
@@ -1131,8 +1143,10 @@ workspaceview_init( Workspaceview *wview )
 	 */
 	wview->fixed = gtk_fixed_new();
 	gtk_widget_add_events( GTK_WIDGET( wview->fixed ), 
-		GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK |
-		GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK ); 
+		GDK_POINTER_MOTION_MASK | 
+		GDK_POINTER_MOTION_HINT_MASK |
+		GDK_BUTTON_PRESS_MASK | 
+		GDK_BUTTON_RELEASE_MASK ); 
 	wview->window = gtk_scrolled_window_new( NULL, NULL );
 	gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( wview->window ), 
 		GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
@@ -1147,7 +1161,9 @@ workspaceview_init( Workspaceview *wview )
         g_signal_connect( wview->fixed, "event",
                 G_CALLBACK( workspaceview_fixed_event_cb ), wview );
 	gtk_widget_add_events( GTK_WIDGET( wview->fixed ), 
-		GDK_BUTTON_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK |
+		GDK_BUTTON_MOTION_MASK | 
+		GDK_POINTER_MOTION_HINT_MASK |
+		GDK_BUTTON_PRESS_MASK |
 		GDK_BUTTON_RELEASE_MASK ); 
 
 	hadj = gtk_scrolled_window_get_hadjustment( 

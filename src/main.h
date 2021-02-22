@@ -41,6 +41,7 @@ extern gboolean main_option_time_save;		/* Time save image ops */
 extern gboolean main_option_profile;		/* Profile calcualtion */
 extern gboolean main_option_i18n;		/* Output i18n strings */
 extern gboolean main_option_batch;		/* Running in batch mode */
+extern gboolean main_option_verbose;		/* Verbose output */
 
 /* Styles for buttons etc.
  */

@@ -491,6 +491,7 @@ tree_copy( Compile *compile, ParseNode *node )
 
 	case NODE_NONE:
 	default:
+		copy = NULL; 
 		g_assert( FALSE );
 	}
 

@@ -93,9 +93,9 @@ static gboolean main_option_benchmark = FALSE;
 gboolean main_option_time_save = FALSE;
 gboolean main_option_profile = FALSE;
 gboolean main_option_i18n = FALSE;
+gboolean main_option_verbose = FALSE;
 static gboolean main_option_print_main = FALSE;
 static gboolean main_option_version = FALSE;
-static gboolean main_option_verbose = FALSE;
 static gboolean main_option_test = FALSE;
 static char *main_option_prefix = NULL;
 
@@ -711,6 +711,13 @@ main_toobig_done( iWindow *iwnd,
 	path_map_dir( PATH_TMP, "*.tif",
 		(path_map_fn) main_toobig_done_sub, NULL );
 
+	/* autotrace can make some others.
+	 */
+	path_map_dir( PATH_TMP, "*.ppm",
+		(path_map_fn) main_toobig_done_sub, NULL );
+	path_map_dir( PATH_TMP, "*.svg",
+		(path_map_fn) main_toobig_done_sub, NULL );
+
 	/* Tell space-free indicators to update.
 	 */
 	if( main_imageinfogroup )
@@ -765,10 +772,6 @@ static gboolean
 main_set( const char *str )
 {
 	Symbol *sym;
-
-#ifdef DEBUG
-	printf( "main_set: %s\n", str );
-#endif /*DEBUG*/
 
 	attach_input_string( str );
 	if( !(sym = parse_set_symbol()) ) 
@@ -951,6 +954,11 @@ main( int argc, char *argv[] )
 	 */
 	if( im_init_world( main_argv0 ) )
 		error_exit( "unable to start VIPS" );
+
+	/* The vips8 cache is no use to us. We have our own cache which is
+	 * integrated with our invalidate system. 
+	 */
+	vips_cache_set_max( 0 );
 
 	/* Init i18n ... get catalogues from $VIPSHOME/share/locale so we're
 	 * relocatable.
@@ -1338,9 +1346,14 @@ main( int argc, char *argv[] )
 	if( main_option_set ) {
 		int i;
 
-		for( i = 0; main_option_set[i]; i++ ) 
+		for( i = 0; main_option_set[i]; i++ ) {
+			if( main_option_verbose ) 
+				printf( "main_set: %s\n", main_option_set[i] );
+
 			if( !main_set( main_option_set[i] ) )
-				main_log_add( "%s\n", error_get_sub() );
+				main_log_add( "%s\n%s", 
+					error_get_top(), error_get_sub() );
+		}
 	}
 
 	/* Make sure our start ws doesn't have modified set. We may have

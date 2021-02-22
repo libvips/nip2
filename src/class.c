@@ -1007,13 +1007,9 @@ class_newv( Heap *heap, const char *name, PElement *out, ... )
 static void
 class_typecheck_error( PElement *instance, const char *name, const char *type )
 {
-	PElement val;
-	gboolean res;
 	char txt[1024];
 	VipsBuf buf = VIPS_BUF_STATIC( txt );
-
-	res = class_get_member( instance, name, NULL, &val );
-	g_assert( res );
+	PElement val;
 
 	vips_buf_appendf( &buf, _( "Member \"%s\" of class \"%s\" "
 		"should be of type \"%s\", instead it's:" ), 
@@ -1021,7 +1017,8 @@ class_typecheck_error( PElement *instance, const char *name, const char *type )
 		IOBJECT( PEGETCLASSCOMPILE( instance )->sym )->name, 
 		type );
 	vips_buf_appends( &buf, "\n   " );
-	if( !itext_value( reduce_context, &buf, &val ) )
+	if( class_get_member( instance, name, NULL, &val ) &&
+		!itext_value( reduce_context, &buf, &val ) )
 		return;
 
 	error_top( _( "Bad argument." ) );

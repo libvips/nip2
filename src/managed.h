@@ -72,6 +72,10 @@ struct _Managed {
 
 	 */
 	GSList *sub;		/* Sub-objects ... mark these if we mark this */
+
+	/* Set by subclasses as part of construction.
+	 */
+	guint hash;
 };
 
 typedef struct _ManagedClass {

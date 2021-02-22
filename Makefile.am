@@ -6,32 +6,33 @@ SUBDIRS = \
 	po 
 
 EXTRA_DIST = \
-	bootstrap.sh \
+	autogen.sh \
 	doc \
 	proj \
 	m4 \
-	nip2.desktop.in \
-	nip2.xml \
-	nip2.appdata.xml
+	screenshot.png \
+	nip3.desktop.in \
+	nip3.xml \
+	nip3.appdata.xml
 
-nip2appdir = $(datadir)/applications
+nip3appdir = $(datadir)/applications
 
-nip2mimedir = $(datadir)/mime/packages
+nip3mimedir = $(datadir)/mime/packages
 
-nip2appdatadir = $(datadir)/appdata
+nip3appdatadir = $(datadir)/appdata
 
-nip2app_DATA = nip2.desktop
+nip3app_DATA = nip3.desktop
 
-nip2mime_DATA = nip2.xml
+nip3mime_DATA = nip3.xml
 
-nip2appdata_DATA = nip2.appdata.xml
+nip3appdata_DATA = nip3.appdata.xml
 
 install-exec-hook:
-	-rm -rf ${DESTDIR}$(datadir)/doc/nip2 
-	$(mkinstalldirs) ${DESTDIR}$(datadir)/doc/nip2
-	-cp -r ${top_srcdir}/doc/html ${top_srcdir}/doc/pdf ${DESTDIR}$(datadir)/doc/nip2
-	-rm -rf ${DESTDIR}$(datadir)/doc/nip2/html/CVS
-	-rm -rf ${DESTDIR}$(datadir)/doc/nip2/pdf/CVS
+	-rm -rf ${DESTDIR}$(datadir)/doc/nip3 
+	$(mkinstalldirs) ${DESTDIR}$(datadir)/doc/nip3
+	-cp -r ${top_srcdir}/doc/html ${top_srcdir}/doc/pdf ${DESTDIR}$(datadir)/doc/nip3
+	-rm -rf ${DESTDIR}$(datadir)/doc/nip3/html/CVS
+	-rm -rf ${DESTDIR}$(datadir)/doc/nip3/pdf/CVS
 
 if UPDATE_DESKTOP
 install-data-hook:
@@ -47,7 +48,7 @@ dist-hook:
 
 uninstall-hook:
 # make sure we have write permission for 'rm'
-	-chmod -R u+w ${DESTDIR}$(datadir)/doc/nip2
-	-rm -rf ${DESTDIR}$(datadir)/doc/nip2
+	-chmod -R u+w ${DESTDIR}$(datadir)/doc/nip3
+	-rm -rf ${DESTDIR}$(datadir)/doc/nip3
 	-$(UPDATE_MIME_DATABASE) ${DESTDIR}$(datadir)/mime
 	-$(UPDATE_DESKTOP_DATABASE) ${DESTDIR}$(datadir)/applications

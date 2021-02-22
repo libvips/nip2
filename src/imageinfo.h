@@ -121,6 +121,7 @@ struct _Imageinfo {
 	Imageinfoproxy *proxy;	/* Proxy for IMAGE callbacks */
 
 	gboolean dfile;		/* delete_file on final close */
+	char *delete_filename;  /* and the file we delete */
 
 	gboolean from_file;	/* Set if ->name is a user file */
 	time_t mtime;		/* What mtime was when we loaded this file */

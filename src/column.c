@@ -40,8 +40,6 @@ G_DEFINE_TYPE( Column, column, TYPE_FILEMODEL );
 static int column_left_offset = 0;
 static int column_top_offset = 0;
 
-static const int column_open_max_frames = 10;	/* Max frames we animate */
-
 /* When we merge workspaces we need to scroll to position the last new column
  * in view.
  */
@@ -311,39 +309,10 @@ column_init( Column *col )
         col->last_select = NULL;
 }
 
-static gint
-iobject_name_compare( iObject *a, iObject *b )
-{
-        return( strcasecmp( a->name, b->name ) );
-}
-
-/* Search for the column before this name in alphabetical order.
- */
-static Column *
-column_find_previous( Column *col )
-{
-	Workspace *ws = col->ws;
-
-	GSList *columns;
-	Column *previous_col;
-	int i;
-
-	columns = icontainer_get_children( ICONTAINER( ws ) );
-	columns = g_slist_sort( columns, (GCompareFunc) iobject_name_compare );
-	i = g_slist_index( columns, col );
-	previous_col = NULL; 
-	if( i > 0 )
-		previous_col = COLUMN( g_slist_nth_data( columns, i - 1 ) );  
-	g_slist_free( columns ); 
-
-	return( previous_col );
-}
-
 Column *
 column_new( Workspace *ws, const char *name )
 {
 	Column *col;
-	Column *previous_col;
 
 	if( workspace_column_find( ws, name ) ) {
 		error_top( _( "Name clash." ) );
@@ -358,14 +327,8 @@ column_new( Workspace *ws, const char *name )
 
         subcolumn_new( NULL, col );
 
-	if( (previous_col = column_find_previous( col )) ) {
-		col->x = previous_col->x + 50;
-		col->y = previous_col->y;
-	}
-	else {
-		col->x = ws->vp.left;
-		col->y = ws->vp.top;
-	}
+	col->x = ws->vp.left + 50;
+	col->y = ws->vp.top;
 
 	column_set_last_new( col );
 

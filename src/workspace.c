@@ -28,6 +28,7 @@
  */
 
 /*
+#define DEBUG_VERBOSE
 #define DEBUG
  */
 
@@ -42,10 +43,10 @@ static GSList *workspace_needs_layout = NULL;
 void
 workspace_set_needs_layout( Workspace *ws, gboolean needs_layout )
 {
-#ifdef DEBUG
+#ifdef DEBUG_VERBOSE
 	printf( "workspace_set_needs_layout: %p %s %d\n", 
 		ws, NN( IOBJECT( ws )->name ), needs_layout );
-#endif /*DEBUG*/
+#endif /*DEBUG_VERBOSE*/
 
 	if( !ws->needs_layout && 
 		needs_layout &&
@@ -652,9 +653,9 @@ workspace_changed( iObject *iobject )
 	Workspace *ws;
 	Workspacegroup *wsg;
 
-#ifdef DEBUG
+#ifdef DEBUG_VERBOSE
 	printf( "workspace_changed: %s\n", NN( iobject->name ) );
-#endif /*DEBUG*/
+#endif /*DEBUG_VERBOSE*/
 
 	g_return_if_fail( iobject != NULL );
 	g_return_if_fail( IS_WORKSPACE( iobject ) );
@@ -821,8 +822,8 @@ workspace_load( Model *model,
 		IM_FREEF( xmlFree, txt );
 	}
 
-	(void) get_iprop( xnode, "major", &ws->compat_major );
-	(void) get_iprop( xnode, "minor", &ws->compat_minor );
+	(void) get_iprop( xnode, "major", &ws->major );
+	(void) get_iprop( xnode, "minor", &ws->minor );
 
 	if( !MODEL_CLASS( workspace_parent_class )->
 		load( model, state, parent, xnode ) )
@@ -863,11 +864,9 @@ workspace_save( Model *model, xmlNode *xnode )
 	if( !set_sprop( xthis, "filename", FILEMODEL( wsg )->filename ) )
 		return( NULL );
 
-	if( ws->compat_major ) {
-		if( !set_iprop( xthis, "major", ws->compat_major ) ||
-			!set_iprop( xthis, "minor", ws->compat_minor ) )
-			return( NULL );
-	}
+	if( !set_iprop( xthis, "major", ws->major ) ||
+		!set_iprop( xthis, "minor", ws->minor ) )
+		return( NULL );
 
 	return( xthis );
 }
@@ -990,14 +989,8 @@ workspace_have_compat( int major, int minor, int *best_major, int *best_minor )
 void
 workspace_get_version( Workspace *ws, int *major, int *minor )
 {
-	if( ws->compat_major ) {
-		*major = ws->compat_major;
-		*minor = ws->compat_minor;
-	}
-	else {
-		*major = MAJOR_VERSION;
-		*minor = MINOR_VERSION;
-	}
+	*major = ws->major;
+	*minor = ws->minor;
 }
 
 gboolean
@@ -1028,10 +1021,19 @@ workspace_load_compat( Workspace *ws, int major, int minor )
 		}
 		path_free2( path );
 
+#ifdef DEBUG
+		printf( "workspace_load_compat: loaded %d.%d\n", 
+			best_major, best_minor );
+#endif /*DEBUG*/
+
 		ws->compat_major = best_major;
 		ws->compat_minor = best_minor;
 	}
 	else {
+#ifdef DEBUG
+		printf( "workspace_load_compat: no compat necessary\n" ); 
+#endif /*DEBUG*/
+
 		/* No compat defs necessary for this ws. 
 		 */
 		ws->compat_major = 0;
@@ -1089,6 +1091,9 @@ workspace_init( Workspace *ws )
 	ws->selected = NULL;
 	ws->errors = NULL;
         ws->mode = WORKSPACE_MODE_REGULAR;
+
+	ws->major = MAJOR_VERSION;
+	ws->minor = MINOR_VERSION;
 
 	ws->compat_major = 0;
 	ws->compat_minor = 0;

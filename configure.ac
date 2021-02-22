@@ -1,10 +1,10 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([nip2], [8.0])
+AC_INIT([nip3], [8.9.0], [vipsip@jiscmail.ac.uk])
 
 # foreign stops complaints about a missing README (we use README.md instead)
 # and missing INSTALL (the standard Gnu INSTALL is not very useful)
-AM_INIT_AUTOMAKE([-Wall foreign])
+AM_INIT_AUTOMAKE([-Wno-portability foreign])
 
 AC_CONFIG_HEADERS(config.h)
 AC_CONFIG_MACRO_DIR([m4])
@@ -16,7 +16,7 @@ dnl of them.
 dnl
 
 m4_define([nip_major_version], [8])
-m4_define([nip_minor_version], [0])
+m4_define([nip_minor_version], [9])
 m4_define([nip_micro_version], [0])
 m4_define([nip_version],
           [nip_major_version.nip_minor_version.nip_micro_version])
@@ -66,14 +66,10 @@ if test x"$nip_os_darwin" = "xyes"; then
   AC_DEFINE(OS_DARWIN,1,[native Mac OS X])
 fi
 
-# disable debugging by default for production releases
-m4_define([debug_default],
-  m4_if(m4_eval(nip_minor_version() % 2), [1], [yes], [no]))
-
 AC_ARG_ENABLE(debug,
   AC_HELP_STRING([--enable-debug=@<:@no/minimum/yes@:>@],
     [turn on debugging @<:@default=debug_default()@:>@]),,
-  enable_debug=debug_default())
+  enable_debug=no)
 
 if test "x$enable_debug" = "xyes"; then
   NIP_DEBUG_FLAGS="-DDEBUG_FATAL -DDEBUG_LEAK"
@@ -124,7 +120,7 @@ AC_PROG_LIBTOOL
 AM_WITH_DMALLOC
 
 # i18n
-GETTEXT_PACKAGE=nip2
+GETTEXT_PACKAGE=nip3
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
 	[The prefix for our gettext translation domains.])
@@ -154,7 +150,7 @@ AC_COMPILE_IFELSE([AC_LANG_DEFINES_PROVIDED [`cat $LEX_OUTPUT_ROOT.c`]], [
 ])
 rm -f conftest.l $LEX_OUTPUT_ROOT.c
 
-PKG_CHECK_MODULES(REQUIRED_PACKAGES, gtk+-3.0 libxml-2.0 vips >= 7.30)
+PKG_CHECK_MODULES(REQUIRED_PACKAGES, gtk+-3.0 libxml-2.0 vips >= 8.10)
 IP_CFLAGS="$REQUIRED_PACKAGES_CFLAGS $IP_CFLAGS"
 IP_LIBS="$REQUIRED_PACKAGES_LIBS $IP_LIBS"
 
@@ -197,6 +193,21 @@ if test "x$with_fftw3" != "xno"; then
   IP_LIBS="$FFTW3_LIBS $IP_LIBS"
 fi
 
+# goffice needs libgsf to save plots to files
+AC_ARG_WITH([libgsf], AS_HELP_STRING([--without-libgsf], [build without libgsf (default: test)]))
+
+if test "x$with_libgsf" != "xno"; then
+  PKG_CHECK_MODULES(LIBGSF, libgsf-1,
+    [AC_DEFINE(HAVE_LIBGSF,1,[define if you have libgsf installed.])
+     with_libgsf=yes
+    ],
+    [AC_MSG_WARN([libgsf not found; disabling save plot to file])
+     with_libgsf=no
+    ])
+  IP_CFLAGS="$LIBGSF_CFLAGS $LIBGSF_INCLUDES $IP_CFLAGS"
+  IP_LIBS="$LIBGSF_LIBS $IP_LIBS"
+fi
+
 # optional ... use libgoffice to draw plots
 # pretty basic functionality, really, but we need to be able to build without
 # it for testing
@@ -212,21 +223,6 @@ if test "x$with_libgoffice" != "xno"; then
     ])
   IP_CFLAGS="$LIBGOFFICE_CFLAGS $LIBGOFFICE_INCLUDES $IP_CFLAGS"
   IP_LIBS="$LIBGOFFICE_LIBS $IP_LIBS"
-fi
-
-# use libgsf to save goffice plots to files
-AC_ARG_WITH([libgsf], AS_HELP_STRING([--without-libgsf], [build without libgsf (default: test)]))
-
-if test "x$with_libgsf" != "xno"; then
-  PKG_CHECK_MODULES(LIBGSF, libgsf-1,
-    [AC_DEFINE(HAVE_LIBGSF,1,[define if you have libgsf installed.])
-     with_libgsf=yes
-    ],
-    [AC_MSG_WARN([libgsf not found; disabling save plot to file])
-     with_libgsf=no
-    ])
-  IP_CFLAGS="$LIBGSF_CFLAGS $LIBGSF_INCLUDES $IP_CFLAGS"
-  IP_LIBS="$LIBGSF_LIBS $IP_LIBS"
 fi
 
 # optional ... use libgvc to draw graphs of workspace dependencies
@@ -293,6 +289,9 @@ else
   AM_CONDITIONAL(UPDATE_DESKTOP, false)
 fi
 
+# we always need -lm
+IP_LIBS="$IP_LIBS -lm"
+
 AC_SUBST(IP_CFLAGS)
 AC_SUBST(IP_LIBS)
 
@@ -302,33 +301,38 @@ TOP_SRCDIR=$ac_pwd
 AC_SUBST(TOP_SRCDIR)
 
 AC_OUTPUT([
-	nip2.desktop
+	nip3.desktop
 	Makefile
 	man/Makefile
 	man/man1/Makefile
 	share/Makefile
-	share/nip2/Makefile
-	share/nip2/data/Makefile
-	share/nip2/rc/Makefile
-	share/nip2/start/Makefile
-	share/nip2/compat/Makefile
-	share/nip2/compat/7.8/Makefile
-	share/nip2/compat/7.9/Makefile
-	share/nip2/compat/7.10/Makefile
-	share/nip2/compat/7.12/Makefile
-	share/nip2/compat/7.14/Makefile
-	share/nip2/compat/7.16/Makefile
-	share/nip2/compat/7.24/Makefile
-	share/nip2/compat/7.26/Makefile
-	share/nip2/compat/7.28/Makefile
-	share/nip2/compat/7.38/Makefile
-	share/nip2/compat/7.40/Makefile
+	share/nip3/Makefile
+	share/nip3/data/Makefile
+	share/nip3/rc/Makefile
+	share/nip3/start/Makefile
+	share/nip3/compat/Makefile
+	share/nip3/compat/7.8/Makefile
+	share/nip3/compat/7.9/Makefile
+	share/nip3/compat/7.10/Makefile
+	share/nip3/compat/7.12/Makefile
+	share/nip3/compat/7.14/Makefile
+	share/nip3/compat/7.16/Makefile
+	share/nip3/compat/7.24/Makefile
+	share/nip3/compat/7.26/Makefile
+	share/nip3/compat/7.28/Makefile
+	share/nip3/compat/7.38/Makefile
+	share/nip3/compat/7.40/Makefile
+	share/nip3/compat/8.2/Makefile
+	share/nip3/compat/8.3/Makefile
+	share/nip3/compat/8.4/Makefile
+	share/nip3/compat/8.5/Makefile
+	share/nip3/compat/8.6/Makefile
 	src/BITMAPS/Makefile 
 	src/Makefile
 	test/Makefile
 	test/test_all.sh
 	po/Makefile.in
-	nip2.spec
+	nip3.spec
 ])
 
 # generated script needs to be executable

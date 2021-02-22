@@ -793,7 +793,7 @@ icontainer_class_init( iContainerClass *class )
 		G_SIGNAL_RUN_LAST,
 		G_STRUCT_OFFSET( iContainerClass, child_remove ),
 		NULL, NULL,
-		g_cclosure_marshal_VOID__POINTER,
+		g_cclosure_marshal_VOID__OBJECT,
 		G_TYPE_NONE, 1,
 		TYPE_ICONTAINER );
 
@@ -802,7 +802,7 @@ icontainer_class_init( iContainerClass *class )
 		G_SIGNAL_RUN_LAST,
 		G_STRUCT_OFFSET( iContainerClass, current ),
 		NULL, NULL,
-		g_cclosure_marshal_VOID__POINTER,
+		g_cclosure_marshal_VOID__OBJECT,
 		G_TYPE_NONE, 1,
 		TYPE_ICONTAINER );
 
@@ -811,7 +811,7 @@ icontainer_class_init( iContainerClass *class )
 		G_SIGNAL_RUN_LAST,
 		G_STRUCT_OFFSET( iContainerClass, child_detach ),
 		NULL, NULL,
-		g_cclosure_marshal_VOID__POINTER,
+		g_cclosure_marshal_VOID__OBJECT,
 		G_TYPE_NONE, 1,
 		TYPE_ICONTAINER );
 

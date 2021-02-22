@@ -1140,6 +1140,7 @@ classmodel_get_item( Classmodel *classmodel,
 
 	case CLASSMODEL_MEMBER_REALVEC_FIXED:
 		g_assert( m->extent < 4 );
+
 		if( (l = heap_get_realvec( value, vec, m->extent )) < 0 )
 			return( FALSE );
 		if( l != m->extent ) {
@@ -1169,13 +1170,10 @@ classmodel_get_item( Classmodel *classmodel,
 	}
 
 	case CLASSMODEL_MEMBER_OPTIONS:
-	{
-		ClassmodelClass *class = CLASSMODEL_GET_CLASS( classmodel );
-
 		/* If there are optional fields, we have to have a reset
 		 * method for clearing the ones we don't use.
 		 */
-		g_assert( class->reset );
+		g_assert( CLASSMODEL_GET_CLASS( classmodel )->reset );
 
 		if( heap_map_dict( value, 
 			(heap_map_dict_fn) classmodel_parse_option, 
@@ -1183,7 +1181,6 @@ classmodel_get_item( Classmodel *classmodel,
 			return( FALSE );
 
 		break;
-	}
 
 	case CLASSMODEL_MEMBER_IMAGE:
 	{

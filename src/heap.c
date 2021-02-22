@@ -122,6 +122,7 @@ heap_map( HeapNode *hn, heap_map_fn fn, void *a, void *b )
 	}
 }
 
+#ifdef DEBUG_HEAP_GC
 /* Debugging ... check that all nodes on the free list are TAG_FREE, and that
  * all other nodes are not TAG_FREE.
  */
@@ -164,6 +165,7 @@ heap_check_free( Heap *heap )
 		}
 	}
 }
+#endif /*DEBUG_HEAP_GC*/
 
 #ifdef DEBUG_HEAP_GC
 static void
@@ -180,9 +182,9 @@ heap_check_managed( void *key, void *value, Heap *heap )
 int
 heap_sanity( Heap *heap )
 {
+#ifdef DEBUG_HEAP_GC
 	heap_check_free( heap );
 
-#ifdef DEBUG_HEAP_GC
 	heap_gc( heap );
 	heap_check_free( heap );
 	g_hash_table_foreach( heap->mtable, (GHFunc) heap_check_managed, heap );
@@ -1861,22 +1863,41 @@ heap_ip_to_gvalue( PElement *in, GValue *out )
 			g_value_init( out, IM_TYPE_REF_STRING );
 			im_ref_string_set( out, name );
 		}
-#if VIPS_VERSION_MAJOR > 7 || VIPS_VERSION_MINOR > 39
-		/* vips_value_set_array_image() is a 7.40 feature.
+#if VIPS_MAJOR_VERSION > 7 || VIPS_MINOR_VERSION > 39
+		/* vips_value_set_array_*() is a 7.40 feature.
 		 */
 		else if( heap_is_imagevec( in, &result ) &&
 			result ) { 
-			Imageinfo *iivec[100];
-			VipsImage *ivec[100];
+			Imageinfo *iivec[MAX_VEC];
+			VipsImage **ivec;
 			int n;
 			int i;
 
-			if( (n = heap_get_imagevec( in, iivec, 100 )) < 0 ) 
+			if( (n = heap_get_imagevec( in, 
+				iivec, MAX_VEC )) < 0 ) 
 				return( FALSE );
-			for( i = 0; i < n; i++ )
+			g_value_init( out, VIPS_TYPE_ARRAY_IMAGE );
+			vips_value_set_array_image( out, n ); 
+			ivec = vips_value_get_array_image( out, NULL );
+			for( i = 0; i < n; i++ ) {
 				ivec[i] = imageinfo_get( FALSE, iivec[i] );
 
-			vips_value_set_array_image( out, ivec, n ); 
+				/* g_value_unset() on out will unref every
+				 * array element, so we need to ref.
+				 */
+				g_object_ref( ivec[i] ); 
+			}
+		}
+		else if( heap_is_realvec( in, &result ) &&
+			result ) { 
+			double realvec[MAX_VEC];
+			int n;
+
+			if( (n = heap_get_realvec( in, 
+				realvec, MAX_VEC )) < 0 ) 
+				return( FALSE );
+			g_value_init( out, VIPS_TYPE_ARRAY_DOUBLE );
+			vips_value_set_array_double( out, realvec, n );
 		}
 #endif
 		else {

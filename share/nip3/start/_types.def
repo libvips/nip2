@@ -1,0 +1,1413 @@
+/* A list of things. Do automatic iteration of unary and binary operators on
+ * us. 
+ *	List [1, 2] + [2, 3] -> List [3, 5]
+ *	hd (List [2, 3]) -> 2
+ *	List [] == [] -> true
+ */
+List value = class
+	_Object {
+	_check_args = [
+		[value, "value", check_list]
+	];
+
+	// methods
+    oo_binary_table op x = [
+		[apply2 op value x',
+			op.op_name == "subscript" || op.op_name == "subscript'" ||
+			op.op_name == "equal" || op.op_name == "equal'"],
+		[this.List (apply2 op value x'),
+			op.op_name == "join" || op.op_name == "join'"],
+		[this.List (map2 (apply2 op) value x'),
+			is_list x'],
+		[this.List (map (apply2 op' x) value),
+			true]
+	] ++ super.oo_binary_table op x
+	{
+		op' = oo_converse op;
+
+		// strip the List wrapper, if any
+		x'
+			= x.value, is_List x
+			= x;
+
+		apply2 op x1 x2
+			= oo_binary_function op x1 x2, is_class x1 
+			= oo_binary'_function op x1 x2, is_class x2
+			= op.fn x1 x2;
+	};
+
+	oo_unary_table op = [
+		[apply value,
+			op.op_name == "hd" || op.op_name == "tl"],
+		[this.List (map apply value),
+			true]
+	] ++ super.oo_unary_table op
+	{
+		apply x
+			= oo_unary_function op x, is_class x
+			= op.fn x;
+	}
+}
+
+/* A group of things. Loop the operation over the group.
+ */
+Group value = class 
+	_Object {
+	_check_args = [
+		[value, "value", check_list]
+	];
+
+	// methods
+	oo_binary_table op x = [
+		// if_then_else is really a trinary operator
+		[map_trinary ite this x?0 x?1,
+			op.op_name == "if_then_else"],
+		[map_binary op.fn this x,
+			is_Group x],
+		[map_unary (\a op.fn a x) this,
+			true]
+	] ++ super.oo_binary_table op x;
+
+	oo_unary_table op = [
+		[map_unary op.fn this,
+			true]
+	] ++ super.oo_unary_table op;
+
+	// we can't call map_trinary directly, since it uses Group and we
+	// don't support mutually recursive top-level functions :-(
+	// copy-paste it here, keep in sync with the version in _stdenv
+	map_nary fn args
+		= fn args, groups == []
+		= Group (map process [0, 1 .. shortest - 1])
+	{
+		groups = filter is_Group args;
+	
+		shortest = foldr1 min_pair (map (len @ get_value) groups);
+
+		process n
+			= NULL, any (map (is_noval n) args)
+			= map_nary fn (map (extract n) args)
+		{
+			extract n arg
+				= arg.value?n, is_Group arg
+				= arg;
+	
+			is_noval n arg = is_Group arg && arg.value?n == NULL;
+		}
+	}
+
+	// need ite as a true trinary
+	ite a b c = if a then b else c;
+
+	map_unary fn a = map_nary (list_1ary fn) [a];
+	map_binary fn a b = map_nary (list_2ary fn) [a, b];
+	map_trinary fn a b c = map_nary (list_3ary fn) [a, b, c];
+}
+
+/* Single real number ... eg slider.
+ */
+Real value = class 
+	_Object {
+	_check_args = [
+		[value, "value", check_real]
+	];
+
+	// methods
+	oo_binary_table op x = [
+		[this.Real (op.fn this.value x.value), 
+			is_Real x &&
+			op.type == Operator_type.ARITHMETIC],
+		[this.Real (op.fn this.value x), 
+			is_real x && 
+			op.type == Operator_type.ARITHMETIC],
+		[op.fn this.value x.value, 
+			is_Real x && 
+			op.type == Operator_type.RELATIONAL],
+		[op.fn this.value x, 
+			!is_class x]
+	] ++ super.oo_binary_table op x;
+
+	oo_unary_table op = [
+		[this.Real (op.fn this.value),
+			op.type == Operator_type.ARITHMETIC],
+		[op.fn this.value,
+			true]
+	] ++ super.oo_unary_table op;
+}
+
+/* Single bool ... eg Toggle.
+ */
+Bool value = class 
+	_Object {
+	_check_args = [
+		[value, "value", check_bool]
+	];
+
+	// methods
+	oo_binary_table op x = [
+		[op.fn this.value x, 
+			op.op_name == "if_then_else"],
+		[this.Bool (op.fn this.value x.value), 
+			is_Bool x],
+		[this.Bool (op.fn this.value x), 
+			is_bool x]
+	] ++ super.oo_binary_table op x;
+
+	oo_unary_table op = [
+		[this.Bool (op.fn this.value),
+			op.type == Operator_type.ARITHMETIC ||
+			op.type == Operator_type.RELATIONAL],
+		[op.fn this.value,
+			true]
+	] ++ super.oo_unary_table op;
+}
+
+/* An editable string.
+ */
+String caption value = class 
+	_Object {
+	_check_args = [
+		[caption, "caption", check_string],
+		[value, "value", check_string]
+	];
+}
+
+/* An editable real number.
+ */
+Number caption value = class 
+	scope.Real value {
+	_check_args = [
+		[caption, "caption", check_string]
+	];
+
+	Real x = this.Number caption x;
+}
+
+/* An editable expression.
+ */
+Expression caption expr = class 
+	(if is_class expr then expr else _Object) {
+	_check_args = [
+		[caption, "caption", check_string],
+		[expr, "expr", check_any]
+	];
+}
+
+/* A ticking clock.
+ */
+Clock interval value = class 
+	scope.Real value {
+	_check_args = [
+		[interval, "interval", check_real]
+	];
+
+	Real x = this.Clock interval x;
+}
+
+/* An editable filename.
+ */
+Pathname caption value = class 
+	_Object {
+	_check_args = [
+		[caption, "caption", check_string],
+		[value, "value", check_string]
+	];
+}
+
+/* An editable fontname.
+ */
+Fontname caption value = class 
+	_Object {
+	_check_args = [
+		[caption, "caption", check_string],
+		[value, "value", check_string]
+	];
+}
+
+/* Vector type ... just a finite list of real. Handy for wrapping an
+ * argument to eg. im_lintra_vec. Make it behave like a single pixel image.
+ */
+Vector value = class
+	_Object {
+	_check_args = [
+		[value, "value", check_real_list]
+	];
+
+	bands = len value;
+
+	// methods
+	oo_binary_table op x = [
+		// Vector ++ Vector means bandwise join
+		[this.Vector (op.fn this.value x.value), 
+			is_Vector x &&
+			(op.op_name == "join" || op.op_name == "join'")],
+		[this.Vector (op.fn this.value [get_number x]), 
+			has_number x &&
+			(op.op_name == "join" || op.op_name == "join'")],
+		// Vector ? number means extract element
+		[op.fn this.value (get_real x), 
+			has_real x &&
+			(op.op_name == "subscript" || 
+				op.op_name == "subscript'")],
+		// extra check for lengths equal
+		[this.Vector (map_binaryl op.fn this.value x.value), 
+			is_Vector x &&
+			len value == len x.value &&
+			op.type == Operator_type.ARITHMETIC],
+		[this.Vector (map_binaryl op.fn this.value (get_real x)), 
+			has_real x &&
+			op.type == Operator_type.ARITHMETIC],
+
+		// need extra length check
+		[this.Vector (map bool_to_real 
+			(map_binaryl op.fn this.value x.value)), 
+			is_Vector x &&
+			len value == len x.value &&
+			op.type == Operator_type.RELATIONAL],
+		[this.Vector (map bool_to_real 
+			(map_binaryl op.fn this.value (get_real x))), 
+			has_real x &&
+			op.type == Operator_type.RELATIONAL],
+		[this.Vector (op.fn this.value x.value),
+			is_Vector x &&
+			len value == len x.value &&
+			op.type == Operator_type.COMPOUND_REWRAP],
+		[x.Image (vec op'.op_name x.value value),
+			is_Image x],
+		[vec op'.op_name x value,
+			is_image x],
+		[op.fn this.value x, 
+			is_real x]
+	] ++ super.oo_binary_table op x
+	{
+		op' = oo_converse op;
+	};
+
+	oo_unary_table op = [
+		[this.Vector (map_unaryl op.fn this.value),
+			op.type == Operator_type.ARITHMETIC],
+		[this.Vector (map bool_to_real
+			(map_unaryl op.fn this.value)),
+			op.type == Operator_type.RELATIONAL],
+		[this.Vector (op.fn this.value),
+			op.type == Operator_type.COMPOUND_REWRAP],
+		[op.fn this.value,
+			true]
+	] ++ super.oo_unary_table op;
+
+	// turn an ip bool (or a number, for Vector) into VIPSs 255/0
+	bool_to_real x
+		= 255, is_bool x && x
+		= 255, is_number x && x != 0
+		= 0;
+}
+
+/* A rectangular array of real.
+ */
+Matrix_base value = class 
+	_Object {
+	_check_args = [
+		[value, "value", check_matrix]
+	];
+
+	// calculate these from value
+	width = len value?0;
+	height = len value;
+
+	// extract a rectanguar area
+	extract left top width height
+		= this.Matrix_base 
+			((map (take width) @ map (drop left) @
+				take height @ drop top) value);
+
+	// methods
+	oo_binary_table op x = [
+		// mat multiply is special
+		[this.Matrix_base mul.value,
+			is_Matrix x &&
+			op.op_name == "multiply"],
+		[this.Matrix_base mul'.value,
+			is_Matrix x &&
+			op.op_name == "multiply'"],
+
+		// mat divide is also special
+		[this.Matrix_base div.value,
+			is_Matrix x &&
+			op.op_name == "divide"],
+		[this.Matrix_base div'.value,
+			is_Matrix x &&
+			op.op_name == "divide'"],
+
+		// power -1 means invert
+		[this.Matrix_base inv.value,
+			is_real x && x == -1 &&
+			op.op_name == "power"],
+		[this.Matrix_base sq.value,
+			is_real x && x == 2 &&
+			op.op_name == "power"],
+		[error "matrix **-1 and **2 only",
+			op.op_name == "power" ||
+			op.op_name == "power'"],
+
+		// matrix op vector ... treat a vector as a 1 row matrix
+		[this.Matrix_base (map (map_binaryl op'.fn x.value) this.value),
+			is_Vector x &&
+			op.type == Operator_type.ARITHMETIC],
+		[this.Matrix_base (map_binaryl op.fn this.value x.value),
+			(is_Matrix x || is_Real x) && 
+			op.type == Operator_type.ARITHMETIC],
+
+		[this.Matrix_base (map_binaryl op.fn this.value x),
+			is_real x && 
+			op.type == Operator_type.ARITHMETIC],
+
+		// compound ... don't do iteration
+		[this.Matrix_base (op.fn this.value x.value),
+			(is_Matrix x || is_Real x || is_Vector x) &&
+			op.type == Operator_type.COMPOUND_REWRAP],
+
+		[op.fn this.value x,
+			op.type == Operator_type.COMPOUND]
+
+	] ++ super.oo_binary_table op x
+	{
+		mul = im_matmul this x;
+		mul' = im_matmul x this;
+		div = im_matmul this (im_matinv x);
+		div' = im_matmul x (im_matinv this);
+		inv = im_matinv this;
+		sq = im_matmul this this;
+		op' = oo_converse op;
+	}
+
+	oo_unary_table op = [
+		[this.Matrix_base (map_unaryl op.fn this.value),
+			op.type == Operator_type.ARITHMETIC],
+		[this.Matrix_base (op.fn this.value),
+			op.type == Operator_type.COMPOUND_REWRAP],
+		[op.fn this.value,
+			true]
+	] ++ super.oo_unary_table op;
+}
+
+/* How to display a matrix: text, sliders, toggles, or text plus scale/offset.
+ */
+Matrix_display = class {
+        text = 0;
+        slider = 1;
+        toggle = 2;
+        text_scale_offset = 3;
+
+        is_display = member [text, slider, toggle, text_scale_offset];
+}
+
+/* A matrix as VIPS sees them ... add scale, offset and filename. For nip, add
+ * a display type as well to control how the widget renders.
+ */
+Matrix_vips value scale offset filename display = class 
+	scope.Matrix_base value {
+	_check_args = [
+		[scale, "scale", check_real],
+		[offset, "offset", check_real],
+		[filename, "filename", check_string],
+		[display, "display", check_matrix_display]
+	];
+
+	Matrix_base x = this.Matrix_vips x scale offset filename display;
+}
+
+/* A plain 'ol matrix which can be passed to VIPS.
+ */
+Matrix value = class 
+	Matrix_vips value 1 0 "" Matrix_display.text {}
+
+/* Specialised constructors ... for convolutions, recombinations and
+ * morphologies.
+ */
+Matrix_con scale offset value = class
+	Matrix_vips value scale offset "" Matrix_display.text_scale_offset {};
+
+Matrix_rec value = class
+	Matrix_vips value 1 0 "" Matrix_display.slider {};
+
+Matrix_mor value = class
+	Matrix_vips value 1 0 "" Matrix_display.toggle {};
+
+Matrix_file filename = (im_read_dmask @ expand @ search) filename;
+
+/* A CIE colour ... a triple, plus a format (eg XYZ, Lab etc)
+ */
+Colour colour_space value = class
+	scope.Vector value {
+	_check_args = [
+		[colour_space, "colour_space", check_colour_space]
+	];
+	_check_all = [
+		[is_list_len 3 value, "len value == 3"]
+	];
+
+	Vector x = this.Colour colour_space x;
+
+	// make a colour-ish thing from an image
+	// back to Colour if we have another 3 band image
+	// to a vector if bands > 1
+	// to a number otherwise
+	itoc im
+		= this.Colour nip_type (to_matrix im).value?0, 
+			bands == 3
+		= scope.Vector (map mean (bandsplit im)),
+			bands > 1
+		= mean im
+	{
+		type = get_header "Type" im;
+		bands = get_header "Bands" im;
+		nip_type = Image_type.colour_spaces.lookup 1 0 type;
+	}
+
+	// methods
+	oo_binary_table op x = [
+		[itoc (op.fn 
+			((float) (to_image this).value) 
+			((float) (to_image x).value)),
+			// here REWRAP means go via image
+			op.type == Operator_type.COMPOUND_REWRAP]
+	] ++ super.oo_binary_table op x;
+
+	oo_unary_table op = [
+		[itoc (op.fn ((float) (to_image this).value)),
+			op.type == Operator_type.COMPOUND_REWRAP]
+	] ++ super.oo_unary_table op;
+}
+
+// a subclass with widgets for picking a space and value
+Colour_picker default_colour default_value = class 
+	Colour space.item colour.expr {
+	_vislevel = 3;
+
+	space = Option_enum "Colour space" Image_type.colour_spaces default_colour;
+	colour = Expression "Colour value" default_value;
+
+	Colour_edit colour_space value = 
+		Colour_picker colour_space value;
+}
+
+/* Base scale type.
+ */
+Scale caption from to value = class 
+	scope.Real value {
+	_check_args = [
+		[caption, "caption", check_string],
+		[from, "from", check_real],
+		[to, "to", check_real]
+	];
+	_check_all = [
+		[from < to, "from < to"]
+	];
+
+	Real x = this.Scale caption from to x;
+
+	// methods
+	oo_binary_table op x = [
+		[this.Scale caption (op.fn this.from x.from) (op.fn this.to x.to)
+			(op.fn this.value x.value), 
+			is_Scale x &&
+			op.type == Operator_type.ARITHMETIC],
+		[this.Scale caption (op.fn this.from x) (op.fn this.to x)
+			(op.fn this.value x), 
+			is_real x && 
+			op.type == Operator_type.ARITHMETIC]
+	] ++ super.oo_binary_table op x;
+}
+
+/* Base toggle type.
+ */
+Toggle caption value = class 
+	scope.Bool value {
+	_check_args = [
+		[caption, "caption", check_string],
+		[value, "value", check_bool]
+	];
+
+	Bool x = this.Toggle caption x;
+}
+
+/* Base option type.
+ */
+Option caption labels value = class 
+	scope.Real value {
+	_check_args = [
+		[caption, "caption", check_string],
+		[labels, "labels", check_string_list],
+		[value, "value", check_uint]
+	];
+}
+
+/* An option whose value is a string rather than a number.
+ */
+Option_string caption labels item = class
+	Option caption labels (index (equal item) labels) {
+	Option_edit caption labels value 
+		= this.Option_string caption labels (labels?value);
+}
+
+/* Make an option from an enum.
+ */
+Option_enum caption enum item = class
+	Option_string caption enum.names item {
+	// corresponding thing
+	value_thing = enum.get_thing item;
+
+	Option_edit caption labels value 
+		= this.Option_enum caption enum (enum.names?value);
+}
+
+/* A rectangle. width and height can be -ve.
+ */
+Rect left top width height = class 
+	_Object {
+	_check_args = [
+		[left, "left", check_real],
+		[top, "top", check_real],
+		[width, "width", check_real],
+		[height, "height", check_real]
+	];
+
+	// derived
+	right = left + width;
+	bottom = top + height;
+
+	oo_binary_table op x = [
+		[equal x, 
+			is_Rect x &&
+			(op.op_name == "equal" || op.op_name == "equal'")],
+		[!equal x, 
+			is_Rect x &&
+			(op.op_name == "not_equal" || 
+				op.op_name == "not_equal'")],
+
+		// binops with a complex are the same as (comp op comp)
+		[oo_binary_function op this (Rect (re x) (im x) 0 0),
+			is_complex x],
+
+		// all others are just pairwise
+		[this.Rect left' top' width' height',
+			is_Rect x && 
+			op.type == Operator_type.ARITHMETIC],
+		[this.Rect left'' top'' width'' height'',
+			has_number x && 
+			op.type == Operator_type.ARITHMETIC]
+	] ++ super.oo_binary_table op x
+	{
+		left' = op.fn left x.left;
+		top' = op.fn top x.top;
+		width' = op.fn width x.width;
+		height' = op.fn height x.height;
+
+		left'' = op.fn left x';
+		top'' = op.fn top x';
+		width'' = op.fn width x';
+		height'' = op.fn height x';
+		x' = get_number x;
+	}
+
+	oo_unary_table op = [
+		// arithmetic uops just map
+		[this.Rect left' top' width' height',
+			op.type == Operator_type.ARITHMETIC],
+
+		// compound uops are just like ops on complex
+		// do (width, height) so thing like abs(Arrow) work as you'd expect
+		[op.fn (width, height),
+			op.type == Operator_type.COMPOUND]
+	] ++ super.oo_unary_table op
+	{
+		left' = op.fn left;
+		top' = op.fn top;
+		width' = op.fn width;
+		height' = op.fn height;
+	}
+
+	// empty? ie. contains no pixels
+	is_empty = width == 0 || height == 0;
+
+	// normalised version, ie. make width/height +ve and flip the origin
+	nleft
+		= left + width, width < 0
+		= left;
+	ntop
+		= top + height, height < 0
+		= top;
+	nwidth = abs width;
+	nheight = abs height;
+	nright = nleft + nwidth;
+	nbottom = ntop + nheight;
+
+	equal x = left == x.left && top == x.top &&
+		  width == x.width && height == x.height;
+
+	// contains a point?
+	includes_point x y
+		= nleft <= x && x <= nright && ntop <= y && y <= nbottom;
+
+	// contains a rect? just test top left and bottom right points
+	includes_rect r
+		= includes_point r.nleft r.ntop &&
+			includes_point r.nright r.nbottom;
+
+	// bounding box of two rects
+	// if either is empty, can just return the other
+	union r
+		= r, is_empty
+		= this, r.is_empty
+		= Rect left' top' width' height'
+	{
+		left' = min_pair nleft r.nleft;
+		top' = min_pair ntop r.ntop;
+		width' = max_pair nright r.nright - left';
+		height' = max_pair nbottom r.nbottom - top';
+	}
+
+	// intersection of two rects ... empty rect if no intersection
+	intersect r
+		= Rect left' top' width'' height''
+	{
+		left' = max_pair nleft r.nleft;
+		top' = max_pair ntop r.ntop;
+		width' = min_pair nright r.nright - left';
+		height' = min_pair nbottom r.nbottom - top';
+		width''
+			= width', width > 0
+			= 0;
+		height''
+			= height', height > 0
+			= 0;
+	}
+
+	// expand/collapse by n pixels
+	margin_adjust n
+		= Rect (left - n) (top - n) (width + 2 * n) (height + 2 * n);
+}
+
+/* Values for Compression field in image.
+ */
+Image_compression = class {
+	NONE = 0;
+	NO_COMPRESSION = 0;
+	TCSF_COMPRESSION = 1;
+	JPEG_COMPRESSION = 2;
+	LABPACK_COMPRESSED = 3;
+	RGB_COMPRESSED = 4;
+	LUM_COMPRESSED = 5;
+}
+
+/* Values for Coding field in image.
+ */
+Image_coding = class {
+	NONE = 0;
+	NOCODING = 0;
+	COLQUANT = 1;
+	LABPACK = 2;
+	RAD = 6;
+}
+
+/* Values for BandFmt field in image.
+ */
+Image_format = class {
+	DPCOMPLEX = 9;
+	DOUBLE = 8;
+	COMPLEX = 7;
+	FLOAT = 6;
+	INT = 5;
+	UINT = 4;
+	SHORT = 3;
+	USHORT = 2;
+	CHAR = 1;
+	UCHAR = 0;
+	NOTSET = -1;
+
+	maxval fmt 
+		= [
+			255,		// UCHAR
+			127,		// CHAR
+			65535,		// USHORT
+			32767,		// SHORT
+			4294967295,	// UINT
+			2147483647,	// INT
+			255,		// FLOAT
+			255,		// COMPLEX
+			255,		// DOUBLE
+			255			// DPCOMPLEX
+		] ? fmt, fmt >= 0 && fmt <= DPCOMPLEX
+		= error (_ "bad value for BandFmt");
+}
+
+/* A lookup table.
+ */
+Table value = class 
+	_Object {
+	_check_args = [
+		[value, "value", check_rectangular]
+	];
+
+	/* Extract a column.
+	 */
+	column n = map (extract n) value;
+
+	/* present col x: is there an x in column col
+	 */
+	present col x = member (column col) x;
+
+	/* Look on column from, return matching item in column to.
+	 */
+	lookup from to x
+		= value?n?to, n >= 0
+		= error (_ "item" ++ " " ++ print x ++ " " ++ _ "not in table")
+	{
+		n = index (equal x) (column from);
+	}
+}
+
+/* A two column lookup table with the first column a string and the second a
+ * thing. Used for representing various enums. Option_enum makes a selector
+ * from one of these.
+ */
+Enum value = class 
+	Table value {
+	_check_args = [
+		[value, "value", check_enum]
+	]
+	{
+		check_enum = [is_enum, _ "is [[char, *]]"];
+		is_enum x = 
+			is_rectangular x && 
+			is_listof is_string (map (extract 0) x);
+	}
+
+	// handy ... all the names and things as lists
+	names = this.column 0; 
+	things = this.column 1; 
+
+	// is a legal name or thing
+	has_name x = this.present 1 x;
+	has_thing x = this.present 0 x;
+
+	// map things to strings and back
+	get_name x = this.lookup 1 0 x;
+	get_thing x = this.lookup 0 1 x;
+}
+
+/* Type field.
+ */
+Image_type = class {
+	MULTIBAND = 0;
+	B_W = 1;
+	HISTOGRAM = 10;
+	XYZ = 12;
+	LAB = 13;
+	CMYK = 15;
+	LABQ = 16;
+	RGB = 17;
+	UCS = 18;
+	LCH = 19;
+	LABS = 21;
+	sRGB = 22;
+	YXY = 23;
+	FOURIER = 24;
+	RGB16 = 25;
+	GREY16 = 26;
+	ARRAY = 27;
+	scRGB = 28;
+
+	/* Table to get names <-> numbers.
+	 */
+	type_names = Enum [
+		$MULTIBAND => MULTIBAND,
+		$B_W => B_W,
+		$HISTOGRAM => HISTOGRAM,
+		$XYZ => XYZ,
+		$LAB => LAB,
+		$CMYK => CMYK,
+		$LABQ => LABQ,
+		$RGB => RGB,
+		$UCS => UCS,
+		$LCH => LCH,
+		$LABS => LABS,
+		$sRGB => sRGB,
+		$YXY => YXY,
+		$FOURIER => FOURIER,
+		$RGB16 => RGB16,
+		$GREY16 => GREY16,
+		$ARRAY => ARRAY,
+		$scRGB => scRGB
+	];
+
+	/* Table relating nip's colour space names and VIPS's Type numbers.
+	 * Options are generated from this, so match the order to the order in 
+	 * the Colour menu.
+	 */
+	colour_spaces = Enum [
+		$sRGB => sRGB,
+		$scRGB => scRGB,
+		$Lab => LAB,
+		$LCh => LCH,
+		$XYZ => XYZ,
+		$Yxy => YXY,
+		$UCS => UCS
+	];
+
+	/* A slightly larger table ... the types of colorimetric image we can
+	 * have. Add mono, and the S and Q forms of LAB.
+	 */
+	image_colour_spaces = Enum [
+		$Mono => B_W,
+		$sRGB => sRGB,
+		$scRGB => scRGB,
+		$RGB16 => RGB16,
+		$GREY16 => GREY16,
+		$Lab => LAB,
+		$LabQ => LABQ,
+		$LabS => LABS,
+		$LCh => LCH,
+		$XYZ => XYZ,
+		$Yxy => YXY,
+		$UCS => UCS
+	];
+}
+
+/* Base image type. Simple layer over vips_image.
+ */
+Image value = class 
+	_Object {
+	_check_args = [
+		[value, "value", check_image]
+	];
+
+	// fields from VIPS header
+	width = get_width value;
+	height = get_height value;
+	bands = get_bands value;
+	format = get_format value;
+	bits = get_bits value;
+	coding = get_coding value;
+	type = get_type value;
+	xres = get_header "Xres" value;
+	yres = get_header "Yres" value;
+	xoffset = get_header "Xoffset" value;
+	yoffset = get_header "Yoffset" value;
+	filename = get_header "filename" value;
+	
+	// convenience ... the area our pixels occupy, as a rect
+	rect = Rect 0 0 width height;
+
+	// operator overloading
+	// (op Image Vector) done in Vector class
+	oo_binary_table op x = [
+		// handle image ++ constant here
+		[wrap join_result_image,
+			(has_real x || is_Vector x) &&
+			(op.op_name == "join" || op.op_name == "join'")],
+		[wrap ite_result_image,
+			op.op_name == "if_then_else"],
+		[wrap (op.fn this.value (get_image x)),
+			has_image x],
+		[wrap (op.fn this.value (get_number x)),
+			has_number x],
+		// if it's not a class on the RHS, handle here ... just apply and
+		// rewrap
+		[wrap (op.fn this.value x),
+			!is_class x]
+		// all other cases handled by other classes
+	] ++ super.oo_binary_table op x
+	{
+		// wrap the result with this 
+		// x can be a non-image, eg. compare "Image v == []" vs. 
+		// "Image v == 12"
+		wrap x
+			= x, op.type == Operator_type.COMPOUND ||
+				!is_image x
+			= this.Image x;
+
+		join_result_image 
+			= value ++ new_stuff, op.op_name == "join"
+			= new_stuff ++ value
+		{
+			new_stuff = image_new width height new_bands
+				format
+				coding
+				Image_type.B_W x xoffset yoffset;
+			new_bands
+				= get_bands x, has_bands x
+				= 1;
+		}
+
+		[then_part, else_part] = x;
+
+		// get things about our output from inputs in this order
+		objects = [then_part, else_part, this];
+
+		// properties of our output image
+		target_bands = get_member_list has_bands get_bands objects;
+		target_type = get_member_list has_type get_type objects;
+
+		// if one of then/else is an image, get the target format from that
+		// otherwise, let the non-image objects set the target
+		target_format 
+			= get_member_list has_format get_format x, 
+				has_member_list has_format x
+			= NULL;
+
+		to_image x = to_image_size width height target_bands target_format x;
+
+		[then', else'] = map to_image x;
+
+		ite_result_image = image_set_type target_type
+			(if value then then' else else');
+	}
+
+	// FIXME ... yuk ... don't use operator hints, just always rewrap if
+	// we have an image result
+	// forced on us by things like abs:
+	// 	abs Vector -> real
+	//	abs Image -> Image
+	// does not fit well with COMPOUND/whatever scheme
+	oo_unary_table op = [
+		[this.Image result,
+			is_image result],
+		[result,
+			true]
+	] ++ super.oo_unary_table op
+	{
+		result = op.fn this.value;
+	}
+}
+
+/* Construct an image from a file.
+ */
+Image_file filename = class 
+	Image value {
+	_check_args = [
+		[filename, "filename", check_string]
+	];
+
+	value = vips_image filename;
+}
+
+Region image left top width height = class 
+	Image value {
+	_check_args = [
+		[image, "Image", check_Image],
+		[left, "left", check_real],
+		[top, "top", check_real],
+		[width, "width", check_preal],
+		[height, "height", check_preal]
+	];
+
+	// a rect for our coordinates
+	// region.rect gets the rect for the extracted image
+	region_rect = Rect left top width height;
+
+	// we need to always succeed ... value is our enclosing image if we're
+	// out of bounds
+	value 
+		= extract_area left top width height image.value,
+			image.rect.includes_rect region_rect
+		= image.value;
+}
+
+Area image left top width height = class
+	scope.Region image left top width height {
+	Region image left top width height 
+		= this.Area image left top width height;
+}
+
+Arrow image left top width height = class 
+	scope.Rect left top width height {
+	_check_args = [
+		[image, "Image", check_Image],
+		[left, "left", check_real],
+		[top, "top", check_real],
+		[width, "width", check_real],
+		[height, "height", check_real]
+	];
+
+	Rect l t w h = this.Arrow image l t w h;
+}
+
+HGuide image top = class 
+	scope.Arrow image image.rect.left top image.width 0 {
+	Arrow image left top width height = this.HGuide image top;
+}
+
+VGuide image left = class 
+	scope.Arrow image left image.rect.top 0 image.height {
+	Arrow image left top width height = this.VGuide image left;
+}
+
+Mark image left top = class 
+	scope.Arrow image left top 0 0 {
+	Arrow image left top width height = this.Mark image left top;
+}
+
+// convenience functions: ... specify position as [0 .. 1)
+
+Region_relative image u v w h
+	= Region image 
+		(image.width * u)
+		(image.height * v)
+		(image.width * w)
+		(image.height * h);
+
+Area_relative image u v w h
+	= Area image 
+		(image.width * u)
+		(image.height * v)
+		(image.width * w)
+		(image.height * h);
+
+Arrow_relative image u v w h
+	= Arrow image 
+		(image.width * u)
+		(image.height * v)
+		(image.width * w)
+		(image.height * h);
+
+VGuide_relative image v 
+	= VGuide image (image.height * v);
+
+HGuide_relative image u 
+	= HGuide image (image.width * u);
+
+Mark_relative image u v
+	= Mark image 
+		(image.width * u)
+		(image.height * v);
+
+Kernel_type = class {
+	NEAREST_NEIGHBOUR = 0;
+	LINEAR = 1;
+	CUBIC = 2;
+	MITCHELL = 3;
+	LANCZOS2 = 4;
+	LANCZOS3 = 5;
+
+	// Should introspect to get the list of interpolators :-(
+	// We can "dir" on VipsInterpolate to get a list of them, but we
+	// can't get i18n'd descriptions until we have more
+	// introspection stuff in nip2.
+
+	/* Table to map kernel numbers to descriptive strings
+	 */
+	descriptions = [
+		_ "Nearest neighbour",
+		_ "Linear", 
+		_ "Cubic",
+		_ "Mitchell",
+		_ "Lanczos, two lobes",
+		_ "Lanczos, three lobes"
+	];
+
+	/* And to vips enum nicknames.
+	 */
+	types = [
+		"nearest", 
+		"linear", 
+		"cubic", 
+		"mitchell", 
+		"lanczos2", 
+		"lanczos3"
+	];
+}
+
+Kernel type = class {
+	value = Kernel_type.types?type;
+}
+
+Kernel_linear = Kernel Kernel_type.LINEAR;
+
+Kernel_picker default = class 
+	Kernel kernel.value {
+	_vislevel = 2;
+
+	kernel = Option "Kernel" Kernel_type.descriptions default;
+}
+
+Interpolate_type = class {
+	NEAREST_NEIGHBOUR = 0;
+	BILINEAR = 1;
+	BICUBIC = 2;
+	LBB = 3;
+	NOHALO = 4;
+	VSQBS = 5;
+
+	// Should introspect to get the list of interpolators :-(
+	// We can "dir" on VipsInterpolate to get a list of them, but we
+	// can't get i18n'd descriptions until we have more
+	// introspection stuff in nip2.
+
+	/* Table to map interpol numbers to descriptive strings
+	 */
+	descriptions = [
+		_ "Nearest neighbour",
+		_ "Bilinear", 
+		_ "Bicubic",
+		_ "Upsize: reduced halo bicubic (LBB)",
+		_ "Upsharp: reduced halo bicubic with edge sharpening (Nohalo)",
+		_ "Upsmooth: quadratic B-splines with jaggy reduction (VSQBS)"
+	];
+
+	/* And to vips type names.
+	 */
+	types = [
+		"VipsInterpolateNearest",
+		"VipsInterpolateBilinear",
+		"VipsInterpolateBicubic",
+		"VipsInterpolateLbb",
+		"VipsInterpolateNohalo",
+		"VipsInterpolateVsqbs"
+	];
+}
+
+Interpolate type options = class {
+	value = vips_object_new Interpolate_type.types?type [] options;
+}
+
+Interpolate_bilinear = Interpolate Interpolate_type.BILINEAR [];
+
+Interpolate_picker default = class 
+	Interpolate interp.value [] {
+	_vislevel = 2;
+
+	interp = Option "Interpolation" Interpolate_type.descriptions default;
+}
+
+Render_intent = class {
+	PERCEPTUAL = 0;
+	RELATIVE = 1;
+	SATURATION = 2;
+	ABSOLUTE = 3;
+
+	/* Table to get names <-> numbers.
+	 */
+	names = Enum [
+		_ "Perceptual" => PERCEPTUAL,
+		_ "Relative" => RELATIVE,
+		_ "Saturation" => SATURATION,
+		_ "Absolute" => ABSOLUTE
+	];
+}
+
+// abstract base class for toolkit menus
+Menu = class {}
+
+// a "----" line in a menu
+Menuseparator = class Menu {}
+
+// abstract base class for items in menus
+Menuitem label tooltip = class Menu {}
+
+Menupullright label tooltip = class Menuitem label tooltip {}
+
+Menuaction label tooltip = class Menuitem label tooltip {}
+
+/* Plots.
+ */
+
+Plot_style = class {
+	POINT = 0;
+	LINE = 1;
+	SPLINE = 2;
+	BAR = 3;
+
+	names = Enum [
+		_ "Point" => POINT,
+		_ "Line" => LINE,
+		_ "Spline" => SPLINE,
+		_ "Bar" => BAR
+	];
+}
+
+Plot_format = class {
+	YYYY = 0;
+	XYYY = 1;
+	XYXY = 2;
+
+	names = Enum [
+		_ "YYYY" => YYYY,
+		_ "XYYY" => XYXY,
+		_ "XYXY" => XYXY
+	];
+}
+
+Plot_type = class {
+	/* Lots of Ys (ie. multiple line plots).
+	 */
+	YYYY = 0;
+
+	/* First column of matrix is X position, others are Ys (ie. multiple XY 
+	 * line plots, all with the same Xes).
+	 */
+	XYYY = 1;
+
+	/* Many independent XY plots.
+	 */
+	XYXY = 2;
+}
+
+/* "options" is a list of ["key", value] pairs.
+ */
+Plot options value = class 
+	scope.Image value {
+	Image value = this.Plot options value;
+	to_image dpi = extract_bands 0 3 
+		(graph_export_image (to_real dpi) this);
+}
+
+Plot_matrix options value = class 
+	Plot options (to_image value).value {
+}
+
+Plot_histogram value = class
+	scope.Plot [] value {
+}
+
+Plot_xy value = class
+	scope.Plot [$format => Plot_format.XYYY] value {
+}
+
+/* A no-value type. Call it NULL for C-alike fun. Used by Group to indicate
+ * empty slots, for example.
+ */
+NULL = class 
+	_Object {
+	oo_binary_table op x = [
+		// the only operation we allow is equality .. use pointer equality,
+		// this lets us test a == NULL and a != NULL
+		[this === x, 
+			op.type == Operator_type.RELATIONAL &&
+			op.op_name == "equal"],
+		[this !== x, 
+			op.type == Operator_type.RELATIONAL &&
+			op.op_name == "not_equal"]
+	] ++ super.oo_binary_table op x;
+}
+
+Blend_type = class {
+	CLEAR = 0;
+	SOURCE = 1;
+	OVER = 2;
+	IN = 3;
+	OUT = 4;
+	ATOP = 5;
+	DEST = 6;
+	DEST_OVER = 7;
+	DEST_IN = 8;
+	DEST_OUT = 9;
+	DEST_ATOP = 10;
+	XOR = 11;
+	ADD = 12;
+	SATURATE = 13;
+	MULTIPLY = 14;
+	SCREEN = 15;
+	OVERLAY = 16;
+	DARKEN = 17;
+	LIGHTEN = 18;
+	COLOUR_DODGE = 19;
+	COLOUR_BURN = 20;
+	HARD_LIGHT = 21;
+	SOFT_LIGHT = 22;
+	DIFFERENCE = 23;
+	EXCLUSION = 24;
+
+	/* Table to map blend numbers to descriptive strings
+	 */
+	descriptions = [
+		_ "Clear",
+		_ "Source",
+		_ "Over",
+		_ "In",
+		_ "Out",
+		_ "Atop",
+		_ "Dest",
+		_ "Dest over",
+		_ "Dest in",
+		_ "Dest out",
+		_ "Dest atop",
+		_ "Xor",
+		_ "Add",
+		_ "Saturate",
+		_ "Multiply",
+		_ "Screen",
+		_ "Overlay",
+		_ "Darken",
+		_ "Lighten",
+		_ "Colour dodge",
+		_ "Colour burn",
+		_ "Hard light",
+		_ "Soft light",
+		_ "Difference",
+		_ "Exclusion"
+	];
+
+	/* And to vips enum nicknames.
+	 */
+	types = Enum [
+		$clear => "clear",
+		$source => "source",
+		$over => "over",
+		$in => "in",
+		$out => "out",
+		$atop => "atop",
+		$dest => "dest",
+		$dest_over => "dest_over",
+		$dest_in => "dest_in",
+		$dest_out => "dest_out",
+		$dest_atop => "dest_atop",
+		$xor => "xor",
+		$add => "add",
+		$saturate => "saturate",
+		$multiply => "multiply",
+		$screen => "screen",
+		$overlay => "overlay",
+		$darken => "darken",
+		$lighten => "lighten",
+		$colour_dodge => "colour_dodge",
+		$colour_burn => "colour_burn",
+		$hard_light => "hard_light",
+		$soft_light => "soft_light",
+		$difference => "difference",
+		$exclusion => "exclusion"
+	];
+}
+
+Blend type = class {
+	value = Blend_type.types?type;
+}
+
+Blend_over = Blend Blend_type.OVER;
+
+Blend_picker default = class 
+	Blend blend.value {
+	_vislevel = 2;
+
+	blend = Option "Blend" Blend_type.descriptions default;
+}
+
+Combine_type = class {
+	MAX = 0;
+	SUM = 1;
+	MIN = 2;
+
+	enum = Enum [
+		_ "Maximum" => MAX,
+		_ "Sum" => SUM,
+		_ "Minimum" => MIN
+	];
+}
+
+Combine type = class {
+	value = Combine_type.enum.names?type;
+}
+
+Combine_sum = Combine Combine_type.SUM;
+
+Combine_picker default = Option "Combine" Combine_type.enum.names default;

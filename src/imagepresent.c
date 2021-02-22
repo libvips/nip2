@@ -1470,7 +1470,6 @@ imagepresent_ruler_hide_cb( GtkWidget *wid, GtkWidget *host, Imagepresent *ip )
 static void
 imagepresent_init( Imagepresent *ip )
 {
-	GtkWidget *port;
 	GtkWidget *bar;
 	GtkWidget *table;
 

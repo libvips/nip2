@@ -1,3 +1,3 @@
-man_MANS = nip2.1
+man_MANS = nip3.1
 
 EXTRA_DIST = ${man_MANS}

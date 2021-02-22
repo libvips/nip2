@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=nip3
+Comment=Image manipulation program based on VIPS
+Comment[it]=Programma per la manipolazione di immagini basato su VIPS
+Exec=nip2 %F
+Icon=nip2
+Terminal=false
+Type=Application
+Categories=Graphics;RasterGraphics;
+StartupNotify=true
+MimeType=image/x-vips;

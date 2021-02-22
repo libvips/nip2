@@ -1,0 +1,2423 @@
+/* 
+
+   ImageMagick operations edited by Alan Gibson (aka "snibgo"; snibgo at earthling dot net).
+   1-Apr-2014
+     Minor corrections to Geometry_widget and Alpha.
+     Added loads of widgets and Menuactions.
+     Not fully tested.
+   5-Apr-2014
+     Many more menu actions.
+     Reorganised Magick menu.
+   10-Apr-2014
+     Many more menu actions.
+   11-Apr-2014 jcupitt
+     Split to separate Magick.def
+   13-Apr-2014 snibgo
+     Put "new image" items into sub-menu.
+     New class VirtualPixlBack.
+   17-Apr-2014 snibgo
+     Many small changes.
+     A few new menu options.
+     Created sub-menu for multi-input operations.
+   3-May-2014 jcupitt
+     Put quotes around ( in shadow to help unix
+
+   Last update: 17-Apr-2014.
+
+   For details of ImageMagick operations, see http://www.imagemagick.org/script/command-line-options.php etc.
+*/
+
+// We don't need Noop.
+/*===
+Magick_noop_item = class
+	Menuaction "_Noop" "no operation" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		command = Magick.command [
+			"\"%s\"",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+===*/
+
+Magick_testPar_item = class
+	Menuaction "_TestPar" "no operation" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		command = Magick.command [
+			"\"%s\"",
+			"( +clone ) +append ",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+/* Removed Read_item and Write_item, much better to use nip2 load/save image.
+ * Plus they can load all libMagick formats anyway.
+ */
+
+
+// Put "new image" items into sub-menu
+Magick_NewImageMenu_item = class
+	Menupullright "_New image" "make a new image" {
+
+	Magick_newcanvas_item = class
+		Menuaction "_Solid colour" "make image of solid colour" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			size = Magick.Size_widget;
+			colour = Magick.generalcol_widget;
+			command = Magick.command [
+				size._flag,
+				"\"canvas:" ++ colour._flag ++ "\"", 
+				"\"%s\""
+			];
+
+			_result = Magick.system0 command; 
+		}
+	}
+
+	Magick_builtin_item = class
+		Menuaction "_Built-in image" "create a built-in image" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			builtin = Magick.builtin_widget;
+			command = Magick.command [
+				builtin._flag,
+				"\"%s\""
+			];
+
+			_result = Magick.system0 command; 
+		}
+	}
+
+	Magick_gradient_item = class
+		Menuaction "_Gradient" "make a linear gradient between two colours" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			size = Magick.Size_widget;
+			topColour = Magick.generalcol_widget;
+			bottomColour = Magick.generalcol_widget;
+
+			command = Magick.command [
+				size._flag,
+				concat ["\"gradient:", 
+					topColour._flag, "-", bottomColour._flag, "\""],
+				"\"%s\""
+			];
+
+			_result = Magick.system0 command; 
+		}
+	}
+
+	Magick_hald_item = class
+		Menuaction "_Hald-clut image" "create an identity hald-clut image" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			order = Expression "order" 8;
+			command = Magick.command [
+				"hald:" ++ print order.expr,
+				"\"%s\""
+			];
+
+			_result = Magick.system0 command; 
+		}
+	}
+
+	Magick_pattern_item = class
+		Menuaction "_Pattern" "create pattern" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			size = Magick.Size_widget;
+			pattern = Magick.pattern_widget;
+			command = Magick.command [
+				size._flag,
+				pattern._flag,
+				"\"%s\""
+			];
+
+			_result = Magick.system0 command; 
+		}
+	}
+
+	Magick_plasma_item = class
+		Menuaction "_Plasma image" "create plasma image" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			size = Magick.Size_widget;
+			// FIXME? ColourA-ColourB.
+			// FIXME? Allow plasma:fractal?
+
+			command = Magick.command [
+				size._flag,
+				"plasma:",
+				"\"%s\""
+			];
+
+			_result = Magick.system0 command; 
+		}
+	}
+
+	Magick_radialgradient_item = class
+		Menuaction "_Radial gradient" 
+			"make a radial gradient between two colours" {
+		action = class
+			_result {
+			_vislevel = 3;
+
+			size = Magick.Size_widget;
+			innerColour = Magick.generalcol_widget;
+			outerColour = Magick.generalcol_widget;
+
+			command = Magick.command [
+				size._flag,
+				concat ["\"radial-gradient:", 
+					innerColour._flag, "-", outerColour._flag, "\""],
+				"\"%s\""
+			];
+
+			_result = Magick.system0 command; 
+		}
+	}
+}  // end Magick_NewImageMenu_item
+
+
+Magick_MultiMenu_item = class
+	Menupullright "_Multiple inputs" "make an image from multiple images" {
+
+	Magick_composite_item = class
+		Menuaction "_Composite" "composite two images (without mask)" {
+		action x y = class
+			_result {
+			_vislevel = 3;
+
+			method = Magick.compose_widget;
+			offsets = Magick.OffsetGeometry_widget;
+			gravity = Magick.gravity_widget; 
+
+			command = Magick.command [
+				"\"%s\"",
+				"\"%s\"",
+				"-geometry", offsets._flag,
+				gravity._flag,
+				method._flag,
+				"-composite",
+				"\"%s\""
+			];
+
+			_result = Magick.system2 command x y; 
+		}
+	}
+
+	Magick_compositeMask_item = class
+		Menuaction "_Composite masked" "composite two images (with mask)" {
+		action x y z = class
+			_result {
+			_vislevel = 3;
+
+			method = Magick.compose_widget;
+			offsets = Magick.OffsetGeometry_widget;
+			gravity = Magick.gravity_widget; 
+
+			command = Magick.command [
+				"\"%s\"",
+				"\"%s\"",
+				"\"%s\"",
+				"-geometry", offsets._flag,
+				gravity._flag,
+				method._flag, 
+				"-composite",
+				"\"%s\""
+			];
+
+			_result = Magick.system3 command x y z; 
+		}
+	}
+
+	// FIXME: other operations like remap that take another image as arguments are:
+	// mask (pointless?), texture, tile (pointless?)
+
+	// FIXME: operations that take a filename that isn't an image:
+	// cdl, profile
+
+	Magick_clut_item = class
+		Menuaction "_Clut" "replace values using second image as colour look-up table" {
+		action x y = class
+			_result {
+			_vislevel = 3;
+
+			// FIXME: uses -intensity "when mapping greyscale CLUT image to alpha channel if set by -channels"
+
+			command = Magick.command [
+				"\"%s\"",
+				"\"%s\"",
+				"-clut",
+				"\"%s\""
+			];
+
+			_result = Magick.system2 command x y; 
+		}
+	}
+
+	Magick_haldclut_item = class
+		Menuaction "_Hald clut" "replace values using second image as Hald colour look-up table" {
+		action x y = class
+			_result {
+			_vislevel = 3;
+
+			command = Magick.command [
+				"\"%s\"",
+				"\"%s\"",
+				"-hald-clut",
+				"\"%s\""
+			];
+
+			_result = Magick.system2 command x y; 
+		}
+	}
+
+
+	// Encipher and decipher: key files can be text or image files.
+
+	Magick_encipher_item = class
+		Menuaction "_Encipher/Decipher" "encipher or decipher an image image" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			pathname = Pathname "Read key file" "";
+			isDecipher = Toggle "Decipher" false;
+
+			command = Magick.command [
+				"\"%s\"",
+				if pathname.value == "" then "" else (
+					( if isDecipher then "-decipher " else "-encipher ") ++
+					( "\"" ++ pathname.value ++ "\"" )
+				),
+				"\"%s\""
+			];
+
+			_result = Magick.system command x; 
+		}
+	}
+
+	Magick_profile_item = class
+		Menuaction "_Profile" "assigns/applies an ICC profile" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			pathname1 = Pathname "Read profile file" "";
+			pathname2 = Pathname "Read profile file" "";
+
+			command = Magick.command [
+				"\"%s\"",
+				if pathname1.value == "" then "" else (
+					"-profile " ++
+					"\"" ++ pathname1.value ++ "\""),
+				if pathname2.value == "" then "" else (
+					"-profile " ++
+					"\"" ++ pathname2.value ++ "\""),
+				"\"%s\""
+			];
+
+			_result = Magick.system command x; 
+		}
+	}
+
+	Magick_remap_item = class
+		Menuaction "_Remap" "reduce colours to those in another image" {
+		action x y = class
+			_result {
+			_vislevel = 3;
+
+			command = Magick.command [
+				"\"%s\"",
+				"-remap",
+				"\"%s\"",
+				"\"%s\""
+			];
+
+			_result = Magick.system2 command x y; 
+		}
+	}
+
+}  // end Magick_MultiMenu_item
+
+
+Magick_image_type_item = class
+	Menuaction "_Image Type" "change image type" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		imagetype = Magick.imagetype_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			imagetype._flag,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+sep2 = Menuseparator;
+
+Magick_alpha_item = class
+	Menuaction "_Alpha" "add/remove alpha channel" {
+	action x = class 
+		_result {
+		_vislevel = 3;
+
+		alpha = Magick.alpha_widget; 
+		command = Magick.command [
+			"\"%s\"",
+			alpha._flag,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_annotate_item = class
+	Menuaction "_Annotate" "add text annotation" {
+	action x = class 
+		_result {
+		_vislevel = 3;
+
+		text = Magick.text_widget;
+		font = Magick.Font_widget;
+		geometry = Magick.AnnotGeometry_widget; 
+		gravity = Magick.gravity_widget; 
+		foreground = Magick.foreground_widget;
+		undercol = Magick.undercol_widget;
+		antialias = Magick.antialias_widget;
+		command = Magick.command [
+			"\"%s\"",
+			font._flag,
+			antialias._flag,
+			gravity._flag,
+			foreground._flag,
+			undercol._flag,
+			"-annotate", 
+			geometry._flag, 
+			"\"" ++ text.value ++ "\"",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_autoGamma_item = class
+	Menuaction "_AutoGamma" "automatic gamma" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		channels = Magick.channels_widget;
+		command = Magick.command [
+			"\"%s\"",
+			channels._flag,
+			"-auto-gamma",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_autoLevel_item = class
+	Menuaction "_AutoLevel" "automatic level" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		channels = Magick.channels_widget;
+		command = Magick.command [
+			"\"%s\"",
+			channels._flag,
+			"-auto-level",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_blurSharpMenu_item = class
+	Menupullright "_Blur/Sharpen" "blur and sharpen" {
+
+	Magick_adaptive_blur_item = class
+		Menuaction "_Adaptive Blur" "blur less near edges" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			intensity = Magick.intensity_widget;
+			radius = Magick.blur_rad_widget; 
+			sigma = Magick.sigma_widget;
+			channels = Magick.channels_widget;
+			// note: adaptive-blur doesn't regard VP.
+
+			command = Magick.command [
+				"\"%s\"",
+				intensity._flag,
+				channels._flag,
+				"-adaptive-blur",
+				print radius.value ++ "x" ++ print sigma.value,
+				"\"%s\""
+			];
+
+			_result = Magick.system command x; 
+		}
+	}
+
+	Magick_blur_item = class
+		Menuaction "_Blur" "blur" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			radius = Magick.blur_rad_widget; 
+			sigma = Magick.sigma_widget;
+			channels = Magick.channels_widget;
+			virtpixback = Magick.VirtualPixelBack_widget;
+			command = Magick.command [
+				"\"%s\"",
+				virtpixback._flag, 
+				channels._flag,
+				"-blur",
+				print radius.value ++ "x" ++ print sigma.value,
+				"\"%s\""
+			];
+
+			_result = Magick.system command x; 
+		}
+	}
+
+	Magick_gaussianBlur_item = class
+		Menuaction "_Gaussian Blur" "blur with a Gaussian operator" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			radius = Magick.blur_rad_widget; 
+			sigma = Magick.sigma_widget;
+			channels = Magick.channels_widget;
+			virtpixback = Magick.VirtualPixelBack_widget;
+			command = Magick.command [
+				"\"%s\"",
+				virtpixback._flag, 
+				channels._flag,
+				"-gaussian-blur",
+				print radius.value ++ "x" ++ print sigma.value,
+				"\"%s\""
+			];
+
+			_result = Magick.system command x; 
+		}
+	}
+
+	Magick_motionBlur_item = class
+		Menuaction "_Motion Blur" "simulate motion blur" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			radius = Magick.blur_rad_widget; 
+			sigma = Magick.sigma_widget;
+			angle = Scale "angle" (-360) 360 0;
+			channels = Magick.ch_widget;
+			virtpixback = Magick.VirtualPixelBack_widget;
+			command = Magick.command [
+				"\"%s\"",
+				virtpixback._flag, 
+				channels._flag,
+				"-motion-blur",
+				print radius.value ++ "x" ++
+					print sigma.value ++ "+" ++
+					print angle.value,
+				"\"%s\""
+			];
+
+			_result = Magick.system command x; 
+		}
+	}
+
+	Magick_rotationalBlur_item = class
+		Menuaction "_RotationalBlur" "blur around the centre" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			channels = Magick.channels_widget;
+			virtpixback = Magick.VirtualPixelBack_widget;
+			angle = Scale "angle (degrees)" (-360) 360 20;
+
+			command = Magick.command [
+				"\"%s\"",
+				virtpixback._flag, 
+				channels._flag,
+				"-radial-blur", 
+				print angle.value,
+				"\"%s\""
+			];
+
+			_result = Magick.system command x; 
+		}
+	}
+
+	Magick_selectiveBlur_item = class
+		Menuaction "_Selective Blur" "blur where contrast is less than or equal to threshold" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			intensity = Magick.intensity_widget;
+			radius = Magick.blur_rad_widget; 
+			sigma = Magick.sigma_widget;
+			threshold = Scale "Threshold (percent)" 0 100 50;
+			channels = Magick.channels_widget;
+			virtpixback = Magick.VirtualPixelBack_widget;
+			command = Magick.command [
+				"\"%s\"",
+				intensity._flag,
+				virtpixback._flag, 
+				channels._flag,
+				"-selective-blur",
+				print radius.value ++ "x" ++
+					print sigma.value ++  "+" ++
+					print threshold.value ++ "%%",
+				"\"%s\""
+			];
+
+			_result = Magick.system command x; 
+		}
+	}
+
+	sep1 = Menuseparator;
+
+	Magick_adaptive_sharpen_item = class
+		Menuaction "_Adaptive Sharpen" "sharpen more near edges" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			intensity = Magick.intensity_widget;
+			radius = Magick.blur_rad_widget; 
+			sigma = Magick.sigma_widget;
+
+			command = Magick.command [
+				"\"%s\"",
+				intensity._flag,
+				"-adaptive-sharpen",
+				print radius.value ++ "x" ++ print sigma.value,
+				"\"%s\""
+			];
+
+			_result = Magick.system command x; 
+		}
+	}
+
+	Magick_sharpen_item = class
+		Menuaction "_Sharpen" "sharpen" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			radius = Magick.blur_rad_widget; 
+			sigma = Magick.sigma_widget;
+			channels = Magick.channels_widget;
+			virtpixback = Magick.VirtualPixelBack_widget;
+			command = Magick.command [
+				"\"%s\"",
+				virtpixback._flag, 
+				channels._flag, 
+				"-sharpen",
+				print radius.value ++ "x" ++ print sigma.value,
+				"\"%s\""
+			];
+
+			_result = Magick.system command x; 
+		}
+	}
+
+	Magick_unsharpen_item = class
+		Menuaction "_Unsharp" "sharpen with unsharp mask" {
+		action x = class 
+			_result {
+			_vislevel = 3;
+
+			radius = Magick.blur_rad_widget; 
+			sigma = Magick.sigma_widget;
+			channels = Magick.channels_widget;
+			gain = Scale "Gain" (-10) 10 1;
+			threshold = Scale "Threshold" 0 1 0.05;
+			virtpixback = Magick.VirtualPixelBack_widget;
+
+			command = Magick.command [
+				"\"%s\"",
+				virtpixback._flag, 
+				channels._flag, 
+				"-unsharp",
+				print radius.value ++ "x" ++
+					print sigma.value ++ "+" ++
+					print gain.value ++ "+" ++
+					print threshold.value,
+				"\"%s\""
+			];
+
+			_result = Magick.system command x; 
+		}
+	}
+
+} // end BlurSharpMenu_item
+
+
+Magick_border_item = class
+	Menuaction "_Border" "add border of given colour" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		compose = Magick.compose_widget;
+		width = Expression "Width" 3;
+		bordercol = Magick.bordercol_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			compose._flag,
+			bordercol._flag,
+			"-border", 
+			print width.expr,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_brightCont_item = class
+	Menuaction "_Brightness-contrast" "adjust the brightness and/or contrast" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		bri = Scale "brightness" (-100) 100 0;
+		con = Scale "contrast" (-100) 100 0;
+		channels = Magick.channels_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			channels._flag,
+			"-brightness-contrast", 
+			print bri.value ++ "x" ++ print con.value,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+// Note: canny requires ImageMagick 6.8.9-0 or later.
+
+Magick_canny_item = class
+	Menuaction "_Canny" "detect a wide range of edges" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		radius = Magick.blur_rad_widget; 
+		sigma = Magick.sigma_widget;
+		lowPc = Scale "lower percent" 0 100 10;
+		highPc = Scale "lower percent" 0 100 10;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-canny", 
+			concat ["\"",
+				print radius.value ++ "x" ++ 
+				print sigma.value ++ "+" ++
+				print lowPc.value ++ "%%+" ++
+				print highPc.value ++ "%%" ++ "\""
+			],
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+
+Magick_charcoal_item = class
+	Menuaction "_Charcoal" "simulate a charcoal drawing" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		intensity = Magick.intensity_widget;
+		factor = Scale "factor" 0 50 1;
+
+		command = Magick.command [
+			"\"%s\"",
+			intensity._flag,
+			"-charcoal", 
+			print factor.value,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_chop_item = class
+	Menuaction "_Chop" "remove pixels from the interior" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		gravity = Magick.gravity_widget; 
+		geometry = Magick.WhxyGeometry_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			gravity._flag,
+			"-chop", 
+			geometry._flag,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_colorize_item = class
+	Menuaction "_Colorize" "colorize by given amount" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		foreground = Magick.foreground_widget;
+		val = Scale "value" 0 100 100;
+
+		command = Magick.command [
+			"\"%s\"",
+			foreground._flag,
+			"-colorize", 
+			print val.value,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_colors_item = class
+	Menuaction "_Colors" "reduce number of colors" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		treedepth = Expression "Treedepth" 8;
+		dither = Magick.dither_widget;
+		quantize = Magick.colorspace_widget;
+		colors = Expression "Colours" 3;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-quantize", quantize._flag,
+			"-treedepth", 
+			print treedepth.expr, 
+			dither._flag,
+			"-colors", 
+			print colors.expr,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+// FIXME: color-matrix?
+
+Magick_colorspace_item = class
+	Menuaction "_Colourspace" "convert to arbitrary colourspace" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		colsp = Magick.colorspace_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-colorspace",
+			colsp._flag,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_colorspaceGray_item = class
+	Menuaction "_Colourspace gray" "convert to gray using given intensity method" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		intensity = Magick.intensity_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			intensity._flag,
+			"-colorspace gray",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_contrast_item = class
+	Menuaction "_Contrast" "increase or reduce the contrast" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		isReduce = Toggle "reduce contrast" false;
+
+		command = Magick.command [
+			"\"%s\"",
+			(if isReduce then "+" else "-") ++ "contrast",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_contrastStretch_item = class
+	Menuaction "_Contrast stretch" "stretches tones, making some black/white" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		intensity = Magick.intensity_widget;
+		channels = Magick.channels_widget;
+		blk = Scale "percent to make black" 0 100 0;
+		wht = Scale "percent to make white" 0 100 0;
+
+		command = Magick.command [
+			"\"%s\"",
+			intensity._flag,
+			channels._flag,
+			"-contrast-stretch",
+			"\"" ++ print blk.value ++ "x" ++ print wht.value ++ "%%\"",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+// FIXME: convolve (bias, kernel)
+
+Magick_crop_item = class
+	Menuaction "_Crop" "cut out a rectangular region" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		gravity = Magick.gravity_widget; 
+		geometry = Magick.WhxyGeometry_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			gravity._flag,
+			"-crop",
+			geometry._flag,
+			"+repage",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_deskew_item = class
+	Menuaction "_Deskew" "straighten the image" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		threshold = Scale "Threshold (percent)" 0 100 80;
+
+		// FIXME: toggle auto-crop?
+
+		command = Magick.command [
+			"\"%s\"",
+			"-deskew",
+			"\"" ++ print threshold.value ++ "%%\"",
+			"+repage",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_despeckle_item = class
+	Menuaction "_Despeckle" "reduce the speckles" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-despeckle",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_distort_item = class
+	Menuaction "_Distort" "distort using a method and arguments" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		virtpixback = Magick.VirtualPixelBack_widget;
+		distort = Magick.distort_widget;
+		args = String "Arguments" "1,0";
+		isPlus = Toggle "Extend to show entire image" false;
+
+		command = Magick.command [
+			"\"%s\"",
+			virtpixback._flag,
+			(if isPlus then "+" else "-") ++ "distort",
+			distort._flag,
+			args.value,
+			"+repage",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_draw_item = class
+	Menuaction "_Draw" "annotate with one or more graphic primitives" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		foreground = Magick.foreground_widget;
+		args = String "Arguments" "line 0,0 9,9 rectangle 10,10 20,20";
+
+		command = Magick.command [
+			"\"%s\"",
+			foreground._flag,
+			"-draw",
+			concat ["\"", args.value, "\""],
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_edge_item = class
+	Menuaction "_Edge" "detect edges" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		rad = Expression "Radius" 3;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-edge",
+			print rad.expr,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_emboss_item = class
+	Menuaction "_Emboss" "emboss" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		rad = Expression "Radius" 3;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-emboss",
+			print rad.expr,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_enhance_item = class
+	Menuaction "_Enhance" "enhance a noisy image" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-enhance",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_equalize_item = class
+	Menuaction "_Equalize" "equalize the histogram" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		channels = Magick.channels_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			channels._flag,
+			"-equalize",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_evaluate_item = class
+	Menuaction "_Evaluate" "evaluate an expression on each pixel channel" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		channels = Magick.channels_widget;
+		operation = Magick.evaluate_widget;
+		val = Expression "value" 5;
+		isPc = Toggle "Value is percent" false;
+
+		command = Magick.command [
+			"\"%s\"",
+			channels._flag, 
+			operation._flag, 
+			print val.expr ++ if isPc then "%%" else "",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_extent_item = class
+	Menuaction "_Extent" "set the image size and offset" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		background = Magick.background_widget;
+		compose = Magick.compose_widget;
+		gravity = Magick.gravity_widget; 
+		geometry = Magick.WhxyGeometry_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			compose._flag, 
+			background._flag, 
+			gravity._flag,
+			"-extent", 
+			geometry._flag,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+
+Magick_FlipFlopMenu_item = class
+	Menupullright "_Flip/flop" "flip/flop/transverse/transpose" {
+
+	Magick_flip_item = class
+		Menuaction "_Flip vertically" "mirror upside-down" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			command = Magick.command [
+				"\"%s\"",
+				"-flip",
+				"\"%s\""
+			];
+
+			_result = Magick.system command x; 
+		}
+	}
+
+	Magick_flop_item = class
+		Menuaction "_Flop horizontally" "mirror left-right" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			command = Magick.command [
+				"\"%s\"",
+				"-flop",
+				"\"%s\""
+			];
+
+			_result = Magick.system command x; 
+		}
+	}
+
+	Magick_transpose_item = class
+		Menuaction "_Transpose" "mirror along the top-left to bottom-right diagonal" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			command = Magick.command [
+				"\"%s\"",
+				"-transpose +repage",
+				"\"%s\""
+			];
+
+			_result = Magick.system command x; 
+		}
+	}
+
+	Magick_transverse_item = class
+		Menuaction "_Transverse" "mirror along the bottom-left to top-right diagonal" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			command = Magick.command [
+				"\"%s\"",
+				"-transverse +repage",
+				"\"%s\""
+			];
+
+			_result = Magick.system command x; 
+		}
+	}
+
+} // end Magick_FlipFlopMenu_item
+
+
+Magick_floodfill_item = class
+	Menuaction "_Floodfill" "recolour neighbours that match" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		foreground = Magick.foreground_widget;
+		fuzz = Magick.fuzz_widget;
+		coordinate = Magick.coordinate_widget;
+
+		// -draw "color x,y floodfill"
+		command = Magick.command [
+			"\"%s\"",
+			foreground._flag,
+			"-fuzz",
+			"\"" ++ print fuzz.value ++ "%%\"",
+			"-draw \" color",
+			coordinate._flag,
+			"floodfill \"",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_frame_item = class
+	Menuaction "_Frame" "surround with border or beveled frame" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		border = Magick.bordercol_widget;
+		compose = Magick.compose_widget;
+		matte = Magick.mattecol_widget;
+		geometry = Magick.FrameGeometry_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			compose._flag, 
+			border._flag, 
+			matte._flag, 
+			"-frame", 
+			geometry._flag,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_function_item = class
+	Menuaction "_Function" "evaluate a function on each pixel channel" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		channels = Magick.channels_widget;
+		function = Magick.function_widget;
+		// FIXME: explain values; use sensible defaults.
+		values = String "values" "0,0,0,0";
+
+		command = Magick.command [
+			"\"%s\"",
+			channels._flag,
+			"-function", 
+			function._flag, 
+			values.value,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_fx_item = class
+	Menuaction "_Fx" "apply a mathematical expression" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		channels = Magick.channels_widget;
+		interpolate = Magick.interpolate_widget;
+		virtpixback = Magick.VirtualPixelBack_widget;
+		args = String "Expression" "u*1/2";
+
+		command = Magick.command [
+			"\"%s\"",
+			channels._flag,
+			interpolate._flag,
+			virtpixback._flag,
+			"-fx",
+			concat ["\"", args.value, "\""],
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_gamma_item = class
+	Menuaction "_Gamma" "apply a gamma correction" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		channels = Magick.channels_widget;
+		gamma = Magick.gamma_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			channels._flag,
+			"-gamma",
+			print gamma.value,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_gradient_item = class
+	Menuaction "_Gradient" "apply a linear gradient" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		colourA = Magick.generalcol_widget;
+		colourB = Magick.generalcol_widget;
+
+		position = Option "colourA is at" [
+				"top", "bottom", 
+				"left", "right", 
+				"top-left", "top-right", 
+				"bottom-left", "bottom-right"] 0;
+		_baryArg
+			= concat ["0,0,", colourA._flag, " 0,%%[fx:h-1],", colourB._flag], position.value == 0
+			= concat ["0,0,", colourB._flag, " 0,%%[fx:h-1],", colourA._flag], position.value == 1
+			= concat ["0,0,", colourA._flag, " %%[fx:w-1],0,", colourB._flag], position.value == 2
+			= concat ["0,0,", colourB._flag, " %%[fx:w-1],0,", colourA._flag], position.value == 3
+			= concat ["0,0,", colourA._flag, " %%[fx:w-1],%%[fx:h-1],", colourB._flag], position.value == 4
+			= concat ["%%[fx:w-1],0,", colourA._flag, " 0,%%[fx:h-1],", colourB._flag], position.value == 5
+			= concat ["%%[fx:w-1],0,", colourB._flag, " 0,%%[fx:h-1],", colourA._flag], position.value == 6
+			= concat ["0,0,", colourB._flag, " %%[fx:w-1],%%[fx:h-1],", colourA._flag], position.value == 7
+			= "dunno";
+
+		command = Magick.command [
+			"\"%s\"",
+			"-sparse-color barycentric \"" ++ _baryArg ++ "\"",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_gradientCorn_item = class
+	Menuaction "_Gradient corners" 
+		"apply a bilinear gradient between the corners" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		colour_top_left = Magick.generalcol_widget;
+		colour_top_right = Magick.generalcol_widget;
+		colour_bottom_left = Magick.generalcol_widget;
+		colour_bottom_right = Magick.generalcol_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-sparse-color bilinear \"" ++
+				"0,0," ++ colour_top_left._flag ++
+				",%%[fx:w-1],0" ++ colour_top_right._flag ++
+				",0,%%[fx:h-1]" ++ colour_bottom_left._flag ++
+				",%%[fx:w-1],%%[fx:h-1]" ++ colour_bottom_right._flag ++ "\"",
+			"+depth",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_histogram_item = class
+	Menuaction "_Histogram" "make a histogram image" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-define histogram:unique-colors=false histogram:" ++
+				"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_implode_item = class
+	Menuaction "_Implode" "implode pixels about the center" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		factor = Scale "factor" 0 20 1;
+		interpolate = Magick.interpolate_widget;
+		// FIXME: virtual-pixel?
+
+		command = Magick.command [
+			"\"%s\"",
+			interpolate._flag,
+			"-implode", 
+			print factor.value,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_level_item = class
+	Menuaction "_Level" "adjust the level of channels" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		channels = Magick.channels_widget;
+		blk = Scale "black point" (-100) 200 0;
+		wht = Scale "white point" (-100) 200 100;
+		gam = Scale "gamma" 0 30 1;
+		isPc = Toggle "Levels are percent" true;
+		isInv = Toggle "Invert effect" false;
+
+		command = Magick.command [
+			"\"%s\"",
+			channels._flag,
+			(if isInv then "+" else "-") ++ "level",
+			"\"" ++ print blk.value ++ "," ++ 
+				print wht.value ++ (if isPc then "%%" else "") ++ "," ++ 
+				print gam.value ++ "\"",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_levelCols_item = class
+	Menuaction "_Level colors" "adjust levels to given colours" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		channels = Magick.channels_widget;
+		colour_black = Magick.generalcol_widget;
+		colour_white = Magick.generalcol_widget;
+		isInv = Toggle "Invert effect" false;
+
+		command = Magick.command [
+			"\"%s\"",
+			channels._flag,
+			(if isInv then "+" else "-") ++ "level-colors",
+			"\"" ++ colour_black._flag ++ "," ++ colour_white._flag ++ "\"",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_linearStretch_item = class
+	Menuaction "_Linear stretch" "stretches tones, making some black/white" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		channels = Magick.channels_widget;
+		blk = Scale "percent to make black" 0 100 0;
+		wht = Scale "percent to make white" 0 100 0;
+
+		command = Magick.command [
+			"\"%s\"",
+			channels._flag,
+			"-linear-stretch",
+			"\"" ++ print blk.value ++ "x" ++ print wht.value ++ "%%\"",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_magnify_item = class
+	Menuaction "_Magnify" "double the size of the image with pixel art scaling" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-magnify",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_modulate_item = class
+	Menuaction "_Modulate" "modulate brightness, saturation and hue" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		modcolsp = Magick.ModColSp_widget;
+		bright = Scale "brightness" 0 200 100;
+		sat = Scale "saturation" 0 200 100;
+		hue = Scale "hue" 0 200 100;
+
+		command = Magick.command [
+			"\"%s\"",
+			modcolsp._flag,
+			"-modulate",
+			print bright.value ++ "," ++ print sat.value ++ "," ++ 
+				print hue.value,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_monochrome_item = class
+	Menuaction "_Monochrome" "transform to black and white" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		// FIXME: also intensity?
+
+		intensity = Magick.intensity_widget;
+		treedepth = Expression "Treedepth" 8;
+		dither = Magick.dither_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			intensity._flag,
+			dither._flag,
+			"-treedepth", 
+			print treedepth.expr, 
+			"-monochrome",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_morphology_item = class
+	// See http://www.imagemagick.org/Usage/morphology/
+	Menuaction "_Morphology" "apply a morphological method" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		method = Magick.morphmeth_widget;
+		iter = Expression "Iterations (-1=repeat until done)" 1;
+
+		kernel = Magick.kernel_widget;
+		// FIXME: custom kernel eg "3x1+2+0:1,0,0"
+		//   width x height + offsx + offsy : {w*h values}
+		//   each value is 0.0 to 1.0 or "NaN" or "-"
+
+		// kernel args, mostly float radius,scale. radius=0=default. default scale = 1.0
+		// but
+		//   ring takes: radius1, radius2, scale
+		//   rectangle and comet take: width x height + offsx + offsy
+		//   blur takes: radius x sigma
+		// FIXME: for now, simply allow any string input.
+		kernel_arg = String "Kernel arguments" "";
+		channels = Magick.channels_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			channels._flag,
+			"-morphology",
+			method._flag ++ ":" ++ print iter.expr, 
+			kernel._flag ++
+			(if kernel_arg.value == "" then "" else ":") ++ kernel_arg.value,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_negate_item = class
+	Menuaction "_Negate" "negate" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		channels = Magick.channels_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			channels._flag,
+			"-negate",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_addNoise_item = class
+	Menuaction "_add Noise" "add noise" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		channels = Magick.channels_widget;
+		attenuate = Scale "attenuate" 0 1.0 1.0;
+		noise = Magick.noise_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			channels._flag,
+			"-attenuate", 
+			print attenuate.value,
+			noise._flag,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_normalize_item = class
+	Menuaction "_Normalize" "normalize" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		intensity = Magick.intensity_widget;
+		channels = Magick.channels_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			intensity._flag,
+			channels._flag,
+			"-normalize",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_opaque_item = class
+	Menuaction "_Opaque" "change this colour to the fill colour" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		channels = Magick.channels_widget;
+		fill = Magick.foreground_widget;
+		changeColour = Magick.changeCol_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			fill._flag,
+			channels._flag,
+			"-fuzz",
+			"\"" ++ print changeColour.fuzz.value ++ "%%\"",
+			(if changeColour.nonMatch then "+" else "-") ++ "opaque",
+			"\"" ++ changeColour.colour._flag ++ "\"",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_paint_item = class
+	Menuaction "_Paint" "simulate an oil painting" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		rad = Expression "radius" 10;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-paint",
+			print rad.expr,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+/*=== FIXME Bug; remove for now.
+Polaroid_item = class
+	Menuaction "_Polaroid" "simulate a polaroid picture" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		angle = Scale "angle" (-90) 90 20;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-polaroid",
+			print angle.value,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+===*/
+
+Magick_posterize_item = class
+	Menuaction "_Posterize" "reduce to (n) levels per channel" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		levels = Expression "levels" 3;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-posterize",
+			print levels.expr,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_raise_item = class
+	Menuaction "_Raise" "lighten or darken image edges" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		thk = Expression "Thickness" 3;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-raise",
+			print thk.expr,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_resize_item = class
+	Menuaction "_Resize" "resize to given width and height" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		filter = Magick.filter_widget;
+		type = Magick.ResizeType_widget;
+		width = Scale "Width" 1 100 10;
+		height = Scale "Height" 1 100 10;
+		isPc = Toggle "Width and height are percent" false;
+
+		command = Magick.command [
+			"\"%s\"",
+			filter._flag,
+			"-" ++ type._flag,
+			"\"" ++ print width.value ++ "x" ++ print height.value ++
+				(if isPc then "%%" else "!") ++ "\"",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_roll_item = class
+	Menuaction "_Roll" "roll an image horizontally or vertically" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		rollx = Expression "X" 3;
+		rolly = Expression "Y" 3;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-roll",
+			(if rollx.expr >= 0 then "+" else "") ++ print rollx.expr ++
+			(if rolly.expr >= 0 then "+" else "") ++ print rolly.expr,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_rotate_item = class
+	Menuaction "_Rotate" "rotate" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		angle = Scale "angle (degrees)" (-360) 360 20;
+		virtpixback = Magick.VirtualPixelBack_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			virtpixback._flag,
+			"+distort",
+			"SRT",
+			print angle.value,
+			"+repage",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+// FIXME: -segment, but cluster-threshold should be percentage of image area.
+
+Magick_sepia_item = class
+	Menuaction "_Sepia tone" "simulate a sepia-toned photo" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		threshold = Scale "Threshold (percent)" 0 100 80;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-sepia-tone",
+			"\"" ++ print threshold.value ++ "%%\"",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_shade_item = class
+	Menuaction "_Shade" "shade with a distant light source" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		azimuth = Scale "Azimuth (degrees)" (-360) 360 0;
+		elevation = Scale "Elevation (degrees)" 0 90 45;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-shade",
+			print azimuth.value ++ "x" ++ print elevation.value,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_shadow_item = class
+	Menuaction "_Shadow" "simulate a shadow" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		shadowCol = Magick.generalcol_widget;
+		opacity = Scale "Opacity (percent)" 0 100 75;
+		sigma = Scale "Sigma" 0 30 2;
+		// FIXME: make offsets a single widget?
+		offsx = Scale "X-offset" (-20) 20 4;
+		offsy = Scale "Y-offset" (-20) 20 4;
+		arePc = Toggle "offsets are percentages" false;
+
+		// FIXME: raw operation creates page offset, which vips dislikes.
+		// So we take this futher, compositing with source.
+		command = Magick.command [
+			"\"%s\"",
+			"\"(\" +clone",
+			"-background", "\"" ++ shadowCol._flag ++ "\"",
+			"-shadow",
+			concat [
+				"\"",
+				print opacity.value, "x", print sigma.value,
+				(if offsx.value >= 0 then "+" else ""), print offsx.value,
+				(if offsy.value >= 0 then "+" else ""), print offsy.value,
+				(if arePc then "%%" else ""),
+				"\""
+			],
+			"\")\" +swap -background None -layers merge",
+			"+repage",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_shave_item = class
+	Menuaction "_Shave" "shave pixels from the edges" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		width = Scale "Width" 0 50 10;
+		height = Scale "Height" 0 50 10;
+		isPc = Toggle "Width and height are percent" false;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-shave",
+			"\"" ++ print width.value ++ "x" ++ print height.value ++
+				(if isPc then "%%" else "") ++ "\"",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_shear_item = class
+	Menuaction "_Shear" "shear along the x-axis and/or y-axis" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		shearX = Expression "shear X (degrees)" 0;
+		shearY = Expression "shear Y (degrees)" 0;
+		background = Magick.background_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			background._flag,
+			"-shear",
+			print shearX.expr ++ "x" ++ print shearY.expr,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_sigmoid_item = class
+	Menuaction "_Sigmoid" "increase or decrease mid-tone contrast sigmoidally" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		channels = Magick.channels_widget;
+		contrast = Scale "contrast" 0 30 3;
+		midpoint = Scale "mid-point (percent)" 0 100 50;
+		isInv = Toggle "Invert effect" false;
+
+		command = Magick.command [
+			"\"%s\"",
+			channels._flag,
+			(if isInv then "+" else "-") ++ "sigmoidal-contrast",
+			"\"" ++ print contrast.value ++ "x" ++ 
+				print midpoint.value ++ "%%\"",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_sketch_item = class
+	Menuaction "_Sketch" "simulate a pencil sketch" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		radius = Magick.blur_rad_widget; 
+		sigma = Magick.sigma_widget;
+		angle = Scale "angle" (-360) 360 0;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-sketch",
+			print radius.value ++ "x" ++ print sigma.value ++
+				(if angle >= 0 then ("+" ++ print angle.value) else ""),
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_solarize_item = class
+	Menuaction "_Solarize" "negate all pixels above a threshold level" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		channels = Magick.channels_widget;
+		threshold = Scale "Threshold (percent)" 0 100 50;
+
+		command = Magick.command [
+			"\"%s\"",
+			channels._flag,
+			"-solarize",
+			"\"" ++ print threshold.value ++ "%%\"",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+// FIXME: -sparse-color needs abitrary list of {x,y,colour}.
+
+Magick_splice_item = class
+	Menuaction "_Splice" "splice a colour into the image" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		background = Magick.background_widget;
+		gravity = Magick.gravity_widget; 
+		geometry = Magick.WhxyGeometry_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			background._flag, 
+			gravity._flag,
+			"-splice", 
+			geometry._flag,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_spread_item = class
+	Menuaction "_Spread" "displace pixels by random amount" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		virtpixback = Magick.VirtualPixelBack_widget;
+		amount = Expression "Amount (pixels)" 5;
+
+		command = Magick.command [
+			"\"%s\"",
+			virtpixback._flag,
+			"-spread",
+			print amount.expr,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_statistic_item = class
+	Menuaction "_Statistic" "replace each pixel with statistic from neighbourhood" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		width = Expression "Width" 5;
+		height = Expression "Height" 5;
+		statisticType = Magick.StatType_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-statistic", 
+			statisticType._flag, 
+			print width.expr ++ "x" ++ print height.expr,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_swirl_item = class
+	Menuaction "_Swirl" "swirl around the centre" {
+	action x = class 
+		_result {
+		_vislevel = 3;
+
+		angle = Magick.angle_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-swirl",
+			print angle.value,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_thresholdMenu_item = class
+	Menupullright "_Threshold" "make black or white" {
+
+	Magick_threshold_item = class
+		Menuaction "_Threshold" "apply black/white threshold" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			intensity = Magick.intensity_widget;
+			channels = Magick.channels_widget;
+			threshold = Scale "Threshold (percent)" 0 100 50;
+
+			command = Magick.command [
+				"\"%s\"",
+				intensity._flag,
+				channels._flag,
+				"-threshold", 
+				"\"" ++ print threshold.value ++ "%%\"",
+				"\"%s\""
+			];
+
+			_result = Magick.system command x; 
+		}
+	}
+
+	Magick_blackThreshold_item = class
+		Menuaction "_Black threshold" "where below threshold set to black" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			channels = Magick.channels_widget;
+			threshold = Scale "Threshold (percent)" 0 100 50;
+
+			command = Magick.command [
+				"\"%s\"",
+				channels._flag,
+				"-black-threshold",
+				"\"" ++ print threshold.value ++ "%%\"",
+				"\"%s\""
+			];
+
+			_result = Magick.system command x; 
+		}
+	}
+
+	Magick_whiteThreshold_item = class
+		Menuaction "_White threshold" "where above threshold set to white" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			channels = Magick.channels_widget;
+			threshold = Scale "Threshold (percent)" 0 100 50;
+
+			command = Magick.command [
+				"\"%s\"",
+				channels._flag,
+				"-white-threshold",
+				"\"" ++ print threshold.value ++ "%%\"",
+				"\"%s\""
+			];
+
+			_result = Magick.system command x; 
+		}
+	}
+
+	Magick_latThreshold_item = class
+		Menuaction "_Local Adaptive Threshold" "where above average plus offset set to white, otherwise black" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			width = Expression "Width" 10;
+			height = Expression "Height" 10;
+			offset = Scale "Offset (percent)" (-100) 100 0;
+			// note: "-lat" doesn't respond to channels
+
+			command = Magick.command [
+				"\"%s\"",
+				"-lat",
+				concat ["\"", print width.expr, "x", print height.expr, 
+					(if offset.value >= 0 then "+" else ""), print offset.value,
+					"%%\""
+				],
+				"\"%s\""
+			];
+
+			_result = Magick.system command x; 
+		}
+	}
+
+	Magick_randThreshold_item = class
+		Menuaction "_Random Threshold" "between specified limits, apply random threshold" {
+		action x = class
+			_result {
+			_vislevel = 3;
+
+			channels = Magick.channels_widget;
+			low = Scale "Low threshold" 0 100 10;
+			high = Scale "High threshold" 0 100 90;
+			isPc = Toggle "Thresholds are percent" true;
+
+			command = Magick.command [
+				"\"%s\"",
+				channels._flag,
+				"-random-threshold", 
+				"\"" ++ print low.value ++ "x" ++ print high.value ++
+					(if isPc then "%%" else "") ++ "\"",
+				"\"%s\""
+			];
+
+			_result = Magick.system command x; 
+		}
+	}
+
+} // end ThresholdMenu_item
+
+
+// Note: alternatives include:
+// convert in.tif -write mpr:TILE +delete -size 200x200 -background XXXX -tile-offset +30+30 tile:mpr:TILE out.tif
+
+Magick_tile_item = class
+	Menuaction "_Tile" "fill given size with tiled image" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		size = Magick.Size_widget;
+
+		command = Magick.command [
+			size._flag,
+			"tile:" ++ "\"%s\"",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_tint_item = class
+	Menuaction "_Tint" "apply a tint" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		foreground = Magick.foreground_widget;
+		amount = Scale "amount (percent)" 0 100 50;
+
+		command = Magick.command [
+			"\"%s\"",
+			foreground._flag,
+			"-tint",
+			// snibgo note: although the amount is a percentage, it doesn't need "%" character.
+			print amount.value,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_transparent_item = class
+	Menuaction "_Transparent" "make this colour transparent" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		changeColour = Magick.changeCol_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-fuzz",
+			"\"" ++ print changeColour.fuzz.value ++ "%%\"",
+			(if changeColour.nonMatch then "+" else "-") ++ "transparent",
+			"\"" ++ changeColour.colour._flag ++ "\"",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_trim_item = class
+	Menuaction "_Trim" "trims away border" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		fuzz = Magick.fuzz_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-fuzz",
+			"\"" ++ print fuzz.value ++ "%%\"",
+			"-trim +repage",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_uniqueCols_item = class
+	Menuaction "_Unique colours" "discard all but one of any pixel color" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-unique-colors",
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_vignette_item = class
+	Menuaction "_Vignette" "soften the edges in vignette style" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		radius = Magick.blur_rad_widget; 
+		sigma = Magick.sigma_widget;
+		rx = Scale "Rolloff x (percent)" 0 100 10;
+		ry = Scale "Rolloff y (percent)" 0 100 10;
+		background = Magick.background_widget;
+
+		command = Magick.command [
+			"\"%s\"",
+			background._flag,
+			"-vignette",
+			print radius.value ++ "x" ++ print sigma.value ++
+				(if rx.value >= 0 then "+" else "") ++ print rx.value ++
+				(if ry.value >= 0 then "+" else "") ++ print ry.value,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+Magick_wave_item = class
+	Menuaction "_Wave" "shear the columns into a sine wave" {
+	action x = class
+		_result {
+		_vislevel = 3;
+
+		amplitude = Scale "Amplitude (pixels)" 0 100 10;
+		wavelength = Scale "Wavelength (pixels)" 0 100 10;
+
+		command = Magick.command [
+			"\"%s\"",
+			"-wave",
+			print amplitude.value ++ "x" ++ print wavelength.value,
+			"\"%s\""
+		];
+
+		_result = Magick.system command x; 
+	}
+}
+
+

@@ -67,34 +67,26 @@ imageheader_add_item( IMAGE *im,
 	char txt[256];
 	VipsBuf buf = VIPS_BUF_STATIC( txt );
 	GtkTreeIter iter;
-        char *value_str;
-	const char *extra;
 
-	value_str = g_strdup_value_contents( value );
-	vips_buf_appendf( &buf, "%s", value_str );
-
-	/* Look for enums and decode them.
+	/* Show the nicks for enums.
 	 */
-	extra = NULL;
-	if( strcmp( field, "coding" ) == 0 )
-		extra = vips_enum_nick( VIPS_TYPE_CODING, 
-			g_value_get_int( value ) );
-	else if( strcmp( field, "format" ) == 0 )
-		extra = vips_enum_nick( VIPS_TYPE_BAND_FORMAT, 
-			g_value_get_int( value ) );
-	else if( strcmp( field, "interpretation" ) == 0 )
-		extra = vips_enum_nick( VIPS_TYPE_INTERPRETATION, 
-			g_value_get_int( value ) );
-	if( extra )
-		vips_buf_appendf( &buf, " - %s", extra );
+	if( G_VALUE_HOLDS_ENUM( value ) ) 
+		vips_buf_appendf( &buf, "%s", 
+			vips_enum_nick( G_VALUE_TYPE( value ), 
+				g_value_get_enum( value ) ) );
+	else {
+		char *value_str;
+
+		value_str = g_strdup_value_contents( value );
+		vips_buf_appendf( &buf, "%s", value_str );
+		g_free( value_str );
+	}
 
 	gtk_list_store_append( imageheader->store, &iter );
 	gtk_list_store_set( imageheader->store, &iter,
 		NAME_COLUMN, field,
 		VALUE_COLUMN, vips_buf_all( &buf ),
 		-1 );
-
-	g_free( value_str );
 
 	return( NULL );
 }

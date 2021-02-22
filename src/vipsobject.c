@@ -77,7 +77,7 @@ vo_free( Vo *vo )
 static Vo *
 vo_new( Reduce *rc, const char *name )
 {
-	VipsObjectClass *class;
+	const VipsObjectClass *class;
 	Vo *vo;
 
 	if( !(class = vips_class_find( "VipsObject", name )) )
@@ -116,6 +116,26 @@ vo_gather_required( PElement *item, Vo *vo )
 	return( NULL );
 }
 
+static int
+vo_set_property( Vo *vo, 
+	const char *name, GParamSpec *pspec, GValue *value )
+{
+	/* If we're setting an enum from a string, look up the enum nickname.
+	 */
+	if( G_IS_PARAM_SPEC_ENUM( pspec ) &&
+		G_VALUE_TYPE( value ) == VIPS_TYPE_REF_STRING ) {
+		const char *str = vips_value_get_ref_string( value, NULL );
+
+		if( vips_object_set_argument_from_string( vo->object, 
+			name, str ) )
+			return( -1 );
+	}
+	else
+		g_object_set_property( G_OBJECT( vo->object ), name, value );
+
+	return( 0 );
+}
+
 static void *
 vo_set_required_input( VipsObject *object, GParamSpec *pspec,
         VipsArgumentClass *argument_class, 
@@ -132,12 +152,15 @@ vo_set_required_input( VipsObject *object, GParamSpec *pspec,
 		const char *name = g_param_spec_get_name( pspec );
 		int i = vo->nargs_required;
 
-		GValue value = { 0 };
+		GValue gvalue = { 0 };
 
-		if( !heap_ip_to_gvalue( &vo->args[i], &value ) )
+		if( !heap_ip_to_gvalue( &vo->args[i], &gvalue ) )
 			return( object );
-		g_object_set_property( G_OBJECT( object ), name, &value );
-		g_value_unset( &value );
+		if( vo_set_property( vo, name, pspec, &gvalue ) ) {
+			g_value_unset( &gvalue );
+			return( object );
+		}
+		g_value_unset( &gvalue );
 
 		vo->nargs_required += 1;
 	}
@@ -173,7 +196,10 @@ vo_set_optional_arg( const char *name, PElement *value, Vo *vo )
 			g_value_unset( &gvalue );
 			return( value );
 		}
-		g_object_set_property( G_OBJECT( vo->object ), name, &gvalue );
+		if( vo_set_property( vo, name, pspec, &gvalue ) ) {
+			g_value_unset( &gvalue );
+			return( value );
+		}
 		g_value_unset( &gvalue );
 	}
 

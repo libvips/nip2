@@ -9,16 +9,16 @@ SUFFIXES = .rc
 
 # only build the cli wrapper on win32
 if OS_WIN32 
-bin_PROGRAMS = nip2 nip2-cli
-nip2_cli_SOURCES = nip2-cli.c
-nip2_CFLAGS="-mwindows"
+bin_PROGRAMS = nip3 nip3-cli
+nip3_cli_SOURCES = nip3-cli.c
+nip3_CFLAGS="-mwindows"
 CLI_DIST = 
 else
-bin_PROGRAMS = nip2 
-CLI_DIST = nip2-cli.c
+bin_PROGRAMS = nip3 
+CLI_DIST = nip3-cli.c
 endif
 
-nip2_SOURCES = \
+nip3_SOURCES = \
 	gimpruler.c \
 	gimpruler.h \
 	vipsobject.c \
@@ -168,7 +168,6 @@ nip2_SOURCES = \
 	plotview.h \
 	model.c \
 	model.h \
-	nip2-icon.rc \
 	option.c \
 	option.h \
 	optionview.c \
@@ -300,6 +299,11 @@ need_rewrite = \
 	program.c \
 	program.h 
 
+if OS_WIN32
+nip3_SOURCES += \
+	nip3-icon.rc
+endif
+
 helpindex.h: 
 	./makehelpindex.pl $(prefix) > helpindex.h
 nipmarshal.h:
@@ -308,27 +312,19 @@ nipmarshal.c:
 	echo "#include \"nipmarshal.h\"" > nipmarshal.c 
 	glib-genmarshal --prefix=nip --body nipmarshal.list >> nipmarshal.c
 
-nip2-icon.rc:
-	echo 1 ICON \"nip2-icon.ico\" > nip2-icon.rc
-
 .rc.o:
-if OS_WIN32 
-	cp ${top_srcdir}/share/nip2/data/nip2-icon.ico .
+	cp ${top_srcdir}/share/nip3/data/nip3-icon.ico .
 	${WINDRES} $< -o $@ 
-else
-	echo "int poop () {}" >dummy.c 
-	$(CC) -c dummy.c -o $@
-endif
 
 # we have to replace the standard .y.c rule: we are a bison-only GLR parser,
 # so we can't use autoconf's preferred -y yacc-compatibility stuff
 .y.c:
 	$(BISON) --defines=$*.h -o $*.c $<
 
-nip2-model.o model.o: model.c parse.c
+nip3-model.o model.o: model.c parse.c
 
 AM_CPPFLAGS = @IP_CFLAGS@ 
-LDADD = @IP_CFLAGS@ @IP_LIBS@
+LDADD = @IP_CFLAGS@ @IP_LIBS@ 
 AM_LDFLAGS = @LDFLAGS@
 
 dist-hook:

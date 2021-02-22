@@ -147,7 +147,6 @@ extern int statfs();
 #include <goffice/graph/gog-legend.h>
 #include <goffice/graph/gog-chart-map.h>
 
-#include <goffice/gtk/go-graph-widget.h>
 
 #include <goffice/utils/go-color.h>
 #include <goffice/utils/go-marker.h>
@@ -158,6 +157,7 @@ extern int statfs();
 #endif /*HAVE_LIBGVC*/
 
 #include <vips/vips.h>
+#include <vips/vips7compat.h>
 #include <vips/debug.h>
 
 #include <libxml/tree.h>
@@ -184,6 +184,10 @@ extern int statfs();
  */
 #include "nipmarshal.h"
 
+/* XML namespace ... note, not nip2! We can't change this.
+ */
+#define NAMESPACE "http://www.vips.ecs.soton.ac.uk/nip" 
+
 #define MAXFILES (4000)		/* Max. no of files in path */
 #define STACK_SIZE (1000)	/* Depth of eval stack */
 #define LEN_LABEL (512)		/* Label on windows */
@@ -193,18 +197,16 @@ extern int statfs();
 #define MAX_STRSIZE (100000)	/* Size of text for user defs */
 #define MAX_TRACE (1024)	/* Biggest thing we print in trace */
 #define MAX_SSTACK (40)		/* Scope stack for parser */
-#define VIPS_HOMEPAGE "http://www.vips.ecs.soton.ac.uk"
+#define VIPS_HOMEPAGE "https://github.com/jcupitt/nip2"
 #define IP_NAME PACKAGE "-" VERSION
 #define NIP_DOCPATH "$VIPSHOME" G_DIR_SEPARATOR_S "share" G_DIR_SEPARATOR_S \
         "doc" G_DIR_SEPARATOR_S PACKAGE G_DIR_SEPARATOR_S "html"
 #define VIPS_DOCPATH "$VIPSHOME" G_DIR_SEPARATOR_S "share" G_DIR_SEPARATOR_S \
 	"doc" G_DIR_SEPARATOR_S "vips" G_DIR_SEPARATOR_S "html"
 #define IP_NAME PACKAGE "-" VERSION
-#define NAMESPACE VIPS_HOMEPAGE "/" "nip" 
-				/* XML namespace ... note, not nip2! */
 #define MAX_LINELENGTH (120)	/* Max chars we display of value */
 #define MAX_RECENT (10)		/* Number of recent items in file menu */
-#define NIP_COPYRIGHT "%s: &#0169;2014 Imperial College, London"
+#define NIP_COPYRIGHT "%s: &#0169;2018 Imperial College, London"
 
 /* Our stock_ids.
  */

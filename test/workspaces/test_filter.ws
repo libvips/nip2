@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/7.38.1">
+<root xmlns="http://www.vips.ecs.soton.ac.uk/nip/8.5.0">
   <Workspace window_x="6" window_y="56" window_width="1022" window_height="605" view="WORKSPACE_MODE_REGULAR" scale="1" offset="0" locked="false" lpane_position="400" lpane_open="false" rpane_position="100" rpane_open="false" local_defs="// private definitions for this workspace&#10;" name="test_filter" caption="Default empty workspace" filename="$HOME/GIT/nip2/test/workspaces/test_filter.ws">
     <Column x="0" y="0" open="true" selected="false" sform="false" next="17" name="B" caption="Colour / Colourspace">
       <Subcolumn vislevel="3">

@@ -1,3 +1,4 @@
+INSTALL
 test-driver
 test/test-suite.log
 test/test_all.sh.log
@@ -7,6 +8,7 @@ nip2-*.tar.gz
 *.o
 .*.swp
 TAGS
+tags
 Makefile
 scan
 Makefile.in
@@ -28,12 +30,10 @@ po/POTFILES
 fred
 po/Makefile.in.in
 src/.deps/
-src/dummy.c
 src/gtksheet-marshal.c
 src/gtksheettypebuiltins.c
 src/lex.c
 src/nip2
-src/nip2-icon.rc
 src/parse.c
 src/parse.h
 stamp-h1

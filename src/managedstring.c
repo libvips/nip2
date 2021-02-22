@@ -163,6 +163,8 @@ managedstring_new( Heap *heap, const char *string )
 	g_assert( !g_hash_table_lookup( managedstring_all, managedstring ) );
 	g_hash_table_insert( managedstring_all, managedstring, managedstring );
 
+	MANAGED( managedstring )->hash = managedstring_hash( managedstring ); 
+
 	return( managedstring );
 }
 

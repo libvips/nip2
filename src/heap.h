@@ -174,39 +174,50 @@ typedef struct pelement {
 /* Write to a PE. We are careful to eval all args before writing, in case we
  * are writing to one of the inputs.
  */
-#define PEPUTE(PE,E) {*((PE)->type)=(E)->type;*((PE)->ele)=(E)->ele;}
-#define PEPUTPE(PEto,PEfrom) {\
-	EType t99 = PEGETTYPE(PEfrom);\
-	void *v99 = PEGETVAL(PEfrom);\
+#define PEPUTE( PE, E ) \
+G_STMT_START { \
+ 	*((PE)->type) = (E)->type; \
+	*((PE)->ele) = (E)->ele; \
+} G_STMT_END
+
+#define PEPUTPE(PEto,PEfrom) \
+G_STMT_START { \
+	EType t99 = PEGETTYPE( PEfrom ); \
+	void *v99 = PEGETVAL( PEfrom ); \
 	\
-	*((PEto)->type) = t99;\
-	*((PEto)->ele) = v99;\
-}
-#define PEPUTP(PE,T,V) {\
-	EType t99 = (T);\
-	void *v99 = GUINT_TO_POINTER(V);\
+	*((PEto)->type) = t99; \
+	*((PEto)->ele) = v99; \
+} G_STMT_END
+
+#define PEPUTP( PE, T, V ) \
+G_STMT_START { \
+	EType t99 = (T); \
+	void *v99 = GUINT_TO_POINTER( V ); \
 	\
-	*((PE)->type) = t99;\
-	*((PE)->ele) = v99;\
-}
+	*((PE)->type) = t99; \
+	*((PE)->ele) = v99; \
+} G_STMT_END
 
 /* Write a PE to a node. Again, make sure we read both before we write, in
  * case we are writing an expression to ourselves.
  */
-#define PEPUTLEFT(N,PE) {\
-	EType t99 = PEGETTYPE(PE);\
-	void *v99 = PEGETVAL(PE);\
+#define PEPUTLEFT(N,PE) \
+G_STMT_START { \
+	EType t99 = PEGETTYPE( PE ); \
+	void *v99 = PEGETVAL( PE ); \
 	\
-	(N)->ltype = t99;\
-	(N)->body.ptrs.left = v99;\
-}
-#define PEPUTRIGHT(N,PE) {\
-	EType t99 = PEGETTYPE(PE);\
-	void *v99 = PEGETVAL(PE);\
+	(N)->ltype = t99; \
+	(N)->body.ptrs.left = v99; \
+} G_STMT_END
+
+#define PEPUTRIGHT( N, PE ) \
+G_STMT_START { \
+	EType t99 = PEGETTYPE( PE ); \
+	void *v99 = PEGETVAL( PE ); \
 	\
-	(N)->rtype = t99;\
-	(N)->body.ptrs.right = v99;\
-}
+	(N)->rtype = t99; \
+	(N)->body.ptrs.right = v99; \
+} G_STMT_END
 
 /* Predicates.
  */

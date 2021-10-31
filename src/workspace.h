@@ -68,7 +68,7 @@ struct _Workspace {
         WorkspaceMode mode;	/* Display mode */
 	gboolean locked;	/* WS has been locked */
 
-	/* The nip2 version that made this workspace.
+	/* The nip version that made this workspace.
 	 */
 	int major;
 	int minor;

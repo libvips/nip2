@@ -507,9 +507,11 @@ rowview_link( View *view, Model *model, View *parent )
 	/* Only drag n drop top level rows.
 	 */
 	if( row->top_row == row ) {
+		/* FIXME
 		gtk_drag_source_set( rview->but, GDK_BUTTON1_MASK, 
 			rowview_target_table, IM_NUMBER( rowview_target_table ),
 			GDK_ACTION_COPY );
+			 */
 		g_signal_connect( rview->but, "drag_data_get",
 			G_CALLBACK( rowview_drag_data_get ), rview );
 

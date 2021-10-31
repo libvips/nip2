@@ -127,7 +127,9 @@ toolkitview_refresh( vObject *vobject )
 			iwnd->accel_group );
 		im_snprintf( path, 256, 
 			"<mainw>/Toolkits/%s", IOBJECT( kit )->name );
+		/* FIXME
 		gtk_menu_set_accel_path( GTK_MENU( kview->menu ), path );
+		 */
 
 		changed = TRUE;
 	}

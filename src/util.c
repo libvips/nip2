@@ -2780,7 +2780,7 @@ recent_save( GSList *recent, const char *filename )
 	recent_free( old_recent );
 }
 
-/* Return the name of the save dir we use ... eg. "$HOME/.nip2-7.10.8",
+/* Return the name of the save dir we use ... eg. "$HOME/.nip-7.10.8",
  * or maybe "C:\Documents and Settings\john\Application Data"
  */
 const char *

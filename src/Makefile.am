@@ -9,18 +9,16 @@ SUFFIXES = .rc
 
 # only build the cli wrapper on win32
 if OS_WIN32 
-bin_PROGRAMS = nip3 nip3-cli
-nip3_cli_SOURCES = nip3-cli.c
-nip3_CFLAGS="-mwindows"
+bin_PROGRAMS = nip4 nip4-cli
+nip4_cli_SOURCES = nip4-cli.c
+nip4_CFLAGS="-mwindows"
 CLI_DIST = 
 else
-bin_PROGRAMS = nip3 
-CLI_DIST = nip3-cli.c
+bin_PROGRAMS = nip4 
+CLI_DIST = nip4-cli.c
 endif
 
-nip3_SOURCES = \
-	gimpruler.c \
-	gimpruler.h \
+nip4_SOURCES = \
 	vipsobject.c \
 	vipsobject.h \
 	plotmodel.c \
@@ -246,8 +244,6 @@ nip3_SOURCES = \
 	toolkitbrowser.h \
 	toolview.c \
 	toolview.h \
-	trace.c \
-	trace.h \
 	tree.c \
 	tree.h \
 	tslider.c \
@@ -300,8 +296,8 @@ need_rewrite = \
 	program.h 
 
 if OS_WIN32
-nip3_SOURCES += \
-	nip3-icon.rc
+nip4_SOURCES += \
+	nip4-icon.rc
 endif
 
 helpindex.h: 
@@ -313,7 +309,7 @@ nipmarshal.c:
 	glib-genmarshal --prefix=nip --body nipmarshal.list >> nipmarshal.c
 
 .rc.o:
-	cp ${top_srcdir}/share/nip3/data/nip3-icon.ico .
+	cp ${top_srcdir}/share/nip4/data/nip4-icon.ico .
 	${WINDRES} $< -o $@ 
 
 # we have to replace the standard .y.c rule: we are a bison-only GLR parser,
@@ -321,7 +317,7 @@ nipmarshal.c:
 .y.c:
 	$(BISON) --defines=$*.h -o $*.c $<
 
-nip3-model.o model.o: model.c parse.c
+nip4-model.o model.o: model.c parse.c
 
 AM_CPPFLAGS = @IP_CFLAGS@ 
 LDADD = @IP_CFLAGS@ @IP_LIBS@ 

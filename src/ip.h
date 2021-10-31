@@ -171,10 +171,6 @@ extern int statfs();
 #  endif
 #endif
 
-/* We use the gimp ruler widget.
- */
-#include "gimpruler.h"
-
 /* Our general widgets.
  */
 #include "formula.h"
@@ -184,7 +180,7 @@ extern int statfs();
  */
 #include "nipmarshal.h"
 
-/* XML namespace ... note, not nip2! We can't change this.
+/* XML namespace ... note, not nip4! We can't change this.
  */
 #define NAMESPACE "http://www.vips.ecs.soton.ac.uk/nip" 
 
@@ -197,7 +193,7 @@ extern int statfs();
 #define MAX_STRSIZE (100000)	/* Size of text for user defs */
 #define MAX_TRACE (1024)	/* Biggest thing we print in trace */
 #define MAX_SSTACK (40)		/* Scope stack for parser */
-#define VIPS_HOMEPAGE "https://github.com/jcupitt/nip2"
+#define VIPS_HOMEPAGE "https://github.com/libvips/nip2"
 #define IP_NAME PACKAGE "-" VERSION
 #define NIP_DOCPATH "$VIPSHOME" G_DIR_SEPARATOR_S "share" G_DIR_SEPARATOR_S \
         "doc" G_DIR_SEPARATOR_S PACKAGE G_DIR_SEPARATOR_S "html"
@@ -424,7 +420,6 @@ typedef void *(*tool_map_fn)( Tool *, void *, void * );
 #include "defbrowser.h"
 #include "log.h"
 #include "error.h"
-#include "trace.h"
 #include "program.h"
 #include "conversionview.h"
 #include "statusview.h"

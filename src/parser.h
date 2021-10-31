@@ -52,7 +52,7 @@ extern InputState input_state;
 
 /* Function declarations for parse.y.
  */
-void nip2yyerror( const char *sub, ... )
+void nipyyerror( const char *sub, ... )
 	__attribute__((format(printf, 1, 2)));
 void yyerror( const char *msg ); 
 #ifdef YYLENG_IS_YY_SIZE_T

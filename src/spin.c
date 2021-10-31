@@ -207,7 +207,9 @@ spin_init( Spin *spin )
 
 	ebox = gtk_event_box_new();
 	set_tooltip( ebox, _( "Expand or collapse row" ) );
+	/* FIXME 
 	gtk_event_box_set_visible_window( GTK_EVENT_BOX( ebox ), FALSE );
+	 */
         g_signal_connect( ebox, "button_press_event",
                 G_CALLBACK( spin_button_press_event_cb ), spin );
         g_signal_connect( ebox, "enter_notify_event",

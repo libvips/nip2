@@ -79,10 +79,13 @@ colourdisplay_set_drag_type( Colourdisplay *colourdisplay )
 		targets, IM_NUMBER( text_targets ),
 		GDK_ACTION_COPY );
 	gtk_drag_source_unset( GTK_WIDGET( colourdisplay ) );
+	// FIXME 
+	/*
 	gtk_drag_source_set( GTK_WIDGET( colourdisplay ),
 		GDK_BUTTON1_MASK | GDK_BUTTON3_MASK,
 		targets, IM_NUMBER( text_targets ),
 		GDK_ACTION_COPY | GDK_ACTION_MOVE );
+		 */
 }
 
 static void
@@ -105,7 +108,7 @@ colourdisplay_drag_begin( GtkWidget *widget, GdkDragContext *context )
 
 	window = iimageview_drag_window_new( 48, 32 ); 
 	g_object_set_data_full( G_OBJECT( widget ),
-		"nip2-drag-window", window,
+		"nip-drag-window", window,
 		(GDestroyNotify) gtk_widget_destroy );
 #ifdef DEBUG
 	printf( "colourdisplay_drag_begin: generating drag swatch colour\n" );
@@ -123,7 +126,7 @@ static void
 colourdisplay_drag_end( GtkWidget *widget, GdkDragContext *context )
 {
 	g_object_set_data( G_OBJECT( widget ), 
-		"nip2-drag-window", NULL );
+		"nip-drag-window", NULL );
 }
 
 static void

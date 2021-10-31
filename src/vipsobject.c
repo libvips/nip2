@@ -219,7 +219,7 @@ vo_set_optional( Vo *vo, PElement *optional )
 	return( TRUE );
 }
 
-/* Make a vo and supply args from nip2.
+/* Make a vo and supply args from nip.
  */
 static gboolean
 vo_args( Vo *vo, PElement *required, PElement *optional )

@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=nip3
+Name=nip4
 Comment=Image manipulation program based on VIPS
 Comment[it]=Programma per la manipolazione di immagini basato su VIPS
 Exec=nip2 %F

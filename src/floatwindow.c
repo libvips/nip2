@@ -78,36 +78,9 @@ floatwindow_build( GtkWidget *widget )
 	/* Position and size to restore? Come here after parent build, so we
 	 * can override any default settings from there.
 	 */
-	if( model->window_width != -1 ) {
-		GdkScreen *screen = 
-			gtk_widget_get_screen( GTK_WIDGET( floatwindow ) );
-		int screen_width = gdk_screen_get_width( screen );
-		int screen_height = gdk_screen_get_height( screen );
-
-		/* We need to clip x/y against the desktop size ... we may be
-		 * loading a workspace made on a machine with a big screen on
-		 * a machine with a small screen.
-
-		 	FIXME ... we could only clip if the window will be
-			completely off the screen? ie. ignore
-			iimage->window_width etc.
-
-		 */
-
-		int window_x = IM_CLIP( 0, model->window_x,
-			screen_width - model->window_width );
-		int window_y = IM_CLIP( 0, model->window_y,
-			screen_height - model->window_height );
-		int window_width = IM_MIN( model->window_width,
-			screen_width );
-		int window_height = IM_MIN( model->window_height,
-			screen_height );
-
-		gtk_window_move( GTK_WINDOW( floatwindow ), 
-			window_x, window_y );
+	if( model->window_width != -1 ) 
 		gtk_window_set_default_size( GTK_WINDOW( floatwindow ),
-			window_width, window_height );
-	}
+			model->window_width, model->window_height );
 }
 
 static void

@@ -674,7 +674,7 @@ static GtkActionEntry iwnd_actions[] = {
 
 	{ "Quit", 
 		GTK_STOCK_QUIT, N_( "_Quit" ), "<control>q",
-		N_( "Quit nip2" ), 
+		N_( "Quit nip" ), 
 		G_CALLBACK( main_quit_test ) },
 	{ "Guide", 
 		GTK_STOCK_HELP, N_( "_Contents" ), "F1",

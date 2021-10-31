@@ -756,7 +756,7 @@ main_check_temp( double total )
 	}
 }
 
-/* Make sure a savedir exists. Used to build the "~/.nip2-xx/tmp" etc.
+/* Make sure a savedir exists. Used to build the "~/.nip-xx/tmp" etc.
  * directory tree.
  */
 static void
@@ -983,9 +983,10 @@ main( int argc, char *argv[] )
 		main_option, GETTEXT_PACKAGE );
 
 	/* Don't start X here! We may be in batch mode.
-	 */
+	 *  FIXME
 	g_option_context_add_group( context, gtk_get_option_group( FALSE ) );
 	g_option_context_add_group( context, im_get_option_group() );
+	 */
 
 	if( !g_option_context_parse( context, &argc, &argv, &error ) ) 
 		vfatal( &error );
@@ -1276,7 +1277,7 @@ main( int argc, char *argv[] )
 	for( i = 0; i < argc; i++ ) {
 		/* Ignore "--" args. Consider eg. 
 		 *
-		 * 	./try201.nip2 -o x.v -- -12 ~/pics/shark.jpg 
+		 * 	./try201.nip -o x.v -- -12 ~/pics/shark.jpg 
 		 *
 		 * if we didn't remove --, all scripts would need to. 
 		 */

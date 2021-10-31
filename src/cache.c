@@ -989,7 +989,7 @@ cache_dispatch( CallInfo *vi, PElement *out )
 	/* Calculate the hash for this vi after building it, but before we do
 	 * cache_gather();
 	 *
-	 * We want the hash to reflect the args as supplied by nip2, not the
+	 * We want the hash to reflect the args as supplied by nip, not the
 	 * args as transformed by cache_gather() for this specific call.
 	 */
 	(void) cache_hash( vi );
@@ -1031,9 +1031,6 @@ cache_dispatch( CallInfo *vi, PElement *out )
 		g_object_unref( vi );
 		vi = old_vi;
 		g_object_ref( vi );
-
-		if( trace_flags & TRACE_VIPS ) 
-			vips_buf_appendf( trace_current(), "(from cache) " );
 
 #ifdef DEBUG_HISTORY
 		printf( "cache_dispatch: found %s in history\n", vi->name );

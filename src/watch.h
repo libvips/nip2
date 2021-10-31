@@ -321,7 +321,7 @@ const char *watch_string_get( Watchgroup *,
 	(watch_int_get( main_watchgroup, "JPEG_ICC_PROFILE", 0 ))
 #define IP_JPEG_ICC_PROFILE_FILE \
 	(watch_string_get( main_watchgroup, "JPEG_ICC_PROFILE_FILE", \
-		"$VIPSHOME/share/nip2/data/sRGB.icm" ))
+		"$VIPSHOME/share/nip4/data/sRGB.icm" ))
 #define IP_PPM_MODE \
 	(watch_int_get( main_watchgroup, "PPM_MODE", 0 ))
 #define IP_CSV_SEPARATOR \

@@ -336,7 +336,7 @@ about_build( iDialog *idlg, GtkWidget *work )
 		reduce_context->heap->max_fn( reduce_context->heap ) );
         vips_buf_appends( &buf, "\n" );
 
-        vips_buf_appendf( &buf, _( "%d vips calls cached by nip2" ), 
+        vips_buf_appendf( &buf, _( "%d vips calls cached by nip" ), 
 		cache_history_size );
         vips_buf_appends( &buf, "\n" );
 

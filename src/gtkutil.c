@@ -39,29 +39,10 @@ void
 adjustments_set_value( GtkAdjustment *hadj, GtkAdjustment *vadj,
         float hval, float vval )
 {
-        gboolean hchanged = FALSE;
-        gboolean vchanged = FALSE;
-
-        if( hval != gtk_adjustment_get_value( hadj ) ) {
+        if( hval != gtk_adjustment_get_value( hadj ) )
                 gtk_adjustment_set_value( hadj, hval );
-                hchanged = TRUE;
-        }
-        if( vval != gtk_adjustment_get_value( vadj ) ) {
+        if( vval != gtk_adjustment_get_value( vadj ) ) 
                 gtk_adjustment_set_value( vadj, vval ); 
-                vchanged = TRUE;
-        }
-
-#ifdef DEBUG
-        if( hchanged )
-                printf( "adjustments_set_value: hadj = %g\n", hval );
-        if( vchanged )
-                printf( "adjustments_set_value: vadj = %g\n", vval );
-#endif /*DEBUG*/
-
-        if( hchanged )
-                gtk_adjustment_value_changed( hadj );
-        if( vchanged )
-                gtk_adjustment_value_changed( vadj );
 }
 
 void *
@@ -302,8 +283,12 @@ popup_show( GtkWidget *host, GdkEvent *ev )
 	GtkWidget *popup = g_object_get_qdata( G_OBJECT( host ), quark_popup );
 
 	g_object_set_qdata( G_OBJECT( popup ), quark_host, host );
-	gtk_menu_popup( GTK_MENU( popup ), NULL, NULL,
-		(GtkMenuPositionFunc) NULL, NULL, 3, ev->button.time );
+
+	gtk_menu_popup_at_widget( GTK_MENU( popup ),
+		GTK_WIDGET( host ),
+		GDK_GRAVITY_SOUTH_WEST,
+		GDK_GRAVITY_NORTH_WEST,
+		NULL );
 }
 
 /* Event handler for popupshow.
@@ -960,10 +945,12 @@ set_symbol_drag_type( GtkWidget *widget )
 			targets, IM_NUMBER( targets ),
 			GDK_ACTION_COPY );
 
+	/* FIXME
 	gtk_drag_source_set( widget,
 		GDK_BUTTON1_MASK | GDK_BUTTON3_MASK,
 		targets, IM_NUMBER( targets ),
 		GDK_ACTION_COPY | GDK_ACTION_MOVE );
+		 */
 }
 
 typedef struct _Listen {
@@ -1047,6 +1034,8 @@ gobject_print( GObject *gobject )
 int
 get_dpi( void )
 {
+	/* FIXME
+	 *
 	GdkScreen *screen = gdk_screen_get_default();
 
 	if( screen ) {
@@ -1056,6 +1045,8 @@ get_dpi( void )
 		return( width_pixels / (width_mm / 25.4) );
 	}
 	else
+	 */
+
 		return( 72 );
 }
 

@@ -1,4 +1,4 @@
-Name:           nip3
+Name:           nip4
 Version:        8.9.0
 Release:	1%{?dist}
 Summary:	Interactive tool for working with large images

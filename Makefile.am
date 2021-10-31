@@ -11,28 +11,28 @@ EXTRA_DIST = \
 	proj \
 	m4 \
 	screenshot.png \
-	nip3.desktop.in \
-	nip3.xml \
-	nip3.appdata.xml
+	nip4.desktop.in \
+	nip4.xml \
+	nip4.appdata.xml
 
-nip3appdir = $(datadir)/applications
+nip4appdir = $(datadir)/applications
 
-nip3mimedir = $(datadir)/mime/packages
+nip4mimedir = $(datadir)/mime/packages
 
-nip3appdatadir = $(datadir)/appdata
+nip4appdatadir = $(datadir)/appdata
 
-nip3app_DATA = nip3.desktop
+nip4app_DATA = nip4.desktop
 
-nip3mime_DATA = nip3.xml
+nip4mime_DATA = nip4.xml
 
-nip3appdata_DATA = nip3.appdata.xml
+nip4appdata_DATA = nip4.appdata.xml
 
 install-exec-hook:
-	-rm -rf ${DESTDIR}$(datadir)/doc/nip3 
-	$(mkinstalldirs) ${DESTDIR}$(datadir)/doc/nip3
-	-cp -r ${top_srcdir}/doc/html ${top_srcdir}/doc/pdf ${DESTDIR}$(datadir)/doc/nip3
-	-rm -rf ${DESTDIR}$(datadir)/doc/nip3/html/CVS
-	-rm -rf ${DESTDIR}$(datadir)/doc/nip3/pdf/CVS
+	-rm -rf ${DESTDIR}$(datadir)/doc/nip4 
+	$(mkinstalldirs) ${DESTDIR}$(datadir)/doc/nip4
+	-cp -r ${top_srcdir}/doc/html ${top_srcdir}/doc/pdf ${DESTDIR}$(datadir)/doc/nip4
+	-rm -rf ${DESTDIR}$(datadir)/doc/nip4/html/CVS
+	-rm -rf ${DESTDIR}$(datadir)/doc/nip4/pdf/CVS
 
 if UPDATE_DESKTOP
 install-data-hook:
@@ -48,7 +48,7 @@ dist-hook:
 
 uninstall-hook:
 # make sure we have write permission for 'rm'
-	-chmod -R u+w ${DESTDIR}$(datadir)/doc/nip3
-	-rm -rf ${DESTDIR}$(datadir)/doc/nip3
+	-chmod -R u+w ${DESTDIR}$(datadir)/doc/nip4
+	-rm -rf ${DESTDIR}$(datadir)/doc/nip4
 	-$(UPDATE_MIME_DATABASE) ${DESTDIR}$(datadir)/mime
 	-$(UPDATE_DESKTOP_DATABASE) ${DESTDIR}$(datadir)/applications

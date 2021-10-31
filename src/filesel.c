@@ -412,7 +412,7 @@ filesel_csv_mode( char *out )
 typedef void (*make_mode_fn)( char *buf );
 
 typedef struct {
-	const char *caption_filter;	/* nip2 column name for the format */
+	const char *caption_filter;	/* nip column name for the format */
 	const char *name;		/* vips nickname for the format */
 	make_mode_fn mode_fn;		/* Build a mode string */
 } FileselMode;

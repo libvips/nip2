@@ -94,7 +94,7 @@ call_check_all_destroyed( void )
 #endif /*DEBUG_LEAK*/
 }
 
-/* Does a vips argument type require an argument from nip2?
+/* Does a vips argument type require an argument from nip?
  */
 gboolean
 call_type_needs_input( im_type_desc *ty )
@@ -113,7 +113,7 @@ call_type_needs_input( im_type_desc *ty )
 	return( FALSE );
 }
 
-/* Will a vips argument type generate a result for nip2?
+/* Will a vips argument type generate a result for nip?
  */
 gboolean
 call_type_makes_output( im_type_desc *ty )
@@ -446,7 +446,7 @@ call_add_input_ii( CallInfo *vi, Imageinfo *ii )
 	vi->ninii += 1;
 
 	/* We hold a ref to the ii until the call is done and the result
-	 * written back to nip2. If we cache the result, we make a new
+	 * written back to nip. If we cache the result, we make a new
 	 * weakref.
 	 */
 	managed_dup_nonheap( MANAGED( ii ) );
@@ -808,7 +808,7 @@ call_write_result( CallInfo *vi, PElement *out )
 /* Junk all the refs we were holding during the call. See call_add_input_ii() 
  * and call_add_output_ii().
  *
- * This gets called explicitly after we have handed the ii refs back to nip2
+ * This gets called explicitly after we have handed the ii refs back to nip
  * during normal processing, or from _dispose() if we bomb out early and
  * unref.
  */
@@ -1062,7 +1062,7 @@ call_add_output_ii( CallInfo *vi, Imageinfo *ii )
 	vi->noutii += 1;
 
 	/* We hold a ref to the ii until the call is done and the result
-	 * written back to nip2. If we cache the result, we make a new
+	 * written back to nip. If we cache the result, we make a new
 	 * weakref.
 	 */
 	managed_dup_nonheap( MANAGED( ii ) );
@@ -1156,9 +1156,6 @@ call_build_inputva( CallInfo *vi, int i, va_list *ap )
 
 		*((double*)vi->vargv[i]) = v;
 
-		if( trace_flags & TRACE_VIPS ) 
-			vips_buf_appendf( trace_current(), "%g ", v );
-
 		break;
 	}
 
@@ -1171,9 +1168,6 @@ call_build_inputva( CallInfo *vi, int i, va_list *ap )
 #endif /*DEBUG*/
 
 		*((int*)vi->vargv[i]) = v;
-
-		if( trace_flags & TRACE_VIPS ) 
-			vips_buf_appendf( trace_current(), "%d ", v );
 
 		break;
 	}
@@ -1188,11 +1182,6 @@ call_build_inputva( CallInfo *vi, int i, va_list *ap )
 
 		vi->vargv[i] = value;
 
-		if( trace_flags & TRACE_VIPS ) {
-			vips_buf_appendgv( trace_current(), value );
-			vips_buf_appends( trace_current(), " " );
-		}
-
 		break;
 	}
 
@@ -1206,12 +1195,6 @@ call_build_inputva( CallInfo *vi, int i, va_list *ap )
 #endif /*DEBUG*/
 
 		vi->vargv[i] = value;
-
-		if( trace_flags & TRACE_VIPS ) {
-			vips_object_to_string( VIPS_OBJECT( value ), 
-				trace_current() );
-			vips_buf_appends( trace_current(), " " );
-		}
 
 		break;
 	}
@@ -1230,24 +1213,6 @@ call_build_inputva( CallInfo *vi, int i, va_list *ap )
 		/* Filled in later.
 		 */
 		vi->vargv[i] = NULL;
-
-		if( trace_flags & TRACE_VIPS ) {
-			VipsBuf *buf = trace_current();
-
-			if( ii && ii->im ) {
-				vips_buf_appends( buf, "<" );
-				vips_buf_appendf( buf, 
-					_( "image \"%s\"" ),
-					ii->im->filename ); 
-				vips_buf_appends( buf, "> " );
-			}
-			else {
-				vips_buf_appends( buf, "<" );
-				vips_buf_appends( buf, 
-					_( "no image" ) );
-				vips_buf_appends( buf, "> " );
-			}
-		}
 
 		break;
 	}
@@ -1269,17 +1234,6 @@ call_build_inputva( CallInfo *vi, int i, va_list *ap )
 
 		if( call_make_doublevec( vi->vargv[i], n, vec ) )
 			return( FALSE );
-
-		if( trace_flags & TRACE_VIPS ) {
-			VipsBuf *buf = trace_current();
-			int i;
-
-			vips_buf_appendf( buf, "<" );
-			vips_buf_appendf( buf, _( "doublevec" ) );
-			for( i = 0; i < n; i++ )
-				vips_buf_appendf( buf, " %g", vec[i] );
-			vips_buf_appends( buf, "> " );
-		}
 
 		break;
 	}
@@ -1311,22 +1265,6 @@ call_build_inputva( CallInfo *vi, int i, va_list *ap )
 		for( i = 0; i < n; i++ )
 			if( !call_add_input_ii( vi, vec[i] ) )
 				return( FALSE );
-
-		if( trace_flags & TRACE_VIPS ) {
-			VipsBuf *buf = trace_current();
-			int i;
-
-			vips_buf_appendf( buf, "<" );
-			vips_buf_appendf( buf, _( "imagevec" ) );
-			for( i = 0; i < n; i++ ) {
-				vips_buf_appendf( buf, " <" );
-				vips_buf_appendf( buf, 
-					_( "image \"%s\"" ),
-					vec[i]->im->filename );
-				vips_buf_appendf( buf, ">" );
-			}
-			vips_buf_appends( buf, "> " );
-		}
 
 		break;
 	}
@@ -1399,32 +1337,18 @@ callva_sub( Reduce *rc, const char *name, PElement *out, va_list *ap )
 	CallInfo *vi;
 	gboolean result;
 
-	if( trace_flags & TRACE_VIPS ) 
-		trace_push();
-
 	if( !(vi = call_new( rc, im_find_function( name ) )) )
 		return( FALSE );
-
-	if( trace_flags & TRACE_VIPS ) 
-		vips_buf_appendf( trace_current(), "\"%s\" ", vi->name );
 
 	result = TRUE;
 
 	if( !call_fillva( vi, ap ) )
 		result = FALSE;
 
-	if( trace_flags & TRACE_VIPS ) 
-		vips_buf_appends( trace_current(), " ->\n" ); 
-
 	if( result && (
 		!(vi = cache_dispatch( vi, out )) ||
 		!call_write_result( vi, out ) ) )  
 		result = FALSE;
-
-	if( trace_flags & TRACE_VIPS ) {
-		trace_result( TRACE_VIPS, out );
-		trace_pop();
-	}
 
 	if( vi ) {
 		/* We must drop refs explicitly, since this unref might not
@@ -1542,24 +1466,12 @@ call_spine_sub( Reduce *rc, const char *name, im_function *fn,
 	if( !(vi = call_new( rc, fn )) )
 		return( FALSE );
 
-	if( trace_flags & TRACE_VIPS ) {
-		VipsBuf *buf = trace_push();
-
-		vips_buf_appendf( buf, "\"%s\" ", name );
-		trace_args( arg, vi->nargs );
-	}
-
 	result = TRUE;
 
 	if( !call_fill_spine( vi, arg ) ||
 		!(vi = cache_dispatch( vi, out )) ||
 		!call_write_result( vi, out ) )
 		result = FALSE;
-
-	if( trace_flags & TRACE_VIPS ) {
-		trace_result( TRACE_VIPS, out );
-		trace_pop();
-	}
 
 	if( vi ) {
 		/* We must drop refs explicitly, since this unref might not

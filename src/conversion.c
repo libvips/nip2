@@ -283,9 +283,8 @@ conversion_render_notify_cb( IMAGE *im, Rect *area, void *client )
 static int
 conversion_get_default_tiles( Conversion *conv )
 {
-	GdkScreen *screen = gdk_screen_get_default();
-	int width = gdk_screen_get_width( screen ) / conv->tile_size;
-	int height = gdk_screen_get_height( screen ) / conv->tile_size;
+	int width = 3000 / conv->tile_size;
+	int height = 2000 / conv->tile_size;
 
 	return( 2 * width * height );
 }

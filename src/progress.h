@@ -87,7 +87,7 @@ typedef struct _ProgressClass {
 	void (*end)( Progress * );
 } ProgressClass;
 
-/* Called from all over nip2 as computation proceeds.
+/* Called from all over nip as computation proceeds.
  */
 void progress_begin( void );
 gboolean progress_update_percent( int percent, int eta );

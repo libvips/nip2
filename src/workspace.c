@@ -859,7 +859,7 @@ workspace_save( Model *model, xmlNode *xnode )
 		return( NULL );
 
 	/* We have to save our workspacegroup's filename here for compt with
-	 * older nip2.
+	 * older nip.
 	 */
 	if( !set_sprop( xthis, "filename", FILEMODEL( wsg )->filename ) )
 		return( NULL );
@@ -895,7 +895,7 @@ workspace_load_toolkit( const char *filename, Toolkitgroup *toolkitgroup )
 	return( NULL );
 }
 
-/* The compat modes this version of nip2 has. Search the compat dir and make a
+/* The compat modes this version of nip has. Search the compat dir and make a
  * list of these things.
  */
 #define MAX_COMPAT (100)
@@ -1366,7 +1366,8 @@ workspace_selected_remove_yesno( Workspace *ws, GtkWidget *parent )
 	box_yesno( parent, 
 		workspace_selected_remove_yesno_cb, iwindow_true_cb, ws, 
 		iwindow_notify_null, NULL,
-		GTK_STOCK_DELETE, 
+		// FIXME GTK_STOCK_DELETE, 
+		"",
 		_( "Delete selected objects?" ),
 		_( "Are you sure you want to delete %s?" ), vips_buf_all( &buf ) );
 }
@@ -1664,7 +1665,8 @@ workspace_jump_build( Column *column, GtkWidget *menu )
 	item = gtk_menu_item_new_with_label( vips_buf_all( &buf ) );
 	g_signal_connect( item, "activate",
 		G_CALLBACK( workspace_jump_column_cb ), column );
-	gtk_menu_append( GTK_MENU( menu ), item );
+	// FIXME really no idea
+	//gtk_menu_append( GTK_MENU( menu ), item );
 	gtk_widget_show( item );
 
 	return( NULL );

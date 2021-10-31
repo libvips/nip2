@@ -802,7 +802,7 @@ program_kit_destroy( Toolkit *kit, Program *program )
 	program_refresh( program );
 }
 
-/* Is a character one of those allowed in nip2 identifers?
+/* Is a character one of those allowed in nip identifers?
  */
 static gboolean
 is_ident( int ch )
@@ -1807,11 +1807,6 @@ static GtkActionEntry program_actions[] = {
 		N_( "Info on selected object" ), 
 		G_CALLBACK( program_info_action_cb ) },
 
-	{ "Trace", 
-		NULL, N_( "_Trace" ), NULL,
-		N_( "Make a new trace window" ), 
-		G_CALLBACK( program_trace_action_cb ) },
-
 	{ "Errors", 
 		NULL, N_( "_Errors" ), NULL,
 		N_( "Show all errors" ), 
@@ -1874,7 +1869,6 @@ static const char *program_menubar_ui_description =
 "      <menuitem action='DefBrowser'/>"
 "    </menu>"
 "    <menu action='DebugMenu'>"
-"      <menuitem action='Trace'/>"
 "      <menuitem action='Errors'/>"
 "    </menu>"
 "    <menu action='HelpMenu'>"
@@ -2346,7 +2340,7 @@ program_popdown( iWindow *iwnd, void *client, iWindowNotifyFn nfn, void *sys )
 		gtk_paned_get_position( GTK_PANED( program->lpane ) ) );
 
 	/* We can't parse in popdown, we may have lost too much of the rest of 
-	 * nip2 before here.
+	 * nip before here.
 	 */
 	nfn( sys, IWINDOW_YES );
 }

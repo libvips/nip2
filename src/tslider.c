@@ -167,15 +167,10 @@ tslider_real_changed( Tslider *tslider )
 
 		tslider->last_to = tslider->to;
 		tslider->last_from = tslider->from;
-
-		gtk_adjustment_changed( adj );
 	}
 
-	if( !DEQ( tslider->svalue, tslider->last_svalue ) ) {
+	if( !DEQ( tslider->svalue, tslider->last_svalue ) ) 
 		gtk_adjustment_set_value( adj, tslider->svalue ); 
-
-		gtk_adjustment_value_changed( adj );
-	}
 
 	g_signal_handlers_unblock_matched( G_OBJECT( adj ), 
 		G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, tslider );

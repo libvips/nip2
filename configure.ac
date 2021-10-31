@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([nip3], [8.9.0], [vipsip@jiscmail.ac.uk])
+AC_INIT([nip4], [8.9.0], [vipsip@jiscmail.ac.uk])
 
 # foreign stops complaints about a missing README (we use README.md instead)
 # and missing INSTALL (the standard Gnu INSTALL is not very useful)
@@ -120,7 +120,7 @@ AC_PROG_LIBTOOL
 AM_WITH_DMALLOC
 
 # i18n
-GETTEXT_PACKAGE=nip3
+GETTEXT_PACKAGE=nip4
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
 	[The prefix for our gettext translation domains.])
@@ -150,7 +150,7 @@ AC_COMPILE_IFELSE([AC_LANG_DEFINES_PROVIDED [`cat $LEX_OUTPUT_ROOT.c`]], [
 ])
 rm -f conftest.l $LEX_OUTPUT_ROOT.c
 
-PKG_CHECK_MODULES(REQUIRED_PACKAGES, gtk+-3.0 libxml-2.0 vips >= 8.10)
+PKG_CHECK_MODULES(REQUIRED_PACKAGES, gtk4-x11 vips >= 8.11)
 IP_CFLAGS="$REQUIRED_PACKAGES_CFLAGS $IP_CFLAGS"
 IP_LIBS="$REQUIRED_PACKAGES_LIBS $IP_LIBS"
 
@@ -206,41 +206,6 @@ if test "x$with_libgsf" != "xno"; then
     ])
   IP_CFLAGS="$LIBGSF_CFLAGS $LIBGSF_INCLUDES $IP_CFLAGS"
   IP_LIBS="$LIBGSF_LIBS $IP_LIBS"
-fi
-
-# optional ... use libgoffice to draw plots
-# pretty basic functionality, really, but we need to be able to build without
-# it for testing
-AC_ARG_WITH([libgoffice], AS_HELP_STRING([--without-libgoffice], [build without libgoffice (default: test)]))
-
-if test "x$with_libgoffice" != "xno"; then
-  PKG_CHECK_MODULES(LIBGOFFICE, libgoffice-0.10,
-    [AC_DEFINE(HAVE_LIBGOFFICE,1,[define if you have libgoffice installed.])
-     with_libgoffice=yes
-    ],
-    [AC_MSG_WARN([libgoffice not found; disabling plot display])
-     with_libgoffice=no
-    ])
-  IP_CFLAGS="$LIBGOFFICE_CFLAGS $LIBGOFFICE_INCLUDES $IP_CFLAGS"
-  IP_LIBS="$LIBGOFFICE_LIBS $IP_LIBS"
-fi
-
-# optional ... use libgvc to draw graphs of workspace dependencies
-AC_ARG_WITH([libgvc], AS_HELP_STRING([--without-libgvc], [build without libgvc (default: test)]))
-
-# gvc 2.30 is broken in a number of ways and we can't use it, see for example
-# http://lists.research.att.com/pipermail/graphviz-devel/2012/001544.html
-
-if test "x$with_libgvc" != "xno"; then
-  PKG_CHECK_MODULES(LIBGVC, libgvc > 2.30,
-    [AC_DEFINE(HAVE_LIBGVC,1,[define if you have libgvc installed.])
-     with_libgvc=yes
-    ],
-    [AC_MSG_WARN([libgvc not found; disabling workspace dep graph display])
-     with_libgvc=no
-    ])
-  IP_CFLAGS="$LIBGVC_CFLAGS $LIBGVC_INCLUDES $IP_CFLAGS"
-  IP_LIBS="$LIBGVC_LIBS $IP_LIBS"
 fi
 
 # optional ... we add some gsl funcs as builtins if available
@@ -301,38 +266,38 @@ TOP_SRCDIR=$ac_pwd
 AC_SUBST(TOP_SRCDIR)
 
 AC_OUTPUT([
-	nip3.desktop
+	nip4.desktop
 	Makefile
 	man/Makefile
 	man/man1/Makefile
 	share/Makefile
-	share/nip3/Makefile
-	share/nip3/data/Makefile
-	share/nip3/rc/Makefile
-	share/nip3/start/Makefile
-	share/nip3/compat/Makefile
-	share/nip3/compat/7.8/Makefile
-	share/nip3/compat/7.9/Makefile
-	share/nip3/compat/7.10/Makefile
-	share/nip3/compat/7.12/Makefile
-	share/nip3/compat/7.14/Makefile
-	share/nip3/compat/7.16/Makefile
-	share/nip3/compat/7.24/Makefile
-	share/nip3/compat/7.26/Makefile
-	share/nip3/compat/7.28/Makefile
-	share/nip3/compat/7.38/Makefile
-	share/nip3/compat/7.40/Makefile
-	share/nip3/compat/8.2/Makefile
-	share/nip3/compat/8.3/Makefile
-	share/nip3/compat/8.4/Makefile
-	share/nip3/compat/8.5/Makefile
-	share/nip3/compat/8.6/Makefile
+	share/nip4/Makefile
+	share/nip4/data/Makefile
+	share/nip4/rc/Makefile
+	share/nip4/start/Makefile
+	share/nip4/compat/Makefile
+	share/nip4/compat/7.8/Makefile
+	share/nip4/compat/7.9/Makefile
+	share/nip4/compat/7.10/Makefile
+	share/nip4/compat/7.12/Makefile
+	share/nip4/compat/7.14/Makefile
+	share/nip4/compat/7.16/Makefile
+	share/nip4/compat/7.24/Makefile
+	share/nip4/compat/7.26/Makefile
+	share/nip4/compat/7.28/Makefile
+	share/nip4/compat/7.38/Makefile
+	share/nip4/compat/7.40/Makefile
+	share/nip4/compat/8.2/Makefile
+	share/nip4/compat/8.3/Makefile
+	share/nip4/compat/8.4/Makefile
+	share/nip4/compat/8.5/Makefile
+	share/nip4/compat/8.6/Makefile
 	src/BITMAPS/Makefile 
 	src/Makefile
 	test/Makefile
 	test/test_all.sh
 	po/Makefile.in
-	nip3.spec
+	nip4.spec
 ])
 
 # generated script needs to be executable

@@ -228,78 +228,6 @@ imagepresent_class_init( ImagepresentClass *class )
 	 */
 }
 
-/* Rethink rulers.
- */
-static void
-imagepresent_hruler_rethink( Imagepresent *ip )
-{
-	Imagemodel *imagemodel = ip->imagemodel;
-	Conversion *conv = imagemodel->conv;
-	IMAGE *im = imageinfo_get( FALSE, conv->ii );
-
-	/* Try to get the ruler width: same as the whole of the scrolled
-	 * window.
-	 */
-	int ruler_width = GTK_WIDGET( ip->swin )->allocation.width;
-
-	double from = imagemodel->visible.left;
-	double to = from + ruler_width;
-	double pos = ip->last_x;
-
-	double scale;
-
-	if( imagemodel->rulers_offset && im ) {
-		from -= im->Xoffset;
-		to -= im->Xoffset;
-		pos -= im->Xoffset;
-	}
-
-	scale = conversion_dmag( conv->mag );
-	if( imagemodel->rulers_mm && im ) 
-		scale *= im->Xres;
-
-	from /= scale;
-	to /= scale;
-	pos /= scale;
-
-	gtk_ruler_set_range( GTK_RULER( ip->hrule ), from, to, pos, to - from );
-}
-
-static void
-imagepresent_vruler_rethink( Imagepresent *ip )
-{
-	Imagemodel *imagemodel = ip->imagemodel;
-	Conversion *conv = imagemodel->conv;
-	IMAGE *im = imageinfo_get( FALSE, conv->ii );
-
-	/* Try to get the ruler height: same as the whole of the scrolled
-	 * window.
-	 */
-	int ruler_height = GTK_WIDGET( ip->swin )->allocation.height;
-
-	double from = imagemodel->visible.top;
-	double to = from + ruler_height;
-	double pos = ip->last_y;
-
-	double scale;
-
-	if( imagemodel->rulers_offset && im ) {
-		from -= im->Yoffset;
-		to -= im->Yoffset;
-		pos -= im->Yoffset;
-	}
-
-	scale = conversion_dmag( conv->mag );
-	if( imagemodel->rulers_mm && im ) 
-		scale *= im->Yres;
-
-	from /= scale;
-	to /= scale;
-	pos /= scale;
-
-	gtk_ruler_set_range( GTK_RULER( ip->vrule ), from, to, pos, to - from );
-}
-
 /* Zoom with the mouse clicked at position x, y in canvas coordinates.
  */
 static void
@@ -410,8 +338,6 @@ imagepresent_hadj_changed_cb( GtkAdjustment *adj, Imagepresent *ip )
 	printf( "imagepresent_hadj_changed_cb: left = %d, width = %d\n",
 		imagemodel->visible.left, imagemodel->visible.width );
 #endif /*DEBUG*/
-
-	imagepresent_hruler_rethink( ip );
 }
 
 static void
@@ -459,110 +385,6 @@ imagepresent_floating_new( Imagepresent *ip,
  */
 static void imagepresent_left_release( Imagepresent *ip, GdkEvent *ev, 
 	int x, int y );
-
-static gint
-imagepresent_hruler_event( GtkWidget *widget, GdkEvent *ev, Imagepresent *ip )
-{
-	Imagemodel *imagemodel = ip->imagemodel;
-	Conversion *conv = imagemodel->conv;
-	IMAGE *im = imageinfo_get( FALSE, conv->ii );
-	gboolean handled = FALSE;
-
-	switch( ev->type ) {
-	case GDK_BUTTON_PRESS:
-		switch( ev->button.button ) {
-		case 1:
-			(void) imagemodel_set_state( imagemodel, 
-				IMAGEMODEL_SELECT, NULL );
-			imagepresent_floating_new( ip,
-				0, 0, im->Xsize, 0,
-				TRUE, REGIONVIEW_HGUIDE,
-				REGIONVIEW_RESIZE_BOTTOM,
-				ev->button.x, ev->button.y );
-
-			/* The pointer will be grabbed for the drag on the
-			 * ruler window. We want to track in the main image
-			 * display window, so we have to explicitly ungrab.
-			 */
-			gdk_pointer_ungrab( ev->button.time );
-
-			handled = TRUE;
-
-			break;
-
-		default:
-			break;
-		}
-		break;
-
-	case GDK_BUTTON_RELEASE:
-		switch( ev->button.button ) {
-		case 1:
-			imagepresent_left_release( ip, ev, 
-				ev->button.x, ev->button.y );
-			handled = TRUE;
-			break;
-
-		default:
-			break;
-		}
-		break;
-
-	default:
-		break;
-	}
-
-	return( handled );
-}
-
-static gint
-imagepresent_vruler_event( GtkWidget *widget, GdkEvent *ev, Imagepresent *ip )
-{
-	Imagemodel *imagemodel = ip->imagemodel;
-	Conversion *conv = imagemodel->conv;
-	IMAGE *im = imageinfo_get( FALSE, conv->ii );
-	gboolean handled = FALSE;
-
-	switch( ev->type ) {
-	case GDK_BUTTON_PRESS:
-		switch( ev->button.button ) {
-		case 1:
-			(void) imagemodel_set_state( imagemodel, 
-				IMAGEMODEL_SELECT, NULL );
-			imagepresent_floating_new( ip,
-				0, 0, 0, im->Ysize,
-				TRUE, REGIONVIEW_VGUIDE,
-				REGIONVIEW_RESIZE_RIGHT,
-				ev->button.x, ev->button.y );
-			gdk_pointer_ungrab( ev->button.time );
-			handled = TRUE;
-
-			break;
-
-		default:
-			break;
-		}
-		break;
-
-	case GDK_BUTTON_RELEASE:
-		switch( ev->button.button ) {
-		case 1:
-			imagepresent_left_release( ip, ev, 
-				ev->button.x, ev->button.y );
-			handled = TRUE;
-			break;
-
-		default:
-			break;
-		}
-		break;
-
-	default:
-		break;
-	}
-
-	return( handled );
-}
 
 /* Track this during a snap.
  */
@@ -1285,13 +1107,6 @@ imagepresent_event_cb( GtkWidget *widget, GdkEvent *ev, Imagepresent *ip )
 			ev->motion.state & GDK_BUTTON2_MASK ) 
 			imagepresent_button_motion( ip, ev );
 
-		/* Update tick marks on rulers, if they're being drawn.
-		 */
-		if( GTK_WIDGET_VISIBLE( ip->hrule ) ) {
-			imagepresent_hruler_rethink( ip );
-			imagepresent_vruler_rethink( ip );
-		}
-
 		break;
 
 	case GDK_ENTER_NOTIFY:
@@ -1556,42 +1371,8 @@ imagepresent_init( Imagepresent *ip )
 	popup_add_but( ip->ruler_menu, GTK_STOCK_CLOSE,
 		POPUP_FUNC( imagepresent_ruler_hide_cb ) );
 
-	/* Make rulers.
-	 */
-	ip->hrule = GTK_HRULER( gtk_hruler_new() );
-	gtk_ruler_set_metric( GTK_RULER( ip->hrule ), GTK_PIXELS );
-	GTK_WIDGET_UNSET_FLAGS( GTK_WIDGET( ip->hrule ), GTK_CAN_FOCUS );
-	gtk_widget_show( GTK_WIDGET( ip->hrule ) );
-
-	ip->vrule = GTK_VRULER( gtk_vruler_new() );
-	gtk_ruler_set_metric( GTK_RULER( ip->vrule ), GTK_PIXELS );
-	GTK_WIDGET_UNSET_FLAGS( GTK_WIDGET( ip->vrule ), GTK_CAN_FOCUS );
-	gtk_widget_show( GTK_WIDGET( ip->vrule ) );
-
-	ip->heb = GTK_EVENT_BOX( gtk_event_box_new() );
-        gtk_container_add( GTK_CONTAINER( ip->heb ), GTK_WIDGET( ip->hrule ) );
-        g_signal_connect( ip->heb, "event",
-		G_CALLBACK( imagepresent_hruler_event ), ip );
-        popup_attach( GTK_WIDGET( ip->heb ), ip->ruler_menu, ip );
-
-	ip->veb = GTK_EVENT_BOX( gtk_event_box_new() );
-        gtk_container_add( GTK_CONTAINER( ip->veb ), GTK_WIDGET( ip->vrule ) );
-        g_signal_connect( ip->veb, "event",
-		G_CALLBACK( imagepresent_vruler_event ), ip );
-        popup_attach( GTK_WIDGET( ip->veb ), ip->ruler_menu, ip );
-
 	/* Attach all widgets to table.
 	 */
-	gtk_table_attach( GTK_TABLE( table ), GTK_WIDGET( ip->heb ), 
-		1, 2, 0, 1,
-		GTK_EXPAND | GTK_SHRINK | GTK_FILL,
-		GTK_FILL, 
-		2, 2 );
-	gtk_table_attach( GTK_TABLE( table ), GTK_WIDGET( ip->veb ), 
-		0, 1, 1, 2,
-		GTK_FILL, 
-		GTK_EXPAND | GTK_SHRINK | GTK_FILL,
-		2, 2 );
 	gtk_table_attach( GTK_TABLE( table ), GTK_WIDGET( ip->swin ), 
 		1, 2, 1, 2,
 		GTK_FILL | GTK_EXPAND | GTK_SHRINK, 
@@ -1612,11 +1393,6 @@ imagepresent_imagemodel_changed_cb( Imagemodel *imagemodel, Imagepresent *ip )
 	if( ip->cntxt )
 		iwindow_cursor_context_set_cursor( ip->cntxt, 
 			imagepresent_cursors[imagemodel->state] );
-
-	widget_visible( GTK_WIDGET( ip->heb ), imagemodel->show_rulers );
-	widget_visible( GTK_WIDGET( ip->veb ), imagemodel->show_rulers );
-	imagepresent_hruler_rethink( ip );
-	imagepresent_vruler_rethink( ip );
 }
 
 /* The model has a new imageinfo.

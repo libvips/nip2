@@ -1,4 +1,4 @@
-/* nip2-cli.c ... run the nip2 executable, connecting stdin and stdout to the
+/* nip4-cli.c ... run the nip4 executable, connecting stdin and stdout to the
  * console
  *
  * 11/12/09
@@ -36,8 +36,8 @@
  */
 
 /* Windows does not let a single exe run in both command-line and GUI mode. To
- * run nip2 in command-line mode, we run this CLI wrapper program instead,
- * which starts the main nip2 exe, connecting stdin/out/err appropriately.
+ * run nip4 in command-line mode, we run this CLI wrapper program instead,
+ * which starts the main nip4 exe, connecting stdin/out/err appropriately.
  */
 
 #include <windows.h>
@@ -83,12 +83,12 @@ main (int argc, char **argv)
   DWORD dwRead;
   CHAR buf[1024];
 
-  /* we run the nip2.exe in the same directory as this exe: swap the last 
-   * pathname component for nip2.exe
+  /* we run the nip4.exe in the same directory as this exe: swap the last 
+   * pathname component for nip4.exe
    * we change the argv[0] pointer, probably not a good idea
    */
   dirname = g_path_get_dirname (argv[0]);
-  argv[0] = g_build_filename (dirname, "nip2.exe", NULL);
+  argv[0] = g_build_filename (dirname, "nip4.exe", NULL);
   g_free (dirname);
 
   if (_access (argv[0], 00))

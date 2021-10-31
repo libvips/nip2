@@ -67,7 +67,6 @@ struct _Reduce {
 	jmp_buf error[SPINE_SIZE];
 	int sps[SPINE_SIZE];
 	int fsps[SPINE_SIZE];
-	int tsp[SPINE_SIZE];
 };
 
 #define RSPUSH(RC,N) { \
@@ -144,12 +143,10 @@ struct _Reduce {
 { \
 	rc->sps[rc->running] = rc->sp; \
 	rc->fsps[rc->running] = rc->fsp; \
-	rc->tsp[rc->running] = trace_get_mark(); \
 	if( setjmp( rc->error[rc->running++] ) ) { \
 		g_assert( rc->running >= 0 ); \
 		rc->sp = rc->sps[rc->running]; \
 		rc->fsp = rc->fsps[rc->running]; \
-		trace_pop_to( rc->tsp[rc->running] ); \
 		return( (R) ); \
 	} \
 }

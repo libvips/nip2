@@ -753,7 +753,7 @@ symbol_new_defining( Compile *compile, const char *name )
 	/* Block definition of "root" anywhere ... too confusing.
 	 */
 	if( strcmp( name, IOBJECT( symbol_root )->name ) == 0 )
-		nip2yyerror( _( "Attempt to redefine root symbol \"%s\"." ), 
+		nipyyerror( _( "Attempt to redefine root symbol \"%s\"." ), 
 			name );
 
 	/* Is this a redefinition of an existing symbol?
@@ -779,7 +779,7 @@ symbol_new_defining( Compile *compile, const char *name )
 		default:
 			/* Parameter, workspace, etc.
 			 */
-			nip2yyerror( _( "Can't redefine %s \"%s\"." ), 
+			nipyyerror( _( "Can't redefine %s \"%s\"." ), 
 				decode_SymbolType_user( sym->type ), name );
 			/*NOTREACHED*/
 		}

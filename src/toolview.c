@@ -174,8 +174,10 @@ toolview_refresh_sub( Toolview *tview,
 
 			gtk_menu_set_accel_group( GTK_MENU( submenu ), 
 				IWINDOW( mainw )->accel_group );
+			/* FIXME
 			gtk_menu_set_accel_path( GTK_MENU( submenu ), 
 				toolitem->path );
+				*/
 
 			for( p = toolitem->children; p; p = p->next ) {
 				Toolitem *child = p->data;

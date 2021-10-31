@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
-# html docs in $VIPSHOME/share/nip2/doc/html include extra anchor tags
-# generated from \mylabel{} stuff in doc src (nip2-xx/doc/src/nipguide)
+# html docs in $VIPSHOME/share/nip4/doc/html include extra anchor tags
+# generated from \mylabel{} stuff in doc src (nip-xx/doc/src/nipguide)
 #
 # latex source
 #
@@ -12,7 +12,7 @@
 #
 #	<a NAME="nip_label_sec:view"> </a>
 #
-# scan all html files in $VIPSHOME/share/nip2/doc/html for patterns like this,
+# scan all html files in $VIPSHOME/share/nip4/doc/html for patterns like this,
 # and generate C along the lines of:
 #
 #	{ "sec:view", "node4.html#nip_label_sec:view" },
@@ -24,7 +24,7 @@
 # we can pop up a web browser pointing at the right place in the docs
 
 $prefix = @ARGV[0];
-$docbase = "$prefix/share/doc/nip2/html";
+$docbase = "$prefix/share/doc/nip4/html";
 
 opendir( SDIR, "$docbase" );
 

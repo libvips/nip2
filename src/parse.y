@@ -184,7 +184,7 @@ void *parse_access_end( Symbol *sym, Symbol *main );
 %glr-parser
 %expect-rr 13
 
-%error-verbose
+%define parse.error verbose
 
 %%
 
@@ -1051,10 +1051,10 @@ int parse_object_id = 0;
 /* Here for errors in parse. 
  *
  * Bison calls yyerror with only a char* arg. This printf() version is called
- * from nip2 in a few places during parse.
+ * from nip in a few places during parse.
  */
 void
-nip2yyerror( const char *sub, ... )
+nipyyerror( const char *sub, ... )
 {
 	va_list ap;
  	char buf[4096];
@@ -1079,7 +1079,7 @@ nip2yyerror( const char *sub, ... )
 void
 yyerror( const char *msg )
 {
-	nip2yyerror( "%s", msg );
+	nipyyerror( "%s", msg );
 }
 
 /* Attach yyinput to a file.
@@ -1664,11 +1664,11 @@ parse_set_symbol( void )
 			 * come. Look up this one and move to that context.
 			 */
 			if( !(sym = compile_lookup( compile, ident )) ) 
-				nip2yyerror( _( "'%s' does not exist" ), 
+				nipyyerror( _( "'%s' does not exist" ), 
 					ident );
 			if( !sym->expr || 
 				!sym->expr->compile )
-				nip2yyerror( _( "'%s' has no members" ), 
+				nipyyerror( _( "'%s' has no members" ), 
 					ident );
 			compile = sym->expr->compile;
 			IM_FREE( ident );

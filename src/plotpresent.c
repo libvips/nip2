@@ -80,10 +80,12 @@ plotpresent_get_preferred_width( GtkWidget *widget,
 	GtkBin *bin = GTK_BIN( widget );
 	GtkWidget *child = gtk_bin_get_child( bin );
 
+	/* FIXME
 	if( child && 
 		gtk_widget_get_visible( child ) ) 
 		gtk_widget_get_preferred_width( child,
 			minimal_width, natural_width );
+	 */
 }
 
 static void

@@ -231,12 +231,12 @@ workspacegroupview_class_init( WorkspacegroupviewClass *class )
 	view_class->child_front = workspacegroupview_child_front;
 }
 
-typedef struct _nip2GtkNotebookPage {
+typedef struct _nipGtkNotebookPage {
 	  GtkWidget *child;
 
 	  /* A lot of stuff follows in the real struct, which we ignore.
 	   */
-} nip2GtkNotebookPage;
+} nipGtkNotebookPage;
 
 /* gtk+-2.20 and earlier had a bug whereby switch_page would be given a
  * GtkNotebookPage rather than the actual page widget.

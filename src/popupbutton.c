@@ -49,44 +49,15 @@ popupbutton_init( Popupbutton *popupbutton )
 }
 
 static void
-popupbutton_position_func( GtkMenu *menu, 
-	gint *x, gint *y, gboolean *push_in, GtkWidget *button )
-{
-	GtkRequisition minimum_size;
-	GtkRequisition natural_size;
-	GtkTextDirection direction;
-	GtkAllocation allocation;
-
-	gtk_widget_get_preferred_size( GTK_WIDGET( menu ), 
-		&minimum_size, &natural_size );
-
-	direction = gtk_widget_get_direction( button );
-
-	gdk_window_get_origin( gtk_widget_get_window( button ), x, y );
-	gtk_widget_get_allocation( button, &allocation );
-	*x += allocation.x;
-	*y += allocation.y;
-
-	if( direction == GTK_TEXT_DIR_LTR )
-		*x += VIPS_MAX( allocation.width - natural_size.width, 0 );
-	else if( natural_size.width > allocation.width )
-		*x -= natural_size.width - allocation.width;
-
-	*y += allocation.height;
-
-	*push_in = FALSE;
-}
-
-static void
 popupbutton_over_arrow( Popupbutton *popupbutton, GdkEventButton *event )
 {
 	GtkWidget *menu = popupbutton->menu;
 
-	gtk_menu_popup( GTK_MENU( menu ), NULL, NULL, 
-		(GtkMenuPositionFunc) popupbutton_position_func,
-		popupbutton,
-		event ? event->button : 0,
-		event ? event->time : gtk_get_current_event_time() );
+	gtk_menu_popup_at_widget( GTK_MENU( menu ),
+		GTK_WIDGET( popupbutton ),
+		GDK_GRAVITY_SOUTH_WEST,
+		GDK_GRAVITY_NORTH_WEST,
+		NULL );
 }
 
 static void

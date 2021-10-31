@@ -442,7 +442,7 @@ matrixview_edited_cb( GtkCellRendererText *renderer,
 
 	if( gtk_tree_model_get_iter_from_string( tree, &iter, path ) ) {
 		int col = GPOINTER_TO_INT( g_object_get_data( 
-			G_OBJECT( renderer ), "nip2_column_num" ) );
+			G_OBJECT( renderer ), "nip_column_num" ) );
 
 		gtk_list_store_set( GTK_LIST_STORE( tree ), &iter, 
 			col, atof( new_text ),
@@ -458,7 +458,7 @@ matrixview_cell_data_cb( GtkTreeViewColumn *tree_column, GtkCellRenderer *cell,
 	GtkTreeModel *tree, GtkTreeIter *iter, void *data )
 {
 	int col = GPOINTER_TO_INT( g_object_get_data( 
-		G_OBJECT( cell ), "nip2_column_num" ) );
+		G_OBJECT( cell ), "nip_column_num" ) );
 	double d;
 	char buf[256];
 
@@ -499,7 +499,7 @@ matrixview_text_build( Matrixview *matrixview )
 		renderer = gtk_cell_renderer_text_new();
 		g_object_set( renderer, "editable", TRUE, NULL );
 		g_object_set_data( G_OBJECT( renderer ), 
-			"nip2_column_num", GINT_TO_POINTER( i ) );
+			"nip_column_num", GINT_TO_POINTER( i ) );
 		g_signal_connect( G_OBJECT( renderer ), "edited",
 			G_CALLBACK( matrixview_edited_cb ), matrixview );
 

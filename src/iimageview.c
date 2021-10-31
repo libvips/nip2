@@ -74,7 +74,7 @@ iimageview_drag_begin( GtkWidget *widget, GdkDragContext *context )
 	window = iimageview_drag_window_new( 
 		conv->canvas.width, conv->canvas.height );
 	g_object_set_data_full( G_OBJECT( widget ),
-		"nip2-drag-window", window,
+		"nip-drag-window", window,
 		(GDestroyNotify) gtk_widget_destroy );
 	id = imagedisplay_new( conv );
 	gtk_container_add( GTK_CONTAINER( window ), GTK_WIDGET( id ) );
@@ -90,7 +90,7 @@ iimageview_drag_end( GtkWidget *widget, GdkDragContext *context )
 #endif /*DEBUG*/
 
 	g_object_set_data( G_OBJECT( widget ), 
-		"nip2-drag-window", NULL );
+		"nip-drag-window", NULL );
 }
 
 static void

@@ -292,8 +292,8 @@ AC_OUTPUT([
 	share/nip4/compat/8.4/Makefile
 	share/nip4/compat/8.5/Makefile
 	share/nip4/compat/8.6/Makefile
-	src/BITMAPS/Makefile 
 	src/Makefile
+	src/BITMAPS/Makefile
 	test/Makefile
 	test/test_all.sh
 	po/Makefile.in

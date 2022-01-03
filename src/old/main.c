@@ -1,0 +1,1512 @@
+/* main() ... start everything up. See mainw.c for main window stuff.
+ */
+
+/*
+
+    Copyright (C) 1991-2003 The National Gallery
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+ */
+
+/*
+
+    These files are distributed with VIPS - http://www.vips.ecs.soton.ac.uk
+
+ */
+
+#include "ip.h"
+
+/* 
+#define DEBUG
+ */
+
+/* Show all paint actions with flashing stuff.
+#define DEBUG_UPDATES
+ */
+
+/* Stop startup creation of externs for all VIPS functions etc.
+#define DEBUG_NOAUTO
+ */
+
+/* Stop on any gtk error/warning/whatever. Usually set by configure for dev
+ * builds. 
+#define DEBUG_FATAL
+ */
+
+/* But some themes can trigger warnings, argh, so sometimes we need to
+ * undef it. VipsObject sets can trigger warnings. libgoffice will warn about
+ * precision issues if run under valgrind.
+ */
+#undef DEBUG_FATAL
+
+/* Time startup.
+#define DEBUG_TIME
+ */
+
+/* On quit, make sure we free stuff we can free. 
+#define DEBUG_LEAK
+ */
+
+/* Sometimes we need to be able to disable these at build time.
+#undef DEBUG_LEAK
+#undef DEBUG_FATAL
+ */
+
+/* General stuff. 
+ */
+Workspaceroot *main_workspaceroot = NULL;	/* All the workspaces */
+Toolkitgroup *main_toolkitgroup = NULL;		/* All the toolkits */
+Symbol *main_symbol_root = NULL;		/* Root of symtable */
+Watchgroup *main_watchgroup = NULL;		/* All of the watches */
+Imageinfogroup *main_imageinfogroup = NULL;	/* All of the images */
+
+void *main_c_stack_base = NULL;			/* Base of C stack */
+
+gboolean main_starting = TRUE;			/* In startup */
+
+static const char *main_argv0 = NULL;		/* argv[0] */
+static iOpenFile *main_stdin = NULL;		/* stdin as an iOpenFile */
+
+static char *main_option_script = NULL;
+static char *main_option_expression = NULL;
+gboolean main_option_batch = FALSE;
+static gboolean main_option_no_load_menus = FALSE;
+static gboolean main_option_no_load_args = FALSE;
+static gboolean main_option_stdin_ws = FALSE;
+static gboolean main_option_stdin_def = FALSE;
+static char *main_option_output = NULL;
+static char **main_option_set = NULL;
+static gboolean main_option_benchmark = FALSE;
+gboolean main_option_time_save = FALSE;
+gboolean main_option_profile = FALSE;
+gboolean main_option_i18n = FALSE;
+gboolean main_option_verbose = FALSE;
+static gboolean main_option_print_main = FALSE;
+static gboolean main_option_version = FALSE;
+static gboolean main_option_test = FALSE;
+static char *main_option_prefix = NULL;
+
+static GOptionEntry main_option[] = {
+	{ "expression", 'e', 0, G_OPTION_ARG_STRING, &main_option_expression, 
+		N_( "evaluate and print EXPRESSION" ), 
+		"EXPRESSION" },
+	{ "script", 's', 0, G_OPTION_ARG_FILENAME, &main_option_script, 
+		N_( "load FILE as a set of definitions" ), 
+		"FILE" },
+	{ "output", 'o', 0, G_OPTION_ARG_FILENAME, &main_option_output, 
+		N_( "write value of 'main' to FILE" ), "FILE" },
+	{ "batch", 'b', 0, G_OPTION_ARG_NONE, &main_option_batch, 
+		N_( "run in batch mode" ), NULL },
+	{ "set", '=', 0, G_OPTION_ARG_STRING_ARRAY, &main_option_set, 
+		N_( "set values" ), NULL },
+	{ "verbose", 'V', 0, G_OPTION_ARG_NONE, &main_option_verbose, 
+		N_( "verbose error output" ), NULL },
+	{ "no-load-menus", 'm', 0, G_OPTION_ARG_NONE, 
+		&main_option_no_load_menus, 
+		N_( "don't load menu definitions" ), NULL },
+	{ "no-load-args", 'a', 0, G_OPTION_ARG_NONE, &main_option_no_load_args, 
+		N_( "don't try to load command-line arguments" ), NULL },
+	{ "stdin-ws", 'w', 0, G_OPTION_ARG_NONE, &main_option_stdin_ws, 
+		N_( "load stdin as a workspace" ), NULL },
+	{ "stdin-def", 'd', 0, G_OPTION_ARG_NONE, &main_option_stdin_def, 
+		N_( "load stdin as a set of definitions" ), NULL },
+	{ "print-main", 'p', 0, G_OPTION_ARG_NONE, &main_option_print_main, 
+		N_( "print value of 'main' to stdout" ), 
+		NULL },
+	{ "benchmark", 'c', 0, G_OPTION_ARG_NONE, &main_option_benchmark, 
+		N_( "start up and shut down" ), 
+		NULL },
+	{ "time-save", 't', 0, G_OPTION_ARG_NONE, &main_option_time_save, 
+		N_( "time image save operations" ), 
+		NULL },
+	{ "profile", 'r', 0, G_OPTION_ARG_NONE, &main_option_profile, 
+		N_( "profile workspace calculation" ), 
+		NULL },
+	{ "prefix", 'x', 0, G_OPTION_ARG_FILENAME, &main_option_prefix, 
+		N_( "start as if installed to PREFIX" ), "PREFIX" },
+	{ "i18n", 'i', 0, G_OPTION_ARG_NONE, &main_option_i18n, 
+		N_( "output strings for internationalisation" ), 
+		NULL },
+	{ "version", 'v', 0, G_OPTION_ARG_NONE, &main_option_version, 
+		N_( "print version number" ), 
+		NULL },
+	{ "test", 'T', 0, G_OPTION_ARG_NONE, &main_option_test, 
+		N_( "test for errors and quit" ), NULL },
+	{ NULL }
+};
+
+/* Accumulate startup errors here.
+ */
+static char main_start_error_txt[MAX_STRSIZE];
+static VipsBuf main_start_error = VIPS_BUF_STATIC( main_start_error_txt );
+
+static void
+main_log_add( const char *fmt, ... )
+{
+	va_list ap;
+
+        va_start( ap, fmt );
+	vips_buf_vappendf( &main_start_error, fmt, ap );
+        va_end( ap );
+}
+
+static const char *
+main_log_get( void )
+{
+	return( vips_buf_all( &main_start_error ) );
+}
+
+static gboolean
+main_log_is_empty( void )
+{
+	return( vips_buf_is_empty( &main_start_error ) );
+}
+
+/* NULL log handler. Used to suppress output on win32 without DEBUG_FATAL.
+ */
+#ifndef DEBUG_FATAL
+#ifdef OS_WIN32 
+static void
+main_log_null( const char *log_domain, GLogLevelFlags log_level,
+	const char *message, void *user_data )
+{
+}
+#endif /*OS_WIN32*/ 
+#endif /*!DEBUG_FATAL*/
+
+/* Print all errors and quit. Batch mode only.
+ */
+static void
+main_error_exit( const char *fmt, ... )
+{
+	va_list args;
+
+        va_start( args, fmt );
+        (void) vfprintf( stderr, fmt, args );
+        va_end( args );
+	fprintf( stderr, "\n" );  
+
+	if( strcmp( error_get_top(), "" ) != 0 ) {
+		fprintf( stderr, "%s\n", error_get_top() ); 
+		if( strcmp( error_get_sub(), "" ) != 0 ) 
+			fprintf( stderr, "%s\n", error_get_sub() ); 
+	}
+
+	if( main_option_verbose ) {
+		char txt[MAX_STRSIZE];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
+
+		slist_map( expr_error_all,
+			(SListMapFn) expr_error_print, &buf );
+		fprintf( stderr, "%s", vips_buf_all( &buf ) );
+	}
+
+	exit( 1 );
+}
+
+/* Output a single main.
+ */
+static void
+main_print_main( Symbol *sym )
+{
+	PElement *root;
+
+	root = &sym->expr->root;
+	if( !symbol_recalculate_check( sym ) ||
+		!reduce_pelement( reduce_context, reduce_spine_strict, root ) ) 
+		main_error_exit( _( "error calculating \"%s\"" ), 
+			symbol_name_scope( sym ) );
+
+	if( main_option_output ) {
+		char filename[FILENAME_MAX];
+
+		im_strncpy( filename, main_option_output, FILENAME_MAX );
+		if( !group_save_item( root, filename ) )
+			main_error_exit( _( "error saving \"%s\"" ), 
+				symbol_name_scope( sym ) );
+	}
+
+	if( main_option_print_main )
+		graph_value( root );
+}
+
+static void *
+main_print_ws( Workspace *ws, gboolean *found )
+{
+	Symbol *sym;
+
+	if( (sym = compile_lookup( ws->sym->expr->compile, "main" )) ) {
+		main_print_main( sym );
+		*found = TRUE;
+	}
+
+	return( NULL );
+}
+
+/* Clean up our application and quit. Not interactive! Do any "has been
+ * modified, OK to quit?" stuff before this, see main_quit_test().
+ */
+static void
+main_quit( void )
+{
+#if HAVE_FFTW || HAVE_FFTW3
+	iOpenFile *of;
+#endif /*HAVE_FFTW || HAVE_FFTW3*/
+
+#ifdef DEBUG
+	printf( "main_quit: cleaning up ...\n" );
+#endif/*DEBUG*/
+
+	if( main_option_print_main || 
+		main_option_output ) {
+		Symbol *sym;
+		gboolean found;
+
+		symbol_recalculate_all();
+
+		/* Process all the mains we can find: one at the top level,
+		 * one in each workspace.
+		 */
+		found = FALSE;
+		if( (sym = compile_lookup( 
+			symbol_root->expr->compile, "main" )) ) {
+			main_print_main( sym );
+			found = TRUE;
+		}
+		workspace_map( (workspace_map_fn) main_print_ws, &found, NULL );
+
+		if( !found )
+			main_error_exit( "%s", _( "no \"main\" found" ) );
+	}
+
+	/* Force all our windows down.
+	 */
+	iwindow_map_all( (iWindowMapFn) iwindow_kill, NULL );
+
+	/* Saves recent and stuff like that.
+	 */
+	mainw_shutdown();
+
+	/* Dump wisdom back again.
+	 */
+#if HAVE_FFTW || HAVE_FFTW3
+	if( (of = ifile_open_write( "%s" G_DIR_SEPARATOR_S "wisdom", 
+		get_savedir() )) ) {
+		fftw_export_wisdom_to_file( of->fp );
+		ifile_close( of );
+	}
+#endif /*HAVE_FFTW*/
+
+	/* Remove any ws retain files.
+	 */
+	workspacegroup_autosave_clean();
+
+	/* Junk all symbols. This may remove a bunch of intermediate images
+	 * too.
+	 */
+	UNREF( main_watchgroup );
+	UNREF( main_symbol_root );
+	UNREF( main_toolkitgroup );
+	UNREF( main_workspaceroot );
+
+	/* Junk reduction machine ... this should remove all image temps.
+	 */
+	reduce_destroy( reduce_context );
+
+#ifdef DEBUG_LEAK
+#ifdef HAVE_LIBGOFFICE
+	/* Not quite sure what this does, but don't do it in batch mode.
+ 	 */
+	if( !main_option_batch )
+		libgoffice_shutdown ();
+#endif /*HAVE_LIBGOFFICE*/
+
+	path_rewrite_free_all();
+
+	/* Should have freed everything now.
+	 */
+
+	/* Make sure!
+
+		FIXME ... #ifdef this lot out at some point
+
+	 */
+	UNREF( main_imageinfogroup );
+	heap_check_all_destroyed();
+	vips_shutdown();
+	managed_check_all_destroyed();
+	util_check_all_destroyed();
+	call_check_all_destroyed();
+#endif /*DEBUG_LEAK*/
+
+#ifdef DEBUG
+	printf( "main_quit: exit( 0 )\n" );
+#endif/*DEBUG*/
+
+	/* And exit.
+	 */
+	exit( 0 );
+}
+
+/* We mustn't quit recursively!
+ */
+static gboolean main_quit_running = FALSE;
+
+static void
+main_quit_test_cb( void *sys, iWindowResult result )
+{
+#ifdef DEBUG
+	printf( "main_quit_test_cb:\n" );
+#endif/*DEBUG*/
+
+	if( result == IWINDOW_YES )
+		/* No return from this.
+		 */
+		main_quit();
+	else
+		/* Quit has been cancelled.
+		 */
+		main_quit_running = FALSE;
+}
+
+/* Check before quitting. 
+ */
+void
+main_quit_test( void )
+{
+	if( main_quit_running ) {
+#ifdef DEBUG
+		printf( "main_quit_test: recursive quit blocked\n" );
+#endif/*DEBUG*/
+		return;
+	}
+	main_quit_running = TRUE;
+
+#ifdef DEBUG
+	printf( "main_quit_test:\n" );
+#endif/*DEBUG*/
+
+	/* Flush any pending preference saves before we look for dirty
+	 * objects.
+	 */
+	watchgroup_flush( main_watchgroup );
+
+	/* Close registered models.
+	 */
+	filemodel_inter_close_registered_cb( iwindow_pick_one(), NULL,
+		main_quit_test_cb, NULL );
+}
+
+static void
+main_watchgroup_changed_cb( void )
+{
+	/* Only set this in GUI mode. Otherwise, let the user control CPUs 
+	 * with the env variable and --vips-concurrency args.
+	 */
+	if( !main_option_batch )
+		im_concurrency_set( VIPS_CPUS );
+}
+
+/* Try to load a thing, anything at all. Actually, we don't load plugins
+ * experimentally, win32 pops up an annoying error dialog if you try that.
+ */
+static gboolean
+main_load( Workspace *ws, const char *filename )
+{
+	Workspacegroup *new_wsg;
+
+	if( (new_wsg = workspacegroup_new_from_file( main_workspaceroot, 
+		filename, filename )) ) {
+		Mainw *mainw;
+
+		if( !main_option_batch ) {
+			mainw = mainw_new( new_wsg );
+			gtk_widget_show( GTK_WIDGET( mainw ) );
+		}
+
+		mainw_recent_add( &mainw_recent_workspace, filename );
+
+		return( TRUE );
+	}
+
+	error_clear();
+
+	/* workspace_load_file() needs to recalc to work, try to avoid that by
+	 * doing .defs first.
+	 */
+	if( is_file_type( &filesel_dfile_type, filename ) ) {
+		if( toolkit_new_from_file( main_toolkitgroup, filename ) )
+			return( TRUE );
+	}
+
+	/* Try as matrix or image. Have to do these via definitions.
+	 */
+	if( workspace_load_file( ws, filename ) ) 
+		return( TRUE );
+
+	error_clear();
+
+	error_top( _( "Unknown file type." ) );
+	error_sub( _( "Unable to load \"%s\"." ), filename );
+
+	return( FALSE );
+}
+
+#ifndef DEBUG_NOAUTO
+static void *
+main_load_plug( char *name )
+{
+	if( !calli_string_filename( (calli_string_fn) im_load_plugin,
+		name, NULL, NULL, NULL ) ) {
+		error_top( _( "Unable to load." ) );
+		error_sub( _( "Error loading plug-in \"%s\"." ), name );
+		error_vips();
+		iwindow_alert( NULL, GTK_MESSAGE_ERROR );
+	}
+
+	return( NULL );
+}
+#endif /*!DEBUG_NOAUTO*/
+
+static void *
+main_load_def( const char *filename )
+{	
+	Toolkit *kit;
+
+	if( !main_option_no_load_menus || im_skip_dir( filename )[0] == '_' ) {
+		progress_update_loading( 0, im_skip_dir( filename ) );
+
+		if( !(kit = toolkit_new_from_file( main_toolkitgroup, 
+			filename )) )
+			iwindow_alert( NULL, GTK_MESSAGE_ERROR );
+		else 
+			filemodel_set_auto_load( FILEMODEL( kit ) );
+	}
+
+	return( NULL );
+}
+
+static void *
+main_load_wsg( const char *filename )
+{
+	Workspacegroup *wsg;
+
+#ifdef DEBUG
+	printf( "main_load_wsg: %s\n", filename );
+#endif/*DEBUG*/
+
+	progress_update_loading( 0, im_skip_dir( filename ) );
+
+	if( !(wsg = workspacegroup_new_from_file( main_workspaceroot, 
+		filename, filename )) ) 
+		iwindow_alert( NULL, GTK_MESSAGE_ERROR );
+	else {
+		filemodel_set_auto_load( FILEMODEL( wsg ) );
+	}
+
+	return( NULL );
+}
+
+#ifndef DEBUG_NOAUTO
+/* Link all the packages in a function.
+ */
+static void *
+main_link_package( im_package *pack)
+{
+	char name[MAX_STRSIZE];
+	Toolkit *kit;
+        int i;
+
+	im_snprintf( name, MAX_STRSIZE, "_%s", pack->name );
+	kit = toolkit_new( main_toolkitgroup, name );
+
+        for( i = 0; i < pack->nfuncs; i++ ) 
+		if( call_is_callable( pack->table[i] ) ) {
+			Symbol *sym;
+
+			sym = symbol_new( symbol_root->expr->compile,
+				pack->table[i]->name );
+			g_assert( sym->type == SYM_ZOMBIE );
+			sym->type = SYM_EXTERNAL;
+			sym->function = pack->table[i];
+			sym->fn_nargs = call_n_args( pack->table[i] );
+			(void) tool_new_sym( kit, -1, sym );
+			symbol_made( sym );
+		}
+
+	filemodel_set_auto_load( FILEMODEL( kit ) );
+	filemodel_set_modified( FILEMODEL( kit ), FALSE );
+	kit->pseudo = TRUE;
+
+        return( NULL );
+}
+#endif /*!DEBUG_NOAUTO*/
+
+/* Load all plugins and defs.
+ */
+static void
+main_load_startup( void )
+{
+	mainw_recent_freeze();
+
+/* Stop load of builtins, plugs and vips ... handy for debugging if you're
+ * tracing symbol.c
+ */
+#ifdef DEBUG_NOAUTO
+	printf( "*** DEBUG_NOAUTO set, not loading builtin, plugs and vips\n" );
+#else /*!DEBUG_NOAUTO*/
+
+#ifdef DEBUG
+	printf( "built-ins init\n" );
+#endif/*DEBUG*/
+
+	/* Add builtin toolkit.
+	 */
+	builtin_init();
+
+#ifdef DEBUG
+	printf( "plug-ins init\n" );
+#endif/*DEBUG*/
+
+	/* Load any plug-ins on PATH_START. 
+	 */
+	(void) path_map( PATH_START, "*.plg", 
+		(path_map_fn) main_load_plug, NULL );
+
+	/* Link all VIPS functions as SYM_EXTERNAL.
+	 */
+        (void) im_map_packages( (VSListMap2Fn) main_link_package, NULL );
+#endif /*!DEBUG_NOAUTO*/
+
+	/* Load up all defs and wses.
+	 */
+#ifdef DEBUG
+	printf( "definitions init\n" );
+#endif/*DEBUG*/
+	(void) path_map( PATH_START, "*.def", 
+		(path_map_fn) main_load_def, NULL );
+
+#ifdef DEBUG
+	printf( "ws init\n" );
+#endif/*DEBUG*/
+	(void) path_map( PATH_START, "*.ws", 
+		(path_map_fn) main_load_wsg, NULL );
+
+	mainw_recent_thaw();
+}
+
+static void *
+main_junk_auto_load( Filemodel *filemodel )
+{
+	g_assert( IS_FILEMODEL( filemodel ) );
+
+	if( filemodel->auto_load )
+		IDESTROY( filemodel );
+
+	return( NULL );
+}
+
+/* Remove and reload all menus/plugins/workspaces.
+ */
+void
+main_reload( void )
+{
+	progress_begin();
+
+	/* Remove.
+	 */
+	toolkitgroup_map( main_toolkitgroup, 
+		(toolkit_map_fn) main_junk_auto_load, NULL, NULL );
+	workspace_map( (workspace_map_fn) main_junk_auto_load, NULL, NULL );
+	im_close_plugins();
+
+	/* Reload.
+	 */
+	main_load_startup();
+
+	/* We may have changed our prefs ... link the watches to the
+	 * new prefs workspace.
+	 */
+	watch_relink_all();
+
+	progress_end();
+}
+
+/* Init the display connection stuff.
+ */
+static void
+main_x_init( int *argc, char ***argv )
+{
+	char buf[FILENAME_MAX];
+
+#ifdef DEBUG
+	printf( "X11 init\n" );
+#endif/*DEBUG*/
+
+	gtk_init( argc, argv );
+
+	/* Set the default icon. 
+	 */
+	im_strncpy( buf, 
+		"$VIPSHOME/share/$PACKAGE/data/vips-128.png", FILENAME_MAX );
+	path_expand( buf );
+	gtk_window_set_default_icon_from_file( buf, NULL );
+
+	/* Turn off startup notification. Startup is done when we pop our
+	 * first window, not when we make this secret window.
+	 */
+	gtk_window_set_auto_startup_notification( FALSE );
+
+#ifdef DEBUG_UPDATES
+	printf( "*** debug updates is on\n" );
+	gdk_window_set_debug_updates( TRUE );
+#endif /*DEBUG_UPDATES*/
+
+	/* Next window we make is end of startup.
+	 */
+	gtk_window_set_auto_startup_notification( TRUE );
+
+	/* Load up any saved accelerators.
+	 */
+	calli_string_filenamef( (calli_string_fn) gtk_accel_map_load,
+		"%s" G_DIR_SEPARATOR_S "accel_map", get_savedir() );
+}
+
+static void *
+main_toobig_done_sub( const char *filename )
+{
+	unlinkf( "%s", filename );
+
+	return( NULL );
+}
+
+/* OK in "flush temps" yesno.
+ */
+static void
+main_toobig_done( iWindow *iwnd, 
+	void *client, iWindowNotifyFn nfn, void *sys )
+{
+	/* Don't "rm *", too dangerous. 
+	 */
+	path_map_dir( PATH_TMP, "*.v",
+		(path_map_fn) main_toobig_done_sub, NULL );
+	path_map_dir( PATH_TMP, "*.ws",
+		(path_map_fn) main_toobig_done_sub, NULL );
+
+	/* _stdenv.def:magick can generate .tif files.
+	 */
+	path_map_dir( PATH_TMP, "*.tif",
+		(path_map_fn) main_toobig_done_sub, NULL );
+
+	/* autotrace can make some others.
+	 */
+	path_map_dir( PATH_TMP, "*.ppm",
+		(path_map_fn) main_toobig_done_sub, NULL );
+	path_map_dir( PATH_TMP, "*.svg",
+		(path_map_fn) main_toobig_done_sub, NULL );
+
+	/* Tell space-free indicators to update.
+	 */
+	if( main_imageinfogroup )
+		iobject_changed( IOBJECT( main_imageinfogroup ) );
+
+	nfn( sys, IWINDOW_YES );
+}
+
+/* Test for a bunch of stuff in the TMP area. Need to do this before
+ * we load args in case there are large JPEGs there. Only bother in
+ * interactive mode: we won't be able to question the user without an
+ * X connection.
+ */
+static void
+main_check_temp( double total )
+{
+	if( total > 10 * 1024 * 1024 ) {
+		char txt[256];
+		VipsBuf buf = VIPS_BUF_STATIC( txt );
+		char tmp[FILENAME_MAX];
+
+		im_strncpy( tmp, PATH_TMP, FILENAME_MAX );
+		path_expand( tmp );
+		vips_buf_append_size( &buf, total );
+
+		box_yesno( NULL,
+			main_toobig_done, iwindow_true_cb, NULL,
+			NULL, NULL,
+			_( "Empty temp area" ),
+			_( "Many files in temp area." ),
+			_( "The temp area \"%s\" contains %s of files. "
+			"Would you like to empty the temp area? "
+			"This will delete any workspace backups and "
+			"cannot be undone." ),
+			tmp, vips_buf_all( &buf ) );
+	}
+}
+
+/* Make sure a savedir exists. Used to build the "~/.nip-xx/tmp" etc.
+ * directory tree.
+ */
+static void
+main_mkdir( const char *dir )
+{
+	if( !existsf( "%s" G_DIR_SEPARATOR_S "%s", get_savedir(), dir ) )
+		if( !mkdirf( "%s" G_DIR_SEPARATOR_S "%s", get_savedir(), dir ) )
+			error_exit( _( "unable to make %s %s: %s" ),
+				get_savedir(), dir, g_strerror( errno ) );
+}
+
+static gboolean
+main_set( const char *str )
+{
+	Symbol *sym;
+
+	attach_input_string( str );
+	if( !(sym = parse_set_symbol()) ) 
+		return( FALSE );
+
+	/* Put the input just after the '=', ready to parse a RHS into the
+	 * symbol.
+	 */
+	attach_input_string( str + 
+		IM_CLIP( 0, input_state.charpos - 1, strlen( str ) ) );
+
+	if( !symbol_user_init( sym ) || 
+		!parse_rhs( sym->expr, PARSE_RHS ) ) {
+		/* Another parse error.
+		 */
+		expr_error_get( sym->expr );
+
+		/* Block changes to error_string ... symbol_destroy() 
+		 * can set this for compound objects.
+		 */
+		error_block();
+		IDESTROY( sym );
+		error_unblock();
+
+		return( FALSE );
+	}
+
+	symbol_made( sym );
+
+	/* Is there a row? Make sure any modified text there can't zap our new
+	 * text.
+	 */
+	if( sym->expr->row ) {
+		Row *row = sym->expr->row;
+
+		heapmodel_set_modified( 
+			HEAPMODEL( row->child_rhs->itext ), FALSE );
+	}
+
+	return( TRUE );
+}
+
+static char prefix_buffer[FILENAME_MAX];
+static gboolean prefix_valid = FALSE;
+
+/* Override the install guess from vips. Handy for testing. 
+ */
+static void
+set_prefix( const char *prefix )
+{
+	im_strncpy( prefix_buffer, prefix, FILENAME_MAX );
+	nativeize_path( prefix_buffer );
+	absoluteize_path( prefix_buffer );
+	setenvf( "VIPSHOME", "%s", prefix_buffer );
+	prefix_valid = TRUE;
+}
+
+/* Guess VIPSHOME, if we can.
+ */
+const char *
+get_prefix( void )
+{
+	if( !prefix_valid ) {
+		const char *prefix;
+
+		if( !(prefix = im_guess_prefix( main_argv0, "VIPSHOME" )) ) {
+			error_top( _( "Unable to find install area." ) );
+			error_vips();
+
+			return( NULL );
+		}
+
+		set_prefix( prefix ); 
+	}
+
+	return( prefix_buffer );
+}
+
+/* Start here!
+ */
+int
+main( int argc, char *argv[] )
+{
+	gboolean welcome_message = FALSE;
+	Workspacegroup *wsg;
+	Workspace *ws;
+	GError *error = NULL;
+	GOptionContext *context;
+	const char *prefix;
+	int i;
+	double total = 0.0;
+#ifdef HAVE_GETRLIMIT
+	struct rlimit rlp;
+#endif /*HAVE_GETRLIMIT*/
+	char name[256];
+#if HAVE_FFTW || HAVE_FFTW3
+	iOpenFile *of;
+#endif /*HAVE_FFTW*/
+	Toolkit *kit;
+	char txt[MAX_STRSIZE];
+	VipsBuf buf = VIPS_BUF_STATIC( txt );
+
+#ifdef DEBUG_TIME
+	GTimer *startup_timer = g_timer_new();
+	printf( "DEBUG_TIME: startup timer zeroed ...\n" );
+#endif /*DEBUG_TIME*/
+
+	/* In startup phase.
+	 */
+	main_starting = TRUE;
+
+	/* Want numeric locale to be "C", so we have C rules for doing 
+	 * double <-> string (ie. no "," for decimal point).
+	 */
+	setlocale( LC_ALL, "" );
+	setlocale( LC_NUMERIC, "C" );
+
+	/* Make sure our LC_NUMERIC setting is not trashed.
+ 	 */
+	gtk_disable_setlocale();
+
+#ifdef DEBUG
+	printf( "main: sizeof( HeapNode ) == %zd\n", sizeof( HeapNode ) );
+
+	/* Should be 3 pointers, hopefully.
+	 */
+	if( sizeof( HeapNode ) != 3 * sizeof( void * ) )
+		printf( "*** struct packing problem!\n" );
+#endif/*DEBUG*/
+
+	/* Yuk .. shouldn't really write to argv0. This can't change the
+	 * string length.
+	 *
+	 * On win32 we will sometimes get paths with mixed '/' and '\' which 
+	 * confuses vips's prefix guessing. Make sure we have one or the other.
+	 */
+	nativeize_path( argv[0] );
+
+	main_argv0 = argv[0];
+	main_c_stack_base = &argc;
+
+	/* Pass config.h stuff down to .ws files.
+	 */
+	setenvf( "PACKAGE", "%s", PACKAGE );
+	setenvf( "VERSION", "%s", VERSION );
+
+#ifdef OS_WIN32
+{
+        /* No HOME on windows ... make one from HOMEDRIVE and HOMEDIR (via
+         * glib).
+         */
+	const char *home;
+	char buf[FILENAME_MAX];
+
+	if( !(home = g_getenv( "HOME" )) ) 
+		home = g_get_home_dir();
+
+	/* We need native paths.
+	 */
+	strncpy( buf, home, FILENAME_MAX );
+	nativeize_path( buf );
+	setenvf( "HOME", "%s", buf );
+}
+#endif /*OS_WIN32*/
+
+	/* Name of the dir we store our config stuff in. This can get used by
+	 * Preferences.ws.
+	 */
+	setenvf( "SAVEDIR", "%s", get_savedir() );
+
+	/* Path separator on this platform.
+	 */
+	setenvf( "SEP", "%s", G_DIR_SEPARATOR_S );
+
+	/* Executable file extension (eg. ".exe" on Windows).
+	 */
+	setenvf( "EXEEXT", "%s", VIPS_EXEEXT );
+
+	/* Start up vips.
+	 */
+	if( im_init_world( main_argv0 ) )
+		error_exit( "unable to start VIPS" );
+
+	/* The vips8 cache is no use to us. We have our own cache which is
+	 * integrated with our invalidate system. 
+	 */
+	vips_cache_set_max( 0 );
+
+	/* Init i18n ... get catalogues from $VIPSHOME/share/locale so we're
+	 * relocatable.
+	 */
+	prefix = get_prefix();
+	im_snprintf( name, 256, 
+		"%s" G_DIR_SEPARATOR_S "share" G_DIR_SEPARATOR_S "locale", 
+		prefix );
+#ifdef DEBUG
+	printf( "bindtextdomain: %s\n", name );
+#endif /*DEBUG*/
+	textdomain( GETTEXT_PACKAGE );
+	bindtextdomain( GETTEXT_PACKAGE, name );
+	bind_textdomain_codeset( GETTEXT_PACKAGE, "UTF-8" );
+
+	/* Set localised application name.
+	 */
+	g_set_application_name( _( PACKAGE ) );
+
+	context = g_option_context_new( _( "- image processing spreadsheet" ) );
+	g_option_context_add_main_entries( context, 
+		main_option, GETTEXT_PACKAGE );
+
+	/* Don't start X here! We may be in batch mode.
+	 *  FIXME
+	g_option_context_add_group( context, gtk_get_option_group( FALSE ) );
+	g_option_context_add_group( context, im_get_option_group() );
+	 */
+
+	if( !g_option_context_parse( context, &argc, &argv, &error ) ) 
+		vfatal( &error );
+
+	g_option_context_free( context );
+
+	/* Override the install guess from vips. This won't pick up msg
+	 * cats sadly :( since we have to init i18n before arg parsing. Handy
+	 * for testing without installing.
+	 */
+	if( main_option_prefix ) 
+		set_prefix( main_option_prefix );
+
+	if( main_option_version ) {
+		printf( "%s-%s", PACKAGE, VERSION );
+		printf( "\n" );
+
+		printf( _( "linked to vips-%s" ), im_version_string() );
+		printf( "\n" );
+
+		exit( 0 );
+	}
+
+#ifdef DEBUG_FATAL
+	/* Set masks for debugging ... stop on any problem. 
+	 */
+	g_log_set_always_fatal( 
+		G_LOG_FLAG_RECURSION |
+		G_LOG_FLAG_FATAL |
+		G_LOG_LEVEL_ERROR |
+		G_LOG_LEVEL_CRITICAL |
+		G_LOG_LEVEL_WARNING );
+#else /*!DEBUG_FATAL*/
+#ifdef OS_WIN32 
+	/* No logging output ... on win32, log output pops up a very annoying
+ 	 * console text box.
+	 */
+	g_log_set_handler( "GLib", 
+		G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION, 
+		main_log_null, NULL );
+	g_log_set_handler( "Gtk", 
+		G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION, 
+		main_log_null, NULL );
+	g_log_set_handler( NULL,
+		G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION, 
+		main_log_null, NULL );
+#endif /*OS_WIN32*/ 
+#endif /*DEBUG_FATAL*/
+
+	main_stdin = ifile_open_read_stdin();
+
+#ifdef HAVE_GETRLIMIT
+	/* Make sure we have lots of file descriptors. Some platforms have cur
+	 * as 256 and max at 1024 to keep stdio happy.
+	 */
+	if( getrlimit( RLIMIT_NOFILE, &rlp ) == 0 ) {
+		rlim_t old_limit = rlp.rlim_cur;
+
+		rlp.rlim_cur = rlp.rlim_max;
+		if( setrlimit( RLIMIT_NOFILE, &rlp ) == 0 ) {
+#ifdef DEBUG
+			printf( "set max file descriptors to %d\n", 
+				(int) rlp.rlim_max );
+#endif /*DEBUG*/
+		}
+		else if( (int) rlp.rlim_max != -1 ) {
+			/* -1 means can't-be-set, at least on os x, so don't
+			 * warn.
+			 */
+			g_warning( _( "unable to change max file descriptors\n"
+				"max file descriptors still set to %d" ),
+				(int) old_limit );
+		}
+	}
+	else {
+		g_warning( _( "unable to read max file descriptors" ) );
+	}
+#endif /*HAVE_GETRLIMIT*/
+
+	/* Make our file types.
+	 */
+	filesel_startup();
+
+	/* Set default values for paths.
+	 */
+	path_init();
+
+	/* First time we've been run? Welcome message.
+	 */
+	if( !existsf( "%s", get_savedir() ) ) 
+		welcome_message = TRUE;
+
+	/* Always make these in case some got deleted.
+	 */
+	main_mkdir( "" );
+	main_mkdir( "tmp" );
+	main_mkdir( "start" );
+	main_mkdir( "data" );
+
+	/* Init other stuff.
+	 */
+#ifdef HAVE_FFTW3
+	fftw_import_system_wisdom();
+#endif /*HAVE_FFTW3*/
+#if HAVE_FFTW || HAVE_FFTW3
+	if( (of = ifile_open_read( "%s" G_DIR_SEPARATOR_S "wisdom", 
+		get_savedir() )) ) {
+		fftw_import_wisdom_from_file( of->fp );
+		ifile_close( of );
+	}
+#endif /*HAVE_FFTW*/
+
+	mainw_startup();
+	reduce_context = reduce_new();
+	main_symbol_root = symbol_root_init();
+	g_object_ref( G_OBJECT( main_symbol_root ) );
+	iobject_sink( IOBJECT( main_symbol_root ) );
+	model_base_init();
+	main_workspaceroot = workspaceroot_new( "Workspaces" );
+	g_object_ref( G_OBJECT( main_workspaceroot ) );
+	iobject_sink( IOBJECT( main_workspaceroot ) );
+	main_watchgroup = watchgroup_new( main_workspaceroot, "Preferences" );
+	g_object_ref( G_OBJECT( main_watchgroup ) );
+	iobject_sink( IOBJECT( main_watchgroup ) );
+	main_toolkitgroup = toolkitgroup_new( symbol_root );
+	g_object_ref( G_OBJECT( main_toolkitgroup ) );
+	iobject_sink( IOBJECT( main_toolkitgroup ) );
+	main_imageinfogroup = imageinfogroup_new();
+	g_object_ref( G_OBJECT( main_imageinfogroup ) );
+	iobject_sink( IOBJECT( main_imageinfogroup ) );
+
+	/* First pass at command-line options. Just look at the flags that
+	 * imply other flags, don't do any processing yet.
+	 */
+	if( main_option_script ) {
+		main_option_batch = TRUE;
+		main_option_no_load_menus = TRUE;
+		main_option_no_load_args = TRUE;
+		main_option_print_main = TRUE;
+	}
+
+	if( main_option_test ) {
+		main_option_batch = TRUE;
+		main_option_verbose = TRUE;
+	}
+
+	if( main_option_expression ) {
+		main_option_batch = TRUE;
+		main_option_no_load_menus = TRUE;
+		main_option_no_load_args = TRUE;
+		main_option_print_main = TRUE;
+	}
+
+	if( main_option_benchmark ) {
+		main_option_batch = TRUE;
+		main_option_no_load_menus = FALSE;
+	}
+
+	if( main_option_i18n ) {
+		/* Just start up and shutdown, no X. Output constant
+		 * i18n strings.
+		 */
+		main_option_batch = TRUE;
+		main_option_no_load_menus = FALSE;
+	}
+
+#ifdef DEBUG
+	if( main_option_batch ) 
+		printf( "non-interactive mode\n" );
+#endif /*DEBUG*/
+
+	/* Start the X connection. We need this before _load_all(), so that
+	 * we can pop up error dialogs.
+	 */
+	if( !main_option_batch )
+		main_x_init( &argc, &argv );
+
+#ifdef HAVE_LIBGOFFICE
+        libgoffice_init();
+	go_plugins_init( NULL, NULL, NULL, NULL, TRUE, 
+		GO_TYPE_PLUGIN_LOADER_MODULE );
+#endif /*HAVE_LIBGOFFICE*/
+
+	/* Load start-up stuff. Builtins, plugins, externals etc. We need to
+	 * do this before we load any user code so we can prevent redefinition
+	 * of builtins.
+	 */
+	main_load_startup();
+
+	/* Recalc to build all classes and gets prefs working. 
+	 *
+	 * We have to do this in batch
+	 * mode since we can find dirties through dynamic lookups. Even though
+	 * you might think we could just follow recomps.
+	 */
+	symbol_recalculate_all_force( TRUE );
+
+#ifdef DEBUG
+	printf( "arg processing\n" );
+#endif/*DEBUG*/
+
+	/* Might make this from stdin/whatever if we have a special
+	 * command-line flag.
+	 */
+	wsg = NULL;
+	ws = NULL;
+
+	/* Second command-line pass. This time we do any actions.
+	 */
+	if( main_option_script ) {
+		if( !toolkit_new_from_file( main_toolkitgroup,
+			main_option_script ) )
+			main_log_add( "%s\n", error_get_sub() );
+	}
+
+	if( main_option_expression ) {
+		kit = toolkit_new( main_toolkitgroup, "_expression" );
+
+		vips_buf_appendf( &buf, "main = %s;", main_option_expression );
+		attach_input_string( vips_buf_all( &buf ) );
+		(void) parse_onedef( kit, -1 );
+
+		filemodel_set_modified( FILEMODEL( kit ), FALSE );
+	}
+
+	if( main_option_stdin_def ) {
+		if( !(kit = toolkit_new_from_openfile( 
+			main_toolkitgroup, main_stdin )) )
+			main_log_add( "%s\n", error_get_sub() );
+	}
+
+	if( main_option_stdin_ws ) {
+		if( !(wsg = workspacegroup_new_from_openfile( 
+			main_workspaceroot, main_stdin )) ) 
+			main_log_add( "%s\n", error_get_sub() );
+		else 
+			/* Don't want to have "stdin" as the filename.
+			 */
+			filemodel_set_filename( FILEMODEL( wsg ), NULL );
+	}
+
+	/* Make a start workspace and workspacegroup to load
+	 * stuff into.
+	 */
+	if( !wsg ) {
+		wsg = workspacegroup_new_blank( main_workspaceroot, NULL ); 
+		ws = WORKSPACE( icontainer_get_nth_child( 
+			ICONTAINER( wsg ), 0 ) ); 
+	}
+
+	/* Reset IM_CONCURRENCY if a watch changes. Need to do this after
+	 * parsing options so we skip in batch mode.
+	 */
+	g_signal_connect( main_watchgroup, "watch_changed", 
+		G_CALLBACK( main_watchgroup_changed_cb ), NULL );
+
+	/* Pass PATH_TMP down to vips via TMPDIR. See im_system(), for
+	 * example. We need to do this after the first recomp so that prefs
+	 * are loaded.
+	 */
+{
+	char buf[FILENAME_MAX];
+
+	im_strncpy( buf, PATH_TMP, FILENAME_MAX );
+	path_expand( buf );
+	setenvf( "TMPDIR", "%s", buf );
+
+	path_rewrite_add( PATH_TMP, "$TMPDIR", TRUE );
+}
+
+	/* Measure amount of stuff in temp area ... need this for checking
+	 * temps later. We pop a dialog if there are too many, so only useful
+	 * in interactive mode.
+	 */
+	if( !main_option_batch )
+		total = directory_size( PATH_TMP );
+
+	/* Make nip's argc/argv[].
+	 */
+	kit = toolkit_new( main_toolkitgroup, "_args" );
+	vips_buf_rewind( &buf );
+	vips_buf_appendf( &buf, "argc = %d;", argc );
+	attach_input_string( vips_buf_all( &buf ) );
+	(void) parse_onedef( kit, -1 );
+
+	vips_buf_rewind( &buf );
+	vips_buf_appendf( &buf, "argv = [" );
+	for( i = 0; i < argc; i++ ) {
+		/* Ignore "--" args. Consider eg. 
+		 *
+		 * 	./try201.nip -o x.v -- -12 ~/pics/shark.jpg 
+		 *
+		 * if we didn't remove --, all scripts would need to. 
+		 */
+		if( strcmp( argv[i], "--" ) == 0 )
+			continue;
+
+		if( i > 0 )
+			vips_buf_appendf( &buf, ", " );
+		vips_buf_appendf( &buf, "\"%s\"", argv[i] );
+	}
+	vips_buf_appendf( &buf, "];" );
+
+	attach_input_string( vips_buf_all( &buf ) );
+	if( !parse_onedef( kit, -1 ) ) 
+		main_log_add( "%s\n", error_get_sub() );
+
+	filemodel_set_modified( FILEMODEL( kit ), FALSE );
+
+	/* Double-check: we often forget to move the prefs ws to the latest
+	 * version.
+	 */
+#ifdef DEBUG_LEAK
+{
+	Symbol *wsr_sym = main_workspaceroot->sym;
+	Symbol *ws_sym = SYMBOL( icontainer_child_lookup( 
+		ICONTAINER( wsr_sym->expr->compile ), "Preferences" ) );
+
+	if( !ws_sym )
+		printf( "No prefs workspace!\n" ); 
+	else {
+		Workspace *ws = ws_sym->ws;
+
+		if( ws->compat_major || 
+			ws->compat_minor )
+			printf( "Preferences loaded in compat mode!\n" );
+	}
+}
+#endif /*DEBUG_LEAK*/
+
+	if( !main_option_no_load_args ) {
+		/* Load args as files, if we can. 
+		 */
+		for( i = 1; i < argc; i++ ) {
+			char buf[FILENAME_MAX];
+
+			/* We want to use the absolute, compact form of the 
+			 * filename object so we don't get a dependency on CWD.
+			 */
+			im_strncpy( buf, argv[i], FILENAME_MAX );
+			path_compact( buf );
+
+			if( !main_load( ws, buf ) ) 
+				main_log_add( "%s\n", error_get_sub() );
+		}
+	}
+
+	/* In batch mode give up if there are startup errors.
+	 */
+	if( main_option_batch ) {
+		if( !main_log_is_empty() ) {
+			fprintf( stderr, _( "Startup error log:\n%s" ), 
+				main_log_get() );
+			exit( 1 );
+		}
+	}
+
+	if( main_option_set ) {
+		int i;
+
+		for( i = 0; main_option_set[i]; i++ ) {
+			if( main_option_verbose ) 
+				printf( "main_set: %s\n", main_option_set[i] );
+
+			if( !main_set( main_option_set[i] ) )
+				main_log_add( "%s\n%s", 
+					error_get_top(), error_get_sub() );
+		}
+	}
+
+	/* Make sure our start ws doesn't have modified set. We may have
+	 * loaded some images or whatever into it.
+	 */
+	workspace_set_modified( ws, FALSE );
+
+	/* If the start ws is empty (we didn't load anything into it) and we
+	 * loaded some other workspaces, we can junk the empty ws. 
+	 */
+	if( icontainer_get_n_children( ICONTAINER( main_workspaceroot ) ) > 2 &&
+		workspace_is_empty( ws ) ) {
+		IDESTROY( wsg ); 
+		wsg = NULL;
+		ws = NULL;
+	}
+
+#ifdef DEBUG_TIME
+	printf( "DEBUG_TIME: main init in %gs\n",  
+		g_timer_elapsed( startup_timer, NULL ) );
+#endif /*DEBUG_TIME*/
+
+	/* Are we running interactively? Start the main window and loop.
+	 */
+	if( !main_option_batch ) {
+		if( wsg ) { 
+			Mainw *mainw;
+
+			mainw = mainw_new( wsg );
+			gtk_widget_show( GTK_WIDGET( mainw ) );
+		}
+
+		/* Process a few events ... we want the window to be mapped so
+		 * that log/welcome/clean? messages we pop appear in the right
+		 * place on the screen.
+		 */
+		while( g_main_context_iteration( NULL, FALSE ) )
+			;
+
+		if( !main_log_is_empty() ) {
+			error_top( _( "Startup error." ) );
+			error_sub( _( "Startup error log:\n%s" ), 
+				main_log_get() );
+			iwindow_alert( NULL, GTK_MESSAGE_ERROR );
+		}
+
+		if( welcome_message ) {
+			char save_dir[FILENAME_MAX];
+			char buf[256];
+
+			im_snprintf( buf, 256, 
+				_( "Welcome to %s-%s!" ), PACKAGE, VERSION );
+			im_strncpy( save_dir, get_savedir(), FILENAME_MAX );
+			path_expand( save_dir );
+			error_top( "%s", buf );
+			error_sub( 
+_( "A new directory has been created to hold startup, "
+"data and temporary files:\n\n"
+"     %s\n\n"
+"If you've used previous versions of %s, you might want "
+"to copy files over from your old work area." ),
+				save_dir, PACKAGE );
+			iwindow_alert( NULL, GTK_MESSAGE_INFO );
+		}
+
+		main_check_temp( total );
+
+#ifdef DEBUG
+		printf( "starting event dispatch loop\n" );
+#endif/*DEBUG*/
+
+		main_starting = FALSE;
+
+		symbol_recalculate_all_force( FALSE );
+
+		gtk_main();
+	}
+
+	if( main_option_test ) {
+		/* Make sure we've had at least one recomp.
+		 */
+		symbol_recalculate_all_force( TRUE );
+		if( expr_error_all )
+			main_error_exit( "--test: errors found" );
+	}
+
+	/* No return from this.
+	 */
+	main_quit();
+
+	return( 0 );
+}
+
+#ifdef OS_WIN32 
+/* Get non-cmd line args on win32.
+ */
+static int 
+breakargs( char *program, char *line, char **argv ) 
+{ 
+	int argc = 1; 
+
+	argv[0] = program; 
+
+	while( *line && argc < MAX_SYSTEM - 1 ) { 
+		while( *line && isspace( *line ) ) 
+			line++; 
+
+		if( *line == '"' ) {
+			/* Windows-95 quoted arguments 
+			 */ 
+			char *start = line + 1; 
+			char *end = start; 
+
+			while( *end && *end != '"' ) 
+				end++; 
+
+			if( *end == '"' ) { 
+				*end = '\0'; 
+				argv[argc++] = start; 
+				line = end + 1; 
+				continue; 
+			} 
+		} 
+
+		if( *line ) { 
+			argv[argc++] = line; 
+			while( *line && !isspace( *line ) ) 
+				line++; 
+
+			if( *line ) 
+				*line++ = '\0'; 
+		} 
+	} 
+
+	/* add trailing NULL pointer to argv 
+	 */ 
+	argv[argc] = NULL; 
+
+	return( argc ); 
+} 
+
+int WINAPI 
+WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, 
+	LPSTR lpszCmdLine, int nShowCmd ) 
+{ 
+	char *argv[MAX_SYSTEM];
+	int  argc;                                               
+	TCHAR program[MAXPATHLEN];                               
+
+	GetModuleFileName( hInstance, program, sizeof(program) );  
+	argc = breakargs( (char *) program, lpszCmdLine, argv );    
+
+	return( main( argc, argv ) );
+} 
+#endif /*OS_WIN32*/ 

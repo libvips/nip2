@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <object class="GtkAdjustment" id="adj">
+  </object>
+
+  <template class="Tslider" parent="GtkWidget">
+    <child>
+      <object class="GtkBox" id="box">
+        <property name="orientation">horizontal</property>
+        <property name="spacing">2</property>
+
+        <child>
+          <object class="GtkEntry" id="entry">
+            <property name="max-width-chars">5</property>
+            <property name="input-purpose">digits</property>
+          </object>
+        </child>
+
+        <child>
+          <object class="GtkScale" id="scale">
+            <property name="hexpand">True</property>
+            <property name="adjustment">adj</property>
+            <property name="draw-value">False</property>
+          </object>
+        </child>
+
+      </object>
+    </child>
+  </template>
+</interface>

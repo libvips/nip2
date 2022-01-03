@@ -1,0 +1,111 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<interface>
+  <menu id="imagewindow-menu">
+    <section>
+      <attribute name="display-hint">horizontal-buttons</attribute>
+      <item>
+        <attribute name="label">Cut</attribute>
+        <attribute name="action">app.cut</attribute>
+        <attribute name="verb-icon">edit-cut-symbolic</attribute>
+      </item>
+      <item>
+        <attribute name="label">Copy</attribute>
+        <attribute name="action">app.copy</attribute>
+        <attribute name="verb-icon">edit-copy-symbolic</attribute>
+      </item>
+      <item>
+        <attribute name="label">Paste</attribute>
+        <attribute name="action">app.paste</attribute>
+        <attribute name="verb-icon">edit-paste-symbolic</attribute>
+      </item>
+    </section>
+
+    <section>
+      <attribute name="display-hint">horizontal-buttons</attribute>
+      <item>
+        <attribute name="label">Previous page</attribute>
+        <attribute name="action">win.prev</attribute>
+        <attribute name="verb-icon">media-seek-backward</attribute>
+      </item>
+      <item>
+        <attribute name="label">Next page</attribute>
+        <attribute name="action">win.next</attribute>
+        <attribute name="verb-icon">media-seek-forward</attribute>
+      </item>
+    </section>
+
+    <section>
+      <item>
+        <attribute name='label' translatable='yes'>New window</attribute>
+        <attribute name='action'>app.new</attribute>
+      </item>
+      <item>
+        <attribute name='label' translatable='yes'>Duplicate window</attribute>
+        <attribute name='action'>win.duplicate</attribute>
+      </item>
+      <item>
+        <attribute name='label' translatable='yes'>Replace image ...</attribute>
+        <attribute name='action'>win.replace</attribute>
+      </item>
+    </section>
+
+    <section>
+      <item>
+        <attribute name='label' translatable='yes'>Save as ...</attribute>
+        <attribute name='action'>win.saveas</attribute>
+      </item>
+    </section>
+
+    <section>
+      <submenu>
+        <attribute name="label">Zoom</attribute>
+        <section>
+          <item>
+            <attribute name="label" translatable="yes">Zoom in</attribute>
+            <attribute name="action">win.magin</attribute>
+          </item>
+          <item>
+            <attribute name="label" translatable="yes">Zoom out</attribute>
+            <attribute name="action">win.magout</attribute>
+          </item>
+          <item>
+            <attribute name="label" translatable="yes">1:1</attribute>
+            <attribute name="action">win.oneone</attribute>
+          </item>
+          <item>
+            <attribute name="label" translatable="yes">Best fit</attribute>
+            <attribute name="action">win.bestfit</attribute>
+          </item>
+        </section>
+      </submenu>
+
+      <item>
+        <attribute name="label" translatable="yes">Fullscreen</attribute>
+        <attribute name="action">win.fullscreen</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Display control bar</attribute>
+        <attribute name="action">win.control</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Info bar</attribute>
+        <attribute name="action">win.info</attribute>
+      </item>
+    </section>
+
+    <section>
+      <item>
+        <attribute name='label' translatable='yes'>Close</attribute>
+        <attribute name='action'>win.close</attribute>
+      </item>
+    </section>
+
+    <section>
+      <item>
+        <attribute name='label' translatable='yes'>About vipsdisp</attribute>
+        <attribute name='action'>app.about</attribute>
+      </item>
+    </section>
+
+  </menu>
+</interface>

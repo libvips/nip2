@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="Infobar" parent="GtkWidget">
+    <child>
+      <object class="GtkActionBar" id="action_bar">
+        <property name="revealed">false</property>
+
+        <child type="start">
+          <object class="GtkLabel">
+            <property name="label">(</property>
+          </object>
+        </child>
+
+        <child type="start">
+          <object class="GtkLabel" id="x">
+            <property name="width-chars">6</property>
+            <property name="label">0</property>
+            <property name="xalign">1</property>
+          </object>
+        </child>
+
+        <child type="start">
+          <object class="GtkLabel">
+            <property name="label">,</property>
+          </object>
+        </child>
+
+        <child type="start">
+          <object class="GtkLabel" id="y">
+            <property name="width-chars">6</property>
+            <property name="label">0</property>
+            <property name="xalign">1</property>
+          </object>
+        </child>
+
+        <child type="start">
+          <object class="GtkLabel">
+            <property name="label">)</property>
+          </object>
+        </child>
+
+        <child type="start">
+          <object class="GtkBox" id="values">
+            <property name="orientation">horizontal</property>
+            <property name="homogeneous">true</property>
+            <property name="spacing">3</property>
+          </object>
+        </child>
+
+        <child type="end">
+          <object class="GtkLabel" id="mag">
+            <property name="label">Magnification 1:1</property>
+            <property name="xalign">1</property>
+          </object>
+        </child>
+
+      </object>
+    </child>
+  </template>
+</interface>

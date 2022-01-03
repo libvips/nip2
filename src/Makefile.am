@@ -19,46 +19,26 @@ CLI_DIST = nip4-cli.c
 endif
 
 nip4_SOURCES = \
-	vipsobject.c \
-	vipsobject.h \
-	plotmodel.c \
-	plotmodel.h \
-	progress.c \
-	progress.h \
-	panechild.c \
-	panechild.h \
-	plotpresent.c \
-	plotpresent.h \
-	plotstatus.c \
-	plotstatus.h \
-	floatwindow.c \
-	floatwindow.h \
-	vobject.c \
-	vobject.h \
 	action.c \
 	action.h \
 	boxes.c \
 	boxes.h \
-	popupbutton.c \
-	popupbutton.h \
-	imageheader.c \
-	imageheader.h \
-	preview.c \
-	preview.h \
 	builtin.c \
 	builtin.h \
-	icontainer.c \
-	icontainer.h \
-	iobject.c \
-	iobject.h \
+	cache.c \
+	cache.h \
+	call.c \
+	call.h \
 	class.c \
 	class.h \
 	classmodel.c \
 	classmodel.h \
+	clock.c \
+	clock.h \
 	colour.c \
-	colour.h \
 	colourdisplay.c \
 	colourdisplay.h \
+	colour.h \
 	colourview.c \
 	colourview.h \
 	column.c \
@@ -67,34 +47,39 @@ nip4_SOURCES = \
 	columnview.h \
 	compile.c \
 	compile.h \
-	conversion.c \
-	conversion.h \
-	conversionview.c \
-	conversionview.h \
+	defbrowser.c \
+	defbrowser.h \
 	doubleclick.c \
 	doubleclick.h \
 	dump.c \
 	dump.h \
+	editview.c \
+	editview.h \
+	error.c \
+	error.h \
 	expr.c \
+	expression.c \
+	expression.h \
+	expressionview.c \
+	expressionview.h \
 	expr.h \
 	filemodel.c \
 	filemodel.h \
-	pane.c \
-	pane.h \
-	pathname.c \
-	pathname.h \
-	fontname.c \
-	fontname.h \
-	group.c \
-	group.h \
-	pathnameview.c \
-	pathnameview.h \
-	fontnameview.c \
-	fontnameview.h \
 	filesel.c \
 	filesel.h \
+	floatwindow.c \
+	floatwindow.h \
+	fontname.c \
+	fontname.h \
+	fontnameview.c \
+	fontnameview.h \
+	formula.c \
+	formula.h \
 	graphicview.c \
 	graphicview.h \
+	gresources.c \
+	group.c \
+	group.h \
 	gtkutil.c \
 	gtkutil.h \
 	heap.c \
@@ -102,100 +87,109 @@ nip4_SOURCES = \
 	heapmodel.c \
 	heapmodel.h \
 	helpindex.h \
-	nipmarshal.h \
-	nipmarshal.c \
 	iarrow.c \
 	iarrow.h \
-	value.c \
-	value.h \
-	valueview.c \
-	valueview.h \
+	icontainer.c \
+	icontainer.h \
 	idialog.c \
 	idialog.h \
 	iimage.c \
 	iimage.h \
-	error.c \
-	error.h \
-	managed.c \
-	managed.h \
-	managedfile.c \
-	managedfile.h \
-	managedgvalue.c \
-	managedgvalue.h \
-	managedgobject.c \
-	managedgobject.h \
-	managedstring.c \
-	managedstring.h \
+	imagedisplay.c \
+	imagedisplay.h \
+	imageheader.c \
+	imageheader.h \
 	imageinfo.c \
 	imageinfo.h \
 	imagemodel.c \
 	imagemodel.h \
+	iobject.c \
+	iobject.h \
 	ip.h \
 	iregion.c \
-	iregion.h \
 	iregiongroup.c \
 	iregiongroup.h \
 	iregiongroupview.c \
 	iregiongroupview.h \
+	iregion.h \
 	iregionview.c \
 	iregionview.h \
+	istring.h \
 	itext.c \
 	itext.h \
 	itextview.c \
 	itextview.h \
-	parse.y \
-	parser.h \
-	prefs.c \
-	prefs.h \
-	prefworkspaceview.c \
-	prefworkspaceview.h \
-	prefcolumnview.c \
-	prefcolumnview.h \
 	lex.l \
 	link.c \
 	link.h \
 	main.c \
 	main.h \
+	managed.c \
+	managedfile.c \
+	managedfile.h \
+	managedgobject.c \
+	managedgobject.h \
+	managedgvalue.c \
+	managedgvalue.h \
+	managed.h \
+	managedstring.c \
+	managedstring.h \
 	matrix.c \
 	matrix.h \
 	matrixview.c \
 	matrixview.h \
-	plot.c \
-	plot.h \
-	plotview.c \
-	plotview.h \
 	model.c \
 	model.h \
+	nipmarshal.c \
+	nipmarshal.h \
+	number.c \
+	number.h \
+	numberview.c \
+	numberview.h \
 	option.c \
 	option.h \
 	optionview.c \
 	optionview.h \
-	formula.c \
-	formula.h \
 	paintboxview.c \
 	paintboxview.h \
+	pane.c \
+	panechild.c \
+	panechild.h \
+	pane.h \
+	parser.h \
+	parse.y \
 	path.c \
 	path.h \
+	pathname.c \
+	pathname.h \
+	pathnameview.c \
+	pathnameview.h \
+	plot.c \
+	plot.h \
+	plotmodel.c \
+	plotmodel.h \
+	plotpresent.c \
+	plotpresent.h \
+	plotstatus.c \
+	plotstatus.h \
+	plotview.c \
+	plotview.h \
+	popupbutton.c \
+	popupbutton.h \
 	predicate.c \
 	predicate.h \
-	string.c \
-	istring.h \
-	number.c \
-	number.h \
-	expression.c \
-	expression.h \
-	expressionview.c \
-	expressionview.h \
-	stringview.c \
-	stringview.h \
-	editview.c \
-	editview.h \
-	numberview.c \
-	numberview.h \
+	prefcolumnview.c \
+	prefcolumnview.h \
+	prefs.c \
+	prefs.h \
+	prefworkspaceview.c \
+	prefworkspaceview.h \
+	preview.c \
+	preview.h \
+	progress.c \
+	progress.h \
 	real.c \
 	real.h \
-	vector.c \
-	vector.h \
 	reduce.c \
 	reduce.h \
 	rhs.c \
@@ -212,36 +206,41 @@ nip4_SOURCES = \
 	slider.h \
 	sliderview.c \
 	sliderview.h \
-	clock.c \
-	clock.h \
 	spin.c \
 	spin.h \
 	statusview.c \
 	statusview.h \
+	string.c \
+	stringview.c \
+	stringview.h \
 	subcolumn.c \
 	subcolumn.h \
 	subcolumnview.c \
 	subcolumnview.h \
 	symbol.c \
 	symbol.h \
+	tile.h \
+	tile.c \
+	tilesource.h \
+	tilesource.c \
+	tilecache.h \
+	tilecache.c \
 	toggle.c \
 	toggle.h \
 	toggleview.c \
 	toggleview.h \
 	tool.c \
 	tool.h \
+	toolkitbrowser.c \
+	toolkitbrowser.h \
 	toolkit.c \
-	toolkit.h \
 	toolkitgroup.c \
 	toolkitgroup.h \
 	toolkitgroupview.c \
 	toolkitgroupview.h \
+	toolkit.h \
 	toolkitview.c \
 	toolkitview.h \
-	defbrowser.c \
-	defbrowser.h \
-	toolkitbrowser.c \
-	toolkitbrowser.h \
 	toolview.c \
 	toolview.h \
 	tree.c \
@@ -250,42 +249,40 @@ nip4_SOURCES = \
 	tslider.h \
 	util.c \
 	util.h \
+	value.c \
+	value.h \
+	valueview.c \
+	valueview.h \
+	vector.c \
+	vector.h \
 	view.c \
 	view.h \
-	call.c \
-	call.h \
-	cache.c \
-	cache.h \
+	vipsobject.c \
+	vipsobject.h \
+	vobject.c \
+	vobject.h \
 	watch.c \
 	watch.h \
 	workspace.c \
-	workspace.h \
+	workspacedefs.c \
+	workspacedefs.h \
 	workspacegroup.c \
 	workspacegroup.h \
 	workspacegroupview.c \
 	workspacegroupview.h \
-	workspacedefs.c \
-	workspacedefs.h \
+	workspace.h \
 	workspaceroot.c \
 	workspaceroot.h \
 	workspaceview.c \
 	workspaceview.h 
 
 need_rewrite = \
-	regionview.c \
-	regionview.h \
-	iwindow.c \
-	iwindow.h \
-	imageview.c \
-	imageview.h \
-	imagepresent.c \
-	imagepresent.h \
-	imagedisplay.c \
-	imagedisplay.h \
 	graphwindow.c \
 	graphwindow.h \
 	iimageview.c \
 	iimageview.h \
+	iwindow.c \
+	iwindow.h \
 	log.c \
 	log.h \
 	mainw.c \
@@ -293,7 +290,9 @@ need_rewrite = \
 	plotwindow.c \
 	plotwindow.h \
 	program.c \
-	program.h 
+	program.h \
+	regionview.c \
+	regionview.h
 
 if OS_WIN32
 nip4_SOURCES += \
@@ -307,6 +306,16 @@ nipmarshal.h:
 nipmarshal.c:
 	echo "#include \"nipmarshal.h\"" > nipmarshal.c 
 	glib-genmarshal --prefix=nip --body nipmarshal.list >> nipmarshal.c
+
+resource_files = \
+	gresources.xml 
+
+gresources.c: $(resource_files)
+	glib-compile-resources \
+		--target=$@ \
+		--sourcedir=$(top_srcdir)/src/gtk \
+		--generate-source \
+		$<
 
 .rc.o:
 	cp ${top_srcdir}/share/nip4/data/nip4-icon.ico .
@@ -326,8 +335,9 @@ AM_LDFLAGS = @LDFLAGS@
 dist-hook:
 	${RM} ${distdir}/parse.c ${distdir}/lex.c
 
-CLEANFILES = parse.c parse.h lex.c tags
+CLEANFILES = parse.c parse.h lex.c tags gresources.c
 
 EXTRA_DIST = makehelpindex.pl helpindex.h \
 	nipmarshal.h nipmarshal.c nipmarshal.list \
+	gresources.c \
 	$(CLI_DIST)

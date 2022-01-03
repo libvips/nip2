@@ -1,0 +1,13 @@
+/* XPM */
+static char *separator[]={
+"64 4 6 1",
+"# c #000040",
+". c #0000ff",
+"c c #0080ff",
+"a c #58a8ff",
+"b c #a8dcff",
+"d c #ffffff",
+".##############################################################.",
+"a..............................................................a",
+"bbccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccbb",
+"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"};

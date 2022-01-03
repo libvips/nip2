@@ -1,79 +1,40 @@
-/* a slider with an entry widget
- */
+#include "vipsdisp.h"
 
 /*
-
-    Copyright (C) 1991-2003 The National Gallery
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-
- */
-
-/*
-
-    These files are distributed with VIPS - http://www.vips.ecs.soton.ac.uk
-
-*/
-
-/*
+#define DEBUG_VERBOSE
 #define DEBUG
  */
 
-#include "ip.h"
-
-/* Our signals. 
- */
 enum {
 	CHANGED,		
 	ACTIVATE,	
 	SLIDER_CHANGED,
 	TEXT_CHANGED,	
-	LAST_SIGNAL
+
+	LAST
 };
 
-G_DEFINE_TYPE( Tslider, tslider, GTK_TYPE_BOX ); 
-
-static guint tslider_signals[LAST_SIGNAL] = { 0 };
+static guint tslider_signals[LAST] = { 0 };
 
 /* Are two doubles more or less equal. We need this when we check the sliders
  * for update to stop loops. The 0.0001 is a bit of a fudge :-(
  */
-#define DEQ( A, B ) (ABS((A) - (B)) < 0.0001)
+#define DEQ( A, B ) (VIPS_ABS((A) - (B)) < 0.0001)
+
+G_DEFINE_TYPE( Tslider, tslider, GTK_TYPE_WIDGET );
 
 static void
-tslider_destroy( GtkWidget *widget )
+tslider_dispose( GObject *object )
 {
-	Tslider *tslider;
-
-	g_return_if_fail( widget != NULL );
-	g_return_if_fail( IS_TSLIDER( widget ) );
-
-	tslider = TSLIDER( widget );
+	Tslider *tslider = (Tslider *) object;
 
 #ifdef DEBUG
-	printf( "tslider_destroy: %p\n", tslider );
+	printf( "tslider_dispose:\n" ); 
 #endif /*DEBUG*/
 
-	/* My instance destroy stuff.
-	 */
-	if( tslider->adj ) {
-		g_signal_handlers_disconnect_by_data( tslider->adj, tslider );
-		tslider->adj = NULL;
-	}
+	VIPS_FREEF( gtk_widget_unparent, tslider->box );
 
-	GTK_WIDGET_CLASS( tslider_parent_class )->destroy( widget );
+	G_OBJECT_CLASS( tslider_parent_class )->dispose( object );
 }
 
 /* Map a value to a slider position.
@@ -151,8 +112,8 @@ tslider_real_changed( Tslider *tslider )
 	/* Some libc's hate out-of-bounds precision, so clip, just in case.
 	 */
 	set_gentry( tslider->entry, "%.*f", 
-		IM_CLIP( 0, tslider->digits, 100 ), tslider->value );
-	gtk_scale_set_digits( GTK_SCALE( tslider->slider ), tslider->digits );
+		VIPS_CLIP( 0, tslider->digits, 100 ), tslider->value );
+	gtk_scale_set_digits( GTK_SCALE( tslider->scale ), tslider->digits );
 
 	if( !DEQ( tslider->from, tslider->last_from ) || 
 		!DEQ( tslider->to, tslider->last_to ) ) {
@@ -178,53 +139,6 @@ tslider_real_changed( Tslider *tslider )
 		G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, tslider );
 }
 
-static void
-tslider_class_init( TsliderClass *class )
-{
-	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
-	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
-
-	widget_class->destroy = tslider_destroy;
-
-	class->changed = tslider_real_changed;
-	class->slider_changed = NULL;
-	class->activate = NULL;
-
-	/* Create signals.
-	 */
-	tslider_signals[CHANGED] = g_signal_new( "changed",
-		G_OBJECT_CLASS_TYPE( gobject_class ),
-		G_SIGNAL_RUN_FIRST,
-		G_STRUCT_OFFSET( TsliderClass, changed ),
-		NULL, NULL,
-		g_cclosure_marshal_VOID__VOID,
-		G_TYPE_NONE, 0 );
-	tslider_signals[ACTIVATE] = g_signal_new( "activate",
-		G_OBJECT_CLASS_TYPE( gobject_class ),
-		G_SIGNAL_RUN_FIRST,
-		G_STRUCT_OFFSET( TsliderClass, activate ),
-		NULL, NULL,
-		g_cclosure_marshal_VOID__VOID,
-		G_TYPE_NONE, 0 );
-	tslider_signals[SLIDER_CHANGED] = g_signal_new( "slider_changed",
-		G_OBJECT_CLASS_TYPE( gobject_class ),
-		G_SIGNAL_RUN_FIRST,
-		G_STRUCT_OFFSET( TsliderClass, slider_changed ),
-		NULL, NULL,
-		g_cclosure_marshal_VOID__VOID,
-		G_TYPE_NONE, 0 );
-	tslider_signals[TEXT_CHANGED] = g_signal_new( "text_changed",
-		G_OBJECT_CLASS_TYPE( gobject_class ),
-		G_SIGNAL_RUN_FIRST,
-		G_STRUCT_OFFSET( TsliderClass, text_changed ),
-		NULL, NULL,
-		g_cclosure_marshal_VOID__VOID,
-		G_TYPE_NONE, 0 );
-
-	/* Init methods.
-	 */
-}
-
 /* From/to/value have changed ... tell everyone.
  */
 void
@@ -234,7 +148,8 @@ tslider_changed( Tslider *tslider )
 	printf( "tslider_changed\n" );
 #endif /*DEBUG*/
 
-	g_signal_emit( G_OBJECT( tslider ), tslider_signals[CHANGED], 0 );
+	g_signal_emit( G_OBJECT( tslider ), 
+		tslider_signals[CHANGED], 0 );
 }
 
 /* Activated!
@@ -246,7 +161,8 @@ tslider_activate( Tslider *tslider )
 	printf( "tslider_activate\n" );
 #endif /*DEBUG*/
 
-	g_signal_emit( G_OBJECT( tslider ), tslider_signals[ACTIVATE], 0 );
+	g_signal_emit( G_OBJECT( tslider ), 
+		tslider_signals[ACTIVATE], 0 );
 }
 
 /* Just the slider changed.
@@ -271,7 +187,8 @@ tslider_text_changed( Tslider *tslider )
 	printf( "tslider_text_changed\n" );
 #endif /*DEBUG*/
 
-	g_signal_emit( G_OBJECT( tslider ), tslider_signals[TEXT_CHANGED], 0 );
+	g_signal_emit( G_OBJECT( tslider ), 
+		tslider_signals[TEXT_CHANGED], 0 );
 }
 
 /* Enter in entry widget
@@ -281,12 +198,12 @@ tslider_value_activate_cb( GtkWidget *entry, Tslider *tslider )
 {
 	double value;
 
-	if( !get_geditable_double( entry, &value ) ) {
-		iwindow_alert( entry, GTK_MESSAGE_ERROR );
-		return;
-	}
+#ifdef DEBUG
+	printf( "tslider_value_activate_cb:\n" );
+#endif /*DEBUG*/
 
-	if( tslider->value != value ) {
+	if( get_geditable_double( entry, &value ) &&
+		tslider->value != value ) {
 		tslider->value = value;
 
 		if( tslider->auto_link ) 
@@ -302,7 +219,7 @@ static void
 tslider_value_changed_cb( GtkAdjustment *adj, Tslider *tslider )
 {
 #ifdef DEBUG
-	printf( "tslider_value_changed_cb\n" );
+	printf( "tslider_value_changed_cb:\n" );
 #endif /*DEBUG*/
 
 	if( tslider->svalue != gtk_adjustment_get_value( adj ) ) {
@@ -325,7 +242,7 @@ static void
 tslider_text_changed_cb( GtkWidget *widget, Tslider *tslider )
 {
 #ifdef DEBUG
-	printf( "tslider_text_changed_cb\n" );
+	printf( "tslider_text_changed_cb:\n" );
 #endif /*DEBUG*/
 
 	tslider_text_changed( tslider );
@@ -339,27 +256,11 @@ tslider_conversion_id( double from, double to, double value )
 	return( value );
 }
 
-static gboolean
-tslider_scroll_cb( GtkWidget *wid, GdkEvent *event, Tslider *tslider )
-{
-	gboolean handled;
-
-	handled = FALSE;
-
-	/* Stop any other scroll handlers running. We don't want the scroll 
-	 * wheel to change widgets while we're moving.
-	 */
-	if( tslider->ignore_scroll )
-		handled = TRUE;
-
-	return( handled ); 
-}
-
 static void
 tslider_init( Tslider *tslider )
 {
 #ifdef DEBUG
-	printf( "tslider_init: %p\n", tslider );
+	printf( "tslider_init:\n" ); 
 #endif /*DEBUG*/
 
 	/* Any old start values ... overridden later.
@@ -372,50 +273,99 @@ tslider_init( Tslider *tslider )
 	tslider->last_to = -1;
 	tslider->last_from = -1;
 	tslider->last_svalue = -1;
-	tslider->ignore_scroll = TRUE;
 
-        gtk_box_set_spacing( GTK_BOX( tslider ), 2 );
-
-	tslider->entry = build_entry( 5 );
-	gtk_entry_set_max_length( GTK_ENTRY( tslider->entry ), 10 );
-        set_tooltip( tslider->entry, _( "Slider value ... edit!" ) );
-        gtk_box_pack_start( GTK_BOX( tslider ), 
-		tslider->entry, FALSE, FALSE, 0 );
+	gtk_widget_init_template( GTK_WIDGET( tslider ) );
+	
         g_signal_connect( tslider->entry, "activate",
                 G_CALLBACK( tslider_value_activate_cb ), tslider );
         g_signal_connect( tslider->entry, "changed",
                 G_CALLBACK( tslider_text_changed_cb ), tslider );
-	gtk_widget_show( tslider->entry );
 
-        tslider->slider = gtk_scale_new( GTK_ORIENTATION_HORIZONTAL, NULL );
-	tslider->adj = gtk_range_get_adjustment( GTK_RANGE( tslider->slider ) );
-        gtk_scale_set_draw_value( GTK_SCALE( tslider->slider ), FALSE );
-	gtk_widget_set_size_request( GTK_WIDGET( tslider->slider ), 100, -1 );
-        gtk_box_pack_start( GTK_BOX( tslider ), 
-		tslider->slider, TRUE, TRUE, 0 );
-        set_tooltip( tslider->slider, _( "Left-drag to set number" ) );
         g_signal_connect( tslider->adj, "value_changed", 
 		G_CALLBACK( tslider_value_changed_cb ), tslider );
-	g_signal_connect( tslider->slider, "scroll-event", 
-		G_CALLBACK( tslider_scroll_cb ), tslider );
-	gtk_widget_show( tslider->slider );
 
 	tslider->auto_link = TRUE;
 	tslider->slider_to_value = tslider_conversion_id;
 	tslider->value_to_slider = tslider_conversion_id;
+
+	tslider_changed( tslider );
+}
+
+#define BIND( field ) \
+	gtk_widget_class_bind_template_child( GTK_WIDGET_CLASS( class ), \
+		Tslider, field );
+
+static void
+tslider_class_init( TsliderClass *class )
+{
+	GObjectClass *gobject_class = G_OBJECT_CLASS( class );
+	GtkWidgetClass *widget_class = GTK_WIDGET_CLASS( class );
+
+#ifdef DEBUG
+	printf( "tslider_class_init:\n" ); 
+#endif /*DEBUG*/
+
+	G_OBJECT_CLASS( class )->dispose = tslider_dispose;
+
+	class->changed = tslider_real_changed;
+
+	gtk_widget_class_set_layout_manager_type( widget_class, 
+		GTK_TYPE_BOX_LAYOUT );
+	gtk_widget_class_set_template_from_resource( GTK_WIDGET_CLASS( class ),
+		APP_PATH "/tslider.ui");
+
+	BIND( adj );
+	BIND( box );
+	BIND( entry );
+	BIND( scale );
+
+	/* Create signals.
+	 */
+	tslider_signals[CHANGED] = g_signal_new( "changed",
+		G_OBJECT_CLASS_TYPE( gobject_class ),
+		G_SIGNAL_RUN_FIRST,
+		G_STRUCT_OFFSET( TsliderClass, changed ),
+		NULL, NULL,
+		g_cclosure_marshal_VOID__VOID,
+		G_TYPE_NONE, 0 );
+	tslider_signals[ACTIVATE] = g_signal_new( "activate",
+		G_OBJECT_CLASS_TYPE( gobject_class ),
+		G_SIGNAL_RUN_FIRST,
+		0, NULL, NULL,
+		g_cclosure_marshal_VOID__VOID,
+		G_TYPE_NONE, 0 );
+	tslider_signals[SLIDER_CHANGED] = g_signal_new( "slider_changed",
+		G_OBJECT_CLASS_TYPE( gobject_class ),
+		G_SIGNAL_RUN_FIRST,
+		0, NULL, NULL,
+		g_cclosure_marshal_VOID__VOID,
+		G_TYPE_NONE, 0 );
+	tslider_signals[TEXT_CHANGED] = g_signal_new( "text_changed",
+		G_OBJECT_CLASS_TYPE( gobject_class ),
+		G_SIGNAL_RUN_FIRST,
+		0, NULL, NULL,
+		g_cclosure_marshal_VOID__VOID,
+		G_TYPE_NONE, 0 );
+
 }
 
 Tslider *
-tslider_new()
+tslider_new( void ) 
 {
-	Tslider *tslider = g_object_new( TYPE_TSLIDER, NULL );
+	Tslider *tslider;
 
-	return( tslider );
+#ifdef DEBUG
+	printf( "tslider_new:\n" ); 
+#endif /*DEBUG*/
+
+	tslider = g_object_new( TSLIDER_TYPE, NULL );
+
+	return( tslider ); 
 }
 
 void
 tslider_set_conversions( Tslider *tslider, 
-	tslider_fn value_to_slider, tslider_fn slider_to_value )
+	TsliderFn value_to_slider, TsliderFn slider_to_value )
 {
 	tslider->value_to_slider = value_to_slider;
 	tslider->slider_to_value = slider_to_value;
@@ -455,8 +405,3 @@ tslider_log_slider_to_value( double from, double to, double value )
 	return( nvalue );
 }
 
-void
-tslider_set_ignore_scroll( Tslider *tslider, gboolean ignore_scroll )
-{
-	tslider->ignore_scroll = ignore_scroll;
-}

@@ -1,0 +1,26 @@
+/* XPM */
+static char * paint_xpm[] = {
+/* width height ncolors cpp [x_hot y_hot] */
+"16 16 4 1 -1 -1",
+/* colors */
+" 	s none	m none	c none",
+".	s iconColor2	m white	c white",
+"x	s iconColor1	m black	c black",
+"a	s iconGray2	m gray	c #909090909090",
+/* pixels */
+"           x..xa",
+"          x..xaa",
+"          x..xa ",
+"         x..xaa ",
+"         x..xa  ",
+"        x..xaa  ",
+"        x..xa   ",
+"       xxxxaa   ",
+"      x..xxa    ",
+"     x...xxa    ",
+"     x..axxa    ",
+"    x..axxaa    ",
+"    x.axxaa     ",
+"   x.axxaa      ",
+"  xxxxaaa       ",
+"   aaaa         "};

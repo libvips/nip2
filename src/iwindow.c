@@ -851,14 +851,14 @@ iwindow_init( iWindow *iwnd )
 }
 
 GtkWidget *
-iwindow_new( GtkWindowType type )
+iwindow_new( void )
 {
 	iWindow *iwnd = g_object_new( TYPE_IWINDOW, NULL );
 	GtkWindow *gwnd = GTK_WINDOW( iwnd );
 
 	/* Init superclass.
-	 */
 	gwnd->type = type;
+	 */
 
 	return( GTK_WIDGET( iwnd ) );
 }

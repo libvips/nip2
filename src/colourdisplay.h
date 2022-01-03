@@ -39,7 +39,9 @@
 	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_COLOURDISPLAY ))
 
 typedef struct _Colourdisplay {
-	Imagedisplay parent_class;
+	GtkWidget parent_instance;
+
+	Imagedisplay *imagedisplay;
 
 	/* Set this to indicate that we prefer to drag as text rather than 
 	 * colour.
@@ -48,7 +50,7 @@ typedef struct _Colourdisplay {
 } Colourdisplay;
 
 typedef struct _ColourdisplayClass {
-	ImagedisplayClass parent_class;
+	GtkWidgetClass parent_class;
 
 	/* My methods.
 	 */

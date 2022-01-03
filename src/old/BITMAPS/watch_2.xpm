@@ -1,0 +1,25 @@
+/* XPM */
+static char *watch_2[] = {
+/* columns rows colors chars-per-pixel */
+"16 16 3 1 ",
+"  c black",
+". c white",
+"X c None",
+/* pixels */
+"XXXXX.....XXX..X",
+"XXX.........X...",
+"XX...     ...X..",
+"X..         ..X ",
+"X.. .       .. X",
+"..   .       ..X",
+"..    .      .. ",
+"..     .     .. ",
+"..     .     .. ",
+"..     .     .. ",
+"X..    .    ..  ",
+"X..    .    .. X",
+"XX...     ...  X",
+"XXX.........  XX",
+"XXXX .....   XXX",
+"XXXXXX     XXXXX"
+};

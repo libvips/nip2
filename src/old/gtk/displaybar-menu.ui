@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<interface>
+  <menu id="displaybar-menu">
+    <section>
+      <item>
+        <attribute name='label' translatable='yes'>Scale</attribute>
+        <attribute name='action'>win.scale</attribute>
+      </item>
+    </section>
+
+    <section>
+      <item>
+        <attribute name='label' translatable='yes'>Falsecolour</attribute>
+        <attribute name='action'>win.falsecolour</attribute>
+      </item>
+
+      <item>
+        <attribute name='label' translatable='yes'>Log scale</attribute>
+        <attribute name='action'>win.log</attribute>
+      </item>
+    </section>
+
+    <section>
+
+      <item>
+        <attribute name='label' translatable='yes'>Toilet roll</attribute>
+        <attribute name='action'>win.mode</attribute>
+        <attribute name='target'>toilet-roll</attribute>
+      </item>
+
+      <item>
+        <attribute name='label' translatable='yes'>Multipage</attribute>
+        <attribute name='action'>win.mode</attribute>
+        <attribute name='target'>multipage</attribute>
+      </item>
+
+      <item>
+        <attribute name='label' translatable='yes'>Animated</attribute>
+        <attribute name='action'>win.mode</attribute>
+        <attribute name='target'>animated</attribute>
+      </item>
+
+      <item>
+        <attribute name='label' translatable='yes'>Pages as bands</attribute>
+        <attribute name='action'>win.mode</attribute>
+        <attribute name='target'>pages-as-bands</attribute>
+      </item>
+
+    </section>
+
+    <section>
+      <item>
+        <attribute name='label' translatable='yes'>Reset</attribute>
+        <attribute name='action'>win.reset</attribute>
+      </item>
+    </section>
+
+  </menu>
+</interface>

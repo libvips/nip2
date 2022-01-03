@@ -1,546 +1,733 @@
-/* Imagedisplay widget code ... display entire image, place this widget in a 
- * scrolledwindow to get clipping/scrolling behaviour.
- */
+#include "vipsdisp.h"
 
 /*
-
-    Copyright (C) 1991-2003 The National Gallery
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-
- */
-
-/*
-
-    These files are distributed with VIPS - http://www.vips.ecs.soton.ac.uk
-
- */
-
-/*
+#define DEBUG_VERBOSE
 #define DEBUG
  */
 
-/* Trace painting actions
-#define DEBUG_PAINT
- */
+struct _Imagedisplay {
+        GtkDrawingArea parent_instance;
 
-/*
-#define DEBUG_GEO
- */
+        /* The tilecache whose output we display.
+         */
+        TileCache *tile_cache;
 
-#include "ip.h"
+        /* We implement a scrollable interface.
+         */
+        GtkAdjustment *hadj;
+        GtkAdjustment *vadj;
+        guint hscroll_policy;
+        guint vscroll_policy;
 
-G_DEFINE_TYPE( Imagedisplay, imagedisplay, GTK_TYPE_DRAWING_AREA ); 
+        /* image_rect is the bounds of image space .. 0,0 to image->Xsize,
+         * image->Ysize
+         */
+        VipsRect image_rect;
 
-enum {
-	SIG_AREA_CHANGED,	/* xywh area changed, canvas cods */
-	SIG_LAST
+        /* The rect of the widget.
+         */
+        VipsRect widget_rect;
+
+        /* The sub-area of widget_rect that we paint. Very zoomed out images
+         * are centred in the widget.
+         */
+        VipsRect paint_rect;
+
+        /* How we transform the image_rect to widget space. 
+         *
+         * scale is how much we zoom/reduce the image by. 
+         * x, y is the position of the top-left of the widget in the scaled
+         * image.
+         */
+        double scale;
+        double x, y;
+
+	/* Draw the screen in debug mode.
+	 */
+	gboolean debug;
+
+	/* _layout will pick a scale to fit the image to the window.
+	 */
+	gboolean bestfit;
 };
 
-static guint imagedisplay_signals[SIG_LAST] = { 0 };
-
-/* Handy!
+/* imagedisplay is actually a drawing area the size of the widget on screen: we 
+ * do all scrolling ourselves.
  */
-void
-imagedisplay_queue_draw_area( Imagedisplay *id, Rect *area )
-{
-#ifdef DEBUG_PAINT
-	printf( "imagedisplay_queue_draw_area: "
-		"left = %d, top = %d, width = %d, height = %d\n",
-		area->left, area->top, area->width, area->height );
-#endif /*DEBUG_PAINT*/
+G_DEFINE_TYPE_WITH_CODE( Imagedisplay, imagedisplay, GTK_TYPE_DRAWING_AREA,
+        G_IMPLEMENT_INTERFACE( GTK_TYPE_SCROLLABLE, NULL ) );
 
-	gtk_widget_queue_draw_area( GTK_WIDGET( id ),
-		area->left, area->top, area->width, area->height ); 
-}
+enum {
+        /* Set the tile_cache we display.
+         */
+        PROP_TILE_CACHE = 1,
 
-/* Repaint an area of the image.
- */
+        /* The props we implement for the scrollable interface.
+         */
+        PROP_HADJUSTMENT,
+        PROP_HSCROLL_POLICY,
+        PROP_VADJUSTMENT,
+        PROP_VSCROLL_POLICY,
+
+        /* Control transform with this.
+         */
+        PROP_SCALE,
+        PROP_X,
+        PROP_Y,
+
+        /* Draw snapshot in debug mode.
+         */
+        PROP_DEBUG,
+
+        SIG_LAST
+};
+
 static void
-imagedisplay_paint_image( Imagedisplay *id, Rect *area )
+imagedisplay_dispose( GObject *object )
 {
-	Conversion *conv = id->conv;
+        Imagedisplay *imagedisplay = (Imagedisplay *) object;
 
-	guchar *buf;
-	int lsk;
+#ifdef DEBUG
+        printf( "imagedisplay_dispose:\n" ); 
+#endif /*DEBUG*/
 
-#ifdef DEBUG_PAINT
-	g_print( "imagedisplay_paint_image: at %d x %d, size %d x %d ",
-		area->left, area->top, area->width, area->height );
-	gobject_print( G_OBJECT( id ) );
-#endif /*DEBUG_PAINT*/
+        VIPS_UNREF( imagedisplay->tile_cache );
 
-	/* Request pixels. We ask the mask first, to get an idea of what's
-	 * currently in cache, then request tiles of pixels. We must always
-	 * request pixels, even if the mask is blank, because the request
-	 * will trigger a notify later which will reinvoke us.
-	 */
-	if( conv->mreg &&
-		im_prepare( conv->mreg, area ) ) {
-#ifdef DEBUG_PAINT
-		printf( "imagedisplay_paint_image: mask paint error\n" );
-		printf( "\t%s\n", im_error_buffer() );
-#endif /*DEBUG_PAINT*/
-
-		return;
-	}
-	if( im_prepare( conv->ireg, area ) ) {
-#ifdef DEBUG_PAINT
-		printf( "imagedisplay_paint_image: paint error\n" );
-		printf( "\t%s\n", im_error_buffer() );
-#endif /*DEBUG_PAINT*/
-
-		im_error_clear();
-
-		return;
-	}
-
-	/* Is the mask all zero? Skip the paint.
-	 */
-	if( conv->mreg ) {
-		gboolean found;
-		int x, y;
-
-		buf = (guchar *) 
-			IM_REGION_ADDR( conv->mreg, area->left, area->top );
-		lsk = IM_REGION_LSKIP( conv->mreg );
-		found = FALSE;
-
-		for( y = 0; y < area->height; y++ ) {
-			for( x = 0; x < area->width; x++ )
-				if( buf[x] ) {
-					found = TRUE;
-					break;
-				}
-
-			if( found )
-				break;
-
-			buf += lsk;
-		}
-
-		if( !found ) {
-#ifdef DEBUG_PAINT
-			printf( "imagedisplay_paint_image: zero mask\n" );
-#endif /*DEBUG_PAINT*/
-
-			return;
-		}
-	}
-
-	/* Paint into window.
-	 */
-
-	buf = (guchar *) IM_REGION_ADDR( conv->ireg, area->left, area->top );
-	lsk = IM_REGION_LSKIP( conv->ireg );
-
-	if( conv->ireg->im->Bands == 3 )
-		gdk_draw_rgb_image( GTK_WIDGET( id )->window,
-			GTK_WIDGET( id )->style->white_gc,
-			area->left, area->top, area->width, area->height,
-			GDK_RGB_DITHER_MAX,
-			buf, lsk );
-	else if( conv->ireg->im->Bands == 1 )
-		gdk_draw_gray_image( GTK_WIDGET( id )->window,
-			GTK_WIDGET( id )->style->white_gc,
-			area->left, area->top, area->width, area->height,
-			GDK_RGB_DITHER_MAX,
-			buf, lsk );
-}
-
-/* Paint an area with the background pattern.
- */
-static void
-imagedisplay_paint_background( Imagedisplay *id, Rect *expose )
-{
-#ifdef DEBUG_PAINT
-	g_print( "imagedisplay_paint_background: at %d x %d, size %d x %d\n",
-		expose->left, expose->top, expose->width, expose->height );
-#endif /*DEBUG_PAINT*/
-
-	gdk_draw_rectangle( GTK_WIDGET( id )->window, 
-		id->back_gc, TRUE,
-		expose->left, expose->top, expose->width, expose->height );
-}
-
-/* Paint areas outside the image.
- */
-static void
-imagedisplay_paint_background_clipped( Imagedisplay *id, Rect *expose )
-{
-	Conversion *conv = id->conv;
-	Rect clip;
-
-#ifdef DEBUG_PAINT
-	g_print( "imagedisplay_paint_background_clipped: canvas %d x %d\n",
-		conv->canvas.width, conv->canvas.height );
-#endif /*DEBUG_PAINT*/
-
-	/* If the expose touches the image, we cut it into two parts:
-	 * everything to the right of the image, and everything strictly
-	 * below.
-	 */
-	im_rect_intersectrect( expose, &conv->canvas, &clip );
-	if( !im_rect_isempty( &clip ) ) {
-		Rect area;
-
-		area = *expose;
-		area.left = conv->canvas.width;
-		area.width -= clip.width;
-		if( area.width > 0 )
-			imagedisplay_paint_background( id, &area );
-
-		area = *expose;
-		area.top = conv->canvas.height;
-		area.width = clip.width;
-		area.height -= clip.height;
-		if( area.height > 0 )
-			imagedisplay_paint_background( id, &area );
-	}
-	else
-		imagedisplay_paint_background( id, expose );
+        G_OBJECT_CLASS( imagedisplay_parent_class )->dispose( object );
 }
 
 static void
-imagedisplay_paint( Imagedisplay *id, Rect *area )
+imagedisplay_set_transform( Imagedisplay *imagedisplay, 
+        double scale, double x, double y )
 {
-	Conversion *conv = id->conv;
-	const int tsize = conv->tile_size;
+        /* Sanity limits.
+         */
+        if( scale > 100000 || 
+                scale < (1.0 / 100000) )
+                return;
+        if( x < -1000 ||
+                x > 2 * VIPS_MAX_COORD ||
+                y < -1000 ||
+                y > 2 * VIPS_MAX_COORD )
+                return;
 
-	Rect clip;
-	int xs, ys;
-	int x, y;
+#ifdef DEBUG
+	printf( "imagedisplay_set_transform: "
+		"x = %g, y = %g, scale = %g\n", x, y, scale );
+#endif /*DEBUG*/
 
-	/* There's no image to paint.
-	 */
-	if( !conv->ireg )
-		return;
-
-	/* Clip non-image parts of the expose.
-	 */
-	im_rect_intersectrect( area, &conv->canvas, &clip );
-	if( im_rect_isempty( &clip ) )
-		return;
-
-#ifdef DEBUG_PAINT
-	g_print( "imagedisplay_paint: at %d x %d, size %d x %d\n",
-		clip.left, clip.top, clip.width, clip.height );
-#endif /*DEBUG_PAINT*/
-
-	/* Round left/top down to the start tile.
-	 */
-	xs = (clip.left / tsize) * tsize;
-	ys = (clip.top / tsize) * tsize;
-
-	/* Now loop painting image tiles.
-	 */
-	for( y = ys; y < IM_RECT_BOTTOM( &clip ); y += tsize )
-		for( x = xs; x < IM_RECT_RIGHT( &clip ); x += tsize ) {
-			Rect tile;
-			Rect tile2;
-
-			tile.left = x;
-			tile.top = y;
-			tile.width = conv->tile_size;
-			tile.height = conv->tile_size;
-			im_rect_intersectrect( &tile, &clip, &tile2 );
-
-			imagedisplay_paint_image( id, &tile2 );
-		}
+        imagedisplay->scale = scale;
+        imagedisplay->x = x;
+        imagedisplay->y = y;
 }
 
-/* Expose signal handler.
- */
-static gint
-imagedisplay_expose( GtkWidget *widget, GdkEventExpose *event )
+static void
+imagedisplay_adjustment_changed( GtkAdjustment *adjustment, 
+        Imagedisplay *imagedisplay )
 {
-	Imagedisplay *id = IMAGEDISPLAY( widget );
+        if( gtk_widget_get_realized( GTK_WIDGET( imagedisplay ) ) ) {
+                double left = gtk_adjustment_get_value( imagedisplay->hadj );
+                double top = gtk_adjustment_get_value( imagedisplay->vadj );
 
-	GdkRectangle *rect;
-	int i, n;
+#ifdef DEBUG
+                printf( "imagedisplay_adjustment_changed: %g x %g\n", 
+                        left, top );
+#endif /*DEBUG*/
 
-	if( !GTK_WIDGET_DRAWABLE( id ) ||
-		event->area.width == 0 || 
-		event->area.height == 0 ||
-		!GTK_WIDGET( id )->window ||
-		!GTK_WIDGET_VISIBLE( id ) )
-		return( FALSE );
-
-	gdk_region_get_rectangles( event->region, &rect, &n );
-#ifdef DEBUG_PAINT
-	g_print( "imagedisplay_expose: %d rectangles\n", n ); 
-#endif /*DEBUG_PAINT*/
-	for( i = 0; i < n; i++ ) {
-		Rect area;
-
-		area.left = rect[i].x;
-		area.top = rect[i].y;
-		area.width = rect[i].width;
-		area.height = rect[i].height;
-
-		/* Clear to background. Always do this, to make sure we paint 
-		 * outside the image area.
-		 */
-		imagedisplay_paint_background_clipped( id, &area );
-
-		/* And paint pixels.
-		 */
-		imagedisplay_paint( id, &area );
-	}
-	g_free( rect );
-
-        return( FALSE );
+                imagedisplay_set_transform( imagedisplay, 
+                        imagedisplay->scale, left, top );
+		gtk_widget_queue_draw( GTK_WIDGET( imagedisplay ) ); 
+        }
 }
 
-/* Resize signal.
- */
 static gboolean
-imagedisplay_configure_event( GtkWidget *widget, GdkEventConfigure *event )
+imagedisplay_set_adjustment( Imagedisplay *imagedisplay,
+        GtkAdjustment **adjustment_slot, GtkAdjustment *new_adjustment )
 {
-	Imagedisplay *id = IMAGEDISPLAY( widget );
-
-#ifdef DEBUG_GEO
-	g_print( "imagedisplay_configure_event: %d x %d:\n", 
-		event->width, event->height );
-#endif /*DEBUG_GEO*/
-
-	/* Note new size in visible hint. Except if parent is a viewport ...
-	 * if it's a viewport, someone else will have to track the visible
-	 * area.
-	 */
-	if( !GTK_IS_VIEWPORT( gtk_widget_get_parent( widget ) ) ) { 
-		id->conv->visible.width = event->width;
-		id->conv->visible.height = event->height;
-	}
-
-	/* Recalculate shrink to fit, if necessary.
-	 */
-	if( id->shrink_to_fit ) {
-#ifdef DEBUG_GEO
-		g_print( "imagedisplay_configure_event_cb: shrink-to-fit\n" );
-#endif /*DEBUG_GEO*/
-
-		conversion_set_mag( id->conv, 0 );
-	}
-
-        return( FALSE );
-}
-
-static void
-imagedisplay_destroy( GtkWidget *widget )
-{
-	Imagedisplay *id = IMAGEDISPLAY( widget );
-
 #ifdef DEBUG
-	g_print( "imagedisplay_destroy: " );
-	gobject_print( G_OBJECT( id ) );
+        printf( "imagedisplay_set_adjustment:\n" ); 
 #endif /*DEBUG*/
 
-	FREESID( id->changed_sid, id->conv );
-	FREESID( id->area_changed_sid, id->conv );
-	UNREF( id->conv );
+        if( new_adjustment && 
+                *adjustment_slot == new_adjustment )
+                return( FALSE );
 
-	UNREF( id->back_gc );
-	UNREF( id->top_gc );
-	UNREF( id->bottom_gc );
+        if( *adjustment_slot ) {
+                g_signal_handlers_disconnect_by_func( *adjustment_slot,
+                            imagedisplay_adjustment_changed, imagedisplay );
+                VIPS_UNREF( *adjustment_slot );
+        }
 
-	GTK_WIDGET_CLASS( imagedisplay_parent_class )->destroy( widget );
+        if( !new_adjustment )
+                new_adjustment = 
+                        gtk_adjustment_new( 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 );
+
+        g_signal_connect( new_adjustment, "value-changed",
+                G_CALLBACK( imagedisplay_adjustment_changed ), imagedisplay );
+        *adjustment_slot = g_object_ref_sink( new_adjustment );
+
+        return( TRUE );
 }
 
-/* Conversion has changed ... resize to fit.
- */
 static void
-imagedisplay_real_conversion_changed( Imagedisplay *id )
+imagedisplay_set_adjustment_values( Imagedisplay *imagedisplay, 
+        GtkAdjustment *adjustment, int axis_size, int window_size ) 
 {
-	GtkRequisition *requisition = &GTK_WIDGET( id )->requisition;
-	Rect *canvas = &id->conv->canvas;
-
-	g_assert( IS_IMAGEDISPLAY( id ) );
+        double old_value;
+        double new_value;
+        double new_upper;
+        double page_size;
 
 #ifdef DEBUG
-	g_print( "imagedisplay_real_conversion_changed: " );
-	gobject_print( G_OBJECT( id ) );
+        printf( "imagedisplay_set_adjustment_values: axis_size = %d, "
+                "window_size = %d\n", axis_size, window_size );
 #endif /*DEBUG*/
 
-	/* If we're in shrink-to-fit mode, do a shrink.
-	 * Otherwise resize to hold the new image.
+        old_value = gtk_adjustment_get_value( adjustment );
+        page_size = window_size;
+        new_upper = VIPS_MAX( axis_size, page_size );
+
+        g_object_set( adjustment,
+                "lower", 0.0,
+                "upper", new_upper,
+                "page-size", page_size,
+                "step-increment", 10.0,
+                "page-increment", page_size * 0.9,
+                NULL );
+
+        new_value = VIPS_CLIP( 0, old_value, new_upper - page_size );
+        if( new_value != old_value )
+                gtk_adjustment_set_value( adjustment, new_value );
+}
+
+static void
+imagedisplay_set_hadjustment_values( Imagedisplay *imagedisplay ) 
+{
+        imagedisplay_set_adjustment_values( imagedisplay, 
+                imagedisplay->hadj, 
+                imagedisplay->image_rect.width * imagedisplay->scale, 
+                imagedisplay->paint_rect.width );
+}
+
+static void
+imagedisplay_set_vadjustment_values( Imagedisplay *imagedisplay ) 
+{
+        imagedisplay_set_adjustment_values( imagedisplay, 
+                imagedisplay->vadj, 
+                imagedisplay->image_rect.height * imagedisplay->scale, 
+                imagedisplay->paint_rect.height );
+}
+
+static void
+imagedisplay_layout( Imagedisplay *imagedisplay )
+{
+#ifdef DEBUG
+        printf( "imagedisplay_layout:\n" ); 
+#endif /*DEBUG*/
+
+        imagedisplay->widget_rect.width = 
+                gtk_widget_get_width( GTK_WIDGET( imagedisplay ) );
+        imagedisplay->widget_rect.height = 
+                gtk_widget_get_height( GTK_WIDGET( imagedisplay ) );
+
+	/* width and height will be 0 if _layout runs too early to be useful.
 	 */
-	if( id->shrink_to_fit )
-		conversion_set_mag( id->conv, 0 );
-	else if( requisition->width != canvas->width ||
-		requisition->height != canvas->height ) {
-#ifdef DEBUG_GEO
-		g_print( "imagedisplay_real_conversion_"
-			"changed: requesting new size "
-			"%d x %d\n",
-			id->conv->canvas.width,
-			id->conv->canvas.height );
-#endif /*DEBUG_GEO*/
+	if( !imagedisplay->widget_rect.width ||
+		!imagedisplay->widget_rect.height )
+		return;
 
-		requisition->width = canvas->width;
-		requisition->height = canvas->height;
-		gtk_widget_queue_resize( GTK_WIDGET( id ) );
+	/* If there's no image yet, we can't do anything.
+	 */
+	if( !imagedisplay->tile_cache )
+		return;
+
+	/* Do this the first time we have the image.
+	 */
+	if( imagedisplay->bestfit ) {
+		double hscale = (double) imagedisplay->widget_rect.width / 
+			imagedisplay->image_rect.width;
+		double vscale = (double) imagedisplay->widget_rect.height / 
+			imagedisplay->image_rect.height;
+
+                imagedisplay_set_transform( imagedisplay, 
+			VIPS_MIN( hscale, vscale ),
+                        imagedisplay->x, 
+                        imagedisplay->y ); 
+
+#ifdef DEBUG
+		printf( "imagedisplay_layout: bestfit sets scale = %g\n",
+			imagedisplay->scale );
+#endif /*DEBUG*/
+
+		imagedisplay->bestfit = FALSE;
 	}
+
+        imagedisplay->paint_rect.width = VIPS_MIN( 
+                imagedisplay->widget_rect.width, 
+                imagedisplay->image_rect.width * imagedisplay->scale );
+        imagedisplay->paint_rect.height = VIPS_MIN( 
+                imagedisplay->widget_rect.height, 
+                imagedisplay->image_rect.height * imagedisplay->scale );
+
+        /* If we've zoomed right out, centre the image in the window.
+         */
+        imagedisplay->paint_rect.left = VIPS_MAX( 0,
+                (imagedisplay->widget_rect.width - 
+                 imagedisplay->paint_rect.width) / 2 ); 
+        imagedisplay->paint_rect.top = VIPS_MAX( 0,
+                (imagedisplay->widget_rect.height - 
+                 imagedisplay->paint_rect.height) / 2 ); 
+
+        imagedisplay_set_hadjustment_values( imagedisplay );
+        imagedisplay_set_vadjustment_values( imagedisplay );
 }
 
-static void
-imagedisplay_real_area_changed( Imagedisplay *id, Rect *dirty )
-{
-	imagedisplay_queue_draw_area( id, dirty );
-}
-
-static void
-imagedisplay_realize( GtkWidget *widget )
-{
-	Imagedisplay *id = IMAGEDISPLAY( widget );
-
-	GdkColor fg, bg;
-
-	GTK_WIDGET_CLASS( imagedisplay_parent_class )->realize( widget );
-
-	gdk_window_set_back_pixmap( widget->window, NULL, FALSE );
-	gtk_widget_set_double_buffered( widget, FALSE );
-
-	id->back_gc = gdk_gc_new( widget->window );
-	fg.red = fg.green = fg.blue = 0x90 << 8;
-	bg.red = bg.green = bg.blue = 0xA0 << 8;
-	gdk_gc_set_rgb_fg_color( id->back_gc, &fg );
-	gdk_gc_set_rgb_bg_color( id->back_gc, &bg );
-
-	id->top_gc = gdk_gc_new( widget->window );
-	id->bottom_gc = gdk_gc_new( widget->window );
-}
-
-/* Init Imagedisplay class.
+/* Large change, we need to relayout.
  */
+static void
+imagedisplay_tile_cache_changed( TileCache *tile_cache, 
+        Imagedisplay *imagedisplay ) 
+{
+#ifdef DEBUG
+        printf( "imagedisplay_tile_cache_changed:\n" ); 
+#endif /*DEBUG*/
+
+	/* Always shrink-to-fit new image sources.
+	 */
+	imagedisplay->bestfit = TRUE;
+
+        imagedisplay->image_rect.width = 
+                tile_cache->tile_source->display_width;
+        imagedisplay->image_rect.height = 
+                tile_cache->tile_source->display_height;
+
+        imagedisplay_layout( imagedisplay );
+
+	gtk_widget_queue_draw( GTK_WIDGET( imagedisplay ) ); 
+}
+
+/* Tiles have changed, but not image geometry. Perhaps falsecolour.
+ */
+static void
+imagedisplay_tile_cache_tiles_changed( TileCache *tile_cache, 
+        Imagedisplay *imagedisplay ) 
+{
+#ifdef DEBUG
+        printf( "imagedisplay_tile_cache_tiles_changed:\n" ); 
+#endif /*DEBUG*/
+
+        gtk_widget_queue_draw( GTK_WIDGET( imagedisplay ) ); 
+}
+
+static void
+imagedisplay_tile_cache_area_changed( TileCache *tile_cache, 
+	VipsRect *dirty, int z, Imagedisplay *imagedisplay ) 
+{
+#ifdef DEBUG_VERBOSE
+        printf( "imagedisplay_tile_cache_area_changed: "
+                "at %d x %d, size %d x %d, z = %d\n",
+                dirty->left, dirty->top,
+                dirty->width, dirty->height,
+                z );
+#endif /*DEBUG_VERBOSE*/
+
+        /* Sadly, gtk4 only has this and we can't redraw areas. Perhaps we
+         * could just renegerate part of the snapshot?
+         */
+        gtk_widget_queue_draw( GTK_WIDGET( imagedisplay ) );
+}
+
+static void
+imagedisplay_set_tile_cache( Imagedisplay *imagedisplay, 
+        TileCache *tile_cache )
+{
+        VIPS_UNREF( imagedisplay->tile_cache );
+        imagedisplay->tile_cache = tile_cache;
+        g_object_ref( imagedisplay->tile_cache );
+
+        g_signal_connect_object( tile_cache, "changed", 
+                G_CALLBACK( imagedisplay_tile_cache_changed ), 
+                imagedisplay, 0 );
+        g_signal_connect_object( tile_cache, "tiles-changed", 
+                G_CALLBACK( imagedisplay_tile_cache_tiles_changed ), 
+                imagedisplay, 0 );
+        g_signal_connect_object( tile_cache, "area-changed", 
+                G_CALLBACK( imagedisplay_tile_cache_area_changed ), 
+                imagedisplay, 0 );
+
+	/* Do initial change to init.
+	 */
+	imagedisplay_tile_cache_changed( tile_cache, imagedisplay );
+}
+
+static void
+imagedisplay_set_property( GObject *object, 
+        guint prop_id, const GValue *value, GParamSpec *pspec )
+{
+        Imagedisplay *imagedisplay = (Imagedisplay *) object;
+
+        switch( prop_id ) {
+        case PROP_HADJUSTMENT:
+                if( imagedisplay_set_adjustment( imagedisplay, 
+                        &imagedisplay->hadj, 
+                        g_value_get_object( value ) ) ) { 
+                        imagedisplay_set_hadjustment_values( imagedisplay );
+                        g_object_notify( G_OBJECT( imagedisplay ), 
+                                "hadjustment" );
+                }
+                break;
+
+        case PROP_VADJUSTMENT:
+                if( imagedisplay_set_adjustment( imagedisplay, 
+                        &imagedisplay->vadj, 
+                        g_value_get_object( value ) ) ) { 
+                        imagedisplay_set_vadjustment_values( imagedisplay );
+                        g_object_notify( G_OBJECT( imagedisplay ), 
+                                "vadjustment" );
+                }
+                break;
+
+        case PROP_HSCROLL_POLICY:
+                if( imagedisplay->hscroll_policy != 
+                        g_value_get_enum( value ) ) {
+                        imagedisplay->hscroll_policy = 
+                                g_value_get_enum( value );
+                        gtk_widget_queue_resize( GTK_WIDGET( imagedisplay ) );
+                        g_object_notify_by_pspec( object, pspec );
+                }
+                break;
+
+        case PROP_VSCROLL_POLICY:
+                if( imagedisplay->vscroll_policy != 
+                        g_value_get_enum( value ) ) {
+                        imagedisplay->vscroll_policy = 
+                                g_value_get_enum( value );
+                        gtk_widget_queue_resize( GTK_WIDGET( imagedisplay ) );
+                        g_object_notify_by_pspec( object, pspec );
+                }
+                break;
+
+        case PROP_TILE_CACHE:
+                imagedisplay_set_tile_cache( imagedisplay, 
+                        g_value_get_object( value ) );
+                break;
+
+        case PROP_SCALE:
+                imagedisplay_set_transform( imagedisplay, 
+			g_value_get_double( value ),
+                        imagedisplay->x, 
+                        imagedisplay->y ); 
+                imagedisplay_layout( imagedisplay );
+		gtk_widget_queue_draw( GTK_WIDGET( imagedisplay ) ); 
+                break;
+
+        case PROP_X:
+                imagedisplay_set_transform( imagedisplay, 
+                        imagedisplay->scale,
+                        g_value_get_double( value ),
+                        imagedisplay->y );
+		gtk_widget_queue_draw( GTK_WIDGET( imagedisplay ) ); 
+                break;
+
+        case PROP_Y:
+                imagedisplay_set_transform( imagedisplay, 
+                        imagedisplay->scale,
+                        imagedisplay->x, 
+                        g_value_get_double( value ) );
+		gtk_widget_queue_draw( GTK_WIDGET( imagedisplay ) ); 
+                break;
+
+        case PROP_DEBUG:
+                imagedisplay->debug = g_value_get_boolean( value );
+		gtk_widget_queue_draw( GTK_WIDGET( imagedisplay ) ); 
+                break;
+
+        default:
+                G_OBJECT_WARN_INVALID_PROPERTY_ID( object, prop_id, pspec );
+                break;
+        }
+}
+
+static void
+imagedisplay_get_property( GObject *object, 
+        guint prop_id, GValue *value, GParamSpec *pspec )
+{
+        Imagedisplay *imagedisplay = (Imagedisplay *) object;
+
+        switch( prop_id ) {
+        case PROP_HADJUSTMENT:
+                g_value_set_object( value, imagedisplay->hadj );
+                break;
+
+        case PROP_VADJUSTMENT:
+                g_value_set_object( value, imagedisplay->vadj );
+                break;
+
+        case PROP_HSCROLL_POLICY:
+                g_value_set_enum( value, imagedisplay->hscroll_policy );
+                break;
+
+        case PROP_VSCROLL_POLICY:
+                g_value_set_enum( value, imagedisplay->vscroll_policy );
+                break;
+
+        case PROP_TILE_CACHE:
+                g_value_set_object( value, imagedisplay->tile_cache );
+                break;
+
+        case PROP_SCALE:
+                g_value_set_double( value, imagedisplay->scale );
+                break;
+
+        case PROP_X:
+                g_value_set_double( value, imagedisplay->x );
+                break;
+
+        case PROP_Y:
+                g_value_set_double( value, imagedisplay->y );
+                break;
+
+        case PROP_DEBUG:
+                g_value_set_boolean( value, imagedisplay->debug );
+                break;
+
+        default:
+                G_OBJECT_WARN_INVALID_PROPERTY_ID( object, prop_id, pspec );
+                break;
+        }
+}
+
+static void
+imagedisplay_snapshot( GtkWidget *widget, GtkSnapshot *snapshot )
+{
+        Imagedisplay *imagedisplay = VIPSDISP_IMAGEDISPLAY( widget );
+
+#ifdef DEBUG
+        printf( "imagedisplay_snapshot:\n" );
+#endif /*DEBUG*/
+
+        /* Clip to the widget area, or we may paint over the display control
+         * bar.
+         */
+        gtk_snapshot_push_clip( snapshot, &GRAPHENE_RECT_INIT(
+                0, 
+                0, 
+                gtk_widget_get_width( widget ),
+                gtk_widget_get_height( widget ) )); 
+
+	if( imagedisplay->tile_cache &&
+		imagedisplay->tile_cache->tiles )
+		tile_cache_snapshot( imagedisplay->tile_cache, snapshot, 
+			imagedisplay->scale, imagedisplay->x, imagedisplay->y,
+			&imagedisplay->paint_rect,
+		        imagedisplay->debug );
+
+        gtk_snapshot_pop( snapshot );
+
+         /* I wasn't able to get gtk_snapshot_render_focus() working. Draw
+          * the focus rect ourselves.
+          */
+        if( gtk_widget_has_focus( widget ) ) {
+                #define BORDER ((GdkRGBA) { 0.4, 0.4, 0.6, 1 })
+
+                GskRoundedRect outline;
+
+                gsk_rounded_rect_init_from_rect( &outline, 
+                        &GRAPHENE_RECT_INIT(
+                                3, 
+                                3, 
+                                gtk_widget_get_width( widget ) - 6,
+                                gtk_widget_get_height( widget ) - 6
+                        ), 
+                        5 );
+
+                gtk_snapshot_append_border( snapshot, 
+                        &outline, 
+                        (float[4]) { 2, 2, 2, 2 },
+                        (GdkRGBA [4]) { BORDER, BORDER, BORDER, BORDER } );
+        }
+}
+
+static void
+imagedisplay_resize( GtkWidget *widget, int width, int height )
+{
+        Imagedisplay *imagedisplay = (Imagedisplay *) widget;
+
+#ifdef DEBUG
+        printf( "imagedisplay_resize: %d x %d\n", width, height ); 
+#endif /*DEBUG*/
+
+        imagedisplay_layout( imagedisplay );
+
+	gtk_widget_queue_draw( GTK_WIDGET( imagedisplay ) ); 
+}
+
+static void
+imagedisplay_focus_enter( GtkEventController *controller, 
+        Imagedisplay *imagedisplay )
+{
+#ifdef DEBUG
+        printf( "imagedisplay_focus_enter:\n" );
+#endif /*DEBUG*/
+
+        gtk_widget_queue_draw( GTK_WIDGET( imagedisplay ) ); 
+}
+
+static void
+imagedisplay_focus_leave( GtkEventController *controller, 
+        Imagedisplay *imagedisplay )
+{
+#ifdef DEBUG
+        printf( "imagedisplay_focus_leave:\n" );
+#endif /*DEBUG*/
+
+        gtk_widget_queue_draw( GTK_WIDGET( imagedisplay ) ); 
+}
+
+static void 
+imagedisplay_click( GtkEventController *controller, 
+        int n_press, double x, double y, Imagedisplay *imagedisplay )
+{
+        gtk_widget_grab_focus( GTK_WIDGET( imagedisplay ) );
+}
+
+static void
+imagedisplay_init( Imagedisplay *imagedisplay )
+{
+        GtkEventController *controller;
+
+#ifdef DEBUG
+        printf( "imagedisplay_init:\n" ); 
+#endif /*DEBUG*/
+
+        imagedisplay->scale = 1;
+
+        gtk_widget_set_focusable( GTK_WIDGET( imagedisplay ), TRUE );
+
+        g_signal_connect( GTK_DRAWING_AREA( imagedisplay ), "resize",
+                G_CALLBACK( imagedisplay_resize ), NULL);
+
+        controller = gtk_event_controller_focus_new();
+        g_signal_connect( controller, "enter", 
+                G_CALLBACK( imagedisplay_focus_enter ), imagedisplay );
+        g_signal_connect( controller, "leave", 
+                G_CALLBACK( imagedisplay_focus_leave ), imagedisplay );
+        gtk_widget_add_controller( GTK_WIDGET( imagedisplay ), controller );
+
+        controller = GTK_EVENT_CONTROLLER( gtk_gesture_click_new() );
+        g_signal_connect( controller, "pressed", 
+                G_CALLBACK( imagedisplay_click ), imagedisplay );
+        gtk_widget_add_controller( GTK_WIDGET( imagedisplay ), controller );
+}
+
 static void
 imagedisplay_class_init( ImagedisplayClass *class )
 {
-        GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
+        GObjectClass *gobject_class = G_OBJECT_CLASS( class );
+        GtkWidgetClass *widget_class = GTK_WIDGET_CLASS( class );
 
-        widget_class->destroy = imagedisplay_destroy;
-	widget_class->expose_event = imagedisplay_expose;
-	widget_class->configure_event = imagedisplay_configure_event;
-	widget_class->realize = imagedisplay_realize;
-
-	class->conversion_changed = imagedisplay_real_conversion_changed;
-	class->area_changed = imagedisplay_real_area_changed;
-
-	imagedisplay_signals[SIG_AREA_CHANGED] = g_signal_new( "area_changed",
-		G_OBJECT_CLASS_TYPE( class ),
-		G_SIGNAL_RUN_FIRST,
-		G_STRUCT_OFFSET( ImagedisplayClass, area_changed ),
-		NULL, NULL,
-		g_cclosure_marshal_VOID__POINTER,
-		G_TYPE_NONE, 1,
-		G_TYPE_POINTER );
-}
-
-static void
-imagedisplay_init( Imagedisplay *id )
-{
-	id->conv = NULL;
-	id->changed_sid = 0;
-	id->area_changed_sid = 0;
-	id->shrink_to_fit = FALSE;
-
-	id->back_gc = NULL;
-	id->top_gc = NULL;
-	id->bottom_gc = NULL;
-}
-
-/* Conversion has changed ... repaint everything.
- */
-static void
-imagedisplay_conversion_changed_cb( Conversion *conv, Imagedisplay *id )
-{
 #ifdef DEBUG
-	printf( "imagedisplay_conversion_changed_cb: " );
-	gobject_print( G_OBJECT( id ) );
+        printf( "imagedisplay_class_init:\n" ); 
 #endif /*DEBUG*/
 
-	IMAGEDISPLAY_GET_CLASS( id )->conversion_changed( id );
+        gobject_class->dispose = imagedisplay_dispose;
+        gobject_class->set_property = imagedisplay_set_property;
+        gobject_class->get_property = imagedisplay_get_property;
 
-	g_signal_emit( G_OBJECT( id ), 
-		imagedisplay_signals[SIG_AREA_CHANGED], 0, &conv->canvas );
+        widget_class->snapshot = imagedisplay_snapshot;
+
+        g_object_class_install_property( gobject_class, PROP_TILE_CACHE,
+                g_param_spec_object( "tile-cache",
+                        _( "Tile cache" ),
+                        _( "The tile cache to be displayed" ),
+                        TILE_CACHE_TYPE,
+                        G_PARAM_READWRITE ) );
+
+        g_object_class_install_property( gobject_class, PROP_SCALE,
+                g_param_spec_double( "scale",
+                        _( "Scale" ),
+                        _( "Scale of viewport" ),
+                        -VIPS_MAX_COORD, VIPS_MAX_COORD, 0,
+                        G_PARAM_READWRITE ) );
+
+        g_object_class_install_property( gobject_class, PROP_X,
+                g_param_spec_double( "x",
+                        _( "x" ),
+                        _( "Horizontal position of viewport" ),
+                        -VIPS_MAX_COORD, VIPS_MAX_COORD, 0,
+                        G_PARAM_READWRITE ) );
+
+        g_object_class_install_property( gobject_class, PROP_Y,
+                g_param_spec_double( "y",
+                        _( "y" ),
+                        _( "Vertical position of viewport" ),
+                        -VIPS_MAX_COORD, VIPS_MAX_COORD, 0,
+                        G_PARAM_READWRITE ) );
+
+        g_object_class_install_property( gobject_class, PROP_DEBUG,
+                g_param_spec_boolean( "debug",
+                        _( "Debug" ),
+                        _( "Render snapshot in debug mode" ),
+			FALSE,
+                        G_PARAM_READWRITE ) );
+
+        g_object_class_override_property( gobject_class, 
+                PROP_HADJUSTMENT, "hadjustment" );
+        g_object_class_override_property( gobject_class, 
+                PROP_VADJUSTMENT, "vadjustment" );
+        g_object_class_override_property( gobject_class, 
+                PROP_HSCROLL_POLICY, "hscroll-policy" );
+        g_object_class_override_property( gobject_class, 
+                PROP_VSCROLL_POLICY, "vscroll-policy" );
 }
 
-/* Part of the repaint has changed. 
- */
-static void
-imagedisplay_conversion_area_changed_cb( Conversion *conv, 
-	Rect *dirty, Imagedisplay *id )
-{
-#ifdef DEBUG
-	printf( "imagedisplay_conversion_area_changed_cb: " 
-		"left = %d, top = %d, width = %d, height = %d, ",
-		dirty->left, dirty->top, dirty->width, dirty->height );
-	gobject_print( G_OBJECT( id ) );
-#endif /*DEBUG*/
-
-	g_signal_emit( G_OBJECT( id ), 
-		imagedisplay_signals[SIG_AREA_CHANGED], 0, dirty );
-}
-
-/* Install a conversion. Only allow this once.
- */
-void
-imagedisplay_set_conversion( Imagedisplay *id, Conversion *conv )
-{
-	g_assert( !id->conv );
-
-	if( conv ) {
-		id->conv = conv;
-		id->changed_sid = g_signal_connect( id->conv, "changed", 
-			G_CALLBACK( imagedisplay_conversion_changed_cb ), id );
-		id->area_changed_sid = g_signal_connect( id->conv, 
-			"area_changed", 
-			G_CALLBACK( imagedisplay_conversion_area_changed_cb ), 
-			id );
-		g_object_ref( G_OBJECT( conv ) );
-		iobject_sink( IOBJECT( conv ) );
-
-		/* Trigger a change on the conv so we update.
-		 */
-		iobject_changed( IOBJECT( conv ) );
-	}
-}
-
-/* Make a new Imagedisplay. Pass in the conversion we should show, conv can
- * be NULL ... wait for one to be installed.
- */
 Imagedisplay *
-imagedisplay_new( Conversion *conv )
+imagedisplay_new( TileCache *tile_cache ) 
 {
-	Imagedisplay *id = g_object_new( TYPE_IMAGEDISPLAY, NULL );
+        Imagedisplay *imagedisplay;
 
 #ifdef DEBUG
-	g_print( "imagedisplay_new: " );
-	gobject_print( G_OBJECT( id ) );
+        printf( "imagedisplay_new:\n" ); 
 #endif /*DEBUG*/
 
-	imagedisplay_set_conversion( id, conv );
+        imagedisplay = g_object_new( imagedisplay_get_type(),
+                "tile-cache", tile_cache,
+                NULL );
 
-	return( id );
+        return( imagedisplay ); 
 }
 
-void 
-imagedisplay_set_shrink_to_fit( Imagedisplay *id, gboolean shrink_to_fit )
-{
-	id->shrink_to_fit = shrink_to_fit;
+/* image        level0 image coordinates ... this is the coordinate space we
+ *              pass down to tile_cache
+ *
+ * gtk          screen cods, so the coordinates we use to render tiles
+ */
 
-	if( shrink_to_fit )
-		conversion_set_mag( id->conv, 0 );
+void
+imagedisplay_image_to_gtk( Imagedisplay *imagedisplay, 
+        double x_image, double y_image, double *x_gtk, double *y_gtk )
+{
+        *x_gtk = x_image * imagedisplay->scale - 
+                imagedisplay->x + 
+                imagedisplay->paint_rect.left;
+        *y_gtk = y_image * imagedisplay->scale - 
+                imagedisplay->y + 
+                imagedisplay->paint_rect.top;
+}
+
+void
+imagedisplay_gtk_to_image( Imagedisplay *imagedisplay, 
+        double x_gtk, double y_gtk, double *x_image, double *y_image )
+{
+        *x_image = (imagedisplay->x + 
+                x_gtk - 
+                imagedisplay->paint_rect.left) / imagedisplay->scale;
+        *y_image = (imagedisplay->y + 
+                y_gtk - 
+                imagedisplay->paint_rect.top) / imagedisplay->scale;
+
+        *x_image = VIPS_CLIP( 0, *x_image, 
+                imagedisplay->image_rect.width - 1 );
+        *y_image = VIPS_CLIP( 0, *y_image, 
+                imagedisplay->image_rect.height - 1 );
 }

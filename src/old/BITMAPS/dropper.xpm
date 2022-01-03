@@ -1,0 +1,25 @@
+/* XPM */
+static char *dropper[] = {
+/* columns rows colors chars-per-pixel */
+"16 16 3 1 ",
+"  c black",
+". c white",
+"X c None",
+/* pixels */
+"XXXXXXXXXX....XX",
+"XXXXXXXXX.  ...X",
+"XXXXXXXXX. .....",
+"XXXXXXXXX.......",
+"XXXXXXXXX.......",
+"XXXXXXX.........",
+"XXXXXXX  ......X",
+"XXXXXX .  .XXXXX",
+"XXXXX .   .XXXXX",
+"XXXX .   XXXXXXX",
+"XXX .   XXXXXXXX",
+"XX .   XXXXXXXXX",
+"X .   XXXXXXXXXX",
+"X    XXXXXXXXXXX",
+"    XXXXXXXXXXXX",
+"  XXXXXXXXXXXXXX"
+};

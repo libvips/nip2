@@ -43,7 +43,7 @@ typedef enum {
 } PaneHandedness;
 
 typedef struct _Pane {
-	GtkHPaned parent_object;
+	GtkWidget parent_object;
 
 	PaneHandedness handedness;	/* Hide on left or right */
 
@@ -81,7 +81,7 @@ typedef struct _Pane {
 } Pane;
 
 typedef struct _PaneClass {
-	GtkHPanedClass parent_class;
+	GtkWidgetClass parent_class;
 
 	/* Either position or open have changed.
 	 */

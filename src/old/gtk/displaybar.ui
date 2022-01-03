@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <object class="GtkAdjustment" id="page_adj">
+    <property name="lower">0</property>
+    <property name="upper">100</property>
+    <property name="step-increment">1</property>
+  </object>
+
+  <template class="Displaybar" parent="GtkWidget">
+    <child>
+      <object class="GtkActionBar" id="action_bar">
+        <property name="revealed">false</property>
+
+        <child type="center">
+          <object class="GtkBox">
+            <property name="hexpand">True</property>
+            <property name="spacing">5</property>
+
+            <child>
+  	      <object class="GtkMenuButton" id="gears">
+	        <property name="hexpand">False</property>
+	        <property name="direction">none</property>
+	      </object>
+            </child>
+
+            <child>
+              <object class="GtkSpinButton" id="page">
+                <property name="adjustment">page_adj</property>
+                <property name="climb-rate">1</property>
+                <property name="digits">0</property>
+                <property name="numeric">true</property>
+	      </object>
+            </child>
+
+            <child>
+              <object class="Tslider" id="scale">
+                <property name="hexpand">True</property>
+              </object>
+            </child>
+
+            <child>
+              <object class="Tslider" id="offset">
+                <property name="hexpand">True</property>
+              </object>
+            </child>
+
+          </object>
+        </child>
+
+      </object>
+    </child>
+  </template>
+</interface>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<gresources>
+  <gresource prefix="/org/libvips/vipsdisp">
+    <file preprocess="xml-stripblanks">imagewindow.ui</file>
+    <file preprocess="xml-stripblanks">imagewindow-menu.ui</file>
+    <file preprocess="xml-stripblanks">infobar.ui</file>
+    <file preprocess="xml-stripblanks">displaybar.ui</file>
+    <file preprocess="xml-stripblanks">displaybar-menu.ui</file>
+    <file preprocess="xml-stripblanks">tslider.ui</file>
+  </gresource>
+</gresources>

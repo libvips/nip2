@@ -207,7 +207,7 @@ TRUE {
 	BEGIN BINARY;
 
 	yylval.yy_const.type = PARSE_CONST_BOOL;
-	yylval.yy_const.val.boolean = TRUE;
+	yylval.yy_const.val.bol = TRUE;
 
 	return( TK_CONST );
 }
@@ -216,7 +216,7 @@ FALSE {
 	BEGIN BINARY;
 
 	yylval.yy_const.type = PARSE_CONST_BOOL;
-	yylval.yy_const.val.boolean = FALSE;
+	yylval.yy_const.val.bol = FALSE;
 
 	return( TK_CONST );
 }

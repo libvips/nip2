@@ -126,7 +126,7 @@ struct _ParseConst {
 	union {
 		double num;
 		char *str;
-		gboolean boolean;
+		gboolean bol;
 		int ch;
 	} val;
 };

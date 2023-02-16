@@ -202,7 +202,7 @@ extern int statfs();
 #define IP_NAME PACKAGE "-" VERSION
 #define MAX_LINELENGTH (120)	/* Max chars we display of value */
 #define MAX_RECENT (10)		/* Number of recent items in file menu */
-#define NIP_COPYRIGHT "%s: &#0169;2018 Imperial College, London"
+#define NIP_COPYRIGHT "%s: &#0169;2023 libvips.org"
 
 /* Our stock_ids.
  */

@@ -25,25 +25,18 @@ nip4_SOURCES = \
 	plotmodel.h \
 	progress.c \
 	progress.h \
-	panechild.c \
 	panechild.h \
 	plotpresent.c \
 	plotpresent.h \
-	plotstatus.c \
 	plotstatus.h \
-	floatwindow.c \
 	floatwindow.h \
 	vobject.c \
 	vobject.h \
 	action.c \
 	action.h \
-	boxes.c \
 	boxes.h \
-	popupbutton.c \
 	popupbutton.h \
-	imageheader.c \
 	imageheader.h \
-	preview.c \
 	preview.h \
 	builtin.c \
 	builtin.h \
@@ -79,7 +72,6 @@ nip4_SOURCES = \
 	expr.h \
 	filemodel.c \
 	filemodel.h \
-	pane.c \
 	pane.h \
 	pathname.c \
 	pathname.h \

@@ -38,7 +38,8 @@
 	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_FORMULA ))
 
 typedef struct _Formula {
-	GtkEventBox parent_object;
+	// was GtkEventBox parent_object;
+	GtkWidget parent_object;
 
 	/* State.
 	 */
@@ -60,7 +61,8 @@ typedef struct _Formula {
 } Formula;
 
 typedef struct _FormulaClass {
-	GtkEventBoxClass parent_class;
+	// was GtkEventBoxClass parent_class;
+	GtkWidgetClass parent_class;
 
 	/* My methods.
 	 */

@@ -193,7 +193,7 @@ vobject_iobject_destroy( iObject *iobject, vObject *vobject )
 		G_OBJECT_TYPE_NAME( iobject ), NN( iobject->name ) );
 #endif /*DEBUG*/
 
-	gtk_widget_destroy( GTK_WIDGET( vobject ) );
+	VIPS_UNREF( vobject );
 }
 
 /* Link to iobject. 
@@ -214,17 +214,17 @@ vobject_link( vObject *vobject, iObject *iobject )
 }
 
 static void
-vobject_destroy( GtkWidget *widget )
+vobject_dispose( GObject *object )
 {
 	vObject *vobject;
 
-	g_return_if_fail( widget != NULL );
-	g_return_if_fail( IS_VOBJECT( widget ) );
+	g_return_if_fail( object != NULL );
+	g_return_if_fail( IS_VOBJECT( object ) );
 
-	vobject = VOBJECT( widget );
+	vobject = VOBJECT( object );
 
 #ifdef DEBUG
-	printf( "vobject_destroy: \"%s\"\n", G_OBJECT_TYPE_NAME( widget ) );
+	printf( "vobject_destroy: \"%s\"\n", G_OBJECT_TYPE_NAME( object ) );
 #endif /*DEBUG*/
 
 	if( vobject->iobject ) {
@@ -234,7 +234,7 @@ vobject_destroy( GtkWidget *widget )
 	}
 	vobject_refresh_dequeue( vobject );
 
-	GTK_WIDGET_CLASS( vobject_parent_class )->destroy( widget );
+	G_OBJECT_CLASS( vobject_parent_class )->dispose( object );
 }
 
 static void 
@@ -274,8 +274,7 @@ vobject_class_init( vObjectClass *class )
 	GtkWidgetClass *widget_class = (GtkWidgetClass*) class;
 
 	gobject_class->finalize = vobject_finalize;
-
-	widget_class->destroy = vobject_destroy;
+	gobject_class->dispose = vobject_dispose;
 
 	/* Create signals.
 	 */

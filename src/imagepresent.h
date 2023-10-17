@@ -44,7 +44,8 @@
 /* Track an image view canvas in one of these.
  */
 struct _Imagepresent {
-	GtkBin parent_object;
+	// was GtkBin parent_object;
+	GtkWidget parent_object;
 
 	/* Context.
 	 */
@@ -98,7 +99,7 @@ struct _Imagepresent {
 typedef struct _ImagepresentClass {
 	/* Our parent.
 	 */
-	GtkBinClass parent_class;
+	GtkWidgetClass parent_class;
 } ImagepresentClass;
 
 gboolean imagepresent_snap_point( Imagepresent *ip, 

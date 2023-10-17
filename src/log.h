@@ -48,9 +48,9 @@ typedef struct _LogClass {
 
 	/* How we want the menu bar built.
 	 */
-	GtkActionEntry *actions;
+	//GtkActionEntry *actions;
 	int n_actions;
-	GtkToggleActionEntry *toggle_actions;
+	//GtkToggleActionEntry *toggle_actions;
 	int n_toggle_actions;
 	const char *action_name;
 	const char *ui_description;
@@ -59,7 +59,7 @@ typedef struct _LogClass {
 
 GType log_get_type( void );
 
-void log_clear_action_cb( GtkAction *action, Log *log );
+//void log_clear_action_cb( GtkAction *action, Log *log );
 void log_text( Log *log, const char *buf );
 void log_textf( Log *log, const char *fmt, ... )
 	__attribute__((format(printf, 2, 3)));

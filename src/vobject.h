@@ -39,7 +39,7 @@
 	(G_TYPE_INSTANCE_GET_CLASS( (obj), TYPE_VOBJECT, vObjectClass ))
 
 struct _vObject {
-	GtkVBox vbox;
+	GtkWidget parent_object;
 
 	/* My instance vars.
 	 */
@@ -51,7 +51,7 @@ struct _vObject {
 };
 
 typedef struct _vObjectClass {
-	GtkVBoxClass parent_class;
+	GtkWidgetClass parent_class;
 
 	/* State change
 

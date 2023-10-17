@@ -38,7 +38,7 @@
 typedef double (*tslider_fn)( double from, double to, double value );
 
 typedef struct _Tslider {
-	GtkHBox parent_class;
+	GtkWidget parent_class;
 
 	/* Our state.
 	 */
@@ -73,7 +73,7 @@ typedef struct _Tslider {
 } Tslider;
 
 typedef struct _TsliderClass {
-	GtkHBoxClass parent_class;
+	GtkWidgetClass parent_class;
 
 	void (*changed)( Tslider * );		/* from/to/value change */
 	void (*activate)( Tslider * );		/* enter in text */

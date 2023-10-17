@@ -1,5 +1,5 @@
 Name:           nip4
-Version:        8.9.0
+Version:        8.9.1
 Release:	1%{?dist}
 Summary:	Interactive tool for working with large images
 
@@ -19,12 +19,12 @@ BuildRequires:	desktop-file-utils
 
 # description taken from Debian package
 %description
-nip2 is a graphical front end to the VIPS package.
-With nip2, rather than directly editing images, you build
+nip4 is a graphical front end to the VIPS package.
+With nip4, rather than directly editing images, you build
 relationships between objects in a spreadsheet-like fashion. When you
-make a change somewhere, nip2 recalculates the objects affected by
+make a change somewhere, nip4 recalculates the objects affected by
 that change. Since it is demand-driven this update is very fast, even
-for very, very large images. nip2 is very good at creating pipelines
+for very, very large images. nip4 is very good at creating pipelines
 of image manipulation operations. It is not very good for image
 editing tasks like touching up photographs. For that, a tool like the
 GIMP should be used instead.
@@ -44,32 +44,32 @@ rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
 
 # delete doc (we will get it later with %doc)
-rm -rf $RPM_BUILD_ROOT%{_datadir}/doc/nip2
+rm -rf $RPM_BUILD_ROOT%{_datadir}/doc/nip4
 
 # malkovich??
 rm -rf $RPM_BUILD_ROOT%{_datadir}/locale/malkovich
 
-# the nip2 post install hook seems to run update-mime-database, but we
+# the nip4 post install hook seems to run update-mime-database, but we
 # need to run it in post
 rm -rf $RPM_BUILD_ROOT%{_datadir}/mime
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/mime/packages
-cp -a nip2.xml $RPM_BUILD_ROOT%{_datadir}/mime/packages
+cp -a nip4.xml $RPM_BUILD_ROOT%{_datadir}/mime/packages
 
 # same with desktop file
 rm -rf $RPM_BUILD_ROOT%{_datadir}/applications
 
 # locale stuff
-%find_lang nip2
+%find_lang nip4
 
 # icon
 install -d $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/128x128/apps
-cp -a share/nip2/data/vips-128.png	\
-	$RPM_BUILD_ROOT%{_datadir}/icons/hicolor/128x128/apps/nip2.png
+cp -a share/nip4/data/vips-128.png	\
+	$RPM_BUILD_ROOT%{_datadir}/icons/hicolor/128x128/apps/nip4.png
 
 # desktop file
 desktop-file-install --vendor fedora 			\
 	--dir $RPM_BUILD_ROOT%{_datadir}/applications	\
-	nip2.desktop
+	nip4.desktop
 
 
 %post
@@ -104,16 +104,16 @@ update-mime-database %{_datadir}/mime &> /dev/null || :
 rm -rf $RPM_BUILD_ROOT
 
 
-%files -f nip2.lang
+%files -f nip4.lang
 %defattr(-,root,root,-)
 %doc doc/html doc/pdf AUTHORS ChangeLog COPYING NEWS THANKS TODO
-%{_bindir}/nip2
-%{_bindir}/run-nip2.sh
-%{_datadir}/nip2
-%{_mandir}/man1/nip2.1.gz
+%{_bindir}/nip4
+%{_bindir}/run-nip4.sh
+%{_datadir}/nip4
+%{_mandir}/man1/nip4.1.gz
 %{_datadir}/icons/hicolor/*/apps/*
 %{_datadir}/applications/*
-%{_datadir}/mime/packages/nip2.xml
+%{_datadir}/mime/packages/nip4.xml
 
 
 %changelog

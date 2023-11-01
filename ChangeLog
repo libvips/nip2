@@ -1,3 +1,6 @@
+started 8.9.1 15/2/23
+- fix build with --std=c99 [Schamschula]
+
 started 8.9.0 10/4/20
 - add find_trim
 

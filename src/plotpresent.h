@@ -37,7 +37,7 @@
 	(G_TYPE_CHECK_CLASS_TYPE( (klass), TYPE_PLOTPRESENT ))
 
 struct _Plotpresent {
-	GtkBin parent_class;
+	GtkWidget parent_class;
 
 	/* Context.
 	 */
@@ -56,7 +56,7 @@ struct _Plotpresent {
 };
 
 typedef struct _PlotpresentClass {
-	GtkBinClass parent_class;
+	GtkWidgetClass parent_class;
 
 	/* My methods.
 	 */

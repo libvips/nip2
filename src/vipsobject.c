@@ -71,7 +71,7 @@ vo_free( Vo *vo )
 	heap_unregister_element( vo->rc->heap, &vo->out );
 	VIPS_UNREF( vo->object );
 
-	im_free( vo );
+	g_free( vo );
 }
 
 static Vo *

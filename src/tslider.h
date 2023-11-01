@@ -16,7 +16,7 @@
 typedef double (*TsliderFn)( double from, double to, double value );
 
 typedef struct _Tslider {
-	GtkWidget parent_instance;
+	GtkWidget parent_class;
 
 	/* Our state.
 	 */

@@ -19,10 +19,25 @@ CLI_DIST = nip4-cli.c
 endif
 
 nip4_SOURCES = \
+	vipsobject.c \
+	vipsobject.h \
+	plotmodel.c \
+	plotmodel.h \
+	progress.c \
+	progress.h \
+	panechild.h \
+	plotpresent.c \
+	plotpresent.h \
+	plotstatus.h \
+	floatwindow.h \
+	vobject.c \
+	vobject.h \
 	action.c \
 	action.h \
-	boxes.c \
 	boxes.h \
+	popupbutton.h \
+	imageheader.h \
+	preview.h \
 	builtin.c \
 	builtin.h \
 	cache.c \
@@ -65,6 +80,17 @@ nip4_SOURCES = \
 	expr.h \
 	filemodel.c \
 	filemodel.h \
+	pane.h \
+	pathname.c \
+	pathname.h \
+	fontname.c \
+	fontname.h \
+	group.c \
+	group.h \
+	pathnameview.c \
+	pathnameview.h \
+	fontnameview.c \
+	fontnameview.h \
 	filesel.c \
 	filesel.h \
 	floatwindow.c \

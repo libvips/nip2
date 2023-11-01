@@ -152,17 +152,13 @@ struct _iWindow {
 	guint parent_unmap_sid; 	/* Watch parent death here */
 
 	GtkWidget *work;
-	/* FIXME
-	GtkAccelGroup *accel_group;
-	 */
+	// GtkAccelGroup *accel_group;
 	Infobar *infobar;
 
 	char *title;
 
 	/* Action stuff. We init this and add a few common actions to help out
 	 * subclasses.
-	 */
-	/* FIXME
 	GtkActionGroup *action_group;
 	GtkUIManager *ui_manager;
 	 */
@@ -187,10 +183,7 @@ struct _iWindow {
 	 */
 	iWindowShape shape;		/* Global shape ... for hglass */
 	GSList *contexts;		/* Set of other requested shapes */
-
-	/* FIXME
-	GdkWindow *work_window;		
-	 */
+	// GdkWindow *work_window;		/* The window we actually set */
 
 	/* Size memorization.
 	 */
@@ -238,18 +231,18 @@ void iwindow_notify_null( void *client, iWindowResult result );
 
 GType iwindow_get_type( void );
 
-GtkWidget *iwindow_new( void );
+GtkWidget *iwindow_new( GType type );
 void iwindow_set_title( iWindow *, const char *, ... )
 	__attribute__((format(printf, 2, 3)));
 void iwindow_set_build( iWindow *, iWindowBuildFn, void *, void *, void * );
 void iwindow_set_popdown( iWindow *, iWindowFn, void * );
 void iwindow_set_size_prefs( iWindow *, const char *, const char * );
-void iwindow_set_work_window( iWindow *iwnd, GtkWindow *work_window );
+//void iwindow_set_work_window( iWindow *iwnd, GdkWindow *work_window );
 void iwindow_set_parent( iWindow *, GtkWidget *par );
 
 void iwindow_build( iWindow * );
 void *iwindow_kill( iWindow * );
-void iwindow_kill_action_cb( GAction *action, iWindow *iwnd );
+//void iwindow_kill_action_cb( GtkAction *action, iWindow *iwnd );
 
 GtkWidget *iwindow_get_root( GtkWidget *widget );
 GtkWidget *iwindow_get_root_noparent( GtkWidget *widget );

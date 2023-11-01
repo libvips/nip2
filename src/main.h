@@ -45,13 +45,13 @@ extern gboolean main_option_verbose;		/* Verbose output */
 
 /* Styles for buttons etc.
  */
-extern GtkStyle *default_style;
-extern GtkStyle *selected_style;
-extern GtkStyle *error_style;
-extern GtkStyle *ok_style;
-extern GtkStyle *tooltip_style;
-extern GtkStyle *leaf_style;
-extern GtkStyle *dirty_style;
+//extern GtkStyle *default_style;
+//extern GtkStyle *selected_style;
+//extern GtkStyle *error_style;
+//extern GtkStyle *ok_style;
+//extern GtkStyle *tooltip_style;
+//extern GtkStyle *leaf_style;
+//extern GtkStyle *dirty_style;
 
 void main_quit_test( void );
 void main_reload( void );

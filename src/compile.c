@@ -788,7 +788,7 @@ compile_graph( Compile *compile, ParseNode *pn, PElement *out )
 			break;
 
 		case PARSE_CONST_BOOL:
-			PEPUTP( out, ELEMENT_BOOL, pn->con.val.bool );
+			PEPUTP( out, ELEMENT_BOOL, pn->con.val.bol );
 			break;
 
 		case PARSE_CONST_ELIST:
@@ -2496,7 +2496,7 @@ compile_pattern_condition( Compile *compile,
 	int i;
 
 	n.type = PARSE_CONST_BOOL;
-	n.val.bool = TRUE;
+	n.val.bol = TRUE;
 	node = tree_const_new( compile, n );
 
 	for( i = depth - 1; i >= 0; i-- ) {

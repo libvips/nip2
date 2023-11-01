@@ -33,42 +33,38 @@
 
 #include "ip.h"
 
-/* The popup menu.
- */
-static GtkWidget *plotstatus_menu = NULL;
-
 G_DEFINE_TYPE( Plotstatus, plotstatus, GTK_TYPE_FRAME ); 
 
 static void
-plotstatus_columns_destroy( Plotstatus *plotstatus )
+plotstatus_columns_dispose( Plotstatus *plotstatus )
 {
 	int i;
 
 	for( i = 0; i < plotstatus->columns; i++ ) 
-		DESTROY_GTK( plotstatus->label[i] );
+		VIPS_UNREF( plotstatus->label[i] );
 
-	IM_FREE( plotstatus->label );
+	VIPS_FREE( plotstatus->label );
 
 	plotstatus->columns = 0;
 }
 
 static void
-plotstatus_destroy( GtkWidget *widget )
+plotstatus_dispose( GObject *object )
 {
 	Plotstatus *plotstatus;
 
-	g_return_if_fail( widget != NULL );
-	g_return_if_fail( IS_PLOTSTATUS( widget ) );
+	g_return_if_fail( object != NULL );
+	g_return_if_fail( IS_PLOTSTATUS( object ) );
 
-	plotstatus = PLOTSTATUS( widget );
+	plotstatus = PLOTSTATUS( object );
 
 #ifdef DEBUG
-	printf( "plotstatus_destroy\n" );
+	printf( "plotstatus_dispose\n" );
 #endif /*DEBUG*/
 
-	plotstatus_columns_destroy( plotstatus );
+	plotstatus_columns_dispose( plotstatus );
 
-	GTK_WIDGET_CLASS( plotstatus_parent_class )->destroy( widget );
+	G_OBJECT_CLASS( plotstatus_parent_class )->dispose( object );
 }
 
 /* Hide this plotstatus.
@@ -82,58 +78,44 @@ plotstatus_hide_cb( GtkWidget *menu, GtkWidget *host, Plotstatus *plotstatus )
 static void
 plotstatus_class_init( PlotstatusClass *class )
 {
-	GtkWidgetClass *widget_class = (GtkWidgetClass *) class;
+	GObjectClass *object_class = (GObjectClass *) class;
 
-	GtkWidget *pane;
-
-	widget_class->destroy = plotstatus_destroy;
+	object_class->dispose = plotstatus_dispose;
 
 	/* Create signals.
 	 */
 
 	/* Init methods.
 	 */
-
-	pane = plotstatus_menu = popup_build( _( "Status bar menu" ) );
-	popup_add_but( pane, "window-close", 
-		POPUP_FUNC( plotstatus_hide_cb ) );
 }
 
 static void
 plotstatus_init( Plotstatus *plotstatus )
 {
 	GtkWidget *vb, *hb;
-	GtkWidget *eb;
 
 	plotstatus->plotmodel = NULL;
 	plotstatus->label = NULL;
 	plotstatus->columns = 0;
 
-        gtk_frame_set_shadow_type( GTK_FRAME( plotstatus ), GTK_SHADOW_OUT );
-
-	eb = gtk_event_box_new();
-        gtk_container_add( GTK_CONTAINER( plotstatus ), eb );
-        popup_attach( eb, plotstatus_menu, plotstatus );
-
 	vb = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0 );
-        gtk_container_set_border_width( GTK_CONTAINER( vb ), 1 );
-        gtk_container_add( GTK_CONTAINER( eb ), vb );
+	gtk_container_add( GTK_CONTAINER( plotstatus ), vb );
 
 	plotstatus->top = gtk_label_new( "" );
-        gtk_box_pack_start( GTK_BOX( vb ), plotstatus->top, TRUE, TRUE, 0 );
+	gtk_box_pack_start( GTK_BOX( vb ), plotstatus->top, TRUE, TRUE, 0 );
 
 	hb = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 5 );
-        gtk_box_pack_start( GTK_BOX( vb ), hb, TRUE, TRUE, 0 );
+	gtk_box_pack_start( GTK_BOX( vb ), hb, TRUE, TRUE, 0 );
 
 	plotstatus->pos = gtk_label_new( "" );
 	set_fixed( plotstatus->pos, strlen( "(8888888,8888888)" ) );
-        gtk_box_pack_start( GTK_BOX( hb ), plotstatus->pos, FALSE, FALSE, 0 );
+	gtk_box_pack_start( GTK_BOX( hb ), plotstatus->pos, FALSE, FALSE, 0 );
 
 	plotstatus->hb = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 5 );
-        gtk_box_pack_start( GTK_BOX( hb ), plotstatus->hb, TRUE, TRUE, 0 );
+	gtk_box_pack_start( GTK_BOX( hb ), plotstatus->hb, TRUE, TRUE, 0 );
 
 	plotstatus->mag = gtk_label_new( "" );
-        gtk_box_pack_end( GTK_BOX( hb ), plotstatus->mag, FALSE, FALSE, 0 );
+	gtk_box_pack_end( GTK_BOX( hb ), plotstatus->mag, FALSE, FALSE, 0 );
 
 	gtk_widget_show_all( eb );
 }

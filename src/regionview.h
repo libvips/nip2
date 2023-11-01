@@ -110,7 +110,7 @@ struct _Regionview {
 
 	/* Model info we read for display.
 	 */
-	GtkStateType paint_state;/* prelight/normal/etc. */
+	//GtkStateType paint_state;/* prelight/normal/etc. */
 
 	/* What's on the screen.
 	 */
@@ -120,7 +120,7 @@ struct _Regionview {
 	int ascent;		/* Height of ascenders for text */
 	int dash_offset;
 	guint dash_crawl;	/* Timer for dash crawl animation */
-	GtkStateType last_paint_state;
+	//GtkStateType last_paint_state;
 	RegionviewType last_type;
 	gboolean first;		/* Initial draw (no old pos to remove) */
 	gboolean label_geo;	/* Redo the label geo on refresh, please */

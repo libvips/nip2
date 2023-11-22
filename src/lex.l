@@ -180,7 +180,7 @@ read_char( void )
 
 	/* Read string up to \n, EOF.
 	 */
-	while( (ch = input()) != EOF && ch != '\n' )
+	while( (ch = input()) != EOF && ch != '\n' && ch != '\0')
 		;
 }
 

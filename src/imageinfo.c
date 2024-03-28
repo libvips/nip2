@@ -720,7 +720,6 @@ imageinfo_proxy_add( Imageinfo *imageinfo )
          */ 
 	g_assert( !imageinfo->proxy );
 	if( !(imageinfo->proxy = IM_NEW( imageinfo->im, Imageinfoproxy )) )
-	if( !(imageinfo->proxy = IM_NEW( NULL, Imageinfoproxy )) )
 		return;
 	imageinfo->proxy->im = imageinfo->im;
 	imageinfo->proxy->imageinfo = imageinfo;

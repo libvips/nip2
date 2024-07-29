@@ -16,7 +16,7 @@ analyzing images of many tens of gigabytes. It has a batch mode, so you
 can run any image processing system you develop from the command-line and
 without a GUI.
 
-[![Screenshot](screenshot.png)](screenshot.png)
+![image](https://github.com/user-attachments/assets/aa2c3e0f-9f96-4594-9f1d-62ef770d0775)
 
 ## Installing
 

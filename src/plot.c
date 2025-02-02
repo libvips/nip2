@@ -375,7 +375,7 @@ plot_class_get( Classmodel *classmodel, PElement *root )
 	Imageinfo *ii2;
 	IMAGE *t;
 	DOUBLEMASK *mask;
-	int (*fn)();
+	int (*fn)(VipsImage *, VipsImage *);
 
 	/* nx1 or 1xm images only ... use Bands for columns.
 	 */

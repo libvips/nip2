@@ -108,7 +108,6 @@
 #endif /*HAVE_SYS_STATVFS_H*/
 #ifdef HAVE_SYS_VFS_H
 #include <sys/vfs.h>
-extern int statfs();
 #endif /*HAVE_SYS_VFS_H*/
 #ifdef HAVE_SYS_MOUNT_H
 #include <sys/mount.h>

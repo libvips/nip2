@@ -1,7 +1,12 @@
 # nip2 --- a user interface for libvips
 
-[![Snap
-Status](https://build.snapcraft.io/badge/jcupitt/nip2.svg)](https://build.snapcraft.io/user/jcupitt/nip2)
+We now have a first public test release of nip4, a rewrite of nip2 for the
+gtk4 UI toolkit. If you have some time to try it, any feedback would
+be very welcome:
+
+https://github.com/jcupitt/nip4/releases
+
+## nip2
 
 nip2 is a GUI for the [libvips image processing 
 library](https://libvips.github.io/libvips). It's a little like a spreadsheet:

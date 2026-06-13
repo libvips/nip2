@@ -1,10 +1,9 @@
 # nip2 --- a user interface for libvips
 
-We now have a first public test release of nip4, a rewrite of nip2 for the
-gtk4 UI toolkit. If you have some time to try it, any feedback would
-be very welcome:
+This project has now been fully replaced by the new and better nip4, and
+we don't plan to do any more updates.
 
-https://github.com/jcupitt/nip4/releases
+https://github.com/libvips/nip4
 
 ## nip2
 
